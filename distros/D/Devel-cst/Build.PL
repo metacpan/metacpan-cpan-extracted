@@ -21,6 +21,9 @@ my $builder = Module::Build->new(
     'warnings' => '0'
   },
   'test_requires' => {
+    'File::Spec' => '0',
+    'IO::Handle' => '0',
+    'IPC::Open3' => '0',
     'POSIX' => '0',
     'Test::More' => '0.89',
     'perl' => '5.006'

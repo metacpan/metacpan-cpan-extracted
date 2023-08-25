@@ -151,9 +151,9 @@ sermonaudio.com sermons: audio and video (L<StreamFinder::SermonAudio>),
 soundcloud.com (non-paywalled) songs (L<StreamFinder::SoundCloud>), 
 spreaker.com podcasts (L<StreamFinder::Spreaker>), 
 tunein.com (non-paywalled) radio stations and podcasts 
-(L<StreamFinder::Tunein>), 
+(L<StreamFinder::Tunein>), vimeo.com videos (L<StreamFinder::Vimeo>), 
 youtube.com, et. al and other sites that youtube-dl supports 
-(L<StreamFinder::Youtube>), vimeo.com videos (L<StreamFinder::Vimeo>), 
+(L<StreamFinder::Youtube>), 
 zeno.fm radio stations and podcasts (L<StreamFinder::Zeno>), 
 and L<StreamFinder::Anystream> - search any (other) webpage URL (not supported 
 by any of the other submodules) for streams.  
@@ -537,7 +537,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '2.16';
+our $VERSION = '2.17';
 our $DEBUG = 0;
 
 require Exporter;

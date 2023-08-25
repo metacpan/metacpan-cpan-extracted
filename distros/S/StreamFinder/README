@@ -145,11 +145,11 @@ DESCRIPTION
     soundcloud.com (non-paywalled) songs (StreamFinder::SoundCloud),
     spreaker.com podcasts (StreamFinder::Spreaker), tunein.com
     (non-paywalled) radio stations and podcasts (StreamFinder::Tunein),
-    youtube.com, et. al and other sites that youtube-dl supports
-    (StreamFinder::Youtube), vimeo.com videos (StreamFinder::Vimeo), zeno.fm
-    radio stations and podcasts (StreamFinder::Zeno), and
-    StreamFinder::Anystream - search any (other) webpage URL (not supported
-    by any of the other submodules) for streams.
+    vimeo.com videos (StreamFinder::Vimeo), youtube.com, et. al and other
+    sites that youtube-dl supports (StreamFinder::Youtube), zeno.fm radio
+    stations and podcasts (StreamFinder::Zeno), and StreamFinder::Anystream
+    - search any (other) webpage URL (not supported by any of the other
+    submodules) for streams.
 
     NOTE: StreamFinder::Podcastaddict is now considered depreciated and may
     be removed in a later StreamFinder release as it now requires a specific

@@ -2,10 +2,10 @@
 
 Generate random chicken noises.
 
-> Bwak cluck cock-a-doodle-doo bwak bwak honk! Pukaaak waaak cluck cluck bok
-> bwok cock-a-doodle-doo bwok cock-a-doodle-doo cluckity bwak cluck-cluck-cluck
-> bwwwaaaaaaaaaak? Honk gobble-gobble bwak bok waaak bwak waaak puk bok
-> gobble-gobble bwok cock-a-doodle-doo...
+> Honk cluck-cluck-cluck bwok cluck! Gobble-gobble cluck waaak cluck-a-buh-gawk
+> cluck-a-buh-gawk honk bwwwaaaaaaaaaak? Honk COCK-A-DOODLE-DOO bwok
+> cock-a-doodle-doo CLUCKITY cluck-a-buh-gawk bwok cluck. Cluck-a-buh-gawk
+> gobble-gobble bwok bwwwaaaaaaaaaak PUK bok bwwwaaaaaaaaaak...
 >
 > &mdash; Some [chicken][chicken-chicken-chicken], probably
 
@@ -21,7 +21,7 @@ This module ships a script, `chicken-ipsum` which generates paragraphs of text:
 
 ```sh
 $ chicken-ipsum
-Cluck-a-buh-gawk pukaaak cock-a-doodle-doo waaak puk honk... Cluck bok cluck cluck-a-buh-gawk cock-a-doodle-doo cluck cluckity! Cluck-a-buh-gawk honk waaak cluck bwak cock-a-doodle-doo honk. Waaak cluck-cluck-cluck cock-a-doodle-doo bwak pukaaak cluck-cluck-cluck cluck-cluck-cluck cluck-a-buh-gawk pukaaak. Bok pukaaak bok honk. Bwak cluckity bwwwaaaaaaaaaak bwok gobble-gobble bwok cluck cluck-a-buh-gawk bok cluck-cluck-cluck cluck pukaaak...
+Cluck cluck-a-buh-gawk bok honk bwak bwak bwok cluckity. BWAK cluck-a-buh-gawk cock-a-doodle-doo puk gobble-gobble waaak gobble-gobble cock-a-doodle-doo. Cluck bwok honk cluck?
 ```
 
 It accepts a single integer argument, being the number of chicken-y paragraphs to generate.

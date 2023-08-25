@@ -1,6 +1,6 @@
 #!perl
-use strict;
-use warnings;
+use 5.012;
+use warnings FATAL => 'all';
 
 use Test::More 'no_plan';
 
@@ -10,12 +10,14 @@ use Symbol qw/ gensym /;
 use FindBin qw//;
 my $script = "$FindBin::RealBin/../chicken-ipsum.in";
 
+require Chicken::Ipsum;
+
 ok -f $script, 'script exists';
 
 # Test run with no arguments
 my ($stdout, $stderr, $ret) = run_script();
 is $ret, 0, 'script exits 0';
-like $stdout, qr/^[A-Z][a-z]/, 'beginning of script output is a capitalized word';
+like $stdout, qr/^[A-Z]/, 'beginning of script output is a capitalized word';
 like $stdout, qr/[!.?]/, 'script output contains a sentence-ending mark';
 like $stdout, qr/\n$/, 'script output ends with a newline';
 is $stderr, '', 'script does not output on stderr';
@@ -23,7 +25,7 @@ is $stderr, '', 'script does not output on stderr';
 # Test getting only one paragraph
 ($stdout, $stderr, $ret) = run_script('1');
 is $ret, 0, 'script (1) exits 0';
-like $stdout, qr/^[A-Z][a-z]/, 'beginning of script output (1) is a capitalized word';
+like $stdout, qr/^[A-Z]/, 'beginning of script output (1) is a capitalized word';
 like $stdout, qr/[!.?]/, 'script output (1) contains a sentence-ending mark';
 like $stdout, qr/\n$/, 'script output (1) ends with a newline';
 unlike $stdout, qr/\n\n/, 'script output (1) does not contain more than one paragraph';
@@ -32,7 +34,7 @@ is $stderr, '', 'script (1) does not output on stderr';
 # Test getting only one paragraph
 ($stdout, $stderr, $ret) = run_script('4');
 is $ret, 0, 'script (4) exits 0';
-like $stdout, qr/^[A-Z][a-z]/, 'beginning of script output (4) is a capitalized word';
+like $stdout, qr/^[A-Z]/, 'beginning of script output (4) is a capitalized word';
 like $stdout, qr/[!.?]/, 'script output (4) contains a sentence-ending mark';
 like $stdout, qr/\n$/, 'script output (4) ends with a newline';
 like $stdout, qr/\n\n/, 'script output (4) contains more than one paragraph';

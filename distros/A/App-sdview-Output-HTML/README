@@ -1,0 +1,26 @@
+NAME
+
+    App::sdview::Output::HTML - generate HTML output from App::sdview
+
+SYNOPSIS
+
+       $ sdview Some/File.pod -o HTML > index.html
+
+DESCRIPTION
+
+    This output module adds to App::sdview the ability to output HTML; or
+    at least, a page fragment that might be used to construct a full HTML
+    page.
+
+    Currently, no header or CSS is generated, only the main body content by
+    relatively simple conversion - headers to <h1>, <h2>, etc.. and inline
+    formatting within paragraphs.
+
+TODO
+
+      * Customisable page header, CSS, general page template?
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

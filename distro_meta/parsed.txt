@@ -86460,3 +86460,9 @@ O/OA/OALDERS/Pithub-0.01041.tar.gz
 T/TU/TURNERJW/StreamFinder-2.16.tar.gz
 R/RW/RWI/UML-PlantUML-Encoder-0.03.tar.gz
 A/AB/ABALAMA/WWW-Suffit-Server-1.00.tar.gz
+P/PE/PEVANS/App-sdview-Output-HTML-0.01.tar.gz
+K/KA/KARMAN/CatalystX-CRUD-0.58.tar.gz
+D/DC/DCHURCH/Chicken-Ipsum-1.000000.tar.gz
+L/LE/LEONT/Devel-cst-0.011.tar.gz
+H/HA/HANGY/GS1-SyntaxEngine-FFI-0.2.tar.gz
+T/TU/TURNERJW/StreamFinder-2.17.tar.gz

@@ -1,8 +1,6 @@
-package Chicken::Ipsum;
-use strict;
+package Chicken::Ipsum 1.000000;
+use 5.012;
 use warnings;
-
-our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -40,6 +38,7 @@ cawing and other chicken-y noises.
 
 =cut
 
+use Carp qw/ croak /;
 use List::Util qw/ sample /;
 
 use constant WORDS => [qw/
@@ -73,20 +72,48 @@ use constant MAX_PARAGRAPH_SENTENCES => 7;
 
 =head2 C<new()>
 
-The default constructor, C<new()> takes no arguments and returns a
-Chicken::Ipsum object.
+    my $ci = Chicken::Ipsum->new( %options )
+
+This method constructs a new L<Chicken::Ipsum> object and returns it. Key/value
+pair arguments may be provided to set up the initial state. The following
+options are recognized:
+
+   KEY                     DEFAULT
+   -----------             --------------------
+   frantic                 0.1
+
+=over
+
+=item frantic
+
+Randomly capitalize words with the given ratio.
+
+=back
 
 =cut
 
 sub new {
-    my ($class) = @_;
-    return bless {
+    my ($class, %args) = @_;
+    my $self = bless {
+        frantic => 0.1,
     }, $class;
+
+    foreach my $opt (keys %{$self}) {
+        if (exists $args{$opt}) {
+            $self->{$opt} = delete $args{$opt};
+        }
+    }
+    # Ensure all incoming arguments were used
+    if (%args) {
+        croak('Unrecognized argument(s): ', join ', ', sort keys %args);
+    }
+    return $self;
 }
 
 =head1 METHODS
 
-All methods below will return a string in scalar context or list in list context.
+All methods below will return a string in scalar context or a list in list
+context.
 
 =head2 C<words( INTEGER )>
 
@@ -97,6 +124,11 @@ Returns INTEGER Chicken words.
 sub words {
     my ($self, $num) = @_;
     my @words = sample $num, @{+WORDS};
+    foreach my $word (@words) {
+        if (rand 1 < $self->{frantic}) {
+            $word = uc $word;
+        }
+    }
     return wantarray ? @words : "@words";
 }
 
@@ -145,7 +177,7 @@ sub _get_punctuation {
 
 sub _get_sentence {
     my $self = shift;
-    my $num = MIN_SENTENCE_WORDS + int rand MAX_SENTENCE_WORDS;
+    my $num = MIN_SENTENCE_WORDS + int rand MAX_SENTENCE_WORDS - MIN_SENTENCE_WORDS;
     my $words = ucfirst $self->words($num);
     return $words . _get_punctuation();
 }
@@ -160,7 +192,7 @@ L<Text::Lorem>
 
 L<https://isotropic.org/papers/chicken.pdf>
 
-=head1 COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
 
 Copyright (C) 2023 Dan Church.
 

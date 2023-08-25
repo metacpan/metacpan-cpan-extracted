@@ -34,13 +34,14 @@
          "requires" : {
             "Carp" : "0",
             "List::Util" : "1.54",
-            "perl" : "5.008"
+            "perl" : "5.012"
          }
       },
       "test" : {
          "requires" : {
             "FindBin" : "0",
             "IPC::Open3" : "0",
+            "Math::BigInt" : "0",
             "Symbol" : "0",
             "Test::More" : "0"
          }
@@ -60,6 +61,6 @@
          "web" : "https://codeberg.org/h3xx/perl-Chicken-Ipsum"
       }
    },
-   "version" : "0.03",
+   "version" : "1.000000",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

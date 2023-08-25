@@ -4,7 +4,7 @@ StreamFinder::Rumble - Fetch actual raw streamable URLs from Rumble.com.
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2021 by
+This module is Copyright (C) 2017-2023 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -319,7 +319,7 @@ L<http://search.cpan.org/dist/StreamFinder-Rumble/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2021 Jim Turner.
+Copyright 2017-2023 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -472,7 +472,8 @@ sub new
 
 			$self->{'artist'} = $1  if ($html =~ m#class\=\"media-heading-name\"\>([^\<]+)\<#s);
 			$self->{'artist'} ||= $1  if ($html =~ m#\<button data-title=\"([^\"]+)#s);
-			$self->{'artist'} =~ s/\s+$//;
+			$self->{'artist'} =~ s/^\s+//s;
+			$self->{'artist'} =~ s/\s+$//s;
 
 			$self->{'albumartist'} = 'https://rumble.com' . $1  if ($html =~ m#href\=\"([^\"]+)\" rel=author#s);
 
@@ -482,7 +483,13 @@ sub new
 			$self->{'description'} ||= $1  if ($html =~ m#<meta\s+name\=description\"?\s+content\=\"\:\"([^\"]+)#s);
 			$self->{'description'} ||= $1  if ($html =~ m#<meta\s+property\=\"?og\:description\"?\s+content\=\"\:\"([^\"]+)#s);
 			$self->{'description'} ||= $1  if ($html =~ m#\<meta\s+name\=\"?twitter\:description\"?\s+content\=\"([^\"]+)\"#s);
-
+			$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
+			$self->{'description'} = uri_unescape($self->{'description'});
+			$self->{'description'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
+			$self->{'description'} =~ s/\<\/?(?:br|p|button)[^\>]*\>/\n/gis;
+			$self->{'description'} =~ s/^\s+//s;
+			$self->{'description'} =~ s/\n\n\n+/\n\n/s;
+			$self->{'description'} =~ s/\s+$//s;
 			$self->{'iconurl'} = ($html =~ m#\"thumbnailUrl\"\:\"([^\"]+)#s) ? $1 : '';
 			$self->{'iconurl'} ||= $1  if ($html =~ m#\<meta\s+property\=\"?og\:image\"?\s+content\=\"?([^\<]+)\<#s);
 			$self->{'iconurl'} =~ s/\"$//;
@@ -492,7 +499,7 @@ sub new
 				$self->{'articonurl'} = $1  if ($stuff =~ m#url\(([^\)]+)#);
 			}
 
-			if ($html =~ m#Published(.+?)\<span#s) {
+			if ($html =~ m#Published(.+?)\<span#s) {   #JWT:NOTE: CAN'T USE $self->{'created'} HERE!:
 				my $published = $1;
 				$self->{'year'} = $1  if ($published =~ /(\d\d\d\d)/);
 			}
@@ -561,9 +568,9 @@ sub new
 					}
 				}
 			}			
-			if ($self->{'year'} !~ /\d\d\d\d/ && $html =~ m#\"pubDate\"\:\"([^\"]+)#s) {
-				my $published = $1;
-				$self->{'year'} = $1  if ($published =~ /(\d\d\d\d)/);
+			if ($html =~ m#\"pubDate\"\:\"([^\"]+)#s) {
+				$self->{'created'} = $1;
+				$self->{'year'} ||= $1  if ($self->{'created'} =~ /(\d\d\d\d)/);
 			}
 			return $url2;
 		} else {
@@ -611,10 +618,13 @@ TRYIT:
 	$self->{'imageurl'} = $self->{'iconurl'};
 	$self->{'total'} = $self->{'cnt'};
 	$self->{'Url'} = ($self->{'cnt'} > 0) ? $self->{'streams'}->[0] : '';
-	print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
-			if ($DEBUG && $self->{'cnt'} > 0);
-	print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--1ST=".$self->{'Url'}."=\n--streams=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
-	print STDERR "--ICON=".$self->{'iconurl'}."= ARTICON=".$self->{'articonurl'}."=\n"  if ($DEBUG);
+	if ($DEBUG) {
+		foreach my $i (sort keys %{$self}) {
+			print STDERR "--KEY=$i= VAL=".$self->{$i}."=\n";
+		}
+		print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
+				if ($self->{'cnt'} > 0);
+	}
 	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!

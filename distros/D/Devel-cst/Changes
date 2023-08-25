@@ -1,5 +1,9 @@
 Revision history for Devel-cst
 
+0.011     2023-08-25 18:21:45+02:00 Europe/Brussels
+          - Correct check for being loaded first
+          - Always use psiginfo
+
 0.010     2016-11-25 13:20:55+01:00 Europe/Amsterdam
           - No longer use alternative signal stack for bus faults
           - Free buffer in stacktrace function

@@ -1,10 +1,10 @@
 package Devel::cst;
-$Devel::cst::VERSION = '0.010';
+$Devel::cst::VERSION = '0.011';
+BEGIN { $^P = 0 if $^P == 0x73f and not defined &DB::DB and caller eq ($] >= '5.036' ? 'Devel::cst' : 'main') and keys %INC == 1 }
 use strict;
 use warnings;
 use XSLoader;
 
-$^P = 0 if $^P == 0x73f && not defined &DB::DB && caller eq 'main' && keys %INC == 1;
 XSLoader::load(__PACKAGE__, __PACKAGE__->VERSION);
 
 1;
@@ -23,7 +23,7 @@ Devel::cst - C stacktraces for GNU systems
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

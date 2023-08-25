@@ -10,7 +10,7 @@ use mro 'c3';
 
 __PACKAGE__->mk_accessors(qw( inc_path ));
 
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 
 # test whether symlink() works at compile time
 my $SYMLINK_SUPPORTED = eval { symlink( "", "" ); 1 };

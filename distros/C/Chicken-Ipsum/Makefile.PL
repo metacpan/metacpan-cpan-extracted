@@ -1,5 +1,4 @@
-use 5.008;
-use strict;
+use 5.012;
 use warnings;
 require ExtUtils::MakeMaker;
 
@@ -12,13 +11,14 @@ my %writemakefileargs = (
     VERSION_FROM     => 'lib/Chicken/Ipsum.pm',
     ABSTRACT_FROM    => 'lib/Chicken/Ipsum.pm',
     LICENSE          => 'perl_5',
-    MIN_PERL_VERSION => '5.008',
+    MIN_PERL_VERSION => '5.012',
     CONFIGURE_REQUIRES => {qw(
         ExtUtils::MakeMaker 0
     )},
     TEST_REQUIRES => {qw(
         FindBin 0
         IPC::Open3 0
+        Math::BigInt 0
         Symbol 0
         Test::More 0
     )},

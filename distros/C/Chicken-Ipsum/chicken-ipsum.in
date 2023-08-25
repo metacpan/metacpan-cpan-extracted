@@ -1,5 +1,5 @@
 #!perl
-use strict;
+use 5.012;
 use warnings;
 
 # :squash-remove-start:
@@ -26,21 +26,26 @@ if (@ARGV > 1) {
 }
 
 my $num_paragraphs = int (shift // 1);
-print scalar Chicken::Ipsum->new->paragraphs($num_paragraphs), "\n";
+say scalar Chicken::Ipsum->new->paragraphs($num_paragraphs);
 
 sub USAGE {
-    return "Usage: chicken-ipsum [NUM]\n";
+    return <<'EOUSAGE'
+Usage: chicken-ipsum [NUM]
+EOUSAGE
 }
 
 sub HELP_MESSAGE {
-    return USAGE(),
-        "Generate NUM paragraphs of random chicken noises (1 paragraph by default)\n\n",
-        "Options:\n",
-        "    --help      Show this message\n",
-        "    --version   Show version\n",
-        ;
+    return USAGE() . <<'EOHELP';
+Generate NUM paragraphs of random chicken noises (1 paragraph by default)
+
+Options:
+    --help      Show this message
+    --version   Show version
+EOHELP
 }
 
 sub VERSION_MESSAGE {
-    return "chicken-ipsum (Chicken::Ipsum) $Chicken::Ipsum::VERSION\n";
+    return <<"EOVERSION";
+chicken-ipsum (Chicken::Ipsum) $Chicken::Ipsum::VERSION
+EOVERSION
 }

@@ -1,5 +1,8 @@
 Revision history for CatalystX-CRUD
 
+0.58 25 Aug 2023
+ - https://github.com/karpet/catalystx-crud/pull/1
+
 0.57 07 Dec 2015
  - failure to load object now returns 404 rather than throwing a 500.
 

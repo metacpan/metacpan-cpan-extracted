@@ -3,8 +3,8 @@
    "author" : [
       "Leon Timmermans <leont@cpan.org>"
    ],
-   "dynamic_config" : "1",
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -28,15 +28,10 @@
       "develop" : {
          "requires" : {
             "Devel::PPPort" : "3.23",
-            "File::Spec" : "0",
-            "IO::Handle" : "0",
-            "IPC::Open3" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Test::More" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08",
-            "blib" : "1.01",
-            "perl" : "5.006"
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
@@ -50,6 +45,9 @@
       },
       "test" : {
          "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "POSIX" : "0",
             "Test::More" : "0.89",
             "perl" : "5.006"
@@ -59,18 +57,17 @@
    "provides" : {
       "Devel::CStacktrace" : {
          "file" : "lib/Devel/CStacktrace.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       },
       "Devel::cst" : {
          "file" : "lib/Devel/cst.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-devel-cst at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Devel-cst"
+         "web" : "https://github.com/Leont/devel-cstacktrace/issues"
       },
       "repository" : {
          "type" : "git",
@@ -78,10 +75,9 @@
          "web" : "https://github.com/Leont/devel-cstacktrace"
       }
    },
-   "version" : "0.010",
-   "x_contributors" : [
-      "Leon Timmermans <fawaka@gmail.com>"
-   ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0215"
+   "version" : "0.011",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

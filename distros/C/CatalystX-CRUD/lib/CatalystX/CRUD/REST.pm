@@ -11,7 +11,7 @@ use Try::Tiny;
 __PACKAGE__->mk_accessors(qw( enable_rpc_compat ));
 __PACKAGE__->config( enable_rpc_compat => 0 );
 
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 
 #warn "REST VERSION = $VERSION";
 

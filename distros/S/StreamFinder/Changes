@@ -549,3 +549,8 @@ Revision history for StreamFinder
         javascripted & crapped up their podcast pages making it now impossible 
         to fetch a playlist or first episode from them (correct episode pages 
         still seem to work for now, if you get them from your browser first).
+2.17    2023/08/25
+        - StreamFinder::Rumble - Further Cleanup artist and description fields 
+        of excess leading & trailing spacing likely introduced by possible 
+        tweaks in their site.  This issue was causing Fauxdacious mediaplayer 
+        to fail to properly load display metadata for Rumble streams.

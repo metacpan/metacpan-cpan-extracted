@@ -1,5 +1,5 @@
 package Devel::CStacktrace;
-$Devel::CStacktrace::VERSION = '0.010';
+$Devel::CStacktrace::VERSION = '0.011';
 use strict;
 use warnings;
 use Devel::cst ();
@@ -22,7 +22,7 @@ Devel::CStacktrace - C stacktraces for GNU systems
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

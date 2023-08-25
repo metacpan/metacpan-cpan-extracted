@@ -1,6 +1,6 @@
 #!perl
-use strict;
-use warnings;
+use 5.012;
+use warnings FATAL => 'all';
 
 use Test::More 'no_plan';
 require_ok 'Chicken::Ipsum';

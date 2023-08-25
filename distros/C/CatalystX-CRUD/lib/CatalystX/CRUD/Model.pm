@@ -9,7 +9,7 @@ use base qw(
     Catalyst::Model
 );
 
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 
 __PACKAGE__->mk_accessors(qw( object_class page_size ));
 
