@@ -4,9 +4,10 @@
 #  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
+use warnings;
 use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
 
-package Tickit::Widget::Scroller 0.29;
+package Tickit::Widget::Scroller 0.30;
 class Tickit::Widget::Scroller
    :strict(params)
    :isa(Tickit::Widget);
@@ -71,9 +72,17 @@ display
 =cut
 
 style_definition base =>
-   indicator_rv => 1;
+   indicator_rv => 1,
+   "<Down>"     => "scroll_down_line",
+   "<Up>"       => "scroll_up_line",
+   "<PageDown>" => "scroll_down_halfpage",
+   "<PageUp>"   => "scroll_up_halfpage",
+   "<C-Home>"   => "scroll_to_top",
+   "<C-End>"    => "scroll_to_bottom",
+   ;
 
 use constant WIDGET_PEN_FROM_STYLE => 1;
+use constant KEYPRESSES_FROM_STYLE => 1;
 
 =head1 KEYBINDINGS
 
@@ -902,26 +911,17 @@ method render_to_rb ( $rb, $rect )
    }
 }
 
-my %bindings = (
-   Down => sub { $_[0]->scroll( +1 ) },
-   Up   => sub { $_[0]->scroll( -1 ) },
+method key_scroll_to_top    { $self->scroll_to_top }
+method key_scroll_to_bottom { $self->scroll_to_bottom }
 
-   PageDown => sub { $_[0]->scroll( +int( $_[0]->window->lines / 2 ) ) },
-   PageUp   => sub { $_[0]->scroll( -int( $_[0]->window->lines / 2 ) ) },
+method key_scroll_up_line   { $self->scroll( -1 ) }
+method key_scroll_down_line { $self->scroll( +1 ) }
 
-   'C-Home' => sub { $_[0]->scroll_to_top },
-   'C-End'  => sub { $_[0]->scroll_to_bottom },
-);
+method key_scroll_up_halfpage   { $self->scroll( -int( $self->window->lines / 2 ) ) }
+method key_scroll_down_halfpage { $self->scroll( +int( $self->window->lines / 2 ) ) }
 
-method on_key ( $ev )
-{
-   if( $ev->type eq "key" and my $code = $bindings{$ev->str} ) {
-      $code->( $self );
-      return 1;
-   }
-
-   return 0;
-}
+method key_scroll_up_page   { $self->scroll( $self->window->lines ) }
+method key_scroll_down_page { $self->scroll( $self->window->lines ) }
 
 method on_mouse ( $ev )
 {
@@ -1034,10 +1034,6 @@ method update_indicators ()
 
 Abstract away the "item storage model" out of the actual widget. Implement
 more storage models, such as database-driven ones.. more dynamic.
-
-=item *
-
-Keybindings
 
 =back
 

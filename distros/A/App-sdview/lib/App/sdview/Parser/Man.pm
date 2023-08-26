@@ -9,7 +9,7 @@ use utf8;
 
 use Object::Pad 0.800;
 
-package App::sdview::Parser::Man 0.10;
+package App::sdview::Parser::Man 0.11;
 class App::sdview::Parser::Man
    :does(App::sdview::Parser)
    :strict(params);
@@ -17,6 +17,8 @@ class App::sdview::Parser::Man
 use Parse::Man::DOM 0.03;
 
 use String::Tagged;
+
+use constant sort_order => 30;
 
 sub find_file ( $class, $name )
 {

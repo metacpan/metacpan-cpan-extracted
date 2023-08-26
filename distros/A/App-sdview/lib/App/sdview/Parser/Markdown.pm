@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.800;
 
-package App::sdview::Parser::Markdown 0.10;
+package App::sdview::Parser::Markdown 0.11;
 class App::sdview::Parser::Markdown
    :does(App::sdview::Parser)
    :strict(params);
@@ -18,6 +18,7 @@ use File::Slurper 'read_text';
 use String::Tagged::Markdown;
 
 use constant format => "Markdown";
+use constant sort_order => 20;
 
 sub find_file ( $class, $name ) { return undef }
 

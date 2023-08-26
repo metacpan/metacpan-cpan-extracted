@@ -1,5 +1,12 @@
 Revision history for App-sdview
 
+0.11    2023-08-25
+        [CHANGES]
+         * Use `Module::Pluggable` to find Parser and Output classes
+         * Add some POD documentation, at least to the Output modules
+         * Move style information into new `App::sdview::Style` module
+         * Other preparations for Tickit-based output module
+
 0.10    2023-08-24
         [CHANGES]
          * Updated to Object::Pad v0.800

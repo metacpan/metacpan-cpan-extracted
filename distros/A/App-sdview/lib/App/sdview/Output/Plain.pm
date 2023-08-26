@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
@@ -9,12 +9,30 @@ use utf8;
 
 use Object::Pad 0.800;
 
-package App::sdview::Output::Plain 0.10;
+package App::sdview::Output::Plain 0.11;
 class App::sdview::Output::Plain
    :isa(App::sdview::Output::Formatted)
    :strict(params);
 
 use constant format => "plain";
+
+=head1 NAME
+
+C<App::sdview::Output::Plain> - generate plain-text output from L<App::sdview>
+
+=head1 SYNOPSIS
+
+   $ sdview README.pod -o plain > README.txt
+
+=head1 DESCRIPTION
+
+This output module allows L<App::sdview> to generate output text without any
+special formatting, other than indentation and spacing applied in plain text
+characters. The generated output should be similar to the formatted output
+rendered for terminal use, except with none of the embedded terminal control
+codes used to apply formatting.
+
+=cut
 
 method setup_output ()
 {
@@ -48,5 +66,11 @@ method generate ( @p )
 
    return Encode::decode( "UTF-8", $outbuf );
 }
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
 
 0x55AA;

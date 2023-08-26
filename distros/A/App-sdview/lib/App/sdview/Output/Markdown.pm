@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
 
 use Object::Pad 0.800;
 
-package App::sdview::Output::Markdown 0.10;
+package App::sdview::Output::Markdown 0.11;
 class App::sdview::Output::Markdown
    :does(App::sdview::Output)
    :strict(params);
@@ -16,6 +16,24 @@ class App::sdview::Output::Markdown
 use String::Tagged::Markdown 0.02;
 
 use constant format => "Markdown";
+
+=head1 NAME
+
+C<App::sdview::Output::Markdown> - generate Markdown output from L<App::sdview>
+
+=head1 SYNOPSIS
+
+   $ sdview README.pod -o Markdown > README.md
+
+=head1 DESCRIPTION
+
+This output module adds to L<App::sdview> the ability to output text in
+Markdown formatting. Given a Markdown file as input, the output should be
+relatively similar, up to minor details like whitespacing. Given input in some
+other format, it will do a reasonable job attempting to represent most of the
+structure and formatting.
+
+=cut
 
 method output_head1 ( $para ) { $self->_output_head( "#",    $para ); }
 method output_head2 ( $para ) { $self->_output_head( "##",   $para ); }
@@ -106,5 +124,11 @@ method _convert_str ( $s )
       }
    )->build_markdown;
 }
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
 
 0x55AA;

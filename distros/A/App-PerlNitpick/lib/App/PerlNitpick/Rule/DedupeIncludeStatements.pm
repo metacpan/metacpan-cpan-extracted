@@ -18,10 +18,22 @@ sub rewrite {
     }
 
     for my $el (@to_delete) {
-        $el->remove;
+        $self->_remove_with_trailing_characters($el);
     }
 
     return $document;
+}
+
+sub _remove_with_trailing_characters {
+    my ($self, $el) = @_;
+
+    while ( my $next = $el->next_sibling ) {
+        last if !$next->isa('PPI::Token::Whitespace');
+        $next->remove;
+        last if $next eq "\n";
+    }
+    $el->remove;
+    return;
 }
 
 no Moose;

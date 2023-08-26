@@ -286,8 +286,6 @@ TODO
       Implement more storage models, such as database-driven ones.. more
       dynamic.
 
-      * Keybindings
-
 AUTHOR
 
     Paul Evans <leonerd@leonerd.org.uk>

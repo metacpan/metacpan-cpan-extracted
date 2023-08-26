@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Tickit::Test;
 
@@ -51,13 +51,13 @@ is_display( [ "The first line",
             'Display initially' );
 
 is( scalar $scroller->line2item( 0 ),     0, 'scalar line2item 0' );
-is_deeply( [ $scroller->line2item( 0 ) ], [ 0, 0 ], 'line2item 0' );
-is_deeply( [ $scroller->line2item( 1 ) ], [ 1, 0 ], 'line2item 1' );
-is_deeply( [ $scroller->line2item( 2 ) ], [ 2, 0 ], 'line2item 2' );
-is_deeply( [ $scroller->line2item( 3 ) ], [ ],      'line2item 3' );
+is( [ $scroller->line2item( 0 ) ], [ 0, 0 ], 'line2item 0' );
+is( [ $scroller->line2item( 1 ) ], [ 1, 0 ], 'line2item 1' );
+is( [ $scroller->line2item( 2 ) ], [ 2, 0 ], 'line2item 2' );
+is( [ $scroller->line2item( 3 ) ], [ ],      'line2item 3' );
 
-is_deeply( [ $scroller->line2item( -1 ) ], [ ],      'line2item -1' );
-is_deeply( [ $scroller->line2item( -23 ) ], [ 2, 0 ], 'line2item -23' );
+is( [ $scroller->line2item( -1 ) ], [ ],      'line2item -1' );
+is( [ $scroller->line2item( -23 ) ], [ 2, 0 ], 'line2item -23' );
 
 is( $scroller->item2line( 0 ),     0, 'item2line 0' );
 is( $scroller->item2line( 0, -1 ), 0, 'item2line 0, -1' );
@@ -97,14 +97,14 @@ is_display( [ "The first line",
               "The third line" ],
             'Display after narrowing' );
 
-is_deeply( [ $scroller->line2item( 0 ) ], [ 0, 0 ], 'line2item 0' );
-is_deeply( [ $scroller->line2item( 1 ) ], [ 1, 0 ], 'line2item 1' );
-is_deeply( [ $scroller->line2item( 2 ) ], [ 1, 1 ], 'line2item 2' );
-is_deeply( [ $scroller->line2item( 3 ) ], [ 2, 0 ], 'line2item 3' );
-is_deeply( [ $scroller->line2item( 4 ) ], [ ],      'line2item 4' );
+is( [ $scroller->line2item( 0 ) ], [ 0, 0 ], 'line2item 0' );
+is( [ $scroller->line2item( 1 ) ], [ 1, 0 ], 'line2item 1' );
+is( [ $scroller->line2item( 2 ) ], [ 1, 1 ], 'line2item 2' );
+is( [ $scroller->line2item( 3 ) ], [ 2, 0 ], 'line2item 3' );
+is( [ $scroller->line2item( 4 ) ], [ ],      'line2item 4' );
 
-is_deeply( [ $scroller->line2item( -1 ) ], [ ],      'line2item -1' );
-is_deeply( [ $scroller->line2item( -22 ) ], [ 2, 0 ], 'line2item -22' );
+is( [ $scroller->line2item( -1 ) ], [ ],      'line2item -1' );
+is( [ $scroller->line2item( -22 ) ], [ 2, 0 ], 'line2item -22' );
 
 is( $scroller->item2line( 0 ),     0, 'item2line 0' );
 is( $scroller->item2line( 0, -1 ), 0, 'item2line 0, -1' );

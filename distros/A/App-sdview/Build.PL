@@ -17,6 +17,7 @@ my $build = Module::Build->new(
       'File::Slurper' => 0,
       'List::Keywords' => 0,
       'List::Util' => 0,
+      'Module::Pluggable' => 0,
       'Parse::Man::DOM' => '0.03',
       'Pod::Simple' => 0,
       'String::Tagged' => '0.15',

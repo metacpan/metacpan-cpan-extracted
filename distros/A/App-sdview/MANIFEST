@@ -14,6 +14,7 @@ lib/App/sdview/Parser.pm
 lib/App/sdview/Parser/Man.pm
 lib/App/sdview/Parser/Markdown.pm
 lib/App/sdview/Parser/Pod.pm
+lib/App/sdview/Style.pm
 LICENSE
 MANIFEST			This list of files
 META.json
@@ -27,3 +28,4 @@ t/20output-pod.t
 t/21output-markdown.t
 t/22output-man.t
 t/30output-plain.t
+t/99pod.t

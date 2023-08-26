@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Tickit::Test 0.12;
 
@@ -62,8 +62,8 @@ is( $scroller->item2line( 1, -1 ), 3, 'item2line 1, -1 initially' );
 is( $scroller->item2line( 2,  0 ), 4, 'item2line 2, 0 initially' );
 is( $scroller->item2line( 2, -1 ), undef, 'item2line 2, -1 initially offscreen' );
 
-is_deeply( [ $scroller->item2line( 2, -1 )    ], [ undef, "below" ], 'list item2line 2, -1 initially below screen' );
-is_deeply( [ $scroller->item2line( 2, -1, 1 ) ], [ 5,     "below" ], 'list item2line 2, -1 initially below screen with count_offscreen' );
+is( [ $scroller->item2line( 2, -1 )    ], [ undef, "below" ], 'list item2line 2, -1 initially below screen' );
+is( [ $scroller->item2line( 2, -1, 1 ) ], [ 5,     "below" ], 'list item2line 2, -1 initially below screen with count_offscreen' );
 
 is( $scroller->lines_above, 0, 'lines_above initially' );
 is( $scroller->lines_below, 13, 'lines_below initially' );
@@ -108,10 +108,10 @@ is( $scroller->item2line( 5,  0 ), 0, 'item2line 5, 0 after scroll +10' );
 is( $scroller->item2line( 5, -1 ), 1, 'item2line 5, -1 after scroll +10' );
 is( $scroller->item2line( 8,  0 ), undef, 'item2line 8, 0 offscreen after scroll +10' );
 
-is_deeply( [ $scroller->item2line( 0, 0 )    ], [ undef, "above" ], 'list item2line 0, 0 above screen after scroll +10' );
-is_deeply( [ $scroller->item2line( 0, 0, 1 ) ], [ -10,   "above" ], 'list item2line 0, 0 above screen after scroll +10 with count_offscreen' );
-is_deeply( [ $scroller->item2line( 8, 0 )    ], [ undef, "below" ], 'list item2line 8, 0 below screen after scroll +10' );
-is_deeply( [ $scroller->item2line( 8, 0, 1 ) ], [ 6,     "below" ], 'list item2line 8, 0 below screen after scroll +10 with count_offscreen' );
+is( [ $scroller->item2line( 0, 0 )    ], [ undef, "above" ], 'list item2line 0, 0 above screen after scroll +10' );
+is( [ $scroller->item2line( 0, 0, 1 ) ], [ -10,   "above" ], 'list item2line 0, 0 above screen after scroll +10 with count_offscreen' );
+is( [ $scroller->item2line( 8, 0 )    ], [ undef, "below" ], 'list item2line 8, 0 below screen after scroll +10' );
+is( [ $scroller->item2line( 8, 0, 1 ) ], [ 6,     "below" ], 'list item2line 8, 0 below screen after scroll +10 with count_offscreen' );
 
 is( $scroller->lines_above, 10, 'lines_above after scroll +10' );
 is( $scroller->lines_below,  3, 'lines_below after scroll +10' );

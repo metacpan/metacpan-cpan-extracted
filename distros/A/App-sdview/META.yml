@@ -16,46 +16,50 @@ name: App-sdview
 provides:
   App::sdview:
     file: lib/App/sdview.pm
-    version: '0.10'
+    version: '0.11'
   App::sdview::Output:
     file: lib/App/sdview/Output.pm
-    version: '0.10'
+    version: '0.11'
   App::sdview::Output::Formatted:
     file: lib/App/sdview/Output/Formatted.pm
-    version: '0.10'
+    version: '0.11'
   App::sdview::Output::Man:
     file: lib/App/sdview/Output/Man.pm
-    version: '0.10'
+    version: '0.11'
   App::sdview::Output::Markdown:
     file: lib/App/sdview/Output/Markdown.pm
-    version: '0.10'
+    version: '0.11'
   App::sdview::Output::Plain:
     file: lib/App/sdview/Output/Plain.pm
-    version: '0.10'
+    version: '0.11'
   App::sdview::Output::Pod:
     file: lib/App/sdview/Output/Pod.pm
-    version: '0.10'
+    version: '0.11'
   App::sdview::Output::Terminal:
     file: lib/App/sdview/Output/Terminal.pm
-    version: '0.10'
+    version: '0.11'
   App::sdview::Parser:
     file: lib/App/sdview/Parser.pm
-    version: '0.10'
+    version: '0.11'
   App::sdview::Parser::Man:
     file: lib/App/sdview/Parser/Man.pm
-    version: '0.10'
+    version: '0.11'
   App::sdview::Parser::Markdown:
     file: lib/App/sdview/Parser/Markdown.pm
-    version: '0.10'
+    version: '0.11'
   App::sdview::Parser::Pod:
     file: lib/App/sdview/Parser/Pod.pm
-    version: '0.10'
+    version: '0.11'
+  App::sdview::Style:
+    file: lib/App/sdview/Style.pm
+    version: '0.11'
 requires:
   Convert::Color: '0'
   Convert::Color::XTerm: '0.06'
   File::Slurper: '0'
   List::Keywords: '0'
   List::Util: '0'
+  Module::Pluggable: '0'
   Object::Pad: '0.800'
   Object::Pad::FieldAttr::Checked: '0.04'
   Parse::Man::DOM: '0.03'
@@ -68,5 +72,5 @@ requires:
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

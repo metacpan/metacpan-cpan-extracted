@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
+use warnings;
 use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Tickit::Widget::Scroller::Item::Text 0.29;
+package Tickit::Widget::Scroller::Item::Text 0.30;
 class Tickit::Widget::Scroller::Item::Text
    :strict(params);
 
@@ -55,23 +56,52 @@ The following options are recognised in C<%opts>:
 If the text item needs to wrap, indent the second and subsequent lines by this
 amount. Does not apply to the first line.
 
+=item margin_left => INT
+
+=item margin_right => INT
+
+I<Since version 0.30.>
+
+A number of columns to leave blank at the left and right edge of the item.
+This applies outside of any additional space added by C<indent>.
+
+=item margin => INT
+
+I<Since version 0.30.>
+
+Shortcut to setting both C<margin_left> and C<margin_right> to the same value.
+
+=item pen => Tickit::Pen
+
+A pen to set for rendering the item, including erasing its background. This
+will not be set while erasing area required for its margin.
+
 =back
 
 =cut
 
 sub BUILDARGS ( $class, $text, %opts ) { return ( text => $text, %opts ) }
 
-field $_indent;
+field $_indent       :param = undef;
+field $_margin_left         = 0;
+field $_margin_right        = 0;
 field @_chunks;
+field $_pen          :param = undef;
 
 field $_width; # width for which the @_lineruns are valid
 field @_lineruns;
 
 ADJUST :params (
-   :$indent = undef,
-   :$text   = undef,
+   :$margin_left  = undef,
+   :$margin_right = undef,
+   :$margin       = undef,
+   :$text         = undef,
 ) {
-   $_indent = $indent if defined $indent;
+   $margin_left  //= $margin;
+   $margin_right //= $margin;
+
+   $_margin_left  = $margin_left  if defined $margin_left;
+   $_margin_right = $margin_right if defined $margin_right;
 
    @_chunks = $self->_build_chunks_for( $text );
 }
@@ -110,6 +140,7 @@ following line.
 method _build_chunks_for ( $text )
 {
    my @lines = split m/\n/, $text, -1;
+   @lines or @lines = ( "" ); # if blank
    my $lastline = pop @lines;
    return ( map { [ $_, textwidth( $_ ), linebreak => 1 ] } @lines ),
             [ $lastline, textwidth( $lastline ) ];
@@ -119,6 +150,9 @@ method chunks { @_chunks }
 
 method height_for_width ( $width )
 {
+   # Just pretend the width doesn't include the margins
+   $width -= ( $_margin_left + $_margin_right );
+
    $_width = $width;
 
    my @chunks = $self->chunks;
@@ -181,6 +215,12 @@ method render ( $rb, %args )
       my $indent = ( $lineidx && $_indent ) ? $_indent : 0;
 
       $rb->goto( $lineidx, 0 );
+      $rb->erase( $_margin_left ) if $_margin_left;
+
+      if( $_pen ) {
+         $rb->savepen;
+         $rb->setpen( $_pen );
+      }
       $rb->erase( $indent ) if $indent;
 
       foreach my $chunk ( $_lineruns[$lineidx]->@* ) {
@@ -188,7 +228,14 @@ method render ( $rb, %args )
          $rb->text( $text, $chunkpen );
       }
 
-      $rb->erase_to( $cols );
+      if( $_pen ) {
+         $rb->erase_to( $cols - $_margin_right );
+         $rb->restore;
+         $rb->erase_to( $cols ) if $_margin_right;
+      }
+      else {
+         $rb->erase_to( $cols );
+      }
    }
 }
 

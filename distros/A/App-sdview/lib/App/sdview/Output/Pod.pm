@@ -1,19 +1,37 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
 
 use Object::Pad 0.800;
 
-package App::sdview::Output::Pod 0.10;
+package App::sdview::Output::Pod 0.11;
 class App::sdview::Output::Pod
    :does(App::sdview::Output)
    :strict(params);
 
 use constant format => "POD";
+
+=head1 NAME
+
+C<App::sdview::Output::Pod> - generate POD output from L<App::sdview>
+
+=head1 SYNOPSIS
+
+   $ sdview README.md -o POD > README.pod
+
+=head1 DESCRIPTION
+
+This output module adds to L<App::sdview> the ability to output text in POD
+formatting. Given a POD file as input, the output should be relatively
+similar, up to minor details like whitespacing. Given input in some other
+format, it will do a reasonable job attempting to represent most of the
+structure and formatting.
+
+=cut
 
 field $_printed_pod;
 
@@ -121,5 +139,24 @@ method _convert_str ( $s )
 
    return $ret;
 }
+
+=head1 TODO
+
+=over 4
+
+=item *
+
+Some handling of tables. POD does not (currently?) support tables, but at
+least we could emit some kind of plain-text rendering of the contents.
+
+=back
+
+=cut
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
 
 0x55AA;

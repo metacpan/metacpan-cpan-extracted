@@ -1,5 +1,5 @@
 package App::PerlNitpick::Rule::RemoveEffectlessUTF8Pragma;
-# ABSTRACT: Re-quote strings with single quotes ('') if they look "simple"
+# ABSTRACT: Remove `use utf8;` if all characters in the source file file are in ASCII.
 
 use Moose;
 use PPI::Document;
@@ -12,9 +12,8 @@ sub rewrite {
             my $st = $_[1];
             $st->isa('PPI::Statement::Include') && $st->schild(0) eq 'use' && $st->schild(1) eq 'utf8';
         }
-    );
-    return $doc unless $use_utf8_statements;
-    
+    ) or return $doc;
+
     my $chars_outside_ascii_range = 0;
     for (my $tok = $doc->first_token; $tok && $chars_outside_ascii_range == 0; $tok = $tok->next_token) {
         next unless $tok->significant;

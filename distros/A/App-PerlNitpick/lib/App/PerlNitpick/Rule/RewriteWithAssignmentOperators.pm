@@ -5,6 +5,29 @@ use PPI::Token::Whitespace;
 
 no Moose;
 
+use constant IS_REWRITABLE => { map { $_ => 1 } (
+    '*', '/', '%', 'x', '+', '-', '.',
+    '//', '||',
+    '|', '&', '^',
+    '|.', '&.', '^.',
+    '<<', '>>'
+) };
+
+sub is_rewritable {
+    my ($op) = @_;
+    return IS_REWRITABLE->{$op};
+}
+
+sub _trim_whitespace {
+    my ($elem) = @_;
+
+    my $e = $elem->next_sibling;
+    while (! $e->significant) {
+        $e->remove;
+        $e = $elem->next_sibling;
+    }
+}
+
 sub rewrite {
     my ($self, $document) = @_;
 
@@ -19,10 +42,10 @@ sub rewrite {
 
         ($c1->isa('PPI::Token::Operator') && $c1->content eq '=') &&
         ($c5->isa('PPI::Token::Structure') && $c5->content eq ';') &&
-        ($c3->isa('PPI::Token::Operator') && $c3->content !~ m{\A( -> | > | < | \.)\z}x) &&
+        ($c3->isa('PPI::Token::Operator') && is_rewritable($c3->content)) &&
         ($c0->isa('PPI::Token::Symbol') && $c0->raw_type eq '$' &&
-        $c2->isa('PPI::Token::Symbol') && $c2->raw_type eq '$' &&
-        $c1->content && $c2->content)
+         $c2->isa('PPI::Token::Symbol') && $c2->raw_type eq '$' &&
+         $c0->content eq $c2->content)
     } grep {
         $_->schildren == 6
     } @{ $document->find('PPI::Statement') ||[] };
@@ -32,12 +55,15 @@ sub rewrite {
     for my $statement (@found) {
         my @child = $statement->schildren;
 
-        # assigment operator :)
-        my $assop = PPI::Token::Operator->new($child[3]->content . $child[1]->content);
+        my $assigment_operator = PPI::Token::Operator->new($child[3]->content . $child[1]->content);
 
         $child[3]->remove;
+
+        _trim_whitespace($child[2]);
         $child[2]->remove;
-        $child[1]->insert_after($assop);
+
+        $child[2]->remove;
+        $child[1]->insert_after($assigment_operator);
         $child[1]->remove;
     }
 

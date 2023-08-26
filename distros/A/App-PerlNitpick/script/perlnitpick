@@ -16,10 +16,13 @@ GetOptions(
     "l|list",
     "r|rules=s",
     "i|inplace",
+    "version",
 );
 
 if ($args{h} || (0 == keys %args)) {
     pod2usage({ -sections => 'USAGE' });
+} elsif ($args{version}) {
+    print $App::PerlNitpick::VERSION, "\n";
 } elsif ($args{l}) {
     App::PerlNitpick::Nitpicker->list_rules;
 } elsif ($args{r}) {
@@ -51,5 +54,6 @@ perlnitpick [options] [paths]
    -l --list	  List available rules
    -r --rules     Comma-separate list of rules to apply
    -i --inplace   Rewrite files in-place
+   --version      Print version and exit
 
 perlnitpick rewrite perl code found under those paths according to the given rules.

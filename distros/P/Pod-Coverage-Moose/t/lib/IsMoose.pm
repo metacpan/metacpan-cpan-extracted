@@ -2,7 +2,7 @@
 
 =head2 IsMoose->baz
 
-The baz method
+The C<baz> method
 
 =cut
 

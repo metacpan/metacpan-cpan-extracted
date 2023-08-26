@@ -1,10 +1,8 @@
 #!perl
 use Test2::V0;
-
 use App::PerlNitpick::Rule::RemoveUnnecessaryScalarKeyword;
 
 subtest 'Remove only the imported subroutine' => sub {
-
     my $code_in = 'my $n = scalar @items;';
     my $code_out = 'my $n = @items;';
 

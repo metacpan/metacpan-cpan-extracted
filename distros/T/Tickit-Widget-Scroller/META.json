@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -27,7 +27,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88",
+            "Test2::V0" : "0",
             "Tickit::Test" : "0.12"
          }
       }
@@ -35,15 +35,15 @@
    "provides" : {
       "Tickit::Widget::Scroller" : {
          "file" : "lib/Tickit/Widget/Scroller.pm",
-         "version" : "0.29"
+         "version" : "0.30"
       },
       "Tickit::Widget::Scroller::Item::RichText" : {
          "file" : "lib/Tickit/Widget/Scroller/Item/RichText.pm",
-         "version" : "0.29"
+         "version" : "0.30"
       },
       "Tickit::Widget::Scroller::Item::Text" : {
          "file" : "lib/Tickit/Widget/Scroller/Item/Text.pm",
-         "version" : "0.29"
+         "version" : "0.30"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
       ],
       "x_IRC" : "irc://irc.freenode.net/#tickit"
    },
-   "version" : "0.29",
+   "version" : "0.30",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

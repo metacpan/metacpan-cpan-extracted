@@ -1,11 +1,12 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Tickit::Test 0.12;
+use Tickit::Pen;
 use Tickit::RenderBuffer;
 
 use Tickit::Widget::Scroller::Item::Text;
@@ -14,11 +15,11 @@ my $term = mk_term;
 
 my $item = Tickit::Widget::Scroller::Item::Text->new( "My message here" );
 
-isa_ok( $item, "Tickit::Widget::Scroller::Item::Text", '$item' );
+isa_ok( $item, [ "Tickit::Widget::Scroller::Item::Text" ], '$item' );
 
-is_deeply( [ $item->chunks ],
-           [ [ "My message here", 15 ] ],
-           '$item->chunks' );
+is( [ $item->chunks ],
+    [ [ "My message here", 15 ] ],
+    '$item->chunks' );
 
 is( $item->height_for_width( 80 ), 1, 'height_for_width 80' );
 
@@ -142,10 +143,10 @@ drain_termlog;
 
    my $item = Tickit::Widget::Scroller::Item::Text->new( "Some more text\nwith linefeeds" );
 
-   is_deeply( [ $item->chunks ],
-              [ [ "Some more text", 14, linebreak => 1 ],
-                [ "with linefeeds", 14 ] ],
-              '$item->chunks with linefeeds' );
+   is( [ $item->chunks ],
+       [ [ "Some more text", 14, linebreak => 1 ],
+         [ "with linefeeds", 14 ] ],
+       '$item->chunks with linefeeds' );
 
    is( $item->height_for_width( 80 ), 2, 'height_for_width 2 with linefeeds' );
 
@@ -180,9 +181,9 @@ drain_termlog;
 
    my $item = Tickit::Widget::Scroller::Item::Text->new( "(ノಠ益ಠ)ノ彡┻━┻" );
 
-   is_deeply( [ $item->chunks ],
-              [ [ "(ノಠ益ಠ)ノ彡┻━┻", 15 ] ],
-              '$item->chunks with Unicode' );
+   is( [ $item->chunks ],
+       [ [ "(ノಠ益ಠ)ノ彡┻━┻", 15 ] ],
+       '$item->chunks with Unicode' );
 
    is( $item->height_for_width( 80 ), 1, 'height_for_width 2 with Unicode' );
 
@@ -200,6 +201,57 @@ drain_termlog;
 
    is_display( [ [TEXT("(ノಠ益ಠ)ノ彡┻━┻")] ],
                'Display for render with Unicode' );
+}
+
+# Empty
+{
+   $term->clear;
+   drain_termlog;
+
+   my $item = Tickit::Widget::Scroller::Item::Text->new( "" );
+
+   is( [ $item->chunks ],
+      [ [ "", 0 ] ],
+      '$item->chunks for empty string' );
+
+   is( $item->height_for_width( 80 ), 1, 'height_for_width 1 for empty string' );
+
+   $item->render( $rb, top => 0, firstline => 0, lastline => 0, width => 80, height => 1 );
+   $rb->flush_to_term( $term );
+
+   flush_tickit;
+
+   is_termlog( [ GOTO(0,0),
+                 SETPEN,
+                 ERASECH(80) ],
+               'Termlog for render for empty string' );
+
+   is_display( [ ],
+               'Display for render for empty string' );
+}
+
+# With pen
+{
+   $term->clear;
+   drain_termlog;
+
+   my $item = Tickit::Widget::Scroller::Item::Text->new( "Red with green BG",
+      pen => Tickit::Pen->new( fg => "red", bg => "green" )
+   );
+
+   $item->height_for_width( 80 );
+
+   $item->render( $rb, top => 0, firstline => 0, lastline => 0, width => 80, height => 1 );
+   $rb->flush_to_term( $term );
+
+   flush_tickit;
+
+   is_termlog( [ GOTO(0,0),
+                 SETPEN(fg=>1,bg=>2),
+                 PRINT("Red with green BG"),
+                 SETPEN(fg=>1,bg=>2),
+                 ERASECH(63) ],
+               'Termlog for render with pen' );
 }
 
 done_testing;

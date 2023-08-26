@@ -1,9 +1,9 @@
-package Pod::Coverage::Moose; # git description: v0.06-2-g7fc3173
+package Pod::Coverage::Moose; # git description: v0.07-13-g19d14b4
 # ABSTRACT: Pod::Coverage extension for Moose
 # KEYWORDS: pod coverage verification validity tests documentation completeness moose methods inheritance
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Moose;
 
@@ -24,7 +24,7 @@ use namespace::autoclean;
 #pod =head1 DESCRIPTION
 #pod
 #pod When using L<Pod::Coverage> in combination with L<Moose>, it will
-#pod report any method imported from a Role. This is especially bad when
+#pod report any method imported from a L<role|Moose::Role>. This is especially bad when
 #pod used in combination with L<Test::Pod::Coverage>, since it takes away
 #pod its ease of use.
 #pod
@@ -173,7 +173,7 @@ Pod::Coverage::Moose - Pod::Coverage extension for Moose
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -185,7 +185,7 @@ version 0.07
 =head1 DESCRIPTION
 
 When using L<Pod::Coverage> in combination with L<Moose>, it will
-report any method imported from a Role. This is especially bad when
+report any method imported from a L<role|Moose::Role>. This is especially bad when
 used in combination with L<Test::Pod::Coverage>, since it takes away
 its ease of use.
 
@@ -266,10 +266,10 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 (or L<bug-Pod-Coverage-Moose@rt.cpan.org|mailto:bug-Pod-Coverage-Moose@rt.cpan.org>).
 
 There is also a mailing list available for users of this distribution, at
-http://lists.perl.org/list/moose.html.
+L<http://lists.perl.org/list/moose.html>.
 
 There is also an irc channel available for users of this distribution, at
-irc://irc.perl.org/#moose.
+L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
 
 =head1 AUTHOR
 
@@ -295,7 +295,7 @@ Dave Rolsky <autarch@urth.org>
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2007 by Robert 'phaylon' Sedlacek.
 

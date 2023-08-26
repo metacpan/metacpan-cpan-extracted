@@ -19,7 +19,26 @@ DESCRIPTION
     To actually use it, you likely wanted wanted to see the bin/sdview
     script.
 
+       $ sdview Some::Module
+    
+       $ sdview lib/Some/Module.pm
+    
+       $ sdview README.md
+    
+       $ sdview man/somelib.3
+
+    Various output plugins exist. By default it will output a
+    terminal-formatted rendering of the document via the less pager, but it
+    can also output plaintext, POD, Markdown.
+
+       $ sdview Some::Module -o plain > module.txt
+    
+       $ sdview Some::Module -o Markdown > module.md
+
 TODO
+
+      * Customisable formatting and style information in
+      App::sdview::Style.
 
       * Add more formats. ReST perhaps. Maybe others too.
 
@@ -27,7 +46,7 @@ TODO
 
       * Other outputs. Consider a Tickit-based frontend.
 
-      Also more structured file writers - ReST and maybe also HTML output.
+      Also more structured file writers - ReST.
 
 AUTHOR
 

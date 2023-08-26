@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -16,7 +17,7 @@ my $build = Module::Build->new(
       'Tickit::Pen' => '0.19',
    },
    test_requires => {
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
       'Tickit::Test' => '0.12',
    },
    auto_configure_requires => 0, # Don't add M::B to configure_requires

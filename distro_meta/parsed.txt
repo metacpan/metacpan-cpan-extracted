@@ -86466,3 +86466,9 @@ D/DC/DCHURCH/Chicken-Ipsum-1.000000.tar.gz
 L/LE/LEONT/Devel-cst-0.011.tar.gz
 H/HA/HANGY/GS1-SyntaxEngine-FFI-0.2.tar.gz
 T/TU/TURNERJW/StreamFinder-2.17.tar.gz
+P/PE/PERLANCAR/App-perlmv-scriptlet-add_extension_according_to_mime_type-0.607.tar.gz
+G/GU/GUGOD/App-PerlNitpick-v0.4.0.tar.gz
+P/PE/PEVANS/App-sdview-0.11.tar.gz
+P/PE/PEVANS/App-sdview-Output-Tickit-0.01.tar.gz
+E/ET/ETHER/Pod-Coverage-Moose-0.08.tar.gz
+P/PE/PEVANS/Tickit-Widget-Scroller-0.30.tar.gz

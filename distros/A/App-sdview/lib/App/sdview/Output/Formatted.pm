@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
@@ -9,47 +9,27 @@ use utf8;
 
 use Object::Pad 0.800;
 
-package App::sdview::Output::Formatted 0.10;
+package App::sdview::Output::Formatted 0.11;
 class App::sdview::Output::Formatted :strict(params);
 
 # This isn't itself an output module; but a base class to build them on
 # So no `format` constant.
 
-use Convert::Color;
-use Convert::Color::XTerm 0.06;
+use App::sdview::Style;
+
 use List::Util qw( max );
 use String::Tagged 0.15;  # ->from_sprintf
 
-my %FORMATSTYLES = (
-   B => { bold => 1 },
-   I => { italic => 1 },
-   F => { italic => 1, under => 1 },
-   C => { monospace => 1, bg => Convert::Color->new( "xterm:235" ) },
-   L => { under => 1, fg => Convert::Color->new( "xterm:rgb(3,3,5)" ) }, # light blue
-);
+=head1 NAME
 
-sub _convert_str ( $s )
-{
-   return $s->clone(
-      convert_tags => {
-         ( map { $_ => do { my $k = $_; sub { $FORMATSTYLES{$k}->%* } } } keys %FORMATSTYLES ),
-      },
-   );
-}
+C<App::sdview::Output::Formatted> - base class for generating formatted output from L<App::sdview>
 
-my %PARASTYLES = (
-   head1    => { fg => Convert::Color->new( "vga:yellow" ), bold => 1 },
-   head2    => { fg => Convert::Color->new( "vga:cyan" ), bold => 1, indent => 2 },
-   head3    => { fg => Convert::Color->new( "vga:green" ), bold => 1, indent => 4 },
-   head4    => { fg => Convert::Color->new( "xterm:217" ), under => 1, indent => 5 },
-   plain    => { indent => 6, blank_after => 1 },
-   verbatim => { indent => 8, blank_after => 1, $FORMATSTYLES{C}->%* },
-   list     => { indent => 6 },
-   leader   => { bold => 1 },
-   table    => { indent => 8 },
-   "table-heading" => { bold => 1 },
-);
-$PARASTYLES{item} = $PARASTYLES{plain};
+=head1 DESCRIPTION
+
+This module is the base class used by  both L<App::sdview::Output::Plain> and
+L<App::sdview::Output::Terminal>. It shouldn't be used directly.
+
+=cut
 
 field $_TERMWIDTH;
 field $_nextblank;
@@ -85,18 +65,12 @@ method _output_para ( $para, %opts )
    my $margin = $opts{margin} // 0;
    my $leader = $opts{leader};
    my $indent = $opts{indent};
-   my %typestyle;
 
-   $PARASTYLES{ $para->type } or
-      die "Unrecognised paragraph style for " . $para->type;
-
-   # TODO: merge typestyle argument
-   $PARASTYLES{ $para->type } and
-      %typestyle = ( $PARASTYLES{ $para->type }->%* );
+   my %typestyle = App::sdview::Style->para_style( $para->type )->%*;
 
    $self->say() if $_nextblank;
 
-   my $text = _convert_str( $para->text );
+   my $text = App::sdview::Style->convert_str( $para->text );
 
    $typestyle{$_} and $text->apply_tag( 0, -1, $_ => $typestyle{$_} )
       for qw( fg bg bold under italic monospace );
@@ -145,7 +119,7 @@ method _output_para ( $para, %opts )
          my $prefix = " "x$margin;;
 
          if( defined $leader ) {
-            my %leaderstyle = $PARASTYLES{leader}->%*;
+            my %leaderstyle = App::sdview::Style->para_style( "leader" )->%*;
             $leaderstyle{$_} and $leader->apply_tag( 0, -1, $_ => $leaderstyle{$_} )
                for qw( fg bg bold under italic monospace );
 
@@ -180,7 +154,7 @@ method _output_list( $listtype, $para, %opts )
    my $n = $para->initial;
 
    my $margin = $opts{margin} // 0;
-   my $indent = $PARASTYLES{list}{indent} // 0;
+   my $indent = App::sdview::Style->para_style( "list" )->{indent} // 0;
 
    foreach my $item ( $para->items ) {
       my $leader;
@@ -194,7 +168,7 @@ method _output_list( $listtype, $para, %opts )
          $leader = String::Tagged->from_sprintf( "%d.", $n++ );
       }
       elsif( $listtype eq "text" ) {
-         $leader = _convert_str( $item->term );
+         $leader = App::sdview::Style->convert_str( $item->term );
       }
 
       my $code = $self->can( "output_" . ( $item->type =~ s/-/_/gr ) ) or
@@ -213,7 +187,7 @@ method output_table ( $para, %opts )
    my $margin = $opts{margin} // 0;
    my $indent = $opts{indent};
 
-   my %typestyle = $PARASTYLES{table}->%*;
+   my %typestyle = App::sdview::Style->para_style( "table" )->%*;
 
    $indent //= $typestyle{indent};
    $indent //= 0;
@@ -239,14 +213,14 @@ method output_table ( $para, %opts )
       }
 
       my %rowstyle = %typestyle;
-      %rowstyle = ( $PARASTYLES{ "table-heading" }->%*, %rowstyle ) if $firstrow;
+      %rowstyle = ( App::sdview::Style->para_style( "table-heading" )->%*, %rowstyle ) if $firstrow;
 
       my $out = "│";
 
       foreach my $colidx ( 0 .. $maxcol ) {
          my $cell = $row->[$colidx];
 
-         my $text = _convert_str( $cell->text );
+         my $text = App::sdview::Style->convert_str( $cell->text );
 
          $rowstyle{$_} and $text->apply_tag( 0, -1, $_ => $rowstyle{$_} )
             for qw( fg bg bold under italic monospace );
@@ -267,5 +241,11 @@ method output_table ( $para, %opts )
 
    $self->say( " " x $indent, "└", join( "┴", @hrules ), "┘" );
 }
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
 
 0x55AA;

@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Tickit::Test;
 use Tickit::RenderBuffer;
@@ -21,14 +21,15 @@ $str->apply_tag( 11, 4, u => 1 );
 
 my $item = Tickit::Widget::Scroller::Item::RichText->new( $str );
 
-isa_ok( $item, "Tickit::Widget::Scroller::Item::Text", '$item' );
+isa_ok( $item, [ "Tickit::Widget::Scroller::Item::Text" ], '$item' );
 
-is_deeply( [ $item->chunks ],
-           [ [ "My ",     3, pen => Tickit::Pen->new() ],
-             [ "message", 7, pen => Tickit::Pen->new( b => 1 ) ],
-             [ " ",       1, pen => Tickit::Pen->new() ],
-             [ "here",    4, pen => Tickit::Pen->new( u => 1 ) ] ],
-           '$item->chunks' );
+is( [ $item->chunks ],
+   # Stringify the pens so Test2 will compare the stringified versions
+    [ [ "My ",     3, pen => "".Tickit::Pen->new() ],
+      [ "message", 7, pen => "".Tickit::Pen->new( b => 1 ) ],
+      [ " ",       1, pen => "".Tickit::Pen->new() ],
+      [ "here",    4, pen => "".Tickit::Pen->new( u => 1 ) ] ],
+    '$item->chunks' );
 
 is( $item->height_for_width( 80 ), 1, 'height_for_width 80' );
 
@@ -63,12 +64,12 @@ is_display( [ [TEXT("My "), TEXT("message",b=>1), BLANK(1), TEXT("here",u=>1)] ]
 
    my $item = Tickit::Widget::Scroller::Item::RichText->new( $str );
 
-   is_deeply( [ $item->chunks ],
-              [ [ "Another ",    8, pen => Tickit::Pen->new() ],
-                [ "message",     7, pen => Tickit::Pen->new( b => 1 ), linebreak => 1 ],
-                [ "with",        4, pen => Tickit::Pen->new( b => 1 ) ], 
-                [ " linefeeds", 10, pen => Tickit::Pen->new() ] ],
-              '$item->chunks with linefeeds' );
+   is( [ $item->chunks ],
+       [ [ "Another ",    8, pen => "".Tickit::Pen->new() ],
+         [ "message",     7, pen => "".Tickit::Pen->new( b => 1 ), linebreak => 1 ],
+         [ "with",        4, pen => "".Tickit::Pen->new( b => 1 ) ], 
+         [ " linefeeds", 10, pen => "".Tickit::Pen->new() ] ],
+       '$item->chunks with linefeeds' );
 }
 
 # Word wrapping on pen changes

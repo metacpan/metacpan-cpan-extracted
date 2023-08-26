@@ -1,9 +1,6 @@
 #!perl
-use strict;
 use Test2::V0;
-
 use App::PerlNitpick::Rule::AppendUnimportStatement;
-
 
 subtest 'do not append "no Moo::Role";' => sub {
     my $code = <<CODE;
@@ -19,7 +16,6 @@ CODE
     ok $code2 !~ m{no Moose::Role;\n1;\n};
 };
 
-
 subtest 'append "no Moose::Role";' => sub {
     my $code = <<CODE;
 package Bar;
@@ -33,7 +29,6 @@ CODE
     my $code2 = "". $o->rewrite($doc);
     ok $code2 =~ m{no Moose::Role;\n1;\n};
 };
-
 
 subtest 'append "no Mouse::Role";' => sub {
     my $code = <<CODE;

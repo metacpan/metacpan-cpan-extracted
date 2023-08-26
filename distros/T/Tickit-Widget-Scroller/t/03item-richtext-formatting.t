@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 plan skip_all => "Convert::Color::XTerm is not available"
    unless eval { require Convert::Color::XTerm };

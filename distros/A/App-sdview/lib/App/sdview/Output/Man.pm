@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.800;
 
-package App::sdview::Output::Man 0.10;
+package App::sdview::Output::Man 0.11;
 class App::sdview::Output::Man
    :does(App::sdview::Output)
    :strict(params);

@@ -3,9 +3,11 @@
 #
 #  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
+use v5.26;
+use warnings;
 use Object::Pad 0.57;
 
-package Tickit::Widget::Scroller::Item::RichText 0.29;
+package Tickit::Widget::Scroller::Item::RichText 0.30;
 class Tickit::Widget::Scroller::Item::RichText
    :strict(params)
    :isa(Tickit::Widget::Scroller::Item::Text);

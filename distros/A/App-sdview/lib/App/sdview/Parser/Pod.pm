@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.800;
 
-package App::sdview::Parser::Pod 0.10;
+package App::sdview::Parser::Pod 0.11;
 class App::sdview::Parser::Pod
    :isa(Pod::Simple)
    :does(App::sdview::Parser)
@@ -20,6 +20,7 @@ use List::Util qw( min );
 use String::Tagged;
 
 use constant format => "POD";
+use constant sort_order => 10;
 
 sub find_file ( $class, $name )
 {

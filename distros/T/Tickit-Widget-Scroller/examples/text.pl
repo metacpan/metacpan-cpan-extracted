@@ -1,4 +1,4 @@
-use strict;
+use v5.26;
 use warnings;
 
 use Tickit;

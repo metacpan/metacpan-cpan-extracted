@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
@@ -9,7 +9,7 @@ use utf8;
 
 use Object::Pad 0.800;
 
-package App::sdview 0.10;
+package App::sdview 0.11;
 class App::sdview :strict(params);
 
 use List::Keywords qw( first );
@@ -33,32 +33,46 @@ these abilities, extending them or adding new formats.
 
 To actually use it, you likely wanted wanted to see the F<bin/sdview> script.
 
+   $ sdview Some::Module
+
+   $ sdview lib/Some/Module.pm
+
+   $ sdview README.md
+
+   $ sdview man/somelib.3
+
+Various output plugins exist. By default it will output a terminal-formatted
+rendering of the document via the F<less> pager, but it can also output
+plaintext, POD, Markdown.
+
+   $ sdview Some::Module -o plain > module.txt
+
+   $ sdview Some::Module -o Markdown > module.md
+
 =cut
 
-my @PARSER_CLASSES = qw(
-   App::sdview::Parser::Pod
-   App::sdview::Parser::Markdown
-   App::sdview::Parser::Man
-);
+# Permit loaded output modules to override
+our $DEFAULT_OUTPUT = "terminal";
 
-require ( "$_.pm" =~ s{::}{/}gr ) for @PARSER_CLASSES;
+use Module::Pluggable
+   search_path => "App::sdview::Parser",
+   sub_name    => "PARSERS",
+   require     => 1;
 
-my @OUTPUT_CLASSES = qw(
-   App::sdview::Output::Terminal
-   App::sdview::Output::Plain
-   App::sdview::Output::Pod
-   App::sdview::Output::Markdown
-   App::sdview::Output::Man
-);
-
-require ( "$_.pm" =~ s{::}{/}gr ) for @OUTPUT_CLASSES;
+use Module::Pluggable
+   search_path => "App::sdview::Output",
+   sub_name    => "OUTPUTS",
+   require     => 1;
 
 method run ( $file, %opts )
 {
+   my @PARSER_CLASSES = sort { $a->sort_order <=> $b->sort_order } PARSERS();
+   my @OUTPUT_CLASSES = OUTPUTS();
+
    my $parser_class;
 
    if( defined $opts{format} ) {
-      $parser_class = first { $_->format eq $opts{format} } @PARSER_CLASSES or
+      $parser_class = first { $_->can( "format" ) and $_->format eq $opts{format} } @PARSER_CLASSES or
          die "Unrecognised format name $opts{format}\n";
    }
 
@@ -79,9 +93,9 @@ method run ( $file, %opts )
          die "Unable to find a handler for $file\n";
    };
 
-   $opts{output} //= "terminal";
+   $opts{output} //= $DEFAULT_OUTPUT;
 
-   my $output_class = first { $_->format eq $opts{output} } @OUTPUT_CLASSES or
+   my $output_class = first { $_->can( "format" ) and $_->format eq $opts{output} } @OUTPUT_CLASSES or
       die "Unrecognised output name $opts{output}\n";
 
    my @paragraphs = $parser_class->new->parse_file( $file );
@@ -95,6 +109,10 @@ method run ( $file, %opts )
 
 =item *
 
+Customisable formatting and style information in C<App::sdview::Style>.
+
+=item *
+
 Add more formats. ReST perhaps. Maybe others too.
 
 =item *
@@ -105,7 +123,7 @@ Improved Markdown parser. Currently the parser is very simple.
 
 Other outputs. Consider a L<Tickit>-based frontend.
 
-Also more structured file writers - ReST and maybe also HTML output.
+Also more structured file writers - ReST.
 
 =back
 

@@ -1,22 +1,21 @@
 use warnings;
 use strict;
 
-use Test::More;
+use Test::More 0.88;
 use lib 't/lib';
 
-use_ok('Pod::Coverage::Moose')
-    or die "Doesn't make sense to continue without compiling class\n";
+use Pod::Coverage::Moose;
 
 {   package NonMoose;
     sub foo { }
 }
-isa_ok Pod::Coverage::Moose->new(package => 'NonMoose'), 'Pod::Coverage',
-    'non Moose package coverage object';
+isa_ok(Pod::Coverage::Moose->new(package => 'NonMoose'), 'Pod::Coverage',
+    'non Moose package coverage object');
 
 require IsMoose;
 my $pcm = Pod::Coverage::Moose->new(package => 'IsMoose');
-isa_ok $pcm, 'Pod::Coverage::Moose',
-    'Moose package coverage object';
+isa_ok($pcm, 'Pod::Coverage::Moose',
+    'Moose package coverage object');
 
 #use Data::Dump qw( dump );
 #print dump([$pcm->covered]), "\n";

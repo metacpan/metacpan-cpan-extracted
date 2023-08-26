@@ -1,11 +1,11 @@
 use warnings;
 use strict;
 
-use Test::More;
+use Test::More 0.88;
 use lib 't/lib';
 
-use_ok  'TestCoverRequires_Consumer',    'consumer test class loaded ok';
-use_ok  'Pod::Coverage::Moose',             'pcm loaded ok';
+use TestCoverRequires_Consumer;
+use Pod::Coverage::Moose;
 
 my $pcm = Pod::Coverage::Moose->new(package => 'TestCoverRequires_Consumer', cover_requires => 1);
 isa_ok $pcm, 'Pod::Coverage::Moose',

@@ -1,0 +1,29 @@
+NAME
+
+    App::sdview::Output::Tickit - interactive terminal-based viewer for
+    App::sdview
+
+SYNOPSIS
+
+       $ sdview README.pod -o tickit
+
+    (though this is likely the default output mode if this module is
+    installed)
+
+DESCRIPTION
+
+    This output module provides an interactive terminal-viewer for
+    rendering documents in App::sdview, showing formatted information on
+    the terminal. It uses Tickit to provide the terminal interactions.
+
+TODO
+
+      * Search behaviours
+
+      * Follow links, possibly internally implementing a history mechanism
+      or multiple pages.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+
