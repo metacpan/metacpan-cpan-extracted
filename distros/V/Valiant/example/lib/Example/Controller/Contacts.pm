@@ -25,10 +25,6 @@ sub root :At('$path_end/...') Via('../protected')  ($self, $c, $user) {
       return $self->view(list => $contacts);
     }
 
-    sub list_path($self, @args) {
-      return $self->ctx->uri('list', @args);
-    }
-
   # /contacts/...
   sub prepare_build :At('/...') Via('root') ($self, $c, $contacts) {
     $self->view_for('build', contact => my $new_contact = $contacts->new_contact);
@@ -68,7 +64,7 @@ sub root :At('$path_end/...') Via('../protected')  ($self, $c, $user) {
 
       # GET /contacts/{:Int}/edit
       sub edit :Get('edit') Via('prepare_edit') ($self, $c, $contact) { return }
-    
+
       # PATCH /contacts/{:Int}
       sub update :Patch('') Via('prepare_edit') BodyModelFor('create') ($self, $c, $contact, $bm) {
         return $contact->set_from_request($bm);

@@ -4,18 +4,12 @@ use Moo;
 use Example::Syntax;
 use Example::View::HTML
   -tags => qw(div a fieldset form_for),
-  -util => qw(path);
+  -util => qw(list_uri);
 
 has 'todo' => (is=>'ro', required=>1, handles=>[qw/status_options/] );
 
-sub create_or_update_path  :Renders ($self)  {
-  return $self->todo->in_storage ?
-   path('update', [$self->todo->id]) :
-    path('create'); 
-}
-
 sub render($self, $c) {
-  form_for $self->todo, +{action=>$self->create_or_update_path}, sub ($self, $fb, $todo) {
+  form_for $self->todo, sub ($self, $fb, $todo) {
     fieldset [
       div +{ if=>$fb->successfully_updated, class=>'alert alert-success', role=>'alert' }, 'Successfully Saved!',
       $fb->legend,
@@ -34,7 +28,7 @@ sub render($self, $c) {
         ],
       ],
       $fb->submit(),
-      a {href=>path('list'), class=>'btn btn-secondary btn-lg btn-block'}, 'Return to Todo List',
+      a {href=>list_uri, class=>'btn btn-secondary btn-lg btn-block'}, 'Return to Todo List',
     ],
   },
 }

@@ -18,6 +18,7 @@ t/42-get_version.t
 t/69-read-ai_str.t
 t/69-read-dl_uri.t
 t/69-set-data_str.t
+t/90-encoder-exception.t
 t/99-multi-opts.t
 xt/author/00-compile.t
 xt/author/pod-syntax.t

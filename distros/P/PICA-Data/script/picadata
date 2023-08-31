@@ -80,7 +80,7 @@ Build an Avram schema from input data, optionally based on an existing schema
 =head2 --from, -f
 
 PICA serialization type (plain, plus/normalized, binary, import, XML, ppxml,
-pixml) with Plain as default. Guessed from first input filename unless
+pixml, patch) with Plain as default. Guessed from first input filename unless
 specified. See format documentation at L<http://format.gbv.de/pica>.
 
 =head2 --to, -t

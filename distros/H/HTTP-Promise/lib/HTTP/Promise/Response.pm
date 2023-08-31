@@ -423,19 +423,19 @@ Here is how it fits in overall relation with other classes.
 
 =head2 new
 
-    my $req = HTTP::Promise::Response->new( $code, $status, $headers, $content,
+    my $resp = HTTP::Promise::Response->new( $code, $status, $headers, $content,
         host        => 'example.com',
         uri         => 'https://example.com/somewhere',
     );
-    my $req = HTTP::Promise::Response->new( $code, $status, $headers, $content, {
+    my $resp = HTTP::Promise::Response->new( $code, $status, $headers, $content, {
         host        => 'example.com',
         uri         => 'https://example.com/somewhere',
     });
-    my $req = HTTP::Promise::Response->new( $code, $status, $headers,
+    my $resp = HTTP::Promise::Response->new( $code, $status, $headers,
         host        => 'example.com',
         uri         => 'https://example.com/somewhere',
     );
-    my $req = HTTP::Promise::Response->new( $code, $status, $headers, {
+    my $resp = HTTP::Promise::Response->new( $code, $status, $headers, {
         host        => 'example.com',
         uri         => 'https://example.com/somewhere',
     });

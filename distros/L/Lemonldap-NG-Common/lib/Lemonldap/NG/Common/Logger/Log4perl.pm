@@ -20,6 +20,17 @@ sub new {
             "Lemonldap::NG::Common::Logger::_Duplicate");
         Log::Log4perl->wrapper_register(__PACKAGE__);
 
+        # map %S to the userData
+        Log::Log4perl::Layout::PatternLayout::add_global_cspec(
+            'S',
+            sub {
+                my $layout = shift;
+                my $subvar = $layout->{curlies};
+                my $req    = Log::Log4perl::MDC->get("req");
+                return defined($req) ? $req->userData->{$subvar} : undef;
+            }
+        );
+
         # map %E to the stored $req->env
         Log::Log4perl::Layout::PatternLayout::add_global_cspec(
             'E',

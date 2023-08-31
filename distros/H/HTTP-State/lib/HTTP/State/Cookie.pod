@@ -119,8 +119,8 @@ Returns a encoded http header value string.
 
 =head3 decode_set_cookie
 
-  my  $cookie=decode_set_cookie $string $string;
-  my  $cookie=decode_set_cookie $string $string, $offset;
+  my  $cookie=decode_set_cookie $string;
+  my  $cookie=decode_set_cookie $string, $offset;
 
 Decodes a HTTP Set-Cookie header value into a cookie structure and returns it.
 

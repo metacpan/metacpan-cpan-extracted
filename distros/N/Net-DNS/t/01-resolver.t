@@ -1,14 +1,21 @@
 #!/usr/bin/perl
-# $Id: 01-resolver.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
+# $Id: 01-resolver.t 1934 2023-08-25 12:14:08Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
-use Test::More tests => 34;
+use Test::More tests => 35;
 use TestToolkit;
 
 use Net::DNS::Resolver;
 use Net::DNS::Resolver::Recurse;
+
+{					## off-line dry tests
+
+	package Net::DNS::Resolver;
+	sub _create_tcp_socket {return}	## stub
+	sub _create_udp_socket {return}	## stub
+}
 
 
 my @NOIP = qw(:: 0.0.0.0);
@@ -103,12 +110,15 @@ my $deprecated = sub { $resolver->make_query_packet('example.com') };
 exception( 'deprecated make_query_packet()', $deprecated );
 noexception( 'no repeated deprecation warning', $deprecated );
 
+
+SKIP: {
+	skip( 'Unable to emulate SpamAssassin socket usage', 1 ) if $^O eq 'MSWin32';
+	my $handle = \*DATA;		## exercise SpamAssassin's use of plain sockets
+	ok( !$resolver->bgbusy($handle), 'bgbusy():	SpamAssassin workaround' );
+}
+
 exit;
 
-
-package Net::DNS::Resolver;		## off-line dry test
-sub _create_tcp_socket {return}		## stub
-sub _create_udp_socket {return}		## stub
-
-__END__
+__DATA__
+arbitrary
 

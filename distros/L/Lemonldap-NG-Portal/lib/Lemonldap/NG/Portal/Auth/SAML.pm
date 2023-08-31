@@ -139,7 +139,7 @@ sub extractFormInfo {
             $self->logger->debug("Found entityID $idp in SAML message");
 
             # IDP conf key
-            my $idpConfKey = $self->idpList->{$idp}->{confKey};
+            my $idpConfKey = $self->getIDPConfKey($idp);
 
             unless ($idpConfKey) {
                 $self->userLogger->error(
@@ -490,7 +490,7 @@ sub extractFormInfo {
             $self->logger->debug("Found entityID $idp in SAML message");
 
             # IDP conf key
-            my $idpConfKey = $self->idpList->{$idp}->{confKey};
+            my $idpConfKey = $self->getIDPConfKey($idp);
 
             unless ($idpConfKey) {
                 $self->userLogger->error(
@@ -565,7 +565,7 @@ sub extractFormInfo {
             # Process logout request
             unless ( $self->processLogoutRequestMsg( $logout, $request ) ) {
                 $self->userLogger->error("Fail to process logout request");
-                $logout_error = 1;
+                return PE_SAML_SLO_ERROR;
             }
 
             $self->logger->debug("Logout request is valid");
@@ -580,7 +580,7 @@ sub extractFormInfo {
             $self->logger->debug("Found entityID $idp in SAML message");
 
             # IDP conf key
-            my $idpConfKey = $self->idpList->{$idp}->{confKey};
+            my $idpConfKey = $self->getIDPConfKey($idp);
 
             unless ($idpConfKey) {
                 $self->userLogger->error(
@@ -1001,7 +1001,7 @@ sub extractFormInfo {
     # 3. Build authentication request
 
     # IDP conf key
-    my $idpConfKey = $self->idpList->{$idp}->{confKey};
+    my $idpConfKey = $self->getIDPConfKey($idp);
 
     unless ($idpConfKey) {
         $self->userLogger->error("$idp do not match any IDP in configuration");
@@ -1472,6 +1472,28 @@ sub getDisplayType {
 
 # Internal methods
 
+sub getIDPConfKey {
+    my ( $self, $entityID ) = @_;
+
+    # Make sure we don't modify the hash by reading it
+    if ( $self->idpList->{$entityID} ) {
+        return $self->idpList->{$entityID}->{confKey};
+    }
+    return undef;
+}
+
+sub getEntityID {
+    my ( $self, $confKey ) = @_;
+
+    foreach ( keys %{ $self->idpList } ) {
+        my $idpConfKey = $self->idpList->{$_}->{confKey} // "";
+        if ( $confKey eq $idpConfKey ) {
+            return $_;
+        }
+    }
+    return undef;
+}
+
 # Try to find an IdP using :
 # * HTTP parameter
 # * Rules
@@ -1489,16 +1511,10 @@ sub getIDP {
 
         # Case 2: Recover IDP from idpName URL Parameter
         if ( $idpName = $req->param("idpName") ) {
-            foreach ( keys %{ $self->idpList } ) {
-                my $idpConfKey = $self->idpList->{$_}->{confKey};
-                if ( $idpName eq $idpConfKey ) {
-                    $idp = $_;
-                    $self->logger->debug(
-"IDP $idp selected from idpName URL Parameter ($idpName)"
-                    );
-                    last;
-                }
-            }
+            $idp = $self->getEntityID($idpName);
+            $self->logger->debug(
+                "IDP $idp selected from idpName URL Parameter ($idpName)")
+              if $idp;
         }
 
         # Case 3: check all IDP resolution rules
@@ -1522,7 +1538,7 @@ sub getIDP {
     }
 
     # Lazy load IDP
-    $self->lazy_load_entityid($idp);
+    $self->lazy_load_entityid($idp) if $idp;
 
     # Case 6: auto select IDP if only one IDP defined
     if ( scalar keys %{ $self->idpList } == 1 ) {

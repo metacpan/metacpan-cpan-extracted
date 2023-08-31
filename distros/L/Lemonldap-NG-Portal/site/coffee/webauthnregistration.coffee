@@ -35,29 +35,40 @@ register = ->
 		success: (ch) ->
 			# 2 build response
 			request = ch.request 
-			setMsg 'webAuthnRegisterInProgress', 'warning'
-			$('#u2fPermission').show()
-			WebAuthnUI.WebAuthnUI.createCredential request
-			. then (response) ->
-				$.ajax
-					type: "POST"
-					url: "#{portal}2fregisters/webauthn/registration"
-					data:
-						state_id: ch.state_id
-						credential: JSON.stringify response
-						keyName: $('#keyName').val()
-					dataType: 'json'
-					success: (resp) ->
-						if resp.error
-							if resp.error.match /badName/
-								setMsg resp.error, 'danger'
-							else setMsg 'webAuthnRegisterFailed', 'danger'
-						else if resp.result
-							$(document).trigger "mfaAdded", [ { "type": "webauthn" } ]
-							setMsg 'yourKeyIsRegistered', 'positive'
-					error: displayError
-			. catch (error) ->
-				webAuthnError(error)
+			e = jQuery.Event( "webauthnRegistrationAttempt" )
+			$(document).trigger e
+			if !e.isDefaultPrevented()
+				setMsg 'webAuthnRegisterInProgress', 'warning'
+				$('#u2fPermission').show()
+				WebAuthnUI.WebAuthnUI.createCredential request
+				. then (response) ->
+					e = jQuery.Event( "webauthnRegistrationSuccess" )
+					$(document).trigger e, [ response ]
+					if !e.isDefaultPrevented()
+						$.ajax
+							type: "POST"
+							url: "#{portal}2fregisters/webauthn/registration"
+							data:
+								state_id: ch.state_id
+								credential: JSON.stringify response
+								keyName: $('#keyName').val()
+							dataType: 'json'
+							success: (resp) ->
+								if resp.error
+									if resp.error.match /badName/
+										setMsg resp.error, 'danger'
+									else setMsg 'webAuthnRegisterFailed', 'danger'
+								else if resp.result
+									e = jQuery.Event( "mfaAdded" )
+									$(document).trigger e, [ { "type": "webauthn" } ]
+									if !e.isDefaultPrevented()
+										setMsg 'yourKeyIsRegistered', 'positive'
+							error: displayError
+				. catch (error) ->
+					e = jQuery.Event( "webauthnRegistrationFailure" )
+					$(document).trigger e, [ error ]
+					if !e.isDefaultPrevented()
+						webAuthnError(error)
 
 # Verification function (launched by "verify" button)
 verify = ->

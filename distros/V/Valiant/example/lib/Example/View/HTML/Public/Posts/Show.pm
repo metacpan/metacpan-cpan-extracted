@@ -5,13 +5,13 @@ use Example::Syntax;
 use Example::View::HTML
   -tags => qw(div h1 h2 p span link_to br),
   -views => 'HTML::Page', 'HTML::Navbar',
-  -helpers => qw(path $sf user);
+  -helpers => qw(path show_uri list_uri $sf user);
 
 has 'post' => (is=>'ro', required=>1);
 
 sub render($self, $c) {
   html_page page_title=>$self->post->author->$sf("{:first_name} {:last_name}"), sub($page) {
-    html_navbar active_link=>path('show', [$self->post->id]),
+    html_navbar active_link=>show_uri([$self->post->id]),
     div {class=>"col-5 mx-auto"}, [
       h1 $self->post->title,
       p $self->post->content,
@@ -26,7 +26,7 @@ sub render($self, $c) {
         ]
       },
       link_to path('comments/build', [$self->post->id]), {class=>'btn btn-primary btn-lg btn-block'}, 'Add a new Comment',  
-      link_to path('list'), {class=>'btn btn-secondary btn-lg btn-block'}, 'Return to Recent Blogs',
+      link_to list_uri, {class=>'btn btn-secondary btn-lg btn-block'}, 'Return to Recent Blogs',
     ],
   },
 }

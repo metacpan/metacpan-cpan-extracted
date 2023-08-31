@@ -1,0 +1,118 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+dkbench - DKbench Perl Benchmark launch script
+
+=head1 DESCRIPTION
+
+This is the benchmarking script, part of the L<Benchmark::DKbench> distribution.
+
+See POD on the main module for info.
+
+=cut
+
+use strict;
+use warnings;
+
+use lib 'lib';
+
+use Digest;
+use Benchmark::DKbench;
+use Benchmark::DKbench::Setup;
+use File::Spec::Functions;
+use FindBin;
+use Getopt::Long;
+
+my %opt = ();
+GetOptions (
+    \%opt,
+    'skip_bio',
+    'skip_timep',
+    'skip_prove',
+    'bio_codons',
+    'quick|q',
+    'time|t',
+    'iter|i=i',
+    'multi|m',
+    'threads|j=i',
+    'max_threads=i',
+    'include=s',
+    'exclude=s',
+    'repeat|r=i',
+    'no_mce|n',
+    'sleep=i',
+    'setup',
+    'datapath=s',
+);
+
+$opt{iter} ||= 1;
+$opt{repeat} ||= 1;
+$opt{time} = 1 if $opt{quick} || $opt{repeat} > 1;
+
+Benchmark::DKbench::Setup::fetch_genbank($opt{datapath}) if $opt{setup};
+
+check_kit();
+my $max_threads = system_identity();
+$max_threads  = $opt{max_threads} if $opt{max_threads};
+$opt{threads} = $max_threads if $opt{multi} && $max_threads;
+$opt{threads} = 1 if ($opt{threads} && $opt{threads} < 0) || $opt{no_mce};
+
+my $mce = $opt{no_mce} ? 'no MCE' :'MCE';
+
+if ($opt{threads} || !$max_threads || $max_threads == 1) {
+    print "DKbench threads: $opt{threads} (".($opt{no_mce} ? 'no ':'')."MCE)\n";
+    suite_run(\%opt);
+} else {
+    print "DKbench single-thread run:\n";
+    $opt{threads} = 1;
+    my %stat1 = suite_run(\%opt);
+    print (("-"x34)."\n");
+    print "DKbench multi-thread run ($max_threads threads):\n";
+    $opt{threads} = $max_threads;
+    my %stat2 = suite_run(\%opt);
+    print (("-"x34)."\n");
+    calc_scalability(\%opt, \%stat1, \%stat2);
+}
+
+sub check_kit {
+    warn "! Perl version v5.36.0 recommended as a comparison base\n"
+        unless $^V =~ /v5.36.\d/;
+
+    my %mod_ver = Benchmark::DKbench::Setup::cpan_versions();
+
+    foreach my $module (sort keys %mod_ver) {
+        next if $opt{skip_bio} && $module =~ /Bio::/;
+        eval "use $module";
+        my $ver = eval "\$${module}::VERSION" || 'none';
+        unless ($ver eq $mod_ver{$module}) {
+            my $msg = "! $module $mod_ver{$module} recommended as a comparison base ($ver found).";
+            $msg .= " Older installed versions may cause issues to benchmarks."
+                if $mod_ver{$module} cmp $ver; # $ver is less
+            if ($module =~ /Bio::/ && $ver eq 'none') {
+                $opt{skip_bio}   = 1;
+                $opt{bio_codons} = 0;
+                $msg = "! BioPerl not found. You can install it to enable the BioPerl benchmarks.\n...applying --skip_bio.\n";
+            }
+            warn "$msg\n";
+        }
+    }
+
+    my $datadir = Benchmark::DKbench::Setup::datadir();
+    die "!! No ditribution data found (expected at $datadir). Refer to documentation for installation etc.\n" unless $datadir && -f catfile($datadir, "wiki0.html") && -f catfile($datadir, "M31.jpg");
+
+    unless ($opt{skip_prove} || -e catfile($datadir, 't', 'recipes')) {
+        $opt{skip_proove} = 1;
+        warn "!! Moose test data folder not found. Was the distribution not installed properly? Applying --skip-prove.\n";
+    }
+
+    unless ($opt{skip_bio} || Benchmark::DKbench::Setup::has_genbank()) {
+        $opt{skip_bio} = 1;
+        warn "!! gbbct5.seq missing, applying --skip_bio. Use --setup to fetch (or setup_dkbench.pl).\n";
+    }
+
+    if (!$opt{skip_timep} && $^O =~ /darwin/ && !$opt{no_mce}) {
+        $opt{skip_timep} = 1;
+        warn "!! Running localtime forked on MacOS is extremely slow, applying --skip_timep. You may run it with --no_mce.\n"
+    }
+}

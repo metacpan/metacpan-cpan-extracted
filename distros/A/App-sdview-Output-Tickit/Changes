@@ -1,4 +1,12 @@
 Revision history for App-sdview-Output-Tickit
 
+0.02    2023-08-30
+        [CHANGES]
+         * Added a popup outline view with jump scrolling on click
+         * Updated for new margin/indent model of App::sdview::Style v0.12
+
+        [BUGFIXES]
+         * Correct handling of empty paragraphs that still have a leader term
+
 0.01    2023-08-26
         First version, released on an unsuspecting world.

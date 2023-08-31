@@ -18,6 +18,7 @@ The following class-variables can be changed during runtime:
     Num!VERBOSE         = false      # true to enable verbose/debug mode
     Num!USE_YAFU        = false      # true to use YAFU for factoring large integers
     Num!USE_FACTORDB    = false      # true to use factordb.com for factoring large integers
+    Num!USE_PRIMESUM    = false      # true to use Kim Walisch's primesum in prime_sum(n)
     Num!USE_PRIMECOUNT  = false      # true to use Kim Walisch's primecount in prime_count(n)
     Num!SPECIAL_FACTORS = true       # true to try to find factors of special form in factor(n)
 
@@ -266,7 +267,7 @@ Aliases: I<cmp>
 
 =cut
 
-=head2 approx_cmp
+=head2 <~>
 
     a <~> b
     approx_cmp(a, b)
@@ -279,6 +280,8 @@ Equivalent with:
     a.round(k) <=> b.round(k)
 
 When C<k> is omitted, it uses the default floating-point precision to deduce C<k>.
+
+Aliases: I<approx_cmp>
 
 =cut
 
@@ -351,7 +354,8 @@ Aliases: I<catalan_G>
 
 =head2 Y
 
-    Num.Y()
+    Num.Y
+    Num.EulerGamma
 
 Returns the Euler–Mascheroni constant: 0.5772156649...
 
@@ -384,8 +388,13 @@ Aliases: I<not>
 
     Γ(n)
     gamma(n)
+    Num.gamma
 
-The gamma function, where for any positive integer C<n>:
+When called as C<Num.gamma>, it returns the Euler-Mascheroni constant:
+
+    say Num.gamma   #=> 0.5772156...
+
+When given a numeric real value, it computes the gamma function (as a floating-point value), which has the identity:
 
     gamma(n) = (n-1)!
 
@@ -704,9 +713,9 @@ Modular integer addition: C<(a+b) % m>.
 
 =head2 addmulmod
 
-    addmulmod(x, y, z, m)
+    addmulmod(a, b, c, m)
 
-Modular operation: C<(x + y*z) % m>.
+Modular operation: C<(a + b*c) % m>.
 
 =cut
 
@@ -793,6 +802,18 @@ Return an array with the k-almost primes <= C<n>, or in the range C<a..b>.
 
     5.almost_primes(1e6)        # array of 5-almost primes <= 1e6
     5.almost_primes(1e5, 1e6)   # array of 5-almost primes in the range [1e5, 1e6]
+
+=cut
+
+=head2 almost_prime_sum
+
+    k.almost_prime_sum(n)
+    k.almost_prime_sum(a,b)
+
+Returns the sum of k-almost primes <= C<n>, or in the range C<a..b>.
+
+    say 1.almost_prime_sum(100)           # sum of primes <= 100
+    say 2.almost_prime_sum(50, 100)       # sum of semiprimes in range 50..100
 
 =cut
 
@@ -1162,7 +1183,7 @@ Aliases: I<getbit>, I<testbit>
 
 =head2 bits
 
-    n.bits()
+    n.bits
 
 Returns the binary digits of C<n>.
 
@@ -1312,7 +1333,7 @@ Aliases: I<bsearch_inverse>
 
 Returns the sum of the bi-unitary divisors of C<n>, each divisor raised to the k-th power.
 
-    say 20.of { .bsigma }   #=> OEIS: A188999
+    say 20.of { .bsigma }    #=> OEIS: A188999
 
 Aliases: I<biusigma>
 
@@ -1324,7 +1345,7 @@ Aliases: I<biusigma>
 
 Returns the count of the bi-unitary divisors of C<n>.
 
-    say 20.of { .bsigma0 }  #=> OEIS: A286324
+    say 20.of { .bsigma0 }   #=> OEIS: A286324
 
 Aliases: I<biusigma0>
 
@@ -1338,8 +1359,6 @@ Returns an array with C<n> elements >= 0 that satisfy the provided block of code
 
     say 10.by { .is_prime }      # first 10 primes
     say 10.by { .is_square }     # first 10 squares
-
-Aliases: I<first>
 
 =cut
 
@@ -1859,7 +1878,7 @@ Aliases: I<consecutive_integer_lcm>
 
     n.convergents(k)
 
-Returns an array with the continued fraction convergents for a given real number C<n>, where C<k> is the number of convergenents to be computed and returned.
+Returns an array with the continued fraction convergents for a given real number C<n>, where C<k> is the number of convergents to be computed and returned.
 
     say Num.pi.convergents(5)   #=> [3, 22/7, 333/106, 355/113, 103993/33102]
 
@@ -1985,6 +2004,20 @@ Returns the cube of C<x>. Equivalent with C<x**3>.
 
 =cut
 
+=head2 cube_divisors
+
+    n.cube_divisors
+
+Returns the cube divisors of C<n>.
+
+    say 10!.cube_divisors    #=> [1, 8, 27, 64, 216, 1728]
+
+Equivalent with:
+
+    n.divisors.grep { .is_cube }
+
+=cut
+
 =head2 cubefree
 
     cubefree(n)
@@ -2003,6 +2036,16 @@ Returns the count of cubefree numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
+=head2 cubefree_divisors
+
+    n.cubefree_divisors
+
+Returns an array with the cubefree divisors of C<n>.
+
+    say cubefree_divisors(120)  #=> [1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60]
+
+=cut
+
 =head2 cubefree_each
 
     n.cubefree_each { ... }
@@ -2011,6 +2054,25 @@ Returns the count of cubefree numbers <= C<n>, or in the range C<a..b>.
 Iterates over the cubefree numbers <= C<n>, or in the range C<a..b>.
 
 Aliases: I<each_cubefree>
+
+=cut
+
+=head2 cubefree_sigma
+
+    n.cubefree_sigma(k=1)
+
+Sum of the cubefree divisors of C<n>, each divisor raised to power C<k>.
+
+    say cubefree_sigma(5040)      #=> 4368
+    say cubefree_sigma(5040, 2)   #=> 2484300
+
+=cut
+
+=head2 cubefree_sigma0
+
+    n.cubefree_sigma0
+
+Returns the count of cubefree divisors of C<n>.
 
 =cut
 
@@ -2023,41 +2085,128 @@ Returns the sum of cubefree numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
-=head2 cubeful
+=head2 cubefree_udivisors
 
-    cubeful(n)
-    cubeful(a,b)
+    n.cubefree_udivisors
 
-Returns an array with the cubeful numbers <= C<n>, or in the range C<a..b>.
+Returns the unitary cubefree divisors of C<n>.
 
-=cut
-
-=head2 cubeful_count
-
-    cubeful_count(n)
-    cubeful_count(a,b)
-
-Returns the count of cubeful numbers <= C<n>, or in the range C<a..b>.
+    say cubefree_udivisors(5040)   #=> [1, 5, 7, 9, 35, 45, 63, 315]
 
 =cut
 
-=head2 cubeful_each
+=head2 cubefree_usigma
 
-    n.cubeful_each { ... }
-    cubeful_each(a, b, { ... })
+    n.cubefree_usigma(k=1)
 
-Iterates over the cubeful numbers <= C<n>, or in the range C<a..b>.
+Sum of the unitary cubefree divisors of C<n>, each divisor raised to power C<k>.
 
-Aliases: I<each_cubeful>
+    say 5040.cubefree_usigma     #=> 480
+    say 5040.cubefree_usigma(2)  #=> 106600
 
 =cut
 
-=head2 cubeful_sum
+=head2 cubefree_usigma0
 
-    cubeful_sum(n)
-    cubeful_sum(a,b)
+    n.cubefree_usigma0
 
-Returns the sum of cubeful numbers <= C<n>, or in the range C<a..b>.
+Returns the number of unitary cubefree divisors of C<n>.
+
+    say cubefree_usigma0(5040)    #=> 8
+
+=cut
+
+=head2 cubefull
+
+    cubefull(n)
+    cubefull(a,b)
+
+Returns an array with the cubefull numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 cubefull_count
+
+    cubefull_count(n)
+    cubefull_count(a,b)
+
+Returns the count of cubefull numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 cubefull_each
+
+    n.cubefull_each { ... }
+    cubefull_each(a, b, { ... })
+
+Iterates over the cubefull numbers <= C<n>, or in the range C<a..b>.
+
+Aliases: I<each_cubefull>
+
+=cut
+
+=head2 cubefull_sum
+
+    cubefull_sum(n)
+    cubefull_sum(a,b)
+
+Returns the sum of cubefull numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 cube_sigma
+
+    n.cube_sigma(k=1)
+
+Sum of the cube divisors of C<n>, each divisor raised to the power C<k>.
+
+    say 10!.cube_sigma       #=> 2044
+    say 10!.cube_sigma(2)    #=> 3037530
+
+Equivalent with:
+
+    n.cube_divisors.sum {|d| d**k }
+
+=cut
+
+=head2 cube_sigma0
+
+    n.cube_sigma0
+
+Returns the count of cube divisors of C<n>.
+
+=cut
+
+=head2 cube_udivisors
+
+    n.cube_udivisors
+
+Returns the unitary cube divisors of C<n>, such that each divisor C<d> is a cube and C<gcd(n/d, d) = 1>.
+
+    say 15!.cube_udivisors   #=> [1, 125, 729, 91125]
+
+=cut
+
+=head2 cube_usigma
+
+    n.cube_usigma(k=1)
+
+Sum of the unitary cube divisors of C<n>, each divisor raised to power C<k>.
+
+    say cube_usigma(15!)     #=> 91980
+    say cube_usigma(15!, 2)  #=> 8304312692
+
+Equivalent with:
+
+    n.cube_udivisors.sum {|d| d**k }
+
+=cut
+
+=head2 cube_usigma0
+
+    n.cube_usigma0
+
+Returns the count of unitary cube divisors of C<n>.
 
 =cut
 
@@ -2215,8 +2364,6 @@ Returns an array of C<[a,b]> pairs with all the possible solutions to the equati
     n.digit(k, b=10)
 
 Returns the k-th digit of C<n> in a base C<b>.
-
-Exmaples:
 
     say 1119.digit(0)         #=> 9
     say 1181.digit(1)         #=> 8
@@ -2498,39 +2645,39 @@ Aliases: I<lucas_carmichael_each>
 
 =cut
 
-=head2 each_non_cubefree
+=head2 each_noncubefree
 
-    n.non_cubefree_each { ... }
-    non_cubefree_each(a, b, { ... })
+    n.noncubefree_each { ... }
+    noncubefree_each(a, b, { ... })
 
-Iterates over the non-cubefree numbers <= C<n>, or in the range C<a..b>.
+Iterates over the noncubefree numbers <= C<n>, or in the range C<a..b>.
 
-Aliases: I<non_cubefree_each>
+Aliases: I<noncubefree_each>
 
 =cut
 
-=head2 each_non_powerfree
+=head2 each_nonpowerfree
 
-    k.non_powerfree_each(n, { ... })
-    k.non_powerfree_each(a, b, { ... })
+    k.nonpowerfree_each(n, { ... })
+    k.nonpowerfree_each(a, b, { ... })
 
 Iterates over the numbers <= C<n>, or in the range C<a..b>, that are not k-powerfree.
 
-    2.non_powerfree_each(100, {|n| say n })         # iterate over non-squarefree numbers <= 100
-    3.non_powerfree_each(50, 100, {|n| say n })     # iterate over non-cubefree numbers in range 50..100
+    2.nonpowerfree_each(100, {|n| say n })         # iterate over nonsquarefree numbers <= 100
+    3.nonpowerfree_each(50, 100, {|n| say n })     # iterate over noncubefree numbers in range 50..100
 
-Aliases: I<non_powerfree_each>
+Aliases: I<nonpowerfree_each>
 
 =cut
 
-=head2 each_non_squarefree
+=head2 each_nonsquarefree
 
-    n.non_squarefree_each { ... }
-    non_squarefree_each(a, b, { ... })
+    n.nonsquarefree_each { ... }
+    nonsquarefree_each(a, b, { ... })
 
-Iterates over the non-squarefree numbers <= C<n>, or in the range C<a..b>.
+Iterates over the nonsquarefree numbers <= C<n>, or in the range C<a..b>.
 
-Aliases: I<non_squarefree_each>
+Aliases: I<nonsquarefree_each>
 
 =cut
 
@@ -2583,19 +2730,13 @@ Aliases: I<powerful_each>
     n.each_prime {...}
     each_prime(a,b,{...})
 
-It efficiently iterates over the primes in the given range, using a segmented prime sieve.
+Iterates over the primes in the given range.
 
     # Iterate over the primes between 100 and 200
-    each_prime(100, 200, {|p|
-        say p
-    })
+    each_prime(100, 200, {|p| say p })
 
     # Iterate over the primes <= 100
-    100.each_prime {|p|
-        say p
-    }
-
-It's considerably faster than using the C<next_prime(n)> method.
+    100.each_prime {|p| say p }
 
 Aliases: I<primes_each>
 
@@ -2709,14 +2850,14 @@ Aliases: I<squarefree_strong_fermat_psp_each>
 
 =cut
 
-=head2 each_squareful
+=head2 each_squarefull
 
-    n.squareful_each { ... }
-    squareful_each(a, b, { ... })
+    n.squarefull_each { ... }
+    squarefull_each(a, b, { ... })
 
-Iterates over the squareful numbers <= C<n>, or in the range C<a..b>.
+Iterates over the squarefull (or 2-full) numbers <= C<n>, or in the range C<a..b>.
 
-Aliases: I<squareful_each>
+Aliases: I<squarefull_each>
 
 =cut
 
@@ -2903,7 +3044,7 @@ Aliases: I<powmod>
 
     expnorm(n, b=10)
 
-Returns C<exp(n)> normalized in the range C<[0,1)>. The base C<b> can be value > 1.
+Returns C<exp(n)> normalized in the range C<[0,1)>. The base C<b> can be any value != C<{0,1}>.
 
     say expnorm(log(2) * 20996011)          #=> 0.125976895450330105020494309574...
 
@@ -3075,7 +3216,7 @@ Sum of powers: C<1^k + 2^k + ... + n^k>, using Faulhaber's summation formula.
 
     faulhaber(5, 2)   # 1^2 + 2^2 + 3^2 + 4^2 + 5^2 = 55
 
-The value for C<k> must be a non-negative native integer.
+The value for C<k> must be a nonnegative native integer.
 
 Aliases: I<faulhaber_sum>
 
@@ -3104,7 +3245,7 @@ Sum of powers: C<a^k + (a+1)^k + (a+2)^k + ... + b^k>, using Faulhaber's summati
 
     faulhaber_range(50, 100, 2)   # 50^2 + 51^2 + ... + 100^2 = 297925
 
-The value for C<k> must be a non-negative native integer.
+The value for C<k> must be a nonnegative native integer.
 
 =cut
 
@@ -3114,7 +3255,7 @@ The value for C<k> must be a non-negative native integer.
 
 Tries to factorize a given number using Fermat's factorization method (using at most C<k> iterations).
 
-Works for odd composite non-power numbers C<n> that have two divisors close to C<sqrt(n)>.
+Works for odd composite nonpower numbers C<n> that have two divisors close to C<sqrt(n)>.
 
 The product of the factors will give back C<n>. However, some factors may be composite.
 
@@ -3169,8 +3310,15 @@ Aliases: I<fibonacci_factor>
 =head2 fibmod
 
     fibmod(n,m)
+    fibmod(n,k,m)
 
-Efficiently compute the n-th Fibonacci number modulo C<m>.
+Efficiently computes the n-th Fibonacci number modulo C<m>.
+
+    fibmod(n,m) == (fibonacci(n) % m)
+
+When three arguments are given, it computes the n-th k-th order Fibonacci number modulo C<m>.
+
+    fibmod(n,k,m) == (fibonacci(n,k) % m)
 
 Aliases: I<fibonacci_mod>, I<fibonaccimod>
 
@@ -3180,7 +3328,7 @@ Aliases: I<fibonacci_mod>, I<fibonaccimod>
 
     n.flip(base=10)
 
-Returns the reversal of C<n> in base C<b>. When C<b> is not given, it defaults to base 10.
+Returns the reversal of C<n> in base C<b>. When C<b> is not given, it defaults to base C<10>.
 
     say 20.of { .flip }         # A004086
     say 20.of { .flip(2) }      # A030101
@@ -3217,9 +3365,9 @@ Round C<x> towards -Infinity.
 
 Tries to find a factor of C<n>, using a new factorization method, inspired by Fermat's Little Theorem (FLT).
 
-This method is particularly effective for numbers that have factors closed to each other, or have a factor C<k> for which C<znorder(2,k)> is small.
+This method is particularly effective for numbers that have factors close to each other, or have a factor C<k> for which C<znorder(2,k)> is small.
 
-Example (try with base 3 and give up after 10^6 iterations):
+Example (try with base C<3> and give up after C<10^6> iterations):
 
     say flt_factor(2**64 + 1, 3, 1e6)   #=> [274177, 67280421310721]
 
@@ -3275,7 +3423,7 @@ The extended greatest common divisor of C<a> and C<b>, returning C<(u, v, d)>, w
 
     u*a + v*b = d.
 
-The value of C<d> is always non-negative.
+The value of C<d> is always nonnegative.
 
 =cut
 
@@ -3283,7 +3431,7 @@ The value of C<d> is always non-negative.
 
     gcd_factors(n, [a, b, ...])
 
-Given a positive integer and an array of integers, it tries to find non-trivial factors of C<n>, checking each C<gcd(n, array[0])>, C<gcd(n, array[1])>, etc.
+Given a positive integer and an array of integers, it tries to find nontrivial factors of C<n>, checking each C<gcd(n, array[0])>, C<gcd(n, array[1])>, etc.
 
     var n = 43*43*97*503
     var a = [19*43*97, 1, 13*41*43*101]
@@ -3329,6 +3477,17 @@ Defined with the base-cases:
 Example:
 
     say gpf(2**128 + 1)     #=> 5704689200685129054721
+
+=cut
+
+=head2 gpf_sum
+
+    gpf_sum(n)
+    gpf_sum(a,b)
+
+Returns the sum of largest prime factors of numbers from C<1> to C<n>, or in the range C<a..b>.
+
+    say 30.of { .gpf_sum }   #=> OEIS: A088822
 
 =cut
 
@@ -3428,7 +3587,7 @@ Hyperfactorial of C<n>, defined as C<Prod_{k=1..n} k^k>.
 
     hyperfactorial_ln(n)
 
-Natural logarithm of C<hyperfactorial(n)>, where C<n> is a non-negative integer.
+Natural logarithm of C<hyperfactorial(n)>, where C<n> is a nonnegative integer.
 
 Aliases: I<lnhyperfactorial>, I<hyperfactorial_log>
 
@@ -3612,7 +3771,7 @@ Multiplicative inverse of C<n>: C<1/n>.
 
     n.inverse_phi
 
-Returns all the solutions C<x> to the Euler totient function: phi(x) = n.
+Returns all the solutions C<x> to the Euler totient function: C<phi(x) = n>.
 
 Aliases: I<inverse_totient>
 
@@ -3622,7 +3781,7 @@ Aliases: I<inverse_totient>
 
     n.inverse_phi_len
 
-Returns the number of solutions to the Euler totient function: phi(x) = n.
+Returns the number of solutions to the Euler totient function: C<phi(x) = n>.
 
 Equivalent with:
 
@@ -3636,7 +3795,7 @@ Aliases: I<inverse_totient_len>
 
     n.inverse_phi_max
 
-Returns the largest solution x to the Euler totient function: phi(x) = n.
+Returns the largest solution x to the Euler totient function: C<phi(x) = n>.
 
 Equivalent with:
 
@@ -3652,7 +3811,7 @@ Aliases: I<inverse_euler_phi_max>
 
     n.inverse_phi_min
 
-Returns the smallest solution x to the Euler totient function: phi(x) = n.
+Returns the smallest solution x to the Euler totient function: C<phi(x) = n>.
 
 Equivalent with:
 
@@ -3680,7 +3839,7 @@ Aliases: I<polygonal_inverse>
 
     n.inverse_psi
 
-Returns all the solutions C<x> to the Dedekin psi function: psi(x) = n.
+Returns all the solutions C<x> to Dedekind's psi function: C<psi(x) = n>.
 
     say inverse_psi(120)    #=> [75, 76, 87, 95]
 
@@ -3692,7 +3851,7 @@ Aliases: I<inverse_dedekind_psi>
 
     n.inverse_psi_len
 
-Returns the number of solutions to Dedekind's psi function: psi(x) = n.
+Returns the number of solutions to Dedekind's psi function: C<psi(x) = n>.
 
 Equivalent to C<n.inverse_psi.len>, but much faster.
 
@@ -3704,7 +3863,7 @@ Aliases: I<inverse_dedekind_psi_len>
 
     n.inverse_psi_max
 
-Returns the largest solution x to the Dedekind psi function: psi(x) = n.
+Returns the largest solution C<x> to Dedekind's psi function: C<psi(x) = n>.
 
 Equivalent with:
 
@@ -3720,7 +3879,7 @@ Aliases: I<inverse_dedekind_psi_max>
 
     n.inverse_psi_min
 
-Returns the smallest solution x to the Dedekind psi function: psi(x) = n.
+Returns the smallest solution C<x> to Dedekind's psi function: C<psi(x) = n>.
 
 Equivalent with:
 
@@ -3751,21 +3910,23 @@ Also works with arbitrary large integers:
 
     n.inverse_sigma_len(k=1)
 
-Returns the number of solutions to the sigma sum of divisors function: sigma_k(x) = n.
+Returns the number of solutions to the sigma sum of divisors function: C<sigma_k(x) = n>.
 
-Equivalent to C<n.inverse_sigma(k).len>, but much faster.
+Equivalent with:
+
+    n.inverse_sigma(k).len
 
 =cut
 
 =head2 inverse_sigma_max
 
-    n.inverse_sigma_max
+    n.inverse_sigma_max(k=1)
 
-Returns the largest solution x to the sum of divisors function: sigma(x) = n.
+Returns the largest solution x to the sum of divisors function: C<sigma_k(x) = n>.
 
 Equivalent with:
 
-    n.inverse_sigma.max
+    n.inverse_sigma(k).max
 
 Returns C<nil> if there are no solutions.
 
@@ -3773,13 +3934,13 @@ Returns C<nil> if there are no solutions.
 
 =head2 inverse_sigma_min
 
-    n.inverse_sigma_min
+    n.inverse_sigma_min(k=1)
 
-Returns the smallest solution x to the sum of divisors function: sigma(x) = n.
+Returns the smallest solution x to the sum of divisors function: C<sigma_k(x) = n>.
 
 Equivalent with:
 
-    n.inverse_sigma.min
+    n.inverse_sigma(k).min
 
 Returns C<nil> if there are no solutions.
 
@@ -3799,11 +3960,9 @@ Returns an array with all the solutions C<x> to C<uphi(x) = n>.
 
     n.inverse_usigma
 
-Returns an array with all the possible solutions for C<x> in usigma(x) = n.
+Returns an array with all the possible solutions C<x> to C<usigma(x) = n>.
 
     say inverse_usigma(120)                         #=> [60, 87, 92, 95, 99]
-    say inverse_usigma(5040).len                    #=> 38
-    say inverse_usigma(5040).map { .usigma }.uniq   #=> [5040]
 
 =cut
 
@@ -3919,7 +4078,7 @@ Equivalent with:
 
     n.is_abs_euler_psp
 
-Returns true if C<n> is an absolute Euler pseudoprime: p-1 | (n-1)/2 for every p|n, where C<n> is a squarefree composite integer.
+Returns true if C<n> is an absolute Euler pseudoprime: C<p-1 | (n-1)/2> for every C<p|n>, where C<n> is a squarefree composite integer.
 
     say 10.by { .is_abs_euler_psp }     #=> OEIS: A033181
 
@@ -3994,7 +4153,7 @@ Returns true if C<n> is a centered k-gonal number.
 
 =head2 is_chebyshev
 
-    n.is_chebyshev()
+    n.is_chebyshev
 
 Returns true if C<n> is an odd composite Chebyshev pseudoprime, as defined by OEIS A175530.
 
@@ -4061,9 +4220,9 @@ Returns true if C<n> is not divisible by any perfect cube > 1.
 
 =cut
 
-=head2 is_cubeful
+=head2 is_cubefull
 
-    n.is_cubeful
+    n.is_cubefull
 
 Returns true if C<n> is divisible by the cubes of all its prime factors.
 
@@ -4351,25 +4510,25 @@ Aliases: I<is_pm1_prime>, I<is_nminus1_prime>
 
 =cut
 
-=head2 is_non_cubefree
+=head2 is_noncubefree
 
-    n.is_non_cubefree
+    n.is_noncubefree
 
 Returns true if C<n> is a positive integer divisible by the cube of a prime.
 
 =cut
 
-=head2 is_non_powerfree
+=head2 is_nonpowerfree
 
-    n.is_non_powerfree
+    n.is_nonpowerfree
 
 Returns true if C<n> is a positive integer divisible by the k-th power of a prime.
 
 =cut
 
-=head2 is_non_squarefree
+=head2 is_nonsquarefree
 
-    n.is_non_squarefree
+    n.is_nonsquarefree
 
 Returns true if C<n> is a positive integer divisible by the square of a prime.
 
@@ -4389,7 +4548,7 @@ Aliases: I<is_pp1_prime>, I<is_nplus1_prime>
 
     g.is_ntf(n)
 
-Returns true if C<g> is a non-trivial integer factor of C<n>.
+Returns true if C<g> is a nontrivial integer factor of C<n>.
 
 Equivalent with (assuming C<g> and C<n> are both integers):
 
@@ -4560,8 +4719,8 @@ Aliases: I<is_positive>
 
 Returns true when all the exponents in the prime-power factorization of C<n> are less than C<k>.
 
-    say 15.by { .is_powerfree(2) }      # square-free numbers
-    say 15.by { .is_powerfree(3) }      # cube-free numbers
+    say 15.by { .is_powerfree(2) }      # squarefree numbers
+    say 15.by { .is_powerfree(3) }      # cubefree numbers
 
 =cut
 
@@ -4607,7 +4766,7 @@ Aliases: I<is_power>, I<is_perfect_power>
 
 =head2 is_practical
 
-    n.is_practical()
+    n.is_practical
 
 Returns true if C<n> is a practical number (OEIS: A005153).
 
@@ -4828,9 +4987,9 @@ Returns true if C<n> is a squarefree semiprime (i.e.: C<n = p*q>, where C<p> and
 
 =cut
 
-=head2 is_squareful
+=head2 is_squarefull
 
-    n.is_squareful
+    n.is_squarefull
 
 Returns true if C<n> is divisible by the squares of all its prime factors.
 
@@ -4850,7 +5009,7 @@ Aliases: I<is_extra_strong_lucas_psp>, I<is_stronger_lucas_pseudoprime>, I<is_ex
 
     n.is_strong_fib
 
-Teturns true if C<n> is a strong Fibonacci pseudoprime, satisfying:
+Returns true if C<n> is a strong Fibonacci pseudoprime, satisfying:
 
     V_n(P,Q) = P (mod)
 
@@ -5016,7 +5175,7 @@ Alias: I<carmichael_lambda>.
 
 The Lambert-W function. When the value of C<x> is less than C<-1/e>, it returns a complex number.
 
-    It also accepts a complex number as input.
+It also accepts a complex number as input.
 
 Identities (assuming x>0):
 
@@ -5114,7 +5273,7 @@ Returns the logarithmic integral of x.
 
     li2(x)
 
-Dilogarithm function, defined as the integral of C<-log(1-t)/t> from 0 to x.
+Dilogarithm function, defined as the integral of C<-log(1-t)/t> from C<0> to C<x>.
 
 =cut
 
@@ -5266,11 +5425,22 @@ Example:
 
 =cut
 
+=head2 lpf_sum
+
+    lpf_sum(n)
+    lpf_sum(a,b)
+
+Returns the sum of least prime factors of numbers from C<1> to C<n>, or in the range C<a..b>.
+
+    say 30.of { .lpf_sum }     #=> OEIS: A088821
+
+=cut
+
 =head2 lsb
 
     lsb(n)
 
-Returns the index of the least significant bit of C<n> that is non-zero.
+Returns the index of the least significant bit of C<n> that is nonzero.
 
     say 0b110010101111000000.lsb    # 6
 
@@ -5534,6 +5704,22 @@ Returns the index of the most significant bit of C<n>.
 
 =cut
 
+=head2 muladdmod
+
+    muladdmod(a, b, c, m)
+
+Modular operation: C<(a*b + c) % m>.
+
+=cut
+
+=head2 muladdmulmod
+
+    muladdmulmod(a, b, c, d, m)
+
+Modular operation: C<(a*b + c*d) % m>.
+
+=cut
+
 =head2 mulmod
 
     mulmod(a,b,m)
@@ -5541,6 +5727,22 @@ Returns the index of the most significant bit of C<n>.
 Modular integer multiplication: C<(a*b) % m>.
 
     say mulmod(43, 97, 127)     # == (43*97)%127
+
+=cut
+
+=head2 mulsubmod
+
+    mulsubmod(a, b, c, m)
+
+Modular operation: C<(a*b - c) % m>.
+
+=cut
+
+=head2 mulsubmulmod
+
+    mulsubmulmod(a, b, c, d, m)
+
+Modular operation: C<(a*b - c*d) % m>.
 
 =cut
 
@@ -5626,7 +5828,7 @@ Negates the sign of C<x> (equivalent with: C<-x>).
 
     nesigma(n, k=1)
 
-Returns the sum of the non-exponential divisors of C<n>, each divisor raised to the k-th power.
+Returns the sum of the nonexponential divisors of C<n>, each divisor raised to the k-th power.
 
     say 30.of { .nesigma }      #=> OEIS: A160135
 
@@ -5636,7 +5838,7 @@ Returns the sum of the non-exponential divisors of C<n>, each divisor raised to 
 
     nesigma0(n)
 
-Returns the count of the non-exponential divisors of C<n>.
+Returns the count of the nonexponential divisors of C<n>.
 
     say 30.of { .nesigma0 }     #=> OEIS: A160097
 
@@ -5665,7 +5867,47 @@ Returns the next k-almost prime greater than C<n>.
 
     n.next_composite
 
-Given a non-negative integer C<n>, returns the next composite number greater than C<n>.
+Given a nonnegative integer C<n>, returns the next composite number greater than C<n>.
+
+=cut
+
+=head2 next_cubefree
+
+    n.next_cubefree
+
+Returns the next cubefree number greater than C<n>.
+
+=cut
+
+=head2 next_cubefull
+
+    n.next_cubefull
+
+Returns the next cubefull (or 2-full) number greater than C<n>.
+
+=cut
+
+=head2 next_noncubefree
+
+    n.next_noncubefree
+
+Returns the next noncubefree number greater than C<n>.
+
+=cut
+
+=head2 next_nonpowerfree
+
+    n.next_nonpowerfree(k=2)
+
+Returns the next k-nonpowerfree number greater than C<n>.
+
+=cut
+
+=head2 next_nonsquarefree
+
+    n.next_nonsquarefree
+
+Returns the next nonsquarefree number greater than C<n>.
 
 =cut
 
@@ -5687,6 +5929,21 @@ Efficiently returns the next palindrome in base-b greater than C<n>.
     for (var n = 0; n < 1e6; n = n.next_palindrome) {
         say n
     }
+
+=cut
+
+=head2 next_perfect_power
+
+    next_perfect_power(n)
+    next_perfect_power(n,k)
+
+Returns the next perfect power greater than C<n>.
+
+    say next_perfect_power(1e6)     #=> 1002001
+
+When C<k> is given, it returns the next k-perfect-power greater than C<n>.
+
+    say next_perfect_power(1e6, 3)  #=> 1030301
 
 =cut
 
@@ -5719,7 +5976,7 @@ Returns the next k-powerfree number greater than C<n>.
 
     n.next_powerful(k=2)
 
-Returns the next k-powerful number greater than C<n>.
+Returns the next k-powerful (or k-full) number greater than C<n>.
 
 =cut
 
@@ -5735,7 +5992,7 @@ Returns the next prime larger than C<n>.
 
     n.next_prime_power
 
-Given a non-negative integer C<n>, returns the next prime power (C<p^k> with k >= 1) greater than C<n>.
+Given a nonnegative integer C<n>, returns the next prime power (C<p^k> with k >= 1) greater than C<n>.
 
 =cut
 
@@ -5763,6 +6020,22 @@ Returns the next squarefree k-almost prime greater than C<n>.
 
 =cut
 
+=head2 next_squarefree_semiprime
+
+    n.next_squarefree_semiprime
+
+Returns the next squarefree semiprime greater than C<n>.
+
+=cut
+
+=head2 next_squarefull
+
+    n.next_squarefull
+
+Returns the next squarefull (or 2-full) number greater than C<n>.
+
+=cut
+
 =head2 next_twin_prime
 
     n.next_twin_prime
@@ -5785,7 +6058,7 @@ Returns the negative infinity special value (C<-Inf>).
 
     nisigma(n, k=1)
 
-Returns the sum of the non-infinitary divisors of C<n>, each divisor raised to the k-th power.
+Returns the sum of the noninfinitary divisors of C<n>, each divisor raised to the k-th power.
 
     say 30.of { .nisigma }      #=> OEIS: A348271
 
@@ -5795,7 +6068,7 @@ Returns the sum of the non-infinitary divisors of C<n>, each divisor raised to t
 
     nisigma0(n)
 
-Returns the count of the non-infinitary divisors of C<n>.
+Returns the count of the noninfinitary divisors of C<n>.
 
     say 30.of { .nisigma0 }     #=> OEIS: A348341
 
@@ -5818,87 +6091,87 @@ Aliases: I<binomial>
 
 =cut
 
-=head2 non_cubefree
+=head2 noncubefree
 
-    non_cubefree(n)
-    non_cubefree(a,b)
+    noncubefree(n)
+    noncubefree(a,b)
 
-Returns an array with the non-cubefree numbers <= C<n>, or in the range C<a..b>.
-
-=cut
-
-=head2 non_cubefree_count
-
-    non_cubefree_count(n)
-    non_cubefree_count(a,b)
-
-Returns the count of non-cubefree numbers <= C<n>, or in the range C<a..b>.
+Returns an array with the noncubefree numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
-=head2 non_cubefree_sum
+=head2 noncubefree_count
 
-    non_cubefree_sum(n)
-    non_cubefree_sum(a,b)
+    noncubefree_count(n)
+    noncubefree_count(a,b)
 
-Returns the sum of non-cubefree numbers <= C<n>, or in the range C<a..b>.
+Returns the count of noncubefree numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
-=head2 non_powerfree
+=head2 noncubefree_sum
 
-    k.non_powerfree(n)
-    k.non_powerfree(a,b)
+    noncubefree_sum(n)
+    noncubefree_sum(a,b)
+
+Returns the sum of noncubefree numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 nonpowerfree
+
+    k.nonpowerfree(n)
+    k.nonpowerfree(a,b)
 
 Returns an array of numbers <= C<n>, or in the range C<a..b>, that are not k-powerfree.
 
-    say 2.non_powerfree(100)        # numbers that are not squarefree <= 100
-    say 3.non_powerfree(50, 100)    # numbers that are not cubefree in range 50..100
+    say 2.nonpowerfree(100)        # numbers that are not squarefree <= 100
+    say 3.nonpowerfree(50, 100)    # numbers that are not cubefree in range 50..100
 
 =cut
 
-=head2 non_powerfree_count
+=head2 nonpowerfree_count
 
-    k.non_powerfree_count(n)
-    k.non_powerfree_count(a,b)
+    k.nonpowerfree_count(n)
+    k.nonpowerfree_count(a,b)
 
 Returns the count of numbers <= C<n>, or in the range C<a..b>, that are not k-powerfree.
 
 =cut
 
-=head2 non_powerfree_sum
+=head2 nonpowerfree_sum
 
-    k.non_powerfree_sum(n)
-    k.non_powerfree_sum(a,b)
+    k.nonpowerfree_sum(n)
+    k.nonpowerfree_sum(a,b)
 
 Returns the sum of numbers <= C<n>, or in the range C<a..b>, that are not k-powerfree.
 
 =cut
 
-=head2 non_squarefree
+=head2 nonsquarefree
 
-    non_squarefree(n)
-    non_squarefree(a,b)
+    nonsquarefree(n)
+    nonsquarefree(a,b)
 
-Returns an array with the non-squarefree numbers <= C<n>, or in the range C<a..b>.
-
-=cut
-
-=head2 non_squarefree_count
-
-    non_squarefree_count(n)
-    non_squarefree_count(a,b)
-
-Returns the count of non-squarefree numbers <= C<n>, or in the range C<a..b>.
+Returns an array with the nonsquarefree numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
-=head2 non_squarefree_sum
+=head2 nonsquarefree_count
 
-    non_squarefree_sum(n)
-    non_squarefree_sum(a,b)
+    nonsquarefree_count(n)
+    nonsquarefree_count(a,b)
 
-Returns the sum of non-squarefree numbers <= C<n>, or in the range C<a..b>.
+Returns the count of nonsquarefree numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 nonsquarefree_sum
+
+    nonsquarefree_sum(n)
+    nonsquarefree_sum(a,b)
+
+Returns the sum of nonsquarefree numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
@@ -5939,6 +6212,50 @@ Returns the n-th k-almost prime.
 
 =cut
 
+=head2 nth_cubefree
+
+    n.nth_cubefree
+
+Returns the n-th cubefree number.
+
+=cut
+
+=head2 nth_cubefull
+
+    n.nth_cubefull
+
+Returns the n-th cubefull (or 3-full) number.
+
+=cut
+
+=head2 nth_noncubefree
+
+    n.nth_noncubefree
+
+Returns the n-th noncubefree number.
+
+=cut
+
+=head2 nth_nonpowerfree
+
+    n.nth_nonpowerfree(k)
+
+Returns the n-th k-nonpowerfree number.
+
+    say nth_nonpowerfree(1e9, 2)   #=> 2550546152
+    say nth_nonpowerfree(1e9, 3)   #=> 5949100928
+    say nth_nonpowerfree(1e9, 4)   #=> 13147239114
+
+=cut
+
+=head2 nth_nonsquarefree
+
+    n.nth_nonsquarefree
+
+Returns the n-th nonsquarefree number.
+
+=cut
+
 =head2 nth_omega_prime
 
     nth_omega_prime(n, k=2)
@@ -5948,6 +6265,20 @@ Returns the n-th k-omega prime.
     say nth_omega_prime(1e7, 2)    #=> 42314023
     say nth_omega_prime(1e7, 3)    #=> 28013887
     say nth_omega_prime(1e7, 4)    #=> 39780102
+
+=cut
+
+=head2 nth_perfect_power
+
+    nth_perfect_power(n)
+    nth_perfect_power(n,k)
+
+Returns the n-th perfect power.
+
+    say nth_perfect_power(1e8)  #=> 9956760243243489
+    say nth_perfect_power(1e9)  #=> 997995681331086244
+
+When C<k> is given, it returns the n-th k-perfect-power.
 
 =cut
 
@@ -5967,7 +6298,7 @@ Returns the n-th k-powerfree number.
 
     nth_powerful(n, k=2)
 
-Returns the n-th k-powerful number.
+Returns the n-th k-powerful (or k-full) number.
 
     say nth_powerful(1e4, 2)    #=> 23002083
     say nth_powerful(1e4, 3)    #=> 16720797973
@@ -6006,6 +6337,14 @@ Returns the n-th squarefree k-almost prime.
 
 =cut
 
+=head2 nth_squarefull
+
+    n.nth_squarefull
+
+Returns the n-th squarefull (or 2-full) number.
+
+=cut
+
 =head2 nu
 
     r.nu
@@ -6033,7 +6372,7 @@ Returns a list with the numerator and the denominator of a rational number C<r>.
 
     num2perm(n,k)
 
-Given a non-negative integer C<n> and integer C<k>, return the rank C<k> lexicographic permutation of C<n> elements.
+Given a nonnegative integer C<n> and integer C<k>, return the rank C<k> lexicographic permutation of C<n> elements.
 
 C<k> will be interpreted as mod C<n!>.
 
@@ -6069,7 +6408,7 @@ Although this may or may not be actually faster.
 
     nusigma(n, k=1)
 
-Returns the sum of the non-unitary divisors of C<n>, each divisor raised to the k-th power.
+Returns the sum of the nonunitary divisors of C<n>, each divisor raised to the k-th power.
 
     say 30.of { .nusigma }     #=> OEIS: A048146
 
@@ -6079,7 +6418,7 @@ Returns the sum of the non-unitary divisors of C<n>, each divisor raised to the 
 
     nusigma0(n)
 
-Returns the count of the non-unitary divisors of C<n>.
+Returns the count of the nonunitary divisors of C<n>.
 
     say 30.of { .nusigma0 }    #=> OEIS: A048105
 
@@ -6139,6 +6478,18 @@ k-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
 
 =cut
 
+=head2 omega_prime_sum
+
+    k.omega_prime_sum(n)
+    k.omega_prime_sum(a,b)
+
+Returns the sum of k-omega primes <= C<n>, or in the range C<a..b>.
+
+    say 1.omega_prime_sum(100)            # sum of prime powers <= 100
+    say 2.omega_prime_sum(50, 100)        # sum of 2-omega primes in range 50..100
+
+=cut
+
 =head2 one
 
     Num.one
@@ -6147,9 +6498,9 @@ Returns the 1 value.
 
 =cut
 
-=head2 partitions
+=head2 partition_count
 
-    partitions(n)
+    partition_count(n)
 
 Returns the number of partitions of C<n>.
 
@@ -6203,6 +6554,34 @@ Returns the largest power C<k> of C<n> for which there exists an integer C<r>, s
 
 =cut
 
+=head2 perfect_power_count
+
+    perfect_power_count(n)
+    perfect_power_count(n,k)
+
+Returns the count of perfect powers <= C<n>.
+
+    say perfect_power_count(10**6)      #=> 1111
+    say perfect_power_count(10**20)     #=> 10004650118
+
+When C<k> is provided, it returns the number of k-powers <= C<n>.
+
+=cut
+
+=head2 perfect_power_sum
+
+    perfect_power_sum(n)
+    perfect_power_sum(n,k)
+
+Returns the sum of perfect powers <= C<n>.
+
+    say perfect_power_sum(10**6)      #=> 361590619
+    say perfect_power_sum(10**20)     #=> 333449517656248628022493884999
+
+When C<k> is provided, it returns the sum of k-powers <= C<n>.
+
+=cut
+
 =head2 perfect_root
 
     n.perfect_root
@@ -6240,7 +6619,7 @@ The product of the factors will give back C<n>. However, some factors may be com
 
 =cut
 
-=head2 pi_k
+=head2 almost_prime_count
 
     k.almost_prime_count(n)
     k.almost_prime_count(a,b)
@@ -6250,7 +6629,7 @@ Returns the count of k-almost primes <= C<n>, or in the range C<a..b>.
     say 1.almost_prime_count(100)           # count of primes <= 100
     say 2.almost_prime_count(50, 100)       # count of semiprimes in range 50..100
 
-Aliases: I<almost_primepi>, I<almost_prime_count>
+Aliases: I<almost_primepi>, I<pi_k>
 
 =cut
 
@@ -6349,14 +6728,10 @@ Aliases: I<hammingweight>
 
 =head2 power_count
 
-    n.power_count
+    k.power_count(n)
+    k.power_count(a,b)
 
-Returns the count of perfect powers <= C<n>.
-
-    say power_count(10**6)      #=> 1111
-    say power_count(10**20)     #=> 10004650118
-
-Aliases: I<perfect_power_count>
+Returns the number of k-th power positive integers in <= C<n>, or in the range C<a..b>.
 
 =cut
 
@@ -6484,8 +6859,6 @@ Equivalent with (but much faster):
     n.udivisors.grep { .is_powerfree(k) }
     k.powerfree_divisors(n).grep {|d| gcd(n/d, d) == 1 }
 
-Aliases: I<powerfree_unitary_divisors>, I<unitary_powerfree_divisors>
-
 =cut
 
 =head2 powerfree_usigma
@@ -6518,7 +6891,7 @@ Returns the number of the k-powerfree unitary divisors of C<n>.
     k.powerful(n)
     k.powerful(a,b)
 
-Efficiently generates all the k-powerful numbers <= C<n>, or in the range C<a..b>.
+Returns an array with the k-powerful (or k-full) numbers <= C<n>, or in the range C<a..b>.
 
     say 2.powerful(100)          #=> 2-powerful numbers <= 100
     say 2.powerful(50, 100)      #=> 2-powerful numbers in the range 50..100
@@ -6530,7 +6903,7 @@ Efficiently generates all the k-powerful numbers <= C<n>, or in the range C<a..b
     k.powerful_count(n)
     k.powerful_count(a,b)
 
-Efficiently counts the number of k-powerful numbers <= C<n>, or in the range C<a..b>.
+Returns the number of k-powerful (or k-full) numbers <= C<n>, or in the range C<a..b>.
 
     say 2.powerful_count(100)       #=> count of 2-powerful numbers <= 100
     say 2.powerful_count(50, 100)   #=> count of 2-powerful numbers in the range 50..100
@@ -6542,7 +6915,7 @@ Efficiently counts the number of k-powerful numbers <= C<n>, or in the range C<a
     k.powerful_sum(n)
     k.powerful_sum(a,b)
 
-Efficiently sums the k-powerful numbers <= C<n>, or in the range C<a..b>.
+Returns the sum of k-powerful (or k-full) numbers <= C<n>, or in the range C<a..b>.
 
     say 2.powerful_sum(100)       #=> sum of 2-powerful numbers <= 100
     say 2.powerful_sum(50, 100)   #=> sum of 2-powerful numbers in the range 50..100
@@ -6571,6 +6944,15 @@ Equivalent with (but much faster):
 Returns the number of the k-th power divisors of C<n>.
 
     say 30.of { 2.power_sigma0(_) }       # OEIS: A046951
+
+=cut
+
+=head2 power_sum
+
+    k.power_sum(n)
+    k.power_sum(a,b)
+
+Returns the sum of k-th power positive integers <= C<n>, or in the range C<a..b>.
 
 =cut
 
@@ -6657,6 +7039,14 @@ Aliases: I<perfect_power_udivisors>, I<perfect_power_unitary_divisors>
 
 =cut
 
+=head2 prev_almost_prime
+
+    n.prev_almost_prime(k=2)
+
+Returns the previous k-almost prime smaller than C<n>.
+
+=cut
+
 =head2 prev_composite
 
     prev_composite(n)
@@ -6676,6 +7066,69 @@ Returns an array with C<n> consecutive decreasing composite numbers starting fro
 
 =cut
 
+=head2 prev_cubefree
+
+    n.prev_cubefree
+
+Returns the previous cubefree number smaller than C<n>.
+
+=cut
+
+=head2 prev_cubefull
+
+    n.prev_cubefull
+
+Returns the previous cubefull or (3-full) number smaller than C<n>.
+
+=cut
+
+=head2 prev_noncubefree
+
+    n.prev_noncubefree
+
+Returns the previous noncubefree number smaller than C<n>.
+
+=cut
+
+=head2 prev_nonpowerfree
+
+    n.prev_nonpowerfree(k)
+
+Returns the previous k-nonpowerfree number smaller than C<n>.
+
+=cut
+
+=head2 prev_nonsquarefree
+
+    n.prev_nonsquarefree
+
+Returns the previous nonsquarefree number smaller than C<n>.
+
+=cut
+
+=head2 prev_omega_prime
+
+    n.prev_omega_prime(k=2)
+
+Returns the previous k-omega prime smaller than C<n>.
+
+=cut
+
+=head2 prev_perfect_power
+
+    prev_perfect_power(n)
+    prev_perfect_power(n,k)
+
+Returns the previous perfect power smaller than C<n>.
+
+    say prev_perfect_power(1e6)     #=> 998001
+
+When C<k> is given, it returns the previous k-perfect-power smaller than C<n>.
+
+    say prev_perfect_power(1e6,3)   #=> 970299
+
+=cut
+
 =head2 prev_pow
 
     n.prev_pow(b)
@@ -6689,11 +7142,35 @@ Aliases: I<prev_power>
 
 =cut
 
+=head2 prev_powerfree
+
+    n.prev_powerfree(k=2)
+
+Returns the previous k-powerfree number smaller than C<n>.
+
+=cut
+
+=head2 prev_powerful
+
+    n.prev_powerful(k=2)
+
+Returns the previous k-powerful (or k-full) number smaller than C<n>.
+
+=cut
+
 =head2 prev_prime
 
     n.prev_prime
 
 Returns the previous prime smaller than C<n>.
+
+=cut
+
+=head2 prev_prime_power
+
+    n.prev_prime_power
+
+Returns the previous prime power smaller than C<n>.
 
 =cut
 
@@ -6704,6 +7181,46 @@ Returns the previous prime smaller than C<n>.
 Returns an array with C<n> consecutive decreasing prime numbers starting from C<start>.
 
     say 5.prev_primes(100)  #=> [97, 89, 83, 79, 73]
+
+=cut
+
+=head2 prev_semiprime
+
+    n.prev_semiprime
+
+Returns the previous semiprime smaller than C<n>.
+
+=cut
+
+=head2 prev_squarefree
+
+    n.prev_squarefree
+
+Returns the previous squarefree number smaller than C<n>.
+
+=cut
+
+=head2 prev_squarefree_almost_prime
+
+    n.prev_squarefree_almost_prime(k=2)
+
+Returns the previous squarefree k-almost prime smaller than C<n>.
+
+=cut
+
+=head2 prev_squarefree_semiprime
+
+    n.prev_squarefree_semiprime
+
+Returns the previous squarefree semiprime smaller than C<n>.
+
+=cut
+
+=head2 prev_squarefull
+
+    n.prev_squarefull
+
+Returns the previous squarefull (or 2-full) number smaller than C<n>.
 
 =cut
 
@@ -6720,7 +7237,7 @@ The product of the factors will give back C<n>. However, some factors may be com
 
 =head2 primality_pretest
 
-    n.primality_pretest()
+    n.primality_pretest
 
 The method returns true when C<n> passes the internal primality pretest (when C<n> is large enough and it has no small factors).
 
@@ -6888,6 +7405,17 @@ Returns the count of prime power divisors of C<n>.
 Equivalent with:
 
     bigomega(n)
+
+=cut
+
+=head2 prime_power_sum
+
+    prime_power_sum(n)
+    prime_power_sum(a,b)
+
+Returns the sum of prime powers <= C<n>, or in the range C<a..b>.
+
+Aliases: I<prime_powers_sum>
 
 =cut
 
@@ -7069,7 +7597,7 @@ Returns the
 
 =head2 primorial_deflation
 
-    n.primorial_deflation()
+    n.primorial_deflation
 
 Primorial deflation of C<n>, satisfying:
 
@@ -7083,7 +7611,7 @@ Defined as:
 
 =head2 primorial_inflation
 
-    n.primorial_inflation()
+    n.primorial_inflation
 
 Primorial inflation of C<n>.
 
@@ -7137,7 +7665,7 @@ Returns the k-gonal pyramidal root of C<n>. Also defined for complex numbers.
 
     qnr(n)
 
-Returns the least quadratic non-residue of C<n>.
+Returns the least quadratic nonresidue of C<n>.
 
     say qnr(17676352761153241)      #=> 37
     say qnr(172138573277896681)     #=> 41
@@ -7574,6 +8102,17 @@ Returns an array with the semiprimes <= C<n>, or in the range C<a..b>.
 
 =cut
 
+=head2 semiprime_sum
+
+    semiprime_sum(n)
+    semiprime_sum(a,b)
+
+Returns the sum of semiprimes <= C<n>, or in the range C<a..b>.
+
+Aliases: I<semiprimes_sum>
+
+=cut
+
 =head2 setbit
 
     setbit(n,k)
@@ -7869,6 +8408,18 @@ Returns an array with the squarefree k-almost primes <= C<n>, or in the range C<
 
 =cut
 
+=head2 squarefree_almost_prime_sum
+
+    k.squarefree_almost_prime_sum(n)
+    k.squarefree_almost_prime_sum(a,b)
+
+Returns the sum of squarefree k-almost primes <= C<n>, or in the range C<a..b>.
+
+    say 1.squarefree_almost_prime_sum(1000)          # sum of primes <= 1000
+    say 2.squarefree_almost_prime_sum(50, 1000)      # sum of squarefree semiprimes in range 50..1000
+
+=cut
+
 =head2 squarefree_count
 
     squarefree_count(n)
@@ -7890,7 +8441,7 @@ Aliases: I<square_free_count>
 
     squarefree_divisors(n)
 
-Returns an array with the square-free divisors of C<n>.
+Returns an array with the squarefree divisors of C<n>.
 
     say squarefree_divisors(120)  #=> [1, 2, 3, 5, 6, 10, 15, 30]
 
@@ -7908,7 +8459,7 @@ Returns an array with all the squarefree Fermat pseudoprimes to the given C<base
 
 =cut
 
-=head2 squarefree_pi_k
+=head2 squarefree_almost_prime_count
 
     k.squarefree_almost_prime_count(n)
     k.squarefree_almost_prime_count(a,b)
@@ -7918,7 +8469,7 @@ Returns the count of squarefree k-almost primes <= C<n>, or in the range C<a..b>
     say 1.squarefree_almost_prime_count(1000)          # count of primes <= 1000
     say 2.squarefree_almost_prime_count(50, 1000)      # count of squarefree semiprimes in range 50..1000
 
-Aliases: I<squarefree_almost_primepi>, I<squarefree_almost_prime_count>
+Aliases: I<squarefree_almost_primepi>, I<squarefree_pi_k>
 
 =cut
 
@@ -7947,11 +8498,22 @@ Returns an array with the squarefree semiprimes <= C<n>, or in the range C<a..b>
 
 =cut
 
+=head2 squarefree_semiprime_sum
+
+    squarefree_semiprime_sum(n)
+    squarefree_semiprime_sum(a,b)
+
+Returns the sum of squarefree semiprimes <= C<n>, or in the range C<a..b>.
+
+Aliases: I<squarefree_semiprimes_sum>
+
+=cut
+
 =head2 squarefree_sigma
 
     squarefree_sigma(n,k=1)
 
-Sum of the square free divisors of C<n>, each divisor raised to power C<k>.
+Sum of the squarefree divisors of C<n>, each divisor raised to power C<k>.
 
     say squarefree_sigma(5040)      #=> 576
     say squarefree_sigma(5040, 2)   #=> 65000
@@ -7990,15 +8552,13 @@ Returns the unitary squarefree divisors of C<n>.
 
     say squarefree_udivisors(5040)   #=> [1, 5, 7, 35]
 
-Aliases: I<squarefree_unitary_divisors>, I<unitary_squarefree_divisors>
-
 =cut
 
 =head2 squarefree_usigma
 
     n.squarefree_usigma(k=1)
 
-Sum of the unitary squarefree divisors of C<n>, each divisor raised to the k-th power.
+Sum of the unitary squarefree divisors of C<n>, each divisor raised to power C<k>.
 
     say 5040.squarefree_usigma     #=> 48
     say 5040.squarefree_usigma(2)  #=> 1300
@@ -8015,30 +8575,30 @@ Returns the number of unitary squarefree divisors of C<n>.
 
 =cut
 
-=head2 squareful
+=head2 squarefull
 
-    squareful(n)
-    squareful(a,b)
+    squarefull(n)
+    squarefull(a,b)
 
-Returns an array with the squareful numbers <= C<n>, or in the range C<a..b>.
-
-=cut
-
-=head2 squareful_count
-
-    squareful_count(n)
-    squareful_count(a,b)
-
-Returns the count of squareful numbers <= C<n>, or in the range C<a..b>.
+Returns an array with the squarefull numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
-=head2 squareful_sum
+=head2 squarefull_count
 
-    squareful_sum(n)
-    squareful_sum(a,b)
+    squarefull_count(n)
+    squarefull_count(a,b)
 
-Returns the sum of squareful numbers <= C<n>, or in the range C<a..b>.
+Returns the count of squarefull numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 squarefull_sum
+
+    squarefull_sum(n)
+    squarefull_sum(a,b)
+
+Returns the sum of squarefull numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
@@ -8086,8 +8646,6 @@ Aliases: I<sum_of_squares_count>
 Returns the unitary square divisors of C<n>, such that each divisor C<d> is a square and C<gcd(n/d, d) = 1>.
 
     say 5040.square_udivisors   #=> [1, 9, 16, 144]
-
-Aliases: I<square_unitary_divisors>, I<unitary_square_divisors>
 
 =cut
 
@@ -8180,6 +8738,14 @@ Number of derangements of a set with C<n> elements having exactly C<k> fixed poi
 Modular integer subtraction: C<(a-b) % m>.
 
     say submod(43, 97, 127)     #=> (43-97)%127
+
+=cut
+
+=head2 submulmod
+
+    submulmod(a, b, c, m)
+
+Modular operation: C<(a - b*c) % m>.
 
 =cut
 
@@ -8403,7 +8969,7 @@ The unitary totient function. (OEIS: A047994)
     urand(n)
     urand(a, b)
 
-Given a positive integer C<n>, returns a random unsigned integer less than C<n>.
+Given a positive integer C<n>, returns a random unsigned integer smaller than C<n>.
 
     say urand(100)          # random integer in [0,99]
 
@@ -8411,7 +8977,7 @@ When two arguments are given, returns a uniform random unsigned integer in the r
 
     say urand(100, 110)     # random integer in [100, 110]
 
-Both arguments must be non-negative. If C<a> is greater than C<b>, then function will return a random integer in the range C<[b,a]>.
+Both arguments must be nonnegative. If C<a> is greater than C<b>, then function will return a random integer in the range C<[b,a]>.
 
 Aliases: I<urandomm>
 
@@ -8421,7 +8987,7 @@ Aliases: I<urandomm>
 
     useed(n)
 
-Takes a non-negative integer C<n>, which is used to seed the internal CSPRNG used for random functions, such as C<urand> and the random prime functions.
+Takes a nonnegative integer C<n>, which is used to seed the internal CSPRNG used for random functions, such as C<urand> and the random prime functions.
 
 For good security, C<n> should be at least an 128-bit random integer.
 

@@ -36,17 +36,20 @@ subtest 'basic MULTI' => sub {
     done_testing;
 };
 subtest 'MULTI combined with regular requests' => sub {
+    my $data;
     my $multi = $redis->multi(sub {
         my ($tx) = @_;
         $tx->set(x => 123);
         $tx->get('x')->on_ready(sub {
             my $f = shift;
             is(exception {
-                my ($data) = $f->get;
-                is($data, '123', 'data is correct');
+                ($data) = $f->get;
+                is($data, '123', 'data is correct inside MULTI');
             }, undef, 'no exception on ->get');
         });
     });
+    await $multi;
+    is($data, '123', 'data is correct after multi');
     my $f = $redis->get('x')->on_ready(sub {
         my $f = shift;
         is(exception {

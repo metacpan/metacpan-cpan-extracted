@@ -3,7 +3,7 @@ package Template::Plex;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('v0.6.0');
+our $VERSION = 'v0.6.2';
 use feature qw<say refaliasing>;
 no warnings "experimental";
 
@@ -13,14 +13,14 @@ use Log::OK;	#Allow control of logging from the command line
 
 use Symbol qw<delete_package>;
 
-use constant KEY_OFFSET=>0;
-use enum ("plex_=0",qw<meta_ args_ sub_ package_ init_done_flag_ skip_
+use constant::more KEY_OFFSET=>0;
 
-	cache_
-	slots_ parent_ default_result_
-	>);
+use constant::more {plex_=>0, meta_=>1, args_=>2, sub_=>3,
+  package_=>4, init_done_flag_=>5, skip_=>6,
+	cache_=>7, slots_=>8, parent_=>9, default_result_=>10
+};
 
-use constant KEY_COUNT=>default_result_ - plex_ +1;
+use constant::more KEY_COUNT=>default_result_ - plex_ +1;
 
 #Template::Plex::Internal uses the field name constants so import it AFTER
 #we define them
@@ -375,7 +375,7 @@ sub parent {$_[0][parent_];}
 
 
 sub DESTROY {
-	delete_package $_[0][package_] if $_[0][package_];
+  delete_package $_[0][package_] if $_[0][package_];
 }
 
 #Internal testing use only

@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.57;
 
-package Tickit::Widget::Scroller::Item::RichText 0.30;
+package Tickit::Widget::Scroller::Item::RichText 0.31;
 class Tickit::Widget::Scroller::Item::RichText
    :strict(params)
    :isa(Tickit::Widget::Scroller::Item::Text);

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-1.0-or-later OR Artistic-1.0-Perl
 
 package GS1::SyntaxEngine::FFI::GS1Encoder;
-$GS1::SyntaxEngine::FFI::GS1Encoder::VERSION = '0.2';
+$GS1::SyntaxEngine::FFI::GS1Encoder::VERSION = '0.3';
 use utf8;
 
 use strictures 2;
@@ -11,6 +11,9 @@ use FFI::Platypus 2.08;
 use FFI::Platypus::Memory ();
 
 use Alien::libgs1encoders 0.03;
+
+use GS1::SyntaxEngine::FFI::EncoderParameterException;
+use GS1::SyntaxEngine::FFI::InitException;
 
 my $ffi = FFI::Platypus->new(
     api => 2,
@@ -53,6 +56,10 @@ sub new {
     my $size    = _instanceSize();
     my $self    = bless \FFI::Platypus::Memory::malloc($size), $class;
     my $r       = _init( ${$self} );
+    if ( !$r ) {
+        GS1::SyntaxEngine::FFI::InitException->throw();
+    }
+
     return $self;
 }
 
@@ -175,7 +182,7 @@ GS1::SyntaxEngine::FFI::GS1Encoder
 
 =head1 VERSION
 
-version 0.2
+version 0.3
 
 =head1 AUTHOR
 

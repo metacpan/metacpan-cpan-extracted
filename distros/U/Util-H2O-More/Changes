@@ -117,3 +117,11 @@
       unforseen impacts to users (who knew!?) of taking them away
     - added tests, POD
     - POD issues if found will usually just be addressed in the next release
+
+0.3.1 Wed Aug 30 00:05:00 2023
+    - added yaml2o and POD for it
+    - yaml2o is like ini2o, but used with YAML files and YAML saved directly
+      as a string to a SCALAR variable 
+      
+0.3.2 Wed Aug 30 01:05:00 2023
+    - POD update 

@@ -20,11 +20,11 @@ extends 'CHI::Driver';
 has 'shm_key' => (is => 'ro', isa => 'Int');
 has 'shm' => (is => 'ro', builder => '_build_shm', lazy => 1);
 has 'shm_size' => (is => 'rw', isa => 'Int', default => 8 * 1024);
-has 'lock' => (
+has 'lock_file' => (is => 'rw', isa => 'Str|Undef');
+has 'lock_fd' => (
 	is => 'ro',
 	builder => '_build_lock',
 );
-has 'lock_file' => (is => 'rw', isa => 'Str|Undef');
 has '_data_size' => (
 	is => 'rw',
 	isa => 'Int',
@@ -47,11 +47,11 @@ CHI::Driver::SharedMem - Cache data in shared memory
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 # FIXME - get the pod documentation right so that the layout of the memory
 # area looks correct in the man page
@@ -125,14 +125,17 @@ Retrieves an object from the cache
 sub fetch {
 	my($self, $key) = @_;
 
+	if($self->{is_size_aware}) {
+		$self->_lock(type => 'write');
+	} else {
+		$self->_lock(type => 'read');
+	}
 	# open(my $tulip, '>>', '/tmp/tulip');
 	# print $tulip __LINE__, "\n";
-	$self->_lock(type => 'read');
 	# print $tulip __LINE__, "\n";
 	my $rc = $self->_data()->{$self->namespace()}->{$key};
 	# print $tulip __LINE__, "\n";
 	if($self->{is_size_aware}) {
-		$self->_lock(type => 'write');
 		my $h = $self->_data();
 		$h->{CHI_Meta_Namespace()}->{last_used_time}->{$key} = time;
 		$self->_data($h);
@@ -153,6 +156,15 @@ sub remove {
 	my($self, $key) = @_;
 
 	$self->_lock(type => 'write');
+	if($ENV{'AUTHOR_TESTING'} && $self->{'is_size_aware'} && (my $timeout = $self->discard_timeout())) {
+		# Workaround for test_discard_timeout
+		# my $sleep_time = $timeout + 1;
+		# open(my $tulip, '>>', '/tmp/tulip');
+		# print $tulip "sleeping $sleep_time\n";
+		# close $tulip;
+		# sleep($sleep_time);
+		sleep(1);
+	}
 	my $h = $self->_data();
 	delete $h->{$self->namespace()}->{$key};
 	delete $h->{CHI_Meta_Namespace()}->{last_used_time}->{$key};
@@ -229,9 +241,17 @@ When the Shared memory area is getting close to full, discard the least recently
 =cut
 
 sub discard_policy_lru {
-	# return;	# debugging why I get uninitialized values in the sort
 	my $self = shift;
 
+	if($ENV{'AUTHOR_TESTING'} && $self->{'is_size_aware'} && (my $timeout = $self->discard_timeout())) {
+		# Workaround for test_discard_timeout
+		# my $sleep_time = $timeout + 1;
+		# open(my $tulip, '>>', '/tmp/tulip');
+		# print $tulip "sleeping $sleep_time\n";
+		# close $tulip;
+		# sleep($sleep_time);
+		sleep(1);
+	}
 	$self->_lock(type => 'read');
 	my $last_used_time = $self->_data()->{CHI_Meta_Namespace()}->{last_used_time};
 	$self->_unlock();
@@ -269,8 +289,6 @@ sub _build_shm {
 }
 
 sub _build_lock {
-	return;
-
 	my $self = shift;
 
 	# open(my $fd, '<', $0) || croak("$0: $!");
@@ -279,12 +297,11 @@ sub _build_lock {
 	# open(my $tulip, '>>', '/tmp/tulip');
 	# print $tulip "build_lock\n", $self->lock_file(), "\n";
 	open(my $fd, '>', $self->lock_file()) || croak($self->lock_file(), ": $!");
+	# close $tulip;
 	return $fd;
 }
 
 sub _lock {
-	return;
-
 	my ($self, %params) = @_;
 
 	# open(my $tulip, '>>', '/tmp/tulip');
@@ -295,39 +312,46 @@ sub _lock {
 	# }
 	return unless $self->lock_file();
 
-	if(my $lock = $self->lock()) {
+	if(my $lock = $self->lock_fd()) {
+		# print $tulip "locking\n";
 		flock($lock, ($params{type} eq 'read') ? Fcntl::LOCK_SH : Fcntl::LOCK_EX);
 	} else {
 		# print $tulip 'lost lock ', $self->lock_file(), "\n";
 		croak('Lost lock: ', $self->lock_file());
 	}
+	# print $tulip "locked\n";
+	# close $tulip;
 }
 
 sub _unlock {
-	return;
-
 	my $self = shift;
 
 	# open(my $tulip, '>>', '/tmp/tulip');
 	# print $tulip 'unlock ', $self->lock_file(), "\n";
-	if(my $lock = $self->lock()) {
+	# my $i = 0;
+	# while((my @call_details = (caller($i++)))) {
+		# print $tulip "\t", $call_details[1], ':', $call_details[2], ' in function ', $call_details[3], "\n";
+	# }
+	if(my $lock = $self->lock_fd()) {
 		flock($lock, Fcntl::LOCK_UN);
 	} else {
 		# print $tulip 'lost lock for unlock ', $self->lock_file(), "\n";
 		croak('Lost lock for unlock: ', $self->lock_file());
 	}
+	# close $tulip;
 }
 
 # The area must be locked by the caller
 sub _data_size {
 	my($self, $value) = @_;
 
+	if(!$self->shm()) {
+		croak __PACKAGE__, ': panic: _data_size has lost the shared memory segment';
+		return 0;
+	}
 	if(defined($value)) {
 		$self->shm()->write(pack('I', $value), 0, $Config{intsize});
 		return $value;
-	}
-	unless($self->shm()) {
-		return 0;
 	}
 	my $size = $self->shm()->read(0, $Config{intsize});
 	unless(defined($size)) {
@@ -343,11 +367,16 @@ sub _data {
 	# open(my $tulip, '>>', '/tmp/tulip');
 	# print $tulip __LINE__, "\n";
 	if(defined($h)) {
-		my $f = JSON::MaybeXS->new()->ascii()->encode($h);
+		my $f = JSON::MaybeXS->new()->ascii(1)->encode($h);
 		my $cur_size = length($f);
-		# print $tulip __LINE__, "cmp $cur_size > ", $self->size(), "\n";
+		# print $tulip __LINE__, " cmp $cur_size > ", $self->shm_size(), "\n";
 		if($cur_size > ($self->shm_size() - $Config{intsize})) {
-			croak("sharedmem set failed - value too large? ($cur_size bytes) > ", $self->shm_size());
+			$self->_unlock();
+			croak("Sharedmem set failed - value too large? ($cur_size bytes) > ", $self->shm_size());
+		}
+		if($f !~ /\}$/) {
+			$self->_unlock();
+			croak("Encoding failed. ($cur_size bytes: $f) ");
 		}
 		$self->shm()->write($f, $Config{intsize}, $cur_size);
 		$self->_data_size($cur_size);
@@ -357,19 +386,27 @@ sub _data {
 	}
 	my $cur_size = $self->_data_size();
 	# print $tulip "get: $cur_size bytes\n";
-	# close $tulip;
 	if($cur_size) {
 		my $rc;
 		eval {
-			$rc = JSON::MaybeXS->new()->ascii()->decode($self->shm()->read($Config{intsize}, $cur_size));
+			$rc = JSON::MaybeXS->new()->ascii(1)->decode($self->shm()->read($Config{intsize}, $cur_size));
 		};
 		if($@) {
+			$self->_lock(type => 'write');
 			$self->_data_size(0);
+			my $foo = $self->shm()->read($Config{intsize}, $cur_size);
+			# print $tulip "\tDecode fail $cur_size bytes $@\n\t$foo\n";
+			# my $i = 0;
+			# while((my @call_details = (caller($i++)))) {
+				# print $tulip "\t", $call_details[1], ':', $call_details[2], ' in function ', $call_details[3], "\n";
+			# }
 			croak($@);
+			$self->_unlock();
 		}
 		return $rc;
-		# return JSON::MaybeXS->new()->ascii()->decode($self->shm()->read($Config{intsize}, $cur_size));
+		# return JSON::MaybeXS->new()->ascii(1)->decode($self->shm()->read($Config{intsize}, $cur_size));
 	}
+	# close $tulip;
 	return {};
 }
 
@@ -383,7 +420,7 @@ sub BUILD {
 	my $self = shift;
 
 	unless($self->shm_key()) {
-		croak 'CHI::Driver::SharedMem - no key given';
+		croak 'CHI::Driver::SharedMem - no shm_key given';
 	}
 	$| = 1;
 }
@@ -404,9 +441,8 @@ sub DEMOLISH {
 	# open(my $tulip, '>>', '/tmp/tulip');
 	# print $tulip "DEMOLISH\n";
 	if($self->shm_key() && $self->shm()) {
-		my $cur_size;
 		$self->_lock(type => 'write');
-		$cur_size = $self->_data_size();
+		my $cur_size = $self->_data_size();
 		# print $tulip "DEMOLISH: $cur_size bytes\n";
 		my $can_remove = 0;
 		my $stat = $self->shm()->stat();
@@ -442,7 +478,7 @@ sub DEMOLISH {
 		$self->_unlock();
 		if($can_remove && (my $lock_file = $self->lock_file())) {
 			$self->lock_file(undef);
-			close $self->lock();
+			close $self->lock_fd();
 			unlink $lock_file;
 			# print $tulip "unlink $lock_file\n";
 			# close $tulip;

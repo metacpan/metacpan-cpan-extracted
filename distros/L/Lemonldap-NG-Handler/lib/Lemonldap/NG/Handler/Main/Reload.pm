@@ -1,6 +1,6 @@
 package Lemonldap::NG::Handler::Main::Reload;
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.17.0';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -208,13 +208,12 @@ sub defaultValuesInit {
 
     $class->tsv->{$_} = $conf->{$_}
       foreach ( qw(
-        cookieExpiration        cookieName         customFunctions httpOnly
+        cookieExpiration        cookieName         customFunctions
         securedCookie           timeout            timeoutActivity
         timeoutActivityInterval useRedirectOnError useRedirectOnForbidden
-        useSafeJail             whatToTrace        handlerInternalCache
+        useSafeJail  httpOnly   whatToTrace        handlerInternalCache
         handlerServiceTokenTTL  customToTrace      lwpOpts lwpSslOpts
-        authChoiceAuthBasic     authChoiceParam    hiddenAttributes
-        upgradeSession
+        authChoiceAuthBasic     authChoiceParam    upgradeSession
         )
       );
 
@@ -665,6 +664,9 @@ sub substitute {
 
     # handle has2f
     $expr =~ s/\bhas2f\(([^),]*)\)/has2f_internal(\$s,$1)/g;
+
+    # handle inSubnet
+    $expr =~ s/\binSubnet\(([^)]*)\)/ipInSubnet(\$r->{env}->{REMOTE_ADDR},$1)/g;
 
     return $expr;
 }

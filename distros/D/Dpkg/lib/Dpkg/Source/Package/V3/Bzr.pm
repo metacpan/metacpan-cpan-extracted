@@ -1,6 +1,3 @@
-#
-# bzr support for dpkg-source
-#
 # Copyright © 2007 Colin Watson <cjwatson@debian.org>.
 # Based on Dpkg::Source::Package::V3_0::git, which is:
 # Copyright © 2007 Joey Hess <joeyh@debian.org>.
@@ -19,12 +16,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Source::Package::V3::Bzr;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::Source::Package::V3::Bzr - class for source format 3.0 (bzr)
+
+=head1 DESCRIPTION
+
+This module provides a class to handle the source package format 3.0 (bzr).
+
+B<Note>: This is a private module, its API can change at any time.
+
+=cut
+
+package Dpkg::Source::Package::V3::Bzr 0.01;
 
 use strict;
 use warnings;
-
-our $VERSION = '0.01';
 
 use Cwd;
 use File::Basename;
@@ -209,5 +218,13 @@ sub do_extract {
 
     chdir $old_cwd or syserr(g_("unable to chdir to '%s'"), $old_cwd);
 }
+
+=head1 CHANGES
+
+=head2 Version 0.xx
+
+This is a private module.
+
+=cut
 
 1;

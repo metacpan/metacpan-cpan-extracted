@@ -13,6 +13,10 @@ my $xml;
     close XML;
 }
 
+# Update this if you change the content of the file
+my $idp_in_file = 12;
+my $sp_in_file  = 48;
+
 subtest 'Ignore SP' => sub {
     my $lmConf     = {};
     my $importConf = {
@@ -27,9 +31,9 @@ subtest 'Ignore SP' => sub {
     # Run import
     my ( $spCounters, $idpCounters ) =
       transform_config( $importConf, $lmConf, $xml );
-    is( $spCounters->{created},  45 );
+    is( $spCounters->{created},  $sp_in_file - 2 );
     is( $spCounters->{ignored},  2 );
-    is( $idpCounters->{created}, 12 );
+    is( $idpCounters->{created}, $idp_in_file );
     is( $idpCounters->{ignored}, 0 );
 };
 
@@ -47,9 +51,9 @@ subtest 'Ignore IDP' => sub {
     # Run import
     my ( $spCounters, $idpCounters ) =
       transform_config( $importConf, $lmConf, $xml );
-    is( $spCounters->{created},  47 );
+    is( $spCounters->{created},  $sp_in_file );
     is( $spCounters->{ignored},  0 );
-    is( $idpCounters->{created}, 10 );
+    is( $idpCounters->{created}, $idp_in_file - 2 );
     is( $idpCounters->{ignored}, 2 );
 };
 
@@ -65,11 +69,11 @@ subtest 'Conf Prefix' => sub {
     # Run import
     transform_config( $importConf, $lmConf, $xml );
     is( scalar grep( /^renater-sp/, keys( %{ $lmConf->{samlSPMetaDataXML} } ) ),
-        47 );
+        $sp_in_file );
     is(
         scalar
           grep( /^renater-idp/, keys( %{ $lmConf->{samlIDPMetaDataXML} } ) ),
-        12
+        $idp_in_file
     );
 };
 

@@ -82,11 +82,16 @@ ok(
     ' Description app1 found'
 );
 ok(
+    $res->{myapplications}->[0]->{Applications}->[0]->{'Application Test 1'}
+      ->{AppLogo} eq 'http:/auth.example.com//static/common/apps/demo.png',
+    ' Logo app1 found'
+);
+ok(
     $res->{myapplications}->[0]->{Applications}->[1]->{'Application Test 2'}
       ->{AppUri} =~ m#http://test2\.example\.com/#,
     ' URI app2 found'
 );
-count(4);
+count(5);
 
 # Test logout
 $client->logout($id);

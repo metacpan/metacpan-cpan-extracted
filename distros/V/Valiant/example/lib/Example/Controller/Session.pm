@@ -15,7 +15,7 @@ sub root :At('login/...') Via('../root') ($self, $c, $user) {
 }
 
   sub prepare_build :At('...') Via('root') ($self, $c, $user) {
-    $self->view_for('build', user => $user); 
+    $self->view_for('build', person => $user); 
     $c->action->next($user);
   }
 

@@ -429,31 +429,7 @@ package Sidef::Types::String::String {
     }
 
     *substring = \&substr;
-
-    sub ft {
-        my ($self, $from, $to) = @_;
-
-        my $max = CORE::length($$self);
-
-        $from = defined($from) ? CORE::int($from) : 0;
-        $to   = defined($to)   ? CORE::int($to)   : $max;
-
-        if (abs($from) > $max) {
-            return state $x = bless \(my $str = '');
-        }
-
-        if ($to < 0) {
-            $to += $max;
-        }
-
-        if ($from < 0) {
-            $from += $max;
-        }
-
-        __PACKAGE__->new($to < $from ? '' : CORE::substr($$self, $from, $to - $from + 1));
-    }
-
-    *slice = \&ft;
+    *slice     = \&substr;
 
     sub insert {
         my ($self, $string, $pos, $len) = @_;
@@ -895,6 +871,13 @@ package Sidef::Types::String::String {
         my ($self) = @_;
         Sidef::Types::Array::Array->new([map { bless \$_ } CORE::split(//, $$self)]);
     }
+
+    sub code_points {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new([map { Sidef::Types::Number::Number::_set_int($_) } unpack('C*', $$self)]);
+    }
+
+    *codes = \&code_points;
 
     sub iter {
         my ($self) = @_;

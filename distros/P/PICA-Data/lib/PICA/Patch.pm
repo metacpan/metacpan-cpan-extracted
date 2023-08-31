@@ -1,7 +1,7 @@
 package PICA::Patch;
 use v5.14.1;
 
-our $VERSION = '2.11';
+our $VERSION = '2.12';
 
 use PICA::Schema qw(field_identifier);
 use PICA::Data::Field;
@@ -29,6 +29,8 @@ sub sorted_fields {
                 if $level ne substr $_->[0], 0, 1;
         }
     }
+
+    $fields = [sort {cmp_fields($a, $b)} @$fields];
 
     return $fields;
 }

@@ -105,8 +105,9 @@ sub case {
             return $case_stmt;
         }
         elsif ( $menu->[$idx] eq $when ) {
-            $tmp_sql->{when_stmt} = "${pad2}WHEN";
-            my $ret = $sb->__add_condition( $tmp_sql, 'when', $qt_cols, $clause );
+            my $stmt = 'when_stmt';
+            $tmp_sql->{$stmt} = "${pad2}WHEN";
+            my $ret = $sb->__add_condition( $tmp_sql, $clause, $stmt, $qt_cols );
             if ( ! defined $ret ) {
                 delete $tmp_sql->{when_stmt};
                 $tmp_sql->{case_stmt} = pop @bu;

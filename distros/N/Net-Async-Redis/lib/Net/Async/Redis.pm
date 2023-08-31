@@ -9,7 +9,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '3.024';
+our $VERSION = '4.000';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -59,9 +59,9 @@ Current features include:
 
 =over 4
 
-=item * L<all commands|https://redis.io/commands> as of 7.0 RC2 (March 2022), see L<https://redis.io/commands> for the methods and parameters
+=item * L<all commands|https://redis.io/commands> as of 7.2 (August 2023), see L<https://redis.io/commands> for the methods and parameters
 
-=item * L<pub/sub support|https://redis.io/topics/pubsub>, see L</METHODS - Subscriptions>
+=item * L<pub/sub support|https://redis.io/topics/pubsub>, see L</METHODS - Subscriptions> including sharded pubsub
 
 =item * L<pipelining|https://redis.io/topics/pipelining>, see L</pipeline_depth>
 
@@ -72,6 +72,11 @@ Current features include:
 =item * L<client-side caching|https://redis.io/topics/client-side-caching>, see L</METHODS - Clientside caching>
 
 =item * L<RESP3/https://github.com/antirez/RESP3/blob/master/spec.md> protocol for Redis 6 and above, allowing pubsub on the same connection as regular commands
+
+=item * cluster support via L<Net::Async::Redis::Cluster>, including key specifications from L<https://redis.io/docs/reference/key-specs/> to route commands to
+the correct node(s)
+
+=item * see L<Net::Async::Redis::XS> for a faster XS version (can be 40x faster than the pure Perl version, particularly when parsing large L</xreadgroup> responses)
 
 =back
 
@@ -162,6 +167,7 @@ use mro;
 use Class::Method::Modifiers;
 use Syntax::Keyword::Try;
 use Syntax::Keyword::Dynamically;
+use Syntax::Keyword::Match;
 use curry::weak;
 use Future::AsyncAwait;
 use IO::Async::Stream;
@@ -169,6 +175,10 @@ use Ryu::Async;
 use URI;
 use URI::redis;
 use Cache::LRU;
+use YAML::XS ();
+use Path::Tiny;
+use Dir::Self;
+use File::ShareDir ();
 
 use Log::Any qw($log);
 use Metrics::Any qw($metrics), strict => 0;
@@ -221,6 +231,22 @@ our %SUBSCRIPTION_COMMANDS = (
     PMESSAGE     => 1,
 );
 
+our %COMMAND_DEFINITION = do {
+    my $path = Path::Tiny::path(__DIR__)->parent(3)->child('share/commands.yaml');
+    $path = Path::Tiny::path(
+        File::ShareDir::dist_file(
+            'Net-Async-Redis',
+            'commands.yaml'
+        )
+    ) unless $path->exists;
+    YAML::XS::LoadFile("$path")->%*
+};
+
+# Add support for secure Redis `rediss://...` URIs
+unless(URI::rediss->can('new')) {
+    push @URI::rediss::ISA, qw(URI::redis);
+    *URI::rediss::secure = sub { 1 };
+}
 
 =head1 METHODS
 
@@ -272,6 +298,7 @@ sub configure {
     for (qw(
         host
         port
+        username
         auth
         database
         pipeline_depth
@@ -282,6 +309,9 @@ sub configure {
         opentracing
         protocol
         hashrefs
+        tls_cert_file
+        tls_key_file
+        tls_ca_file
     )) {
         $self->{$_} = delete $args{$_} if exists $args{$_};
     }
@@ -292,7 +322,7 @@ sub configure {
     # would we expect it to be?
     if(exists $args{uri}) {
         my $uri = delete $args{uri};
-        $uri = "redis://$uri" unless ref($uri) or $uri =~ /^redis:/;
+        $uri = "redis://$uri" unless ref($uri) or $uri =~ /^rediss?:/;
         $self->{uri} = $uri;
     }
 
@@ -404,12 +434,26 @@ sub connect : method {
     $uri->path('/' . $self->database) if $self->database;
 
     my $auth = $self->{auth};
-    $auth //= ($uri->userinfo =~ s{^[^:]*:}{}r) if defined $uri->userinfo;
+    # Our configured values are used in preference to the URI,
+    # to support separation of sensitive information (pull URI
+    # from config with defaults for user/password, then override
+    # those with secret values taken from another source).
+    my $username = $self->{username} // 'default';
+    if(!defined($auth) and defined($uri->userinfo)) {
+        (my $userpart, $auth) = split ':', $uri->userinfo, 2;
+        $username = $userpart if length $userpart;
+    }
     $log->tracef('About to start connection to %s', "$uri");
+    my $tls = $self->{tls} // $uri->secure // 0;
+    require IO::Async::SSL if $tls;
     $self->{connection} //= $self->loop->connect(
         service => $uri->port // 6379,
         host    => $uri->host,
         socktype => 'stream',
+        $tls ? (
+            extensions => ['SSL'],
+            $self->ssl_options->%*,
+        ) : (),
     )->then(async sub {
         my ($sock) = @_;
         $self->{endpoint} = join ':', $sock->peerhost, $sock->peerport;
@@ -444,7 +488,7 @@ sub connect : method {
             dynamically $self->{connection_in_progress} = 1;
             await $self->hello(
                 3, defined($auth) ? (
-                    qw(AUTH default), $auth
+                    qw(AUTH), $username, $auth
                 ) : (), defined($self->client_name) ? (
                     qw(SETNAME), $self->client_name
                 ) : ()
@@ -1185,8 +1229,9 @@ sub execute_command {
         }
         my $data = $self->wire_protocol->encode_from_client(@cmd);
 
-        # Void-context write allows IaStream to combine multiple writes on the same connection.
         push @{$self->{pending}}, [ $cmd, $f ];
+
+        # Void-context write allows IaStream to combine multiple writes on the same connection.
         $self->stream->write($data);
         return $f
     };
@@ -1358,6 +1403,215 @@ sub _add_to_loop {
     delete $self->{client_side_connection};
 }
 
+=head2 retrieve_full_command_list
+
+Iterates through all commands defined in Redis, extracting the information about
+that command using C<COMMAND INFO>.
+
+The data is formatted for internal use, converting information such as flags
+into hashrefs for easier lookup.
+
+This information is also used by L</extract_keys_from_command>.
+
+Returns a hashref, where each key represents a method name (space-separated
+commands such as C<CLUSTER NODES> are returned as C<cluster_nodes>). The values
+are a restructured form of L<https://redis.io/commands/command>.
+
+=cut
+
+async sub retrieve_full_command_list {
+    my ($self) = @_;
+    my %data;
+    my $commands = await $self->command_list;
+    for my $command_name ($commands->@*) {
+        my $method_name = $command_name =~ s/\|/_/gr;
+        my ($info) = (await $self->command_info($command_name))->@*;
+        my ($name, $arity, $flags, $first_key, $last_key, $step, $acl_cat, $tips, $key_spec, $subcommands) = $info->@*;
+        $flags = +{ map { $_ => 1 } $flags->@* };
+        $acl_cat = +{ map { $_ => 1 } $acl_cat->@* };
+        $tips = +{ map { $_ => 1 } $tips->@* };
+        my @key_specs;
+        for my $ks ($key_spec->@*) {
+            $key_spec = +{ $ks->@* };
+            $key_spec->{flags} &&= +{ map { $_ => 1 } $key_spec->{flags}->@* };
+            $key_spec->{begin_search} &&= +{ $key_spec->{begin_search}->@* };
+            $key_spec->{begin_search}{spec} &&= +{ $key_spec->{begin_search}{spec}->@* };
+            $key_spec->{find_keys} &&= +{ $key_spec->{find_keys}->@* };
+            $key_spec->{find_keys}{spec} &&= +{ $key_spec->{find_keys}{spec}->@* };
+            push @key_specs, $key_spec;
+        }
+
+        $data{$method_name} = {
+            name        => $name,
+            arity       => $arity,
+            flags       => $flags,
+            first_key   => $first_key,
+            last_key    => $last_key,
+            step        => $step,
+            acl_cat     => $acl_cat,
+            tips        => $tips,
+            key_spec    => \@key_specs,
+            subcommands => $subcommands
+        };
+    }
+    return \%data;
+}
+
+=head2 extract_keys_for_command
+
+Given a command arrayref and a definition for the server, this will
+return a list of any keys found in that command.
+
+Since the logic for this is slightly slow, we are caching the result
+unless a specific definition is provided: this is an internal implementation
+detail and not something to rely on.
+
+(the key specification is a relatively new Redis feature - an optimised version
+of this logic will be added to L<Net::Async::Redis::XS> in due course, which
+should reduce the need for caching)
+
+Returns a list of keys.
+
+=cut
+
+my $keyspec_cache = Cache::LRU->new(
+    size => 10_000
+);
+sub extract_keys_for_command {
+    my ($class, $command, $def) = @_;
+    my $cache = 0;
+    unless($def) {
+        my $cached = $keyspec_cache->get(join "\x{01FF}", $command->@*);
+        return $cached->@* if $cached;
+        $def //= \%COMMAND_DEFINITION;
+        ++$cache;
+    }
+
+    # The command itself is represented as a method name
+    my (@components) = $command->@*;
+    my ($cmd) = @components;
+    my $info = $def->{lc $cmd} or die 'command not found: ' . $cmd;
+
+    # Identify the full matching command against the known definitions
+    my $idx = 0;
+    while(@components && $info->{subcommands} && $info->{subcommands}->@* && $#components >= $idx) {
+        my $next = "${cmd}_" . $components[++$idx];
+        last unless exists $def->{lc $next};
+        $cmd = $next;
+        $info = $def->{lc $cmd};
+    }
+
+    # Commands can have zero or more keyspecs which tell us where to find the key information. Each
+    # command may have multiple keyspec definitions.
+    my @keys;
+
+    KEYSPEC:
+    for my $key_spec ($info->{key_spec}->@*) {
+        my $type = $key_spec->{begin_search}{type}
+            or next KEYSPEC;
+
+        # Instead of trying to track index and offset, we work with a copy of the data - less efficient,
+        # but easier to get accurate results.
+        my @target = @components;
+
+        # Find the starting index
+        match($type : eq) {
+            case('index') {
+                splice @target, 0, $key_spec->{begin_search}{spec}{index} if $key_spec->{begin_search}{spec}{index};
+            }
+            case('keyword') {
+                my $target = $key_spec->{begin_search}{spec}{keyword};
+                my $start = $key_spec->{begin_search}{spec}{startfrom};
+                if($start < 0) {
+                    splice @target, $start, -$#target if $start < -1;
+                    pop @target while @target and uc($target[-1]) ne $target;
+                    next KEYSPEC unless @target;
+                    @target = reverse @target;
+                } else {
+                    splice @target, 0, $start - 1 if $start > 1;
+                    shift @target while @target and uc($target[0]) ne $target;
+                    next KEYSPEC unless @target;
+                    shift @target;
+                }
+            }
+            case('unknown') {
+                die 'Unknown key specification for command ' . $cmd;
+            }
+            default {
+                die 'No key specification for command ' . $cmd;
+            }
+        }
+
+        # Find the keys, starting from the index identified above
+        match($key_spec->{find_keys}{type} : eq) {
+            case('range') {
+                my $spec = $key_spec->{find_keys}{spec};
+                my $last_key = $spec->{lastkey};
+                unless($last_key) {
+                    push @keys, shift @target;
+                    next KEYSPEC;
+                }
+
+                my $key_step = $spec->{keystep};
+                my $limit = $spec->{limit};
+
+                splice @target, (1 + $last_key) * ($key_step + 1) if $last_key < -1;
+                my $target_index = 0 + @target;
+                $target_index = $last_key * $key_step if $last_key > 0;
+                $target_index = int($target_index / $limit) if $limit > 1;
+                $target_index //= 1;
+
+                while(@target and $target_index--) {
+                    my ($next) = splice @target, 0, $key_step;
+                    push @keys, $next;
+                }
+                next KEYSPEC;
+            }
+            case('keynum') {
+                my $spec = $key_spec->{find_keys}{spec};
+                my $key_step = $spec->{keystep};
+                my $count = $target[$spec->{keynumidx}];
+                splice @target, 0, $spec->{firstkey};
+                while(@target and $count--) {
+                    my ($next) = splice @target, 0, $key_step;
+                    push @keys, $next;
+                }
+                next KEYSPEC;
+            }
+            case('unknown') {
+                die 'Unknown key specification for command ' . $cmd;
+            }
+            default {
+                die 'No key specification for command ' . $cmd;
+            }
+        }
+    }
+    $keyspec_cache->set(join("\x{01FF}", $command->@*), \@keys) if $cache;
+    return @keys;
+}
+
+=head2 ssl_options
+
+Extracts the SSL-related options as a hashref for passing
+to C<< $loop->connect >>.
+
+=cut
+
+sub ssl_options {
+    my ($self) = @_;
+    return {
+        map {
+            defined $self->{"tls_$_"} ? (
+                "SSL_$_" => $self->{"tls_$_"}
+            ) : ()
+        } qw(
+            cert_file
+            key_file
+            ca_file
+        )
+    };
+}
+
 1;
 
 __END__
@@ -1408,6 +1662,8 @@ tests and feedback:
 =item * Nael Alolwani
 
 =item * Marc Frank
+
+=item * C<< @pnevins >>
 
 =back
 

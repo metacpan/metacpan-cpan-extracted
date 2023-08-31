@@ -138,7 +138,7 @@ sub is_decoder_installed
     return( $@ ? 0 : 1 );
 }
 
-sub is_emcoder_installed
+sub is_encoder_installed
 {
     eval( 'use MIME::QuotedPrint ();' );
     return( $@ ? 0 : 1 );
@@ -264,6 +264,14 @@ It returns true upon success, and upon error, it will set the error in the globa
 =head2 encode_qp_utf8
 
 This takes a string, encode it into an UTF-8 string using L<Encode/encode_utf8> and then encode the resulting string into quoted-printable and returns the result.
+
+=head2 is_decoder_installed
+
+Returns true if the module L<MIME::QuotedPrint> is installed, false otherwise.
+
+=head2 is_encoder_installed
+
+Returns true if the module L<MIME::QuotedPrint> is installed, false otherwise.
 
 =head1 AUTHOR
 

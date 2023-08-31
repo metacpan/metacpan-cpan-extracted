@@ -57,6 +57,7 @@ LemonLDAP::NG 2F registration script
       dataType: 'json',
       error: displayError,
       success: function(resp) {
+        var e;
         if (resp.error) {
           if (resp.error.match(/notAuthorized/)) {
             return setMsg('notAuthorized', 'warning');
@@ -65,13 +66,16 @@ LemonLDAP::NG 2F registration script
           }
         } else if (resp.result) {
           $("#delete-" + epoch).hide();
-          $(document).trigger("mfaDeleted", [
+          e = jQuery.Event("mfaDeleted");
+          $(document).trigger(e, [
             {
               "type": device,
               "epoch": epoch
             }
           ]);
-          return setMsg('yourKeyIsUnregistered', 'positive');
+          if (!e.isDefaultPrevented()) {
+            return setMsg('yourKeyIsUnregistered', 'positive');
+          }
         }
       },
       error: displayError

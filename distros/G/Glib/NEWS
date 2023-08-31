@@ -1,3 +1,9 @@
+Overview of changes in Glib 1.3294 (stable)
+============================================
+* Add G_OPTION_FLAG_NONE to the GOptionFlag GEnum (GNOME/perl-glib!8)
+* Add a CI pipeline for perl-Glib (GNOME/perl-glib!9)
+* Adapt tests to glib-2.77 (GNOME/perl-glib!10)
+
 Overview of changes in Glib 1.3293 (stable)
 ============================================
 

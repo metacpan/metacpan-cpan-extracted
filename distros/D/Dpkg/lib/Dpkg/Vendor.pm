@@ -14,34 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Vendor;
-
-use strict;
-use warnings;
-use feature qw(state);
-
-our $VERSION = '1.02';
-our @EXPORT_OK = qw(
-    get_current_vendor
-    get_vendor_info
-    get_vendor_file
-    get_vendor_dir
-    get_vendor_object
-    run_vendor_hook
-);
-
-use Exporter qw(import);
-use List::Util qw(uniq);
-
-use Dpkg ();
-use Dpkg::ErrorHandling;
-use Dpkg::Gettext;
-use Dpkg::BuildEnv;
-use Dpkg::Control::HashCore;
-
-my $origins = "$Dpkg::CONFDIR/origins";
-$origins = $ENV{DPKG_ORIGINS_DIR} if $ENV{DPKG_ORIGINS_DIR};
-
 =encoding utf8
 
 =head1 NAME
@@ -67,6 +39,35 @@ The file should be named according to the vendor name. The usual convention
 is to name the vendor file using the vendor name in all lowercase, but some
 variation is permitted. Namely, spaces are mapped to dashes ('-'), and the
 file can have the same casing as the Vendor field, or it can be capitalized.
+
+=cut
+
+package Dpkg::Vendor 1.02;
+
+use strict;
+use warnings;
+use feature qw(state);
+
+our @EXPORT_OK = qw(
+    get_current_vendor
+    get_vendor_info
+    get_vendor_file
+    get_vendor_dir
+    get_vendor_object
+    run_vendor_hook
+);
+
+use Exporter qw(import);
+use List::Util qw(uniq);
+
+use Dpkg ();
+use Dpkg::ErrorHandling;
+use Dpkg::Gettext;
+use Dpkg::BuildEnv;
+use Dpkg::Control::HashCore;
+
+my $origins = "$Dpkg::CONFDIR/origins";
+$origins = $ENV{DPKG_ORIGINS_DIR} if $ENV{DPKG_ORIGINS_DIR};
 
 =head1 FUNCTIONS
 
@@ -228,7 +229,6 @@ sub get_vendor_object {
 
     foreach my $name (uniq @names) {
         eval qq{
-            pop \@INC if \$INC[-1] eq '.';
             require Dpkg::Vendor::$name;
             \$obj = Dpkg::Vendor::$name->new();
         };
@@ -258,8 +258,10 @@ Run a hook implemented by the current vendor object.
 =cut
 
 sub run_vendor_hook {
+    my @args = @_;
     my $vendor_obj = get_vendor_object();
-    $vendor_obj->run_hook(@_);
+
+    $vendor_obj->run_hook(@args);
 }
 
 =back

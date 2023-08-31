@@ -57,8 +57,13 @@ sub getUser {
     $req->data->{OpenIDConnect_user_info} = $userinfo_content;
 
     # Check that received sub is the same than current user
-    unless ( $req->data->{OpenIDConnect_user_info}->{sub} eq $req->{user} ) {
-        $self->logger->error("Received sub do not match current user");
+    my $id_token_sub =
+      $req->data->{id_token_sub} || $req->userData->{_oidc_sub};
+    my $received_sub = $req->data->{OpenIDConnect_user_info}->{'sub'};
+    unless ( $received_sub eq $id_token_sub ) {
+        $self->logger->error(
+"Received sub $received_sub does not match current user $id_token_sub"
+        );
         return PE_BADCREDENTIALS;
     }
 
@@ -78,7 +83,7 @@ sub setSessionInfo {
 
     my %vars = (
         %{ $self->conf->{exportedVars} },
-        %{ $self->conf->{oidcOPMetaDataExportedVars}->{$op} }
+        %{ $self->opAttributes->{$op} }
     );
 
     while ( my ( $k, $v ) = each %vars ) {

@@ -4,6 +4,7 @@ use strict;
 use Encode;
 use Mouse;
 use POSIX qw(strftime);
+use JSON;
 use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
@@ -32,7 +33,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PP_INSUFFICIENT_PASSWORD_QUALITY
 );
 
-our $VERSION = '2.16.1';
+our $VERSION = '2.17.0';
 
 extends qw(
   Lemonldap::NG::Portal::Lib::SMTP
@@ -598,16 +599,17 @@ sub display {
     $self->logger->debug( 'Display called with code: ' . $req->error );
 
     my %tplPrm = (
-        AUTH_ERROR      => $req->error,
-        AUTH_ERROR_TYPE => $req->error_type,
-        AUTH_ERROR_ROLE => $req->error_role,
-        AUTH_URL        => $req->data->{_url},
-        CHOICE_VALUE    => $req->{_authChoice},
-        EXPMAILDATE     => $req->data->{expMailDate},
-        EXPMAILTIME     => $req->data->{expMailTime},
-        STARTMAILDATE   => $req->data->{startMailDate},
-        STARTMAILTIME   => $req->data->{startMailTime},
-        MAILALREADYSENT => $req->data->{mailAlreadySent},
+        AUTH_ERROR                      => $req->error,
+        AUTH_ERROR_TYPE                 => $req->error_type,
+        AUTH_ERROR_ROLE                 => $req->error_role,
+        ( 'AUTH_ERROR_' . $req->error ) => 1,
+        AUTH_URL                        => $req->data->{_url},
+        CHOICE_VALUE                    => $req->{_authChoice},
+        EXPMAILDATE                     => $req->data->{expMailDate},
+        EXPMAILTIME                     => $req->data->{expMailTime},
+        STARTMAILDATE                   => $req->data->{startMailDate},
+        STARTMAILTIME                   => $req->data->{startMailTime},
+        MAILALREADYSENT                 => $req->data->{mailAlreadySent},
         (
             $req->data->{customScript}
             ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -630,8 +632,10 @@ sub display {
         PPOLICY_MINLOWER => $self->conf->{passwordPolicyMinLower},
         PPOLICY_MINUPPER => $self->conf->{passwordPolicyMinUpper},
         PPOLICY_MINDIGIT => $self->conf->{passwordPolicyMinDigit},
-        PPOLICY_MINSPECHAR        => $self->conf->{passwordPolicyMinSpeChar},
-        PPOLICY_ALLOWEDSPECHAR    => $speChars,
+        PPOLICY_MINSPECHAR          => $self->conf->{passwordPolicyMinSpeChar},
+        PPOLICY_ALLOWEDSPECHAR      => $speChars,
+        PPOLICY_ALLOWEDSPECHAR_JSON =>
+          to_json( $speChars, { allow_nonref => 1 } ),
         DISPLAY_GENERATE_PASSWORD =>
           $self->conf->{portalDisplayGeneratePassword},
     );

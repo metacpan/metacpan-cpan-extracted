@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 52;
+use Test::More tests => 56;
 use Test::Dpkg qw(:paths);
 
 use Dpkg ();
@@ -29,6 +29,7 @@ use_ok('Dpkg::Substvars');
 
 my $datadir = test_get_data_path();
 
+my $output;
 my $expected;
 
 my $s = Dpkg::Substvars->new();
@@ -110,15 +111,31 @@ is($s->get('ctrl:Some-Field'), 'some-value', 'contents of ctrl:Some-Field');
 is($s->get('ctrl:Other-Field'), 'other-value', 'contents of ctrl:Other-Field');
 is($s->get('ctrl:Alter-Field'), 'alter-value', 'contents of ctrl:Alter-Field');
 
-# Replace stuff
+# Direct replace: few
 is($s->substvars('This is a string ${var1} with variables ${binary:Version}'),
                  'This is a string New value with variables 1:2.3.4~5-6.7.8~nmu9+b0',
-                 'substvars simple');
+                 'direct replace, few times');
+
+# Direct replace: many times (more than the recursive limit)
+$s->set('dr', 'feed');
+is($s->substvars('${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}' .
+                 '${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}' .
+                 '${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}' .
+                 '${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}' .
+                 '${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}' .
+                 '${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}${dr}'),
+    'feedfeedfeedfeedfeedfeedfeedfeedfeedfeed' .
+    'feedfeedfeedfeedfeedfeedfeedfeedfeedfeed' .
+    'feedfeedfeedfeedfeedfeedfeedfeedfeedfeed' .
+    'feedfeedfeedfeedfeedfeedfeedfeedfeedfeed' .
+    'feedfeedfeedfeedfeedfeedfeedfeedfeedfeed' .
+    'feedfeedfeedfeedfeedfeedfeedfeedfeedfeed',
+    'direct replace, many times');
 
 # Add a test prefix to error and warning messages.
 $s->set_msg_prefix('test ');
 
-my $output;
+$output = q{};
 $SIG{__WARN__} = sub { $output .= $_[0] };
 is($s->substvars('This is a string with unknown variable ${blubb}'),
                  'This is a string with unknown variable ',
@@ -128,11 +145,82 @@ is($output,
    'Dpkg_Substvars.t: warning: test substitution variable ${blubb} used, but is not defined' . "\n",
    'missing variables warning');
 
-# Recursive replace
+# Recursive replace: Simple.
 $s->set('rvar', 'recursive ${var1}');
 is($s->substvars('This is a string with ${rvar}'),
                  'This is a string with recursive New value',
-                 'substvars recursive');
+                 'recursive replace simple');
+
+# Recursive replace: Constructed variables.
+$s->set('partref', 'recursive result');
+$s->set('part1', '${pa');
+$s->set('part2', 'rtr');
+$s->set('part3', 'ef}');
+is($s->substvars('Constructed ${part1}${part2}${part3} replace'),
+                 'Constructed recursive result replace',
+                 'recursive constructed variable');
+
+# Recursive replace: Cycle.
+$s->set('ref0', '${ref1}');
+$s->set('ref1', '${ref2}');
+$s->set('ref2', '${ref0}');
+
+eval {
+    $s->substvars('Cycle reference ${ref0}');
+    1;
+};
+$output = $@ // q{};
+is($output,
+   'Dpkg_Substvars.t: error: test too many ${ref0} substitutions ' .
+   "(recursive?) in 'Cycle reference \${ref1}'\n",
+   'recursive cyclic expansion is limited');
+
+# Recursive replace: Billion laughs.
+$s->set('ex0', ':)');
+$s->set('ex1', '${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}');
+$s->set('ex2', '${ex1}${ex1}${ex1}${ex1}${ex1}${ex1}${ex1}${ex1}${ex1}${ex1}');
+$s->set('ex3', '${ex2}${ex2}${ex2}${ex2}${ex2}${ex2}${ex2}${ex2}${ex2}${ex2}');
+$s->set('ex4', '${ex3}${ex3}${ex3}${ex3}${ex3}${ex3}${ex3}${ex3}${ex3}${ex3}');
+$s->set('ex5', '${ex4}${ex4}${ex4}${ex4}${ex4}${ex4}${ex4}${ex4}${ex4}${ex4}');
+$s->set('ex6', '${ex5}${ex5}${ex5}${ex5}${ex5}${ex5}${ex5}${ex5}${ex5}${ex5}');
+$s->set('ex7', '${ex6}${ex6}${ex6}${ex6}${ex6}${ex6}${ex6}${ex6}${ex6}${ex6}');
+$s->set('ex8', '${ex7}${ex7}${ex7}${ex7}${ex7}${ex7}${ex7}${ex7}${ex7}${ex7}');
+$s->set('ex9', '${ex8}${ex8}${ex8}${ex8}${ex8}${ex8}${ex8}${ex8}${ex8}${ex8}');
+
+eval {
+    $s->substvars('Billion laughs ${ex9}');
+    1;
+};
+$output = $@ // q{};
+is($output,
+   'Dpkg_Substvars.t: error: test too many ${ex1} substitutions ' .
+   "(recursive?) in 'Billion laughs :):):):):):):):):):):):):):)" .
+   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+   ':):):):):):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+   ':):):):):):):):):):):):):):):):):):):):):):):):):):)' .
+   '${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}${ex0}' .
+   '${ex2}${ex2}${ex2}${ex2}${ex2}' .
+   '${ex3}${ex3}${ex3}${ex3}${ex3}${ex3}${ex3}${ex3}${ex3}' .
+   '${ex4}${ex4}${ex4}${ex4}${ex4}${ex4}${ex4}${ex4}${ex4}' .
+   '${ex5}${ex5}${ex5}${ex5}${ex5}${ex5}${ex5}${ex5}${ex5}' .
+   '${ex6}${ex6}${ex6}${ex6}${ex6}${ex6}${ex6}${ex6}${ex6}' .
+   '${ex7}${ex7}${ex7}${ex7}${ex7}${ex7}${ex7}${ex7}${ex7}' .
+   '${ex8}${ex8}${ex8}${ex8}${ex8}${ex8}${ex8}${ex8}${ex8}' .
+   "'\n",
+   'recursive or exponential expansion is limited');
 
 # Strange input
 is($s->substvars('Nothing to $ ${substitute  here}, is it ${}?, it ${is'),

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 
@@ -149,6 +149,8 @@ If specified, assume that the resource in question may have several instances,
 distinguished by a string argument. Such argument will be passed as the 3rd
 parameter to the C<init> function.
 
+Only one resource instance will be cached per argument value.
+
 This may be useful e.g. for L<DBIx::Class> result sets,
 or for L<Redis::Namespace>.
 
@@ -157,28 +159,7 @@ A function must return true for the parameter to be valid.
 
 If the argument is omitted, it is assumed to be an empty string.
 
-Example:
-
-    use Resource::Silo;
-    use Redis;
-    use Redis::Namespace;
-
-    resource real_redis => sub { Redis->new };
-
-    my %known_namespaces = (
-        users    => 1,
-        sessions => 1,
-        counters => 1,
-    );
-
-    resource redis => argument => sub { $known_namespaces{ +shift } },
-        init => sub {
-            my ($self, $name, $ns) = @_;
-            Redis::Namespace->new(
-                redis     => $self->real_redis,
-                namespace => $ns,
-            );
-        };
+See L<MORE EXAMPLES> below.
 
 =head3 derived => 1 | 0
 
@@ -238,10 +219,29 @@ This may be useful if cleanup is destructive and shouldn't be performed twice.
 
 =head3 dependencies => \@list
 
-If specified, only allow resources from the list to be fetched
-in the initializer.
+List other resources that may be requested in the initializer.
+Unless C<loose_deps> is specified (see below),
+the dependencies I<must> be declared I<before> the dependant.
 
-This parameter has a different meaning if C<class> parameter is in use (see below).
+A resource with parameter may also depend on itself.
+
+The default is all eligible resources known so far.
+
+B<NOTE> This behavior was different prior to v.0.09
+and may be change again in the near future.
+
+This parameter has a different structure
+if C<class> parameter is in action (see below).
+
+=head3 loose_deps => 1|0
+
+Allow dependencies that have not been declared yet.
+
+Not specifying the C<dependencies> parameter would now mean
+there are no restrictions whatsoever.
+
+B<NOTE> Having to resort to this flag may be
+a sign of a deeper architectural problem.
 
 =head3 class => 'Class::Name'
 
@@ -524,6 +524,12 @@ A more pragmatic one:
     package My::App;
     use Resource::Silo;
 
+    resource redis_conn => sub {
+        my $self = shift;
+        require Redis;
+        Redis->new( server => $self->config->{redis} );
+    };
+
     my %known_namespaces = (
         lock    => 1,
         session => 1,
@@ -540,12 +546,6 @@ A more pragmatic one:
                 namespace => $ns,
             );
         };
-
-    resource redis_conn => sub {
-        my $self = shift;
-        require Redis;
-        Redis->new( server => $self->config->{redis} );
-    };
 
     # later in the code
     silo->redis;            # nope!
@@ -594,7 +594,11 @@ That was a great time and I had great coworkers!
 
 =head1 BUGS
 
-Please report any bugs or feature requests to
+This software is still in beta stage. Its interface is still evolving.
+
+Version 0.09 brings a breaking change that forbids forward dependencies.
+
+Please report bug reports and feature requests to
 L<https://github.com/dallaylaen/resource-silo-p5/issues>
 or via RT:
 L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Resource-Silo>.

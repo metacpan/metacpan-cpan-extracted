@@ -1,6 +1,6 @@
 # Resource::Silo
 
-A lazy declarative resource managemement library for Perl.
+A lazy declarative resource container for Perl.
 
 # DESCRIPTION
 
@@ -76,10 +76,10 @@ Resources with more options:
         init              => sub { ... };
 
     resource schema =>
-        derived           => 1,        # merely a frontend to its dependencies
-        init              => sub {
+        derived         => 1,                  # merely a frontend to DBI
+        require         => 'My::App::Schema',  # load module before init
+        init            => sub {
             my $self = shift;
-            require My::App::Schema;
             return My::App::Schema->connect( sub { $self->dbh } );
         };
 ```
@@ -99,6 +99,11 @@ Declaring a parametric resource:
         user    => 1,
     );
 
+    resource redis_conn => sub {
+        my $self = shift;
+        Redis->new( server => $self->config->{redis} );
+    };
+
     resource redis =>
         argument      => sub { $known_namespaces{ $_ } },
         init          => sub {
@@ -109,15 +114,9 @@ Declaring a parametric resource:
             );
         };
 
-    resource redis_conn => sub {
-        my $self = shift;
-        Redis->new( server => $self->config->{redis} );
-    };
-
     # later in the code
     silo->redis;            # nope!
     silo->redis('session'); # get a prefixed namespace
-
 ```
 
 Using it elsewhere:
@@ -128,15 +127,8 @@ Using it elsewhere:
     sub load_foo {
         my $id = shift;
         my $sql = q{SELECT * FROM foo WHERE foo_id = ?};
-        silo->dbh->fetchrow_hashred( $sql, $id );
+        silo->dbh->fetchrow_hashref( $sql, $id );
     };
-```
-
-```perl
-    package My::App::Stuff;
-    use Moo;
-    use My::App qw(silo);
-    has dbh => is => 'lazy', builder => sub { silo->dbh };
 ```
 
 Using it in test files:

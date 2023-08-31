@@ -1,3 +1,9 @@
+Overview of changes in Glib::Object::Introspection 0.051
+========================================================
+- Check for empty closures (RT#147409)
+- tests: Add empty callback (GNOME/perl-glib-object-introspection!8)
+- Fix use of GI_CHECK_VERSION (GNOME/perl-glib-object-introspection!10)
+
 Overview of changes in Glib::Object::Introspection 0.050
 ========================================================
 - Add CI pipeline (on Gnome GitLab server)

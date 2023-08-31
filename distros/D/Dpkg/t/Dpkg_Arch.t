@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 18900;
+use Test::More tests => 17421;
 
 use_ok('Dpkg::Arch', qw(debarch_to_debtuple debarch_to_multiarch
                         debarch_eq debarch_is debarch_is_wildcard
@@ -28,7 +28,7 @@ use_ok('Dpkg::Arch', qw(debarch_to_debtuple debarch_to_multiarch
                         get_host_gnu_type
                         get_valid_arches));
 
-my $KNOWN_ARCHES_TOTAL = 569;
+my $KNOWN_ARCHES_TOTAL = 524;
 my @valid_arches = get_valid_arches();
 
 sub get_valid_wildcards
@@ -170,7 +170,7 @@ is(debarch_to_cpubits(undef), undef, 'undef CPU bits');
 is(debarch_to_cpubits('i386'), 32, 'i386 CPU bits');
 is(debarch_to_cpubits('amd64'), 64, 'amd64 CPU bits');
 
-is(debtuple_to_debarch(undef, undef, undef, undef), undef, 'undef debtuple');
+is(debtuple_to_debarch((undef) x 4), undef, 'undef debtuple');
 is(debtuple_to_debarch('base', 'gnu', 'linux', 'amd64'), 'amd64', 'known debtuple');
 is(debtuple_to_debarch('unknown', 'unknown', 'unknown', 'unknown'), undef, 'unknown debtuple');
 
@@ -199,5 +199,3 @@ is(scalar @valid_arches, $KNOWN_ARCHES_TOTAL,
     is(get_host_gnu_type(), 'CC -dumpmachine',
        'CC does not report expected synthetic result for -dumpmachine');
 }
-
-1;

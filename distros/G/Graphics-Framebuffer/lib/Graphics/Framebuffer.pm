@@ -363,7 +363,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.52';
+    our $VERSION   = '6.54';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -442,10 +442,10 @@ sub DESTROY { # Always clean up after yourself before exiting
 # use Inline 'info', 'noclean', 'noisy'; # Only needed for debugging
 
 use Inline C => <<'C_CODE','name' => 'Graphics::Framebuffer', 'VERSION' => $VERSION;
-/* Copyright 2018-2021 Richard Kelsch, All Rights Reserved
+/* Copyright 2018-2023 Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  6.48
+   Version:  6.54
 
    You may wonder why the stack is so heavily used when the global structures
    have the needed values.  Well, the module can emulate another graphics mode
@@ -2137,6 +2137,81 @@ our @COLORORDER = (qw( RGB RBG BGR BRG GBR GRB ));
 
 =head1 METHODS
 
+X<acceleration>
+X<active_console>
+X<add_mode>
+X<alpha_mode>
+X<and_mode>
+X<angle_line>
+X<arc>
+X<attribute_reset>
+X<bezier>
+X<blit_copy>
+X<blit_move>
+X<blit_read>
+X<blit_transform>
+X<blit_write>
+X<box>
+X<circle>
+X<clear_screen>
+X<clip_off>
+X<clip_reset>
+X<clip_rset>
+X<clip_set>
+X<cls>
+X<divide_mode>
+X<draw_arc>
+X<draw_mode>
+X<drawto>
+X<ellipse>
+X<fill>
+X<filled_pie>
+X<get_face_name>
+X<get_font_list>
+X<get_pixel>
+X<graphics_mode>
+X<hardware>
+X<last_plot>
+X<line>
+X<load_image>
+X<mask_mode>
+X<monochrome>
+X<multiply_mode>
+X<new>
+X<normal_mode>
+X<or_mode>
+X<perl>
+X<pixel>
+X<play_animation>
+X<plot>
+X<poly_arc>
+X<polygon>
+X<rbox>
+X<replace_color>
+X<RGB565_to_RGB888>
+X<RGB565_to_RGBA8888>
+X<RGB888_to_RGB565>
+X<RGB888_to_RGBA8888>
+X<RGBA8888_to_RGB565>
+X<RGBA8888_to_RGB888>
+X<screen_dimensions>
+X<screen_dump>
+X<set_b_color>
+X<set_background_color>
+X<set_color>
+X<set_foreground_color>
+X<setpixel>
+X<software>
+X<subtract_mode>
+X<text_mode>
+X<ttf_paragraph>
+X<ttf_print>
+X<unmask_mode>
+X<vsync>
+X<wait_for_console>
+X<which_console>
+X<xor_mode>
+
 With the exception of "new" and some other methods that only expect one parameter, the methods expect a single hash reference to be passed.  This may seem unusual, but it was chosen for speed, and speed is important in a Perl graphics module.
 
 =cut
@@ -2455,9 +2530,9 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
         'FB_DEVICE'   => undef,    # Framebuffer device name (defined later)
         'COLOR_ORDER' => 'RGB',    # Default color Order.  Redefined later to be an integer
         'ACCELERATED' => SOFTWARE, # Use accelerated graphics
-                                   #   0 = Pure Perl
-                                   #   1 = C Accelerated (but still software)
-                                   #   2 = C & Hardware accelerated.
+                                   #   0 = PERL     = Pure Perl
+                                   #   1 = SOFTWARE = C Accelerated (but still software)
+                                   #   2 = HARDWARE = C & Hardware accelerated.
         'FBIO_WAITFORVSYNC'   => 0x4620,
         'VT_GETSTATE'         => 0x5603,
         'KDSETMODE'           => 0x4B3A,
@@ -2593,7 +2668,7 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
                 'Pro Savage DDR',
                 'Pro Savage DDRX',
             ],
-            # Unfortunately, these are not IOCTLs.  Gee, that would be nice if they were.
+            # Unfortunately, these are not IOCTLs.  Gee, that would be nice if they were.  Not Used
             'FBinfo_hwaccel_fillrect'  => 'L6',      # dx(32),dy(32),width(32),height(32),color(32),rop(32)?
             'FBinfo_hwaccel_copyarea'  => 'L6',      # dx(32),dy(32),width(32),height(32),sx(32),sy(32)
             'FBinfo_hwaccel_fillrect'  => 'L6',      # dx(32),dy(32),width(32),height(32),color(32),rop(32)
@@ -2601,7 +2676,7 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
                                                      # COLOR MAP:
                                                      #   start(32),length(32),red(16),green(16),blue(16),alpha(16)
             # FLAGS
-            'FBINFO_HWACCEL_NONE'      => 0x0000,    # These come from "fb.h" in the kernel source
+            'FBINFO_HWACCEL_NONE'      => 0x0000,    # These come from "fb.h" in the kernel source.  Not Used
             'FBINFO_HWACCEL_COPYAREA'  => 0x0100,
             'FBINFO_HWACCEL_FILLRECT'  => 0x0200,
             'FBINFO_HWACCEL_IMAGEBLIT' => 0x0400,
@@ -2611,8 +2686,6 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
             'FBINFO_HWACCEL_YWRAP'     => 0x4000,
 
             ## Set up the Framebuffer driver "constants" defaults
-            # These "fb.h" constants may go away in future versions, as the data needed to get from these
-            # Is available from Inline::C now.
             # Commands
             'FBIOPUT_VSCREENINFO' => 0x4601,
             'FBIOGETCMAP'         => 0x4604,
@@ -4201,7 +4274,7 @@ Draws a Bezier curve, based on a list of control points.
     }
 }
 
-sub cubic_bezier {
+sub cubic_bezier { # obsolete
 =head2 cubic_bezier
 
 DISCONTINUED, use 'bezier' instead (now just an alias to 'bezier')
@@ -9036,7 +9109,7 @@ A copy of this license is included in the 'LICENSE' file in this distribution.
 
 =head1 VERSION
 
-Version 6.52 (Jul 12, 2023)
+Version 6.54 (Aug 29, 2023)
 
 =head1 THANKS
 

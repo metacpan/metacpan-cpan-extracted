@@ -1,8 +1,11 @@
 requires 'parent', 0;
 requires 'curry', 0;
+requires 'Path::Tiny', 0;
+requires 'Dir::Self', 0;
 requires 'Future', '>= 0.47';
 requires 'Future::AsyncAwait', '>= 0.48';
 requires 'Syntax::Keyword::Try', '>= 0.21';
+requires 'Syntax::Keyword::Match', 0;
 requires 'Syntax::Keyword::Dynamically', '>= 0.07';
 requires 'IO::Async', 0;
 requires 'Ryu', '>= 2.008';
@@ -23,6 +26,10 @@ requires 'Cache::LRU', '>= 0.04';
 # Cluster support
 requires 'Digest::CRC', '>= 0.22';
 requires 'List::BinarySearch::XS', '>= 0.09';
+requires 'YAML::XS', '>= 0.88';
+
+requires 'File::ShareDir';
+requires 'File::ShareDir::Install';
 
 on 'test' => sub {
     requires 'Test::More', '>= 0.98';

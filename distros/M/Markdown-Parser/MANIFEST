@@ -1,4 +1,4 @@
-Changes
+CHANGES
 CONTRIBUTING.md
 lib/Markdown/Parser.pm
 lib/Markdown/Parser/Abbr.pm
@@ -39,6 +39,7 @@ MANIFEST
 README
 README.md
 t/000.load.t
+t/020.from_html.t
 t/900.pod.t
 t/910.coverage.t
 t/999.kwalitee.t

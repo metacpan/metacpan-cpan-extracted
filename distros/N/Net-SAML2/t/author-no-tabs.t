@@ -58,6 +58,7 @@ my @files = (
     't/23-post-binding.t',
     't/24-assertion-with-encrypted-attribute-values.t',
     't/25-verify-authn-post-sign_xml.t',
+    't/26-test-verify-xml.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',

@@ -5,7 +5,7 @@ use warnings;
 use 5.006;
 
 # ABSTRACT: Process run using AnyEvent::Open3::Simple
-our $VERSION = '0.88'; # VERSION
+our $VERSION = '0.90'; # VERSION
 
 
 sub new
@@ -64,7 +64,7 @@ AnyEvent::Open3::Simple::Process - Process run using AnyEvent::Open3::Simple
 
 =head1 VERSION
 
-version 0.88
+version 0.90
 
 =head1 DESCRIPTION
 
@@ -152,6 +152,8 @@ Contributors:
 Stephen R. Scaffidi
 
 Scott Wiersdorf
+
+Graham Knop (HAARG)
 
 =head1 COPYRIGHT AND LICENSE
 

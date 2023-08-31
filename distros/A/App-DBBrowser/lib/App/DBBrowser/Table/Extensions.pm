@@ -15,7 +15,6 @@ use App::DBBrowser::Auxil;
 #use App::DBBrowser::Table::Extensions::WindowFunctions;  # required
 
 
-
 sub new {
     my ( $class, $info, $options, $d ) = @_;
     my $sf = {
@@ -31,7 +30,7 @@ sub new {
     $sf->{math} = 'math()';
     $sf->{col} = 'col';
     $sf->{null} = 'NULL';
-    $sf->{close_in} = ') close';
+    $sf->{close_in} = ')end';
     $sf->{par_open} = '(';
     $sf->{par_close} = ')';
     bless $sf, $class;
@@ -50,8 +49,9 @@ sub column {
     else {
         $extensions = [ $sf->{subquery}, $sf->{scalar_func}, $sf->{case}, $sf->{math} ];
     }
-    if ( $clause =~ /^(?:where|having|when)\z/i ) {
+    if ( $opt->{add_parentheses} ) {
         push @$extensions, $sf->{par_open}, $sf->{par_close};
+        delete $opt->{add_parentheses};
     }
     if ( length $opt->{from} ) {
         # no recursion:
@@ -72,7 +72,12 @@ sub value {
     my $ext_express = $sf->{o}{enable}{extended_values};
     my $extensions = [];
     if ( $ext_express ) {
-        $extensions = [ $sf->{const}, $sf->{subquery}, $sf->{scalar_func}, $sf->{case}, $sf->{math}, $sf->{col} ];
+        if ( $clause =~ /^(?:select|order_by)\z/i ) {
+            $extensions = [ $sf->{const}, $sf->{subquery}, $sf->{scalar_func}, $sf->{window_func}, $sf->{case}, $sf->{math}, $sf->{col} ];
+        }
+        else {
+            $extensions = [ $sf->{const}, $sf->{subquery}, $sf->{scalar_func}, $sf->{case}, $sf->{math}, $sf->{col} ];
+        }
         if ( $clause eq 'set' ) {
             push @$extensions, $sf->{null};
         }

@@ -3,7 +3,6 @@ package Perinci::Sub::DepChecker;
 use 5.010001;
 use strict;
 use warnings;
-use experimental 'smartmatch';
 use Log::ger;
 
 require Exporter;
@@ -15,9 +14,9 @@ our @EXPORT_OK = qw(
                );
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-04-22'; # DATE
+our $DATE = '2023-07-08'; # DATE
 our $DIST = 'Perinci-Sub-DepChecker'; # DIST
-our $VERSION = '0.125'; # VERSION
+our $VERSION = '0.126'; # VERSION
 
 my $pa;
 
@@ -186,16 +185,16 @@ sub dep_satisfy_rel {
             my @r = map { dep_satisfy_rel($wanted, $_) } @$dval;
             #$log->tracef("all: %s", \@r);
             next unless @r;
-            return "impossible" if "impossible" ~~ @r;
-            return "impossible" if "must" ~~ @r && "must not" ~~ @r;
-            return "must"       if "must" ~~ @r;
-            return "must not"   if "must not" ~~ @r;
+            return "impossible" if grep { $_ eq "impossible" } @r;
+            return "impossible" if (grep { $_ eq "must" } @r) && (grep {$_ eq "must not"} @r);
+            return "must"       if grep { $_ eq "must" } @r;
+            return "must not"   if grep { $_ eq "must not" } @r;
             return "might"      if _all_nonblank_elems_is(\@r, "might");
         } elsif ($dname eq 'any') {
             my @r = map { dep_satisfy_rel($wanted, $_) } @$dval;
             #$log->tracef("any: %s", \@r);
             next unless @r;
-            return "impossible" if "impossible" ~~ @r;
+            return "impossible" if grep { $_ eq "impossible" } @r;
             return "must"       if _all_elems_is(\@r, "must");
             return "must not"   if _all_elems_is(\@r, "must not");
             next                if _all_elems_is(\@r, "");
@@ -204,10 +203,10 @@ sub dep_satisfy_rel {
             my @r = map { dep_satisfy_rel($wanted, $_) } @$dval;
             #$log->tracef("none: %s", \@r);
             next unless @r;
-            return "impossible" if "impossible" ~~ @r;
-            return "impossible" if "must" ~~ @r && "must not" ~~ @r;
-            return "must not"   if "must" ~~ @r;
-            return "must"       if "must not" ~~ @r;
+            return "impossible" if grep { $_ eq "impossible" } @r;
+            return "impossible" if (grep { $_ eq "must" } @r) && (grep {$_ eq "must not"} @r);
+            return "must not"   if grep { $_ eq "must" } @r;
+            return "must"       if grep { $_ eq "must not" } @r;
             return "might"      if _all_nonblank_elems_is(\@r, "might");
         } else {
             return "must" if $dname eq $wanted;
@@ -221,7 +220,7 @@ sub list_mentioned_dep_clauses {
     $res //= [];
     for my $dname (keys %$deps) {
         my $dval = $deps->{$dname};
-        push @$res, $dname unless $dname ~~ @$res;
+        push @$res, $dname unless grep { $_ eq $dname } @$res;
         if ($dname =~ /\A(?:all|any|none)\z/) {
             list_mentioned_dep_clauses($_, $res) for @$dval;
         }
@@ -244,7 +243,7 @@ Perinci::Sub::DepChecker - Check dependencies from 'deps' property
 
 =head1 VERSION
 
-This document describes version 0.125 of Perinci::Sub::DepChecker (from Perl distribution Perinci-Sub-DepChecker), released on 2022-04-22.
+This document describes version 0.126 of Perinci::Sub::DepChecker (from Perl distribution Perinci-Sub-DepChecker), released on 2023-07-08.
 
 =head1 SYNOPSIS
 
@@ -366,13 +365,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

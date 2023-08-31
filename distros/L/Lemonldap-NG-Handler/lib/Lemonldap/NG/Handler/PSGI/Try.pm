@@ -3,7 +3,7 @@ package Lemonldap::NG::Handler::PSGI::Try;
 use strict;
 use Mouse;
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.17.0';
 
 extends 'Lemonldap::NG::Handler::PSGI::Router';
 
@@ -83,30 +83,32 @@ sub defaultUnauthRoute {
 sub _run {
     my $self = shift;
 
-    return sub {
-        my $req = Lemonldap::NG::Common::PSGI::Request->new( $_[0] );
-        my $res = $self->_logAuthTrace( $req, 1 );
-        if ( $res->[0] < 300 ) {
-            $self->routes( $self->authRoutes );
-            $req->userData( $self->api->data );
-            $req->respHeaders( $res->[1] );
-        }
-        elsif ( $res->[0] != 403 and not $req->data->{noTry} ) {
+    return $self->psgiAdapter(
+        sub {
+            my $req = $_[0];
+            my $res = $self->_authAndTrace( $req, 1 );
+            if ( $res->[0] < 300 ) {
+                $self->routes( $self->authRoutes );
+                $req->userData( $self->api->data );
+                $req->respHeaders( $res->[1] );
+            }
+            elsif ( $res->[0] != 403 and not $req->data->{noTry} ) {
 
-            # Unset headers (handler adds a Location header)
-            $self->logger->debug(
-                "User not authenticated, Try in use, cancel redirection");
-            $req->userData( {} );
-            $req->respHeaders( [] );
-            $self->routes( $self->unAuthRoutes );
-        }
-        else {
+                # Unset headers (handler adds a Location header)
+                $self->logger->debug(
+                    "User not authenticated, Try in use, cancel redirection");
+                $req->userData( {} );
+                $req->respHeaders( [] );
+                $self->routes( $self->unAuthRoutes );
+            }
+            else {
+                return $res;
+            }
+            $res = $self->handler($req);
+            push @{ $res->[1] }, $req->spliceHdrs;
             return $res;
         }
-        $res = $self->_logAndHandle($req);
-        push @{ $res->[1] }, $req->spliceHdrs;
-        return $res;
-    };
+    );
 
 }
 

@@ -148,7 +148,7 @@
       $scope.displaySession = function(scope) {
         var sessionId, transformSession;
         transformSession = function(session) {
-          var _insert, _stToStr, array, arrayDate, attr, attrs, category, epoch, i, k, key, len, len1, name, pattern, res, sfDevice, subres, time, title, value;
+          var _insert, _stToStr, array, arrayDate, attr, attrs, category, epoch, i, k, key, len, len1, name, pattern, res, sfDevice, subres, time, type, value;
           _stToStr = function(s) {
             return s;
           };
@@ -207,8 +207,9 @@
                   array = JSON.parse(session[attr]);
                   if (array.length > 0) {
                     subres.push({
-                      title: "type",
+                      title: "2fid",
                       value: "name",
+                      type: "type",
                       epoch: "date"
                     });
                     for (k = 0, len1 = array.length; k < len1; k++) {
@@ -216,7 +217,7 @@
                       for (key in sfDevice) {
                         value = sfDevice[key];
                         if (key === 'type') {
-                          title = value;
+                          type = value;
                         }
                         if (key === 'name') {
                           name = value;
@@ -226,7 +227,8 @@
                         }
                       }
                       subres.push({
-                        title: title,
+                        title: '[' + type + ']' + epoch,
+                        type: type,
                         value: name,
                         epoch: epoch,
                         sfrow: true

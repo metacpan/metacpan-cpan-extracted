@@ -9,8 +9,10 @@ use utf8;
 
 use Object::Pad 0.800;
 
-package App::sdview 0.11;
+package App::sdview 0.12;
 class App::sdview :strict(params);
+
+use App::sdview::Style;
 
 use List::Keywords qw( first );
 
@@ -66,6 +68,10 @@ use Module::Pluggable
 
 method run ( $file, %opts )
 {
+   if( -f( my $configpath = "$ENV{HOME}/.sdviewrc" ) ) {
+      App::sdview::Style->load_config( $configpath );
+   }
+
    my @PARSER_CLASSES = sort { $a->sort_order <=> $b->sort_order } PARSERS();
    my @OUTPUT_CLASSES = OUTPUTS();
 

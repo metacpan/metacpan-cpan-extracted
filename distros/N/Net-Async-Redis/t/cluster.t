@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 
+use experimental qw(signatures);
+
 # no indirect;
 use Syntax::Keyword::Try;
 
@@ -23,6 +25,53 @@ eval {
 };
 
 my $loop = IO::Async::Loop->new;
+
+sub cluster_test {
+    my ($msg, $code, %args) = @_;
+    $msg //= 'async test';
+    return subtest $msg => sub {
+        $loop->add(
+            my $cluster = Net::Async::Redis::Cluster->new(
+                %args
+            )
+        );
+        try {
+            my $f = (async sub {
+                await $cluster->bootstrap(
+                    host => $ENV{NET_ASYNC_REDIS_HOST} // '127.0.0.1',
+                    port => 6379
+                );
+                await $code->($cluster);
+                return;
+            })->();
+            $f->get();
+            ok($msg);
+        } catch($e) {
+            fail("exception - $e");
+        }
+        done_testing;
+    };
+}
+
+# Migrate a slot to the server who owns the slot in the next param
+async sub migrate_slot {
+    my ($cluster, $slot, $to) = @_;
+    my $source = await $cluster->connection_for_slot($slot);
+    my $src_id = await $source->cluster_myid;
+
+    my $destination = await $cluster->connection_for_slot($to);
+    my $dst_id = await $destination->cluster_myid;
+
+    await $destination->cluster_setslot($slot, importing => $src_id);
+    await $source->cluster_setslot($slot, migrating => $dst_id);
+    # 1000 is an arbitrary value here
+    my $keys_to_migrate = await $source->cluster_getkeysinslot($slot, 1000);
+    if ($keys_to_migrate->@*) {
+        await $source->migrate($destination->host, 6379, "", 0, 10, 'replace', keys => $keys_to_migrate->@*);
+    }
+    await $destination->cluster_setslot($slot, node => $dst_id);
+    await $source->cluster_setslot($slot, node => $dst_id);
+};
 
 subtest 'General cluster behaviour' => sub {
     (async sub {
@@ -87,27 +136,6 @@ subtest 'Should abort if the cluster has invalid node(s)' => sub {
     }, qr/invalid primary/, 'Cluster bootstrap should throw an exception');
 };
 
-# Migrate a slot to the server who owns the slot in the next param
-
-async sub migrate_slot {
-    my ($cluster, $slot, $to) = @_;
-    my $source = await $cluster->connection_for_slot($slot);
-    my $src_id = await $source->cluster_myid;
-
-    my $destination = await $cluster->connection_for_slot($to);
-    my $dst_id = await $destination->cluster_myid;
-
-    await $destination->cluster_setslot($slot, importing => $src_id);
-    await $source->cluster_setslot($slot, migrating => $dst_id);
-    # 1000 is an arbitrary value here
-    my $keys_to_migrate = await $source->cluster_getkeysinslot($slot, 1000);
-    if ($keys_to_migrate->@*) {
-        await $source->migrate($destination->host, 6379, "", 0, 10, 'replace', keys => $keys_to_migrate->@*);
-    }
-    await $destination->cluster_setslot($slot, node => $dst_id);
-    await $source->cluster_setslot($slot, node => $dst_id);
-};
-
 subtest 'Should redirect request to correct node if MOVED error occurred' => sub {
     $loop->add(
         my $cluster = Net::Async::Redis::Cluster->new
@@ -131,6 +159,23 @@ subtest 'Should redirect request to correct node if MOVED error occurred' => sub
             migrate_slot($cluster, 3544, 1)->get();
         }
     })->()->get();
+};
+
+cluster_test MULTI => async sub ($redis) {
+    my $data;
+    my $multi = $redis->multi(sub ($tx) {
+        $tx->set(cx => 123);
+        $tx->get('cx')->on_ready(sub {
+            my $f = shift;
+            note 'on ready: ' . $f->state;
+            is(exception {
+                ($data) = $f->get;
+                is($data, '123', 'data is correct');
+            }, undef, 'no exception on ->get');
+        });
+    });
+    await $multi;
+    is($data, '123', 'had correct data after transaction');
 };
 
 done_testing;

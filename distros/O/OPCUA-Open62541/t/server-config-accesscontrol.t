@@ -5,7 +5,7 @@ use OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Client;
 use OPCUA::Open62541::Test::CA;
 
-use Test::More tests => 110;
+use Test::More tests => 158;
 use Test::Exception;
 use Test::LeakTrace;
 use Test::NoWarnings;
@@ -156,8 +156,7 @@ $server = OPCUA::Open62541::Test::Server->new(
 );
 $serverconfig = $server->{server}->getConfig();
 $server->start();
-my $policy = "http://opcfoundation.org/UA/SecurityPolicy#None";
-is($serverconfig->setAccessControl_default(0, undef, $policy, \@login),
+is($serverconfig->setAccessControl_default(0, undef, undef, \@login),
     STATUSCODE_GOOD, "set login");
 
 note "client with default passowrd";
@@ -205,6 +204,66 @@ $client->start();
 
 is($client->{client}->connect($client->url()),
     STATUSCODE_BADIDENTITYTOKENINVALID, "connect without username bad");
+
+$client->stop();
+$server->stop();
+
+note "server with empty user/pass, but anonymous access control";
+
+$server = OPCUA::Open62541::Test::Server->new(
+    certificate    => $ca->{certs}{server}{cert_pem},
+    privateKey     => $ca->{certs}{server}{key_pem},
+);
+$serverconfig = $server->{server}->getConfig();
+$server->start();
+is($serverconfig->setAccessControl_default(1, undef, undef, []),
+    STATUSCODE_GOOD, "set login empty");
+
+note "client with default passowrd";
+
+$client = OPCUA::Open62541::Test::Client->new(
+    port => $server->port(),
+    certificate    => $ca->{certs}{client}{cert_pem},
+    privateKey     => $ca->{certs}{client}{key_pem},
+);
+$clientconfig = $client->{client}->getConfig();
+$client->start();
+$server->run();
+
+$clientconfig->setUsernamePassword("user1", "password");
+is($client->{client}->connect($client->url()), STATUSCODE_BADUSERACCESSDENIED,
+    "connect user1 bad empty");
+
+$client->stop();
+
+note "client with user/pass";
+
+$client = OPCUA::Open62541::Test::Client->new(
+    port => $server->port(),
+    certificate    => $ca->{certs}{client}{cert_pem},
+    privateKey     => $ca->{certs}{client}{key_pem},
+);
+$clientconfig = $client->{client}->getConfig();
+$client->start();
+
+$clientconfig->setUsernamePassword("user", "pass");
+is($client->{client}->connect($client->url()), STATUSCODE_BADUSERACCESSDENIED,
+    "connect user pass bad empty");
+
+$client->stop();
+
+note "client without username";
+
+$client = OPCUA::Open62541::Test::Client->new(
+    port => $server->port(),
+    certificate    => $ca->{certs}{client}{cert_pem},
+    privateKey     => $ca->{certs}{client}{key_pem},
+);
+$clientconfig = $client->{client}->getConfig();
+$client->start();
+
+is($client->{client}->connect($client->url()),
+    STATUSCODE_GOOD, "connect without username good");
 
 $client->stop();
 $server->stop();

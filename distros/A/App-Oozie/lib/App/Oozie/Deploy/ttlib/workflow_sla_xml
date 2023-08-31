@@ -1,0 +1,33 @@
+[% IF has_sla -%]
+    <sla:info>
+
+        <sla:nominal-time>${nominalTime}</sla:nominal-time>
+
+        <sla:should-start>${1 * MINUTES}</sla:should-start>
+
+        <!-- mandatory, even though we don't really care about should-end for
+        now (only max-duration), so we set a limit high enough (twice the
+        duration time); this will show a reasonable expected end-time in the
+        email, like so:
+          Expected End Time - Mon Mar 02 15:25:00 GMT+01:00 2015
+        previously I had set it at +1 month, but this resulted in confusing
+        output, as the expected end time seemed to match the start time (only
+        it was 1 month away, on closer inspection)
+        -->
+        <sla:should-end>${slaDuration * 2 * MINUTES}</sla:should-end>
+
+        <!-- this is the only one we really care about for now -->
+        <sla:max-duration>${slaDuration * MINUTES}</sla:max-duration>
+
+        <!-- the errors can be start_miss,end_miss,duration_miss. For now
+        oozie-run uses duration_miss as a default, but the others can be added
+        using -D"slaEmailErrors=...,...,..." in the oozie-run params
+        -->
+        <sla:alert-events>${slaEmailErrors}</sla:alert-events>
+
+        <!-- sla events emails will be sent to the errorEmailTo address set in
+        the workflow -->
+        <sla:alert-contact>${errorEmailTo}</sla:alert-contact>
+
+    </sla:info>
+[% END -%]

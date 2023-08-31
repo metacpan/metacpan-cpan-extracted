@@ -9,6 +9,7 @@ lib/Lemonldap/NG/Manager/2ndFA.pm
 lib/Lemonldap/NG/Manager/Api.pm
 lib/Lemonldap/NG/Manager/Api/2F.pm
 lib/Lemonldap/NG/Manager/Api/Common.pm
+lib/Lemonldap/NG/Manager/Api/History.pm
 lib/Lemonldap/NG/Manager/Api/Menu/App.pm
 lib/Lemonldap/NG/Manager/Api/Menu/Cat.pm
 lib/Lemonldap/NG/Manager/Api/Misc.pm
@@ -93,6 +94,14 @@ site/htdocs/static/bwr/es5-shim/es5-shim.min.js
 site/htdocs/static/bwr/file-saver.js/FileSaver.js
 site/htdocs/static/bwr/file-saver.js/FileSaver.min.js
 site/htdocs/static/bwr/file-saver.js/FileSaver.min.js.map
+site/htdocs/static/bwr/font-awesome/css/font-awesome.css
+site/htdocs/static/bwr/font-awesome/css/font-awesome.css.map
+site/htdocs/static/bwr/font-awesome/css/font-awesome.min.css
+site/htdocs/static/bwr/font-awesome/fonts/fontawesome-webfont.eot
+site/htdocs/static/bwr/font-awesome/fonts/fontawesome-webfont.svg
+site/htdocs/static/bwr/font-awesome/fonts/fontawesome-webfont.ttf
+site/htdocs/static/bwr/font-awesome/fonts/fontawesome-webfont.woff
+site/htdocs/static/bwr/font-awesome/fonts/fontawesome-webfont.woff2
 site/htdocs/static/css/custom.css
 site/htdocs/static/css/custom.min.css
 site/htdocs/static/css/manager.css
@@ -119,6 +128,7 @@ site/htdocs/static/forms/grantContainer.html
 site/htdocs/static/forms/home.html
 site/htdocs/static/forms/homeViewer.html
 site/htdocs/static/forms/int.html
+site/htdocs/static/forms/intOrNull.html
 site/htdocs/static/forms/keyText.html
 site/htdocs/static/forms/keyTextContainer.html
 site/htdocs/static/forms/longtext.html
@@ -199,6 +209,7 @@ site/htdocs/static/languages/it.json
 site/htdocs/static/languages/pl.json
 site/htdocs/static/languages/pt.json
 site/htdocs/static/languages/pt_BR.json
+site/htdocs/static/languages/ru.json
 site/htdocs/static/languages/tr.json
 site/htdocs/static/languages/vi.json
 site/htdocs/static/languages/zh.json
@@ -218,6 +229,7 @@ site/htdocs/static/logos/llng-logo-32.png
 site/htdocs/static/logos/pl.png
 site/htdocs/static/logos/pt.png
 site/htdocs/static/logos/pt_BR.png
+site/htdocs/static/logos/ru.png
 site/htdocs/static/logos/tr.png
 site/htdocs/static/logos/vi.png
 site/htdocs/static/logos/zh.png
@@ -240,6 +252,7 @@ site/templates/viewer.tpl
 t/02-HTML-template.t
 t/03-HTML-forms.t
 t/04-2F-api.t
+t/04-history-api.t
 t/04-menu-api.t
 t/04-misc-api.t
 t/04-providers-api.t
@@ -276,8 +289,6 @@ t/jsonfiles/15-combination.json
 t/jsonfiles/17-extra2f.json
 t/jsonfiles/70-diff.json
 t/lemonldap-ng-DBI-conf.ini
-t/lemonldap-ng-dbi.ini
-t/lemonldap-ng-noDiff.ini
 t/lemonldap-ng.ini
 t/test-lib.pm
 t/test-merge.json

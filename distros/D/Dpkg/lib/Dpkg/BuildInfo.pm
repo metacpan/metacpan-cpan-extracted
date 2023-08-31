@@ -13,18 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::BuildInfo;
-
-use strict;
-use warnings;
-
-our $VERSION = '1.00';
-our @EXPORT_OK = qw(
-    get_build_env_allowed
-);
-
-use Exporter qw(import);
-
 =encoding utf8
 
 =head1 NAME
@@ -35,6 +23,19 @@ Dpkg::BuildInfo - handle build information
 
 The Dpkg::BuildInfo module provides functions to handle the build
 information.
+
+=cut
+
+package Dpkg::BuildInfo 1.00;
+
+use strict;
+use warnings;
+
+our @EXPORT_OK = qw(
+    get_build_env_allowed
+);
+
+use Exporter qw(import);
 
 =head1 FUNCTIONS
 

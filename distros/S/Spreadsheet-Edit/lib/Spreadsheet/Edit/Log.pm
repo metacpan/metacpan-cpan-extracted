@@ -10,9 +10,9 @@ no warnings qw(experimental::lexical_subs);
 package Spreadsheet::Edit::Log;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
-{ no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 998.999; }
-our $VERSION = '1000.001'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-06-28'; # DATE from Dist::Zilla::Plugin::OurDate
+{ no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
+our $VERSION = '1000.004'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-08-28'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Exporter 'import';
 our @EXPORT = qw/fmt_call log_call fmt_methcall log_methcall
@@ -24,12 +24,17 @@ use Scalar::Util qw/reftype refaddr blessed weaken/;
 use List::Util qw/first any all/;
 use File::Basename qw/dirname basename/;
 use Carp;
+
 sub oops(@) { @_=("\n".(caller)." oops:\n",@_,"\n"); goto &Carp::confess }
-sub btw(@) { local $_=join("",@_); s/\n\z//s; warn((caller(0))[2].": $_\n"); }
+
+sub btwN($@) { my $N=shift; local $_=join("",@_); s/\n\z//s; printf "%4d: %s\n",(caller($N))[2],$_; }
+
+sub btw(@) { unshift @_,0; goto &btwN }
+
 use Data::Dumper::Interp qw/dvis vis visq avis hvis visnew addrvis u/;
 
 my %backup_defaults = (
-  logdest         => \*STDERR, 
+  logdest         => \*STDERR,
   is_public_api   => sub{ $_[1][3] =~ /(?:::|^)[a-z][^:]*$/ },
 
   #fmt_object      => sub{ addrvis($_[1]) },
@@ -45,10 +50,10 @@ sub _getoptions {
   my $N=1; while (($pkg=caller($N)//oops) eq __PACKAGE__) { ++$N }
   no strict 'refs';
   my $r = *{$pkg."::SpreadsheetEdit_Log_Options"}{HASH};
-  +{ %backup_defaults, 
+  +{ %backup_defaults,
     (defined($r) ? %$r : ()),
     ((@_ && ref($_[0]) eq 'HASH') ? %{shift(@_)} : ())
-  } 
+  }
 }
 
 # Format a usually-comma-separated list sans enclosing brackets.
@@ -101,7 +106,7 @@ sub _fmt_list($) {
 # Locate the nearest call to a public sub in the call stack.
 #
 # A callback decides what might be a "public" entrypoint (default:
-# any sub named starting with [a-z]). 
+# any sub named starting with [a-z]).
 #
 # RETURNS
 #   ([frame], [called args]) in array context
@@ -112,7 +117,7 @@ sub _fmt_list($) {
 #   package filename linenum subname ...
 #
 use constant _CALLER_OVERRIDE_CHECK_OK =>
-     (defined(&Carp::CALLER_OVERRIDE_CHECK_OK) 
+     (defined(&Carp::CALLER_OVERRIDE_CHECK_OK)
       && &Carp::CALLER_OVERRIDE_CHECK_OK);
 
 sub _nearest_call($$) {
@@ -249,7 +254,7 @@ Spreadsheet::Edit::Log - log method/function calls, args, and return values
     @result;
   }
   ...
-  $obj->public_method(100);  
+  $obj->public_method(100);
   #  file::lineno public_method 100 ==> Here you go:42,100000
 
 =head1 DESCRIPTION
@@ -261,7 +266,7 @@ This provides perhaps-overkill convenience for "verbose logging" and/or debug
 tracing of subroutine calls.
 
 The resulting message string includes the location of the
-user's call, the name of the public function or method called, 
+user's call, the name of the public function or method called,
 and a representation of the inputs and outputs.
 
 The "public" function/method name shown is not necessarily the immediate caller of the logging function.
@@ -294,13 +299,13 @@ themselves (rather than hex escapes)
 
 =over
 
-=item 1. 
+=item 1.
 
 If an item is a reference to a string then the string is inserted as-is (unquoted),
 and unless the string is empty, adjacent commas are suppressed.
 This allows concatenating arbitrary text with values formatted by Data::Dumper.
 
-=item 2. 
+=item 2.
 
 If an item is an object (blessed reference) then only it's type and
 abbreviated address are shown, unless overridden via
@@ -316,10 +321,10 @@ B<{OPTIONS}>
 
 =item self =E<gt> objref
 
-If your sub is a method, your can pass C<self =E<gt> $self> and 
+If your sub is a method, your can pass C<self =E<gt> $self> and
 the the invocant will be displayed separately before the method name.
-To reduce clutter, the invocant is 
-displayed for only the first of a series of consecutive calls with the 
+To reduce clutter, the invocant is
+displayed for only the first of a series of consecutive calls with the
 same C<self> value.
 
 =item fmt_object =E<gt> CODE
@@ -339,11 +344,11 @@ only during the current C<fmt_call> invocation.
 
 Recognize a public entry-point in the call stack.
 
-The sub is called repeatedly with 
+The sub is called repeatedly with
 arguments S<< C<($state, [package,file,line,subname,...])>. >>
 
 The second argument contains results from C<caller(N)>.
-Your sub should return True if the frame represents the call to be described 
+Your sub should return True if the frame represents the call to be described
 in the message.
 
 The default callback is S<<< C<sub{ $_[1][3] =~ /(?:::|^)[a-z][^:]*$/ }> >>>,
@@ -397,15 +402,20 @@ Z<>
 
 =head2 btw string,string,...
 
+=head2 btwN numlevels,string,string,...
+
 For internal debug messages (not related to the other functions).
 
-Prints a message to STDERR preceeded by "linenum:" 
+C<btw> prints a message to STDERR preceeded by "linenum:"
 giving the line number I<of the call to btw>.
 A newline is appended to the message unless the last string
 string already ends with a newline.
 
 This is like C<warn 'message'> when the message omits a final newline;
-but with a nicer presentation.  
+but with a nicer presentation.
+
+C<btwN> displays the line number of the call <numlevels> earlier
+in the call stack.
 
 Not exported by default.
 
@@ -422,7 +432,7 @@ L<Data::Dumper::Interp>
 
 =head1 AUTHOR
 
-Jim Avera (jim.avera gmail) 
+Jim Avera (jim.avera gmail)
 
 =head1 LICENSE
 

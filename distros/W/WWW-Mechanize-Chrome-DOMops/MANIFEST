@@ -1,9 +1,7 @@
-a.html
 Changes
 lib/WWW/Mechanize/Chrome/DOMops.pm
 Makefile.PL
 MANIFEST			This list of files
-outfile.js
 README
 README.md
 t/000-load.t

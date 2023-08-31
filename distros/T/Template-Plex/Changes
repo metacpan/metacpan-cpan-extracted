@@ -1,7 +1,15 @@
 Revision history for Perl extension Template::Plex.
 
-v0.6.0 2023-05-09
+v0.6.2 2023-08-28
+  [fixes]
+  - Added missing dependencies Export::These and constant::more
+  - Removed unused dependency enum
+  
+v0.6.1  2023-08-27
+  [improvements]
+  - RAM usage reduction on loading the module. (5.8MB down to 3.7MB)
 
+v0.6.0 2023-05-09
   [new features]
     - cache and immediate subroutines now also supports a single argument call.
       Makes using cached and immediate templates much nicer in loops with

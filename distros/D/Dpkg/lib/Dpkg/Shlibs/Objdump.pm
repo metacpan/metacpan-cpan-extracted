@@ -14,16 +14,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Shlibs::Objdump;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::Shlibs::Objdump - symbol support via objdump
+
+=head1 DESCRIPTION
+
+This module provides a class that wraps objdump to handle symbols and
+their attributes from a shared object.
+
+B<Note>: This is a private module, its API can change at any time.
+
+=cut
+
+package Dpkg::Shlibs::Objdump 0.01;
 
 use strict;
 use warnings;
 use feature qw(state);
 
-our $VERSION = '0.01';
-
 use Dpkg::Gettext;
 use Dpkg::ErrorHandling;
+use Dpkg::Shlibs::Objdump::Object;
 
 sub new {
     my $this = shift;
@@ -85,10 +99,15 @@ use constant {
     ELF_ORDER_2MSB          => 2,
 
     # ELF Machine.
+    EM_NONE                 => 0,
     EM_SPARC                => 2,
+    EM_386                  => 3,
+    EM_68K                  => 4,
     EM_MIPS                 => 8,
     EM_SPARC64_OLD          => 11,
+    EM_PARISC               => 15,
     EM_SPARC32PLUS          => 18,
+    EM_PPC                  => 20,
     EM_PPC64                => 21,
     EM_S390                 => 22,
     EM_ARM                  => 40,
@@ -96,24 +115,16 @@ use constant {
     EM_SH                   => 42,
     EM_SPARC64              => 43,
     EM_IA64                 => 50,
-    EM_AVR                  => 83,
-    EM_M32R                 => 88,
-    EM_MN10300              => 89,
-    EM_MN10200              => 90,
+    EM_X86_64               => 62,
     EM_OR1K                 => 92,
-    EM_XTENSA               => 94,
-    EM_MICROBLAZE           => 189,
+    EM_AARCH64              => 183,
     EM_ARCV2                => 195,
+    EM_RISCV                => 243,
     EM_LOONGARCH            => 258,
-    EM_AVR_OLD              => 0x1057,
     EM_OR1K_OLD             => 0x8472,
     EM_ALPHA                => 0x9026,
-    EM_M32R_CYGNUS          => 0x9041,
     EM_S390_OLD             => 0xa390,
-    EM_XTENSA_OLD           => 0xabc7,
-    EM_MICROBLAZE_OLD       => 0xbaab,
-    EM_MN10300_CYGNUS       => 0xbeef,
-    EM_MN10200_CYGNUS       => 0xdead,
+    EM_NIOS32               => 0xfebb,
 
     # ELF Version.
     EV_NONE                 => 0,
@@ -141,24 +152,52 @@ use constant {
     EF_MIPS_ABI_MASK        => 0x0000f000,
     EF_MIPS_ARCH_MASK       => 0xf0000000,
 
+    EF_OR1K_NODELAY         => 0x00000001,
+
     EF_PPC64_ABI64          => 0x00000003,
+
+    EF_RISCV_FLOAT_ABI_SOFT     => 0x0000,
+    EF_RISCV_FLOAT_ABI_SINGLE   => 0x0002,
+    EF_RISCV_FLOAT_ABI_DOUBLE   => 0x0004,
+    EF_RISCV_FLOAT_ABI_QUAD     => 0x0006,
+    EF_RISCV_FLOAT_ABI_MASK     => 0x0006,
+    EF_RISCV_RVE                => 0x0008,
 
     EF_SH_MACH_MASK         => 0x0000001f,
 };
 
+# These map machine IDs to their name.
+my %elf_mach_name = (
+    EM_NONE()               => 'none',
+    EM_386()                => 'i386',
+    EM_68K()                => 'm68k',
+    EM_AARCH64()            => 'arm64',
+    EM_ALPHA()              => 'alpha',
+    EM_ARCV2()              => 'arcv2',
+    EM_ARM()                => 'arm',
+    EM_IA64()               => 'ia64',
+    EM_LOONGARCH()          => 'loong',
+    EM_MIPS()               => 'mips',
+    EM_NIOS32()             => 'nios2',
+    EM_OR1K()               => 'or1k',
+    EM_PARISC()             => 'hppa',
+    EM_PPC()                => 'ppc',
+    EM_PPC64()              => 'ppc64',
+    EM_RISCV()              => 'riscv',
+    EM_S390()               => 's390',
+    EM_SH()                 => 'sh',
+    EM_SPARC()              => 'sparc',
+    EM_SPARC64()            => 'sparc64',
+    EM_X86_64()             => 'amd64',
+);
+
 # These map alternative or old machine IDs to their canonical form.
 my %elf_mach_map = (
     EM_ALPHA_OLD()          => EM_ALPHA,
-    EM_AVR_OLD()            => EM_AVR,
-    EM_M32R_CYGNUS()        => EM_M32R,
-    EM_MICROBLAZE_OLD()     => EM_MICROBLAZE,
-    EM_MN10200_CYGNUS()     => EM_MN10200,
-    EM_MN10300_CYGNUS()     => EM_MN10300,
     EM_OR1K_OLD()           => EM_OR1K,
     EM_S390_OLD()           => EM_S390,
     EM_SPARC32PLUS()        => EM_SPARC,
     EM_SPARC64_OLD()        => EM_SPARC64,
-    EM_XTENSA_OLD()         => EM_XTENSA,
 );
 
 # These masks will try to expose processor flags that are ABI incompatible,
@@ -166,10 +205,23 @@ my %elf_mach_map = (
 # always better to not mask a flag, because that preserves the historical
 # behavior, and we do not drop dependencies.
 my %elf_flags_mask = (
+    # XXX: The mask for ARM had to be disabled due to objects in the wild
+    # with EABIv4, while EABIv5 is the current one, and the soft and hard
+    # flags not always being set on armel and armhf respectively, although
+    # the Tag_ABI_VFP_args in the ARM attribute section should always be
+    # present on armhf, and there are even cases where both soft and hard
+    # float flags are set at the same time(!). Once these are confirmed to
+    # be fixed, we could reconsider enabling the below for a more strict
+    # ABI mismatch check. See #853793.
+#   EM_ARM()                => EF_ARM_EABI_MASK |
+#                              EF_ARM_NEW_ABI | EF_ARM_OLD_ABI |
+#                              EF_ARM_SOFT_FLOAT | EF_ARM_HARD_FLOAT,
     EM_IA64()               => EF_IA64_ABI64,
     EM_LOONGARCH()          => EF_LOONGARCH_ABI_MASK,
     EM_MIPS()               => EF_MIPS_ABI_MASK | EF_MIPS_ABI2,
+    EM_OR1K()               => EF_OR1K_NODELAY,
     EM_PPC64()              => EF_PPC64_ABI64,
+    EM_RISCV()              => EF_RISCV_FLOAT_ABI_MASK | EF_RISCV_RVE,
 );
 
 sub get_format {
@@ -197,17 +249,22 @@ sub get_format {
     return unless $elf{magic} eq "\x7fELF";
     return unless $elf{vertype} == EV_CURRENT;
 
+    my %abi;
     my ($elf_word, $elf_endian);
     if ($elf{bits} == ELF_BITS_32) {
+        $abi{bits} = 32;
         $elf_word = 'L';
     } elsif ($elf{bits} == ELF_BITS_64) {
+        $abi{bits} = 64;
         $elf_word = 'Q';
     } else {
         return;
     }
     if ($elf{endian} == ELF_ORDER_2LSB) {
+        $abi{endian} = 'l';
         $elf_endian = '<';
     } elsif ($elf{endian} == ELF_ORDER_2MSB) {
+        $abi{endian} = 'b';
         $elf_endian = '>';
     } else {
         return;
@@ -219,13 +276,14 @@ sub get_format {
 
     # Canonicalize the machine ID.
     $elf{mach} = $elf_mach_map{$elf{mach}} // $elf{mach};
+    $abi{mach} = $elf_mach_name{$elf{mach}} // $elf{mach};
 
     # Mask any processor flags that might not change the architecture ABI.
-    $elf{flags} &= $elf_flags_mask{$elf{mach}} // 0;
+    $abi{flags} = $elf{flags} & ($elf_flags_mask{$elf{mach}} // 0);
 
-    # Repack for easy comparison, as a big-endian byte stream, so that
-    # unpacking for output gives meaningful results.
-    $format{$file} = pack 'C2(SL)>', @elf{qw(bits endian mach flags)};
+    # Normalize into a colon-separated string for easy comparison, and easy
+    # debugging aid.
+    $format{$file} = join ':', 'ELF', @abi{qw(bits endian mach flags)};
 
     return $format{$file};
 }
@@ -241,342 +299,12 @@ sub is_elf {
     return $result;
 }
 
-package Dpkg::Shlibs::Objdump::Object;
+=head1 CHANGES
 
-use strict;
-use warnings;
-use feature qw(state);
+=head2 Version 0.xx
 
-use Dpkg::Gettext;
-use Dpkg::ErrorHandling;
-use Dpkg::Path qw(find_command);
-use Dpkg::Arch qw(debarch_to_gnutriplet get_build_arch get_host_arch);
+This is a private module.
 
-sub new {
-    my $this = shift;
-    my $file = shift // '';
-    my $class = ref($this) || $this;
-    my $self = {};
-    bless $self, $class;
-
-    $self->reset;
-    if ($file) {
-	$self->analyze($file);
-    }
-
-    return $self;
-}
-
-sub reset {
-    my $self = shift;
-
-    $self->{file} = '';
-    $self->{id} = '';
-    $self->{HASH} = '';
-    $self->{GNU_HASH} = '';
-    $self->{INTERP} = 0;
-    $self->{SONAME} = '';
-    $self->{NEEDED} = [];
-    $self->{RPATH} = [];
-    $self->{dynsyms} = {};
-    $self->{flags} = {};
-    $self->{dynrelocs} = {};
-
-    return $self;
-}
-
-sub _select_objdump {
-    # Decide which objdump to call
-    if (get_build_arch() ne get_host_arch()) {
-        my $od = debarch_to_gnutriplet(get_host_arch()) . '-objdump';
-        return $od if find_command($od);
-    }
-    return 'objdump';
-}
-
-sub analyze {
-    my ($self, $file) = @_;
-
-    $file ||= $self->{file};
-    return unless $file;
-
-    $self->reset;
-    $self->{file} = $file;
-
-    $self->{exec_abi} = Dpkg::Shlibs::Objdump::get_format($file);
-
-    if (not defined $self->{exec_abi}) {
-        warning(g_("unknown executable format in file '%s'"), $file);
-        return;
-    }
-
-    state $OBJDUMP = _select_objdump();
-    local $ENV{LC_ALL} = 'C';
-    open(my $objdump, '-|', $OBJDUMP, '-w', '-f', '-p', '-T', '-R', $file)
-        or syserr(g_('cannot fork for %s'), $OBJDUMP);
-    my $ret = $self->parse_objdump_output($objdump);
-    close($objdump);
-    return $ret;
-}
-
-sub parse_objdump_output {
-    my ($self, $fh) = @_;
-
-    my $section = 'none';
-    while (<$fh>) {
-	s/\s*$//;
-	next if length == 0;
-
-	if (/^DYNAMIC SYMBOL TABLE:/) {
-	    $section = 'dynsym';
-	    next;
-	} elsif (/^DYNAMIC RELOCATION RECORDS/) {
-	    $section = 'dynreloc';
-	    $_ = <$fh>; # Skip header
-	    next;
-	} elsif (/^Dynamic Section:/) {
-	    $section = 'dyninfo';
-	    next;
-	} elsif (/^Program Header:/) {
-	    $section = 'program';
-	    next;
-	} elsif (/^Version definitions:/) {
-	    $section = 'verdef';
-	    next;
-	} elsif (/^Version References:/) {
-	    $section = 'verref';
-	    next;
-	}
-
-	if ($section eq 'dynsym') {
-	    $self->parse_dynamic_symbol($_);
-	} elsif ($section eq 'dynreloc') {
-	    if (/^\S+\s+(\S+)\s+(.+)$/) {
-		$self->{dynrelocs}{$2} = $1;
-	    } else {
-		warning(g_("couldn't parse dynamic relocation record: %s"), $_);
-	    }
-	} elsif ($section eq 'dyninfo') {
-	    if (/^\s*NEEDED\s+(\S+)/) {
-		push @{$self->{NEEDED}}, $1;
-	    } elsif (/^\s*SONAME\s+(\S+)/) {
-		$self->{SONAME} = $1;
-	    } elsif (/^\s*HASH\s+(\S+)/) {
-		$self->{HASH} = $1;
-	    } elsif (/^\s*GNU_HASH\s+(\S+)/) {
-		$self->{GNU_HASH} = $1;
-	    } elsif (/^\s*RUNPATH\s+(\S+)/) {
-                # RUNPATH takes precedence over RPATH but is
-                # considered after LD_LIBRARY_PATH while RPATH
-                # is considered before (if RUNPATH is not set).
-                my $runpath = $1;
-                $self->{RPATH} = [ split /:/, $runpath ];
-	    } elsif (/^\s*RPATH\s+(\S+)/) {
-                my $rpath = $1;
-                unless (scalar(@{$self->{RPATH}})) {
-                    $self->{RPATH} = [ split /:/, $rpath ];
-                }
-	    }
-        } elsif ($section eq 'program') {
-            if (/^\s*INTERP\s+/) {
-                $self->{INTERP} = 1;
-            }
-	} elsif ($section eq 'none') {
-	    if (/^\s*.+:\s*file\s+format\s+(\S+)$/) {
-		$self->{format} = $1;
-	    } elsif (/^architecture:\s*\S+,\s*flags\s*\S+:$/) {
-		# Parse 2 lines of "-f"
-		# architecture: i386, flags 0x00000112:
-		# EXEC_P, HAS_SYMS, D_PAGED
-		# start address 0x08049b50
-		$_ = <$fh>;
-		chomp;
-		$self->{flags}{$_} = 1 foreach (split(/,\s*/));
-	    }
-	}
-    }
-    # Update status of dynamic symbols given the relocations that have
-    # been parsed after the symbols...
-    $self->apply_relocations();
-
-    return $section ne 'none';
-}
-
-# Output format of objdump -w -T
-#
-# /lib/libc.so.6:     file format elf32-i386
-#
-# DYNAMIC SYMBOL TABLE:
-# 00056ef0 g    DF .text  000000db  GLIBC_2.2   getwchar
-# 00000000 g    DO *ABS*  00000000  GCC_3.0     GCC_3.0
-# 00069960  w   DF .text  0000001e  GLIBC_2.0   bcmp
-# 00000000  w   D  *UND*  00000000              _pthread_cleanup_pop_restore
-# 0000b788 g    DF .text  0000008e  Base        .protected xine_close
-# 0000b788 g    DF .text  0000008e              .hidden IA__g_free
-# |        ||||||| |      |         |           |
-# |        ||||||| |      |         Version str (.visibility) + Symbol name
-# |        ||||||| |      Alignment
-# |        ||||||| Section name (or *UND* for an undefined symbol)
-# |        ||||||F=Function,f=file,O=object
-# |        |||||d=debugging,D=dynamic
-# |        ||||I=Indirect
-# |        |||W=warning
-# |        ||C=constructor
-# |        |w=weak
-# |        g=global,l=local,!=both global/local
-# Size of the symbol
-#
-# GLIBC_2.2 is the version string associated to the symbol
-# (GLIBC_2.2) is the same but the symbol is hidden, a newer version of the
-# symbol exist
-
-my $vis_re = qr/(\.protected|\.hidden|\.internal|0x\S+)/;
-my $dynsym_re = qr<
-    ^
-    [0-9a-f]+                   # Symbol size
-    \ (.{7})                    # Flags
-    \s+(\S+)                    # Section name
-    \s+[0-9a-f]+                # Alignment
-    (?:\s+(\S+))?               # Version string
-    (?:\s+$vis_re)?             # Visibility
-    \s+(.+)                     # Symbol name
->x;
-
-sub parse_dynamic_symbol {
-    my ($self, $line) = @_;
-    if ($line =~ $dynsym_re) {
-	my ($flags, $sect, $ver, $vis, $name) = ($1, $2, $3, $4, $5);
-
-	# Special case if version is missing but extra visibility
-	# attribute replaces it in the match
-	if (defined($ver) and $ver =~ /^$vis_re$/) {
-	    $vis = $ver;
-	    $ver = '';
-	}
-
-	# Cleanup visibility field
-	$vis =~ s/^\.// if defined($vis);
-
-	my $symbol = {
-		name => $name,
-		version => $ver // '',
-		section => $sect,
-		dynamic => substr($flags, 5, 1) eq 'D',
-		debug => substr($flags, 5, 1) eq 'd',
-		type => substr($flags, 6, 1),
-		weak => substr($flags, 1, 1) eq 'w',
-		local => substr($flags, 0, 1) eq 'l',
-		global => substr($flags, 0, 1) eq 'g',
-		visibility => $vis // '',
-		hidden => '',
-		defined => $sect ne '*UND*'
-	    };
-
-	# Handle hidden symbols
-	if (defined($ver) and $ver =~ /^\((.*)\)$/) {
-	    $ver = $1;
-	    $symbol->{version} = $1;
-	    $symbol->{hidden} = 1;
-	}
-
-	# Register symbol
-	$self->add_dynamic_symbol($symbol);
-    } elsif ($line =~ /^[0-9a-f]+ (.{7})\s+(\S+)\s+[0-9a-f]+/) {
-	# Same start but no version and no symbol ... just ignore
-    } elsif ($line =~ /^REG_G\d+\s+/) {
-	# Ignore some s390-specific output like
-	# REG_G6           g     R *UND*      0000000000000000              #scratch
-    } else {
-	warning(g_("couldn't parse dynamic symbol definition: %s"), $line);
-    }
-}
-
-sub apply_relocations {
-    my $self = shift;
-    foreach my $sym (values %{$self->{dynsyms}}) {
-	# We want to mark as undefined symbols those which are currently
-	# defined but that depend on a copy relocation
-	next if not $sym->{defined};
-
-        my @relocs;
-
-        # When objdump qualifies the symbol with a version it will use @ when
-        # the symbol is in an undefined section (which we discarded above, or
-        # @@ otherwise.
-        push @relocs, $sym->{name} . '@@' . $sym->{version} if $sym->{version};
-
-        # Symbols that are not versioned, or versioned but shown with objdump
-        # from binutils < 2.26, do not have a version appended.
-        push @relocs, $sym->{name};
-
-        foreach my $reloc (@relocs) {
-            next if not exists $self->{dynrelocs}{$reloc};
-            next if not $self->{dynrelocs}{$reloc} =~ /^R_.*_COPY$/;
-
-	    $sym->{defined} = 0;
-            last;
-	}
-    }
-}
-
-sub add_dynamic_symbol {
-    my ($self, $symbol) = @_;
-    $symbol->{objid} = $symbol->{soname} = $self->get_id();
-    $symbol->{soname} =~ s{^.*/}{} unless $self->{SONAME};
-    if ($symbol->{version}) {
-	$self->{dynsyms}{$symbol->{name} . '@' . $symbol->{version}} = $symbol;
-    } else {
-	$self->{dynsyms}{$symbol->{name} . '@Base'} = $symbol;
-    }
-}
-
-sub get_id {
-    my $self = shift;
-    return $self->{SONAME} || $self->{file};
-}
-
-sub get_symbol {
-    my ($self, $name) = @_;
-    if (exists $self->{dynsyms}{$name}) {
-	return $self->{dynsyms}{$name};
-    }
-    if ($name !~ /@/) {
-        if (exists $self->{dynsyms}{$name . '@Base'}) {
-            return $self->{dynsyms}{$name . '@Base'};
-        }
-    }
-    return;
-}
-
-sub get_exported_dynamic_symbols {
-    my $self = shift;
-    return grep {
-        $_->{defined} && $_->{dynamic} && !$_->{local}
-    } values %{$self->{dynsyms}};
-}
-
-sub get_undefined_dynamic_symbols {
-    my $self = shift;
-    return grep {
-        (!$_->{defined}) && $_->{dynamic}
-    } values %{$self->{dynsyms}};
-}
-
-sub get_needed_libraries {
-    my $self = shift;
-    return @{$self->{NEEDED}};
-}
-
-sub is_executable {
-    my $self = shift;
-    return (exists $self->{flags}{EXEC_P} && $self->{flags}{EXEC_P}) ||
-           (exists $self->{INTERP} && $self->{INTERP});
-}
-
-sub is_public_library {
-    my $self = shift;
-    return exists $self->{flags}{DYNAMIC} && $self->{flags}{DYNAMIC}
-	&& exists $self->{SONAME} && $self->{SONAME};
-}
+=cut
 
 1;

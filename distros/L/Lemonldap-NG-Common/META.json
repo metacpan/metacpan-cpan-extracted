@@ -63,6 +63,7 @@
             "JSON::XS" : "0",
             "LWP::UserAgent" : "0",
             "Mouse" : "0",
+            "Net::CIDR" : "0",
             "Plack" : "0",
             "URI" : "0",
             "XML::LibXML" : "0"
@@ -81,6 +82,6 @@
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.16.2",
+   "version" : "v2.17.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -1,0 +1,15 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::BIO {
+   
+   # Class Methods
+   native static method new : Net::SSLeay::BIO ();
+   
+   # Instance Methods
+   native method DESTROY : void ();
+   
+   native method read : int ($data : mutable string, $dlen : int = -1);
+   
+   native method write : int ($data : string, $dlen : int = -1);
+}

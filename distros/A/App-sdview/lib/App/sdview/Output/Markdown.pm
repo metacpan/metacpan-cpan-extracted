@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.800;
 
-package App::sdview::Output::Markdown 0.11;
+package App::sdview::Output::Markdown 0.12;
 class App::sdview::Output::Markdown
    :does(App::sdview::Output)
    :strict(params);

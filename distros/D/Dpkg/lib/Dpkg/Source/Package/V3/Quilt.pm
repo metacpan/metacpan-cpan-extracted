@@ -13,12 +13,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Source::Package::V3::Quilt;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::Source::Package::V3::Quilt - class for source format 3.0 (quilt)
+
+=head1 DESCRIPTION
+
+This module provides a class to handle the source package format 3.0 (quilt).
+
+B<Note>: This is a private module, its API can change at any time.
+
+=cut
+
+package Dpkg::Source::Package::V3::Quilt 0.01;
 
 use strict;
 use warnings;
-
-our $VERSION = '0.01';
 
 use List::Util qw(any);
 use File::Spec;
@@ -265,5 +277,13 @@ sub register_patch {
     }
     return $patch;
 }
+
+=head1 CHANGES
+
+=head2 Version 0.xx
+
+This is a private module.
+
+=cut
 
 1;

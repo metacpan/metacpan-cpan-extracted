@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+#
+# $Id$
+#
+use strict;
+use warnings;
+
+my $query = shift or die("Give OPP query");
+
+use OPP;
+use OPP::State;
+use OPP::Output;
+
+my $opp = OPP->new;
+$opp->nested([ 'app.http.component' ]);
+$opp->state(OPP::State->new->init);
+$opp->output(OPP::Output->new->init);
+
+while (<>) {
+   chomp;
+   $opp->process_as_json($_, $query);
+}
+
+1;
+
+__END__

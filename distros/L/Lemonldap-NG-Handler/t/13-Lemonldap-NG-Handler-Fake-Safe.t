@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 16;
+use Test::More tests => 24;
 require 't/test.pm';
 BEGIN { use_ok('Lemonldap::NG::Handler::Main::Jail') }
 
@@ -69,8 +69,7 @@ ok(
     'checkDate extended function is defined'
 );
 is(
-    $has2f->(
-        {
+    $has2f->( {
             _2fDevices =>
 "[{\"name\":\"MyTOTP\",\"_secret\":\"g5fsxwf4d34biemlojsbbvhgtskrssos\",\"epoch\":1602173208,\"type\":\"TOTP\"}]"
         },
@@ -80,8 +79,7 @@ is(
     "Function works"
 );
 is(
-    $has2f->(
-        {
+    $has2f->( {
             _2fDevices =>
 "[{\"name\":\"MyTOTP\",\"_secret\":\"g5fsxwf4d34biemlojsbbvhgtskrssos\",\"epoch\":1602173208,\"type\":\"TOTP\"}]"
         },
@@ -90,8 +88,7 @@ is(
     "Function works"
 );
 is(
-    $has2f->(
-        {
+    $has2f->( {
             _2fDevices =>
 "[{\"name\":\"MyTOTP\",\"_secret\":\"g5fsxwf4d34biemlojsbbvhgtskrssos\",\"epoch\":1602173208,\"type\":\"TOTP\"}]"
         },
@@ -101,11 +98,47 @@ is(
     "Function works"
 );
 
+$sub  = "sub { return(ipInSubnet(\@_)) }";
+$code = $jail->jail_reval($sub);
+ok(
+    ( defined($code) and ref($code) eq 'CODE' ),
+    'ipInSubnet extended function is defined'
+);
+is( $code->( "127.0.0.1", "127.0.0.0/8" ), 1, "ipInSubnet works as expected" );
+is( $code->( "192.168.0.1", "127.0.0.0/8" ), 0,
+    "ipInSubnet works as expected" );
+is( $code->( "192.168.0.1", "127.0.0.0/8", "192.168.0.0/16" ),
+    1, "ipInSubnet works as expected" );
+
 $sub  = "sub { return()";
 $code = $jail->jail_reval($sub);
 ok( ( not defined($code) ), 'Syntax error yields undef result' );
 like(
     $jail->error,
-    qr/Missing right curly or square bracket/,
+    qr/(?:Missing right curly or square bracket|Syntax error)/i,
     'Found correct error message'
+);
+
+$sub  = "sub { return(subjectid(\@_)) }";
+$code = $jail->jail_reval($sub);
+ok(
+    ( defined($code) and ref($code) eq 'CODE' ),
+    'subjectid extended function is defined'
+);
+is(
+    $code->( "abc", "def" ),
+    "xj4bnp4pahh6uqkbidpf3lrceoyagyndsylxvhfucd7wd4qacwwq\@def",
+    "subjectid works as expected"
+);
+
+is(
+    $code->( "abc", "def", "salt" ),
+    "c2ntukyjo7v64lvr7u4sy2veocrsqhkdt7zs6if25jzqtv7ub3wa\@def",
+    "subjectid works as expected"
+);
+
+is(
+    $code->("abc"),
+    "xj4bnp4pahh6uqkbidpf3lrceoyagyndsylxvhfucd7wd4qacwwq",
+    "subjectid works as expected"
 );

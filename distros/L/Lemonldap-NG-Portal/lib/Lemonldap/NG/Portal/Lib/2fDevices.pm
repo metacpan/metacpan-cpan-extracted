@@ -22,11 +22,12 @@ of this module
 
 use strict;
 use Mouse::Role;
+use Lemonldap::NG::Common::Util qw/display2F/;
 use JSON;
 
 requires qw(p conf logger);
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.17.0';
 
 =item update2fDevice
 
@@ -103,9 +104,10 @@ sub add2fDevice {
     my $_2fDevices = $self->get2fDevices( $req, $info );
 
     push @{$_2fDevices}, $device;
-    $self->logger->debug(
-        "Append 2F device: { type => $device->{type}, name => $device->{name} }"
-    );
+
+    my $uid = $info->{ $self->conf->{whatToTrace} };
+    $self->userLogger->notice(
+        "User " . $uid . " registered 2F device: " . display2F($device) );
     $self->p->updatePersistentSession( $req,
         { _2fDevices => to_json($_2fDevices) } );
     return 1;
@@ -156,8 +158,11 @@ sub del2fDevices {
           @updated_2fDevices;
         if ( @updated_2fDevices < $size_before ) {
             $need_update = 1;
-            $self->logger->debug(
-                "Deleted 2F device: { type => $type, epoch => $epoch }");
+            my $uid = $info->{ $self->conf->{whatToTrace} };
+            $self->userLogger->notice( "User "
+                  . $uid
+                  . " deleted 2F device: "
+                  . display2F($device_spec) );
         }
     }
 

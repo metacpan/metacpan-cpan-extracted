@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Export::These" : "0",
             "List::Insertion" : "0",
             "Log::OK" : "0",
             "Log::ger" : "0",
@@ -49,6 +50,6 @@
          "web" : "http://github.com/drclaw1394/perl-http-state"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.1",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

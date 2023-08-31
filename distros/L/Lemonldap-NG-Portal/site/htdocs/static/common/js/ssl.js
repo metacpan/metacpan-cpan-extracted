@@ -3,36 +3,48 @@
   var sendUrl, tryssl;
 
   tryssl = function() {
-    var path;
+    var e, path;
     path = window.location.pathname;
     console.log('path -> ', path);
     console.log('Call URL -> ', window.datas.sslHost);
-    $.ajax(window.datas.sslHost, {
-      dataType: 'json',
-      xhrFields: {
-        withCredentials: true
-      },
-      success: function(data) {
-        if (data.ajax_auth_token) {
-          $('#lform').find('input[name="ajax_auth_token"]').attr("value", data.ajax_auth_token);
+    e = jQuery.Event("sslAttempt");
+    $(document).trigger(e);
+    if (!e.isDefaultPrevented()) {
+      $.ajax(window.datas.sslHost, {
+        dataType: 'json',
+        xhrFields: {
+          withCredentials: true
+        },
+        success: function(data) {
+          console.log('Success -> ', data);
+          e = jQuery.Event("sslSuccess");
+          $(document).trigger(e, [data]);
+          if (!e.isDefaultPrevented()) {
+            if (data.ajax_auth_token) {
+              $('#lform').find('input[name="ajax_auth_token"]').attr("value", data.ajax_auth_token);
+            }
+            return sendUrl(path);
+          }
+        },
+        error: function(result) {
+          console.log('Error during AJAX SSL authentication', result);
+          e = jQuery.Event("sslFailure");
+          $(document).trigger(e, [result]);
+          if (!e.isDefaultPrevented()) {
+            if (result.status === 0) {
+              sendUrl(path);
+            }
+            if (result.responseJSON && 'error' in result.responseJSON && result.responseJSON.error === "9") {
+              sendUrl(path);
+            }
+            if (result.responseJSON && 'html' in result.responseJSON) {
+              $('#errormsg').html(result.responseJSON.html);
+              return $(window).trigger('load');
+            }
+          }
         }
-        sendUrl(path);
-        return console.log('Success -> ', data);
-      },
-      error: function(result) {
-        if (result.status === 0) {
-          sendUrl(path);
-        }
-        if (result.responseJSON && 'error' in result.responseJSON && result.responseJSON.error === "9") {
-          sendUrl(path);
-        }
-        if (result.responseJSON && 'html' in result.responseJSON) {
-          $('#errormsg').html(result.responseJSON.html);
-          $(window).trigger('load');
-        }
-        return console.log('Error during AJAX SSL authentication', result);
-      }
-    });
+      });
+    }
     return false;
   };
 

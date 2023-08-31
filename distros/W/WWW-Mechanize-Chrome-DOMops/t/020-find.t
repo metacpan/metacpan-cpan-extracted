@@ -7,7 +7,7 @@ use lib 'blib/lib';
 
 #use utf8;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use Test::More;
 use Test2::Plugin::UTF8; # rids of the Wide Character in TAP message!
@@ -18,6 +18,15 @@ use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
 use Log::Log4perl qw(:easy);
 use File::Temp;
 use File::Spec;
+
+use WWW::Mechanize::Chrome::DOMops qw/
+	zap
+	find
+	VERBOSE_DOMops
+/;
+
+# This is for the mech obj, Set priority of root logger to ERROR
+Log::Log4perl->easy_init($ERROR);
 
 # At this point we are not sure if the google-chrome binary
 # is installed or not, so we will test the creation of a simple
@@ -30,15 +39,6 @@ if( $@ne'' ){
 	exit 0; # gracefull exit, all tests have passed! hopefully the user trying to install it has seen this message.
 }
 diag "found google-chrome executable, version:\n$cv";
-
-# This is for the mech obj, Set priority of root logger to ERROR
-Log::Log4perl->easy_init($ERROR);
-
-use WWW::Mechanize::Chrome::DOMops qw/
-	zap
-	find
-	VERBOSE_DOMops
-/;
 
 my $curdir = $FindBin::Bin;
 

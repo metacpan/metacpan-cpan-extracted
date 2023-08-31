@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 #########################################################################
 
@@ -133,6 +133,8 @@ our %T =
      => "parameter '%s' in Aufruf von %s::%s muß positive ganze Zahl sein",
      parameter__1_must_be_in__2__3
      => "parameter '%s' muß im Bereich [%s..%s] liegen",
+     reset_directory_invalid_symbolic_link
+     => 'Verzeichnis zurückgesetzt (kaputter symbolischer Link?)',
      scrolls
      => '+/- blättert',
      specified_implementation_missing

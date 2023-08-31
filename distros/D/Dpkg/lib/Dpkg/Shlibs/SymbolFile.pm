@@ -14,12 +14,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Shlibs::SymbolFile;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::Shlibs::SymbolFile - represent a symbols file
+
+=head1 DESCRIPTION
+
+This module provides a class to handle symbols files.
+
+B<Note>: This is a private module, its API can change at any time.
+
+=cut
+
+package Dpkg::Shlibs::SymbolFile 0.01;
 
 use strict;
 use warnings;
-
-our $VERSION = '0.01';
 
 use Dpkg::Gettext;
 use Dpkg::ErrorHandling;
@@ -29,10 +41,6 @@ use Dpkg::Shlibs::Symbol;
 use Dpkg::Arch qw(get_host_arch);
 
 use parent qw(Dpkg::Interface::Storable);
-
-# Needed by the deprecated key, which is a correct use.
-no if $Dpkg::Version::VERSION ge '1.02',
-    warnings => qw(Dpkg::Version::semantic_change::overload::bool);
 
 my %internal_symbol = (
     __bss_end__ => 1,                   # arm
@@ -693,5 +701,13 @@ sub get_lost_libs {
     my ($self, $ref) = @_;
     return $ref->get_new_libs($self);
 }
+
+=head1 CHANGES
+
+=head2 Version 0.xx
+
+This is a private module.
+
+=cut
 
 1;

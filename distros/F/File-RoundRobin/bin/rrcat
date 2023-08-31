@@ -20,7 +20,7 @@ To write into a file :
 
 Size can be in the fallowing forms :
 
-=over 4 
+=over 4
 
 =item 1. number (bytes)
 
@@ -37,7 +37,7 @@ Size can be in the fallowing forms :
 Version 0.05
 
 =cut
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 
 use File::RoundRobin;
@@ -49,12 +49,12 @@ if ( $ARGV[0] =~ /^(\d+(?:Kb?|Mb?|Gb?)?)$/ && defined $ARGV[1] ) {
 	while ( my $buffer = <STDIN> ) {
 		$rrfile->write($buffer);
 	}
-	
+
 	$rrfile->close();
 }
 elsif (-f $ARGV[0]) {
 	my $rrfile = File::RoundRobin->new(path => $ARGV[0], mode => 'read');
-	
+
 
 	while ( my $buffer = $rrfile->read(10000) ) {
 		print $buffer;
@@ -63,9 +63,9 @@ elsif (-f $ARGV[0]) {
 }
 else {
 	print <<EOF;
-Usage : 
+Usage :
 To print the content of a file :
-	$0 <filename> 
+	$0 <filename>
 
 To write into a file :
 	$0 <size> <filename>
@@ -75,39 +75,9 @@ Size can be in the fallowing forms :
 	2. <number>Kb (kilobytes)
 	3. <number>Mb (megabytes)
 	4. <number>Gb (gigabytes)
-	
+
 EOF
 }
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc File::RoundRobin
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-RoundRobin>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/File-RoundRobin>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/File-RoundRobin>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/File-RoundRobin/>
-
-=back
-
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -52,14 +52,8 @@ sub run {
 
     # Session creation timestamp
     my $time = $req->{sessionInfo}->{_utime} || time();
-    $req->path =~ m#^$self->{conf}->{issuerDBGetPath}/(log(?:in|out))#;
-    my $logInOut = $1 || 'login';
-    if ( $logInOut eq 'login' ) {
-        $self->logger->debug("IssuerGet: request for login");
-        $self->computeGetParams($req);
-        return PE_OK;
-    }
-    elsif ( $logInOut eq 'logout' ) {
+
+    if ( $req->path =~ m#^$self->{conf}->{issuerDBGetPath}/logout# ) {
         $self->logger->debug("IssuerGet: request for logout");
 
         # TODO
@@ -67,8 +61,9 @@ sub run {
         return PE_OK;
     }
     else {
-        $self->logger->error("IssuerGet: bad url");
-        return PE_UNAUTHORIZEDURL;
+        $self->logger->debug("IssuerGet: request for login");
+        $self->computeGetParams($req);
+        return PE_OK;
     }
 }
 

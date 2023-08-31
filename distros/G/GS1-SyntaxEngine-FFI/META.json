@@ -64,19 +64,19 @@
    "provides" : {
       "GS1::SyntaxEngine::FFI" : {
          "file" : "lib/GS1/SyntaxEngine/FFI.pm",
-         "version" : "0.2"
+         "version" : "0.3"
       },
       "GS1::SyntaxEngine::FFI::EncoderParameterException" : {
          "file" : "lib/GS1/SyntaxEngine/FFI/EncoderParameterException.pm",
-         "version" : "0.2"
+         "version" : "0.3"
       },
       "GS1::SyntaxEngine::FFI::GS1Encoder" : {
          "file" : "lib/GS1/SyntaxEngine/FFI/GS1Encoder.pm",
-         "version" : "0.2"
+         "version" : "0.3"
       },
       "GS1::SyntaxEngine::FFI::InitException" : {
          "file" : "lib/GS1/SyntaxEngine/FFI/InitException.pm",
-         "version" : "0.2"
+         "version" : "0.3"
       }
    },
    "release_status" : "stable",
@@ -91,7 +91,7 @@
          "web" : "https://github.com/hangy/stunning-goggles"
       }
    },
-   "version" : "0.2",
+   "version" : "0.3",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"
@@ -354,7 +354,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.2",
+                  "tag" : "v0.3",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

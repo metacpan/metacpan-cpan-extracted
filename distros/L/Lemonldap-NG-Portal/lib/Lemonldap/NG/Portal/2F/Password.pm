@@ -8,6 +8,7 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 use Lemonldap::NG::Common::Crypto;
+use Lemonldap::NG::Common::Util qw/display2F/;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_ERROR
@@ -16,7 +17,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.17.0';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor';
 with 'Lemonldap::NG::Portal::Lib::2fDevices';
@@ -82,6 +83,7 @@ sub run {
 sub verify {
     my ( $self, $req, $session ) = @_;
     my ( $password, $password_device, $secret );
+    my $uid = $session->{ $self->conf->{whatToTrace} };
 
     $self->logger->debug( $self->prefix . '2f: verification' );
 
@@ -103,13 +105,13 @@ sub verify {
     }
 
     if ( $password eq $self->crypto->decrypt($secret) ) {
-        $self->userLogger->info( $self->prefix . '2f: correct' );
+
+        $self->userLogger->info( "User $uid authenticated with 2F device: "
+              . display2F($password_device) );
         return PE_OK;
     }
     else {
-        $self->userLogger->notice( $self->prefix
-              . '2f: invalid for '
-              . $session->{ $self->conf->{whatToTrace} } );
+        $self->userLogger->notice( $self->prefix . '2f: invalid for ' . $uid );
         return PE_BADCREDENTIALS;
     }
 }

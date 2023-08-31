@@ -18,7 +18,7 @@ my $dir = tempdir( CLEANUP => 1 );
 my $fh;
 open($fh, '>', File::Spec->catfile($dir, 'child.pl'));
 print $fh join "\n", "#!$^X",
-                     'use File::Spec',
+                     'use File::Spec;',
                      "open(\$out, '>', File::Spec->catfile('$dir', 'child.out'));",
                      'while(<STDIN>) {',
                      '  print $out $_',

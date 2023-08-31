@@ -13,22 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Interface::Storable;
-
-use strict;
-use warnings;
-
-our $VERSION = '1.01';
-
-use Carp;
-
-use Dpkg::Gettext;
-use Dpkg::ErrorHandling;
-
-use overload
-    '""' => \&_stringify,
-    'fallback' => 1;
-
 =encoding utf8
 
 =head1 NAME
@@ -40,6 +24,22 @@ Dpkg::Interface::Storable - common methods related to object serialization
 Dpkg::Interface::Storable is only meant to be used as parent
 class for other classes. It provides common methods that are
 all implemented on top of two basic methods parse() and output().
+
+=cut
+
+package Dpkg::Interface::Storable 1.01;
+
+use strict;
+use warnings;
+
+use Carp;
+
+use Dpkg::Gettext;
+use Dpkg::ErrorHandling;
+
+use overload
+    '""' => \&_stringify,
+    'fallback' => 1;
 
 =head1 BASE METHODS
 

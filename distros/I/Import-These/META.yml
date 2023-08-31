@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,7 @@ no_index:
 requires: {}
 resources:
   repository: git://github.com/drclaw1394/perl-import-these.git
-version: v0.1.0
+version: v0.1.2
 x_bugtracker:
   web: https://github.com/drclaw1394/perl-import-these/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

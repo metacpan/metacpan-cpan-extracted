@@ -5,7 +5,7 @@ use Mouse;
 
 #use Lemonldap::NG::Handler::Main qw(:jailSharedVars);
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.17.0';
 
 has protection => ( is => 'rw', isa => 'Str' );
 has rule       => ( is => 'rw', isa => 'Str' );
@@ -38,7 +38,7 @@ sub init {
 
 ## @methodi void _run()
 # Check if protecton is activated then return a code ref that will launch
-# _logAuthTrace() if protection in on or handler() else
+# _authAndTrace() if protection in on or handler() else
 #@return code-ref
 sub _run {
     my $self = shift;
@@ -49,10 +49,11 @@ sub _run {
 
         # Handle requests
         # Developers, be careful: Only this part is executed at each request
-        return sub {
-            return $self->_logAuthTrace(
-                Lemonldap::NG::Common::PSGI::Request->new( $_[0] ) );
-        };
+        return $self->psgiAdapter(
+            sub {
+                return $self->_authAndTrace( $_[0] );
+            }
+        );
     }
 
     else {
@@ -66,12 +67,14 @@ sub _run {
         }
 
         # Handle unprotected requests
-        return sub {
-            my $req = Lemonldap::NG::Common::PSGI::Request->new( $_[0] );
-            my $res = $self->_logAndHandle($req);
-            push @{ $res->[1] }, $req->spliceHdrs;
-            return $res;
-        };
+        return $self->psgiAdapter(
+            sub {
+                my $req = $_[0];
+                my $res = $self->handler($req);
+                push @{ $res->[1] }, $req->spliceHdrs;
+                return $res;
+            }
+        );
     }
 }
 
@@ -86,11 +89,13 @@ sub status {
         eval { $self->api->checkConf() };
         $self->logger->error($@) if ($@);
     }
-    return sub {
-        my $req = Lemonldap::NG::Common::PSGI::Request->new( $_[0] );
-        $self->api->status($req);
-        return [ 200, [ $req->spliceHdrs ], [ $req->{respBody} ] ];
-    };
+    return $self->psgiAdapter(
+        sub {
+            my $req = $_[0];
+            $self->api->status($req);
+            return [ 200, [ $req->spliceHdrs ], [ $req->{respBody} ] ];
+        }
+    );
 }
 
 sub reload {
@@ -104,39 +109,13 @@ sub reload {
         eval { $self->api->checkConf() };
         $self->logger->error($@) if ($@);
     }
-    return sub {
-        my $req = Lemonldap::NG::Common::PSGI::Request->new( $_[0] );
-        $self->api->reload($req);
-        return [ 200, [ $req->spliceHdrs ], [ $req->{respBody} ] ];
-    };
-}
-
-sub _logAuthTrace {
-    my ( $self, $req, $noCall ) = @_;
-
-    # register the request object to the logging system
-    if ( ref( $self->logger ) and $self->logger->can('setRequestObj') ) {
-        $self->logger->setRequestObj($req);
-    }
-    if ( ref( $self->userLogger ) and $self->userLogger->can('setRequestObj') )
-    {
-        $self->userLogger->setRequestObj($req);
-    }
-
-    # Call the handler
-    my $res = $self->_authAndTrace( $req, $noCall );
-
-    # Clear the logging system before the next request
-    if ( ref( $self->logger ) and $self->logger->can('clearRequestObj') ) {
-        $self->logger->clearRequestObj($req);
-    }
-    if ( ref( $self->userLogger )
-        and $self->userLogger->can('clearRequestObj') )
-    {
-        $self->userLogger->clearRequestObj($req);
-    }
-
-    return $res;
+    return $self->psgiAdapter(
+        sub {
+            my $req = $_[0];
+            $self->api->reload($req);
+            return [ 200, [ $req->spliceHdrs ], [ $req->{respBody} ] ];
+        }
+    );
 }
 
 ## @method private PSGI-Response _authAndTrace($req)
@@ -166,7 +145,7 @@ sub _authAndTrace {
         }
         else {
             $self->logger->debug('User authenticated, calling handler()');
-            $res = $self->_logAndHandle($req);
+            $res = $self->handler($req);
             push @{ $res->[1] }, $req->spliceHdrs;
             return $res;
         }

@@ -17,6 +17,7 @@ lib/PICA/Parser/Import.pm
 lib/PICA/Parser/JSON.pm
 lib/PICA/Parser/PIXML.pm
 lib/PICA/Parser/PPXML.pm
+lib/PICA/Parser/Patch.pm
 lib/PICA/Parser/Plain.pm
 lib/PICA/Parser/Plus.pm
 lib/PICA/Parser/XML.pm
@@ -31,6 +32,7 @@ lib/PICA/Writer/Import.pm
 lib/PICA/Writer/JSON.pm
 lib/PICA/Writer/PIXML.pm
 lib/PICA/Writer/PPXML.pm
+lib/PICA/Writer/Patch.pm
 lib/PICA/Writer/Plain.pm
 lib/PICA/Writer/Plus.pm
 lib/PICA/Writer/XML.pm

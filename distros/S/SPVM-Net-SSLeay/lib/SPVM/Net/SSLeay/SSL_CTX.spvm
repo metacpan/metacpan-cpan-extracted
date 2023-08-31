@@ -1,0 +1,37 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::SSL_CTX {
+  use Net::SSLeay::SSL_METHOD;
+  use Net::SSLeay::X509_STORE;
+  use Net::SSLeay::X509_VERIFY_PARAM;
+  
+  # Class Methods
+  native static method new : Net::SSLeay::SSL_CTX ($method : Net::SSLeay::SSL_METHOD);
+  
+  # Instance Methods
+  native method DESTROY : void ();
+  
+  native method set_mode : long ($mode : long);
+  
+  native method set_verify : int ($mode : int);
+  
+  native method get0_param : Net::SSLeay::X509_VERIFY_PARAM ();
+  
+  native method load_verify_locations : int ($path : string);
+  
+  native method set_default_verify_paths : int ();
+  
+  native method use_certificate_file : int ($file : string, $type : int);
+  
+  native method use_certificate_chain_file : int ($file : string);
+  
+  native method use_PrivateKey_file : int ($file : string, $type : int);
+  
+  native method set_cipher_list : int ($str : string);
+  
+  native method set_ciphersuites : int ($str : string);
+  
+  native method get_cert_store : Net::SSLeay::X509_STORE ();
+
+}

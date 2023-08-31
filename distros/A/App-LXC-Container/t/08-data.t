@@ -216,6 +216,12 @@ unless (m/^coreutils$/m)
     diag('OS release: "', $App::LXC::Container::Data::_os_release, '"');
     diag('OS 1: "', $singleton->{OS}, '"');
     diag('OS 2: "', App::LXC::Container::Data::common::new()->{OS}, '"');
+    foreach (qw(ldd ls sh su))
+    {
+	my $exe = App::LXC::Container::Data::find_executable($_);
+	diag($_, ' is ', $exe);
+	$exe  and  diag($exe, ' is ', Cwd::abs_path($exe));
+    }
 }
 
 $singleton->{SYSTEM_DEFAULT} = '/non-existing';

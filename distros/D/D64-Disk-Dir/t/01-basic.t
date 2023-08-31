@@ -8,7 +8,7 @@ BEGIN { use_ok('D64::Disk::Dir', qw(:all)) };
 }
 #########################
 {
-BEGIN { use_ok('D64::Disk::Dir::Entry', qw(:all)) };
+BEGIN { use_ok('D64::Disk::Dir::Entry') };
 }
 #########################
 {

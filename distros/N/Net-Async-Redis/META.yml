@@ -16,6 +16,7 @@ build_requires:
   Variable::Disposition: '0.004'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -33,41 +34,44 @@ no_index:
 provides:
   Net::Async::Redis:
     file: lib/Net/Async/Redis.pm
-    version: '3.024'
+    version: '4.000'
   Net::Async::Redis::Cluster:
     file: lib/Net/Async/Redis/Cluster.pm
-    version: '3.024'
+    version: '4.000'
   Net::Async::Redis::Cluster::Node:
     file: lib/Net/Async/Redis/Cluster/Node.pm
-    version: '3.024'
+    version: '4.000'
   Net::Async::Redis::Commands:
     file: lib/Net/Async/Redis/Commands.pm
-    version: '3.024'
+    version: '4.000'
   Net::Async::Redis::Multi:
     file: lib/Net/Async/Redis/Multi.pm
-    version: '3.024'
+    version: '4.000'
   Net::Async::Redis::Protocol:
     file: lib/Net/Async/Redis/Protocol.pm
-    version: '3.024'
+    version: '4.000'
   Net::Async::Redis::Server:
     file: lib/Net/Async/Redis/Server.pm
-    version: '3.024'
+    version: '4.000'
   Net::Async::Redis::Server::Connection:
     file: lib/Net/Async/Redis/Server/Connection.pm
-    version: '3.024'
+    version: '4.000'
   Net::Async::Redis::Server::Database:
     file: lib/Net/Async/Redis/Server/Database.pm
-    version: '3.024'
+    version: '4.000'
   Net::Async::Redis::Subscription:
     file: lib/Net/Async/Redis/Subscription.pm
-    version: '3.024'
+    version: '4.000'
   Net::Async::Redis::Subscription::Message:
     file: lib/Net/Async/Redis/Subscription/Message.pm
-    version: '3.024'
+    version: '4.000'
 requires:
   Cache::LRU: '0.04'
   Class::Method::Modifiers: '0'
   Digest::CRC: '0.22'
+  Dir::Self: '0'
+  File::ShareDir: '0'
+  File::ShareDir::Install: '0'
   Future: '0.47'
   Future::AsyncAwait: '0.48'
   IO::Async: '0'
@@ -77,19 +81,22 @@ requires:
   Math::Random::Secure: '0'
   Metrics::Any: '0'
   OpenTracing::Any: '1.003'
+  Path::Tiny: '0'
   Ryu: '2.009'
   Ryu::Async: '0.019'
   Syntax::Keyword::Dynamically: '0.07'
+  Syntax::Keyword::Match: '0'
   Syntax::Keyword::Try: '0.21'
   URI: '0'
   URI::redis: '0'
+  YAML::XS: '0.88'
   curry: '0'
   parent: '0'
 resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Redis/issues
   homepage: https://github.com/team-at-cpan/Net-Async-Redis
   repository: https://github.com/team-at-cpan/Net-Async-Redis.git
-version: '3.024'
+version: '4.000'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Eyad Arnabeh <eyadof@gmail.com>'

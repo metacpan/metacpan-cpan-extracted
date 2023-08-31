@@ -94,6 +94,9 @@
         </TMPL_IF>
       </TMPL_IF>
     </div>
+  <TMPL_IF NAME=CAPTCHA_HTML>
+    <TMPL_VAR NAME=CAPTCHA_HTML>
+  </TMPL_IF>
     <div class="buttons">
       <button type="submit" class="btn btn-success">
         <span class="fa fa-check-circle"></span>

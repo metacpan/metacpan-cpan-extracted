@@ -1,16 +1,15 @@
-use strict;
-use warnings;
+use v5.36;
+
 package HTTP::State::Cookie;
 no warnings "experimental";
+
 # Logging
 #
 use Log::ger; 
 use Log::OK;
 
 
-use Exporter "import";
 
-use feature qw"say";# signatures";
 use builtin qw<trim>;
 
 
@@ -74,36 +73,36 @@ BEGIN {
   $same_site_reverse{undef}=0;			#catching
 }
 
-use constant \%const_names;
+use constant::more \%const_names;
 
 
-
-our @EXPORT_OK=(
-  keys(%const_names),
-  "encode_cookies",
-  "encode_set_cookie",      #encodes a standalone cookie struct
-  "decode_set_cookie",      #decodes a string into a cookie struct
-  "decode_cookies",          #decodes a strin of kv cookie pairs into an array
-                            # NOTE encoding a cookie is via a cookie jar object
+use Export::These 
   "cookie_struct",
-  "hash_set_cookie"
-);
-
-our %EXPORT_TAGS=(
-  "constants"=>["cookie_struct", keys %const_names],      
-  "encode"=>["cookie_struct", "encode_set_cookie", "encode_cookies", "hash_set_cookie"],
-  "decode"=>["cookie_struct", "decode_set_cookie", "decode_cookies"],
-  "all"=>[@EXPORT_OK]
-);
-
-our @EXPORT=("cookie_struct");
+  constants=>["cookie_struct", keys %const_names],
+  encode=>[qw<cookie_struct encode_set_cookie encode_cookies hash_set_cookie>],
+  decode=>[qw<cookie_struct decode_set_cookie decode_cookies>],
+  export_ok=>["hash_set_cookie"],
+  all=>
+  [keys(%const_names),qw<encode_cookies encode_set_cookie decode_set_cookie decode_cookies cookie_struct hash_set_cookie>];
 
 
+use Time::Local qw<timelocal_modern>;
 
-use Time::Piece;
-use Time::Local qw<timegm_modern timelocal_modern>;
+my $tz_offset;
 
-my $tz_offset=Time::Piece->localtime->tzoffset->seconds;
+
+BEGIN {
+  # Low memory timezone offset calculation.
+  # Removes the need to load Time::Piece just for timezone offset
+  my $now=time;
+  my @g=gmtime $now;
+  my @l=localtime $now;
+  my $gs=$g[0]+ $g[1]*60 + $g[2]*3600 + $g[3]*86400;
+  my $ls=$l[0]+ $l[1]*60 + $l[2]*3600 + $l[3]*86400; 
+  $tz_offset=$ls-$gs;
+}
+
+use constant::more TZ_OFFSET=>$tz_offset;
 
 
 # Expects the name and value as the first pair of arguments
@@ -137,7 +136,7 @@ sub cookie_struct {
     }
 
 
-    $c[COOKIE_EXPIRES]-=$tz_offset if defined $c[COOKIE_EXPIRES];
+    $c[COOKIE_EXPIRES]-=TZ_OFFSET if defined $c[COOKIE_EXPIRES];
     $c[COOKIE_DOMAIN]=scalar reverse lc $c[COOKIE_DOMAIN] if $c[COOKIE_DOMAIN];
 
     $c[COOKIE_SAMESITE]=$same_site_reverse{lc$c[COOKIE_SAMESITE]};
@@ -180,7 +179,7 @@ sub decode_set_cookie{
 	my $value;
 	my @values;
 	my $first=1;
-  my @fields;#=split /;\s*/, $_[0];
+  my @fields;
 
   #Value needs to be the first field 
 
@@ -266,7 +265,6 @@ sub decode_set_cookie{
     #as the time is already gmt
     #
     $_ = timelocal_modern($sec, $min, $hour, $mday, $months{$mon_key}, $year);
-    #$_ = timegm_modern($sec, $min, $hour, $mday, $months{$mon_key}, $year);
   }
 
   # adjust creation and last modified times

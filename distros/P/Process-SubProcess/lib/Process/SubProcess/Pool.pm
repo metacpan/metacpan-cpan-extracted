@@ -1,5 +1,4 @@
-#!/usr/bin/perl
-
+#---------------------------------
 # @author Bodo (Hugo) Barwich
 # @version 2020-03-21
 # @package SubProcess Management
@@ -25,6 +24,12 @@ BEGIN {
 #==============================================================================
 # The Process::SubProcess::Pool Package
 
+=head1 NAME
+
+Process::SubProcess::Pool - Module to manage and run multiple Sub Processes in a non-synchronous way
+
+=cut
+
 package Process::SubProcess::Pool;
 
 #----------------------------------------------------------------------------
@@ -38,6 +43,18 @@ use Scalar::Util 'blessed';
 use Data::Dump qw(dump);
 
 use Process::SubProcess;
+
+=head1 DESCRIPTION
+
+C<Process::SubProcess::Pool> implements a class to manage multiple Sub Process
+and run them in a non-synchronous way while keeping their Output and Errors related to each command.
+
+The Idea of this API is that longer running processes must not block the execution
+of shorter processes.
+
+This also helps to integrate non-synchronous process execution into synchronous applications.
+
+=cut
 
 #----------------------------------------------------------------------------
 #Constructors

@@ -402,7 +402,7 @@ sub restore {
     }
     else {
         die "Unable to read $file" unless ( -r $file );
-        open( my $f, $file ) or die $!;
+        open( my $f, '<', $file ) or die $!;
         $conf = join '', <$f>;
         close $f;
         die "Empty or malformed file $file" unless ( $conf =~ /\w/s );

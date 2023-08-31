@@ -3,10 +3,7 @@
 use strict;
 use warnings;
 use Test::More;
-use FindBin         qw/$Bin/;
 use Util::H2O::More qw/h2o tr4h2o/;
-use Config::Tiny    qw//;
-use File::Temp      qw/tempfile/;
 
 my $hash = { "foo bar" => 123, "quz-ba%z" => 456 };
 my $obj  = h2o tr4h2o $hash;

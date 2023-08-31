@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension CatalystX-ControllerPerContext.
 
+0.006 - 26 August 2023
+  - Some example roles that are probably dangerous.  If you cut yourself
+    don't say I didn't warn you.
+
 0.005 - 20 June 2023
   - Add hook to let you pre process arguments at component creation time.
     Useful in you need to do once time setup of variables and processing of

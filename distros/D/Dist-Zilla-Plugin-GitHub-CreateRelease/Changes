@@ -1,5 +1,21 @@
 Revision history for Dist-Zilla-Plugin-GitHub-CreateRelease
 
+0.0003 -- Mon Aug 28 21:18:37 ADT 2023
+
+    [Significant Changes from 0.0002]
+
+    GitHub supports personal and organizations.  This update allows you
+    to specify an optional org_id to reference a specific identity by repo.
+    Despite the name it can be set to your GitHub login id for your personal
+    account.  It defaults to "github" and looks for ~/.github-identity
+    or ~/.github if org_id is not provided.
+
+    [Detailed Change Log]
+
+    - 2cdfa5a Support multiple repo specific identity files
+    - 986eb93 Replace true and false constants with JSON Booleans
+    - 33b8f20 v0.0002
+
 0.0002 -- Tue Aug 22 22:09:46 ADT 2023
 
     - 564838e Use Dist::Zilla::Plugin::GitHub::CreateRelease to create github release

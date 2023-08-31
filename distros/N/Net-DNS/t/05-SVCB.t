@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-SVCB.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
+# $Id: 05-SVCB.t 1930 2023-08-21 14:10:10Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -11,10 +11,10 @@ use Test::More;
 use TestToolkit;
 
 exit( plan skip_all => 'unresolved AUTOLOAD regression	[perl #120694]' )
-		if ( $] == 5.018000 )
-		or ( $] == 5.018001 );
+		unless ( $] > 5.018001 )
+		or ( $] < 5.018 );
 
-plan tests => 44;
+plan tests => 46;
 
 
 my $name = 'SVCB.example';
@@ -22,7 +22,7 @@ my $type = 'SVCB';
 my $code = 64;
 my @attr = qw( svcpriority targetname port );
 my @data = qw( 1 pool.svc.example 1234 );
-my @also = qw(mandatory alpn no-default-alpn port ipv4hint ech ipv6hint);
+my @also = qw(mandatory alpn no-default-alpn port ipv4hint ech ipv6hint dohpath ohttp);
 
 my $wire = '000104706f6f6c03737663076578616d706c65000003000204d2';
 
@@ -73,6 +73,7 @@ example.com.	SVCB	16 foo.example.org.	( mandatory=alpn alpn=h2,h3-19
 			no-default-alpn port=1234 ipv4hint=192.0.2.1
 			ech=Li4u ipv6hint=2001:db8::1
 			dohpath=/dns-query{?dns}
+			ohttp
 			)
 END
 

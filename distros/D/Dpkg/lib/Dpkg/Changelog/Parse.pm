@@ -1,19 +1,19 @@
 # Copyright © 2005, 2007 Frank Lichtenheld <frank@lichtenheld.de>
-# Copyright © 2009       Raphaël Hertzog <hertzog@debian.org>
+# Copyright © 2009 Raphaël Hertzog <hertzog@debian.org>
 # Copyright © 2010, 2012-2015 Guillem Jover <guillem@debian.org>
 #
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 2 of the License, or
-#    (at your option) any later version.
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 =encoding utf8
 
@@ -28,12 +28,11 @@ of dpkg-parsechangelog.
 
 =cut
 
-package Dpkg::Changelog::Parse;
+package Dpkg::Changelog::Parse 2.01;
 
 use strict;
 use warnings;
 
-our $VERSION = '2.01';
 our @EXPORT = qw(
     changelog_parse
 );
@@ -127,7 +126,6 @@ sub changelog_parse {
     my $format = ucfirst lc $options{changelogformat};
     my $changes;
     eval qq{
-        pop \@INC if \$INC[-1] eq '.';
         require Dpkg::Changelog::$format;
         \$changes = Dpkg::Changelog::$format->new();
     };

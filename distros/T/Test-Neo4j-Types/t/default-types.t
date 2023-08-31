@@ -28,7 +28,13 @@ neo4j_relationship_ok 'Neo4j_Test::RelDef', sub {
 
 neo4j_path_ok 'Neo4j_Test::PathDef', sub { bless pop, shift };
 
-neo4j_point_ok 'Neo4j_Test::PointDef';
+neo4j_point_ok 'Neo4j_Test::PointDef', sub {
+	my ($class, $params) = @_;
+	return bless [
+		$params->{srid},
+		@{$params->{coordinates}},
+	], $class;
+};
 
 
 done_testing;
@@ -70,6 +76,8 @@ sub relationships {
 package Neo4j_Test::PointDef;
 use parent 'Neo4j::Types::Point';
 
+sub srid { shift->[0] }
 sub coordinates {
-	my @c = shift->SUPER::coordinates(@_);
+	my @self = @{+shift};
+	my @coords = @self > 3 ? @self[ 1 .. 3 ] :  @self[ 1 .. 2 ];
 }

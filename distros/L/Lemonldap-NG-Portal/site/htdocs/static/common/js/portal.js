@@ -665,11 +665,13 @@ LemonLDAP::NG Portal jQuery scripts
       checked = $(this).prop('checked');
       console.log('Reset is checked', checked);
       if (checked === true) {
+        $('#ppolicy').hide();
         $('#newpasswords').hide();
         $('#newpassword').removeAttr('required');
         $('#confirmpassword').removeAttr('required');
         return (ref3 = $('#confirmpassword').get(0)) != null ? ref3.setCustomValidity('') : void 0;
       } else {
+        $('#ppolicy').show();
         $('#newpasswords').show();
         $('#newpassword').attr('required', true);
         $('#confirmpassword').attr('required', true);

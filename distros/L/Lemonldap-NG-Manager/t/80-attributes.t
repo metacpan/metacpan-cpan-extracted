@@ -62,7 +62,8 @@ my @notManagedAttributes = (
     # Other ini-only prms
     'checkTime',                 'status', 'soapProxyUrn',
     'impersonationPrefix',       'pdataDomain',
-    'mySessionAuthorizedRWKeys', 'contextSwitchingPrefix'
+    'mySessionAuthorizedRWKeys', 'contextSwitchingPrefix',
+    'defaultNewKeySize',
 );
 
 # Words used either as attribute name and node title
@@ -161,8 +162,7 @@ sub scanTree {
             ok( $name =~ /^\w+$/,       "Name is a string" );
 
             # Nodes must have leafs or subnodes
-            ok(
-                (
+            ok( (
                          exists( $leaf->{nodes} )
                       or exists( $leaf->{nodes_cond} )
                       or exists( $leaf->{group} )

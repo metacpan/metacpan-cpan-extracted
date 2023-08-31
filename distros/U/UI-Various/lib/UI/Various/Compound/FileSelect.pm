@@ -57,7 +57,7 @@ use warnings 'once';
 
 use Cwd 'abs_path';
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 use UI::Various::core;
 use UI::Various::Box;
@@ -219,7 +219,7 @@ constructor for UI elements>
 
 sub new($;\[@$])
 {
-    debug(2, __PACKAGE__, '::new');
+    debug(2, __PACKAGE__, '::new(', join(',', @_), ')');
     my $self = construct({ DEFAULT_ATTRIBUTES },
 			 '^(?:' . join('|', ALLOWED_PARAMETERS) . ')$',
 			 @_,
@@ -325,6 +325,8 @@ directory prior to that.
 sub _cd($;$)
 {
     my ($self, $cd) = @_;
+    shift @_;
+    debug(3, __PACKAGE__, '::_cd(', @_, ')');
     local $_ = $self->{directory};
 
     $self->{_msg} = ' ' x $self->{width};
@@ -336,7 +338,14 @@ sub _cd($;$)
 	s|^/{2,}|/|;
     }
     else
-    {	$_ = abs_path($_);   }
+    {
+	$_ = abs_path($_);
+	unless ($_)
+	{
+	    $self->{_msg} = message('reset_directory_invalid_symbolic_link');
+	    $_ = '/';
+	}
+    }
     my @files = ();
     my $dir;
     if (opendir $dir, $_)

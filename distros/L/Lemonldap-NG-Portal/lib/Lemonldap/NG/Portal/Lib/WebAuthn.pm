@@ -8,8 +8,9 @@ use Digest::SHA qw(sha256);
 use URI;
 use Carp;
 with 'Lemonldap::NG::Portal::Lib::2fDevices';
+use Lemonldap::NG::Common::Util qw/display2F/;
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.17.0';
 
 has rp_id    => ( is => 'rw', lazy => 1, builder => "_build_rp_id" );
 has origin   => ( is => 'rw', lazy => 1, builder => "_build_origin" );
@@ -186,9 +187,10 @@ sub validateAssertion {
 
     if ( $validation_result->{success} == 1 ) {
         my $new_signature_count = $validation_result->{signature_count};
-        $self->userLogger->info(
-                "Successfully verified signature with count "
-              . "$new_signature_count for $user" );
+
+        $self->userLogger->info( "User $user authenticated with 2F device: "
+              . display2F($matching_credential)
+              . " (signature count: $new_signature_count) " );
 
         # Update storedSignCount to be the value of authData.signCount
         $self->update2fDevice( $req, $data, $self->type,

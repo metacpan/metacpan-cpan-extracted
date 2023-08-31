@@ -1,8 +1,11 @@
 Revision history for Perl extension constant::more
+v0.2.1  2023-08-27
+  [improvements]
+  - only load Getopt::Long if the opt field is used AND if there are arguments to process in @ARGV
 
 v0.2.0 2023-07-25
   [improvements]
-    - Trimmed uneeded fat by removing List::Util, Exporter and Carp and state
+    - Trimmed unneeded fat by removing List::Util, Exporter and Carp and state
       feature.
 
 0.1.2 2022-12-19

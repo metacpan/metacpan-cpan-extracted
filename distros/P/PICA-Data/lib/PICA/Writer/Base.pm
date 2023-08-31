@@ -1,13 +1,13 @@
 package PICA::Writer::Base;
 use v5.14.1;
 
-our $VERSION = '2.11';
+our $VERSION = '2.12';
 
 use Scalar::Util qw(blessed openhandle reftype);
 use PICA::Schema qw(clean_pica);
 use Term::ANSIColor;
 use Encode qw(decode);
-use Carp qw(croak);
+use Carp   qw(croak);
 
 sub new {
     my $class = shift;
@@ -154,6 +154,8 @@ Use one of the following subclasses instead:
 
 =item L<PICA::Writer::Generic>
 
+=item L<PICA::Writer::Patch>
+
 =back
 
 =head1 METHODS
@@ -202,6 +204,8 @@ annotations. Set this option to true to enforce field annotations (set to an
 empty space if missing) or to false to ignore them.
 
 =head1 SEE ALSO
+
+See L<PICA::Parser::Base> for corresponding parser modules.
 
 See L<Catmandu::Exporter::PICA> for usage of this module within the L<Catmandu>
 framework (recommended). 

@@ -14,12 +14,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Shlibs::Cppfilt;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::Shlibs::Cppfilt - C++ symbol mangling support via c++filt
+
+=head1 DESCRIPTION
+
+This module provides functions that wrap over c++filt for its easy and
+fast usage.
+
+B<Note>: This is a private module, its API can change at any time.
+
+=cut
+
+package Dpkg::Shlibs::Cppfilt 0.01;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
 our @EXPORT = qw(
     cppfilt_demangle_cpp
 );
@@ -116,5 +130,13 @@ END {
     terminate_cppfilts();
     $? = $exitcode;
 }
+
+=head1 CHANGES
+
+=head2 Version 0.xx
+
+This is a private module.
+
+=cut
 
 1;

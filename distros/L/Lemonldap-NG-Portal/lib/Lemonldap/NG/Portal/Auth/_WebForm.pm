@@ -132,7 +132,7 @@ sub extractFormInfo {
                 or $self->ott->getToken($token) )
             {
                 $self->ott->setToken($req);
-                $self->userLogger->warn('Token expired');
+                $self->userLogger->warn('Invalid authentication form token');
                 return PE_TOKENEXPIRED;
             }
             $req->data->{tokenVerified} = 1;

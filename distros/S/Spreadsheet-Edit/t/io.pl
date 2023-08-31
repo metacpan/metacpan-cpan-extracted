@@ -60,12 +60,12 @@ sub verif_Another_Sheet(;$) {
 sub doconvert(@) {
   if (@_ % 2 == 0) {
     #convert_spreadsheet(verbose => $verbose, debug => $debug, @_);
-    unshift @_, (verbose => $verbose, debug => $debug);
+    unshift @_, (verbose => $verbose, debug => $debug, silent => $silent);
     goto &convert_spreadsheet;
   } else {
     my $inpath = shift;
     #convert_spreadsheet($inpath, verbose => $verbose, debug => $debug, @_);
-    unshift @_, (verbose => $verbose, debug => $debug);
+    unshift @_, (verbose => $verbose, debug => $debug, silent => $silent);
     unshift @_, $inpath;
     goto &convert_spreadsheet;
   }
@@ -76,7 +76,7 @@ sub doread($$) {
   eq_deeply(sheet(), undef) or confess "sheet() did not return undef";
 
   eq_deeply(eval{my $dum=$num_cols},undef) or confess "num_cols unexpectedly valid";
-  read_spreadsheet {debug => $debug, verbose => $verbose, %$opts}, $inpath;
+  read_spreadsheet {debug => $debug, verbose => $verbose, silent => $silent, %$opts}, $inpath;
   confess "num_cols is not positive" unless $num_cols > 0;
 }
 
@@ -142,7 +142,17 @@ die "Conflicting sheetname opt and !suffix not caught" if $@ eq "";
 
 # "Read" a csv; should be a pass-thru without conversion
 {
-  read_spreadsheet {verbose => $verbose}, $local_testcsv;
+### This is failing to auto-detect $local_testcsv as a CSV on Solaris ;
+### try to show enough information to debug it...
+eval {
+  read_spreadsheet {debug => $debug, verbose => $verbose}, $local_testcsv;
+};
+if ($@) {
+  warn __FILE__,":",__LINE__," - failed: $@\nRE_TRYING WITH DEBUG...\n";
+  read_spreadsheet {debug => 1, verbose => 1}, $local_testcsv;
+  die "should have died by now";
+}
+
   verif_Sheet1 "(extracted csv)";
   my $hash = doconvert(inpath=>$local_testcsv, cvt_to => 'csv');
   die "expected null converstion" unless $hash->{outpath} eq $local_testcsv;

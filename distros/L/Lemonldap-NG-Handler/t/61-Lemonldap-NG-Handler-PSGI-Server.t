@@ -7,7 +7,21 @@ require 't/test-psgi-lib.pm';
 
 init('Lemonldap::NG::Handler::Server');
 
+my $counter = ReloadCounter->new;
+Lemonldap::NG::Handler::Main->onReload( $counter, 'doReload' );
+
 my $res;
+
+is( $counter->counter, 0, "Check intial counter value" );
+ok( $res = $client->_get('/reload'), 'Reload query' );
+is( $res->[0],         200, "Reload returned 200" );
+is( $counter->counter, 1,   "Reload handler was called" );
+count(4);
+
+ok( $res = $client->_get('/status'), 'Status query' );
+is( $res->[0], 200, "Status returned 200" );
+like( $res->[2]->[0], qr/Lemonldap::NG statistics/ );
+count(3);
 
 # Unauthentified query
 # --------------------

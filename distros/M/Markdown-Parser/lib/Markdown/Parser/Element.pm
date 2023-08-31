@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/Element.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2022/09/19
+## Modified 2022/09/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -21,7 +21,7 @@ BEGIN
     use Nice::Try;
     use CSS::Object;
     use Devel::Confess;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -488,15 +488,8 @@ sub look_up
 sub make_html_parser
 {
     my $self = shift( @_ );
-    return( HTML::TreeBuilder->new( 
-        ignore_unknown  => 0,
-        store_comments  => 1,
-        no_space_compacting => 1,
-        implicit_tags   => 0,
-        implicit        => 0,
-        tighten         => 0,
-        # no_expand_entities => 1,
-    ) );
+    require HTML::Object;
+    return( HTML::Object->new );
 }
 
 sub object_id
@@ -516,17 +509,9 @@ sub parse_html
     my $self = shift( @_ );
     my $html = shift( @_ ) || return;
     my $p = $self->make_html_parser;
-    try
-    {
-        $p->parse( $html );
-        $p->eof;
-        $p->elementify;
-    }
-    catch( $e )
-    {
-        return( $self->error( "An error occurred while parsing html: $e" ) );
-    }
-    return( $p );
+    my $doc = $p->parse_data( $html ) ||
+        return( $self->pass_error( $p->error ) );
+    return( $doc );
 }
 
 sub pos { return( shift->_set_get_number_as_object( 'pos', @_ ) ); }
@@ -644,7 +629,7 @@ Markdown::Parser::Element - Markdown Element Object Class
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 
@@ -949,9 +934,9 @@ The value provided must be a subclass of L<Markdown::Parser::Element>
 
 =head2 parse_html
 
-Provided with some html data, and this will use a L<HTML::TreeBuilder> object to parse the data.
+Provided with some html data, and this will use a L<HTML::Object> object to parse the data.
 
-Returns the resulting tree object.
+Returns the resulting L<HTML::Object::Document> object, which inherits from L<HTML::Object::Element>.
 
 =head2 pos
 

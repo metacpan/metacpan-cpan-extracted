@@ -1,0 +1,9 @@
+=head1 Imager::zxing
+
+Provides limited access to barcode decoding with the zxing-cpp library.
+
+This requires at least version 1.4.0 of libzxng, which is the version
+included in Debian bookworm.  Also tested with 2.1.0.
+
+This requires Imager 1.015 since that fixed a bug with C++
+compatibility.

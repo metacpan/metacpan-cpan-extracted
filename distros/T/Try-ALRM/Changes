@@ -47,3 +47,11 @@ Revision history for Perl extension Try::ALRM.
 0.8  Tue Jul 26 11:05:12 2022
         - fixed mispeeling in error message
         - maintenance release, no functional changes
+
+0.81 Tue Jul 26 11:05:12 2023
+        - fixed POD examples to be internally consistent
+        - maintenance release, no functional changes
+
+0.82 Tue Jul 26 12:05:12 2023
+        - added better ABSTRAC description
+        - maintenance release, no functional changes

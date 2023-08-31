@@ -692,7 +692,7 @@ HTTP::Promise::Headers::Generic - Generic HTTP Header Class
 
 =head1 SYNOPSIS
 
-    package HTTP::Promise::Header::MyHeader;
+    package HTTP::Promise::Headers::MyHeader;
     use strict;
     use warnings;
     use parent qw( HTTP::Promise::Headers::Generic );

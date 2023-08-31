@@ -1,9 +1,11 @@
 ---
-abstract: 'Library to manage Sub Processes as Objects'
+abstract: 'Library to manage Sub Processes as objects'
 author:
   - 'Bodo (Hugo) Barwich <b.barwich@hotmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '6.46'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -27,5 +29,5 @@ requires:
 resources:
   bugtracker: https://github.com/bodo-hugo-barwich/Process/issues
   repository: https://github.com/bodo-hugo-barwich/Process.git
-version: v2.1.4
+version: v2.1.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

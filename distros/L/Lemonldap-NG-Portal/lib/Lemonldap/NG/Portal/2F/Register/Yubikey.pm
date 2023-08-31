@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
 );
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.17.0';
 
 extends 'Lemonldap::NG::Portal::2F::Register::Base';
 with 'Lemonldap::NG::Portal::Lib::2fDevices';
@@ -71,9 +71,6 @@ sub run {
                 )
               )
             {
-                $self->userLogger->notice( $self->prefix
-                      . "2f: registration of device $UBKName succeeds for $user"
-                );
                 return $self->p->sendHtml(
                     $req, 'error',
                     params => {
@@ -93,8 +90,9 @@ sub run {
             return $self->p->sendHtml(
                 $req, 'error',
                 params => {
-                    AUTH_ERROR      => PE_FORMEMPTY,
-                    AUTH_ERROR_TYPE => 'positive',
+                    AUTH_ERROR                       => PE_FORMEMPTY,
+                    ( 'AUTH_ERROR_' . PE_FORMEMPTY ) => 1,
+                    AUTH_ERROR_TYPE                  => 'positive',
                 }
             );
         }
@@ -110,8 +108,6 @@ sub run {
           or return $self->p->sendError( $req,
             $self->prefix . '2f: "epoch" parameter is missing', 400 );
         if ( $self->del2fDevice( $req, $req->userData, $self->type, $epoch ) ) {
-            $self->userLogger->notice(
-                $self->prefix . "2f: device deleted for $user" );
             return [
                 200,
                 [

@@ -14,12 +14,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Lock;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::Lock - file locking support
+
+=head1 DESCRIPTION
+
+This module implements locking functions used to support parallel builds.
+
+B<Note>: This is a private module, its API can change at any time.
+
+=cut
+
+package Dpkg::Lock 0.01;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
 our @EXPORT = qw(
     file_lock
 );
@@ -38,7 +51,6 @@ sub file_lock($$) {
     # package which bump the perl ABI impossible as these packages cannot
     # be installed alongside.
     eval q{
-        pop @INC if $INC[-1] eq '.';
         use File::FcntlLock;
     };
     if ($@) {
@@ -57,5 +69,13 @@ sub file_lock($$) {
         }
     }
 }
+
+=head1 CHANGES
+
+=head2 Version 0.xx
+
+This is a private module.
+
+=cut
 
 1;

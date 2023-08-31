@@ -1,22 +1,22 @@
 package Net::SAML2::Binding::SOAP;
 use Moose;
 
-our $VERSION = '0.73'; # VERSION
+our $VERSION = '0.74'; # VERSION
 
-use MooseX::Types::URI qw/ Uri /;
-use Net::SAML2::XML::Util qw/ no_comments /;
 use Carp qw(croak);
+use HTTP::Request::Common;
+use LWP::UserAgent;
+use MooseX::Types::URI qw/ Uri /;
 use Try::Tiny;
+use XML::LibXML::XPathContext;
+
+use Net::SAML2::XML::Sig;
+use Net::SAML2::XML::Util qw/ no_comments /;
 
 with 'Net::SAML2::Role::VerifyXML';
 
 # ABSTRACT: SOAP binding for SAML
 
-
-use Net::SAML2::XML::Sig;
-use XML::LibXML;
-use LWP::UserAgent;
-use HTTP::Request::Common;
 
 
 has 'ua' => (
@@ -232,7 +232,7 @@ Net::SAML2::Binding::SOAP - SOAP binding for SAML
 
 =head1 VERSION
 
-version 0.73
+version 0.74
 
 =head1 SYNOPSIS
 

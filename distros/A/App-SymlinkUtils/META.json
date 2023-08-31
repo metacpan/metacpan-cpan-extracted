@@ -24,11 +24,16 @@
             "Pod::Coverage::TrustPod" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Rinci" : "0.151"
+         },
+         "x_spec" : {
+            "Rinci" : "v1.1.102"
          }
       },
       "runtime" : {
          "requires" : {
+            "Data::Sah::Compiler::perl::TH::array" : "0.914",
             "Data::Sah::Compiler::perl::TH::bool" : "0.914",
             "Data::Sah::Compiler::perl::TH::str" : "0.914",
             "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" : "0",
@@ -37,6 +42,7 @@
             "Log::ger" : "0.038",
             "Perinci::CmdLine::Any" : "0.154",
             "Perinci::CmdLine::Lite" : "1.924",
+            "Perinci::Sub::Util" : "0.471",
             "Sah::Schema::filename" : "0",
             "strict" : "0",
             "warnings" : "0"
@@ -54,7 +60,7 @@
    "provides" : {
       "App::SymlinkUtils" : {
          "file" : "lib/App/SymlinkUtils.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -69,7 +75,7 @@
          "web" : "https://github.com/perlancar/perl-App-SymlinkUtils"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -78,6 +84,11 @@
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript check-symlink",
+            "version" : "0.424"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript check-symlinks",
             "version" : "0.424"
          },
          {
@@ -597,6 +608,17 @@
                }
             },
             "name" : "Prereqs",
+            "version" : "6.028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "develop",
+                  "type" : "x_spec"
+               }
+            },
+            "name" : "DevelopX_spec",
             "version" : "6.028"
          },
          {

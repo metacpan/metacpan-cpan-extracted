@@ -382,7 +382,7 @@ sub run {
             $self->logger->debug(" -> Redirect to 2fregisters/");
             $req->response( [
                     302,
-                    [ Location => $self->conf->{portal} . '2fregisters/' ], []
+                    [ Location => $self->p->buildUrl('2fregisters') ], []
                 ]
             );
             return PE_SENDRESPONSE;
@@ -480,7 +480,7 @@ sub _choice {
 
     my $session;
     unless ( $session = $self->ott->getToken($token) ) {
-        $self->userLogger->info('Token expired');
+        $self->userLogger->info('Invalid 2F choice form token');
         $req->noLoginDisplay(1);
         return $self->p->do( $req, [ sub { PE_TOKENEXPIRED } ] );
     }
@@ -579,7 +579,7 @@ sub _displayRegister {
     }
 
     # If only one 2F is available, redirect to it
-    return [ 302, [ Location => $self->conf->{portal} . $am[0]->{URL} ], [] ]
+    return [ 302, [ Location => $self->p->buildUrl('2fregisters', $am[0]->{CODE}) ], [] ]
       if (
         @am == 1
         and not( @$_2fDevices

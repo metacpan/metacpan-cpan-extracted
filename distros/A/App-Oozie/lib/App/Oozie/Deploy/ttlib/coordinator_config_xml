@@ -1,0 +1,6 @@
+<!-- this passes the nominal time to the workflow, in ${nominalTime}. It is REQUIRED for automatic SLA support -->
+<property>
+    <name>nominalTime</name>
+    <value>${coord:nominalTime()}</value>
+</property>
+

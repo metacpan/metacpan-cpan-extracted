@@ -6,7 +6,7 @@ use Mouse;
 use JSON qw(from_json to_json);
 use Lemonldap::NG::Common::Crypto;
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.17.0';
 
 extends 'Lemonldap::NG::Portal::2F::Register::Base';
 with 'Lemonldap::NG::Portal::Lib::2fDevices';
@@ -110,8 +110,6 @@ sub run {
             )
           )
         {
-            $self->userLogger->notice( $self->prefix
-                  . "2f: registration of password succeeds for $user" );
             return [
                 200,
                 [

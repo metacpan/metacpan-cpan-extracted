@@ -13,17 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Control::Changelog;
-
-use strict;
-use warnings;
-
-our $VERSION = '1.00';
-
-use Dpkg::Control;
-
-use parent qw(Dpkg::Control);
-
 =encoding utf8
 
 =head1 NAME
@@ -34,6 +23,17 @@ Dpkg::Control::Changelog - represent info fields output by dpkg-parsechangelog
 
 This class derives directly from Dpkg::Control with the type
 CTRL_CHANGELOG.
+
+=cut
+
+package Dpkg::Control::Changelog 1.00;
+
+use strict;
+use warnings;
+
+use Dpkg::Control;
+
+use parent qw(Dpkg::Control);
 
 =head1 METHODS
 
@@ -46,9 +46,9 @@ Create a new empty set of changelog related fields.
 =cut
 
 sub new {
-    my $this = shift;
+    my ($this, @args) = @_;
     my $class = ref($this) || $this;
-    my $self = Dpkg::Control->new(type => CTRL_CHANGELOG, @_);
+    my $self = Dpkg::Control->new(type => CTRL_CHANGELOG, @args);
     return bless $self, $class;
 }
 

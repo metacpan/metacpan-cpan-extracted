@@ -8,9 +8,10 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_FORBIDDENIP
   PE_USERNOTFOUND
+  PE_MALFORMEDUSER
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.17.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -37,11 +38,16 @@ sub extractFormInfo {
     $user_header = 'HTTP_' . uc($user_header);
     $user_header =~ s/\-/_/g;
 
-    unless ( $req->{user} = $req->env->{$user_header} ) {
+    unless ( $req->env->{$user_header} ) {
         $self->userLogger->error(
             "No header " . $self->conf->{slaveUserHeader} . " found" );
         return PE_USERNOTFOUND;
     }
+
+    return PE_MALFORMEDUSER
+      unless ( $req->env->{$user_header} =~ /$self->{conf}->{userControl}/o );
+
+    $req->{user} = $req->env->{$user_header};
     return PE_OK;
 }
 

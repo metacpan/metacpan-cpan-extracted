@@ -1,5 +1,6 @@
 AVIF.pm
 AVIF.xs
+Changes
 imavif.c
 imavif.h
 Makefile.PL

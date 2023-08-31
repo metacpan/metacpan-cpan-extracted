@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2;
-our $VERSION = "0.73";
+our $VERSION = "0.74";
 
 require 5.012;
 
@@ -38,7 +38,7 @@ Net::SAML2 - SAML2 bindings and protocol implementation
 
 =head1 VERSION
 
-version 0.73
+version 0.74
 
 =head1 SYNOPSIS
 
@@ -141,6 +141,12 @@ SP applications if EncryptedAssertions are not in use.
 =item Shibboleth (requires Net::SAML2 >=0.63)
 
 =item SimpleSAMLphp
+
+=item DigiD (requires Net::SAML2 >= 0.63)
+
+=item eHerkenning (requires Net::SAML2 >= 0.73)
+
+=item eIDAS (requires Net::SAML2 >= 0.73)
 
 =back
 

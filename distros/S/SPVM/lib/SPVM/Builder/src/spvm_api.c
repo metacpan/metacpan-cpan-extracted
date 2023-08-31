@@ -40,6 +40,7 @@
 #include "spvm_api_field.h"
 #include "spvm_api_method.h"
 #include "spvm_api_arg.h"
+#include "spvm_api_type.h"
 
 static const char* FILE_NAME = "spvm_api.c";
 
@@ -61,6 +62,8 @@ SPVM_ENV* SPVM_API_new_env(void) {
   
   SPVM_API_FIELD* api_field = SPVM_API_FIELD_new_api();
   
+  SPVM_API_TYPE* api_type = SPVM_API_TYPE_new_api();
+  
   SPVM_API_METHOD* api_method = SPVM_API_METHOD_new_api();
   
   SPVM_API_ARG* api_arg = SPVM_API_ARG_new_api();
@@ -76,6 +79,7 @@ SPVM_ENV* SPVM_API_new_env(void) {
     api_field,
     api_method,
     api_arg,
+    api_type,
   };
   SPVM_ENV_API* env_api = calloc(1, sizeof(env_api_init));
   memcpy(env_api, env_api_init, sizeof(env_api_init));
@@ -330,6 +334,7 @@ void SPVM_API_free_env(SPVM_ENV* env) {
   SPVM_API_BASIC_TYPE_free_api(env->api->basic_type);
   SPVM_API_CLASS_VAR_free_api(env->api->class_var);
   SPVM_API_FIELD_free_api(env->api->field);
+  SPVM_API_TYPE_free_api(env->api->type);
   SPVM_API_METHOD_free_api(env->api->method);
   SPVM_API_ARG_free_api(env->api->arg);
   
@@ -430,7 +435,7 @@ void SPVM_API_destroy_class_vars(SPVM_ENV* env, SPVM_VALUE* stack){
       int32_t class_var_type_dimension = class_var->type_dimension;
       int32_t class_var_type_flag = class_var->type_flag;
       
-      int32_t class_var_type_is_object = SPVM_API_RUNTIME_is_object_type(runtime, class_var_basic_type, class_var_type_dimension, class_var_type_flag);
+      int32_t class_var_type_is_object = SPVM_API_TYPE_is_object_type(runtime, class_var_basic_type, class_var_type_dimension, class_var_type_flag);
       if (class_var_type_is_object) {
         SPVM_OBJECT* object = class_var->data.oval;
         if (object) {
@@ -1801,7 +1806,7 @@ int32_t SPVM_API_call_method_common(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTI
     
     SPVM_RUNTIME_BASIC_TYPE* current_basic_type = method->current_basic_type;
     
-    int32_t method_return_type_is_object = SPVM_API_RUNTIME_is_object_type(runtime, method_return_basic_type, method_return_type_dimension, method_return_type_flag);
+    int32_t method_return_type_is_object = SPVM_API_TYPE_is_object_type(runtime, method_return_basic_type, method_return_type_dimension, method_return_type_flag);
     int32_t no_need_call = 0;
     if (method->is_init) {
       
@@ -2032,7 +2037,7 @@ int32_t SPVM_API_is_object_array(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* 
       SPVM_RUNTIME_BASIC_TYPE* object_basic_type = SPVM_API_get_object_basic_type(env, stack, object);
       int32_t element_type_dimension = 0;
       int32_t type_flag = 0;
-      is_object_array = SPVM_API_RUNTIME_is_object_type(env->runtime, object_basic_type, element_type_dimension, type_flag);
+      is_object_array = SPVM_API_TYPE_is_object_type(env->runtime, object_basic_type, element_type_dimension, type_flag);
     }
     else if (object_type_dimension > 1) {
       is_object_array = 1;
@@ -3615,7 +3620,7 @@ void SPVM_API_dec_ref_count(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* objec
           void* field_basic_type = SPVM_API_RUNTIME_get_basic_type_by_id(runtime, field_basic_type_id);
           int32_t field_type_dimension = field->type_dimension;
           int32_t field_type_flag = field->type_flag;
-          int32_t field_type_is_object = SPVM_API_RUNTIME_is_object_type(runtime, field_basic_type, field_type_dimension, field_type_flag);
+          int32_t field_type_is_object = SPVM_API_TYPE_is_object_type(runtime, field_basic_type, field_type_dimension, field_type_flag);
           
           if (field_type_is_object) {
             SPVM_OBJECT** get_field_object_address = (SPVM_OBJECT**)((intptr_t)object + (size_t)SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset);
@@ -3998,7 +4003,7 @@ int32_t SPVM_API_isa(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM
       isa = 0;
     }
     else {
-      isa = SPVM_API_RUNTIME_can_assign(env->runtime, basic_type, type_dimension, 0, object_basic_type, object_type_dimension, 0);
+      isa = SPVM_API_TYPE_can_assign(env->runtime, basic_type, type_dimension, 0, object_basic_type, object_type_dimension, 0);
     }
   }
   

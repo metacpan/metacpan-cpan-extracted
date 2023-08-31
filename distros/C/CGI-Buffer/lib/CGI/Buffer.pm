@@ -17,11 +17,11 @@ CGI::Buffer - Verify, Cache and Optimise CGI Output
 
 =head1 VERSION
 
-Version 0.83
+Version 0.84
 
 =cut
 
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 
 =head1 SYNOPSIS
 
@@ -135,6 +135,17 @@ END {
 	unless($headers || is_cached()) {
 		if($logger) {
 			$logger->debug('There was no output');
+		}
+		if(!defined($headers)) {
+			require HTTP::Status;
+			HTTP::Status->import();
+
+			if(!defined($status)) {
+				$status = 200;
+			}
+			print "Status: $status ",
+				HTTP::Status::status_message($status),
+				"\n\n";
 		}
 		return;
 	}
@@ -422,7 +433,7 @@ END {
 			if($status == 200) {
 				$encoding = _should_gzip();
 				if($send_body) {
-					if($generate_etag && !defined($etag) && ((!defined($headers)) || ($headers !~ /^ETag: /m))) {
+					if($generate_etag && !defined($etag) && defined($body) && ((!defined($headers)) || ($headers !~ /^ETag: /m))) {
 						$etag = '"' . Digest::MD5->new->add(Encode::encode_utf8($body))->hexdigest() . '"';
 					}
 					_compress({ encoding => $encoding });
@@ -615,7 +626,7 @@ END {
 					$logger->trace($call_details[1] . ':' . $call_details[2] . ' in function ' . $call_details[3]);
 				}
 			}
-			CORE::warn(@_);     # call the builtin warn as usual
+			CORE::warn(@_);	# call the builtin warn as usual
 		};
 
 		if(scalar @o) {
@@ -698,7 +709,7 @@ sub _optimise_content {
 	# $body =~ s/\<div\>\s+/\<div\>/gis;	# Remove spaces after <div>
 	$body =~ s/(<div>\s+|\s+<div>)/<div>/gis;
 	$body =~ s/\s+<\/div\>/\<\/div\>/gis;	# Remove spaces before </div>
-	$body =~ s/\s+\<p\>|\<p\>\s+/\<p\>/im;  # TODO <p class=
+	$body =~ s/\s+\<p\>|\<p\>\s+/\<p\>/im;	# TODO <p class=
 	$body =~ s/\s+\<\/p\>|\<\/p\>\s+/\<\/p\>/gis;
 	$body =~ s/<html>\s+<head>/<html><head>/is;
 	$body =~ s/\s*<\/head>\s+<body>\s*/<\/head><body>/is;
@@ -1129,6 +1140,8 @@ sub _set_content_type
 
 sub _compress {
 	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+
+	return unless(defined($body));
 
 	my $encoding = $params{encoding};
 

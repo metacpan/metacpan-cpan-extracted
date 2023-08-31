@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Handler::Server::Main;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.17.0';
 
 extends 'Lemonldap::NG::Handler::PSGI';
 
@@ -16,12 +16,21 @@ sub init {
 
 sub _run {
     my $self = shift;
+
+    # Create regular _authAndTrace PSGI app
+    my $app = $self->psgiAdapter(
+        sub {
+            my $req = $_[0];
+            return $self->_authAndTrace($req);
+        }
+    );
+
+    # Middleware to set correct values for Traefik
     return sub {
-        my $req = $_[0];
-        $req->{HTTP_HOST}   = $req->{HTTP_X_FORWARDED_HOST};
-        $req->{REQUEST_URI} = $req->{HTTP_X_FORWARDED_URI};
-        return $self->_logAuthTrace(
-            Lemonldap::NG::Common::PSGI::Request->new($req) );
+        my $env = $_[0];
+        $env->{HTTP_HOST}   = $env->{HTTP_X_FORWARDED_HOST};
+        $env->{REQUEST_URI} = $env->{HTTP_X_FORWARDED_URI};
+        return $app->($env);
     }
 }
 

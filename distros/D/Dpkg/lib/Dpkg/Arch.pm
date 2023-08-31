@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Arch;
-
 =encoding utf8
 
 =head1 NAME
@@ -32,11 +30,12 @@ to import specific symbol subsets.
 
 =cut
 
+package Dpkg::Arch 1.03;
+
 use strict;
 use warnings;
 use feature qw(state);
 
-our $VERSION = '1.03';
 our @EXPORT_OK = qw(
     get_raw_build_arch
     get_raw_host_arch
@@ -522,7 +521,9 @@ sub debarch_to_abiattrs($)
 sub debarch_to_cpubits($)
 {
     my $arch = shift;
-    my (undef, undef, undef, $cpu) = debarch_to_debtuple($arch);
+    my $cpu;
+
+    ((undef) x 3, $cpu) = debarch_to_debtuple($arch);
 
     if (defined $cpu) {
         return $cpubits{$cpu};

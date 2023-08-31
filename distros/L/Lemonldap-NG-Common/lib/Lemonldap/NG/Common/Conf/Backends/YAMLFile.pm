@@ -57,7 +57,7 @@ sub lock {
         sleep 2;
         return 0 if ( $self->isLocked );
     }
-    unless ( open F, ">" . $self->_yamlLock ) {
+    unless ( open F, ">", $self->_yamlLock ) {
         $Lemonldap::NG::Common::Conf::msg .=
           "Unable to lock (" . $self->_yamlLock . ") \n";
         return 0;

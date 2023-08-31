@@ -146,9 +146,13 @@
                         <!-- Logo (optional) -->
                         <TMPL_IF NAME="applogo">
                           <div class="col-3">
+                          <TMPL_IF NAME="applogo_icon">
+                          <span class="applogo fa-3x fa fa-<TMPL_VAR NAME="applogo"> <TMPL_VAR NAME="appid">"></span>
+                          <TMPL_ELSE>
                           <img src="<TMPL_VAR NAME="STATIC_PREFIX">common/apps/<TMPL_VAR NAME="applogo">"
                             class="applogo <TMPL_VAR NAME="appid"> img-fluid"
                             alt="" />
+                          </TMPL_IF>
                           </div>
                           <div class="col-9">
                         <TMPL_ELSE>

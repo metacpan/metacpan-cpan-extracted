@@ -14,7 +14,7 @@ use CPAN::Audit::Version;
 use CPAN::Audit::Query;
 use CPAN::Audit::DB;
 
-our $VERSION = '20230709.001';
+our $VERSION = '20230826.001';
 
 sub new {
 	my( $class, %params ) = @_;
@@ -26,7 +26,7 @@ sub new {
 
 	$self->_handle_exclude_file if $self->{exclude_file};
 
-	$self->{db}       = CPAN::Audit::DB->db;
+	$self->{db}     //= CPAN::Audit::DB->db;
 
 	$self->{filter}   = CPAN::Audit::Filter->new( exclude => $args{exclude} );
 	$self->{query}    = CPAN::Audit::Query->new( db => $self->{db} );
@@ -106,7 +106,7 @@ sub command_show {
 
 sub command_modules {
 	my ($self, $dists, $queried, @modules) = @_;
-	return "Usage: modules '<module>[,version-range]' '<module>[,version-range]'" unless @modules;
+	return "Usage: modules '<module>[;version-range]' '<module>[;version-range]'" unless @modules;
 
 	foreach my $module ( @modules ) {
 		my ($name, $version) = split /;/, $module;

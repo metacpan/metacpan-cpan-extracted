@@ -225,14 +225,10 @@ fail("Unexpected ndigits change") if reget_addrvis;
 note "avisr(\@\$aref)=",avisr(@$aref) if $debug;
 is (avisr(@$aref), "(100,101,102)", "avisr with non-ref ary elements");
 
-# avis & hvis introduce a different temporary [] or {} wrapper each time,
-# which might unexpectedly increase the number of addrvis digits.
-addrvis_forget();
-#addrvis_digits( addrvis_digits() + 2 );
-
 for ([$aref,"ARRAY"], [$href,"HASH"], [$sref,"SCALAR"], 
      [$bigint,"Math::BigInt"]) {
   my ($theref, $type) = @$_;
+
   my $plain = vis($theref);
   my $addrvis = addrvis($theref);
   my $abbr_addr = refaddress_part($theref);

@@ -2335,32 +2335,25 @@ sub attributeServer {
     ];
 }
 
-# INTERNAL METHODS
+# LEGACY METHODS
+# Remove in 3.0
 
 sub imgok {
-    my ( $self, $req, ) = @_;
-    return $self->sendImage( $req, 'icons/ok.png' );
+    my $self = shift;
+    return $self->p->imgok(@_);
 }
 
 sub imgnok {
-    my ( $self, $req, ) = @_;
-    return $self->sendImage( $req, 'icons/warning.png' );
+    my $self = shift;
+    return $self->p->imgnok(@_);
 }
 
 sub sendImage {
-    my ( $self, $req,, $img ) = @_;
-    return [
-        302,
-        [
-                'Location' => $self->conf->{portal}
-              . $self->p->staticPrefix
-              . '/common/'
-              . $img,
-        ],
-        [],
-    ];
+    my $self = shift;
+    return $self->p->sendImage(@_);
 }
 
+# INTERNAL METHODS
 # Normalize url to be tolerant to SAML Path
 # Usefull if SAML Path is a regex
 # @return normalized url

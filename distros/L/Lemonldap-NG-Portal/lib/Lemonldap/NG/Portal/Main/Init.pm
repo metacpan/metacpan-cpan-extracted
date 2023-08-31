@@ -124,6 +124,9 @@ sub init {
             my $lang = $1 || 'all';
             $self->trOver->{$lang}->{$2} = $self->localConfig->{$k};
         }
+        else {
+            $self->conf->{$k} = $self->localConfig->{$k};
+        }
     }
     $self->trOver( JSON::to_json( $self->trOver ) );
 
@@ -280,7 +283,7 @@ sub reloadConf {
         [ $self->{templateDir}, $self->conf->{templateDir} . '/bootstrap' ] );
 
     $self->{staticPrefix} = $self->conf->{staticPrefix} || '/static';
-    $self->{languages}    = $self->conf->{languages}    || '/';
+    $self->{languages}    = $self->conf->{languages}    || 'en';
 
     # Initialize session DBs
     unless ( $self->conf->{globalStorage} ) {

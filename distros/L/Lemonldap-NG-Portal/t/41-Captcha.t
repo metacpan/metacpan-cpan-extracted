@@ -133,7 +133,7 @@ SKIP: {
         ' New captcha image inserted' );
     ok(
         $res->[2]->[0] =~
-m#<img class="renewcaptchaclick" src="/static/common/icons/arrow_refresh.png" alt="Renew Captcha" title="Renew Captcha" class="img-thumbnail mb-3" />#,
+m#<img class="renewcaptchaclick" src="/static/common/icons/arrow_refresh.png" alt="Renew Captcha" class="img-thumbnail mb-3" />#,
         ' Renew Captcha button found'
     ) or explain( $res->[2]->[0], 'Renew captcha button not found' );
     ok( $res->[2]->[0] =~ /captcha\.(?:min\.)?js/, 'Get captcha javascript' );

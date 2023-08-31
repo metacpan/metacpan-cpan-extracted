@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker;
 sub MY::libscan {
     my( $mm, $file ) = @_;
     return if $file =~  /^push_to_GIT$/; # SKIP the git dir
-    return if $file =~ /\.lock$/; # SKIP editor files
+    return if $file =~ /\.lock.*$/; # SKIP editor files
     return $file;
 }
 
@@ -43,7 +43,7 @@ INSTALL_BASE => '/home/andreas/usr',
 	# see https://perlmonks.org/?displaytype=displaycode;node_id=359256;part=1;abspart=1
         META_MERGE => {
           'meta-spec' => { version => 2 },
-	  requires    => { perl => '5.0.8' },
+	  requires    => { perl => '5.0.6' },
           resources   => {
             license    => 'artistic_2',
 	    homepage   => 'https://metacpan.org/module/WWW::Mechanize::Chrome::DOMops',

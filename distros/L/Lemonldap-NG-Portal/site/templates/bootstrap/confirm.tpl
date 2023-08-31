@@ -56,7 +56,7 @@
 	  <TMPL_IF NAME="PORTAL_URL">
 	    <div id="logout">
 	      <div class="buttons">
-	        <a href="<TMPL_VAR NAME="PORTAL_URL">/?cancel=1<TMPL_IF NAME="AUTH_URL">&url=<TMPL_VAR NAME="AUTH_URL"></TMPL_IF>" class="btn btn-primary" role="button">
+	        <a href="<TMPL_VAR NAME="PORTAL_URL">?cancel=1<TMPL_IF NAME="AUTH_URL">&url=<TMPL_VAR NAME="AUTH_URL"></TMPL_IF>" class="btn btn-primary" role="button">
 	          <span class="fa fa-home"></span>
 	          <span trspan="cancel">Cancel</span>
 	        </a>

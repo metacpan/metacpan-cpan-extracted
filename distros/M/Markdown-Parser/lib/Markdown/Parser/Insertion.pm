@@ -36,7 +36,7 @@ sub as_markdown
 {
     my $self = shift( @_ );
     my $str = $self->children->map(sub{ $_->as_markdown })->join( '' );
-    return( "~~${str}~~" );
+    return( "++${str}++" );
 }
 
 sub as_pod

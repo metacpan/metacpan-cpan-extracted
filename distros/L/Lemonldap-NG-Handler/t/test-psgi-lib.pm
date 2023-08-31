@@ -5,6 +5,7 @@ use 5.10.0;
 use POSIX 'strftime';
 use Data::Dumper;
 use Time::Fake;
+use Plack::Builder;
 use_ok('Lemonldap::NG::Common::PSGI::Cli::Lib');
 
 our $client;
@@ -29,9 +30,10 @@ sub init {
         localSessionStorage => '',
         logLevel            => 'error',
         cookieName          => 'lemonldap',
+        status              => 1,
         securedCookie       => 0,
         https               => 0,
-        hiddenAttributes    => 'mail cn',
+        hiddenAttributes    => 'cn /^mail/',
         logger              => 'Lemonldap::NG::Common::Logger::Std',
         %$prms
     );
@@ -131,7 +133,11 @@ has app => (
     is      => 'ro',
     isa     => 'CodeRef',
     builder => sub {
-        return $module->run( $_[0]->{ini} );
+        my $builder = Plack::Builder->new;
+        $builder->mount( '/reload' => $module->reload( $_[0]->{ini} ) );
+        $builder->mount( '/status' => $module->status( $_[0]->{ini} ) );
+        $builder->mount( '/'       => $module->run( $_[0]->{ini} ) );
+        return $builder->to_app;
     }
 );
 
@@ -160,6 +166,15 @@ sub _get {
             %custom,
         }
     );
+}
+
+package ReloadCounter;
+use Mouse;
+has counter => ( is => 'rw', default => 0 );
+
+sub doReload {
+    my ($self) = @_;
+    $self->counter( $self->counter + 1 );
 }
 
 1;

@@ -2,6 +2,13 @@ CHANGE LOG
 ==========
 
 
+2023-08-28 - v0.47.0
+--------------------
+
+### Added
+  - now supports context propagation via HTTP headers
+
+
 2023-04-25 - v0.46.2
 --------------------
 

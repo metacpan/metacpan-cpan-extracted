@@ -224,9 +224,8 @@ sub _compute_requested_attributes {
     my $result = {};
 
     for my $name ( keys %$requestedAttributes ) {
-        my $attrconf = $requestedAttributes->{$name};
-        my $is_required =
-          $config->{"$entityID"}->{"attribute_required_$name"}
+        my $attrconf    = $requestedAttributes->{$name};
+        my $is_required = $config->{"$entityID"}->{"attribute_required_$name"}
           // $config->{"$entityID"}->{"attribute_required"}
           // $config->{"ALL"}->{"attribute_required_$name"}
           // $config->{"ALL"}->{"attribute_required"} // $attrconf->{required};
@@ -371,9 +370,6 @@ sub transform_config {
 
     my $dom = XML::LibXML->load_xml( string => $xml_metadata );
 
-    # Remove extensions
-    foreach ( $dom->findnodes('//md:Extensions') ) { $_->unbindNode; }
-
     # Browse all partners
     foreach my $partner (
         $dom->findnodes('/md:EntitiesDescriptor/md:EntityDescriptor') )
@@ -383,9 +379,29 @@ sub transform_config {
         # Add required XML namespaces
         $partner->setNamespace( "urn:oasis:names:tc:SAML:2.0:metadata",
             "md", 0 );
+        $partner->setNamespace( "urn:oasis:names:tc:SAML:metadata:attribute",
+            "mdattr", 0 );
         $partner->setNamespace( "urn:oasis:names:tc:SAML:2.0:assertion",
             "saml", 0 );
         $partner->setNamespace( "http://www.w3.org/2000/09/xmldsig#", "ds", 0 );
+
+        # Parse subject-id:req extension
+        my $requested_subject_id = "none";
+        if (
+            my $subjectid = $partner->findnodes(
+                    './md:Extensions'
+                  . '/mdattr:EntityAttributes'
+                  . '/saml:Attribute[@Name="urn:oasis:names:tc:SAML:profiles:subject-id:req"]'
+                  . '/saml:AttributeValue[1]'
+                  . '/text()'
+            )->shift()
+          )
+        {
+            $requested_subject_id = $subjectid->toString;
+        }
+
+        # Remove other extensions
+        foreach ( $partner->findnodes('.//md:Extensions') ) { $_->unbindNode; }
 
         # Check IDP or SP
         if ( my $idp = $partner->findnodes('./md:IDPSSODescriptor') ) {
@@ -403,6 +419,7 @@ sub transform_config {
                 # Read metadata
                 my $partner_metadata = $partner->toString;
                 $partner_metadata =~ s/\n//g;
+                utf8::encode($partner_metadata);
 
                 # test if IDP entityID is inside the block list
 
@@ -490,14 +507,16 @@ sub transform_config {
                         my $required =
                           ( $requestedAttribute->getAttribute("isRequired") =~
                               /true/i ) ? 1 : 0;
-                        $requestedAttributes->{$friendlyname} = {
-                            required      => $required,
-                            name          => $name,
-                            name_format   => $nameformat,
-                            friendly_name => $friendlyname
-                        };
-                        printlog( "Attribute $friendlyname ($name)"
-                              . " requested by SP $entityID\n" );
+                        if ($friendlyname) {
+                            $requestedAttributes->{$friendlyname} = {
+                                required      => $required,
+                                name          => $name,
+                                name_format   => $nameformat,
+                                friendly_name => $friendlyname
+                            };
+                            printlog( "Attribute $friendlyname ($name)"
+                                  . " requested by SP $entityID\n" );
+                        }
                     }
                 }
                 else {
@@ -505,6 +524,17 @@ sub transform_config {
                         cn   => { required => 1, name => 'cn' },
                         uid  => { required => 1, name => 'uid' },
                         mail => { required => 1, name => 'mail' },
+                    };
+                }
+                if (   $requested_subject_id eq "any"
+                    or $requested_subject_id eq "subject-id" )
+                {
+                    $requestedAttributes->{"subjectId"} = {
+                        required => 0,
+                        name => "urn:oasis:names:tc:SAML:attribute:subject-id",
+                        name_format =>
+                          "urn:oasis:names:tc:SAML:2.0:attrname-format:uri",
+                        friendly_name => "subject-id",
                     };
                 }
 
@@ -520,6 +550,7 @@ sub transform_config {
                 # Read metadata
                 my $partner_metadata = $partner->toString;
                 $partner_metadata =~ s/\n//g;
+                utf8::encode($partner_metadata);
 
                 # test if IDP entityID is inside the block list
 
@@ -668,7 +699,7 @@ sub main {
         printlog("[INFO] run mod EntityID will be inserted\n");
         $numConf = $conf->saveConf( $lastConf, ( cfgNumFixed => 1 ) );
         printlog("[OK] Configuration $numConf saved\n");
-        unless ($numConf > 0) {
+        unless ( $numConf > 0 ) {
             print "[ERROR] Unable to save configuration\n";
             $exitCode = 1;
         }

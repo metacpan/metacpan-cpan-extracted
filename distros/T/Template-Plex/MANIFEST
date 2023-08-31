@@ -28,5 +28,6 @@ t/sub1.plex
 t/sub2.plex
 t/sub3.plex
 t/Template-Plex.t
+Template-Plex-v0.6.1.tar
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

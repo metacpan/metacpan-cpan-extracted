@@ -35,6 +35,7 @@ sub newSession {
             uid           => $uid,
             _utime        => time,
             _session_kind => $kind,
+            _session_uid  => $uid,
             _2fDevices    => to_json($sfaDevices),
         }
     );

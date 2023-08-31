@@ -17,4 +17,5 @@ print "Title before: $title_before\n";
 print "Title after: $title_after\n";
 
 # Output like:
-# TODO
+# Title before: JUDr.
+# Title after: Th.D.

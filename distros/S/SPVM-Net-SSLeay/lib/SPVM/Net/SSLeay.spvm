@@ -1,0 +1,49 @@
+# Copyright (c) 2023 [--user-name]
+# MIT License
+
+class Net::SSLeay {
+  version "0.001";
+  
+  use Net::SSLeay::Constant;
+  use Net::SSLeay::SSL_CTX;
+  use Net::SSLeay::ERR;
+  
+  INIT {
+    &init();
+  }
+  
+  # Fields
+  has ssl_ctx : Net::SSLeay::SSL_CTX;
+  
+  has operation_error : ro int;
+  
+  has error : ro long;
+  
+  # Class Methods
+  native static method new : Net::SSLeay ($ssl_ctx : Net::SSLeay::SSL_CTX);
+  
+  # Private or Internal Class Methods
+  private native static method init : void ();
+  
+  native static method _print_version_text : void ();
+  
+  # Instance Methods
+  native method DESTROY : void ();
+  
+  native method set_fd : int ($fd : int);
+  
+  native method connect : int ();
+  
+  native method accept : int ();
+  
+  native method shutdown : int ();
+  
+  native method set_tlsext_host_name : int ($name : string);
+  
+  native method read : int ($buf : mutable string, $num : int = -1, $offset : int = 0);
+  
+  native method peek : int ($buf : mutable string, $num : int = -1, $offset : int = 0);
+  
+  native method write : int ($buf : string, $num : int = -1, $offset : int = 0);
+  
+}

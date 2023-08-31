@@ -1,10 +1,5 @@
 package App::ShellCompleter::cpanm;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-22'; # DATE
-our $DIST = 'App-ShellCompleter-cpanm'; # DIST
-our $VERSION = '0.211'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -13,6 +8,11 @@ use Log::ger;
 use Complete::File qw(complete_file);
 use Complete::Util qw(answer_has_entries complete_array_elem);
 use Getopt::Long::Complete qw(GetOptionsWithCompletion);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-07-08'; # DATE
+our $DIST = 'App-ShellCompleter-cpanm'; # DIST
+our $VERSION = '0.212'; # VERSION
 
 my $noop = sub {};
 
@@ -93,10 +93,10 @@ my $comp_installable = sub {
         while (my @row = $sth->fetchrow_array) {
             my $mod = $row[0];
             $mod =~ s/\A\Q$mod_prefix\E//;
-            push @mods, $mod unless @mods ~~ $mod;
+            push @mods, $mod unless grep { $_ eq $mod } @mods;
             if ($row[1]) {
                 $mod .= '::';
-                push @mods, $mod unless @mods ~~ $mod;
+                push @mods, $mod unless grep { $_ eq $mod } @mods;
             }
         };
         return \@mods if @mods;
@@ -110,7 +110,7 @@ my $comp_installable = sub {
 sub _connect_lcpan {
     no warnings 'once';
 
-    eval "use App::lcpan 0.32";
+    eval "use App::lcpan 0.32"; ## no critic: TestingAndDebugging::ProhibitNoStrict
     if ($@) {
         log_trace("[_cpanm] App::lcpan not available, skipped ".
                          "trying to complete from CPAN module names");
@@ -260,7 +260,7 @@ App::ShellCompleter::cpanm - Shell completion for cpanm
 
 =head1 VERSION
 
-This document describes version 0.211 of App::ShellCompleter::cpanm (from Perl distribution App-ShellCompleter-cpanm), released on 2021-05-22.
+This document describes version 0.212 of App::ShellCompleter::cpanm (from Perl distribution App-ShellCompleter-cpanm), released on 2023-07-08.
 
 =head1 SYNOPSIS
 
@@ -276,14 +276,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-ShellC
 
 Source repository is at L<https://github.com/perlancar/perl-App-BashCompleter-cpanm>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-BashCompleter-cpanm/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Bash::Completion::Plugins::cpanm>, which focuses on completing module name
@@ -294,11 +286,37 @@ completing C<cpanm> command-line options.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2021, 2020, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ShellCompleter-cpanm>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

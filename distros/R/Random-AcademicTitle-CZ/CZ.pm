@@ -10,10 +10,13 @@ Readonly::Array our @TITLES_AFTER => (
 	'Ph.D.',
 	'Th.D.',
 	'DiS.',
+	'DSc.',
 );
 Readonly::Array our @TITLES_AFTER_OLD => (
 	'CSc.',
 	'DrSc.',
+	'Dr.',
+	'Th.D.',
 );
 Readonly::Array our @TITLES_BEFORE => (
 	'prof.',
@@ -29,16 +32,25 @@ Readonly::Array our @TITLES_BEFORE => (
 	'Ing.',
 	'Ing. arch.',
 	'Mgr.',
-	'PhMr.',
 	'MgA.',
 	'Bc.',
 	'BcA.',
+	'ThLic.',
 );
 Readonly::Array our @TITLES_BEFORE_OLD => (
+	'akad. arch.',
 	'akad. mal.',
+	'ak. soch.',
+	'MSDr.',
+	'PaedDr.',
+	'PhMr.',
+	'RSDr.',
+	'RTDr.',
+	'RCDr.',
+	'ThMgr.',
 );
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -100,6 +112,14 @@ Random::AcademicTitle::CZ - Class for random Czech academic title.
  my $obj = Random::AcademicTitle::CZ->new(%params);
  my $title_after = $obj->random_title_after;
  my $title_before = $obj->random_title_before;
+
+=head1 DESCRIPTION
+
+This module could generate actual Czech academic title or academic titles from
+all history in the Czech lands.
+
+The information about Czech academic titles you can see at
+L<https://cs.wikipedia.org/wiki/Akademick%C3%BD_titul>.
 
 =head1 METHODS
 
@@ -198,6 +218,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

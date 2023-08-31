@@ -7,7 +7,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(PE_OK);
 
 extends 'Lemonldap::NG::Portal::Lib::LDAP';
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.17.0';
 
 has ldapGroupAttributeNameSearch => (
     is      => 'rw',
@@ -60,6 +60,10 @@ sub setSessionInfo {
 # @return Lemonldap::NG::Portal constant
 sub setGroups {
     my ( $self, $req ) = @_;
+
+    # Bail out if we are being called out of sequence
+    return PE_OK unless ($req->data->{ldapentry});
+
     my $groups  = $req->{sessionInfo}->{groups}  || '';
     my $hGroups = $req->{sessionInfo}->{hGroups} || {};
 

@@ -2,6 +2,7 @@ test.html
 experiments/.*
 bench/.*
 jar.*
+.*\.tar\.gz$
 #!start included /Users/drclaw/perl5/perlbrew/perls/perl-5.36.0/lib/5.36.0/ExtUtils/MANIFEST.SKIP
 # Avoid version control files.
 \bRCS\b

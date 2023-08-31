@@ -125,7 +125,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                 },
                 this
             );
-
+            
             this.add(action);
         },
 

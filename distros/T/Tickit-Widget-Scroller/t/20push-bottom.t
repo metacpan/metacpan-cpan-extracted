@@ -33,9 +33,13 @@ is_display( [ ],
 
 is_cursorpos( 7, 0, 'Cursor position intially' );
 
+is( scalar $scroller->items, 0, '$scroller->items is 0 before ->push' );
+
 $scroller->push(
    Tickit::Widget::Scroller::Item::Text->new( "A line of text" ),
 );
+
+is( scalar $scroller->items, 1, '$scroller->items is 1 after ->push' );
 
 flush_tickit;
 

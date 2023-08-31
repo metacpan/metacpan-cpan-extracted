@@ -8,6 +8,7 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 use MIME::Base64 qw(decode_base64url);
+use Lemonldap::NG::Common::Util qw/display2F/;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_ERROR
@@ -16,7 +17,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.17.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::SecondFactor
@@ -106,6 +107,7 @@ sub run {
 sub verify {
     my ( $self, $req, $session ) = @_;
     my $crypter;
+    my $uid = $session->{ $self->conf->{whatToTrace} };
 
     # Check U2F signature
     if (    my $resp = $req->param('signature')
@@ -151,13 +153,17 @@ sub verify {
             return $self->fail($req);
         }
         if ( $crypter->authenticationVerify($resp) ) {
-            $self->userLogger->info( $self->prefix . '2f: signature verified' );
+
+            # Lookup 2f device from authenticator's keyHandle
+            my $device = $req->data->{u2fkhtodev}->{ $data->{keyHandle} };
+            $self->userLogger->info( "User $uid authenticated with 2F device: "
+                  . display2F($device) );
             return PE_OK;
         }
         else {
             $self->userLogger->notice( $self->prefix
                   . '2f: unvalid signature for '
-                  . $session->{ $self->conf->{whatToTrace} } . ' ('
+                  . $uid . ' ('
                   . Crypt::U2F::Server::u2fclib_getError()
                   . ')' );
             $req->error(PE_U2FFAILED);
@@ -165,9 +171,8 @@ sub verify {
         }
     }
     else {
-        $self->userLogger->notice( $self->prefix
-              . '2f: no valid response for user '
-              . $session->{ $self->conf->{whatToTrace} } );
+        $self->userLogger->notice(
+            $self->prefix . '2f: no valid response for user ' . $uid );
         $req->authResult(PE_U2FFAILED);
         return $self->fail($req);
     }
@@ -180,10 +185,11 @@ sub fail {
             $req,
             'u2fcheck',
             params => {
-                AUTH_ERROR      => $req->error,
-                AUTH_ERROR_TYPE => $req->error_type,
-                AUTH_ERROR_ROLE => $req->error_role,
-                FAILED          => 1
+                AUTH_ERROR                      => $req->error,
+                AUTH_ERROR_TYPE                 => $req->error_type,
+                AUTH_ERROR_ROLE                 => $req->error_role,
+                ( 'AUTH_ERROR_' . $req->error ) => 1,
+                FAILED                          => 1
             }
         )
     );
@@ -202,6 +208,7 @@ sub loadUser {
 
         foreach (@u2fs) {
             $kh = $_->{_keyHandle};
+            $req->data->{u2fkhtodev}->{$kh} = $_;
             $uk = decode_base64url( $_->{_userKey} );
             $self->logger->debug(
                 $self->prefix . "2f: append crypter with kh = $kh" );

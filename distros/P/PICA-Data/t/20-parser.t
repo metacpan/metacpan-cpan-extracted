@@ -13,6 +13,8 @@ ok $first->{record}->[0][0] eq '002@', 'tag from first field';
 is_deeply $first->{record}->[1], ['003@', '', 0 => '12345'], 'second field';
 is_deeply $first->{record}->[4], ['012X', '', 0 => '0', x => '', y => ''],
     'empty subfields';
+
+
 is $first->{record}->[6]->[7], '柳经纬主编;', 'Unicode';
 is_deeply $first->{record}->[11],
     ['145Z', '40', 'a', '$', 'b', 'test$', 'c', '...'], 'sub field with $';
@@ -116,6 +118,10 @@ note 'error handling';
     dies_ok {pica_parser(xml => '')} 'invalid handle';
     dies_ok {pica_parser(plus => [])} 'invalid handle';
     dies_ok {pica_parser(plain => bless({}, 'MyFooBar'))} 'invalid handle';
+
+    # https://github.com/gbv/PICA-Data/issues/136
+    $plain = '021A $$';
+    dies_ok {PICA::Parser::Plain->new(\$plain, strict => 1)->next} 'issue 136';
 }
 
 is pica_parser(plain => \'012A/00 $xy')->next->string, 
@@ -153,6 +159,12 @@ my $annotated = "";
         ok $parser->next;
         dies_ok { $parser->next } 'forbid annotation';
     }
+}
+
+{
+    my $patch = pica_parser(patch => \"003@ \$01\n+ 021A \$ax")->next;
+    is_deeply $patch->{record}, [['003@','','0','1',' '],['021A','','a','x','+']], 'patch parser';
+    throws_ok { pica_parser(patch => \"? 003@ \$01")->next } qr/Invalid annotation/;
 }
 
 done_testing;

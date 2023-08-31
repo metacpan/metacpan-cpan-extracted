@@ -1,7 +1,7 @@
-/* Copyright 2018-2021 Richard Kelsch, All Rights Reserved
+/* Copyright 2018-## YEAR ## Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  6.48
+   Version:  ## VERSION ##
 
    You may wonder why the stack is so heavily used when the global structures
    have the needed values.  Well, the module can emulate another graphics mode

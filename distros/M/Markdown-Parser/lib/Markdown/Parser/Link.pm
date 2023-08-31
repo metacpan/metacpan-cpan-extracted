@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/Link.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2022/09/19
+## Modified 2022/09/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,7 +19,7 @@ BEGIN
     use parent qw( Markdown::Parser::Element );
     use vars qw( $VERSION );
     use Devel::Confess;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -29,7 +29,7 @@ sub init
 {
     my $self = shift( @_ );
     $self->{encrypt}        = '';
-    $self->{id}             = '';
+    $self->{id}             = [];
     $self->{link_id}        = '';
     $self->{name}           = '';
     $self->{original}       = '';
@@ -43,8 +43,9 @@ sub as_markdown
 {
     my $self = shift( @_ );
     my $arr = $self->new_array;
-    $arr->push( sprintf( '[%s]', $self->alt ) );
-    if( $self->id )
+    my $name = $self->children->map(sub{ $_->as_markdown })->join( '' );
+    $arr->push( sprintf( '[%s]', $name ) );
+    if( $self->link_id )
     {
         $arr->push( sprintf( '[%s]', $self->link_id ) );
     }
@@ -53,7 +54,7 @@ sub as_markdown
         $arr->push( '(' );
         $arr->push( sprintf( '%s', $self->url ) ) if( $self->url );
         $arr->push( ' ' ) if( $self->url && $self->title );
-        $arr->push( sprintf( '"%s"', $self->title ) );
+        $arr->push( sprintf( '"%s"', $self->title ) ) if( $self->title );
         $arr->push( ')' );
     }
     if( $self->class->length || $self->id->length )
@@ -70,9 +71,10 @@ sub as_pod
 {
     my $self = shift( @_ );
     my $arr = $self->new_array;
-    if( $self->url && $self->title )
+    my $name = $self->children->map(sub{ $_->as_pod })->join( '' );
+    if( $self->url && $name )
     {
-        $arr->push( sprintf( 'L<%s|%s>', $self->title, $self->url ) );
+        $arr->push( sprintf( 'L<%s|%s>', $name, $self->url ) );
     }
     elsif( $self->url )
     {
@@ -249,7 +251,7 @@ Markdown::Parser::Link - Markdown Link Element
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

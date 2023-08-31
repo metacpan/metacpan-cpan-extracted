@@ -12,6 +12,39 @@ assert_eq(squarefree_sum(1e7), 30396557311887)
 assert_eq(squarefree_count(1e9), 607927124)
 assert_eq(squarefree_count(1e10), 6079270942)
 
+assert_eq(prime_count(1e5-1), 9592)
+assert_eq(prime_count(1e6-1), 78498)
+
+assert_eq(prime_count(1e5.next_prime-1), 9592)
+assert_eq(prime_count(1e6.next_prime-1), 78498)
+
+assert_eq(prime_count(1e5.next_prime), 9593)
+assert_eq(prime_count(1e6.next_prime), 78499)
+
+assert_eq(
+    30.of { .inc.nth_nonpowerfree(1) },
+    30.by { .is_nonpowerfree(1) }
+)
+
+assert_eq(
+    30.of { .inc.nth_nonpowerfree(2) },
+    30.by { .is_nonpowerfree(2) }
+)
+
+assert_eq(
+    30.of { .inc.nth_nonpowerfree(3) },
+    30.by { .is_nonpowerfree(3) }
+)
+
+assert_eq(
+    100.of { .prime_power_sum },
+    100.of {|n|
+        sum(1..n.ilog2, {|k|
+            sum_primes(2, n.iroot(k), k)
+        })
+    }
+)
+
 assert_eq(
     semiprimes(100),
     1..100 -> grep { .is_semiprime },
@@ -197,17 +230,17 @@ assert_eq(
 # RangeNumber non-powerfree numbers
 
 assert_eq(
-    gather { 10..100 -> each_non_powerfree(3, {|k| take(k) }) },
-    3.non_powerfree(10, 100)
+    gather { 10..100 -> each_nonpowerfree(3, {|k| take(k) }) },
+    3.nonpowerfree(10, 100)
 )
 
 assert_eq(
-    gather { 1..100 -> each_non_powerfree(2, {|k| take(k) }) },
-    2.non_powerfree(100)
+    gather { 1..100 -> each_nonpowerfree(2, {|k| take(k) }) },
+    2.nonpowerfree(100)
 )
 
 assert_eq(
-    gather { 10..100 `by` 3 -> each_non_powerfree(3, {|k| take(k) }) },
+    gather { 10..100 `by` 3 -> each_nonpowerfree(3, {|k| take(k) }) },
     10..100 `by` 3 -> grep { !.is_cubefree }
 )
 
@@ -259,22 +292,22 @@ assert_eq(3.powerful(50, 106).len, 3.powerful_count(50, 106))
 assert_eq(3.powerful(49, 105).len, 3.powerful_count(49, 105))
 
 assert_eq(
-    (faulhaber_sum(2**100 * 10000, 1) - 100.non_powerfree(2**100 * 10000).sum),
+    (faulhaber_sum(2**100 * 10000, 1) - 100.nonpowerfree(2**100 * 10000).sum),
     100.powerfree_sum(2**100 * 10000)
 )
 
-assert_eq(2.non_powerfree(100), 0..100 -> grep { .is_non_powerfree(2) })
-assert_eq(3.non_powerfree(100), 0..100 -> grep { .is_non_powerfree(3) })
-assert_eq(4.non_powerfree(100), 0..100 -> grep { .is_non_powerfree(4) })
+assert_eq(2.nonpowerfree(100), 0..100 -> grep { .is_nonpowerfree(2) })
+assert_eq(3.nonpowerfree(100), 0..100 -> grep { .is_nonpowerfree(3) })
+assert_eq(4.nonpowerfree(100), 0..100 -> grep { .is_nonpowerfree(4) })
 
-assert_eq(2.non_powerfree(65, 100, 2), %n[68, 72, 75, 76, 80, 81, 84, 88, 90, 92, 96, 98, 99, 100])
-assert_eq(3.non_powerfree(64, 150, 3), %n[64, 72, 80, 81, 88, 96, 104, 108, 112, 120, 125, 128, 135, 136, 144])
+assert_eq(2.nonpowerfree(65, 100, 2), %n[68, 72, 75, 76, 80, 81, 84, 88, 90, 92, 96, 98, 99, 100])
+assert_eq(3.nonpowerfree(64, 150, 3), %n[64, 72, 80, 81, 88, 96, 104, 108, 112, 120, 125, 128, 135, 136, 144])
 
-assert_eq(2.non_powerfree_count(65, 100, 2), 14)
-assert_eq(3.non_powerfree_count(64, 150, 2), 15)
+assert_eq(2.nonpowerfree_count(65, 100, 2), 14)
+assert_eq(3.nonpowerfree_count(64, 150, 2), 15)
 
-assert_eq(2.non_powerfree_sum(65, 100, 2), 1199)
-assert_eq(3.non_powerfree_sum(64, 150, 2), 1593)
+assert_eq(2.nonpowerfree_sum(65, 100, 2), 1199)
+assert_eq(3.nonpowerfree_sum(64, 150, 2), 1593)
 
 for k in (2..5) {
     var lo = 1e6.irand
@@ -445,19 +478,57 @@ do {
 
 do {
     var p = (2**127 - 1)
+    var t = nil
 
     for k in (-100 .. 100) {
-        var t = next_prime_power(p+k)
-        assert(t.is_prime_power)
+
+        if (1.rand < 0.3) {
+            t = next_prime_power(p+k)
+            assert(t.is_prime_power)
+            assert(t > p+k)
+
+            t = prev_prime_power(p+k)
+            assert(t.is_prime_power)
+            assert(t < p+k)
+        }
+
+        if (1.rand < 0.05) {
+            t = next_perfect_power(p+k)
+            assert(t.is_perfect_power)
+            assert(t > p+k)
+
+            t = prev_perfect_power(p+k)
+            assert(t.is_perfect_power)
+            assert(t < p+k)
+        }
     }
 }
 
 do {
     var p = 4171
+    var t = nil
 
     for k in (-100 .. 100) {
-        var t = next_prime_power(p+k)
-        assert(t.is_prime_power)
+
+        if (1.rand < 0.3) {
+            t = next_prime_power(p+k)
+            assert(t.is_prime_power)
+            assert(t > p+k)
+
+            t = prev_prime_power(p+k)
+            assert(t.is_prime_power)
+            assert(t < p+k)
+        }
+
+        if (1.rand < 0.1) {
+            t = next_perfect_power(p+k)
+            assert(t.is_perfect_power)
+            assert(t > p+k)
+
+            t = prev_perfect_power(p+k)
+            assert(t.is_perfect_power)
+            assert(t < p+k)
+        }
     }
 }
 
@@ -479,6 +550,14 @@ assert_eq(prime_count(620, 630), 0)
 assert_eq(prime_count(620, 631), 1)
 assert_eq(prime_count(619, 631), 2)
 
+assert_eq(prime_power_sum(626, 630), prime_powers(626, 630).sum)
+assert_eq(prime_power_sum(620, 630), prime_powers(620, 630).sum)
+assert_eq(prime_power_sum(620, 631), prime_powers(620, 631).sum)
+assert_eq(prime_power_sum(619, 631), prime_powers(619, 631).sum)
+
+assert_eq(prime_power_sum(43**2), prime_powers(43**2).sum)
+assert_eq(prime_power_sum(43**3), prime_powers(43**3).sum)
+
 assert_eq(prime_count(2**127 - 1, 2**127 - 1), 1)
 assert_eq(3.almost_prime_count(82654, 7158821), 1736362)
 assert_eq(4.almost_prime_count(83925, 4376019), 872251)
@@ -496,8 +575,257 @@ with (15.omega_primes(1922334673882737115)) {|a|
     assert_eq(a.len, 365)
 }
 
-assert_eq(next_omega_prime(1e12, 7), 1000000000090)
-assert_eq(next_omega_prime(1e12, 6), 1000000000010)
+assert_eq(next_squarefree(2**31 + 3), 2**31 + 6)
+assert_eq(next_squarefree(2**128 + 1), 2**128 + 2)
+
+assert_eq(prev_squarefree(2**31 + 3), 2**31 + 1)
+assert_eq(prev_squarefree(2**128 + 3), 2**128 + 2)
+
+assert_eq(next_powerfree(2**31 + 3, 3), 2**31 + 4)
+assert_eq(next_powerfree(2**128 + 1, 3), 2**128 + 2)
+
+assert_eq(prev_powerfree(2**31 + 3, 3), 2**31 + 2)
+assert_eq(prev_powerfree(2**128 + 3, 3), 2**128 + 2)
+
+assert_eq(next_semiprime(23), 25)
+assert_eq(next_semiprime(4171), 4174)
+assert_eq(next_semiprime(4171-1), 4171)
+assert_eq(next_semiprime(2**128 + 1), 2**128 + 3)
+
+assert_eq(next_squarefree_semiprime(23), 26)
+assert_eq(next_squarefree_semiprime(4171), 4174)
+assert_eq(next_squarefree_semiprime(4171-1), 4171)
+assert_eq(next_squarefree_semiprime(2**128 + 1), 2**128 + 3)
+
+assert_eq(prev_semiprime(4171), 4169)
+assert_eq(prev_semiprime(4171+1), 4171)
+assert_eq(prev_semiprime(2**128 + 1), 2**128 - 2)
+
+assert_eq(prev_almost_prime(2**128 + 1, 3), 2**128 - 3)
+assert_eq(prev_almost_prime(2**128 + 1, 125), 2**128 - 2**122)
+assert_eq(next_almost_prime(2**128 + 1, 126), (75*128**18 + 120*128**17)/15)
+
+#assert_eq(next_omega_prime(16.pn_primorial, 16), 36278497172720993190)  # quite slow
+
+for k in (1..3) {
+
+    var n = 30
+
+    if (k > 1) {
+        assert_eq(
+            n.inc.of { .next_powerfree(k).prev_powerfree(k) }.grep.uniq,
+            k.powerfree(n),
+        )
+    }
+
+    assert_eq(
+        n.inc.of { .next_powerful(k).prev_powerful(k) }.grep.uniq,
+        k.powerful(n),
+    )
+
+    assert_eq(
+        n.inc.of { .next_nonpowerfree(k).prev_nonpowerfree(k) }.grep.uniq,
+        k.nonpowerfree(n),
+    )
+
+    assert_eq(
+        n.inc.of { .next_almost_prime(k).prev_almost_prime(k) }.grep.uniq,
+        k.almost_primes(n),
+    )
+
+    assert_eq(
+        n.inc.of { .next_squarefree_almost_prime(k).prev_squarefree_almost_prime(k) }.grep.uniq,
+        k.squarefree_almost_primes(n),
+    )
+
+    assert_eq(
+        n.inc.of { .next_omega_prime(k).prev_omega_prime(k) }.grep.uniq,
+        k.omega_primes(n),
+    )
+}
+
+assert_eq(next_omega_prime(8.pn_primorial*17, 8), 164949330)
+assert_eq(prev_omega_prime(8.pn_primorial*17, 8), 164862390)
+
+assert_eq(next_omega_prime(1e8, 8), 100025310)
+assert_eq(prev_omega_prime(1e8, 8), 99981420)
+
+assert_eq(next_squarefree_almost_prime(8.pn_primorial/13 * 23, 8), 17687670)
+assert_eq(prev_squarefree_almost_prime(8.pn_primorial/13 * 23, 8), 16546530)
+
+assert_eq(next_squarefree_almost_prime(1e8, 8), 100025310)
+assert_eq(prev_squarefree_almost_prime(1e8, 8), 99953490)
+
+var seen = Set()
+
+for n,k in ([[4171, 1], [4171, 2], [4171, 3], [1e4, 4], [1e8, 7], [1e8,6], [1e8,5], [1e12,7], [1e12,6], [1e12,5]]) {
+
+    if (n <= 1e6) {
+        assert_eq(prev_almost_prime(next_almost_prime(n, k), k), prev_almost_prime(n+1, k))
+        assert_eq(next_almost_prime(prev_almost_prime(n, k), k), next_almost_prime(n-1, k))
+
+        assert_eq(prev_squarefree_almost_prime(next_squarefree_almost_prime(n, k), k), prev_squarefree_almost_prime(n+1, k))
+        assert_eq(next_squarefree_almost_prime(prev_squarefree_almost_prime(n, k), k), next_squarefree_almost_prime(n-1, k))
+
+        assert_eq(prev_omega_prime(next_omega_prime(n, k), k), prev_omega_prime(n+1, k))
+        assert_eq(next_omega_prime(prev_omega_prime(n, k), k), next_omega_prime(n-1, k))
+    }
+
+    if (!seen.has(n)) {     # methods that take only one argument (n)
+
+        seen << n
+
+        assert_eq(next_semiprime(n), ->(n) {
+            ++n; while (!n.is_semiprime) { ++n }; n
+        }(n))
+
+        assert_eq(prev_semiprime(n), ->(n) {
+            --n; while (!n.is_semiprime) { --n }; n
+        }(n))
+
+        assert_eq(next_squarefree_semiprime(n), ->(n) {
+            ++n; while (!n.is_squarefree_semiprime) { ++n }; n
+        }(n))
+
+        assert_eq(prev_squarefree_semiprime(n), ->(n) {
+            --n; while (!n.is_squarefree_semiprime) { --n }; n
+        }(n))
+
+        assert_eq(next_squarefree(n), ->(n) {
+            ++n; while (!n.is_squarefree) { ++n }; n
+        }(n))
+
+        assert_eq(prev_squarefree(n), ->(n) {
+            --n; while (!n.is_squarefree) { --n }; n
+        }(n))
+
+        assert_eq(next_prime(n), ->(n) {
+            ++n; while (!n.is_prime) { ++n }; n
+        }(n))
+
+        assert_eq(prev_prime(n), ->(n) {
+            --n; while (!n.is_prime) { --n }; n
+        }(n))
+
+        assert_eq(next_prime_power(n), ->(n) {
+            ++n; while (!n.is_prime_power) { ++n }; n
+        }(n))
+
+        assert_eq(prev_prime_power(n), ->(n) {
+            --n; while (!n.is_prime_power) { --n }; n
+        }(n))
+    }
+
+    if (n <= 1e6) {
+        with (next_omega_prime(n,k)) {|w|
+            assert_eq([w], k.omega_primes(n+1, w))
+        }
+
+        with (prev_omega_prime(n,k)) {|w|
+            assert_eq([w], k.omega_primes(w, n-1))
+        }
+
+        with (next_squarefree_almost_prime(n,k)) {|w|
+            assert_eq([w], k.squarefree_almost_primes(n+1, w))
+        }
+
+        with (prev_squarefree_almost_prime(n,k)) {|w|
+            assert_eq([w], k.squarefree_almost_primes(w, n-1))
+        }
+    }
+
+    with (next_almost_prime(n,k)) {|w|
+        assert_eq([w], k.almost_primes(n+1, w))
+    }
+
+    with (prev_almost_prime(n,k)) {|w|
+        assert_eq([w], k.almost_primes(w, n-1))
+    }
+
+    assert_eq(next_omega_prime(n,k), ->(n) {
+        ++n; while (!n.is_omega_prime(k)) { ++n }; n
+    }(n))
+
+    assert_eq(prev_omega_prime(n,k), ->(n) {
+        --n; while (!n.is_omega_prime(k)) { --n }; n
+    }(n))
+
+    assert_eq(next_almost_prime(n,k), ->(n) {
+        ++n; while (!n.is_almost_prime(k)) { ++n }; n
+    }(n))
+
+    assert_eq(prev_almost_prime(n,k), ->(n) {
+        --n; while (!n.is_almost_prime(k)) { --n }; n
+    }(n))
+
+    assert_eq(next_squarefree_almost_prime(n,k), ->(n) {
+        ++n; while (!n.is_squarefree_almost_prime(k)) { ++n }; n
+    }(n))
+
+    assert_eq(prev_squarefree_almost_prime(n,k), ->(n) {
+        --n; while (!n.is_squarefree_almost_prime(k)) { --n }; n
+    }(n))
+
+    if (k > 1) {
+        assert_eq(next_powerfree(n,k), ->(n) {
+            ++n; while (!n.is_powerfree(k)) { ++n }; n
+        }(n))
+
+        assert_eq(prev_powerfree(n,k), ->(n) {
+            --n; while (!n.is_powerfree(k)) { --n }; n
+        }(n))
+
+        with (next_powerfree(n,k)) {|w|
+            assert_eq([w], k.powerfree(n+1, w))
+        }
+
+        with (prev_powerfree(n,k)) {|w|
+            assert_eq([w], k.powerfree(w, n-1))
+        }
+    }
+
+    if (n <= 1e6) {
+        assert_eq(next_powerful(n,k), ->(n) {
+            ++n; while (!n.is_powerful(k)) { ++n }; n
+        }(n))
+
+        assert_eq(prev_powerful(n,k), ->(n) {
+            --n; while (!n.is_powerful(k)) { --n }; n
+        }(n))
+
+        assert_eq(next_nonpowerfree(n,k), ->(n) {
+            ++n; while (!n.is_nonpowerfree(k)) { ++n }; n
+        }(n))
+
+        assert_eq(prev_nonpowerfree(n,k), ->(n) {
+            --n; while (!n.is_nonpowerfree(k)) { --n }; n
+        }(n))
+    }
+
+    with (next_powerful(n,k)) {|w|
+        assert_eq([w], k.powerful(n+1, w))
+    }
+
+    with (prev_powerful(n,k)) {|w|
+        assert_eq([w], k.powerful(w, n-1))
+    }
+
+    with (next_nonpowerfree(n,k)) {|w|
+        assert_eq([w], k.nonpowerfree(n+1, w))
+    }
+
+    with (prev_nonpowerfree(n,k)) {|w|
+        assert_eq([w], k.nonpowerfree(w, n-1))
+    }
+}
+
+assert_eq(next_perfect_power(4171), do {
+    var n = 4171; while (!n.is_perfect_power) { ++n }; n
+})
+
+assert_eq(prev_perfect_power(4171), do {
+    var n = 4171; while (!n.is_perfect_power) { --n }; n
+})
 
 assert_eq(
     10.by { .is_squarefree_almost_prime(2) },
@@ -745,6 +1073,10 @@ assert_eq(15.of { .fibonacci(2) }, %n[0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 1
 assert_eq(15.of { .fibonacci(3) }, %n[0, 0, 1, 1, 2, 4, 7, 13, 24, 44, 81, 149, 274, 504, 927])
 assert_eq(15.of { .fibonacci(4) }, %n[0, 0, 0, 1, 1, 2, 4, 8, 15, 29, 56, 108, 208, 401, 773])
 
+assert_eq(1e5.fib(2), Math.linear_rec(2.of(1), 1.of(0)+[1], 1e5))
+assert_eq(1e5.fib(3), Math.linear_rec(3.of(1), 2.of(0)+[1], 1e5))
+assert_eq(1e5.fib(4), Math.linear_rec(4.of(1), 3.of(0)+[1], 1e5))
+
 assert_eq(15.of {|n| n! }, %n[1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800, 479001600, 6227020800, 87178291200])
 assert_eq(15.of {|n| n!! }, %n[1, 1, 2, 3, 8, 15, 48, 105, 384, 945, 3840, 10395, 46080, 135135, 645120])
 assert_eq(15.of {|n| n.multi_factorial(3) }, %n[1, 1, 2, 3, 4, 10, 18, 28, 80, 162, 280, 880, 1944, 3640, 12320])
@@ -763,10 +1095,13 @@ assert_eq(composite_sum(1e2, 1e3.next_prime), composites(1e2, 1e3.next_prime).su
 assert_eq(composite_sum(1e2.next_prime, 1e3.next_prime), composites(1e2.next_prime, 1e3.next_prime).sum)
 
 assert_eq(20.by { .is_squarefree }, squarefree(20.nth_squarefree))
-assert_eq(20.by { .is_cubefree }, 1..20.nth_powerfree(3) -> grep { .is_powerfree(3) })
+assert_eq(20.by { .is_cubefree }, 1..20.nth_cubefree -> grep { .is_powerfree(3) })
 
-assert_eq(20.by { .is_squareful }, 2.powerful(20.nth_powerful(2)))
-assert_eq(20.by { .is_cubeful }, 3.powerful(20.nth_powerful(3)))
+assert_eq(20.by { .is_nonsquarefree }, nonsquarefree(20.nth_nonsquarefree))
+assert_eq(20.by { .is_noncubefree }, 1..20.nth_noncubefree -> grep { .is_nonpowerfree(3) })
+
+assert_eq(20.by { .is_squarefull }, 2.powerful(20.nth_powerful(2)))
+assert_eq(20.by { .is_cubefull }, 3.powerful(20.nth_powerful(3)))
 
 assert_eq(1000!.lpf, 2)
 assert_eq(1000!.make_coprime(2*3*5*7).lpf, 11)
@@ -774,13 +1109,13 @@ assert_eq(1000!.make_coprime(2*3*5*7).lpf, 11)
 assert_eq(1000!.gpf, 1000.prev_prime)
 assert_eq(gpf(1000! * (2**64 + 1)), 67280421310721)
 
-assert_eq(20.of{ .non_squarefree_count },      20.of{ .is_non_squarefree ? 1 : 0 }.acc)
-assert_eq(20.of{ .non_squarefree_sum },        20.of{ .is_non_squarefree ? _ : 0 }.acc)
-assert_eq(20.of{ .non_cubefree_count },        20.of{ .is_non_cubefree ? 1 : 0 }.acc)
-assert_eq(20.of{ .non_cubefree_sum },          20.of{ .is_non_cubefree ? _ : 0 }.acc)
+assert_eq(20.of{ .nonsquarefree_count },      20.of{ .is_nonsquarefree ? 1 : 0 }.acc)
+assert_eq(20.of{ .nonsquarefree_sum },        20.of{ .is_nonsquarefree ? _ : 0 }.acc)
+assert_eq(20.of{ .noncubefree_count },        20.of{ .is_noncubefree ? 1 : 0 }.acc)
+assert_eq(20.of{ .noncubefree_sum },          20.of{ .is_noncubefree ? _ : 0 }.acc)
 
-assert_eq(20.of{ 4.non_powerfree_count(_) },   20.of{ .is_non_powerfree(4) ? 1 : 0 }.acc)
-assert_eq(20.of{ 4.non_powerfree_sum(_) },     20.of{ .is_non_powerfree(4) ? _ : 0 }.acc)
+assert_eq(20.of{ 4.nonpowerfree_count(_) },   20.of{ .is_nonpowerfree(4) ? 1 : 0 }.acc)
+assert_eq(20.of{ 4.nonpowerfree_sum(_) },     20.of{ .is_nonpowerfree(4) ? _ : 0 }.acc)
 
 assert_eq(20.of{ 4.powerfree_count(_) },       20.of{ .is_powerfree(4) ? 1 : 0 }.acc)
 assert_eq(20.of{ 4.powerfree_sum(_) },         20.of{ .is_powerfree(4) ? _ : 0 }.acc)
@@ -789,15 +1124,19 @@ assert_eq(20.of { .squarefree_count },  20.of { .is_squarefree ? 1 : 0 }.acc)
 assert_eq(20.of { .squarefree_sum },    20.of { .is_squarefree ? _ : 0 }.acc)
 assert_eq(20.of { .cubefree_count },    20.of { .is_cubefree ? 1 : 0 }.acc)
 assert_eq(20.of { .cubefree_sum },      20.of { .is_cubefree ? _ : 0 }.acc)
-assert_eq(20.of { .squareful_count },   20.of { .is_squareful ? 1 : 0 }.acc)
-assert_eq(20.of { .squareful_sum },     20.of { .is_squareful ? _ : 0 }.acc)
-assert_eq(20.of { .cubeful_count },     20.of { .is_cubeful ? 1 : 0 }.acc)
-assert_eq(20.of { .cubeful_sum },       20.of { .is_cubeful ? _ : 0 }.acc)
+assert_eq(20.of { .squarefull_count },  20.of { .is_squarefull ? 1 : 0 }.acc)
+assert_eq(20.of { .squarefull_sum },    20.of { .is_squarefull ? _ : 0 }.acc)
+assert_eq(20.of { .cubefull_count },    20.of { .is_cubefull ? 1 : 0 }.acc)
+assert_eq(20.of { .cubefull_sum },      20.of { .is_cubefull ? _ : 0 }.acc)
 assert_eq(20.of { .composite_count },   20.of { .is_composite ? 1 : 0 }.acc)
 assert_eq(20.of { .composite_sum },     20.of { .is_composite ? _ : 0 }.acc)
 assert_eq(20.of { .mertens },           20.of { .moebius }.acc)
 assert_eq(20.of { .liouville },         20.of { .is_zero ? 0 : ((-1)**bigomega(_)) })
 assert_eq(20.of { .liouville_sum },     20.of { .liouville }.acc)
+assert_eq(20.of { 2.power_count(_) },   20.of { .is_power(2)&&.is_pos ? 1 : 0 }.acc)
+assert_eq(20.of { 3.power_count(_) },   20.of { .is_power(3)&&.is_pos ? 1 : 0 }.acc)
+assert_eq(20.of { 2.power_sum(_) },     20.of { .is_power(2) ? _ : 0 }.acc)
+assert_eq(20.of { 3.power_sum(_) },     20.of { .is_power(3) ? _ : 0 }.acc)
 assert_eq(20.of { .pi },                20.of { .is_prime ? 1 : 0 }.acc)
 assert_eq(20.of { .prime_sum },         20.of { .is_prime ? _ : 0 }.acc)
 assert_eq(20.of { prime_sum(2,_,0) },   20.of { .is_prime ? 1 : 0 }.acc)
@@ -807,6 +1146,8 @@ assert_eq(20.of { prime_sum(2,_,3) },   20.of { .is_prime ? .cube : 0 }.acc)
 assert_eq(20.of { prime_sum(3,_,3) },   20.of { (.is_prime && _>=3) ? .cube : 0 }.acc)
 assert_eq(20.of { .primorial },         20.of { .is_prime ? _ : 1 }.map_reduce{|a,b| a*b })
 assert_eq(20.of { .pn_primorial },      20.of { .nth_prime }.map_reduce{|a,b| a*b })
+assert_eq(20.of { .lpf_sum },           20.of { _ >= 2 ? .lpf : 0 }.acc)
+assert_eq(20.of { .gpf_sum },           20.of { _ >= 2 ? .gpf : 0 }.acc)
 assert_eq(20.of { .sigma0 },            20.of { .divisors.len })
 assert_eq(20.of { .sigma(0) },          20.of { .divisors.len })
 assert_eq(20.of { .sigma },             20.of { .divisors.sum })
@@ -822,6 +1163,25 @@ assert_eq(20.of { .factorial },         20.of { .is_zero ? 1 : _ }.map_reduce{|a
 assert_eq(20.of { .superfactorial },    20.of { .factorial }.map_reduce{|a,b| a*b })
 assert_eq(20.of { .hyperfactorial },    20.of { _**_ }.map_reduce{|a,b| a*b })
 assert_eq(20.of { .subfactorial },      20.of {|n| (-1)**n / n! }.acc.map_kv {|k,v| k! * v })
+
+assert_eq(20.of { .perfect_power_count },     20.of { .is_perfect_power && .is_pos ? 1 : 0 }.acc)
+assert_eq(20.of { .perfect_power_sum },       20.of { .is_perfect_power ? _ : 0 }.acc)
+
+for k in (0..3) {
+    assert_eq(20.of { k.almost_prime_sum(_) },            20.of { .is_almost_prime(k) ? _ : 0 }.acc)
+    assert_eq(20.of { k.squarefree_almost_prime_sum(_) }, 20.of { .is_squarefree_almost_prime(k) ? _ : 0 }.acc)
+    assert_eq(20.of { k.omega_prime_sum(_) },             20.of { .is_omega_prime(k) ? _ : 0 }.acc)
+
+    assert_eq(20.of { k.almost_prime_count(_) },            20.of { .is_almost_prime(k) ? 1 : 0 }.acc)
+    assert_eq(20.of { k.squarefree_almost_prime_count(_) }, 20.of { .is_squarefree_almost_prime(k) ? 1 : 0 }.acc)
+    assert_eq(20.of { k.omega_prime_count(_) },             20.of { .is_omega_prime(k) ? 1 : 0 }.acc)
+
+    assert_eq(20.of { .perfect_power_count(k) },  20.of { .is_power(k) && .is_pos ? 1 : 0 }.acc)
+    assert_eq(20.of { .perfect_power_sum(k) },    20.of { .is_power(k) ? _ : 0 }.acc)
+
+    assert_eq(20.of { k.powerful_count(_) },  20.of { .is_powerful(k) && .is_pos ? 1 : 0 }.acc)
+    assert_eq(20.of { k.powerful_sum(_) },    20.of { .is_powerful(k) ? _ : 0 }.acc)
+}
 
 assert_eq(20.of { .digits(2).sum },     20.of { .hammingweight })
 assert_eq(20.of { .digits(2).len },     20.of { .len(2) })
@@ -873,6 +1233,9 @@ for n in (2147483646, 2147483647, 2147483648, 4294967293, 4294967294, 4294967295
         assert_eq(k.sumdigits(b), D.sum)
     }
 }
+
+assert_eq(lpf_sum(50, 100), 50..100 -> sum{.lpf})
+assert_eq(gpf_sum(50, 100), 50..100 -> sum{.gpf})
 
 assert_eq(convergents(3/2), [1, 3/2])
 assert_eq(convergents(2/3), [0, 1, 2/3])
@@ -938,6 +1301,13 @@ assert_eq(
 assert_eq(
     primes(2**65, 2**65 + 1000),
     prime_count(2**65, 2**65 + 1000).next_primes(2**65),
+)
+
+assert_eq(
+    10.by {|n|
+        n.is_composite && (divmod(powmod(10, n-1, n)-1, 9, n) == 0)
+    },
+    %n[91 259 451 481 703 1729 2821 2981 3367 4141],
 )
 
 say "** Tests passed!"

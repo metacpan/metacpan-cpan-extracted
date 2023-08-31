@@ -5,13 +5,10 @@ use utf8;
 use Mouse;
 
 use Lemonldap::NG::Common::Session;
-use Lemonldap::NG::Common::Conf::Constants;
-use Lemonldap::NG::Common::Session;
 use Lemonldap::NG::Common::PSGI::Constants;
+use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::Conf::ReConstants;
 use Lemonldap::NG::Common::IPv6;
-
-#use feature 'state';
 
 extends qw(
   Lemonldap::NG::Manager::Plugin
@@ -19,7 +16,7 @@ extends qw(
   Lemonldap::NG::Common::Conf::AccessLib
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.17.0';
 
 #############################
 # I. INITIALIZATION METHODS #

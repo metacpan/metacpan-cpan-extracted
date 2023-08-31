@@ -5,8 +5,7 @@ use IO::String;
 
 require 't/test-lib.pm';
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel       => 'error',
             useSafeJail    => 1,
@@ -21,21 +20,25 @@ my @tests = (
     '' => 0, 'Empty',
 
     # 2 http://test1.example.com/
-    'aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw==' => 1, 'Protected virtual host',
+    'aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw==' => 'http://test1.example.com/',
+    'Protected virtual host',
 
     # 3 http://test1.example.com
-    'aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29t' => 1, 'Missing / in URL',
+    'aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29t' => 'http://test1.example.com',
+    'Missing / in URL',
 
     # 4 http://test1.example.com:8000/test
-    'aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tOjgwMDAvdGVzdA==' => 1,
+    'aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tOjgwMDAvdGVzdA==' =>
+      'http://test1.example.com:8000/test',
     'Non default port',
 
     # 5 http://test1.example.com:8000/
-    'aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tOjgwMDAv' => 1,
+    'aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tOjgwMDAv' =>
+      'http://test1.example.com:8000/',
     'Non default port with missing /',
 
     # 6 http://t.example2.com/test
-    'aHR0cDovL3QuZXhhbXBsZTIuY29tL3Rlc3Q=' => 1,
+    'aHR0cDovL3QuZXhhbXBsZTIuY29tL3Rlc3Q=' => 'http://t.example2.com/test',
     'Undeclared virtual host in trusted domain',
 
     # 7 http://testexample2.com/
@@ -49,7 +52,7 @@ my @tests = (
       . ' "example3.com" is trusted, but domain "*.example3.com" not)',
 
     # 9 http://example3.com/
-    'aHR0cDovL2V4YW1wbGUzLmNvbS8K' => 1,
+    'aHR0cDovL2V4YW1wbGUzLmNvbS8K' => 'http://example3.com/',
     'Undeclared virtual host with trusted domain name',
 
     # 10 http://t.example.com/test
@@ -87,6 +90,21 @@ my @tests = (
     'aHR0cHM6Ly90ZXN0MS5leGFtcGxlLmNvbTp0ZXN0QGhhY2tlci5jb20=' => 0,
     'userinfo trick',
 
+    # 22 url=https://hacker.com\@@test1.example.com/
+    'aHR0cHM6Ly9oYWNrZXIuY29tXEBAdGVzdDEuZXhhbXBsZS5jb20v' =>
+      'https://hacker.com%5C@@test1.example.com/',
+    'Good reencoding (2931)',
+
+    # 23 url=https://hacker.com:\@@test1.example.com/
+    'aHR0cHM6Ly9oYWNrZXIuY29tOlxAQHRlc3QxLmV4YW1wbGUuY29tLw==' =>
+      'https://hacker.com:%5C@@test1.example.com/',
+    'Good reencoding (2931)',
+
+    # 24 url='https://hacker.com\anything@test1.example.com/'
+    'aHR0cHM6Ly9oYWNrZXIuY29tXGFueXRoaW5nQHRlc3QxLmV4YW1wbGUuY29tLw==' =>
+      'https://hacker.com%5Canything@test1.example.com/',
+    'Good reencoding (2931)',
+
     # LOGOUT TESTS
     'LOGOUT',
 
@@ -97,7 +115,7 @@ my @tests = (
 
     # 19 url=http://www.toto.com/, good referer
     'aHR0cDovL3d3dy50b3RvLmNvbS8=',
-    'http://test1.example.com/' => 1,
+    'http://test1.example.com/' => 'http://www.toto.com/',
     'Logout required by good site',
 
     # 20 url=http://www?<script>, good referer
@@ -107,7 +125,7 @@ my @tests = (
 
     # 21 url=http://www.toto.com/, no referer
     'aHR0cDovL3d3dy50b3RvLmNvbS8=',
-    '' => 1,
+    '' => 'http://www.toto.com/',
     'Logout required by good site, empty referer',
 );
 
@@ -137,10 +155,13 @@ while ( defined( my $url = shift(@tests) ) ) {
         ),
         $detail
     );
-    ok( ( $res->[0] == ( $redir ? 302 : 200 ) ),
-        ( $redir ? 'Get redirection' : 'Redirection dropped' ) )
-      or explain( $res->[0], ( $redir ? 302 : 200 ) );
-    count(2);
+    if ($redir) {
+        expectRedirection( $res, $redir );
+    }
+    else {
+        expectOK($res);
+    }
+    count(1);
 }
 
 while ( defined( my $url = shift(@tests) ) ) {
@@ -158,9 +179,12 @@ while ( defined( my $url = shift(@tests) ) ) {
         ),
         $detail
     );
-    ok( ( $res->[0] == ( $redir ? 302 : 200 ) ),
-        ( $redir ? 'Get redirection' : 'Redirection dropped' ) )
-      or explain( $res->[0], ( $redir ? 302 : 200 ) );
+    if ($redir) {
+        expectRedirection( $res, $redir );
+    }
+    else {
+        expectOK($res);
+    }
     ok(
         $res = $client->_post(
             '/',
@@ -171,7 +195,7 @@ while ( defined( my $url = shift(@tests) ) ) {
     );
     expectOK($res);
     $id = expectCookie($res);
-    count(3);
+    count(2);
 }
 
 clean_sessions();

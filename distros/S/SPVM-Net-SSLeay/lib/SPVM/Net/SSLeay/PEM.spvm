@@ -1,0 +1,10 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::PEM {
+  use Net::SSLeay::BIO;
+  use Net::SSLeay::X509;
+  
+  # Class Methods
+  native static method read_bio_X509 : Net::SSLeay::X509 ($bp : Net::SSLeay::BIO);
+}

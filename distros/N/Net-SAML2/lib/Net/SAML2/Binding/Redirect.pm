@@ -1,7 +1,7 @@
 package Net::SAML2::Binding::Redirect;
 use Moose;
 
-our $VERSION = '0.73'; # VERSION
+our $VERSION = '0.74'; # VERSION
 
 use Carp qw(croak);
 use Crypt::OpenSSL::RSA;
@@ -139,12 +139,12 @@ sub sign {
 
 
 sub verify {
-    my ($self, $url) = @_;
+    my $self = shift;
+    my $query_string = shift;
 
-    # This now becomes the query string
-    $url =~ s#^.*\?##;
+    $query_string =~ s#^.*\?##;
 
-    my %params = map { split(/=/, $_, 2) } split(/&/, $url);
+    my %params = map { split(/=/, $_, 2) } split(/&/, $query_string);
 
     my $sigalg = uri_unescape($params{SigAlg});
 
@@ -164,9 +164,8 @@ sub verify {
     my $request = '';
     rawinflate \$deflated => \$request;
 
-    # unpack the relaystate
-    my $relaystate = uri_unescape($params{'RelayState'});
-    return ($request, $relaystate);
+    # return the relaystate if it is defined
+    return ($request, defined $params{RelayState} ?  uri_unescape($params{RelayState}) : undef);
 }
 
 sub _verify {
@@ -213,7 +212,7 @@ Net::SAML2::Binding::Redirect - HTTP Redirect binding for SAML
 
 =head1 VERSION
 
-version 0.73
+version 0.74
 
 =head1 SYNOPSIS
 
@@ -310,6 +309,8 @@ authentication process with the IdP.
 Returns the signed (or unsigned) URL for the SAML2 redirect
 
 =head2 verify( $query_string )
+
+    my ($request, $relaystate) = $self->verify($query_string)
 
 Decode a Redirect binding URL.
 

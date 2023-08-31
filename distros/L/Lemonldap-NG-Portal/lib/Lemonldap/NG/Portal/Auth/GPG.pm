@@ -83,12 +83,15 @@ sub extractFormInfo {
     $self->setSecurity($req);
     $self->userLogger->notice("Good GPG signature");
     $self->userLogger->debug("GPG out:\n$out\n$err");
-    unless ( $err =~ /using .*? key (.*)$/m ) {
+    my $key;
+    if ( $err =~ /using .*? key (.*)$/m ) {
+        $key = $1;
+        chomp $key;
+    }
+    else {
         $self->logger->error("Unable to parse gpgv result:\n$err");
         return PE_ERROR;
     }
-    my $key = $1;
-    chomp $key;
     $self->logger->debug("GPG full sign key: $key");
     my $in;
     IPC::Run::run( [
@@ -105,13 +108,16 @@ sub extractFormInfo {
         $self->logger->error("gpg --list-key return an error:\n$err");
         return PE_ERROR;
     }
-    unless ( $out =~ /pub [^\n]*\r?\n +([^\n]+)\n/ ) {
+
+    if ( $out =~ /pub [^\n]*\r?\n +([^\n]+)\n/ ) {
+        $key = $1;
+        chomp $key;
+    }
+    else {
         $self->logger->error(
             "Unable to parse gpg --list-key result:\n$out\n$err\n");
         return PE_ERROR;
     }
-    $key = $1;
-    chomp $key;
     $self->logger->debug("GPG full master key: $key");
 
     # Keep only gpgKeyLength characters

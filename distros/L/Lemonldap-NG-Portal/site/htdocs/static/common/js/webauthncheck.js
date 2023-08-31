@@ -28,15 +28,27 @@ LemonLDAP::NG WebAuthn verify script
   };
 
   check = function() {
-    var request;
-    setMsg('webAuthnBrowserInProgress', 'warning');
-    request = window.datas.request;
-    return WebAuthnUI.WebAuthnUI.getCredential(request).then(function(response) {
-      $('#credential').val(JSON.stringify(response));
-      return $('#verify-form').submit();
-    })["catch"](function(error) {
-      return webAuthnError(error);
-    });
+    var e, request;
+    e = jQuery.Event("webauthnAttempt");
+    $(document).trigger(e);
+    if (!e.isDefaultPrevented()) {
+      setMsg('webAuthnBrowserInProgress', 'warning');
+      request = window.datas.request;
+      return WebAuthnUI.WebAuthnUI.getCredential(request).then(function(response) {
+        e = jQuery.Event("webauthnSuccess");
+        $(document).trigger(e, [response]);
+        if (!e.isDefaultPrevented()) {
+          $('#credential').val(JSON.stringify(response));
+          return $('#verify-form').submit();
+        }
+      })["catch"](function(error) {
+        e = jQuery.Event("webauthnFailure");
+        $(document).trigger(e, [error]);
+        if (!e.isDefaultPrevented()) {
+          return webAuthnError(error);
+        }
+      });
+    }
   };
 
   $(document).ready(function() {

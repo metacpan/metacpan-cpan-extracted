@@ -206,6 +206,17 @@ sub add_body
     return( $val );
 }
 
+sub add_header
+{
+    my $self = shift( @_ );
+    my $val  = shift( @_ ) || return;
+    my $base = $self->base_class;
+    return( $self->error( "Value provided (", overload::StrVal( $val ), ") is not a ${base}::TableHeader object" ) ) if( !$self->_is_a( $val, "${base}::TableHeader" ) );
+    $val->parent( $self );
+    $self->headers->push( $val );
+    return( $val );
+}
+
 sub bodies { return( shift->_set_get_object_array_object( 'bodies', 'Markdown::Parser::TableBody', @_ ) ); }
 
 # Alias
@@ -238,6 +249,8 @@ sub header
     }
     return( $self->_set_get_object( 'header', "${base}::TableHeader" ) );
 }
+
+sub headers { return( shift->_set_get_object_array_object( 'headers', 'Markdown::Parser::TableHeader', @_ ) ); }
 
 sub remove_body
 {
@@ -414,6 +427,10 @@ When set to true, L</as_string> returns L</as_css_grid> instead
 
 Provided with a L<Markdown::Parser::TableBody> object, and this adds it to the stack of L<Markdown::Parser::TableBody> objects.
 
+=head2 add_header
+
+Provided with a L<Markdown::Parser::TableHeader> object, and this adds it to the stack of L<Markdown::Parser::TableHeader> objects.
+
 =head2 as_css_grid
 
 Returns this table as a CSS grid as a regular string.
@@ -463,6 +480,10 @@ Sets or gets a L<Markdown::Parser::TableHeader> object.
 When an L<Markdown::Parser::TableHeader> object is provided, this method automatically sets the object L<Markdown::Parser::Element/parent> property to the current table object.
 
 Returns the current value set.
+
+=head2 headers
+
+Sets or gets a L<Module::Generic::Array> object containing L<Markdown::Parser::TableHeader> objects.
 
 =head2 remove_body
 

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.88
+    version 0.90
 
 SYNOPSIS
 
@@ -285,6 +285,8 @@ AUTHOR
     Stephen R. Scaffidi
 
     Scott Wiersdorf
+
+    Graham Knop (HAARG)
 
 COPYRIGHT AND LICENSE
 

@@ -81,10 +81,9 @@ sub build_having_col {
 
 
 sub choose_and_add_operator {
-    my ( $sf, $sql, $clause, $qt_col ) = @_;
+    my ( $sf, $sql, $clause, $stmt, $qt_col ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $stmt = $clause . '_stmt';
     my @operators = @{$sf->{o}{G}{operators}};
     if ( $sf->{i}{driver} =~ /(?:Firebird|Informix)\z/ ) {
         @operators = uniq map { s/(?<=REGEXP)_i\z//; $_ } @operators;
@@ -127,7 +126,8 @@ sub choose_and_add_operator {
             $sql->{$stmt} .= $regex_op;
         }
         elsif ( $op =~ /^(?:ALL|ANY)\z/) {
-            my @comb_op = ( "= $op", "<> $op", "> $op", "< $op", ">= $op", "<= $op" );
+            my $not_equal = ( any { $_ =~ /^\s?!=\s?\z/ } @operators ) ? "!=" : "<>";
+            my @comb_op = ( "= $op", "$not_equal $op", "> $op", "< $op", ">= $op", "<= $op" );
             my @pre = ( undef );
             my $info = $ax->get_sql_info( $sql );
             # Choose
@@ -151,10 +151,9 @@ sub choose_and_add_operator {
 
 
 sub read_and_add_value {
-    my ( $sf, $sql, $clause, $qt_col, $op ) = @_;
+    my ( $sf, $sql, $clause, $stmt, $qt_col, $op ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $stmt = $clause . '_stmt';
     if ( $op =~ /^IS\s(?:NOT\s)?NULL\z/ ) {
         return 1;
     }

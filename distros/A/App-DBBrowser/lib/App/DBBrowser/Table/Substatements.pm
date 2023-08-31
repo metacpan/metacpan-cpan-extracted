@@ -345,9 +345,10 @@ sub set {
 sub where {
     my ( $sf, $sql ) = @_;
     my $clause = 'where';
-    $sql->{where_stmt} = "WHERE";
+    my $stmt = 'where_stmt';
+    $sql->{$stmt} = "WHERE";
     my $items = [ @{$sql->{cols}} ];
-    my $ret = $sf->__add_condition( $sql, $clause, $items );
+    my $ret = $sf->__add_condition( $sql, $clause, $stmt, $items );
     return $ret;
 }
 
@@ -410,9 +411,10 @@ sub group_by {
 sub having {
     my ( $sf, $sql ) = @_;
     my $clause = 'having';
-    $sql->{having_stmt} = "HAVING";
+    my $stmt = 'having_stmt';
+    $sql->{$stmt} = "HAVING";
     my $items = [ @{$sf->{i}{avail_aggr}}, map( '@' . $_, @{$sql->{aggr_cols}} ) ];
-    my $ret = $sf->__add_condition( $sql, $clause, $items );
+    my $ret = $sf->__add_condition( $sql, $clause, $stmt, $items );
     return $ret;
 }
 
@@ -582,13 +584,11 @@ sub limit_offset {
 
 
 sub __add_condition {
-    my ( $sf, $sql, $clause, $items, $parent_clause ) = @_;
-    # the when-clause of a case expression has a $parent_clause
-    # because case expressions can be found in different places.
+    my ( $sf, $sql, $clause, $stmt, $items ) = @_;
+    # when-clause: $clause != $stmt
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $so = App::DBBrowser::Table::Substatements::Operators->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $stmt = $clause . '_stmt';
     my $AND_OR = '';
     my @bu;
     my @pre = ( undef, $sf->{i}{ok} );
@@ -620,7 +620,7 @@ sub __add_condition {
         }
         if ( $qt_col eq $sf->{i}{menu_addition} ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $complex_column = $ext->column( $sql, $parent_clause // $clause );
+            my $complex_column = $ext->column( $sql, $clause, {}, { add_parentheses => 1 } );
             if ( ! defined $complex_column ) {
                 next COL;
             }
@@ -666,12 +666,12 @@ sub __add_condition {
 
         OPERATOR: while ( 1 ) {
             my $bu_op = $sql->{$stmt};
-            my $op = $so->choose_and_add_operator( $sql, $clause, $qt_col );
+            my $op = $so->choose_and_add_operator( $sql, $clause, $stmt, $qt_col );
             if ( ! defined $op ) {
                 $sql->{$stmt} = pop @bu;
                 next COL;
             }
-            my $ok = $so->read_and_add_value( $sql, $clause, $qt_col, $op );
+            my $ok = $so->read_and_add_value( $sql, $clause, $stmt, $qt_col, $op );
             if ( ! $ok ) {
                 $sql->{$stmt} = $bu_op;
                 next OPERATOR;

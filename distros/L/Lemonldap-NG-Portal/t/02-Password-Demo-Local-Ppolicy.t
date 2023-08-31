@@ -326,7 +326,7 @@ m%<span trspan="passwordPolicyMinSpeChar">Minimal special characters:</span> 2%,
 ) or print STDERR Dumper( $res->[2]->[0], 'passwordPolicyMinSpeChar' );
 ok(
     $res->[2]->[0] =~
-m%\Q<span trspan="passwordPolicySpecialChar">Allowed special characters:</span> <space> [ \ }%,
+m%\Q<span trspan="passwordPolicySpecialChar">Allowed special characters:</span> &lt;space&gt; [ \ }%,
     ' passwordPolicySpecialChar'
 ) or print STDERR Dumper( $res->[2]->[0], 'passwordPolicySpecialChar' );
 ok( $res->[2]->[0] !~ m%class="fa fa-eye-slash toggle-password">%,

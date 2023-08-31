@@ -82,7 +82,7 @@ sub as_pod
     });
     my $indent = $self->indent;
     $indent = 4 unless( $indent > 0 );
-    return( "=over ${indent}\n\n" . $self->children->map(sub{ $_->as_pod })->join( "\n" )->scalar . "\n\n=back" );
+    return( "=over ${indent}\n\n" . $self->children->map(sub{ $_->as_pod })->join( "\n\n" )->scalar . "\n\n=back" );
 }
 
 sub as_string

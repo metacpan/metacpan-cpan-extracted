@@ -1,19 +1,23 @@
 # Launch Kerberos request
 
 $(document).ready ->
-	$.ajax portal + 'authkrb',
-		dataType: 'json'
-		# Called if browser can't find Kerberos ticket, will display
-		# PE_BADCREDENTIALS
-		statusCode:
-			401: () ->
-				$('#lform').submit()
-		# Remove upgrading flag, if set
-		success: (data) ->
-			if data.ajax_auth_token
-				$('#lform').find('input[name="ajax_auth_token"]').attr("value", data.ajax_auth_token)
-			$('#lform').submit()
-		# Case else, will display PE_BADCREDENTIALS or fallback to next auth
-		# backend
-		error: () ->
-			$('#lform').submit()
+	e = jQuery.Event( "kerberosAttempt" )
+	$(document).trigger e
+	if !e.isDefaultPrevented()
+		$.ajax "#{portal}authkrb",
+			dataType: 'json'
+			# Get auth token from success response and post it
+			success: (data) ->
+				e = jQuery.Event( "kerberosSuccess" )
+				$(document).trigger e, [ data ]
+				if !e.isDefaultPrevented()
+					if data.ajax_auth_token
+						$('#lform').find('input[name="ajax_auth_token"]').attr("value", data.ajax_auth_token)
+					$('#lform').submit()
+			# Case else, will display PE_BADCREDENTIALS or fallback to next auth
+			# backend
+			error: (xhr, status, error) ->
+				e = jQuery.Event( "kerberosFailure" )
+				$(document).trigger e, [ xhr, status, error ]
+				if !e.isDefaultPrevented()
+					$('#lform').submit()

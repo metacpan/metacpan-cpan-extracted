@@ -4,7 +4,7 @@ use Imager;
 use vars qw($VERSION @ISA);
 
 BEGIN {
-  $VERSION = "0.001";
+  $VERSION = "0.002";
 
   require XSLoader;
   XSLoader::load('Imager::File::AVIF', $VERSION);
@@ -99,9 +99,12 @@ Imager::File::AVIF - read and write AVIF files
   $img->read(file=>"foo.avif")
     or die $img->errstr;
 
-  # type won't be necessary if the extension is avif from Imager 1.008
+  # type won't be necessary if the extension is avif from Imager 1.016
   $img->write(file => "foo.avif", type => "avif")
     or die $img->errstr;
+
+  # before 1.016
+  Imager->add_type_extensions(avif => qw(avif avifs));
 
   use Imager::File::AVIF;
   # do we have the codecs needed to read and write?

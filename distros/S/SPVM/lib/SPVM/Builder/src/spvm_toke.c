@@ -38,7 +38,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
   }
   
   // Save buf pointer
-  compiler->before_ch_ptr = compiler->ch_ptr;
+  compiler->token_begin_ch_ptr = compiler->ch_ptr;
   
   // Before character is "-". This is used by the numeric literal that has "-".
   int32_t before_char_is_minus = 0;
@@ -46,6 +46,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
   // Before token is arrow
   int32_t before_token_is_arrow = compiler->before_token_is_arrow;
   compiler->before_token_is_arrow = 0;
+  
+  int32_t previous_token_is_heredoc = compiler->previous_token_is_heredoc;
+  compiler->previous_token_is_heredoc = 0;
   
   // Expect method name
   int32_t expect_method_name = compiler->expect_method_name;
@@ -128,6 +131,11 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         }
       }
     }
+    else if (previous_token_is_heredoc) {
+      yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_DO_NOTHING);
+      
+      return (int) (uint8_t) ';';
+    }
     else {
       ch = *compiler->ch_ptr;
     }
@@ -139,21 +147,20 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       case '\f':
       {
         compiler->ch_ptr++;
-        compiler->before_ch_ptr = compiler->ch_ptr;
+        compiler->token_begin_ch_ptr = compiler->ch_ptr;
         continue;
         break;
       }
       case '\r':
       case '\n':
       {
-        if (*compiler->ch_ptr == '\r' && *(compiler->ch_ptr + 1) == '\n') {
-          compiler->ch_ptr++;
-        }
+        assert(SPVM_TOKE_is_line_terminator(compiler, compiler->ch_ptr));
         
-        compiler->ch_ptr++;
-        compiler->current_line++;
-        compiler->line_begin_ptr = compiler->ch_ptr;
-        compiler->before_ch_ptr = compiler->ch_ptr;
+        SPVM_TOKE_parse_line_terminator(compiler, &compiler->ch_ptr);
+        
+        SPVM_TOKE_increment_current_line(compiler);
+        
+        compiler->token_begin_ch_ptr = compiler->ch_ptr;
         continue;
         break;
       }
@@ -385,10 +392,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       case '#': {
         compiler->ch_ptr++;
         while(1) {
-          if (*compiler->ch_ptr == '\r' && *(compiler->ch_ptr + 1) == '\n') {
-            compiler->ch_ptr++;
+          int32_t is_line_terminator = SPVM_TOKE_is_line_terminator(compiler, compiler->ch_ptr);
+          
+          if (is_line_terminator) {
+            SPVM_TOKE_parse_line_terminator(compiler, &compiler->ch_ptr);
+            SPVM_TOKE_increment_current_line(compiler);
           }
-          if (*compiler->ch_ptr == '\n' || *compiler->ch_ptr == '\r' || *compiler->ch_ptr == '\0') {
+          
+          if (is_line_terminator || *compiler->ch_ptr == '\0') {
             break;
           }
           else {
@@ -471,6 +482,125 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             yylvalp->opval = op_special_assign;
             
             return SPECIAL_ASSIGN;
+          }
+          // Here document
+          // <<'
+          else if (*compiler->ch_ptr == '\'') {
+            compiler->ch_ptr++;
+            
+            const char* heredoc_name_start_ptr = compiler->ch_ptr;
+            
+            while(isalnum(*compiler->ch_ptr) || *compiler->ch_ptr == '_') {
+              compiler->ch_ptr++;
+            }
+            
+            int32_t heredoc_name_length = (compiler->ch_ptr - heredoc_name_start_ptr);
+            
+            if (heredoc_name_length == 0) {
+              SPVM_COMPILER_error(compiler, "The length of a here document name must be greater than or equal to 0.\n  at %s line %d", compiler->current_file, compiler->current_line);
+              return 0;
+            }
+            
+            char* heredoc_name = SPVM_ALLOCATOR_alloc_memory_block_tmp(compiler->current_each_compile_allocator, heredoc_name_length + 1);
+            memcpy(heredoc_name, heredoc_name_start_ptr, heredoc_name_length);
+            heredoc_name[heredoc_name_length] = '\0';
+            
+            int32_t comile_error = 0;
+            if (isdigit(heredoc_name[0])) {
+              SPVM_COMPILER_error(compiler, "A here document name cannot start with a number.\n  at %s line %d", compiler->current_file, compiler->current_line);
+            }
+            else if (strstr(heredoc_name, "__")) {
+              SPVM_COMPILER_error(compiler, "A here document name cannot contain \"__\".\n  at %s line %d", compiler->current_file, compiler->current_line);
+            }
+            else if (!(*(compiler->ch_ptr) == '\'' && *(compiler->ch_ptr + 1) == ';' && SPVM_TOKE_is_line_terminator(compiler, compiler->ch_ptr + 2))) {
+              SPVM_COMPILER_error(compiler, "The first line of the here document must end with \"';\" + a line terminator.\n  at %s line %d", compiler->current_file, compiler->current_line);
+            }
+            
+            if (compiler->error_messages->length == 0) {
+            
+              compiler->ch_ptr += 2;
+              
+              SPVM_TOKE_parse_line_terminator(compiler, &compiler->ch_ptr);
+              SPVM_TOKE_increment_current_line(compiler);
+              
+              char* heredoc_end_ch_ptr = compiler->ch_ptr;
+              
+              int32_t heredoc_length = 0;
+              int32_t previous_is_line_terminator = 1;
+              char* heredoc_ptr = compiler->ch_ptr;
+              int32_t heredoc_begin_line = compiler->current_line;
+              while (1) {
+                if (previous_is_line_terminator) {
+                  int32_t end_of_heredoc = 0;
+                  if (strncmp(compiler->ch_ptr, heredoc_name, heredoc_name_length) == 0 && SPVM_TOKE_is_line_terminator(compiler, compiler->ch_ptr + heredoc_name_length)) {
+                    compiler->ch_ptr += heredoc_name_length;
+                    SPVM_TOKE_parse_line_terminator(compiler, &compiler->ch_ptr);
+                    SPVM_TOKE_increment_current_line(compiler);
+                    break;
+                  }
+                }
+                
+                int32_t is_line_terminator = SPVM_TOKE_is_line_terminator(compiler, compiler->ch_ptr);
+                
+                if (is_line_terminator) {
+                  SPVM_TOKE_parse_line_terminator(compiler, &compiler->ch_ptr);
+                  SPVM_TOKE_increment_current_line(compiler);
+                  
+                  heredoc_length++;
+                  previous_is_line_terminator = 1;
+                }
+                else if (*compiler->ch_ptr == '\0') {
+                  SPVM_COMPILER_error(compiler, "A here document must end with its here document name + a line terminator.\n  at %s line %d", compiler->current_file, heredoc_begin_line);
+                  break;
+                }
+                else {
+                  heredoc_length++;
+                  compiler->ch_ptr++;
+                  previous_is_line_terminator = 0;
+                }
+              }
+              
+              if (compiler->error_messages->length == 0) {
+                char* heredoc = SPVM_ALLOCATOR_alloc_memory_block_tmp(compiler->current_each_compile_allocator, heredoc_length + 1);
+                
+                int32_t heredoc_index = 0;
+                while (heredoc_index < heredoc_length) {
+                  int32_t is_line_terminator = SPVM_TOKE_is_line_terminator(compiler, heredoc_ptr);
+                  
+                  if (is_line_terminator) {
+                    heredoc[heredoc_index] = '\n';
+                    
+                    SPVM_TOKE_parse_line_terminator(compiler, &heredoc_ptr);
+                    
+                    heredoc_index++;
+                  }
+                  else if (*heredoc_ptr == '\0') {
+                    assert(0);
+                  }
+                  else {
+                    heredoc[heredoc_index] = *heredoc_ptr;
+                    heredoc_ptr++;
+                    heredoc_index++;
+                  }
+                }
+                
+                SPVM_OP* op_constant = SPVM_OP_new_op_constant_string(compiler, heredoc, heredoc_length, compiler->current_file, compiler->current_line);
+                
+                yylvalp->opval = op_constant;
+                
+                compiler->previous_token_is_heredoc = 1;
+                
+                SPVM_ALLOCATOR_free_memory_block_tmp(compiler->current_each_compile_allocator, heredoc);
+              }
+            }
+            
+            SPVM_ALLOCATOR_free_memory_block_tmp(compiler->current_each_compile_allocator, heredoc_name);
+            
+            if (compiler->error_messages->length > 0) {
+              return 0;
+            }
+            
+            return CONSTANT;
           }
           // <<
           else {
@@ -634,19 +764,11 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             }
             // Octal escape character
             else if (SPVM_TOKE_is_octal_number(compiler, *compiler->ch_ptr) || *compiler->ch_ptr == 'o') {
-              char* char_ptr = compiler->ch_ptr;
-              
-              ch = SPVM_TOKE_parse_octal_escape(compiler, &char_ptr);
-              
-              compiler->ch_ptr = char_ptr;
+              ch = SPVM_TOKE_parse_octal_escape(compiler, &compiler->ch_ptr);
             }
             // Hex escape character
             else if (*compiler->ch_ptr == 'x') {
-              char* char_ptr = compiler->ch_ptr;
-              
-              ch = SPVM_TOKE_parse_hex_escape(compiler, &char_ptr);
-              
-              compiler->ch_ptr = char_ptr;
+              ch = SPVM_TOKE_parse_hex_escape(compiler, &compiler->ch_ptr);
             }
             else {
               SPVM_COMPILER_error(compiler, "\"\\%c\" is the invalid charater literal escape character.\n  at %s line %d", *compiler->ch_ptr, compiler->current_file, compiler->current_line);
@@ -683,7 +805,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         }
         
         // Save current position
-        const char* current_token_ptr = compiler->ch_ptr;
+        const char* string_literal_begin_ch_ptr = compiler->ch_ptr;
         
         int8_t next_var_expansion_state = SPVM_TOKE_C_VAR_EXPANSION_STATE_NOT_STARTED;
         
@@ -860,91 +982,92 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             return 0;
           }
           
-          int32_t string_literal_tmp_len = (int32_t)(compiler->ch_ptr - current_token_ptr) * 4;
+          int32_t string_literal_tmp_len = (int32_t)(compiler->ch_ptr - string_literal_begin_ch_ptr) * 4;
           
           compiler->ch_ptr++;
           
           string_literal_tmp = SPVM_ALLOCATOR_alloc_memory_block_tmp(compiler->current_each_compile_allocator, string_literal_tmp_len + 1);
           {
-            char* char_ptr = (char*)current_token_ptr;
-            while (char_ptr != compiler->ch_ptr - 1) {
-              if (*char_ptr == '\\') {
-                char_ptr++;
-                if (*char_ptr == 'a') {
+            char* string_literal_ch_ptr = (char*)string_literal_begin_ch_ptr;
+            const char* string_literal_end_ch_ptr = compiler->ch_ptr - 1;
+            while (string_literal_ch_ptr != string_literal_end_ch_ptr) {
+              if (*string_literal_ch_ptr == '\\') {
+                string_literal_ch_ptr++;
+                if (*string_literal_ch_ptr == 'a') {
                   string_literal_tmp[string_literal_length] = 0x07;
                   string_literal_length++;
-                  char_ptr++;
+                  string_literal_ch_ptr++;
                 }
-                else if (*char_ptr == 't') {
+                else if (*string_literal_ch_ptr == 't') {
                   string_literal_tmp[string_literal_length] = 0x09;
                   string_literal_length++;
-                  char_ptr++;
+                  string_literal_ch_ptr++;
                 }
-                else if (*char_ptr == 'n') {
+                else if (*string_literal_ch_ptr == 'n') {
                   string_literal_tmp[string_literal_length] = 0x0a;
                   string_literal_length++;
-                  char_ptr++;
+                  string_literal_ch_ptr++;
                 }
-                else if (*char_ptr == 'f') {
+                else if (*string_literal_ch_ptr == 'f') {
                   string_literal_tmp[string_literal_length] = 0x0c;
                   string_literal_length++;
-                  char_ptr++;
+                  string_literal_ch_ptr++;
                 }
-                else if (*char_ptr == 'r') {
+                else if (*string_literal_ch_ptr == 'r') {
                   string_literal_tmp[string_literal_length] = 0x0d;
                   string_literal_length++;
-                  char_ptr++;
+                  string_literal_ch_ptr++;
                 }
-                else if (*char_ptr == '"') {
+                else if (*string_literal_ch_ptr == '"') {
                   string_literal_tmp[string_literal_length] = 0x22;
                   string_literal_length++;
-                  char_ptr++;
+                  string_literal_ch_ptr++;
                 }
-                else if (*char_ptr == '$') {
+                else if (*string_literal_ch_ptr == '$') {
                   string_literal_tmp[string_literal_length] = 0x24;
                   string_literal_length++;
-                  char_ptr++;
+                  string_literal_ch_ptr++;
                 }
-                else if (*char_ptr == '\'') {
+                else if (*string_literal_ch_ptr == '\'') {
                   string_literal_tmp[string_literal_length] = 0x27;
                   string_literal_length++;
-                  char_ptr++;
+                  string_literal_ch_ptr++;
                 }
-                else if (*char_ptr == '\\') {
+                else if (*string_literal_ch_ptr == '\\') {
                   string_literal_tmp[string_literal_length] = 0x5c;
                   string_literal_length++;
-                  char_ptr++;
+                  string_literal_ch_ptr++;
                 }
                 // Octal escape character
-                else if (SPVM_TOKE_is_octal_number(compiler, *char_ptr) || *char_ptr == 'o') {
-                  ch = SPVM_TOKE_parse_octal_escape(compiler, &char_ptr);
+                else if (SPVM_TOKE_is_octal_number(compiler, *string_literal_ch_ptr) || *string_literal_ch_ptr == 'o') {
+                  ch = SPVM_TOKE_parse_octal_escape(compiler, &string_literal_ch_ptr);
                   
                   string_literal_tmp[string_literal_length] = ch;
                   string_literal_length++;
                 }
                 // A hexadecimal escape character
-                else if (*char_ptr == 'x') {
-                  ch = SPVM_TOKE_parse_hex_escape(compiler, &char_ptr);
+                else if (*string_literal_ch_ptr == 'x') {
+                  ch = SPVM_TOKE_parse_hex_escape(compiler, &string_literal_ch_ptr);
                   
                   string_literal_tmp[string_literal_length] = ch;
                   string_literal_length++;
                 }
                 // Unicode escape character
                 // Note: "\N" is raw escape character, "\N{" is Unicode escape character
-                else if (*char_ptr == 'N' && *(char_ptr + 1) == '{') {
-                  char_ptr++;
+                else if (*string_literal_ch_ptr == 'N' && *(string_literal_ch_ptr + 1) == '{') {
+                  string_literal_ch_ptr++;
                   
-                  if (*char_ptr == '{' && *(char_ptr + 1) == 'U' && *(char_ptr + 2) == '+') {
-                    char_ptr += 3;
-                    char* char_start_ptr = char_ptr;
+                  if (*string_literal_ch_ptr == '{' && *(string_literal_ch_ptr + 1) == 'U' && *(string_literal_ch_ptr + 2) == '+') {
+                    string_literal_ch_ptr += 3;
+                    char* char_start_ptr = string_literal_ch_ptr;
                     int32_t unicode_chars_length = 0;
                     
-                    while (SPVM_TOKE_is_hex_number(compiler, *char_ptr)) {
-                      char_ptr++;
+                    while (SPVM_TOKE_is_hex_number(compiler, *string_literal_ch_ptr)) {
+                      string_literal_ch_ptr++;
                       unicode_chars_length++;
                     }
-                    if (*char_ptr == '}') {
-                      char_ptr++;
+                    if (*string_literal_ch_ptr == '}') {
+                      string_literal_ch_ptr++;
                       if (unicode_chars_length < 1) {
                         SPVM_COMPILER_error(compiler, "One or more than one hexadecimal numbers must be followed by \"\\N{U+\" of the Unicode escape character.\n  at %s line %d", compiler->current_file, compiler->current_line);
                       }
@@ -983,7 +1106,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   }
                 }
                 else {
-                  switch(*char_ptr) {
+                  switch(*string_literal_ch_ptr) {
                     case '!':
                     case '#':
                     case '%':
@@ -1048,29 +1171,32 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                     {
                       string_literal_tmp[string_literal_length] = '\\';
                       string_literal_length++;
-                      string_literal_tmp[string_literal_length] = *char_ptr;
+                      string_literal_tmp[string_literal_length] = *string_literal_ch_ptr;
                       string_literal_length++;
-                      char_ptr++;
+                      string_literal_ch_ptr++;
                       break;
                     }
                     default: {
-                      SPVM_COMPILER_error(compiler, "Invalid string literal escape character \"\\%c\".\n  at %s line %d", *char_ptr, compiler->current_file, compiler->current_line);
+                      SPVM_COMPILER_error(compiler, "Invalid string literal escape character \"\\%c\".\n  at %s line %d", *string_literal_ch_ptr, compiler->current_file, compiler->current_line);
                     }
                   }
                 }
               }
               else {
-                if (*char_ptr == '\r' && *(char_ptr + 1) == '\n') {
-                  char_ptr++;
-                }
-                if (*char_ptr == '\n' || *char_ptr == '\r') {
-                  compiler->current_line++;
-                  compiler->line_begin_ptr = compiler->ch_ptr;
-                }
+                int32_t is_line_terminator = SPVM_TOKE_is_line_terminator(compiler, string_literal_ch_ptr);
                 
-                string_literal_tmp[string_literal_length] = *char_ptr;
-                string_literal_length++;
-                char_ptr++;
+                if (is_line_terminator) {
+                  SPVM_TOKE_parse_line_terminator(compiler, &string_literal_ch_ptr);
+                  SPVM_TOKE_increment_current_line(compiler);
+                  
+                  string_literal_tmp[string_literal_length] = '\n';
+                  string_literal_length++;
+                }
+                else {
+                  string_literal_tmp[string_literal_length] = *string_literal_ch_ptr;
+                  string_literal_length++;
+                  string_literal_ch_ptr++;
+                }
               }
             }
           }
@@ -1575,7 +1701,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         // A symbol name
         else if (isalpha(ch) || ch == '_') {
           // Column
-          int32_t column = compiler->ch_ptr - compiler->line_begin_ptr;
+          int32_t column = compiler->ch_ptr - compiler->line_begin_ch_ptr;
           
           // The staring position of the symbol name
           const char* symbol_name_start_ptr = compiler->ch_ptr;
@@ -2100,7 +2226,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               case '_': {
                 if (strcmp(symbol_name, "__END__") == 0) {
                   compiler->ch_ptr = compiler->current_class_content + compiler->current_class_content_length;
-                  compiler->before_ch_ptr = compiler->ch_ptr;
+                  compiler->token_begin_ch_ptr = compiler->ch_ptr;
                   compiler->end_of_file = 1;
                   SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_END_OF_FILE);
                   yylvalp->opval = op;
@@ -2196,8 +2322,8 @@ int32_t SPVM_TOKE_load_class_file(SPVM_COMPILER* compiler) {
   compiler->current_class_content = NULL;
   compiler->current_tmp_vars_length = 0;
   compiler->ch_ptr = NULL;
-  compiler->before_ch_ptr = NULL;
-  compiler->line_begin_ptr = NULL;
+  compiler->token_begin_ch_ptr = NULL;
+  compiler->line_begin_ch_ptr = NULL;
   compiler->current_anon_op_types = SPVM_LIST_new_list_permanent(compiler->current_each_compile_allocator, 128);
   
   // If there are more module, load it
@@ -2426,9 +2552,9 @@ int32_t SPVM_TOKE_load_class_file(SPVM_COMPILER* compiler) {
           }
           
           // Set initial information for tokenization
-          compiler->ch_ptr = compiler->current_class_content;
-          compiler->before_ch_ptr = compiler->current_class_content;
-          compiler->line_begin_ptr = compiler->current_class_content;
+          compiler->token_begin_ch_ptr = compiler->current_class_content;
+          compiler->ch_ptr = compiler->token_begin_ch_ptr;
+          compiler->line_begin_ch_ptr = compiler->token_begin_ch_ptr;
           compiler->current_line = 1;
         }
         else {
@@ -2500,19 +2626,19 @@ int32_t SPVM_TOKE_is_hex_number(SPVM_COMPILER* compiler, char ch) {
   }
 }
 
-char SPVM_TOKE_parse_octal_escape(SPVM_COMPILER* compiler, char** char_ptr_ptr) {
+char SPVM_TOKE_parse_octal_escape(SPVM_COMPILER* compiler, char** ch_ptr_ptr) {
   char ch = -1;
-  char* char_ptr = *char_ptr_ptr;
+  char* ch_ptr = *ch_ptr_ptr;
   
   int32_t is_o_escape_character = 0;
   int32_t has_brace = 0;
-  if (*char_ptr == 'o') {
+  if (*ch_ptr == 'o') {
     is_o_escape_character = 1;
-    char_ptr++;
-    if (*char_ptr == '{') {
+    ch_ptr++;
+    if (*ch_ptr == '{') {
       has_brace = 1;
-      char_ptr++;
-      if (!SPVM_TOKE_is_octal_number(compiler, *char_ptr)) {
+      ch_ptr++;
+      if (!SPVM_TOKE_is_octal_number(compiler, *ch_ptr)) {
         SPVM_COMPILER_error(compiler, "At least one octal number must be followed by \"\\o{\" of the octal escape character.\n  at %s line %d", compiler->current_file, compiler->current_line);
         return ch;
       }
@@ -2525,12 +2651,12 @@ char SPVM_TOKE_parse_octal_escape(SPVM_COMPILER* compiler, char** char_ptr_ptr) 
   
   char octal_escape_char[4] = {0};
   int32_t octal_escape_char_index = 0;
-  while (SPVM_TOKE_is_octal_number(compiler, *char_ptr)) {
+  while (SPVM_TOKE_is_octal_number(compiler, *ch_ptr)) {
     if (octal_escape_char_index >= 3) {
       break;
     }
-    octal_escape_char[octal_escape_char_index] = *char_ptr;
-    char_ptr++;
+    octal_escape_char[octal_escape_char_index] = *ch_ptr;
+    ch_ptr++;
     octal_escape_char_index++;
   }
   
@@ -2545,40 +2671,40 @@ char SPVM_TOKE_parse_octal_escape(SPVM_COMPILER* compiler, char** char_ptr_ptr) 
   }
   
   if (has_brace) {
-    if (*char_ptr == '}') {
-      char_ptr++;
+    if (*ch_ptr == '}') {
+      ch_ptr++;
     }
     else {
       SPVM_COMPILER_error(compiler, "The octal escape character is not closed by \"}\".\n  at %s line %d", compiler->current_file, compiler->current_line);
     }
   }
   
-  *char_ptr_ptr = char_ptr;
+  *ch_ptr_ptr = ch_ptr;
   
   return ch;
 }
 
-char SPVM_TOKE_parse_hex_escape(SPVM_COMPILER* compiler, char** char_ptr_ptr) {
+char SPVM_TOKE_parse_hex_escape(SPVM_COMPILER* compiler, char** ch_ptr_ptr) {
   char ch;
-  char* char_ptr = *char_ptr_ptr;
+  char* ch_ptr = *ch_ptr_ptr;
 
-  char_ptr++;
+  ch_ptr++;
   
   // {
   int32_t has_brace = 0;
-  if (*char_ptr == '{') {
+  if (*ch_ptr == '{') {
     has_brace = 1;
-    char_ptr++;
+    ch_ptr++;
   }
   
   char hex_escape_char[9] = {0};
   int32_t hex_escape_char_index = 0;
-  while (SPVM_TOKE_is_hex_number(compiler, *char_ptr)) {
+  while (SPVM_TOKE_is_hex_number(compiler, *ch_ptr)) {
     if (hex_escape_char_index >= 2) {
       break;
     }
-    hex_escape_char[hex_escape_char_index] = *char_ptr;
-    char_ptr++;
+    hex_escape_char[hex_escape_char_index] = *ch_ptr;
+    ch_ptr++;
     hex_escape_char_index++;
   }
   
@@ -2591,15 +2717,15 @@ char SPVM_TOKE_parse_hex_escape(SPVM_COMPILER* compiler, char** char_ptr_ptr) {
   }
   
   if (has_brace) {
-    if (*char_ptr == '}') {
-      char_ptr++;
+    if (*ch_ptr == '}') {
+      ch_ptr++;
     }
     else {
       SPVM_COMPILER_error(compiler, "The hexadecimal escape character is not closed by \"}\".\n  at %s line %d", compiler->current_file, compiler->current_line);
     }
   }
   
-  *char_ptr_ptr = char_ptr;
+  *ch_ptr_ptr = ch_ptr;
   
   return ch;
 }
@@ -2646,4 +2772,40 @@ int32_t SPVM_TOKE_convert_unicode_codepoint_to_utf8_character(int32_t uc, uint8_
   else {
     return 0;
   }
+}
+
+int32_t SPVM_TOKE_is_line_terminator(SPVM_COMPILER* compiler, char* ch) {
+  
+  int32_t is_line_terminator = 0;
+  
+  if (*ch == '\n' || *ch == '\r') {
+    is_line_terminator = 1;
+  }
+  
+  return is_line_terminator;
+}
+
+int32_t SPVM_TOKE_parse_line_terminator(SPVM_COMPILER* compiler, char** ch_ptr_ptr) {
+  
+  int32_t is_line_terminator = 0;
+  
+  if (**ch_ptr_ptr == '\r' && *(*ch_ptr_ptr + 1) == '\n') {
+    is_line_terminator = 1;
+    *ch_ptr_ptr += 2;
+  }
+  else if (**ch_ptr_ptr == '\n' || **ch_ptr_ptr == '\r') {
+    is_line_terminator = 1;
+    (*ch_ptr_ptr)++;
+  }
+  else {
+    assert(0);
+  }
+  
+  return is_line_terminator;
+}
+
+void SPVM_TOKE_increment_current_line(SPVM_COMPILER* compiler) {
+  
+  compiler->current_line++;
+  compiler->line_begin_ch_ptr = compiler->ch_ptr;
 }

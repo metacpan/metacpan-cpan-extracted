@@ -27,7 +27,8 @@
         newimage = data.newimage;
         console.log('GET new image -> ', newimage);
         $('#token').attr('value', newtoken);
-        return $('#captcha').attr('src', newimage);
+        $('#captcha').attr('src', newimage);
+        return $('#captchafield').get(0).value = '';
       }
     });
   };

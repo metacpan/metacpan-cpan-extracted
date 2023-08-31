@@ -1,5 +1,11 @@
 Revision history for PICA::Data
 
+2.12 2023-08-28T08:01:58Z
+    - Add explicit PICA Patch parser and writer
+    - Fix parsing plain $$ (#136)
+    - Fix diff for multiple fields of same identifier
+    - Avoid circular dependency
+
 2.11 2023-08-18T05:19:26Z
     - Add parser method: all
 

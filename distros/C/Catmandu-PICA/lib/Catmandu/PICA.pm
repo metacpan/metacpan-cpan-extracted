@@ -1,6 +1,6 @@
 package Catmandu::PICA;
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 1;
 __END__

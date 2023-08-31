@@ -33,9 +33,10 @@
       "runtime" : {
          "requires" : {
             "Error::Show" : "v0.2.0",
+            "Export::These" : "0",
             "Log::OK" : "0",
             "Log::ger" : "0",
-            "enum" : "0",
+            "constant::more" : "v0.2.1",
             "perl" : "5.024000"
          }
       },
@@ -53,6 +54,6 @@
          "web" : "http://github.com/drclaw1394/perl-template-plex"
       }
    },
-   "version" : "v0.6.0",
+   "version" : "v0.6.2",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

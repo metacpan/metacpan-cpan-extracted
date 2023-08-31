@@ -689,8 +689,9 @@ sub scanTree {
             if ( $leaf =~ s/^\*// ) {
                 push @angularScopeVars, [ $leaf, "$path._nodes[$ord]" ];
             }
-            push @sessionTypes, $1
-              if ( $leaf =~ /^(.*)(?<!notification)StorageOptions$/ );
+            if ( $leaf =~ /^(.*)(?<!notification)StorageOptions$/ ) {
+                push @sessionTypes, $1;
+            }
             my $attr = $attributes->{$leaf} or die("Missing attribute $leaf");
 
             #print STDERR "| $attr->{documentation}  |  $leaf  |\n";

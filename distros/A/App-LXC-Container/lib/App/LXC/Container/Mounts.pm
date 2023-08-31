@@ -41,7 +41,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = "0.20";
+our $VERSION = "0.26";
 
 use Cwd 'abs_path';
 
@@ -318,10 +318,9 @@ sub mount_point($$;$)
 		$state == EMPTY  or
 		$state == EXPLICIT  or
 		$state == NO_MERGE)
-	    {   $self->_set($path, $state, \@parents, NO_MERGE);
-# FIXME: How do we handle symbolic links correctly???
-#	Waterloo-link: /lib64/ld-linux-x86-64.so.2
-   }
+		# hopefully this now even covers all links correctly, even
+		# the "Waterloo-link": /lib64/ld-linux-x86-64.so.2
+	    {   $self->_set($path, $state, \@parents, NO_MERGE);   }
 	    elsif ($state == IGNORE  or
 		   $state == IMPLICIT  or
 		   $state == IMPLICIT_LINK)

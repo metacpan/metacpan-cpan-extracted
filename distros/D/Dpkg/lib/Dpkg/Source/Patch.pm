@@ -14,12 +14,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Source::Patch;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::Source::Patch - represent a patch file
+
+=head1 DESCRIPTION
+
+This module provides a class to handle patch files.
+
+B<Note>: This is a private module, its API can change at any time.
+
+=cut
+
+package Dpkg::Source::Patch 0.01;
 
 use strict;
 use warnings;
-
-our $VERSION = '0.01';
 
 use POSIX qw(:errno_h :sys_wait_h);
 use File::Find;
@@ -112,7 +124,7 @@ sub add_diff_file {
     my $diffgen;
     my $diff_pid = spawn(
         exec => [ 'diff', '-u', @options, '--', $old, $new ],
-        env => { LC_ALL => 'C', LANG => 'C', TZ => 'UTC0' },
+        env => { LC_ALL => 'C', TZ => 'UTC0' },
         to_pipe => \$diffgen,
     );
     # Check diff and write it in patch file
@@ -604,7 +616,7 @@ sub apply {
     spawn(
 	exec => [ $Dpkg::PROGPATCH, @{$opts{options}} ],
 	chdir => $destdir,
-	env => { LC_ALL => 'C', LANG => 'C', PATCH_GET => '0' },
+        env => { LC_ALL => 'C', PATCH_GET => '0' },
 	delete_env => [ 'POSIXLY_CORRECT' ], # ensure expected patch behaviour
 	wait_child => 1,
 	nocheck => 1,
@@ -664,7 +676,7 @@ sub check_apply {
     my $patch_pid = spawn(
 	exec => [ $Dpkg::PROGPATCH, @{$opts{options}} ],
 	chdir => $destdir,
-	env => { LC_ALL => 'C', LANG => 'C', PATCH_GET => '0' },
+        env => { LC_ALL => 'C', PATCH_GET => '0' },
 	delete_env => [ 'POSIXLY_CORRECT' ], # ensure expected patch behaviour
 	from_handle => $self->get_filehandle(),
 	to_file => '/dev/null',
@@ -693,5 +705,13 @@ sub get_type {
         -S _ && return g_('named socket');
     }
 }
+
+=head1 CHANGES
+
+=head2 Version 0.xx
+
+This is a private module.
+
+=cut
 
 1;

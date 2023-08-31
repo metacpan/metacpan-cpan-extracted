@@ -1,6 +1,6 @@
 package Lemonldap::NG::Manager::Api::2F;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.17.0';
 
 package Lemonldap::NG::Manager::Api;
 
@@ -10,7 +10,7 @@ use Mouse;
 use JSON;
 
 use Lemonldap::NG::Common::Session;
-use Lemonldap::NG::Common::Util qw/genId2F/;
+use Lemonldap::NG::Common::Util qw/genId2F display2F/;
 
 sub getSecondFactors {
     my ( $self, $req ) = @_;
@@ -230,7 +230,7 @@ sub _delete2FFromSessions {
                     push @keep, $element;
                 }
                 else {
-                    $removed->{ genId2F($element) } = "removed";
+                    $removed->{ genId2F($element) } = $element;
                 }
             }
             if ( ( $total - scalar @keep ) > 0 ) {
@@ -291,6 +291,13 @@ sub _delete2F {
     # merge results
     $removed = { %$removed, %{ $res->{removed} } };
     $count   = scalar( keys %$removed );
+    if ($count) {
+        my $list_log = join(
+            ",", map { display2F( $removed->{$_} ) }
+              keys %$removed
+        );
+        $self->userLogger->notice("[API] 2FA deletion for $uid: $list_log");
+    }
 
     return {
         res     => 'ok',

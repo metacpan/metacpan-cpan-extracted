@@ -2,7 +2,7 @@ NAME
     Dist::Zilla::Plugin::GitHub::CreateRelease - Create a GitHub Release
 
 VERSION
-    version 0.0002
+    version 0.0003
 
 SYNOPSIS
     In your dist.ini:
@@ -17,6 +17,7 @@ SYNOPSIS
      draft = 0                       ; default = 0 (false)
      hash_alg = sha256               ; default = sha256
      add_checksum = 1                ; default = 1 (true)
+     org_id = some_id_identifier     ; default = github (~/.github-identity or ~/.github)
      title_template = Version RELEASE - TRIAL CPAN release      ; this is the default
 
 DESCRIPTION
@@ -128,16 +129,23 @@ ATTRIBUTES
         the api call instructs github that the Release is a draft. You must
         publish it via the github webpage to make it active.
 
+    org_id
+        A string value that allows you to reference another identity file.
+        GitHub has personal accounts and organizations. If you have
+        repositories in both personal and organizations (or multiple
+        organizations) this allows you to choose a specific identity for
+        each repo.
+
+        The default is github and references: ~/.github-identity or
+        ~/.github.
+
+        Specifying org_id = project in your dist.ini would reference:
+        ~/.project-identity or ~/.project.
+
 METHODS
     after_release
         The main processing function that is called automatically after the
         release is complete.
-
-    true
-        Boolean true constant
-
-    false
-        Boolean false constant
 
 AUTHOR
       Timothy Legge <timlegge@cpan.org>

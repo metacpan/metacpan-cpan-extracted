@@ -62,6 +62,11 @@ package UI::Various::Curses::Dummy
 # identical parts of messages:
 my $re_msg_tail = qr/ at $0 line \d{2,}\.?$/;
 
+# TODO: On some OpenBSD and Solaris smokers the used Curses::UI fails to
+# determine the size of the TTY and aborts.
+
+# TODO: On some FreeBSD smokers the input sequences do not work correctly:
+
 # We use a (dirty?) trick to simulate the keyboard input for Curses::UI.
 # This way we can test using almost all of the real thing; and it's easier
 # than using Curses::UI's "feedkey" (which is not yet documented anyway) and

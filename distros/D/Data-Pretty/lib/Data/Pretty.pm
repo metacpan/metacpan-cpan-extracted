@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Data Dump Beautifier - ~/lib/Data/Pretty.pm
-## Version v0.1.3
+## Version v0.1.6
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/08/06
-## Modified 2023/08/08
+## Modified 2023/08/30
 ## All rights reserved
 ## 
 ## 
@@ -26,9 +26,9 @@ BEGIN
     require Exporter;
     *import = \&Exporter::import;
     @EXPORT = qw( dd ddx );
-    @EXPORT_OK = qw( dump pp dumpf quote );
+    @EXPORT_OK = qw( dump pp dumpf literal quote );
     our $DEBUG = 0;
-    our $VERSION = 'v0.1.3';
+    our $VERSION = 'v0.1.6';
 };
 
 use strict;
@@ -108,7 +108,7 @@ sub dump
     my $formatted = format_list(
         paren => $paren,
         comment => undef,
-        values => [map {defined($_->[1]) ? $_->[1] : "\$".$_->[0]} @dump],
+        values => [map {defined($_->[1]) ? $_->[1] : "\$" .$_->[0]} @dump],
         use_qw => $use_qw,
     );
     my $has_qw = substr( $formatted, 0, 2 ) eq 'qw';
@@ -252,6 +252,8 @@ sub fullname
     $name;
 }
 
+sub literal { return( Data::Pretty::Literal->new( @_ ) ); }
+
 my %esc = (
     "\a" => "\\a",
     "\b" => "\\b",
@@ -284,6 +286,7 @@ sub quote {
 }
 
 sub str {
+    my $opts = $_[1];
     if (length($_[0]) > 20) {
         for ($_[0]) {
             # Check for repeated string
@@ -306,6 +309,7 @@ sub str {
     }
 
     local $_ = &quote;
+    # local $_ = $opts->{use_qw} ? $_[0] : &quote;
 
     if (length($_) > 40  && !/\\x\{/ && length($_) > (length($_[0]) * 2)) {
         # too much binary data, better to represent as a hex/base64 string
@@ -498,7 +502,8 @@ sub _dump
                 $out = $$rval;
             }
             else {
-                $out = str($$rval);
+                $out = str($$rval, $opts);
+                # $out = str($$rval);
             }
             if ($class && !@$idx) {
                 # Top is an object, not a reference to one as perl needs
@@ -617,6 +622,7 @@ sub _dump
 
         my $need_breakdown = 0;
         for my $key (@orig_keys) {
+            my $orig = $key;
             my $val = \$rval->{$key};  # capture value before we modify $key
             # $key = quote($key) if $quote;
             $key = quote($key) if $need_quotes->{ $key };
@@ -639,7 +645,7 @@ sub _dump
                 $this_type = substr(overload::StrVal($$val), 0, $i);
             }
             # Our child element is also an HASH, and if it is not empty, this would become too much of a cluttered structure to print in just one line.
-            if( defined( $this_type ) && $this_type eq 'HASH' && scalar( keys( %{$rval->{$key}} ) ) )
+            if( defined( $this_type ) && $this_type eq 'HASH' && scalar( keys( %{$rval->{$orig}} ) ) )
             {
                 $need_breakdown++;
             }
@@ -694,7 +700,14 @@ sub _dump
     }
 
     if ($class && $ref) {
-        $out = "bless($out, " . quote($class) . ")";
+        if( $class eq 'Data::Pretty::Literal' )
+        {
+            $out = $$rval;
+        }
+        else
+        {
+            $out = "bless($out, " . quote($class) . ")";
+        }
     }
     if ($comment) {
         $comment =~ s/^/# /gm;
@@ -718,7 +731,7 @@ sub _use_qw
             ref( $v ) || 
             substr( overload::StrVal( \$v ), 0, 7 ) eq 'VSTRING' ||
             # See perlop/"qw/STRING/" section
-            ( !ref( $v ) && $v =~ /[\,\#[:blank:]\h\v]/ ) )
+            ( !ref( $v ) && $v =~ /[\,\\\#[:blank:]\h\v\a\b\t\n\f\r\e\@\"\$]/ ) )
         {
             $use_qw = 0;
             last;
@@ -728,6 +741,17 @@ sub _use_qw
     # Don't use qw() if we are only dealing with numbers
     $use_qw = 0 if( $only_numbers == scalar( @$rval ) || scalar( @$rval ) == 1 );
     return( $use_qw );
+}
+
+{
+    package
+        Data::Pretty::Literal;
+    sub new
+    {
+        my $this = shift( @_ );
+        my $str = shift( @_ );
+        return( bless( ( ref( $str ) eq 'SCALAR' ? $str : \$str ) => ( ref( $this ) || $this ) ) );
+    }
 }
 
 1;
@@ -749,9 +773,14 @@ Data::Pretty - Data Dump Beautifier
     # or use it for easy debug printout
     use Data::Pretty; dd localtime;
 
+    use Data::Pretty qw( dump literal );
+    my $users = [qw( John Peter )];
+    my $ref = { name => literal( '$users->[0]' ) };
+    say dump( $ref ); # { name => $users->[0] }
+
 =head1 VERSION
 
-    v0.1.3
+    v0.1.6
 
 =head1 DESCRIPTION
 
@@ -859,6 +888,27 @@ whereas, C<Data::Pretty> would rather produce:
         ],
     }
 
+=item * Specify literal string values
+
+You can set a literal string value in your data by passing it to the L<literal method|/literal>. Normally, a string is quoted and its characters within escaped as they need be. If you use C<literal>, the value will be used as-is in the dump.
+
+For example, consider the following 2 examples, one without and the other with using C<literal>
+
+    use Data::Dump qw( dump literal );
+    my $ref = 
+    {
+        name => '$users->[0]',
+        values => '["some","thing"]',
+    };
+    say dump( $ref ); # { name => "\$users->[0]", values => "[\"some\",\"thing\"]" }
+
+    my $ref = 
+    {
+        name => literal( '$users->[0]' ),
+        values => literal( '["some","thing"]' ),
+    };
+    say dump( $ref ); # { name => $users->[0], values => ["some","thing"] }
+
 =back
 
 The rest of this documentation is identical to the original L<Data::Dump>.
@@ -918,6 +968,27 @@ This works like L<dump|/dump>, but the last argument should be a filter callback
 
 =for Pod::Coverage fullname
 
+=head2 literal
+
+This takes a value and marks it as a literal value that will be used as-is in the resulting dump.
+
+For example, consider the following 2 examples, one without and the other with using C<literal>
+
+    use Data::Dump qw( dump literal );
+    my $ref = 
+    {
+        name => '$users->[0]',
+        values => '["some","thing"]',
+    };
+    say dump( $ref ); # { name => "\$users->[0]", values => "[\"some\",\"thing\"]" }
+
+    my $ref = 
+    {
+        name => literal( '$users->[0]' ),
+        values => literal( '["some","thing"]' ),
+    };
+    say dump( $ref ); # { name => $users->[0], values => ["some","thing"] }
+
 =head2 pp
 
 Same as L</dump>
@@ -936,11 +1007,15 @@ It differs from C<dump($string)> in that it will quote even numbers and not try 
 
 There are a few global variables that can be set to modify the output generated by the dump functions. It's wise to localize the setting of these.
 
-=head2 $Data::Pretty::INDENT
+=head2 C<$Data::Pretty::CODE_DEPARSE>
+
+When set to true, which is the default, this will use L<B::Deparse>, if available, to reproduce the perl code of the anonymous subroutines found. Note that due to perl's internal way of working, the code reproduced might not be exactly the same as the original.
+
+=head2 C<$Data::Pretty::INDENT>
 
 This holds the string that's used for indenting multiline data structures. It's default value is C<"    "> (four spaces). Set it to C<""> to suppress indentation. Setting it to C<"| "> makes for nice visuals even if the dump output then fails to be valid Perl.
 
-=head2 $Data::Pretty::SHOW_UTF8
+=head2 C<$Data::Pretty::SHOW_UTF8>
 
 When set to true (default), this will show the UTF-8 texts as is and when set to a false value, this will revert to the L<Data::Dump> original behaviour of showing the text with its characters encoded in hexadecimal. For example, a string like
 
@@ -950,7 +1025,7 @@ would be encoded in L<Data::Dump> as:
 
     \x{30B8}\x{30E3}\x{30C3}\x{30AF}
 
-=head2 $Data::Pretty::TRY_BASE64
+=head2 C<$Data::Pretty::TRY_BASE64>
 
 How long must a binary string be before we try to use the L<base64 encoding|MIME::Base64> for the dump output. The default is C<50>. Set it to C<0> to disable base64 dumps.
 

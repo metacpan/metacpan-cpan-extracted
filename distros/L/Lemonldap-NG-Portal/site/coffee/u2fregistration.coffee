@@ -57,8 +57,10 @@ register = ->
 									setMsg resp.error, 'warning'
 								else setMsg 'u2fFailed', 'danger'
 							else if resp.result
-								$(document).trigger "mfaAdded", [ { "type": "u" } ]
-								setMsg 'yourKeyIsRegistered', 'positive'
+								e = jQuery.Event( "mfaAdded" )
+								$(document).trigger e, [ { "type": "u" } ]
+								if !e.isDefaultPrevented()
+									setMsg 'yourKeyIsRegistered', 'positive'
 						error: displayError
 
 # Verification function (launched by "verify" button)

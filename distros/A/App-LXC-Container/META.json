@@ -65,51 +65,51 @@
    "provides" : {
       "App::LXC::Container" : {
          "file" : "lib/App/LXC/Container.pm",
-         "version" : "0.20"
+         "version" : "0.26"
       },
       "App::LXC::Container::Data" : {
          "file" : "lib/App/LXC/Container/Data.pm",
-         "version" : "0.20"
+         "version" : "0.26"
       },
       "App::LXC::Container::Data::Debian" : {
          "file" : "lib/App/LXC/Container/Data/Debian.pm",
-         "version" : "0.20"
+         "version" : "0.26"
       },
       "App::LXC::Container::Data::Ubuntu" : {
          "file" : "lib/App/LXC/Container/Data/Ubuntu.pm",
-         "version" : "0.20"
+         "version" : "0.26"
       },
       "App::LXC::Container::Data::common" : {
          "file" : "lib/App/LXC/Container/Data/common.pm",
-         "version" : "0.20"
+         "version" : "0.26"
       },
       "App::LXC::Container::Mounts" : {
          "file" : "lib/App/LXC/Container/Mounts.pm",
-         "version" : "0.20"
+         "version" : "0.26"
       },
       "App::LXC::Container::Run" : {
          "file" : "lib/App/LXC/Container/Run.pm",
-         "version" : "0.20"
+         "version" : "0.26"
       },
       "App::LXC::Container::Setup" : {
          "file" : "lib/App/LXC/Container/Setup.pm",
-         "version" : "0.20"
+         "version" : "0.26"
       },
       "App::LXC::Container::Texts" : {
          "file" : "lib/App/LXC/Container/Texts.pm",
-         "version" : "0.20"
+         "version" : "0.26"
       },
       "App::LXC::Container::Texts::de" : {
          "file" : "lib/App/LXC/Container/Texts/de.pm",
-         "version" : "0.20"
+         "version" : "0.26"
       },
       "App::LXC::Container::Texts::en" : {
          "file" : "lib/App/LXC/Container/Texts/en.pm",
-         "version" : "0.20"
+         "version" : "0.26"
       },
       "App::LXC::Container::Update" : {
          "file" : "lib/App/LXC/Container/Update.pm",
-         "version" : "0.20"
+         "version" : "0.26"
       }
    },
    "release_status" : "stable",
@@ -124,7 +124,7 @@
          "web" : "https://gitlab.com/thdorner/lxc-container"
       }
    },
-   "version" : "0.20",
+   "version" : "0.26",
    "x_contributors" : [
       "Thomas Dorner <dorner@cpan.org>",
       "Thomas Dorner <td-gitlab@th-dorner.de>"

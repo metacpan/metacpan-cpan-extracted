@@ -54,6 +54,7 @@ case $1 in
     --search)
 	[ $# -gt 1 ]  ||  Die 'missing parameter(s) for --search'
 	echo 'dummy: /something'
+	# Some of these mocked results are suppressed in some tests:
 	output=''
 	case $2 in
 	    /bin/dash)		output='dash: /bin/dash';;
@@ -63,6 +64,10 @@ case $1 in
 	    /usr/bin/ldd)	echo 'libc-bin: /usr/bin/ldd';;
 	    */1chromium)	echo "chromium: $2";;
 	    */ip)		output="iproute2: $2";;
+	    */busybox)		# Some smokers use busybox as ls (soft-link)!
+		echo 'coreutils: /bin/ls'
+		echo "coreutils: $2"
+		;;
 	    */pactl)		output="pulseaudio-utils: $2";;
 	    */su)		output="util-linux: $2";;
 	    *)			Die "mocked --search error for '$2'"

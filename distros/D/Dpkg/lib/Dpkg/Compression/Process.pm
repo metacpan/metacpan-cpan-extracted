@@ -14,20 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Compression::Process;
-
-use strict;
-use warnings;
-
-our $VERSION = '1.00';
-
-use Carp;
-
-use Dpkg::Compression;
-use Dpkg::ErrorHandling;
-use Dpkg::Gettext;
-use Dpkg::IPC;
-
 =encoding utf8
 
 =head1 NAME
@@ -38,6 +24,20 @@ Dpkg::Compression::Process - run compression/decompression processes
 
 This module provides an object oriented interface to run and manage
 compression/decompression processes.
+
+=cut
+
+package Dpkg::Compression::Process 1.00;
+
+use strict;
+use warnings;
+
+use Carp;
+
+use Dpkg::Compression;
+use Dpkg::ErrorHandling;
+use Dpkg::Gettext;
+use Dpkg::IPC;
 
 =head1 METHODS
 

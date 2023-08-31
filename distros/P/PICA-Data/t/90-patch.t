@@ -11,6 +11,8 @@ is_diff("001A \$x0\n002A \$x0", "001A \$x0\n002A \$y1",
     "- 002A \$x0\n+ 002A \$y1", 'changed field');
 is_diff("001A \$x0\n002A \$x0", "002A \$x0\n001A \$x0", '', 'compare sorted');
 
+is_diff("045Q/01 \$aXX.XX\n045Q/01 \$a38.10", "045Q/01 \$a38.10", '- 045Q/01 $aXX.XX', "sort before diff");
+
 is_patch("001A \$x.", "+ 001A \$y.", "001A \$x.\n001A \$y.", 'add same field id');
 is_patch("002A \$x.", "+ 001A \$y.", "001A \$y.\n002A \$x.", 'add before first field');
 is_patch("001A \$x.", "- 001A \$x.\n+ 001A \$y.", "001A \$y.", 'replace field id');

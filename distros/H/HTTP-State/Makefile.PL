@@ -9,6 +9,7 @@ WriteMakefile(
       "Object::Pad"=>0,
       "List::Insertion"=>0,
       "Mozilla::PublicSuffix"=>0,
+      "Export::These"=>0
     },
 
     ABSTRACT_FROM     => 'lib/HTTP/State.pod', 

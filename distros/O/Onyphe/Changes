@@ -1,0 +1,74 @@
+Revision history for Perl extension Onyphe.
+
+4.10 Wed 30 Aug 07:23:29 CEST 2023
+  - Bugfix: correctly handle HTTP_PROXY & HTTPS_PROXY environment variables
+
+4.09 Mon 17 Jul 11:33:46 CEST 2023
+  - Bugfix: OPP to skip keys when they are undef
+  - Bugfix: add more Perl deps for installation
+  - New: onyphe to add -import argument (0 or 1 to disable or enable import for on-demand scans)
+  - New: onyphe to add -postsearch API endpoint
+  - New: onyphe to add -ondemand-scope-ip-bulk & ondemand-scope-domain-bulk API endpoints
+  - New: Onyphe::Api: add option to give content-type to queries
+  - New: Onyphe::Api: post_request() function for POST Search API endpoint
+  - New: Onyphe::Api: post_stream() function for POST Export API endpoint
+  - New: Onyphe::Api: import parameter for API endpoints supporting it (on-demand scans)
+  - New: Onyphe::Api: ondemand_scope_ip_bulk & ondemand_scope_domain_bulk API endpoints
+
+4.08 Wed  5 Apr 17:44:05 CEST 2023
+  - Bugfix: allowlist proc to keep results only when all field have matched,
+    thus when all fields exist in JSON document
+
+4.07 Wed  5 Apr 17:10:08 CEST 2023
+  - Update: add trackquery:true to all ONYPHE Procs
+  - New procs added: lookup, blocklist & allowlist
+
+4.06 Sat 25 Mar 11:32:35 CET 2023
+  - Bugfix: state machine is now not only bound to a proc but also to its ID. Thus
+    we can use multiple times the same proc in OPP without messing with previous proc's
+    state.
+  - Bugfix: catch API calls to retry them in case of network failure
+  - Update: set connection timeout to 5 seconds i/o 10
+
+4.05 Fri 24 Mar 07:36:56 CET 2023
+  - Bugfix: remove leading & trailing spaces in OPP query
+  - New: regex proc
+
+4.04 Thu 23 Mar 10:31:52 CET 2023
+  - Bugfix: handle nested fields for expand, output, splitsubnet, uniq, fieldcount procs
+  - Bugfix: don't remove _* fields on delete()
+  - Bugfix: dedup proc to avoid deduping when no dedup key found
+  - New: set() function to handle nested fields
+  - New: uniq proc supports multiple fields like dedup proc
+
+4.03 Sat 18 Mar 11:05:55 CET 2023
+  - UPDATE: all request & stream APIs can now accept HTTP params
+  - Update: -discovery to force -size to 10000 by default
+  - Bugfix: Onyphe::Api interface changed, Procs have been updated
+
+4.02 Thu 16 Mar 16:38:44 CET 2023
+  - NEW: Onyphe::Api ondemand_scope_result() function
+  - NEW: -ondemand-scope-ip, -ondemand-scope-domain, -ondemand-scope-result, -ondemand-resolver-domain & -ondemand-resolver-result APIs
+  - New: -key argument to override default API key from conf
+  - New: -maxscantime argument to configure scan timeout threshold
+  - New: -urlscan 0|1 to deactivate/activate urlscan in ondemand-scope APIs
+  - New: -vulnscan 0|1 to deactivate/activate urlscan in ondemand-scope APIs
+  - Bugfix: all arguments were not working at all (-size, -maxpage, ...)
+  - Bugfix: OPP callbacks were no more working against Alert API
+
+4.01 Fri 10 Mar 06:39:56 CET 2023
+  - NEW: bulk_discovery() supports passing an OQL along with input filename
+  - New procs added: top, fieldcount, filter, expand, discovery, pivots, subnet, output, flatten
+  - New: various state handling functions
+  - New: systematically order results by field name
+  - BUGFIX: onyphe to strip "@category":"none" in OPP callbacks
+  - BUGFIX: export, bulk and all streaming APIs were returning duplicates at output
+  - Bugfix: discovery proc to strip "@category":"none" results
+  - Update: output proc to render ordered results
+  - Remove: app.extract.domain from pivots proc as too easy to do false positive
+
+4.00 Tue  7 Mar 16:03:36 CET 2023
+  - Complete rewrite with minimal dependencies
+  - Based on Mojolicious framework
+  - ONYPHE Processing Pipeline is now a separate tool but shipped with this dist
+

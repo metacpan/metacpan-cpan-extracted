@@ -12,7 +12,7 @@ CGI::Buffer - Verify, Cache and Optimise CGI Output
 
 # VERSION
 
-Version 0.83
+Version 0.84
 
 # SYNOPSIS
 
@@ -258,5 +258,5 @@ The licence for cgi\_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2011-2018 Nigel Horne,
+The rest of the program is Copyright 2011-2023 Nigel Horne,
 and is released under the following licence: GPL2

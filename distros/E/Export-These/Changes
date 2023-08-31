@@ -1,6 +1,12 @@
 Revision history for Perl extension Export::These.
 
-0.01  Sun Jul 23 04:10:20 2023
+v0.1.1 2023-08-14
+  [fixes]
+    - Don't die when a tag is specified without a group or an empty group.
+      Allows using tags to control rexport
+    - Remove 'Use of uninitialized value' warning if Exporter namespace hasn't been loaded
+
+v0.1.0  Sun Jul 23 04:10:20 2023
 	- original version; created by h2xs 1.23 with options
 		--name Export::These -P -X -b 5.24.0
 

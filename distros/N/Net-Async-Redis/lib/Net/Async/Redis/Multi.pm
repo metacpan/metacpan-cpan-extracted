@@ -3,7 +3,7 @@ package Net::Async::Redis::Multi;
 use strict;
 use warnings;
 
-our $VERSION = '3.024'; # VERSION
+our $VERSION = '4.000'; # VERSION
 
 =head1 NAME
 
@@ -23,16 +23,19 @@ use Log::Any qw($log);
 
 sub new {
     my ($class, %args) = @_;
+    $args{queued_requests} //= [];
     weaken($args{redis} // die 'Must be provided a Net::Async::Redis instance');
     bless \%args, $class;
 }
 
 async sub exec {
     my ($self, $code) = @_;
-    my $f = $self->$code;
-    $f->retain if blessed($f) and $f->isa('Future');
 
     try {
+        my $f = $self->$code;
+        $f->retain if blessed($f) and $f->isa('Future');
+
+        $log->infof('MULTI exec');
         my ($exec_result) = await $self->redis->exec;
         my @reply = $exec_result->@*;
         my $success = 0;
@@ -51,6 +54,7 @@ async sub exec {
         return $success, $failure;
     } catch {
         my $err = $@;
+        $log->errorf('Failed to complete multi - %s', $err);
         for my $queued (splice @{$self->{queued_requests}}) {
             try {
                 $queued->fail("Transaction failed", redis => 'transaction_failure') unless $queued->is_ready;
@@ -74,6 +78,8 @@ use Sub::Util qw(set_subname);
 
 sub AUTOLOAD {
     my ($method) = our $AUTOLOAD =~ m{::([^:]+)$};
+
+    # We only need to check this once
     die "Unknown method $method" unless Net::Async::Redis::Commands->can($method);
 
     my $code = async sub {
@@ -86,14 +92,12 @@ sub AUTOLOAD {
             $self->redis->$method(@args);
         };
         my ($resp) = await $ff;
-        if($resp eq 'QUEUED') {
-            return await $f;
-        } else {
-            # my $addr = refaddr($f);
-            # extract_by { $addr == refaddr($_) } @{$self->{queued_requests}};
-            $f->fail($resp);
-            die $resp unless $resp eq 'QUEUED';
-        }
+        return await $f if $resp eq 'QUEUED';
+
+        # my $addr = refaddr($f);
+        # extract_by { $addr == refaddr($_) } @{$self->{queued_requests}};
+        $f->fail($resp);
+        die $resp;
     };
     set_subname $method => $code;
     { no strict 'refs'; *$method = sub { $code->(@_)->retain } }

@@ -834,6 +834,16 @@ sub tests {
             return ( $res, join( ', ', @msg ) );
         },
 
+        # Test if SAML private and public keys signature keys are set
+        oidcSecretKeys => sub {
+            return 1 unless ( $conf->{issuerDBOpenIDConnectActivation} );
+            return ( 1,
+                'OIDC service private and public keys signature should be set' )
+              unless ( $conf->{oidcServicePrivateKeySig}
+                && $conf->{oidcServicePublicKeySig} );
+            return 1;
+        },
+
         # RS* OIDC algs require a signing key
         oidcRPNeedRSAKey => sub {
             return 1
@@ -941,8 +951,7 @@ sub tests {
                   )
                 {
                     $appUrl ||= "";
-                    $appUrl =~ m#^(https?://[^/]+)(/.*)?$#;
-                    my $appHost = $1;
+                    my ($appHost) = $appUrl =~ m#^(https?://[^/]+)(/.*)?$#;
                     unless ($appHost) {
                         push @msg,
                           "$casConfKey CAS Application has no Service URL";
@@ -1011,7 +1020,7 @@ sub tests {
             {
                 my $hasPwdBE = 0;
                 foreach ( keys %{ $conf->{authChoiceModules} } ) {
-                    my @mods = split /[;\|]/, $conf->{authChoiceModules}->{$_};
+                    my @mods = split /;\s*/, $conf->{authChoiceModules}->{$_};
                     $hasPwdBE ||= 1 unless $mods[2] eq 'Null';
                 }
                 return ( -1,

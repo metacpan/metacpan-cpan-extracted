@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/Code.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2022/09/19
+## Modified 2022/09/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,7 +18,7 @@ BEGIN
     use parent qw( Markdown::Parser::Element );
     use vars qw( $VERSION );
     use Devel::Confess;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
     use constant MERMAID_RSRC_URI => 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js';
     use constant MERMAID_INIT     => "mermaid.initialize({startOnLoad:true});";
     # https://katex.org/
@@ -57,7 +57,7 @@ sub as_markdown
     {
         return( "`${str}`" );
     }
-    else
+    elsif( $str->index( "\n" ) != -1 )
     {
         my $lines = $str->split( "\n" );
         $lines->for(sub
@@ -66,6 +66,10 @@ sub as_markdown
             substr( $lines->[ $i ], 0, 0 ) = '    ';
         });
         return( $lines->join( "\n" )->scalar );
+    }
+    else
+    {
+        return( "`${str}`" );
     }
 }
 
@@ -244,7 +248,7 @@ Markdown::Parser::Code - Markdown Code Element
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

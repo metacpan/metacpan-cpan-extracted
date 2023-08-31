@@ -14,12 +14,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Compression;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::Compression - simple database of available compression methods
+
+=head1 DESCRIPTION
+
+This modules provides a few public functions and a public regex to
+interact with the set of supported compression methods.
+
+=cut
+
+package Dpkg::Compression 2.01;
 
 use strict;
 use warnings;
 
-our $VERSION = '2.01';
 our @EXPORT = qw(
     compression_is_supported
     compression_get_list
@@ -46,19 +58,6 @@ use List::Util qw(any);
 
 use Dpkg::ErrorHandling;
 use Dpkg::Gettext;
-
-=encoding utf8
-
-=head1 NAME
-
-Dpkg::Compression - simple database of available compression methods
-
-=head1 DESCRIPTION
-
-This modules provides a few public functions and a public regex to
-interact with the set of supported compression methods.
-
-=cut
 
 my %COMP = (
     gzip => {

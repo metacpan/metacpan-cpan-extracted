@@ -7,7 +7,7 @@ OpenTracing::Implementation::DataDog - Sending traces to DataDog using Agent
 
 =head1 VERSION
 
-This is version 'v0.46.2'
+This is version 'v0.47.0'
 
 
 
@@ -165,6 +165,64 @@ Your application version (for example, 2.5, 202003181415, 1.3-alpha).
 
 B<default:> I<none>
 
+
+=head2 C<DD_TRACE_PROPAGATION_STYLE>
+
+Comma separated list of propagation styles used for extracting trace context from inbound request headers and injecting trace context into outbound request headers.
+
+Overridden by C<DD_TRACE_PROPAGATION_STYLE_EXTRACT> for extraction.
+
+Overridden by C<DD_TRACE_PROPAGATION_STYLE_INJECT> for injection.
+
+The supported values are:
+
+=over
+
+=item datadog
+
+DataDog native headers, C<x-datadog-trace-id> and C<x-datadog-parent-id>.
+
+=item b3multi
+
+L<https://github.com/openzipkin/b3-propagation#multiple-headers>
+
+=item b3 single header
+
+L<https://github.com/openzipkin/b3-propagation#single-header>
+
+=item tracecontext
+
+L<https://www.w3.org/TR/trace-context/>
+
+=item none
+
+Propagation disabled.
+
+=back
+
+When checking inbound request headers we will take the first valid trace context
+in the order provided.
+
+When C<none> is the only propagator listed, propagation is disabled.
+
+All provided styles are injected into the headers of outbound requests.
+
+Example: C<DD_TRACE_PROPAGATION_STYLE="datadog,b3multi"> to check for both
+C<x-datadog-*> and C<x-b3-*> headers when parsing incoming request headers
+for a trace context. In addition, to inject both C<x-datadog-*>
+and C<x-b3-*> headers into outbound requests.
+
+B<default:> datadog
+
+
+=head2 C<DD_TRACE_PROPAGATION_STYLE_EXTRACT>
+
+Override the propagation style for extraction only, see L<DD_TRACE_PROPAGATION_STYLE> for supported values.
+
+
+=head2 C<DD_TRACE_PROPAGATION_STYLE_INJECT>
+
+Override the propagation style for injection only, see L<DD_TRACE_PROPAGATION_STYLE> for supported values.
 
 
 =head2 STRICT

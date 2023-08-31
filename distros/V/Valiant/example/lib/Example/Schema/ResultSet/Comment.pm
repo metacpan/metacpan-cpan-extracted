@@ -7,7 +7,7 @@ sub find_with_person($self, $id) {
   return $self->find({id=>$id}, {prefetch=>'person'});
 }
 
-sub build_for_user($self, $user) {
-  return $self->new_resultset({user_id=>$user->id});
+sub build_for_user($self, $person) {
+  return $self->new_result({person_id=>$person->id});
 }
 1;

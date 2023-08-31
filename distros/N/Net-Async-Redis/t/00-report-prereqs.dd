@@ -1,7 +1,8 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'File::ShareDir::Install' => '0.06'
                                       }
                       },
        'develop' => {
@@ -29,6 +30,9 @@ do { my $x = {
                                       'Cache::LRU' => '0.04',
                                       'Class::Method::Modifiers' => '0',
                                       'Digest::CRC' => '0.22',
+                                      'Dir::Self' => '0',
+                                      'File::ShareDir' => '0',
+                                      'File::ShareDir::Install' => '0',
                                       'Future' => '0.47',
                                       'Future::AsyncAwait' => '0.48',
                                       'IO::Async' => '0',
@@ -38,12 +42,15 @@ do { my $x = {
                                       'Math::Random::Secure' => '0',
                                       'Metrics::Any' => '0',
                                       'OpenTracing::Any' => '1.003',
+                                      'Path::Tiny' => '0',
                                       'Ryu' => '2.009',
                                       'Ryu::Async' => '0.019',
                                       'Syntax::Keyword::Dynamically' => '0.07',
+                                      'Syntax::Keyword::Match' => '0',
                                       'Syntax::Keyword::Try' => '0.21',
                                       'URI' => '0',
                                       'URI::redis' => '0',
+                                      'YAML::XS' => '0.88',
                                       'curry' => '0',
                                       'parent' => '0'
                                     }

@@ -9,11 +9,12 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.16.1';
+our $VERSION = '2.17.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
   Lemonldap::NG::Portal::Lib::OtherSessions
+  Lemonldap::NG::Common::TOTP
 );
 
 # INTERFACE
@@ -82,8 +83,10 @@ sub newDevice {
     if (   $req->param('stayconnected')
         && $self->rule->( $req, $req->sessionInfo ) )
     {
-        my $token = $self->ott->createToken( {
-                name => $req->sessionInfo->{ $self->conf->{whatToTrace} },
+        my $totpSecret = $self->newSecret;
+        my $token      = $self->ott->createToken( {
+                name       => $req->sessionInfo->{ $self->conf->{whatToTrace} },
+                totpSecret => $totpSecret,
                 (
                     $checkLogins
                     ? ( history => $req->sessionInfo->{_loginHistory} )
@@ -97,6 +100,7 @@ sub newDevice {
                 '../common/registerBrowser',
                 params => {
                     URL         => $req->urldc,
+                    TOTPSEC     => $totpSecret,
                     TOKEN       => $token,
                     ACTION      => '/registerbrowser',
                     CHECKLOGINS => $checkLogins
@@ -119,30 +123,48 @@ sub storeBrowser {
                 my $uid = $req->userData->{ $self->conf->{whatToTrace} };
                 if ( $tmp->{name} eq $uid ) {
                     if ( my $fg = $req->param('fg') ) {
-                        my $ps = $self->newConnectionSession( {
-                                _utime          => time + $self->timeout,
-                                _session_uid    => $uid,
-                                _connectedSince => time,
-                                dataKeep        => $req->data->{dataToKeep},
-                                fingerprint     => $fg,
-                            },
-                        );
-
-                        # Cookie available 30 days by default
-                        $req->addCookie(
-                            $self->p->cookie(
-                                name    => $self->cookieName,
-                                value   => $ps->id,
-                                max_age => $self->timeout,
-                                secure  => $self->conf->{securedCookie},
+                        my $isTotp = ( $fg =~ s/^TOTP_// ) ? 1 : 0;
+                        if (
+                            $isTotp
+                            and !$self->verifyCode(
+                                30, 1, 6, $tmp->{totpSecret}, $fg
                             )
-                        );
-                        $req->sessionInfo->{_loginHistory} = $tmp->{history}
-                          if exists $tmp->{history};
+                          )
+                        {
+                            $self->logger->warn(
+                                "Failed to register device, bad TOTP");
+                        }
+                        else {
+                            my $ps = $self->newConnectionSession( {
+                                    _utime          => time + $self->timeout,
+                                    _session_uid    => $uid,
+                                    _connectedSince => time,
+                                    dataKeep        => $req->data->{dataToKeep},
+                                    (
+                                        $isTotp
+                                        ? ( totpSecret => $tmp->{totpSecret} )
+                                        : ( fingerprint => $fg )
+                                    ),
+                                },
+                            );
 
-                        # Store connection ID in current session
-                        $self->p->updateSession( $req,
-                            { _stayConnectedSession => $ps->id } );
+                            # Cookie available 30 days by default
+                            $req->addCookie(
+                                $self->p->cookie(
+                                    name    => $self->cookieName,
+                                    value   => $ps->id,
+                                    max_age => $self->timeout,
+                                    secure  => $self->conf->{securedCookie},
+                                )
+                            );
+
+                            $req->sessionInfo->{_loginHistory} = $tmp->{history}
+                              if exists $tmp->{history};
+
+                            # Store connection ID in current session
+                            $self->p->updateSession( $req,
+                                { _stayConnectedSession => $ps->id } );
+                        }
                     }
                     else {
                         $self->logger->warn(
@@ -202,16 +224,20 @@ sub check {
                                 0 );
                         }
                         else {
-                            if ( $fg eq $ps->data->{fingerprint} ) {
+                            if ( $fg =~ s/^TOTP_// ) {
+                                return $self->skipAuthentication( $req, $uid,
+                                    $cid, 1 )
+                                  if $self->verifyCode( 30, 1, 6,
+                                    $ps->data->{totpSecret}, $fg ) > 0;
+                            }
+                            elsif ( $fg eq $ps->data->{fingerprint} ) {
                                 return $self->skipAuthentication( $req, $uid,
                                     $cid, 1 );
                             }
-                            else {
-                                $self->userLogger->warn(
-                                    "Fingerprint changed for $uid");
-                                $ps->remove;
-                                $self->logout($req);
-                            }
+                            $self->userLogger->warn(
+                                "Fingerprint changed for $uid");
+                            $ps->remove;
+                            $self->logout($req);
                         }
                     }
                     else {

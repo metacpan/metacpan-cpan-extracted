@@ -3,6 +3,7 @@ use warnings;
 use utf8;
 
 use Test::More;
+use Test::Exception;
 use Test::XML;
 
 use PICA::Data qw(pica_writer pica_parser pica_string);
@@ -13,6 +14,7 @@ use PICA::Writer::XML;
 use PICA::Writer::PPXML;
 use PICA::Parser::PPXML;
 use PICA::Writer::JSON;
+use PICA::Writer::Patch;
 use PICA::Writer::Generic;
 use PICA::Schema;
 
@@ -213,6 +215,17 @@ note 'PICA::Writer::JSON';
     like $out, qr/^\[\n\s+\[/m, 'JSON (pretty)';
 }
 
+note 'PICA::Writer::Patch';
+{
+    my $out = "";
+    my $writer = PICA::Writer::Patch->new(fh => \$out);
+    my $record = [['003@','','0','1'],['021A','','a','x','+']];
+    $writer->write($record);
+    $writer->end;
+    is $out, "  003@ \$01\n+ 021A \$ax\n\n", "patch format";
+    throws_ok { $writer->write([['021A','','a','x','?']]) } qr{Invalid annotation};
+}
+
 note 'PICA::Data';
 
 {
@@ -240,11 +253,8 @@ PLAIN
 note 'Exeptions';
 
 {
-    eval {pica_writer('plain', fh => '')};
-    ok $@, 'invalid filename';
-
-    eval {pica_writer('plain', fh => {})};
-    ok $@, 'invalid handle';
+    dies_ok {pica_writer('plain', fh => '')} 'invalid filename';
+    dies_ok {pica_writer('plain', fh => {})} 'invalid handle';
 }
 
 note 'undefined occurrence';

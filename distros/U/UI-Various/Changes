@@ -1,6 +1,12 @@
 Revision history for Perl extension UI-Various
 
-0.40 2023-08-02T07:31:57Z
+0.41 2023-08-31T11:41:30Z
+
+0.41 2023-08-31T11:39:43Z
+
+    - added some more tests and diagnostics to handle deep recursion in _cd
+      (which is still happening and not yet completley prevented)
+    - added some comments about sporadic Curses::UI problems to t/41-curses.t
 
 0.40 2023-08-02T07:30:58Z
 

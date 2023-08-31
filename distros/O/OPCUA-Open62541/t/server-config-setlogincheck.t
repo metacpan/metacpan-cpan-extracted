@@ -7,11 +7,12 @@ use OPCUA::Open62541::Test::CA;
 
 use Test::More;
 BEGIN {
-    if (OPCUA::Open62541::ServerConfig->can('setAccessControl_loginCheck')) {
-	plan tests => 61;
+    if (OPCUA::Open62541::ServerConfig->can(
+	'setAccessControl_defaultWithLoginCallback')) {
+	plan tests => 57;
     } else {
-	plan skip_all =>
-	    'open62541 has no server config setAccessControl_loginCheck';
+	plan skip_all => 'open62541 has no server config '.
+	    'setAccessControl_defaultWithLoginCallback';
     }
 }
 use Test::Exception;
@@ -23,45 +24,45 @@ my $server = OPCUA::Open62541::Test::Server->new();
 my $serverconfig = $server->{server}->getConfig();
 
 lives_and { is
-    $serverconfig->setAccessControl_loginCheck(undef),
-    STATUSCODE_BADINTERNALERROR
-} "access control";
-no_leaks_ok {
-    $serverconfig->setAccessControl_loginCheck(undef),
-} "access control leak";
-
-is $serverconfig->setAccessControl_default(0, undef, undef, undef),
-    STATUSCODE_GOOD, "access control default";
-
-lives_and { is
-    $serverconfig->setAccessControl_loginCheck(undef),
+    $serverconfig->setAccessControl_defaultWithLoginCallback(0,
+	undef, undef, undef, undef, undef),
     STATUSCODE_GOOD
-} "unset";
+} "without callback";
 no_leaks_ok {
-    $serverconfig->setAccessControl_loginCheck(undef),
-} "unset leak";
+    $serverconfig->setAccessControl_defaultWithLoginCallback(0,
+	undef, undef, undef, undef, undef),
+} "without callback leak";
 
-lives_and { is
-    $serverconfig->setAccessControl_loginCheck("foo"),
-    STATUSCODE_BADINVALIDARGUMENT
-} "set bad";
-no_leaks_ok {
-    $serverconfig->setAccessControl_loginCheck("foo"),
-} "set bad leak";
+throws_ok {
+    $serverconfig->setAccessControl_defaultWithLoginCallback(0,
+	undef, undef, undef, "foo", "bar"),
+} qr/Callback 'foo' is not CODE reference and unknown check/, "callback bad";
+no_leaks_ok { eval {
+    $serverconfig->setAccessControl_defaultWithLoginCallback(0,
+	undef, undef, undef, "foo", "bar"),
+} } "callback bad leak";
 
 my $can_crypt_newhash =
     OPCUA::Open62541::ServerConfig->can('AccessControl_CryptNewhash');
 
-lives_and { is
-    $serverconfig->setAccessControl_loginCheck("crypt_checkpass"),
-    $can_crypt_newhash ? STATUSCODE_GOOD : STATUSCODE_BADINVALIDARGUMENT;
-} "set crypt_checkpass";
-no_leaks_ok {
-    $serverconfig->setAccessControl_loginCheck("crypt_checkpass"),
-} "set crypt_checkpass leak";
+SKIP: {
+    skip "server does not support crypt_checkpass", 2
+	unless $can_crypt_newhash;
+
+    lives_and { is
+	$serverconfig->setAccessControl_defaultWithLoginCallback(0,
+	    undef, undef, undef, "crypt_checkpass", undef),
+	STATUSCODE_GOOD
+    } "crypt_checkpass";
+    no_leaks_ok {
+	$serverconfig->setAccessControl_defaultWithLoginCallback(0,
+	    undef, undef, undef, "crypt_checkpass", undef),
+    } "crypt_checkpass leak";
+}
 
 SKIP: {
-    skip "server does not support crypt_checkpass", 8 if !$can_crypt_newhash;
+    skip "server config does not provide crypt_newhash", 8
+	unless $can_crypt_newhash;
 
     throws_ok {
 	$serverconfig->AccessControl_CryptNewhash(undef, undef)
@@ -115,11 +116,9 @@ my @login = (
     },
 );
 my $policy = "http://opcfoundation.org/UA/SecurityPolicy#None";
-is $serverconfig->setAccessControl_default(0, undef, $policy, \@login),
+is $serverconfig->setAccessControl_defaultWithLoginCallback(0, undef, $policy,
+    \@login, $can_crypt_newhash ? "crypt_checkpass" : undef, undef),
     STATUSCODE_GOOD, "set login";
-is $serverconfig->setAccessControl_loginCheck("crypt_checkpass"),
-    $can_crypt_newhash ? STATUSCODE_GOOD : STATUSCODE_BADINVALIDARGUMENT,
-    "set crypt";
 $server->run();
 
 note "client with user/pass";

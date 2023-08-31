@@ -15,23 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::IPC;
-
-use strict;
-use warnings;
-
-our $VERSION = '1.02';
-our @EXPORT = qw(
-    spawn
-    wait_child
-);
-
-use Carp;
-use Exporter qw(import);
-
-use Dpkg::ErrorHandling;
-use Dpkg::Gettext;
-
 =encoding utf8
 
 =head1 NAME
@@ -44,6 +27,24 @@ Dpkg::IPC offers helper functions to allow you to execute
 other programs in an easy, yet flexible way, while hiding
 all the gory details of IPC (Inter-Process Communication)
 from you.
+
+=cut
+
+package Dpkg::IPC 1.02;
+
+use strict;
+use warnings;
+
+our @EXPORT = qw(
+    spawn
+    wait_child
+);
+
+use Carp;
+use Exporter qw(import);
+
+use Dpkg::ErrorHandling;
+use Dpkg::Gettext;
 
 =head1 FUNCTIONS
 

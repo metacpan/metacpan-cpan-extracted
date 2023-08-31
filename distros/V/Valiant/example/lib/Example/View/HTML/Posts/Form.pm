@@ -4,18 +4,12 @@ use Moo;
 use Example::Syntax;
 use Example::View::HTML
   -tags => qw(div a fieldset link_to legend br form_for),
-  -util => qw(path);
+  -util => qw(list_uri);
 
 has 'post' => (is=>'ro', required=>1);
 
-sub create_or_update_path :Renders ($self)  {
-  return $self->post->in_storage ?
-   path('update', [$self->post->id]) :
-    path('create'); 
-}
-
 sub render($self, $c) {
-  form_for $self->post, +{action=>$self->create_or_update_path}, sub ($self, $fb, $post) {
+  form_for $self->post, sub ($self, $fb, $post) {
     div +{ if=>$fb->successfully_updated, 
       class=>'alert alert-success', role=>'alert' 
     }, 'Successfully Saved!',
@@ -36,7 +30,7 @@ sub render($self, $c) {
     ],
 
     $fb->submit(),
-    link_to path('list'), {class=>'btn btn-secondary btn-lg btn-block'}, 'Return to Posts List',
+    link_to list_uri, {class=>'btn btn-secondary btn-lg btn-block'}, 'Return to Posts List',
   };
 }
 

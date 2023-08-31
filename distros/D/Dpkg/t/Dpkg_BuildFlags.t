@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 34;
+use Test::More tests => 40;
 
 BEGIN {
     $ENV{DEB_BUILD_ARCH} = 'amd64';
@@ -24,6 +24,21 @@ BEGIN {
     use_ok('Dpkg::BuildFlags');
 }
 
+sub test_has_flag
+{
+    my ($bf, $flag, $optflag) = @_;
+
+    my $value = $bf->get($flag);
+    ok($value =~ m/$optflag/, "$flag contains $optflag: $value");
+}
+
+sub test_has_noflag
+{
+    my ($bf, $flag, $optflag) = @_;
+
+    my $value = $bf->get($flag);
+    ok($value !~ m/$optflag/, "$flag does not contain $optflag: $value");
+}
 my $bf = Dpkg::BuildFlags->new();
 
 ok($bf->has('CPPFLAGS'), 'CPPFLAGS is present');
@@ -88,12 +103,18 @@ my %known_features = (
     future => [ qw(
         lfs
     ) ],
+    abi => [ qw(
+        lfs
+        time64
+    ) ],
     hardening => [ qw(
         bindnow
+        branch
         format
         fortify
         pie
         relro
+        stackclash
         stackprotector
         stackprotectorstrong
     ) ],
@@ -128,6 +149,25 @@ foreach my $area (sort keys %known_features) {
               "supported features for area $area");
 }
 
-# TODO: Add more test cases.
+# Test lfs alias from abi to future, we need a 32-bit arch that does does
+# not currently have this flag built-in.
+$ENV{DEB_BUILD_ARCH} = 'i386';
+$ENV{DEB_HOST_ARCH} = 'i386';
 
-1;
+$ENV{DEB_BUILD_MAINT_OPTIONS} = 'future=+lfs';
+$bf = Dpkg::BuildFlags->new();
+test_has_flag($bf, 'CPPFLAGS', '-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64');
+
+$ENV{DEB_BUILD_MAINT_OPTIONS} = 'abi=+lfs';
+$bf = Dpkg::BuildFlags->new();
+test_has_flag($bf, 'CPPFLAGS', '-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64');
+
+$ENV{DEB_BUILD_MAINT_OPTIONS} = 'future=-lfs abi=+lfs';
+$bf = Dpkg::BuildFlags->new();
+test_has_flag($bf, 'CPPFLAGS', '-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64');
+
+$ENV{DEB_BUILD_MAINT_OPTIONS} = 'future=+lfs abi=-lfs';
+$bf = Dpkg::BuildFlags->new();
+test_has_noflag($bf, 'CPPFLAGS', '-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64');
+
+# TODO: Add more test cases.

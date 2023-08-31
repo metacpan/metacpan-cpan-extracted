@@ -1,6 +1,6 @@
 #!perl
 
-# Note: This script is a CLI for Riap function /File/Symlink/Util/check_symlink
+# Note: This script is a CLI for Riap function /App/SymlinkUtils/check_symlink
 # and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
@@ -11,12 +11,12 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-30'; # DATE
+our $DATE = '2023-07-02'; # DATE
 our $DIST = 'App-SymlinkUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
-    url => "/File/Symlink/Util/check_symlink",
+    url => "/App/SymlinkUtils/check_symlink",
     program_name => "check-symlink",
     log => 1,
     read_config => 0,
@@ -40,7 +40,7 @@ check-symlink - Perform various checks on a symlink
 
 =head1 VERSION
 
-This document describes version 0.001 of check-symlink (from Perl distribution App-SymlinkUtils), released on 2023-06-30.
+This document describes version 0.002 of check-symlink (from Perl distribution App-SymlinkUtils), released on 2023-07-02.
 
 =head1 SYNOPSIS
 

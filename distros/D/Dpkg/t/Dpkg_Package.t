@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 12;
 
 use_ok('Dpkg::Package');
 
@@ -28,4 +28,15 @@ ok(pkg_name_is_illegal('-abc'), 'package name has a dash');
 
 is(pkg_name_is_illegal('pkg+name-1.0'), undef, 'package name is valid');
 
-1;
+eval { set_source_name('foo%bar') };
+ok($@, 'cannot set invalid source package name');
+is(get_source_name(), undef, 'invalid source package name unset');
+
+set_source_name('source');
+is(get_source_name(), 'source', 'set/get source package name');
+
+set_source_name('source');
+is(get_source_name(), 'source', 'reset/get same source package name');
+
+eval { set_source_name('other') };
+ok($@, 'cannot set different source package name');

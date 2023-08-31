@@ -44,11 +44,11 @@ DESCRIPTION
 
     Current features include:
 
-      * all commands <https://redis.io/commands> as of 7.0 RC2 (March
-      2022), see https://redis.io/commands for the methods and parameters
+      * all commands <https://redis.io/commands> as of 7.2 (August 2023),
+      see https://redis.io/commands for the methods and parameters
 
       * pub/sub support <https://redis.io/topics/pubsub>, see "METHODS -
-      Subscriptions"
+      Subscriptions" including sharded pubsub
 
       * pipelining <https://redis.io/topics/pipelining>, see
       "pipeline_depth"
@@ -65,6 +65,14 @@ DESCRIPTION
       * "https://github.com/antirez/RESP3/blob/master/spec.md" in RESP3
       protocol for Redis 6 and above, allowing pubsub on the same
       connection as regular commands
+
+      * cluster support via Net::Async::Redis::Cluster, including key
+      specifications from https://redis.io/docs/reference/key-specs/ to
+      route commands to the correct node(s)
+
+      * see Net::Async::Redis::XS for a faster XS version (can be 40x
+      faster than the pure Perl version, particularly when parsing large
+      "xreadgroup" responses)
 
  Connecting
 
@@ -517,6 +525,41 @@ METHODS - Internal
 
  _add_to_loop
 
+ retrieve_full_command_list
+
+    Iterates through all commands defined in Redis, extracting the
+    information about that command using COMMAND INFO.
+
+    The data is formatted for internal use, converting information such as
+    flags into hashrefs for easier lookup.
+
+    This information is also used by "extract_keys_from_command".
+
+    Returns a hashref, where each key represents a method name
+    (space-separated commands such as CLUSTER NODES are returned as
+    cluster_nodes). The values are a restructured form of
+    https://redis.io/commands/command.
+
+ extract_keys_for_command
+
+    Given a command arrayref and a definition for the server, this will
+    return a list of any keys found in that command.
+
+    Since the logic for this is slightly slow, we are caching the result
+    unless a specific definition is provided: this is an internal
+    implementation detail and not something to rely on.
+
+    (the key specification is a relatively new Redis feature - an optimised
+    version of this logic will be added to Net::Async::Redis::XS in due
+    course, which should reduce the need for caching)
+
+    Returns a list of keys.
+
+ ssl_options
+
+    Extracts the SSL-related options as a hashref for passing to
+    $loop->connect.
+
 SEE ALSO
 
     Some other Redis implementations on CPAN:
@@ -562,6 +605,8 @@ CONTRIBUTORS
       * Nael Alolwani
 
       * Marc Frank
+
+      * @pnevins
 
 LICENSE
 

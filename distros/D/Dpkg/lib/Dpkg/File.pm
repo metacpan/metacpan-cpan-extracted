@@ -14,12 +14,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::File;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::File - file handling
+
+=head1 DESCRIPTION
+
+This module provides file handling support functions.
+
+B<Note>: This is a private module, its API can change at any time.
+
+=cut
+
+package Dpkg::File 0.01;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
 our @EXPORT = qw(
     file_slurp
     file_dump
@@ -75,5 +88,13 @@ sub file_touch {
     open my $fh, '>', $file or syserr(g_('cannot create file %s'), $file);
     close $fh or syserr(g_('cannot write %s'), $file);
 }
+
+=head1 CHANGES
+
+=head2 Version 0.xx
+
+This is a private module.
+
+=cut
 
 1;

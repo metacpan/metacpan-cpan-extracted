@@ -1,3 +1,11 @@
+v0.2.1 
+  [improvements]
+   - memory reduction
+   - use latest version of constant::more  to avoid loading Getopt::Long unless actually needed
+   - remove use version
+   - remove use Carp
+   
+
 v0.2.0 2023-07-25
   [features]
     - Reduced the amount of boilerplate with sensible default options

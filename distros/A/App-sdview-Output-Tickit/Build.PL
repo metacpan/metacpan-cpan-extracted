@@ -10,8 +10,11 @@ my $build = Module::Build->new(
       perl => '5.026',
       'Object::Pad' => '0.800',
 
+      'App::sdview::Style' => '0.12',
       'Tickit' => 0,
-      'Tickit::Widget::Scroller' => '0.30',
+      'Tickit::Style' => 0,
+      'Tickit::Widget::FloatBox' => 0,
+      'Tickit::Widget::Scroller' => '0.31',
       'Tickit::Widget::Scroller::Item::RichText' => 0,
    },
    test_requires => {

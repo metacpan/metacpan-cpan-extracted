@@ -7,7 +7,7 @@ use JSON qw(from_json to_json);
 use MIME::Base64 qw(encode_base64url decode_base64url);
 use Crypt::URandom;
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.17.0';
 
 extends 'Lemonldap::NG::Portal::2F::Register::Base';
 with 'Lemonldap::NG::Portal::Lib::WebAuthn';
@@ -192,8 +192,6 @@ sub _registration {
         )
       )
     {
-        $self->userLogger->notice(
-            $self->prefix . "2f: registration of $keyName succeeds for $user" );
         return $self->p->sendJSONresponse( $req, { result => 1 } );
     }
     else {

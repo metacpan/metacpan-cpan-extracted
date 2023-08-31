@@ -31,5 +31,5 @@ resources:
   bugtracker: https://github.com/hadjiprocopis/www-mechanize-chrome-domops/issues
   homepage: https://metacpan.org/module/WWW::Mechanize::Chrome::DOMops
   repository: https://github.com/hadjiprocopis/www-mechanize-chrome-domops
-version: '0.04'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

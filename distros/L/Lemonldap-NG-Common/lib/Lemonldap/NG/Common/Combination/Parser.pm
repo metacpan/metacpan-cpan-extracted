@@ -30,10 +30,12 @@ sub parse {
         unless ( $rest =~ s/^\s*\bthen\b\s*// ) {
             die('Bad combination: missing "then"');
         }
-        unless ( $rest =~ /(.*?)\s*\belse\b\s*(.*)$/ ) {
+        if ( $rest =~ /(.*?)\s*\belse\b\s*(.*)$/ ) {
+            ( $then, $else ) = ( $1, $2 );
+        }
+        else {
             die('Bad combination: missing "else"');
         }
-        ( $then, $else ) = ( $1, $2 );
         unless ($then) {
             die('Bad combination: missing "then" content');
         }
@@ -111,15 +113,17 @@ sub parseAnd {
 # Returns [authSub,userSub] array
 sub parseBlock {
     my ( $self, $moduleList, $expr ) = @_;
-    unless ( $expr =~ /^\s*\[(.*?)\s*(?:,\s*(.*?))?\s*\]\s*$/ ) {
+    if ( $expr =~ /^\s*\[(.*?)\s*(?:,\s*(.*?))?\s*\]\s*$/ ) {
+        my @res = ( $1, $2 || $1 );
+        @res = (
+            $self->parseMod( $moduleList, 0, $res[0] ),
+            $self->parseMod( $moduleList, 1, $res[1] )
+        );
+        return \@res;
+    }
+    else {
         die "Bad expression: $expr";
     }
-    my @res = ( $1, $2 || $1 );
-    @res = (
-        $self->parseMod( $moduleList, 0, $res[0] ),
-        $self->parseMod( $moduleList, 1, $res[1] )
-    );
-    return \@res;
 }
 
 # Internal method to parse auth or userDB expr

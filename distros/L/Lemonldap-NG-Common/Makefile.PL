@@ -84,6 +84,7 @@ WriteMakefile(
         'JSON'                   => 0,
         'JSON::XS'               => 0,
         'Mouse'                  => 0,
+        'Net::CIDR'              => 0,
         'Plack'                  => 0,
         'URI'                    => 0,
         'LWP::UserAgent'         => 0,

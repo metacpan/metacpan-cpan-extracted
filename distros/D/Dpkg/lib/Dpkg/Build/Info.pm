@@ -13,21 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Build::Info;
-
-use strict;
-use warnings;
-
-our $VERSION = '1.02';
-our @EXPORT_OK = qw(
-    get_build_env_whitelist
-    get_build_env_allowed
-);
-
-use Exporter qw(import);
-
-use Dpkg::BuildInfo;
-
 =encoding utf8
 
 =head1 NAME
@@ -40,6 +25,22 @@ The Dpkg::Build::Info module provides functions to handle the build
 information.
 
 This module is deprecated, use Dpkg::BuildInfo instead.
+
+=cut
+
+package Dpkg::Build::Info 1.02;
+
+use strict;
+use warnings;
+
+our @EXPORT_OK = qw(
+    get_build_env_whitelist
+    get_build_env_allowed
+);
+
+use Exporter qw(import);
+
+use Dpkg::BuildInfo;
 
 =head1 FUNCTIONS
 

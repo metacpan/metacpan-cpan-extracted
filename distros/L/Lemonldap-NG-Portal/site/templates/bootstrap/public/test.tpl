@@ -16,7 +16,7 @@
     </ul>
     <div class="buttons">
     <TMPL_IF NAME="MSG"><TMPL_VAR NAME="MSG"></TMPL_IF>
-      <a href="<TMPL_VAR NAME="PORTAL_URL">/?cancel=1" class="btn btn-primary" role="button">
+      <a href="<TMPL_VAR NAME="PORTAL_URL">?cancel=1" class="btn btn-primary" role="button">
         <span class="fa fa-home"></span>
         <span trspan="goToPortal">Go to portal</span>
       </a>

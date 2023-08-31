@@ -108,6 +108,9 @@ gperl_option_flags_get_type (void)
   static GType t = 0;
   if (t == 0) {
     static const GFlagsValue values[] = {
+#if GLIB_CHECK_VERSION (2, 42, 0)
+      {G_OPTION_FLAG_NONE,         "G_OPTION_FLAG_NONE",         "none"},
+#endif
       {G_OPTION_FLAG_HIDDEN,       "G_OPTION_FLAG_HIDDEN",       "hidden"},
       {G_OPTION_FLAG_IN_MAIN,      "G_OPTION_FLAG_IN_MAIN",      "in-main"},
       {G_OPTION_FLAG_REVERSE,      "G_OPTION_FLAG_REVERSE",      "reverse"},

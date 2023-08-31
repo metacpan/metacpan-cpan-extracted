@@ -1,5 +1,11 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.002002 2023 August 27
+          - Fixes to how Formhandler computes a default action for the form
+            based on the passed model and information provided by the view
+            or controller.
+          - Updated example application to match.
+
 0.002001 2023 August 11
           - HTML Form helper sets tunneled method info as a data attribute.
           - The DBIC Resultset SetSize validator now distinguished between

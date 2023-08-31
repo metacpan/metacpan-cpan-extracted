@@ -1,0 +1,399 @@
+#!/usr/bin/env perl
+#
+# $Id: onyphe,v 689580a0e0f8 2023/07/17 09:34:26 gomor $
+#
+use strict;
+use warnings;
+
+our $VERSION = '4.00';
+
+use Getopt::Long;
+use Onyphe::Api;
+use OPP;
+use OPP::State;
+use OPP::Output;
+
+my $oa = Onyphe::Api->new;
+my $opp = OPP->new;
+$opp->nested([ 'app.http.component', 'app.http.header', 'alert' ]);
+$opp->state(OPP::State->new->init);
+$opp->output(OPP::Output->new->init);
+
+# Default values
+my %lopts = (
+   # General options:
+   config => $ENV{HOME}.'/.onyphe.ini',
+);
+
+# Option parsing
+GetOptions(
+   # General options:
+   "config=s" => \$lopts{config},         # -config ~/.onyphe.ini
+   "verbose" => \$lopts{verbose},         # -verbose
+   "version" => \$lopts{version},         # -version
+   "help" => \$lopts{help},               # -help
+   # API options:
+   "size=i" => \$lopts{size},             # -size 10
+   "maxpage=i" => \$lopts{maxpage},       # -maxpage 10
+   "trackquery=i" => \$lopts{trackquery}, # -trackquery 1
+   "calculated=i" => \$lopts{calculated}, # -calculated 1
+   "keepalive=i" => \$lopts{keepalive},   # -keepalive 1
+   "key=s" => \$lopts{key},               # -key XXX
+   #"poll" => \$lopts{poll},               # -poll
+   "maxscantime=i" => \$lopts{'maxscantime'}, # -maxscantime 120
+   "urlscan=i" => \$lopts{'urlscan'}, # -urlscan 1
+   "vulnscan=i" => \$lopts{'vulnscan'}, # -vulnscan 1
+   "import=i" => \$lopts{'import'}, # -import 1
+   # APIs:
+   "user" => \$lopts{user},                     # -user
+   "summary=s" => \$lopts{summary},             # -summary ip|domain|hostname
+   "simple=s" => \$lopts{simple},               # -simple synscan|datascan|vulnscan|...
+   "simple-best=s" => \$lopts{'simple-best'},   # -simple-best whois|threatlist|inetnum|geoloc
+   "bulk-summary=s" => \$lopts{'bulk-summary'}, # -bulk-summary ip|domain|hostname
+   "bulk-simple=s" => \$lopts{'bulk-simple'}, # -bulk-simple ctl|datascan|resolve|...
+   "bulk-simple-best=s" => \$lopts{'bulk-simple-best'}, # -bulk-simple-best whois|...
+   "discovery=s" => \$lopts{discovery},       # -discovery datascan|resolver|ctl|...
+   "search" => \$lopts{search},               # -search
+   "postsearch" => \$lopts{postsearch},       # -postsearch
+   "export" => \$lopts{export},               # -export
+   "alert-list" => \$lopts{'alert-list'},              # -alert-list
+   "alert-add" => \$lopts{'alert-add'},                # -alert-add
+   "alert-del=s" => \$lopts{'alert-del'},              # -alert-del 0
+   "alert-name=s" => \$lopts{'alert-name'},            # -alert-name "New alert"
+   "alert-email=s" => \$lopts{'alert-email'},          # -alert-email example@example.com
+   "alert-threshold=s" => \$lopts{'alert-threshold'},  # -alert-threshold '>0'
+   "ondemand-scope-ip=s" => \$lopts{'ondemand-scope-ip'}, # -ondemand-scope-ip IP|CIDR
+   "ondemand-scope-ip-bulk=s" => \$lopts{'ondemand-scope-ip-bulk'}, # -ondemand-scope-ip-bulk INPUT.txt
+   "ondemand-scope-domain=s" => \$lopts{'ondemand-scope-domain'}, # -ondemand-scope-domain DOMAIN
+   "ondemand-scope-domain-bulk=s" => \$lopts{'ondemand-scope-domain-bulk'}, # -ondemand-scope-domain-bulk INPUT.txt
+   "ondemand-scope-result=s" => \$lopts{'ondemand-scope-result'}, # -ondemand-scope-result ID
+   "ondemand-resolver-domain=s" => \$lopts{'ondemand-resolver-domain'}, # -ondemand-resolver-domain DOMAIN
+   "ondemand-resolver-result=s" => \$lopts{'ondemand-resolver-result'}, # -ondemand-resolver-result ID
+) or exit(0);
+
+if ($lopts{help}) {
+   usage();
+   exit(0);
+}
+
+if ($lopts{version}) {
+   print $oa->version."\n";
+   exit(0);
+}
+
+$oa->verbose(1) if $lopts{verbose};
+
+my $arg = pop @ARGV;  # Global argument
+
+my ($oql, $opl) = split(/\s*\|\s*/, $arg, 2) if defined $arg;
+
+$oa->init($lopts{config}) or die("FATAL: cannot initialize Onyphe::Api\n");
+
+# Override default values from config:
+$oa->config->{''}{api_size} = $lopts{size} if $lopts{size};
+$oa->config->{''}{api_maxpage} = $lopts{maxpage} if $lopts{maxpage};
+$oa->config->{''}{api_trackquery} = $lopts{trackquery} if $lopts{trackquery};
+$oa->config->{''}{api_calculated} = $lopts{calculated} if $lopts{calculated};
+$oa->config->{''}{api_keepalive} = $lopts{keepalive} if $lopts{keepalive};
+$oa->config->{''}{api_key} = $lopts{key} if $lopts{key};
+$oa->config->{''}{api_ondemand_key} = $lopts{key} if $lopts{key};
+
+if ($oa->verbose) {
+   print STDERR "VERBOSE: api_size: ".$oa->config->{''}{api_size}."\n";
+   print STDERR "VERBOSE: api_maxpage: ".$oa->config->{''}{api_maxpage}."\n";
+   print STDERR "VERBOSE: api_trackquery: ".$oa->config->{''}{api_trackquery}."\n";
+   print STDERR "VERBOSE: api_calculated: ".$oa->config->{''}{api_calculated}."\n";
+   print STDERR "VERBOSE: api_keepalive: ".$oa->config->{''}{api_keepalive}."\n";
+}
+
+my $opp_perl_cb = sub {
+   my ($results, $opl) = @_;
+   $opl ||= 'noop';
+   my @results = ();
+   if (ref($results) eq 'ARRAY') {
+      for (@$results) {
+         next if defined($_->{'@category'}) && $_->{'@category'} eq 'none';
+         push @results, $_;
+      }
+   }
+   else {
+      push @results, $results;
+   }
+   $opp->process_as_perl($results, $opl);
+};
+
+my $opp_json_cb = sub {
+   my ($results, $opl) = @_;
+   $opl ||= 'noop';
+   my @results = ();
+   if (ref($results) eq 'ARRAY') {
+      for (@$results) {
+         next if m{.\@category.\s*:\s*.none.};
+         push @results, $_;
+      }
+   }
+   else {
+      push @results, $results;
+   }
+   $opp->process_as_json(\@results, $opl);
+};
+
+if ($lopts{user}) {
+   $oa->user($opp_perl_cb, $opl);
+}
+elsif ($lopts{summary}) {
+   my $v = $lopts{summary};
+   if ($v ne 'ip' && $v ne 'domain' && $v ne 'hostname') {
+      die("FATAL: -summary: only accepts ip, domain or hostname values\n");
+   }
+   my $params;
+   $oa->summary($v, $oql, $params, $opp_perl_cb, $opl);
+}
+elsif ($lopts{simple}) {
+   my $v = $lopts{simple};
+   my $params;
+   $oa->simple($v, $oql, $params, $opp_perl_cb, $opl);
+}
+elsif ($lopts{'simple-best'}) {
+   my $v = $lopts{'simple-best'};
+   if ($v ne 'whois' && $v ne 'threatlist' && $v ne 'geoloc' && $v ne 'inetnum') {
+      die("FATAL: -simple-best: only accepts whois, threatlist, geoloc or inetnum values\n");
+   }
+   my $params;
+   $oa->simple_best($v, $oql, $params, $opp_perl_cb, $opl);
+}
+elsif ($lopts{'bulk-summary'}) {
+   my $v = $lopts{'bulk-summary'};
+   if ($v ne 'ip' && $v ne 'domain' && $v ne 'hostname') {
+      die("FATAL: -bulk-summary: only accepts ip, domain or hostname values\n");
+   }
+   my $params;
+   $oa->bulk_summary($v, $oql, $params, $opp_json_cb, $opl);
+}
+elsif ($lopts{'bulk-simple'}) {
+   my $v = $lopts{'bulk-simple'};
+   my $params;
+   $oa->bulk_simple($v, $oql, $params, $opp_json_cb, $opl);
+}
+elsif ($lopts{'bulk-simple-best'}) {
+   my $v = $lopts{'bulk-simple-best'};
+   if ($v ne 'whois' && $v ne 'threatlist' && $v ne 'geoloc' && $v ne 'inetnum') {
+      die("FATAL: -bulk-simple-best: only accepts whois, threatlist, geoloc or inetnum values\n");
+   }
+   my $params;
+   $oa->bulk_simple_best($v, $oql, $params, $opp_json_cb, $opl);
+}
+elsif ($lopts{discovery}) {
+   my $v = $lopts{discovery};
+   unless (defined($oql)) {
+      die("FATAL: no query given\n");
+   }
+   my ($filename, $query) = $oql =~ m{^(\S+)\s*((?:.*?))\s*$};
+   unless (defined($filename)) {
+      die("FATAL: no file given\n");
+   }
+   unless (-f $filename) {
+      die("FATAL: file not found: $filename\n");
+   }
+   unless (defined($query)) {
+      die("FATAL: query not given\n");
+   }
+   my $params;
+   $params->{size} = 10000;  # Force 10000 by default
+   $oa->bulk_discovery($v, $filename, $query, $params, $opp_json_cb, $opl);
+}
+elsif ($lopts{search}) {
+   my $params;
+   $params->{size} = $lopts{size} if defined($lopts{size});
+   $oa->search($oql, 1, $lopts{maxpage}, $params, $opp_perl_cb, $opl);  # But is also in config()
+}
+elsif ($lopts{postsearch}) {
+   my $params;
+   $params->{size} = $lopts{size} if defined($lopts{size});
+   $oa->post_search($oql, 1, $lopts{maxpage}, $params, $opp_perl_cb, $opl);  # But is also in config()
+}
+elsif ($lopts{export}) {
+   my $params;
+   $oa->export($oql, $params, $opp_json_cb, $opl);
+}
+elsif ($lopts{'alert-list'}) {
+   $oa->alert_list($opp_perl_cb, $opl);
+}
+elsif ($lopts{'alert-add'}) {
+   my $name = $lopts{'alert-name'};
+   my $email = $lopts{'alert-email'};
+   my $threshold = $lopts{'alert-threshold'} || '>0';
+   if (!defined($name) || !defined($email)) {
+      die("FATAL: -alert-add: needs at least -alert-name & -alert-email\n");
+   }
+   $oa->alert_add($name, $oql, $email, $threshold, $opp_perl_cb, $opl);
+}
+elsif (defined($lopts{'alert-del'})) {
+   my $v = $lopts{'alert-del'};
+   if ($v !~ m{^\d+$} || $v < 0) {
+      die("FATAL: -alert-del: need an ID as an interger >= 0\n");
+   }
+   $oa->alert_del($v, $opp_perl_cb, $opl);
+}
+elsif (defined($lopts{'ondemand-scope-ip'})) {
+   my $v = $lopts{'ondemand-scope-ip'};
+   my $param;
+   $param->{maxscantime} = $lopts{maxscantime} if defined $lopts{maxscantime};
+   $param->{urlscan} = $lopts{urlscan} if defined $lopts{urlscan};
+   $param->{vulnscan} = $lopts{vulnscan} if defined $lopts{vulnscan};
+   $param->{import} = $lopts{import} if defined $lopts{import};
+   #my $scan_id;
+   #if ($lopts{poll}) {
+      #my $poll_opp_perl_cb = sub {
+         #my ($results, $opl) = @_;
+         #$scan_id = $results->{scan_id};
+         #return $opp_perl_cb->($results, $opl);
+      #};
+      #$oa->ondemand_scope_ip($v, $param, $poll_opp_perl_cb, $opl);
+      #print STDERR "VERBOSE: polling Scan ID: $scan_id\n" if $oa->verbose;
+      #while (1) {
+         #$oa->ondemand_scope_result($scan_id, undef, $opp_perl_cb, $opl);
+         #sleep 1;
+      #}
+   #}
+   #else {
+      $oa->ondemand_scope_ip($v, $param, $opp_perl_cb, $opl);
+   #}
+}
+elsif (defined($lopts{'ondemand-scope-ip-bulk'})) {
+   my $v = $lopts{'ondemand-scope-ip-bulk'};
+   my $param;
+   $param->{maxscantime} = $lopts{maxscantime} if defined $lopts{maxscantime};
+   $param->{urlscan} = $lopts{urlscan} if defined $lopts{urlscan};
+   $param->{vulnscan} = $lopts{vulnscan} if defined $lopts{vulnscan};
+   $param->{import} = $lopts{import} if defined $lopts{import};
+   $oa->ondemand_scope_ip_bulk($v, $param, $opp_perl_cb, $opl);
+}
+elsif (defined($lopts{'ondemand-scope-domain'})) {
+   my $v = $lopts{'ondemand-scope-domain'};
+   my $param;
+   $param->{maxscantime} = $lopts{maxscantime} if defined $lopts{maxscantime};
+   $param->{urlscan} = $lopts{urlscan} if defined $lopts{urlscan};
+   $param->{vulnscan} = $lopts{vulnscan} if defined $lopts{vulnscan};
+   $param->{import} = $lopts{import} if defined $lopts{import};
+   $oa->ondemand_scope_domain($v, $param, $opp_perl_cb, $opl);
+}
+elsif (defined($lopts{'ondemand-scope-domain-bulk'})) {
+   my $v = $lopts{'ondemand-scope-domain-bulk'};
+   my $param;
+   $param->{maxscantime} = $lopts{maxscantime} if defined $lopts{maxscantime};
+   $param->{urlscan} = $lopts{urlscan} if defined $lopts{urlscan};
+   $param->{vulnscan} = $lopts{vulnscan} if defined $lopts{vulnscan};
+   $param->{import} = $lopts{import} if defined $lopts{import};
+   $oa->ondemand_scope_domain_bulk($v, $param, $opp_perl_cb, $opl);
+}
+elsif (defined($lopts{'ondemand-scope-result'})) {
+   my $v = $lopts{'ondemand-scope-result'};
+   $oa->ondemand_scope_result($v, undef, $opp_perl_cb, $opl);
+}
+elsif (defined($lopts{'ondemand-resolver-domain'})) {
+   my $v = $lopts{'ondemand-resolver-domain'};
+   my $param;
+   $param->{maxscantime} = $lopts{maxscantime} if defined $lopts{maxscantime};
+   $oa->ondemand_resolver_domain($v, $param, $opp_perl_cb, $opl);
+}
+elsif (defined($lopts{'ondemand-resolver-result'})) {
+   my $v = $lopts{'ondemand-resolver-result'};
+   $oa->ondemand_resolver_result($v, undef, $opp_perl_cb, $opl);
+}
+else {
+   usage();
+}
+
+exit(0);
+
+#
+# Local subroutines
+#
+
+sub usage {
+   print<<EOF
+
+Usage: onyphe [options] -user
+       onyphe [options] -search 'OQL'
+       onyphe [options] -export 'OQL'
+       onyphe [options] -discovery datascan 'input.txt'
+       onyphe [options] -simple datascan 'IP'
+       onyphe [options] -simple-best whois 'IP'
+       onyphe [options] -bulk-simple datascan 'input.txt'
+       onyphe [options] -bulk-simple-best whois 'ip.txt'
+       onyphe [options] -summary ip '1.1.1.1'
+       onyphe [options] -summary domain 'example.com'
+       onyphe [options] -summary hostname 'www.example.com'
+       onyphe [options] -bulk-summary ip 'ip.txt'
+       onyphe [options] -bulk-summary domain 'domain.txt'
+       onyphe [options] -bulk-summary hostname 'hostname.txt'
+
+General options:
+
+   -verbose <0|1>                          verbosity level (default: 0)
+
+API options:
+   -key <API_KEY>                          use given API key to override configuration
+   -maxpage <MAXPAGE>                      max page to fetch with Search API (default: 1)
+   -size <0|1|..|10000>                    fetch pages of size results (default: 10)
+   -trackquery <0|1>                       add trackquery field into results (default: 0)
+   -calculated <0|1>                       add calculated fields into results (default: 0)
+   -keepalive <0|1>                        use a keepalive message (default: 0)
+   -keepalive <0|1>                        use a keepalive message (default: 0)
+   -maxscantime <1|120|...|0>              maximum duration for a scan in seconds (default: 120)
+   -urlscan <0|1>                          turn off/on URL scanning step in scan mode
+   -vulnscan <0|1>                         turn off/on vulnerability scanning step in scan mode
+   -import <0|1>                           turn off/on import of results into ONYPHE
+
+APIs:
+
+   -user '| OPP'                                get information on your license
+   -search 'OQL | OPP'                          use Search API for query
+   -export 'OQL | OPP'                          use Export API for query
+   -discovery CATEGORY 'input.txt | OPP'        use Discovery API on CATEGORY for query
+   -simple CATEGORY 'OQL | OPP'                 use Simple API on CATEGORY for query
+   -simple-best CATEGORY 'OQL | OPP'            use Simple Best API on CATEGORY for query
+   -bulk-simple CATEGORY 'input.txt | OPP'      use Bulk Simple API on CATEGORY for query
+   -bulk-simple-best CATEGORY 'ip.txt | OPP'    use Bulk Simple Best API on CATEGORY for query
+   -summary ip 'IP | OPP'                                use ip Summary API for query
+   -summary domain 'DOMAIN | OPP'                        use domain Summary API for query
+   -summary hostname 'HOSTNAME | OPP'                    use hostname Summary API for query
+   -bulk-summary <ip|domain|hostname> 'input.txt | OPP'  use Bulk Summary API for query
+   -alert-list                                           use Alert API for query
+   -alert-del \$id                                        use Alert API for query
+   -alert-add -alert-name NAME -alert-email EMAIL 'OQL'  use Alert API for query
+   -ondemand-scope-ip '<IP|CIDR>'                        use Ondemand Scope IP API to launch a scan against IP or CIDR
+   -ondemand-scope-ip-bulk 'input.txt'                   use Ondemand Scope Ip Bulk API to launch a scan against a given list of IPs from an input file
+   -ondemand-scope-domain 'DOMAIN'                       use Ondemand Scope Domain API to launch a scan against given domain
+   -ondemand-scope-domain-bulk 'input.txt'               use Ondemand Scope Domain Bulk API to launch a scan against a given list of domain from an input file
+   -ondemand-scope-result \$scan_id                       use Ondemand Scope Result API with Scan ID
+   -ondemand-resolver-domain 'DOMAIN'                    use Ondemand Resolver Domain API to launch a DNS enumeration and resolution against given domain
+   -ondemand-resolver-result \$scan_id                    use Ondemand Resolver Result API with Scan ID
+
+EOF
+;
+
+   exit(0);
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+ONYPHE - ONYPHE Command Line Interface
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2023, ONYPHE
+
+You may distribute this module under the terms of The BSD 3-Clause License.
+See LICENSE file in the source distribution archive.
+
+=head1 AUTHOR
+
+ONYPHE E<lt>contact_at_onyphe.ioE<gt>
+
+=cut

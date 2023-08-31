@@ -113,9 +113,8 @@ sub _buildFilter {
 
 sub init {
     my ($self) = @_;
-    $self->ldap
-      or $self->logger->error(
-        "LDAP initialization has failed, but let's continue");
+    # #2932: no need to initialize LDAP connection at this step,
+    # it will be done later, in other ldap methods
     $self->filter;
 }
 

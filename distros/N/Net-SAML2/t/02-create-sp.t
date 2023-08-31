@@ -300,7 +300,7 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
             "Returns the correct binding: HTTP-POST"
         );
         is($ssos[0]->getAttribute('isDefault'),
-            'false', "... and is the default");
+            undef, "... and doesn't have a default");
 
         is($ssos[0]->getAttribute('index'), 1,
             "... and has the correct index");
@@ -331,6 +331,75 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
             "... with the correct URI");
         is($default->{index}, 2, "... and index");
 
+    }
+
+    {
+        my $sp = net_saml2_sp(
+            single_logout_service => [
+                {
+                    Binding  => BINDING_HTTP_POST,
+                    Location => 'https://foo.example.com/slo-http-post'
+                }
+            ],
+            assertion_consumer_service => [
+                {
+                    Binding  => BINDING_HTTP_POST,
+                    Location => 'https://foo.example.com/acs-http-post',
+                    isDefault => 'false',
+                },
+                {
+                    Binding  => BINDING_HTTP_ARTIFACT,
+                    Location => 'https://foo.example.com/acs-http-artifact',
+                }
+            ],
+            error_url => 'https://foo.example.com/error-url',
+        );
+
+        my $default = $sp->get_default_assertion_service;
+        cmp_deeply(
+            $default,
+            {
+                'Binding'   => BINDING_HTTP_ARTIFACT,
+                'Location'  => 'https://foo.example.com/acs-http-artifact',
+                'index'     => 2,
+            },
+            "We have a default assertion service"
+        );
+    }
+    {
+        my $sp = net_saml2_sp(
+            single_logout_service => [
+                {
+                    Binding  => BINDING_HTTP_POST,
+                    Location => 'https://foo.example.com/slo-http-post'
+                }
+            ],
+            assertion_consumer_service => [
+                {
+                    Binding  => BINDING_HTTP_POST,
+                    Location => 'https://foo.example.com/acs-http-post',
+                    isDefault => 'false',
+                },
+                {
+                    Binding  => BINDING_HTTP_ARTIFACT,
+                    Location => 'https://foo.example.com/acs-http-artifact',
+                    isDefault => 0,
+                }
+            ],
+            error_url => 'https://foo.example.com/error-url',
+        );
+
+        my $default = $sp->get_default_assertion_service;
+        cmp_deeply(
+            $default,
+            {
+                Binding   => BINDING_HTTP_POST,
+                Location  => 'https://foo.example.com/acs-http-post',
+                index     => 1,
+                isDefault => 'false',
+            },
+            "We have a default assertion service"
+        );
     }
 
     {
@@ -370,7 +439,6 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
         qr/You don't have any Assertion Consumer Services configured/,
         "Needs at least one ASC",
     );
-
 }
 
 done_testing;

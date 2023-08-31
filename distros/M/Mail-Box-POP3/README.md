@@ -3,8 +3,7 @@
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-Mail-Box-POP3>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/Mail-Box-POP3/>
-    and <https://metacpan.org/release/Mail-Box-POP3>
+  * Indexed from CPAN: <https://metacpan.org/release/Mail-Box-POP3>
 
 Until release 3.0, this module was an integral part of the Mail-Box
 distribution.  This distribution implements a client connector to a

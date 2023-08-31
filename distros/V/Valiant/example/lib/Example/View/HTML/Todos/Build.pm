@@ -4,7 +4,7 @@ use Moo;
 use Example::Syntax;
 use Example::View::HTML
   -tags => qw(div a fieldset form_for),
-  -util => qw(path),
+  -util => qw(),
   -views => 'HTML::Page', 'HTML::Navbar', 'HTML::Todos::Form';
 
 has 'todo' => (is=>'ro', required=>1, handles=>[qw/status_options/] );

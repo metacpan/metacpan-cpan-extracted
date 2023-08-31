@@ -1,7 +1,4 @@
-requires 'Catalyst',
-  git => 'https://github.com/perl-catalyst/catalyst-runtime.git';
-
-  
+requires 'Catalyst', '5.90131';  
 requires 'Catalyst::Model::DBIC::Schema', '0.65';
 requires 'Catalyst::Plugin::ConfigLoader', '0.34';
 requires 'Catalyst::Plugin::RedirectTo', '0.004';
@@ -13,7 +10,7 @@ requires 'Catalyst::Plugin::ServeFile', '0.004';
 requires 'Catalyst::Plugin::CSRFToken', '0.006';
 requires 'CatalystX::Errors', '0.001009';
 requires 'CatalystX::RequestModel', '0.018';
-requires 'Catalyst::ControllerPerContext', '0.005';
+requires 'Catalyst::ControllerPerContext', '0.006';
 requires 'Catalyst::View::BasePerRequest', '0.010';
 requires 'Catalyst::View::MojoTemplate::PerContext', '0.005';
 requires 'Catalyst::ActionRole::RenderView', '0.001';
@@ -40,6 +37,7 @@ requires 'Digest::MD5';
 requires 'Plack::Runner';
 requires 'Scalar::Util';
 requires 'Sub::Exporter';
+requires 'Term::Size::Any';
 
 
 

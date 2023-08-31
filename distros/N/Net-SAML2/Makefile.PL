@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.012;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Net-SAML2",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.012",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Net::SAML2",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -55,14 +55,11 @@ my %WriteMakefileArgs = (
     "XML::LibXML" => 0,
     "XML::LibXML::XPathContext" => 0,
     "XML::Sig" => "0.64",
-    "base" => 0,
-    "namespace::autoclean" => 0,
-    "strict" => 0,
-    "vars" => 0,
-    "warnings" => 0
+    "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
     "Import::Into" => 0,
+    "MooseX::Test::Role" => 0,
     "Path::Tiny" => 0,
     "Sub::Override" => 0,
     "Test::Deep" => 0,
@@ -73,11 +70,9 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::NoTabs" => 0,
     "Test::Pod" => "1.14",
-    "Test::Pod::Coverage" => "1.04",
-    "URI::URL" => 0,
-    "XML::LibXML::XPathContext" => 0
+    "Test::Pod::Coverage" => "1.04"
   },
-  "VERSION" => "0.73",
+  "VERSION" => "0.74",
   "test" => {
     "TESTS" => "t/*.t t/author/*.t"
   }
@@ -107,6 +102,7 @@ my %FallbackPrereqs = (
   "MIME::Base64" => 0,
   "Moose" => 0,
   "Moose::Role" => 0,
+  "MooseX::Test::Role" => 0,
   "MooseX::Types" => 0,
   "MooseX::Types::Common::String" => 0,
   "MooseX::Types::DateTime" => 0,
@@ -129,18 +125,13 @@ my %FallbackPrereqs = (
   "URI::Encode" => 0,
   "URI::Escape" => 0,
   "URI::QueryParam" => 0,
-  "URI::URL" => 0,
   "URN::OASIS::SAML2" => "0.003",
   "XML::Enc" => "0.13",
   "XML::Generator" => "1.13",
   "XML::LibXML" => 0,
   "XML::LibXML::XPathContext" => 0,
   "XML::Sig" => "0.64",
-  "base" => 0,
-  "namespace::autoclean" => 0,
-  "strict" => 0,
-  "vars" => 0,
-  "warnings" => 0
+  "namespace::autoclean" => 0
 );
 
 

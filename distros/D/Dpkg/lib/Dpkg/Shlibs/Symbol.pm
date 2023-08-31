@@ -14,12 +14,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Shlibs::Symbol;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::Shlibs::Symbol - represent an object file symbol
+
+=head1 DESCRIPTION
+
+This module provides a class to handle symbols from an executable or
+shared object file.
+
+B<Note>: This is a private module, its API can change at any time.
+
+=cut
+
+package Dpkg::Shlibs::Symbol 0.01;
 
 use strict;
 use warnings;
-
-our $VERSION = '0.01';
 
 use Storable ();
 use List::Util qw(any);
@@ -35,10 +48,6 @@ use constant ALIAS_TYPES => qw(
     c++
     symver
 );
-
-# Needed by the deprecated key, which is a correct use.
-no if $Dpkg::Version::VERSION ge '1.02',
-    warnings => qw(Dpkg::Version::semantic_change::overload::bool);
 
 sub new {
     my ($this, %args) = @_;
@@ -70,7 +79,7 @@ sub parse_tagspec {
     if ($tagspec =~ /^\s*\((.*?)\)(.*)$/ && $1) {
 	# (tag1=t1 value|tag2|...|tagN=tNp)
 	# Symbols ()|= cannot appear in the tag names and values
-	my $tagspec = $1;
+	$tagspec = $1;
 	my $rest = ($2) ? $2 : '';
 	my @tags = split(/\|/, $tagspec);
 
@@ -527,5 +536,13 @@ sub matches_rawname {
     }
     return $ok;
 }
+
+=head1 CHANGES
+
+=head2 Version 0.xx
+
+This is a private module.
+
+=cut
 
 1;

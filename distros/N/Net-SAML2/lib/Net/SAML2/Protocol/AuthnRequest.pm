@@ -1,7 +1,7 @@
 package Net::SAML2::Protocol::AuthnRequest;
 use Moose;
 
-our $VERSION = '0.73'; # VERSION
+our $VERSION = '0.74'; # VERSION
 use MooseX::Types::URI            qw/ Uri /;
 use MooseX::Types::Common::String qw/ NonEmptySimpleStr /;
 use XML::Generator;
@@ -253,7 +253,7 @@ Net::SAML2::Protocol::AuthnRequest - SAML2 AuthnRequest object
 
 =head1 VERSION
 
-version 0.73
+version 0.74
 
 =head1 SYNOPSIS
 

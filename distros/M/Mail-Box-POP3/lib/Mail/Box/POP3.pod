@@ -95,21 +95,27 @@ for user, password, pop-server and server-port.
   save_on_exit       Mail::Box        <true>
   server_name        Mail::Box::Net   undef
   server_port        Mail::Box::Net   110
+  ssl_options                         <undef>
   trace              Mail::Reporter   'WARNINGS'
   trusted            Mail::Box        <false>
+  use_ssl                             <false>
   username           Mail::Box::Net   undef
 
 =over 2
 
 =item access => MODE
 
-=item authenticate => 'LOGIN'|'APOP'|'AUTO'
+=item authenticate => 'LOGIN'|'APOP'|'AUTO'|'OUATH2'|'OAUTH2_SEP'
 
 POP3 can use two methods of authentication: the old LOGIN protocol, which
 transmits a username and password in plain text, and the newer APOP
 protocol which uses MD5 encryption.  APOP is therefore much better, however
 not always supported by the server.  With AUTO, first APOP is tried and
 if that fails LOGIN.
+
+[3.006] OAUTH* requires the authorization token to be passed as Password.
+Microsoft Office365 needs C<OAUTH2_SEP>, where other oauth2 implementations
+use C<OAUTH2>.
 
 =item body_delayed_type => CLASS
 
@@ -168,9 +174,13 @@ which is passed must extend L<Mail::Transport::POP3|Mail::Transport::POP3>.
 
 =item server_port => INTEGER
 
+=item ssl_options => HASH
+
 =item trace => LEVEL
 
 =item trusted => BOOLEAN
+
+=item use_ssl => BOOLEAN
 
 =item username => STRING
 
@@ -450,10 +460,13 @@ Inherited, see L<Mail::Box/"Internals">
 
 Returns the pop client object.  This does not establish the connection.
 
- -Option --Default
-  use_ssl  <false>
+ -Option     --Default
+  ssl_options  <from new(ssl_options)>
+  use_ssl      <from new(use_ssl)>
 
 =over 2
+
+=item ssl_options => HASH
 
 =item use_ssl => BOOLEAN
 
@@ -734,12 +747,12 @@ implementation with writing.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-POP3 distribution version 3.005,
-built on May 03, 2019. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-POP3 distribution version 3.006,
+built on August 28, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2023 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

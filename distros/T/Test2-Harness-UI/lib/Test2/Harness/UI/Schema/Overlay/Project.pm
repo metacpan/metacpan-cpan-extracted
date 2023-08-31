@@ -10,7 +10,7 @@ use Carp qw/confess/;
 confess "You must first load a Test2::Harness::UI::Schema::NAME module"
     unless $Test2::Harness::UI::Schema::LOADED;
 
-our $VERSION = '0.000136';
+our $VERSION = '0.000138';
 
 sub last_covered_run {
     my $self = shift;
@@ -66,7 +66,7 @@ sub durations {
     my ($user_append, @user_args) = $username ? ("users.username = ?", $username) : ();
 
     if ($username) {
-        $query .= "AND $user_append";
+        $query .= "AND $user_append\n";
         push @vals => @user_args;
     }
 
@@ -85,8 +85,10 @@ sub durations {
 
         my @ids = map { $_->[0] } @{$sth->fetchall_arrayref};
 
-        $query .= "AND run_id IN (" . ('?' x scalar @ids) . ")\n";
-        push @vals => (@ids);
+        if (@ids) {
+            $query .= "AND run_id IN (" . ('?' x scalar @ids) . ")\n";
+            push @vals => (@ids);
+        }
     }
 
     my $sth = $dbh->prepare($query);

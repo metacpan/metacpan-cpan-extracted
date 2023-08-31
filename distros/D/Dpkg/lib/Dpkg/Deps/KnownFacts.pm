@@ -19,8 +19,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Deps::KnownFacts;
-
 =encoding utf8
 
 =head1 NAME
@@ -34,10 +32,10 @@ packages provided (by the set of installed packages).
 
 =cut
 
+package Dpkg::Deps::KnownFacts 2.00;
+
 use strict;
 use warnings;
-
-our $VERSION = '2.00';
 
 use Dpkg::Version;
 

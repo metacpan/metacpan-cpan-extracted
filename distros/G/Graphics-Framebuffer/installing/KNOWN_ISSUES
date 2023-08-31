@@ -2,6 +2,12 @@ KNOWN ISSUES
 
 ##############################################################################
 
+16 bit processing is a hack, a kludge.  It is a slower than 32 bit color
+operations.  It also may have problems.  The best way to avoid any speed or
+bug issues, is to avoid 16 bit mode all together and use 24 or 32 bit mode.
+
+##############################################################################
+
 Loading very large images can crash if your system does not have enough RAM.
 This is something you need to keep in mind before loading giant pictures.
 

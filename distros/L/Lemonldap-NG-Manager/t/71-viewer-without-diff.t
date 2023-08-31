@@ -17,8 +17,13 @@ sub body {
 # Load lemonldap-ng-noDiff.ini
 my $client2;
 ok(
-    $client2 = Lemonldap::NG::Manager::Cli::Lib->new(
-        iniFile => 't/lemonldap-ng-noDiff.ini'
+    $client2 = LLNG::Manager::Test->new(
+        ini => {
+            viewerAllowDiff  => 0,
+            viewerHiddenKeys =>
+              "samlIDPMetaDataNodes samlSPMetaDataNodes portalDisplayLogout",
+            viewerAllowBrowser => '$env->{REMOTE_ADDR} ne "127.0.0.1"',
+        }
     ),
     'Client object'
 );

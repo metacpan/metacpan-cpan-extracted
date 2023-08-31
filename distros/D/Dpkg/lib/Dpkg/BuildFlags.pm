@@ -14,19 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::BuildFlags;
-
-use strict;
-use warnings;
-
-our $VERSION = '1.06';
-
-use Dpkg ();
-use Dpkg::Gettext;
-use Dpkg::BuildEnv;
-use Dpkg::ErrorHandling;
-use Dpkg::Vendor qw(run_vendor_hook);
-
 =encoding utf8
 
 =head1 NAME
@@ -37,6 +24,19 @@ Dpkg::BuildFlags - query build flags
 
 This class is used by dpkg-buildflags and can be used
 to query the same information.
+
+=cut
+
+package Dpkg::BuildFlags 1.06;
+
+use strict;
+use warnings;
+
+use Dpkg ();
+use Dpkg::Gettext;
+use Dpkg::BuildEnv;
+use Dpkg::ErrorHandling;
+use Dpkg::Vendor qw(run_vendor_hook);
 
 =head1 METHODS
 

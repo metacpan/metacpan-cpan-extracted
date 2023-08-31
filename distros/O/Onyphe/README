@@ -1,0 +1,46 @@
+
+
+  1. Installating dependencies for Ubuntu/Debian/Kali systems
+
+  sudo apt-get install cpanminus libmojolicious-perl libtie-ixhash-perl
+  sudo apt-get install liblwp-protocol-https-perl libjson-xs-perl libfile-slurp-perl
+  sudo apt-get install libregexp-ipv6-perl libtext-csv-xs-perl
+  sudo cpanm -n Config::INI::Tiny Text::ParseWords Net::IPv4Addr Regexp::IPv4
+
+
+  2. Installing dependencies for all other systems
+
+  Install your local cpanminus ditribution and run the following:
+
+  sudo cpanm -n Mojolicious Config::INI::Tiny Tie::IxHash LWP::Protocol::https JSON::XS
+  sudo cpanm -n Text::ParseWords File::Slurp
+  sudo cpanm -n Regexp::IPv4 Text::CSV_XS Net::IPv4Addr Regexp::IPv6
+
+
+  3. Configure ONYPHE Command Line Interface settings
+
+  echo 'api_endpoint = https://www.onyphe.io/api/v2' > ~/.onyphe.ini
+  echo 'api_key = XXX' >> ~/.onyphe.ini
+
+
+  4. Install ONYPHE Command Line Interface
+
+  perl Build.PL
+  ./Build && ./Build test
+  sudo ./Build install
+
+
+  5. With an Unrated API license
+
+  echo 'api_unrated_endpoint = https://www.onyphe.io/unrated/api/v2' > ~/.onyphe.ini
+  echo 'api_unrated_email = user@company.com' >> ~/.onyphe.ini
+  echo 'api_key = XXX' >> ~/.onyphe.ini
+
+
+  6. You're done
+
+  onyphe -help
+  onyphe -version
+
+  onyphe -search 'protocol:ssh | uniq domain | addcount'
+

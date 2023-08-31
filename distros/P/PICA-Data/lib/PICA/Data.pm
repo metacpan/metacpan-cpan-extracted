@@ -1,7 +1,7 @@
 package PICA::Data;
 use v5.14.1;
 
-our $VERSION = '2.11';
+our $VERSION = '2.12';
 
 use Exporter 'import';
 our @EXPORT_OK
@@ -396,6 +396,7 @@ use PICA::Patch;
 use PICA::Parser::XML;
 use PICA::Parser::Plus;
 use PICA::Parser::Plain;
+use PICA::Parser::Patch;
 use PICA::Parser::Import;
 use PICA::Parser::Binary;
 use PICA::Parser::PPXML;
@@ -404,6 +405,7 @@ use PICA::Parser::JSON;
 use PICA::Writer::XML;
 use PICA::Writer::Plus;
 use PICA::Writer::Plain;
+use PICA::Writer::Patch;
 use PICA::Writer::Import;
 use PICA::Writer::Binary;
 use PICA::Writer::PPXML;
@@ -465,6 +467,9 @@ sub _pica_module {
     }
     elsif ($type =~ /^(pica)?plain$/) {
         "${base}::Plain"->new(@_);
+    }
+    elsif ($type =~ /^patch$/) {
+        "${base}::Patch"->new(@_);
     }
     elsif ($type eq 'import') {
         "${base}::Import"->new(@_);
@@ -676,6 +681,10 @@ L<PICA::Parser::PPXML> for type C<ppxml> (PicaPlus-XML)
 
 L<PICA::Parser::PIXML> for type C<pixml> (PICA FOLIO Import XML)
 
+=item
+
+L<PICA::Parser::Patch> for type C<patch> (PICA Patch format)
+
 =back
 
 =head2 pica_guess( $data )
@@ -729,6 +738,10 @@ L<PICA::Writer::PPXML> for type C<ppxml> (PicaPlus-XML)
 =item
 
 L<PICA::Writer::PIXML> for type C<pixml> (PICA FOLIO Import XML)
+
+=item 
+
+L<PICA::Writer::Patch> for type C<patch> (PICA Patch format)
 
 =back
 

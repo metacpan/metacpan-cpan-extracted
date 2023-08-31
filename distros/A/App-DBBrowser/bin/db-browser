@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.339';
+our $VERSION = '2.340';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -47,24 +47,22 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.339
+Version 2.340
 
 =head1 SYNOPSIS
-
-=head2 SQLite/MySQL/MariaDB/PostgreSQL/Firebird/DB2/Informix
 
     db-browser -h|--help
 
     db-browser
 
-    db-browser database-name, ...
+    db-browser data source, ...
 
-When the C<db-browser> is called with the argument C<-h|--help>, it shows a menu. The menu entry I<HELP> shows this
+When the C<db-browser> is called with the argument C<-h|--help>, it shows a menu. The menu entry I<Help> shows this
 documentation - see L</OPTIONS>.
 
 If C<db-browser> is called without arguments, the user can choose from the databases offered by the database plugin.
 
-If C<db-browser> is called with arguments, the arguments are used as the available databases.
+If C<db-browser> is called with arguments, the arguments are used as the available data sources.
 
 =head2 SQLite/Firebird
 
@@ -79,8 +77,8 @@ Before using C<db-browser>, make sure you backed up your databases.
 Search and read in SQL databases: one can browse databases and their tables interactively.
 
 C<App::DBBrowser> provides and supports plugins for the DBI drivers C<DBD::SQLite>, C<DBD::mysql>, C<DBD::MariaDB>,
-C<DBD::Pg>, C<DBD::Firebird>, C<DBD::DB2>, C<DBD::Informix> and C<DBD::Oracle>. See L<App::DBBrowser::DB> how to write
-a database plugin.
+C<DBD::Pg>, C<DBD::Firebird>, C<DBD::DB2>, C<DBD::Informix>, C<DBD::Oracle> and C<DBD::ODBC>. See L<App::DBBrowser::DB>
+how to write a database plugin.
 
 =head1 NAVIGATION
 
@@ -598,15 +596,7 @@ Change the parse settings and reparse the data with the new settings.
 
 The options menu is called with C<db-browser -h>.
 
-=head2 HELP
-
-Show this documentation.
-
-=head2 Path
-
-Shows the version and the path of the running C<db-browser> and the path of the application directory.
-
-=head2 DB Plugins
+=head2 Plugins
 
 Choose the required database plugins.
 
@@ -894,30 +884,6 @@ are then used as default values when the user is asked for the data types.
 
 =head2 Output
 
-=head3 Truncate column threshold
-
-Columns with a width below or equal I<Trunc col threshold> are only trimmed if it is still required to lower the row
-width despite all columns wider than I<Trunc col threshold> have been trimmed to I<Trunc col threshold>.
-
-=head3 Truncate fractions first
-
-If the terminal width is not wide enough and I<Trunc fract first> is enabled, the first step to reduce the width of the
-columns is to truncate the fraction part of numbers to 2 decimal places.
-
-=head3 Progress bar
-
-Set the progress bar threshold. If the number of fields (rows x columns) is higher than the threshold, a progress bar is
-shown while preparing the data for the output.
-
-=head3 Tab width
-
-Set the number of spaces between columns.
-
-=head3 Color
-
-Enables the support for color and text formatting escape sequences (SGR) if set to C<Enable>. Before the output it is
-added a reset (C<\e[0m>) at the end of each row.
-
 =head3 Binary filter
 
 Set I<Binary filter> to C<NO>, C<BNRY> or C<Hexadecimal>.
@@ -964,6 +930,30 @@ C<File::Find> warnings when searching for C<SQLite> databases.
 warnings - e.g. utf8 warnings - when printing a table.
 
 =back
+
+=head3 Progress bar
+
+Set the progress bar threshold. If the number of fields (rows x columns) is higher than the threshold, a progress bar is
+shown while preparing the data for the output.
+
+=head3 Tab width
+
+Set the number of spaces between columns.
+
+=head3 Color
+
+Enables the support for color and text formatting escape sequences (SGR) if set to C<Enable>. Before the output it is
+added a reset (C<\e[0m>) at the end of each row.
+
+=head3 Truncate fractions first
+
+If the terminal width is not wide enough and I<Trunc fract first> is enabled, the first step to reduce the width of the
+columns is to truncate the fraction part of numbers to 2 decimal places.
+
+=head3 Truncate column threshold
+
+Columns with a width below or equal I<Trunc col threshold> are only trimmed if it is still required to lower the row
+width despite all columns wider than I<Trunc col threshold> have been trimmed to I<Trunc col threshold>.
 
 =head2 Import data
 
@@ -1283,6 +1273,14 @@ Set the I<Mouse mode> (see L<Term::Choose/mouse>).
 C<DB2> databases only: set the application code set.
 
 Data coming from a DB2 database is decoded with this encoding.
+
+=head2 Help
+
+Show this documentation.
+
+=head2 Path
+
+Shows the version and the path of the running C<db-browser> and the path of the application directory.
 
 =head1 CONFIGURATION FILES
 

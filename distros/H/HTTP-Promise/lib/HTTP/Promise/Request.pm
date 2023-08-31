@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Request.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/21
-## Modified 2022/03/21
+## Modified 2023/08/27
 ## All rights reserved.
 ## 
 ## 
@@ -50,7 +50,7 @@ BEGIN
     our $GROSS_URI_RE  = qr{(?<scheme>(?:https?:)?)//(?<host>[^/?\#]*)(?<rest>.*)};
     # [\x00-\x7f]
     our $INTL_URI_RE  = qr{(?<scheme>(?:https?:)?)//(?<host>[^\x00-\x7f]+\.[^/?\#]*)(?<rest>.*)};
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 use strict;
@@ -375,6 +375,29 @@ sub uri_absolute { return( shift->_set_get_boolean( 'uri_absolute', @_ ) ); }
 
 sub uri_canonical { return( shift->uri->canonical ); }
 
+sub url_encode
+{
+    my $self = shift( @_ );
+    my $str = shift( @_ );
+    $self->_load_class( 'URL::Encode::XS' ) || return( $self->pass_error );
+    if( Encode::is_utf8( $str ) )
+    {
+        return( URL::Encode::XS::url_encode_utf8( "$str" ) );
+    }
+    else
+    {
+        return( URL::Encode::XS::url_encode( "$str" ) );
+    }
+}
+
+sub url_encode_utf8
+{
+    my $self = shift( @_ );
+    my $str = shift( @_ );
+    $self->_load_class( 'URL::Encode::XS' ) || return( $self->pass_error );
+    return( URL::Encode::XS::url_encode_utf8( "$str" ) );
+}
+
 # NOTE: sub FREEZE is inherited
 
 # NOTE: sub STORABLE_freeze is inherited
@@ -396,11 +419,18 @@ HTTP::Promise::Request - HTTP Request Class
 =head1 SYNOPSIS
 
     use HTTP::Promise::Request;
-    my $this = HTTP::Promise::Request->new || die( HTTP::Promise::Request->error, "\n" );
+    my $r = HTTP::Promise::Request->new( $method, $uri, $headers, $content, k1 => v1, k2 => v2);
+    my $r = HTTP::Promise::Request->new( $method, $uri, $headers, $content, { k1 => v1, k2 => v2 });
+    my $r = HTTP::Promise::Request->new( $method, $uri, $headers, k1 => v1, k2 => v2);
+    my $r = HTTP::Promise::Request->new( $method, $uri, $headers, { k1 => v1, k2 => v2 });
+    my $r = HTTP::Promise::Request->new( $method, $uri, k1 => v1, k2 => v2);
+    my $r = HTTP::Promise::Request->new( $method, k1 => v1, k2 => v2);
+    my $r = HTTP::Promise::Request->new( k1 => v1, k2 => v2 );
+    die( HTTP::Promise::Request->error ) if( !defined( $r ) );
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -452,6 +482,25 @@ Here is how it fits in overall relation with other classes.
     my $r = HTTP::Promise::Request->new( $method, k1 => v1, k2 => v2);
     my $r = HTTP::Promise::Request->new( k1 => v1, k2 => v2 );
     die( HTTP::Promise::Request->error ) if( !defined( $r ) );
+
+    my $decodable = $r->accept_decodable;
+    my $r2 = $r->clone;
+    $r->cookie_jar( Cookie::Jar->new );
+    my $jar = $r->cookie_jar;
+    my $proto = $r->default_protocol; # HTTP/1.1
+    say $r->dump;
+    my $headers = $r->headers; # Returns an HTTP::Promise::Headers object
+    $r->make_form_data;
+    $r->method( 'GET' );
+    my $method = $r->method;
+    my $r3 = $r->parse( $data );
+    say $r->start_line;
+    say $r->start_line( "\015\012" );
+    $r->timeout(5);
+    $r->uri( 'https://example.org/some/where' );
+    my $uri = $r->uri; # Returns an URI object
+    my $bool = $r->uri_absolute;
+    my $canonical_uri = $r->uri_canonical;
 
 Provided with an HTTP method, URI, an optional set of headers, as either an array reference or a L<HTTP::Promise::Headers> or a L<HTTP::Headers> object, some optional content and an optional hash reference of options (as the last or only parameter), and this instantiates a new L<HTTP::Promise::Request> object. The supported arguments are as follow. Each arguments can be set or changed later using the method with the same name.
 
@@ -773,6 +822,27 @@ If true, it sets the former otherwise the latter. Default to false.
 =head2 uri_canonical
 
 Returns the current L</uri> in its canonical form by calling L<URI/canonical>
+
+=head2 url_encode
+
+    my $v = $req->url_encode( "=encoding utf-8\n\n=head1 Hello World" );
+    # %3Dencoding+utf-8%0A%0A%3Dhead1+Hello+World
+
+or
+
+    use utf8;
+    my $v = $req->url_encode( "文字化けかな" );
+    # %C3%A6%C2%96%C2%87%C3%A5%C2%AD%C2%97%C3%A5%C2%8C%C2%96%C3%A3%C2%81%C2%91%C3%A3%C2%81%C2%8B%C3%A3%C2%81%C2%AA
+
+This returns the string provided properly URL-encoded.
+
+This is actually a convenient wrapper around C<URL::Encode::XS::url_encode> or C<URL::Encode::XS::url_encode_utf8> if this is regarded as a Perl internal UTF-8 string.
+
+=head2 url_encode_utf8
+
+Returns the string provided URL-encoded.
+
+This is to be used on Perl internal UTF-8 strings.
 
 =head2 version
 

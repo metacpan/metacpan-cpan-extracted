@@ -74,7 +74,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 #########################################################################
 
@@ -183,6 +183,8 @@ our %T =
      => "parameter '%s' must be a positive integer in call to %s::%s",
      parameter__1_must_be_in__2__3
      => "parameter '%s' must be in [%s..%s]",
+     reset_directory_invalid_symbolic_link
+     => 'reset directory (invalid symbolic link?)',
      scrolls
      => '+/- scrolls',
      specified_implementation_missing

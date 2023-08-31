@@ -69,7 +69,6 @@ my $class = Module::Build->subclass(
         sub ACTION_test {
             my $self = shift;
 
-            local $ENV{LANG} = 'C';
             local $ENV{LC_ALL} = 'C';
             local $ENV{PERL} = $Config::Config{perlpath} || $^X || 'perl';
             local $ENV{DPKG_TEST_MODE} = 'cpan';
@@ -85,7 +84,7 @@ my $class = Module::Build->subclass(
 my $build = $class->new(
     dist_name       => 'Dpkg',
     dist_abstract   => 'Debian Package Manager Perl modules',
-    dist_version    => '1.21.22',
+    dist_version    => '1.22.0',
     dist_author     => 'Dpkg Developers <debian-dpkg@lists.debian.org>',
     license         => 'GPL_2',
 
@@ -151,7 +150,7 @@ my $build = $class->new(
 
     },
     requires => {
-        'perl'                  => '5.28.1',
+        'perl'                  => '5.32.1',
     },
 
     data_files => {
@@ -167,5 +166,3 @@ my $build = $class->new(
 
 $build->add_build_element('data');
 $build->create_build_script();
-
-1;

@@ -8,7 +8,7 @@ use Lemonldap::NG::Handler::ApacheMP2::Request;
 
 use Lemonldap::NG::Handler::ApacheMP2::Main;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.17.0';
 
 # PUBLIC METHODS
 
@@ -43,6 +43,9 @@ sub launch {
     my $class = "Lemonldap::NG::Handler::ApacheMP2::$type";
     eval "require $class";
     die $@ if ($@);
+
+    $class->logger->info(
+        "New request $class " . $req->method . " " . $req->request_uri );
 
     # register the request object to the logging system
     if ( ref( $class->logger ) and $class->logger->can('setRequestObj') ) {

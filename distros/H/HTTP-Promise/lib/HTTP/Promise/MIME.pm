@@ -16,8 +16,11 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
-    use vars qw( $VERSION $TYPES );
-    use File::MMagic::XS;
+    use vars qw( $VERSION $TYPES $HAS_FILE_MMAGIC_XS );
+    # use File::MMagic::XS;
+    eval( "use File::MMagic::XS 0.09008" );
+    our $HAS_FILE_MMAGIC_XS = $@ ? 0 : 1;                               
+    use Nice::Try;
     our $VERSION = 'v0.1.0';
     our $TYPES = {};
 };
@@ -81,8 +84,24 @@ sub mime_type
 {
     my $self = shift( @_ );
     my $file = shift( @_ ) || return( $self->error( "No file was provided." ) );
-    my $m = File::MMagic::XS->new;
-    return( $m->get_mime( "$file" ) );
+    try
+    {
+        if( $HAS_FILE_MMAGIC_XS )
+        {
+            my $m = File::MMagic::XS->new;
+            return( $m->get_mime( "$file" ) );
+        }
+        else
+        {
+            require File::MMagic;
+            my $m = File::MMagic->new;
+            return( $m->checktype_filename( "$file" ) );
+        }
+    }
+    catch( $e )
+    {
+        return( $self->error( "An error occurred while trying to get the mime type for file \"${file}\": $e" ) );
+    }
 }
 
 sub mime_type_from_suffix

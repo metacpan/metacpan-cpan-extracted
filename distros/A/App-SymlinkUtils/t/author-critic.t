@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/SymlinkUtils.pm','script/check-symlink'];
+my $filenames = ['lib/App/SymlinkUtils.pm','script/check-symlink','script/check-symlinks'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

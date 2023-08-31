@@ -1,0 +1,15 @@
+class TestCase::Mozilla::CA {
+  use Mozilla::CA;
+  use Fn;
+  
+  static method test : int () {
+    
+    my $ssl_ca = Mozilla::CA->SSL_ca;
+    
+    unless (Fn->contains($ssl_ca, "Bundle of CA Root Certificates")) {
+      return 0;
+    }
+    
+    return 1;
+  }
+}

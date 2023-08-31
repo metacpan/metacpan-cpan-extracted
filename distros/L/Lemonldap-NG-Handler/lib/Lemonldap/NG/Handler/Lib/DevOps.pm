@@ -2,9 +2,10 @@ package Lemonldap::NG::Handler::Lib::DevOps;
 
 use strict;
 use Lemonldap::NG::Common::UserAgent;
+use Lemonldap::NG::Common::Util qw(isHiddenAttr);
 use JSON qw(from_json);
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.17.0';
 our $_ua;
 
 sub ua {
@@ -95,10 +96,14 @@ q"I refuse to compile 'rules.json' when useSafeJail isn't activated! Yes I know,
     $json->{headers} //= { 'Auth-User' => '$uid' };
 
     # Removed hidden session attributes
-    foreach my $v ( split /[,\s]+/, $class->tsv->{hiddenAttributes} ) {
-        foreach ( keys %{ $json->{headers} } ) {
-            delete $json->{headers}->{$_}
-              if $json->{headers}->{$_} eq '$' . $v;
+    foreach ( keys %{ $json->{headers} } ) {
+        my $header = $json->{headers}->{$_};
+        $header =~ s/^\$//;
+        if ( isHiddenAttr( $class->localConfig, $header ) ) {
+            delete $json->{headers}->{$_};
+            $class->userLogger->warn(
+"DevOps handler: $vhost tried to retrieve a hidden attribute -> $header"
+            );
         }
     }
 

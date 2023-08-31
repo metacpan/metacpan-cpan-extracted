@@ -134,7 +134,7 @@ class TestCase::Module::Hash {
 
   static method set_get_numeric : int () {
 
-    my $hash = Hash->new({});
+    my $hash = Hash->new;
 
     # set_byte, get_byte
     {
@@ -250,11 +250,11 @@ class TestCase::Module::Hash {
   static method set : int () {
     my $keys = ["alice", "bob", "carol", "1234567890-="];
     my $vals = [Int->new(1), Int->new(2), undef, Int->new(3)];
-    my $hash = Hash->new({});
+    my $hash = Hash->new;
     for (my $i = 0; $i < @$keys; ++$i) {
       $hash->set($keys->[$i], $vals->[$i]);
     }
-    unless ($hash->count == @$keys) {
+    unless ($hash->keys_length == @$keys) {
       return 0;
     }
     for (my $i = 0; $i < @$keys; ++$i) {
@@ -266,7 +266,7 @@ class TestCase::Module::Hash {
   }
 
   static method set_do_not_refer_caller_key : int () {
-    my $hash = Hash->new({});
+    my $hash = Hash->new;
     my $key = "a";
     $hash->set($key, Int->new(1));
     $key = "b";
@@ -280,7 +280,7 @@ class TestCase::Module::Hash {
   }
 
   static method get : int () {
-    my $hash = Hash->new({});
+    my $hash = Hash->new;
     $hash->set_int("a" => 1);
     $hash->set("b" => undef);
     $hash->set("c" => "str");
@@ -297,13 +297,26 @@ class TestCase::Module::Hash {
     unless ($hash->get("no_key") == undef) {
       return 0;
     }
+    
+    # Exceptions
+    {
+      my $hash = Hash->new;
+      eval { $hash->get(undef); }
+      
+      unless (Fn->contains($@, "The \$key must be defined.")) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
     return 1;
   }
 
   static method exists : int () {
     my $keys = ["alice", "bob"];
     my $vals = [Int->new(1), Int->new(2)];
-    my $hash = Hash->new({});
+    my $hash = Hash->new;
     for (my $i = 0; $i < @$keys; ++$i) {
       $hash->set($keys->[$i], $vals->[$i]);
     }
@@ -315,11 +328,57 @@ class TestCase::Module::Hash {
     unless ($hash->exists("carol") == 0) {
       return 0;
     }
+    
+    # Exceptions
+    {
+      my $hash = Hash->new;
+      eval { $hash->exists(undef); }
+      
+      unless (Fn->contains($@, "The \$key must be defined.")) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
     return 1;
   }
-
+  
+  static method delete : int () {
+    
+    {
+      my $success = &delete_with_no_hash_collision;
+      
+      unless ($success) {
+        return 0;
+      }
+    }
+    
+    {
+      my $success = &delete_with_hash_collision;
+      
+      unless ($success) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      my $hash = Hash->new;
+      eval { $hash->delete(undef); }
+      
+      unless (Fn->contains($@, "The \$key must be defined.")) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
   static method delete_with_no_hash_collision : int () {
-    my $hash = Hash->new({});
+    my $hash = Hash->new;
     $hash->set("alice", Int->new(1));
     $hash->set("bob", Int->new(2));
     unless (((Int)($hash->delete("alice")))->value == 1) {
@@ -328,7 +387,7 @@ class TestCase::Module::Hash {
     unless ($hash->exists("alice") == 0) {
       return 0;
     }
-    unless ($hash->count == 1) {
+    unless ($hash->keys_length == 1) {
       return 0;
     }
     unless ($hash->delete("alice") == undef) {
@@ -337,7 +396,7 @@ class TestCase::Module::Hash {
     unless ($hash->delete("carol") == undef) {
       return 0;
     }
-    unless ($hash->count == 1) {
+    unless ($hash->keys_length == 1) {
       return 0;
     }
     unless ($hash->exists("bob") == 1) {
@@ -345,9 +404,9 @@ class TestCase::Module::Hash {
     }
     return 1;
   }
-
+  
   static method delete_with_hash_collision : int () {
-    my $hash = Hash->new({});
+    my $hash = Hash->new;
     $hash->set("alice", Int->new(1));
     $hash->set("bob", Int->new(2));
     unless (((Int)$hash->delete("alice"))->value == 1) {
@@ -356,13 +415,13 @@ class TestCase::Module::Hash {
     unless ($hash->exists("alice") == 0) {
       return 0;
     }
-    unless ($hash->count == 1) {
+    unless ($hash->keys_length == 1) {
       return 0;
     }
     unless ($hash->delete("alice") == undef) {
       return 0;
     }
-    unless ($hash->count == 1) {
+    unless ($hash->keys_length == 1) {
       return 0;
     }
 
@@ -372,7 +431,7 @@ class TestCase::Module::Hash {
     unless (((Int)($hash->delete("bob")))->value == 2) {
       return 0;
     }
-    unless ($hash->count == 0) {
+    unless ($hash->keys_length == 0) {
       return 0;
     }
     unless ($hash->exists("bob") == 0) {
@@ -383,15 +442,12 @@ class TestCase::Module::Hash {
 
   static method rehash : int () {
     my $initial_capacity = 16;
-    my $hash = Hash->new({});
+    my $hash = Hash->new;
     for (my $i = 0; $i < 14; ++$i) {
       my $key = "key" . $i;
       $hash->set_int($key => $i);
     }
 
-    unless ($hash->_bucket_count == $initial_capacity * 2) {
-      return 0;
-    }
     unless (@{$hash->_entries} == $initial_capacity * 2) {
       return 0;
     }
@@ -404,7 +460,7 @@ class TestCase::Module::Hash {
   }
 
   static method keys : int () {
-    my $hash = Hash->new({});
+    my $hash = Hash->new;
     my $key0 = "a";
     my $key1 = "b";
     
@@ -458,7 +514,7 @@ class TestCase::Module::Hash {
   }
   
   static method values : int () {
-    my $hash = Hash->new({});
+    my $hash = Hash->new;
     my $key0 = "a";
     my $key1 = "b";
     my $key2 = "c";
@@ -496,7 +552,7 @@ class TestCase::Module::Hash {
   }
 
   static method copy : int () {
-    my $hash = Hash->new({});
+    my $hash = Hash->new;
     for (my $i = 0; $i < 3; ++$i) {
       $hash->set("key$i", $i);
     }
@@ -517,7 +573,7 @@ class TestCase::Module::Hash {
   }
 
   static method clone : int () {
-    my $hash = Hash->new({});
+    my $hash = Hash->new;
     for (my $i = 0; $i < 3; ++$i) {
       $hash->set("key$i", $i);
     }
@@ -568,28 +624,53 @@ class TestCase::Module::Hash {
         $hash->set("key$i", $i);
       }
       
-      my $sort = 1;
-      my $array = $hash->to_array($sort);
+      {
+        my $sort = 1;
+        my $array = $hash->to_array($sort);
+        
+        unless ($array->[0]->(string) eq "key0") {
+          return 0;
+        }
+        unless ($array->[1]->(int) == 0) {
+          return 0;
+        }
+        unless ($array->[2]->(string) eq "key1") {
+          return 0;
+        }
+        unless ($array->[3]->(int) == 1) {
+          return 0;
+        }
+        unless ($array->[4]->(string) eq "key2") {
+          return 0;
+        }
+        unless ($array->[5]->(int) == 2) {
+          return 0;
+        }
+      }
       
-      unless ($array->[0]->(string) eq "key0") {
-        return 0;
+      {
+        my $sort = -1;
+        my $array = $hash->to_array($sort);
+        
+        unless ($array->[4]->(string) eq "key0") {
+          return 0;
+        }
+        unless ($array->[5]->(int) == 0) {
+          return 0;
+        }
+        unless ($array->[2]->(string) eq "key1") {
+          return 0;
+        }
+        unless ($array->[3]->(int) == 1) {
+          return 0;
+        }
+        unless ($array->[0]->(string) eq "key2") {
+          return 0;
+        }
+        unless ($array->[1]->(int) == 2) {
+          return 0;
+        }
       }
-      unless ($array->[1]->(int) == 0) {
-        return 0;
-      }
-      unless ($array->[2]->(string) eq "key1") {
-        return 0;
-      }
-      unless ($array->[3]->(int) == 1) {
-        return 0;
-      }
-      unless ($array->[4]->(string) eq "key2") {
-        return 0;
-      }
-      unless ($array->[5]->(int) == 2) {
-        return 0;
-      }
-      
     }
     
     

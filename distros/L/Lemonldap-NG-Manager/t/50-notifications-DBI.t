@@ -6,6 +6,7 @@ use Data::Dumper;
 use IO::String;
 use JSON qw(from_json);
 use Test::More;
+require 't/test-lib.pm';
 
 my $count     = 0;
 my $file      = 't/notifications.db';
@@ -32,8 +33,12 @@ SKIP: {
 
     use_ok('Lemonldap::NG::Manager::Cli::Lib');
     ok(
-        $client = Lemonldap::NG::Manager::Cli::Lib->new(
-            iniFile => 't/lemonldap-ng-dbi.ini'
+        $client = LLNG::Manager::Test->new(
+            ini => {
+                notificationStorage        => 'DBI',
+                notificationStorageOptions =>
+                  { dbiChain => "dbi:SQLite:dbname=t/notifications.db" },
+            }
         ),
         'Client object'
     );

@@ -4,9 +4,9 @@ use warnings;
 package Util::H2O::More;
 use parent q/Exporter/;
 
-our $VERSION = q{0.3.0};
+our $VERSION = q{0.3.2};
 
-our @EXPORT_OK = (qw/baptise opt2h2o h2o o2h d2o o2d o2h2o ini2h2o ini2o h2o2ini o2ini Getopt2h2o ddd dddie tr4h2o/);
+our @EXPORT_OK = (qw/baptise opt2h2o h2o o2h d2o o2d o2h2o ini2h2o ini2o h2o2ini o2ini Getopt2h2o ddd dddie tr4h2o yaml2o/);
 
 use Util::H2O ();
 
@@ -251,18 +251,57 @@ sub dddie(@) {
     die qq{died due to use of dddie};
 }
 
+# YAML configuration support - may return more than 1 reference
+sub yaml2o($) {
+    require YAML;
+    my $file_or_yaml = shift; # may be a file or a string
+    my @yaml         = ();    # yaml can have multiple objects serialized, via ---
+
+    # determine if YAML or file name
+    my @lines = split /\n/, $file_or_yaml;
+
+    # if a file, use YAML::LoadFile
+    if ( @lines == 1 and -e $file_or_yaml ) {
+        @yaml = YAML::LoadFile($file_or_yaml);
+    }
+
+    # if not a file, assume YAML string and use YAML::Load
+    elsif ($lines[0] eq q{---}) {
+        @yaml = YAML::Load($file_or_yaml);
+    }
+
+    # die because not supported content $file_or_yaml - it is neither
+    else {
+        die qq{Provided parameter looks like neither a file name nor a valid YAML snippet.\n};
+    }
+
+    # iterate over 1 or more serialized objects that were deserialized
+    # from the YAML, applie C<d2o> to it due to the potential presence
+    # of ARRAY references
+    my @obs = ();
+    foreach my $y (@yaml) {
+        push @obs, d2o $y;
+    }
+
+    return @obs;
+}
+
+# NOTE: no o2yaml, but can add one if somebody needs it ... please file an issue on the tracker (GH these days)
+
 1;
 
 __END__
 
 =head1 NAME
 
-Util::H2O::More - provides C<baptise>, a drop-in replacement for
-C<bless>; like if C<bless> created accessors for you. This module
-also provides additional methods built using C<h2o> or C<o2h> from
-L<Util::H2O> that allow for the incremental addition of I<OOP> into
-existing or small scale Perl code without having to fully commit
-to a Perl I<OOP> framework or compromise one's personal Perl style.
+Util::H2O::More - Provides C<baptise>, a drop-in replacement C<bless>
+that creates accessors for you.
+
+This module also provides additional methods built using C<h2o>
+or C<o2h> from L<Util::H2O> that allow for the incremental addition
+of I<OOP> into existing or small scale Perl code without having to
+fully commit to a Perl I<OOP> framework or compromise one's personal
+Perl style.
 
 C<Util::H2O::More> now provides a wrapper method now, C<d2o>
 that will find and I<objectify> all C<HASH> refs contained in
@@ -270,6 +309,24 @@ C<ARRAY>s at any level, no matter how deep. This ability is
 very useful for dealing with modern services that return C<ARRAY>s
 of C<HASH>, traditional L<DBI> queries, and other modules that can
 provide C<LIST>s of C<HASH> refs,  such as L<Web::Scraper>.
+
+C<d2o> and C<o2d> would not have been added if the author of this
+module had been keeping up with the latest features of C<Util::H2O>.
+If nested data structure support is what you need, please see if
+C<h2o>'s C<-array> is what you want; it tells C<h2o> to descende into
+C<ARRAY>s and applies C<h2o -recurse> to them if found; this is
+extremely useful for dealing with data structures generated from
+deserializing JSON (e.g.,).
+
+This module provides some other compelling methods, such as those
+implementing the I<cookbook> suggestions described in C<Util::H2O>.
+Which make it easier to deal with modules such as L<Config::Tiny>
+(C<ini2h2o>, C<h2o2ini>), handle non-compliant keys C<tr4h2o>, or 
+even provide convient access to C<Data::Dumper> (via C<ddd>).
+
+You may have come here for the C<baptise>, but stay for the other
+stuff -all built with the purpose of showing people I<the way> to
+cleaning up their Perl with C<Util::H2O>!
 
 =head1 SYNOPSIS 
 
@@ -481,6 +538,100 @@ C<baptise> and friends.
     # ...
     # now $o can be used to query all possible options, even if they were
     # never passed at the commandline 
+
+=head2 C<yaml2o FILENAME_OR_YAML_STRING>
+
+Takes a single parameter that may be the name of a YAML file (in which case
+it uses L<YAML>'s C<LoadFile>) or as a string of YAML (in which case it uses
+L<YAML>'s C<Load> to parse it). If either C<YAML::LoadFile> or C<YAML::Load>
+fails and throws an exception, it will not be caught and propagate to the
+caller of C<yaml2o>.
+
+Note: C<YAML> may contain more than one serialized object (separated by a
+line with C<---\n>. Therefore C<yaml2o> should be treated as returning a
+list of C<d2o>'d objects.
+
+For example, say the YAML file looks like the following, saved as C<myfile.yaml>:
+
+  ---
+  database:
+    host:     localhost 
+    port:     3306
+    db:       users 
+    username: appuser 
+    password: 1uggagel2345 
+  ---
+  devices:
+    copter1:
+      active:  1
+      macaddr: a0:ff:6b:14:19:6e
+      host:    192.168.0.14
+      port:    80
+    thingywhirl:
+      active:  1
+      macaddr: 00:88:fb:1a:5f:08
+      host:    192.168.0.14
+      port:    80
+
+Then the one may use the C<yaml2o> as follows:
+
+  my @objects_from_yaml = yaml2o q{/path/to/myfile.yaml>;
+
+And C<@objects_from_yaml> will have 2 objects in it, but having been C<bless>ed
+with accessors via the C<d2o> command, which will detect and handle properly lists.
+
+If known ahead of time how many serialized objects C<myfile.yaml> would have
+contained, then this is also a useful way to call it:
+
+  my ($dbconfig, $devices) = yaml2o q{/path/to/myfile.yaml};
+
+More exotic C<YAML> files may break C<yaml2o>; this method was added to support
+simple C<YAML>. YAML can be used to encode a lot of things that we do not need.
+
+If you just need, e.g., the C<$dbconfig>; then this trick would apply well also:
+
+  my ($dbconfig, undef) = yaml2o q{/path/to/myfile.yaml};
+
+Similarly, the following works as expected. The only different is that C<$YAML>
+contains a string.
+
+  my $YAML =<< EOYAML;
+  ---
+  database:
+    host:     localhost 
+    port:     3306
+    db:       users 
+    username: appuser 
+    password: 1uggagel2345 
+  ---
+  devices:
+    copter1:
+      active:  1
+      macaddr: a0:ff:6b:14:19:6e
+      host:    192.168.0.14
+      port:    80
+    thingywhirl:
+      active:  1
+      macaddr: 00:88:fb:1a:5f:08
+      host:    192.168.0.14
+      port:    80
+  EOYAML
+  
+  my ($dbconfig, $devices) = yaml2o $YAML;
+
+=head3 C<yaml2o> May C<die>!
+
+If whatever is passed to C<yaml2o> looks like neither a block of YAML or a file
+name, an exception will be thrown with an error saying as much.
+
+=head3 Note on Serialization to YAML
+
+There is no C<o2yaml> that serializes an object to a file. One may be provided
+at a later date. If you're reading this and want it, please create an issue at
+the Github repository to request it (or other things).
+
+See also, C<o2h>, which returns the pure underlying Perl data structure that is
+objectified by C<h2o>, C<baptise>, C<ini2o>, C<yaml2o>, C<d2o>, etc.
 
 =head2 C<ini2h2o FILENAME>
 

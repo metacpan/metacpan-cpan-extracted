@@ -6,14 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/SymlinkUtils.pm'
 );
 
 my @scripts = (
-    'script/check-symlink'
+    'script/check-symlink',
+    'script/check-symlinks'
 );
 
 # no fake home requested

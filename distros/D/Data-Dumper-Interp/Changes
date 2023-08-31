@@ -1,5 +1,6 @@
 (Recent) Revision history for Perl extension Data-Dumper-Interp
 
+6.005 - Avoid addrvis on temp container for avis/hvis - for test stability
 6.004 - Fix bug Maxdepth off-by-1 with Refaddr. Renamed
         set_addrvis_digits -> addrvis_digits, which now gets with undef arg
 6.003 - Fixed bug where AUTOLOAD did not preserve $@ etc.

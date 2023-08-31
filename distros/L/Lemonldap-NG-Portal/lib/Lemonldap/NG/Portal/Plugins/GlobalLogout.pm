@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.17.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -24,7 +24,7 @@ use constant beforeLogout => 'run';
 
 # INITIALIZATION
 has rule => ( is => 'rw', default => sub { 0 } );
-has ott => (
+has ott  => (
     is      => 'rw',
     lazy    => 1,
     default => sub {
@@ -67,8 +67,14 @@ sub run {
     return PE_OK unless ( $nbr > 1 );
 
     # Force GlobalLogout if timer is disabled
-    unless ( $self->conf->{globalLogoutTimer} ) {
-        $self->logger->debug("GlobalLogout: timer disabled");
+    if ( $req->param('confirm') && $req->param('confirm') == 1
+        || !$self->conf->{globalLogoutTimer} )
+    {
+        my $msg =
+          $self->conf->{globalLogoutTimer}
+          ? 'GlobalLogout: confirm parameter detected'
+          : 'GlobalLogout: timer disabled';
+        $self->logger->debug($msg);
         $self->userLogger->info("GlobalLogout: force global logout for $user");
         $nbr = $self->removeOtherActiveSessions( $req, $sessions );
         $self->userLogger->info("$nbr remaining session(s) removed");
@@ -95,7 +101,13 @@ sub run {
             CUSTOMPRM => $self->conf->{globalLogoutCustomParam}
         }
     );
-    $req->response($tmp);
+
+    $req->response(
+        $req->wantJSON
+        ? $self->sendJSONresponse( $req,
+            { globalLogout => $nbr, confirmationRequired => 1 } )
+        : $tmp
+    );
 
     return PE_SENDRESPONSE;
 }
@@ -193,13 +205,22 @@ sub activeSessions {
           map {
             my $epoch;
             my $regex = '^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$';
-            $_->{startTime} =~ /$regex/;
-            $epoch = timelocal( $6, $5, $4, $3, $2 - 1, $1 );
-            $_->{startTime} = $epoch;
-            if ( $_->{updateTime} ) {
-                $_->{updateTime} =~ /$regex/;
+            if ( $_->{startTime} =~ /$regex/ ) {
                 $epoch = timelocal( $6, $5, $4, $3, $2 - 1, $1 );
-                $_->{updateTime} = $epoch;
+                $_->{startTime} = $epoch;
+            }
+            else {
+                delete $_->{startTime};
+            }
+            if ( $_->{updateTime} ) {
+                if ( $_->{updateTime} =~ /$regex/ ) {
+
+                    $epoch = timelocal( $6, $5, $4, $3, $2 - 1, $1 );
+                    $_->{updateTime} = $epoch;
+                }
+                else {
+                    delete $_->{updateTime};
+                }
             }
             $_;
           }

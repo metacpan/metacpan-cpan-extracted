@@ -15,8 +15,12 @@ use Test::Exception;
     package My::Project;
     use Resource::Silo -class;
 
-    resource foo => sub { $_[0]->bar };
-    resource bar => sub { $_[0]->foo };
+    resource foo    =>
+        loose_deps      => 1,
+        init            => sub { $_[0]->bar };
+    resource bar    =>
+        loose_deps      => 1,
+        init            => sub { $_[0]->foo };
 }
 
 subtest 'throws like it should' => sub {

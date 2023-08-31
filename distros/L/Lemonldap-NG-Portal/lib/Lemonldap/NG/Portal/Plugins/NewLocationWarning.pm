@@ -6,7 +6,7 @@ use POSIX qw(strftime);
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK);
 use List::MoreUtils qw/uniq/;
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.17.0';
 
 has locationAttribute        => ( is => 'rw' );
 has locationDisplayAttribute => ( is => 'rw' );
@@ -60,8 +60,9 @@ sub checkNewLocation {
     my ( $self, $req ) = @_;
     my $successLogin = $req->sessionInfo->{_loginHistory}->{successLogin} || [];
     my $location     = $req->sessionInfo->{ $self->locationAttribute };
+    my $user         = $req->sessionInfo->{ $self->conf->{whatToTrace} };
 
-    $self->logger->debug( "Could not find location of user " . $req->user )
+    $self->logger->debug( "Could not find location of user " . $user )
       unless $location;
 
     # Get all non-empty, unique values of location attribute through list of
@@ -77,24 +78,22 @@ sub checkNewLocation {
 
     if ( grep { $_ eq $location } @envHistory ) {
         $self->userLogger->debug(
-            "User " . $req->user . " logged in from known location $location" );
+            "User $user logged in from known location $location");
     }
     else {
         # Not the first location in history, warn if new location
         if (@envHistory) {
-            $self->userLogger->info( "User "
-                  . $req->user
-                  . " logged in from unknown location $location" );
+            $self->userLogger->info(
+                "User $user logged in from unknown location $location");
             my $riskLevel = ( $req->sessionInfo->{_riskLevel} || 0 ) + 1;
             $req->sessionInfo->{_riskLevel} = $riskLevel;
             $req->sessionInfo->{_riskDetails}->{newLocation} =
               $req->sessionInfo->{ $self->locationDisplayAttribute };
         }
         else {
-            $self->userLogger->info( "User "
-                  . $req->user
-                  . " logged with empty location history from location $location"
-            );
+            $self->userLogger->info(
+                    "User $user logged with empty location history "
+                  . "from location $location" );
         }
     }
     return PE_OK;

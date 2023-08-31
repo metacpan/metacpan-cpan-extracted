@@ -61,6 +61,6 @@
          "url" : "https://github.com/oetiker/callbackery"
       }
    },
-   "version" : "v0.46.5",
+   "version" : "v0.47.3",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

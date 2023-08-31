@@ -1,0 +1,63 @@
+{
+   "abstract" : "Barcode scanning with libzxing-cpp",
+   "author" : [
+      "Tony Cook <tonyc@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Imager-zxing",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Imager" : "1.015",
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CppGuess" : "0",
+            "ExtUtils::MakeMaker" : "6.46",
+            "Imager" : "1.015"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Imager" : "1.015",
+            "XSLoader" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.47"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tonycoz/imager-zxing/"
+      },
+      "homepage" : "http://imager.perl.org/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tonycoz/imager-zxing.git",
+         "web" : "https://github.com/tonycoz/imager-zxing/"
+      }
+   },
+   "version" : "1.000",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

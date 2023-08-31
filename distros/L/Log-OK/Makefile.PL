@@ -3,7 +3,7 @@ WriteMakefile(
 	NAME              => 'Log::OK',
 	VERSION_FROM      => 'lib/Log/OK.pm',
 	PREREQ_PM         => {
-		"constant::more"=>"v0.2.0"
+		"constant::more"=>"v0.2.1"
 	}, 
 	ABSTRACT_FROM     => 'lib/Log/OK.pod', # retrieve abstract from module
 	AUTHOR            => 'Ruben Westerberg <drclaw@mac.com>',

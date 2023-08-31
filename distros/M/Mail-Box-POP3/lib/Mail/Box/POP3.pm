@@ -1,14 +1,14 @@
-# Copyrights 2001-2019 by [Mark Overmeer].
+# Copyrights 2001-2023 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution Mail-Box-POP3.  Meta-POD processed with
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Mail::Box::POP3;
 use vars '$VERSION';
-$VERSION = '3.005';
+$VERSION = '3.006';
 
 use base 'Mail::Box::Net';
 
@@ -33,8 +33,10 @@ sub init($)
 
     $self->SUPER::init($args);
 
-    $self->{MBP_client}    = $args->{pop_client}; 
-    $self->{MBP_auth}      = $args->{authenticate} || 'AUTO';
+    $self->{MBP_client}   = $args->{pop_client}; 
+    $self->{MBP_auth}     = $args->{authenticate} || 'AUTO';
+    $self->{MBP_use_ssl}  = $args->{use_ssl} || 0;
+    $self->{MBP_ssl_opts} = $args->{ssl_options};
 
     $self;
 }
@@ -121,7 +123,8 @@ sub popClient(%)
       , hostname     => $self->{MBN_hostname}
       , port         => $self->{MBN_port}
       , authenticate => $self->{MBP_auth}
-      , use_ssl      => $args{use_ssl}
+      , use_ssl      => $args{use_ssl} || $self->{MBP_use_ssl}
+      , ssl_options  => $args{ssl_options} || $self->{MBP_ssl_opts}
       );
 
     $self->log(ERROR => "Cannot create POP3 client for $self.")

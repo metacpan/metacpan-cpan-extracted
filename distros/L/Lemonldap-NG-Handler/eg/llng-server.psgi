@@ -69,11 +69,38 @@ my %builder = (
     },
 );
 
+# This middleware is a workaround for the fact that UWSGI does not
+# automatically downgrade UTF8 strings, unlike Apache and FastCGI
+# We can't blame it because PSGI responses are supposed to be byte string, not
+# unicode strings
+# It can be disabled by setting the LLNG_SKIPUTF8DOWNGRADE environment variable
+sub optional_utf8_middleware {
+    my $app = shift;
+    if ( !$ENV{LLNG_SKIPUTF8DOWNGRADE} ) {
+        return sub {
+            my $env = shift;
+            my $res = $app->($env);
+
+            # Downgrade headers
+            map { utf8::downgrade($_) } @{ $res->[1] };
+
+            # Downgrade body
+            map { utf8::downgrade($_) } @{ $res->[2] }
+              if ref( $res->[2] ) eq "ARRAY";
+            return $res;
+        };
+    }
+    else {
+        return $app;
+    }
+}
+
 sub {
     my $type = $_[0]->{LLTYPE} || 'handler';
     return $_apps{$type}->(@_) if ( defined $_apps{$type} );
     if ( defined $builder{$type} ) {
-        $_apps{$type} = $builder{$type}->();
+        my $app = $builder{$type}->();
+        $_apps{$type} = optional_utf8_middleware($app);
         return $_apps{$type}->(@_);
     }
     die "Unknown PSGI type $type";

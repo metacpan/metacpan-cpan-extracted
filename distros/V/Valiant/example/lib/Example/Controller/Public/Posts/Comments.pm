@@ -49,7 +49,7 @@ sub root :At('$path_end/...') Via('../find') ($self, $c, $post) {
 
       # GET /posts/{post-id}/comments/{comment-id}/edit
       sub edit :Get('edit') Via('prepare_edit') ($self, $c, $comment) { return }
-    
+
       # PATCH /posts/{post-id}/comments/{comment-id}
       sub update :Patch('') Via('prepare_edit') BodyModelFor('create') ($self, $c, $comment, $bm) {
         return $comment->set_from_request($bm);

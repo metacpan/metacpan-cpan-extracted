@@ -11,13 +11,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::ErrorHandling;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::ErrorHandling - handle error conditions
+
+=head1 DESCRIPTION
+
+This module provides functions to handle all reporting and error handling.
+
+B<Note>: This is a private module, its API can change at any time.
+
+=cut
+
+package Dpkg::ErrorHandling 0.02;
 
 use strict;
 use warnings;
 use feature qw(state);
 
-our $VERSION = '0.02';
 our @EXPORT_OK = qw(
     REPORT_PROGNAME
     REPORT_COMMAND
@@ -175,9 +188,9 @@ sub _typename_prefix
 
 sub report(@)
 {
-    my ($type, $msg) = (shift, shift);
+    my ($type, $msg, @args) = @_;
 
-    $msg = sprintf($msg, @_) if (@_);
+    $msg = sprintf $msg, @args if @args;
 
     my $progname = _progname_prefix();
     my $typename = _typename_prefix($type);
@@ -187,39 +200,51 @@ sub report(@)
 
 sub debug
 {
-    my $level = shift;
-    print report(REPORT_DEBUG, @_) if $level <= $debug_level;
+    my ($level, @args) = @_;
+
+    print report(REPORT_DEBUG, @args) if $level <= $debug_level;
 }
 
 sub info($;@)
 {
-    print { $info_fh } report(REPORT_INFO, @_) if not $quiet_warnings;
+    my @args = @_;
+
+    print { $info_fh } report(REPORT_INFO, @args) if not $quiet_warnings;
 }
 
 sub notice
 {
-    warn report(REPORT_NOTICE, @_) if not $quiet_warnings;
+    my @args = @_;
+
+    warn report(REPORT_NOTICE, @args) if not $quiet_warnings;
 }
 
 sub warning($;@)
 {
-    warn report(REPORT_WARN, @_) if not $quiet_warnings;
+    my @args = @_;
+
+    warn report(REPORT_WARN, @args) if not $quiet_warnings;
 }
 
 sub syserr($;@)
 {
-    my $msg = shift;
-    die report(REPORT_ERROR, "$msg: $!", @_);
+    my ($msg, @args) = @_;
+
+    die report(REPORT_ERROR, "$msg: $!", @args);
 }
 
 sub error($;@)
 {
-    die report(REPORT_ERROR, @_);
+    my @args = @_;
+
+    die report(REPORT_ERROR, @args);
 }
 
 sub errormsg($;@)
 {
-    print { *STDERR } report(REPORT_ERROR, @_);
+    my @args = @_;
+
+    print { *STDERR } report(REPORT_ERROR, @args);
 }
 
 sub printcmd
@@ -231,9 +256,9 @@ sub printcmd
 
 sub subprocerr(@)
 {
-    my ($p) = (shift);
+    my ($p, @args) = @_;
 
-    $p = sprintf($p, @_) if (@_);
+    $p = sprintf $p, @args if @args;
 
     require POSIX;
 
@@ -250,14 +275,22 @@ sub subprocerr(@)
 
 sub usageerr(@)
 {
-    my ($msg) = (shift);
+    my ($msg, @args) = @_;
 
     state $printforhelp = g_('Use --help for program usage information.');
 
-    $msg = sprintf($msg, @_) if (@_);
+    $msg = sprintf $msg, @args if @args;
     warn report(REPORT_ERROR, $msg);
     warn "\n$printforhelp\n";
     exit(2);
 }
+
+=head1 CHANGES
+
+=head2 Version 0.xx
+
+This is a private module.
+
+=cut
 
 1;

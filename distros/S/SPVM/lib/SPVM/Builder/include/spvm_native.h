@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#define SPVM_NATIVE_VERSION_NUMBER 0.989035
+#define SPVM_NATIVE_VERSION_NUMBER 0.989038
 
 #define SPVM_NATIVE_CREATE_VERSION_STRING_STRINGIFY(x) #x
 
@@ -50,6 +50,9 @@ typedef struct spvm_api_class_var SPVM_API_CLASS_VAR;
 
 struct spvm_api_field;
 typedef struct spvm_api_field SPVM_API_FIELD;
+
+struct spvm_api_type;
+typedef struct spvm_api_type SPVM_API_TYPE;
 
 struct spvm_api_method;
 typedef struct spvm_api_method SPVM_API_METHOD;
@@ -322,6 +325,7 @@ struct spvm_env_api {
   SPVM_API_FIELD* field;
   SPVM_API_METHOD* method;
   SPVM_API_ARG* arg;
+  SPVM_API_TYPE* type;
 };
 
 struct spvm_api_allocator {
@@ -377,11 +381,8 @@ struct spvm_api_runtime {
   void* (*get_basic_type_by_id)(void* runtime, int32_t basic_type_id);
   void* (*get_basic_type_by_name)(void* runtime, const char* basic_type_name);
   int32_t (*get_basic_types_length)(void* runtime);
-  int32_t (*is_object_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t flag);
-  int32_t (*can_assign)(void* runtime, void* dist_basic_type, int32_t dist_type_dimension, int32_t dist_type_flag, void* src_basic_type, int32_t src_type_dimension, int32_t src_type_flag);
   void (*build_precompile_module_source)(void* runtime, void* string_buffer, void* module_basic_type);
   void (*build_precompile_method_source)(void* runtime, void* string_buffer, void* method);
-  int32_t (*get_type_width)(void* runtime, void* basic_type, int32_t dimension, int32_t flag);
 };
 
 struct spvm_api_basic_type {
@@ -426,6 +427,15 @@ struct spvm_api_field {
   int32_t (*get_type_dimension)(void* runtime, void* field);
   int32_t (*get_type_flag)(void* runtime, void* field);
   void* (*get_current_basic_type)(void* runtime, void* field);
+};
+
+struct spvm_api_type {
+  int32_t (*can_assign)(void* runtime, void* dist_basic_type, int32_t dist_type_dimension, int32_t dist_type_flag, void* src_basic_type, int32_t src_type_dimension, int32_t src_type_flag);
+  int32_t (*get_type_width)(void* runtime, void* basic_type, int32_t dimension, int32_t flag);
+  int32_t (*is_object_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t flag);
+  int32_t (*is_any_object_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t flag);
+  int32_t (*is_object_array_type)(void* runtime, void* basic_type, int32_t dimension, int32_t flag);
+  int32_t (*is_any_object_array_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t flag);
 };
 
 struct spvm_api_method {

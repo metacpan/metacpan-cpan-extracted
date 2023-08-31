@@ -14,12 +14,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Index;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::Index - generic index of control information
+
+=head1 DESCRIPTION
+
+This class represent a set of Dpkg::Control objects.
+
+=cut
+
+package Dpkg::Index 3.00;
 
 use strict;
 use warnings;
-
-our $VERSION = '3.00';
 
 use Dpkg::Gettext;
 use Dpkg::ErrorHandling;
@@ -30,16 +40,6 @@ use parent qw(Dpkg::Interface::Storable);
 use overload
     '@{}' => sub { return $_[0]->{order} },
     fallback => 1;
-
-=encoding utf8
-
-=head1 NAME
-
-Dpkg::Index - generic index of control information
-
-=head1 DESCRIPTION
-
-This class represent a set of Dpkg::Control objects.
 
 =head1 METHODS
 

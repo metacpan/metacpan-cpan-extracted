@@ -5,6 +5,7 @@ use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Manager::Conf::Parser;
 use Lemonldap::NG::Handler::Main::Jail;
 use Lemonldap::NG::Manager::Cli::Lib;
+use File::Compare qw/compare/;
 use Data::Dumper;
 use English qw(-no_match_vars);
 use File::Temp;
@@ -60,28 +61,27 @@ my $editor = $ENV{EDITOR} || 'editor';
 
 system "$editor $editFile";
 
-if (`diff $refFile $editFile`) {
-    my $VAR1;
-    my $buf;
+if ( compare( $refFile->filename, $editFile->filename ) == 1 ) {
 
     # Check if the new configuration hash is valid
-    open F1, $editFile->filename();
-    while (<F1>) {
-        $buf .= $_;
-    }
-    eval $buf;
+    open my $F1, "<", $editFile->filename();
+    my $buf = join( '', <$F1> );
+    close $F1;
+
+    my $newConf = Safe->new->reval($buf);
     die $EVAL_ERROR if $EVAL_ERROR;
 
     # Update author and date
-    $VAR1->{cfgAuthor} = $ENV{SUDO_USER} || $ENV{LOGNAME} || "lmConfigEditor";
-    $VAR1->{cfgAuthorIP} = $ENV{SSH_CONNECTION} || "localhost";
-    $VAR1->{cfgDate}     = time();
-    $VAR1->{cfgLog} ||= 'Edited by lmConfigEditor';
+    $newConf->{cfgAuthor} =
+      $ENV{SUDO_USER} || $ENV{LOGNAME} || "lmConfigEditor";
+    $newConf->{cfgAuthorIP} = $ENV{SSH_CONNECTION} || "localhost";
+    $newConf->{cfgDate}     = time();
+    $newConf->{cfgLog} ||= 'Edited by lmConfigEditor';
 
     # Test new configuration
     my $parser = Lemonldap::NG::Manager::Conf::Parser->new( {
             refConf => $refConf,
-            newConf => $VAR1,
+            newConf => $newConf,
             req     => 1,
         }
     );
@@ -96,7 +96,7 @@ if (`diff $refFile $editFile`) {
     undef $parser;
 
     # Store new configuration
-    my $res = $conf->saveConf($VAR1);
+    my $res = $conf->saveConf($newConf);
     if ( $res > 0 ) {
         print STDERR "Configuration $res saved\n";
     }

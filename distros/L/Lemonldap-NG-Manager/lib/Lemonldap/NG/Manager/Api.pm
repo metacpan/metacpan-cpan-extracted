@@ -6,6 +6,7 @@ use utf8;
 use Mouse;
 
 use Lemonldap::NG::Manager::Api::2F;
+use Lemonldap::NG::Manager::Api::History;
 use Lemonldap::NG::Manager::Api::Misc;
 use Lemonldap::NG::Manager::Api::Providers::OidcRp;
 use Lemonldap::NG::Manager::Api::Providers::SamlSp;
@@ -19,7 +20,7 @@ extends qw(
   Lemonldap::NG::Common::Session::REST
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.17.0';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -102,6 +103,9 @@ sub init {
                             ':appConfKey' => 'getMenuApp'
                         }
                     },
+                },
+                history => {
+                    ':uid' => 'getHistory',
                 },
             },
         },

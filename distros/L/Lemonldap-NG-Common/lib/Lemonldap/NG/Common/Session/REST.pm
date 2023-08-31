@@ -2,10 +2,12 @@ package Lemonldap::NG::Common::Session::REST;
 
 use strict;
 use Mouse;
+use Lemonldap::NG::Common::Util qw(isHiddenAttr);
 use Lemonldap::NG::Common::Conf::Constants;
+use Lemonldap::NG::Common::Util qw/display2F/;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.17.0';
 
 has sessionTypes => ( is => 'rw' );
 
@@ -33,31 +35,23 @@ sub setTypes {
     $self->{sessionTypes}->{offline}->{kind} = "OIDCI";
 }
 
-sub separator {
-    $_[0]->{multiValuesSeparator} || $_[0]->conf->{multiValuesSeparator};
-}
-
-sub hAttr {
-    $_[0]->{hiddenAttributes} || $_[0]->conf->{hiddenAttributes};
-}
-
-### SEE LEMONLDAP::NG::COMMON::SESSION FOR AVAILABLE FUNCTIONS
+### SEE LEMONLDAP::NG::COMMON::SESSION FOR AVAILABLE FUNCTIONS
 
 sub delSession {
     my ( $self, $req ) = @_;
-    my $mod = $self->getMod($req)
+    my $type = $req->params('sessionType');
+    my $mod  = $self->getMod($req)
       or return $self->sendError( $req, undef, 400 );
     my $id = $req->params('sessionId')
       or return $self->sendError( $req, 'sessionId is missing', 400 );
     my $session = $self->getApacheSession( $mod, $id );
-    $self->logger->debug("Delete session : $id");
+    $self->userLogger->notice("Deleted $type session: $id");
     $session->remove;
-    Lemonldap::NG::Handler::PSGI::Main->localUnlog( $req, $id );
 
-    if ( $session->error ) {
-        return $self->sendError( $req, $session->error, 200 );
-    }
-    return $self->sendJSONresponse( $req, { result => 1 } );
+    Lemonldap::NG::Handler::PSGI::Main->localUnlog( $req, $id );
+    return $session->error
+      ? $self->sendError( $req, $session->error, 200 )
+      : $self->sendJSONresponse( $req, { result => 1 } );
 }
 
 sub deleteOIDCConsent {
@@ -68,67 +62,66 @@ sub deleteOIDCConsent {
       or return $self->sendError( $req, 'sessionId is missing', 400 );
 
     # Try to read session
-    $self->logger->debug("Loading session : $id");
+    $self->logger->debug("Loading session: $id");
     my $session = $self->getApacheSession( $mod, $id )
       or return $self->sendError( $req, undef, 400 );
 
     # Try to read OIDC Consent parameters
-    $self->logger->debug("Reading parameters ...");
+    $self->logger->debug("Reading parameters...");
     my $params = $req->parameters();
     my $rp     = $params->{rp}
       or
-      return $self->sendError( $req, 'OIDC Consent "RP" parameter is missing',
+      return $self->sendError( $req, 'OIDC consent "RP" parameter is missing',
         400 );
     my $epoch = $params->{epoch}
       or return $self->sendError( $req,
-        'OIDC Consent "epoch" parameter is missing', 400 );
+        'OIDC consent "epoch" parameter is missing', 400 );
 
     # Try to load OIDC Consents from session
-    $self->logger->debug("Looking for OIDC Consent(s) ...");
+    $self->logger->debug("Looking for OIDC consent(s)...");
     my $_oidcConsents;
     if ( $session->data->{_oidcConsents} ) {
         $_oidcConsents = eval {
             from_json( $session->data->{_oidcConsents}, { allow_nonref => 1 } );
         };
         if ($@) {
-            $self->logger->error("Corrupted session (_oidcConsents) : $@");
+            $self->logger->error("Corrupted session (_oidcConsents): $@");
             return $self->p->sendError( $req, "Corrupted session", 500 );
         }
     }
     else {
-        $self->logger->debug("No OIDC Consent found");
+        $self->logger->debug("No OIDC consent found");
         $_oidcConsents = [];
     }
 
     # Delete OIDC Consent
-    $self->logger->debug("Reading OIDC Consent(s) ...");
+    $self->logger->debug("Reading OIDC consent(s)...");
     my @keep = ();
     while (@$_oidcConsents) {
         my $element = shift @$_oidcConsents;
 
         $self->logger->debug(
-            "Searching for OIDC Consent to delete -> $rp / $epoch ...");
+            "Searching for OIDC Consent to delete -> $rp / $epoch...");
         if ( defined $element->{rp} && defined $element->{epoch} ) {
             push @keep, $element
               unless ( ( $element->{rp} eq $rp )
                 and ( $element->{epoch} eq $epoch ) );
         }
         else {
-            $self->logger->error("Corrupted OIDC Consent");
+            $self->logger->error("Corrupted OIDC consent");
         }
     }
 
     # Update session
-    $self->logger->debug("Saving OIDC Consents ...");
+    $self->logger->debug("Saving OIDC consents...");
     $session->data->{_oidcConsents} = to_json( \@keep );
-    $self->logger->debug("Updating session ...");
+    $self->logger->debug("Update session");
     $session->update( \%{ $session->data } );
 
     Lemonldap::NG::Handler::PSGI::Main->localUnlog( $req, $id );
-    if ( $session->error ) {
-        return $self->sendError( $req, $session->error, 200 );
-    }
-    return $self->sendJSONresponse( $req, { result => 1 } );
+    return $session->error
+      ? $self->sendError( $req, $session->error, 200 )
+      : $self->sendJSONresponse( $req, { result => 1 } );
 }
 
 sub delete2F {
@@ -144,7 +137,7 @@ sub delete2F {
       or return $self->sendError( $req, undef, 400 );
 
     # Try to read 2F parameters
-    $self->logger->debug("Reading parameters ...");
+    $self->logger->debug("Reading parameters...");
     my $params = $req->parameters();
     my $type   = $params->{type}
       or return $self->sendError( $req, '2F device "type" parameter is missing',
@@ -154,8 +147,8 @@ sub delete2F {
       return $self->sendError( $req, '2F device "epoch" parameter is missing',
         400 );
 
-    # Try to load 2F Device(s) from session
-    $self->logger->debug("Looking for 2F Device(s) ...");
+    # Try to load 2F device(s) from session
+    $self->logger->debug("Looking for 2F device(s)...");
     my $_2fDevices;
     if ( $session->data->{_2fDevices} ) {
         $_2fDevices = eval {
@@ -167,22 +160,29 @@ sub delete2F {
         }
     }
     else {
-        $self->logger->debug("No 2F Device found");
+        $self->logger->debug("No 2F device found");
         $_2fDevices = [];
     }
 
     # Delete 2F device
-    $self->logger->debug("Reading 2F device(s) ...");
+    $self->logger->debug("Reading 2F device(s)...");
     my @keep = ();
     while (@$_2fDevices) {
         my $element = shift @$_2fDevices;
 
         $self->logger->debug(
-            "Searching for 2F device to delete -> $type / $epoch ...");
+            "Looking for 2F device to delete: [$type]$epoch");
         if ( defined $element->{type} && defined $element->{epoch} ) {
-            push @keep, $element
-              unless ( ( $element->{type} eq $type )
-                and ( $element->{epoch} eq $epoch ) );
+            if (    ( $element->{type} eq $type )
+                and ( $element->{epoch} eq $epoch ) )
+            {
+                my $uid = $session->data->{_session_uid};
+                $self->userLogger->notice(
+                    "2FA deletion for $uid: " . display2F($element) );
+            }
+            else {
+                push @keep, $element;
+            }
         }
         else {
             $self->logger->error("Corrupted _2fDevice");
@@ -190,22 +190,21 @@ sub delete2F {
     }
 
     # Update session
-    $self->logger->debug("Saving 2F Devices ...");
+    $self->logger->debug("Saving 2F devices...");
     $session->data->{_2fDevices} = to_json( \@keep );
-    $self->logger->debug("Updating session ...");
+    $self->logger->debug("Update session");
     $session->update( \%{ $session->data } );
 
     Lemonldap::NG::Handler::PSGI::Main->localUnlog( $req, $id );
-    if ( $session->error ) {
-        return $self->sendError( $req, $session->error, 200 );
-    }
-    return $self->sendJSONresponse( $req, { result => 1 } );
+    return $session->error
+      ? $self->sendError( $req, $session->error, 200 )
+      : $self->sendJSONresponse( $req, { result => 1 } );
 }
 
 sub _session {
     my ( $self, $raw, $req, $id, $skey ) = @_;
     my ( %h, $res );
-    return $self->sendError( $req, 'Bad request', 400 ) unless ($id);
+    return $self->sendError( $req, 'Bad request', 400 ) unless $id;
     my $mod = $self->getMod($req)
       or return $self->sendError( $req, undef, 400 );
 
@@ -215,9 +214,8 @@ sub _session {
 
     my %session = %{ $apacheSession->data };
     unless ($raw) {
-        foreach my $k ( keys %session ) {
-            $session{$k} = '**********'
-              if ( $self->hAttr =~ /\b$k\b/ );
+        foreach ( keys %session ) {
+            $session{$_} = '******' if isHiddenAttr( $self->conf, $_ );
         }
     }
 

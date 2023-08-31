@@ -2,21 +2,21 @@ use warnings;
 use Test::More;
 use strict;
 use JSON;
-use Lemonldap::NG::Portal::Main::Constants qw(PE_FORBIDDENIP PE_USERNOTFOUND);
+use Lemonldap::NG::Portal::Main::Constants qw(PE_FORBIDDENIP PE_USERNOTFOUND PE_MALFORMEDUSER);
 
 require 't/test-lib.pm';
 
 my $res;
 my $json;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel           => 'error',
             useSafeJail        => 1,
             securedCookie      => 3,
             authentication     => 'Slave',
             userDB             => 'Same',
+            userControl        => '^\w{4}$',
             slaveUserHeader    => 'My-Test',
             slaveHeaderName    => 'Check-Slave',
             slaveHeaderContent => 'Password',
@@ -91,7 +91,28 @@ ok( $json->{error} == PE_USERNOTFOUND, 'Response is PE_USERNOTFOUND' )
   or explain( $json, "error => 4" );
 count(4);
 
-# Good credentials with acredited IP
+# Good credentials with an unauthorized login
+ok(
+    $res = $client->_get(
+        '/',
+        ip     => '127.0.0.1',
+        custom => {
+            HTTP_MY_TEST     => 'dwhoo',
+            HTTP_NAME        => 'Dr Who',
+            HTTP_CHECK_SLAVE => 'Password',
+        }
+
+    ),
+    'Auth query'
+);
+ok( $res->[0] == 401, 'Get 401' ) or explain( $res->[0], 401 );
+ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
+  or print STDERR "$@\n" . Dumper($res);
+ok( $json->{error} == PE_MALFORMEDUSER, 'Response is PE_MALFORMEDUSER' )
+  or explain( $json, "error => 40" );
+count(4);
+
+# Good credentials with accredited IP
 ok(
     $res = $client->_get(
         '/',

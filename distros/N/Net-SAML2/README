@@ -2,7 +2,7 @@ NAME
     Net::SAML2 - SAML2 bindings and protocol implementation
 
 VERSION
-    version 0.73
+    version 0.74
 
 SYNOPSIS
       See TUTORIAL.md for implementation documentation and
@@ -90,6 +90,9 @@ DESCRIPTION
     SAMLTEST.ID (requires Net::SAML2 >=0.63)
     Shibboleth (requires Net::SAML2 >=0.63)
     SimpleSAMLphp
+    DigiD (requires Net::SAML2 >= 0.63)
+    eHerkenning (requires Net::SAML2 >= 0.73)
+    eIDAS (requires Net::SAML2 >= 0.73)
 
 MAJOR CAVEATS
     SP-side protocol only

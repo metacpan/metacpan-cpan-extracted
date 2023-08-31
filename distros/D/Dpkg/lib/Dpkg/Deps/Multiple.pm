@@ -19,8 +19,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Deps::Multiple;
-
 =encoding utf8
 
 =head1 NAME
@@ -34,10 +32,10 @@ of dependencies. It is the base class for Dpkg::Deps::{AND,OR,Union}.
 
 =cut
 
+package Dpkg::Deps::Multiple 1.02;
+
 use strict;
 use warnings;
-
-our $VERSION = '1.02';
 
 use Carp;
 
@@ -56,9 +54,9 @@ Creates a new object.
 =cut
 
 sub new {
-    my $this = shift;
+    my ($this, @deps) = @_;
     my $class = ref($this) || $this;
-    my $self = { list => [ @_ ] };
+    my $self = { list => [ @deps ] };
 
     bless $self, $class;
     return $self;
@@ -84,9 +82,9 @@ Adds new dependency objects at the end of the list.
 =cut
 
 sub add {
-    my $self = shift;
+    my ($self, @deps) = @_;
 
-    push @{$self->{list}}, @_;
+    push @{$self->{list}}, @deps;
 }
 
 =item $dep->get_deps()

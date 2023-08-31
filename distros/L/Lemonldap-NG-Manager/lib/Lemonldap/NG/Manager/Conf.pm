@@ -24,7 +24,7 @@ extends qw(
   Lemonldap::NG::Common::Conf::RESTServer
 );
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.17.0';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -32,8 +32,14 @@ our $VERSION = '2.0.14';
 
 use constant defaultRoute => 'manager.html';
 
+has defaultNewKeySize => ( is => 'rw', default => 2048, );
+
 sub init {
     my ( $self, $conf ) = @_;
+
+    $self->defaultNewKeySize( $conf->{defaultNewKeySize} )
+      if $conf->{defaultNewKeySize};
+
     $self->ua( Lemonldap::NG::Common::UserAgent->new($conf) );
 
     # HTML template
@@ -118,7 +124,7 @@ sub newRSAKey {
     my ( $self, $req, @others ) = @_;
     return $self->sendError( $req, 'There is no subkey for "newRSAKey"', 400 )
       if (@others);
-    my $rsa = Crypt::OpenSSL::RSA->generate_key(2048);
+    my $rsa = Crypt::OpenSSL::RSA->generate_key( $self->defaultNewKeySize );
 
     my $query = $req->jsonBodyToObj;
     my $keys  = {
@@ -163,7 +169,7 @@ sub _generateX509 {
     # Generate 2048 bits RSA key
     my $key = Net::SSLeay::EVP_PKEY_new();
     Net::SSLeay::EVP_PKEY_assign_RSA( $key,
-        Net::SSLeay::RSA_generate_key( 2048, 0x10001 ) );
+        Net::SSLeay::RSA_generate_key( $self->defaultNewKeySize, 0x10001 ) );
 
     my $cert = Net::SSLeay::X509_new();
 
@@ -397,8 +403,11 @@ sub newConf {
     $res->{details}->{'__errors__'} = $parser->{errors}
       if ( @{ $parser->{errors} } );
     unless ( @{ $parser->{errors} } ) {
-        $res->{details}->{'__needConfirmation__'} = $parser->{needConfirmation}
-          if ( @{ $parser->{needConfirmation} } && !$req->params('force') );
+        if ( @{ $parser->{needConfirmation} } && !$req->params('force') ) {
+            $res->{needConfirm} = 1;
+            $res->{details}->{'__needConfirmation__'} =
+              $parser->{needConfirmation};
+        }
         $res->{message} = $parser->{message};
         foreach my $t (qw(warnings changes)) {
             $res->{details}->{ '__' . $t . '__' } = $parser->$t
@@ -412,7 +421,7 @@ sub newConf {
             $args{cfgDate}        = $req->params('cfgDate');
             $args{currentCfgDate} = $currentCfgDate;
         }
-        my $s = CONFIG_WAS_CHANGED;
+        my $s = UNKNOWN_ERROR;
         $s = $self->confAcc->saveConf( $parser->newConf, %args )
           unless ( @{ $parser->{needConfirmation} } && !$args{force} );
         if ( $s > 0 ) {
@@ -433,8 +442,9 @@ sub newConf {
             $res->{result} = 0;
             if ( $s == CONFIG_WAS_CHANGED ) {
                 $res->{needConfirm} = 1;
-                $res->{message} .= '__needConfirmation__'
-                  unless @{ $parser->{needConfirmation} };
+                $res->{details}->{'__needConfirmation__'} ||= [];
+                push @{ $res->{details}->{'__needConfirmation__'} },
+                  { message => '__newCfgAvailableWarning__' };
             }
             else {
                 $res->{message} = $Lemonldap::NG::Common::Conf::msg;

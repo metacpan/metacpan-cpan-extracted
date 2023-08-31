@@ -10,9 +10,9 @@ no warnings qw(experimental::lexical_subs);
 package Spreadsheet::Edit::IO;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
-{ no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 998.999; }
-our $VERSION = '1000.001'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-06-28'; # DATE from Dist::Zilla::Plugin::OurDate
+{ no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
+our $VERSION = '1000.004'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-08-28'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 
@@ -135,6 +135,7 @@ sub _get_exclusive_lock($) { # returns lock object
         $owner = _get_username($s[4])." ".$owner;
       }
       my $ownermsg = $owner ? " held by $owner" : "";
+      # Carp::longmess ...
       warn ">> ($$) Waiting for exclusive lock${ownermsg}...\n",
            "   $lockfile_path\n"
         unless $opts->{silent};
@@ -438,13 +439,19 @@ sub _openlibre_path() {
         # https://github.com/Perl/perl5/issues/21143
         my $fullname = $File::Find::fullname;
         if (!defined($fullname) && $is_MSWin) {
-            stat($_); # lstat was not done
+            warn "# _ MSWin undef fullname! ",_Findvarsmsg() if $debug;
+            stat($_); # lstat was not done. Grr...
             $fullname = $File::Find::name;
-        }
-        unless (-d _ || -l _) {
-          warn "# _ notdir/symlink: ",_Findvarsmsg() if $debug;
-          $File::Find::prune = 1; # in case it really is
-          return;
+            unless (-d _) {
+              $File::Find::prune = 1; # in case it really is a dir
+              return;
+            }
+        } else {
+          unless (-d _ or -l _) {
+            warn "# _ notdir/symlink: ",_Findvarsmsg() if $debug;
+            $File::Find::prune = 1; # in case it really is
+            return;
+          }
         }
         if (
             !defined($fullname) # broken link, per docs
@@ -915,7 +922,7 @@ sub _convert_using_openlibre($$$) {
     foreach (@result_files) {
       my $dir  = $_->parent;  # Like dirname but including Volume:
       my $base = $_->basename;
-      (my $newbase = $base) =~ s/^$opts->{ifbase}-// or oops;
+      (my $newbase = $base) =~ s/^\Q$opts->{ifbase}\E-// or oops dvis '$base $opts';
       my $newpath = $dir->child($newbase)->canonpath;
       my $oldpath = path($_)->canonpath;
       btw ">> Renaming $oldpath -> $newbase\n" if $debug;
@@ -1017,6 +1024,7 @@ sub _convert_using_ssconvert($$$) {
 ##      remove_tree($td); mkdir($td) or die $!;
 ##      $eff_inpath = catfile($td, $opts->{sheetname});
 ##      symlink $opts->{inpath}, $eff_inpath or die $!;
+##        fixme: handle unimplmented or no-perms symlink failures
 ##    }
 ##    my @cmd = ($prog, @options, $eff_inpath, $eff_outpath);
 ##
@@ -1632,15 +1640,14 @@ sub convert_spreadsheet(@) {
       my $dest = $outpath->child( $opts{ifbase}.".csv" );
       my $inpath = $opts{inpath_sans_sheet};
       my $s = eval{ symlink($inpath, $dest) };
-      if ($@) { # symlink unimplmented
+      if ($@ or !$s) { # symlink unimplmented or insufficient permissions
         btw dvis '>> $@' if $opts{debug};
         warn "> No conversion needed! Copying into ", qsh($dest),"\n"
           if $opts{verbose};
         $opts{inpath_sans_sheet}->copy($dest);
       } else {
-        warn "> No conversion needed! Leaving symlink at ", qsh($dest),"\n"
+        warn "> No conversion needed! Left symlink at ", qsh($dest),"\n"
           if $opts{verbose};
-        croak "symlink $inpath <-- $dest : $!" unless $s;
       }
       $done = 1;
     }

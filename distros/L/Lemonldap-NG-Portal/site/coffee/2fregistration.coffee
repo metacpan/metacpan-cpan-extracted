@@ -50,8 +50,10 @@ delete2F = (device, epoch, prefix) ->
 					else setMsg 'unknownAction', 'warning'
 				else if resp.result
 					$("#delete-#{epoch}").hide()
-					$(document).trigger "mfaDeleted", [ { "type": device, "epoch": epoch } ]
-					setMsg 'yourKeyIsUnregistered', 'positive'
+					e = jQuery.Event( "mfaDeleted" );
+					$(document).trigger e, [ { "type": device, "epoch": epoch } ]
+					if !e.isDefaultPrevented()
+						setMsg 'yourKeyIsUnregistered', 'positive'
 			error: displayError
 
 # Register "click" events

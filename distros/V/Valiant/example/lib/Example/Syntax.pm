@@ -13,8 +13,10 @@ sub importables {
     'utf8',
     'strict',
     'warnings',
-    ['feature', ':5.38'],
-    ['experimental', 'class', 'try', 'defer'],
+    ['feature', ':5.34'],
+    ['Scalar::Util', 'blessed'],
+    ['experimental', 'signatures'],
+ #   ['experimental', 'class', 'try', 'defer'],
   );
 }
 

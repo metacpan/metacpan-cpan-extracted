@@ -24,8 +24,8 @@ my $file = '{
     "UA": "$UA"
   }
 }';
-my $client = LLNG::Manager::Test->new(
-    {
+
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel                          => 'error',
             authentication                    => 'Demo',
@@ -34,7 +34,7 @@ my $client = LLNG::Manager::Test->new(
             checkDevOps                       => 1,
             checkDevOpsDownload               => 1,
             checkDevOpsCheckSessionAttributes => 0,
-            hiddenAttributes                  => 'mail'
+            hiddenAttributes                  => 'mail , /^uidd?/',
         }
     }
 );
@@ -103,8 +103,8 @@ ok( $res->[2]->[0] =~ m%HTTP_NAME: Doctor Who<br/>%,
     'Normalized hearder Name found' )
   or explain( $res->[2]->[0], 'Hearder Name' );
 ok(
-    $res->[2]->[0] =~ m%HTTP_AUTH_USER: dwho<br/>%,
-    'Normalized hearder Auth-User found'
+    $res->[2]->[0] !~ m%HTTP_AUTH_USER: dwho<br/>%,
+    'Normalized hearder Auth-User not found'
 ) or explain( $res->[2]->[0], 'Hearder Auth-User' );
 
 # Rules

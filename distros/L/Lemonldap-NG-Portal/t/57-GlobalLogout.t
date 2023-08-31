@@ -12,8 +12,7 @@ BEGIN {
 
 my $res;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel                => 'error',
             authentication          => 'Demo',
@@ -159,7 +158,10 @@ ok( @e == 3, ' -> Three epoch found' )
   or explain( $res->[2]->[0], "Number of epoch found = " . scalar @e );
 ok( time() - 5 <= $e[0] && $e[0] <= time() + 5, 'Right epoch found' )
   or print STDERR Dumper( $res->[2]->[0] ), time(), " / $1";
-count(6);
+ok( $res->[2]->[0] =~ /\bglobalLogout(?:min)?\.js\b/,
+    'Get globalLogout javascript' )
+  or print STDERR Dumper( $res->[2]->[0] );
+count(7);
 
 ## GlobalLogout request with bad token
 my $bad_query = 'token=1234567890_12345&all=1';

@@ -1,0 +1,178 @@
+<!-- Coordinator Documentation: https://oozie.apache.org/docs/4.1.0/CoordinatorFunctionalSpec.html -->
+
+<!--
+    Frequency is the interval at which the coordinator will be scheduled to run.
+    In this example, we are setting the job to run daily. Check the documentation
+    for other ways to specify time periods.
+
+    Don't modify the other fields (name, start, end), oozie run tool will
+    populate them as needed.
+-->
+<coordinator-app
+        xmlns     = "uri:oozie:coordinator:0.4"
+        timezone  = "UTC"
+        name      = "${appName}"
+        frequency = "${coord:days(1)}"
+        start     = "${startTime}"
+        end       = "${endTime}"
+    >
+    <!--
+        Optional. Make a workflow instance time out (status TIMEDOUT) when it
+        has not been able to transition from WAITING to RUNNING in the given
+        number of minutes.
+
+        This happens mostly when a workflow is dependent on a dataset that
+        fails to appear due to another script failing. For instance, there
+        can be a need for a workflow to have its actions time out when the
+        files pushed on HDFS by an external script aren't there (an eternal
+        controller in the pipeline).
+
+        In a typical case, your workflow will be dependent on the mysql
+        imports, and maybe could be skipped if the import finishes in the
+        evening after office hours; in that case, and if skipping a run isn't
+        critical, you can use this feature to not process something that won't
+        be needed, and leave the job to the next instance.
+
+        Also, this can be used to prevent job pileup when one instance is
+        stuck in RUNNING state for whatever reason. The next instances will
+        time out, which will prevent too many to queue up and indicate there
+        is one blocking the queue.
+
+        You can also change the concurrency of your workflows here, although
+        that should be done only in very specific cases (meaning that you know
+        precisely what you are doing and why). Blindly scheduling parallel
+        jobs can lead to taking down or slowing down some systems it might be
+        consuming (i.e.: heavy writes on a mysql master or a job recreating
+        a table in every run).
+    -->
+
+    <!-- Timeout after 23 hours -->
+    <!--
+        <controls>
+            <timeout>1380</timeout>
+            <concurrency>1</concurrency>
+            <execution>FIFO</execution>
+        </controls>
+    -->
+
+    <!--
+        Optional. Specify the relevant datasets (input and output)
+
+        Dataset: Set of data produced by an application. It can be specified
+        either by directory location or metadata.
+
+        Input dataset: Dataset required by the workflow in order to start.
+
+        Output dataset: Dataset produced by the workflow. Tipically, it's
+        existance indicates the run has finished succesfully. An output dataset
+        can be used as input by other coordinator(s).
+
+        The patterns will be resolved at runtime based on nominal execution time.
+    -->
+    <datasets>
+        <!-- Remember that 'frequency' states the period of time in which the dataset is generated -->
+        <dataset name             = "ds_input"
+                 frequency        = "${coord:days(1)}"
+                 initial-instance = "${startTime}"
+                 timezone         = "UTC"
+            >
+            <!-- This is only an example -->
+            <uri-template>${nameNode}/user/hive/flags/mysql-daily-imports/${YEAR}/${MONTH}/${DAY}/schema</uri-template>
+            <done-flag>OK</done-flag>
+        </dataset>
+        <dataset name             = "ds_output"
+                 frequency        = "${coord:days(1)}"
+                 initial-instance = "${startTime}"
+                 timezone         = "UTC"
+            >
+            <!--
+                Change '_copy_me' for a more relevant name
+                It can be the name of the directory for a table,
+                for instance.
+
+                You can have the dependencies (or your job for dependants)
+                to emit "flags" to create dependencies.
+            -->
+            <uri-template>${nameNode}/user/hive/flags/_copy_me/yyyy_mm_dd=${YEAR}-${MONTH}-${DAY}</uri-template>
+            <done-flag>OK</done-flag>
+        </dataset>
+        <!-- More datasets can be added after this line, if needed -->
+    </datasets>
+
+    <!--
+        Optional: Specify the input dataset(s).
+
+        Check the documentation to specify ranges (i.e. If our job runs daily,
+        but input dataset is generated hourly and we require all the files
+        generated the previous day)
+    -->
+    <input-events>
+        <data-in name    = "input"
+                 dataset = "ds_input"
+            >
+            <instance>${coord:current(0)}</instance>
+        </data-in>
+        <!-- More input events can be added after this line, if needed -->
+    </input-events>
+
+    <!--
+        Optional: Specify the output dataset.
+
+        Remember that Oozie will NOT create the dataset (you need to do this
+        manually on your workflow), but Oozie will help with the cleaning process
+        in case your job needs to be re-runned.
+    -->
+    <output-events>
+        <!-- Remember that only one data-out is allowed -->
+        <data-out name    = "output"
+                  dataset = "ds_output"
+            >
+            <instance>${coord:current(0)}</instance>
+        </data-out>
+    </output-events>
+
+    <!-- This is the only mandatory section -->
+    <action>
+        <workflow>
+            <!-- workflowPath will be set by oozie-run, don't change it -->
+            <app-path>${workflowPath}</app-path>
+            <configuration>
+                <!--
+                    Optional. Use this in your workflow to get the path where
+                    you need to create the output dataset. The value will be
+                    resolved at runtime for each workflow execution and accessible
+                    as ${flagDirForToday}.
+                -->
+               <property>
+                    <name>flagDirForToday</name>
+                    <!-- 'output' is the 'name' property of our data-out (check output-events) -->
+                    <value>${coord:dataOut('output')}</value>
+                </property>
+               <!--
+                    Use this in your workflow instead of e.g. CURRENT_DATE() to
+                    ensure that your workflow gives the same result regardless of
+                    when it runs.
+                    If you are processing yesterday's data, you could also choose
+                    to use this instead:
+
+                     <value>${coord:formatTime(coord:dateOffset(coord:nominalTime(), -1, 'DAY'), 'yyyy-MM-dd')}</value>
+
+                    If you re-build the data from scratch every day, and do not
+                    write it to a separate daily partition, it is possible you
+                    will not use this variable. You could still leave it here
+                    for future use.
+                -->
+               <property>
+                   <name>DATE</name>
+                   <value>${coord:formatTime(coord:nominalTime(), 'yyyy-MM-dd')}</value>
+               </property>
+
+               <!-- Don't remove this (needed for SLA) -->
+               [% PROCESS coordinator_config_xml %]
+
+               <!-- Add more properties as needed -->
+
+            </configuration>
+        </workflow>
+    </action>
+</coordinator-app>

@@ -1,7 +1,7 @@
 This archive contains the distribution Try-ALRM,
-version 0.8:
+version 0.82:
 
-  Provides C<try_once> and C<retry> semantics to C<CORE::alarm>, similar to Try::Tiny.
+  Provides try/catch-like semantics for an ALRM thrown by CORE::alarm
 
 This software is copyright (c) 2022 by oodler577.
 

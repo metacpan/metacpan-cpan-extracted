@@ -48,11 +48,11 @@
    "provides" : {
       "App::CPANtoRPM" : {
          "file" : "lib/App/CPANtoRPM.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "cpantorpm" : {
          "file" : "cpantorpm",
-         "version" : "1.13"
+         "version" : "1.14"
       }
    },
    "release_status" : "stable",
@@ -67,6 +67,6 @@
          "web" : "https://github.com/SBECK-github/App-CPANtoRPM"
       }
    },
-   "version" : "1.13",
+   "version" : "1.14",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

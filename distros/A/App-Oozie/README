@@ -1,0 +1,12 @@
+This is a tooling around the Oozie workflow scheduler for Hadoop.
+It can deploy, schedule and re-run jobs. It is opinionated on
+many things and also makes use of the Template Toolkit, so that
+there is a powerfult tempalting mechanism for you to use when
+creating complex definitions.
+
+Running the application will need a `kinit` on secure clusters
+before hand to have a Kerberos ticket, which will be propagated
+to the Hadoop/Oozie services.
+
+There might be some sections being out of date or not cleaned up
+in this release.

@@ -49,9 +49,9 @@ sub genRoute {
             die "Target required for $word" unless ($dest);
             $word = ':';
         }
-        elsif ( $word =~ m#/# ) {
-            $word =~ s#^(.*?)/##;
-            return $self->genRoute( $routes->{$1}, $word, $dest, $transform );
+        elsif ( my ( $first, $rest ) = $word =~ m#^(.*?)/(.*)# ) {
+            return $self->genRoute( $routes->{$first},
+                $rest, $dest, $transform );
         }
         else {
             $dest ||= $word;

@@ -14,12 +14,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Path;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::Path - some common path handling functions
+
+=head1 DESCRIPTION
+
+It provides some functions to handle various path.
+
+=cut
+
+package Dpkg::Path 1.05;
 
 use strict;
 use warnings;
 
-our $VERSION = '1.05';
 our @EXPORT_OK = qw(
     canonpath
     resolve_symlink
@@ -43,16 +54,6 @@ use Dpkg::ErrorHandling;
 use Dpkg::Gettext;
 use Dpkg::Arch qw(get_host_arch debarch_to_debtuple);
 use Dpkg::IPC;
-
-=encoding utf8
-
-=head1 NAME
-
-Dpkg::Path - some common path handling functions
-
-=head1 DESCRIPTION
-
-It provides some functions to handle various path.
 
 =head1 FUNCTIONS
 
@@ -313,8 +314,8 @@ sub find_build_file($) {
     my $host_arch = get_host_arch();
     my ($abi, $libc, $host_os, $cpu) = debarch_to_debtuple($host_arch);
     my @files;
-    foreach my $f ("$base.$host_arch", "$base.$host_os", "$base") {
-        push @files, $f if -f $f;
+    foreach my $fn ("$base.$host_arch", "$base.$host_os", "$base") {
+        push @files, $fn if -f $fn;
     }
     return @files if wantarray;
     return $files[0] if scalar @files;

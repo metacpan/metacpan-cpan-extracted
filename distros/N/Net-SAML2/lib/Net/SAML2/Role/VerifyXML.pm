@@ -1,6 +1,6 @@
 package Net::SAML2::Role::VerifyXML;
 use Moose::Role;
-our $VERSION = '0.73'; # VERSION
+our $VERSION = '0.74'; # VERSION
 
 use Net::SAML2::XML::Sig;
 use Crypt::OpenSSL::Verify;
@@ -30,9 +30,7 @@ sub verify_xml {
 
     croak("XML signature check failed") unless $x->verify($xml);
 
-    if (!$anchors && !$cacert) {
-        return 1;
-    }
+    return if !$anchors && !$cacert;
 
     my $cert = $x->signer_cert
         or die "Certificate not provided in SAML Response, cannot validate\n";
@@ -45,7 +43,7 @@ sub verify_xml {
         };
     }
 
-    return 1 if !$anchors;
+    return if !$anchors;
 
     if (ref $anchors ne 'HASH') {
         croak("Unable to verify anchor trust");
@@ -65,7 +63,7 @@ sub verify_xml {
     if (none { $_ eq $got } @$want) {
         croak("Could not verify trust anchors of certificate!");
     }
-    return 1;
+    return;
 
 }
 
@@ -84,7 +82,7 @@ Net::SAML2::Role::VerifyXML - A role to verify the SAML response XML
 
 =head1 VERSION
 
-version 0.73
+version 0.74
 
 =head1 SYNOPSIS
 

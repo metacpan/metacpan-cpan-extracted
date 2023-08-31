@@ -38,9 +38,12 @@ SKIP: {
     my $saml =
       $issuer->p->loadedModules->{'Lemonldap::NG::Portal::Issuer::SAML'};
     my $entityID = "https://podcast.mines-nantes.fr/shibboleth";
-    $saml->lazy_load_metadata($entityID);
+    $saml->load_config($entityID);
     $entityID = "https://www.numistral.fr/shibboleth";
-    $saml->lazy_load_metadata($entityID);
+    $saml->load_config($entityID);
+    $entityID =
+"https://monitor.eduroam.org/sp/module.php/saml/sp/metadata.php/default-sp";
+    $saml->load_config($entityID);
     is(
         $saml->spList->{'https://podcast.mines-nantes.fr/shibboleth'}
           ->{confKey},
@@ -78,6 +81,13 @@ SKIP: {
 
         "SP attributes have been imported as configured by policy",
     );
+
+    is(
+        $saml->spOptions->{'https://podcast.mines-nantes.fr/shibboleth'}
+          ->{samlSPMetaDataOptionsNameIDFormat},
+        undef, 'default NameID Format'
+    );
+
     is_deeply(
         $saml->spAttributes->{'https://www.numistral.fr/shibboleth'},
         {
@@ -89,11 +99,24 @@ SKIP: {
         "SP attributes have been imported as configured by policy",
     );
 
+    is(
+        $saml->spAttributes->{
+'https://monitor.eduroam.org/sp/module.php/saml/sp/metadata.php/default-sp'
+        }->{'subjectId'},
+'0;urn:oasis:names:tc:SAML:attribute:subject-id;urn:oasis:names:tc:SAML:2.0:attrname-format:uri;subject-id'
+    );
+
+    is(
+        $saml->spOptions->{'https://www.numistral.fr/shibboleth'}
+          ->{samlSPMetaDataOptionsNameIDFormat},
+        'persistent', 'eduPersonTargetedID sets required persistent NameID'
+    );
+
     $saml     = $sp->p->loadedModules->{'Lemonldap::NG::Portal::Auth::SAML'};
     $entityID = "https://idp4.crous-lorraine.fr/idp/shibboleth";
-    $saml->lazy_load_metadata($entityID);
+    $saml->load_config($entityID);
     $entityID = "https://auth.centrale-marseille.fr/idp/shibboleth";
-    $saml->lazy_load_metadata($entityID);
+    $saml->load_config($entityID);
     is(
         $saml->idpOptions->{
             'https://auth.centrale-marseille.fr/idp/shibboleth'}
@@ -106,7 +129,7 @@ SKIP: {
           ->{'samlIDPMetaDataOptionsForceUTF8'},
         '0', "IDP option from federation defaults"
     );
-    $saml->lazy_load_metadata("Notfound");
+    $saml->load_config("Notfound");
 
     is_deeply(
         $saml->idpAttributes->{'https://idp4.crous-lorraine.fr/idp/shibboleth'},
@@ -132,8 +155,7 @@ clean_sessions();
 done_testing();
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 samlFederationFiles =>
 "t/main-idps-renater-metadata.xml t/main-sps-renater-metadata.xml",
@@ -206,8 +228,7 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 samlFederationFiles =>
 "t/main-idps-renater-metadata.xml t/main-sps-renater-metadata.xml",

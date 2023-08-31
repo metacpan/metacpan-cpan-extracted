@@ -1,3 +1,22 @@
+0.47.3 2023-08-29 16:20:30 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - make table columns with flex with work on mobile devices
+
+0.47.2 2023-08-29 14:14:54 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - connect mmButton properties to button propperties
+
+0.47.1 2023-08-29 12:04:49 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - include callbackery.ui.form.FileSelectorMenuButton into distro
+
+0.47.0 2023-08-29 11:01:09 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+* make callbackery work better on mobile
+  - collapse navbar buttons into menu on mobile
+  - move labels over form fields on mobile
+* cleanup indentation
+
 0.46.5 2023-06-28 08:29:18 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - fixed regression in abstractform (missing signature)

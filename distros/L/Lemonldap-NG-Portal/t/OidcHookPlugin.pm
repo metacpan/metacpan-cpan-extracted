@@ -7,6 +7,21 @@ use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_SENDRESPONSE);
 use Data::Dumper;
 use Test::More;
 
+has confEnabled => (
+    is      => 'rw',
+    default => 1,
+);
+
+has alg => (
+    is      => 'rw',
+    default => 'HS512',
+);
+
+has callCount => (
+    is      => 'rw',
+    default => 0,
+);
+
 use constant hook => {
     oidcGenerateCode                  => 'modifyRedirectUri',
     oidcGenerateIDToken               => 'addClaimToIDToken',
@@ -22,6 +37,7 @@ use constant hook => {
     oidcGotOnlineRefresh              => 'refreshHook',
     oidcGotOfflineRefresh             => 'refreshHook',
     oidcGotTokenExchange              => 'tokenExchange',
+    getOidcRpConfig                   => 'getRp',
 };
 
 sub addClaimToIDToken {
@@ -114,6 +130,45 @@ sub tokenExchange {
         $req->response( $self->p->sendJSONresponse( $req, { result => 1 } ) );
         return PE_SENDRESPONSE;
     }
+    return PE_OK;
+}
+
+sub getRp {
+    my ( $self, $req, $client_id, $config ) = @_;
+
+    $self->callCount( $self->callCount + 1 );
+
+    $config->{ttl} = 600;
+
+    return unless $client_id eq "hookclient" and $self->confEnabled;
+
+    %$config = (
+        confKey    => "hook.hookclient",
+        attributes => {
+            email    => "mail",
+            fullname => "myfullname",
+        },
+        options => {
+            oidcRPMetaDataOptionsDisplayName           => "RP",
+            oidcRPMetaDataOptionsIDTokenExpiration     => 120,
+            oidcRPMetaDataOptionsIDTokenSignAlg        => $self->alg,
+            oidcRPMetaDataOptionsClientSecret          => "hookclient",
+            oidcRPMetaDataOptionsAccessTokenExpiration => 120,
+            oidcRPMetaDataOptionsBypassConsent         => 1,
+            oidcRPMetaDataOptionsRedirectUris          => "http://hook.com/",
+        },
+        macros => {
+            myfullname => '"I am ". $cn',
+        },
+        scopeRules => {
+            mydynscope => "1",
+        },
+        extraClaims => {
+            mydynscope => "fullname",
+        },
+        ttl => 600,
+    );
+
     return PE_OK;
 }
 

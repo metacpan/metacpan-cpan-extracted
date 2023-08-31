@@ -3,10 +3,11 @@ WriteMakefile(
 	NAME			=> 'Template::Plex',
 	VERSION_FROM		=> 'lib/Template/Plex.pm', 
 	PREREQ_PM		=> {
-					enum=>0,
 					"Log::ger"=>0,
 					"Log::OK"=>0,
-          "Error::Show"=>"v0.2.0"
+          "Error::Show"=>"v0.2.0",
+          "Export::These"=>0,
+          "constant::more"=>"v0.2.1"
 
 				}, 
 	ABSTRACT_FROM		=> 'lib/Template/Plex.pod', # retrieve abstract from module

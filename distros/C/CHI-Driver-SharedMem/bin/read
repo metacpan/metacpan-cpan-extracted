@@ -1,6 +1,9 @@
 #!/usr/bin/env perl
 
+use strict;
+use warnings;
 use Config;
+use IPC::SysV qw(S_IRUSR S_IWUSR IPC_CREAT);
 use IPC::SharedMem;
 use Data::Dumper;
 use JSON::MaybeXS;

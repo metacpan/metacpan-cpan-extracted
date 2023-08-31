@@ -16,6 +16,29 @@ DESCRIPTION
     rendering documents in App::sdview, showing formatted information on
     the terminal. It uses Tickit to provide the terminal interactions.
 
+ Keybindings
+
+      * Home - scroll to top
+
+      * Backspace - scroll up a page
+
+      * PageUp - scroll up half a page
+
+      * Up - scroll up a line
+
+      * Down - scroll down a line
+
+      * PageDown - scroll down half a page
+
+      * Space - scroll down a page
+
+      * End - scroll to bottom
+
+      * F9 - open the outline view popup. Clicking on an entry will jump
+      directly to it.
+
+      * q - exit
+
 TODO
 
       * Search behaviours

@@ -13,19 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Control::Tests;
-
-use strict;
-use warnings;
-
-our $VERSION = '1.00';
-
-use Dpkg::Control;
-use Dpkg::Control::Tests::Entry;
-use Dpkg::Index;
-
-use parent qw(Dpkg::Index);
-
 =encoding utf8
 
 =head1 NAME
@@ -36,6 +23,19 @@ Dpkg::Control::Tests - parse files like debian/tests/control
 
 It provides a class to access data of files that follow the same
 syntax as F<debian/tests/control>.
+
+=cut
+
+package Dpkg::Control::Tests 1.00;
+
+use strict;
+use warnings;
+
+use Dpkg::Control;
+use Dpkg::Control::Tests::Entry;
+use Dpkg::Index;
+
+use parent qw(Dpkg::Index);
 
 =head1 METHODS
 

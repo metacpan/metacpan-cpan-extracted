@@ -2,13 +2,131 @@ NAME
     App::SymlinkUtils - CLI utilities related to symbolic links (symlinks)
 
 VERSION
-    This document describes version 0.001 of App::SymlinkUtils (from Perl
-    distribution App-SymlinkUtils), released on 2023-06-30.
+    This document describes version 0.002 of App::SymlinkUtils (from Perl
+    distribution App-SymlinkUtils), released on 2023-07-02.
 
 DESCRIPTION
     This distribution includes several utilities related to symlinks:
 
     *   check-symlink
+
+    *   check-symlinks
+
+FUNCTIONS
+  check_symlink
+    Usage:
+
+     check_symlink(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Perform various checks on a symlink.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   content_matches => *bool*
+
+        Whether content should match extension.
+
+        If set to true, will guess media type from content and check that
+        file extension exists nd matches the media type. Requires
+        File::MimeInfo::Magic, which is only specified as a "Recommends"
+        dependency by File-Symlink-Util distribution.
+
+    *   ext_matches => *bool*
+
+        Whether extension should match.
+
+        If set to true, then if both symlink name and target filename
+        contain filename extension (e.g. "jpg") then they must match. Case
+        variation is allowed (e.g. "JPG") but other variation is not (e.g.
+        "jpeg").
+
+    *   is_abs => *bool*
+
+        Whether we should check that symlink target is an absolute path.
+
+        If set to true, then symlink target must be an absolute path. If set
+        to false, then symlink target must be a relative path.
+
+    *   symlink* => *filename*
+
+        Path to the symlink to be checked.
+
+    *   target => *filename*
+
+        Expected target path.
+
+        If specified, then target of symlink (after normalized to absolute
+        path) will be checked and must point to this target.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  check_symlinks
+    Usage:
+
+     check_symlinks(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Perform various checks on symlinks.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   content_matches => *bool*
+
+        Whether content should match extension.
+
+        If set to true, will guess media type from content and check that
+        file extension exists nd matches the media type. Requires
+        File::MimeInfo::Magic, which is only specified as a "Recommends"
+        dependency by File-Symlink-Util distribution.
+
+    *   ext_matches => *bool*
+
+        Whether extension should match.
+
+        If set to true, then if both symlink name and target filename
+        contain filename extension (e.g. "jpg") then they must match. Case
+        variation is allowed (e.g. "JPG") but other variation is not (e.g.
+        "jpeg").
+
+    *   is_abs => *bool*
+
+        Whether we should check that symlink target is an absolute path.
+
+        If set to true, then symlink target must be an absolute path. If set
+        to false, then symlink target must be a relative path.
+
+    *   symlinks* => *array[filename]*
+
+        Symlinks to check.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -17,6 +135,14 @@ HOMEPAGE
 SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-App-SymlinkUtils>.
+
+SEE ALSO
+    File::Symlink::Util
+
+    Setup::File::Symlink
+
+    App::CpMvUtils has some utilities related to symlink:
+    cp-and-adjust-symlinks.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

@@ -17,7 +17,7 @@
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '2.16.1';
+our $VERSION = '2.17.0';
 
 sub tree {
     return [ {
@@ -284,6 +284,7 @@ sub tree {
                                     form  => 'simpleInputContainer',
                                     nodes => [
                                         'ldapGroupBase',
+                                        'groupLDAPFilter',
                                         'ldapGroupObjectClass',
                                         'ldapGroupAttributeName',
                                         'ldapGroupAttributeNameUser',
@@ -397,9 +398,12 @@ sub tree {
                             title => 'radiusParams',
                             help  => 'authradius.html',
                             nodes => [
-                                'radiusAuthnLevel', 'radiusSecret',
-                                'radiusServer',     'radiusExportedVars',
+                                'radiusAuthnLevel',
+                                'radiusSecret',
+                                'radiusServer',
+                                'radiusExportedVars',
                                 'radiusDictionaryFile',
+                                'radiusRequestAttributes',
                             ]
                         },
                         {
@@ -964,8 +968,8 @@ sub tree {
                             nodes => [
                                 'webauthn2fActivation',
                                 'webauthn2fSelfRegistration',
-                                'webauthn2fUserVerification',
                                 'webauthn2fUserCanRemoveKey',
+                                'webauthn2fUserVerification',
                                 'webauthnRpName',
                                 'webauthnDisplayNameAttr',
                                 'webauthn2fAuthnLevel',
@@ -1040,6 +1044,9 @@ sub tree {
                                 'radius2fSecret',
                                 'radius2fUsernameSessionKey',
                                 'radius2fTimeout',
+                                'radius2fDictionaryFile',
+                                'radius2fRequestAttributes',
+                                'radius2fSendInitialRequest',
                                 'radius2fAuthnLevel',
                                 'radius2fLabel',
                                 'radius2fLogo'
@@ -1456,6 +1463,12 @@ sub tree {
                                 'oidcServicePrivateKeySig',
                                 'oidcServicePublicKeySig',
                                 'oidcServiceKeyIdSig',
+                                'oidcServiceOldPrivateKeySig',
+                                'oidcServiceOldPublicKeySig',
+                                'oidcServiceOldKeyIdSig',
+                                'oidcServiceNewPrivateKeySig',
+                                'oidcServiceNewPublicKeySig',
+                                'oidcServiceNewKeyIdSig',
                             ],
                         },
                         'oidcServiceAllowAuthorizationCodeFlow',
@@ -1463,6 +1476,7 @@ sub tree {
                         'oidcServiceAllowHybridFlow',
                         'oidcServiceIgnoreScopeForClaims',
                         'oidcServiceAllowOnlyDeclaredScopes',
+                        'oidcDropCspHeaders',
                     ],
                 },
                 {

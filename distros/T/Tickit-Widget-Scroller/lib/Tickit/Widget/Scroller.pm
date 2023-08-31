@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2023 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
 use warnings;
 use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
 
-package Tickit::Widget::Scroller 0.30;
+package Tickit::Widget::Scroller 0.31;
 class Tickit::Widget::Scroller
    :strict(params)
    :isa(Tickit::Widget);
@@ -158,7 +158,6 @@ field $_start_partial = 0;
 
 # accessor methods for t/30indicator.t to use
 # TODO: Should think about whether these should be made public
-method _items         { @_items }
 method _start_item    { $_start_item }
 method _start_partial { $_start_partial }
 
@@ -226,7 +225,7 @@ method reshape ()
       $self->scroll_to_top;
    }
 
-   $self->update_indicators;
+   $self->update_indicators( 1 );
 }
 
 method window_lost
@@ -273,6 +272,20 @@ clipped if this would scroll past the beginning or end of the display.
 =cut
 
 # generated accessors
+
+=head2 items
+
+   $count = scalar $scroller->items;
+
+I<Since version 0.31.>
+
+In scalar context, returns the number of items currently stored in the
+Scroller. The behaviour of this method in non-scalar context is currently
+unspecified.
+
+=cut
+
+method items { return scalar @_items; }
 
 =head2 push
 
@@ -981,7 +994,7 @@ return different text now.
 field %_indicator_win;
 field %_indicator_text;
 
-method update_indicators ()
+method update_indicators ( $force = 0 )
 {
    my $win = $self->window or return;
 
@@ -992,7 +1005,7 @@ method update_indicators ()
       my $text = $gen_indicator ? $self->$gen_indicator
                                 : undef;
       $text //= "";
-      next if $text eq ( $_indicator_text{$edge} // "" );
+      next if !$force and $text eq ( $_indicator_text{$edge} // "" );
 
       $_indicator_text{$edge} = $text;
 

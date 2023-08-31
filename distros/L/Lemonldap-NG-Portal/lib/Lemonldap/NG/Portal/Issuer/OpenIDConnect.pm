@@ -22,13 +22,15 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 );
 use String::Random qw/random_string/;
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.17.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Issuer
   Lemonldap::NG::Common::Conf::AccessLib
   Lemonldap::NG::Portal::Lib::OpenIDConnect
 );
+
+with 'Lemonldap::NG::Portal::Lib::LazyLoadedConfiguration';
 
 # INTERFACE
 
@@ -91,8 +93,7 @@ sub init {
 
     # Initialize RP list
     return 0
-      unless ( $self->Lemonldap::NG::Portal::Main::Issuer::init()
-        and $self->loadRPs );
+      unless $self->Lemonldap::NG::Portal::Main::Issuer::init();
 
     # Manage RP requests
     $self->addRouteFromConf(
@@ -110,11 +111,11 @@ sub init {
     $self->addRouteFromConf(
         'Auth',
         oidcServiceMetaDataCheckSessionURI  => 'checkSession',
-        oidcServiceMetaDataTokenURI         => 'badAuthRequest',
-        oidcServiceMetaDataUserInfoURI      => 'badAuthRequest',
-        oidcServiceMetaDataJWKSURI          => 'badAuthRequest',
-        oidcServiceMetaDataRegistrationURI  => 'badAuthRequest',
-        oidcServiceMetaDataIntrospectionURI => 'badAuthRequest',
+        oidcServiceMetaDataTokenURI         => 'token',
+        oidcServiceMetaDataUserInfoURI      => 'userInfo',
+        oidcServiceMetaDataJWKSURI          => 'jwks',
+        oidcServiceMetaDataRegistrationURI  => 'registration',
+        oidcServiceMetaDataIntrospectionURI => 'introspection',
     );
 
     # Metadata (.well-known/openid-configuration)
@@ -137,6 +138,62 @@ sub init {
     return 1;
 }
 
+# CONFIGURATION LOADING
+
+# Get Relying Party corresponding to a Client ID
+# This will lazy-load the corresponding config from either LLNG configuration
+# or from a plugin.
+# @param client_id Client ID
+# @return String result
+sub getRP {
+    my ( $self, $client_id ) = @_;
+    my $rp;
+    my $result = $self->lazy_load_config($client_id);
+    return $result->{confKey};
+}
+
+# Handles configuration loading of RPs
+# this method is called by the LazyLoadedConfiguration role
+sub load_config {
+    my ( $self, $client_id ) = @_;
+
+    my @confKeys = grep {
+        $self->conf->{oidcRPMetaDataOptions}->{$_}
+          ->{oidcRPMetaDataOptionsClientID} eq $client_id
+    } keys %{ $self->conf->{oidcRPMetaDataOptions} || {} };
+
+    # Found this client_id in configuration,
+    # load it permanently (until next conf reload)
+    if (@confKeys) {
+        my $confKey = $confKeys[0];
+        $self->logger->debug("Loading $client_id from LLNG config $confKey");
+        $self->load_rp_from_llng_conf($confKey);
+        return { info => { confKey => $confKey } };
+    }
+
+    # Not found in config, try to load from hook
+    my $config = {};
+    $self->p->processHook( {}, 'getOidcRpConfig', $client_id, $config );
+
+    my $info;
+    if ( $config->{confKey} ) {
+
+        $self->logger->debug("Loading $config->{confKey} from getOidcRpConfig hook");
+        $info = { confKey => $config->{confKey} };
+
+        # Make sure Client ID is correctly set in options
+        $config->{options}->{oidcRPMetaDataOptionsClientID} = $client_id;
+        $self->load_rp(%$config);
+
+    }
+
+    # You can set a negative TTL in getOidcRPConfig hook even if you don't find
+    # anything to avoid doing too many lookups
+    my $ttl = $config->{ttl};
+    return { ( $ttl ? ( ttl => $ttl ) : () ),
+        ( $info ? ( info => $info ) : () ) };
+}
+
 # RUNNING METHODS
 
 sub ssoMatch {
@@ -148,6 +205,7 @@ sub ssoMatch {
 # run() manages only "authorize" and "logout" endpoints.
 sub run {
     my ( $self, $req, $path ) = @_;
+    $req->data->{dropCsp} = 1 if $self->conf->{oidcDropCspHeaders};
 
     # Check activation rule
     unless ( $self->rule->( $req, $req->sessionInfo ) ) {
@@ -272,7 +330,7 @@ sub run {
             }
 
             # Check if this RP is authorized
-            if ( my $rule = $self->spRules->{$rp} ) {
+            if ( my $rule = $self->rpRules->{$rp} ) {
                 my $ruleVariables =
                   { %{ $req->sessionInfo || {} }, _oidc_grant_type => $flow };
                 unless ( $rule->( $req, $ruleVariables ) ) {
@@ -288,9 +346,9 @@ sub run {
                   . " is authorized to access to $rp" );
 
             # Check redirect_uri
-            my $redirect_uri  = $oidc_request->{'redirect_uri'};
-            my $redirect_uris = $self->conf->{oidcRPMetaDataOptions}->{$rp}
-              ->{oidcRPMetaDataOptionsRedirectUris};
+            my $redirect_uri = $oidc_request->{'redirect_uri'};
+            my $redirect_uris =
+              $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsRedirectUris};
 
             if ($redirect_uris) {
                 my $redirect_uri_allowed = 0;
@@ -340,8 +398,8 @@ sub run {
                 );
             }
 
-            my $spAuthnLevel = $self->conf->{oidcRPMetaDataOptions}->{$rp}
-              ->{oidcRPMetaDataOptionsAuthnLevel} || 0;
+            my $spAuthnLevel =
+              $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAuthnLevel} || 0;
 
             # Check if user needs to be reauthenticated
             my $prompt = $oidc_request->{'prompt'};
@@ -358,29 +416,6 @@ sub run {
                 );
                 $req->pdata->{targetAuthnLevel} = $spAuthnLevel;
                 return $self->reAuth($req);
-            }
-
-            my $max_age         = $oidc_request->{'max_age'};
-            my $_lastAuthnUTime = $req->{sessionInfo}->{_lastAuthnUTime};
-            if ( $max_age && time > $_lastAuthnUTime + $max_age ) {
-                $self->logger->debug(
-"Reauthentication forced because authentication time ($_lastAuthnUTime) is too old (>$max_age s)"
-                );
-                $req->pdata->{targetAuthnLevel} = $spAuthnLevel;
-                return $self->reAuth($req);
-            }
-
-            # Check if we have sufficient auth level
-            my $authenticationLevel =
-              $req->{sessionInfo}->{authenticationLevel} || 0;
-            if ( $authenticationLevel < $spAuthnLevel ) {
-                $self->logger->debug(
-                        "Insufficient authentication level for service $rp"
-                      . " (has: $authenticationLevel, want: $spAuthnLevel)" );
-
-                # Reauth with sp auth level as target
-                $req->pdata->{targetAuthnLevel} = $spAuthnLevel;
-                return $self->upgradeAuth($req);
             }
 
             # Check scope validity
@@ -451,13 +486,36 @@ sub run {
                 }
             }
 
+            my $max_age         = $oidc_request->{'max_age'};
+            my $_lastAuthnUTime = $req->{sessionInfo}->{_lastAuthnUTime};
+            if ( $max_age && time > $_lastAuthnUTime + $max_age ) {
+                $self->logger->debug(
+"Reauthentication forced because authentication time ($_lastAuthnUTime) is too old (>$max_age s)"
+                );
+                $req->pdata->{targetAuthnLevel} = $spAuthnLevel;
+                return $self->reAuth($req);
+            }
+
+            # Check if we have sufficient auth level
+            my $authenticationLevel =
+              $req->{sessionInfo}->{authenticationLevel} || 0;
+            if ( $authenticationLevel < $spAuthnLevel ) {
+                $self->logger->debug(
+                        "Insufficient authentication level for service $rp"
+                      . " (has: $authenticationLevel, want: $spAuthnLevel)" );
+
+                # Reauth with sp auth level as target
+                $req->pdata->{targetAuthnLevel} = $spAuthnLevel;
+                return $self->upgradeAuth($req);
+            }
+
             # Compute scopes
             my $req_scope = $oidc_request->{'scope'};
             my $scope     = $self->getScope( $req, $rp, $req_scope );
 
             # Obtain consent
-            my $bypassConsent = $self->conf->{oidcRPMetaDataOptions}->{$rp}
-              ->{oidcRPMetaDataOptionsBypassConsent};
+            my $bypassConsent =
+              $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsBypassConsent};
             if ($bypassConsent) {
                 $self->logger->debug(
 "Consent is disabled for Relying Party $rp, user will not be prompted"
@@ -589,11 +647,10 @@ sub run {
                         }
 
                         my $display_name =
-                          $self->conf->{oidcRPMetaDataOptions}->{$rp}
+                          $self->rpOptions->{$rp}
                           ->{oidcRPMetaDataOptionsDisplayName};
                         my $icon =
-                          $self->conf->{oidcRPMetaDataOptions}->{$rp}
-                          ->{oidcRPMetaDataOptionsIcon};
+                          $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsIcon};
                         my $imgSrc;
 
                         if ($icon) {
@@ -648,8 +705,7 @@ sub run {
               $self->createSessionState( $req->id, $client_id );
 
             # Check if PKCE is required
-            if ( $self->conf->{oidcRPMetaDataOptions}->{$rp}
-                ->{oidcRPMetaDataOptionsRequirePKCE}
+            if ( $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsRequirePKCE}
                 and !$oidc_request->{'code_challenge'} )
             {
                 $self->userLogger->error(
@@ -665,7 +721,6 @@ sub run {
                 );
             }
 
-            # WIP: Offline access
             my $offline = 0;
             if ( $self->_hasScope( 'offline_access', $scope ) ) {
                 $offline = 1;
@@ -693,8 +748,9 @@ sub run {
                 }
 
                 # Ignore offline_access request if not authorized by the RP
-                unless ( $self->conf->{oidcRPMetaDataOptions}->{$rp}
-                    ->{oidcRPMetaDataOptionsAllowOffline} )
+                unless (
+                    $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAllowOffline}
+                  )
                 {
                     $self->logger->warn(
                         "Offline access not authorized for RP $rp");
@@ -792,7 +848,7 @@ sub run {
 
                     # Compute hash to store in at_hash
                     my $alg =
-                      $self->conf->{oidcRPMetaDataOptions}->{$rp}
+                      $self->rpOptions->{$rp}
                       ->{oidcRPMetaDataOptionsIDTokenSignAlg};
                     my ($hash_level) = ( $alg =~ /(?:\w{2})(\d{3})/ );
                     $at_hash = $self->createHash( $access_token, $hash_level )
@@ -817,7 +873,7 @@ sub run {
 
                 # Send token response
                 my $expires_in =
-                  $self->conf->{oidcRPMetaDataOptions}->{$rp}
+                  $self->rpOptions->{$rp}
                   ->{oidcRPMetaDataOptionsAccessTokenExpiration}
                   || $self->conf->{oidcServiceAccessTokenExpiration};
 
@@ -856,7 +912,7 @@ sub run {
                 my $c_hash;
 
                 # Hash level
-                my $alg = $self->conf->{oidcRPMetaDataOptions}->{$rp}
+                my $alg = $self->rpOptions->{$rp}
                   ->{oidcRPMetaDataOptionsIDTokenSignAlg};
                 my ($hash_level) = ( $alg =~ /(?:\w{2})(\d{3})/ );
 
@@ -937,7 +993,7 @@ sub run {
                 }
 
                 my $expires_in =
-                  $self->conf->{oidcRPMetaDataOptions}->{$rp}
+                  $self->rpOptions->{$rp}
                   ->{oidcRPMetaDataOptionsAccessTokenExpiration}
                   || $self->conf->{oidcServiceAccessTokenExpiration};
 
@@ -988,9 +1044,6 @@ sub run {
                 if ( $oidc_request->{$param} = $req->param($param) ) {
                     $self->logger->debug( "OIDC request parameter $param: "
                           . $oidc_request->{$param} );
-                    $self->p->setHiddenFormValue( $req, $param,
-                        $oidc_request->{$param},
-                        '', 0 );
                 }
             }
 
@@ -1011,25 +1064,53 @@ sub run {
                 # trivial to bypass
                 my $payload = getJWTPayload($id_token_hint);
                 my $azp     = $payload->{azp};
+                my $sid     = $payload->{sid};
+                my $sub     = $payload->{sub};
 
                 # Check bypassConfirm parameter for rp using audience
-                foreach ( keys %{ $self->conf->{oidcRPMetaDataOptions} } ) {
+                my $rp;
+                foreach ( keys %{ $self->rpOptions } ) {
                     my $logout_rp = $_;
                     my $rpid =
-                      $self->conf->{oidcRPMetaDataOptions}->{$logout_rp}
+                      $self->rpOptions->{$logout_rp}
                       ->{oidcRPMetaDataOptionsClientID};
 
                     # this works because _generateIDToken always sets azp
                     if ( $azp and $rpid eq $azp ) {
                         $bypassConfirm =
-                          $self->conf->{oidcRPMetaDataOptions}->{$logout_rp}
+                          $self->rpOptions->{$logout_rp}
                           ->{oidcRPMetaDataOptionsLogoutBypassConfirm};
                         $self->logger->debug(
                             "Bypass logout confirm for RP $logout_rp")
                           if $bypassConfirm;
+                        $rp = $logout_rp;
                         last;
                     }
                 }
+
+                unless ($rp) {
+                    $self->userLogger->error(
+                        "ID Token hint azp doesn't match any known RP");
+                    $bypassConfirm = 0;
+                }
+
+                my $user_id =
+                  $self->getUserIDForRP( $req, $rp, $req->{sessionInfo} );
+                unless ( $sub eq $user_id ) {
+                    $self->userLogger->error(
+                        "ID Token hint sub $sub does not match user $user_id");
+                    $bypassConfirm = 0;
+                }
+                else {
+                    if ( $self->getSidFromSession( $rp, $req->{sessionInfo} ) ne
+                        $sid )
+                    {
+                        $self->userLogger->error(
+                            "ID Token hint `sid` does not match user session");
+                        $bypassConfirm = 0;
+                    }
+                }
+
             }
 
             # Ask consent for logout
@@ -1062,10 +1143,10 @@ sub run {
 
                     # Check redirect URI is allowed
                     my $redirect_uri_allowed = 0;
-                    foreach ( keys %{ $self->conf->{oidcRPMetaDataOptions} } ) {
+                    foreach ( keys %{ $self->rpOptions } ) {
                         my $logout_rp = $_;
                         if ( my $redirect_uris =
-                            $self->conf->{oidcRPMetaDataOptions}->{$logout_rp}
+                            $self->rpOptions->{$logout_rp}
                             ->{oidcRPMetaDataOptionsPostLogoutRedirectUris} )
                         {
                             foreach ( split( /\s+/, $redirect_uris ) ) {
@@ -1099,6 +1180,12 @@ sub run {
 
             $req->info( $self->loadTemplate( $req, 'oidcLogout' ) );
             $req->data->{activeTimer} = 0;
+
+            while ( my ( $k, $v ) = each %$oidc_request ) {
+                $self->p->setHiddenFormValue( $req, $k, $v,
+                    '', 0 );
+            }
+
             return PE_CONFIRM;
         }
     }
@@ -1114,6 +1201,7 @@ sub run {
 # Handle token endpoint
 sub token {
     my ( $self, $req ) = @_;
+    $req->data->{dropCsp} = 1 if $self->conf->{oidcDropCspHeaders};
     $self->logger->debug("URL detected as an OpenID Connect TOKEN URL");
 
     my $rp = $self->checkEndPointAuthenticationCredentials($req);
@@ -1134,8 +1222,7 @@ sub token {
     # Resource Owner Password Credenials
     elsif ( $grant_type eq 'password' ) {
         unless (
-            $self->oidcRPList->{$rp}->{oidcRPMetaDataOptionsAllowPasswordGrant}
-          )
+            $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAllowPasswordGrant} )
         {
             $self->logger->warn(
                 "Access to grant_type=password, is not allowed for RP $rp");
@@ -1146,7 +1233,7 @@ sub token {
 
     # Resource Owner Password Credenials
     elsif ( $grant_type eq 'client_credentials' ) {
-        unless ( $self->oidcRPList->{$rp}
+        unless ( $self->rpOptions->{$rp}
             ->{oidcRPMetaDataOptionsAllowClientCredentialsGrant} )
         {
             $self->logger->warn(
@@ -1179,12 +1266,12 @@ sub _handleClientCredentialsGrant {
 
     # The client credentials grant type MUST only be used by confidential
     # clients.
-    if ( $self->oidcRPList->{$rp}->{oidcRPMetaDataOptionsPublic} ) {
+    if ( $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsPublic} ) {
         $self->logger->error(
             "Client Credentials grant cannot be used on public clients");
         return $self->sendOIDCError( $req, 'unauthorized_client', 400 );
     }
-    my $client_id = $self->oidcRPList->{$rp}->{oidcRPMetaDataOptionsClientID};
+    my $client_id = $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsClientID};
 
     # Populate minimal session info
     my $req_scope = $req->param('scope') || '';
@@ -1210,7 +1297,7 @@ sub _handleClientCredentialsGrant {
     return $self->sendOIDCError( $req, 'server_error', 500 ) if ( $h != PE_OK );
 
     # Run rule against session info
-    if ( my $rule = $self->spRules->{$rp} ) {
+    if ( my $rule = $self->rpRules->{$rp} ) {
         my $ruleVariables =
           { %{ $infos || {} }, _oidc_grant_type => "clientcredentials", };
         unless ( $rule->( $req, $ruleVariables ) ) {
@@ -1244,8 +1331,7 @@ sub _handleClientCredentialsGrant {
     }
 
     my $expires_in =
-      $self->conf->{oidcRPMetaDataOptions}->{$rp}
-      ->{oidcRPMetaDataOptionsAccessTokenExpiration}
+         $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAccessTokenExpiration}
       || $self->conf->{oidcServiceAccessTokenExpiration};
 
     my $token_response = {
@@ -1274,7 +1360,7 @@ sub _handleTokenExchange {
 
 sub _handlePasswordGrant {
     my ( $self, $req, $rp ) = @_;
-    my $client_id = $self->oidcRPList->{$rp}->{oidcRPMetaDataOptionsClientID};
+    my $client_id = $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsClientID};
     my $req_scope = $req->param('scope') || '';
     my $username  = $req->param('username');
     my $password  = $req->param('password');
@@ -1324,7 +1410,7 @@ sub _handlePasswordGrant {
       unless ( $result == PE_OK and $req->id and $req->user );
 
     ## Make sure the current user is allowed to use this RP
-    if ( my $rule = $self->spRules->{$rp} ) {
+    if ( my $rule = $self->rpRules->{$rp} ) {
         my $ruleVariables =
           { %{ $req->sessionInfo || {} }, _oidc_grant_type => "password", };
         unless ( $rule->( $req, $ruleVariables ) ) {
@@ -1373,9 +1459,7 @@ sub _handlePasswordGrant {
     # Generate refresh_token
     my $refresh_token = undef;
 
-    if ( $self->conf->{oidcRPMetaDataOptions}->{$rp}
-        ->{oidcRPMetaDataOptionsRefreshToken} )
-    {
+    if ( $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsRefreshToken} ) {
         my $refreshTokenSession = $self->newRefreshToken(
             $rp,
             {
@@ -1404,8 +1488,8 @@ sub _handlePasswordGrant {
     if ( $self->_hasScope( "openid", $scope ) ) {
 
         # Compute hash to store in at_hash
-        my $alg = $self->conf->{oidcRPMetaDataOptions}->{$rp}
-          ->{oidcRPMetaDataOptionsIDTokenSignAlg};
+        my $alg =
+          $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsIDTokenSignAlg};
         my ($hash_level) = ( $alg =~ /(?:\w{2})(\d{3})/ );
         my $at_hash = $self->createHash( $access_token, $hash_level )
           if $hash_level;
@@ -1423,8 +1507,7 @@ sub _handlePasswordGrant {
 
     # Send token response
     my $expires_in =
-      $self->conf->{oidcRPMetaDataOptions}->{$rp}
-      ->{oidcRPMetaDataOptionsAccessTokenExpiration}
+         $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAccessTokenExpiration}
       || $self->conf->{oidcServiceAccessTokenExpiration};
 
     my $token_response = {
@@ -1443,7 +1526,7 @@ sub _handlePasswordGrant {
 
 sub _handleAuthorizationCodeGrant {
     my ( $self, $req, $rp ) = @_;
-    my $client_id = $self->oidcRPList->{$rp}->{oidcRPMetaDataOptionsClientID};
+    my $client_id = $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsClientID};
     my $code      = $req->param('code');
 
     unless ($code) {
@@ -1460,9 +1543,7 @@ sub _handleAuthorizationCodeGrant {
     $codeSession->remove();
 
     # Check PKCE
-    if ( $self->conf->{oidcRPMetaDataOptions}->{$rp}
-        ->{oidcRPMetaDataOptionsRequirePKCE} )
-    {
+    if ( $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsRequirePKCE} ) {
         unless (
             $self->validatePKCEChallenge(
                 $req->param('code_verifier'),
@@ -1529,10 +1610,11 @@ sub _handleAuthorizationCodeGrant {
     # For offline access, the refresh token isn't tied to the session ID
     if ( $codeSession->{data}->{offline} ) {
 
-        # We need to remove _sessionType, _sessionid and _utime from the
-        # session data before storing session data in the refresh token
+        # We need to remove _sessionType, _sessionid , _utime and _lastSeen
+        # from the session data before storing session data in the refresh
+        # token
         my %userInfo;
-        for my $userKey ( grep !/^(_session|_utime$)/,
+        for my $userKey ( grep !/^(_session|_utime$|_lastSeen$)/,
             keys %{ $apacheSession->data } )
         {
             $userInfo{$userKey} = $apacheSession->data->{$userKey};
@@ -1559,13 +1641,11 @@ sub _handleAuthorizationCodeGrant {
 
         $refresh_token = $refreshTokenSession->id;
 
-        $self->logger->debug("Generated refresh token: $refresh_token");
+        $self->logger->debug("Generated offline refresh token: $refresh_token");
     }
 
     # For online access, if configured
-    elsif ( $self->conf->{oidcRPMetaDataOptions}->{$rp}
-        ->{oidcRPMetaDataOptionsRefreshToken} )
-    {
+    elsif ( $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsRefreshToken} ) {
         my $refreshTokenSession = $self->newRefreshToken(
             $rp,
             {
@@ -1586,14 +1666,13 @@ sub _handleAuthorizationCodeGrant {
 
         $refresh_token = $refreshTokenSession->id;
 
-        $self->logger->debug("Generated refresh token: $refresh_token");
+        $self->logger->debug("Generated online refresh token: $refresh_token");
     }
 
     # Compute hash to store in at_hash
-    my $alg = $self->conf->{oidcRPMetaDataOptions}->{$rp}
-      ->{oidcRPMetaDataOptionsIDTokenSignAlg};
+    my $alg = $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsIDTokenSignAlg};
     my ($hash_level) = ( $alg =~ /(?:\w{2})(\d{3})/ );
-    my $at_hash = $self->createHash( $access_token, $hash_level )
+    my $at_hash      = $self->createHash( $access_token, $hash_level )
       if $hash_level;
 
     # Create ID Token
@@ -1618,8 +1697,7 @@ sub _handleAuthorizationCodeGrant {
 
     # Send token response
     my $expires_in =
-      $self->conf->{oidcRPMetaDataOptions}->{$rp}
-      ->{oidcRPMetaDataOptionsAccessTokenExpiration}
+         $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAccessTokenExpiration}
       || $self->conf->{oidcServiceAccessTokenExpiration};
 
     my $token_response = {
@@ -1644,7 +1722,7 @@ sub _handleAuthorizationCodeGrant {
 
 sub _handleRefreshTokenGrant {
     my ( $self, $req, $rp ) = @_;
-    my $client_id = $self->oidcRPList->{$rp}->{oidcRPMetaDataOptionsClientID};
+    my $client_id = $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsClientID};
     my $refresh_token = $req->param('refresh_token');
 
     unless ($refresh_token) {
@@ -1773,10 +1851,9 @@ sub _handleRefreshTokenGrant {
     }
 
     # Compute hash to store in at_hash
-    my $alg = $self->conf->{oidcRPMetaDataOptions}->{$rp}
-      ->{oidcRPMetaDataOptionsIDTokenSignAlg};
+    my $alg = $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsIDTokenSignAlg};
     my ($hash_level) = ( $alg =~ /(?:\w{2})(\d{3})/ );
-    my $at_hash = $self->createHash( $access_token, $hash_level )
+    my $at_hash      = $self->createHash( $access_token, $hash_level )
       if $hash_level;
 
     # Create ID Token
@@ -1805,8 +1882,7 @@ sub _handleRefreshTokenGrant {
 
     # Send token response
     my $expires_in =
-      $self->conf->{oidcRPMetaDataOptions}->{$rp}
-      ->{oidcRPMetaDataOptionsAccessTokenExpiration}
+         $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAccessTokenExpiration}
       || $self->conf->{oidcServiceAccessTokenExpiration};
 
     my $token_response = {
@@ -1825,6 +1901,7 @@ sub _handleRefreshTokenGrant {
 # Handle userinfo endpoint
 sub userInfo {
     my ( $self, $req ) = @_;
+    $req->data->{dropCsp} = 1 if $self->conf->{oidcDropCspHeaders};
     $self->logger->debug("URL detected as an OpenID Connect USERINFO URL");
 
     my $access_token = $self->getEndPointAccessToken($req);
@@ -1863,8 +1940,8 @@ sub userInfo {
     return $self->returnBearerError( 'invalid_request', 'Invalid request', 401 )
       unless ($userinfo_response);
 
-    my $userinfo_sign_alg = $self->conf->{oidcRPMetaDataOptions}->{$rp}
-      ->{oidcRPMetaDataOptionsUserInfoSignAlg};
+    my $userinfo_sign_alg =
+      $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsUserInfoSignAlg};
 
     unless ($userinfo_sign_alg) {
         return $self->p->sendJSONresponse( $req, $userinfo_response );
@@ -1908,14 +1985,13 @@ sub _getSessionFromAccessTokenData {
 
 sub introspection {
     my ( $self, $req ) = @_;
+    $req->data->{dropCsp} = 1 if $self->conf->{oidcDropCspHeaders};
     $self->logger->debug("URL detected as an OpenID Connect INTROSPECTION URL");
 
     my $rp = $self->checkEndPointAuthenticationCredentials($req);
     return $self->invalidClientResponse($req) unless ($rp);
 
-    if ( $self->conf->{oidcRPMetaDataOptions}->{$rp}
-        ->{oidcRPMetaDataOptionsPublic} )
-    {
+    if ( $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsPublic} ) {
         $self->logger->error(
             "Public clients are not allowed to acces the introspection endpoint"
         );
@@ -1941,7 +2017,7 @@ sub introspection {
             $response->{scope} = $oidcSession->{data}->{scope}
               if $oidcSession->{data}->{scope};
             $response->{client_id} =
-              $self->oidcRPList->{ $oidcSession->{data}->{rp} }
+              $self->rpOptions->{ $oidcSession->{data}->{rp} }
               ->{oidcRPMetaDataOptionsClientID}
               if $oidcSession->{data}->{rp};
             $response->{iss} = $self->iss;
@@ -1958,22 +2034,25 @@ sub introspection {
 # Handle jwks endpoint
 sub jwks {
     my ( $self, $req ) = @_;
+    $req->data->{dropCsp} = 1 if $self->conf->{oidcDropCspHeaders};
     $self->logger->debug("URL detected as an OpenID Connect JWKS URL");
 
     my $jwks = { keys => [] };
 
-    my $public_key_sig_or_cert = $self->conf->{oidcServicePublicKeySig};
-    my $private_key_sig        = $self->conf->{oidcServicePrivateKeySig};
-    my $key_id_sig             = $self->conf->{oidcServiceKeyIdSig};
-    if ($private_key_sig) {
-        my $jwk = {
-            kty => "RSA",
-            use => "sig",
-            ( $key_id_sig ? ( kid => $key_id_sig ) : () ),
-            %{ $self->key2jwks($private_key_sig) },
-            %{ $self->getCertInfo($public_key_sig_or_cert) },
-        };
-        push @{ $jwks->{keys} }, $jwk;
+    foreach my $prefix (qw(oidcService oidcServiceOld oidcServiceNew)) {
+        my $public_key_sig_or_cert = $self->conf->{ $prefix . 'PublicKeySig' };
+        my $private_key_sig        = $self->conf->{ $prefix . 'PrivateKeySig' };
+        my $key_id_sig             = $self->conf->{ $prefix . 'KeyIdSig' };
+        if ($private_key_sig) {
+            my $jwk = {
+                kty => "RSA",
+                use => "sig",
+                ( $key_id_sig ? ( kid => $key_id_sig ) : () ),
+                %{ $self->key2jwks($private_key_sig) },
+                %{ $self->getCertInfo($public_key_sig_or_cert) },
+            };
+            push @{ $jwks->{keys} }, $jwk;
+        }
     }
     $self->logger->debug("Send JWKS response sent");
     return $self->p->sendJSONresponse( $req, $jwks );
@@ -1982,6 +2061,7 @@ sub jwks {
 # Handle register endpoint
 sub registration {
     my ( $self, $req ) = @_;
+    $req->data->{dropCsp} = 1 if $self->conf->{oidcDropCspHeaders};
     $self->logger->debug("URL detected as an OpenID Connect REGISTRATION URL");
 
     # TODO: check Initial Access Token
@@ -2004,7 +2084,8 @@ sub registration {
 
     $self->logger->debug("Client metadata received: $client_metadata_json");
 
-    my $client_metadata = $self->decodeClientMetadata($client_metadata_json);
+    my $client_metadata = $self->decodeClientMetadata($client_metadata_json)
+      or return $self->p->sendError( $req, 'invalid_client_metadata', 400 );
     my $registration_response = {};
 
     # Check redirect_uris
@@ -2029,7 +2110,13 @@ sub registration {
       $client_metadata->{id_token_signed_response_alg} || "RS256";
     my $userinfo_signed_response_alg =
       $client_metadata->{userinfo_signed_response_alg};
-    my $redirect_uris = $client_metadata->{redirect_uris};
+    my $redirect_uris          = $client_metadata->{redirect_uris};
+    my $backchannel_logout_uri = $client_metadata->{backchannel_logout_uri};
+    my $backchannel_logout_session_required =
+      $client_metadata->{backchannel_logout_session_required};
+    my $frontchannel_logout_uri = $client_metadata->{backchannel_logout_uri};
+    my $frontchannel_logout_session_required =
+      $client_metadata->{frontchannel_logout_session_required};
 
     # Register RP in global configuration
     my $conf = $self->confAcc->getConf( { raw => 1, noCache => 1 } );
@@ -2055,6 +2142,25 @@ sub registration {
       ->{oidcRPMetaDataOptionsUserInfoSignAlg} = $userinfo_signed_response_alg
       if defined $userinfo_signed_response_alg;
 
+    if ($frontchannel_logout_uri) {
+        $conf->{oidcRPMetaDataOptions}->{$rp}->{oidcRPMetaDataOptionsLogoutType}
+          = 'front';
+        $conf->{oidcRPMetaDataOptions}->{$rp}->{oidcRPMetaDataOptionsLogoutUrl}
+          = $frontchannel_logout_uri;
+        $conf->{oidcRPMetaDataOptions}->{$rp}
+          ->{oidcRPMetaDataOptionsLogoutSessionRequired} =
+          $frontchannel_logout_session_required;
+    }
+    elsif ($backchannel_logout_uri) {
+        $conf->{oidcRPMetaDataOptions}->{$rp}->{oidcRPMetaDataOptionsLogoutType}
+          = 'back';
+        $conf->{oidcRPMetaDataOptions}->{$rp}->{oidcRPMetaDataOptionsLogoutUrl}
+          = $backchannel_logout_uri;
+        $conf->{oidcRPMetaDataOptions}->{$rp}
+          ->{oidcRPMetaDataOptionsLogoutSessionRequired} =
+          $backchannel_logout_session_required;
+    }
+
     # Exported Vars
     if (
         ref( $self->conf->{oidcServiceDynamicRegistrationExportedVars} ) eq
@@ -2074,9 +2180,6 @@ sub registration {
     }
 
     if ( $self->confAcc->saveConf($conf) > 0 ) {
-
-        # Reload RP list
-        $self->loadRPs();
 
         # Send registration response
         $registration_response->{'client_id'}            = $client_id;
@@ -2106,6 +2209,7 @@ sub registration {
 # Handle logout endpoint for unauthenticated users
 sub endSessionDone {
     my ( $self, $req ) = @_;
+    $req->data->{dropCsp} = 1 if $self->conf->{oidcDropCspHeaders};
     $self->logger->debug("URL  detected as an OpenID Connect END SESSION URL");
     $self->logger->debug("User is already logged out");
 
@@ -2116,10 +2220,10 @@ sub endSessionDone {
 
         # Check redirect URI is allowed
         my $redirect_uri_allowed = 0;
-        foreach ( keys %{ $self->conf->{oidcRPMetaDataOptions} } ) {
+        foreach ( keys %{ $self->rpOptions } ) {
             my $logout_rp = $_;
             my $redirect_uris =
-              $self->conf->{oidcRPMetaDataOptions}->{$logout_rp}
+              $self->rpOptions->{$logout_rp}
               ->{oidcRPMetaDataOptionsPostLogoutRedirectUris};
 
             foreach ( split( /\s+/, $redirect_uris ) ) {
@@ -2152,6 +2256,7 @@ sub endSessionDone {
 # Handle checksession endpoint
 sub checkSession {
     my ( $self, $req ) = @_;
+    $req->data->{dropCsp} = 1 if $self->conf->{oidcDropCspHeaders};
     $self->logger->debug("URL detected as an OpenID Connect CHECK SESSION URL");
 
     # TODO: access_control_allow_origin => '*'
@@ -2165,41 +2270,98 @@ sub checkSession {
     );
 }
 
-sub badAuthRequest {
-    my ( $self, $req ) = @_;
-    my $desc =
-      "This endpoint is not supposed to be called by authenticated users";
-    return $self->sendOIDCError( $req, 'invalid_request', 400, $desc );
-}
-
 # Nothing to do here
 sub logout {
     my ( $self, $req ) = @_;
+    $req->data->{dropCsp} = 1 if $self->conf->{oidcDropCspHeaders};
     if ( my $s = $req->userData->{_oidcConnectedRP} ) {
         my @rps = grep /\w/, split( ',', $s );
         foreach my $rp (@rps) {
-            my $rpConf = $self->conf->{oidcRPMetaDataOptions}->{$rp};
+            my $rpConf = $self->rpOptions->{$rp};
             unless ($rpConf) {
                 $self->logger->error("Unknown Relying Party $rp");
                 return PE_ERROR;
             }
             if ( my $url = $rpConf->{oidcRPMetaDataOptionsLogoutUrl} ) {
+
+                # FRONT CHANNEL
                 if ( $rpConf->{oidcRPMetaDataOptionsLogoutType} eq 'front' ) {
                     if ( $rpConf->{oidcRPMetaDataOptionsLogoutSessionRequired} )
                     {
-                        my $user_id = $self->getUserIDForRP( $req, $rp,
-                            $req->{sessionInfo} );
                         $url .= ( $url =~ /\?/ ? '&' : '?' )
                           . build_urlencoded(
                             iss => $self->iss,
-                            sid => $user_id
+                            sid => $self->getSidFromSession(
+                                $rp, $req->{sessionInfo}
+                            )
                           );
                     }
                     $req->info( qq'<iframe src="$url" class="noborder">'
                           . '</iframe>' );
                 }
-                else {
-                    # TODO #1194
+
+                # BACK CHANNEL
+                elsif ( $rpConf->{oidcRPMetaDataOptionsLogoutType} eq 'back' ) {
+
+                    # Logout token must contain:
+                    #  - iss: issuer identifier
+                    #  - sub: subject id (user id)
+                    #  OR/AND
+                    #  - sid: OP session id given to the RP
+                    #  - aud: audience
+                    #  - iat: issue at time
+                    #  - jti: JWT token id
+                    #  - events: should be :
+                    #   { 'http://schemas.openid.net/event/backchannel-logout"
+                    #     => {} } # or a JSON object
+                    #
+                    # Logout token should be send using a POST request:
+                    #
+                    #   POST /backChannelUri HTTP/1.1
+                    #   Host: rp
+                    #   Content-Type: application/x-www-form-urlencoded
+                    #
+                    #   logout_token=<JWT value>
+                    #
+                    # RP response should be 200 (204 accepted) or 400 for errors
+                    my $alg = $self->rpOptions->{$rp}
+                      ->{oidcRPMetaDataOptionsAccessTokenSignAlg} || "RS256";
+                    $self->logger->debug(
+                        "Access Token signature algorithm: $alg");
+                    my $userId =
+                      $self->getUserIDForRP( $req, $rp, $req->userData );
+                    my $logoutToken = {
+                        iss => $self->iss,
+                        sub => $userId,
+                        aud => $self->getAudiences($rp),
+                        iat => time,
+
+                        # Random string: no response expected from RP
+                        jti => join( "",
+                            map { [ "0" .. "9", 'A' .. 'Z' ]->[ rand 36 ] }
+                              1 .. 8 ),
+                        events => { $self->BACKCHANNEL_EVENTSKEY => {} },
+                    };
+                    if ( $self->rpOptions->{$rp}
+                        ->{oidcRPMetaDataOptionsLogoutSessionRequired} )
+                    {
+                        $logoutToken->{sid} =
+                          $self->getSidFromSession( $rp, $req->{sessionInfo} );
+                    }
+                    $self->logger->debug( "Logout token content: "
+                          . JSON::to_json($logoutToken) );
+                    my $jwt  = $self->createJWT( $logoutToken, $alg, $rp );
+                    my $resp = $self->ua->post(
+                        $url,
+                        { logout_token => $jwt },
+                        'Content-Type' => 'application/x-www-form-urlencoded',
+                    );
+                    $resp->is_error
+                      ? $self->logger->warn(
+                        "OIDC back channel: unable to unlog $userId from $rp: "
+                          . $resp->status_line )
+                      : $self->logger->info(
+                        "OIDC back channel: user $userId unlogged from $rp");
                 }
             }
         }
@@ -2211,6 +2373,7 @@ sub logout {
 
 sub metadata {
     my ( $self, $req ) = @_;
+    $req->data->{dropCsp} = 1 if $self->conf->{oidcDropCspHeaders};
     my $issuerDBOpenIDConnectPath = $self->conf->{issuerDBOpenIDConnectPath};
     my $authorize_uri     = $self->conf->{oidcServiceMetaDataAuthorizeURI};
     my $token_uri         = $self->conf->{oidcServiceMetaDataTokenURI};
@@ -2243,8 +2406,8 @@ sub metadata {
     # If one of the RPs has password grant enabled
     if (
         grep {
-            $self->oidcRPList->{$_}->{oidcRPMetaDataOptionsAllowPasswordGrant}
-        } keys %{ $self->oidcRPList }
+            $self->rpOptions->{$_}->{oidcRPMetaDataOptionsAllowPasswordGrant}
+        } keys %{ $self->rpOptions }
       )
     {
         push( @$grant_types, "password" );
@@ -2253,9 +2416,9 @@ sub metadata {
     # If one of the RPs has client credentials grant enabled
     if (
         grep {
-            $self->oidcRPList->{$_}
+            $self->rpOptions->{$_}
               ->{oidcRPMetaDataOptionsAllowClientCredentialsGrant}
-        } keys %{ $self->oidcRPList }
+        } keys %{ $self->rpOptions }
       )
     {
         push( @$grant_types, "client_credentials" );
@@ -2263,8 +2426,8 @@ sub metadata {
 
     # If one of the RPs has refresh tokens enabled
     if (
-        grep { $self->oidcRPList->{$_}->{oidcRPMetaDataOptionsRefreshToken} }
-        keys %{ $self->oidcRPList }
+        grep { $self->rpOptions->{$_}->{oidcRPMetaDataOptionsRefreshToken} }
+        keys %{ $self->rpOptions }
       )
     {
         push( @$grant_types, "refresh_token" );
@@ -2284,58 +2447,59 @@ sub metadata {
             issuer => $issuer,
 
             # Endpoints
+            authorization_endpoint => $baseUrl . $authorize_uri,
             token_endpoint         => $baseUrl . $token_uri,
             userinfo_endpoint      => $baseUrl . $userinfo_uri,
             jwks_uri               => $baseUrl . $jwks_uri,
-            authorization_endpoint => $baseUrl . $authorize_uri,
-            end_session_endpoint   => $baseUrl . $endsession_uri,
-
-            #check_session_iframe   => $baseUrl . $checksession_uri,
-            introspection_endpoint => $baseUrl . $introspection_uri,
-
-            # Logout capabilities
-            backchannel_logout_supported          => JSON::false,
-            backchannel_logout_session_supported  => JSON::false,
-            frontchannel_logout_supported         => JSON::true,
-            frontchannel_logout_session_supported => JSON::true,
             (
                 $self->conf->{oidcServiceAllowDynamicRegistration}
                 ? ( registration_endpoint => $baseUrl . $registration_uri )
                 : ()
             ),
+            end_session_endpoint => $baseUrl . $endsession_uri,
+
+            #check_session_iframe   => $baseUrl . $checksession_uri,
+            introspection_endpoint => $baseUrl . $introspection_uri,
 
             # Scopes
             scopes_supported => [qw/openid profile email address phone/],
-            response_types_supported              => $response_types,
-            grant_types_supported                 => $grant_types,
-            acr_values_supported                  => \@acr,
-            subject_types_supported               => ["public"],
+            response_types_supported => $response_types,
+            response_modes_supported => [ "query", "fragment", "form_post", ],
+            grant_types_supported    => $grant_types,
+            acr_values_supported     => \@acr,
+            subject_types_supported  => ["public"],
             token_endpoint_auth_methods_supported =>
               [qw/client_secret_post client_secret_basic/],
             introspection_endpoint_auth_methods_supported =>
               [qw/client_secret_post client_secret_basic/],
-            claims_supported                 => [qw/sub iss auth_time acr/],
+            claims_supported                 => [qw/sub iss auth_time acr sid/],
             request_parameter_supported      => JSON::true,
             request_uri_parameter_supported  => JSON::true,
             require_request_uri_registration => JSON::false,
-            response_modes_supported => [ "query", "fragment", "form_post", ],
 
             # Algorithms
             id_token_signing_alg_values_supported =>
               [qw/none HS256 HS384 HS512 RS256 RS384 RS512/],
+
+            # id_token_encryption_alg_values_supported
+            # id_token_encryption_enc_values_supported
             userinfo_signing_alg_values_supported =>
               [qw/none HS256 HS384 HS512 RS256 RS384 RS512/],
 
+            # userinfo_encryption_alg_values_supported
+            # userinfo_encryption_enc_values_supported
+
             # PKCE
             code_challenge_methods_supported => [qw/plain S256/],
+
+            # Logout supported methods
+            frontchannel_logout_supported         => JSON::true,
+            frontchannel_logout_session_supported => JSON::true,
+            backchannel_logout_supported          => JSON::true,
+            backchannel_logout_session_supported  => JSON::true,
         }
     );
 
-    # id_token_encryption_alg_values_supported
-    # id_token_encryption_enc_values_supported
-
-    # userinfo_encryption_alg_values_supported
-    # userinfo_encryption_enc_values_supported
     # request_object_signing_alg_values_supported
     # request_object_encryption_alg_values_supported
     # request_object_encryption_enc_values_supported
@@ -2343,7 +2507,6 @@ sub metadata {
     # token_endpoint_auth_signing_alg_values_supported
     # display_values_supported
     # claim_types_supported
-    # RECOMMENDED # claims_supported
     # service_documentation
     # claims_locales_supported
     # ui_locales_supported
@@ -2383,13 +2546,15 @@ sub exportRequestParameters {
 
     if ( $req->param('client_id') ) {
         my $rp = $self->getRP( $req->param('client_id') );
-        $req->env->{"llng_oidc_rp"} = $rp if $rp;
+        if ($rp) {
 
-        # Store target authentication level in pdata
-        my $targetAuthnLevel = $self->conf->{oidcRPMetaDataOptions}->{$rp}
-          ->{oidcRPMetaDataOptionsAuthnLevel};
-        $req->pdata->{targetAuthnLevel} = $targetAuthnLevel
-          if $targetAuthnLevel;
+            $req->env->{"llng_oidc_rp"} = $rp;
+            # Store target authentication level in pdata
+            my $targetAuthnLevel =
+              $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAuthnLevel};
+            $req->pdata->{targetAuthnLevel} = $targetAuthnLevel
+              if $targetAuthnLevel;
+          }
     }
 
     return PE_OK;
@@ -2461,11 +2626,10 @@ sub _generateIDToken {
         $extra_claims )
       = @_;
 
-    my $client_id = $self->oidcRPList->{$rp}->{oidcRPMetaDataOptionsClientID};
+    my $client_id = $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsClientID};
 
     my $id_token_exp =
-      $self->conf->{oidcRPMetaDataOptions}->{$rp}
-      ->{oidcRPMetaDataOptionsIDTokenExpiration}
+         $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsIDTokenExpiration}
       || $self->conf->{oidcServiceIDTokenExpiration};
     $id_token_exp += time;
 
@@ -2493,11 +2657,12 @@ sub _generateIDToken {
         acr       => $id_token_acr,  # Authentication Context Class Reference
         azp       => $client_id,     # Authorized party, this is used for logout
                                      # TODO amr
+        sid       => $self->getSidFromSession( $rp, $sessionInfo ), # Session id
     };
 
     for ( keys %{$extra_claims} ) {
         $id_token_payload_hash->{$_} = $extra_claims->{$_}
-          if $extra_claims->{$_};
+          if $extra_claims->{$_} and not $id_token_payload_hash->{$_};
     }
 
     # Decided by response_type or forced in RP config
@@ -2509,7 +2674,7 @@ sub _generateIDToken {
 
         foreach ( keys %$claims ) {
             $id_token_payload_hash->{$_} = $claims->{$_}
-              unless ( $_ eq "sub" );
+              unless ( $_ eq "sub" or $_ eq "sid" );
         }
     }
 

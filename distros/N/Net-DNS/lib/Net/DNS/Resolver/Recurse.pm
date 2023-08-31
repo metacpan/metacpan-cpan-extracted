@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Recurse;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Recurse.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: Recurse.pm 1930 2023-08-21 14:10:10Z willem $)[2];
 
 
 =head1 NAME
@@ -127,21 +127,22 @@ sub _recurse {
 sub _referral {
 	my ( $self, $packet ) = @_;
 	return unless $packet;
-	my @auth = grep { $_->type eq 'NS' } $packet->answer, $packet->authority;
+	my @ans	 = $packet->answer;
+	my @auth = grep { $_->type eq 'NS' } $packet->authority, @ans;
 	return unless scalar(@auth);
 	my $owner = lc( $auth[0]->owner );
 	my $cache = $self->{persistent}->{$owner};
 	return $owner if $cache && scalar(@$cache);
-	my @addr = grep { $_->can('address') } $packet->additional;
+	my @addr = grep { $_->can('address') } $packet->additional, @ans;
 	my @ip;
 	my @ns = map { lc( $_->nsdname ) } @auth;
 
 	foreach my $ns (@ns) {
-		push @ip, map { $_->address } grep { $ns eq lc( $_->owner ) } @addr;
+		push @ip, map { $ns eq lc( $_->owner ) ? $_->address : () } @addr;
 	}
-	$self->_diag("resolving glue for $owner")   unless scalar(@ip);
-	@ip = $self->nameservers( $ns[0], $ns[-1] ) unless scalar(@ip);
-	$self->_diag("caching nameservers for $owner");
+	$self->_diag("resolving missing glue for $owner") unless scalar(@ip);
+	@ip = $self->nameservers( $ns[0], $ns[-1] )	  unless scalar(@ip);
+	$self->_diag("caching nameserver addresses for $owner");
 	$self->{persistent}->{$owner} = \@ip;
 	return $owner;
 }

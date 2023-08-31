@@ -19,8 +19,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Deps::OR;
-
 =encoding utf8
 
 =head1 NAME
@@ -34,10 +32,10 @@ for the dependency to be true. It inherits from Dpkg::Deps::Multiple.
 
 =cut
 
+package Dpkg::Deps::OR 1.00;
+
 use strict;
 use warnings;
-
-our $VERSION = '1.00';
 
 use parent qw(Dpkg::Deps::Multiple);
 

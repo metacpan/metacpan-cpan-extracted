@@ -13,6 +13,7 @@
     "jquery": "3.x",
     "jquery-ui": "x",
     "jquery.cookie": "x",
+    "jssha": "3.3.0",
     "qrious": "x"
   }
 }

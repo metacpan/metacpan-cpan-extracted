@@ -8,8 +8,8 @@ use Carp;
 
 extends 'Valiant::HTML::Util::FormTags';
 
-has 'context' => (is=>'ro', required=>0, predicate=>'has_context');  # For the future
-has 'controller' => (is=>'ro', required=>0);  # For the future
+has 'context' => (is=>'ro', required=>0, predicate=>'has_context');
+has 'controller' => (is=>'ro', required=>0, predicate=>'has_controller');
 
 has 'form_with_generates_ids' => (
   is => 'ro', 
@@ -103,11 +103,11 @@ sub form_for {
 
   my ($model, $object_name);
   if( ref(\$proto) eq 'SCALAR') {
-    $object_name = $proto;  # form_for 'name', $model, \%options, \&block
+    $object_name = $proto;  
     if(@_) {
-      $model = shift;
+      $model = shift;  # form_for 'name', $model, \%options, \&block
     } else {
-      # Support form_for 'attribute_name', ... 
+      # Support form_for 'attribute_name', \%options, \&block 
       $model = $self->view->read_attribute_for_html($object_name)
         if $self->view->attribute_exists_for_html($object_name);
     }
@@ -173,11 +173,12 @@ sub form_with {
 
   my ($model, $url);
   if($options->{model}) {
-    $url = $self->_polymorphic_path_for_model($model, $scope);
+    my $model_path = ((ref($options->{model})||'') eq 'ARRAY') ? $options->{model} : [$options->{model}];
     $model = $self->_to_model($self->_object_from_record_proto(delete $options->{model}));
     $scope = exists $options->{scope} ?
       delete $options->{scope} :
         $self->_model_name_from_object_or_class($model)->param_key;
+    $url = $self->_polymorphic_path_for_model($model_path, $scope, $options);
   }
 
   $url ||= delete $options->{url} if exists $options->{url};
@@ -195,27 +196,56 @@ sub form_with {
 }
 
 sub _polymorphic_path_for_model {
-  my ($self, $model, $scope) = @_;
-  return undef;
+  my ($self, $model_path, $scope, $options) = @_;
+  my $model = $model_path->[-1];
+
   # $model can be an object, string or array of objects strings
   if($self->model_persisted($model)) {
-    return $self->_edit_action_for_model($model, $scope);
+    if(my $edit = $options->{controller_edit_uri}) {
+      return $self->controller->$edit($model_path);
+    }
+    return $self->_edit_action_for_model($model_path, $scope);
   } else {
-    return $self->_new_action_for_model($model, $scope);
+    if(my $create = $options->{controller_create_uri}) {
+      return $self->controller->$create($model_path);
+    }
+    return $self->_new_action_for_model($model_path, $scope);
   }
 }
 
 sub _edit_action_for_model {
-  my ($self, $model, $scope) = @_;
-  my $method = "edit_${scope}_url";
-  return $self->context->$method() if $self->has_context && $self->context->can($method);
+  my ($self, $model_path, $scope) = @_;
+  my $scoped_method = "update_${scope}_uri";
+  my $controller_method = "update_uri";
+
+  return $self->view->update_uri_for_model($model_path, $scope) if $self->view->can('update_uri_for_model');
+  return $self->controller->update_uri_for_model($model_path, $scope) if $self->has_controller && $self->controller->can('update_uri_for_model');
+  return $self->context->update_uri_for_model($model_path, $scope) if $self->has_context && $self->context->can('update_uri_for_model');
+  return $self->view->$scoped_method($model_path) if $self->view->can($scoped_method);
+  return $self->controller->$scoped_method($model_path) if $self->has_controller && $self->controller->can($scoped_method);
+  return $self->controller->$controller_method($model_path) if $self->has_controller && $self->controller->can($controller_method);
+  return $self->context->$scoped_method($model_path) if $self->has_context && $self->context->can($scoped_method);
+
   return undef;
 }
 
 sub _new_action_for_model {
-  my ($self, $model, $scope) = @_;
-  my $method = "new_${scope}_url";
-  return $self->context->$method() if $self->has_context && $self->context->can($method);
+  my ($self, $model_path, $scope) = @_;
+  my $scoped_method = "create_${scope}_uri";
+  my $controller_method = "create_uri";
+
+  my @full_model_path = @$model_path;
+  pop @full_model_path if @full_model_path;
+
+  return $self->view->create_uri_for_model($model_path, $scope) if $self->view->can('create_uri_for_model');
+  return $self->controller->create_uri_for_model($model_path, $scope) if $self->has_controller && $self->controller->can('create_uri_for_model');
+  return $self->context->create_uri_for_model($model_path, $scope) if $self->has_context && $self->context->can('create_uri_for_model');
+
+  return $self->view->$scoped_method(\@full_model_path) if $self->view->can($scoped_method);
+  return $self->controller->$scoped_method(\@full_model_path) if $self->has_controller && $self->controller->can($scoped_method);
+  return $self->controller->$controller_method(\@full_model_path) if $self->has_controller && $self->controller->can($controller_method);
+  return $self->context->$scoped_method(\@full_model_path) if $self->has_context && $self->context->can($scoped_method);
+
   return undef;
 }
 
@@ -482,6 +512,62 @@ and ORM and to L<DBIx::Class> in particular.
 Optional, but should be supported if your model supports a storage backend.  A boolean that indicates if
 the model is currently marked for deletion upon successful validation.   Used for things like radio
 and checkbox collections when the state should be 'unchecked' even if the model is still in storage.
+
+=head1 VIEW, CONTROLLER, CONTEXT API
+
+Since you will have access potentially to a view, controller or context object you can use the following
+API in those classes in order to influence the form generation.
+
+=head2 formbuilder_class
+
+Optional.  If provided should return a string that is the name of a class that will be used to instantiate
+the formbuilder.  If not provided we default to L<Valiant::HTML::FormBuilder>.
+
+=head2 Generating a URL for the action attribure
+
+The following methods are used to generate the URL for the C<action> attribute of the form tag.  They
+are tried in the following order:
+
+=over 4
+
+=item * create_uri_for_model
+
+=item * create_${scope}_uri
+
+=item * create_uri
+
+=item * update_uri_for_model
+
+=item * update_${scope}_uri
+
+=item * update_uri
+
+=back
+
+The 'create' methods are checked when the model is not persistent (ie not in storage).  The 'update' methods
+are checked when the model is persistent (ie in storage).
+
+Where C<${scope}> is the C<scope> argument passed to C<form_with> or C<form_for>.  If you don't provide
+a C<scope> argument we try to guess one based on the model name.  For example if your model is C<Person>
+we will try to use C<person> as the scope.
+
+We first look for these methods on the view object, then the controller object and finally the context
+object.  If you don't provide any of these objects we will just return C<undef> which will result in 
+no C<action> attribute being generated (You will have to supply it yourself).
+
+All the 'update_*' methods are passed the full model path as an argument, which is an arrayref whos last
+member is the model object and any preceding members are the parent objects or strings used to create a
+path.  For example if you have a deeply nested model you might need both its ID and the ID of its parent
+to form the correct URL to its update action.
+
+All the 'create_*' methods are passed only the 'path' parts of model path, that is the models or
+strings that are used to create the path.  However the C<create_uri_for_model> (and the C<update_uri_for_model>)
+methods always get the full path as an argument.  You might use those if you create a central registry
+mapping models to controllers (perhaps this is a possible good idea for a L<Catalyst> plugin or similar?)
+
+This allows you to move more of the request and application bound logic and information out of the view
+and back to the controller.  For an example of how this works with L<Catalyst> you can review the example
+application in the C<example> directory of this distribution.
 
 =head1 INSTANCE METHODS 
 

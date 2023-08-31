@@ -13,12 +13,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::OpenPGP::Backend::Sequoia;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::OpenPGP::Backend::Sequoia - OpenPGP backend for Sequoia
+
+=head1 DESCRIPTION
+
+This module provides a class that implements the OpenPGP backend
+for Sequoia-PGP.
+
+B<Note>: This is a private module, its API can change at any time.
+
+=cut
+
+package Dpkg::OpenPGP::Backend::Sequoia 0.01;
 
 use strict;
 use warnings;
-
-our $VERSION = '0.01';
 
 use POSIX qw(:sys_wait_h);
 
@@ -119,5 +132,13 @@ sub inline_sign
     return OPENPGP_KEY_CANNOT_SIGN if $rc;
     return OPENPGP_OK;
 }
+
+=head1 CHANGES
+
+=head2 Version 0.xx
+
+This is a private module.
+
+=cut
 
 1;

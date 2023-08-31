@@ -5,7 +5,7 @@ use warnings;
 use feature "say";
 
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.1.2';
 
 # Marker is pushed to end of argument list to aid in processing.
 # Make random to prevent collisions.
@@ -19,13 +19,13 @@ sub import {
   my $package=shift;
 
   my $prefix="";
+  my $next_prefix="";
   my $k;
   my $version;
   my $mod;
-  my $prev_mod;
+  my $next_mod;
   my $list;
 
-  my $execute;
 
   push @_, $marker;
   
@@ -41,33 +41,22 @@ sub import {
     my $r=ref $k;
     if($r eq "ARRAY"){
       $list=$k;
-      $prev_mod=$mod if $mod; #version may have already shift this
-      $mod=undef;
-      $execute=1;
     }
+
     elsif($r eq ""){
       if($k eq $marker){
-        # End processing if we hit the marker
-        $prev_mod=$mod if $mod;
-        $execute=!!$prev_mod;
       }
       elsif($k eq "::"){
         # Exact. Clear prefix
-        $prefix="";
-        $prev_mod=$mod;
-        $mod=undef;
+        $next_prefix="";
       }
       elsif($k =~ /^::.*?::$/){
         # Double ended. Append new portion to prefix
-        $prefix.=substr $k, 2;
-        $prev_mod=$mod;
-        $mod=undef;
+        $next_prefix=$prefix.substr $k, 2;
       }
       elsif($k =~/::$/){
         # At end. Update prefix
-        $prefix=$k;
-        $prev_mod=$mod;
-        $mod=undef;
+        $next_prefix=$k;
       }
       elsif($k =~ /^v|^\d/){
         # Test if it looks like a version. 
@@ -79,65 +68,58 @@ sub import {
         }
         else {
           $version=$k;
-          $prev_mod=$mod;
-          $mod=undef;
         }
       }
       else {
         # Module name
-        $prev_mod=$mod;
-        $mod=$k;
-        $execute=!!$prev_mod;
+        $next_mod=$k;
       }
     }
     else {
       die "Scalar or array ref only";
     }
 
-    # Attempt to execute/load what we have
+    # Attempt to execute/load the current state
     
-    
-    if($execute){
-      #DEBUG
-      if($prev_mod){
-        #say "REQUIRE $prefix$prev_mod";
-        # Force export level to 0 so any imports of required package are
-        # relative to required package
-        local $Exporter::ExportLevel=0;
-        eval "require $prefix$prev_mod;";
-        die "Could not require $prefix$prev_mod: $@" if $@;
-      }
+    if($mod){
+      #say STDERR "REQUIRE $prefix$mod";
+      # Force export level to 0 so any imports of required package are
+      # relative to required package
+      local $Exporter::ExportLevel=0;
+      eval "require $prefix$mod;";
+      die "Could not require $prefix$mod: $@" if $@;
 
       # After the package has been required, set the target level for import
       #
       local $Exporter::ExportLevel=$target_level;
-      #say "Target level is $Exporter::ExportLevel";
 
       if($version){
-        #say "IMPORTING $prefix$prev_mod with no import";
-        "$prefix$prev_mod"->VERSION($version);
+        "$prefix$mod"->VERSION($version);
       }
 
       if($list and @$list){
         # List import
-        #say "IMPORTING $prefix$prev_mod with @$list";
-        "$prefix$prev_mod"->import(@$list);
+        "$prefix$mod"->import(@$list);
       }
       elsif($list and @$list ==0){
         # no not import
       }
       else {
         # Default import
-        #say "IMPORTING $prefix$prev_mod with default";
-        "$prefix$prev_mod"->import();
+        "$prefix$mod"->import();
       }
-      $prev_mod=undef;
-      $list=undef;
-      $version=undef;
     }
+      
+    # Update the state
+    $mod=$next_mod;
+
+    $next_mod=undef;
+    $prefix=$next_prefix if $next_prefix;
+    $next_prefix=undef;
+    $list=undef;
+    $version=undef;
     $i++;
   }
-  #say "END OF IMPORT::THESE IMPORT";
 }
 
 __PACKAGE__;

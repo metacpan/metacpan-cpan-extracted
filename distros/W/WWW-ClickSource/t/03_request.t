@@ -9,7 +9,7 @@ plan skip_all => "Catalyst::Request required for this test"
     
 plan tests => 3;
 
-use_ok("WWW::ClickSource::Request","WWW::ClickSource::Request loaded");
+use_ok("WWW::ClickSource::Request");
 
 
 {

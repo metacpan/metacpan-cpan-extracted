@@ -1,17 +1,18 @@
 package PICA::Schema;
 use v5.14.1;
 
-our $VERSION = '2.11';
+our $VERSION = '2.12';
 
 use Scalar::Util qw(reftype);
 use Storable     qw(dclone);
 use List::Util   qw(pairs);
-use PICA::Data;
-use PICA::Error;
 
 use Exporter 'import';
 our @EXPORT_OK
     = qw(field_identifier check_value clean_pica parse_subfield_schedule);
+
+require PICA::Data;
+require PICA::Error;
 
 sub new {
     my ($class, $schema) = @_;

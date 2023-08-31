@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::SP;
-our $VERSION = '0.73'; # VERSION
+our $VERSION = '0.74'; # VERSION
 
 use Moose;
 
@@ -132,10 +132,6 @@ around BUILDARGS => sub {
             $_->{index} = $acs_index;
             ++$acs_index;
         }
-    }
-
-    foreach (@{$args{assertion_consumer_service}}) {
-        $_->{isDefault} = 'false' if !exists $_->{isDefault};
     }
 
     return $self->$orig(%args);
@@ -454,8 +450,14 @@ sub metadata {
 
 sub get_default_assertion_service {
     my $self = shift;
-    return first { $_->{isDefault} eq 1 || $_->{isDefault} eq 'true' }
-        @{ $self->assertion_consumer_service };
+    my $default = first { $_->{isDefault} eq 1 || $_->{isDefault} eq 'true' }
+        grep { defined $_->{isDefault} } @{ $self->assertion_consumer_service };
+    return $default if $default;
+
+    $default = first { ! defined $_->{isDefault} } @{ $self->assertion_consumer_service };
+    return $default if $default;
+
+    return $self->assertion_consumer_service->[0];
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -472,7 +474,7 @@ Net::SAML2::SP - SAML Service Provider object
 
 =head1 VERSION
 
-version 0.73
+version 0.74
 
 =head1 SYNOPSIS
 

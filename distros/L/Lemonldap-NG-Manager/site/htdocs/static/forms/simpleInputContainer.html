@@ -7,7 +7,7 @@
       <tr ng-repeat="n in currentNode.nodes">
         <th>{{translateTitle(n)}}</th>
         <!-- TEXT -->
-        <td ng-if="!n.type||n.type=='text'">
+        <td ng-if="!n.type||n.type=='text'||n.type=='intOrNull'">
           <input class="form-control" ng-model="n.data" />
         </td>
         <!-- PASSWORD -->
@@ -80,7 +80,7 @@
             <option ng-repeat="item in n.select" ng-selected="item.k==n.data" value="{{item.k}}" trspan="{{item.v}}"></option>
           </select>
         </td>
-        <th ng-if="n.type&&n.type!='text'&&n.type!='longtext'&&n.type!='int'&&n.type!='bool'&&n.type!='trool'&&n.type!='boolOrExpr'&&n.type!='select'&&n.type!='password'">
+        <th ng-if="n.type&&n.type!='text'&&n.type!='intOrNull'&&n.type!='longtext'&&n.type!='int'&&n.type!='bool'&&n.type!='trool'&&n.type!='boolOrExpr'&&n.type!='select'&&n.type!='password'">
           ERROR, complex node inside. Do not use simpleInputContainer for {{currentNode.title}}
         </th>
       </tr>

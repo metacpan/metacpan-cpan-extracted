@@ -36,7 +36,7 @@ LemonLDAP::NG TOTP registration script
     setMsg('yourTotpKey', 'warning');
     return $.ajax({
       type: "POST",
-      url: portal + "/2fregisters/totp/getkey",
+      url: portal + "2fregisters/totp/getkey",
       dataType: 'json',
       error: displayError,
       success: function(data) {
@@ -84,7 +84,7 @@ LemonLDAP::NG TOTP registration script
     } else {
       return $.ajax({
         type: "POST",
-        url: portal + "/2fregisters/totp/verify",
+        url: portal + "2fregisters/totp/verify",
         dataType: 'json',
         data: {
           token: token,
@@ -93,6 +93,7 @@ LemonLDAP::NG TOTP registration script
         },
         error: displayError,
         success: function(data) {
+          var e;
           if (data.error) {
             if (data.error.match(/bad(Code|Name)/)) {
               return setMsg(data.error, 'warning');
@@ -100,12 +101,15 @@ LemonLDAP::NG TOTP registration script
               return setMsg(data.error, 'danger');
             }
           } else {
-            $(document).trigger("mfaAdded", [
+            e = jQuery.Event("mfaAdded");
+            $(document).trigger(e, [
               {
                 "type": "totp"
               }
             ]);
-            return setMsg('yourKeyIsRegistered', 'success');
+            if (!e.isDefaultPrevented()) {
+              return setMsg('yourKeyIsRegistered', 'success');
+            }
           }
         }
       });

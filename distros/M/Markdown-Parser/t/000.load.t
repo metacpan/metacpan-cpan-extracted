@@ -8,7 +8,7 @@ BEGIN
     our @modules;
     File::Find::find(sub
     {
-        next unless( /\.pm$/ );
+        return unless( /\.pm$/ );
         # print( "Checking file '$_' ($File::Find::name)\n" );
         $_ = $File::Find::name;
         s,^./lib/,,;

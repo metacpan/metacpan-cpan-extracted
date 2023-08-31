@@ -19,8 +19,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Deps::Union;
-
 =encoding utf8
 
 =head1 NAME
@@ -34,10 +32,10 @@ It inherits from Dpkg::Deps::Multiple.
 
 =cut
 
+package Dpkg::Deps::Union 1.00;
+
 use strict;
 use warnings;
-
-our $VERSION = '1.00';
 
 use parent qw(Dpkg::Deps::Multiple);
 

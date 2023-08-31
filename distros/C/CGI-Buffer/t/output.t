@@ -40,7 +40,7 @@ OUTPUT: {
 		"print \"\\n\\n\";\n",
 		"print \"<HTML><BODY>   Hello, world</BODY></HTML>\\n\";\n";
 
-	open(my $fin, '-|', "$^X -Iblib/lib " . $filename);
+	open(my $fin, '-|', "$^X -Iblib/lib $filename");
 
 	my $keep = $_;
 	undef $/;
@@ -69,7 +69,7 @@ OUTPUT: {
 	print $tmp "print \"\\n\\n\";\n";
 	print $tmp "print \"<HTML>\\n<BODY>\\n\\t    Hello, world\\n  </BODY>\\n</HTML>\\n\";\n";
 
-	open($fin, '-|', "$^X -Iblib/lib " . $filename);
+	open($fin, '-|', "$^X -Iblib/lib $filename");
 
 	$keep = $_;
 	undef $/;
@@ -100,7 +100,7 @@ OUTPUT: {
 	print $tmp "print \"\\n\\n\";\n";
 	print $tmp "print \"<HTML><HEAD>Test</HEAD><BODY><P>Hello, world></BODY></HTML>\\n\";\n";
 
-	open($fin, '-|', "$^X -Iblib/lib " . $filename);
+	open($fin, '-|', "$^X -Iblib/lib $filename");
 
 	$keep = $_;
 	undef $/;
@@ -185,7 +185,7 @@ OUTPUT: {
 		"print \"\\n\\n\";\n",
 		"print \"<HTML><BODY><A HREF=\\\"http://www.example.com\\\">Click</A>\n<script>\nalert(foo);\n</script></BODY></HTML>\\n\";\n";
 
-	open($fin, '-|', "$^X -Iblib/lib " . $filename);
+	open($fin, '-|', "$^X -Iblib/lib $filename");
 
 	$keep = $_;
 	undef $/;
@@ -219,7 +219,7 @@ OUTPUT: {
 	print $tmp "print \"\\n\\n\";\n";
 	print $tmp "print \"<HTML><BODY><A HREF= \\\"http://www.example.com/foo.htm\\\">Click</A></BODY></HTML>\\n\";\n";
 
-	open($fin, '-|', "$^X -Iblib/lib " . $filename);
+	open($fin, '-|', "$^X -Iblib/lib $filename");
 
 	$keep = $_;
 	undef $/;
@@ -251,7 +251,7 @@ OUTPUT: {
 		"print \"\\n\\n\";\n",
 		"print \"<HTML><HEAD><TITLE>test 7</TITLE></HEAD><BODY><A HREF= \n\\\"http://www.example.com/foo.htm\\\">Click</A></BODY></HTML>\\n\";\n";
 
-	open($fin, '-|', "$^X -Iblib/lib " . $filename);
+	open($fin, '-|', "$^X -Iblib/lib $filename");
 
 	$keep = $_;
 	undef $/;
@@ -288,7 +288,7 @@ OUTPUT: {
 		"print \"\\n\\n\";\n",
 		"print \"<HTML><HEAD><TITLE>test 8</TITLE></HEAD><BODY><A HREF= \n\\\"http://www.example.com/foo.htm\\\">Click </A> \\n\\t<a href=\\\"http://www.example.com/bar.htm\\\">Or here</a> </BODY></HTML>\\n\";\n";
 
-	open($fin, '-|', "$^X -Iblib/lib " . $filename);
+	open($fin, '-|', "$^X -Iblib/lib $filename");
 
 	$keep = $_;
 	undef $/;
@@ -326,7 +326,7 @@ OUTPUT: {
 	print $tmp "print \"\\n\\n\";\n";
 	print $tmp "print \"<HTML><BODY><A HREF=\\\"http://www.example.com/foo.htm\\\">Click</a> <hr> A Line \n<HR>\r\n Foo</BODY></HTML>\\n\";\n";
 
-	open($fin, '-|', "$^X -Iblib/lib " . $filename);
+	open($fin, '-|', "$^X -Iblib/lib $filename");
 
 	$keep = $_;
 	undef $/;
@@ -357,7 +357,7 @@ OUTPUT: {
 	print $tmp "print \"\\n\\n\";\n";
 	print $tmp "print \"<HTML><BODY>\n<p><em>The Brass Band Portal</em> is visited some 500 times</BODY></HTML>\\n\";\n";
 
-	open($fin, '-|', "$^X -Iblib/lib " . $filename);
+	open($fin, '-|', "$^X -Iblib/lib $filename");
 
 	$keep = $_;
 	undef $/;
@@ -390,7 +390,7 @@ OUTPUT: {
 	print $tmp "print \"\\n\\n\";\n";
 	print $tmp "print \"<HTML><BODY><A HREF=\\\"http://www.example.com/foo.htm\\\">Click</BODY></HTML>\\n\";\n";
 
-	open($fin, '-|', "$^X -Iblib/lib " . $filename);
+	open($fin, '-|', "$^X -Iblib/lib $filename");
 
 	$keep = $_;
 	undef $/;
@@ -424,7 +424,7 @@ OUTPUT: {
 	print $tmp "print \"\\n\\n\";\n";
 	print $tmp "print \"<HTML><BODY><TABLE><TR><TD>foo</TD>  <TD>bar</TD></TR></TABLE></BODY></HTML>\\n\";\n";
 
-	open($fin, '-|', "$^X -Iblib/lib " . $filename);
+	open($fin, '-|', "$^X -Iblib/lib $filename");
 
 	$keep = $_;
 	undef $/;
@@ -447,7 +447,7 @@ OUTPUT: {
 	#..........................................
 	$ENV{'HTTP_IF_NONE_MATCH'} = "\"$etag\"";
 
-	open($fin, '-|', "$^X -Iblib/lib " . $filename);
+	open($fin, '-|', "$^X -Iblib/lib $filename");
 
 	$keep = $_;
 	undef $/;
@@ -460,7 +460,7 @@ OUTPUT: {
 
 	$ENV{'REQUEST_METHOD'} = 'HEAD';
 
-	open($fin, '-|', "$^X -Iblib/lib " . $filename);
+	open($fin, '-|', "$^X -Iblib/lib $filename");
 
 	$keep = $_;
 	undef $/;
@@ -491,7 +491,7 @@ OUTPUT: {
 	print $tmp "print \"\\n\\n\";\n";
 	print $tmp "print \"<HTML><BODY><TABLE><TR><TD>foo</TD>\\t  <TD>bar</TD></TR></TABLE></BODY></HTML>\\n\";\n";
 
-	open($fin, '-|', "$^X -Iblib/lib " . $filename);
+	open($fin, '-|', "$^X -Iblib/lib $filename");
 
 	$keep = $_;
 	undef $/;
@@ -519,7 +519,7 @@ OUTPUT: {
 	#..........................................
 	$ENV{'HTTP_IF_NONE_MATCH'} = $etag;
 
-	open($fin, '-|', "$^X -Iblib/lib " . $filename);
+	open($fin, '-|', "$^X -Iblib/lib $filename");
 
 	$keep = $_;
 	undef $/;
@@ -532,7 +532,6 @@ OUTPUT: {
 
 	#..........................................
 	delete $ENV{'HTTP_IF_NONE_MATCH'};
-	$ENV{'HTTP_IF_MODIFIED_SINCE'} = DateTime->now();
 
 	$filename = tempdir() . 'test14';
 	open($tmp, '>', $filename);
@@ -546,23 +545,30 @@ OUTPUT: {
 		"print \"\\n\\n\";\n",
 		"print \"<HTML><BODY><TABLE><TR><TD>foo</TD>  <TD>bar</TD></TR></TABLE></BODY></HTML>\\n\";\n";
 
-	open($fin, '-|', "$^X -Iblib/lib " . $filename);
+	close $tmp;
+
+	$ENV{'HTTP_IF_MODIFIED_SINCE'} = DateTime->now();
+
+	open($fin, '-|', "$^X -Iblib/lib $filename");
 
 	$keep = $_;
 	undef $/;
 	$output = <$fin>;
 	$/ = $keep;
 
-	close $tmp;
+	if($output !~ /Status: 304 Not Modified/mi) {
+		# Track https://www.cpantesters.org/cpan/report/cbb57c6a-bf6b-11ed-b310-26e96d8775ea
+		diag($output);
+	}
 
 	ok($output !~ /ETag: "([A-Za-z0-F0-f]{32})"/m);
-	ok($output =~ /^Status: 304 Not Modified/mi);
+	like($output, qr/^Status: 304 Not Modified/mi, '304 not modified');
 
 	($headers, $body) = split /\r?\n\r?\n/, $output, 2;
 
-	ok($headers !~ /^Content-Length:/m);
+	unlike($headers, qr/^Content-Length:/m, '304 does not contain content-length');
 
-	ok(length($body) == 0);
+	cmp_ok(length($body), '==', 0, '304 has empty body');
 
 	#......................................
 	$ENV{'HTTP_IF_MODIFIED_SINCE'} = 'This is an invalid date';
@@ -579,7 +585,7 @@ OUTPUT: {
 	print $tmp "print \"\\n\\n\";\n";
 	print $tmp "print \"<HTML><BODY><TABLE><TR><TD>foo</TD>   <TD>bar</TD></TR></TABLE></BODY></HTML>\\n\";\n";
 
-	open($fin, '-|', "$^X -Iblib/lib " . $filename);
+	open($fin, '-|', "$^X -Iblib/lib $filename");
 
 	$keep = $_;
 	undef $/;
@@ -615,7 +621,7 @@ OUTPUT: {
 	print $tmp "use strict;\n",
 		"use CGI::Buffer;\n";
 
-	open($fin, '-|', "$^X -Iblib/lib " . $filename);
+	open($fin, '-|', "$^X -Iblib/lib  $filename");
 
 	$keep = $_;
 	undef $/;
@@ -625,5 +631,5 @@ OUTPUT: {
 	close $tmp;
 	close $fin;
 
-	ok($output eq '');
+	ok($output eq "Status: 200 OK\n\n");
 }

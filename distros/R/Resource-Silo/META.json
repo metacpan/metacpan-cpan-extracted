@@ -56,6 +56,6 @@
          "web" : "https://github.com/dallaylaen/resource-silo-p5"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

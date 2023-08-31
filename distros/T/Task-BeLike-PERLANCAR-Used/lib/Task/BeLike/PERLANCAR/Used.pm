@@ -4,7 +4,7 @@ package Task::BeLike::PERLANCAR::Used;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-07-07'; # DATE
 our $DIST = 'Task-BeLike-PERLANCAR-Used'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: All my modules which I currently use and install on a new perl installation
@@ -21,7 +21,15 @@ Task::BeLike::PERLANCAR::Used - All my modules which I currently use and install
 
 =head1 VERSION
 
-version 0.001
+version 0.002
+
+=head1 SYNOPSIS
+
+Here's how I usually bootstrap a fresh perl installation (e.g. after a
+C<perlbrew install>):
+
+ % cpanm -n App::cpanm::perlancar
+ % cpanm-perlancar -n Task::BeLike::PERLANCAR::Used
 
 =head1 TASK CONTENTS
 

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-1.0-or-later OR Artistic-1.0-Perl
 
 package GS1::SyntaxEngine::FFI;
-$GS1::SyntaxEngine::FFI::VERSION = '0.2';
+$GS1::SyntaxEngine::FFI::VERSION = '0.3';
 # ABSTRACT: Provides a FFI wrapper for libgs1encoders
 
 use utf8;
@@ -21,7 +21,7 @@ GS1::SyntaxEngine::FFI - Provides a FFI wrapper for libgs1encoders
 
 =head1 VERSION
 
-version 0.2
+version 0.3
 
 =head1 SYNOPSIS
 

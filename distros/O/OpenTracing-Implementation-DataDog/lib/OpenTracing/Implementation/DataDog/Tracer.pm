@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 
-our $VERSION = 'v0.46.2';
+our $VERSION = 'v0.47.0';
 
 =head1 NAME
 
@@ -43,6 +43,7 @@ use MooX::Should;
 with 'OpenTracing::Role::Tracer';
 
 use aliased 'OpenTracing::Implementation::DataDog::Client';
+use aliased 'OpenTracing::Implementation::DataDog::HTTPPropagator';
 use aliased 'OpenTracing::Implementation::DataDog::ScopeManager';
 use aliased 'OpenTracing::Implementation::DataDog::Span';
 use aliased 'OpenTracing::Implementation::DataDog::SpanContext';
@@ -153,6 +154,11 @@ has default_version => (
     is          => 'ro',
     should      => Str,
     predicate   => 1,
+);
+
+has '_http_propagator' => (
+    is      => 'ro',
+    default => sub { HTTPPropagator->new },
 );
 
 
@@ -269,10 +275,27 @@ sub inject_context_into_hash_reference   {
 
 
 
-sub inject_context_into_http_headers     { return $_[1] } # $carrier
+sub inject_context_into_http_headers {
+    my ($self, $carrier, $context) = @_;
+    $carrier = $carrier->clone;
+
+    $self->_http_propagator->inject($carrier, $context);
+
+    return $carrier;
+}
+
 sub extract_context_from_array_reference { return undef }
 sub extract_context_from_hash_reference  { return undef }
-sub extract_context_from_http_headers    { return undef }
+
+sub extract_context_from_http_headers {
+    my ($self, $carrier) = @_;
+    my ($trace_id, $span_id) = $self->_http_propagator->extract($carrier);
+    return unless defined $trace_id and defined $span_id;
+
+    return $self->build_context()
+                ->with_trace_id($trace_id)
+                ->with_span_id($span_id);
+}
 
 =head1 SEE ALSO
 

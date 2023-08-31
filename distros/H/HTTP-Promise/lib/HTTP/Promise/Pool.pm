@@ -66,6 +66,8 @@ sub reset
     return( $self );
 }
 
+sub sock { return( shift->_set_get_scalar( 'sock', @_ ) ); }
+
 sub steal
 {
     my $self = shift( @_ );
@@ -74,8 +76,9 @@ sub steal
     if( defined( $host_port ) && 
         $host_port eq "${host}:${port}" )
     {
+        my $sock = $self->sock;
         $self->reset;
-        return( $host_port );
+        return( $sock );
     }
     else
     {
@@ -130,15 +133,31 @@ This modules managed a cache of HTTP connections.
 
 =head2 host
 
+Sets or gets the host. Returns a L<scalar object|Module::Generic::Scalar>
+
 =head2 host_port
+
+Read-only. Returns the host and port separated by a semi colon if a port is defined, otherwise returns just the host.
 
 =head2 port
 
+Sets or gets the port. Returns a L<number object|Module::Generic::Number>
+
 =head2 push
+
+Add the C<host>, C<port> and C<socket> provided to the stack.
 
 =head2 reset
 
+Resets the C<host> and C<port>
+
+=head2 sock
+
+Sets or gets the socket.
+
 =head2 steal
+
+Provided with an C<host> and C<port>, this checks if those matches the current values, and returns the current socket after resetting the object.
 
 =head1 AUTHOR
 

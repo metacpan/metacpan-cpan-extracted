@@ -48,8 +48,7 @@ lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/form/Auto.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/form/DateTime.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/form/renderer/HBox.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/form/renderer/NoteForm.js
-lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/form/UploadButton.js
-lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/form/UploadToolbarButton.js
+lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/form/FileSelectorMenuButton.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/form/VirtualSelectBox.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/Header.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/__init__.js

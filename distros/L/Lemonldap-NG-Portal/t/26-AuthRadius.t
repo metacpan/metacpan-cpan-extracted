@@ -2,14 +2,12 @@ use warnings;
 use Test::More;
 use strict;
 use IO::String;
-use Test::MockObject;
+use Authen::Radius;
 
 require 't/test-lib.pm';
 
 my $res;
-my $mock   = Test::MockObject->new();
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel           => 'error',
             authentication     => 'Radius',
@@ -22,14 +20,25 @@ my $client = LLNG::Manager::Test->new(
     }
 );
 
+no warnings 'redefine';
+*Lemonldap::NG::Portal::Lib::Radius::_check_pwd_radius = sub {
+    my ( $self, @attributes ) = @_;
+
+    # Store attributes in a hash
+    my %hattr;
+    for my $a (@attributes) {
+        $hattr{ $a->{Name} } = $a->{Value};
+    }
+
+    # Succeed if login == password, return no attributes
+    return { result => ( $hattr{1} eq $hattr{2} ), };
+};
+
 # Test normal first access
 ok( $res = $client->_get( '/', accept => 'text/html' ), 'First request' );
 count(1);
 my ( $host, $url, $query ) =
   expectForm( $res, '#', undef, 'user', 'password', 'token' );
-
-# Fake Radius server (bad password)
-$mock->fake_module( 'Authen::Radius', check_pwd => sub { 0 } );
 
 # Try to authenticate with bad password
 $query =~ s/user=[^&]*/user=dwho/;
@@ -46,9 +55,6 @@ ok(
 count(1);
 ( $host, $url, $query ) =
   expectForm( $res, '#', undef, 'user', 'password', 'token' );
-
-# Fake Radius server
-$mock->fake_module( 'Authen::Radius', check_pwd => sub { 1 } );
 
 # Try to authenticate
 $query =~ s/user=[^&]*/user=dwho/;

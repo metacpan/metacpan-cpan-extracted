@@ -1,6 +1,17 @@
 
 ===== history of distribution Mail-Box-POP3
 
+version 3.006: Mon 28 Aug 13:35:25 CEST 2023
+
+	Improvements:
+	- Mail::Box::POP3 and Mail::Transport::POP3 can set SSL during
+	  construction.
+	  rt.cpan.org#140896 [Yanyan Yang]
+	- Add OUATH2 verification [Madha Prasad]
+
+	Changes:
+	- Default SSL options disable verification.
+
 version 3.005: Fri  3 May 09:41:53 CEST 2019
 
 	Fixes:

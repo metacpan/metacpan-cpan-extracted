@@ -5,8 +5,7 @@
    Utf8Check: äöü
 ************************************************************************ */
 /**
- * Build the desktop. This is a singleton. So that the desktop
- * object and with it the treeView and the searchView are universaly accessible
+ * Build the desktop. This is a singleton
  */
 qx.Class.define("callbackery.ui.TabView", {
     extend : qx.ui.tabview.TabView,

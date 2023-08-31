@@ -3,6 +3,7 @@ package Lemonldap::NG::Portal::Plugins::SamlFederation;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw( PE_OK);
+use Carp qw(croak);
 use XML::LibXML::Reader;
 
 our $VERSION = '2.0.16';
@@ -10,6 +11,12 @@ our $VERSION = '2.0.16';
 use constant hook => { getSamlConfig => 'getSamlConfig' };
 
 extends qw( Lemonldap::NG::Portal::Main::Plugin );
+
+# TTL for found providers
+has default_ttl => ( is => 'rw', default => '3600' );
+
+# How long before we retry when an entityID was not found
+has default_notfound_ttl => ( is => 'rw', default => '60' );
 
 sub getSamlConfig {
     my ( $self, $req, $entityID, $config ) = @_;
@@ -23,6 +30,9 @@ sub get_config_info_federation {
     my ( $self, $entityID ) = @_;
 
     my $config = $self->get_config_info_from_xml_federation($entityID) || {};
+
+    # Default negative TTL
+    $config->{ttl} ||= $self->default_notfound_ttl;
 
     if ( $config->{sp_metadata} ) {
 
@@ -102,6 +112,12 @@ sub get_sp_config_from_placeholders {
         }
     }
 
+    # handle eduPersonTargetedID
+    if ( $attributes->{eduPersonTargetedID} ) {
+        delete $attributes->{eduPersonTargetedID};
+        $options->{samlSPMetaDataOptionsNameIDFormat} = 'persistent';
+    }
+
     $config->{sp_confKey}    = $spConfKey;
     $config->{sp_attributes} = $attributes;
     $config->{sp_options}    = $options;
@@ -161,13 +177,31 @@ sub get_config_info_from_xml_federation {
 
     my $partner = $info->{metadata};
 
-    my $result = { federation_name => $info->{federation}, };
+    my $result =
+      { federation_name => $info->{federation}, ttl => $info->{ttl} };
 
     # Add required XML namespaces
     $partner->setNamespace( "urn:oasis:names:tc:SAML:2.0:metadata", "md", 0 );
+    $partner->setNamespace( "urn:oasis:names:tc:SAML:metadata:attribute",
+        "mdattr", 0 );
     $partner->setNamespace( "urn:oasis:names:tc:SAML:2.0:assertion",
         "saml", 0 );
     $partner->setNamespace( "http://www.w3.org/2000/09/xmldsig#", "ds", 0 );
+
+    # Parse subject-id:req extension
+    my $requested_subject_id = "none";
+    if (
+        my $subjectid = $partner->findnodes(
+                './md:Extensions'
+              . '/mdattr:EntityAttributes'
+              . '/saml:Attribute[@Name="urn:oasis:names:tc:SAML:profiles:subject-id:req"]'
+              . '/saml:AttributeValue[1]'
+              . '/text()'
+        )->shift()
+      )
+    {
+        $requested_subject_id = $subjectid->toString;
+    }
 
     # Check IDP or SP
     if ( my $idp = $partner->findnodes('./md:IDPSSODescriptor') ) {
@@ -223,12 +257,25 @@ sub get_config_info_from_xml_federation {
                       ( $requestedAttribute->getAttribute("isRequired")
                           || '' =~ /true/i ) ? 1 : 0;
 
-                    $self->logger->debug( "Attribute $friendlyname ($name)"
-                          . " requested by SP $entityID\n" );
+                    if ($friendlyname) {
+                        $self->logger->debug( "Attribute $friendlyname ($name)"
+                              . " requested by SP $entityID\n" );
 
-                    $requestedAttributes->{$friendlyname} =
-                      "$required;$name;$nameformat;$friendlyname";
+                        $requestedAttributes->{$friendlyname} =
+                          "$required;$name;$nameformat;$friendlyname";
+                    }
                 }
+            }
+
+            if (   $requested_subject_id eq "any"
+                or $requested_subject_id eq "subject-id" )
+            {
+                # any or subject-id means that the attribute is required
+                $requestedAttributes->{"subjectId"} = join( ";",
+                    "1",
+                    "urn:oasis:names:tc:SAML:attribute:subject-id",
+                    "urn:oasis:names:tc:SAML:2.0:attrname-format:uri",
+                    "subject-id" );
             }
 
             # Remove AttributeConsumingService node
@@ -267,44 +314,51 @@ sub get_federation {
 
     my $reader = XML::LibXML::Reader->new( location => $file );
     my $federation_name;
+    my $cache_duration;
 
     if ( !$reader ) {
-        $self->logger->debug("Could not open federation metadata at $file");
+        $self->logger->warn("Could not open federation metadata at $file");
+        return;
+    }
+
+    # Find federation name
+    if (
+        $reader->nextElement(
+            "EntitiesDescriptor", "urn:oasis:names:tc:SAML:2.0:metadata"
+        )
+      )
+    {
+        $federation_name = $reader->getAttribute('Name');
+        $cache_duration =
+        eval { parse_duration( $reader->getAttribute('cacheDuration') ) }
+        || $self->default_ttl;
+    }
+    else {
+        $self->logger->warn(
+            "Federation metadata $file does not contain an EntitiesDescriptor");
         return;
     }
 
     # To avoid exhausting all memory,
     # we only parse one EntityDescriptor at a time
-    while ( $reader->read ) {
+    while (
+        $reader->nextElement( "EntityDescriptor",
+            "urn:oasis:names:tc:SAML:2.0:metadata" ) > 0
+      )
+    {
 
-        # Skip to the next EntityDescriptor
-        next unless $reader->nodeType == XML_READER_TYPE_ELEMENT;
-        if (   !$federation_name
-            and $reader->localName eq "EntitiesDescriptor"
-            and $reader->namespaceURI eq
-            "urn:oasis:names:tc:SAML:2.0:metadata" )
-        {
-            $federation_name = $reader->getAttribute('Name');
+        my $current_entityID = $reader->getAttribute('entityID');
+        if ( $current_entityID eq $entityID ) {
 
-        }
-        if (    $reader->localName eq "EntityDescriptor"
-            and $reader->namespaceURI eq
-            "urn:oasis:names:tc:SAML:2.0:metadata" )
-        {
+            $self->logger->debug( "Found $entityID in SAML Federation"
+                  . " $federation_name from $file" );
 
-            my $current_entityID = $reader->getAttribute('entityID');
-
-            if ( $current_entityID eq $entityID ) {
-                $self->logger->debug( "Found $entityID in SAML Federation"
-                      . " $federation_name from $file" );
-
-                my $partner = $reader->copyCurrentNode(1);
-                return {
-                    metadata   => $partner,
-                    federation => $federation_name,
-                };
-            }
-            $reader->next;
+            my $partner = $reader->copyCurrentNode(1);
+            return {
+                metadata   => $partner,
+                federation => $federation_name,
+                ttl        => $cache_duration,
+            };
         }
     }
 
@@ -326,6 +380,45 @@ sub lookup_llng_config {
         }
     }
     return;
+}
+
+# from https://metacpan.org/pod/DateTime::Format::Duration::XSD
+sub parse_duration {
+    my ($xs_duration) = @_;
+    my ( $neg, $year, $mounth, $day, $hour, $min, $sec, $fsec );
+    if (
+        $xs_duration =~ /^(-)?
+                          P
+                          ((\d+)Y)?
+                          ((\d+)M)?
+                          ((\d+)D)?
+                          (
+                          T
+                          ((\d+)H)?
+                          ((\d+)M)?
+                          (((\d+)(\.(\d+))?)S)?
+                          )?
+                         $/x
+      )
+    {
+        ( $neg, $year, $mounth, $day, $hour, $min, $sec, $fsec ) = (
+            $1, $3 || 0, $5 || 0, $7 || 0,
+            $10 || 0, $12 || 0, $15 || 0, $17 || 0
+        );
+        unless ( grep { defined } ( $year, $mounth, $day, $hour, $min, $sec ) )
+        {
+            croak "duration contains no data '$xs_duration'";
+        }
+    }
+    else {
+        croak "duration string does not match standart: '$xs_duration'";
+    }
+    return ( 86400 * 365 * $year +
+          86400 * 30 * $mounth +
+          86400 * $day +
+          3600 * $hour +
+          60 * $min +
+          $sec );
 }
 
 1;

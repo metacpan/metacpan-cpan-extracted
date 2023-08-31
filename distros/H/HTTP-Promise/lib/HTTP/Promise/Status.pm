@@ -768,7 +768,7 @@ HTTP::Promise::Status - HTTP Status Codes & Locale Equivalents
 
     use HTTP::Promise::Status ':common';
     use HTTP::Promise::Status ':all';
-    say $HTTP::Promise::Status::HTTP_TOO_MANY_REQUESTS;
+    say HTTP::Promise::Status::HTTP_TOO_MANY_REQUESTS;
     # returns code 429
 
     say $HTTP::Promise::Status::CODES_LOCALE->{fr_FR}->{429} # Trop de requête

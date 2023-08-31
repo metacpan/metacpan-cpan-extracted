@@ -1,12 +1,13 @@
 package Lemonldap::NG::Portal::Main::Process;
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.17.0';
 
 package Lemonldap::NG::Portal::Main;
 
 use strict;
 use MIME::Base64;
 use POSIX qw(strftime);
+use Lemonldap::NG::Common::Util qw(isHiddenAttr);
 use Lemonldap::NG::Portal::Main::Constants qw(portalConsts);
 use URI;
 
@@ -144,6 +145,7 @@ sub controlUrl {
                 $req->{urldc} =~ s/[\r\n]//sg;
             }
         }
+        $req->{urldc} = URI->new( $req->{urldc} )->as_string;
 
         # For logout request, test if Referer comes from an authorized site
         my $tmp = (
@@ -549,9 +551,9 @@ sub store {
         $infos{_httpSessionType} = 1;
 
         my $session2 = $self->getApacheSession( undef, info => \%infos );
-        $self->logger->debug("Create second session for unsecured cookie...");
+        $self->logger->debug("Create second session for unsecured cookie");
         $req->{sessionInfo}->{_httpSession} = $session2->id;
-        $self->logger->debug( " -> Cookie value : " . $session2->id );
+        $self->logger->debug( " -> Cookie value: " . $session2->id );
     }
 
     # Fill session
@@ -559,10 +561,7 @@ sub store {
     foreach my $k ( keys %{ $req->{sessionInfo} } ) {
         next unless defined $req->{sessionInfo}->{$k};
         my $displayValue = $req->{sessionInfo}->{$k};
-        $displayValue = '****'
-          if (  $self->conf->{hiddenAttributes}
-            and $self->conf->{hiddenAttributes} =~ /\b$k\b/ );
-
+        $displayValue = '****' if isHiddenAttr( $self->conf, $k );
         $self->logger->debug("Store $displayValue in session key $k");
         $self->_dump($displayValue) if ref($displayValue);
         $infos->{$k} = $req->{sessionInfo}->{$k};

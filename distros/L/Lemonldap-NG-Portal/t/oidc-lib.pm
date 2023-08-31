@@ -1,4 +1,4 @@
-use Lemonldap::NG::Common::JWT qw/getJWTPayload/;
+use Lemonldap::NG::Common::JWT qw/getJWTPayload getJWTHeader/;
 
 sub oidc_key_op_private_sig {
     "-----BEGIN RSA PRIVATE KEY-----
@@ -66,7 +66,12 @@ LcJp
 
 sub id_token_payload {
     my $token = shift;
-    JSON::from_json( decode_base64( [ split /\./, $token ]->[1] ) );
+    return getJWTPayload($token);
+}
+
+sub id_token_header {
+    my $token = shift;
+    return getJWTHeader($token);
 }
 
 sub login {

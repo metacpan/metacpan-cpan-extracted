@@ -1,4 +1,4 @@
-<div class="card p-3 mb-3 border-danger ppolicy">
+<div id="ppolicy" class="card p-3 mb-3 border-danger ppolicy">
   <span trspan="passwordPolicy">Please respect the following password policy:</span>
   <ul class="fa-ul text-left">
     <TMPL_IF NAME="PPOLICY_MINSIZE">
@@ -34,7 +34,7 @@
     <TMPL_IF NAME="PPOLICY_ALLOWEDSPECHAR">
     <li>
         <i id="ppolicy-allowedspechar-feedback" class="fa fa-li"> </i>
-        <span trspan="passwordPolicySpecialChar">Allowed special characters:</span> <TMPL_VAR NAME="PPOLICY_ALLOWEDSPECHAR">
+        <span trspan="passwordPolicySpecialChar">Allowed special characters:</span> <TMPL_VAR NAME="PPOLICY_ALLOWEDSPECHAR" ESCAPE="html">
     </li>
     </TMPL_IF>
     <TMPL_IF NAME="ENABLE_CHECKHIBP">

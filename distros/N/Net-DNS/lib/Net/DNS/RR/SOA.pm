@@ -2,7 +2,7 @@ package Net::DNS::RR::SOA;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SOA.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: SOA.pm 1931 2023-08-23 13:14:15Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -60,7 +60,8 @@ sub _format_rdata {			## format rdata portion of RR string.
 sub _parse_rdata {			## populate RR from rdata in argument list
 	my ( $self, @argument ) = @_;
 
-	for (qw(mname rname serial)) { $self->$_( shift @argument ) }
+	for (qw(mname rname)) { $self->$_( shift @argument ) }
+	$self->serial( shift @argument ) if scalar @argument;	# possibly undefined
 	for (qw(refresh retry expire minimum)) {
 		last unless scalar @argument;
 		$self->$_( Net::DNS::RR::ttl( {}, shift @argument ) );
@@ -145,11 +146,9 @@ sub _ordered() {			## irreflexive 32-bit partial ordering
 	return 1 unless defined $n1;				# ( undef, any )
 
 	# unwise to assume 64-bit arithmetic, or that 32-bit integer overflow goes unpunished
-	use integer;
-	if ( $n2 < 0 ) {					# fold, leaving $n2 non-negative
-		$n1 = ( $n1 & 0xFFFFFFFF ) ^ 0x80000000;	# -2**31 <= $n1 < 2**32
-		$n2 = ( $n2 & 0x7FFFFFFF );			#  0	 <= $n2 < 2**31
-	}
+	use integer;						# fold, leaving $n2 non-negative
+	$n1 = ( $n1 & 0xFFFFFFFF ) ^ ( $n2 & 0x80000000 );	# -2**31 <= $n1 < 2**32
+	$n2 = ( $n2 & 0x7FFFFFFF );				#  0	 <= $n2 < 2**31
 
 	return $n1 < $n2 ? ( $n1 > ( $n2 - 0x80000000 ) ) : ( $n2 < ( $n1 - 0x80000000 ) );
 }

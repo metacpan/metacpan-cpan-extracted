@@ -1,4 +1,16 @@
-$Id: Changes 1929 2023-06-01 11:40:49Z willem $                       -*-text-*-
+$Id: Changes 1936 2023-08-30 18:05:44Z willem $                       -*-text-*-
+
+
+**** 1.40 Aug 30, 2023
+
+	Add support for SVCB dohpath and ohttp parameters.
+	More robust test of bgbusy() SpamAssassin workaround.
+
+Fix rt.cpan.org #149456 
+	t/05-SOA.t test fails in 2038
+
+Fix rt.cpan.org #149280
+	Deep recursion on subroutine "Net::DNS::Resolver::Recurse::_recurse"
 
 
 **** 1.39 Jun 1, 2023

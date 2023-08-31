@@ -40,7 +40,7 @@ use Cwd 'abs_path';
 use File::Path qw(make_path remove_tree);
 use File::stat;
 
-our $VERSION = "0.20";
+our $VERSION = "0.26";
 
 use App::LXC::Container::Data;
 use App::LXC::Container::Mounts;
@@ -335,6 +335,7 @@ sub _make_lxc_path($$)
 	my ($mode, $uid, $gid) = ($stat->mode, $stat->uid, $stat->gid);
 	if (-d)
 	{
+	    $mode |= 0200;	# prevent blocking ourselves later on
 	    if (-l)
 	    {
 		# links can be arbitrarily deep, so we use make_path on the
@@ -861,13 +862,12 @@ sub _write_lxc_configuration($)
 		    $header = 1;
 		}
 		say($out
-#		    '# created empty: ', $key);
 		    'lxc.mount.entry = tmpfs ', substr($key, 1),
 		    ' tmpfs create=dir,rw 0 0');
 		$mounts->mount_point($key, EMPTY);
 	    }
 	    else
-	    {   push @{$self->{empty}}, $key;   }
+	    {   push @{$self->{empty_files}}, $key;   }
 	}
 	elsif ($_ eq 'ignore')
 	{   $mounts->mount_point($key, IGNORE);   }
@@ -924,7 +924,7 @@ sub _write_lxc_configuration($)
 
     ################################
     # part 5 - create all empty files:
-    foreach (@{$self->{empty}})
+    foreach (@{$self->{empty_files}})
     {
 	$_ = $self->{root_fs} . '/' . $container . $_;
 	# As we just deleted the whole tree we can't create a test for a

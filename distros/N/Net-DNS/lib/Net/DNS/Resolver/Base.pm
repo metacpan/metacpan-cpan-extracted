@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Base;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Base.pm 1910 2023-03-30 19:16:30Z willem $)[2];
+our $VERSION = (qw$Id: Base.pm 1930 2023-08-21 14:10:10Z willem $)[2];
 
 
 #
@@ -257,8 +257,7 @@ END
 
 
 sub print {
-	print shift->string;
-	return;
+	return print shift->string;
 }
 
 
@@ -624,9 +623,9 @@ sub bgbusy {				## no critic		# overwrites user UDP handle
 
 	return time() <= $expire unless IO::Select->new($handle)->can_read(0);
 
+	return unless $query;					# SpamAssassin 3.4.1 workaround
 	return if $self->{igntc};
 	return unless $handle->socktype() == SOCK_DGRAM;
-	return unless $query;					# SpamAssassin 3.4.1 workaround
 
 	my $ans = $self->_bgread($handle);
 	$$appendix[2] = [$ans];

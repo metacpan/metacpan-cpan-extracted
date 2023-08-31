@@ -78,13 +78,14 @@ sub handler {
     my ( $stdout, $stderr, $status ) =
       FCGI::Client::Connection->new( sock => $sock )->request($env);
     my %hdrs =
-      map { s/\r//g; m/(.*?):\s*(.*)/; $_ ? ( $1, $2 ) : () } split /\n+/,
-      $stdout;
-    unless ( $hdrs{Status} =~ /^(\d+)\s+(.*?)$/ ) {
+      map { m/(.*?):\s*(.*)/; } split /(?:\r?\n)+/, $stdout;
+    if ( $hdrs{Status} =~ /^(\d+)\s+(.*?)$/ ) {
+        $status = $1;
+    }
+    else {
         print STDERR "Bad status line $hdrs{Status}\n";
         return SERVER_ERROR;
     }
-    $status = $1;
 
     if ( ( $status == 302 or $status == 401 ) and $hdrs{Location} ) {
         $r->err_headers_out->set( Location => $hdrs{Location} );

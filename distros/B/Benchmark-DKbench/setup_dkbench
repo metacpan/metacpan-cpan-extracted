@@ -1,0 +1,105 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+setup_dkbench - DKbench Perl Benchmark utility setup script
+
+=head1 DESCRIPTION
+
+This is a setup script, part of the L<Benchmark::DKbench> distribution.
+
+Refer to the distribution POD for more information on the DKbench suite.
+
+=head1 SYNOPSIS
+
+Simple setup script to check/get the reference versions of CPAN modules and download
+the Genbank data file required for the BioPerl benchmarks of the DKbench suite.
+
+ setup_dkbench [options]
+
+ Options:
+ --sudo   : Will use sudo for cpanm calls.
+ --force  : Will install reference CPAN module versions and re-download the genbank data.
+ --test   : Will run the test suites for the CPAN module (default behavior is to skip).
+ --data=s : Data dir path to copy files from. Should not need if you installed DKbench.
+ --help   : Print this help text and exit.
+
+If you don't match the recommended Perl and CPAN module versions, the benchmarks
+may show 'Fail' under Pass/Fail and scores may not be comparable to the baseline.
+This might be perfectly fine for your purposes - in fact it might be intended if
+you are benchmarking to compare different software instead of hardware.
+
+This installer assumes you have at least gunzip, File::Fetch and cpanm already
+installed (e.g. yum install perl-App-cpanminus for CentOS 7, apt install cpanminus
+for Debian buster).
+
+In some systems you might need to install some packages (XML etc) with the package
+manager: e.g. 'yum install libdb-devel perl-XML-LibXML perl-XML-Parser libjpeg-devel'
+for CentOS or 'apt install libdb-dev libxml-simple-perl libjpeg-dev' for Debian.
+
+Note that the suite can be installed to as low as perl 5.12, however if you have a perl
+version lower than 5.14 make sure you install L<IO::Socket::IP> 0.41 or lower first.
+
+=cut
+
+use strict;
+use warnings;
+
+use Pod::Usage;
+
+pod2usage({ -exitval => 'NOEXIT', -verbose => 1, -output => \*STDOUT, -noperldoc => 1});
+
+use lib 'lib';
+use Benchmark::DKbench::Setup;
+use Getopt::Long;
+
+GetOptions (
+    sudo     => \my $use_sudo,
+    force    => \my $force,
+    test     => \my $test,
+    'data=s' => \my $data,
+    'help|h' => \my $help,
+);
+
+exit(1) if $help;
+my $sudo = $use_sudo ? 'sudo' : '';
+my $t    = $test ? '' : '-n';
+
+Benchmark::DKbench::Setup::fetch_genbank();
+
+system "cp -r $data/* ".Benchmark::DKbench::Setup::datadir() if $data;
+
+my @packages = qw(
+O/OA/OALDERS/HTML-Parser-3.81.tar.gz
+K/KE/KENTNL/HTML-Tree-5.07.tar.gz
+N/NI/NIGELM/HTML-Formatter-2.16.tar.gz
+K/KA/KAMELKEV/CSS-Inliner-4018.tar.gz
+C/CJ/CJFIELDS/BioPerl-1.7.8.tar.gz
+E/ET/ETHER/Moose-2.2206.tar.gz
+D/DR/DROLSKY/DateTime-TimeZone-2.60.tar.gz
+D/DR/DROLSKY/DateTime-1.59.tar.gz
+D/DK/DKECHAG/Astro-Coord-Precession-0.03.tar.gz
+D/DK/DKECHAG/Astro-Coord-Constellations-0.01.tar.gz
+D/DK/DKECHAG/Image-PHash-0.3.tar.gz
+D/DK/DKECHAG/Math-DCT-0.04.tar.gz
+M/MI/MIK/CryptX-0.078.tar.gz
+M/MI/MIK/Crypt-JWT-0.034.tar.gz
+M/ML/MLEHMANN/JSON-XS-4.03.tar.gz
+L/LE/LETO/Math-MatrixReal-2.13.tar.gz
+T/TO/TONYC/Imager-1.019.tar.gz
+);
+
+print $force ? "Installing reference cpan verions ...\n" : "Checking cpan modules ...\n";
+foreach (@packages) {
+    m#/([a-z]+)(?:-([a-z]+))?(?:-([a-z]+))?[^/]+$#i;
+    my $mod = $1;
+    $mod .= "::$2" if $2;
+    $mod .= "::$3" if $3;
+    my $ver = eval "use $mod; return \$${mod}::VERSION";
+    if (!$force && !$@) {
+        print "Skipping $mod (found version $ver)\n";
+    } else {
+        system "$sudo cpanm $t http://cpan.metacpan.org/authors/id/$_";
+    }
+}
+system "$sudo cpanm $t Imager::File::JPEG Sys::Info MCE::Loop Test::Harness Test::Output Test::Requires";

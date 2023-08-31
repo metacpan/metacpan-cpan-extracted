@@ -14,12 +14,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Changelog::Entry::Debian;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::Changelog::Entry::Debian - represents a Debian changelog entry
+
+=head1 DESCRIPTION
+
+This class represents a Debian changelog entry.
+It implements the generic interface Dpkg::Changelog::Entry.
+Only functions specific to this implementation are described below,
+the rest are inherited.
+
+=cut
+
+package Dpkg::Changelog::Entry::Debian 2.00;
 
 use strict;
 use warnings;
 
-our $VERSION = '2.00';
 our @EXPORT_OK = qw(
     match_header
     match_trailer
@@ -36,21 +50,6 @@ use Dpkg::Changelog::Entry;
 use Dpkg::Version;
 
 use parent qw(Dpkg::Changelog::Entry);
-
-=encoding utf8
-
-=head1 NAME
-
-Dpkg::Changelog::Entry::Debian - represents a Debian changelog entry
-
-=head1 DESCRIPTION
-
-This class represents a Debian changelog entry.
-It implements the generic interface Dpkg::Changelog::Entry.
-Only functions specific to this implementation are described below,
-the rest are inherited.
-
-=cut
 
 my $name_chars = qr/[-+0-9a-z.]/i;
 
@@ -167,17 +166,18 @@ sub parse_header {
 
 	my $options = $4;
 	$options =~ s/^\s+//;
-	my $f = Dpkg::Control::Changelog->new();
+	my $c = Dpkg::Control::Changelog->new();
 	foreach my $opt (split(/\s*,\s*/, $options)) {
 	    unless ($opt =~ m/^([-0-9a-z]+)\=\s*(.*\S)$/i) {
 		push @errors, sprintf(g_("bad key-value after ';': '%s'"), $opt);
 		next;
 	    }
+            ## no critic (RegularExpressions::ProhibitCaptureWithoutTest)
 	    my ($k, $v) = (field_capitalize($1), $2);
-	    if (exists $f->{$k}) {
+	    if (exists $c->{$k}) {
 		push @errors, sprintf(g_('repeated key-value %s'), $k);
 	    } else {
-		$f->{$k} = $v;
+		$c->{$k} = $v;
 	    }
 	    if ($k eq 'Urgency') {
 		push @errors, sprintf(g_('badly formatted urgency value: %s'), $v)
@@ -190,7 +190,7 @@ sub parse_header {
 		push @errors, sprintf(g_('unknown key-value %s'), $k);
 	    }
 	}
-	$self->{header_fields} = $f;
+	$self->{header_fields} = $c;
     } else {
 	push @errors, g_("the header doesn't match the expected regex");
     }
@@ -294,7 +294,7 @@ sub get_distributions {
     return;
 }
 
-=item $fields = $entry->get_optional_fields()
+=item $ctrl = $entry->get_optional_fields()
 
 Return a set of optional fields exposed by the changelog entry.
 It always returns a Dpkg::Control object (possibly empty though).
@@ -303,20 +303,20 @@ It always returns a Dpkg::Control object (possibly empty though).
 
 sub get_optional_fields {
     my $self = shift;
-    my $f;
+    my $c;
 
     if (defined $self->{header_fields}) {
-        $f = $self->{header_fields};
+        $c = $self->{header_fields};
     } else {
-        $f = Dpkg::Control::Changelog->new();
+        $c = Dpkg::Control::Changelog->new();
     }
 
     my @closes = find_closes(join("\n", @{$self->{changes}}));
     if (@closes) {
-	$f->{Closes} = join(' ', @closes);
+        $c->{Closes} = join ' ', @closes;
     }
 
-    return $f;
+    return $c;
 }
 
 =item $urgency = $entry->get_urgency()
@@ -327,10 +327,10 @@ Return the urgency of the associated upload.
 
 sub get_urgency {
     my $self = shift;
-    my $f = $self->get_optional_fields();
-    if (exists $f->{Urgency}) {
-	$f->{Urgency} =~ s/\s.*$//;
-	return lc($f->{Urgency});
+    my $c = $self->get_optional_fields();
+    if (exists $c->{Urgency}) {
+        $c->{Urgency} =~ s/\s.*$//;
+        return lc $c->{Urgency};
     }
     return;
 }

@@ -3,7 +3,9 @@ package Lemonldap::NG::Portal::Lib::CAS;
 use strict;
 use Mouse;
 use Lemonldap::NG::Common::FormEncode;
+use POSIX qw(strftime);
 use XML::Simple;
+use XML::LibXML;
 use Lemonldap::NG::Common::UserAgent;
 use URI;
 
@@ -589,6 +591,37 @@ sub _getHostForService {
 
     my $uri = URI->new($service);
     return $uri->scheme ? $uri->host : $uri->as_string;
+}
+
+# Build the XML Logout request that gets sent to CAS applications
+sub buildLogoutRequest {
+    my ( $self, $ticket ) = @_;
+
+    my $now = strftime( "%Y-%m-%dT%TZ", gmtime() );
+
+    my $doc = XML::LibXML::Document->new( '1.0', 'UTF-8' );
+    my $LogoutRequest =
+      $doc->createElementNS( "urn:oasis:names:tc:SAML:2.0:protocol",
+        "samlp:LogoutRequest" );
+
+    # NB: $ticket is a good enough random ID :-)
+    # NB: although it looks alike SAML, the CAS SLO protocol is specific
+    $LogoutRequest->setAttribute( "ID",           $ticket );
+    $LogoutRequest->setAttribute( "Version",      "2.0" );
+    $LogoutRequest->setAttribute( "IssueInstant", $now );
+    my $NameID = $doc->createElementNS( "urn:oasis:names:tc:SAML:2.0:assertion",
+        "saml:NameID" );
+    $NameID->appendText('@NOT_USED@');
+    $LogoutRequest->appendChild($NameID);
+    my $SessionIndex =
+      $doc->createElementNS( "urn:oasis:names:tc:SAML:2.0:protocol",
+        "samlp:SessionIndex" );
+    $SessionIndex->appendText($ticket);
+    $LogoutRequest->appendChild($SessionIndex);
+    my $logout_request_text = $LogoutRequest->toString();
+
+    $self->logger->debug("Generated CAS logout request: $logout_request_text");
+    return $logout_request_text;
 }
 
 1;

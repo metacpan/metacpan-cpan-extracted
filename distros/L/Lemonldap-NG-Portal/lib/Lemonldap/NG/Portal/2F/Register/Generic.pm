@@ -8,7 +8,7 @@ use JSON qw(from_json to_json);
 use Lemonldap::NG::Common::Crypto;
 use Lemonldap::NG::Portal::Main::Constants 'PE_OK';
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.17.0';
 
 extends 'Lemonldap::NG::Portal::2F::Register::Base';
 with 'Lemonldap::NG::Portal::Lib::2fDevices';
@@ -131,8 +131,6 @@ sub run {
             )
           )
         {
-            $self->userLogger->notice( $self->prefix
-                  . "2f: registration of $genericname succeeds for $user" );
             return [
                 200,
                 [
@@ -160,8 +158,6 @@ sub run {
 
         if ( $self->del2fDevice( $req, $req->userData, $self->prefix, $epoch ) )
         {
-            $self->userLogger->notice(
-                $self->prefix . "2f: device deleted for $user" );
             return [
                 200,
                 [

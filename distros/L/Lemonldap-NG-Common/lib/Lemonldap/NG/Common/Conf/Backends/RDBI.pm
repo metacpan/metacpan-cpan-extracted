@@ -16,6 +16,7 @@ sub store {
 
     my $req;
     my $lastCfg = $self->lastCfg;
+    $self->_dbh->begin_work;
     $req = $self->_dbh->prepare(
         "INSERT INTO $self->{dbiTable} (cfgNum,field,value) VALUES (?,?,?)");
 
@@ -32,10 +33,11 @@ sub store {
         unless ($execute) {
             $self->logError;
             _delete( $self, $cfgNum ) if $lastCfg != $cfgNum;
-            $self->_dbh->do("ROLLBACK");
+            $self->_dbh->rollback;
             return UNKNOWN_ERROR;
         }
     }
+    $self->_dbh->commit;
     return $cfgNum;
 }
 

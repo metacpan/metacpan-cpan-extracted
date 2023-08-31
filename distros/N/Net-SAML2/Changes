@@ -1,5 +1,27 @@
 Revision history for Perl extension Net::SAML2.
 
+0.74 -- Sun Aug 27 22:04:34 ADT 2023
+
+    [ Significant Changes since 0.73 ]
+    - Mostly minor cleanup and a few resolved issues
+    - Officially support DigiD, eHerkenning and eIDAS implementations
+
+    [Detailed Change Log]
+    - 242b8f4 Update repo version for release
+    - 6e63336 Quiet annoying Perl::Critic warning
+    - 722d5a6 Add GitHub::CreateRelease to automatically create a GitHub release
+    - 789365e verify_xml will die is it does not verify
+    - 45b299c Only URI escape if defined value
+    - 9154c4d Split Github Actions workflow
+    - 924b819 Add more supported implementations in POD
+    - 92fb773 Always return a default assertion service
+    - 51fde84 Refactor Test::Net::SAML2::Util
+    - e60202c Fix dependency things in the dist.ini
+    - e689af5 Add Coveralls to CI
+    - aeea977 Update pod for Net::SAML2::Binding::POST::handle_response
+    - c3863e1 Update pod for Net::SAML2::Binding::Redirect::verify
+    - 6cf57eb v0.73
+
 0.73 -- Sat Jul 08 07:35:12 ADT 2023
 
   - Release of 0.72 as production release

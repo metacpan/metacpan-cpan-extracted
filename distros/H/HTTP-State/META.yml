@@ -18,6 +18,7 @@ no_index:
     - t
     - inc
 requires:
+  Export::These: '0'
   List::Insertion: '0'
   Log::OK: '0'
   Log::ger: '0'
@@ -26,5 +27,5 @@ requires:
   perl: '5.036000'
 resources:
   repository: git://github.com/drclaw1394/perl-http-state.git
-version: v0.1.0
+version: v0.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

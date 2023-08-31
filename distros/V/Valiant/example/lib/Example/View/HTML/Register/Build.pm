@@ -4,7 +4,7 @@ use Moo;
 use Example::Syntax;
 use Example::View::HTML
   -tags => qw(div a fieldset form_for),
-  -util => qw( path ),
+  -util => qw( session_build_uri ),
   -views => 'HTML::Page';
 
 has 'registration' => (is=>'ro', required=>1);
@@ -12,7 +12,7 @@ has 'registration' => (is=>'ro', required=>1);
 sub render($self, $c) {
   html_page page_title=>'Homepage', sub($page) {
     div +{ class=>'col-5 mx-auto' },
-    form_for $self->registration, +{action=>path('create')}, sub ($self, $fb, $registration) {
+    form_for $self->registration, sub ($self, $fb, $registration) {
       fieldset [
         $fb->legend,
         div +{ class=>'form-group' },
@@ -44,7 +44,7 @@ sub render($self, $c) {
         ],
       ],
       fieldset $fb->submit('Register for Account'),
-      div { class=>'text-center' }, a { href=>path('/session/build') }, 'Login to existing account.',
+      div { class=>'text-center' }, a { href=>session_build_uri }, 'Login to existing account.',
     },
   },
 }

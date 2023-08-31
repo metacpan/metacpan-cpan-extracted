@@ -582,7 +582,7 @@ sub authChoiceModules {
     unless ($key) {
         my @res;
         foreach my $k ( sort keys %$value ) {
-            my $data = [ split /;/, $value->{$k} ];
+            my $data = [ split /;\s*/, $value->{$k} ];
             if ( $data->[5] ) {
                 my $over;
                 eval { $over = from_json( $data->[5] ) };
@@ -605,7 +605,7 @@ sub authChoiceModules {
         return $self->sendJSONresponse( $req, \@res );
     }
     else {
-        my $r = $value->{$key} ? [ split( /[;\|]/, $value->{$key} ) ] : [];
+        my $r = $value->{$key} ? [ split( /;\s*/, $value->{$key} ) ] : [];
         return $self->sendJSONresponse( $req, { value => $r } );
     }
 }

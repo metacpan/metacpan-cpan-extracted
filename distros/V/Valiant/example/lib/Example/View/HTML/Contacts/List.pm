@@ -4,7 +4,7 @@ use Moo;
 use Example::Syntax;
 use Example::View::HTML
   -tags => qw(link_to div a fieldset legend br b u button form_for table thead tbody tfoot trow th td link_to),
-  -helpers => qw(path $sf),
+  -helpers => qw(edit_uri build_uri list_uri $sf),
   -views => 'HTML::Page', 'HTML::Navbar';
 
 has 'list' => (is=>'ro', required=>1, from=>'controller', handles=>['pager']);
@@ -24,14 +24,14 @@ sub render($self, $c) {
             ],
           tbody { repeat=>$self->list }, sub ($self, $item, $idx) {
             trow [
-              td link_to path('edit',[$item->id]), $item->$sf('{:first_name} {:last_name}'),
+              td link_to edit_uri($item), $item->$sf('{:first_name} {:last_name}'),
             ],
           },
           tfoot { if=>$self->pager->last_page > 1  },
             td {colspan=>2, style=>'background:white'},
               ["Page: ", $self->pagelist ],
         ],
-        a { href=>path('build'), role=>'button', class=>'btn btn-lg btn-primary btn-block' }, "Create a new Contact",
+        a { href=>build_uri(), role=>'button', class=>'btn btn-lg btn-primary btn-block' }, "Create a new Contact",
      ],
   };
 }
@@ -48,7 +48,7 @@ sub pagelist :Renders ($self) {
   my @page_html = ();
   foreach my $page (1..$self->pager->last_page) {
     my $page_for_display = $page == $self->pager->current_page ? b u $page : $page;
-    push @page_html, link_to path('list', +{'contact.page'=>$page}), {style=>'margin: .5rem'}, $page_for_display; 
+    push @page_html, link_to list_uri(+{'contact.page'=>$page}), {style=>'margin: .5rem'}, $page_for_display; 
   }
   return @page_html;
 }

@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.70';
+our $VERSION = '0.71';
 
 # shortcuts
 #  os and distros
@@ -18,6 +18,7 @@ use constant before_ubuntu_xenial  => (linuxdistrocodename => [qw(squeeze precis
 use constant before_debian_stretch => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial)]);
 use constant before_ubuntu_bionic  => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch)]);
 use constant before_debian_buster  => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch bionic)]);
+use constant before_ubuntu_focal   => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch bionic buster)]);
 use constant like_fedora => (linuxdistro => '~fedora');
 #  package shortcuts
 use constant freebsd_jpeg => 'jpeg | jpeg-turbo';
@@ -141,7 +142,10 @@ sub mapping {
       [os_freebsd,
        [package => 'protobuf']],
       [like_debian,
-       [package => 'libprotobuf-dev']]],
+       [package => 'libprotobuf-dev']],
+      [like_fedora,
+       [package => 'protobuf-devel']],
+     ],
 
      [cpanmod => 'Alien::raylib',
       [os_freebsd,
@@ -411,7 +415,7 @@ sub mapping {
       [os_freebsd,
        # FreeBSD has libdb in the base system, but this version is too old.
        # Make sure that a corresponding distroprefs file matches this library.
-       [package => 'db48']],
+       [package => 'db5']],
       [like_debian,
        [linuxdistrocodename => 'squeeze',
 	[package => 'libdb4.8-dev']],
@@ -638,6 +642,10 @@ sub mapping {
      [cpanmod => 'Couchbase',
       [os_freebsd,
        [package => 'libcouchbase']],
+      ## Requires also libcouchbase/api3.h which does not seem to exist for fedora
+      #[like_fedora,
+      # [linuxdistro => 'fedora', # not available for centos7, only for fedora36
+      #	[package => 'libcouchbase-devel']]],
      ],
 
      [cpanmod => 'Crypt::Cracklib',
@@ -851,7 +859,7 @@ sub mapping {
        [linuxdistro => 'centos', # CentOS 7 and 8
 	package => 'libdb-devel'],
        [linuxdistro => 'fedora',
-	linuxdistroversion => '28',
+	linuxdistroversion => { '>=', '28' },
 	package => 'libdb-devel'],
       ],
      ],
@@ -925,10 +933,7 @@ sub mapping {
 
      [cpanmod => 'Devel::IPerl',
       [like_debian,
-       [before_debian_stretch,
-	[package => [qw(libzmq3-dev ipython ipython-notebook libmagic-dev)]]], # as specified in https://metacpan.org/source/ZMUGHAL/Devel-IPerl-0.006/README.md
-       [package => [qw(libzmq3-dev ipython jupyter-console jupyter-notebook libmagic-dev)]],
-      ],
+       [package => [qw(libzmq3-dev jupyter-console jupyter-notebook)]]], # as documented in https://metacpan.org/release/ZMUGHAL/Devel-IPerl-0.012/source/README.md
      ],
 
      [cpanmod => 'Devel::Jemallctl',
@@ -1141,7 +1146,7 @@ sub mapping {
       [os_openbsd,
        [package => [ 'firefox' ]]],
       [like_debian,
-       [linuxdistrocodename => [qw(trusty xenial bionic eoan focal)],
+       [linuxdistrocodename => [qw(trusty xenial bionic eoan focal jammy)],
 	[package => [qw(firefox xvfb xauth)]]], # there's no firefox-esr for Ubuntu
        [package => [ 'firefox-esr', 'xvfb', 'xauth' ]]],
       [like_fedora,
@@ -1429,7 +1434,10 @@ sub mapping {
       [os_freebsd,
        [package => 'protobuf']],
       [like_debian,
-       [package => 'libprotoc-dev']]],
+       [package => 'libprotoc-dev']],
+      [like_fedora,
+       [package => 'protobuf-c-devel']],
+     ],
 
      [cpanmod => ['Graphics::GnuplotIF', 'Gnuplot::Simple', 'Chart::Gnuplot'],
       [package => 'gnuplot']],
@@ -1581,11 +1589,18 @@ sub mapping {
 
      [cpanmod => 'Gtk3::WebKit',
       [os_freebsd,
-       [package => 'webkit-gtk3']],
+       [osvers => {'<', 11},
+	[package => 'webkit-gtk3']],
+       [package => []]], # does not exist in newer freebsd versions
       [like_debian,
-       [package => 'libwebkitgtk-3.0-dev']],
+       [before_debian_buster, # only available until ubuntu:bionic
+	[package => 'libwebkitgtk-3.0-dev']],
+       [package => []]],
       [like_fedora,
-       [package => 'webkitgtk3-devel']],
+       [linuxdistro => 'centos',
+	linuxdistroversion => qr{^[7]\.}, # exists for centos 7, does not exist for fedora 36
+	package => 'webkitgtk3-devel'],
+       [package => []]],
      ],
 
      [cpanmod => 'Gtk3::WebKit2',
@@ -1851,6 +1866,21 @@ sub mapping {
        [package => [qw(freetype-devel giflib-devel libpng-devel libjpeg-turbo-devel libtiff-devel)]]],
       [os_darwin,
        [package => [qw(freetype giflib libpng jpeg libtiff)]]],
+     ],
+
+     [cpanmod => 'Imager::File::AVIF',
+      [os_freebsd,
+       [package => 'libavif']],
+      [like_debian,
+       [before_debian_buster,
+	[package => []]],
+       [linuxdistrocodename => ['focal'],
+	[package => []]],
+       [package => 'libavif-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos', # not available for 7 and 8
+	package => []],
+       [package => 'libavif-devel']],
      ],
 
      [cpanmod => 'Imager::File::HEIF',
@@ -2545,6 +2575,12 @@ sub mapping {
        [package => 'liblo-devel']],
      ],
 
+     ## even libwebsockets-dev in Ubuntu 22.04 and debian 11 is too old for the module (4.0.20 < 4.3.0)
+     #[cpanmod => 'Net::Libwebsockets',
+     # [like_debian,
+     #  [package => 'libwebsockets-dev']],
+     #],
+
      [cpanmod => 'Net::NATS::Streaming::PB',
       [os_freebsd,
        [package => 'protobuf']],
@@ -2566,6 +2602,15 @@ sub mapping {
        [package => 'libasyncns-dev']],
       [like_fedora,
        [package => 'libasyncns-devel']],
+     ],
+
+     [cpanmod => 'Net::LibNFS',
+      [os_freebsd,
+       [package => 'libnfs']],
+      [like_debian,
+       [package => 'libnfs-dev']],
+      [like_fedora,
+       [package => 'libnfs-devel']],
      ],
 
      [cpanmod => 'Net::LibNIDS',
@@ -2812,6 +2857,17 @@ sub mapping {
       [like_fedora,
        [package => 'blas-static']],
      ],
+
+     [cpanmod => 'pEFL',
+      [like_debian,
+       [linuxdistrocodename => [qw(jessie)],
+	[package => 'libelementary-dev']],
+       [before_debian_buster,
+	[package => []]],
+       [package => 'libefl-all-dev']],
+      [like_fedora,
+       [linuxdistro => 'fedora', 
+	[package => 'efl-devel']]]],
 
      [cpanmod => 'PerlQt',
       [like_debian,
@@ -3451,6 +3507,22 @@ sub mapping {
        [package => 'libcurl-devel']],
       [os_darwin,
        [package => []]], # libcurl is in the base system
+     ],
+
+     [cpanmod => 'WWW::Mechanize::Chrome',
+      [os_freebsd,
+       [package => 'chromium']],
+      [os_openbsd,
+	# doesn't work
+       [package => 'chromium']],
+      [like_debian,
+       [linuxdistrocodename => [qw(squeeze wheezy jessie precise)],
+	[package => []]], #
+       [package => 'chromium']],
+      [os_windows,
+       [package => 'chromium']],
+      [os_darwin,
+       [package => 'chromium']],
      ],
 
      [cpanmod => 'WWW::Mechanize::PhantomJS',

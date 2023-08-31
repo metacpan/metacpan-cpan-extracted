@@ -1,23 +1,26 @@
-# Copyrights 2001-2019 by [Mark Overmeer].
+# Copyrights 2001-2023 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution Mail-Box-POP3.  Meta-POD processed with
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Mail::Transport::POP3;
 use vars '$VERSION';
-$VERSION = '3.005';
+$VERSION = '3.006';
 
 use base 'Mail::Transport::Receive';
 
 use strict;
 use warnings;
 
-use IO::Socket  ();
-use Socket      qw/$CRLF/;
-use Digest::MD5 qw/md5_hex/;
+use IO::Socket       ();
+use IO::Socket::INET ();
+use IO::Socket::SSL  qw(SSL_VERIFY_NONE);
+use Socket           qw/$CRLF/;
+use Digest::MD5      qw/md5_hex/;
+use MIME::Base64     qw/encode_base64/;
 
 
 sub _OK($) { substr(shift // '', 0, 3) eq '+OK' }
@@ -29,8 +32,13 @@ sub init($)
 
     $self->SUPER::init($args) or return;
 
-    $self->{MTP_auth}   = $args->{authenticate} || 'AUTO';
-    $self->{MTP_ssl}    = $args->{use_ssl};
+    $self->{MTP_auth}     = $args->{authenticate} || 'AUTO';
+    $self->{MTP_ssl}      = $args->{use_ssl};
+
+    my $opts = $self->{MTP_ssl_opts} = $args->{ssl_options} || {};
+    $opts->{verify_hostname} ||= 0;
+    $opts->{SSL_verify_mode} ||= SSL_VERIFY_NONE;
+
     $self->socket or return;   # establish connection
 
     $self;
@@ -39,6 +47,9 @@ sub init($)
 #------------------------------------------
 
 sub useSSL() { shift->{MTP_ssl} }
+
+
+sub SSLOptions() { shift->{MTP_ssl_opts} }
 
 #------------------------------------------
 
@@ -257,10 +268,15 @@ sub login(;$)
         return;
     }
 
-    my $net    = $self->useSSL ? 'IO::Socket::SSL' : 'IO::Socket::INET';
-    eval "require $net" or die $@;
+    my $socket;
+    if($self->useSSL)
+    {   my $opts = $self->SSLOptions;
+        $socket  = eval { IO::Socket::SSL->new(PeerAddr => "$host:$port", %$opts) };
+    }
+    else
+    {   $socket  = eval { IO::Socket::INET->new("$host:$port") };
+    }
 
-    my $socket = eval { $net->new("$host:$port") };
     unless($socket)
     {   $self->log(ERROR => "Cannot connect to $host:$port for POP3: $!");
         return;
@@ -298,6 +314,32 @@ sub login(;$)
                    or return;
                 $connected = _OK $response2;
             }
+        }
+    }
+
+    # Try OAUTH2 login
+    if(! $connected && $authenticate =~ /^OAUTH2/)
+    {   # Borrowed from Net::POP3::XOAuth2 0.0.2 by Kizashi Nagata (also Perl license)
+        my $token = encode_base64 "user=$username\001auth=Bearer $password\001\001";
+        $token    =~ s/[\r\n]//g;    # no base64 newlines, anywhere
+
+		if($authenticate eq 'OAUTH2_SEP')
+        {   # Microsofts way
+            # https://learn.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth
+            my $response = $self->send($socket, "AUTH XOAUTH2$CRLF")
+               or return;
+
+            if($response =~ /^\+/)   # Office365 sends + here, not +OK
+            {   my $response2 = $self->send($socket, "$token$CRLF")
+                   or return;
+                $connected = _OK $response2;
+            }
+        }
+        else
+        {   my $response = $self->send($socket, "AUTH XOAUTH2 $token$CRLF")
+               or return;
+
+            $connected = _OK $response;
         }
     }
 

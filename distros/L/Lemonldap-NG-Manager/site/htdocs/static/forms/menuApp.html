@@ -25,7 +25,10 @@
         <div class="row">
           <div class="col-md-1">
             <button class="btn btn-default" ng-click="showModal('logoChoice.html')">
-              <img ng-src="{{portal.data}}static/common/apps/{{currentNode.data.logo}}" height="30px" width="30px"/>
+
+              <span ng-class="['fa-2x', 'fa', 'fa-'+currentNode.data.logo]" ng-if="currentNode.data.logo.indexOf('.') < 0"></span>
+              <img ng-src="{{portal.data}}static/common/apps/{{currentNode.data.logo}}" height="30px" width="30px"
+                  ng-if="currentNode.data.logo.indexOf('.') > -1" />
             </button>
           </div>
           <div class="col-md-11">
@@ -96,6 +99,12 @@
         </button>
       </div>
     </div>
+  </div>
+  <hr>
+  <div class="modal-body">
+    <p>
+      <a href="https://fontawesome.com/v4/icons/" target="_blank" rel="noreferrer"><span trspan="pickFontAwesome"></span></a>
+    </p>
   </div>
   <div class="modal-footer">
     <button class="btn btn-success" ng-click="ok()"><i class="glyphicon glyphicon-ok"></i> <span trspan="ok"></span></button>

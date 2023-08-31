@@ -7,7 +7,7 @@ SYNOPSIS
             agent => 'MyBot/1.0'
             accept_language => [qw( fr-FR fr en-GB en ja-JP )],
             auto_switch_https => 1,
-            # For example, and Cookie::Jar object
+            # For example, a Cookie::Jar object
             cookie_jar => $cookie_jar,
             dnt => 1,
             # 2Mb. Any data to be sent being bigger than this will trigger a Continue conditional query
@@ -48,11 +48,11 @@ SYNOPSIS
         my $prom = $p->request( $req )->then(sub{ #... })->catch(sub{ # ... });
 
 VERSION
-        v0.2.3
+        v0.2.4
 
 DESCRIPTION
     HTTP::Promise provides with a fast and powerful yet memory-friendly API
-    to make true asynchronous HTTP requests using fork using Promise::Me.
+    to make true asynchronous HTTP requests using fork with Promise::Me.
 
     It is based on the design of HTTP::Message, but with a much cleaner
     interface to make requests and manage HTTP entity bodies.
@@ -117,7 +117,7 @@ DESCRIPTION
     speed, and has a notion of HTTP entity and body stored either on file or
     in memory.
 
-    It also have modules to make it really super easy to create
+    It also has modules to make it really super easy to create
     "x-www-form-urlencoded" requests with HTTP::Promise::Body::Form, or
     "multipart" ones with HTTP::Promise::Body::Form::Data
 
@@ -126,7 +126,7 @@ DESCRIPTION
     methods provided by HTTP::Promise, which are: "delete", "get", "head",
     "options", "patch", "post", "put" and each will occur asynchronously.
 
-    Each of those method returns a promise, which means you can chain the
+    Each of those methods returns a promise, which means you can chain the
     results using a chainable then and catch for errors.
 
     You can also wait for all of them to finish using await, which is
@@ -161,7 +161,7 @@ DESCRIPTION
 
 CONSTRUCTOR
   new
-    Provided with some optional parameters, and this instantiate a new
+    Provided with some optional parameters, and this instantiates a new
     HTTP::Promise objects and returns it. If an error occurred, it will
     return "undef" and the error can be retrieved using error method.
 
@@ -321,7 +321,7 @@ METHODS
     An array of acceptable language. This will be used to set the
     "Accept-Language" header.
 
-    See also HTTP::Promise::Header::AcceptLanguage
+    See also HTTP::Promise::Headers::AcceptLanguage
 
   agent
     This is a string.

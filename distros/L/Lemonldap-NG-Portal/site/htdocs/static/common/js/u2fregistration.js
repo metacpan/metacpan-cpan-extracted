@@ -62,6 +62,7 @@ LemonLDAP::NG U2F registration script
               },
               dataType: 'json',
               success: function(resp) {
+                var e;
                 if (resp.error) {
                   if (resp.error.match(/badName/)) {
                     return setMsg(resp.error, 'warning');
@@ -69,12 +70,15 @@ LemonLDAP::NG U2F registration script
                     return setMsg('u2fFailed', 'danger');
                   }
                 } else if (resp.result) {
-                  $(document).trigger("mfaAdded", [
+                  e = jQuery.Event("mfaAdded");
+                  $(document).trigger(e, [
                     {
                       "type": "u"
                     }
                   ]);
-                  return setMsg('yourKeyIsRegistered', 'positive');
+                  if (!e.isDefaultPrevented()) {
+                    return setMsg('yourKeyIsRegistered', 'positive');
+                  }
                 }
               },
               error: displayError

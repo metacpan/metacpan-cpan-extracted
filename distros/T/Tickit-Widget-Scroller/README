@@ -116,6 +116,16 @@ METHODS
     be clipped if this would scroll past the beginning or end of the
     display.
 
+ items
+
+       $count = scalar $scroller->items;
+
+    Since version 0.31.
+
+    In scalar context, returns the number of items currently stored in the
+    Scroller. The behaviour of this method in non-scalar context is
+    currently unspecified.
+
  push
 
        $scroller->push( @items )

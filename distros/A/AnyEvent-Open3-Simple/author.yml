@@ -13,6 +13,8 @@ pod_spelling_system:
     - open3
     - suboptimal
     - mojo
+    - HAARG
+    - Knop
 
 pod_coverage:
   private:

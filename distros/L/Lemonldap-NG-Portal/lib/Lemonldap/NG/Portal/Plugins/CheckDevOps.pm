@@ -4,6 +4,7 @@ use strict;
 use Mouse;
 use JSON qw(from_json);
 use Lemonldap::NG::Common::UserAgent;
+use Lemonldap::NG::Common::Util qw(isHiddenAttr);
 use Lemonldap::NG::Portal::Main::Constants qw(
   URIRE
   PE_OK
@@ -15,7 +16,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_REGISTERFORMEMPTY
 );
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.17.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -187,15 +188,15 @@ sub parse {
         my $vhost   = $handler->resolveAlias($req);
 
         # Removed hidden session attributes
-        foreach my $v ( split /[,\s]+/, $self->conf->{hiddenAttributes} ) {
-            foreach ( keys %{ $json->{headers} } ) {
-                if ( $json->{headers}->{$_} =~ /\$$v/ ) {
-                    delete $json->{headers}->{$_};
-                    my $user = $req->userData->{ $self->conf->{whatToTrace} };
-                    $self->userLogger->warn(
-"CheckDevOps: $user tried to retrieve hidden attribute '$v'"
-                    );
-                }
+        foreach ( keys %{ $json->{headers} } ) {
+            my $header = $json->{headers}->{$_};
+            $header =~ s/^\$//;
+            if ( isHiddenAttr( $self->conf, $header ) ) {
+                my $user = $req->userData->{ $self->conf->{whatToTrace} };
+                $self->userLogger->warn(
+"CheckDevOps: $user tried to retrieve a hidden attribute -> $header"
+                );
+                delete $json->{headers}->{$_};
             }
         }
 
@@ -265,9 +266,10 @@ sub parse {
                 } @$headers;
             }
 
-            my $headers_list = join ', ', map "$_->{key}:$_->{value}",
+            my $headers_list = join $self->conf->{multiValuesSeparator},
+              map "$_->{key}:$_->{value}",
               @$headers;
-            $self->logger->debug("CheckDevOps compiled headers: $headers_list");
+            $self->logger->debug("Compiled headers: $headers_list");
 
             # Compile rules
             @$rules = map {
@@ -280,8 +282,9 @@ sub parse {
                     : 'forbidden'
                 }
             } sort keys %{ $json->{rules} };
-            my $rules_list = join ', ', map "$_->{uri}:$_->{access}", @$rules;
-            $self->logger->debug("CheckDevOps compiled rules: $rules_list");
+            my $rules_list = join $self->conf->{multiValuesSeparator},
+              map "$_->{uri}:$_->{access}", @$rules;
+            $self->logger->debug("Compiled rules: $rules_list");
 
             # Prepare form params
             $msg   = 'checkDevOps';
@@ -337,7 +340,7 @@ sub _checkSessionAttrs {
       keys %{ $json->{rules} };
     my %usedAttrs = map { $_ => 1 } ( @varh, @varr );
     $self->logger->debug(
-        "Used attributs: " . join $self->conf->{multiValuesSeparator},
+        "Used attributes: " . join $self->conf->{multiValuesSeparator},
         keys %usedAttrs );
 
     @$unknown = map { $sessionAttrs{$_} ? () : $_ } sort keys %usedAttrs;

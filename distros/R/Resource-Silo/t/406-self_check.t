@@ -17,6 +17,7 @@ subtest 'no problem' => sub {
         use Resource::Silo -class;
 
         resource foo    =>
+            loose_deps      => 1,
             require         => [ 'Test::More' ],
             dependencies    => [ 'bar' ],
             init            => sub { 42 };
@@ -36,6 +37,7 @@ subtest 'bad dependencies' => sub {
         use Resource::Silo -class;
 
         resource foo    =>
+            loose_deps      => 1,
             dependencies    => ['bar'],
             init            => sub {};
     } "defining invalid setup is ok";

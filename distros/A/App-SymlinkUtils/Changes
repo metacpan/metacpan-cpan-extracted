@@ -1,3 +1,10 @@
+0.002   2023-07-02  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLI: check-symlinks.
+
+        - [ux] [cli check-symlink] Show error messages to stderr.
+
+
 0.001   2023-06-30  Released-By: PERLANCAR
 
         - First release.

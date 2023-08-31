@@ -159,6 +159,10 @@ sub account($self) {
   $self->result_source->resultset->account_for($self);
 }
 
+sub accessible_people($self) {
+  $self->result_source->resultset->accessible_people_for($self);
+}
+
 sub request_todos($self, $request) {
   my $todos = $self->todos->available->newer_first;
   return $todos = $todos->filter_by_request($request);

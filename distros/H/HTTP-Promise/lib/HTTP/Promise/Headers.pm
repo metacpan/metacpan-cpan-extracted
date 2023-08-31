@@ -2329,7 +2329,8 @@ The return value is a new L<HTTP::Promise::Headers> object that contains the rem
 
 =head2 remove_header
 
-    $h->remove_header( $field, ... );
+    my @values = $h->remove_header( $field, ... );
+    my $total_values_removed = $h->remove_header( $field, ... );
 
 This function removes the header with the specified names.
 
@@ -2383,6 +2384,8 @@ Provided with a string and this returns an URI-escaped string using L<URI::Escap
 Sets or gets the C<Accept> header field value. It takes either a string or an array or array reference of values.
 
 See L<rfc7231, section 5.3.2|https://tools.ietf.org/html/rfc7231#section-5.3.2> and L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept>
+
+See also L<HTTP::Promise::Headers::Accept>
 
 =head2 accept_charset
 
@@ -3566,6 +3569,8 @@ Example:
     X-XSS-Protection: 1; report=https://example.org/some/where
 
 See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection>
+
+=for Pod::Coverage STORABLE_thaw_post_processing
 
 =head1 AUTHOR
 

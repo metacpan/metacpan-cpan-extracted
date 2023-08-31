@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/NewLine.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2022/09/19
+## Modified 2022/10/11
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,7 +19,7 @@ BEGIN
     use vars qw( $VERSION );
     use Want;
     use Devel::Confess;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -28,13 +28,21 @@ use warnings;
 sub init
 {
     my $self = shift( @_ );
-    ## Some new lines are silents, and some are explicit like following a <br />
+    # Some new lines are silents, and some are explicit like following a <br />
     $self->{break}      = 0;
     $self->{new_line}   = "\n";
     $self->{tag_name}   = 'nl';
-    ## Repeating counts the number of occurence of new lines without having multiple new line objects
+    # Repeating counts the number of occurence of new lines without having multiple new line objects
     $self->{repeating}  = 1;
     return( $self->SUPER::init( @_ ) );
+}
+
+sub as_markdown
+{
+    my $self = shift( @_ );
+    my $arr = $self->new_array;
+    $arr->push( $self->new_line->scalar );
+    return( $arr->join( '' )->scalar );
 }
 
 sub as_pod
@@ -88,7 +96,7 @@ Markdown::Parser::NewLine - Markdown New Line Element
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

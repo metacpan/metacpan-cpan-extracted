@@ -10,16 +10,61 @@ use Encode;
 use MIME::Base64;
 use Lemonldap::NG::Common::IPv6;
 use JSON::XS;
+use Net::CIDR;
+use Digest::SHA;
 use Date::Parse;
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.17.0';
 
 # Set here all the names of functions that must be available in Safe objects.
 # Note that only functions, not methods, can be written here
 our $functions =
   [
-    qw(&checkLogonHours &date &dateToTime &checkDate &basic &unicode2iso &unicode2isoSafe &iso2unicode &iso2unicodeSafe &groupMatch &isInNet6 &varIsInUri &has2f_internal)
+    qw(&checkLogonHours &date &dateToTime &checkDate &basic &unicode2iso &unicode2isoSafe &iso2unicode &iso2unicodeSafe &groupMatch &isInNet6 &varIsInUri &has2f_internal &ipInSubnet &subjectid)
   ];
+
+## @function boolean ipInSubnet(string ip, string network, ... )
+# Function to check if an IP is part of a network
+# @param $ip IP address to test
+# @param $network Network in CIDR notation.
+# You can call the function with multiple networks
+# @return 1 true, 0 else
+sub ipInSubnet {
+    my ( $ip, @networks ) = @_;
+    return Net::CIDR::cidrlookup( $ip, @networks );
+}
+
+## @function boolean subjectid(string alg, string value, string scope, string salt)
+# Function to compute an opaque identifier from a value and optional salt
+# @param $ip IP address to test
+# @param $network Network in CIDR notation.
+# You can call the function with multiple networks
+# @return 1 true, 0 else
+sub subjectid {
+    my ( $value, $scope, $salt ) = @_;
+    $salt //= "";
+    $scope = $scope ? "\@$scope" : "";
+    return ( lc ( encode_base32( Digest::SHA::sha256( $value . $salt ) ) ). $scope );
+}
+
+# This function is copied from MIME::Base32 under GPL/Artistic license
+# by Daniel Peder <Daniel.Peder@InfoSet.COM>
+sub encode_base32 {
+    my $arg = shift;
+    return '' unless defined($arg);    # mimic MIME::Base64
+
+    $arg = unpack( 'B*', $arg );
+    $arg =~ s/(.....)/000$1/g;
+    my $l = length($arg);
+    if ( $l & 7 ) {
+        my $e = substr( $arg, $l & ~7 );
+        $arg = substr( $arg, 0, $l & ~7 );
+        $arg .= "000$e" . '0' x ( 5 - length $e );
+    }
+    $arg = pack( 'B*', $arg );
+    $arg =~ tr|\0-\37|A-Z2-7|;
+    return $arg;
+}
 
 ## @function boolean checkLogonHours(string logon_hours, string syntax, string time_correction, boolean default_access)
 # Function to check logon hours
@@ -267,9 +312,7 @@ sub groupMatch {
 
 sub isInNet6 {
     my ( $ip, $net ) = @_;
-    $net =~ s#/(\d+)##;
-    my $bits = $1;
-
+    my ($bits) = $net =~ s#/(\d+)##;
     return net6( $ip, $bits ) eq net6( $net, $bits ) ? 1 : 0;
 }
 

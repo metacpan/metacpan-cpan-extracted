@@ -10,7 +10,7 @@ use utf8;
 use Object::Pad 0.800 ':experimental(adjust_params)';
 use Object::Pad::FieldAttr::Checked;
 
-package App::sdview::Parser 0.11;
+package App::sdview::Parser 0.12;
 role App::sdview::Parser;
 
 use String::Tagged;

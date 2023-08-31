@@ -49,6 +49,9 @@
 #   * GET    /myapplications                               : get my appplications
 #                                                            list
 #
+# - Other (always)
+#   * /languages : get available languages
+#
 # There is no conflict with SOAP server, they can be used together
 
 package Lemonldap::NG::Portal::Plugins::RESTServer;
@@ -57,6 +60,7 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 use MIME::Base64;
+use Lemonldap::NG::Common::Languages;
 use Lemonldap::NG::Portal::Main::Constants qw(
   URIRE
   PE_OK
@@ -64,7 +68,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PASSWORD_OK
 );
 
-our $VERSION = '2.16.1';
+our $VERSION = '2.17.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -245,7 +249,10 @@ sub init {
         ['PUT']
       )
 
-      ->addAuthRoute( myapplications => 'myApplications', ['GET'] );
+      ->addAuthRoute( myapplications => 'myApplications', ['GET'] )
+
+      ->addAuthRoute( languages => 'languages', ['GET'] )
+      ->addUnauthRoute( languages => 'languages', ['GET'] );
 
     extends @parents               if ($add);
     $self->setTypes( $self->conf ) if ( $self->conf->{restSessionServer} );
@@ -312,8 +319,8 @@ sub newAuthSession {
     }
 
     $req->env->{AuthBasic} = 1;
-    $req->{id}    = $id;
-    $req->{force} = 1;
+    $req->{id}             = $id;
+    $req->{force}          = 1;
     $req->user( $req->param('user') );
     $req->data->{password} = $req->param('password');
     $req->steps( [
@@ -409,11 +416,16 @@ sub mysession {
           if ( $self->p->checkXSSAttack( 'authorizationfor', $req->urldc ) );
 
         # Split URL
-        $req->urldc =~ URIRE;
-        my ( $host, $uri ) = ( $3 . ( $4 ? ":$4" : '' ), $5 );
-        $uri ||= '/';
-        return $self->p->sendError( $req, "Bad URL $req->{urldc}", 400 )
-          unless ($host);
+        my ( $host, $uri );
+        if ( $req->urldc =~ URIRE ) {
+            ( $host, $uri ) = ( $3 . ( $4 ? ":$4" : '' ), $5 );
+            $uri ||= '/';
+            return $self->p->sendError( $req, "Bad URL $req->{urldc}", 400 )
+              unless ($host);
+        }
+        else {
+            return $self->p->sendError( $req, "Bad URL $req->{urldc}", 400 );
+        }
 
         $self->logger->debug("Looking for authorization for $url");
 
@@ -773,12 +785,22 @@ sub getUser {
 
 sub myApplications {
     my ( $self, $req ) = @_;
+    my $basePath = $self->conf->{portal};
+    $basePath =~ s#/*$#/#;
+    $basePath .= $self->p->{staticPrefix} . '/common/apps/';
+    $basePath =~ s#//+#/#;
     my @appslist = map {
         my @apps = map {
             {
                 $_->{appname} => {
                     AppUri  => $_->{appuri},
-                    AppDesc => $_->{appdesc}
+                    AppDesc => $_->{appdesc},
+                    AppTip  => $_->{apptip},
+                    (
+                        $_->{applogo_icon}
+                        ? ( AppIcon => $_->{applogo} )
+                        : ( AppLogo => $basePath . $_->{applogo} )
+                    )
                 }
             }
         } @{ $_->{applications} };
@@ -787,6 +809,23 @@ sub myApplications {
 
     return $self->p->sendJSONresponse( $req,
         { result => 1, myapplications => \@appslist } );
+}
+
+sub languages {
+    my ( $self, $req ) = @_;
+    return $self->sendJSONresponse(
+        $req,
+        [
+            map {
+                {
+                    code => $_,
+                    name => langName->{$_},
+                    flag => $self->conf->{portal}.$self->p->{staticPrefix} . "/languages/$_.png"
+                }
+            } split /[,;]\s*/,
+            $self->p->{languages}
+        ]
+    );
 }
 
 sub _checkSecret {

@@ -1,0 +1,1 @@
+select $DATE as foo;

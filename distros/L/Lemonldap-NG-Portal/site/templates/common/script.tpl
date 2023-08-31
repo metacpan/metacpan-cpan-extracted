@@ -33,7 +33,7 @@
             "minupper": "<TMPL_VAR NAME="PPOLICY_MINUPPER" DEFAULT="0">",
             "mindigit": "<TMPL_VAR NAME="PPOLICY_MINDIGIT" DEFAULT="0">",
             "nopolicy": "<TMPL_VAR NAME="PPOLICY_NOPOLICY" DEFAULT="0">",
-            "allowedspechar": "<TMPL_VAR NAME="PPOLICY_ALLOWEDSPECHAR" ESCAPE="js" DEFAULT="">",
+            "allowedspechar": <TMPL_VAR NAME="PPOLICY_ALLOWEDSPECHAR_JSON" DEFAULT='""'>,
             "minspechar": "<TMPL_VAR NAME="PPOLICY_MINSPECHAR" DEFAULT="0">"
             },</TMPL_IF>
  "enablePasswordDisplay":<TMPL_VAR NAME="ENABLE_PASSWORD_DISPLAY" DEFAULT="0">,

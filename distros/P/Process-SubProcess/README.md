@@ -17,17 +17,23 @@ Some important Features are:
 * Captures possible System Errors at Launch Time like "file not found" Errors
 
 # Motivation
-This Module was conceived out of the need to launch multiple Tasks simulaneously while still keeping each Log and Error Messages and Exit Codes separately. \
-As I developed it as Prototype at:
+This Module was conceived out of the need to launch multiple Tasks simultaneously
+while still keeping each Log and Error Messages and Exit Codes separately.\
+As I developed it as Prototype at:\
 [Multi Process Manager](https://stackoverflow.com/questions/50177534/why-do-pipes-from-child-processes-break-sometimes-and-sometimes-not)\
 The **Object Oriented Design** permits the implementation of the **[Command Pattern / Manager-Worker Pattern](https://en.wikipedia.org/wiki/Command_pattern)** with the `Process::SubProcess::Group` and `Process::SubProcess::Pool` Packages.\
-Having a similar implementation as the [`Capture::Tiny` Package](https://metacpan.org/pod/Capture::Tiny) it eventually evolved as a Procedural Replacement for the `Capture::Tiny::capture()` Function.
+Having a similar implementation as the [`Capture::Tiny` Package](https://metacpan.org/pod/Capture::Tiny)
+it eventually evolved as a Procedural Replacement for the `Capture::Tiny::capture()` Function
+which is demonstrated under [Usage > runSubProcess\(\) Function](#runsubprocess-function).\
+This capability also enabled its usage as Command Line Helper Tool with the `run_subprocess.pl` script
+as seen under [Usage > Runner Script](#runner-script).
 
 ## Example Use Case
 The Usefulness of this Library is best shown by an Example Use Case as seen in the `Process::SubProcess::Group::Run` Test Sequence:\
 Having 3 Jobs at hand of 2 seconds, 3 seconds and 1 second running them sequencially would take aproximately **6 seconds**.\
 But using the `Process::SubProcess::Group` it takes effectively only **3 seconds** to complete.\
-And still each Job can be evaluated separately by their own Results keeping Log Message separate from Error Messages and viewing them in their context.
+And still each Job can be evaluated separately by their own Results keeping Log Message separate from Error Messages and
+viewing them in their context.
 ```
 # Subtest: Process::SubProcess::Group::Run
     ok 1 - scripts (count: '3'): added correctly

@@ -417,21 +417,22 @@ sub _register {
 sub display {
     my ( $self, $req ) = @_;
     my %templateParams = (
-        SKIN_PATH       => $self->conf->{staticPrefix},
-        SKIN            => $self->p->getSkin($req),
-        SKIN_BG         => $self->conf->{portalSkinBackground},
-        MAIN_LOGO       => $self->conf->{portalMainLogo},
-        AUTH_ERROR      => $req->error,
-        AUTH_ERROR_TYPE => $req->error_type,
-        AUTH_ERROR_ROLE => $req->error_role,
-        AUTH_URL        => $req->data->{_url},
-        CHOICE_PARAM    => $self->conf->{authChoiceParam},
-        CHOICE_VALUE    => $req->data->{_authChoice},
-        EXPMAILDATE     => $req->data->{expMailDate},
-        EXPMAILTIME     => $req->data->{expMailTime},
-        STARTMAILDATE   => $req->data->{startMailDate},
-        STARTMAILTIME   => $req->data->{startMailTime},
-        MAILALREADYSENT => $req->data->{mail_already_sent},
+        SKIN_PATH                       => $self->conf->{staticPrefix},
+        SKIN                            => $self->p->getSkin($req),
+        SKIN_BG                         => $self->conf->{portalSkinBackground},
+        MAIN_LOGO                       => $self->conf->{portalMainLogo},
+        AUTH_ERROR                      => $req->error,
+        AUTH_ERROR_TYPE                 => $req->error_type,
+        AUTH_ERROR_ROLE                 => $req->error_role,
+        ( 'AUTH_ERROR_' . $req->error ) => 1,
+        AUTH_URL                        => $req->data->{_url},
+        CHOICE_PARAM                    => $self->conf->{authChoiceParam},
+        CHOICE_VALUE                    => $req->data->{_authChoice},
+        EXPMAILDATE                     => $req->data->{expMailDate},
+        EXPMAILTIME                     => $req->data->{expMailTime},
+        STARTMAILDATE                   => $req->data->{startMailDate},
+        STARTMAILTIME                   => $req->data->{startMailTime},
+        MAILALREADYSENT                 => $req->data->{mail_already_sent},
         (
             $req->data->{customScript}
             ? ( CUSTOM_SCRIPT => $req->data->{customScript} )

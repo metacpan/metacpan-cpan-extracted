@@ -88,8 +88,38 @@ assert_eq(
 )
 
 assert_eq(
+    Math.seq(next_cubefree(0), { .tail.next_cubefree }).while { _ <= 100 },
+    cubefree(1..100)
+)
+
+assert_eq(
     Math.seq(next_powerfree(0,3), { .tail.next_powerfree(3) }).while { _ <= 100 },
     1..100 -> grep { .is_powerfree(3) }
+)
+
+assert_eq(
+    Math.seq(next_powerfree(0,4), { .tail.next_powerfree(4) }).while { _ <= 100 },
+    powerfree(1..100, 4)
+)
+
+assert_eq(
+    Math.seq(next_nonsquarefree(0), { .tail.next_nonsquarefree }).while { _ <= 100 },
+    nonsquarefree(1..100)
+)
+
+assert_eq(
+    Math.seq(next_noncubefree(0), { .tail.next_noncubefree }).while { _ <= 100 },
+    noncubefree(1..100)
+)
+
+assert_eq(
+    Math.seq(next_nonpowerfree(0, 4), { .tail.next_nonpowerfree(4) }).while { _ <= 100 },
+    nonpowerfree(1..100, 4)
+)
+
+assert_eq(
+    Math.seq(next_powerful(0, 4), { .tail.next_powerful(4) }).while { _ <= 100 },
+    powerful(1..100, 4)
 )
 
 for n in (31, 32, 63, 64) {
@@ -152,6 +182,6 @@ for n in (1..8), k in (2..15 -> map{|b| b**n }) {
     assert_eq(t.squarefree_count, k)
 }
 
-assert_eq(3000.of{.nth_squarefree}.ft(1), 3000.dec.by{.is_squarefree})
+assert_eq(3000.of{.nth_squarefree}.slice(1), 3000.dec.by{.is_squarefree})
 
 say "** Test passed!"

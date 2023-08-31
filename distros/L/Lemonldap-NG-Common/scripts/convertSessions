@@ -157,9 +157,10 @@ Lemonldap::NG::Common::Apache::Session->get_key_from_all_sessions(
         );
 
         if ( $s->error ) {
-            die "Error encountered on session $id" unless $ignore_errors;
+            die( "Error converting session $id:" . $s->error )
+              unless $ignore_errors;
             $nb_error += 1;
-            print "Error converting session $id : " . $s->error . "\n";
+            print "Error converting session $id: " . $s->error . "\n";
         }
         else {
             print "Session $id successfully converted\n" if $debug;

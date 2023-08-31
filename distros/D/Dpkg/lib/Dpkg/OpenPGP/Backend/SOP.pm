@@ -13,12 +13,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::OpenPGP::Backend::SOP;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::OpenPGP::Backend::SOP - OpenPGP backend for SOP
+
+=head1 DESCRIPTION
+
+This module provides a class that implements the OpenPGP backend
+for the Stateless OpenPGP Command-Line Interface, as described in
+L<https://datatracker.ietf.org/doc/draft-dkg-openpgp-stateless-cli>.
+
+B<Note>: This is a private module, its API can change at any time.
+
+=cut
+
+package Dpkg::OpenPGP::Backend::SOP 0.01;
 
 use strict;
 use warnings;
-
-our $VERSION = '0.01';
 
 use POSIX qw(:sys_wait_h);
 
@@ -104,5 +118,13 @@ sub inline_sign
     return $self->_sop_exec({ in => $data, out => $inlinesigned },
                             qw(inline-sign --as clearsigned --), $key->handle);
 }
+
+=head1 CHANGES
+
+=head2 Version 0.xx
+
+This is a private module.
+
+=cut
 
 1;

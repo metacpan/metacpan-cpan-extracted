@@ -59,13 +59,13 @@ struct spvm_compiler {
   SPVM_ALLOCATOR* class_file_allocator;
   
   // Line start position
-  char* line_begin_ptr;
+  char* line_begin_ch_ptr;
   
   // Char pointer of current source
   char* ch_ptr;
   
   // Char pointer of current source just before
-  char* before_ch_ptr;
+  char* token_begin_ch_ptr;
   
   // Next double quote start position
   char* next_string_literal_ch_ptr;
@@ -78,6 +78,9 @@ struct spvm_compiler {
   
   // Before token is arrow
   int8_t before_token_is_arrow;
+  
+  // Before token is arrow
+  int8_t previous_token_is_heredoc;
   
   // End of file
   int8_t end_of_file;
@@ -99,7 +102,6 @@ struct spvm_compiler {
   // Starting line the starting class is loaded
   int32_t start_line;
   
-  // Syntax error count
   SPVM_LIST* error_messages;
   
   SPVM_LIST* class_files;

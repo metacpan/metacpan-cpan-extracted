@@ -89,10 +89,9 @@ sub _mode_checkid {
         my @list = $self->args->();
         my %extArgs;
         foreach my $arg (@list) {
-            next unless ( $arg =~ /^openid\.(\w+)\.([\w\.]+)?/ );
-            my $tmp = $1;
-            my $val = $2;
-            $extArgs{$tmp}->{$val} = scalar $self->args->($arg);
+            if ( my ( $tmp, $val ) = $arg =~ /^openid\.(\w+)\.([\w\.]+)?/ ) {
+                $extArgs{$tmp}->{$val} = scalar $self->args->($arg);
+            }
         }
         foreach my $ns ( keys %{ $self->{_extensions} } ) {
             print STDERR "Launching OpenIP $ns hook\n" if (DEBUG);

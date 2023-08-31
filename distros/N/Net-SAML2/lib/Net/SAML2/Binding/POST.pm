@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Binding::POST;
-our $VERSION = '0.73'; # VERSION
+our $VERSION = '0.74'; # VERSION
 
 use Moose;
 use Carp qw(croak);
@@ -100,14 +100,14 @@ Net::SAML2::Binding::POST - HTTP POST binding for SAML
 
 =head1 VERSION
 
-version 0.73
+version 0.74
 
 =head1 SYNOPSIS
 
   my $post = Net::SAML2::Binding::POST->new(
     cacert => '/path/to/ca-cert.pem'
   );
-  my $ret = $post->handle_response(
+  my $xml = $post->handle_response(
     $saml_response
   );
 
@@ -133,8 +133,10 @@ path to the CA certificate for verification
 
 =head2 handle_response( $response )
 
-Decodes and verifies the response provided, which should be the raw
-Base64-encoded response, from the SAMLResponse CGI parameter.
+    my $xml = $self->handle_response($response);
+
+Decodes and verifies the Base64-encoded SAMLResponse CGI parameter.
+Returns the decoded response as XML.
 
 =head2 sign_xml( $request )
 

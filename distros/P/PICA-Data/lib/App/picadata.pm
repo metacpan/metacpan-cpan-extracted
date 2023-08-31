@@ -1,7 +1,7 @@
 package App::picadata;
 use v5.14.1;
 
-our $VERSION = '2.11';
+our $VERSION = '2.12';
 
 use Getopt::Long qw(GetOptionsFromArray :config bundling);
 use Pod::Usage;
@@ -34,6 +34,7 @@ my %TYPES = (
     pixml  => 'PIXML',
     json   => 'JSON',
     ndjson => 'JSON',
+    patch  => 'Patch',
 );
 
 my %COLORS = (

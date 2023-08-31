@@ -85,15 +85,17 @@ Extends L<"Constructors" in Mail::Box::POP3|Mail::Box::POP3/"Constructors">.
   save_on_exit       Mail::Box        <true>
   server_name        Mail::Box::Net   undef
   server_port        Mail::Box::Net   995
+  ssl_options        Mail::Box::POP3  <undef>
   trace              Mail::Reporter   'WARNINGS'
   trusted            Mail::Box        <false>
+  use_ssl            Mail::Box::POP3  <false>
   username           Mail::Box::Net   undef
 
 =over 2
 
 =item access => MODE
 
-=item authenticate => 'LOGIN'|'APOP'|'AUTO'
+=item authenticate => 'LOGIN'|'APOP'|'AUTO'|'OUATH2'|'OAUTH2_SEP'
 
 =item body_delayed_type => CLASS
 
@@ -149,9 +151,13 @@ Extends L<"Constructors" in Mail::Box::POP3|Mail::Box::POP3/"Constructors">.
 
 =item server_port => INTEGER
 
+=item ssl_options => HASH
+
 =item trace => LEVEL
 
 =item trusted => BOOLEAN
+
+=item use_ssl => BOOLEAN
 
 =item username => STRING
 
@@ -597,12 +603,12 @@ implementation with writing.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-POP3 distribution version 3.005,
-built on May 03, 2019. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-POP3 distribution version 3.006,
+built on August 28, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2023 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

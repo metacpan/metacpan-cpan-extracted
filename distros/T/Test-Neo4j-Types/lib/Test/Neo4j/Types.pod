@@ -13,7 +13,19 @@ Test::Neo4j::Types - Tools for testing Neo4j type modules
 
 =head1 VERSION
 
-version 0.02
+version 0.03
+
+=head1 OVERVIEW
+
+This module distribution is experimental. Should the experiment
+be deemed successful, it will eventually be merged with the
+existing L<Neo4j-Types|https://metacpan.org/dist/Neo4j-Types>
+distribution.
+
+You probably shouldn't be using this module at this time, because
+the requirements it checks for are evolving and might shift under
+your feet at any moment. For further information, see
+L<johannessen/neo4j-types Version 2 (milestone)|https://github.com/johannessen/neo4j-types/milestone/1>.
 
 =head1 SYNOPSIS
 
@@ -46,8 +58,10 @@ version 0.02
    return bless [ @$elements ], $class;
  };
  
- # For a point data structure:
- neo4j_point_ok 'Local::Point';
+ # For spatial / temporal data structures:
+ neo4j_point_ok 'Local::Point', sub {...};
+ neo4j_datetime_ok 'Local::Temporal::Instant', sub {...};
+ neo4j_duration_ok 'Local::Temporal::Duration', sub {...};
 
 =head1 DESCRIPTION
 
@@ -57,18 +71,6 @@ methods are provided, they also try to verify that the methods
 actually work as expected. While the checks provided by this
 module certainly won't cover all requirements, they will cover
 many of them.
-
-=head1 OVERVIEW
-
-This module distribution is experimental. Should the experiment
-be deemed successful, it will eventually be merged with the
-existing L<Neo4j-Types|https://metacpan.org/dist/Neo4j-Types>
-distribution.
-
-You probably shouldn't be using this module at this time, because
-the requirements it checks for are evolving and might shift under
-your feet at any moment. For further information, see
-L<johannessen/neo4j-types Version 2 (milestone)|https://github.com/johannessen/neo4j-types/milestone/1>.
 
 =head1 FUNCTIONS
 
@@ -98,6 +100,30 @@ L<Neo4j::Types::DateTime>, but epoch and type are not provided:
    seconds     => 72000,   # 20:00 UTC
    tz_name     => 'America/Los_Angeles',
    tz_offset   => -28800,  # UTC-08
+ };
+
+=head2 neo4j_duration_ok
+
+ sub duration_new ($class, $params) {
+   return bless { ... }, $class;
+ }
+ neo4j_duration_ok $duration_class, \&duration_new;
+ neo4j_duration_ok $duration_class, \&duration_new, $subtest_name;
+
+Verifies that C<$duration_class> is a package that implements
+the interface specified for temporal durations by L<Neo4j::Types>.
+
+C<\&duration_new> must be a reference to a subroutine that can
+construct a new temporal instant of the type C<$duration_class>
+based on the parameters provided in the hash ref C<$params>.
+The parameters have names exactly matching the methods in
+L<Neo4j::Types::Duration>:
+
+ $params = {
+   months      => 18,      # 1.5 years
+   days        => 42,      # 12 weeks
+   seconds     => 172800,  # 48 hours
+   nanoseconds => 0,
  };
 
 =head2 neo4j_node_ok
@@ -157,22 +183,25 @@ other than C<< ->DOES() >> on these references may fail.
 
 =head2 neo4j_point_ok
 
- neo4j_point_ok $point_class;
- neo4j_point_ok $point_class, $subtest_name;
+ sub point_new ($class, $params) {
+   return bless { ... }, $class;
+ }
+ neo4j_point_ok $point_class, \&point_new;
+ neo4j_point_ok $point_class, \&point_new, $subtest_name;
 
 Verifies that C<$point_class> is a package that implements
 the interface specified for spatial points by L<Neo4j::Types>.
 
-Note that unlike the other test tools, this one doesn't
-need a constructor sub reference. L<Neo4j::Types::Point>
-requires one anyway because Point is a Neo4j property type,
-which means it should in theory be possible to construct
-points without using Cypher.
-(However, passing of Point values as parameters is not
-currently implemented in any known CPAN module.)
+C<\&point_new> must be a reference to a subroutine that can
+construct a new node of the type C<$point_class> based
+on the parameters provided in the hash ref C<$params>.
+The parameters have names exactly matching the methods in
+L<Neo4j::Types::Point>:
 
-With all that said, this test tool may change in future, even
-independent of the reasons stated in L</"BUGS AND LIMITATIONS">.
+ $params = {
+   srid        => 4326,
+   coordinates => [ $x, $y, $z ],
+ };
 
 =head2 neo4j_relationship_ok
 

@@ -19,7 +19,7 @@ name: Task-BeLike-PERLANCAR-Used
 provides:
   Task::BeLike::PERLANCAR::Used:
     file: lib/Task/BeLike/PERLANCAR/Used.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Acme::CM::Get: '0'
   Acme::CPAN::Testers::DevelCheckOS: '0'
@@ -2482,7 +2482,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Task-BeLike-PERLANCAR-Used
   homepage: https://metacpan.org/release/Task-BeLike-PERLANCAR-Used
   repository: git://github.com/perlancar/perl-Task-BeLike-PERLANCAR-Used.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

@@ -151,7 +151,7 @@ sub _install_utils {
       ## could be from controller or context
       my $sub = sub {
         if($form->controller->can($util)) {
-          return $form->controller->$util($form->context, @_);
+          return $form->controller->$util(@_);
         } elsif($form->context->can($util)) {
           return $form->context->$util(@_);
         } else {

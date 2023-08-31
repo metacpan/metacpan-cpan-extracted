@@ -3,7 +3,7 @@
 # ABSTRACT: Error in case that libgs1encoders couldn't be initialized
 
 package GS1::SyntaxEngine::FFI::InitException;
-$GS1::SyntaxEngine::FFI::InitException::VERSION = '0.2';
+$GS1::SyntaxEngine::FFI::InitException::VERSION = '0.3';
 use utf8;
 
 use Moose;
@@ -23,7 +23,7 @@ GS1::SyntaxEngine::FFI::InitException - Error in case that libgs1encoders couldn
 
 =head1 VERSION
 
-version 0.2
+version 0.3
 
 =head1 AUTHOR
 

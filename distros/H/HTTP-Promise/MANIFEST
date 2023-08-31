@@ -78,7 +78,7 @@ t/17.serialisation.t
 t/90.coverage.t
 t/91.pod.t
 t/92.manifest.t
-t/92.signature.t
+t/93.signature.t
 t/99.kwalitee.t
 t/mime.types
 t/testin/mignonne-ronsard.txt

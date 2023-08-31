@@ -2051,7 +2051,7 @@ If the entity is of type C<multipart/form-data>, this will transform all of its 
 
 It returns the new L<HTTP::Promise::Body::Form::Data> object upon success, or 0 if there was nothing to be done i the entity is not C<multipart/form-data> for example, or upon error, sets an L<error|Module::Generic/error> and returns C<undef>.
 
-Note that this is memory savvy, because een though it breaks down the parts into an L<HTTP::Promise::Body::Form::Data> object, original entity body that were stored on file remain on file. Each of the L<HTTP::Promise::Body::Form::Data> entry is a field name and its value is an L<HTTP::Promise::Body::Form::Field> object. Thus you could access data such as:
+Note that this is memory savvy, because even though it breaks down the parts into an L<HTTP::Promise::Body::Form::Data> object, original entity body that were stored on file remain on file. Each of the L<HTTP::Promise::Body::Form::Data> entry is a field name and its value is an L<HTTP::Promise::Body::Form::Field> object. Thus you could access data such as:
 
     my $form = $ent->as_form_data;
     my $name = $form->{fullname}->value;

@@ -5,6 +5,9 @@ use Test::More;
 use File::Spec;
 use Cwd qw(getcwd);
 
+$ENV{AUTOMATED_TESTING} || $ENV{IMAGER_AUTHOR_TESTING}
+  or plan skip_all => "manifest only tested under automated or author testing";
+
 my $base_mani = maniread();
 my @base_mani = keys %$base_mani;
 

@@ -2,7 +2,7 @@ package Resource::Silo::Metadata;
 
 use strict;
 use warnings;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 
@@ -64,6 +64,7 @@ my %known_args = (
     ignore_cache    => 1,
     init            => 1,
     literal         => 1,
+    loose_deps      => 1,
     preload         => 1,
     require         => 1,
 );
@@ -121,6 +122,23 @@ sub add {
             .join ", ", map { "'$_'" } @bad
                 if @bad;
         $spec{allowdeps} = { map { $_ => 1 } @$deps };
+    };
+
+    unless ($spec{loose_deps}) {
+        # resources with argument should be allowed to depend on themselves
+        local $self->{resource}{$name} = {}
+            if defined $spec{argument};
+
+        if ($spec{allowdeps}) {
+            my @fwd = grep { !$self->{resource}{$_} } keys %{ $spec{allowdeps} };
+            croak "resource '$name': forward dependencies require 'loose_deps' flag: "
+                .join( ", ", map { "'$_'" } @fwd)
+                    if @fwd;
+        } else {
+            $spec{allowdeps} = {
+                map { $_ => 1 } keys %{ $self->{resource} },
+            };
+        };
     };
 
     croak "resource '$name': 'init' must be a function"

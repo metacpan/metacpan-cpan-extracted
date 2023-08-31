@@ -8,6 +8,8 @@ use Cwd qw(abs_path);
 use File::Temp qw(tempdir);
 use IO::Socket::SSL::Utils;
 use IPC::Open3;
+use Socket qw(AF_INET);
+use Socket6 qw(AF_INET6 inet_pton);
 use Test::More;
 
 sub new {
@@ -50,20 +52,28 @@ sub create_cert_ca {
     $self->create_cert(
 	name => 'root',
 	ca => 1,
+	create_args => {
+	    CA => 1,
+	    purpose => 'sslCA,cRLSign',
+	},
 	%args,
     );
 }
 
 sub create_cert_client {
     my ($self, %args) = @_;
+    my $appuri = delete($args{application_uri})
+	// 'URI:urn:client.p5-opcua-open65241';
 
     $self->create_cert(
 	name => 'client',
 	create_args => {
 	    ext => [{
 		sn => 'subjectAltName',
-		data => 'URI:urn:client.p5-opcua-open65241',
+		data => $appuri,
 	    }],
+	    purpose => 'digitalSignature,keyEncipherment,dataEncipherment,'
+		. 'nonRepudiation,client',
 	},
 	%args,
     );
@@ -71,14 +81,28 @@ sub create_cert_client {
 
 sub create_cert_server {
     my ($self, %args) = @_;
+    my $host   = delete($args{host});
+    my $appuri = delete($args{application_uri})
+	// 'URI:urn:server.p5-opcua-open65241';
+    my $subalt = '';
+
+    if ($host) {
+	if (inet_pton(AF_INET, $host) or inet_pton(AF_INET6, $host)) {
+	    $subalt = "IP:$host,";
+	} else {
+	    $subalt = "DNS:$host,";
+	}
+    }
 
     $self->create_cert(
 	name => 'server',
 	create_args => {
 	    ext => [{
 		sn => 'subjectAltName',
-		data => 'URI:urn:server.p5-opcua-open65241',
+		data => $subalt . $appuri,
 	    }],
+	    purpose => 'digitalSignature,keyEncipherment,dataEncipherment,'
+	    . 'nonRepudiation,server',
 	},
 	%args,
     );
@@ -88,7 +112,9 @@ sub create_cert {
     my ($self, %args) = @_;
     my $issuer      = delete($args{issuer});
     my $name        = delete($args{name}) || die 'no name for cert';
-    my $subject     = delete($args{subject}) // {commonName => $name};
+    my $subject     = delete($args{subject}) // {
+	commonName => "OPCUA::Open62541 $name"
+    };
     my $create_args = delete($args{create_args}) // {};
     my $is_ca       = delete($args{ca});
     my $dir         = $self->{dir};
@@ -103,12 +129,6 @@ sub create_cert {
 	not_after => time() + 365*24*60*60,
 	subject => $subject,
 	$issuer ? (issuer => $issuer) : (),
-	$is_ca ? (
-	    CA => 1,
-	    purpose => 'sslCA,cRLSign'
-	) : (
-	    purpose => 'digitalSignature,keyEncipherment,dataEncipherment',
-	),
 	%$create_args,
     );
 
@@ -249,10 +269,17 @@ Create CA certificate.
 =item $ca->create_cert_client(%args)
 
 Create client certificate.
+The parameter I<application_uri> can be used to change the URI entry in
+SubjectAltName.
 
 =item $ca->create_cert_server(%args)
 
 Create server certificate.
+The parameter I<application_uri> can be used to change the URI entry in
+SubjectAltName.
+The parameter I<host> can be used to automatically create an entry in
+SubjectAltName.
+It will be an IP or a DNS entry depending on the given value.
 
 =item $ca->create_cert(%args)
 

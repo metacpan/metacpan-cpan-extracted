@@ -2,7 +2,7 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.16.1';
+our $VERSION = '2.17.0';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
@@ -156,18 +156,19 @@ sub display {
         $self->logger->debug('Display: confirm detected');
         $skinfile       = 'confirm';
         %templateParams = (
-            AUTH_ERROR      => $req->error,
-            AUTH_ERROR_TYPE => $req->error_type,
-            AUTH_ERROR_ROLE => $req->error_role,
-            AUTH_URL        => $req->{data}->{_url},
-            MSG             => $req->info,
-            HIDDEN_INPUTS   => $self->buildHiddenForm($req),
-            ACTIVE_TIMER    => $req->data->{activeTimer},
-            FORM_ACTION     => $req->data->{confirmFormAction} || "#",
-            FORM_METHOD     => $self->conf->{confirmFormMethod},
-            CHOICE_PARAM    => $self->conf->{authChoiceParam},
-            CHOICE_VALUE    => $req->data->{_authChoice},
-            CHECK_LOGINS    => $self->conf->{portalCheckLogins}
+            AUTH_ERROR                      => $req->error,
+            AUTH_ERROR_TYPE                 => $req->error_type,
+            AUTH_ERROR_ROLE                 => $req->error_role,
+            ( 'AUTH_ERROR_' . $req->error ) => 1,
+            AUTH_URL                        => $req->{data}->{_url},
+            MSG                             => $req->info,
+            HIDDEN_INPUTS                   => $self->buildHiddenForm($req),
+            ACTIVE_TIMER                    => $req->data->{activeTimer},
+            FORM_ACTION  => $req->data->{confirmFormAction} || "#",
+            FORM_METHOD  => $self->conf->{confirmFormMethod},
+            CHOICE_PARAM => $self->conf->{authChoiceParam},
+            CHOICE_VALUE => $req->data->{_authChoice},
+            CHECK_LOGINS => $self->conf->{portalCheckLogins}
               && $req->data->{login},
             ASK_LOGINS        => $req->param('checkLogins')   || 0,
             ASK_STAYCONNECTED => $req->param('stayconnected') || 0,
@@ -186,16 +187,17 @@ sub display {
         $self->logger->debug('Display: IDP choice detected');
         $skinfile       = 'idpchoice';
         %templateParams = (
-            AUTH_ERROR      => $req->error,
-            AUTH_ERROR_TYPE => $req->error_type,
-            AUTH_ERROR_ROLE => $req->error_role,
-            AUTH_URL        => $req->{data}->{_url},
-            HIDDEN_INPUTS   => $self->buildHiddenForm($req),
-            ACTIVE_TIMER    => $req->data->{activeTimer},
-            FORM_METHOD     => $self->conf->{confirmFormMethod},
-            CHOICE_PARAM    => $self->conf->{authChoiceParam},
-            CHOICE_VALUE    => $req->data->{_authChoice},
-            CHECK_LOGINS    => $self->conf->{portalCheckLogins}
+            AUTH_ERROR                      => $req->error,
+            AUTH_ERROR_TYPE                 => $req->error_type,
+            AUTH_ERROR_ROLE                 => $req->error_role,
+            ( 'AUTH_ERROR_' . $req->error ) => 1,
+            AUTH_URL                        => $req->{data}->{_url},
+            HIDDEN_INPUTS                   => $self->buildHiddenForm($req),
+            ACTIVE_TIMER                    => $req->data->{activeTimer},
+            FORM_METHOD                     => $self->conf->{confirmFormMethod},
+            CHOICE_PARAM                    => $self->conf->{authChoiceParam},
+            CHOICE_VALUE                    => $req->data->{_authChoice},
+            CHECK_LOGINS                    => $self->conf->{portalCheckLogins}
               && $req->data->{login},
             ASK_LOGINS        => $req->param('checkLogins')   || 0,
             ASK_STAYCONNECTED => $req->param('stayconnected') || 0,
@@ -219,10 +221,11 @@ sub display {
           for keys %{ $req->{portalHiddenFormValues} // {} };
         $skinfile       = 'info';
         %templateParams = (
-            AUTH_ERROR      => $self->error,
-            AUTH_ERROR_TYPE => $req->error_type,
-            AUTH_ERROR_ROLE => $req->error_role,
-            MSG             => $info,
+            AUTH_ERROR                      => $req->error,
+            AUTH_ERROR_TYPE                 => $req->error_type,
+            AUTH_ERROR_ROLE                 => $req->error_role,
+            ( 'AUTH_ERROR_' . $req->error ) => 1,
+            MSG                             => $info,
             URL           => $req->{urldc} || $self->conf->{portal},  # Fix 2158
             HIDDEN_INPUTS => $self->buildOutgoingHiddenForm( $req, $method ),
             ACTIVE_TIMER  => $req->data->{activeTimer},
@@ -251,11 +254,12 @@ sub display {
         my $id = $req->{sessionInfo}
           ->{ $self->conf->{openIdAttr} || $self->conf->{whatToTrace} };
         %templateParams = (
-            AUTH_ERROR      => $self->error,
-            AUTH_ERROR_TYPE => $req->error_type,
-            AUTH_ERROR_ROLE => $req->error_role,
-            PROVIDERURI     => $p,
-            MSG             => $req->info(),
+            AUTH_ERROR                      => $self->error,
+            AUTH_ERROR_TYPE                 => $req->error_type,
+            AUTH_ERROR_ROLE                 => $req->error_role,
+            ( 'AUTH_ERROR_' . $req->error ) => 1,
+            PROVIDERURI                     => $p,
+            MSG                             => $req->info(),
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -314,7 +318,11 @@ sub display {
             ),
             (
                 $self->conf->{passwordPolicyMinSpeChar} || $self->speChars()
-                ? ( PPOLICY_ALLOWEDSPECHAR => $self->speChars() )
+                ? (
+                    PPOLICY_ALLOWEDSPECHAR      => $self->speChars(),
+                    PPOLICY_ALLOWEDSPECHAR_JSON =>
+                      to_json( $self->speChars(), { allow_nonref => 1 } ),
+                  )
                 : ()
             ),
             (
@@ -406,10 +414,11 @@ sub display {
     {
         $skinfile       = 'error';
         %templateParams = (
-            AUTH_ERROR      => $req->error,
-            AUTH_ERROR_TYPE => $req->error_type,
-            AUTH_ERROR_ROLE => $req->error_role,
-            LOCKTIME        => $req->lockTime(),
+            AUTH_ERROR                      => $req->error,
+            AUTH_ERROR_TYPE                 => $req->error_type,
+            AUTH_ERROR_ROLE                 => $req->error_role,
+            ( 'AUTH_ERROR_' . $req->error ) => 1,
+            LOCKTIME                        => $req->lockTime(),
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -423,11 +432,12 @@ sub display {
         $skinfile = 'login';
         my $login = $req->user;
         %templateParams = (
-            AUTH_ERROR            => $req->error,
-            AUTH_ERROR_TYPE       => $req->error_type,
-            AUTH_ERROR_ROLE       => $req->error_role,
-            AUTH_URL              => $req->{data}->{_url},
-            LOGIN                 => $login,
+            AUTH_ERROR                      => $req->error,
+            AUTH_ERROR_TYPE                 => $req->error_type,
+            AUTH_ERROR_ROLE                 => $req->error_role,
+            ( 'AUTH_ERROR_' . $req->error ) => 1,
+            AUTH_URL                        => $req->{data}->{_url},
+            LOGIN                           => $login,
             DONT_STORE_PASSWORD   => $self->conf->{browsersDontStorePassword},
             CHECK_LOGINS          => $self->conf->{portalCheckLogins},
             ASK_LOGINS            => $req->param('checkLogins')   || 0,
@@ -550,7 +560,11 @@ sub display {
                 ),
                 (
                     $self->conf->{passwordPolicyMinSpeChar} || $self->speChars()
-                    ? ( PPOLICY_ALLOWEDSPECHAR => $self->speChars() )
+                    ? (
+                        PPOLICY_ALLOWEDSPECHAR      => $self->speChars(),
+                        PPOLICY_ALLOWEDSPECHAR_JSON =>
+                          to_json( $self->speChars(), { allow_nonref => 1 } ),
+                      )
                     : ()
                 ),
             );
@@ -608,7 +622,16 @@ sub display {
                     DISPLAY_FINDUSER     => scalar @$fields,
                     MANDATORY            => $mandatory,
                     FIELDS               => $fields,
-                    SPOOFID              => $slogin
+                    SPOOFID              => $slogin,
+
+                    # Hidden inputs and custom scripts may have been modified
+                    # by _buildAuthLoop so we need to update them
+                    HIDDEN_INPUTS => $self->buildHiddenForm($req),
+                    (
+                        $req->data->{customScript}
+                        ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
+                        : ()
+                    ),
                 );
             }
 
@@ -684,30 +707,18 @@ sub staticFile {
 
 sub buildOutgoingHiddenForm {
     my ( $self, $req, $method ) = @_;
-    my @keys = keys %{ $req->{portalHiddenFormValues} };
+    my @extra_keys;
 
     if ( lc $method eq 'get' ) {
-        my $uri          = URI->new( $req->{urldc} );
-        my %query_params = $uri->query_form;
-
-        # Redirection URL contains query string. Before displaying a form,
-        # we must set the query string parameters as form fields so they can
-        # be preserved #2085
-        if (%query_params) {
-            $self->logger->debug(
-"urldc contains query parameters, setting them as hidden form values"
-            );
-            foreach ( keys %query_params ) {
-                $self->setHiddenFormValue( $req, $_, $query_params{$_}, "", 0 );
-            }
-        }
+        my $uri = URI->new( $req->{urldc} );
+        @extra_keys = $uri->query_form;
     }
 
-    return $self->buildHiddenForm($req);
+    return $self->buildHiddenForm( $req, @extra_keys );
 }
 
 sub buildHiddenForm {
-    my ( $self, $req ) = @_;
+    my ( $self, $req, @extra_keys ) = @_;
     my @keys = keys %{ $req->{portalHiddenFormValues} };
     my $val  = '';
 
@@ -719,11 +730,18 @@ sub buildHiddenForm {
             && $self->checkXSSAttack( $_, $req->{portalHiddenFormValues}->{$_} )
           );
 
-        # Build hidden input HTML code
-        # 'id' is removed to avoid warning with Choice
-        #$val .= qq{<input type="hidden" name="$_" id="$_" value="}
         $val .= qq{<input type="hidden" name="$_" value="}
           . $req->{portalHiddenFormValues}->{$_} . '" />';
+    }
+
+    while ( my ( $key, $value ) = splice( @extra_keys, 0, 2 ) ) {
+
+        # Check XSS attacks
+        next
+          if (!$req->data->{safeHiddenFormValues}->{$key}
+            && $self->checkXSSAttack( $key, $value ) );
+
+        $val .= qq{<input type="hidden" name="$key" value="$value" />};
     }
 
     return $val;

@@ -3,7 +3,7 @@ package Export::These;
 use strict;
 use warnings;
 
-our $VERSION="v0.1.0";
+our $VERSION="v0.1.1";
 
 sub import {
   my $package=shift;
@@ -83,8 +83,8 @@ sub import {
         my \$name= s/^://r;
 
         my \$group=\$ref_tags->{\$name};
-        die  "Tag \$name does not exists" unless \$group;
-        push \@syms, \@\$group
+        #die  "Tag \$name does not exists" unless \$group;
+        push \@syms, \@\$group if \$group;
       }
       else {
         #non tag symbol
@@ -122,6 +122,7 @@ sub import {
 
   sub import {
     my \$package=shift;
+    \$Exporter::ExportLevel//=0;
     my \$target=(caller(\$Exporter::ExportLevel))[0];
 
     $exporter->_self_export(\$target, \@_);

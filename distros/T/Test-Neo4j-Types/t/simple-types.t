@@ -6,7 +6,7 @@ use lib qw(lib);
 use Test::More 0.88;
 use Test::Neo4j::Types;
 
-plan tests => 5;
+plan tests => 6;
 
 
 neo4j_node_ok 'Neo4j_Test::Node', \&Neo4j_Test::Node::new;
@@ -15,9 +15,11 @@ neo4j_relationship_ok 'Neo4j_Test::Rel', \&Neo4j_Test::Rel::new;
 
 neo4j_path_ok 'Neo4j_Test::Path', \&Neo4j_Test::Path::new;
 
-neo4j_point_ok 'Neo4j_Test::Point';
+neo4j_point_ok 'Neo4j_Test::Point', \&Neo4j_Test::Point::new;
 
 neo4j_datetime_ok 'Neo4j_Test::DateTime', \&Neo4j_Test::DateTime::new;
+
+neo4j_duration_ok 'Neo4j_Test::Duration', \&Neo4j_Test::Duration::new;
 
 
 done_testing;
@@ -87,12 +89,11 @@ sub DOES { $_[1] eq 'Neo4j::Types::Point' }
 sub srid { shift->[1] }
 sub coordinates { @{shift->[0]} }
 sub new {
-	my ($class, $srid, @coordinates) = @_;
-	my $dim = { 4326 => 2, 4979 => 3, 7203 => 2, 9157 => 3 }->{$srid // 0};
-	die "Unsupported SRID ".($srid//"") unless defined $dim;
-	die "Points with SRID $srid must have $dim dimensions" if @coordinates < $dim;
-	die unless defined $dim && @coordinates >= $dim;  # this alone is enough
-	return bless [ [@coordinates[0 .. $dim - 1]], $srid ], $class;
+	my ($class, $params) = @_;
+	bless [
+		$params->{coordinates},
+		$params->{srid},
+	], $class;
 }
 
 
@@ -102,23 +103,60 @@ sub DOES { $_[1] eq 'Neo4j::Types::DateTime' }
 sub days { shift->[0] }
 sub nanoseconds { shift->[1] }
 sub seconds { shift->[2] }
-sub tz_name { shift->[3] }
 sub tz_offset { shift->[4] }
+sub tz_name {
+	my $self = shift;
+	if (! defined $self->[3] && defined $self->[4] && $self->[4] % 3600 == 0) {
+		return 'Etc/GMT' if $self->[4] == 0;
+		return sprintf 'Etc/GMT%+i', $self->[4] / -3600
+			if $self->[4] <= 14*3600 && $self->[4] >= -12*3600;
+	}
+	return $self->[3];
+}
 sub epoch { my $self = shift; ($self->days//0) * 86400 + ($self->seconds//0) }
 sub type {
 	my $self = shift;
-	return "DATE" if ! defined $self->seconds;
-	my $type = defined $self->days ? "DATETIME" : "TIME";
-	my $zone = defined $self->tz_offset || defined $self->tz_name ? "ZONED" : "LOCAL";
-	return "$zone $type";
+	my $days      = defined $self->days;
+	my $seconds   = defined $self->seconds;
+	my $tz_offset = defined $self->tz_offset;
+	my $tz_name   = defined $self->tz_name;
+	return 'DATE'
+		if   $days && ! $seconds && ! $tz_offset && ! $tz_name;
+	return 'LOCAL TIME'
+		if ! $days &&   $seconds && ! $tz_offset && ! $tz_name;
+	return 'ZONED TIME'
+		if ! $days &&   $seconds &&   $tz_offset;
+	return 'LOCAL DATETIME'
+		if   $days &&   $seconds && ! $tz_offset && ! $tz_name;
+	return 'ZONED DATETIME'
+		if   $days &&   $seconds &&   ($tz_offset || $tz_name);
+	die 'Type inconsistent';
 }
 sub new {
 	my ($class, $params) = @_;
 	bless [
 		$params->{days},
-		$params->{nanoseconds},
-		$params->{seconds},
+		$params->{nanoseconds} // (defined $params->{seconds} ? 0 : undef),
+		$params->{seconds} // (defined $params->{nanoseconds} ? 0 : undef),
 		$params->{tz_name},
 		$params->{tz_offset},
+	], $class;
+}
+
+
+package Neo4j_Test::Duration;
+sub DOES { $_[1] eq 'Neo4j::Types::Duration' }
+
+sub months { shift->[0] }
+sub days { shift->[1] }
+sub seconds { shift->[2] }
+sub nanoseconds { shift->[3] }
+sub new {
+	my ($class, $params) = @_;
+	bless [
+		$params->{months} // 0,
+		$params->{days} // 0,
+		$params->{seconds} // 0,
+		$params->{nanoseconds} // 0,
 	], $class;
 }

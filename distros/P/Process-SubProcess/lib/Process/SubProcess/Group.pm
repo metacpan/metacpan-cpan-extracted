@@ -1,11 +1,10 @@
-#!/usr/bin/perl
-
+#---------------------------------
 # @author Bodo (Hugo) Barwich
-# @version 2020-09-20
+# @version 2023-08-25
 # @package SubProcess Management
 # @subpackage Process/SubProcess/Group.pm
 
-# This Module defines a Class to manage multiple SubProcess Objects read their Output and Errors
+# This Module defines a class to manage multiple SubProcess Objects read their Output and Errors
 #
 #---------------------------------
 # Requirements:
@@ -28,6 +27,12 @@ BEGIN {
 #==============================================================================
 # The Process::SubProcess::Group Package
 
+=head1 NAME
+
+Process::SubProcess::Group - Module to manage and run multiple Sub Processes at once
+
+=cut
+
 package Process::SubProcess::Group;
 
 #----------------------------------------------------------------------------
@@ -38,6 +43,17 @@ use Scalar::Util 'blessed';
 use Data::Dump qw(dump);
 
 use Process::SubProcess;
+
+=head1 DESCRIPTION
+
+C<Process::SubProcess::Group> implements a class to manage multiple Sub Process
+and run them at once while keeping their Output and Errors related to each command.
+
+The Idea of this API is to launch Sub Processes and keep track of all Output
+on C<STDOUT>, C<STDERR>, the C<EXIT CODE> and possible System Errors at Launch Time
+in an object oriented manner.
+
+=cut
 
 #----------------------------------------------------------------------------
 #Constructors

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Message.pm
-## Version v0.1.1
+## Version v0.1.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/21
-## Modified 2022/08/06
+## Modified 2023/08/15
 ## All rights reserved.
 ## 
 ## 
@@ -26,7 +26,7 @@ BEGIN
     our $CRLF = "\015\012";
     # HTTP/1.0, HTTP/1.1, HTTP/2
     our $HTTP_VERSION  = qr/(?<http_protocol>HTTP\/(?<http_version>(?<http_vers_major>[0-9])(?:\.(?<http_vers_minor>[0-9]))?))/;
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
 };
 
 use strict;
@@ -100,6 +100,13 @@ sub init
     else
     {
         $headers = HTTP::Promise::Headers->new;
+    }
+    
+    if( !defined( $content ) && $headers->exists( 'Content' ) )
+    {
+        ( $content ) = $headers->remove_header( 'Content' );
+        # $content = $headers->header( 'Content' );
+        # $headers->remove_header( 'Content' );
     }
     
     if( defined( $content ) )
@@ -255,6 +262,46 @@ sub add_part
     
     $ent->parts->push( @new );
     return( $self );
+}
+
+sub as_form_data
+{
+    my( $self, $eol ) = @_;
+    my $type = $self->headers->type;
+    $type = lc( $type // '' );
+    $self->_load_class( 'HTTP::Promise::Body::Form' ) || return( $self->pass_error );
+    my $payload = $self->decoded_content_utf8->scalar;
+    my $uri;
+    if( $type eq 'multipart/form-data' )
+    {
+        return( $self->entity->as_form_data );
+    }
+    elsif( $type eq 'application/json' )
+    {
+        return( HTTP::Promise::Body::Form->new ) unless( length( $payload ) );
+        try
+        {
+            my $hash = $self->new_json->decode( $payload );
+            return( HTTP::Promise::Body::Form->new( $hash ) );
+        }
+        catch( $e )
+        {
+            return( $self->error( "Error trying to decode the JSON payload: $e" ) );
+        }
+    }
+    elsif( $self->can( 'uri' ) && 
+        ( $uri = $self->uri ) && 
+        $uri->query && 
+        ( !defined( $payload ) || !length( $payload ) ) )
+    {
+        my $hash = $uri->query_form_hash;
+        return( HTTP::Promise::Body::Form->new( $hash ) );
+    }
+    # elsif( $type eq 'application/x-www-form-urlencoded' )
+    else
+    {
+        return( length( $payload // '' ) ? HTTP::Promise::Body::Form->new( $payload ) : HTTP::Promise::Body::Form->new );
+    }
 }
 
 sub as_string
@@ -506,6 +553,10 @@ sub decoded_content
         $opts->{binmode} = 'raw';
     }
     my $content = $body->as_string( ( scalar( keys( %$opts ) ) ? $opts : () ) );
+    if( !defined( $content ) )
+    {
+        return( $self->pass_error( $body->error ) );
+    }
     if( defined( $binmode ) )
     {
         $self->_load_class( 'Encode' ) || return( $self->pass_error );
@@ -982,7 +1033,7 @@ sub _utf8_downgrade
         if( defined( &utf8::downgrade ) )
         {
             utf8::downgrade( $_[0], 1 ) ||
-                return( $self->error( 'HTTP::Message content must be bytes' ) );
+                return( $self->error( 'HTTP::Promise::Message content must be bytes' ) );
         }
     }
     catch( $e )
@@ -1074,7 +1125,7 @@ HTTP::Promise::Message - HTTP Message Class
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 
@@ -1263,6 +1314,18 @@ or, using the L<name attribute|HTTP::Promise::Entity/name>:
 Note that you can always set an L<entity name|HTTP::Promise::Entity/name>, and it will only be used if the HTTP message Content-Type is of type C<multipart/form-data>, unless you set yourself the C<Content-Disposition> header value.
 
 It returns the current object, or upon error, sets an L<error|Module::Generic/error> and returns C<undef>.
+
+=head2 as_form_data
+
+This will read the body of the HTTP entity and return it as an object of key-value pairs with the module L<HTTP::Promise::Body::Form>
+
+This supports HTTP C<Content-Type> C<multipart/form-data>, C<application/json>, C<application/x-www-form-urlencoded>, or in the case of HTTP method C<GET>, C<HEAD>, or C<DELETE>, it will use any query string parameters, and return a new L<HTTP::Promise::Body::Form> object.
+
+It defaults to C<application/x-www-form-urlencoded>. Upon error, it will set an L<HTTP::Promise::Exception> and return C<undef> in scalar context, or an empty list in list context.
+
+The way this works is it checks first for C<multipart/form-data>, then C<application/json>, and for query strings only if there is no HTTP body content, and else it fallbacks to C<application/x-www-form-urlencoded>.
+
+This means you must be careful if you send or receive C<JSON> data to properly set the C<Content-Type> to C<application/json>
 
 =head2 as_string
 
@@ -1536,6 +1599,8 @@ This is a no-op since it is superseded by its inheriting classes L<HTTP::Promise
 Sets or gets the HTTP protocol version, something like C<1.0>, or C<1.1>, or maybe C<2>
 
 This returns a L<number object|Module::Generic::Number>
+
+=for Pod::Coverage STORABLE_thaw_post_processing
 
 =head1 AUTHOR
 

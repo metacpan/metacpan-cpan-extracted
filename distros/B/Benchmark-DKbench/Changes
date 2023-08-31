@@ -1,0 +1,9 @@
+Revision history for Benchmark-DKbench
+
+2.0     2023-08-28
+        Rewritten with more benchmarks and multi-threading.
+        First CPAN release.
+
+1.0     2021-12-21
+        First version.
+

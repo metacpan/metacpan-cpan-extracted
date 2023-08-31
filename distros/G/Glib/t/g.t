@@ -96,7 +96,11 @@ SKIP: {
 	$key_file->set_comment('locales', 'mystring', 'comment');
 	like ($key_file->get_comment('locales', 'mystring'), qr/^comment$/);
 	$key_file->set_comment('locales', undef, "another comment\n");
-	is ($key_file->get_comment('locales', undef), "#another comment\n#");
+	is ($key_file->get_comment('locales', undef),
+		Glib::major_version > 2 ||
+		(Glib::major_version == 2 && Glib::minor_version >= 77) ?
+		"another comment\n" : "#another comment\n#"
+	);
 	$key_file->set_comment(undef, undef, 'one comment more');
 	like ($key_file->get_comment(undef, undef), qr/^one comment more$/);
 	$key_file->set_boolean($start_group, 'boolkey', FALSE);

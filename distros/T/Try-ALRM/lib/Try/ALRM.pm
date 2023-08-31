@@ -3,7 +3,7 @@ use warnings;
 
 package Try::ALRM;
 
-our $VERSION = q{0.8};
+our $VERSION = q{0.82};
 
 use Exporter qw/import/;
 our @EXPORT    = qw(try_once retry ALRM finally timeout tries);
@@ -112,8 +112,7 @@ __END__
 
 =head1 NAME
 
-Try::ALRM - Provides C<try_once> and C<retry> semantics to C<CORE::alarm>, similar to
-L<Try::Tiny>.
+Try::ALRM - Provides try/catch-like semantics for an ALRM thrown by CORE::alarm
 
 =head1 SYNOPSIS
 
@@ -127,7 +126,7 @@ The primary method in this module is meant to be C<retry>,
     ALRM {
       my ($attempts) = @_;                # @_ is populated as described in this line
       printf qq{\tTIMED OUT};
-      if ( $attempt < tries ) {
+      if ( $attempts < tries ) {
           printf qq{ - Retrying ...\n};
       }
       else {
@@ -135,7 +134,7 @@ The primary method in this module is meant to be C<retry>,
       }
     }
     finally {
-      my ( $attempts, $success ) = @_;    # Note: @_ is populated as described in this line when called with retry
+      my ( $attempts, $successful ) = @_; # Note: @_ is populated as described in this line when called with retry
       my $tries   = tries;                # "what was the limit on number of tries?" Here it will be 4
       my $timeout = timeout;              # "what was the timeout allowed?" Here it will be 3
 
@@ -193,9 +192,9 @@ Which is essentially equivalent to just,
 
 =head1 DESCRIPTION
 
-Provides I<try/catch>-like semantics for handling code being guarded by
-C<alarm>. Because it's localized and I<probably> expected, C<ALRM> signals
-can be treated as exceptions.
+C<Try::ALRM> provides I<try/catch>-like semantics for handling code being
+guarded by C<alarm>. Because it's localized and I<probably> expected, C<ALRM>
+signals can be treated as exceptions.
 
 C<alarm> is extremely useful, but it can be cumbersome do add in code. The
 goal of this module is to make it more idiomatic, and therefore more accessible.

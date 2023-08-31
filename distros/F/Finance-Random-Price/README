@@ -1,0 +1,106 @@
+NAME
+    Finance::Random::Price - Perl class for creating random image.
+
+SYNOPSIS
+     use Finance::Random::Price;
+
+     my $obj = Finance::Random::Price->new(%parameters);
+     my $price = $obj->random;
+
+METHODS
+  "new"
+     my $obj = Finance::Random::Price->new(%parameters);
+
+    Constructor.
+
+    *       "currencies"
+
+            Reference to array with possible currencies.
+
+            Default value is ['CZK'].
+
+    *       "decimal_num"
+
+            Number of decimal characters in number. Possible values are
+            undef, 1 or 2.
+
+            Default value is undef.
+
+    *       "min"
+
+            Minimal value for random price.
+
+            Default value is 0.
+
+    *       "max"
+
+            Maximal value for random price.
+
+            Default value is 100.
+
+    Returns instance of object.
+
+  "random"
+     my $price = $obj->random;
+
+    Get random price.
+
+    Returns Data::Currency object.
+
+ERRORS
+     new():
+             Parameter 'decimal_num' must be a number.
+             Parameter 'decimal_num' must be greater than 0.
+             Parameter 'decimal_num' must be lesser than 3.
+             Parameter 'min' is required.
+             Parameter 'min' must be a number.
+             Parameter 'max' is required.
+             Parameter 'max' must be a number.
+             Parameter 'max' must be greater than parameter 'min'.
+             From Class::Utils:
+                     Unknown parameter '%s'.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Finance::Random::Price;
+
+     # Object.
+     my $obj = Finance::Random::Price->new(
+             'currencies' => ['USD', 'EUR'],
+             'min' => 99,
+             'max' => 101,
+     );
+
+     # Print random price.
+     print $obj->random."\n";
+
+     # Output like:
+     # EUR100,00
+ 
+     # Output like:
+     # $99.00
+ 
+     # Output like:
+     # $101.00
+
+DEPENDENCIES
+    Class::Utils, Data::Currency, Error::Pure.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Finance-Random-Price>.
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

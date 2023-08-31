@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 keywords:
   - dpkg
   - debian
@@ -28,6 +28,9 @@ provides:
   Dpkg::Build::Info:
     file: lib/Dpkg/Build/Info.pm
     version: '1.02'
+  Dpkg::BuildAPI:
+    file: lib/Dpkg/BuildAPI.pm
+    version: '0.01'
   Dpkg::BuildEnv:
     file: lib/Dpkg/BuildEnv.pm
     version: '0.01'
@@ -87,7 +90,7 @@ provides:
     version: '1.00'
   Dpkg::Control::FieldsCore:
     file: lib/Dpkg/Control/FieldsCore.pm
-    version: '1.01'
+    version: '1.02'
   Dpkg::Control::Hash:
     file: lib/Dpkg/Control/Hash.pm
     version: '1.00'
@@ -95,7 +98,8 @@ provides:
     file: lib/Dpkg/Control/HashCore.pm
     version: '1.02'
   Dpkg::Control::HashCore::Tie:
-    file: lib/Dpkg/Control/HashCore.pm
+    file: lib/Dpkg/Control/HashCore/Tie.pm
+    version: '0.01'
   Dpkg::Control::Info:
     file: lib/Dpkg/Control/Info.pm
     version: '1.01'
@@ -196,7 +200,8 @@ provides:
     file: lib/Dpkg/Shlibs/Objdump.pm
     version: '0.01'
   Dpkg::Shlibs::Objdump::Object:
-    file: lib/Dpkg/Shlibs/Objdump.pm
+    file: lib/Dpkg/Shlibs/Objdump/Object.pm
+    version: '0.01'
   Dpkg::Shlibs::Symbol:
     file: lib/Dpkg/Shlibs/Symbol.pm
     version: '0.01'
@@ -248,9 +253,6 @@ provides:
   Dpkg::Substvars:
     file: lib/Dpkg/Substvars.pm
     version: '2.01'
-  Dpkg::Vars:
-    file: lib/Dpkg/Vars.pm
-    version: '0.03'
   Dpkg::Vendor:
     file: lib/Dpkg/Vendor.pm
     version: '1.02'
@@ -276,11 +278,11 @@ recommends:
   File::FcntlLock: '0'
   Locale::gettext: '0'
 requires:
-  perl: v5.28.1
+  perl: v5.32.1
 resources:
   bugtracker: https://bugs.debian.org/src:dpkg
   homepage: https://wiki.debian.org/Teams/Dpkg
   license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
   repository: https://git.dpkg.org/git/dpkg/dpkg.git
-version: v1.21.22
+version: v1.22.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

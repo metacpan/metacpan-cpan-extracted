@@ -21,7 +21,9 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SAML_SLO_ERROR
 );
 
-our $VERSION = '2.0.16';
+with 'Lemonldap::NG::Portal::Lib::LazyLoadedConfiguration';
+
+our $VERSION = '2.16.3';
 
 # PROPERTIES
 
@@ -211,16 +213,17 @@ sub loadService {
         $serviceCertificate
     );
 
+    unless ($server) {
+        $self->logger->error('Unable to create Lasso server');
+        return 0;
+    }
+
     # Signature method
     my $method = $self->conf->{samlServiceSignatureMethod} || 'RSA_SHA1';
     $server->signature_method( $self->getSignatureMethod($method) );
     $self->logger->debug("Set $method as SAML server signature method ");
 
     # Log
-    unless ($server) {
-        $self->logger->error('Unable to create Lasso server');
-        return 0;
-    }
     $self->logger->debug("Service created");
 
     return $server;
@@ -553,31 +556,39 @@ sub lazy_load_entityid {
     unless ($provider) {
         $self->logger->debug("Lazy loading provider $entityID");
 
-        $self->lazy_load_metadata($entityID);
+        return $self->lazy_load_config($entityID);
     }
 }
 
-sub lazy_load_metadata {
+sub load_config {
     my ( $self, $entityID ) = @_;
 
     my $config = {};
     $self->p->processHook( {}, 'getSamlConfig', $entityID, $config );
 
+    my $info;
     if ( $config->{sp_metadata} ) {
-        return $self->load_sp_metadata(
+        $info->{sp_confKey} = $config->{sp_confKey};
+        $self->load_sp_metadata(
             $config->{sp_confKey}, $config->{sp_metadata},
             $entityID,             $config->{sp_attributes},
             $config->{sp_options}, $config->{sp_macros},
         );
+
     }
 
     if ( $config->{idp_metadata} ) {
-        return $self->load_idp_metadata(
+        $info->{idp_confKey} = $config->{idp_confKey};
+        $self->load_idp_metadata(
             $config->{idp_confKey}, $config->{idp_metadata},
             $entityID,              $config->{idp_attributes},
             $config->{idp_options}
         );
     }
+
+    my $ttl = $config->{ttl};
+    return { ( $ttl ? ( ttl => $ttl ) : () ),
+        ( $info ? ( info => $info ) : () ) };
 }
 
 # This method returns the configuration info for the given provider
@@ -787,16 +798,27 @@ sub createServer {
       = @_;
     my $server;
 
+    # https://dev.entrouvert.org/issues/51415
+    my $save_env = $ENV{'SSL_CERT_FILE'};
+    $ENV{'SSL_CERT_FILE'} = "/dev/null";
+
     eval {
         $server = Lasso::Server::new_from_buffers( $metadata, $private_key,
             $private_key_password, $certificate );
 
         # Set private key for encryption
-        if ($private_key_enc) {
+        if ( $server && $private_key_enc ) {
             Lasso::Server::set_encryption_private_key_with_password( $server,
                 $private_key_enc, $private_key_enc_password );
         }
     };
+
+    if ( defined $save_env ) {
+        $ENV{'SSL_CERT_FILE'} = $save_env;
+    }
+    else {
+        delete $ENV{'SSL_CERT_FILE'};
+    }
 
     if ($@) {
         $self->checkLassoError($@);
@@ -2658,7 +2680,7 @@ sub sendLogoutResponseToServiceProvider {
 
         # Redirect user to response URL
         my $slo_url = $logout->msg_url;
-        return [ 302, [ Location => $slo_url ], [] ];
+        return [ 302, [ Location => URI->new($slo_url)->as_string ], [] ];
     }
 
     # HTTP-POST

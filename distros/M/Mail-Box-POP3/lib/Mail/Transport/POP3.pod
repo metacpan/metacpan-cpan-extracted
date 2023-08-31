@@ -56,6 +56,7 @@ will return C<undef>.
   port          Mail::Transport  110
   proxy         Mail::Transport  undef
   retry         Mail::Transport  <false>
+  ssl_options                    <undef>
   timeout       Mail::Transport  120
   trace         Mail::Reporter   'WARNINGS'
   use_ssl                        <false>
@@ -64,12 +65,16 @@ will return C<undef>.
 
 =over 2
 
-=item authenticate => 'LOGIN'|'APOP'|'AUTO'
+=item authenticate => 'LOGIN'|'APOP'|'AUTO'|'OAUTH2'|'OAUTH2_SEP'
 
 Authenthication method.  The standard defines two methods, named LOGIN and
 APOP.  The first sends the username and password in plain text to the server
 to get permission, the latter encrypts this data using MD5.  When AUTO is
 used, first APOP is tried, and then LOGIN.
+
+[3.006] OAUTH* requires the authorization token to be passed as Password.
+Microsoft Office365 needs C<OAUTH2_SEP>, where other oauth2 implementations
+use C<OAUTH2>.
 
 =item executable => FILENAME
 
@@ -87,15 +92,20 @@ used, first APOP is tried, and then LOGIN.
 
 =item retry => NUMBER|undef
 
+=item ssl_options => HASH
+
+Unless overruled, C<verify_hostname> will be set to false and
+C<SSL_verify_mode> to C<SSL_VERIFY_NONE}>
+
+You can also set the SSL parameters via IO::Socket::SSL subroutine set_defaults.
+Connections will get restarted when they are lost: you have to keep the
+defaults in place during POP actions.
+
 =item timeout => SECONDS
 
 =item trace => LEVEL
 
 =item use_ssl => BOOLEAN
-
-To set the SSL parameters, use IO::Socket::SSL subroutine set_defaults.  Connections
-will get restarted when they are lost: you have to keep the defaults in place
-during POP actions.
 
 =item username => STRING
 
@@ -108,6 +118,8 @@ during POP actions.
 =head2 Attributes
 
 =over 4
+
+=item $obj-E<gt>B<SSLOptions>()
 
 =item $obj-E<gt>B<useSSL>()
 
@@ -428,12 +440,12 @@ service on the specified port.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-POP3 distribution version 3.005,
-built on May 03, 2019. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-POP3 distribution version 3.006,
+built on August 28, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2023 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

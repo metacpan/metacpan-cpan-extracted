@@ -15,24 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Checksums;
-
-use strict;
-use warnings;
-
-our $VERSION = '1.04';
-our @EXPORT = qw(
-    checksums_is_supported
-    checksums_get_list
-    checksums_get_property
-);
-
-use Exporter qw(import);
-use Digest;
-
-use Dpkg::Gettext;
-use Dpkg::ErrorHandling;
-
 =encoding utf8
 
 =head1 NAME
@@ -44,6 +26,25 @@ Dpkg::Checksums - generate and manipulate file checksums
 This module provides a class that can generate and manipulate
 various file checksums as well as some methods to query information
 about supported checksums.
+
+=cut
+
+package Dpkg::Checksums 1.04;
+
+use strict;
+use warnings;
+
+our @EXPORT = qw(
+    checksums_is_supported
+    checksums_get_list
+    checksums_get_property
+);
+
+use Exporter qw(import);
+use Digest;
+
+use Dpkg::Gettext;
+use Dpkg::ErrorHandling;
 
 =head1 FUNCTIONS
 
@@ -227,6 +228,7 @@ sub add_from_string {
 	    error(g_('invalid line in %s checksums string: %s'),
 		  $alg, $checksum);
 	}
+        ## no critic (RegularExpressions::ProhibitCaptureWithoutTest)
 	my ($sum, $size, $file) = ($1, $2, $3);
 	if (not $opts{update} and exists($checksums->{$file}{$alg})
 	    and $checksums->{$file}{$alg} ne $sum) {

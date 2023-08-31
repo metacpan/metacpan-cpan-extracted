@@ -1,13 +1,13 @@
 use strict;
 use warnings;
 package Net::SAML2::Protocol::Artifact;
-our $VERSION = '0.73'; # VERSION
+our $VERSION = '0.74'; # VERSION
 
 use Moose;
 use MooseX::Types::DateTime qw/ DateTime /;
 use DateTime::Format::XSD;
 use Net::SAML2::XML::Util qw/ no_comments /;
-use XML::LibXML;
+use XML::LibXML::XPathContext;
 
 with 'Net::SAML2::Role::ProtocolMessage';
 
@@ -114,7 +114,7 @@ Net::SAML2::Protocol::Artifact - SAML2 artifact object
 
 =head1 VERSION
 
-version 0.73
+version 0.74
 
 =head1 SYNOPSIS
 

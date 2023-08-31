@@ -13,10 +13,10 @@ use feature qw(state lexical_subs current_sub);
 package Spreadsheet::Edit;
 
 # Allow "use <thismodule> <someversion>;" in development sandbox to not bomb
-{ no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 998.999; }
+{ no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
 
-our $VERSION = '1000.001'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-06-28'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.004'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-08-28'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # FIXME: cmd_nesting does nothing except prefix >s to log messages.
 #        Shouldn't it skip that many "public" call frames???
@@ -208,7 +208,7 @@ use Spreadsheet::Edit::Log qw/log_call fmt_call log_methcall fmt_methcall
                               btw oops/;
 
 use Data::Dumper ();
-use Data::Dumper::Interp 5.019;
+use Data::Dumper::Interp 6.002 qw/:all/;
 
 use Carp;
 our @CARP_NOT = qw(Spreadsheet::Edit
@@ -1825,7 +1825,7 @@ sub title_rx(;$@) {
   } else {
     # N.B. undef arg means there are no titles
     $rx = shift;
-    my $notie = shift() if u($_[0]) eq "_notie"; # during auto-detect probes
+    my $notie; $notie = shift() if u($_[0]) eq "_notie"; # during auto-detect probes
     croak "Extraneous argument(s) to title_rx: ".avis(@_) if @_;
 
     if (defined $rx) {
@@ -1919,7 +1919,7 @@ sub _autodetect_title_rx {
         my @shortlist = grep{ $_->[0] >= $first_cx && $_->[0] <= $last_cx }
                         @list;
         if (@shortlist == 0) {
-          push @nd_reasons, ivis 'rx $rx: Matched \'$spec\' but in unacceptable cx '.alvis(map{$_->[0]} @list);
+          push @nd_reasons, ivis 'rx $rx: Matched \'$spec\' but in unacceptable cx '.avisl(map{$_->[0]} @list);
           next RX
         }
         if (! grep{ $_->[1] =~ /title/i } @shortlist) {
@@ -2585,6 +2585,7 @@ sub read_spreadsheet($;@) {
     $hash = OpenAsCsv(
                    inpath => $inpath,
                    debug => $$self->{debug},
+                   silent => $$self->{silent},
                    verbose => ($$self->{verbose} || $$self->{debug}),
                    %$opthash, # all our opts are valid here
              );
@@ -2675,7 +2676,7 @@ sub write_csv(*;@) {
       #removed above... Text::CSV::known_attributes(),
       qw/verbose silent debug/,
     );
-    croak "Unrecognized OPTION(s): ",alvisq(keys %notok) if %notok;
+    croak "Unrecognized OPTION(s): ",avislq(keys %notok) if %notok;
   }
 
   $opts->{iolayers} //= $$self->{iolayers} // "";
@@ -2936,7 +2937,7 @@ use parent 'Tie::Array';
 use Carp;
 #our @CARP_NOT = qw(Tie::Indirect Tie::Indirect::Array
 #                   Tie::Indirect::Hash Tie::Indirect::Scalar);
-use Data::Dumper::Interp qw/visnew
+use Data::Dumper::Interp 6.004 qw/visnew
                     vis  viso  avis  alvis  ivis  dvis  hvis  hlvis
                     visq visoq avisq alvisq ivisq dvisq hvisq hlvisq
                     addrvis rvis rvisq u quotekey qsh qshlist qshpath/;

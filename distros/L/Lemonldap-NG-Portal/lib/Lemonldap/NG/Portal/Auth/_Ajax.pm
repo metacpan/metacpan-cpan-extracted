@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
 );
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.17.0';
 
 # addUnauthRoute/addAuthRoute are provided by deriving your plugin from
 # 'Lemonldap::NG::Portal::Main::Auth' or 'Lemonldap::NG::Portal::Main::Plugin'
@@ -47,14 +47,21 @@ around 'init' => sub {
     my $orig = shift;
     my $self = shift;
 
-    $self->addUnauthRoute(
-        ( 'auth' . $self->auth_id ) => '_auth_route',
-        ['GET']
-    );
+    my $route_name = 'auth' . $self->auth_id;
 
-    # Used for session upgrade/reauthn
-    $self->addAuthRoute( ( 'auth' . $self->auth_id ) => 'auth_route', ['GET'] );
+    # Try to avoid a warning in logs
+    unless ( $self->p->unAuthRoutes->{GET}->{$route_name} ) {
+        $self->addUnauthRoute(
+            $route_name => '_auth_route',
+            ['GET']
+        );
 
+        # Used for session upgrade/reauthn
+        $self->addAuthRoute(
+            $route_name => '_auth_route',
+            ['GET']
+        );
+    }
     return $self->$orig();
 };
 

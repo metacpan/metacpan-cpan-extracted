@@ -10,13 +10,13 @@ use utf8;
 use Object::Pad 0.800;
 use Object::Pad ':experimental(adjust_params)';
 
-package App::sdview::Output::Tickit 0.01;
+package App::sdview::Output::Tickit 0.02;
 class App::sdview::Output::Tickit
    :strict(params);
 
 use constant format => "tickit";
 
-use App::sdview::Style;
+use App::sdview::Style 0.12;
 
 =head1 NAME
 
@@ -34,6 +34,53 @@ This output module provides an interactive terminal-viewer for rendering
 documents in L<App::sdview>, showing formatted information on the terminal.
 It uses L<Tickit> to provide the terminal interactions.
 
+=head2 Keybindings
+
+=over 4
+
+=item *
+
+C<Home> - scroll to top
+
+=item *
+
+C<Backspace> - scroll up a page
+
+=item *
+
+C<PageUp> - scroll up half a page
+
+=item *
+
+C<Up> - scroll up a line
+
+=item *
+
+C<Down> - scroll down a line
+
+=item *
+
+C<PageDown> - scroll down half a page
+
+=item *
+
+C<Space> - scroll down a page
+
+=item *
+
+C<End> - scroll to bottom
+
+=item *
+
+C<F9> - open the outline view popup. Clicking on an entry will jump directly
+to it.
+
+=item
+
+C<q> - exit
+
+=back
+
 =cut
 
 # Override default output format
@@ -43,17 +90,20 @@ $App::sdview::DEFAULT_OUTPUT = "tickit"
 
 field $t;
 field $scroller;
+field $outlinetree;
 ADJUST
 {
    # Lazy load all the Tickit modules in here
 
    require Tickit;
+   require Tickit::Utils;
+
    $t = Tickit->new;
 
    $t->bind_key( q => sub { $t->stop; } );
 
    require Tickit::Widget::Scroller;
-   Tickit::Widget::Scroller->VERSION( '0.30' );
+   Tickit::Widget::Scroller->VERSION( '0.31' );
    $scroller = Tickit::Widget::Scroller->new;
 
    $scroller->set_gen_bottom_indicator(
@@ -72,6 +122,8 @@ ADJUST
       '<Backspace>' => "scroll_up_page",
       '<End>'       => "scroll_to_bottom",
    );
+
+   $outlinetree = App::sdview::Output::Tickit::_OutlineTree->new;
 }
 
 method output ( @paragraphs )
@@ -85,7 +137,34 @@ method output ( @paragraphs )
       $self->$code( $para );
    }
 
-   $t->set_root_widget( $scroller );
+   require Tickit::Widget::FloatBox;
+
+   $t->set_root_widget( my $fb = Tickit::Widget::FloatBox->new
+      ->set_base_child( $scroller )
+   );
+
+   my $outlinefloat = $fb->add_float(
+      child => $outlinetree,
+      hidden => 1, # initially hidden
+      top => 0, bottom => -1,
+      left => 0, right => 25, # ideally we want to set "30%" or somesuch here
+   );
+
+   $t->bind_key(
+      'F9' => sub { $outlinefloat->is_visible ? $outlinefloat->hide : $outlinefloat->show },
+   );
+
+   $scroller->set_on_scrolled( sub ( $scroller, $ ) {
+      my $itemidx = $scroller->line2item( 0 );
+      $outlinetree->set_current_itemidx( $itemidx );
+   } );
+   $outlinetree->set_current_itemidx( 0 ); # initial
+
+   $outlinetree->set_on_select_item( sub ( %params ) {
+      $scroller->scroll_to( 0, $params{itemidx}, 0 );
+      $outlinefloat->hide;
+   } );
+
 
    $t->run;
 }
@@ -114,9 +193,6 @@ method _output_para ( $para, %opts )
 
    my %parastyle = App::sdview::Style->para_style( $para->type )->%*;
 
-   $indent //= $parastyle{indent};
-   $indent //= 0;
-
    my $text = App::sdview::Style->convert_str( $para->text );
 
    my $itempen = Tickit::Pen->new;
@@ -130,11 +206,13 @@ method _output_para ( $para, %opts )
    $itempen->chattr( bg => $parastyle{bg}->as_xterm->index )
       if defined $parastyle{bg};
 
+   $margin += ( $parastyle{margin} // 0 );
+   $indent //= 0;
+
    my @lines = $text->split( qr/\n/ );
 
    if( defined $leader ) {
-      # TODO: use textwidth
-      my $leaderlen = length $leader;
+      my $leaderlen = Tickit::Utils::textwidth( $leader );
 
       my %leaderstyle = App::sdview::Style->para_style( "leader" )->%*;
       $leaderstyle{$_} and $leader->apply_tag( 0, $leaderlen, $_ => $leaderstyle{$_} )
@@ -151,8 +229,10 @@ method _output_para ( $para, %opts )
 
    }
    elsif( $para->type ne "verbatim" ) {
-      $lines[0] = " "x$indent . $lines[0];
+      $lines[0] = " "x$indent . $lines[0] if @lines;
    }
+
+   @lines or @lines = ( String::Tagged->new( "" ) ); # placate String::Tagged->join bug
 
    $text = String::Tagged->join( "\n", @lines );
 
@@ -175,6 +255,12 @@ method _output_para ( $para, %opts )
       )
    }
 
+   if( $para->type =~ m/^head(\d+)/ ) {
+      my $level = $1;
+      my $itemidx = $scroller->items;
+      $outlinetree->add_item( "$lines[0]", $level, $itemidx );
+   }
+
    $scroller->push( $item );
 
    $_nextblank = !!$parastyle{blank_after};
@@ -189,11 +275,20 @@ method _output_list ( $listtype, $para, %opts )
    my $n = $para->initial;
 
    my $margin = $opts{margin} // 0;
-   my $indent = App::sdview::Style->para_style( "list" )->{indent} // 0;
+   $margin += App::sdview::Style->para_style( "list" )->{margin} // 0;
 
    foreach my $item ( $para->items ) {
       my $leader;
-      if( $item->type ne "item" ) {
+      if( $item->type eq "plain" ) {
+         # plain paragraphs in list are treated like items with no leader
+         $self->output_item( $item,
+            # make sure not to double-count the margin
+            margin => $margin - App::sdview::Style->para_style( "plain" )->{margin},
+            indent => $para->indent,
+         );
+         next;
+      }
+      elsif( $item->type ne "item" ) {
          # non-items just stand as they are + indent
       }
       elsif( $listtype eq "bullet" ) {
@@ -210,7 +305,7 @@ method _output_list ( $listtype, $para, %opts )
          die "TODO: Unhandled item type " . $item->type;
 
       $self->$code( $item,
-         margin => $margin + $indent,
+         margin => $margin,
          indent => $para->indent,
          leader => $leader,
       );
@@ -262,6 +357,106 @@ class App::sdview::Output::Tickit::_FixedWidthItem
 
          $rb->erase_to( $cols );
       }
+   }
+}
+
+class App::sdview::Output::Tickit::_OutlineTree
+   :isa(Tickit::Widget)
+{
+   use constant WIDGET_PEN_FROM_STYLE => 1;
+
+   use Tickit::Style;
+   style_definition base =>
+      bg => "blue",
+      selected_b => 1;
+
+   field @items;
+   field $scrolloff = 0;
+
+   method _normalize_scrolloff
+   {
+      $scrolloff = 0 if $scrolloff < 0;
+
+      my $lines = $self->window->lines;
+      my $maxoff = scalar @items - $lines;
+      $maxoff = 0 if $maxoff < 0;
+
+      $scrolloff = $maxoff if $scrolloff > $maxoff;
+   }
+
+   method resized { $self->_normalize_scrolloff }
+
+   field $on_select_item :param :writer = undef;
+
+   field $current;
+
+   method lines { return scalar @items }
+   method cols  { 1 }
+
+   method add_item ( $label, $level, $itemidx )
+   {
+      push @items, [ $label, ($level-1) * 2 + 1, $itemidx ];
+   }
+
+   method set_current_itemidx ( $itemidx )
+   {
+      # TODO: binary search would be faster
+      foreach my $i ( reverse 0 .. $#items ) {
+         my $item = $items[$i];
+         next if $item->[2] > $itemidx;
+
+         $current = $i;
+         last;
+      }
+
+      return unless my $win = $self->window;
+      my $bottom = $win->lines - 1;
+      if( $current < $scrolloff ) {
+         $scrolloff = $current;
+      }
+      elsif( $current > $scrolloff + $bottom ) {
+         $scrolloff = $current - $bottom;
+      }
+   }
+
+   method render_to_rb ( $rb, $rect )
+   {
+      $rb->eraserect( $rect );
+
+      foreach my $line ( $rect->top .. $rect->bottom ) {
+         ($line + $scrolloff) < @items or last;
+         my ( $label, $indent ) = $items[$line + $scrolloff]->@*;
+
+         $rb->goto( $line, 0 );
+         $rb->savepen;
+
+         if( ( $line + $scrolloff ) == $current ) {
+            $rb->setpen( $self->get_style_pen( 'selected' ) );
+            $rb->text( ">" );
+         }
+         $rb->erase_to( $indent );
+
+         $rb->text( $label );
+
+         $rb->restore;
+      }
+   }
+
+   method on_mouse ( $ev )
+   {
+      if( $ev->type eq "wheel" ) {
+         $scrolloff += 5 if $ev->button eq "down";
+         $scrolloff -= 5 if $ev->button eq "up";
+         $self->_normalize_scrolloff;
+         $self->redraw;
+      }
+      elsif( $ev->type eq "press" ) {
+         if( my $item = $items[$ev->line + $scrolloff] ) {
+            $on_select_item->( itemidx => $item->[2] );
+         }
+      }
+
+      return 1;
    }
 }
 

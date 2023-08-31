@@ -1,5 +1,5 @@
 package Crypt::Yescrypt;
-$Crypt::Yescrypt::VERSION = '0.002';
+$Crypt::Yescrypt::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -25,7 +25,7 @@ Crypt::Yescrypt - A Perl interface to the yescrypt password hash
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

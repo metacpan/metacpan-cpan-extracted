@@ -1,7 +1,7 @@
 package PICA::Writer::Plain;
 use v5.14.1;
 
-our $VERSION = '2.11';
+our $VERSION = '2.12';
 
 use charnames qw(:full);
 use Term::ANSIColor;
@@ -48,6 +48,8 @@ PICA::Writer::Plain - Plain PICA+ format serializer
 =head2 DESCRIPTION
 
 See L<PICA::Writer::Base> for synopsis and details.
+
+This writer can be used to write PICA Patch format but L<PICA::Writer::Patch> should be used to ensure all fields are strictly annotated.
 
 The counterpart of this module is L<PICA::Parser::Plain>.
 

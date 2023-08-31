@@ -461,8 +461,13 @@ sub isAuthorizedURI {
     my ( $self, $req, $id, $url ) = @_;
     die 'id is required'  unless ($id);
     die 'uri is required' unless ($url);
-    die 'Bad uri'         unless ( $url =~ URIRE );
-    my ( $host, $uri ) = ( $1, $2 );
+    my ( $host, $uri );
+    if ( $url =~ URIRE ) {
+        ( $host, $uri ) = ( $1, $2 );
+    }
+    else {
+        die 'Bad uri';
+    }
 
     # Get user session.
     my $session = $self->p->getApacheSession($id);

@@ -9,7 +9,7 @@ use utf8;
 
 use Object::Pad 0.800;
 
-package App::sdview::Output::Formatted 0.11;
+package App::sdview::Output::Formatted 0.12;
 class App::sdview::Output::Formatted :strict(params);
 
 # This isn't itself an output module; but a base class to build them on
@@ -88,7 +88,7 @@ method _output_para ( $para, %opts )
       $_ .= " " x ( $width - length $_ ) for @lines;
    }
 
-   $indent //= $typestyle{indent};
+   $margin += ( $typestyle{margin} // 0 );
    $indent //= 0;
 
    foreach my $line ( @lines ) {
@@ -154,11 +154,20 @@ method _output_list( $listtype, $para, %opts )
    my $n = $para->initial;
 
    my $margin = $opts{margin} // 0;
-   my $indent = App::sdview::Style->para_style( "list" )->{indent} // 0;
+   $margin += App::sdview::Style->para_style( "list" )->{margin} // 0;
 
    foreach my $item ( $para->items ) {
       my $leader;
-      if( $item->type ne "item" ) {
+      if( $item->type eq "plain" ) {
+         # plain paragraphs in list are treated like items with no leader
+         $self->output_item( $item,
+            # make sure not to double-count the margin
+            margin => $margin - App::sdview::Style->para_style( "plain" )->{margin},
+            indent => $para->indent,
+         );
+         next;
+      }
+      elsif( $item->type ne "item" ) {
          # non-items just stand as they are + indent
       }
       elsif( $listtype eq "bullet" ) {
@@ -175,7 +184,7 @@ method _output_list( $listtype, $para, %opts )
          die "TODO: Unhandled item type " . $item->type;
 
       $self->$code( $item,
-         margin => $margin + $indent,
+         margin => $margin,
          indent => $para->indent,
          leader => $leader,
       );
@@ -185,12 +194,11 @@ method _output_list( $listtype, $para, %opts )
 method output_table ( $para, %opts )
 {
    my $margin = $opts{margin} // 0;
-   my $indent = $opts{indent};
 
    my %typestyle = App::sdview::Style->para_style( "table" )->%*;
+   $margin += $typestyle{margin} // 0;
 
-   $indent //= $typestyle{indent};
-   $indent //= 0;
+   my $marginspace = " "x$margin;
 
    my @rows = $para->rows;
    my $ncols = scalar $rows[0]->@*;
@@ -203,13 +211,13 @@ method output_table ( $para, %opts )
 
    my @hrules = map { "─" x ($colwidths[$_] + 2) } 0 .. $maxcol;
 
-   $self->say( " " x $indent, "┌", join( "┬", @hrules ), "┐" );
+   $self->say( $marginspace, "┌", join( "┬", @hrules ), "┐" );
 
    # TODO: Much splitting / reflowing of content
    my $firstrow = 1;
    foreach my $row ( @rows ) {
       if( !$firstrow ) {
-         $self->say( " " x $indent, "├", join( "┼", @hrules ), "┤" );
+         $self->say( $marginspace, "├", join( "┼", @hrules ), "┤" );
       }
 
       my %rowstyle = %typestyle;
@@ -234,12 +242,12 @@ method output_table ( $para, %opts )
          $out .= " " . $leftpad . $text . $rightpad . " ";
          $out .= "│";
       }
-      $self->say( " "x$indent, $out );
+      $self->say( $marginspace, $out );
 
       undef $firstrow;
    }
 
-   $self->say( " " x $indent, "└", join( "┴", @hrules ), "┘" );
+   $self->say( $marginspace, "└", join( "┴", @hrules ), "┘" );
 }
 
 =head1 AUTHOR

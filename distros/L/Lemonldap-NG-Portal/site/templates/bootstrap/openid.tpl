@@ -23,7 +23,7 @@
     </TMPL_IF>
 
     <div class="buttons">
-      <a href="<TMPL_VAR NAME="PORTAL_URL">/?cancel=1" class="positive btn btn-primary">
+      <a href="<TMPL_VAR NAME="PORTAL_URL">?cancel=1" class="positive btn btn-primary">
         <span class="fa fa-home"></span>
         <span trspan="goToPortal">Go to portal</span>
       </a>

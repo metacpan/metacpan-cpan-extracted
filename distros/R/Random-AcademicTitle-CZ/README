@@ -8,6 +8,13 @@ SYNOPSIS
      my $title_after = $obj->random_title_after;
      my $title_before = $obj->random_title_before;
 
+DESCRIPTION
+    This module could generate actual Czech academic title or academic
+    titles from all history in the Czech lands.
+
+    The information about Czech academic titles you can see at
+    <https://cs.wikipedia.org/wiki/Akademick%C3%BD_titul>.
+
 METHODS
   "new"
      my $obj = Random::AcademicTitle::CZ->new(%params);
@@ -81,5 +88,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

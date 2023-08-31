@@ -528,9 +528,18 @@ $_->_parse_packages();
 is_deeply($_->{package_sources},
 	  ['30-PKG-default.packages', 'u2-PKG-update-test-2.packages'],
 	  'packages test 2 has correct source list');
-is_deeply($_->{packages},
-	  [qw(coreutils dash libc-bin util-linux chromium evince)],
-	  'packages test 2 has correct content');
+if (6 == @{$_->{packages}})
+{
+    is_deeply($_->{packages},
+	      [qw(coreutils dash libc-bin util-linux chromium evince)],
+	      'packages test 2 has correct content');
+}
+else
+{
+    is_deeply($_->{packages},
+	      [qw(coreutils libc-bin util-linux chromium evince)],
+	      'packages test 2a has correct content');
+}
 is($_->{package_source}{chromium}, 'u2-PKG-update-test-2.packages',
    'packages test 2 chromium entry is correct');
 is($_->{package_source}{evince}, 'u2-PKG-update-test-2.packages',
@@ -543,9 +552,18 @@ is_deeply($_->{package_sources},
 	   'u1-PKG-update-test-1.packages',
 	   'u2-PKG-update-test-2.packages'],
 	  'packages test 3 has correct source list');
-is_deeply($_->{packages},
-	  [qw(coreutils dash libc-bin util-linux chromium evince)],
-	  'packages test 3 has correct content');
+if (6 == @{$_->{packages}})
+{
+    is_deeply($_->{packages},
+	      [qw(coreutils dash libc-bin util-linux chromium evince)],
+	      'packages test 3 has correct content');
+}
+else
+{
+    is_deeply($_->{packages},
+	      [qw(coreutils libc-bin util-linux chromium evince)],
+	      'packages test 3a has correct content');
+}
 is($_->{package_source}{chromium}, 'u1-PKG-update-test-1.packages',
    'packages test 3 chromium entry is correct');
 is($_->{package_source}{evince}, 'u2-PKG-update-test-2.packages',
@@ -694,9 +712,9 @@ is($update_object->{filter}{TMP_PATH . '/var/log'}, 'empty',
 #########################################################################
 # full test:
 
-# Some smokers don't have the needed directory /usr/share/ssl-cert, so
-# hopefully we can create it:
 SKIP:{
+    # Some smokers don't have the needed directory /usr/share/ssl-cert, so
+    # hopefully we can create it:
     unless (-d '/usr/share/ssl-cert')
     {
 	$< == 0
@@ -704,6 +722,9 @@ SKIP:{
 	mkdir '/usr/share/ssl-cert'
 	    or  warn 'failed to mkdir /usr/share/ssl-cert';
     }
+    # Running these tests in a sub-directory below /tmp cause
+    # inconsistencies as that is one of our special directories:
+    TMP_PATH =~ m|^/tmp/|  and  skip 'rest of tests not working below /tmp', 62;
 
     _setup_link(TMP_PATH . '/usr/bin/3link', '2something');
     _setup_dir('/usr/lib');
@@ -768,9 +789,10 @@ SKIP:{
 	 '#+ container users #+',
 	 '',
 	 '#+ 40-MNT-default\.mounts #+',
-	 # distributions may have additional non-symlink directories here:
-	 '.*lxc\.mount\.entry = tmpfs dev/shm tmpfs create=dir,rw 0 0',
-	 'lxc\.mount\.entry = /etc/login.defs etc/login.defs none create=file,ro,bind 0 0',
+	 # distributions may have additional non-symlink directories here,
+	 # some are missing /dev/shm:
+	 '.*(lxc\.mount\.entry = tmpfs dev/shm tmpfs create=dir,rw 0 0',
+	 ')?lxc\.mount\.entry = /etc/login.defs etc/login.defs none create=file,ro,bind 0 0',
 	 'lxc\.mount\.entry = /etc/pam.d etc/pam.d none create=dir,ro,bind 0 0',
 	 'lxc\.mount\.entry = /etc/security etc/security none create=dir,ro,bind 0 0',
 	 '.*lxc\.mount\.entry = tmpfs root tmpfs create=dir,rw,mode=700 0 0',
@@ -896,12 +918,14 @@ SKIP:{
 	     'lxc\.idmap = g 0 100000 65536',
 	     '',
 	     '#+ 40-MNT-default\.mounts #+',
-	     'lxc\.mount\.entry = tmpfs dev/shm tmpfs create=dir,rw 0 0',
-	     'lxc\.mount\.entry = /etc/login.defs etc/login.defs none create=file,ro,bind 0 0',
+	     # distributions may have additional non-symlink directories here,
+	     # some are missing /dev/shm:
+	     '.*(lxc\.mount\.entry = tmpfs dev/shm tmpfs create=dir,rw 0 0',
+	     ')?lxc\.mount\.entry = /etc/login.defs etc/login.defs none create=file,ro,bind 0 0',
 	     'lxc\.mount\.entry = /etc/pam.d etc/pam.d none create=dir,ro,bind 0 0',
 	     'lxc\.mount\.entry = /etc/security etc/security none create=dir,ro,bind 0 0',
-	     'lxc\.mount\.entry = tmpfs root tmpfs create=dir,rw,mode=700 0 0',
-	     'lxc\.mount\.entry = /tmp tmp none create=dir,rw,bind 0 0',
+	     '.*lxc\.mount\.entry = tmpfs root tmpfs create=dir,rw,mode=700 0 0',
+	     '.*lxc\.mount\.entry = /tmp tmp none create=dir,rw,bind 0 0',
 	     'lxc\.mount\.entry = tmpfs var/tmp tmpfs create=dir,rw 0 0',
 	     '(lxc\.mount\.entry = /etc/debian_version etc/debian_version none create=file,ro,bind 0 0',
 	     ')?',

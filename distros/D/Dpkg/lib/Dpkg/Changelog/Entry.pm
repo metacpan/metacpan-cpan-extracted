@@ -13,24 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Changelog::Entry;
-
-use strict;
-use warnings;
-
-our $VERSION = '1.01';
-
-use Carp;
-
-use Dpkg::Gettext;
-use Dpkg::ErrorHandling;
-use Dpkg::Control::Changelog;
-
-use overload
-    '""' => \&output,
-    'eq' => sub { defined($_[1]) and "$_[0]" eq "$_[1]" },
-    fallback => 1;
-
 =encoding utf8
 
 =head1 NAME
@@ -42,6 +24,24 @@ Dpkg::Changelog::Entry - represents a changelog entry
 This class represents a changelog entry. It is composed
 of a set of lines with specific purpose: a header line, changes lines, a
 trailer line. Blank lines can be between those kind of lines.
+
+=cut
+
+package Dpkg::Changelog::Entry 1.01;
+
+use strict;
+use warnings;
+
+use Carp;
+
+use Dpkg::Gettext;
+use Dpkg::ErrorHandling;
+use Dpkg::Control::Changelog;
+
+use overload
+    '""' => \&output,
+    'eq' => sub { defined($_[1]) and "$_[0]" eq "$_[1]" },
+    fallback => 1;
 
 =head1 METHODS
 
@@ -240,7 +240,7 @@ sub get_distributions {
     return;
 }
 
-=item $fields = $entry->get_optional_fields()
+=item $ctrl = $entry->get_optional_fields()
 
 Return a set of optional fields exposed by the changelog entry.
 It always returns a Dpkg::Control object (possibly empty though).

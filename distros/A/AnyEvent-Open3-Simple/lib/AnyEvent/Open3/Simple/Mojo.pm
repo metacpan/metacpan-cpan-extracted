@@ -5,7 +5,7 @@ use warnings;
 use POSIX ':sys_wait_h';
 
 # ABSTRACT: Code for the AnyEvent::Open3::Simple mojo implementation
-our $VERSION = '0.88'; # VERSION
+our $VERSION = '0.90'; # VERSION
 
 if($^O eq 'MSWin32')
 {
@@ -47,7 +47,7 @@ AnyEvent::Open3::Simple::Mojo - Code for the AnyEvent::Open3::Simple mojo implem
 
 =head1 VERSION
 
-version 0.88
+version 0.90
 
 =head1 SYNOPSIS
 
@@ -74,6 +74,8 @@ Contributors:
 Stephen R. Scaffidi
 
 Scott Wiersdorf
+
+Graham Knop (HAARG)
 
 =head1 COPYRIGHT AND LICENSE
 

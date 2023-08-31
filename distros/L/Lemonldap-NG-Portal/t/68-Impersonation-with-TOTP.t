@@ -25,6 +25,7 @@ SKIP: {
                 requireToken        => 0,
                 checkUser           => 1,
                 impersonationRule   => 1,
+                impersonationHiddenAttributes => 'toto',
                 checkUserDisplayPersistentInfo  => 0,
                 checkUserDisplayEmptyValues     => 0,
                 checkUserDisplayComputedSession => 1,

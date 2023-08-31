@@ -28,7 +28,7 @@ register = ->
 	else
 		$.ajax
 			type: 'POST'
-			url: portal + '/2fregisters/password/verify'
+			url: "#{portal}2fregisters/password/verify"
 			dataType: 'json'
 			data:
 				password: password
@@ -41,8 +41,10 @@ register = ->
 					else
 						setMsg data.error, 'danger'
 				else
-					$(document).trigger "mfaAdded", [ { "type": "password" } ]
-					setMsg 'yourPasswordIsRegistered', 'success'
+					e = jQuery.Event( "mfaAdded" )
+					$(document).trigger e, [ { "type": "password" } ]
+					if !e.isDefaultPrevented()
+						setMsg 'yourPasswordIsRegistered', 'success'
 
 # Register "click" events
 $(document).ready ->

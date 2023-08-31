@@ -2,36 +2,40 @@
 # MIT License
 
 class Hash {
-  interface Cloneable;
-  
   use Hash::Entry;
   use Fn;
   use Array;
   use Sort;
   use Format;
-
-  has bucket_count : int;
-  has count : ro int;
+  
+  # Interfaces
+  interface Cloneable;
+  
+  # Fields
+  has keys_length : ro int;
+  
+  # Private Fields
   has entries : Hash::Entry[];
-  has seed128 : private mutable string;
-
+  
+  has seed : mutable string;
+  
+  # Private Enumerations
   private enum {
-    _DEFALUT_HASH_TABLE_LENGTH = 16,
+    DEFALUT_ENTRIES_LENGTH = 1,
   }
-  private static method _MAX_LOAD_FACTOR : double () { return 0.75; }
-
+  
+  # Class Methods
   precompile static method new : Hash ($key_values : object[] = undef) {
     my $self = new Hash;
     
-    my $default_capacity = 32;
-    $self->{bucket_count} = Hash->_DEFALUT_HASH_TABLE_LENGTH();
-    $self->{entries} = new Hash::Entry[Hash->_DEFALUT_HASH_TABLE_LENGTH()];
-    $self->{count} = 0;
+    my $default_entries_length = &DEFALUT_ENTRIES_LENGTH();
+    $self->{entries} = new Hash::Entry[$default_entries_length];
+    $self->{keys_length} = 0;
     
     my $seed_int32 = Fn->object_to_int($self);
     
-    $self->{seed128} = (mutable string)new_string_len 16;
-    $self->build_seed128($seed_int32, $self->{seed128});
+    $self->{seed} = (mutable string)new_string_len 16;
+    $self->build_seed($seed_int32, $self->{seed});
     
     my $length : int;
     if ($key_values) {
@@ -52,32 +56,56 @@ class Hash {
         unless ($key isa string) {
           die "The key in the \$key_values must be string.";
         }
-
+        
         $self->set($key => $value);
       }
     }
     
     return $self;
   }
-
-  native private method build_seed128 : void ($seed_int32 : int, $seed128 : mutable string);
-
-  method set : void ($key : string, $val : object) {
+  
+  # Private or Internal Class Methods
+  private native static method _siphash13 : long ($string : string, $seed : string);
+  
+  private static method _MAX_LOAD_FACTOR : double () { return 0.75; }
+  
+  native static method _murmur_hash : long ($string : string, $seed : int);
+  
+  # Instance Methods
+  precompile method copy : Hash () {
+    my $ret = Hash->new;
+    my $keys = $self->keys;
+    for (my $i = 0; $i < @$keys; ++$i) {
+      $ret->set($keys->[$i], $self->get($keys->[$i]));
+    }
+    return $ret;
+  }
+  
+  method clone : Hash () {
+    return $self->copy;
+  }
+  
+  method set : void ($key : string, $value : object) {
     unless ($key) {
       die "The \$key must be defined.";
     }
+    
     # Rehash
-    if (((double)$self->{count} / $self->{bucket_count}) > Hash->_MAX_LOAD_FACTOR()) {
+    if (((double)$self->{keys_length} / @{$self->{entries}}) > Hash->_MAX_LOAD_FACTOR()) {
       $self->_rehash;
     }
-    my $count = $self->{count};
-    $self->_set_to_container($self->{entries}, $self->{bucket_count}, \$count, $key, $val);
+    my $keys_length = $self->{keys_length};
+    $self->_set_to_container($self->{entries}, @{$self->{entries}}, \$keys_length, $key, $value);
     
-    $self->{count} = $count;
+    $self->{keys_length} = $keys_length;
   }
-
+  
   precompile method get : object ($key : string) {
-    my $index = $self->_index_by_key($key, $self->{bucket_count});
+    unless ($key) {
+      die "The \$key must be defined.";
+    }
+    
+    my $index = $self->_index_by_key($key, @{$self->{entries}});
     my $ref = $self->{entries}->[$index];
     unless ($ref) {
       return undef;
@@ -92,11 +120,15 @@ class Hash {
       $ref = $ref->{next_entry};
     }
   }
-
+  
   precompile method exists : int ($key : string) {
-    my $index = $self->_index_by_key($key, $self->{bucket_count});
+    unless ($key) {
+      die "The \$key must be defined.";
+    }
+    
+    my $index = $self->_index_by_key($key, @{$self->{entries}});
     my $ref = $self->{entries}->[$index];
-
+    
     unless ($ref) {
       return 0;
     }
@@ -110,9 +142,13 @@ class Hash {
       $ref = $ref->{next_entry};
     }
   }
-
+  
   precompile method delete : object ($key : string) {
-    my $index = $self->_index_by_key($key, $self->{bucket_count});
+    unless ($key) {
+      die "The \$key must be defined.";
+    }
+    
+    my $index = $self->_index_by_key($key, @{$self->{entries}});
     my $ref = $self->{entries}->[$index];
     my $prev : Hash::Entry = undef;
     unless ($ref) {
@@ -127,7 +163,7 @@ class Hash {
         else {
           $self->{entries}->[$index] = $ref->{next_entry};
         }
-        $self->{count}--;
+        $self->{keys_length}--;
         return $ret;
       }
       unless ($ref->{next_entry}) {
@@ -137,60 +173,56 @@ class Hash {
       $ref = $ref->{next_entry};
     }
   }
-
+  
   precompile method keys : string[] () {
-    my $keys = new string[$self->{count}];
+    my $keys = new string[$self->{keys_length}];
     # iterate entries
-    my $count = 0;
-    for (my $i = 0; $i < $self->{bucket_count}; ++$i) {
+    my $keys_length = 0;
+    my $entries_length = @{$self->{entries}};
+    for (my $i = 0; $i < $entries_length; ++$i) {
       my $ref = $self->{entries}->[$i];
       while ($ref) {
-        $keys->[$count++] = $ref->{key};
+        $keys->[$keys_length++] = $ref->{key};
         $ref = $ref->{next_entry};
       }
     }
     return $keys;
   }
-
+  
   precompile method has_keys : int () {
     
     my $has_keys = 0;
-    if ($self->{count} > 0) {
+    if ($self->{keys_length} > 0) {
       $has_keys = 1;
     }
     
     return $has_keys;
   }
-
+  
   precompile method values : object[] () {
-    my $retval = new object[$self->{count}];
+    my $retval = new object[$self->{keys_length}];
     # iterate entries
-    my $count = 0;
-    for (my $i = 0; $i < $self->{bucket_count}; ++$i) {
+    my $keys_length = 0;
+    my $entries_length = @{$self->{entries}};
+    for (my $i = 0; $i < $entries_length; ++$i) {
       my $ref = $self->{entries}->[$i];
       while ($ref) {
-        $retval->[$count++] = $ref->{val};
+        $retval->[$keys_length++] = $ref->{val};
         $ref = $ref->{next_entry};
       }
     }
     return $retval;
   }
-
-  precompile method copy : Hash () {
-    my $ret = Hash->new({});
-    my $keys = $self->keys;
-    for (my $i = 0; $i < @$keys; ++$i) {
-      $ret->set($keys->[$i], $self->get($keys->[$i]));
-    }
-    return $ret;
-  }
-
+  
   precompile method to_array : object[] ($sort : int = 0) {
     my $keys = $self->keys;
     my $keys_length = @$keys;
     
-    if ($sort) {
+    if ($sort > 0) {
       Sort->sort_string_asc($keys);
+    }
+    elsif ($sort < 0) {
+      Sort->sort_string_desc($keys);
     }
     
     my $array = new object[$keys_length * 2];
@@ -203,15 +235,7 @@ class Hash {
     
     return $array;
   }
-
-  method clone : Hash () {
-    return $self->copy;
-  }
-
-  native static method _murmur_hash : long ($string : string, $seed : int);
-
-  private native static method _siphash13 : long ($string : string, $seed : string);
-
+  
   method set_byte : void ($key : string, $value : int) {
     $self->set($key => Byte->new($value));
   }
@@ -233,54 +257,209 @@ class Hash {
   method set_double : void ($key : string, $value : double) {
     $self->set($key => Double->new($value));
   }
-
+  
   method get_byte : int ($key : string) {
-    return (byte)$self->get($key);
+    my $object = $self->get($key);
+    
+    unless ($object is_type Byte) {
+      die "The value of the \$key must be a Byte object.";
+    }
+    
+    return (int)(byte)$object;
   }
+  
   method get_short : int ($key : string) {
-    return (short)$self->get($key);
+    my $object = $self->get($key);
+    
+    unless ($object is_type Short) {
+      die "The value of the \$key must be a Short object.";
+    }
+    
+    return (int)(short)$object;
   }
+  
   method get_int : int ($key : string) {
-    return (int)$self->get($key);
+    my $object = $self->get($key);
+    
+    unless ($object is_type Int) {
+      die "The value of the \$key must be a Int object.";
+    }
+    
+    return (int)$object;
   }
   method get_string : string ($key : string) {
-    return (string)$self->get($key);
+    my $object = $self->get($key);
+    
+    unless ($object is_type string) {
+      die "The value of the \$key must be a string.";
+    }
+    
+    return (string)$object;
   }
   method get_long : long ($key : string) {
-    return (long)$self->get($key);
+    my $object = $self->get($key);
+    
+    unless ($object is_type Long) {
+      die "The value of the \$key must be a Byte object.";
+    }
+    
+    return (long)$object;
   }
   method get_float : float ($key : string) {
-    return (float)$self->get($key);
+    my $object = $self->get($key);
+    
+    unless ($object is_type Float) {
+      die "The value of the \$key must be a Byte object.";
+    }
+    
+    return (float)$object;
   }
   method get_double : double ($key : string) {
-    return (double)$self->get($key);
+    my $object = $self->get($key);
+    
+    unless ($object is_type Double) {
+      die "The value of the \$key must be a Byte object.";
+    }
+    
+    return (double)$object;
   }
-
-  method _bucket_count : int () {
-    return $self->{bucket_count};
+  
+  method delete_or_default_byte : int ($key : string, $default : int) {
+    
+    my $value = 0;
+    if ($self->exists($key)) {
+      $value = $self->get_byte($key);
+      $self->delete($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
   }
-
+  
+  method delete_or_default_short : int ($key : string, $default : int) {
+    
+    my $value = 0;
+    if ($self->exists($key)) {
+      $value = $self->get_short($key);
+      $self->delete($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
+  }
+  
+  method delete_or_default_int : int ($key : string, $default : int) {
+    
+    my $value = 0;
+    if ($self->exists($key)) {
+      $value = $self->get_int($key);
+      $self->delete($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
+  }
+  
+  method delete_or_default_long : long ($key : string, $default : long) {
+    
+    my $value = 0L;
+    if ($self->exists($key)) {
+      $value = $self->get_long($key);
+      $self->delete($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
+  }
+  
+  method delete_or_default_float : float ($key : string, $default : float) {
+    
+    my $value = 0f;
+    if ($self->exists($key)) {
+      $value = $self->get_float($key);
+      $self->delete($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
+  }
+  
+  method delete_or_default_double : double ($key : string, $default : double) {
+    
+    my $value = 0.0;
+    if ($self->exists($key)) {
+      $value = $self->get_double($key);
+      $self->delete($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
+  }
+  
+  method delete_or_default_string : string ($key : string, $default : string) {
+    
+    my $value = (string)undef;
+    if ($self->exists($key)) {
+      $value = $self->get_string($key);
+      $self->delete($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
+  }
+  
+  method delete_or_default : object ($key : string, $default : object) {
+    
+    my $value = (object)undef;
+    if ($self->exists($key)) {
+      $value = $self->get($key);
+      $self->delete($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
+  }
+  
+  # Private or Internal Instance Methods
+  native private method build_seed : void ($seed_int32 : int, $seed : mutable string);
+  
   method _entries : Hash::Entry [] () {
     return $self->{entries};
   }
-
-  method _index_by_key : int ($key : string, $bucket_count : int) {
-    my $default_seed = $self->{seed128};
+  
+  private method _index_by_key : int ($key : string, $entries_length : int) {
+    my $default_seed = $self->{seed};
     
     my $hash = Hash->_siphash13($key, $default_seed);
-    my $index_by_key = (int)($hash remul (long)$bucket_count);
+    my $index_by_key = (int)($hash remul (long)$entries_length);
     
     return $index_by_key;
   }
-
-  precompile method _set_to_container : void (
+  
+  precompile private method _set_to_container : void (
     $entries : Hash::Entry[],
-    $bucket_count : int,
-    $count_ref : int*,
+    $entries_length : int,
+    $keys_length_ref : int*,
     $key : string,
-    $val : object)
+    $value : object)
   {
-    my $index = $self->_index_by_key($key, $bucket_count);
+    my $index = $self->_index_by_key($key, $entries_length);
     
     my $ref = $entries->[$index];
     unless ($ref) {
@@ -295,14 +474,14 @@ class Hash {
       }
       
       $entries->[$index]->{key} = $new_key;
-      $entries->[$index]->{val} = $val;
+      $entries->[$index]->{val} = $value;
       $entries->[$index]->{next_entry} = undef;
-      ++$$count_ref;
+      ++$$keys_length_ref;
       return;
     }
     while (1) {
       if ($ref->{key} eq $key) {
-        $ref->{val} = $val;
+        $ref->{val} = $value;
         return;
       }
       unless ($ref->{next_entry}) {
@@ -314,176 +493,32 @@ class Hash {
           $new_key = Fn->copy_string($key);
           make_read_only $new_key;
         }
-
+        
         $ref->{next_entry} = new Hash::Entry;
         $ref->{next_entry}->{key} = $new_key;
-        $ref->{next_entry}->{val} = $val;
+        $ref->{next_entry}->{val} = $value;
         $ref->{next_entry}->{next_entry} = undef;
-        ++$$count_ref;
+        ++$$keys_length_ref;
         return;
       }
       $ref = $ref->{next_entry};
     }
   }
-
-  precompile method _rehash : void () {
-    my $new_bucket_count : int;
-    $new_bucket_count = $self->{bucket_count} * 2;
-    my $new_entries = new Hash::Entry [$new_bucket_count];
-    my $new_count = 0;
+  
+  precompile private method _rehash : void () {
+    my $new_entries_length : int;
+    my $entries_length = @{$self->{entries}};
+    $new_entries_length = @{$self->{entries}} * 2;
+    my $new_entries = new Hash::Entry [$new_entries_length];
+    my $new_keys_length = 0;
     # iterate entries
-    for (my $i = 0; $i < $self->{bucket_count}; ++$i) {
+    for (my $i = 0; $i < $entries_length; ++$i) {
       my $ref = $self->{entries}->[$i];
       while ($ref) {
-        $self->_set_to_container($new_entries, $new_bucket_count, \$new_count, $ref->{key}, $ref->{val});
+        $self->_set_to_container($new_entries, $new_entries_length, \$new_keys_length, $ref->{key}, $ref->{val});
         $ref = $ref->{next_entry};
       }
     }
-    $self->{bucket_count} = $new_bucket_count;
     $self->{entries} = $new_entries;
-  }
-
-  method delete_or_default_byte : int ($key : string, $default : int) {
-    
-    unless ($key) {
-      die "The \$key must be defined.";
-    }
-    
-    my $value = 0;
-    if ($self->exists($key)) {
-      $value = (byte)$self->get_byte($key);
-      $self->delete($key);
-    }
-    else {
-      $value = (byte)$default;
-    }
-    
-    return $value;
-  }
-
-  method delete_or_default_short : int ($key : string, $default : int) {
-    
-    unless ($key) {
-      die "The \$key must be defined.";
-    }
-    
-    my $value = 0;
-    if ($self->exists($key)) {
-      $value = (short)$self->get_short($key);
-      $self->delete($key);
-    }
-    else {
-      $value = (short)$default;
-    }
-    
-    return $value;
-  }
-
-  method delete_or_default_int : int ($key : string, $default : int) {
-    
-    unless ($key) {
-      die "The \$key must be defined.";
-    }
-    
-    my $value = 0;
-    if ($self->exists($key)) {
-      $value = $self->get_int($key);
-      $self->delete($key);
-    }
-    else {
-      $value = $default;
-    }
-    
-    return $value;
-  }
-
-  method delete_or_default_long : long ($key : string, $default : long) {
-    
-    unless ($key) {
-      die "The \$key must be defined.";
-    }
-    
-    my $value = 0L;
-    if ($self->exists($key)) {
-      $value = (long)$self->get_long($key);
-      $self->delete($key);
-    }
-    else {
-      $value = $default;
-    }
-    
-    return $value;
-  }
-
-  method delete_or_default_float : float ($key : string, $default : float) {
-    
-    unless ($key) {
-      die "The \$key must be defined.";
-    }
-    
-    my $value = 0f;
-    if ($self->exists($key)) {
-      $value = $self->get_float($key);
-      $self->delete($key);
-    }
-    else {
-      $value = $default;
-    }
-    
-    return $value;
-  }
-
-  method delete_or_default_double : double ($key : string, $default : double) {
-    
-    unless ($key) {
-      die "The \$key must be defined.";
-    }
-    
-    my $value = 0.0;
-    if ($self->exists($key)) {
-      $value = $self->get_double($key);
-      $self->delete($key);
-    }
-    else {
-      $value = $default;
-    }
-    
-    return $value;
-  }
-
-  method delete_or_default_string : string ($key : string, $default : string) {
-    
-    unless ($key) {
-      die "The \$key must be defined.";
-    }
-    
-    my $value = (string)undef;
-    if ($self->exists($key)) {
-      $value = $self->get_string($key);
-      $self->delete($key);
-    }
-    else {
-      $value = $default;
-    }
-    
-    return $value;
-  }
-
-  method delete_or_default : object ($key : string, $default : object) {
-    
-    unless ($key) {
-      die "The \$key must be defined.";
-    }
-    
-    my $value = (object)undef;
-    if ($self->exists($key)) {
-      $value = $self->get($key);
-      $self->delete($key);
-    }
-    else {
-      $value = $default;
-    }
-    
-    return $value;
   }
 }

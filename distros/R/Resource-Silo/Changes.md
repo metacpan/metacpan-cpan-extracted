@@ -1,5 +1,9 @@
 # Revision history for Resource::Silo
 
+- 0.09    Mon Aug 28 2023
+    - [api][break] Only allow dependencies on previously declared resources
+    - [api] Add `loose_deps` flag to allow forward and/or dangling dependencies
+
 - 0.08    Mon Aug 21 2023
     - [api] Add 'literal' resources that just point to a value
     - [api][break] rename flag: derivative => derived

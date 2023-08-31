@@ -50,7 +50,7 @@ use warnings 'once';
 
 use Cwd 'abs_path';
 
-our $VERSION = '0.20';
+our $VERSION = '0.26';
 
 use App::LXC::Container::Texts;
 
@@ -543,7 +543,6 @@ sub package_of($)
 	    # uncoverable condition right
 	    -l  and  readlink =~ m|^/?usr$_|
 		and  $package = $os_object->package_of($alt);
-	    # un coverable branch false
 	}
 	else
 	{

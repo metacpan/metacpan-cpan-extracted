@@ -5,7 +5,7 @@ use 5.020;
 use warnings;
 use experimental qw(postderef postderef_qq);
 
-package App::Cmd 0.335;
+package App::Cmd 0.336;
 
 use parent 'App::Cmd::ArgProcessor';
 # ABSTRACT: write command line apps with less suffering
@@ -657,8 +657,12 @@ sub _global_option_processing_params {
   return (
     $self->usage_desc(@args),
     $self->global_opt_spec(@args),
-    { getopt_conf => [qw/pass_through/] },
+    { getopt_conf => $self->_getopt_conf },
   );
+}
+
+sub _getopt_conf {
+  return [qw/pass_through/];
 }
 
 #pod =method usage
@@ -747,7 +751,7 @@ App::Cmd - write command line apps with less suffering
 
 =head1 VERSION
 
-version 0.335
+version 0.336
 
 =head1 SYNOPSIS
 
@@ -811,13 +815,13 @@ For information on how to start using App::Cmd, see L<App::Cmd::Tutorial>.
 
 =head1 PERL VERSION
 
-This library should run on perls released even a long time ago.  It should work
-on any version of perl released in the last five years.
+This library should run on perls released even a long time ago.  It should
+work on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 METHODS
 
@@ -1059,7 +1063,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Adam Prime ambs Andreas Hernitscheck A. Sinan Unur Chris 'BinGOs' Williams David Golden Steinbrunner Davor Cubranic Denis Ibaev Diab Jerius Glenn Fowler Ingy dot Net Jakob Voss Jérôme Quelin John SJ Anderson Karen Etheridge Kent Fredric Lucas Theisen Matthew Astley mokko Olivier Mengué Ricardo Signes Ryan C. Thompson Salvatore Bonaccorso Sergey Romanov Stephan Loyd Stephen Caldwell Yuval Kogman
+=for stopwords Adam Prime ambs Andreas Hernitscheck A. Sinan Unur Chris 'BinGOs' Williams David Golden Steinbrunner Davor Cubranic Denis Ibaev Diab Jerius Glenn Fowler Ingy dot Net Jakob Voss Jérôme Quelin John SJ Anderson Karen Etheridge Kent Fredric Lucas Theisen Matthew Astley Michael McClimon mokko Olivier Mengué Ricardo Signes Ryan C. Thompson Salvatore Bonaccorso Sawyer X Sergey Romanov Stephan Loyd Stephen Caldwell Yuval Kogman
 
 =over 4
 
@@ -1145,6 +1149,10 @@ Matthew Astley <mca@sanger.ac.uk>
 
 =item *
 
+Michael McClimon <michael@mcclimon.org>
+
+=item *
+
 mokko <mauricemengel@gmail.com>
 
 =item *
@@ -1162,6 +1170,10 @@ Ryan C. Thompson <rct@thompsonclan.org>
 =item *
 
 Salvatore Bonaccorso <carnil@debian.org>
+
+=item *
+
+Sawyer X <xsawyerx@cpan.org>
 
 =item *
 
@@ -1183,7 +1195,7 @@ Yuval Kogman <nuffin@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Ricardo Signes.
+This software is copyright (c) 2023 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

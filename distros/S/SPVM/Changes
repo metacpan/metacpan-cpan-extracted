@@ -1,3 +1,55 @@
+0.989038 2023-08-29
+  [New Features]
+    * Here document is supported.
+    
+0.989037 2023-08-28
+  
+  [Document Changes]
+    * The doc of the Hash class is improved.
+  [Internal Changes]
+    * ppport.h is upgraded to 3.68
+    * The default entries length of a hash become 1.
+  [Incompatible Bug Fix]
+  
+    * The is_class_method field in the SPVM::Builder::LibInfo is renamed to is_static.
+      This is wrongly changed.
+    * The count field in the Hash class is renamed to the keys_length method.
+    * The the to_array method in the Hash class support decendent order.
+  [Incompatible Changes]
+    * The delete method in the Hash class throws an excetpion.
+    
+      The $key must be defined.
+    
+    * The exists method in the Hash class throws an excetpion.
+    
+      The $key must be defined.
+    
+    * The get method in the Hash class throws an excetpion.
+    
+      The $key must be defined.
+    
+0.989036 2023-08-17
+
+  [New Features]
+    * The type native APIs are added.
+  [Incompatible Changes]
+    * The following runtime nataive APIs are removed and moved to the type native APIs.
+    
+      int32_t (*get_type_width)(void* runtime, void* basic_type, int32_t dimension, int32_t flag);
+      int32_t (*can_assign)(void* runtime, void* dist_basic_type, int32_t dist_type_dimension, int32_t dist_type_flag, void* src_basic_type, int32_t src_type_dimension, int32_t src_type_flag);
+      int32_t (*is_object_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t flag);
+      
+    * Native API IDs of runtime nataive API are changed.
+      
+      0 get_object_data_offset
+      1 get_object_ref_count_offset
+      2 get_object_length_offset
+      3 get_basic_type_by_id
+      4 get_basic_type_by_name
+      5 get_basic_types_length
+      6 build_precompile_module_source
+      7 build_precompile_method_source
+      
 0.989035 2023-08-14
 
   [Changes]

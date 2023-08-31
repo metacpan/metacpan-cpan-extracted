@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/HTML.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2022/09/19
+## Modified 2022/09/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,7 +18,7 @@ BEGIN
     use parent qw( Markdown::Parser::Element );
     use vars qw( $VERSION );
     use Devel::Confess;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -28,7 +28,7 @@ sub init
 {
     my $self = shift( @_ );
     $self->{is_comment} = 0;
-    ## HTML::Element object
+    # HTML::Object::Element object
     $self->{object}     = '';
     $self->{tag_name}   = 'html';
     return( $self->SUPER::init( @_ ) );
@@ -74,7 +74,7 @@ sub object
     return if( !$self->raw->length );
     my $html = $self->raw->scalar;
     $obj = $self->parse_html( $html );
-    $self->_set_get_object( 'object', 'HTML::Element', $obj );
+    $self->_set_get_object( 'object', 'HTML::Object::Element', $obj );
     return( $obj );
 }
 
@@ -96,7 +96,7 @@ Markdown::Parser::HTML - Markdown HTML Element
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 
@@ -130,7 +130,7 @@ This value does B<not> impact how the method L</as_string> or L</as_markdown> wi
 
 =head2 object
 
-Returns a L<HTML::TreeBuilder> object from the data stored
+Returns an L<HTML::Object::Element> object from the data stored
 
 =head1 SEE ALSO
 

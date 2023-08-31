@@ -54,13 +54,6 @@ my @order;
     package My::Ordered;
     use Resource::Silo -class;
 
-    resource main  =>
-        cleanup_order   => -1,
-        init            => sub {
-            $_[0]->$_
-                for (qw(logger dbh huey louie dewey));
-            My::Res->new( $_[1] )
-        };
     resource huey  =>
         init            => sub { My::Res->new( $_[1] ) };
     resource louie =>
@@ -73,6 +66,13 @@ my @order;
     resource logger =>
         cleanup_order   => 100,
         init            => sub { My::Res->new( $_[1] ) };
+    resource main  =>
+        cleanup_order   => -1,
+        init            => sub {
+            $_[0]->$_
+                for (qw(logger dbh huey louie dewey));
+            My::Res->new( $_[1] )
+        };
 };
 
 subtest "cleanup order" => sub {

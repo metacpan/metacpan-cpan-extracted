@@ -151,7 +151,7 @@ ok(
         HTTP_AUTHORIZATION =>
 'Bearer f0fd4e85000ce35d062f97f5b466fc00abc2fad0406e03e086605f929ec4a249',
     ),
-    'Invalid access token'
+    'Valid access token'
 );
 
 # Check headers
@@ -172,7 +172,7 @@ ok(
         HTTP_AUTHORIZATION =>
 'Bearer f0fd4e85000ce35d062f97f5b466fc00abc2fad0406e03e086605f929ec4a249',
     ),
-    'Invalid access token'
+    'Valid access token'
 );
 is( $res->[0], 403, "Unauthorized because the write scope is not granted" );
 
@@ -185,7 +185,7 @@ ok(
         HTTP_AUTHORIZATION =>
 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwianRpIjoiZjBmZDRlODUwMDBjZTM1ZDA2MmY5N2Y1YjQ2NmZjMDBhYmMyZmFkMDQwNmUwM2UwODY2MDVmOTI5ZWM0YTI0OSJ9.h0RDBLo5Vy8lqbltEP2L496KOzJLhLCIRZZmEqcPuN8',
     ),
-    'Invalid access token'
+    'Valid JWT access token'
 );
 
 # Check headers
@@ -202,7 +202,7 @@ ok(
         VHOSTTYPE          => 'OAuth2',
         HTTP_AUTHORIZATION => 'Bearer 999888777',
     ),
-    'Invalid access token'
+    'Valid access token'
 );
 
 # Check headers
@@ -222,7 +222,7 @@ ok(
         VHOSTTYPE          => 'OAuth2',
         HTTP_AUTHORIZATION => 'Bearer 999888777',
     ),
-    'Invalid access token'
+    'Expired access token'
 );
 %h = @{ $res->[1] };
 is( $res->[0], 401, "Access was rejected" );

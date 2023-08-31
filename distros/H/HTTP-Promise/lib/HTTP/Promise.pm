@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.2.3
+## Version v0.2.4
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2022/12/21
+## Modified 2023/08/15
 ## All rights reserved.
 ## 
 ## 
@@ -59,7 +59,7 @@ BEGIN
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
     our $SERIALISER = $Promise::Me::SERIALISER;
-    our $VERSION = 'v0.2.3';
+    our $VERSION = 'v0.2.4';
 };
 
 use strict;
@@ -1141,7 +1141,7 @@ sub send
         my $bytes = $io->write_all( $request, $timeout );
         if( !defined( $bytes ) )
         {
-            return( $self->pass_error );
+            return( $self->pass_error( $io->error ) );
         }
         # Could not transmit the headers
         elsif( !$bytes )
@@ -1180,7 +1180,7 @@ sub send
         {
             my $code = defined( $n ) ? '' : $io->error->code;
             if( $p->{in_keepalive} && 
-                length( $buff ) == 0 &&
+                ( length( $buff ) // 0 ) == 0 &&
                 !$opts->{total_attempts} &&
                 ( defined( $n ) || $code == ECONNRESET || ( $IS_WIN32 && $code == ECONNABORTED ) ) )
             {
@@ -2115,7 +2115,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
         agent => 'MyBot/1.0'
         accept_language => [qw( fr-FR fr en-GB en ja-JP )],
         auto_switch_https => 1,
-        # For example, and Cookie::Jar object
+        # For example, a Cookie::Jar object
         cookie_jar => $cookie_jar,
         dnt => 1,
         # 2Mb. Any data to be sent being bigger than this will trigger a Continue conditional query
@@ -2157,11 +2157,11 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.2.3
+    v0.2.4
 
 =head1 DESCRIPTION
 
-L<HTTP::Promise> provides with a fast and powerful yet memory-friendly API to make true asynchronous HTTP requests using fork using L<Promise::Me>.
+L<HTTP::Promise> provides with a fast and powerful yet memory-friendly API to make true asynchronous HTTP requests using fork with L<Promise::Me>.
 
 It is based on the design of L<HTTP::Message>, but with a much cleaner interface to make requests and manage HTTP entity bodies.
 
@@ -2223,11 +2223,11 @@ Here is how it is organised in overall:
 
 It differentiates from other modules by using several XS modules for speed, and has a notion of HTTP L<entity|HTTP::Promise::Entity> and L<body|HTTP::Promise::Body> stored either on file or in memory.
 
-It also have modules to make it really super easy to create C<x-www-form-urlencoded> requests with L<HTTP::Promise::Body::Form>, or C<multipart> ones with L<HTTP::Promise::Body::Form::Data>
+It also has modules to make it really super easy to create C<x-www-form-urlencoded> requests with L<HTTP::Promise::Body::Form>, or C<multipart> ones with L<HTTP::Promise::Body::Form::Data>
 
 Thus, you can either have a fine granularity by creating your own request using L<HTTP::Promise::Request>, or you can use the high level methods provided by L<HTTP::Promise>, which are: L</delete>, L</get>, L</head>, L</options>, L</patch>, L</post>, L</put> and each will occur asynchronously.
 
-Each of those method returns a L<promise|Promise::Me>, which means you can chain the results using a chainable L<then|Promise::Me/then> and L<catch|Promise::Me/catch> for errors.
+Each of those methods returns a L<promise|Promise::Me>, which means you can chain the results using a chainable L<then|Promise::Me/then> and L<catch|Promise::Me/catch> for errors.
 
 You can also wait for all of them to finish using L<await|Promise::Me/await>, which is exported by default by L<HTTP::Promise> and L<all|Promise::Me/all> or L<race|Promise::Me/|race>.
 
@@ -2256,7 +2256,7 @@ Cookies are automatically and transparently managed with L<Cookie::Jar> which ca
 
 =head2 new
 
-Provided with some optional parameters, and this instantiate a new L<HTTP::Promise> objects and returns it. If an error occurred, it will return C<undef> and the error can be retrieved using L<error|Module::Generic/error> method.
+Provided with some optional parameters, and this instantiates a new L<HTTP::Promise> objects and returns it. If an error occurred, it will return C<undef> and the error can be retrieved using L<error|Module::Generic/error> method.
 
 It accepts the following parameters. Each of those options have a corresponding method, so you can get or change its value later:
 
@@ -2390,7 +2390,7 @@ The following methods are available. This interface provides similar interface a
 
 An array of acceptable language. This will be used to set the C<Accept-Language> header.
 
-See also L<HTTP::Promise::Header::AcceptLanguage>
+See also L<HTTP::Promise::Headers::AcceptLanguage>
 
 =head2 agent
 

@@ -16,14 +16,23 @@ webAuthnError = (error) ->
 		else setMsg 'webAuthnBrowserFailed', 'danger'
 
 check = ->
-	setMsg 'webAuthnBrowserInProgress', 'warning'
-	request = window.datas.request
-	WebAuthnUI.WebAuthnUI.getCredential request
-	. then (response) ->
-		$('#credential').val JSON.stringify response
-		$('#verify-form').submit()
-	. catch (error) ->
-		webAuthnError(error)
+	e = jQuery.Event( "webauthnAttempt" )
+	$(document).trigger e
+	if !e.isDefaultPrevented()
+		setMsg 'webAuthnBrowserInProgress', 'warning'
+		request = window.datas.request
+		WebAuthnUI.WebAuthnUI.getCredential request
+		. then (response) ->
+			e = jQuery.Event( "webauthnSuccess" )
+			$(document).trigger e, [ response ]
+			if !e.isDefaultPrevented()
+				$('#credential').val JSON.stringify response
+				$('#verify-form').submit()
+		. catch (error) ->
+			e = jQuery.Event( "webauthnFailure" )
+			$(document).trigger e, [ error ]
+			if !e.isDefaultPrevented()
+				webAuthnError(error)
 
 $(document).ready ->
 	setTimeout check, 1000

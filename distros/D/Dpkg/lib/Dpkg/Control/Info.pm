@@ -14,22 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Control::Info;
-
-use strict;
-use warnings;
-
-our $VERSION = '1.01';
-
-use Dpkg::Control;
-use Dpkg::ErrorHandling;
-use Dpkg::Gettext;
-
-use parent qw(Dpkg::Interface::Storable);
-
-use overload
-    '@{}' => sub { return [ $_[0]->{source}, @{$_[0]->{packages}} ] };
-
 =encoding utf8
 
 =head1 NAME
@@ -40,6 +24,22 @@ Dpkg::Control::Info - parse files like debian/control
 
 It provides a class to access data of files that follow the same
 syntax as F<debian/control>.
+
+=cut
+
+package Dpkg::Control::Info 1.01;
+
+use strict;
+use warnings;
+
+use Dpkg::Control;
+use Dpkg::ErrorHandling;
+use Dpkg::Gettext;
+
+use parent qw(Dpkg::Interface::Storable);
+
+use overload
+    '@{}' => sub { return [ $_[0]->{source}, @{$_[0]->{packages}} ] };
 
 =head1 METHODS
 

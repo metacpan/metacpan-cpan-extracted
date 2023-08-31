@@ -2,12 +2,12 @@ use strict;
 use warnings;
 
 package Dist::Zilla::Plugin::GitHub::CreateRelease;
-our $VERSION = '0.0002'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
 # ABSTRACT: Create a GitHub Release
 
 use Pithub::Repos::Releases;
-use Config::Identity::GitHub;
+use Config::Identity;
 use Git::Wrapper;
 use File::Basename;
 use URI;
@@ -29,9 +29,7 @@ has notes_from => (is => 'ro', default => 'SignReleaseNotes');
 has notes_file => (is => 'ro', default => 'Release-VERSION');
 has draft => (is => 'ro', default => 0);
 has add_checksum => (is => 'ro', default => 1);
-
-use constant false => \0;
-sub true () { return \1 } # note the empty prototype
+has org_id => (is => 'ro', default => 'github');
 
 sub _create_release {
   my $self      = shift;
@@ -42,9 +40,11 @@ sub _create_release {
   my $filename  = shift;
   my $cpan_tar  = shift;
 
-  my %identity = Config::Identity::GitHub->load_check;
+  my @fields = ("login", "token");
+  my %identity = Config::Identity->load_check($self->{org_id}, \@fields);
 
-  die "Unable to load github token from ~/.github-identity" if (! defined $identity{token});
+  my $org = $self->{org_id} ? $self->{org_id} : "github";
+  die "Unable to load github token from ~/.$org-identity or ~/.$org" if (! defined $identity{token});
 
   my $releases = Pithub::Repos::Releases->new(
     user  => $identity{login} || $self->{username},
@@ -53,15 +53,16 @@ sub _create_release {
   );
   die "Unable to instantiate Pithub::Repos::Releases" if (! defined $releases);
 
+  require JSON::MaybeXS;
   my $release = $releases->create(
     data => {
       tag_name         => "$tag",
       target_commitish => $branch,
       name             => $title,
       body             => $notes,
-      draft            => $self->{draft} ? true : false,
-      prerelease       => $self->zilla->is_trial ? true : false,
-      generate_release_notes => $self->{github_notes} ? true : false,
+      draft            => $self->{draft} ? JSON::MaybeXS::true : JSON::MaybeXS::false,
+      prerelease       => $self->zilla->is_trial ? JSON::MaybeXS::true : JSON::MaybeXS::false,
+      generate_release_notes => $self->{github_notes} ? JSON::MaybeXS::true : JSON::MaybeXS::false,
     }
   );
   die "Unable to create GitHub release\n" if (! defined $release->content->{id});
@@ -265,7 +266,7 @@ Dist::Zilla::Plugin::GitHub::CreateRelease - Create a GitHub Release
 
 =head1 VERSION
 
-version 0.0002
+version 0.0003
 
 =head1 SYNOPSIS
 
@@ -281,6 +282,7 @@ In your F<dist.ini>:
  draft = 0                       ; default = 0 (false)
  hash_alg = sha256               ; default = sha256
  add_checksum = 1                ; default = 1 (true)
+ org_id = some_id_identifier     ; default = github (~/.github-identity or ~/.github)
  title_template = Version RELEASE - TRIAL CPAN release      ; this is the default
 
 =head1 DESCRIPTION
@@ -406,6 +408,17 @@ An integer value specifying true/false.  If the value is true (not 0) the api ca
 github that the Release is a draft.  You must publish it via the github webpage to make
 it active.
 
+=item org_id
+
+A string value that allows you to reference another identity file.  GitHub has personal
+accounts and organizations.  If you have repositories in both personal and organizations
+(or multiple organizations) this allows you to choose a specific identity for each repo.
+
+The default is B<github> and references: B<~/.github-identity> or B<~/.github>.
+
+Specifying B<org_id = project> in your dist.ini would reference: B<~/.project-identity>
+or B<~/.project>.
+
 =back
 
 =head1 METHODS
@@ -415,14 +428,6 @@ it active.
 =item after_release
 
 The main processing function that is called automatically after the release is complete.
-
-=item true
-
-Boolean true constant
-
-=item false
-
-Boolean false constant
 
 =back
 

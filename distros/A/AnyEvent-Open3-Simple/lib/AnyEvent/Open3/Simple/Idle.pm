@@ -5,7 +5,7 @@ use warnings;
 use POSIX ':sys_wait_h';
 
 # ABSTRACT: Code for the AnyEvent::Open3::Simple idle implementation
-our $VERSION = '0.88'; # VERSION
+our $VERSION = '0.90'; # VERSION
 
 sub _watcher
 {
@@ -27,7 +27,7 @@ AnyEvent::Open3::Simple::Idle - Code for the AnyEvent::Open3::Simple idle implem
 
 =head1 VERSION
 
-version 0.88
+version 0.90
 
 =head1 SYNOPSIS
 
@@ -54,6 +54,8 @@ Contributors:
 Stephen R. Scaffidi
 
 Scott Wiersdorf
+
+Graham Knop (HAARG)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -2,10 +2,10 @@
 BEGIN
 {
     use Test::More;
-	unless( $ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING} )
-	{
-		plan(skip_all => 'These tests are for author or release candidate testing');
-	}
+    unless( $ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING} )
+    {
+        plan(skip_all => 'These tests are for author or release candidate testing');
+    }
 };
 
 eval "use Test::Pod 1.00";

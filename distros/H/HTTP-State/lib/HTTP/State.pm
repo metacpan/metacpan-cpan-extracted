@@ -1,10 +1,8 @@
+use v5.36;
 package HTTP::State;
 
-use strict;
-use warnings;
-use feature "say";
 
-our $VERSION="v0.1.0";
+our $VERSION="v0.1.1";
 
 # Logging
 #
@@ -29,23 +27,22 @@ use List::Insertion {type=>"string", duplicate=>"left", accessor=>"->[".COOKIE_K
 #use Mozilla::PublicSuffix qw<public_suffix>;
 
 # Date 
-use Time::Piece;
-my $tz_offset=Time::Piece->localtime->tzoffset->seconds;
+#use Time::Piece;
+#my $tz_offset=Time::Piece->localtime->tzoffset->seconds;
 
+my $tz_offset=HTTP::State::Cookie::TZ_OFFSET;
 
 # Constant flags foor User agent context
 #
-use constant FLAG_SAME_SITE=>0x01;      # Indicate request is same-site/cross-site
-use constant FLAG_TYPE_HTTP=>0x02;      # Indicate request is HTTP/non-HTTP
-use constant FLAG_SAFE_METH=>0x04;      # Indicate request is safe method
-use constant FLAG_TOP_LEVEL=>0x04;      # Indicate top level navigation
+use constant::more FLAG_SAME_SITE=>0x01;      # Indicate request is same-site/cross-site
+use constant::more FLAG_TYPE_HTTP=>0x02;      # Indicate request is HTTP/non-HTTP
+use constant::more FLAG_SAFE_METH=>0x04;      # Indicate request is safe method
+use constant::more FLAG_TOP_LEVEL=>0x04;      # Indicate top level navigation
 
 
-use Exporter "import";
 
-my @const=qw<FLAG_SAME_SITE FLAG_TYPE_HTTP FLAG_SAFE_METH FLAG_TOP_LEVEL>;
-our @EXPORT_OK=@const;
-our %EXPORT_TAGS=("flags"=>\@const);
+use Export::These flags=>[qw<FLAG_SAME_SITE FLAG_TYPE_HTTP FLAG_SAFE_METH FLAG_TOP_LEVEL>];
+
 
 class HTTP::State;
 
@@ -176,18 +173,6 @@ method store_cookies{
 
     die "URI format error" unless $scheme and $host;
 
-  ########################################################################################
-  # my ($scheme, $authority, $path, $query, $fragment) =                                 #
-  # $request_uri =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|; #
-  #                                                                                      #
-  # Log::OK::TRACE and log_trace __PACKAGE__. " authority: ". $authority;                #
-  #                                                                                      #
-  # # Parse the authority into userinfo, host and port                                   #
-  # my ($user, $password, $host, $port)=                                                 #
-  #   $authority =~  m|(?:([^:]+)(?::([^@]+))@){0,1}([^:]+)(?::(\d+)){0,1}|x;            #
-  #                                                                                      #
-  # $port//=80;                                                                          #
-  ########################################################################################
 
 
   my $time=time-$tz_offset; #Cache time. Translate  to GMT

@@ -156,7 +156,7 @@ sub filename { return( shift->_set_get_scalar( 'filename', @_ ) ); }
 
 sub is_decoder_installed { return(1); }
 
-sub is_emcoder_installed { return(1); }
+sub is_encoder_installed { return(1); }
 
 sub mode { return( shift->_set_get_number( 'mode', @_ ) ); }
 
@@ -284,6 +284,14 @@ It returns true upon success, and upon error, it will set the error in the globa
     my $encoded = HTTP::Promise::Stream::UU::encode_uu( $data );
     die( "Something went wrong: $HTTP::Promise::Stream::UU::UUError\n" if( !defined( $encoded ) );
     print( "Encoded data is: $encoded\n" );
+
+=head2 is_decoder_installed
+
+Always returns true, because decoding is done internally.
+
+=head2 is_encoder_installed
+
+Always returns true, because encoding is done internally.
 
 =head1 AUTHOR
 

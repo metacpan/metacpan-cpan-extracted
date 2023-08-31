@@ -13,12 +13,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Control::FieldsCore;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::Control::FieldsCore - manage (list of official) control fields
+
+=head1 DESCRIPTION
+
+The modules contains a list of fieldnames with associated meta-data explaining
+in which type of control information they are allowed. The types are the
+CTRL_* constants exported by Dpkg::Control.
+
+=cut
+
+package Dpkg::Control::FieldsCore 1.02;
 
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
 our @EXPORT = qw(
     field_capitalize
     field_is_official
@@ -1019,18 +1032,6 @@ our %FIELD_ORDER = (
     ],
 );
 
-=encoding utf8
-
-=head1 NAME
-
-Dpkg::Control::FieldsCore - manage (list of official) control fields
-
-=head1 DESCRIPTION
-
-The modules contains a list of fieldnames with associated meta-data explaining
-in which type of control information they are allowed. The types are the
-CTRL_* constants exported by Dpkg::Control.
-
 =head1 FUNCTIONS
 
 =over 4
@@ -1113,7 +1114,12 @@ added to $to otherwise.
 
 sub field_transfer_single($$;$) {
     my ($from, $to, $field) = @_;
-    $field //= $_;
+    if (not defined $field) {
+        warnings::warnif('deprecated',
+            'using Dpkg::Control::Fields::field_transfer_single() with an ' .
+            'an implicit field argument is deprecated');
+        $field = $_;
+    }
     my ($from_type, $to_type) = ($from->get_type(), $to->get_type());
     $field = field_capitalize($field);
 
@@ -1363,6 +1369,10 @@ sub field_insert_before($$@) {
 =back
 
 =head1 CHANGES
+
+=head2 Version 1.02 (dpkg 1.22.0)
+
+Deprecate argument: field_transfer_single() implicit argument usage.
 
 =head2 Version 1.01 (dpkg 1.21.0)
 

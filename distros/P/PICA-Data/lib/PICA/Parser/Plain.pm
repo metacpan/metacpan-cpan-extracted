@@ -2,7 +2,7 @@ package PICA::Parser::Plain;
 use v5.14.1;
 use utf8;
 
-our $VERSION = '2.11';
+our $VERSION = '2.12';
 
 use charnames ':full';
 use Carp qw(carp croak);
@@ -33,68 +33,59 @@ sub _next_record {
     my @record;
 
     for my $field (@fields) {
-        my ($annotation, $tag, $occ, $data);
+        $field = $self->parse_field($field);
+        push @record, $field if $field;
+    }
 
-        unless (defined $self->{annotate} && !$self->{annotate}) {
-            if ($field =~ s/^([^a-z0-9]) (.+)/\2/) {
-                $annotation = $1;
-            }
-            elsif ($self->{annotate}) {
-                croak "ERROR: expected field annotation at field \"$field\"";
-            }
-        }
+    return \@record;
+}
 
-        if ($field =~ m/^(\d{3}[A-Z@])(\/(\d{2,3}))?\s(.+)/) {
-            $tag  = $1;
-            $occ  = $3;
-            $data = $4;
+sub parse_field {
+    my ($self, $field) = @_;
+
+    my ($annotation, $tag, $occ, $data);
+
+    unless (defined $self->{annotate} && !$self->{annotate}) {
+        if ($field =~ s/^([^a-z0-9]) (.+)/\2/) {
+            $annotation = $1;
         }
-        elsif ($self->{strict}) {
+        elsif ($self->{annotate}) {
+            croak "ERROR: expected field annotation at field \"$field\"";
+        }
+    }
+
+    if ($field =~ m/^(\d{3}[A-Z@])(\/(\d{2,3}))?\s(.+)/) {
+        $tag  = $1;
+        $occ  = $3;
+        $data = $4;
+    }
+
+    if (!$self->{strict} && $data =~ /^ƒ/) {
+        $data =~ s/\$/\$\$/g;
+        $data =~ s/ƒ/\$/g;
+    }
+
+    if ($data !~ /^(\$[^\$]([^\$]|\$\$)*)+$/) {
+        if ($self->{strict}) {
             croak "ERROR: invalid PICA field structure \"$field\"";
         }
         else {
             carp
                 "WARNING: invalid PICA field structure \"$field\". Skipped field";
-            next;
+            return;
         }
-
-        if (!$self->{strict} && $data =~ /^ƒ/) {
-            $data =~ s/\$/\$\$/g;
-            $data =~ s/ƒ/\$/g;
-        }
-
-        my @subfields = split /\$(\$+|.)/, $data;
-        shift @subfields;
-        push @subfields, '' if @subfields % 2;   # last subfield without value
-
-        if ($data =~ /\$\$/) {
-            my @tokens = (shift @subfields, shift @subfields);
-            while (@subfields) {
-                my $code  = shift @subfields;
-                my $value = shift @subfields;
-                if ($code =~ /^\$+$/) {
-                    my $length = length $code;
-                    $code =~ s/\$\$/\$/g;
-                    if ($length % 2) {
-                        $tokens[-1] .= "$code$value";
-                        next;
-                    }
-                    else {
-                        $tokens[-1] .= $code;
-                        $code  = substr $value, 0, 1;
-                        $value = substr $value, 1;
-                    }
-                }
-                push @tokens, $code, $value;
-            }
-            @subfields = @tokens;
-        }
-
-        push @subfields, $annotation if defined $annotation;
-
-        push @record, [$tag, $occ > 0 ? $occ : '', @subfields];
     }
-    return \@record;
+
+    my @subfields;
+    while ($data =~ m/\G\$([^\$])(([^\$]|\$\$)*)/g) {
+        my ($code, $value) = ($1, $2);
+        $value =~ s/\$\$/\$/g;
+        push @subfields, $code, $value;
+    }
+
+    push @subfields, $annotation if defined $annotation;
+
+    return [$tag, $occ > 0 ? $occ : '', @subfields];
 }
 
 1;
@@ -108,13 +99,12 @@ PICA::Parser::Plain - Plain PICA format parser
 
 =head1 DESCRIPTION
 
-This parser can parse both PICA Plain and annotated PICA. Option C<annotation>
-can be used to enforce or forbid annotations.
-
-See L<PICA::Parser::Base> for synopsis and configuration.
+This parser can parse both PICA Plain and annotated PICA. See L<PICA::Parser::Base> for synopsis and configuration.
 
 In addition to the C<$> this parser also allows C<ƒ> as subfield indicator and it skips lines with WinIBW download messages, unless option C<strict> is enabled.
 
 The counterpart of this module is L<PICA::Writer::Plain>.
+
+This parser can parse PICA Patch format but L<PICA::Parser::Patch> should be used instead to ensure every field is annotated with C<+>, C<-> or space.
 
 =cut

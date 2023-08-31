@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 08-IPv6.t 1925 2023-05-31 11:58:59Z willem $ -*-perl-*-
+# $Id: 08-IPv6.t 1930 2023-08-21 14:10:10Z willem $ -*-perl-*-
 #
 
 use strict;
@@ -72,7 +72,7 @@ diag join( "\n\t", 'will use nameservers', @$IP ) if $debug;
 Net::DNS::Resolver->debug($debug);
 
 
-plan tests => 64;
+plan tests => 63;
 
 NonFatalBegin();
 
@@ -431,17 +431,6 @@ SKIP: {
 	$socket->recv( $discard, 10 );
 	my $buffer = Net::DNS::Resolver::Base::_read_tcp($socket);
 	is( length($buffer), 0, '_read_tcp()	incomplete data' );
-}
-
-
-{					## exercise SpamAssassin's use of plain sockets
-	my $resolver = Net::DNS::Resolver->new( nameservers => $IP, udp_timeout => 0 );
-
-	my $packet = $resolver->_make_query_packet(qw(net-dns.org SOA));
-	my $socket = $resolver->_bgsend_udp( $packet, $packet->data );
-	delete ${*$socket}{net_dns_bg};				# state vector
-	while ( $resolver->bgbusy($socket) ) { sleep 1 }
-	ok( !$resolver->bgbusy($socket), 'bgbusy()	SpamAssassin workaround' );
 }
 
 

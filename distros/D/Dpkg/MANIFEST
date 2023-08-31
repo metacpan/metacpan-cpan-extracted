@@ -11,6 +11,7 @@ data/tupletable
 lib/Dpkg.pm
 lib/Dpkg/Arch.pm
 lib/Dpkg/Build/Info.pm
+lib/Dpkg/BuildAPI.pm
 lib/Dpkg/BuildEnv.pm
 lib/Dpkg/BuildFlags.pm
 lib/Dpkg/BuildInfo.pm
@@ -33,6 +34,7 @@ lib/Dpkg/Control/Fields.pm
 lib/Dpkg/Control/FieldsCore.pm
 lib/Dpkg/Control/Hash.pm
 lib/Dpkg/Control/HashCore.pm
+lib/Dpkg/Control/HashCore/Tie.pm
 lib/Dpkg/Control/Info.pm
 lib/Dpkg/Control/Tests.pm
 lib/Dpkg/Control/Tests/Entry.pm
@@ -66,6 +68,7 @@ lib/Dpkg/Path.pm
 lib/Dpkg/Shlibs.pm
 lib/Dpkg/Shlibs/Cppfilt.pm
 lib/Dpkg/Shlibs/Objdump.pm
+lib/Dpkg/Shlibs/Objdump/Object.pm
 lib/Dpkg/Shlibs/Symbol.pm
 lib/Dpkg/Shlibs/SymbolFile.pm
 lib/Dpkg/Source/Archive.pm
@@ -83,7 +86,6 @@ lib/Dpkg/Source/Package/V3/Quilt.pm
 lib/Dpkg/Source/Patch.pm
 lib/Dpkg/Source/Quilt.pm
 lib/Dpkg/Substvars.pm
-lib/Dpkg/Vars.pm
 lib/Dpkg/Vendor.pm
 lib/Dpkg/Vendor/Debian.pm
 lib/Dpkg/Vendor/Default.pm
@@ -101,6 +103,14 @@ t/cppcheck/cppcheck.supp
 t/critic.t
 t/critic/perlcriticrc
 t/Dpkg_Arch.t
+t/Dpkg_BuildAPI.t
+t/Dpkg_BuildAPI/ctrl-api-default
+t/Dpkg_BuildAPI/ctrl-api-desync
+t/Dpkg_BuildAPI/ctrl-api-explicit
+t/Dpkg_BuildAPI/ctrl-api-gt-max
+t/Dpkg_BuildAPI/ctrl-api-no-int
+t/Dpkg_BuildAPI/ctrl-api-no-ver
+t/Dpkg_BuildAPI/ctrl-api-rel-noeq
 t/Dpkg_BuildEnv.t
 t/Dpkg_BuildFlags.t
 t/Dpkg_BuildFlags_Ubuntu.t
@@ -225,7 +235,6 @@ t/Dpkg_Source_Quilt/parse/debian/patches/series
 t/Dpkg_Substvars.t
 t/Dpkg_Substvars/substvars1
 t/Dpkg_Substvars/substvars2
-t/Dpkg_Vars.t
 t/Dpkg_Vendor.t
 t/Dpkg_Version.t
 t/minimum-version.t

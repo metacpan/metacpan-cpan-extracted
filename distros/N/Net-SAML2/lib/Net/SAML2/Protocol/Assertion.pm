@@ -1,7 +1,7 @@
 package Net::SAML2::Protocol::Assertion;
 use Moose;
 
-our $VERSION = '0.73'; # VERSION
+our $VERSION = '0.74'; # VERSION
 
 use MooseX::Types::DateTime qw/ DateTime /;
 use MooseX::Types::Common::String qw/ NonEmptySimpleStr /;
@@ -11,7 +11,7 @@ use DateTime::Format::XSD;
 use Net::SAML2::XML::Util qw/ no_comments /;
 use Net::SAML2::XML::Sig;
 use XML::Enc;
-use XML::LibXML;
+use XML::LibXML::XPathContext;
 use List::Util qw(first);
 use URN::OASIS::SAML2 qw(STATUS_SUCCESS);
 use Carp qw(croak);
@@ -380,7 +380,7 @@ Net::SAML2::Protocol::Assertion - SAML2 assertion object
 
 =head1 VERSION
 
-version 0.73
+version 0.74
 
 =head1 SYNOPSIS
 

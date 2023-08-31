@@ -37,13 +37,14 @@ check_lib(
 check_lib(
     function		=> "
 	UA_ServerConfig serverConfig;
-	(void)UA_AccessControl_setCallback(&serverConfig, NULL, NULL);",
+	(void)UA_AccessControl_defaultWithLoginCallback(&serverConfig,
+	    0, NULL, NULL, 0, NULL, NULL, NULL);",
     not_execute		=> 1,
     lib			=> 'open62541',
     header		=> 'open62541/plugin/accesscontrol_default.h',
     libpath		=> '/usr/local/lib',
     incpath		=> '/usr/local/include',
-) and push @have, uc('UA_AccessControl_setCallback');
+) and push @have, uc('UA_AccessControl_defaultWithLoginCallback');
 check_lib(
     function		=> 'crypt_checkpass("", "");',
     lib			=> 'c',
@@ -120,16 +121,17 @@ WriteMakefile(
     TEST_REQUIRES	=> {
 	'IO::Socket::SSL::Utils'	=> 0,
 	'MIME::Base64'			=> 0,
+	'Socket6'			=> 0,
 	'Test::Deep'			=> 0,
 	'Test::EOL'			=> 0,
 	'Test::Exception'		=> 0,
 	'Test::LeakTrace'		=> 0,
 	'Test::NoWarnings'		=> 0,
-	'Test::TCP'			=> 0,
 	'Test::Perl::Critic'		=> 0,
 	'Test::Pod'			=> '1.00',
 	'Test::Requires'		=> 0,
 	'Test::Strict'			=> 0,
+	'Test::TCP'			=> 0,
 	'Test::Warn'			=> 0,
 	'YAML::Tiny'			=> 0,
     },

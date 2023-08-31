@@ -4,7 +4,7 @@ use Moo;
 use Example::Syntax;
 use Example::View::HTML
   -tags => qw(div a fieldset link_to legend br button form_for),
-  -util => qw(path),
+  -util => qw(),
   -views => 'HTML::Page', 'HTML::Navbar', 'HTML::Public::Posts::Comments::Form';
 
 has 'comment' => (is=>'ro', required=>1);

@@ -11,6 +11,9 @@ examples/retry.pl
 examples/timeout.pl
 examples/try-tiny.pl
 lib/Try/ALRM.pm
+releases/Try-ALRM-0.8.tar.gz
+releases/Try-ALRM-0.81.tar.gz
+releases/Try-ALRM-0.82.tar.gz
 t/01-basic.t
 t/02-basic.t
 t/03-basic.t

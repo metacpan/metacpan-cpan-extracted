@@ -120,7 +120,7 @@ SKIP: {
     );
     ok(
         $res->[2]->[0] =~
-/<span trspan="passwordPolicySpecialChar">Allowed special characters:<\/span> &%#/,
+/<span trspan="passwordPolicySpecialChar">Allowed special characters:<\/span> &amp;%#/,
         ' Found password special char list'
     );
     $query .= '&newpassword=zZ11#&confirmpassword=zZ11#';

@@ -1,7 +1,7 @@
 # Main running methods file
 package Lemonldap::NG::Handler::Main::Run;
 
-our $VERSION = '2.0.15';
+our $VERSION = '2.17.0';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -9,6 +9,7 @@ use strict;
 
 #use AutoLoader 'AUTOLOAD';
 use MIME::Base64;
+use URI;
 use URI::Escape;
 use Lemonldap::NG::Common::Session;
 
@@ -241,7 +242,7 @@ sub run {
     else {
 
         # Redirect user to the portal
-        $class->logger->info("No cookie found")
+        $class->logger->debug("No cookie found")
           unless ($id);
 
         # if the cookie was fetched, a log is sent by retrieveSession()
@@ -438,7 +439,7 @@ sub forbidden {
 sub hideCookie {
     my ( $class, $req ) = @_;
     $class->logger->debug("removing cookie");
-    my $cookie = $req->env->{HTTP_COOKIE};
+    my $cookie = $req->env->{HTTP_COOKIE} || '';
     $class->logger->debug("Cookies -> $cookie");
     my $cn = $class->tsv->{cookieName};
     $class->logger->debug("CookieName -> $cn");
@@ -690,7 +691,7 @@ sub _buildUrl {
     ) ? '' : ":$portString";
     my $url = "http" . ( $_https ? "s" : "" ) . "://$realvhost$portString$s";
     $class->logger->debug("Build URL $url");
-    return $url;
+    return URI->new($url)->as_string;
 }
 
 ## @rmethod protected int isUnprotected()

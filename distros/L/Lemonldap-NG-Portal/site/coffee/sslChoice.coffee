@@ -1,51 +1,64 @@
 # Launch SSL request
 
-tryssl = () ->
+tryssl = (myevent) ->
+	form = $(myevent.currentTarget).closest 'form';
 	path = window.location.pathname
 	console.log 'path -> ', path
 	console.log 'Call URL -> ', window.datas.sslHost
-	$.ajax window.datas.sslHost,
-		dataType: 'json',
-		xhrFields:
-			withCredentials: true
-		# If request succeed, posting form to get redirection
-		# or menu
-		success: (data) ->
-		    # If we contain a ajax_auth_token, add it to form
-			if data.ajax_auth_token
-				$('#lformSSL').find('input[name="ajax_auth_token"]').attr("value", data.ajax_auth_token)
-			sendUrl path
-			console.log 'Success -> ', data
-		# Case else, will display PE_BADCREDENTIALS or fallback to next auth
-		# backend
-		error: (result) ->
-			# If the AJAX query didn't fire at all, it's probably
-			# a bad certificate
-			if result.status == 0
-				# We couldn't send the request.
-				# if client verification is optional, this means
-				# the certificate was rejected (or some network error)
-				sendUrl path
-			# For compatibility with earlier configs, handle PE9 by posting form
-			if result.responseJSON && 'error' of result.responseJSON && result.responseJSON.error == "9"
-				sendUrl path
+	e = jQuery.Event( "sslAttempt" )
+	$(document).trigger e
+	if !e.isDefaultPrevented()
+		$.ajax window.datas.sslHost,
+			dataType: 'json',
+			xhrFields:
+				withCredentials: true
+			# If request succeed, posting form to get redirection
+			# or menu
+			success: (data) ->
+				console.log 'Success -> ', data
+				e = jQuery.Event( "sslSuccess" )
+				$(document).trigger e, [ data ]
+				if !e.isDefaultPrevented()
+					# If we contain a ajax_auth_token, add it to form
+					if data.ajax_auth_token
+						form.find('input[name="ajax_auth_token"]').attr("value", data.ajax_auth_token)
+					sendUrl form,path
+			# Case else, will display PE_BADCREDENTIALS or fallback to next auth
+			# backend
+			error: (result) ->
+				console.log 'Error during AJAX SSL authentication', result
+				e = jQuery.Event( "sslFailure" )
+				$(document).trigger e, [ result ]
+				if !e.isDefaultPrevented()
+					# If the AJAX query didn't fire at all, it's probably
+					# a bad certificate
+					if result.status == 0
+						# We couldn't send the request.
+						# if client verification is optional, this means
+						# the certificate was rejected (or some network error)
+						sendUrl form,path
+					# For compatibility with earlier configs, handle PE9 by posting form
+					if result.responseJSON && 'error' of result.responseJSON && result.responseJSON.error == "9"
+						sendUrl form,path
 
-			# If the server sent a html error description, display it
-			if result.responseJSON && 'html' of result.responseJSON
-				$('#errormsg').html(result.responseJSON.html);
-				$(window).trigger('load');
-			console.log 'Error during AJAX SSL authentication', result
+					# If the server sent a html error description, display it
+					if result.responseJSON && 'html' of result.responseJSON
+						$('#errormsg').html(result.responseJSON.html);
+						$(window).trigger('load');
 	false
 
-sendUrl = (path) ->
-	form_url = $('#lformSSL').attr('action')
+sendUrl = (form,path) ->
+	form_url = form.attr('action')
 	if form_url.match /^#$/
 		form_url = path
 	else
 		form_url = form_url + path
 	console.log 'form action URL -> ', form_url
-	$('#lformSSL').attr('action', form_url)
-	$('#lformSSL').submit()
+	form.attr('action', form_url)
+	form.submit()
 
 $(document).ready ->
-	$('.sslclick').on 'click', tryssl
+	# Script may be loaded twice if multiple choices use SSL
+	if !window._ssl_js_done
+		window._ssl_js_done = true
+		$('.sslclick').on 'click', tryssl

@@ -10,8 +10,11 @@ Revision history for File-RoundRobin
         Implemented utility to tail Round-Robin files
 0.05    11/10/2017
         Bug fixes for issues on https://rt.cpan.org
-        Fixed: 
+        Fixed:
             - write() hijacks stdout via "select($self->{_fh_})" (https://rt.cpan.org/Public/Bug/Display.html?id=84614)
             - fixed bug where trying to open a file not created by File::RoundRobin would die without properly reporting the error (https://rt.cpan.org/Public/Bug/Display.html?id=84624)
 0.06    13/10/2017
-        Fixed failing tests due to reusing the same temp file name in all tests and tests running in paralel
+        Fixed failing tests due to reusing the same temp file name in all tests and tests running in parallel
+0.07    28/08/2023
+        Append mode should create a new file if it doesn't exist instead of throwing an error
+        POD cleanup

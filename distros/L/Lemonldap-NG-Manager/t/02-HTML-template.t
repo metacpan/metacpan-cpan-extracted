@@ -8,7 +8,9 @@ require 't/test-lib.pm';
 
 my $res;
 
-ok( $res = &client->_get('/'), 'Succeed to get /' );
+my $client = LLNG::Manager::Test->new;
+
+ok( $res = $client->_get('/'), 'Succeed to get /' );
 my %hdrs = @{ $res->[1] };
 ok( $res->[0] == 200, 'Return a 200 code' )
   or print STDERR "Received" . Dumper($res);

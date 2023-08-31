@@ -1,46 +1,21 @@
-# Copied from /usr/share/perl5/Debconf/Gettext.pm
+# Based on Debconf::Gettext.
 #
 # Copyright © 2000 Joey Hess <joeyh@debian.org>
+# Copyright © 2006 Nicolas François <nicolas.francois@centraliens.net>
 # Copyright © 2007-2022 Guillem Jover <guillem@debian.org>
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
 #
-# THIS SOFTWARE IS PROVIDED BY AUTHORS AND CONTRIBUTORS ``AS IS'' AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE
-# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-# SUCH DAMAGE.
-
-package Dpkg::Gettext;
-
-use strict;
-use warnings;
-use feature qw(state);
-
-our $VERSION = '2.01';
-our @EXPORT = qw(
-    textdomain
-    gettext
-    ngettext
-    g_
-    P_
-    N_
-);
-
-use Exporter qw(import);
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 =encoding utf8
 
@@ -53,6 +28,25 @@ Dpkg::Gettext - convenience wrapper around Locale::gettext
 The Dpkg::Gettext module is a convenience wrapper over the Locale::gettext
 module, to guarantee we always have working gettext functions, and to add
 some commonly used aliases.
+
+=cut
+
+package Dpkg::Gettext 2.01;
+
+use strict;
+use warnings;
+use feature qw(state);
+
+our @EXPORT = qw(
+    textdomain
+    gettext
+    ngettext
+    g_
+    P_
+    N_
+);
+
+use Exporter qw(import);
 
 =head1 ENVIRONMENT
 
@@ -132,7 +126,6 @@ BEGIN {
     my $use_gettext = $ENV{DPKG_NLS} // 1;
     if ($use_gettext) {
         eval q{
-            pop @INC if $INC[-1] eq '.';
             use Locale::gettext;
         };
         $use_gettext = not $@;

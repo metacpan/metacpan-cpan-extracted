@@ -354,7 +354,7 @@ checkGet( $test, 'oidc/rp', 'myOidcRp1', 'options/redirectUris/0',
 checkGet( $test, 'oidc/rp', 'myOidcRp1', 'options/clientSecret', 'secret' );
 
 $test = "OidcRp - Check attribute default value was set after add";
-checkGet( $test, 'oidc/rp', 'myOidcRp1', 'options/IDTokenSignAlg', 'HS512' );
+checkGet( $test, 'oidc/rp', 'myOidcRp1', 'options/IDTokenSignAlg', 'RS256' );
 
 $test = "OidcRp - Add should fail on duplicate confKey";
 checkAddFailsIfExists( $test, 'oidc/rp', $oidcRp );
@@ -422,7 +422,7 @@ delete $oidcRp->{options}->{IDTokenSignAlg};
 checkReplace( $test, 'oidc/rp', 'myOidcRp2', $oidcRp );
 
 $test = "OidcRp - Check attribute default value was set after replace";
-checkGet( $test, 'oidc/rp', 'myOidcRp2', 'options/IDTokenSignAlg', 'HS512' );
+checkGet( $test, 'oidc/rp', 'myOidcRp2', 'options/IDTokenSignAlg', 'RS256' );
 checkGet( $test, 'oidc/rp', 'myOidcRp2', 'options/redirectUris/0',
     'http://url/3' );
 checkGet( $test, 'oidc/rp', 'myOidcRp2', 'options/postLogoutRedirectUris/0',

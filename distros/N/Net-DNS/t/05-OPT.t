@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-OPT.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
+# $Id: 05-OPT.t 1934 2023-08-25 12:14:08Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -9,8 +9,9 @@ use TestToolkit;
 
 use Net::DNS;
 use Net::DNS::Parameters;
+local $Net::DNS::Parameters::ednsoptionbyval{65023} = 'REPORT-CHANNEL';	   ## experimental/private use
 
-use constant UTIL => scalar eval { require Scalar::Util; Scalar::Util->can('isdual') };	## no critic
+use constant UTIL => scalar eval { require Scalar::Util; Scalar::Util->can('isdual') };	   ## no critic
 
 
 my $code = 41;

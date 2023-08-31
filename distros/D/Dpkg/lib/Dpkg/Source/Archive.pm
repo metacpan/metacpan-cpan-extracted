@@ -13,12 +13,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Source::Archive;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::Source::Archive - source tarball archive support
+
+=head1 DESCRIPTION
+
+This module provides a class that implements support for handling
+source tarballs.
+
+B<Note>: This is a private module, its API can change at any time.
+
+=cut
+
+package Dpkg::Source::Archive 0.01;
 
 use strict;
 use warnings;
-
-our $VERSION = '0.01';
 
 use Carp;
 use Errno qw(ENOENT);
@@ -67,7 +80,10 @@ sub _add_entry {
     my ($self, $file) = @_;
     my $cwd = *$self->{cwd};
     croak 'call create() first' unless *$self->{tar_input};
-    $file = $2 if ($file =~ /^\Q$cwd\E\/(.+)$/); # Relative names
+    if ($file =~ m{^\Q$cwd\E/(.+)$}) {
+        # Make pathname relative to the source root directory.
+        $file = $1;
+    }
     print({ *$self->{tar_input} } "$file\0")
         or syserr(g_('write on tar input'));
 }
@@ -236,5 +252,13 @@ sub extract {
     }
     erasedir($tmp);
 }
+
+=head1 CHANGES
+
+=head2 Version 0.xx
+
+This is a private module.
+
+=cut
 
 1;

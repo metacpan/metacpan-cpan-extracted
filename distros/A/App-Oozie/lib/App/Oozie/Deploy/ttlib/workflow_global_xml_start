@@ -1,0 +1,21 @@
+    <global>
+        <job-tracker>[% jobTracker %]</job-tracker>
+        <name-node>[% nameNode %]</name-node>
+        <job-xml>[% jobXML %]</job-xml>
+        <configuration>
+            <property>
+                <name>do.not.remove</name>
+                <value></value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+            [% FILTER remove('\s') %]
+                <value>
+                    [% IF override_oozie_launcher_queue   %]
+                        [% override_oozie_launcher_queue %]
+                    [% ELSE %]
+                        root.mapred-oozie-launcher
+                    [% END %]
+                </value>
+            [% END %]
+            </property>

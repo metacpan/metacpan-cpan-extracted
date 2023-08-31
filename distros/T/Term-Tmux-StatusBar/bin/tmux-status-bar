@@ -1,0 +1,4 @@
+#!/usr/bin/env perl
+use Term::Tmux::StatusBar qw(main);
+
+main;

@@ -50,11 +50,26 @@ sub as_string
     {
         $params->{ $_ } = $opts->{ $_ } if( exists( $opts->{ $_ } ) && $opts->{ $_ } );
     }
-    my $io = $self->open( 'r', ( scalar( keys( %$params ) ) ? $params : () ) ) || return( $self->pass_error );
+    
+    my( $pos, $io );
+    if( $self->can( 'opened' ) && ( $io = $self->opened ) )
+    {
+        $pos = $self->tell;
+        # Rewind
+        $self->seek(0,0);
+    }
+    else
+    {
+        $io = $self->open( 'r', ( scalar( keys( %$params ) ) ? $params : () ) ) || return( $self->pass_error );
+    }
     my( $buff, $nread );
     while( $nread = $io->read( $buff, 8192 ) )
     {
         $$str .= $buff;
+    }
+    if( defined( $pos ) )
+    {
+        $self->seek( $pos, 0 );
     }
     return( $str );
 }

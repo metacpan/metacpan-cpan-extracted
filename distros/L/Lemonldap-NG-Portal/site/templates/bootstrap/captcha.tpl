@@ -5,7 +5,7 @@
 <!-- //endif -->
 
 <div class="form-group">
-  <img class="renewcaptchaclick" src="<TMPL_VAR NAME="STATIC_PREFIX">common/icons/arrow_refresh.png" alt="Renew Captcha" title="Renew Captcha" class="img-thumbnail mb-3" />
+  <img class="renewcaptchaclick" src="<TMPL_VAR NAME="STATIC_PREFIX">common/icons/arrow_refresh.png" alt="Renew Captcha" class="img-thumbnail mb-3" />
   <img id="captcha" src="<TMPL_VAR NAME=CAPTCHA_SRC>" class="img-thumbnail" />
 </div>
 <div class="input-group mb-3">

@@ -4,7 +4,7 @@ use warnings;
 
 package Test::Neo4j::Types;
 # ABSTRACT: Tools for testing Neo4j type modules
-$Test::Neo4j::Types::VERSION = '0.02';
+$Test::Neo4j::Types::VERSION = '0.03';
 
 use Test::More 0.94;
 use Test::Exception;
@@ -17,6 +17,7 @@ BEGIN { our @EXPORT = qw(
 	neo4j_path_ok
 	neo4j_point_ok
 	neo4j_datetime_ok
+	neo4j_duration_ok
 )}
 
 {
@@ -257,28 +258,22 @@ sub neo4j_path_ok {
 
 
 sub _point_test {
-	my ($point_class) = @_;
+	my ($point_class, $new) = @_;
 	
-	plan tests => (9-6)+3 + (9-6)+3+3+3+2 + 6+6+6+6 + 1;
+	plan tests => 3+3 + 3+3+3+3+2 + 1;
 	
 	my (@c, $p);
 	
 	
 	# Simple point, location in real world
 	@c = ( 2.294, 48.858, 396 );
-	$p = $point_class->new( 4979, @c );
+	$p = $new->( $point_class, { srid => 4979, coordinates => [@c] });
 	is $p->srid(), 4979, 'eiffel srid';
-# 	is $p->X(), 2.294, 'eiffel X';
-# 	is $p->Y(), 48.858, 'eiffel Y';
-# 	is $p->Z(), 396, 'eiffel Z';
-# 	is $p->longitude(), 2.294, 'eiffel lon';
-# 	is $p->latitude(), 48.858, 'eiffel lat';
-# 	is $p->height(), 396, 'eiffel ellipsoidal height';
 	is_deeply [$p->coordinates], [@c], 'eiffel coords';
 	is scalar ($p->coordinates), 3, 'scalar context eiffel coords';
 	
 	@c = ( 2.294, 48.858 );
-	$p = $point_class->new( 4326, @c );
+	$p = $new->( $point_class, { srid => 4326, coordinates => [@c] });
 	is $p->srid(), 4326, 'eiffel 2d srid';
 	is_deeply [$p->coordinates], [@c], 'eiffel 2d coords';
 	is scalar ($p->coordinates), 2, 'scalar context eiffel 2d coords';
@@ -286,83 +281,33 @@ sub _point_test {
 	
 	# Other SRSs, location not in real world
 	@c = ( 12, 34 );
-	$p = $point_class->new( 7203, @c );
+	$p = $new->( $point_class, { srid => 7203, coordinates => [@c] });
 	is $p->srid(), 7203, 'plane srid';
-# 	is $p->X(), 12, 'plane X';
-# 	is $p->Y(), 34, 'plane Y';
-# 	ok ! defined $p->Z(), 'plane Z';
-# 	is $p->longitude(), 12, 'plane lon';
-# 	is $p->latitude(), 34, 'plane lat';
-# 	ok ! defined $p->height(), 'plane height';
 	is_deeply [$p->coordinates], [@c], 'plane coords';
 	is scalar ($p->coordinates), 2, 'scalar context plane coords';
 	
 	@c = ( 56, 78, 90 );
-	$p = $point_class->new( 9157, @c );
+	$p = $new->( $point_class, { srid => 9157, coordinates => [@c] });
 	is $p->srid(), 9157, 'space srid';
 	is_deeply [$p->coordinates], [@c], 'space coords';
 	is scalar ($p->coordinates), 3, 'scalar context space coords';
 	
 	@c = ( 361, -91 );
-	$p = $point_class->new( 4326, @c );
+	$p = $new->( $point_class, { srid => 4326, coordinates => [@c] });
 	is $p->srid(), 4326, 'ootw srid';
 	is_deeply [$p->coordinates], [@c], 'ootw coords';
 	is scalar ($p->coordinates), 2, 'scalar context ootw coords';
 	
 	@c = ( 'what', 'ever' );
-	$p = $point_class->new( '4326', @c );
+	$p = $new->( $point_class, { srid => '4326', coordinates => [@c] });
 	is $p->srid(), '4326', 'string srid';
 	is_deeply [$p->coordinates], [@c], 'string coords';
 	is scalar ($p->coordinates), 2, 'scalar context string coords';
 	
 	@c = ( undef, 45 );
-	$p = $point_class->new( 7203, @c );
+	$p = $new->( $point_class, { srid => 7203, coordinates => [@c] });
 	is_deeply [$p->coordinates], [@c], 'undef coord';
 	is scalar ($p->coordinates), 2, 'scalar context undef coord';
-	
-	
-	# Failure behaviour for incorrect number of coordinates supplied to the constructor
-	@c = ( 42 );
-	throws_ok { $point_class->new( 4326, @c ) } qr/\bdimensions\b/i, 'new 4326 X fails';
-	throws_ok { $point_class->new( 4979, @c ) } qr/\bdimensions\b/i, 'new 4979 X fails';
-	throws_ok { $point_class->new( 7203, @c ) } qr/\bdimensions\b/i, 'new 7203 X fails';
-	throws_ok { $point_class->new( 9157, @c ) } qr/\bdimensions\b/i, 'new 9157 X fails';
-	throws_ok { $point_class->new( 12345, @c ) } qr/\bUnsupported\b/i, 'new 12345 X fails';
-	throws_ok { $point_class->new( undef, @c ) } qr/\bSRID\b/i, 'new undef X fails';
-	
-	@c = ( 2.294, 48.858 );
-	$p = $point_class->new( 4326, @c );
-	is_deeply [$p->coordinates], [@c[0..1]], 'new 4326';
-	throws_ok { $point_class->new( 4979, @c ) } qr/\bdimensions\b/i, 'new 4979 XY fails';
-	$p = $point_class->new( 7203, @c );
-	is_deeply [$p->coordinates], [@c[0..1]], 'new 7203';
-	throws_ok { $point_class->new( 9157, @c ) } qr/\bdimensions\b/i, 'new 9157 XY fails';
-	throws_ok { $point_class->new( 12345, @c ) } qr/\bUnsupported\b/i, 'new 12345 XY fails';
-	throws_ok { $point_class->new( undef, @c ) } qr/\bSRID\b/i, 'new undef XY fails';
-	
-	@c = ( 2.294, 48.858, 396 );
-	$p = $point_class->new( 4326, @c );
-	is_deeply [$p->coordinates], [@c[0..1]], 'new 4326 Z ignored';
-	$p = $point_class->new( 4979, @c );
-	is_deeply [$p->coordinates], [@c[0..2]], 'new 4979';
-	$p = $point_class->new( 7203, @c );
-	is_deeply [$p->coordinates], [@c[0..1]], 'new 7203 Z ignored';
-	$p = $point_class->new( 9157, @c );
-	is_deeply [$p->coordinates], [@c[0..2]], 'new 9157';
-	throws_ok { $point_class->new( 12345, @c ) } qr/\bUnsupported\b/i, 'new 12345 XYZ fails';
-	throws_ok { $point_class->new( undef, @c ) } qr/\bSRID\b/i, 'new undef XYZ fails';
-	
-	@c = ( 2.294, 48.858, 396, 13 );
-	$p = $point_class->new( 4326, @c );
-	is_deeply [$p->coordinates], [@c[0..1]], 'new 4326 ZM ignored';
-	$p = $point_class->new( 4979, @c );
-	is_deeply [$p->coordinates], [@c[0..2]], 'new 4979 M ignored';
-	$p = $point_class->new( 7203, @c );
-	is_deeply [$p->coordinates], [@c[0..1]], 'new 7203 ZM ignored';
-	$p = $point_class->new( 9157, @c );
-	is_deeply [$p->coordinates], [@c[0..2]], 'new 9157 M ignored';
-	throws_ok { $point_class->new( 12345, @c ) } qr/\bUnsupported\b/i, 'new 12345 XYZM fails';
-	throws_ok { $point_class->new( undef, @c ) } qr/\bSRID\b/i, 'new undef XYZM fails';
 	
 	
 	ok $p->DOES('Neo4j::Types::Point'), 'does role';
@@ -370,19 +315,20 @@ sub _point_test {
 
 
 sub neo4j_point_ok {
-	my ($class, $name) = @_;
+	my ($class, $new, $name) = @_;
 	$name //= "neo4j_point_ok '$class'";
-	subtest $name, sub { _point_test($class) };
+	subtest $name, sub { _point_test($class, $new) };
 }
 
 
 sub _datetime_test {
 	my ($datetime_class, $new) = @_;
 	
-	plan tests => 5 * 7 + 1;
+	plan tests => 8 * 7 + 1;
 	
 	my ($dt, $p, $type);
 	
+	$type = 'DATE';
 	$dt = $new->($datetime_class, $p = {
 		days => 18645,  # 2021-01-18
 	});
@@ -390,65 +336,103 @@ sub _datetime_test {
 	is $dt->epoch, 1610928000, 'date: epoch';
 	is $dt->nanoseconds, $p->{nanoseconds}, 'date: no nanoseconds';
 	is $dt->seconds, $p->{seconds}, 'date: no seconds';
-	is $dt->type, 'DATE', 'date: type';
+	is $dt->type, $type, 'date: type';
 	is $dt->tz_name, $p->{tz_name}, 'date: no tz_name';
 	is $dt->tz_offset, $p->{tz_offset}, 'date: no tz_offset';
 	
-	$type = lc 'LOCAL TIME';
+	$type = 'LOCAL TIME';
 	$dt = $new->($datetime_class, $p = {
 		nanoseconds => 1,
-		seconds     => 0,
 	});
 	is $dt->days, $p->{days}, 'local time: no days';
 	is $dt->epoch, 0, 'local time: epoch';
 	is $dt->nanoseconds, $p->{nanoseconds}, 'local time: nanoseconds';
-	is $dt->seconds, $p->{seconds}, 'local time: seconds';
-	is $dt->type, 'LOCAL TIME', 'local time: type';
+	is $dt->seconds, 0, 'local time: seconds';
+	is $dt->type, $type, 'local time: type';
 	is $dt->tz_name, $p->{tz_name}, 'local time: no tz_name';
 	is $dt->tz_offset, $p->{tz_offset}, 'local time: no tz_offset';
 	
-	$type = lc 'ZONED TIME';
+	$type = 'ZONED TIME';
 	$dt = $new->($datetime_class, $p = {  
-		nanoseconds => 5e8,     # 0.5 s
 		seconds     => 86340,   # 23:59
+		nanoseconds => 5e8,     # 0.5 s
 		tz_offset   => -28800,  # -8 h
 	});
 	is $dt->days, $p->{days}, 'zoned time: no days';
 	is $dt->epoch, 86340, 'zoned time: epoch';
 	is $dt->nanoseconds, $p->{nanoseconds}, 'zoned time: nanoseconds';
 	is $dt->seconds, $p->{seconds}, 'zoned time: seconds';
-	is $dt->type, 'ZONED TIME', 'zoned time: type';
-	is $dt->tz_name, $p->{tz_name}, 'zoned time: no tz_name';
+	is $dt->type, $type, 'zoned time: type';
+	is $dt->tz_name, 'Etc/GMT+8', 'zoned time: tz_name';
 	is $dt->tz_offset, $p->{tz_offset}, 'zoned time: tz_offset';
 	
-	$type = lc 'LOCAL DATETIME';
+	$type = 'LOCAL DATETIME';
 	$dt = $new->($datetime_class, $p = {
 		days        => -1,
-		nanoseconds => 999_999_999,
 		seconds     => 86399,
 	});
 	is $dt->days, $p->{days}, 'local datetime: days';
 	is $dt->epoch, -1, 'local datetime: epoch';
-	is $dt->nanoseconds, $p->{nanoseconds}, 'local datetime: nanoseconds';
+	is $dt->nanoseconds, 0, 'local datetime: nanoseconds';
 	is $dt->seconds, $p->{seconds}, 'local datetime: seconds';
-	is $dt->type, 'LOCAL DATETIME', 'local datetime: type';
+	is $dt->type, $type, 'local datetime: type';
 	is $dt->tz_name, $p->{tz_name}, 'local datetime: no tz_name';
 	is $dt->tz_offset, $p->{tz_offset}, 'local datetime: no tz_offset';
 	
-	$type = lc 'ZONED DATETIME';
+	$type = 'ZONED DATETIME';
+	$dt = $new->($datetime_class, $p = {
+		days        => 7252,   # 1989-11-09
+		seconds     => 61043,  # 17:57:23 UTC
+		nanoseconds => 0,
+		tz_offset   => 5400,   # +1.5 h
+	});
+	is $dt->days, $p->{days}, 'zoned datetime (offset): days';
+	is $dt->epoch, 626633843, 'zoned datetime (offset): epoch';
+	is $dt->nanoseconds, $p->{nanoseconds}, 'zoned datetime (offset): nanoseconds';
+	is $dt->seconds, $p->{seconds}, 'zoned datetime (offset): seconds';
+	is $dt->type, $type, 'zoned datetime (offset): type';
+	is $dt->tz_name, undef, 'zoned datetime (half hour offset): no tz_name';
+	is $dt->tz_offset, $p->{tz_offset}, 'zoned datetime (offset): tz_offset';
+	
 	$dt = $new->($datetime_class, $p = {
 		days        => 6560,   # 1987-12-18
-		nanoseconds => 0,
 		seconds     => 72000,  # 20:00 UTC
+		nanoseconds => 0,
 		tz_name     => 'America/Los_Angeles',
 	});
 	is $dt->days, $p->{days}, 'zoned datetime: days';
 	is $dt->epoch, 566856000, 'zoned datetime: epoch';
 	is $dt->nanoseconds, $p->{nanoseconds}, 'zoned datetime: nanoseconds';
 	is $dt->seconds, $p->{seconds}, 'zoned datetime: seconds';
-	is $dt->type, 'ZONED DATETIME', 'zoned datetime: type';
+	is $dt->type, $type, 'zoned datetime: type';
 	is $dt->tz_name, $p->{tz_name}, 'zoned datetime: tz_name';
 	is $dt->tz_offset, $p->{tz_offset}, 'zoned datetime: no tz_offset';
+	
+	$dt = $new->($datetime_class, $p = {
+		days        => 0,
+		seconds     => 0,
+		tz_offset   => 0,  # GMT
+	});
+	is $dt->days, 0, 'zoned datetime (zero offset): days';
+	is $dt->epoch, 0, 'zoned datetime (zero offset): epoch';
+	is $dt->nanoseconds, 0, 'zoned datetime (zero offset): nanoseconds';
+	is $dt->seconds, 0, 'zoned datetime (zero offset): seconds';
+	is $dt->type, $type, 'zoned datetime (zero offset): type';
+	is $dt->tz_name, 'Etc/GMT', 'zoned datetime (zero offset): tz_name';
+	is $dt->tz_offset, 0, 'zoned datetime (zero offset): tz_offset';
+	
+	$dt = $new->($datetime_class, $p = {
+		days        => 0,
+		seconds     => 0,
+		tz_offset   => 86400,  # Zone Etc/GMT-24 doesn't exist
+	});
+	is $dt->days, 0, 'zoned datetime (large offset): days';
+	is $dt->epoch, 0, 'zoned datetime (large offset): epoch';
+	is $dt->nanoseconds, 0, 'zoned datetime (large offset): nanoseconds';
+	is $dt->seconds, 0, 'zoned datetime (large offset): seconds';
+	is $dt->type, $type, 'zoned datetime (large offset): type';
+	is $dt->tz_name, undef, 'zoned datetime (large offset): no tz_name';
+	is $dt->tz_offset, 86400, 'zoned datetime (large offset): tz_offset';
 	
 	ok $dt->DOES('Neo4j::Types::DateTime'), 'does role';
 }
@@ -458,6 +442,42 @@ sub neo4j_datetime_ok {
 	my ($class, $new, $name) = @_;
 	$name //= "neo4j_datetime_ok '$class'";
 	subtest $name, sub { _datetime_test($class, $new) };
+}
+
+
+sub _duration_test {
+	my ($duration_class, $new) = @_;
+	
+	plan tests => 2 * 4 + 1;
+	
+	my $d;
+	
+	$d = $new->($duration_class, {
+		months => 18,
+		seconds => 172800,
+	});
+	is $d->months, 18, 'months';
+	is $d->days, 0, 'no days yields zero';
+	is $d->seconds, 172800, 'seconds';
+	is $d->nanoseconds, 0, 'no nanoseconds yields zero';
+	
+	$d = $new->($duration_class, {
+		days => -42,
+		nanoseconds => -2000,
+	});
+	is $d->months, 0, 'no months yields zero';
+	is $d->days, -42, 'days';
+	is $d->seconds, 0, 'no seconds yields zero';
+	is $d->nanoseconds, -2000, 'nanoseconds';
+	
+	ok $d->DOES('Neo4j::Types::Duration'), 'does role';
+}
+
+
+sub neo4j_duration_ok {
+	my ($class, $new, $name) = @_;
+	$name //= "neo4j_duration_ok '$class'";
+	subtest $name, sub { _duration_test($class, $new) };
 }
 
 

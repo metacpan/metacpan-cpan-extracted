@@ -1,0 +1,270 @@
+<!-- Workflow Documentation:
+        https://oozie.apache.org/docs/4.1.0/WorkflowFunctionalSpec.html
+-->
+
+<!-- This will add the default header of the document -->
+[% PROCESS workflow_xmlns %]
+
+    [% PROCESS workflow_parameters_xml_start %]
+
+        <!--
+            Add parameters here, which will be interpolated later in this workflow
+            Note that all these values can also be specified in the job.properties
+            file, but putting them here is better as a change in job.properties
+            sometimes requires a coordinator kill and reschedule.
+    
+            This will be available as $myVar in all expressions in the workflow:
+        -->
+        <property>
+            <name>myVar</name>
+            <value>...</value>
+        </property>
+
+        <!-- A variable that is reused in the succes email action below: -->
+
+         <property>
+            <name>successEmail</name>
+            <value>my@email</value>
+         </property>
+
+        <!-- Email recipient list -->
+        <property>
+            <name>emailTo</name>
+            <value>your_team_address@example.com,another_email@example.com</value>
+        </property>
+
+        <property>
+            <name>errorEmailTo</name>
+            <value>your_team_alerts_address@example.com,another_email@example.com</value>
+        </property>
+
+    [% PROCESS workflow_parameters_xml_end %]
+
+    <!-- This will set the <global> section -->
+
+    [% PROCESS workflow_global_xml_start %]
+
+        <!-- Insert shared properties here, like: -->
+
+        <property>
+            <name>foo</name>
+            <value>my foo value</value>
+        </property>
+
+        <!--
+            They will be accessible in actions (like a -D switch in a java cmd line)
+
+            For example, you'll very likely want to configure the queue here,
+            instead of adding it to each action node individually:
+        -->
+        <property>
+            <name>mapreduce.job.queuename</name>
+            <value>root.THE_QUEUE_NAME_FOR_YOUR_TEAM</value>
+        </property>
+
+        <property>
+            <name>oozie.launcher.mapred.job.queue.name</name>
+            <value>root.THE_QUEUE_NAME_FOR_YOUR_TEAM</value>
+        </property>
+
+    [% PROCESS workflow_global_xml_end %]
+
+    <start to="hive_example" />
+
+    <!-- Hive action, retry 3 times at 10 minute intervals on failure -->
+    <action name           = "hive_example"
+            retry-max      = "3"
+            retry-interval = "10"
+        >
+        <hive xmlns="uri:oozie:hive-action:0.4">
+            <script>myquery.hql</script>
+            <!--
+                use ${DATE} in your hql file as opposed to, say, CURRENT_DATE(),
+                to ensure the output of your action is independent of when it runs
+                as it is possible to schedule jobs either in the past or in the
+                future and such jobs shouldn't use hive date functions to
+                gather the current date, otherwise you will end up generating
+                the same data for a job running with concurrency=10 and querying
+                data bound data sets.
+            -->
+            <param>DATE=${DATE}</param>
+            <file>mytransform.pl</file>
+        </hive>
+        <ok    to="fork_example" />
+        <error to="kill"         />
+    </action>
+
+    <!-- Forking 3 actions -->
+    <fork name="fork_example">
+        <path start="fs_example"    />
+        <path start="sqoop_example" />
+        <path start="shell_example" />
+    </fork>
+
+    <!-- Filesystem (HDFS) action -->
+    <action name           = "fs_example"
+            retry-max      = "3"
+            retry-interval = "10"
+        >
+        <fs>
+            <!-- flagDirForToday is populated on coordinator.xml -->
+            <mkdir  path='${flagDirForToday}'    />
+            <touchz path='${flagDirForToday}/OK' />
+        </fs>
+        <ok    to="join_example" />
+        <error to="kill"         />
+    </action>
+
+    <!-- Sqoop action -->
+
+    <action name           = "sqoop_example"
+            retry-max      = "3"
+            retry-interval = "10"
+            >
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>get-config.pl</exec>
+            <file>get-config.pl</file>
+            <capture-output/>
+        </shell>
+        <ok    to="sqoop_example_sqoop" />
+        <error to="join_example"        />
+    </action>
+
+    <action name           = "sqoop_example_sqoop"
+            retry-max      = "3"
+            retry-interval = "10"
+        >
+        <sqoop xmlns="uri:oozie:sqoop-action:0.4">
+            <!--
+                Accepts delete and mkdir; for hive imports, remove the
+                leftovers of a potentially failed previous import
+            -->
+            <prepare>
+                <delete path="hdfs:///user/hive/warehouse/my_table_name" />
+            </prepare>
+
+            <configuration>
+                <!-- Put the import in the proper pool for throttling -->
+                <property>
+                    <name>mapred.fairscheduler.pool</name>
+                    <value>my-big-fat-pool</value>
+                </property>
+                <!-- Other properties, like  job name, pool name, etc -->
+            </configuration>
+
+            <!--
+                Needs some variables, put them in global for instance.
+                For the DB passwords, instead of passing a password
+                as a bare string, you need to use an HDFS secret (see below)/
+                The secret may not be available for new databases, if
+                this is the case please contact Team BigData.
+                -->
+
+            <arg>import</arg>
+
+            <!--
+                Notice that the configuration is acceseed by the
+                action name: "sqoop_example"
+            -->
+            <arg>--connect</arg>
+            <arg>jdbc:mysql://${wf:actionData('sqoop_example')['db_host']}/${wf:actionData('sqoop_example')['db_schema']?connectTimeout=300000&amp;socketTimeout=7200000</arg>
+
+            <arg>--username</arg>
+            <arg>${wf:actionData('sqoop_example')['db_user']}</arg>
+
+            <arg>--password-file</arg>
+            <arg>${wf:actionData('sqoop_example')['db_password_file']}</arg>
+
+            <arg>--num-mappers</arg>
+            <arg>64</arg>
+
+            <!-- other sqoop options can be added at this point -->
+        </sqoop>
+        <ok    to="join_example" />
+        <error to="kill"         />
+    </action>
+
+    <!-- Shell (any binary) action -->
+    <action name           = "shell_example"
+            retry-max      = "3"
+            retry-interval = "10"
+        >
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <!-- Every action has a configuration section scoped to the action itself -->
+            <configuration>
+                <property>
+                    <name>mapreduce.job.name</name>
+                    <value>example-thingie</value>
+                </property>
+            </configuration>
+
+            <exec>myprogram.pl</exec>
+            <argument>--dryrun</argument>
+            <argument>--whatever=foo</argument>
+
+            <file>myprogram.pl</file>
+
+            <!-- Capture the output (foo=bar pairs on the program's stdout) -->
+            <capture-output/>
+
+        </shell>
+        <ok    to="join_example" />
+        <error to="kill"         />
+    </action>
+
+    <!-- Fork no more -->
+    <join name = "join_example"
+          to   = "mail_example"
+    />
+
+    <!-- Send an email -->
+    <action name           = "mail_example"
+            retry-max      = "3"
+            retry-interval = "10"
+        >
+        <email xmlns="uri:oozie:email-action:0.1">
+            <!--
+                Remember the emailTo variable in global section?
+
+                Also note that ${clusterName} is populated by default when a
+                job is deployed using oozie-deploy
+            -->
+            <to>${successEmail}</to>
+            <!-- try to keep this format for the subjectline, makes it easier to parse -->
+            <subject>${clusterName}: success/ERROR: ${appName}!</subject>
+            <body><![CDATA[
+
+The text of your email should be here, remember to unindent it.
+
+Here is an example of retrieving the captured output from the previous step:
+
+    foo value is: ${wf:actionData('shell_example')['foo']}
+
+Similarly you could use that value in any other place in the workflow (for an
+action that comes *after* shell_example, that is), like for a hive query
+parameter. This is useful for stuff that can only come from perl programs, like
+hardcoded values.
+
+However, limit this use as much as possible; it is not meant to make querying
+MySQL from Oozie a general practice. The right way to talk to MySQL generally
+is to use Sqoop actions and import the data in a table in Hive.
+
+However, there are many cases where you may not want the workflow to fail
+completely and yet send some sort of error message, or you could want to get an
+email with some stats gathered with <capture-output>, etc.
+
+            ]]></body>
+        </email>
+        <ok    to="end"  />
+        <error to="kill" />
+    </action>
+
+    <kill name="kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <end name="end" />
+
+    [% PROCESS workflow_sla_xml %]
+
+</workflow-app>

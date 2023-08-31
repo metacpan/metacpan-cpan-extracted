@@ -3,7 +3,14 @@ NAME
     install on a new perl installation
 
 VERSION
-    version 0.001
+    version 0.002
+
+SYNOPSIS
+    Here's how I usually bootstrap a fresh perl installation (e.g. after a
+    "perlbrew install"):
+
+     % cpanm -n App::cpanm::perlancar
+     % cpanm-perlancar -n Task::BeLike::PERLANCAR::Used
 
 TASK CONTENTS
   Included modules

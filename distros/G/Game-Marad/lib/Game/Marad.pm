@@ -1,8 +1,9 @@
 # -*- Perl -*-
 
-package Game::Marad 0.06;
+package Game::Marad 0.07;
 use 5.26.0;
-use Object::Pad 0.52;
+use warnings;
+use Object::Pad 0.802;
 class Game::Marad :strict(params);
 
 use constant {
@@ -31,10 +32,10 @@ use constant {
 # NOTE the client is expected to be well behaved and to not modify the
 # contents of board nor the score (hiding these references would only
 # make such impolite behavior slightly more difficult)
-has $board      :reader;
-has $move_count :reader;
-has $player     :reader;
-has $score      :reader;
+field $board      :reader;
+field $move_count :reader;
+field $player     :reader;
+field $score      :reader;
 
 ADJUST {
     $board = [

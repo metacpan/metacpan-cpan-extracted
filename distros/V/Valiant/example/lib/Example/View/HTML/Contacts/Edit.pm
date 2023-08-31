@@ -4,7 +4,6 @@ use Moo;
 use Example::Syntax;
 use Example::View::HTML
   -tags => qw(div a fieldset link_to legend br button hr form form_for),
-  -helpers => qw(path),
   -views => 'HTML::Page', 'HTML::Navbar', 'HTML::Contacts::Form';
 
 has 'contact' => (is=>'ro', required=>1);

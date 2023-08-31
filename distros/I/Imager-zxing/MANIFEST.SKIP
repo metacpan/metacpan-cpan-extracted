@@ -1,0 +1,11 @@
+\.o$
+^Makefile$
+zxing\.c$
+zxing\.bs$
+^\.git
+~$
+^blib/
+MANIFEST\.bak$
+pm_to_blib$
+^Imager-zxing-
+^MYMETA\.

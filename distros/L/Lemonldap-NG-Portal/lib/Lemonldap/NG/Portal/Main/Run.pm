@@ -9,7 +9,7 @@
 #
 package Lemonldap::NG::Portal::Main::Run;
 
-our $VERSION = '2.0.15.1';
+our $VERSION = '2.17.0';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -317,9 +317,10 @@ sub do {
                     $req,
                     'errormsg',
                     params => {
-                        AUTH_ERROR      => $err,
-                        AUTH_ERROR_TYPE => $req->error_type,
-                        AUTH_ERROR_ROLE => $req->error_role,
+                        AUTH_ERROR               => $err,
+                        ( 'AUTH_ERROR_' . $err ) => 1,
+                        AUTH_ERROR_TYPE          => $req->error_type,
+                        AUTH_ERROR_ROLE          => $req->error_role,
                     }
                 );
             }
@@ -440,7 +441,14 @@ sub autoRedirect {
             $req->data->{redirectFormMethod} = "get";
         }
         else {
-            return [ 302, [ Location => $req->{urldc}, $req->spliceHdrs ], [] ];
+            return [
+                302,
+                [
+                    Location => URI->new( $req->{urldc} )->as_string,
+                    $req->spliceHdrs
+                ],
+                []
+            ];
         }
     }
     my ( $tpl, $prms ) = $self->display($req);
@@ -936,6 +944,8 @@ sub sendHtml {
 
     $args{params}->{TROVER} = $self->getTrOver( $req, $templateDir );
 
+    $self->processHook( $req, 'sendHtml', \$template, \%args );
+
     my $res = $self->SUPER::sendHtml( $req, $template, %args );
     push @{ $res->[1] },
       'X-XSS-Protection'       => '1; mode=block',
@@ -944,7 +954,7 @@ sub sendHtml {
       'Pragma'        => 'no-cache',                               # HTTP 1.0
       'Expires'       => '0';                                      # Proxies
 
-    $self->setCorsHeaderFromConfig($res);
+    $self->setCorsHeaderFromConfig($res) unless $req->data->{dropCsp};
 
     if (    $self->conf->{strictTransportSecurityMax_Age}
         and $self->conf->{portal} =~ /^https:/ )
@@ -1029,9 +1039,34 @@ sub sendHtml {
     }
 
     # Set CSP header
-    push @{ $res->[1] }, 'Content-Security-Policy' => $csp;
+    push @{ $res->[1] }, 'Content-Security-Policy' => $csp
+      unless $req->data->{dropCsp};
     $self->logger->debug("Apply following CSP: $csp");
     return $res;
+}
+
+sub imgok {
+    my ( $self, $req, ) = @_;
+    return $self->sendImage( $req, 'icons/ok.png' );
+}
+
+sub imgnok {
+    my ( $self, $req, ) = @_;
+    return $self->sendImage( $req, 'icons/warning.png' );
+}
+
+sub sendImage {
+    my ( $self, $req, $img ) = @_;
+    return [
+        302,
+        [
+                'Location' => $self->conf->{portal}
+              . $self->staticPrefix
+              . '/common/'
+              . $img,
+        ],
+        [],
+    ];
 }
 
 sub sendCss {
@@ -1219,13 +1254,14 @@ sub corsPreflight {
     my @headers;
     my $res = [ 204, \@headers, [] ];
 
-    $self->setCorsHeaderFromConfig($res);
+    $self->setCorsHeaderFromConfig($res) unless $req->data->{dropCsp};
 
     return $res;
 }
 
 sub sendJSONresponse {
     my ( $self, $req, $j, %args ) = @_;
+    $j->{token} = $req->token if $req->token;
     my $res = Lemonldap::NG::Common::PSGI::sendJSONresponse(@_);
 
     # Handle caching
@@ -1253,7 +1289,7 @@ sub sendJSONresponse {
 
     }
     else {
-        $self->setCorsHeaderFromConfig($res);
+        $self->setCorsHeaderFromConfig($res) unless $req->data->{dropCsp};
     }
     return $res;
 }
@@ -1262,7 +1298,7 @@ sub sendRawHtml {
     my ($self) = $_[0];
     my $res = Lemonldap::NG::Common::PSGI::sendRawHtml(@_);
 
-    $self->setCorsHeaderFromConfig($res);
+    $self->setCorsHeaderFromConfig($res) unless $_[1]->data->{dropCsp};
 
     return $res;
 }
@@ -1281,6 +1317,8 @@ sub setCorsHeaderFromConfig {
 # Temlate loader
 sub loadTemplate {
     my ( $self, $req, $name, %prm ) = @_;
+
+    $self->processHook( $req, 'sendHtml', \$name, \%prm );
     $name .= '.tpl';
     my $tpl = HTML::Template->new(
         filename => $name,
@@ -1308,7 +1346,7 @@ sub cspGetHost {
     my ( $self, $url ) = @_;
     return unless $url;
     my $uri = $url;
-    unless (blessed($uri) && $uri->isa("URI") ) {
+    unless ( blessed($uri) && $uri->isa("URI") ) {
         $uri = URI->new($uri);
     }
     my $scheme = $uri->scheme || "";
@@ -1350,7 +1388,7 @@ sub buildUrl {
         }
     }
     $uri->path_segments(@pathSg);
-    return $uri;
+    return $uri->as_string;
 }
 
 1;

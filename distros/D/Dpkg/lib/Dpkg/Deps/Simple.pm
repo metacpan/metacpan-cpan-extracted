@@ -19,8 +19,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Deps::Simple;
-
 =encoding utf8
 
 =head1 NAME
@@ -68,16 +66,12 @@ is no restriction formula. Otherwise it is an array ref.
 
 =back
 
-=head1 METHODS
-
-=over 4
-
 =cut
+
+package Dpkg::Deps::Simple 1.02;
 
 use strict;
 use warnings;
-
-our $VERSION = '1.02';
 
 use Carp;
 
@@ -88,6 +82,10 @@ use Dpkg::ErrorHandling;
 use Dpkg::Gettext;
 
 use parent qw(Dpkg::Interface::Storable);
+
+=head1 METHODS
+
+=over 4
 
 =item $dep = Dpkg::Deps::Simple->new([$dep[, %opts]]);
 
@@ -167,6 +165,7 @@ sub parse_string {
         $pkgname_re = qr/[a-zA-Z0-9][a-zA-Z0-9+.-]*/;
     }
 
+    ## no critic (RegularExpressions::ProhibitCaptureWithoutTest)
     return if not $dep =~
            m{^\s*                           # skip leading whitespace
               ($pkgname_re)                 # package name

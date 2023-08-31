@@ -1,5 +1,5 @@
 package Devel::cst;
-$Devel::cst::VERSION = '0.011';
+$Devel::cst::VERSION = '0.012';
 BEGIN { $^P = 0 if $^P == 0x73f and not defined &DB::DB and caller eq ($] >= '5.036' ? 'Devel::cst' : 'main') and keys %INC == 1 }
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ Devel::cst - C stacktraces for GNU systems
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

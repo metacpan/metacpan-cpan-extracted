@@ -13,12 +13,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Getopt;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::Getopt - option parsing handling
+
+=head1 DESCRIPTION
+
+This module provides helper functions for option parsing, and complements
+the system Getopt::Long module.
+
+B<Note>: This is a private module, its API can change at any time.
+
+=cut
+
+package Dpkg::Getopt 0.02;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
 our @EXPORT = qw(
     normalize_options
 );
@@ -44,5 +58,13 @@ sub normalize_options
 
     return @args;
 }
+
+=head1 CHANGES
+
+=head2 Version 0.xx
+
+This is a private module.
+
+=cut
 
 1;

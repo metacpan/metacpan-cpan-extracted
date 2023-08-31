@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.800;
 
-package App::sdview::Parser::Pod 0.11;
+package App::sdview::Parser::Pod 0.12;
 class App::sdview::Parser::Pod
    :isa(Pod::Simple)
    :does(App::sdview::Parser)
@@ -25,17 +25,9 @@ use constant sort_order => 10;
 sub find_file ( $class, $name )
 {
    # We could use `perldoc -l` but it's slow and noisy when it fails
-
-   my $filebase = $name =~ s(::)(/)gr;
-
-   foreach my $dir ( @INC ) {
-      # .pod should take precedence over .pm
-      foreach my $file ( "$dir/$filebase.pod", "$dir/$filebase.pm" ) {
-         -r $file and return $file;
-      }
-   }
-
-   return undef;
+   require Pod::Perldoc;
+   my ( $found ) = Pod::Perldoc->new->searchfor( 0, $name, @INC );
+   return $found;
 }
 
 sub can_parse_file ( $class, $file )

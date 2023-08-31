@@ -1,0 +1,92 @@
+NAME
+    Mo::utils::EAN - Mo EAN utilities.
+
+SYNOPSIS
+     use Mo::utils::EAN qw(check_ean);
+
+     check_ean($self, $key);
+
+DESCRIPTION
+    Mo EAN utilities for checking of data objects.
+
+SUBROUTINES
+  "check_ean"
+     check_ean($self, $key);
+
+    Check parameter defined by $key if it's EAN code. Value could be
+    undefined.
+
+    Returns undef.
+
+ERRORS
+     check_ean():
+             EAN code doesn't valid.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Mo::utils::EAN qw(check_ean);
+
+     my $self = {
+             'key' => '8590786020177',
+     };
+     check_ean($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::EAN qw(check_ean);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'xx',
+     };
+     check_ean($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] EAN code doesn't valid.
+
+DEPENDENCIES
+    Business::Barcode::EAN13, Error::Pure, Exporter, Readonly.
+
+SEE ALSO
+    Mo  Micro Objects. Mo is less.
+
+    Mo::utils
+        Mo utilities.
+
+    Mo::utils::Language
+        Mo language utilities.
+
+    Wikibase::Datatype::Utils
+        Wikibase datatype utilities.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Mo-utils-EAN>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

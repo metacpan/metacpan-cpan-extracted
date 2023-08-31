@@ -10,7 +10,7 @@ use Data::Dumper;
 $Data::Dumper::Sortkeys = 1; $Data::Dumper::Purity = 1;
 
 BEGIN {
-    our $VERSION = '2.00';
+    our $VERSION = '2.01';
 }
 
 unlink('dump.log') if (-e 'dump.log');

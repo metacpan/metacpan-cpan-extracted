@@ -31,6 +31,7 @@ my @files = (
     't/client_side_caching.t',
     't/cluster.t',
     't/hash_slot.t',
+    't/keyspec.t',
     't/multi.t',
     't/pipeline.t',
     't/protocol.t',

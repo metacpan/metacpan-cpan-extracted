@@ -1,0 +1,30 @@
+        <property>
+            <name>clusterName</name>
+            <value>[% clusterName %]</value>
+        </property>
+        <property>
+            <name>nameNode</name>
+            <value>[% nameNode %]</value>
+        </property>
+        <property>
+            <name>jobTracker</name>
+            <value>[% jobTracker %]</value>
+        </property>
+        <property>
+            <name>emailTo</name>
+            <value>[% emailTo %]</value>
+        </property>
+        <property>
+            <name>hive2JdbcURL</name>
+            <value>[% hive2JdbcURL %]</value>
+        </property>
+        <property>
+            <name>workflowsBaseDir</name>
+            <value>[% workflowsBaseDir %]</value>
+        </property>
+[%- TRY -%]
+    [%- PROCESS $WF_META_FILE_PATH -%]
+[% CATCH %]
+[%# Test/debug etc in this section (you can use error.info ) %]
+[%- END -%]
+    </parameters>

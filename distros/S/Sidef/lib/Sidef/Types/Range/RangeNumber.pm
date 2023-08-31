@@ -392,43 +392,45 @@ package Sidef::Types::Range::RangeNumber {
                             predicate  => sub { $_[0]->is_cubefree },
                            },
                            {
-                            each_name  => 'each_squareful',
-                            arr_name   => 'squareful',
-                            count_name => 'squareful_count',
-                            sum_name   => 'squareful_sum',
-                            predicate  => sub { $_[0]->is_squareful },
+                            each_name  => 'each_squarefull',
+                            arr_name   => 'squarefull',
+                            count_name => 'squarefull_count',
+                            sum_name   => 'squarefull_sum',
+                            predicate  => sub { $_[0]->is_squarefull },
                            },
                            {
-                            each_name  => 'each_cubeful',
-                            arr_name   => 'cubeful',
-                            count_name => 'cubeful_count',
-                            sum_name   => 'cubeful_sum',
-                            predicate  => sub { $_[0]->is_cubeful },
+                            each_name  => 'each_cubefull',
+                            arr_name   => 'cubefull',
+                            count_name => 'cubefull_count',
+                            sum_name   => 'cubefull_sum',
+                            predicate  => sub { $_[0]->is_cubefull },
                            },
                            {
-                            each_name  => 'each_non_squarefree',
-                            arr_name   => 'non_squarefree',
-                            count_name => 'non_squarefree_count',
-                            sum_name   => 'non_squarefree_sum',
-                            predicate  => sub { $_[0]->is_non_squarefree },
+                            each_name  => 'each_nonsquarefree',
+                            arr_name   => 'nonsquarefree',
+                            count_name => 'nonsquarefree_count',
+                            sum_name   => 'nonsquarefree_sum',
+                            predicate  => sub { $_[0]->is_nonsquarefree },
                            },
                            {
-                            each_name  => 'each_non_cubefree',
-                            arr_name   => 'non_cubefree',
-                            count_name => 'non_cubefree_count',
-                            sum_name   => 'non_cubefree_sum',
-                            predicate  => sub { $_[0]->is_non_cubefree },
+                            each_name  => 'each_noncubefree',
+                            arr_name   => 'noncubefree',
+                            count_name => 'noncubefree_count',
+                            sum_name   => 'noncubefree_sum',
+                            predicate  => sub { $_[0]->is_noncubefree },
                            },
                            {
                             each_name  => 'each_semiprime',
                             arr_name   => 'semiprimes',
                             count_name => 'semiprime_count',
+                            sum_name   => 'semiprime_sum',
                             predicate  => sub { $_[0]->is_semiprime },
                            },
                            {
                             each_name  => 'each_squarefree_semiprime',
                             arr_name   => 'squarefree_semiprimes',
                             count_name => 'squarefree_semiprime_count',
+                            sum_name   => 'squarefree_semiprime_sum',
                             predicate  => sub { $_[0]->is_squarefree_semiprime },
                            },
                            {
@@ -449,6 +451,7 @@ package Sidef::Types::Range::RangeNumber {
                             each_name  => 'each_prime_power',
                             arr_name   => 'prime_powers',
                             count_name => 'prime_power_count',
+                            sum_name   => 'prime_power_sum',
                             predicate  => sub { $_[0]->is_prime_power },
                            },
                           );
@@ -545,6 +548,7 @@ package Sidef::Types::Range::RangeNumber {
                  arr_name   => 'squarefree_almost_primes',
                  each_name  => 'each_squarefree_almost_prime',
                  count_name => 'squarefree_almost_prime_count',
+                 sum_name   => 'squarefree_almost_prime_sum',
                  predicate  => sub {
                      my ($k) = @_;
                      sub { $_[0]->is_squarefree_almost_prime($k) };
@@ -570,6 +574,7 @@ package Sidef::Types::Range::RangeNumber {
                  arr_name   => 'omega_primes',
                  each_name  => 'each_omega_prime',
                  count_name => 'omega_prime_count',
+                 sum_name   => 'omega_prime_sum',
                  predicate  => sub {
                      my ($k) = @_;
                      sub { $_[0]->is_omega_prime($k) };
@@ -579,6 +584,7 @@ package Sidef::Types::Range::RangeNumber {
                  arr_name   => 'almost_primes',
                  each_name  => 'each_almost_prime',
                  count_name => 'almost_prime_count',
+                 sum_name   => 'almost_prime_sum',
                  predicate  => sub {
                      my ($k) = @_;
                      sub { $_[0]->is_almost_prime($k) };
@@ -595,13 +601,13 @@ package Sidef::Types::Range::RangeNumber {
                  },
                 },
                 {
-                 arr_name   => 'non_powerfree',
-                 each_name  => 'each_non_powerfree',
-                 count_name => 'non_powerfree_count',
-                 sum_name   => 'non_powerfree_sum',
+                 arr_name   => 'nonpowerfree',
+                 each_name  => 'each_nonpowerfree',
+                 count_name => 'nonpowerfree_count',
+                 sum_name   => 'nonpowerfree_sum',
                  predicate  => sub {
                      my ($k) = @_;
-                     sub { $_[0]->is_non_powerfree($k) };
+                     sub { $_[0]->is_nonpowerfree($k) };
                  },
                 },
                 {

@@ -2,7 +2,7 @@ package Net::DNS::RR::SVCB;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SVCB.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: SVCB.pm 1930 2023-08-21 14:10:10Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -15,7 +15,6 @@ Net::DNS::RR::SVCB - DNS SVCB resource record
 
 use integer;
 
-use MIME::Base64;
 use Net::DNS::DomainName;
 use Net::DNS::RR::A;
 use Net::DNS::RR::AAAA;
@@ -31,6 +30,7 @@ my %keybyname = (
 	ech		  => 'key5',
 	ipv6hint	  => 'key6',
 	dohpath		  => 'key7',				# draft-schwartz-svcb-dns
+	ohttp		  => 'key8',				# draft-pauly-ohai-svcb-config
 	);
 
 
@@ -189,9 +189,9 @@ sub alpn {				## alpn=h3,h2,...
 	return $self->key1( _string(@value) );
 }
 
-sub no_default_alpn {			## no-default-alpn
+sub no_default_alpn {			## no-default-alpn	(Boolean)
 	my ( $self, @value ) = @_;				# uncoverable pod
-	return $self->key2( ( defined(wantarray) ? @value : '' ), @value );
+	return $self->key2( ( defined(wantarray) ? () : '' ), @value );
 }
 
 sub port {				## port=1234
@@ -204,9 +204,9 @@ sub ipv4hint {				## ipv4hint=192.0.2.1,...
 	return $self->key4( _ipv4(@value) );
 }
 
-sub ech {				## ech=base64string
+sub ech {				## Format not specified
 	my ( $self, @value ) = @_;
-	return $self->key5( map { _base64($_) } @value );
+	return $self->key5(@value);				# RESERVED
 }
 
 sub ipv6hint {				## ipv6hint=2001:DB8::1,...
@@ -219,6 +219,11 @@ sub dohpath {				## dohpath=/dns-query{?dns}
 	return $self->key7(@value);
 }
 
+sub ohttp {				## ohttp	(Boolean)
+	my ( $self, @value ) = @_;				# uncoverable pod
+	return $self->key8( ( defined(wantarray) ? () : '' ), @value );
+}
+
 
 ########################################
 
@@ -227,11 +232,6 @@ sub _presentation {			## render octet string(s) in presentation format
 	my @arg = @_;
 	my $raw = scalar(@arg) ? join( '', @arg ) : return ();
 	return Net::DNS::Text->decode( \$raw, 0, length($raw) )->string;
-}
-
-sub _base64 {
-	my @arg = @_;
-	return _presentation( map { MIME::Base64::decode($_) } @arg );
 }
 
 sub _integer16 {
@@ -254,17 +254,17 @@ sub _string {
 	local $_ = join ',', @arg;				# reassemble argument string
 	s/\\,/\\044/g;						# disguise (RFC1035) escaped comma
 	die <<"QQ" if /\\092,|\\092\\092/;
-SVCB: Please use standard RFC1035 escapes\n draft-ietf-dnsop-svcb-https double-escape nonsense not implemented
+SVCB:	Please use standard RFC1035 escapes
+	draft-ietf-dnsop-svcb-https double-escape nonsense not implemented
 QQ
 	return _presentation( map { Net::DNS::Text->new($_)->encode() } split /,/ );
 }
 
 
-our $AUTOLOAD;
-
 sub AUTOLOAD {				## Dynamic constructor/accessor methods
 	my ( $self, @argument ) = @_;
 
+	our $AUTOLOAD;
 	my ($method) = reverse split /::/, $AUTOLOAD;
 
 	my $super = "SUPER::$method";

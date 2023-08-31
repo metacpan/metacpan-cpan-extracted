@@ -59,6 +59,14 @@ Returns the
 
 =cut
 
+=head2 almost_prime_sum
+
+    self.almost_prime_sum
+
+Returns the
+
+=cut
+
 =head2 avg
 
     self.avg(arg)
@@ -155,25 +163,25 @@ Returns the
 
 =cut
 
-=head2 cubeful
+=head2 cubefull
 
-    self.cubeful
-
-Returns the
-
-=cut
-
-=head2 cubeful_count
-
-    self.cubeful_count
+    self.cubefull
 
 Returns the
 
 =cut
 
-=head2 cubeful_sum
+=head2 cubefull_count
 
-    self.cubeful_sum
+    self.cubefull_count
+
+Returns the
+
+=cut
+
+=head2 cubefull_sum
+
+    self.cubefull_sum
 
 Returns the
 
@@ -211,9 +219,9 @@ Returns the
 
 =cut
 
-=head2 each_cubeful
+=head2 each_cubefull
 
-    self.each_cubeful
+    self.each_cubefull
 
 Returns the
 
@@ -227,25 +235,25 @@ Returns the
 
 =cut
 
-=head2 each_non_cubefree
+=head2 each_noncubefree
 
-    self.each_non_cubefree
-
-Returns the
-
-=cut
-
-=head2 each_non_powerfree
-
-    self.each_non_powerfree
+    self.each_noncubefree
 
 Returns the
 
 =cut
 
-=head2 each_non_squarefree
+=head2 each_nonpowerfree
 
-    self.each_non_squarefree
+    self.each_nonpowerfree
+
+Returns the
+
+=cut
+
+=head2 each_nonsquarefree
+
+    self.each_nonsquarefree
 
 Returns the
 
@@ -323,9 +331,9 @@ Returns the
 
 =cut
 
-=head2 each_squareful
+=head2 each_squarefull
 
-    self.each_squareful
+    self.each_squarefull
 
 Returns the
 
@@ -407,73 +415,73 @@ Aliases: I<call>
 
 =cut
 
-=head2 non_cubefree
+=head2 noncubefree
 
-    self.non_cubefree
-
-Returns the
-
-=cut
-
-=head2 non_cubefree_count
-
-    self.non_cubefree_count
+    self.noncubefree
 
 Returns the
 
 =cut
 
-=head2 non_cubefree_sum
+=head2 noncubefree_count
 
-    self.non_cubefree_sum
-
-Returns the
-
-=cut
-
-=head2 non_powerfree
-
-    self.non_powerfree
+    self.noncubefree_count
 
 Returns the
 
 =cut
 
-=head2 non_powerfree_count
+=head2 noncubefree_sum
 
-    self.non_powerfree_count
-
-Returns the
-
-=cut
-
-=head2 non_powerfree_sum
-
-    self.non_powerfree_sum
+    self.noncubefree_sum
 
 Returns the
 
 =cut
 
-=head2 non_squarefree
+=head2 nonpowerfree
 
-    self.non_squarefree
-
-Returns the
-
-=cut
-
-=head2 non_squarefree_count
-
-    self.non_squarefree_count
+    self.nonpowerfree
 
 Returns the
 
 =cut
 
-=head2 non_squarefree_sum
+=head2 nonpowerfree_count
 
-    self.non_squarefree_sum
+    self.nonpowerfree_count
+
+Returns the
+
+=cut
+
+=head2 nonpowerfree_sum
+
+    self.nonpowerfree_sum
+
+Returns the
+
+=cut
+
+=head2 nonsquarefree
+
+    self.nonsquarefree
+
+Returns the
+
+=cut
+
+=head2 nonsquarefree_count
+
+    self.nonsquarefree_count
+
+Returns the
+
+=cut
+
+=head2 nonsquarefree_sum
+
+    self.nonsquarefree_sum
 
 Returns the
 
@@ -490,6 +498,14 @@ Returns the
 =head2 omega_primes
 
     self.omega_primes
+
+Returns the
+
+=cut
+
+=head2 omega_prime_sum
+
+    self.omega_prime_sum
 
 Returns the
 
@@ -567,6 +583,14 @@ Returns the
 
 =cut
 
+=head2 prime_power_sum
+
+    self.prime_power_sum
+
+Returns the
+
+=cut
+
 =head2 primes
 
     self.primes
@@ -615,6 +639,14 @@ Returns the
 
 =cut
 
+=head2 semiprime_sum
+
+    self.semiprime_sum
+
+Returns the
+
+=cut
+
 =head2 smooth_count
 
     self.smooth_count
@@ -647,6 +679,14 @@ Returns the
 
 =cut
 
+=head2 squarefree_almost_prime_sum
+
+    self.squarefree_almost_prime_sum
+
+Returns the
+
+=cut
+
 =head2 squarefree_count
 
     self.squarefree_count
@@ -671,6 +711,14 @@ Returns the
 
 =cut
 
+=head2 squarefree_semiprime_sum
+
+    self.squarefree_semiprime_sum
+
+Returns the
+
+=cut
+
 =head2 squarefree_sum
 
     self.squarefree_sum
@@ -679,25 +727,25 @@ Returns the
 
 =cut
 
-=head2 squareful
+=head2 squarefull
 
-    self.squareful
-
-Returns the
-
-=cut
-
-=head2 squareful_count
-
-    self.squareful_count
+    self.squarefull
 
 Returns the
 
 =cut
 
-=head2 squareful_sum
+=head2 squarefull_count
 
-    self.squareful_sum
+    self.squarefull_count
+
+Returns the
+
+=cut
+
+=head2 squarefull_sum
+
+    self.squarefull_sum
 
 Returns the
 

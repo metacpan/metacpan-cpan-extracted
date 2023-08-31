@@ -4,23 +4,13 @@ use warnings;
 
 use Template::Plex;
 
-#use List::Util qw<min max>;
-
-#use Symbol qw<delete_package>;
-use Carp qw<carp croak>;
 
 use feature qw<state refaliasing>;
 no warnings "experimental";
 
-use File::Spec::Functions qw<catfile>;
-#use File::Basename qw<dirname>;
-use Exporter 'import';
+#use File::Spec::Functions qw<catfile>;
 
-
-#our %EXPORT_TAGS = ( 'all' => [ qw( plex plx  block pl plex_clear jmap) ] );
-
-our @EXPORT_OK = qw<block pl jmap>;# @{ $EXPORT_TAGS{'all'} } );
-
+use Export::These qw<block pl jmap>;
 
 my $Include=qr|\@\{\s*\[\s*include\s*\(\s*(.*?)\s*\)\s*\] \s* \}|x;
 my $Init=qr|\@\{\s*\[\s*init\s*\{(?:.*?)\}\s*\] \s* \}|smx;
@@ -30,7 +20,7 @@ sub new;	#forward declare new;
 
 sub lexical{
 	my $href=shift;
-	croak "NEED A HASH REF " unless  ref $href eq "HASH" or !defined $href;
+	die "NEED A HASH REF " unless  ref $href eq "HASH" or !defined $href;
 	$href//={};
 	\my %fields=$href;
 
@@ -312,9 +302,7 @@ sub new{
 	my $plex=bless [], shift;
 	my ($prepare, $path, $args, %options)=@_;
 	my $root=$options{root};
-	#croak "plex: even number of arguments required" if (@_-1)%2;
-	croak "Template::Plex::Internal first argument must be defined" unless defined $path;
-	#croak "plex: at least 2 arguments needed" if ((@_-1) < 2);
+	die "Template::Plex::Internal first argument must be defined" unless defined $path;
 
 	my $data=do {
 		local $/=undef;
@@ -332,13 +320,14 @@ sub new{
 			#Assume a path
 			#Prepend the root if present
 			$options{file}=$path;
-			$path=catfile $root, $path if $root;
+      #$path=catfile $root, $path if $root;
+      $path=join "/", $root, $path if $root;
 			my $fh;
 			if(open $fh, "<", $path){
 				<$fh> 
 			}
 			else {
-				croak "Could not open file: $path $!";
+				die "Could not open file: $path $!";
 				"";
 			}
 		}

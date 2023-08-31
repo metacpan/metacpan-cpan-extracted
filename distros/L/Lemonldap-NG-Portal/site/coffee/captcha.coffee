@@ -20,6 +20,7 @@ renewCaptcha = () ->
 			console.log 'GET new image -> ', newimage
 			$('#token').attr 'value', newtoken
 			$('#captcha').attr 'src', newimage
+			$('#captchafield').get(0).value = ''
 
 $(document).ready ->
 	$('#logout').attr 'href', portal

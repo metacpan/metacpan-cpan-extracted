@@ -13,12 +13,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::OpenPGP::ErrorCodes;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::OpenPGP::ErrorCodes - OpenPGP error codes
+
+=head1 DESCRIPTION
+
+This module provides error codes handling to be used by the various
+OpenPGP backends.
+
+B<Note>: This is a private module, its API can change at any time.
+
+=cut
+
+package Dpkg::OpenPGP::ErrorCodes 0.01;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
 our @EXPORT = qw(
     OPENPGP_OK
     OPENPGP_NO_SIG
@@ -34,6 +48,7 @@ our @EXPORT = qw(
 
     OPENPGP_MISSING_CMD
     OPENPGP_NEEDS_KEYSTORE
+    OPENPGP_CMD_CANNOT_SIGN
 
     openpgp_errorcode_to_string
 );
@@ -63,6 +78,7 @@ use constant {
 
     OPENPGP_MISSING_CMD => -1,
     OPENPGP_NEEDS_KEYSTORE => -2,
+    OPENPGP_CMD_CANNOT_SIGN => -3,
 };
 
 my %code2error = (
@@ -80,6 +96,7 @@ my %code2error = (
 
     OPENPGP_MISSING_CMD() => N_('missing OpenPGP implementation'),
     OPENPGP_NEEDS_KEYSTORE() => N_('specified key needs a keystore'),
+    OPENPGP_CMD_CANNOT_SIGN() => N_('OpenPGP backend command cannot sign'),
 );
 
 sub openpgp_errorcode_to_string
@@ -89,5 +106,13 @@ sub openpgp_errorcode_to_string
     return gettext($code2error{$code}) if exists $code2error{$code};
     return sprintf g_('error code %d'), $code;
 }
+
+=head1 CHANGES
+
+=head2 Version 0.xx
+
+This is a private module.
+
+=cut
 
 1;

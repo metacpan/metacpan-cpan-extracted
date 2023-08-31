@@ -36,7 +36,7 @@ use warnings 'once';
 
 use Carp;
 
-our $VERSION = '0.20';
+our $VERSION = '0.26';
 
 use App::LXC::Container::Texts::en;
 

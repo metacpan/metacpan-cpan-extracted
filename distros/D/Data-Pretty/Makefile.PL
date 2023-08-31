@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     LICENSE             => 'perl_5',
     MIN_PERL_VERSION    => '5.006',
     (MM->can('signature_target') ? (SIGN => 1) : ()),
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', PREOP => './dev/cleanup.pl' },
+    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp', PREOP => './dev/cleanup.pl' },
     clean               => { FILES => 'Data-Pretty-*' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },

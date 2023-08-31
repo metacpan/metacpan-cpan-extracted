@@ -4,7 +4,7 @@
 
 package Glib::MakeHelper;
 
-our $VERSION = '1.3293';
+our $VERSION = '1.3294';
 
 =head1 NAME
 

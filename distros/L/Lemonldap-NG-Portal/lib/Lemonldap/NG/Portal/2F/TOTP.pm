@@ -14,8 +14,9 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_FORMEMPTY
   PE_SENDRESPONSE
 );
+use Lemonldap::NG::Common::Util qw/display2F/;
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.17.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::SecondFactor
@@ -65,6 +66,7 @@ sub run {
 sub verify {
     my ( $self, $req, $session ) = @_;
     my ( $code, $secret, @totp2f );
+    my $uid = $session->{ $self->conf->{whatToTrace} };
     $self->logger->debug( $self->prefix . '2f: verification' );
 
     unless ( $code = $req->param('code') ) {
@@ -73,7 +75,13 @@ sub verify {
     }
 
     @totp2f = $self->find2fDevicesByType( $req, $session, $self->type );
-    $secret = $_->{_secret} foreach @totp2f;
+    my $_2fDevice;
+    foreach (@totp2f) {
+        if ( $_->{_secret} ) {
+            $secret    = $_->{_secret};
+            $_2fDevice = $_;
+        }
+    }
     unless ($secret) {
         $self->logger->debug( $self->prefix . '2f: no secret found' );
         return PE_BADOTP;
@@ -88,13 +96,13 @@ sub verify {
     return PE_ERROR if $r == -1;
 
     if ($r) {
-        $self->userLogger->info( $self->prefix . '2f: succeed' );
+        $self->userLogger->info( "User $uid authenticated with 2F device: "
+              . display2F($_2fDevice) );
         return PE_OK;
     }
     else {
-        $self->userLogger->notice( $self->prefix
-              . '2f: invalid attempt for '
-              . $session->{ $self->conf->{whatToTrace} } );
+        $self->userLogger->notice(
+            $self->prefix . '2f: invalid attempt for ' . $uid );
         return PE_BADOTP;
     }
 }

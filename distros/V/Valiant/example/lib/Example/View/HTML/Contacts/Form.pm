@@ -3,19 +3,13 @@ package Example::View::HTML::Contacts::Form;
 use Moo;
 use Example::Syntax;
 use Example::View::HTML
-  -tags => qw(div a fieldset link_to legend br form button form_for),
-  -util => qw(path content);
+  -tags => qw(div a fieldset title link_to legend br form button form_for),
+  -util => qw(list_uri delete_uri);
 
 has 'contact' => (is=>'ro', required=>1);
 
-sub create_or_update_contact_path  :Renders ($self, $contact)  {
-  return $contact->in_storage ?
-   path('update', [$contact->id]) :
-    path('create'); 
-}
-
 sub render($self, $c) {
-  form_for 'contact', +{action=>$self->create_or_update_contact_path($self->contact), ajax=>0}, sub ($self, $fb, $contact) {
+  form_for 'contact', sub ($self, $fb, $contact) {
     div +{ if=>$fb->successfully_updated, 
       class=>'alert alert-success', role=>'alert' 
     }, 'Successfully Saved!',
@@ -85,7 +79,7 @@ sub render($self, $c) {
     ],
 
     $fb->submit(),
-    link_to path('list'), {class=>'btn btn-secondary btn-lg btn-block'}, 'Return to Contact List',
+    link_to list_uri, {class=>'btn btn-secondary btn-lg btn-block'}, 'Return to Contact List',
   },
   $self->delete_button,
 }
@@ -94,7 +88,7 @@ sub delete_button :Renders ($self) {
   return '' unless $self->contact->in_storage;
   return form {
     method => 'POST',
-    action => path('delete', [$self->contact->id], {'x-tunneled-method'=>'delete'}),
+    action => delete_uri($self->contact, {'x-tunneled-method'=>'delete'}),
   },
     button { class => 'btn btn-danger btn-lg btn-block'}, 'Delete Contact';
 }

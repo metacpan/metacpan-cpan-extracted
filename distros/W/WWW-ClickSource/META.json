@@ -4,7 +4,7 @@
       "Horea <horea@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -37,7 +37,7 @@
    "provides" : {
       "WWW::ClickSource" : {
          "file" : "lib/WWW/ClickSource.pm",
-         "version" : "1.0002"
+         "version" : "1.0003"
       },
       "WWW::ClickSource::Request" : {
          "file" : "lib/WWW/ClickSource/Request.pm"
@@ -55,6 +55,6 @@
          "url" : "https://github.com/gliganh/WWW-ClickSource"
       }
    },
-   "version" : "1.0002",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.0003",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

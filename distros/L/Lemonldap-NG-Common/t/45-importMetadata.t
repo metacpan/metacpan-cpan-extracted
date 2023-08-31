@@ -13,6 +13,10 @@ my $xml;
     close XML;
 }
 
+# Update this if you change the content of the file
+my $idp_in_file = 12;
+my $sp_in_file  = 48;
+
 my $lmConf     = {};
 my $importConf = {};
 
@@ -24,8 +28,8 @@ my ( $spCounters, $idpCounters ) =
 is_deeply(
     $spCounters,
     {
-        'created'  => 47,
-        'found'    => 48,
+        'created'  => $sp_in_file,
+        'found'    => $sp_in_file + 1,
         'ignored'  => 0,
         'rejected' => 1,
         'removed'  => 0,
@@ -36,8 +40,8 @@ is_deeply(
 is_deeply(
     $idpCounters,
     {
-        'created'  => 12,
-        'found'    => 13,
+        'created'  => $idp_in_file,
+        'found'    => $idp_in_file + 1,
         'ignored'  => 0,
         'rejected' => 1,
         'removed'  => 0,
@@ -46,20 +50,23 @@ is_deeply(
     "IDP counters are expected"
 );
 
-is( keys %{ $lmConf->{samlIDPMetaDataXML} }, 12,
-    "Correct amount of providers" );
+is( keys %{ $lmConf->{samlIDPMetaDataXML} },
+    $idp_in_file, "Correct amount of providers" );
 is( keys %{ $lmConf->{samlIDPMetaDataExportedAttributes} },
-    12, "Correct amount of providers" );
+    $idp_in_file, "Correct amount of providers" );
 is( keys %{ $lmConf->{samlIDPMetaDataOptions} },
-    12, "Correct amount of providers" );
-is( keys %{ $lmConf->{samlSPMetaDataXML} }, 47, "Correct amount of providers" );
+    $idp_in_file, "Correct amount of providers" );
+is( keys %{ $lmConf->{samlSPMetaDataXML} },
+    $sp_in_file, "Correct amount of providers" );
 is( keys %{ $lmConf->{samlSPMetaDataExportedAttributes} },
-    47, "Correct amount of providers" );
+    $sp_in_file, "Correct amount of providers" );
 is( keys %{ $lmConf->{samlSPMetaDataOptions} },
-    47, "Correct amount of providers" );
+    $sp_in_file, "Correct amount of providers" );
 
 my $idp = "idp-idp-test-insa-rennes-fr-idp-shibboleth";
 my $sp  = "sp-ucopia-univ-brest-fr";
+my $eduroam =
+  "sp-monitor-eduroam-org-sp-module-php-saml-sp-metadata-php-default-sp";
 
 is(
     $lmConf->{samlIDPMetaDataExportedAttributes}->{$idp}
@@ -86,6 +93,16 @@ is(
     "Found required attribute"
 );
 
+is(
+
+    $lmConf->{samlSPMetaDataExportedAttributes}->{$eduroam}->{'subjectId'},
+    join( ';',
+        0,
+        'urn:oasis:names:tc:SAML:attribute:subject-id',
+        'urn:oasis:names:tc:SAML:2.0:attrname-format:uri', 'subject-id' ),
+    "Found subject ID"
+);
+
 # Check update
 $lmConf->{samlSPMetaDataOptions}->{$sp}
   ->{samlSPMetaDataOptionsCheckSSOMessageSignature} = 0;
@@ -98,7 +115,7 @@ is_deeply(
     $spCounters,
     {
         'created'  => 0,
-        'found'    => 48,
+        'found'    => $sp_in_file + 1,
         'ignored'  => 0,
         'rejected' => 1,
         'removed'  => 0,
@@ -110,7 +127,7 @@ is_deeply(
     $idpCounters,
     {
         'created'  => 0,
-        'found'    => 13,
+        'found'    => $idp_in_file + 1,
         'ignored'  => 0,
         'rejected' => 1,
         'removed'  => 0,
@@ -137,7 +154,7 @@ is_deeply(
     $spCounters,
     {
         'created'  => 0,
-        'found'    => 48,
+        'found'    => $sp_in_file + 1,
         'ignored'  => 0,
         'rejected' => 1,
         'removed'  => 0,
@@ -149,7 +166,7 @@ is_deeply(
     $idpCounters,
     {
         'created'  => 0,
-        'found'    => 13,
+        'found'    => $idp_in_file + 1,
         'ignored'  => 0,
         'rejected' => 1,
         'removed'  => 0,

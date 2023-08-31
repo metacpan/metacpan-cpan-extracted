@@ -46,41 +46,56 @@ LemonLDAP::NG WebAuthn registration script
       dataType: 'json',
       error: displayError,
       success: function(ch) {
-        var request;
+        var e, request;
         request = ch.request;
-        setMsg('webAuthnRegisterInProgress', 'warning');
-        $('#u2fPermission').show();
-        return WebAuthnUI.WebAuthnUI.createCredential(request).then(function(response) {
-          return $.ajax({
-            type: "POST",
-            url: portal + "2fregisters/webauthn/registration",
-            data: {
-              state_id: ch.state_id,
-              credential: JSON.stringify(response),
-              keyName: $('#keyName').val()
-            },
-            dataType: 'json',
-            success: function(resp) {
-              if (resp.error) {
-                if (resp.error.match(/badName/)) {
-                  return setMsg(resp.error, 'danger');
-                } else {
-                  return setMsg('webAuthnRegisterFailed', 'danger');
-                }
-              } else if (resp.result) {
-                $(document).trigger("mfaAdded", [
-                  {
-                    "type": "webauthn"
+        e = jQuery.Event("webauthnRegistrationAttempt");
+        $(document).trigger(e);
+        if (!e.isDefaultPrevented()) {
+          setMsg('webAuthnRegisterInProgress', 'warning');
+          $('#u2fPermission').show();
+          return WebAuthnUI.WebAuthnUI.createCredential(request).then(function(response) {
+            e = jQuery.Event("webauthnRegistrationSuccess");
+            $(document).trigger(e, [response]);
+            if (!e.isDefaultPrevented()) {
+              return $.ajax({
+                type: "POST",
+                url: portal + "2fregisters/webauthn/registration",
+                data: {
+                  state_id: ch.state_id,
+                  credential: JSON.stringify(response),
+                  keyName: $('#keyName').val()
+                },
+                dataType: 'json',
+                success: function(resp) {
+                  if (resp.error) {
+                    if (resp.error.match(/badName/)) {
+                      return setMsg(resp.error, 'danger');
+                    } else {
+                      return setMsg('webAuthnRegisterFailed', 'danger');
+                    }
+                  } else if (resp.result) {
+                    e = jQuery.Event("mfaAdded");
+                    $(document).trigger(e, [
+                      {
+                        "type": "webauthn"
+                      }
+                    ]);
+                    if (!e.isDefaultPrevented()) {
+                      return setMsg('yourKeyIsRegistered', 'positive');
+                    }
                   }
-                ]);
-                return setMsg('yourKeyIsRegistered', 'positive');
-              }
-            },
-            error: displayError
+                },
+                error: displayError
+              });
+            }
+          })["catch"](function(error) {
+            e = jQuery.Event("webauthnRegistrationFailure");
+            $(document).trigger(e, [error]);
+            if (!e.isDefaultPrevented()) {
+              return webAuthnError(error);
+            }
           });
-        })["catch"](function(error) {
-          return webAuthnError(error);
-        });
+        }
       }
     });
   };

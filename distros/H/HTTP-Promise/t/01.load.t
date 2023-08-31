@@ -6,7 +6,7 @@ BEGIN
     use warnings;
     use lib './lib';
     use Test2::V0;
-}
+};
 
 # To build the list of modules:
 # find ./lib -type f -name "*.pm" -print | xargs perl -lE 'my @f=sort(@ARGV); for(@f) { s,./lib/,,; s,\.pm$,,; s,/,::,g; substr( $_, 0, 0, q{use ok( ''} ); $_ .= q{'' );}; say $_; }'

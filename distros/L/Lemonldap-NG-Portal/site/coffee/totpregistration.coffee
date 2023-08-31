@@ -25,7 +25,7 @@ getKey = () ->
 	setMsg 'yourTotpKey', 'warning'
 	$.ajax
 		type: "POST",
-		url: "#{portal}/2fregisters/totp/getkey"
+		url: "#{portal}2fregisters/totp/getkey"
 		dataType: 'json'
 		error: displayError
 		# Display key and QR code
@@ -67,7 +67,7 @@ verify = ->
 	else
 		$.ajax
 			type: "POST",
-			url: "#{portal}/2fregisters/totp/verify"
+			url: "#{portal}2fregisters/totp/verify"
 			dataType: 'json'
 			data:
 				token: token
@@ -81,8 +81,10 @@ verify = ->
 					else
 						setMsg data.error, 'danger'
 				else
-					$(document).trigger "mfaAdded", [ { "type": "totp" } ]
-					setMsg 'yourKeyIsRegistered', 'success'					
+					e = jQuery.Event( "mfaAdded" )
+					$(document).trigger e, [ { "type": "totp" } ]
+					if !e.isDefaultPrevented()
+						setMsg 'yourKeyIsRegistered', 'success'
 					
 $(document).ready ->
 	getKey()

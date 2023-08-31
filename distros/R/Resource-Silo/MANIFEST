@@ -31,6 +31,7 @@ t/404-bad-use-argument.t
 t/405-bad-usage.t
 t/406-self_check.t
 t/407-return-undef.t
+t/408-no-forward.t
 t/501-compat-moo.t
 t/README.md
 t/tlib/My/Class.pm

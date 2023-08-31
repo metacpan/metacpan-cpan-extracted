@@ -1,7 +1,7 @@
 package PICA::Parser::Base;
 use v5.14.1;
 
-our $VERSION = '2.11';
+our $VERSION = '2.12';
 
 use PICA::Data::Field;
 use Carp         qw(croak);
@@ -137,6 +137,8 @@ Use one of the following subclasses instead:
 
 =item L<PICA::Parser::JSON>
 
+=item L<PICA::Parser::Patch>
+
 =back
 
 =head2 CONFIGURATION
@@ -151,7 +153,8 @@ them fatal by setting the I<strict> parameter to 1.
 =item annotate
 
 By default some parsers also support annotated PICA. Set to true to enforce
-field annotations or to false to forbid them.
+field annotations or to false to forbid them. Default value (undefined or empty
+string) allows annotations.
 
 =back
 

@@ -12,6 +12,7 @@ my $build = Module::Build->new(
       'Object::Pad::FieldAttr::Checked' => '0.04',
       'Types::Standard' => 0,
 
+      'Config::Tiny' => 0,
       'Convert::Color' => 0,
       'Convert::Color::XTerm' => '0.06',
       'File::Slurper' => 0,

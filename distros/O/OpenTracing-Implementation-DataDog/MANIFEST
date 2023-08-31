@@ -5,6 +5,7 @@ examples/lib/MyTracer.pm
 lib/OpenTracing/Implementation/DataDog.pm
 lib/OpenTracing/Implementation/DataDog.pod
 lib/OpenTracing/Implementation/DataDog/Client.pm
+lib/OpenTracing/Implementation/DataDog/HTTPPropagator.pm
 lib/OpenTracing/Implementation/DataDog/Scope.pm
 lib/OpenTracing/Implementation/DataDog/ScopeManager.pm
 lib/OpenTracing/Implementation/DataDog/Span.pm

@@ -203,8 +203,10 @@ subtest 'literal' => sub {
     } qr(^resource '\w+': 'literal'.*incompatible.*'class'), "literal + init = no go";
 };
 
-is_deeply [ silo->ctl->meta->list ], [ 'dup' ]
-    , "no reqources except duplicate present";
+my $leftover = [ silo->ctl->meta->list ];
+is_deeply $leftover, [ 'dup' ]
+    , "no resources except the duplicate one present"
+    or note explain $leftover;
 
 done_testing;
 

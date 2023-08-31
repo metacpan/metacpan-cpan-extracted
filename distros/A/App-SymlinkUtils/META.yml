@@ -19,8 +19,9 @@ name: App-SymlinkUtils
 provides:
   App::SymlinkUtils:
     file: lib/App/SymlinkUtils.pm
-    version: '0.001'
+    version: '0.002'
 requires:
+  Data::Sah::Compiler::perl::TH::array: '0.914'
   Data::Sah::Compiler::perl::TH::bool: '0.914'
   Data::Sah::Compiler::perl::TH::str: '0.914'
   Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix: '0'
@@ -29,6 +30,7 @@ requires:
   Log::ger: '0.038'
   Perinci::CmdLine::Any: '0.154'
   Perinci::CmdLine::Lite: '1.924'
+  Perinci::Sub::Util: '0.471'
   Sah::Schema::filename: '0'
   strict: '0'
   warnings: '0'
@@ -36,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-SymlinkUtils
   homepage: https://metacpan.org/release/App-SymlinkUtils
   repository: git://github.com/perlancar/perl-App-SymlinkUtils.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -44,6 +46,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript check-symlink'
+      version: '0.424'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript check-symlinks'
       version: '0.424'
     -
       class: Dist::Zilla::Plugin::InsertExecsList
@@ -448,6 +454,14 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
+      version: '6.028'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: x_spec
+      name: DevelopX_spec
       version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode

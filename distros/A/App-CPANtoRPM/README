@@ -50,7 +50,7 @@ OPTIONS
         may also come from a config file. The config file may contain the
         options for any number of modules and is described below.
 
-  Download Options
+  Obtain the perl module Options
     The following options affect how a module is downloaded.
 
     -c/--cpan
@@ -241,6 +241,30 @@ OPTIONS
         Related to the previous options, these options allow you to remove a
         feature from the requirements list, or the list of features
         provided.
+
+    --repl-require FEATURE=VERS
+    --repl-provide FEATURE=VERS
+        Occasionally, the module author explicitly defines the version of a
+        feature that is required, or provided by this module, in a way that
+        breaks things.
+
+        These options (which can be included any number of times) will
+        replace the version for either a required feature or a provided
+        feature as they will appear in the spec file. That way, for example,
+        you can make the version of the requirement match what is provided
+        in other RPMs.
+
+        For example, if the perl RPM that is installed on the system
+        provides the feature perl=5.24.1 but the module requires
+        perl=5.008001, rpmbuild may fail because it doesn't know how to
+        compare these two version numbers to know whether the requirement is
+        met. When this happens, rpmbuild will fail due to missing
+        dependencies.
+
+        In this cae, you could reformat the dependency version by passing
+        in:
+
+           --repl-require perl=5.08.1
 
     -m, --macros
         Use the macro form of common SPEC constructs over the environment
@@ -470,9 +494,13 @@ OBTAIN THE PERL MODULE
 
        Foo::Bar
 
-    instead of
+    instead of a file form:
 
        Foo-Bar
+       Foo-Bar-1.00
+       Foo-Bar-1.00.tar.gz
+
+    These are not currently supported.
 
     When downloading from a URL, both ftp:// and http:// URLs are supported
     (though others such as file:// and https:// are not supported at this

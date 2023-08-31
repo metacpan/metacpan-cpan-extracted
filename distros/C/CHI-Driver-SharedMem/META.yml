@@ -37,5 +37,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/CHI-Driver-SharedMem/issues
   repository: git://github.com/nigelhorne/CHI-Driver-SharedMem.git
-version: '0.18'
+version: '0.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

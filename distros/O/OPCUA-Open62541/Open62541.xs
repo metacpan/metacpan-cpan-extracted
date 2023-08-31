@@ -2694,14 +2694,14 @@ unpack_UA_UsernamePasswordLogin_List(UA_UsernamePasswordLogin **outList,
 	}
 }
 
-#ifdef HAVE_UA_ACCESSCONTROL_SETCALLBACK
+#ifdef HAVE_UA_ACCESSCONTROL_DEFAULTWITHLOGINCALLBACK
 
 #ifdef HAVE_CRYPT_CHECKPASS
 
 static UA_StatusCode
 loginCryptCheckpassCallback(const UA_String *userName, const UA_ByteString
     *password, size_t loginSize, const UA_UsernamePasswordLogin *loginList,
-    void *loginContext)
+    void **sessionContext, void *loginContext)
 {
 	char *pass;
 	size_t i;
@@ -2714,7 +2714,7 @@ loginCryptCheckpassCallback(const UA_String *userName, const UA_ByteString
 	memcpy(pass, password->data, password->length);
 	pass[password->length] = '\0';
 
-	/* Always run though full loop to avoid timing attack. */
+	/* Always run through full loop to avoid timing attack. */
 	for (i = 0; i < loginSize; i++, loginList++) {
 		char hash[_PASSWORD_LEN + 1];
 		size_t hashlen;
@@ -2745,7 +2745,7 @@ loginCryptCheckpassCallback(const UA_String *userName, const UA_ByteString
 
 #endif /* HAVE_CRYPT_CHECKPASS */
 
-#endif /* HAVE_UA_ACCESSCONTROL_SETCALLBACK */
+#endif /* HAVE_UA_ACCESSCONTROL_DEFAULTWITHLOGINCALLBACK */
 
 /*#########################################################################*/
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541
@@ -3573,6 +3573,14 @@ UA_ServerConfig_setAccessControl_default(config, allowAnonymous, \
 	UA_UsernamePasswordLogin *		loginList;
 	size_t					loginSize;
     CODE:
+	/* Use fallback like UA_ServerConfig_setDefaultWithSecurityPolicies */
+	if (optUserTokenPolicyUri == NULL &&
+	    config->svc_serverconfig->securityPoliciesSize > 0) {
+		optUserTokenPolicyUri =
+		    &config->svc_serverconfig->securityPolicies
+		    [config->svc_serverconfig->securityPoliciesSize - 1].
+		    policyUri;
+	}
 	if (optVerifyX509 && optUserTokenPolicyUri == NULL)
 		CROAK("VerifyX509 needs userTokenPolicyUri");
 	unpack_UA_UsernamePasswordLogin_List(&loginList, &loginSize,
@@ -3581,33 +3589,66 @@ UA_ServerConfig_setAccessControl_default(config, allowAnonymous, \
 		CROAK("UsernamePasswordLogin needs userTokenPolicyUri");
 	RETVAL = UA_AccessControl_default(config->svc_serverconfig,
 	    allowAnonymous, optVerifyX509, optUserTokenPolicyUri,
-	   loginSize, loginList);
+	    loginSize, loginList);
     OUTPUT:
 	RETVAL
 
-#ifdef HAVE_UA_ACCESSCONTROL_SETCALLBACK
+#ifdef HAVE_UA_ACCESSCONTROL_DEFAULTWITHLOGINCALLBACK
 
 UA_StatusCode
-UA_ServerConfig_setAccessControl_loginCheck(config, check)
-	OPCUA_Open62541_ServerConfig	config
-	SV *				check;
+UA_ServerConfig_setAccessControl_defaultWithLoginCallback(config, \
+    allowAnonymous, optVerifyX509, optUserTokenPolicyUri, \
+    usernamePasswordLogin, loginCallback, loginContext)
+	OPCUA_Open62541_ServerConfig		config
+	UA_Boolean				allowAnonymous
+	OPCUA_Open62541_CertificateVerification	optVerifyX509
+	OPCUA_Open62541_ByteString		optUserTokenPolicyUri
+	SV *					usernamePasswordLogin
+	SV *					loginCallback
+	SV *					loginContext
+    PREINIT:
+	UA_UsernamePasswordLogin *		loginList;
+	size_t					loginSize;
+	UA_UsernamePasswordLoginCallback	callback;
+	void *					context;
     CODE:
-	if (!SvOK(check)) {
-		RETVAL = UA_AccessControl_setCallback(config->svc_serverconfig,
-		    NULL, NULL);
+	/* Use fallback like UA_ServerConfig_setDefaultWithSecurityPolicies */
+	if (optUserTokenPolicyUri == NULL &&
+	    config->svc_serverconfig->securityPoliciesSize > 0) {
+		optUserTokenPolicyUri =
+		    &config->svc_serverconfig->securityPolicies
+		    [config->svc_serverconfig->securityPoliciesSize - 1].
+		    policyUri;
+	}
+	if (optVerifyX509 && optUserTokenPolicyUri == NULL)
+		CROAK("VerifyX509 needs userTokenPolicyUri");
+	unpack_UA_UsernamePasswordLogin_List(&loginList, &loginSize,
+	    usernamePasswordLogin);
+	if (loginSize > 0 && optUserTokenPolicyUri == NULL)
+		CROAK("UsernamePasswordLogin needs userTokenPolicyUri");
+	if (!SvOK(loginCallback)) {
+		callback = NULL;
+		context = NULL;
+	} else if (SvROK(loginCallback) &&
+	    SvTYPE(SvRV(loginCallback)) == SVt_PVCV) {
+		(void)loginContext;
+		CROAK("Perl callback not implemented");
 #ifdef HAVE_CRYPT_CHECKPASS
-	} else if (strcmp(SvPV_nolen(check), "crypt_checkpass") == 0) {
-		RETVAL = UA_AccessControl_setCallback(config->svc_serverconfig,
-		    loginCryptCheckpassCallback, NULL);
+	} else if (strcmp(SvPV_nolen(loginCallback), "crypt_checkpass") == 0) {
+		callback = loginCryptCheckpassCallback;
+		context = NULL;
 #endif /* HAVE_CRYPT_CHECKPASS */
 	} else {
-		/* TODO: implement pure Perl callback */
-		RETVAL = UA_STATUSCODE_BADINVALIDARGUMENT;
+		CROAK("Callback '%s' is not CODE reference and unknown check",
+		    SvPV_nolen(loginCallback));
 	}
+	RETVAL = UA_AccessControl_defaultWithLoginCallback(
+	    config->svc_serverconfig, allowAnonymous, optVerifyX509,
+	    optUserTokenPolicyUri, loginSize, loginList, callback, context);
     OUTPUT:
 	RETVAL
 
-#endif /* HAVE_UA_ACCESSCONTROL_SETCALLBACK */
+#endif /* HAVE_UA_ACCESSCONTROL_DEFAULTWITHLOGINCALLBACK */
 
 #ifdef HAVE_CRYPT_CHECKPASS
 

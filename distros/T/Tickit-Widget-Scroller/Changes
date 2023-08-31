@@ -1,5 +1,12 @@
 Revision history for Tickit-Widget-Scroller
 
+0.31    2023-08-30
+        [CHANGES]
+         * Added `->items` accessor for querying the number of stored items
+
+        [BUGFIXES]
+         * Force a redraw of the indicators after a resize
+
 0.30    2023-08-26
         [CHANGES]
          * Use `Tickit::Style` to handle keybindings

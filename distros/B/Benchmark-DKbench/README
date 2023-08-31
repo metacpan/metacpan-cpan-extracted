@@ -1,0 +1,39 @@
+Benchmark-DKbench
+
+Benchmark::DKbench - Fast perceptual image hashing (DCT-based pHash)
+
+INSTALLATION
+
+Normally you would expect to use a package manager like cpanm to install as:
+
+    cpanm Benchmark::DKbench
+
+To install this module manually, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+This, however requires certain CPAN modules and libraries (e.g. dev versions of
+libjpeg, libdb) to be installed. See setup_dkbench for more details.
+
+SUPPORT AND DOCUMENTATION
+
+CPAN:
+    https://metacpan.org/release/Benchmark-DKbench
+
+After installing, you can find documentation for this module with the
+perldoc command:
+
+    perldoc Benchmark::DKbench
+
+Source code and issues on GitHub:
+    https://github.com/dkechag/Benchmark-DKbench
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2021-2023, Dimitrios Kechagias.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

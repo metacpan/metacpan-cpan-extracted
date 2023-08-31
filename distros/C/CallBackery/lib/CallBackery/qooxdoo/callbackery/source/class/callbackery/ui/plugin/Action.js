@@ -9,7 +9,7 @@
  * Form Action Widget.
  */
 qx.Class.define("callbackery.ui.plugin.Action", {
-    extend : qx.ui.container.Composite,
+    extend: qx.ui.container.Composite,
     /**
      * create a page for the View Tab with the given title
      *
@@ -19,26 +19,26 @@ qx.Class.define("callbackery.ui.plugin.Action", {
      * @param getFormData {Function} method to get form data
      * @param plugin {Class} visualization widget to embedd
      */
-    construct : function(cfg,buttonClass,layout,getFormData, plugin) {
+    construct(cfg, buttonClass, layout, getFormData, plugin) {
         this.base(arguments, layout);
         this._plugin = plugin;
         this._urlActions = [];
         this._buttonMap = {};
         this._buttonSetMap = {};
         this._cfg = cfg;
-        this._populate(cfg,buttonClass,getFormData);
+        this._populate(cfg, buttonClass, getFormData);
         plugin.addOwnedQxObject(this, 'Action');
-        this.addListener('actionResponse',function(e){
+        this.addListener('actionResponse', function (e) {
             var data = e.getData();
             // ignore empty actions responses
-            if (!data){
+            if (!data) {
                 return;
             }
-            switch (data.action){
+            switch (data.action) {
                 case 'logout':
-                    callbackery.data.Server.getInstance().callAsyncSmartBusy(function(ret) {
-                        if (window.console){
-                            window.console.log('last words from the server "'+ret+'"');
+                    callbackery.data.Server.getInstance().callAsyncSmartBusy(function (ret) {
+                        if (window.console) {
+                            window.console.log('last words from the server "' + ret + '"');
                         }
                         document.location.reload(true);
                     }, 'logout');
@@ -83,13 +83,13 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                     console.error('Unknown action:', data.action);
                     break;
             }
-        },this);
+        }, this);
 
         // process actions called via URL
         this.addListener('appear', () => {
             let config = callbackery.data.Config.getInstance();
             this._urlActions.forEach(urlAction => {
-                let button   = urlAction.button;
+                let button = urlAction.button;
                 let urlValue = config.getUrlConfigValue(urlAction.key);
                 if (urlValue && urlValue == urlAction.value) {
                     button.execute();
@@ -111,59 +111,70 @@ qx.Class.define("callbackery.ui.plugin.Action", {
 
     members: {
         _cfg: null,
-        _plugin : null,
+        _plugin: null,
         _tableMenu: null,
         _defaultAction: null,
         _buttonMap: null,
         _urlActions: null,
-        _print: function(content, left, top) {
+        _mobileMenu: null,
+        _print(content, left, top) {
             var win = window.open('', '_blank');
             var doc = win.document;
             doc.open();
             doc.write(content);
             doc.close();
-            win.onafterprint=function() {
+            win.onafterprint = function () {
                 win.close();
             }
             win.print();
         },
-        _populate: function(cfg,buttonClass,getFormData){
+        _populate(cfg, buttonClass, getFormData) {
             var tm = this._tableMenu = new qx.ui.menu.Menu;
+            let mm = this._mobileMenu = new qx.ui.menu.Menu;
             var menues = {};
-            let plugin = this._plugin;
-            cfg.action.forEach(function(btCfg){
-                var button, menuButton;
+            var mmMenues = {};
+            cfg.action.forEach(function (btCfg) {
+                var button, menuButton, mmButton;
                 var label = btCfg.label ? this.xtr(btCfg.label) : null;
                 switch (btCfg.action) {
                     case 'menu':
                         var menu = menues[btCfg.key] = new qx.ui.menu.Menu;
+                        var mmMenu = mmMenues[btCfg.key] = new qx.ui.menu.Menu;
                         if (btCfg.addToMenu != null) { // add submenu to menu
                             button = new qx.ui.menu.Button(label, null, null, menu)
+                            mmButton = new qx.ui.menu.Button(label, null, null, mmMenu)
                             menues[btCfg.addToMenu].add(button);
+                            mmMenues[btCfg.addToMenu].add(mmButton);
                         }
                         else { // add menu to form
                             button = new qx.ui.form.MenuButton(label, null, menu);
+                            mmButton = new qx.ui.menu.Button(label, null, null, mmMenu);
                             if (btCfg.buttonSet) {
                                 var bs = btCfg.buttonSet;
                                 if (bs.label) {
                                     bs.label = this.xtr(bs.label);
                                 }
                                 button.set(bs);
-                                if (btCfg.key){
-                                    this._buttonSetMap[btCfg.key]=bs;
+                                mmButton.set(bs);
+                                if (btCfg.key) {
+                                    this._buttonSetMap[btCfg.key] = bs;
                                 }
                             }
                             this.add(button);
+                            mm.add(mmButton);
                         }
                         if (btCfg.key) {
                             let btnId = btCfg.key
                                 + (btCfg.testingIdPostfix ? btCfg.testingIdPostfix : '')
                                 + 'Button';
                             this.addOwnedQxObject(button, btnId);
-                            this._buttonMap[btCfg.key]=button;
+                            let mmBtnId = btCfg.key
+                                + (btCfg.testingIdPostfix ? btCfg.testingIdPostfix : '')
+                                + 'mmButton';
+                            this.addOwnedQxObject(mmButton, mmBtnId);
                         }
+                        this._bindButtonPropperties(button, mmButton);
                         return;
-                        break;
                     case 'save':
                     case 'submitVerify':
                     case 'submit':
@@ -173,20 +184,21 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                     case 'cancel':
                     case 'download':
                     case 'display':
+                        mmButton = new qx.ui.menu.Button(label);
                         if (btCfg.addToMenu != null) {
                             button = new qx.ui.menu.Button(label);
                         }
                         else {
                             button = new buttonClass(label);
                         }
-                        if (btCfg.key){
-                            this._buttonMap[btCfg.key]=button;
+                        if (btCfg.key) {
+                            this._buttonMap[btCfg.key] = button;
                             let urlAction = btCfg.urlAction;
                             if (urlAction) {
                                 this._urlActions.push({
-                                    button : button,
-                                    value  : urlAction.value,
-                                    key    : urlAction.key
+                                    button: button,
+                                    value: urlAction.value,
+                                    key: urlAction.key
                                 });
                             }
                         }
@@ -196,12 +208,13 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                 bs.label = this.xtr(bs.label);
                             }
                             button.set(bs);
-                            if (btCfg.key){
-                                this._buttonSetMap[btCfg.key]=bs;
+                            mmButton.set(bs);
+                            if (btCfg.key) {
+                                this._buttonSetMap[btCfg.key] = bs;
                             }
                         }
 
-                        if ( btCfg.addToContextMenu) {
+                        if (btCfg.addToContextMenu) {
                             menuButton = new qx.ui.menu.Button(label);
                             if (btCfg.key) {
                                 let btnId = btCfg.key
@@ -214,26 +227,26 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                 'Visibility',
                                 'Icon',
                                 'Label'
-                            ].forEach(function(Prop){
+                            ].forEach(function (Prop) {
                                 var prop = Prop.toLowerCase();
-                                button.addListener('change'+Prop,function(e){
-                                    menuButton['set'+Prop](e.getData());
-                                },this);
-                                if (btCfg.buttonSet && prop in btCfg.buttonSet){
-                                    menuButton['set'+Prop](btCfg.buttonSet[prop]);
+                                button.addListener('change' + Prop, function (e) {
+                                    menuButton['set' + Prop](e.getData());
+                                }, this);
+                                if (btCfg.buttonSet && prop in btCfg.buttonSet) {
+                                    menuButton['set' + Prop](btCfg.buttonSet[prop]);
                                 }
-                            },this);
+                            }, this);
                         }
                         break;
                     case 'refresh':
                         var timer = qx.util.TimerManager.getInstance();
                         var timerId;
-                        this.addListener('appear',function(){
-                            timerId = timer.start(function(){
-                                this.fireDataEvent('actionResponse',{action: 'reloadStatus'});
+                        this.addListener('appear', function () {
+                            timerId = timer.start(function () {
+                                this.fireDataEvent('actionResponse', { action: 'reloadStatus' });
                             }, btCfg.interval * 1000, this);
                         }, this);
-                        this.addListener('disappear',function(){
+                        this.addListener('disappear', function () {
                             if (timerId) {
                                 timer.stop(timerId);
                                 timerId = null;
@@ -243,17 +256,17 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                     case 'autoSubmit':
                         var autoTimer = qx.util.TimerManager.getInstance();
                         var autoTimerId;
-                        this.addListener('appear',function(){
+                        this.addListener('appear', function () {
                             var key = btCfg.key;
                             var that = this;
-                            autoTimerId = autoTimer.start(function(){
+                            autoTimerId = autoTimer.start(function () {
                                 var formData = getFormData();
-                                callbackery.data.Server.getInstance().callAsync(function(ret){
-                                    that.fireDataEvent('actionResponse',ret || {});
-                                },'processPluginData',cfg.name,{ "key": key, "formData": formData });
+                                callbackery.data.Server.getInstance().callAsync(function (ret) {
+                                    that.fireDataEvent('actionResponse', ret || {});
+                                }, 'processPluginData', cfg.name, { "key": key, "formData": formData });
                             }, btCfg.interval * 1000, this);
                         }, this);
-                        this.addListener('disappear',function(){
+                        this.addListener('disappear', function () {
                             if (autoTimerId) {
                                 autoTimer.stop(autoTimerId);
                                 autoTimerId = null;
@@ -261,10 +274,19 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         }, this);
                         break;
                     case 'upload':
-                        button = this._makeUploadButton(cfg,btCfg,getFormData);
+                        button = this._makeUploadButton(cfg, btCfg, getFormData,
+                            buttonClass == qx.ui.toolbar.Button
+                                ? qx.ui.toolbar.FileSelectorButton
+                                : qx.ui.form.FileSelectorButton);
+                        mmButton = this._makeUploadButton(cfg, btCfg, getFormData,
+                            callbackery.ui.form.FileSelectorMenuButton);
+                        if (btCfg.key) {
+                            this._buttonMap[btCfg.key] = button;
+                        }
                         break;
                     case 'separator':
-                        this.add(new qx.ui.core.Spacer(10,10));
+                        this.add(new qx.ui.core.Spacer(10, 10));
+                        mm.add(new qx.ui.menu.Separator());
                         break;
                     default:
                         this.debug('Invalid execute action:' + btCfg.action + ' for button', btCfg);
@@ -275,23 +297,29 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         + 'Button';
                     this.addOwnedQxObject(button, btnId);
                 }
-                var action = function(){
+                if (mmButton && btCfg.key) {
+                    let mmBtnId = btCfg.key
+                        + (btCfg.testingIdPostfix ? btCfg.testingIdPostfix : '')
+                        + 'mmButton';
+                    this.addOwnedQxObject(mmButton, mmBtnId);
+                }
+                var action = function () {
                     var that = this;
-                    if (! button.isEnabled()) {
+                    if (!button.isEnabled()) {
                         return;
                     }
                     switch (btCfg.action) {
                         case 'save':
                             var formData = getFormData();
                             var key = btCfg.key;
-                            callbackery.data.Server.getInstance().callAsync(function(ret){
-                                that.fireDataEvent('actionResponse',ret || {});
-                            },'processPluginData',cfg.name,{ "key": key, "formData": formData });
+                            callbackery.data.Server.getInstance().callAsync(function (ret) {
+                                that.fireDataEvent('actionResponse', ret || {});
+                            }, 'processPluginData', cfg.name, { "key": key, "formData": formData });
                             break;
                         case 'submitVerify':
                         case 'submit':
                             var formData = getFormData();
-                            if (formData === false){
+                            if (formData === false) {
                                 callbackery.ui.MsgBox.getInstance().error(
                                     this.tr("Validation Error"),
                                     this.tr("The form can only be submitted when all data fields have valid content.")
@@ -299,23 +327,23 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                 return;
                             }
                             var key = btCfg.key;
-                            var asyncCall = function(){
-                                callbackery.data.Server.getInstance().callAsyncSmartBusy(function(ret){
-                                    that.fireDataEvent('actionResponse',ret || {});
-                                },'processPluginData',cfg.name,{ "key": key, "formData": formData });
+                            var asyncCall = function () {
+                                callbackery.data.Server.getInstance().callAsyncSmartBusy(function (ret) {
+                                    that.fireDataEvent('actionResponse', ret || {});
+                                }, 'processPluginData', cfg.name, { "key": key, "formData": formData });
                             };
 
-                            if (btCfg.action == 'submitVerify'){
+                            if (btCfg.action == 'submitVerify') {
                                 var title = btCfg.label != null ? btCfg.label : btCfg.key;
                                 callbackery.ui.MsgBox.getInstance().yesno(
                                     this.xtr(title),
                                     this.xtr(btCfg.question)
                                 )
-                                .addListenerOnce('choice',function(e){
-                                    if (e.getData() == 'yes'){
-                                        asyncCall();
-                                    }
-                                },this);
+                                    .addListenerOnce('choice', function (e) {
+                                        if (e.getData() == 'yes') {
+                                            asyncCall();
+                                        }
+                                    }, this);
                             }
                             else {
                                 asyncCall();
@@ -324,7 +352,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         case 'download':
                         case 'display':
                             var formData = getFormData();
-                            if (formData === false){
+                            if (formData === false) {
                                 callbackery.ui.MsgBox.getInstance().error(
                                     this.tr("Validation Error"),
                                     this.tr("The form can only be submitted when all data fields have valid content.")
@@ -332,21 +360,21 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                 return;
                             }
                             var key = btCfg.key;
-                            callbackery.data.Server.getInstance().callAsyncSmart(function(cookie){
+                            callbackery.data.Server.getInstance().callAsyncSmart(function (cookie) {
                                 let url = 'download'
-                                +'?name='+cfg.name
-                                +'&key='+key
-                                +'&xsc='+encodeURIComponent(cookie)
-                                +'&formData='+encodeURIComponent(qx.lang.Json.stringify(formData));
+                                    + '?name=' + cfg.name
+                                    + '&key=' + key
+                                    + '&xsc=' + encodeURIComponent(cookie)
+                                    + '&formData=' + encodeURIComponent(qx.lang.Json.stringify(formData));
                                 if (btCfg.action == 'display') {
-                                    window.open(url + '&display=1','_blank');
+                                    window.open(url + '&display=1', '_blank');
                                     return;
                                 }
                                 var iframe = new qx.ui.embed.Iframe().set({
                                     width: 100,
                                     height: 100
                                 });
-                                iframe.addListener('load',function(e){
+                                iframe.addListener('load', function (e) {
                                     var response = {
                                         exception: {
                                             message: String(that.tr("No Data")),
@@ -363,43 +391,43 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                         // If there is text left, it should be the json from the server.
                                         // JSON parsing an empty string is an error.
                                         if (innerHTML) {
-                                            response =  qx.lang.Json.parse(innerHTML);
+                                            response = qx.lang.Json.parse(innerHTML);
                                         }
                                         // otherwise remove standard exception.
                                         else {
                                             response = '';
                                         }
-                                    } catch (e){};
-                                    if (response.exception){
+                                    } catch (e) { };
+                                    if (response.exception) {
                                         callbackery.ui.MsgBox.getInstance().error(
                                             that.tr("Download Exception"),
-                                            that.xtr(response.exception.message) + " ("+ response.exception.code +")"
+                                            that.xtr(response.exception.message) + " (" + response.exception.code + ")"
                                         );
                                     }
                                     that.getApplicationRoot().remove(iframe);
                                 });
                                 iframe.setSource(url);
-                                that.getApplicationRoot().add(iframe,{top: -1000,left: -1000});
-                            },'getSessionCookie');
+                                that.getApplicationRoot().add(iframe, { top: -1000, left: -1000 });
+                            }, 'getSessionCookie');
                             break;
                         case 'cancel':
-                            this.fireDataEvent('actionResponse',{action: 'cancel'});
+                            this.fireDataEvent('actionResponse', { action: 'cancel' });
                             break;
                         case 'wizzard':
                             var parent = that.getLayoutParent();
-                            while (! parent.classname.match(/Page|Popup/) ) {
+                            while (!parent.classname.match(/Page|Popup/)) {
                                 parent = parent.getLayoutParent();
                             }
                             // This could in principal work for Page although.
                             if (parent.classname.match(/Popup/)) { // parent already exists, replace content
-                                parent.replaceContent(btCfg,getFormData);
+                                parent.replaceContent(btCfg, getFormData);
                                 break;
                             }
-                            // fall through intended to create first popup content
+                        // fall through intended to create first popup content
                         case 'popup':
-                            if (! btCfg.noValidation) { // backward incompatibility work around
+                            if (!btCfg.noValidation) { // backward incompatibility work around
                                 var formData = getFormData();
-                                if (formData === false){
+                                if (formData === false) {
                                     callbackery.ui.MsgBox.getInstance().error(
                                         this.tr("Validation Error"),
                                         this.tr("The form can only be submitted when all data fields have valid content.")
@@ -407,26 +435,26 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                     return;
                                 }
                             }
-                            var popup = new callbackery.ui.Popup(btCfg,getFormData, this);
+                            var popup = new callbackery.ui.Popup(btCfg, getFormData, this);
 
                             var appRoot = that.getApplicationRoot();
-                    
-                            popup.addListenerOnce('close',function(){
+
+                            popup.addListenerOnce('close', function () {
                                 // wait for stuff to happen before we rush into
                                 // disposing the popup
-                                qx.event.Timer.once(function(){
+                                qx.event.Timer.once(function () {
                                     appRoot.remove(popup);
                                     popup.dispose();
                                     this.fireEvent('popupClosed');
-                                },that,100);
-                                if (!(btCfg.options && btCfg.options.noReload)){
-                                    this.fireDataEvent('actionResponse',{action: ( btCfg.options && btCfg.options.reloadStatusOnClose ) ? 'reloadStatus' : 'reload'});
+                                }, that, 100);
+                                if (!(btCfg.options && btCfg.options.noReload)) {
+                                    this.fireDataEvent('actionResponse', { action: (btCfg.options && btCfg.options.reloadStatusOnClose) ? 'reloadStatus' : 'reload' });
                                 }
-                            },that);
+                            }, that);
                             popup.open();
                             break;
                         case 'logout':
-                            that.fireDataEvent('actionResponse',{action: 'logout'});
+                            that.fireDataEvent('actionResponse', { action: 'logout' });
                             break;
 
                         default:
@@ -434,11 +462,11 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                     }
                 }; // var action = function() { ... };
 
-                if (btCfg.defaultAction){
+                if (btCfg.defaultAction) {
                     this._defaultAction = action;
                 }
-                if (button){
-                    button.addListener('execute',action,this);
+                if (button) {
+                    button.addListener('execute', action, this);
                     if (btCfg.addToMenu) {
                         menues[btCfg.addToMenu].add(button);
                     }
@@ -448,23 +476,34 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         }
                     }
                 }
-                if (menuButton){
-                    menuButton.addListener('execute',action,this);
-                    this._tableMenu.add(menuButton);
+                if (mmButton) {
+                    mmButton.addListener('execute', action, this);
+                    if (btCfg.addToMenu) {
+                        mmMenues[btCfg.addToMenu].add(mmButton);
+                    }
+                    else {
+                        if (btCfg.addToToolBar !== false) {
+                            mm.add(mmButton);
+                        }
+                    }
                 }
-            },this);
+                if (menuButton) {
+                    menuButton.addListener('execute', action, this);
+                    tm.add(menuButton);
+                }
+                if (button && menuButton) {
+                    this._bindButtonProperties(button, mmButton);
+                }
+            }, this);
         },
-        _makeUploadButton: function(cfg,btCfg,getFormData){
+        _makeUploadButton(cfg, btCfg, getFormData, buttonClass) {
             var button;
             var label = btCfg.label ? this.xtr(btCfg.label) : null;
-            if (btCfg.btnClass == 'toolbar') {
-                button = new callbackery.ui.form.UploadToolbarButton(label);
+            if (buttonClass) {
+                button = new buttonClass(label);
             }
             else {
-                button = new callbackery.ui.form.UploadButton(label);
-            }
-            if (btCfg.key){
-                this._buttonMap[btCfg.key]=button;
+                button = new qx.ui.form.FileSelectorButton(label);
             }
             if (btCfg.buttonSet) {
                 var bs = btCfg.buttonSet;
@@ -472,62 +511,62 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                     bs.label = this.xtr(bs.label);
                 }
                 button.set(bs);
-                if (btCfg.key){
-                    this._buttonSetMap[btCfg.key]=bs;
+                if (btCfg.key) {
+                    this._buttonSetMap[btCfg.key] = bs;
                 }
             }
             var serverCall = callbackery.data.Server.getInstance();
             var key = btCfg.key;
             var name = cfg.name;
-            button.addListener('changeFileSelection',function(e){
+            button.addListener('changeFileSelection', function (e) {
                 var fileList = e.getData();
                 var formData = getFormData();
-                if(formData && fileList) {
+                if (formData && fileList) {
                     var form = new FormData();
-                    form.append('name',name);
-                    form.append('key',key);
-                    form.append('file',fileList[0]);
-                    form.append('formData',qx.lang.Json.stringify(formData));
+                    form.append('name', name);
+                    form.append('key', key);
+                    form.append('file', fileList[0]);
+                    form.append('formData', qx.lang.Json.stringify(formData));
                     var that = this;
-                    serverCall.callAsyncSmart(function(cookie){
-                        form.append('xsc',cookie);
+                    serverCall.callAsyncSmart(function (cookie) {
+                        form.append('xsc', cookie);
                         that._uploadForm(form);
-                    },'getSessionCookie');
+                    }, 'getSessionCookie');
                 } else {
                     callbackery.ui.MsgBox.getInstance().error(
                         this.tr("Upload Exception"),
                         this.tr("Make sure to select a file and properly fill the form")
                     );
                 }
-            },this);
+            }, this);
 
-            
+
             return button;
         },
 
-        _uploadForm: function(form){
-            var req = new qx.io.request.Xhr("upload",'POST').set({
+        _uploadForm(form) {
+            var req = new qx.io.request.Xhr("upload", 'POST').set({
                 requestData: form
             });
-            req.addListener('success',function(e) {
+            req.addListener('success', function (e) {
                 var response = req.getResponse();
-                if (response.exception){
+                if (response.exception) {
                     callbackery.ui.MsgBox.getInstance().error(
                         this.tr("Upload Exception"),
-                        this.xtr(response.exception.message) 
-                            + " ("+ response.exception.code +")"
+                        this.xtr(response.exception.message)
+                        + " (" + response.exception.code + ")"
                     );
                 } else {
-                    this.fireDataEvent('actionResponse',response);
+                    this.fireDataEvent('actionResponse', response);
                 }
                 req.dispose();
-            },this);
-            req.addListener('fail',function(e){
+            }, this);
+            req.addListener('fail', function (e) {
                 var response = {};
                 try {
                     response = req.getResponse();
                 }
-                catch(e){
+                catch (e) {
                     response = {
                         exception: {
                             message: e.message,
@@ -537,35 +576,43 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                 }
                 callbackery.ui.MsgBox.getInstance().error(
                     this.tr("Upload Exception"),
-                    this.xtr(response.exception.message) 
-                        + " ("+ response.exception.code +")"
+                    this.xtr(response.exception.message)
+                    + " (" + response.exception.code + ")"
                 );
                 req.dispose();
             });
             req.send();
         },
 
-        getTableContextMenu: function(){
+        getTableContextMenu() {
             return this._tableMenu;
         },
-
-        getDefaultAction: function(){
+        getMobileMenu() {
+            return this._mobileMenu;
+        },
+        getDefaultAction() {
             return this._defaultAction;
         },
-        getButtonMap: function(){
+        getButtonMap() {
             return this._buttonMap;
         },
-        getButtonSetMap: function(){
+        getButtonSetMap() {
             return this._buttonSetMap;
+        },
+        _bindButtonProperties(button, mmButton) {
+            ['visibility', 'enabled', 'label', 'icon'].forEach((prop) => {
+                button.bind(prop, mmButton, prop);
+            });
         }
     },
 
-    destruct : function() {
-        if (! this._buttonMap) {
+    destruct() {
+        if (!this._buttonMap) {
             return;
         }
         for (const [key, btn] of Object.entries(this._buttonMap)) {
             btn.destroy();
         }
-    }
+    },
+    
 });

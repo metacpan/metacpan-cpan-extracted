@@ -117,7 +117,7 @@ sub is_decoder_installed
     return( $@ ? 0 : 1 );
 }
 
-sub is_emcoder_installed
+sub is_encoder_installed
 {
     eval( 'use Crypt::Misc ();' );
     return( $@ ? 0 : 1 );
@@ -238,6 +238,14 @@ It returns true upon success, and upon error, it will set the error in the globa
     my $encoded = HTTP::Promise::Stream::Base64::encode_b64( $data );
     die( "Something went wrong: $HTTP::Promise::Stream::Base64::Base64Error\n" if( !defined( $encoded ) );
     print( "Encoded data is: $encoded\n" );
+
+=head2 is_decoder_installed
+
+Returns true if the module L<Crypt::Misc> is installed, false otherwise.
+
+=head2 is_encoder_installed
+
+Returns true if the module L<Crypt::Misc> is installed, false otherwise.
 
 =head1 AUTHOR
 

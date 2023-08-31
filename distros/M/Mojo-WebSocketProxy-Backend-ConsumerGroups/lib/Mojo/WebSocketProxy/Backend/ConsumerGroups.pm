@@ -18,7 +18,7 @@ use parent qw(Mojo::WebSocketProxy::Backend);
 
 no indirect;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 __PACKAGE__->register_type('consumer_groups');
 
@@ -264,7 +264,8 @@ sub _prepare_request_data {
     my $method   = $req_storage->{method};
     my $msg_type = $req_storage->{msg_type} ||= $req_storage->{method};
 
-    my $params       = $self->make_call_params($c, $req_storage);
+    my $params = $self->make_call_params($c, $req_storage);
+    $params->{correlation_id} = $c->stash('correlation_id');
     my $stash_params = $req_storage->{stash_params};
 
     my $request_data = [
@@ -293,7 +294,7 @@ Mojo::WebSocketProxy::Backend::ConsumerGroups - Class for communication with bac
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 

@@ -29,12 +29,10 @@ add the ability to fill this object with changelog entries.
 
 =cut
 
-package Dpkg::Changelog;
+package Dpkg::Changelog 2.00;
 
 use strict;
 use warnings;
-
-our $VERSION = '2.00';
 
 use Carp;
 
@@ -440,7 +438,7 @@ sub abort_early {
 	}
 	my $start = my $end = $offset;
 	$end += $count-1 if $count > 0;
-	return ($start < @$data and $end < @$data);
+        return $start < @{$data} > $end;
     }
 
     return unless defined($r->{since}) or defined($r->{from});
@@ -507,53 +505,55 @@ sub _format_dpkg {
     my @data = $self->get_range($range) or return;
     my $src = shift @data;
 
-    my $f = Dpkg::Control::Changelog->new();
-    $f->{Urgency} = $src->get_urgency() || 'unknown';
-    $f->{Source} = $src->get_source() || 'unknown';
-    $f->{Version} = $src->get_version() // 'unknown';
-    $f->{Distribution} = join(' ', $src->get_distributions());
-    $f->{Maintainer} = $src->get_maintainer() // '';
-    $f->{Date} = $src->get_timestamp() // '';
-    $f->{Timestamp} = $src->get_timepiece && $src->get_timepiece->epoch // '';
-    $f->{Changes} = $src->get_dpkg_changes();
+    my $c = Dpkg::Control::Changelog->new();
+    $c->{Urgency} = $src->get_urgency() || 'unknown';
+    $c->{Source} = $src->get_source() || 'unknown';
+    $c->{Version} = $src->get_version() // 'unknown';
+    $c->{Distribution} = join ' ', $src->get_distributions();
+    $c->{Maintainer} = $src->get_maintainer() // '';
+    $c->{Date} = $src->get_timestamp() // '';
+    $c->{Timestamp} = $src->get_timepiece && $src->get_timepiece->epoch // '';
+    $c->{Changes} = $src->get_dpkg_changes();
 
     # handle optional fields
     my $opts = $src->get_optional_fields();
     my %closes;
-    foreach (keys %$opts) {
-	if (/^Urgency$/i) { # Already dealt
-	} elsif (/^Closes$/i) {
+    foreach my $f (keys %{$opts}) {
+        if ($f eq 'Urgency') {
+            # Already handled.
+        } elsif ($f eq 'Closes') {
 	    $closes{$_} = 1 foreach (split(/\s+/, $opts->{Closes}));
 	} else {
-	    field_transfer_single($opts, $f);
+            field_transfer_single($opts, $c, $f);
 	}
     }
 
     foreach my $bin (@data) {
-	my $oldurg = $f->{Urgency} // '';
-	my $oldurgn = $URGENCIES{$f->{Urgency}} // -1;
+        my $oldurg = $c->{Urgency} // '';
+        my $oldurgn = $URGENCIES{$c->{Urgency}} // -1;
 	my $newurg = $bin->get_urgency() // '';
 	my $newurgn = $URGENCIES{$newurg} // -1;
-	$f->{Urgency} = ($newurgn > $oldurgn) ? $newurg : $oldurg;
-	$f->{Changes} .= "\n" . $bin->get_dpkg_changes();
+        $c->{Urgency} = ($newurgn > $oldurgn) ? $newurg : $oldurg;
+        $c->{Changes} .= "\n" . $bin->get_dpkg_changes();
 
 	# handle optional fields
 	$opts = $bin->get_optional_fields();
-	foreach (keys %$opts) {
-	    if (/^Closes$/i) {
+        foreach my $f (keys %{$opts}) {
+            if ($f eq 'Closes') {
 		$closes{$_} = 1 foreach (split(/\s+/, $opts->{Closes}));
-	    } elsif (not exists $f->{$_}) { # Don't overwrite an existing field
-		field_transfer_single($opts, $f);
+            } elsif (not exists $c->{$f}) {
+                # Don't overwrite an existing field
+                field_transfer_single($opts, $c, $f);
 	    }
 	}
     }
 
     if (scalar keys %closes) {
-	$f->{Closes} = join ' ', sort { $a <=> $b } keys %closes;
+        $c->{Closes} = join ' ', sort { $a <=> $b } keys %closes;
     }
-    run_vendor_hook('post-process-changelog-entry', $f);
+    run_vendor_hook('post-process-changelog-entry', $c);
 
-    return $f;
+    return $c;
 }
 
 sub _format_rfc822 {
@@ -563,25 +563,25 @@ sub _format_rfc822 {
     my @ctrl;
 
     foreach my $entry (@data) {
-	my $f = Dpkg::Control::Changelog->new();
-	$f->{Urgency} = $entry->get_urgency() || 'unknown';
-	$f->{Source} = $entry->get_source() || 'unknown';
-	$f->{Version} = $entry->get_version() // 'unknown';
-	$f->{Distribution} = join(' ', $entry->get_distributions());
-	$f->{Maintainer} = $entry->get_maintainer() // '';
-	$f->{Date} = $entry->get_timestamp() // '';
-	$f->{Timestamp} = $entry->get_timepiece && $entry->get_timepiece->epoch // '';
-	$f->{Changes} = $entry->get_dpkg_changes();
+        my $c = Dpkg::Control::Changelog->new();
+        $c->{Urgency} = $entry->get_urgency() || 'unknown';
+        $c->{Source} = $entry->get_source() || 'unknown';
+        $c->{Version} = $entry->get_version() // 'unknown';
+        $c->{Distribution} = join ' ', $entry->get_distributions();
+        $c->{Maintainer} = $entry->get_maintainer() // '';
+        $c->{Date} = $entry->get_timestamp() // '';
+        $c->{Timestamp} = $entry->get_timepiece && $entry->get_timepiece->epoch // '';
+        $c->{Changes} = $entry->get_dpkg_changes();
 
 	# handle optional fields
 	my $opts = $entry->get_optional_fields();
-	foreach (keys %$opts) {
-	    field_transfer_single($opts, $f) unless exists $f->{$_};
+        foreach my $f (keys %{$opts}) {
+            field_transfer_single($opts, $c, $f) unless exists $c->{$f};
 	}
 
-        run_vendor_hook('post-process-changelog-entry', $f);
+        run_vendor_hook('post-process-changelog-entry', $c);
 
-        push @ctrl, $f;
+        push @ctrl, $c;
     }
 
     return @ctrl;
@@ -668,8 +668,8 @@ sub format_range {
     } else {
         my $index = Dpkg::Index->new(type => CTRL_CHANGELOG);
 
-        foreach my $f (@ctrl) {
-            $index->add($f);
+        foreach my $c (@ctrl) {
+            $index->add($c);
         }
 
         return $index;

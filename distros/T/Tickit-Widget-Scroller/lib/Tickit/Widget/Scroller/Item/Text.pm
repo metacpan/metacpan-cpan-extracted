@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Tickit::Widget::Scroller::Item::Text 0.30;
+package Tickit::Widget::Scroller::Item::Text 0.31;
 class Tickit::Widget::Scroller::Item::Text
    :strict(params);
 

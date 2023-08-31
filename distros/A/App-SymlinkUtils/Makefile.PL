@@ -14,11 +14,13 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-SymlinkUtils",
   "EXE_FILES" => [
-    "script/check-symlink"
+    "script/check-symlink",
+    "script/check-symlinks"
   ],
   "LICENSE" => "perl",
   "NAME" => "App::SymlinkUtils",
   "PREREQ_PM" => {
+    "Data::Sah::Compiler::perl::TH::array" => "0.914",
     "Data::Sah::Compiler::perl::TH::bool" => "0.914",
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
     "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
@@ -27,6 +29,7 @@ my %WriteMakefileArgs = (
     "Log::ger" => "0.038",
     "Perinci::CmdLine::Any" => "0.154",
     "Perinci::CmdLine::Lite" => "1.924",
+    "Perinci::Sub::Util" => "0.471",
     "Sah::Schema::filename" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -37,7 +40,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,6 +48,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Data::Sah::Compiler::perl::TH::array" => "0.914",
   "Data::Sah::Compiler::perl::TH::bool" => "0.914",
   "Data::Sah::Compiler::perl::TH::str" => "0.914",
   "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
@@ -56,6 +60,7 @@ my %FallbackPrereqs = (
   "Log::ger" => "0.038",
   "Perinci::CmdLine::Any" => "0.154",
   "Perinci::CmdLine::Lite" => "1.924",
+  "Perinci::Sub::Util" => "0.471",
   "Sah::Schema::filename" => 0,
   "Test::More" => 0,
   "strict" => 0,

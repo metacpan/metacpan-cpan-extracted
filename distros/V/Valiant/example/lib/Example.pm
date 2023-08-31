@@ -26,9 +26,6 @@ __PACKAGE__->config(
     schema_class => 'Example::Schema',
     connect_info => {
       dsn => "dbi:SQLite:dbname=@{[ __PACKAGE__->path_to('var','db.db') ]}",
-      #dsn => "dbi:Pg:dbname=contacts;host=localhost;port=5432",
-      #user => "contact_dbuser",
-      #password => "abc123",
     },
   },
 );

@@ -316,7 +316,8 @@ sub _getSamlSpByEntityId {
 sub _readSamlSpEntityId {
     my ( $self, $metadata ) = @_;
 
-    return ( $metadata =~ /entityID=['"](.+?)['"]/ ) ? $1 : undef;
+    my ($entityID) = $metadata =~ /entityID=['"](.+?)['"]/;
+    return $entityID;
 }
 
 sub _readSamlSpExportedAttributes {

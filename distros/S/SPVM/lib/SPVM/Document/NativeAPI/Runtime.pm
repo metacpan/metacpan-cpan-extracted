@@ -62,28 +62,6 @@ Gets the length of the basic types.
 
 The C<runtime> argument is a runtime object.
 
-=head2 is_object_type
-
-  int32_t (*is_object_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t flag);
-
-If the type is object type, returns 1. Otherwise returns 0.
-
-The C<runtime> argument is a runtime object.
-
-The C<basic_type> argument is a L<basic type|SPVM::Document::NativeAPI::BasicType> object.
-
-=head2 can_assign
-
-  int32_t (*can_assign)(void* runtime, void* dist_basic_type, int32_t dist_type_dimension, int32_t dist_type_flag, void* src_basic_type, int32_t src_type_dimension, int32_t src_type_flag);
-
-If a source type can be assigned to a dist type, returns 1. Otherwise returns 0.
-
-The C<runtime> argument is a runtime object.
-
-The C<dist_basic_type> argument is a L<basic type|SPVM::Document::NativeAPI::BasicType> object.
-
-The C<src_basic_type> argument is a L<basic type|SPVM::Document::NativeAPI::BasicType> object.
-
 =head2 build_precompile_module_source
 
   void (*build_precompile_module_source)(void* runtime, void* string_buffer, void* module_basic_type);
@@ -108,12 +86,6 @@ The C<string_buffer> argument is a L<string buffer|SPVM::Document::NativeAPI::St
 
 The C<method> argument is a L<method|SPVM::Document::NativeAPI::Method> object.
 
-=head2 get_type_width
-
-  int32_t (*get_type_width)(void* runtime, void* basic_type, int32_t dimension, int32_t flag);
-
-Gets the width of a type.
-
 =head1 Native API IDs
 
   0 get_object_data_offset
@@ -122,11 +94,8 @@ Gets the width of a type.
   3 get_basic_type_by_id
   4 get_basic_type_by_name
   5 get_basic_types_length
-  6 is_object_type
-  7 can_assign
-  8 build_precompile_module_source
-  9 build_precompile_method_source
-  10 get_type_width
+  6 build_precompile_module_source
+  7 build_precompile_method_source
 
 =head1 Copyright & License
 

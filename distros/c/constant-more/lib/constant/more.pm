@@ -1,8 +1,8 @@
 package constant::more;
-
-use version; our $VERSION=version->declare("v0.2.0");
 use strict;
 use warnings;
+
+our $VERSION="v0.2.1";
 
 #use feature qw<state>;
 no warnings "experimental";
@@ -88,7 +88,7 @@ sub import {
 			
 
 		#CMD line argument override
-		if($entry->{opt}){	
+		if($entry->{opt} and @ARGV){	
 			require Getopt::Long;
 			if($entry->{keep}){
 				my $parser=Getopt::Long::Parser->new();

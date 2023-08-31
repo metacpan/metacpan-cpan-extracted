@@ -2,6 +2,15 @@ Written by:
    Sullivan Beck (sbeck@cpan.org)
 Any suggestions, bug reports, or donations :-) should be sent to me.
 
+1.14  2023-08-29
+  - Several bugs discovered due to a report by Mark Elser
+      Dependencies were not getting correctly tested.
+      Fix an error message that was including incorrect information.
+      META.yml provides information was not getting used.
+      HTTPS URLs were failing.
+      Specifying module as a relative path was failing.
+      Added the --repl-require and --repl-provide options.
+
 1.13  2022-06-08
   - Fix for the --no-compat option.  Suggested by Stefan Kirchberg
 

@@ -1302,38 +1302,112 @@ package Sidef::Types::Array::Array {
     }
 
     sub _slice {
-        my ($self, $from, $to) = @_;
+        my ($self, $pos1, $len) = @_;
 
-        my $max = @$self;
+        $pos1 = defined($pos1) ? CORE::int($pos1) : 0;
+        $len  = defined($len)  ? CORE::int($len)  : undef;
 
-        $from = defined($from) ? CORE::int($from) : 0;
-        $to   = defined($to)   ? CORE::int($to)   : $max - 1;
+        my $curlen = @$self;
 
-        if (abs($from) > $max) {
+        my $pos2 = 0;
+
+        if ($pos1 < 0) {
+            $pos1 += $curlen;
+        }
+
+        if ($pos1 > 0 and $pos1 > $curlen) {
             return;
         }
 
-        if ($from < 0) {
-            $from += $max;
+        if (defined($len)) {
+            if ($len < 0) {
+                $pos2 = $curlen + $len;
+            }
+            elsif ($pos1 < 0) {
+                $pos2 = $pos1 + $len;
+            }
+            elsif ($len > $curlen - $pos1) {
+                $pos2 = $curlen;
+            }
+            else {
+                $pos2 = $pos1 + $len;
+            }
+        }
+        else {
+            $pos2 = $curlen;
         }
 
-        if ($to < 0) {
-            $to += $max;
+        if ($pos2 < 0) {
+            if ($pos1 < 0) {
+                return;
+            }
+            $pos2 = 0;
+        }
+        elsif ($pos1 < 0) {
+            $pos1 = 0;
         }
 
-        if ($to >= $max) {
-            $to = $max - 1;
+        if ($pos2 < $pos1) {
+            $pos2 = $pos1;
+        }
+        if ($pos2 > $curlen) {
+            $pos2 = $curlen;
         }
 
-        @$self[$from .. $to];
+        @$self[$pos1 .. $pos2 - 1];
     }
 
-    sub ft {
-        my ($self) = @_;
+    sub slice {
         bless [_slice(@_)];
     }
 
-    *slice = \&ft;
+    sub _ft {
+        my ($self, $pos1, $pos2) = @_;
+
+        $pos1 = defined($pos1) ? CORE::int($pos1) : 0;
+        $pos2 = defined($pos2) ? CORE::int($pos2) : undef;
+
+        my $curlen = scalar(@$self);
+
+        if ($pos1 < 0) {
+            $pos1 += $curlen;
+        }
+
+        if ($pos1 > 0 and $pos1 > $curlen) {
+            return;
+        }
+
+        if (defined($pos2)) {
+            if ($pos2 < 0) {
+                $pos2 += $curlen;
+            }
+            elsif ($pos1 < 0) {
+                $pos2 = $pos1 + $pos2;
+            }
+        }
+        else {
+            $pos2 = $curlen - 1;
+        }
+
+        if ($pos2 < 0) {
+            if ($pos1 < 0) {
+                return;
+            }
+        }
+        elsif ($pos1 < 0) {
+            $pos1 = 0;
+        }
+
+        if ($pos2 >= $curlen) {
+            $pos2 = $curlen - 1;
+        }
+
+        @$self[$pos1 .. $pos2];
+    }
+
+    sub ft {
+        bless [_ft(@_)];
+    }
 
     sub each {
         my ($self, $block) = @_;

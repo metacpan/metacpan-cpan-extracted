@@ -1,5 +1,3 @@
-
-
 Revision history for Graphics-Framebuffer
 
 1.00    2004
@@ -1612,3 +1610,7 @@ Revision history for Graphics-Framebuffer
       Examples given extra option to ignore the X-Windows check
 	  " --ignore-x-windows "
 
+6.54  Aug 29, 2023
+
+      Update to "Makefile.PL" for easier to read output.  Also improved
+	  pre-processing.

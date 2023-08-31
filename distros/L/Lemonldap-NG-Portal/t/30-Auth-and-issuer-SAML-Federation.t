@@ -3,6 +3,7 @@ use lib 'inc';
 use Test::More;
 use strict;
 use IO::String;
+use File::Copy "cp";
 use LWP::UserAgent;
 use LWP::Protocol::PSGI;
 use MIME::Base64;
@@ -42,8 +43,7 @@ SKIP: {
             $res = $sp->_get(
                 '/',
                 accept => 'text/html',
-                query  => buildForm(
-                    {
+                query  => buildForm( {
                         idp =>
                           'https://auth.centrale-marseille.fr/idp/shibboleth'
                     }
@@ -60,8 +60,7 @@ SKIP: {
     subtest "Responding to a federated SP" => sub {
         switch ('issuer');
         my $res;
-        my $query = buildForm(
-            {
+        my $query = buildForm( {
                 user     => 'french',
                 password => 'french',
             }
@@ -78,14 +77,49 @@ SKIP: {
                 '/saml/singleSignOn',
                 accept => 'text/html',
                 cookie => "lemonldap=$id",
-                query  => buildForm(
-                    {
+                query  => buildForm( {
                         IDPInitiated => 1,
                         sp           => "https://www.numistral.fr/shibboleth"
                     }
                 )
             )
         );
+        expectPortalError( $res, 107, "SAML service is not yet known" );
+
+        cp( "t/main-sps-renater-metadata.xml",
+            "$main::tmpDir/main-sps-renater-metadata.xml" );
+
+        # After short TTL, service is still not valid
+        Time::Fake->offset("+30s");
+        ok(
+            $res = $issuer->_get(
+                '/saml/singleSignOn',
+                accept => 'text/html',
+                cookie => "lemonldap=$id",
+                query  => buildForm( {
+                        IDPInitiated => 1,
+                        sp           => "https://www.numistral.fr/shibboleth"
+                    }
+                )
+            )
+        );
+        expectPortalError( $res, 107, "SAML service is still not known" );
+
+        # After long TTL, service is found
+        Time::Fake->offset("+900s");
+        ok(
+            $res = $issuer->_get(
+                '/saml/singleSignOn',
+                accept => 'text/html',
+                cookie => "lemonldap=$id",
+                query  => buildForm( {
+                        IDPInitiated => 1,
+                        sp           => "https://www.numistral.fr/shibboleth"
+                    }
+                )
+            )
+        );
+
         my ( $host, $url, $s ) = expectAutoPost( $res, "www.numistral.fr",
             "/Shibboleth.sso/SAML2/POST", "SAMLResponse" );
         my $sr = expectSamlResponse($s);
@@ -103,11 +137,10 @@ clean_sessions();
 done_testing();
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 samlFederationFiles =>
-"t/main-idps-renater-metadata.xml t/main-sps-renater-metadata.xml",
+                  "$main::tmpDir/main-sps-renater-metadata.xml",
                 logLevel         => $debug,
                 domain           => 'idp.com',
                 portal           => 'http://auth.idp.com',
@@ -153,8 +186,7 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 samlFederationFiles =>
 "t/main-idps-renater-metadata.xml t/main-sps-renater-metadata.xml",

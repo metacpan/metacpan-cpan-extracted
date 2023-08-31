@@ -5,11 +5,13 @@ use strict;
 # ABSTRACT: Utils for testsuite of Net::SAML2
 
 use Crypt::OpenSSL::X509;
+use DateTime;
+use MIME::Base64;
+use Path::Tiny;
 use Sub::Override;
+use Test::Deep;
 use Test::Exception;
 use Test::More;
-use Test::Deep;
-use URI::URL;
 use XML::LibXML::XPathContext;
 use XML::LibXML;
 
@@ -40,8 +42,6 @@ our %EXPORT_TAGS = (
 
 sub net_saml2_sp {
     return Net::SAML2::SP->new(
-
-
         id     => 'Some entity ID',
         cert   => 't/sign-nopw-cert.pem',
         key    => 't/sign-nopw-cert.pem',
@@ -76,10 +76,6 @@ sub net_saml2_sp {
 sub net_saml2_binding_redirect_request {
     my ($url) = @_;
 
-    use Path::Tiny;
-    use MIME::Base64;
-    use DateTime;
-
     my $metadata_xml = path('t/net-saml2-idp-metadata.xml')->slurp;
     my $cacert       = 't/net-saml2-cacert.pem';
     my $sp_acs_url   = 'http://ct.local/saml/consumer-post';
@@ -107,12 +103,11 @@ sub net_saml2_binding_redirect_request {
 
     my ($request, $relaystate) = $redirect->verify($url);
 
-    use XML::LibXML;
-    my $dom = XML::LibXML->load_xml( string => $request );
-
-    my $parser = XML::LibXML::XPathContext->new($dom);
-    $parser->registerNs('saml2p', 'urn:oasis:names:tc:SAML:2.0:protocol');
-    $parser->registerNs('saml2', 'urn:oasis:names:tc:SAML:2.0:assertion');
+    my $parser = get_xpath(
+        $request,
+        'saml2p' => 'urn:oasis:names:tc:SAML:2.0:protocol',
+        'saml2'  => 'urn:oasis:names:tc:SAML:2.0:assertion'
+    );
 
     my $sp_id           = $parser->findvalue('saml2p:AuthnRequest/@ID');
     my $sp_audience     = $parser->findvalue('saml2p:AuthnRequest/saml2:Issuer');

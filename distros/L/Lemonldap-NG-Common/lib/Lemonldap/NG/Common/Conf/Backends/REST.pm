@@ -37,7 +37,9 @@ sub ua {
         my $url  = $self->{baseUrl};
         my $port = ( $url =~ /^https/ ? 443 : 80 );
         $url =~ s#https?://([^/]*).*$#$1#;
-        $port = $1 if ( $url =~ s/:(\d+)$// );
+        if ( $url =~ s/:(\d+)$// ) {
+            $port = $1;
+        }
         $ua->credentials( "$url:$port", $self->{realm},
             $self->{user}, $self->{password} );
     }

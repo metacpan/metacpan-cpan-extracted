@@ -13,12 +13,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::BuildProfiles;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::BuildProfiles - handle build profiles
+
+=head1 DESCRIPTION
+
+The Dpkg::BuildProfiles module provides functions to handle the build
+profiles.
+
+=cut
+
+package Dpkg::BuildProfiles 1.00;
 
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
 our @EXPORT_OK = qw(
     get_build_profiles
     set_build_profiles
@@ -33,17 +45,6 @@ use Dpkg::BuildEnv;
 
 my $cache_profiles;
 my @build_profiles;
-
-=encoding utf8
-
-=head1 NAME
-
-Dpkg::BuildProfiles - handle build profiles
-
-=head1 DESCRIPTION
-
-The Dpkg::BuildProfiles module provides functions to handle the build
-profiles.
 
 =head1 FUNCTIONS
 
@@ -114,6 +115,7 @@ sub evaluate_restriction_formula {
         foreach my $restriction (@$restrlist) {
             next if $restriction !~ m/^(!)?(.+)/;
 
+            ## no critic (RegularExpressions::ProhibitCaptureWithoutTest)
             my $negated = defined $1 && $1 eq '!';
             my $profile = $2;
             my $found = any { $_ eq $profile } @{$profiles};

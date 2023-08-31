@@ -7,7 +7,7 @@ use Safe;
 extends 'Lemonldap::NG::Portal::Lib::Wrapper';
 with 'Lemonldap::NG::Portal::Lib::OverConf';
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.17.0';
 
 has modules    => ( is => 'rw', default => sub { {} } );
 has rules      => ( is => 'rw', default => sub { {} } );
@@ -36,7 +36,7 @@ sub init {
 
     foreach my $name ( keys %{ $self->conf->{authChoiceModules} } ) {
         my @mods =
-          split( /[;\|]/, $self->conf->{authChoiceModules}->{$name} );
+          split( /;\s*/, $self->conf->{authChoiceModules}->{$name} );
         my $module = '::'
           . [ 'Auth', 'UserDB', 'Password' ]->[$type] . '::'
           . $mods[$type];
@@ -91,6 +91,26 @@ sub init {
 }
 
 # RUNNING METHODS
+
+sub initDisplay {
+    my ($self, $req, $module) = @_;
+
+    my $mod = $self->modules->{$module};
+    if ( $mod->{AjaxInitScript} ) {
+        $self->logger->debug( 'Append ' . $mod->{Name} . ' init/script' )
+        if $mod->{Name};
+        $req->data->{customScript} .= $mod->AjaxInitScript;
+    }
+    if ( $mod->{InitCmd} ) {
+        $self->logger->debug( 'Launch ' . $mod->{Name} . ' init command' )
+        if $mod->{Name};
+        my $res = eval( $mod->{InitCmd} );
+        if ($@) {
+            die "Error running InitCmd: $@";
+        }
+    }
+
+}
 
 sub checkChoice {
     my ( $self, $req ) = @_;
@@ -199,7 +219,7 @@ sub _buildAuthLoop {
 
         # Find modules associated to authChoice
         my ( $auth, $userDB, $passwordDB, $url, $condition ) =
-          split( /[;\|]/, $self->conf->{authChoiceModules}->{$_} );
+          split( /;\s*/, $self->conf->{authChoiceModules}->{$_} );
 
         unless ( $_choiceRules->{$_} ) {
             $self->logger->error("$_ has no rule");
@@ -232,6 +252,12 @@ sub _buildAuthLoop {
                     $url .= '#';
                 }
                 $self->logger->debug("Use URL $url");
+
+                eval {
+                    $self->_authentication->initDisplay($req, $_);
+                };
+                $self->logger->info("Unable to initialize choice $_ display: $@") if $@;
+
 
                 # Options to store in the loop
                 my $optionsLoop = {

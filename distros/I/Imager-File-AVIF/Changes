@@ -1,0 +1,15 @@
+Imager-File-AVIF 0.002 - 13 Aug 2023
+======================
+
+ - fix the version of Imager that includes avif extension mapping in
+   the synopsis and document the add_type_extensions() invocation
+   needed in older versions.
+   https://github.com/tonycoz/imager-file-avif/issues/2
+
+ - only run the manifest test under author or automated testing
+   https://github.com/tonycoz/imager-file-avif/issues/1
+
+Imager-File-AVIF 0.001
+======================
+
+- original release

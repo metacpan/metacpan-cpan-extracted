@@ -19,7 +19,7 @@ no multidimensional;
 
 use Cwd qw(abs_path getcwd);
 
-use Test::More tests => 22;
+use Test::More tests => 25;
 use Test::Output;
 use Test::Warn;
 
@@ -49,8 +49,10 @@ my $re_output_select_list_scroll =
 my $re_output_select_option = "enter selection\\s+\\(0\\s+to\\s+cancel\\): ";
 
 my $forbidden_dir = T_PATH . '/forbidden';
+my $deep_recursion = T_PATH . '/deep';
 # clean-up possible errors from previous test:
 -d $forbidden_dir  and  rmdir $forbidden_dir;
+-e $deep_recursion  and  unlink $deep_recursion;
 
 ####################################
 # test creation errors:
@@ -303,4 +305,21 @@ SKIP:
     like($fs->{_msg}, qr|^can't open '.*/t/forbidden': |,
 	 'directory without access fails correctly');
     rmdir $forbidden_dir;
+}
+SKIP:
+{
+    my $have_symlinks = eval { symlink('deep', $deep_recursion); 1 };
+    $have_symlinks  or  skip "no symbolic links available on $^O", 3;
+    my $dr = $deep_recursion . ('/deep' x 100);
+    $fs->_cd($dr);
+    is($fs->{_msg}, 'reset directory (invalid symbolic link?)',
+	 'deep recursions as parameter are caught');
+    is($fs->{directory}, '/', 'deep recursions as parameter reset directory');
+    $fs->{directory} = $dr;
+    $fs->_cd();
+    is($fs->{directory}, '/', 'deep recursions as parameter reset directory');
+    unlink $deep_recursion;
+    $fs = UI::Various::Compound::FileSelect->new(mode => 1,
+						 directory => REL_PATH,
+						 symlinks => 1);
 }

@@ -22,3 +22,13 @@ Revision history for WWW-Mechanize-Chrome-DOMops
 	Two more module dependencies added (required for testing).
 	All user-specified javascript code can throw exception which we will catch and propagate
 	to perl code. This has now its own test case.
+
+0.05	29-08-2023/14:30
+	Added a security warning for when the same google-chrome
+	browser/identity is used for everyday surfing and with
+	this module. Cookies, history, passwords will all be
+	accessible to module's internal and 3rd-party
+	javascript if the browser is not invoked with a fresh session.
+
+0.06	29-08-2023/14:31
+	Nothing new.

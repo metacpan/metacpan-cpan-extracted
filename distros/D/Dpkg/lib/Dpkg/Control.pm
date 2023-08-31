@@ -13,42 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Control;
-
-use strict;
-use warnings;
-
-our $VERSION = '1.03';
-our @EXPORT = qw(
-    CTRL_UNKNOWN
-    CTRL_INFO_SRC
-    CTRL_INFO_PKG
-    CTRL_INDEX_SRC
-    CTRL_INDEX_PKG
-    CTRL_REPO_RELEASE
-    CTRL_PKG_SRC
-    CTRL_PKG_DEB
-    CTRL_FILE_BUILDINFO
-    CTRL_FILE_CHANGES
-    CTRL_FILE_VENDOR
-    CTRL_FILE_STATUS
-    CTRL_CHANGELOG
-    CTRL_COPYRIGHT_HEADER
-    CTRL_COPYRIGHT_FILES
-    CTRL_COPYRIGHT_LICENSE
-    CTRL_TESTS
-);
-
-use Exporter qw(import);
-
-use Dpkg::Gettext;
-use Dpkg::ErrorHandling;
-use Dpkg::Control::Types;
-use Dpkg::Control::Hash;
-use Dpkg::Control::Fields;
-
-use parent qw(Dpkg::Control::Hash);
-
 =encoding utf8
 
 =head1 NAME
@@ -146,10 +110,47 @@ Corresponds to a package tests control file in F<debian/tests/control>.
 
 =back
 
+=cut
+
+package Dpkg::Control 1.03;
+
+use strict;
+use warnings;
+
+our @EXPORT = qw(
+    CTRL_UNKNOWN
+    CTRL_INFO_SRC
+    CTRL_INFO_PKG
+    CTRL_INDEX_SRC
+    CTRL_INDEX_PKG
+    CTRL_REPO_RELEASE
+    CTRL_PKG_SRC
+    CTRL_PKG_DEB
+    CTRL_FILE_BUILDINFO
+    CTRL_FILE_CHANGES
+    CTRL_FILE_VENDOR
+    CTRL_FILE_STATUS
+    CTRL_CHANGELOG
+    CTRL_COPYRIGHT_HEADER
+    CTRL_COPYRIGHT_FILES
+    CTRL_COPYRIGHT_LICENSE
+    CTRL_TESTS
+);
+
+use Exporter qw(import);
+
+use Dpkg::Gettext;
+use Dpkg::ErrorHandling;
+use Dpkg::Control::Types;
+use Dpkg::Control::Hash;
+use Dpkg::Control::Fields;
+
+use parent qw(Dpkg::Control::Hash);
+
 =head1 METHODS
 
 All the methods of Dpkg::Control::Hash are available. Those listed below
-are either new or overridden with a different behaviour.
+are either new or overridden with a different behavior.
 
 =over 4
 

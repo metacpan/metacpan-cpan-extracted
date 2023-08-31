@@ -1,7 +1,13 @@
 Revision history for Perl module HTTP::Promise
 
+v0.2.4 2023-08-15T15:35:14+0900
+    - Added method as_form_data in module HTTP::Promise::Message
+    - Added method url_encode to HTTP::Promise::Request
+    - Correcting a typo in HTTP::Promise::Stream::Base64
+    - Improved documentation in HTTP::Promise::Pool
+
 v0.2.3 2022-12-21T11:17:09+0900
-    - Corrected a type in method request in HTTP::Promise
+    - Corrected a typo in method request in HTTP::Promise
 
 v0.2.2 2022-11-12T14:21:39+0900
     - Updated init() in HTTP::Promise to instantiate a default HTTP::Promise::Headers object to make default_header() method work.

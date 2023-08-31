@@ -10,6 +10,7 @@ package Lemonldap::NG::Portal::Lib::Code2F;
 
 use strict;
 use Mouse;
+use Lemonldap::NG::Common::Util qw/display2F/;
 
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
@@ -20,6 +21,8 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_FORMEMPTY
   PE_SENDRESPONSE
 );
+
+our $VERSION = '2.17.0';
 
 has resend_interval => (
     is      => 'rw',
@@ -43,8 +46,6 @@ has is_registrable => (
 );
 
 has random => ( is => 'rw' );
-
-our $VERSION = '2.0.15';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor';
 with 'Lemonldap::NG::Portal::Lib::2fDevices';
@@ -114,7 +115,8 @@ sub _resend {
 
     # Do not invalidate the token while getting it
     unless ( $session = $self->ott->getToken( $token, 1 ) ) {
-        $self->userLogger->info('Token expired');
+        $self->userLogger->info(
+            'Invalid token during ' . $self->prefix . '2f resend' );
         $self->setSecurity($req);
         return $self->p->do( $req, [ sub { PE_TOKENEXPIRED } ] );
     }
@@ -131,9 +133,9 @@ sub _resend {
     {
 
         # Resend code and update last retry
-        unless ($self->sendCode( $req, $session, $code )){
+        unless ( $self->sendCode( $req, $session, $code ) ) {
             return $self->p->do( $req, [ sub { PE_ERROR } ] );
-        };
+        }
         $self->ott->updateToken( $token, __lastRetry => time );
     }
     else {
@@ -151,10 +153,18 @@ sub verify {
         return PE_FORMEMPTY;
     }
 
-    $self->populateDestAttribute( $req, $req->sessionInfo );
+    $self->populateDestAttribute( $req, $session );
 
-    return $self->verify_supplied_code( $req, $session, $usercode );
+    my $res = $self->verify_supplied_code( $req, $session, $usercode );
 
+    # If we authenticated the user using a 2F Device, log it
+    if ( $res == PE_OK && $req->data->{__2fDevice_registrable} ) {
+        my $uid    = $session->{ $self->conf->{whatToTrace} };
+        my $device = $req->data->{__2fDevice_registrable};
+        $self->userLogger->info(
+            "User $uid authenticated with 2F device: " . display2F($device) );
+    }
+    return $res;
 }
 
 sub verify_supplied_code {
@@ -236,7 +246,9 @@ sub populateDestAttribute {
         my @registered_devices =
           $self->find2fDevicesByType( $req, $sessionInfo, $self->prefix );
         if (@registered_devices) {
+
             $sessionInfo->{destination} = $registered_devices[0]->{_generic};
+            $req->data->{__2fDevice_registrable} = $registered_devices[0];
         }
     }
 }

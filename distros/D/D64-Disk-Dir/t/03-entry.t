@@ -9,7 +9,7 @@ use D64::Disk::Image qw(:all);
 use File::Temp qw(tmpnam);
 #########################
 {
-BEGIN { use_ok('D64::Disk::Dir::Entry', qw(:all)) };
+BEGIN { use_ok('D64::Disk::Dir::Entry') };
 }
 #########################
 # Helper subroutine to create image and populate it with files for directory entry access method test cases:

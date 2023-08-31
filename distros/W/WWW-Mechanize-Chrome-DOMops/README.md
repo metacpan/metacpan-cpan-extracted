@@ -4,20 +4,31 @@ WWW::Mechanize::Chrome::DOMops - Operations on the DOM loaded in Chrome
 
 # VERSION
 
-Version 0.04
+Version 0.06
 
 # SYNOPSIS
 
-This module provides a set of tools to operate on the DOM of the
-provided [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome) object. Currently,
-supported operations are:
+This module provides a set of tools to operate on the DOM
+loaded onto the provided <WWW::Mechanize::Chrome> object
+after fetching a URL.
+
+Operating on the DOM is powerful but there are
+security risks involved if the browser and profile
+you used for loading this DOM is your everyday browser and profile.
+
+Please read ["SECURITY WARNING"](#security-warning) before continuing on to the main course.
+
+Currently, [WWW::Mechanize::Chrome::DOMops](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3ADOMops) provides these tools:
 
 - `find()` : finds HTML elements,
 - `zap()` : deletes HTML elements.
 
-Both `find()` and `zap()` return some information from each match and its descendents (like `tag`, `id` etc.).
+Both `find()` and `zap()` return some information from
+each match and its descendents (like `tag`, `id` etc.).
 This information can be tweaked by the caller.
-`find()` and `zap()` optionally execute javascript code on each match and its descendents and can return back data.
+`find()` and `zap()` optionally execute javascript code on
+each match and its descendents and can return data back to
+the caller perl code.
 
 The selection of the HTML elements in the DOM
 can be done in various ways:
@@ -34,12 +45,15 @@ Here are some usage scenaria:
 
       use WWW::Mechanize::Chrome::DOMops qw/zap find VERBOSE_DOMops/;
 
-      # increase verbosity: 0, 1, 2, 3
+      # adjust verbosity: 0, 1, 2, 3
       $WWW::Mechanize::Chrome::VERBOSE_DOMops = 3;
 
       # First, create a mech object and load a URL on it
       # Note: you need google-chrome binary installed in your system!
+      # See section CREATING THE MECH OBJECT for creating the mech
+      # and how to redirect its javascript console to perl's output
       my $mechobj = WWW::Mechanize::Chrome->new();
+      # fetch a page which will setup a DOM on which to operate:
       $mechobj->get('https://www.bbbbbbbbb.com');
 
       # find elements in the DOM, select by id, tag, name, or 
@@ -165,9 +179,10 @@ It finds HTML elements in the DOM currently loaded on the
 parameters-specified [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome) object. The
 parameters are:
 
-- `mech-obj` : user must supply a [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome), this is required. See section
+- `mech-obj` : user must supply a [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome) object,
+this is required. See section
 ["CREATING THE MECH OBJECT"](#creating-the-mech-object) for an example of creating the mech object with some parameters
-(which work for me) and javascript console output propagated on to perl's output.
+which work for me and javascript console output propagated on to perl's output.
 - `element-information-from-matched` : optional javascript code to be run
 on each HTML element matched in order to construct the information data
 whih is returned back. If none
@@ -182,7 +197,7 @@ specified the following default will be used, which returns tagname and id:
     the function preamble (function name, signature, etc.).
     Neither it must have the postamble, which is the end-block curly bracket.
     This piece of code **must return a HASH**. 
-    The code can thow exceptions which will be caught
+    The code can throw exceptions which will be caught
     (because the code is run within a try-catch block)
     and the error message will be propagated to the perl code with status of -1.
 
@@ -214,7 +229,7 @@ contains the code to be run assuming that the
 html element to operate on is named `htmlElement`.
 The code must end with a `return` statement which
 will be recorded and returned back to perl code.
-The code can thow exceptions which will be caught
+The code can throw exceptions which will be caught
 (because the callback is run within a try-catch block)
 and the error message will be propagated to the perl code with status of -1.
 Basically the code is expected to be the **body of a function** which
@@ -384,7 +399,7 @@ Return value is exactly the same as with ["find($params)"](#find-params)
 ## $WWW::Mechanize::Chrome::DOMops::VERBOSE\_DOMops
 
 Set this upon loading the module to `0, 1, 2, 3`
-to increase verbosity. `0` implies no verbosity.
+to adjust verbosity. `0` implies no verbosity.
 
 # ELEMENT SELECTORS
 
@@ -471,6 +486,102 @@ This is how I do it:
     $mech_obj->sleep(1); # let it settle
     # now the mech object has loaded the URL and has a DOM hopefully.
     # You can pass it on to find() or zap() to operate on the DOM.
+
+# SECURITY WARNING
+
+[WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome) invokes the `google-chrome`
+executable
+on behalf of the current user. Headless or not, `google-chrome`
+is invoked. Depending on the launch parameters, either
+a fresh, new browser session will be created or the
+session of the current user with their profile, data, cookies,
+passwords, history, etc. will be used. The latter case is very
+dangerous.
+
+This behaviour is controlled by [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome)'s
+[constructor](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%23WWW%3A%3AMechanize%3A%3AChrome-%253Enew%28-%25options-%29)
+parameters which, in turn, are used for launching
+the `google-chrome` executable. Specifically,
+see [WWW::Mechanize::Chrome#separate\_session](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%23separate_session),
+[<WWW::Mechanize::Chrome#data\_directory](https://metacpan.org/pod/%3CWWW%3A%3AMechanize%3A%3AChrome%23data_directory)
+and [WWW::Mechanize::Chrome#incognito](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%23incognito).
+
+**Unless you really need to mechsurf with your current session, aim
+to launching the browser with a fresh new session.
+This is the safest option.**
+
+**Do not rely on default behaviour as this may change over
+time. Be explicit.**
+
+Also, be warned that [WWW::Mechanize::Chrome::DOMops](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3ADOMops) executes
+javascript code on that `google-chrome` instance.
+This is done nternally with javascript code hardcoded
+into the [WWW::Mechanize::Chrome::DOMops](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3ADOMops)'s package files.
+
+On top of that [WWW::Mechanize::Chrome::DOMops](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3ADOMops) allows
+for **user-specified javascript code** to be executed on
+that `google-chrome` instance. For example the callbacks
+on each element found, etc.
+
+This is an example of what can go wrong if
+you are not using a fresh `google-chrome`
+session:
+
+You have just used `google-chrome` to access your
+yahoo webmail and you did not logout.
+So, there will be an
+access cookie in the `google-chrome` when you later
+invoke it via [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome) (remember
+you have not told it to use a fresh session).
+
+If you allow
+unchecked user-specified (or copy-pasted from ChatGPT)
+javascript code in
+[WWW::Mechanize::Chrome::DOMops](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3ADOMops)'s
+`find()`, `zap()`, etc. then it is, theoretically,
+possible that this javascript code
+initiates an XHR to yahoo and fetch your emails and
+pass them on to your perl code.
+
+But there is another problem,
+[WWW::Mechanize::Chrome::DOMops](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3ADOMops)'s
+integrity of the embedded javascript code may have
+been compromised to exploit your current session.
+
+This is very likely with a Windows installation which,
+being the security swiss cheese it is, it
+is possible for anyone to compromise your module's code.
+It is less likely in Linux, if your modules are
+installed by root and are read-only for normal users.
+But, still, it is possible to be compromised (by root).
+
+Another issue is with the saved passwords and
+the browser's auto-fill when landing on a login form.
+
+Therefore, for all these reasons, **it is advised not to invoke (via [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome))
+`google-chrome` with your
+current/usual/everyday/email-access/bank-access
+identity so that it does not have access to
+your cookies, passwords, history etc.**
+
+It is better to create a fresh
+`google-chrome`
+identity/profile and use that for your
+`WWW::Mechanize::Chrome::DOMops` needs.
+
+No matter what identity you use, you may want
+to erase the cookies and history of `google-chrome`
+upon its exit. That's a good practice.
+
+It is also advised to review the
+javascript code you provide
+via [WWW::Mechanize::Chrome::DOMops](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3ADOMops) callbacks if
+it is taken from 3rd-party, human or not, e.g. ChatGPT.
+
+Additionally, make sure that the current
+installation of [WWW::Mechanize::Chrome::DOMops](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3ADOMops)
+in your system is not compromised with malicious javascript
+code injected into it. For this you can check its MD5 hash.
 
 # DEPENDENCIES
 

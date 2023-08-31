@@ -17,21 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Vendor::Ubuntu;
-
-use strict;
-use warnings;
-
-our $VERSION = '0.01';
-
-use List::Util qw(any);
-
-use Dpkg::ErrorHandling;
-use Dpkg::Gettext;
-use Dpkg::Control::Types;
-
-use parent qw(Dpkg::Vendor::Debian);
-
 =encoding utf8
 
 =head1 NAME
@@ -40,10 +25,25 @@ Dpkg::Vendor::Ubuntu - Ubuntu vendor class
 
 =head1 DESCRIPTION
 
-This vendor class customizes the behaviour of dpkg scripts for Ubuntu
+This vendor class customizes the behavior of dpkg scripts for Ubuntu
 specific behavior and policies.
 
+B<Note>: This is a private module, its API can change at any time.
+
 =cut
+
+package Dpkg::Vendor::Ubuntu 0.01;
+
+use strict;
+use warnings;
+
+use List::Util qw(any);
+
+use Dpkg::ErrorHandling;
+use Dpkg::Gettext;
+use Dpkg::Control::Types;
+
+use parent qw(Dpkg::Vendor::Debian);
 
 sub run_hook {
     my ($self, $hook, @params) = @_;

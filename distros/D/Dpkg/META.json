@@ -4,7 +4,7 @@
       "Dpkg Developers <debian-dpkg@lists.debian.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4232",
+   "generated_by" : "Module::Build version 0.4234",
    "keywords" : [
       "dpkg",
       "debian",
@@ -43,7 +43,7 @@
             "Locale::gettext" : "0"
          },
          "requires" : {
-            "perl" : "v5.28.1"
+            "perl" : "v5.32.1"
          }
       },
       "test" : {
@@ -69,6 +69,10 @@
       "Dpkg::Build::Info" : {
          "file" : "lib/Dpkg/Build/Info.pm",
          "version" : "1.02"
+      },
+      "Dpkg::BuildAPI" : {
+         "file" : "lib/Dpkg/BuildAPI.pm",
+         "version" : "0.01"
       },
       "Dpkg::BuildEnv" : {
          "file" : "lib/Dpkg/BuildEnv.pm",
@@ -148,7 +152,7 @@
       },
       "Dpkg::Control::FieldsCore" : {
          "file" : "lib/Dpkg/Control/FieldsCore.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       },
       "Dpkg::Control::Hash" : {
          "file" : "lib/Dpkg/Control/Hash.pm",
@@ -159,7 +163,8 @@
          "version" : "1.02"
       },
       "Dpkg::Control::HashCore::Tie" : {
-         "file" : "lib/Dpkg/Control/HashCore.pm"
+         "file" : "lib/Dpkg/Control/HashCore/Tie.pm",
+         "version" : "0.01"
       },
       "Dpkg::Control::Info" : {
          "file" : "lib/Dpkg/Control/Info.pm",
@@ -294,7 +299,8 @@
          "version" : "0.01"
       },
       "Dpkg::Shlibs::Objdump::Object" : {
-         "file" : "lib/Dpkg/Shlibs/Objdump.pm"
+         "file" : "lib/Dpkg/Shlibs/Objdump/Object.pm",
+         "version" : "0.01"
       },
       "Dpkg::Shlibs::Symbol" : {
          "file" : "lib/Dpkg/Shlibs/Symbol.pm",
@@ -364,10 +370,6 @@
          "file" : "lib/Dpkg/Substvars.pm",
          "version" : "2.01"
       },
-      "Dpkg::Vars" : {
-         "file" : "lib/Dpkg/Vars.pm",
-         "version" : "0.03"
-      },
       "Dpkg::Vendor" : {
          "file" : "lib/Dpkg/Vendor.pm",
          "version" : "1.02"
@@ -411,6 +413,6 @@
          "web" : "https://git.dpkg.org/cgit/dpkg/dpkg.git"
       }
    },
-   "version" : "v1.21.22",
+   "version" : "v1.22.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

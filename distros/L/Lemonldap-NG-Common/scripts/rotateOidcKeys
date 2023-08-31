@@ -46,9 +46,27 @@ print "Key ID generated: " . $keys->{id} . "\n"            if $debug;
 #=============================================================================
 $conf->{cfgAuthor} = 'Key rotation script';
 
-$conf->{oidcServicePrivateKeySig} = $keys->{private};
-$conf->{oidcServicePublicKeySig}  = $keys->{public};
-$conf->{oidcServiceKeyIdSig}      = $keys->{id};
+if ( $conf->{oidcServiceNewKeyIdSig} and $conf->{oidcServiceNewPublicKeySig} ) {
+
+    # Move current key into previous one
+    $conf->{oidcServiceOldPrivateKeySig} = $conf->{oidcServicePrivateKeySig};
+    $conf->{oidcServiceOldPublicKeySig}  = $conf->{oidcServicePublicKeySig};
+    $conf->{oidcServiceOldKeyIdSig}      = $conf->{oidcServiceKeyIdSig};
+
+    # Move next key into current one
+    $conf->{oidcServicePrivateKeySig} = $conf->{oidcServiceNewPrivateKeySig};
+    $conf->{oidcServicePublicKeySig}  = $conf->{oidcServiceNewPublicKeySig};
+    $conf->{oidcServiceKeyIdSig}      = $conf->{oidcServiceNewKeyIdSig};
+}
+else {
+    print STDERR
+      "No previous pending new key found. Rotation will be done next time\n";
+}
+
+# Store new key
+$conf->{oidcServiceNewPrivateKeySig} = $keys->{private};
+$conf->{oidcServiceNewPublicKeySig}  = $keys->{public};
+$conf->{oidcServiceNewKeyIdSig}      = $keys->{id};
 
 ( $lmconf->saveConf($conf) > 0 ) or die $Lemonldap::NG::Common::Conf::msg;
 

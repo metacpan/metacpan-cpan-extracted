@@ -1,0 +1,14 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::SSL_METHOD {
+  
+  # Class Methods
+  native static method SSLv23_client_method : Net::SSLeay::SSL_METHOD ();
+  
+  native static method SSLv23_server_method : Net::SSLeay::SSL_METHOD ();
+  
+  native static method TLS_client_method : Net::SSLeay::SSL_METHOD ();
+  
+  native static method TLS_server_method : Net::SSLeay::SSL_METHOD ();
+}

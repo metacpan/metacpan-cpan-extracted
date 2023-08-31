@@ -12,7 +12,7 @@ my $dir = tempdir( CLEANUP => 1 );
 my $fh;
 open($fh, '>', File::Spec->catfile($dir, 'child.pl'));
 print $fh "#!$^X\n";
-print $fh 'use File::Spec', "\n";
+print $fh 'use File::Spec;', "\n";
 print $fh "open(\$out, '>', File::Spec->catfile('$dir', 'child.out'));", "\n";
 print $fh 'while(<STDIN>) {', "\n";
 print $fh '  print $out $_', "\n";

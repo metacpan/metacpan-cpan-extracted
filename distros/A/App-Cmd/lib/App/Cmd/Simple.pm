@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package App::Cmd::Simple 0.335;
+package App::Cmd::Simple 0.336;
 
 use App::Cmd::Command;
 BEGIN { our @ISA = 'App::Cmd::Command' }
@@ -20,7 +20,7 @@ use Sub::Install;
 #pod
 #pod in F<YourApp/Cmd.pm>:
 #pod
-#pod   package YourApp::Cmd;
+#pod   package YourApp::Cmd 0.01;
 #pod   use parent qw(App::Cmd::Simple);
 #pod
 #pod   sub opt_spec {
@@ -159,7 +159,10 @@ sub import {
         # If help was requested, show the help for the command, not the
         # main help. Because the main help would talk about subcommands,
         # and a "Simple" app has no subcommands.
-        if ($plugin and $plugin eq $self->plugin_for("help")) {
+        if (
+          $plugin
+          and grep { $plugin eq $self->plugin_for($_) } qw(help version)
+        ) {
           return ($command, [ $self->default_command ]);
         }
         # Any other value for "command" isn't really a command at all --
@@ -169,12 +172,18 @@ sub import {
     },
   });
 
+  {
+    no strict 'refs';
+    *{ "$generated_name\::VERSION" } = \$class->VERSION;
+  }
+
   Sub::Install::install_sub({
     into => $class,
     as   => 'run',
     code => sub {
       $generated_name->new({
         no_help_plugin     => 0,
+        no_version_plugin  => 0,
         no_commands_plugin => 1,
       })->run(@_);
     }
@@ -224,7 +233,7 @@ App::Cmd::Simple - a helper for building one-command App::Cmd applications
 
 =head1 VERSION
 
-version 0.335
+version 0.336
 
 =head1 SYNOPSIS
 
@@ -235,7 +244,7 @@ in F<simplecmd>:
 
 in F<YourApp/Cmd.pm>:
 
-  package YourApp::Cmd;
+  package YourApp::Cmd 0.01;
   use parent qw(App::Cmd::Simple);
 
   sub opt_spec {
@@ -270,13 +279,13 @@ and, finally, at the command line:
 
 =head1 PERL VERSION
 
-This library should run on perls released even a long time ago.  It should work
-on any version of perl released in the last five years.
+This library should run on perls released even a long time ago.  It should
+work on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 SUBCLASSING
 
@@ -345,7 +354,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Ricardo Signes.
+This software is copyright (c) 2023 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

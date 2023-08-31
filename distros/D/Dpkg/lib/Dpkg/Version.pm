@@ -16,13 +16,29 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Version;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::Version - handling and comparing dpkg-style version numbers
+
+=head1 DESCRIPTION
+
+The Dpkg::Version module provides pure-Perl routines to compare
+dpkg-style version numbers (as used in Debian packages) and also
+an object oriented interface overriding perl operators
+to do the right thing when you compare Dpkg::Version object between
+them.
+
+=cut
+
+package Dpkg::Version 1.03;
 
 use strict;
 use warnings;
+# Currently unused, but not removed to not generate warnings on users.
 use warnings::register qw(semantic_change::overload::bool);
 
-our $VERSION = '1.03';
 our @EXPORT = qw(
     version_compare
     version_compare_relation
@@ -58,20 +74,6 @@ use overload
     '""'  => sub { return $_[0]->as_string(); },
     'bool' => sub { return $_[0]->is_valid(); },
     'fallback' => 1;
-
-=encoding utf8
-
-=head1 NAME
-
-Dpkg::Version - handling and comparing dpkg-style version numbers
-
-=head1 DESCRIPTION
-
-The Dpkg::Version module provides pure-Perl routines to compare
-dpkg-style version numbers (as used in Debian packages) and also
-an object oriented interface overriding perl operators
-to do the right thing when you compare Dpkg::Version object between
-them.
 
 =head1 METHODS
 
@@ -128,11 +130,12 @@ stored is valid ($v->is_valid()) and false otherwise.
 B<Notice>: Between dpkg 1.15.7.2 and 1.19.1 this overload used to return
 $v->as_string() if $v->is_valid(), a breaking change in behavior that caused
 "0" versions to be evaluated as false. To catch any possibly intended code
-that relied on those semantics, this overload will emit a warning with
-category "Dpkg::Version::semantic_change::overload::bool" until dpkg 1.20.x.
-Once fixed, or for already valid code the warning can be quiesced with
+that relied on those semantics, this overload emitted a warning with category
+"Dpkg::Version::semantic_change::overload::bool" between dpkg 1.19.1 and
+1.20.0. Once fixed, or for already valid code the warning could be quiesced
+for that specific versions with
 
-  no if $Dpkg::Version::VERSION ge '1.02',
+  no if $Dpkg::Version::VERSION eq '1.02',
      warnings => qw(Dpkg::Version::semantic_change::overload::bool);
 
 added after the C<use Dpkg::Version>.

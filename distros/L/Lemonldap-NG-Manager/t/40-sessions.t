@@ -14,8 +14,7 @@ sub newSession {
     my ( $uid, $ip ) = splice @_;
     my $tmp;
     ok(
-        $tmp = Lemonldap::NG::Common::Session->new(
-            {
+        $tmp = Lemonldap::NG::Common::Session->new( {
                 storageModule        => 'Apache::Session::File',
                 storageModuleOptions => {
                     Directory      => 't/sessions',
@@ -28,8 +27,7 @@ sub newSession {
         'Sessions module'
     );
     count(1);
-    $tmp->update(
-        {
+    $tmp->update( {
             ipAddr        => $ip,
             _whatToTrace  => $uid,
             uid           => $uid,
@@ -45,7 +43,8 @@ my @ids;
 $ids[0] = newSession( 'dwho',  '127.10.0.1' );
 $ids[1] = newSession( 'dwho2', '127.2.0.2' );
 my $res = &client->jsonResponse("/sessions/global/$ids[0]");
-ok( ( $res->{uid}    and $res->{uid} eq 'dwho' ),          'Uid found' );
+ok( ( $res->{uid} and $res->{uid} eq 'dwho' ), 'Uid found' )
+  or print STDERR Dumper($res);
 ok( ( $res->{ipAddr} and $res->{ipAddr} eq '127.10.0.1' ), 'IP found' );
 count(2);
 
@@ -99,22 +98,19 @@ count(4);
 
 # New GroupBy query test with 4 sessions
 $res = &client->jsonResponse( '/sessions/global', 'groupBy=uid' );
-ok(
-    (
+ok( (
               $res->{values}->[0]->{value} eq 'dwho'
           and $res->{values}->[0]->{count} == 1
     ),
     '1st user is dwho'
 ) or print STDERR Dumper($res);
-ok(
-    (
+ok( (
               $res->{values}->[1]->{value} eq 'dwho2'
           and $res->{values}->[1]->{count} == 1
     ),
     '2nd user is dwho2'
 ) or print STDERR Dumper($res);
-ok(
-    (
+ok( (
               $res->{values}->[2]->{value} eq 'foo'
           and $res->{values}->[2]->{count} == 2
     ),

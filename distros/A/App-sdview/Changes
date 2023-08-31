@@ -1,5 +1,14 @@
 Revision history for App-sdview
 
+0.12    2023-08-30
+        [CHANGES]
+         * Neater interaction between `margin` and `indent` style keys
+         * User-overridable style formatting by providing a `~/.sdviewrc` file
+
+        [BUGFIXES]
+         * Use `Pod::Perldoc` to search for POD files relating to given names,
+           so we can find the non-module `perldelta`, etc... as well
+
 0.11    2023-08-25
         [CHANGES]
          * Use `Module::Pluggable` to find Parser and Output classes

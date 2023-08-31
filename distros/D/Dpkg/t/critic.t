@@ -27,6 +27,7 @@ my @policies = qw(
     BuiltinFunctions::ProhibitBooleanGrep
     BuiltinFunctions::ProhibitLvalueSubstr
     BuiltinFunctions::ProhibitReverseSortBlock
+    BuiltinFunctions::ProhibitShiftRef
     BuiltinFunctions::ProhibitSleepViaSelect
     BuiltinFunctions::ProhibitStringySplit
     BuiltinFunctions::ProhibitUniversalCan
@@ -50,8 +51,11 @@ my @policies = qw(
     ControlStructures::ProhibitMutatingListFunctions
     ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions
     ControlStructures::ProhibitUntilBlocks
+    ControlStructures::ProhibitYadaOperator
     Documentation::RequirePackageMatchesPodName
     Documentation::RequirePodSections
+    InputOutput::ProhibitBacktickOperators
+    InputOutput::ProhibitBarewordDirHandles
     InputOutput::ProhibitBarewordFileHandles
     InputOutput::ProhibitInteractiveTest
     InputOutput::ProhibitJoinedReadline
@@ -67,12 +71,15 @@ my @policies = qw(
     Miscellanea::ProhibitUselessNoCritic
     Modules::ProhibitConditionalUseStatements
     Modules::ProhibitEvilModules
+    Modules::ProhibitMultiplePackages
     Modules::RequireBarewordIncludes
     Modules::RequireEndWithOne
     Modules::RequireExplicitPackage
     Modules::RequireFilenameMatchesPackage
     NamingConventions::Capitalization
+    NamingConventions::ProhibitAmbiguousNames
     Objects::ProhibitIndirectSyntax
+    RegularExpressions::ProhibitCaptureWithoutTest
     RegularExpressions::ProhibitSingleCharAlternation
     RegularExpressions::ProhibitUnusedCapture
     RegularExpressions::ProhibitUnusualDelimiters
@@ -86,8 +93,10 @@ my @policies = qw(
     Subroutines::ProhibitReturnSort
     Subroutines::ProhibitUnusedPrivateSubroutines
     Subroutines::ProtectPrivateSubs
+    Subroutines::RequireArgUnpacking
     TestingAndDebugging::ProhibitNoStrict
     TestingAndDebugging::ProhibitNoWarnings
+    TestingAndDebugging::ProhibitProlongedStrictureOverride
     TestingAndDebugging::RequireTestLabels
     TestingAndDebugging::RequireUseStrict
     TestingAndDebugging::RequireUseWarnings

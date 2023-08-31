@@ -93,25 +93,27 @@ sub extractFormInfo {
         $req->wantErrorRender(1);
     }
 
-    my $token_id = $req->param('ajax_auth_token');
-    if ($token_id) {
-        my $token = $self->get_auth_token( $req, $token_id );
-        if ( $token->{user} ) {
-            my $user = $token->{user};
-            $self->userLogger->notice( "GoodSSL authentication for " . $user );
-            $req->user($user);
-            $req->data->{_Issuer} = $token->{extraInfo}->{_Issuer};
-            return PE_OK;
-        }
-        else {
-            return PE_ERROR;
+    if ($self->conf->{sslByAjax}) {
+        my $token_id = $req->param('ajax_auth_token');
+        if ($token_id) {
+            my $token = $self->get_auth_token( $req, $token_id );
+            if ( $token->{user} ) {
+                my $user = $token->{user};
+                $self->userLogger->notice( "Good SSL authentication for " . $user );
+                $req->user($user);
+                $req->data->{_Issuer} = $token->{extraInfo}->{_Issuer};
+                return PE_OK;
+            }
+            else {
+                return PE_ERROR;
+            }
         }
     }
 
     my $ssl_user = $self->get_user_from_req($req);
 
     if ( $ssl_user and $req->user($ssl_user) ) {
-        $self->userLogger->notice( "GoodSSL authentication for " . $req->user );
+        $self->userLogger->notice( "Good SSL authentication for " . $req->user );
         $req->data->{_Issuer} = $req->env->{ $self->issuer_var };
         return PE_OK;
     }

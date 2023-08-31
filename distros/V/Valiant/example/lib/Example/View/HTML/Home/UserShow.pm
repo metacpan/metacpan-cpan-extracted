@@ -5,7 +5,7 @@ use Example::Syntax;
 use Example::View::HTML
   -tags => qw(div blockquote link_to button),
   -views => 'HTML::Page', 'HTML::Navbar',
-  -helpers => 'path';
+  -helpers => qw(user_show_uri public_posts_list_uri );
 
 has info => (is=>'rw', predicate=>'has_info');
 
@@ -23,14 +23,14 @@ sub render($self, $c) {
       role=>"alert" }, $self->info,
     div 'Welcome to your Example application Homepage',
     div [
-      'See ', link_to path('/public/posts/list'), 'Recent Blogs'
+      'See ', link_to public_posts_list_uri(), 'Recent Blogs'
     ],
      div [
       button {
-        formaction=>path('user_show'),
-        type=>'button', 
-        class=>'btn btn-primary',
-        data=>{remote=>'true', confirm=>'Are you Sure'} }, 'Test Button'
+        formaction => user_show_uri(),
+        type => 'button', 
+        class => 'btn btn-primary',
+        data => +{remote=>'true', confirm=>'Are you Sure'} }, 'Test Button'
     ]   
   };
 }

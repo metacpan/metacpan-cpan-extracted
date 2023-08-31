@@ -7,6 +7,7 @@ package Lemonldap::NG::Portal::2F::Yubikey;
 use strict;
 use Mouse;
 use JSON qw(from_json to_json);
+use Lemonldap::NG::Common::Util qw/display2F/;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_ERROR
@@ -15,7 +16,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.17.0';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor';
 with 'Lemonldap::NG::Portal::Lib::2fDevices';
@@ -89,44 +90,63 @@ sub init {
     return $self->SUPER::init();
 }
 
-sub _findYubikey {
-    my ( $self, $req, $session ) = @_;
+sub _findYubikeyForCode {
+    my ( $self, $req, $session, $code ) = @_;
     my ( $yubikey, @ubk2f );
+
+    my $id_from_code = substr( $code, 0, $self->conf->{yubikey2fPublicIDSize} );
 
     # First, lookup from session attribute
     if ( $self->conf->{yubikey2fFromSessionAttribute} ) {
         my $attr = $self->conf->{yubikey2fFromSessionAttribute};
         $yubikey = $session->{$attr};
+        if ($yubikey) {
+            if ( $yubikey eq $id_from_code ) {
+                return { _yubikey => $yubikey, };
+            }
+            else {
+                return;
+            }
+        }
     }
 
     # If we didn't find a key, lookup psession
     if ( !$yubikey and $session->{_2fDevices} ) {
         @ubk2f = $self->find2fDevicesByType( $req, $session, $self->type );
-        if ( my $code = $req->param('code') ) {
-            $yubikey = $_->{_yubikey} foreach grep {
-                $_->{_yubikey} eq
-                  substr( $code, 0, $self->conf->{yubikey2fPublicIDSize} )
-            } @ubk2f;
-        }
-        else {
-            $yubikey = $_->{_yubikey} foreach @ubk2f;
-        }
+        my @results = grep { $_->{_yubikey} eq $id_from_code } @ubk2f;
+        return $results[0];
+    }
+    return;
+}
+
+sub _hasYubikey {
+    my ( $self, $req, $session ) = @_;
+    my ( $yubikey, @ubk2f );
+
+    # Does the user have a session attribute
+    if ( $self->conf->{yubikey2fFromSessionAttribute} ) {
+        my $attr = $self->conf->{yubikey2fFromSessionAttribute};
+        $yubikey = $session->{$attr};
     }
 
-    return $yubikey || '';
+    # If we didn't find a value, lookup registered devices
+    if ( !$yubikey and $session->{_2fDevices} ) {
+        @ubk2f   = $self->find2fDevicesByType( $req, $session, $self->type );
+        $yubikey = $_->{_yubikey} foreach @ubk2f;
+    }
+
+    return ( $yubikey ? 1 : 0 );
 }
 
 sub run {
     my ( $self, $req, $token ) = @_;
-    my $yubikey = $self->_findYubikey( $req, $req->sessionInfo );
-    unless ($yubikey) {
+    unless ( $self->_hasYubikey( $req, $req->sessionInfo ) ) {
         $self->userLogger->warn( $self->prefix
               . '2f: user '
               . $req->{sessionInfo}->{ $self->conf->{whatToTrace} }
               . ' has no device registered' );
         return PE_BADOTP;
     }
-    $self->logger->debug( $self->prefix . "2f: found $yubikey" );
 
     # Prepare form
     my ( $checkLogins, $stayConnected ) = $self->getFormParams($req);
@@ -157,12 +177,8 @@ sub verify {
     }
 
     # Verify OTP
-    my $yubikey = $self->_findYubikey( $req, $session );
-    if (
-        index( $yubikey,
-            substr( $code, 0, $self->conf->{yubikey2fPublicIDSize} ) ) == -1
-      )
-    {
+    my $yubikey = $self->_findYubikeyForCode( $req, $session, $code );
+    unless ($yubikey) {
         $self->userLogger->warn( $self->prefix . '2f: device not registered' );
         return PE_BADOTP;
     }
@@ -173,6 +189,15 @@ sub verify {
         $self->userLogger->warn( $self->prefix . '2f: verification failed' );
         return PE_BADOTP;
     }
+    my $uid = $session->{ $self->conf->{whatToTrace} };
+    if ( $yubikey->{epoch} ) {
+        $self->userLogger->info(
+            "User $uid authenticated with 2F device: " . display2F($yubikey) );
+    }
+    else {
+        $self->userLogger->info("User $uid authenticated with Yubikey");
+    }
+
     return PE_OK;
 }
 

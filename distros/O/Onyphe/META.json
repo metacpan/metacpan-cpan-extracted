@@ -1,0 +1,180 @@
+{
+   "abstract" : "ONYPHE base class",
+   "author" : [
+      "ONYPHE <contact_at_onyphe.io>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Onyphe",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config::INI::Tiny" : "0",
+            "Data::Dumper" : "0",
+            "File::Slurp" : "0",
+            "File::Temp" : "0",
+            "JSON::XS" : "0",
+            "LWP::Protocol::https" : "0",
+            "Mojolicious" : "0",
+            "Net::IPv4Addr" : "0",
+            "Regexp::IPv4" : "0",
+            "Regexp::IPv6" : "0",
+            "Storable" : "0",
+            "Text::CSV_XS" : "0",
+            "Text::ParseWords" : "0",
+            "Tie::IxHash" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Class::Gomor" : {
+         "file" : "lib/Class/Gomor.pm",
+         "version" : "1.03"
+      },
+      "Class::Gomor::Array" : {
+         "file" : "lib/Class/Gomor/Array.pm",
+         "version" : "1.03"
+      },
+      "OPP" : {
+         "file" : "lib/OPP.pm",
+         "version" : "1.00"
+      },
+      "OPP::Output" : {
+         "file" : "lib/OPP/Output.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc" : {
+         "file" : "lib/OPP/Proc.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Addcount" : {
+         "file" : "lib/OPP/Proc/Addcount.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Allowlist" : {
+         "file" : "lib/OPP/Proc/Allowlist.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Blocklist" : {
+         "file" : "lib/OPP/Proc/Blocklist.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Count" : {
+         "file" : "lib/OPP/Proc/Count.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Dedup" : {
+         "file" : "lib/OPP/Proc/Dedup.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Discovery" : {
+         "file" : "lib/OPP/Proc/Discovery.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Exec" : {
+         "file" : "lib/OPP/Proc/Exec.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Expand" : {
+         "file" : "lib/OPP/Proc/Expand.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Fieldcount" : {
+         "file" : "lib/OPP/Proc/Fieldcount.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Fields" : {
+         "file" : "lib/OPP/Proc/Fields.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Filter" : {
+         "file" : "lib/OPP/Proc/Filter.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Flatten" : {
+         "file" : "lib/OPP/Proc/Flatten.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Lookup" : {
+         "file" : "lib/OPP/Proc/Lookup.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Merge" : {
+         "file" : "lib/OPP/Proc/Merge.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Noop" : {
+         "file" : "lib/OPP/Proc/Noop.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Output" : {
+         "file" : "lib/OPP/Proc/Output.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Pivots" : {
+         "file" : "lib/OPP/Proc/Pivots.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Regex" : {
+         "file" : "lib/OPP/Proc/Regex.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Search" : {
+         "file" : "lib/OPP/Proc/Search.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Splitsubnet" : {
+         "file" : "lib/OPP/Proc/Splitsubnet.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Top" : {
+         "file" : "lib/OPP/Proc/Top.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Uniq" : {
+         "file" : "lib/OPP/Proc/Uniq.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Where" : {
+         "file" : "lib/OPP/Proc/Where.pm",
+         "version" : "1.00"
+      },
+      "OPP::Proc::Whois" : {
+         "file" : "lib/OPP/Proc/Whois.pm",
+         "version" : "1.00"
+      },
+      "OPP::State" : {
+         "file" : "lib/OPP/State.pm",
+         "version" : "1.00"
+      },
+      "Onyphe" : {
+         "file" : "lib/Onyphe.pm",
+         "version" : "4.10"
+      },
+      "Onyphe::Api" : {
+         "file" : "lib/Onyphe/Api.pm",
+         "version" : "4.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/BSD-3-Clause"
+      ]
+   },
+   "version" : "4.10",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

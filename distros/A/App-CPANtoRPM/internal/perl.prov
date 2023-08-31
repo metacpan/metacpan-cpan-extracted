@@ -147,7 +147,7 @@ sub process_file {
     #FindBin.pm:$VERSION = $VERSION = sprintf("%d.%02d", q$Revision: 1.9 $ =~ /(\d+)\.(\d+)/);
     #ExtUtils/Install.pm:$VERSION = substr q$Revision: 1.9 $, 10;
     #CGI/Apache.pm:$VERSION = (qw$Revision: 1.9 $)[1];
-    #DynaLoader.pm:$VERSION = $VERSION="1.13";     # avoid typo warning
+    #DynaLoader.pm:$VERSION = $VERSION="1.14";     # avoid typo warning
     #General.pm:$Config::General::VERSION = 2.33;
     # 
     # or with the new "our" pragma you could (read will) see:

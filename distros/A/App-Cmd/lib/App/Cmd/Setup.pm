@@ -5,7 +5,7 @@ use 5.020;
 use warnings;
 use experimental qw(postderef postderef_qq);
 
-package App::Cmd::Setup 0.335;
+package App::Cmd::Setup 0.336;
 
 # ABSTRACT: helper for setting up App::Cmd classes
 
@@ -38,7 +38,15 @@ package App::Cmd::Setup 0.335;
 #pod   package MyApp;
 #pod   use App::Cmd::Setup -app => { plugins => [ 'Prompt' ] };
 #pod
-#pod Plugins are described in L<App::Cmd::Tutorial> and L<App::Cmd::Plugin>.
+#pod Plugins are described in L<App::Cmd::Tutorial>.
+#pod
+#pod Doing this also allows you to override the default configuration passed to
+#pod L<Getopt::Long>. By default, this configuration includes C<pass_through>,
+#pod which allows subdispatch to work correctly. If you are not using subdispatch,
+#pod and want your command to exit on unknown options, you can say:
+#pod
+#pod   package MyApp;
+#pod   use App::Cmd::Setup -app => { getopt_conf => [] };
 #pod
 #pod = when writing abstract base classes for commands
 #pod
@@ -100,13 +108,15 @@ sub import {
 
 sub _app_base_class { 'App::Cmd' }
 
+my %valid_keys = map {; $_ => 1 } qw(plugins getopt_conf);
+
 sub _make_app_class {
   my ($self, $val, $data) = @_;
   my $into = $data->{into};
 
   $val ||= {};
   Carp::confess "invalid argument to -app setup"
-    if grep { $_ ne 'plugins' } keys %$val;
+    if grep { ! $valid_keys{$_} } keys %$val;
 
   Carp::confess "app setup requested on App::Cmd subclass $into"
     if $into->isa('App::Cmd');
@@ -148,6 +158,16 @@ sub _make_app_class {
     into => $into,
     as   => '_plugin_plugins',
   });
+
+  if ($val->{getopt_conf}) {
+    my @getopt_conf = @{ $val->{getopt_conf} };
+
+    Sub::Install::install_sub({
+      code => sub { return [ @getopt_conf ] },
+      into => $into,
+      as   => '_getopt_conf',
+    });
+  }
 
   return 1;
 }
@@ -219,7 +239,7 @@ App::Cmd::Setup - helper for setting up App::Cmd classes
 
 =head1 VERSION
 
-version 0.335
+version 0.336
 
 =head1 OVERVIEW
 
@@ -250,7 +270,15 @@ plugins, as in:
   package MyApp;
   use App::Cmd::Setup -app => { plugins => [ 'Prompt' ] };
 
-Plugins are described in L<App::Cmd::Tutorial> and L<App::Cmd::Plugin>.
+Plugins are described in L<App::Cmd::Tutorial>.
+
+Doing this also allows you to override the default configuration passed to
+L<Getopt::Long>. By default, this configuration includes C<pass_through>,
+which allows subdispatch to work correctly. If you are not using subdispatch,
+and want your command to exit on unknown options, you can say:
+
+  package MyApp;
+  use App::Cmd::Setup -app => { getopt_conf => [] };
 
 =item when writing abstract base classes for commands
 
@@ -286,13 +314,13 @@ L<App::Cmd::Plugin>.
 
 =head1 PERL VERSION
 
-This library should run on perls released even a long time ago.  It should work
-on any version of perl released in the last five years.
+This library should run on perls released even a long time ago.  It should
+work on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 AUTHOR
 
@@ -300,7 +328,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Ricardo Signes.
+This software is copyright (c) 2023 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,9 +3,7 @@ package Example::View::HTML::Page;
 use Moo;
 use Example::Syntax;
 use Example::View::HTML
-  -tags => qw(html head title meta link body script br),
-  -util => qw(content_for),
-  -views => 'Layout';
+  -tags => qw(html head meta title link body script br);
 
 has 'page_title' => (is=>'ro', required=>1);
 has 'scripts' => (

@@ -8,14 +8,8 @@ use Example::View::HTML
 
 has 'comment' => (is=>'ro', required=>1);
 
-sub create_or_update_path :Renders ($self)  {
-  return $self->comment->in_storage ?
-   path('update', [$self->comment->post_id, $self->comment->id]) :
-    path('create', [$self->comment->post_id]); 
-}
-
 sub render($self, $c) {
-  form_for $self->comment, +{action=>$self->create_or_update_path}, sub ($self, $fb, $comment) {
+  form_for [$self->comment->post_id, $self->comment], sub ($self, $fb, $comment) {
     div +{ if=>$fb->successfully_updated, 
       class=>'alert alert-success', role=>'alert' 
     }, 'Successfully Saved!',

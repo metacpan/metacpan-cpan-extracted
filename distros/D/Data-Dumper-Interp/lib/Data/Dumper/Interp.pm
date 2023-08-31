@@ -17,8 +17,8 @@ no warnings "experimental::lexical_subs";
 
 package  Data::Dumper::Interp;
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '6.004'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-08-23'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '6.005'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-08-25'; # DATE from Dist::Zilla::Plugin::OurDate
 
 package
   # newline so Dist::Zilla::Plugin::PkgVersion won't add $VERSION
@@ -627,6 +627,7 @@ sub _Do {
 
   oops unless $my_visit_depth == 0;
   my $modified = $self->visit($original); # see Data::Visitor
+
   btw "## DD input : ",_dbvis($modified) if $debug;
   $self->dd->Values([$modified]);
 
@@ -817,7 +818,8 @@ sub _prefix_refaddr($;$) {
   # However don't do this if $item already has an addrvis() substituted,
   # which happens if an object does not stringify or provide another overload
   # replacement -- see _object_subst().
-  return $item unless $opt_refaddr;
+  return $item 
+    unless $opt_refaddr && (!$listform || $my_visit_depth > 0);
   my $pfx = addrvis(refaddr($original//$item));
   my $ix = index($item,$pfx);
 say "_prefix_refaddr: pfx=$pfx ix=$ix original=",_dbvis1($original)," item=$item" if $debug;

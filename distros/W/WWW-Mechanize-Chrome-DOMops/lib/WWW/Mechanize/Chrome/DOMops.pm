@@ -13,7 +13,7 @@ our @EXPORT = qw(
 
 use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
  
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 # caller can set this to 0,1,2,3
 our $VERBOSE_DOMops = 0;
@@ -536,19 +536,29 @@ sub zap {
 
 ## POD starts here
 
+=pod
+
 =head1 NAME
 
 WWW::Mechanize::Chrome::DOMops - Operations on the DOM loaded in Chrome
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =head1 SYNOPSIS
 
-This module provides a set of tools to operate on the DOM of the
-provided L<WWW::Mechanize::Chrome> object. Currently,
-supported operations are:
+This module provides a set of tools to operate on the DOM
+loaded onto the provided <WWW::Mechanize::Chrome> object
+after fetching a URL.
+
+Operating on the DOM is powerful but there are
+security risks involved if the browser and profile
+you used for loading this DOM is your everyday browser and profile.
+
+Please read L<SECURITY WARNING> before continuing on to the main course.
+
+Currently, L<WWW::Mechanize::Chrome::DOMops> provides these tools:
 
 =over 4
 
@@ -558,9 +568,12 @@ supported operations are:
 
 =back
 
-Both C<find()> and C<zap()> return some information from each match and its descendents (like C<tag>, C<id> etc.).
+Both C<find()> and C<zap()> return some information from
+each match and its descendents (like C<tag>, C<id> etc.).
 This information can be tweaked by the caller.
-C<find()> and C<zap()> optionally execute javascript code on each match and its descendents and can return back data.
+C<find()> and C<zap()> optionally execute javascript code on
+each match and its descendents and can return data back to
+the caller perl code.
 
 The selection of the HTML elements in the DOM
 can be done in various ways:
@@ -585,12 +598,15 @@ Here are some usage scenaria:
 
     use WWW::Mechanize::Chrome::DOMops qw/zap find VERBOSE_DOMops/;
 
-    # increase verbosity: 0, 1, 2, 3
+    # adjust verbosity: 0, 1, 2, 3
     $WWW::Mechanize::Chrome::VERBOSE_DOMops = 3;
 
     # First, create a mech object and load a URL on it
     # Note: you need google-chrome binary installed in your system!
+    # See section CREATING THE MECH OBJECT for creating the mech
+    # and how to redirect its javascript console to perl's output
     my $mechobj = WWW::Mechanize::Chrome->new();
+    # fetch a page which will setup a DOM on which to operate:
     $mechobj->get('https://www.bbbbbbbbb.com');
 
     # find elements in the DOM, select by id, tag, name, or 
@@ -719,9 +735,10 @@ parameters are:
 
 =over 4
 
-=item * C<mech-obj> : user must supply a L<WWW::Mechanize::Chrome>, this is required. See section
+=item * C<mech-obj> : user must supply a L<WWW::Mechanize::Chrome> object,
+this is required. See section
 L<CREATING THE MECH OBJECT> for an example of creating the mech object with some parameters
-(which work for me) and javascript console output propagated on to perl's output.
+which work for me and javascript console output propagated on to perl's output.
 
 =item * C<element-information-from-matched> : optional javascript code to be run
 on each HTML element matched in order to construct the information data
@@ -737,7 +754,7 @@ That means it B<must not have>
 the function preamble (function name, signature, etc.).
 Neither it must have the postamble, which is the end-block curly bracket.
 This piece of code B<must return a HASH>. 
-The code can thow exceptions which will be caught
+The code can throw exceptions which will be caught
 (because the code is run within a try-catch block)
 and the error message will be propagated to the perl code with status of -1.
 
@@ -771,7 +788,7 @@ contains the code to be run assuming that the
 html element to operate on is named C<htmlElement>.
 The code must end with a C<return> statement which
 will be recorded and returned back to perl code.
-The code can thow exceptions which will be caught
+The code can throw exceptions which will be caught
 (because the callback is run within a try-catch block)
 and the error message will be propagated to the perl code with status of -1.
 Basically the code is expected to be the B<body of a function> which
@@ -956,7 +973,7 @@ Return value is exactly the same as with L</find($params)>
 =head2 $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops
 
 Set this upon loading the module to C<0, 1, 2, 3>
-to increase verbosity. C<0> implies no verbosity.
+to adjust verbosity. C<0> implies no verbosity.
 
 =head1 ELEMENT SELECTORS
 
@@ -990,11 +1007,11 @@ into a final list
 
 =over 2
 
-=item C<&&> : Intersection. When set to 1 the result is the intersection of all individual results.
+=item * C<&&> : Intersection. When set to 1 the result is the intersection of all individual results.
 Meaning that an element will make it to the final list if it was matched
 by every selector specified. This is the default.
 
-=item C<||> : Union. When set to 1 the result is the union of all individual results.
+=item * C<||> : Union. When set to 1 the result is the union of all individual results.
 Meaning that an element will make it to the final list if it was matched
 by at least one of the selectors specified.
 
@@ -1057,6 +1074,102 @@ This is how I do it:
     # now the mech object has loaded the URL and has a DOM hopefully.
     # You can pass it on to find() or zap() to operate on the DOM.
 
+
+=head1 SECURITY WARNING
+
+L<WWW::Mechanize::Chrome> invokes the C<google-chrome>
+executable
+on behalf of the current user. Headless or not, C<google-chrome>
+is invoked. Depending on the launch parameters, either
+a fresh, new browser session will be created or the
+session of the current user with their profile, data, cookies,
+passwords, history, etc. will be used. The latter case is very
+dangerous.
+
+This behaviour is controlled by L<WWW::Mechanize::Chrome>'s
+L<constructor|WWW::Mechanize::Chrome#WWW::Mechanize::Chrome-%3Enew(-%options-)>
+parameters which, in turn, are used for launching
+the C<google-chrome> executable. Specifically,
+see L<WWW::Mechanize::Chrome#separate_session>,
+L<<WWW::Mechanize::Chrome#data_directory>
+and L<WWW::Mechanize::Chrome#incognito>.
+
+B<Unless you really need to mechsurf with your current session, aim
+to launching the browser with a fresh new session.
+This is the safest option.>
+
+B<Do not rely on default behaviour as this may change over
+time. Be explicit.>
+
+Also, be warned that L<WWW::Mechanize::Chrome::DOMops> executes
+javascript code on that C<google-chrome> instance.
+This is done nternally with javascript code hardcoded
+into the L<WWW::Mechanize::Chrome::DOMops>'s package files.
+
+On top of that L<WWW::Mechanize::Chrome::DOMops> allows
+for B<user-specified javascript code> to be executed on
+that C<google-chrome> instance. For example the callbacks
+on each element found, etc.
+
+This is an example of what can go wrong if
+you are not using a fresh C<google-chrome>
+session:
+
+You have just used C<google-chrome> to access your
+yahoo webmail and you did not logout.
+So, there will be an
+access cookie in the C<google-chrome> when you later
+invoke it via L<WWW::Mechanize::Chrome> (remember
+you have not told it to use a fresh session).
+
+If you allow
+unchecked user-specified (or copy-pasted from ChatGPT)
+javascript code in
+L<WWW::Mechanize::Chrome::DOMops>'s
+C<find()>, C<zap()>, etc. then it is, theoretically,
+possible that this javascript code
+initiates an XHR to yahoo and fetch your emails and
+pass them on to your perl code.
+
+But there is another problem,
+L<WWW::Mechanize::Chrome::DOMops>'s
+integrity of the embedded javascript code may have
+been compromised to exploit your current session.
+
+This is very likely with a Windows installation which,
+being the security swiss cheese it is, it
+is possible for anyone to compromise your module's code.
+It is less likely in Linux, if your modules are
+installed by root and are read-only for normal users.
+But, still, it is possible to be compromised (by root).
+
+Another issue is with the saved passwords and
+the browser's auto-fill when landing on a login form.
+
+Therefore, for all these reasons, B<it is advised not to invoke (via L<WWW::Mechanize::Chrome>)
+C<google-chrome> with your
+current/usual/everyday/email-access/bank-access
+identity so that it does not have access to
+your cookies, passwords, history etc.>
+
+It is better to create a fresh
+C<google-chrome>
+identity/profile and use that for your
+C<WWW::Mechanize::Chrome::DOMops> needs.
+
+No matter what identity you use, you may want
+to erase the cookies and history of C<google-chrome>
+upon its exit. That's a good practice.
+
+It is also advised to review the
+javascript code you provide
+via L<WWW::Mechanize::Chrome::DOMops> callbacks if
+it is taken from 3rd-party, human or not, e.g. ChatGPT.
+
+Additionally, make sure that the current
+installation of L<WWW::Mechanize::Chrome::DOMops>
+in your system is not compromised with malicious javascript
+code injected into it. For this you can check its MD5 hash.
 
 =head1 DEPENDENCIES
 

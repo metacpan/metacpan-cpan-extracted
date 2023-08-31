@@ -1,0 +1,9 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::X509_STORE {
+  use Net::SSLeay::X509;
+  
+  # Instance Methods
+  native method add_cert : int ($x : Net::SSLeay::X509);
+}

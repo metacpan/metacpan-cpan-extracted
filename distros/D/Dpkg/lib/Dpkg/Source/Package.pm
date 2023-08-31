@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Source::Package;
-
 =encoding utf8
 
 =head1 NAME
@@ -31,10 +29,11 @@ is the one that supports the extraction of the source package.
 
 =cut
 
+package Dpkg::Source::Package 2.02;
+
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
 our @EXPORT_OK = qw(
     get_default_diff_ignore_regex
     set_default_diff_ignore_regex
@@ -306,7 +305,6 @@ sub upgrade_object_type {
     my $module = "Dpkg::Source::Package::V$major";
     $module .= '::' . ucfirst $variant if defined $variant;
     eval qq{
-        pop \@INC if \$INC[-1] eq '.';
         require $module;
         \$minor = \$${module}::CURRENT_MINOR_VERSION;
     };
@@ -621,9 +619,9 @@ sub before_build {
 }
 
 sub build {
-    my $self = shift;
+    my ($self, @args) = @_;
 
-    $self->do_build(@_);
+    $self->do_build(@args);
 }
 
 sub after_build {
@@ -652,9 +650,9 @@ sub add_file {
 }
 
 sub commit {
-    my $self = shift;
+    my ($self, @args) = @_;
 
-    $self->do_commit(@_);
+    $self->do_commit(@args);
 }
 
 sub do_commit {

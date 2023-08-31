@@ -253,7 +253,7 @@ $(window).on 'load', () ->
 
 	# Keep the currently selected tab
 	if "datas" of window && "choicetab" of window.datas
-		datas.choicetab = window.datas.choicetab;
+		datas.choicetab = window.datas.choicetab
 
 	# Export datas for other scripts
 	window.datas = datas
@@ -569,11 +569,13 @@ $(window).on 'load', () ->
 		checked = $(this).prop('checked')
 		console.log 'Reset is checked', checked
 		if checked == true
+			$('#ppolicy').hide()
 			$('#newpasswords').hide()
 			$('#newpassword').removeAttr('required')
 			$('#confirmpassword').removeAttr('required')
 			$('#confirmpassword').get(0)?.setCustomValidity('')
 		else
+			$('#ppolicy').show()
 			$('#newpasswords').show()
 			$('#newpassword').attr('required', true)
 			$('#confirmpassword').attr('required', true)

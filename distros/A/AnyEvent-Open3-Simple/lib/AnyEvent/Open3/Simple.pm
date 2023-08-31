@@ -14,7 +14,7 @@ use constant _is_native_win32 => $^O eq 'MSWin32';
 use constant _detect => _is_native_win32() ? 'idle' : 'child';
 
 # ABSTRACT: Interface to open3 under AnyEvent
-our $VERSION = '0.88'; # VERSION
+our $VERSION = '0.90'; # VERSION
 
 
 sub new
@@ -251,7 +251,7 @@ AnyEvent::Open3::Simple - Interface to open3 under AnyEvent
 
 =head1 VERSION
 
-version 0.88
+version 0.90
 
 =head1 SYNOPSIS
 
@@ -547,6 +547,8 @@ Contributors:
 Stephen R. Scaffidi
 
 Scott Wiersdorf
+
+Graham Knop (HAARG)
 
 =head1 COPYRIGHT AND LICENSE
 

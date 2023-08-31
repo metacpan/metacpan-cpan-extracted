@@ -93,7 +93,7 @@ ENDKEY
         );
 
         expectRedirection( $res,
-            'http://auth.example.com//2fregisters/webauthn' );
+            'http://auth.example.com/2fregisters/webauthn' );
 
         # Display WebAuthn registration
         ok(

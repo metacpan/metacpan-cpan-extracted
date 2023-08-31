@@ -13,12 +13,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package Dpkg::Source::Quilt;
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::Source::Quilt - represent a quilt patch queue
+
+=head1 DESCRIPTION
+
+This module provides a class to handle quilt patch queues.
+
+B<Note>: This is a private module, its API can change at any time.
+
+=cut
+
+package Dpkg::Source::Quilt 0.02;
 
 use strict;
 use warnings;
-
-our $VERSION = '0.02';
 
 use List::Util qw(any none);
 use File::Spec;
@@ -51,7 +63,7 @@ sub new {
 
 sub setup_db {
     my $self = shift;
-    my $db_dir = $self->get_db_file();
+    my $db_dir = $self->get_db_dir();
     if (not -d $db_dir) {
         mkdir $db_dir or syserr(g_('cannot mkdir %s'), $db_dir);
     }
@@ -235,7 +247,7 @@ sub get_db_version {
 
 sub find_problems {
     my $self = shift;
-    my $patch_dir = $self->get_patch_file();
+    my $patch_dir = $self->get_patch_dir();
     if (-e $patch_dir and not -d _) {
         return sprintf(g_('%s should be a directory or non-existing'), $patch_dir);
     }
@@ -257,23 +269,27 @@ sub get_series_file {
 }
 
 sub get_db_file {
-    my $self = shift;
-    return File::Spec->catfile($self->{dir}, '.pc', @_);
+    my ($self, $file) = @_;
+
+    return File::Spec->catfile($self->get_db_dir(), $file);
 }
 
 sub get_db_dir {
     my $self = shift;
-    return $self->get_db_file();
+
+    return File::Spec->catfile($self->{dir}, '.pc');
 }
 
 sub get_patch_file {
-    my $self = shift;
-    return File::Spec->catfile($self->{dir}, 'debian', 'patches', @_);
+    my ($self, $file) = @_;
+
+    return File::Spec->catfile($self->get_patch_dir(), $file);
 }
 
 sub get_patch_dir {
     my $self = shift;
-    return $self->get_patch_file();
+
+    return File::Spec->catfile($self->{dir}, 'debian', 'patches');
 }
 
 ## METHODS BELOW ARE INTERNAL ##
@@ -379,5 +395,13 @@ sub restore_quilt_backup_files {
         }
     }, $patch_dir);
 }
+
+=head1 CHANGES
+
+=head2 Version 0.xx
+
+This is a private module.
+
+=cut
 
 1;
