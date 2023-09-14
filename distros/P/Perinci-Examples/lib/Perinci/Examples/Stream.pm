@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-04-15'; # DATE
+our $DATE = '2023-07-09'; # DATE
 our $DIST = 'Perinci-Examples'; # DIST
-our $VERSION = '0.823'; # VERSION
+our $VERSION = '0.824'; # VERSION
 
 our %SPEC;
 
@@ -370,7 +370,7 @@ Perinci::Examples::Stream - Examples for streaming input/output
 
 =head1 VERSION
 
-This document describes version 0.823 of Perinci::Examples::Stream (from Perl distribution Perinci-Examples), released on 2022-04-15.
+This document describes version 0.824 of Perinci::Examples::Stream (from Perl distribution Perinci-Examples), released on 2023-07-09.
 
 =head1 DESCRIPTION
 
@@ -465,6 +465,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<input> => I<array[str]>
+
+(No description)
 
 
 =back
@@ -642,6 +644,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<input>* => I<array[float]>
 
+(No description)
+
 
 =back
 
@@ -673,6 +677,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<input>* => I<array[float]>
+
+(No description)
 
 
 =back
@@ -706,6 +712,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<input>* => I<array[float]>
 
+(No description)
+
 
 =back
 
@@ -738,6 +746,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<input>* => I<float>
 
+(No description)
+
 
 =back
 
@@ -769,6 +779,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<input>* => I<array[str]>
+
+(No description)
 
 
 =back
@@ -804,6 +816,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<input>* => I<array[hash]>
+
+(No description)
 
 
 =back
@@ -844,13 +858,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

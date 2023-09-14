@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Exception;
+use Test::Fatal;
 use Test::TCP;
 
 use IO::Async::Loop;
@@ -20,7 +20,11 @@ testing_loop($loop);
 subtest "subscribe _ wrong subscription type" => sub {
 
     $loop->add(my $blockchain_btc = Net::Async::Blockchain::BTC->new());
-    dies_ok { $blockchain_btc->subscribe('dummy')->get } 'expecting to die due to wrong subscription type';
+    like(
+        exception { $blockchain_btc->subscribe('dummy')->get },
+        qr/Invalid or not implemented subscription/,
+        'expecting to die due to wrong subscription type'
+    );
 };
 
 subtest "subscribe" => sub {

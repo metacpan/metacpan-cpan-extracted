@@ -1,29 +1,44 @@
 #! perl
+
+use v5.10;
 use strict;
 use warnings;
 
-use Test::More tests => 2;
-use Test::Deep;
+use Test2::V0;
 
 use Image::DS9;
+use Image::DS9::Constants::V1 -angular_formats, 'FRAME_COORD_SYSTEMS', 'SKY_COORD_SYSTEMS', 'WCS',;
 
-require './t/common.pl';
+use Test::Lib;
+use My::Util;
 
-my $ds9 = start_up();
-$ds9->file( 'data/m31.fits.gz' );
+my $ds9 = start_up( image => 1 );
 
-$ds9->crosshair( 0, 0, 'image' );
-cmp_deeply( [0, 0],
-            scalar $ds9->crosshair( 'image' ),
-            'crosshair'
-          );
+test_stuff(
+    $ds9,
+    (
+        crosshair => [
+            ( map { ( match => { out => [$_] } ) } FRAME_COORD_SYSTEMS ),
+            ( map { ( lock  => $_ ) } FRAME_COORD_SYSTEMS, 'none' ),
+        ],
+    ) );
 
-my @coords = qw( 00:42:41.399 +41:15:23.78 );
-$ds9->crosshair( @coords, wcs => 'fk5');
+$ds9->frame( 'center' );
 
-my @exp = ( re( qr/0?0:42:41.399/ ), re( qr/\+41:15:23.780?/ ) );
+subtest 'retrieve' => sub {
 
-cmp_deeply( scalar $ds9->crosshair( qw[ wcs fk5 sexagesimal ] ),
-            \@exp,
-            'crosshair'
-          );
+    for my $wcs ( 'wcs', WCS ) {
+
+        subtest $wcs => sub {
+          SKIP: {
+                skip "don't have $wcs" unless $ds9->frame( has => wcs => ( $wcs eq 'wcs' ? () : $wcs ) );
+                my $coords = $ds9->pan( $wcs, ANGULAR_FORMAT_DEGREES );
+                $ds9->crosshair( @$coords, $wcs );
+                is( $coords, scalar $ds9->crosshair( $wcs, ANGULAR_FORMAT_DEGREES ), 'crosshair' );
+            }
+        };
+
+    }
+};
+
+done_testing;

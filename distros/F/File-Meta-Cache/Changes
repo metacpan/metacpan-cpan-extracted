@@ -1,4 +1,15 @@
 Revision history for Perl extension File::Meta::Cache.
+v0.2.0 2023-09-05
+  [fixes]
+    - disable method now closes file descriptors correctly
+    - minor POD spelling fixes
+
+  [improvements]
+    - Reduced memory usage. Uses IO::FD if its available instead of POSIX, and
+      replaced enum with constant::more
+    - Improved  CI config
+    
+
 v0.1.1 2023-05-10
   [bug fixes]
   - Added minimum Object::Pad version of 0.78 in Makefile.PL instead of any

@@ -47,7 +47,6 @@ do { my $x = {
                                    'Ref::Util' => '0',
                                    'Test::Deep' => '0',
                                    'Test::More' => '0',
-                                   'blib' => '1.01',
                                    'perl' => '5.006'
                                  }
                  }

@@ -1,0 +1,57 @@
+test:
+  basic@: connectors.ldap
+  single@: connectors.ldap-single
+  dn@: connectors.ldap-dn
+
+connectors:
+  # setup your ldap repo and set this to 1 
+  do_tests: 1
+
+  ldap:
+    class: Connector::Proxy::Net::LDAP::Simple
+    LOCATION: ldap://localhost:389
+    base: dc=mycompany,dc=com
+    filter: (cn=[% ARGS.0 %])
+    attrs: ou
+    binddn: cn=admin,dc=mycompany,dc=com
+    password: admin
+    create:
+      basedn: ou=Server CA,dc=mycompany,dc=com
+      rdnkey: cn
+      attribute: ou
+    schema:
+      cn:
+        objectclass: inetOrgPerson organizationalPerson
+        values:
+          sn: copy:self
+          mail: it-department@openxopki.org
+      ou:
+        objectclass: organizationalUnit
+        o: My Company
+
+  ldap-single:
+    class: Connector::Proxy::Net::LDAP::Single
+    LOCATION: ldap://localhost:389
+    base: dc=mycompany,dc=com
+    filter: (cn=[% ARGS.0 %])
+    binddn: cn=admin,dc=mycompany,dc=com
+    password: admin
+    create:
+      basedn: ou=people,dc=mycompany,dc=com
+      rdnkey: cn
+    schema:
+      cn:
+        objectclass: inetOrgPerson organizationalPerson
+        values:
+          sn: copy:self
+          mail: it-department@openxopki.org
+    attrmap:
+      ntlogin = uid
+ 
+  ldap-dn:
+    class: Connector::Proxy::Net::LDAP::DN
+    LOCATION: ldap://localhost:389
+    base: dc=mycompany,dc=com
+    filter: (cn=[% ARGS.0 %])
+    binddn: cn=admin,dc=mycompany,dc=com
+    password: admin

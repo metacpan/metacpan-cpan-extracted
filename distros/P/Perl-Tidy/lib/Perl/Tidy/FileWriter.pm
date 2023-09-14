@@ -7,7 +7,7 @@
 package Perl::Tidy::FileWriter;
 use strict;
 use warnings;
-our $VERSION = '20230701';
+our $VERSION = '20230912';
 
 use constant DEVEL_MODE   => 0;
 use constant EMPTY_STRING => q{};
@@ -21,7 +21,7 @@ sub AUTOLOAD {
     return if ( $AUTOLOAD =~ /\bDESTROY$/ );
     my ( $pkg, $fname, $lno ) = caller();
     my $my_package = __PACKAGE__;
-    print STDERR <<EOM;
+    print {*STDERR} <<EOM;
 ======================================================================
 Error detected in package '$my_package', version $VERSION
 Received unexpected AUTOLOAD call for sub '$AUTOLOAD'
@@ -49,7 +49,6 @@ BEGIN {
     # Do not combine with other BEGIN blocks (c101).
     my $i = 0;
     use constant {
-        _line_sink_object_            => $i++,
         _logger_object_               => $i++,
         _rOpts_                       => $i++,
         _output_line_number_          => $i++,
@@ -70,6 +69,7 @@ BEGIN {
         _K_sequence_error_msg_        => $i++,
         _K_last_arrival_              => $i++,
         _save_logfile_                => $i++,
+        _routput_string_              => $i++,
     };
 } ## end BEGIN
 
@@ -127,7 +127,6 @@ sub new {
     my ( $class, $line_sink_object, $rOpts, $logger_object ) = @_;
 
     my $self = [];
-    $self->[_line_sink_object_]            = $line_sink_object;
     $self->[_logger_object_]               = $logger_object;
     $self->[_rOpts_]                       = $rOpts;
     $self->[_output_line_number_]          = 1;
@@ -148,6 +147,24 @@ sub new {
     $self->[_K_sequence_error_msg_]        = EMPTY_STRING;
     $self->[_K_last_arrival_]              = -1;
     $self->[_save_logfile_]                = defined($logger_object);
+    $self->[_routput_string_]              = undef;
+
+    # '$line_sink_object' is a SCALAR ref which receives the lines.
+    my $ref = ref($line_sink_object);
+    if ( !$ref ) {
+        Fault("FileWriter expects line_sink_object to be a ref\n");
+    }
+    elsif ( $ref eq 'SCALAR' ) {
+        $self->[_routput_string_] = $line_sink_object;
+    }
+    else {
+        my $str = $ref;
+        if ( length($str) > 63 ) { $str = substr( $str, 0, 60 ) . '...' }
+        Fault(<<EOM);
+FileWriter expects 'line_sink_object' to be ref to SCALAR but it is ref to:
+$str
+EOM
+    }
 
     # save input stream name for local error messages
     $input_stream_name = EMPTY_STRING;
@@ -217,7 +234,7 @@ sub set_save_logfile {
 
 sub want_blank_line {
     my $self = shift;
-    unless ( $self->[_consecutive_blank_lines_] ) {
+    if ( !$self->[_consecutive_blank_lines_] ) {
         $self->write_blank_code_line();
     }
     return;
@@ -261,9 +278,9 @@ sub write_blank_code_line {
         return;
     }
 
-    $self->[_line_sink_object_]->write_line("\n");
-    $self->[_output_line_number_]++;
+    ${ $self->[_routput_string_] } .= "\n";
 
+    $self->[_output_line_number_]++;
     $self->[_consecutive_blank_lines_]++;
     $self->[_consecutive_new_blank_lines_]++ if ($forced);
 
@@ -284,9 +301,10 @@ sub write_code_line {
     $self->[_consecutive_blank_lines_]     = 0;
     $self->[_consecutive_new_blank_lines_] = 0;
     $self->[_consecutive_nonblank_lines_]++;
+    $self->[_output_line_number_]++;
 
-    $self->[_line_sink_object_]->write_line($str);
-    if ( chomp $str )              { $self->[_output_line_number_]++; }
+    ${ $self->[_routput_string_] } .= $str;
+
     if ( $self->[_save_logfile_] ) { $self->check_line_lengths($str) }
 
     #----------------------------
@@ -311,15 +329,17 @@ sub write_code_line {
         # caused lines to go out in the wrong order.  This could happen if
         # either the cache or buffer that it uses are emptied in the wrong
         # order.
-        if ( !$self->[_K_sequence_error_msg_] ) {
+        if ( $K < $self->[_K_last_arrival_]
+            && !$self->[_K_sequence_error_msg_] )
+        {
             my $K_prev = $self->[_K_last_arrival_];
-            if ( $K < $K_prev ) {
-                chomp $str;
-                if ( length($str) > MAX_PRINTED_CHARS ) {
-                    $str = substr( $str, 0, MAX_PRINTED_CHARS ) . "...";
-                }
 
-                my $msg = <<EOM;
+            chomp $str;
+            if ( length($str) > MAX_PRINTED_CHARS ) {
+                $str = substr( $str, 0, MAX_PRINTED_CHARS ) . "...";
+            }
+
+            my $msg = <<EOM;
 While operating on input stream with name: '$input_stream_name'
 Lines have arrived out of order in sub 'write_code_line'
 as detected by token index K=$K arriving after index K=$K_prev in the following line:
@@ -327,16 +347,15 @@ $str
 This is probably due to a recent programming change and needs to be fixed.
 EOM
 
-                # Always die during development, this needs to be fixed
-                if (DEVEL_MODE) { Fault($msg) }
+            # Always die during development, this needs to be fixed
+            if (DEVEL_MODE) { Fault($msg) }
 
-                # Otherwise warn if string is not empty (added for b1378)
-                $self->warning($msg) if ( length($str) );
+            # Otherwise warn if string is not empty (added for b1378)
+            $self->warning($msg) if ( length($str) );
 
-                # Only issue this warning once
-                $self->[_K_sequence_error_msg_] = $msg;
+            # Only issue this warning once
+            $self->[_K_sequence_error_msg_] = $msg;
 
-            }
         }
         $self->[_K_last_arrival_] = $K;
     }
@@ -349,7 +368,8 @@ sub write_line {
     # Write a line directly to the output, without any counting of blank or
     # non-blank lines.
 
-    $self->[_line_sink_object_]->write_line($str);
+    ${ $self->[_routput_string_] } .= $str;
+
     if ( chomp $str )              { $self->[_output_line_number_]++; }
     if ( $self->[_save_logfile_] ) { $self->check_line_lengths($str) }
 
@@ -362,7 +382,8 @@ sub check_line_lengths {
     # collect info on line lengths for logfile
 
     # This calculation of excess line length ignores any internal tabs
-    my $rOpts   = $self->[_rOpts_];
+    my $rOpts = $self->[_rOpts_];
+    chomp $str;
     my $len_str = length($str);
     my $exceed  = $len_str - $rOpts->{'maximum-line-length'};
     if ( $str && substr( $str, 0, 1 ) eq "\t" && $str =~ /^\t+/g ) {

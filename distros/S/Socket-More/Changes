@@ -1,4 +1,18 @@
 Revision history for Perl extension Socket::More.
+v0.4.3 2023-09-05
+  [changes]
+    - All symbols are exported by default. No longer need the :all tag
+    - All symbols from Socket module are exported into callers name unless
+      called with use Socket::More ()
+  
+
+  [improvements]
+    - Refactored to remove dependencies List::Util, Sort::Key::Multi and carp
+    - Exporting symbols with Export::These  for easy reexport of  Socket
+      symbols
+    - Updated CI config
+    
+
 v0.4.2 2023-05-27
   [tests]
   - Disabled failing 'localhost' test. Incorrectly assumed a host with IPv6

@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -26,7 +26,7 @@
             "Device::Chip::Sensor" : "0.23",
             "Future::AsyncAwait" : "0.47",
             "Future::Mutex" : "0.47",
-            "Object::Pad" : "0.66",
+            "Object::Pad" : "0.800",
             "perl" : "5.026"
          }
       },
@@ -40,7 +40,7 @@
    "provides" : {
       "Device::Chip::MPL3115A2" : {
          "file" : "lib/Device/Chip/MPL3115A2.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

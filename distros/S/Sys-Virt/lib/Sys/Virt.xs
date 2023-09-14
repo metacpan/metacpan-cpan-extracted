@@ -7397,6 +7397,48 @@ list_all_ports(net, flags=0)
     free(ports);
 
 
+char *
+get_metadata(net, type, uri=&PL_sv_undef, flags=0)
+    virNetworkPtr net;
+    int type;
+    SV *uri;
+    unsigned int flags;
+ PREINIT:
+    const char *uristr = NULL;
+ CODE:
+    if (SvOK(uri))
+        uristr = SvPV_nolen(uri);
+
+    if (!(RETVAL = virNetworkGetMetadata(net, type, uristr, flags)))
+        _croak_error();
+ OUTPUT:
+    RETVAL
+
+
+void
+set_metadata(net, type, metadata=&PL_sv_undef, key=&PL_sv_undef, uri=&PL_sv_undef, flags=0)
+    virNetworkPtr net;
+    int type;
+    SV *metadata;
+    SV *key;
+    SV *uri;
+    unsigned int flags;
+ PREINIT:
+    const char *metadatastr = NULL;
+    const char *keystr = NULL;
+    const char *uristr = NULL;
+ PPCODE:
+    if (SvOK(metadata))
+        metadatastr = SvPV_nolen(metadata);
+    if (SvOK(key))
+        keystr = SvPV_nolen(key);
+    if (SvOK(uri))
+        uristr = SvPV_nolen(uri);
+
+    if (virNetworkSetMetadata(net, type, metadatastr, keystr, uristr, flags) < 0)
+        _croak_error();
+
+
 void
 destroy(net_rv)
     SV *net_rv;
@@ -9208,6 +9250,9 @@ remove_timeout(timer)
         _croak_error();
 
 
+MODULE = Sys::Virt::EventImpl  PACKAGE = Sys::Virt::EventImpl
+
+
 void
 _run_handle_callback_helper(watch, fd, event, cbref, opaqueref)
     int watch;
@@ -10616,6 +10661,10 @@ BOOT:
     REGISTER_CONSTANT(VIR_NETWORK_EVENT_STARTED, EVENT_STARTED);
     REGISTER_CONSTANT(VIR_NETWORK_EVENT_STOPPED, EVENT_STOPPED);
 
+    REGISTER_CONSTANT(VIR_NETWORK_METADATA_DESCRIPTION, METADATA_DESCRIPTION);
+    REGISTER_CONSTANT(VIR_NETWORK_METADATA_TITLE, METADATA_TITLE);
+    REGISTER_CONSTANT(VIR_NETWORK_METADATA_ELEMENT, METADATA_ELEMENT);
+
 
     stash = gv_stashpv( "Sys::Virt::NetworkPort", TRUE );
     REGISTER_CONSTANT(VIR_NETWORK_PORT_CREATE_RECLAIM, CREATE_RECLAIM);
@@ -10951,4 +11000,5 @@ BOOT:
     REGISTER_CONSTANT(VIR_ERR_NO_HOSTNAME, ERR_NO_HOSTNAME);
     REGISTER_CONSTANT(VIR_ERR_CHECKPOINT_INCONSISTENT, ERR_CHECKPOINT_INCONSISTENT);
     REGISTER_CONSTANT(VIR_ERR_MULTIPLE_DOMAINS, ERR_MULTIPLE_DOMAINS);
+    REGISTER_CONSTANT(VIR_ERR_NO_NETWORK_METADATA, ERR_NO_NETWORK_METADATA);
 }

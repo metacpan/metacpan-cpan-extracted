@@ -1,17 +1,12 @@
-Crypt-OpenSSL-AES version 0.02
-==============================
+Perl module Crypt-OpenSSL-AES
+=============================
 
-This is Crypt::OpenSSL::AES version 0.02, an XS-wrapper around
+This is Crypt::OpenSSL::AES, an XS-wrapper around
 OpenSSL's AES (Advanced Encryption Standard) library.
 
 This module is an alternative to the implementation provided by
 Crypt::Rijndael which implements AES itself. In contrast, this
 module is simply a wrapper around the OpenSSL library.
-
-The Crypt::Rijndael implementation seems to produce inaccurate
-results on 64-bit x86 machines.  By using OpenSSL, this module
-aims to avoid architecture specific problems, allowing the OpenSSL
-maintainers to overcome such issues.
 
 INSTALLATION
 
@@ -22,16 +17,9 @@ To install this module type the following:
    make test
    make install
 
-DEPENDENCIES
-
-This module requires OpenSSL with AES support to be installed.
-
-This module has only been tested with OpenSSl version 0.9.7a
-and with Perl version 5.8.5 on both 64-bit and 32-bit x86 machines.
-
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2006 DelTel, Inc.
+Copyright (C) 2006 - 2023 DelTel, Inc.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.5 or,

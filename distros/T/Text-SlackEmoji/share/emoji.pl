@@ -1889,7 +1889,7 @@ if ($] >= 5.032 || ! $ENV{SLACKEMOJI_STRICT}) {
   $hash{"wood"} = "\x{1FAB5}";
   $hash{"worm"} = "\x{1FAB1}";
 }
-if ($] >= 5.035004 || ! $ENV{SLACKEMOJI_STRICT}) {
+if ($] >= 5.036 || ! $ENV{SLACKEMOJI_STRICT}) {
   $hash{"beans"} = "\x{1FAD8}";
   $hash{"biting_lip"} = "\x{1FAE6}";
   $hash{"bubbles"} = "\x{1FAE7}";
@@ -1927,6 +1927,29 @@ if ($] >= 5.035004 || ! $ENV{SLACKEMOJI_STRICT}) {
   $hash{"troll"} = "\x{1F9CC}";
   $hash{"wheel"} = "\x{1F6DE}";
   $hash{"x-ray"} = "\x{1FA7B}";
+}
+if ($] >= 5.038 || ! $ENV{SLACKEMOJI_STRICT}) {
+  $hash{"black_bird"} = "\x{1F426}\x{200D}\x{2B1B}";
+  $hash{"donkey"} = "\x{1FACF}";
+  $hash{"flute"} = "\x{1FA88}";
+  $hash{"folding_hand_fan"} = "\x{1FAAD}";
+  $hash{"ginger_root"} = "\x{1FADA}";
+  $hash{"goose"} = "\x{1FABF}";
+  $hash{"grey_heart"} = "\x{1FA76}";
+  $hash{"hair_pick"} = "\x{1FAAE}";
+  $hash{"hyacinth"} = "\x{1FABB}";
+  $hash{"jellyfish"} = "\x{1FABC}";
+  $hash{"khanda"} = "\x{1FAAF}";
+  $hash{"leftwards_pushing_hand"} = "\x{1FAF7}";
+  $hash{"light_blue_heart"} = "\x{1FA75}";
+  $hash{"maracas"} = "\x{1FA87}";
+  $hash{"moose"} = "\x{1FACE}";
+  $hash{"pea_pod"} = "\x{1FADB}";
+  $hash{"pink_heart"} = "\x{1FA77}";
+  $hash{"rightwards_pushing_hand"} = "\x{1FAF8}";
+  $hash{"shaking_face"} = "\x{1FAE8}";
+  $hash{"wing"} = "\x{1FABD}";
+  $hash{"wireless"} = "\x{1F6DC}";
 }
 if (! $ENV{SLACKEMOJI_STRICT}) {
   $hash{"face_exhaling"} = "\x{1F62E}\x{200D}\x{1F4A8}";

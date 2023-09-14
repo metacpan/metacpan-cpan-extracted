@@ -55,7 +55,7 @@ passed and restore it without further user interaction.
 **borg-restore.pl --update-cache** has to be executed regularly, ideally after
 creating or removing backups.
 
-[App::BorgRestore](https://metacpan.org/pod/App::BorgRestore) provides the base features used to implement this script.
+[App::BorgRestore](https://metacpan.org/pod/App%3A%3ABorgRestore) provides the base features used to implement this script.
 It can be used to build your own restoration script.
 
 # OPTIONS
@@ -125,11 +125,11 @@ It can be used to build your own restoration script.
 
 # CONFIGURATION
 
-For configuration options please see [App::BorgRestore::Settings](https://metacpan.org/pod/App::BorgRestore::Settings).
+For configuration options please see [App::BorgRestore::Settings](https://metacpan.org/pod/App%3A%3ABorgRestore%3A%3ASettings).
 
 # LICENSE
 
-Copyright (C) 2016-2018  Florian Pritz <bluewind@xinu.at>
+Copyright (C) 2016-2023  Florian Pritz <bluewind@xinu.at>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

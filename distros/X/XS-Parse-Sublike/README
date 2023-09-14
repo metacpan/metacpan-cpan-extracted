@@ -227,11 +227,16 @@ PARSE HOOKS
 
       The parameter signature of the function.
 
-      This part can be skipped, but the bit is ignored when in
-      require_parts. It is always permitted not to provide a signature for
-      a function definition, because such syntax only applies when use
+      This part can be skipped, but it is always permitted not to provide a
+      signature for a function definition even if the bit it set in
+      require_parts. This is because such syntax only applies when use
       feature 'signatures' is in effect, and only on supporting perl
       versions.
+
+      However, setting the bit in require_parts instead has the effect of
+      enabling use feature 'signatures' (at least on supporting perl
+      versions), thus permitting the syntax to use a signature even if the
+      signatures feature was not previously enabled.
 
     XS_PARSE_SUBLIKE_PART_BODY
 

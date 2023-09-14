@@ -21,13 +21,21 @@
 
 =head1 NAME
 
-Sys::Virt::Event - An event loop contract
+Sys::Virt::Event - Event loop access
 
 =head1 DESCRIPTION
 
 The C<Sys::Virt::Event> module represents the contract for integrating
 libvirt with an event loop. This package is abstract and intended to
 be subclassed to provide an actual implementation.
+
+=head1 DEPRECATED FUNCTIONALITY
+
+Event loop implementations used to be required to be instances of
+sub-classes of C<Sys::Virt::Event>. Instead, they are now required to
+inherit from C<Sys::Virt::EventImpl>. For backward compatibility with
+versions 9.4 and older, inheriting from C<Sys::Virt::Event> is still
+supported, but will be removed mid 2025.
 
 =head1 METHODS
 
@@ -39,6 +47,10 @@ package Sys::Virt::Event;
 
 use strict;
 use warnings;
+
+
+#The line below exists for 9.4 backward compat; to be removed mid-2025
+use parent 'Sys::Virt::EventImpl';
 
 
 our $eventimpl = undef;
@@ -54,7 +66,8 @@ Run a single iteration of the default event loop implementation
 =item register($impl)
 
 Register an event loop implementation. The implementation should be a
-instance of a sub-class of the C<Sys::Virt::Event> package.
+instance of a sub-class of the C<Sys::Virt::EventImpl> package. See the
+section L</"EVENT LOOP IMPLEMENTATION"> below for more information.
 
 =cut
 
@@ -62,8 +75,12 @@ sub register {
     my $impl = shift;
 
     if (!(ref($impl) &&
-	  $impl->isa("Sys::Virt::Event"))) {
-	die "event implementation must be a subclass of Sys::Virt::Event";
+          $impl->isa("Sys::Virt::EventImpl"))) {
+        die "event implementation must be a subclass of Sys::Virt::EventImpl";
+    }
+    if (ref($impl) &&
+        $impl->isa("Sys::Virt::Event")) {
+        warn "DECPRECATION WARNING: event implementation is a subclass of Sys::Virt::Event";
     }
 
     $eventimpl = $impl;
@@ -92,58 +109,6 @@ sub _remove_timeout {
     $eventimpl->remove_timeout(@_);
 }
 
-=item $self->_run_handle_callback($watch, $fd, $events, $cb, $opaque)
-
-A helper method for executing a callback in response to one of more
-C<$events> on the file handle C<$fd>. The C<$watch> number is the
-unique identifier associated with the file descriptor. The C<$cb>
-and C<$opaque> parameters are the callback and data registered for
-the handle.
-
-=cut
-
-sub _run_handle_callback {
-    my $self = shift;
-    my $watch = shift;
-    my $fd = shift;
-    my $events = shift;
-    my $cb = shift;
-    my $opaque = shift;
-    Sys::Virt::Event::_run_handle_callback_helper($watch, $fd, $events, $cb, $opaque);
-}
-
-=item $self->_run_timeout_callback($timer, $cb, $opaque)
-
-A helper method for executing a callback in response to the
-expiry of a timeout identified by C<$timer>. The C<$cb>
-and C<$opaque> parameters are the callback and data registered for
-the timeout.
-
-=cut
-
-sub _run_timeout_callback {
-    my $self = shift;
-    my $timer = shift;
-    my $cb = shift;
-    my $opaque = shift;
-    Sys::Virt::Event::_run_timeout_callback_helper($timer, $cb, $opaque);
-}
-
-=item $self->_free_callback_opaque($ff, $opaque)
-
-A helper method for freeing the data associated with a callback.
-The C<$ff> and C<$opaque> parameters are the callback and data
-registered for the handle/timeout.
-
-=cut
-
-sub _free_callback_opaque {
-    my $self = shift;
-    my $ff = shift;
-    my $opaque = shift;
-    Sys::Virt::Event::_free_callback_opaque_helper($ff, $opaque);
-}
-
 1;
 
 =item my $watch = Sys::Virt::Event::add_handle($fd, $events, $coderef)
@@ -165,18 +130,20 @@ to use the events C<$events>.
 
 Remove the event mask for the file descriptor watch C<$watch>.
 
-=item my $watch = Sys::Virt::Event::add_timeout($frequency, $coderef)
+=item my $timer = Sys::Virt::Event::add_timeout($frequency, $coderef, $opaque)
 
 Adds a timeout to trigger with C<$frequency> milliseconds interval.
 The C<$coderef> parameter is a subroutine to invoke when an event
 is triggered. The subroutine will be passed one parameter, the
-timer identifier. This method returns the watch identifier which
-can be used to update or remove the watch
+timer identifier. This method returns the timer identifier which
+can be used to update or remove the timer
 
 =item Sys::Virt::Event::update_timeout($timer, $frequency)
 
 Update the timeout C<$timer> to have the frequency C<$frequency>
-milliseconds.
+milliseconds. The values C<0> and C<-1> have special meaning. The value C<0>
+wants the callback to be invoked on each event loop iteration, where
+C<-1> stops the callback from being invoked.
 
 =item Sys::Virt::Event::remove_timeout($timer)
 

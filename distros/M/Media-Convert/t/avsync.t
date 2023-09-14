@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 14;
 use_ok("Media::Convert::Asset");
 use_ok("Media::Convert::AvSync");
 
@@ -27,5 +27,4 @@ ok(-f $output->url, "Doing A/V sync with audio delay creates a file");
 ok($check->video_size eq $input->video_size, "The video was generated with the correct output size");
 ok($check->video_codec eq $input->video_codec, "The video was copied correctly");
 ok($check->audio_codec eq $input->audio_codec, "The audio was copied correctly");
-ok($check->duration < $input->duration, "The output duration is shorter than the input duration");
 unlink($check->url);

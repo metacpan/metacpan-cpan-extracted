@@ -2,231 +2,234 @@ package Image::DS9::Command;
 
 # ABSTRACT: Command definitions
 
+use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.188';
+our $VERSION = 'v1.0.0';
 
-use Carp;
+our @CARP_NOT = qw( Image::DS9 );
 
 use Image::DS9::PConsts;
-use Image::DS9::Grammar;
+use Image::DS9::Grammar 'grammar';
 use Image::DS9::Parser;
+use Image::DS9::Constants::V1 'SPECIAL_ATTRIBUTES';
+
+use Ref::Util 'is_arrayref', 'is_scalarref';
+use Scalar::Util 'reftype';
 
 use namespace::clean;
 
-sub new
-{
-  my $class = shift;
-  $class = ref $class || $class;
-
-  my $command = shift;
-  my $opts = shift || {};
-
-  return unless exists $Image::DS9::Grammar::Grammar{$command};
-
-  my $spec = $Image::DS9::Grammar::Grammar{$command};
-
-
-  my $self = bless {
-                    command => $command,
-                    spec => $spec,
-                    opts => $opts,
-                    cvt  => 1,
-                    chomp => 1,
-                    retref => 0,
-                    attrs => {}
-                   }, $class;
-
-  $self->parse(@_);
-
-  $self;
+sub _croak {
+    require Carp;
+    my $fmt = shift;
+    @_ = sprintf( $fmt, @_ );
+    goto \&Carp::croak;
 }
 
-sub parse
-{
-  my $self = shift;
-
-  local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-
-  my $match = Image::DS9::Parser::parse_spec( $self->{command}, $self->{spec}, @_ );
-
-  my ( $key, $value );
-  $self->{$key} = $value while ( $key, $value ) = each %$match;
-  $self->{found_attrs} = exists $self->{attrs};
-
-  $self->{name} = $self->{argl}{name} || '';
-
-  $self->{chomp} = $self->{argl}{chomp} if exists $self->{argl}{chomp};
-  $self->{cvt} = $self->{argl}{cvt} if exists $self->{argl}{cvt};
-  $self->{retref} = $self->{argl}{retref} if exists $self->{argl}{retref};
-
-  # the 'new' and 'now' attributes are special.  this needs to be generalized
-  for my $special ( qw( new now ) )
-  {
-    $self->{$special} =  $self->{attrs}{$special} || 0;
-    delete $self->{attrs}{$special};
-  }
-
-  # if this command has a buffer argument, it needs to be
-  # sent via the XPASet buffer argument, not as part of the
-  # command string. split it off from the regular args
-  if ( $self->{argl}{bufarg} && ! $self->{query} )
-  {
-    my $buf = pop @{$self->{args}};
-    my $valref =
-      Image::DS9::PConsts::type_cvt( CvtSet, $buf->[0], $buf->[1] );
-    $self->{bufarg} = $valref;
-  }
-
-  $self->form_command
-    unless $self->{opts}{nocmd};
+sub _carp {
+    require Carp;
+    my $fmt = shift;
+    @_ = sprintf( $fmt, @_ );
+    goto \&Carp::carp;
 }
 
+sub new {
+    my $class = shift;
+    $class = ref $class || $class;
 
-sub form_command
-{
-  my $self = shift;
+    my $command = shift;
+    my $opts    = shift || {};
 
-  my @command = ( $self->{command} );
+    my $spec = grammar( $command ) // return;
 
-  foreach my $special( qw( new now ) )
-  {
-    push @command, $special if $self->{$special};
-  }
+    my $self = bless {
+        command       => $command,
+        spec          => $spec,
+        opts          => $opts,
+        cvt           => 1,
+        chomp         => 1,
+        retref        => 0,
+        attrs         => {},
+        special_attrs => {},
+    }, $class;
 
-  foreach my $what ( @{$self->{cmds}}, @{$self->{args}}  )
-  {
-    my ( $tag, $valref, $extra ) = @{$what};
+    $self->parse( @_ );
 
-    # ephemeral sub commands don't get sent
-    next if T_EPHEMERAL == $tag;
-
-    if ( T_REWRITE == $tag )
-    {
-      push @command, $$extra;
-    }
-    else
-    {
-      # cmds and args must be scalars.  they'll have been converted
-      # to scalar refs by now to prevent copying of data.
-      'SCALAR' eq ref $valref or
-        croak( __PACKAGE__, ": internal error! cmd/arg not scalar\n" );
-
-      push @command, ${Image::DS9::PConsts::type_cvt( CvtSet, $tag, $valref )};
-    }
-  }
-
-  unless ( $self->{opts}{noattrs} )
-  {
-    while( my ( $name, $val) = each %{$self->{attrs}} )
-    {
-      my $valref =
-        Image::DS9::PConsts::type_cvt( CvtSet, $val->{tag}, $val->{valref} );
-
-      # dereference
-      push @command, $name, $$valref;
-    }
-  }
-
-  $self->{command_list} = \@command;
+    $self;
 }
 
-sub attrs
-{
-  my $self = shift;
+sub parse {
+    my $self = shift;
 
-  my %attrs;
+    my $match = Image::DS9::Parser::parse_spec( $self->{command}, $self->{spec}, @_ );
 
-  while( my ( $name, $val) = each %{$self->{attrs}} )
-  {
-    my $valref =
-      Image::DS9::PConsts::type_cvt( CvtSet, $val->{tag}, $val->{valref} );
+    $self->{$_} = $match->{$_} for keys %$match;
+    $self->{found_attrs} = exists $self->{attrs};
 
-    # dereference scalar refs; leave the rest as is
-    $attrs{$name} = 'SCALAR' eq ref($valref)? $$valref : $valref;
-  }
+    $self->{name} = $self->{argl}{name} || q{};
 
-  %attrs;
+    $self->{chomp}  = $self->{argl}{chomp}  if exists $self->{argl}{chomp};
+    $self->{cvt}    = $self->{argl}{cvt}    if exists $self->{argl}{cvt};
+    $self->{retref} = $self->{argl}{retref} if exists $self->{argl}{retref};
+
+    # the 'new' and 'now' attributes are special.  this needs to be generalized
+    for my $special ( SPECIAL_ATTRIBUTES ) {
+        $self->{special_attrs}{$special} = $self->{attrs}{$special} || 0;
+        delete $self->{attrs}{$special};
+    }
+
+    # if this command has a buffer argument, it needs to be
+    # sent via the XPASet buffer argument, not as part of the
+    # command string. split it off from the regular args
+    if ( $self->{argl}{bufarg} && !$self->{query} ) {
+        my $value = pop @{ $self->{args} };
+        $self->{bufarg} = $value->cvt_for_set;
+    }
+
+    $self->form_command
+      unless $self->{opts}{nocmd};
 }
 
-sub cvt_get
-{
-  my $self = shift;
+sub _expand_token {
+    my $token = shift;
 
-  # don't change the buffer unless asked to convert values
-  # unless expecting more than one value or we're supposed to convert
-  return unless @{$self->{argl}{rvals}} > 1 || $self->{cvt};
+    return () if $token->is_ephemeral;
 
+    my @return;
 
-  # the buffer will be changed, either through a split or a convert,
-  # or both.
-
-  # split the buffer if required
-  my @input = @{$self->{argl}{rvals}} > 1 ? _splitbuf( $_[0] ) : ( $_[0] );
-  my @output;
-
-  if ( @input != @{$self->{argl}{rvals}} )
-  {
-    # too many results is always an error
-    if ( @input > @{$self->{argl}{rvals}} )
-    {
-      croak( __PACKAGE__,
-            "::cvt_get: $self->{command}: expected ",
-            scalar @{$self->{argl}{rvals}},
-            " values, got ", scalar @input );
+    if ( $token->is_rewrite ) {
+        push @return, ${ $token->extra }
+          if $token->has_extra;
+    }
+    else {
+        my $ref = $token->cvt_for_set;
+        push @return,
+            is_scalarref( $ref ) ? ${$ref}
+          : is_arrayref( $ref )  ? @{$ref}
+          :   _croak( q{don't know how to handle reference type of %s}, reftype( $ref ) );
     }
 
-    unless ( $self->{opts}{ResErrIgnore} )
-    {
-      ## no critic ProhibitNoStrict
-      no strict 'refs';
-      my $func = $self->{opts}{ResErrWarn} ? 'carp' : 'croak';
-      &$func( __PACKAGE__,
-            "::cvt_get: $self->{command}: expected ",
-            scalar @{$self->{argl}{rvals}},
-            " values, got ", scalar @input );
-    }
-
-    if ( @input < @{$self->{argl}{rvals}} )
-    {
-      push @input, () x ( @{$self->{argl}{rvals}} - @input );
-    }
-  }
-
-  if ( $self->{cvt} )
-  {
-    foreach my $arg ( @{$self->{argl}{rvals}} )
-    {
-      my $tag = 'ARRAY' eq ref $arg ? $arg->[0] : T_OTHER;
-      my $input = shift @input;
-
-      my $valref = Image::DS9::PConsts::type_cvt( CvtGet, $tag, \$input );
-      push @output, 'SCALAR' eq ref($valref) ? $$valref : $valref;
-    }
-  }
-  else
-  {
-     @output = @input;
-  }
-
-  $_[0] =  @output > 1 ? \@output : $output[0];
+    return @return;
 }
 
-sub _splitbuf
-{
+sub form_command {
+    my $self = shift;
 
-  $_[0] =~ s/^\s+//;
-  $_[0] =~ s/\s+$//;
-  split( / /, $_[0] )
+    my @command = ( $self->{command} );
+
+    foreach my $special ( SPECIAL_ATTRIBUTES ) {
+        push @command, $special if $self->{special_attrs}{$special};
+    }
+
+    push @command, map { _expand_token( $_ ) } @{ $self->{cmds} };
+    my @args = map { _expand_token( $_ ) } @{ $self->{args} };
+
+    my @attr;
+
+    unless ( $self->{opts}{noattrs} ) {
+        for my $name ( keys %{ $self->{attrs} } ) {
+            my $val    = $self->{attrs}{$name};
+            my $valref = $val->cvt_for_set;
+
+            # dereference
+            push @attr, $name, $$valref;
+        }
+    }
+
+    $self->{command_list} = [ \@command, \@args, \@attr ];
 }
 
-sub command_list  { $_[0]->{command_list} };
-sub command { join( ' ', @{$_[0]->{command_list}} ) };
-sub query   { $_[0]->{query} }
-sub bufarg  { $_[0]->{bufarg} }
-sub chomp   { $_[0]->{chomp} }
-sub retref  { $_[0]->{retref} }
+sub attrs {
+    my $self = shift;
+
+    my %attrs;
+
+    for my $name ( keys %{ $self->{attrs} } ) {
+        my $val    = $self->{attrs}{$name};
+        my $valref = $val->cvt_for_set;
+
+        # dereference scalar refs; leave the rest as is
+        $attrs{$name} = is_scalarref( $valref ) ? $$valref : $valref;
+    }
+
+    %attrs;
+}
+
+sub cvt_get {
+    my $self = shift;
+
+    # don't change the buffer unless asked to convert values
+    # unless expecting more than one value or we're supposed to convert
+    return unless @{ $self->{argl}{rvals} } > 1 || $self->{cvt};
+
+
+    # the buffer will be changed, either through a split or a convert,
+    # or both.
+
+    # split the buffer if required
+    my @input = @{ $self->{argl}{rvals} } > 1 ? _splitbuf( $_[0] ) : ( $_[0] );
+    my @output;
+
+    if ( @input != @{ $self->{argl}{rvals} } ) {
+        # too many results is always an error
+        if ( @input > @{ $self->{argl}{rvals} } ) {
+            _croak(
+                '%s: expected %d values, got %d',
+                $self->{command}, 0+ @{ $self->{argl}{rvals} },
+                0+ @input,
+            );
+        }
+
+        unless ( $self->{opts}{ResErrIgnore} ) {
+            ## no critic( ProhibitNoStrict)
+            no strict 'refs';
+            require Carp;
+            my $func = $self->{opts}{ResErrWarn} ? \&_carp : \&_croak;
+            $func->(
+                '%s: expected %d values, got %d',
+                $self->{command}, 0+ @{ $self->{argl}{rvals} },
+                0+ @input,
+            );
+        }
+
+        if ( @input < @{ $self->{argl}{rvals} } ) {
+            push @input, () x ( @{ $self->{argl}{rvals} } - @input );
+        }
+    }
+
+    if ( $self->{cvt} ) {
+        foreach my $arg ( @{ $self->{argl}{rvals} } ) {
+            my $input  = shift @input;
+            my $valref = $arg->cvt_from_get( \$input );
+            push @output, is_scalarref( $valref ) ? $$valref : $valref;
+        }
+    }
+    else {
+        @output = @input;
+    }
+
+    $_[0] = @output > 1 ? \@output : $output[0];
+}
+
+sub _splitbuf {
+
+    $_[0] =~ s/^\s+//;
+    $_[0] =~ s/\s+$//;
+    split( / /, $_[0] );
+}
+
+sub command_list { @{ $_[0]->{command_list} } }
+
+sub command {
+    my ( $commands, $args, $attr ) = $_[0]->command_list;
+    join q{ }, @$commands, @$args, @$attr;
+}
+
+sub query  { $_[0]->{query} }
+sub bufarg { $_[0]->{bufarg} }
+sub chomp  { $_[0]->{chomp} }    ## no critic(Subroutines::ProhibitBuiltinHomonyms)
+sub retref { $_[0]->{retref} }
 
 #
 # This file is part of Image-DS9
@@ -244,18 +247,31 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
 =head1 NAME
 
 Image::DS9::Command - Command definitions
 
 =head1 VERSION
 
-version 0.188
+version v1.0.0
 
-=head1 BUGS AND LIMITATIONS
+=head1 SUPPORT
 
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9>.
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-image-ds9@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/image-ds9
+
+and may be cloned from
+
+  https://gitlab.com/djerius/image-ds9.git
 
 =head1 SEE ALSO
 

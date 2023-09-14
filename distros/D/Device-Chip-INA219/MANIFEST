@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 examples/ina219-tickit-ui.pl

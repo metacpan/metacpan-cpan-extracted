@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Refcount;
+use Test2::V0 0.000149; # is_refcount
 
 use Tickit::Test;
 
@@ -20,7 +19,7 @@ is_oneref( $win, '$win has refcount 1 initially' );
 is( "$win", 'Tickit::Window[20x4 abs@10,3]', '$win string overload' );
 ok( $win != $rootwin, '$win numeric comparison compares object identities' );
 
-isa_ok( $win, "Tickit::Window", '$win isa Tickit::Window' );
+isa_ok( $win, [ "Tickit::Window" ], '$win isa Tickit::Window' );
 
 is( $win->top,   3, '$win->top' );
 is( $win->left, 10, '$win->left' );
@@ -34,7 +33,7 @@ is( $win->cols,  20, '$win->cols' );
 is( $win->bottom,  7, '$win->bottom' );
 is( $win->right,  30, '$win->right' );
 
-isa_ok( my $rect = $win->rect, "Tickit::Rect", '$win->rect' );
+isa_ok( my $rect = $win->rect, [ "Tickit::Rect" ], '$win->rect' );
 is( $rect->top,     3, '$win->rect->top' );
 is( $rect->left,   10, '$win->rect->left' );
 is( $rect->bottom,  7, '$win->rect->bottom' );
@@ -45,13 +44,13 @@ cmp_ok( $win->root,   '==', $rootwin, '$win->root' );
 
 cmp_ok( $win->tickit, '==', $rootwin->tickit, '$win->tickit' );
 
-is_deeply( [ $rootwin->subwindows ],
-           [ $win ], '$rootwin->subwindows' );
+is( [ $rootwin->subwindows ],
+    [ $win ], '$rootwin->subwindows' );
 
-is_deeply( [ $win->subwindows ],
-           [], '$win->subwindows' );
+is( [ $win->subwindows ],
+    [], '$win->subwindows' );
 
-isa_ok( $win->term, "Tickit::Term", '$win->term' );
+isa_ok( $win->term, [ "Tickit::Term" ], '$win->term' );
 
 # geometry change event
 {
@@ -95,7 +94,7 @@ isa_ok( $win->term, "Tickit::Term", '$win->term' );
    cmp_ok( $subwin->parent, '==', $win, '$subwin->parent' );
    cmp_ok( $subwin->root,   '==', $rootwin, '$subwin->root' );
 
-   isa_ok( $subwin->term, "Tickit::Term", '$subwin->term' );
+   isa_ok( $subwin->term, [ "Tickit::Term" ], '$subwin->term' );
 
    is_refcount( $win, 1, '$win has refcount 1 at EOF' );
 

@@ -8,6 +8,8 @@ use Test2::V0;
 use lib "t";
 use testcase "t::func";
 
+BEGIN { $^H{"t::func/func"}++ }
+
 # named func
 {
    func example { return 123; }

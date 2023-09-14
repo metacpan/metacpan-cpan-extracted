@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -32,7 +32,7 @@ await $chip->mount(
       # chip sometimes returns junk bits as 1s
       ->returns( "\x10\x11\x92\x15\x40\x02\x14" );
 
-   is_deeply( [ await $chip->read_time ], [ 10, 11, 12, 15, 2-1, 2014-1900, 0 ],
+   is( [ await $chip->read_time ], [ 10, 11, 12, 15, 2-1, 2014-1900, 0 ],
       '$chip->read_time returns time' );
 
    $adapter->check_and_clear( '$chip->read_time' );

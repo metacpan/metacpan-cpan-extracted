@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Access;
-$Net::Proxmox::VE::Access::VERSION = '0.37';
+$Net::Proxmox::VE::Access::VERSION = '0.38';
 use parent 'Exporter';
 
 use Carp qw( croak );
@@ -519,7 +519,7 @@ Net::Proxmox::VE::Access - Functions for the 'access' portion of the API
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 SYNOPSIS
 

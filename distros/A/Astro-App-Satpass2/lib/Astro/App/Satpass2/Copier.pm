@@ -9,7 +9,7 @@ use Astro::App::Satpass2::Utils qw{ @CARP_NOT };
 use Astro::App::Satpass2::Warner;
 use Scalar::Util 1.26 qw{ blessed };
 
-our $VERSION = '0.050';
+our $VERSION = '0.051';
 
 sub attribute_names {
     return ( qw{ warner } );
@@ -267,7 +267,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2022 by Thomas R. Wyant, III
+Copyright (C) 2010-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

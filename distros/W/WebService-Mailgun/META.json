@@ -70,7 +70,7 @@
    "provides" : {
       "WebService::Mailgun" : {
          "file" : "lib/WebService/Mailgun.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -84,7 +84,7 @@
          "web" : "https://github.com/kan/p5-web-service-mailgun"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_contributors" : [
       "Bjorn <bjornjac@gmail.com>",
       "Josh Rabinowitz <joshr@joshr.com>",

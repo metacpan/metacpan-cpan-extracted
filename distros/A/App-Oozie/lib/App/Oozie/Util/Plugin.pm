@@ -1,5 +1,5 @@
 package App::Oozie::Util::Plugin;
-$App::Oozie::Util::Plugin::VERSION = '0.002';
+$App::Oozie::Util::Plugin::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
@@ -92,7 +92,7 @@ App::Oozie::Util::Plugin
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 

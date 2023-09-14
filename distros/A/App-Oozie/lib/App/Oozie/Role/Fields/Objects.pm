@@ -1,11 +1,14 @@
 package App::Oozie::Role::Fields::Objects;
-$App::Oozie::Role::Fields::Objects::VERSION = '0.002';
+$App::Oozie::Role::Fields::Objects::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
-use App::Oozie::Constants qw( DEFAULT_TZ DEFAULT_WEBHDFS_PORT );
+use App::Oozie::Constants qw(
+    DEFAULT_TZ
+    DEFAULT_WEBHDFS_PORT
+);
 use App::Oozie::Date;
 use App::Oozie::Types::DateTime qw( IsTZ );
 use DateTime;
@@ -24,7 +27,7 @@ option timezone => (
 );
 
 option webhdfs_hostname => (
-    is => 'rw',
+    is     => 'rw',
     format => 's',
 );
 
@@ -90,7 +93,7 @@ App::Oozie::Role::Fields::Objects
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 

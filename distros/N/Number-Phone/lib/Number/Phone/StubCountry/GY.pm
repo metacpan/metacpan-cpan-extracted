@@ -22,12 +22,12 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230614174403;
+our $VERSION = 1.20230903131447;
 
 my $formatters = [
                 {
                   'format' => '$1 $2',
-                  'leading_digits' => '[2-46-9]',
+                  'leading_digits' => '[2-9]',
                   'pattern' => '(\\d{3})(\\d{4})'
                 }
               ];
@@ -77,8 +77,14 @@ my $validators = {
         ',
                 'mobile' => '
           (?:
+            510|
             6\\d\\d|
-            70[0-35-7]
+            7(?:
+              0\\d|
+              1[0-8]|
+              25|
+              49
+            )
           )\\d{4}
         ',
                 'pager' => '',
@@ -93,73 +99,73 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"592329", "Willemstad\/Fort\ Wellington\/Ithaca",
-"592266", "New\ Hope\/Friendship\/Grove\/Land\ of\ Canaan",
-"592256", "Victoria\/Hope\ West",
-"592333", "New\ Amsterdam",
-"592322", "Kilcoy\/Hampshire\/Nigg",
-"592777", "Mabaruma\/Port\ Kaituma",
-"592772", "Lethem",
-"592327", "Blairmont\/Cumberland",
-"592218", "Georgetown\ \(S\/R\/Veldt\)",
-"592219", "Georgetown\,Sophia",
+$areanames{en} = {"592276", "Anna\ Catherina\/\ Cornelia\ Ida\/Hague\/Fellowship",
 "592225", "Georgetown",
-"592217", "Mocha",
-"592328", "Cottage\/Tempe\/Onverwagt\/Bath\/Waterloo",
-"592258", "Planters\ Hall\/Mortice",
-"592268", "Leonora",
-"592335", "Crabwood\ Creek\/No\:\ 76\/Corentyne",
-"592216", "Diamond\/Grove",
-"592334", "New\ Amsterdam",
-"592275", "Met\-en\-Meer\-Zorg",
-"592274", "Vigilance",
-"592262", "Parika",
-"592442", "Christianburg\/Amelia\’s\ Ward",
-"592231", "Georgetown",
-"592455", "Bartica",
-"592267", "Wales",
 "592261", "Timehri\/Long\ Creek\/Soesdyke",
-"592441", "Ituni",
-"592260", "Tuschen\/Parika",
-"592440", "Kwakwani",
-"592232", "Novar\/Catherine\/Belladrum\/Bush\ Lot",
-"592257", "Cane\ Grove\/Strangroen",
-"592269", "Windsor\ Forest",
-"592326", "Adelphi\/Fryish\/No\.\ 40",
-"592223", "Georgetown",
-"592259", "Clonbrook\/Unity",
-"592325", "Mibikuri\/No\:\ 34\/Joppa\/Brighton",
-"592775", "Matthews\ Ridge",
-"592228", "Mahaica\/Belmont",
-"592456", "Mahdia",
-"592233", "Agricola\/Houston\/Eccles\/Nandy\ Park",
-"592336", "Edinburg\/Port\ Mourant",
-"592253", "La\ Grange\/Goed\ Fortuin",
-"592276", "Anna\ Catherina\/\ Cornelia\ Ida\/Hague\/Fellowship",
-"592229", "Enterprise\/Cove\ \&\ John",
-"592220", "B\/V\ Central",
-"592221", "Mahaicony",
-"592227", "Georgetown",
-"592222", "B\/V\ West",
-"592332", "Sheet\ Anchor\/Susannah",
-"592271", "Canal\ No\.\ 1\/Canal\ No\.\ 2",
-"592337", "Whim\/Bloomfield\/Liverpool\/Rose\ Hall",
-"592270", "Melanie\/Non\ Pariel\/Enmore",
-"592272", "B\/V\ West",
-"592331", "Adventure\/Joanna",
-"592330", "Rosignol\/Shieldstown",
-"592277", "Zeeburg\/Uitvlugt",
-"592339", "No\:\ 52\/Skeldon",
-"592279", "Good\ Hope\/Stanleytown",
-"592773", "Aishalton",
-"592226", "Georgetown",
-"592338", "Benab\/No\.\ 65\ Village\/Massiah",
-"592265", "Diamond",
 "592264", "Vreed\-en\-Hoop",
-"592444", "Linden\/Canvas\ City\/Wisroc",
-"592255", "Paradise\/Golden\ Grove\/Haslington",
+"592257", "Cane\ Grove\/Strangroen",
+"592265", "Diamond",
+"592279", "Good\ Hope\/Stanleytown",
+"592270", "Melanie\/Non\ Pariel\/Enmore",
+"592221", "Mahaicony",
+"592332", "Sheet\ Anchor\/Susannah",
+"592219", "Georgetown\,Sophia",
+"592274", "Vigilance",
+"592228", "Mahaica\/Belmont",
+"592229", "Enterprise\/Cove\ \&\ John",
+"592266", "New\ Hope\/Friendship\/Grove\/Land\ of\ Canaan",
+"592271", "Canal\ No\.\ 1\/Canal\ No\.\ 2",
+"592218", "Georgetown\ \(S\/R\/Veldt\)",
+"592220", "B\/V\ Central",
+"592216", "Diamond\/Grove",
+"592268", "Leonora",
+"592337", "Whim\/Bloomfield\/Liverpool\/Rose\ Hall",
+"592269", "Windsor\ Forest",
+"592275", "Met\-en\-Meer\-Zorg",
+"592226", "Georgetown",
+"592223", "Georgetown",
+"592260", "Tuschen\/Parika",
+"592277", "Zeeburg\/Uitvlugt",
+"592335", "Crabwood\ Creek\/No\:\ 76\/Corentyne",
+"592262", "Parika",
+"592253", "La\ Grange\/Goed\ Fortuin",
+"592256", "Victoria\/Hope\ West",
+"592456", "Mahdia",
+"592331", "Adventure\/Joanna",
+"592258", "Planters\ Hall\/Mortice",
+"592259", "Clonbrook\/Unity",
+"592222", "B\/V\ West",
+"592334", "New\ Amsterdam",
+"592272", "B\/V\ West",
+"592338", "Benab\/No\.\ 65\ Village\/Massiah",
 "592254", "New\ Road\/Best",
-"592234", "B\/V\ Central",};
+"592339", "No\:\ 52\/Skeldon",
+"592267", "Wales",
+"592330", "Rosignol\/Shieldstown",
+"592255", "Paradise\/Golden\ Grove\/Haslington",
+"592217", "Mocha",
+"592455", "Bartica",
+"592333", "New\ Amsterdam",
+"592336", "Edinburg\/Port\ Mourant",
+"592227", "Georgetown",
+"592773", "Aishalton",
+"592440", "Kwakwani",
+"592231", "Georgetown",
+"592322", "Kilcoy\/Hampshire\/Nigg",
+"592234", "B\/V\ Central",
+"592441", "Ituni",
+"592233", "Agricola\/Houston\/Eccles\/Nandy\ Park",
+"592444", "Linden\/Canvas\ City\/Wisroc",
+"592327", "Blairmont\/Cumberland",
+"592775", "Matthews\ Ridge",
+"592325", "Mibikuri\/No\:\ 34\/Joppa\/Brighton",
+"592777", "Mabaruma\/Port\ Kaituma",
+"592232", "Novar\/Catherine\/Belladrum\/Bush\ Lot",
+"592328", "Cottage\/Tempe\/Onverwagt\/Bath\/Waterloo",
+"592772", "Lethem",
+"592329", "Willemstad\/Fort\ Wellington\/Ithaca",
+"592326", "Adelphi\/Fryish\/No\.\ 40",
+"592442", "Christianburg\/Amelia\’s\ Ward",};
 
     sub new {
       my $class = shift;

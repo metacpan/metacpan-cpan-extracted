@@ -1,5 +1,5 @@
 package App::Oozie::Deploy::Validate::Oozie;
-$App::Oozie::Deploy::Validate::Oozie::VERSION = '0.002';
+$App::Oozie::Deploy::Validate::Oozie::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
@@ -93,7 +93,7 @@ App::Oozie::Deploy::Validate::Oozie
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 

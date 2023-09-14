@@ -305,6 +305,9 @@ docs/LoggingMessageType.md
 docs/LoggingNewrelicAdditional.md
 docs/LoggingNewrelicApi.md
 docs/LoggingNewrelicResponse.md
+docs/LoggingNewrelicotlpAdditional.md
+docs/LoggingNewrelicotlpApi.md
+docs/LoggingNewrelicotlpResponse.md
 docs/LoggingOpenstackAdditional.md
 docs/LoggingOpenstackApi.md
 docs/LoggingOpenstackResponse.md
@@ -850,6 +853,7 @@ lib/WebService/Fastly/LoggingLogentriesApi.pm
 lib/WebService/Fastly/LoggingLogglyApi.pm
 lib/WebService/Fastly/LoggingLogshuttleApi.pm
 lib/WebService/Fastly/LoggingNewrelicApi.pm
+lib/WebService/Fastly/LoggingNewrelicotlpApi.pm
 lib/WebService/Fastly/LoggingOpenstackApi.pm
 lib/WebService/Fastly/LoggingPapertrailApi.pm
 lib/WebService/Fastly/LoggingPubsubApi.pm
@@ -1143,6 +1147,8 @@ lib/WebService/Fastly/Object/LoggingNewrelic.pm
 lib/WebService/Fastly/Object/LoggingNewrelicAdditional.pm
 lib/WebService/Fastly/Object/LoggingNewrelicAllOf.pm
 lib/WebService/Fastly/Object/LoggingNewrelicResponse.pm
+lib/WebService/Fastly/Object/LoggingNewrelicotlpAdditional.pm
+lib/WebService/Fastly/Object/LoggingNewrelicotlpResponse.pm
 lib/WebService/Fastly/Object/LoggingOpenstack.pm
 lib/WebService/Fastly/Object/LoggingOpenstackAdditional.pm
 lib/WebService/Fastly/Object/LoggingOpenstackAllOf.pm

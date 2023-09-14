@@ -889,7 +889,9 @@ sub getImportNames {
 
     return if !exists $self->{DataDir}{'.idata'};
 
-    $self->_parse_idata() if !exists $self->{SecData}{'.idata'};
+    $self->_parse_idata() unless
+       exists $self->{SecData}{'.idata'} and
+       exists $self->{SecData}{'.idata'}{ByName};
 
     my $entries = $self->{SecData}{'.idata'}{Entries};
 
@@ -908,7 +910,9 @@ sub getImportNamesArray {
 
     return if !exists $self->{DataDir}{'.idata'};
 
-    $self->_parse_idata() if !exists $self->{SecData}{'.idata'};
+    $self->_parse_idata() unless
+       exists $self->{SecData}{'.idata'} and
+       exists $self->{SecData}{'.idata'}{ByName};
 
     my $entries = $self->{SecData}{'.idata'}{Entries};
 

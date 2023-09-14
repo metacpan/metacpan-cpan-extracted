@@ -13,7 +13,7 @@ use DateTime::Format::Strptime;
 use List::Util qw(any);
 use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '4.15';
+our $VERSION = '4.16';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
@@ -89,7 +89,13 @@ sub new {
 		}
 	}
 
-	my $date_ref     = ( split( qr{[|]}, $jid ) )[4];
+	my $date_ref = ( split( qr{[|]}, $jid ) )[4];
+	if ( length($date_ref) < 7 ) {
+		warn("HAFAS, not even once -- midnight crossing may be bogus");
+	}
+	if ( length($date_ref) == 7 ) {
+		$date_ref = "0${date_ref}";
+	}
 	my $datetime_ref = DateTime::Format::Strptime->new(
 		pattern   => '%d%m%Y',
 		time_zone => 'Europe/Berlin'
@@ -467,7 +473,7 @@ journey received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 4.15
+version 4.16
 
 =head1 DESCRIPTION
 

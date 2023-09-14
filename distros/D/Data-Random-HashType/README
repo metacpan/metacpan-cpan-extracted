@@ -1,0 +1,114 @@
+NAME
+    Data::Random::HashType - Random hash type objects.
+
+SYNOPSIS
+     use Data::Random::HashType;
+
+     my $obj = Data::Random::HashType->new(%params);
+     my @hash_types = $obj->random;
+
+METHODS
+  "new"
+     my $obj = Data::Random::HashType->new(%params);
+
+    Constructor.
+
+    *       "mode_id"
+
+            Boolean value if we are generating id in hash type object.
+
+            Default value is 0.
+
+    *       "num_generated"
+
+            Number of generated hash types.
+
+            Default value is 1.
+
+    *       "possible_hash_types"
+
+            Possible hash type names for result.
+
+            Default value is list (SHA-256 SHA-384 SHA-512).
+
+    Returns instance of object.
+
+  "random"
+     my @hash_types = $obj->random;
+
+    Get random hash type object.
+
+    Returns instance of Data::HashType.
+
+ERRORS
+     new():
+             Parameter 'num_generated' is required.
+             Parameter 'possible_hash_types' must be a reference to array.
+             Parameter 'possible_hash_types' must contain at least one hash type name.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Data::Printer;
+     use Data::Random::HashType;
+
+     my $obj = Data::Random::HashType->new(
+             'mode_id' => 1,
+             'num_generated' => 2,
+     );
+
+     my @hash_types = $obj->random;
+
+     # Dump hash types to out.
+     p @hash_types;
+
+     # Output:
+     # [
+     #     [0] Data::HashType  {
+     #             parents: Mo::Object
+     #             public methods (5):
+     #                 BUILD
+     #                 Mo::utils:
+     #                     check_bool, check_length, check_number, check_required
+     #             private methods (0)
+     #             internals: {
+     #                 active   1,
+     #                 id       1,
+     #                 name     "SHA-256"
+     #             }
+     #         },
+     #     [1] Data::HashType  {
+     #             parents: Mo::Object
+     #             public methods (5):
+     #                 BUILD
+     #                 Mo::utils:
+     #                     check_bool, check_length, check_number, check_required
+     #             private methods (0)
+     #             internals: {
+     #                 active   1,
+     #                 id       2,
+     #                 name     "SHA-384"
+     #             }
+     #         }
+     # ]
+
+DEPENDENCIES
+    Class::Utils, Data::HashType, Error::Pure, Readonly.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-Random-HashType>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

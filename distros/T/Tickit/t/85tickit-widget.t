@@ -9,8 +9,7 @@ BEGIN {
    $ENV{TERM} = "xterm";
 }
 
-use Test::More;
-use Test::HexString;
+use Test2::V0;
 
 use Errno qw( EAGAIN );
 
@@ -35,7 +34,7 @@ sub stream_is
               $stream ne substr( $expect, 0, length $stream );
    }
 
-   is_hexstr( substr( $stream, 0, length $expect, "" ), $expect, $name );
+   is( substr( $stream, 0, length $expect, "" ), $expect, $name );
 }
 
 my $tickit = Tickit->new(

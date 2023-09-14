@@ -24,6 +24,9 @@ README
 t/00_compile.t
 t/01_basic.t
 t/02_method.t
+t/10_setup_pcap.t
 t/97_kwalitee.t
 t/98_pod-coverage.t
 t/99_pod.t
+t/samples/ping-ietf-20pk-be.dmp
+t/samples/ping-ietf-20pk-le.dmp

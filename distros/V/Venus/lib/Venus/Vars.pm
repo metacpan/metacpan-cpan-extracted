@@ -41,16 +41,6 @@ sub build_self {
 
 # METHODS
 
-sub assertion {
-  my ($self) = @_;
-
-  my $assert = $self->SUPER::assertion;
-
-  $assert->clear->expression('hashref');
-
-  return $assert;
-}
-
 sub default {
   my ($self) = @_;
 
@@ -217,7 +207,7 @@ This package provides the following methods:
 
 =head2 default
 
-  default() (HashRef)
+  default() (hashref)
 
 The default method returns the default value, i.e. C<{%ENV}>.
 
@@ -239,7 +229,7 @@ I<Since C<0.01>>
 
 =head2 exists
 
-  exists(Str $key) (Bool)
+  exists(string $key) (boolean)
 
 The exists method takes a name or index and returns truthy if an associated
 value exists.
@@ -298,7 +288,7 @@ I<Since C<0.01>>
 
 =head2 get
 
-  get(Str $key) (Any)
+  get(string $key) (any)
 
 The get method takes a name or index and returns the associated value.
 
@@ -356,7 +346,7 @@ I<Since C<0.01>>
 
 =head2 name
 
-  name(Str $key) (Str | Undef)
+  name(string $key) (string | undef)
 
 The name method takes a name or index and returns index if the the associated
 value exists.
@@ -415,7 +405,7 @@ I<Since C<0.01>>
 
 =head2 set
 
-  set(Str $key, Any $value) (Any)
+  set(string $key, any $value) (any)
 
 The set method takes a name or index and sets the value provided if the
 associated argument exists.
@@ -474,7 +464,7 @@ I<Since C<0.01>>
 
 =head2 unnamed
 
-  unnamed() (HashRef)
+  unnamed() (hashref)
 
 The unnamed method returns an arrayref of values which have not been named
 using the C<named> attribute.
@@ -510,7 +500,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

@@ -40,7 +40,7 @@
    "provides" : {
       "Object::Pad::FieldAttr::Checked" : {
          "file" : "lib/Object/Pad/FieldAttr/Checked.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

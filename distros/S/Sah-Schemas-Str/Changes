@@ -1,3 +1,15 @@
+0.015   2023-09-03  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas: str_or_code, str_or_re_or_code.
+
+
+0.014   2023-09-03  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention related schemas.
+
+
 0.013   2022-09-23  Released-By: PERLANCAR; Urgency: medium
 
         - Add schemas: str1, non_empty_str,

@@ -1,12 +1,13 @@
 #  You may distribute under the terms of the Artistic License (the same terms
 #  as Perl itself)
 #
-#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.73 ':experimental(init_expr adjust_params)';
+use warnings;
+use Object::Pad 0.800 ':experimental(adjust_params)';
 
-package Tickit::Widget::Tabbed::Ribbon 0.027;
+package Tickit::Widget::Tabbed::Ribbon 0.028;
 class Tickit::Widget::Tabbed::Ribbon
         :strict(params)
         :isa(Tickit::Widget);
@@ -21,13 +22,16 @@ use Carp;
 # containing Tickit::Widget::Tabbed
 use constant WIDGET_PEN_FROM_STYLE => 1;
 
-use Struct::Dumb;
-struct MoreMarker => [qw( text width window )];
+class Tickit::Widget::Tabbed::Ribbon::_MoreMarker {
+        field $text   :param :reader;
+        field $width         :reader;
+        ADJUST { $width = Tickit::Utils::textwidth( $text ) }
+        field $window :param :mutator = undef;
+}
 
 =head1 NAME
 
-C<Tickit::Widget::Tabbed::Ribbon> - base class for C<Tickit::Widget::Tabbed>
-control ribbon
+C<Tickit::Widget::Tabbed::Ribbon> - base class for C<Tickit::Widget::Tabbed> control ribbon
 
 =head1 DESCRIPTION
 
@@ -41,37 +45,37 @@ C<Tickit::Widget::Tabbed> with its default control ribbon.
 
 =head1 CUSTOM RIBBON CLASS
 
-To perform create a custom ribbon class, create a subclass of
+To create a custom ribbon class, create a subclass of
 C<Tickit::Widget::Tabbed::Ribbon> with a constructor having the following
 behaviour:
 
- package Custom::Ribbon::Class;
- use base qw( Tickit::Widget::Tabbed::Ribbon );
+ use Object::Pad;
+ class Custom::Ribbon::Class :isa(Tickit::Widget::Tabbed::Ribbon);
 
- sub new_for_orientation
+ sub new_for_orientation   # note: Not a method
  {
          my $class = shift;
          my ( $orientation, %args ) = @_;
 
          ...
-
-         return $self;
- }
+  }
 
 Alternatively if this is not done, then one of two subclasses will be used for
 the constructor, by appending C<::horizontal> or C<::vertical> to the class
 name. In this case, the custom class should provide these as well.
 
- package Custom::Ribbon::Class;
- use base qw( Tickit::Widget::Tabbed::Ribbon );
+ use Object::Pad;
 
- package Custom::Ribbon::Class::horizontal;
- use base qw( Custom::Ribbon::Class );
+ class Custom::Ribbon::Class
+        :isa(Tickit::Widget::Tabbed::Ribbon);
+
+ class Custom::Ribbon::Class::horizontal
+        :isa(Custom::Ribbon::Class);
 
  ...
 
- package Custom::Ribbon::Class::vertical;
- use base qw( Custom::Ribbon::Class );
+ class Custom::Ribbon::Class::vertical
+        :isa(Custom::Ribbon::Class);
 
  ...
 
@@ -94,20 +98,17 @@ or
 =cut
 
 sub new_for_orientation ( $class, $orientation, @args ) {
-        return ${\"${class}::${orientation}"}->new( @args );
+        my $subclass = "${class}::${orientation}";
+        return $subclass->new( @args );
 }
 
+ADJUST
 {
-        my $orig = __PACKAGE__->can( "new" );
-        no warnings 'redefine';
-        *new = sub ( $class, %args ) {
-                foreach my $method (qw( scroll_to_visible on_key on_mouse )) {
-                        $class->can( $method ) or
-                                croak "$class cannot ->$method - do you subclass and implement it?";
-                }
-
-                return $class->$orig( %args );
-        };
+        my $class = __CLASS__;
+        foreach my $method (qw( scroll_to_visible on_key on_mouse )) {
+                $class->can( $method ) or
+                        croak "$class cannot ->$method - do you subclass and implement it?";
+        }
 }
 
 field $_tabbed :param :weak;
@@ -129,8 +130,12 @@ ADJUST :params (
 ADJUST
 {
         my ( $prev_more, $next_more ) = $_tabbed->get_style_values(qw( more_left more_right ));
-        $_prev_more = MoreMarker( $prev_more, textwidth( $prev_more ), undef );
-        $_next_more = MoreMarker( $next_more, textwidth( $next_more ), undef );
+        $_prev_more = Tickit::Widget::Tabbed::Ribbon::_MoreMarker->new(
+                text => $prev_more,
+        );
+        $_next_more = Tickit::Widget::Tabbed::Ribbon::_MoreMarker->new(
+                text => $next_more,
+        );
 
         $self->scroll_to_visible( $_active_tab_index );
 }
@@ -302,6 +307,7 @@ use constant orientation => "horizontal";
 
 use List::Util qw( sum0 );
 
+field $_tab_position  :param;  # currently ignored but we need to consume the constructor param
 field $_active_marker :param = [ "[", "]" ];
 field $_scroll_offset        = 0;
 

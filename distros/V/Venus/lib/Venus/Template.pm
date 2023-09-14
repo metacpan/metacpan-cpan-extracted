@@ -44,11 +44,13 @@ sub build_self {
 sub assertion {
   my ($self) = @_;
 
-  my $assert = $self->SUPER::assertion;
+  my $assertion = $self->SUPER::assertion;
 
-  $assert->clear->expression('string');
+  $assertion->match('string')->format(sub{
+    (ref $self || $self)->new($_)
+  });
 
-  return $assert;
+  return $assertion;
 }
 
 sub default {
@@ -369,7 +371,7 @@ This package provides the following methods:
 
 =head2 render
 
-  render(Str $template, HashRef $variables) (Str)
+  render(string $template, hashref $variables) (string)
 
 The render method processes the template by replacing the tokens and control
 structurs with the appropriate replacements and returns the result. B<Note:>
@@ -641,7 +643,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

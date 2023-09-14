@@ -1,3 +1,6 @@
+1.6     2023/09/13
+- fix SHA384 and SHA512 blocksize (#1)
+
 1.5     2020/07/02
 - fix min supported versions
 

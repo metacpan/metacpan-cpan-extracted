@@ -107,7 +107,7 @@ This package provides the following methods:
 
 =head2 class
 
-  class() (Str)
+  class() (string)
 
 The class method returns the class name for the given class or object.
 
@@ -129,7 +129,7 @@ I<Since C<0.01>>
 
 =head2 meta
 
-  meta() (Meta)
+  meta() (Venus::Meta)
 
 The meta method returns a L<Venus::Meta> object for the given object.
 
@@ -151,7 +151,7 @@ I<Since C<1.23>>
 
 =head2 reify
 
-  reify(Str | CodeRef $code, Any @args) (Object)
+  reify(string | coderef $code, any @args) (object)
 
 The reify method dispatches the method call or executes the callback and
 returns the result as a value object.
@@ -204,7 +204,7 @@ I<Since C<1.23>>
 
 =head2 space
 
-  space() (Space)
+  space() (Venus::Space)
 
 The space method returns a L<Venus::Space> object for the given object.
 
@@ -226,7 +226,7 @@ I<Since C<0.01>>
 
 =head2 type
 
-  type(Str | CodeRef $code, Any @args) (Type)
+  type(string | coderef $code, any @args) (Venus::Type)
 
 The type method dispatches the method call or executes the callback and returns
 the result as a L<Venus::Type> object.
@@ -267,7 +267,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

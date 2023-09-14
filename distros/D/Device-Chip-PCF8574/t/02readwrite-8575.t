@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter 0.08;  # ->read
 
 use Future::AsyncAwait;

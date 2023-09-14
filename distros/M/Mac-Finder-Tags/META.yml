@@ -5,13 +5,11 @@ author:
 build_requires:
   Test::Exception: '0'
   Test::More: '0.88'
-  Test::Warnings: '0'
+  Test::Warnings: '0.010'
 configure_requires:
-  Devel::AssertOS: '0'
-  Devel::CheckOS: '1.63'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,28 +21,28 @@ no_index:
 provides:
   Mac::Finder::Tags:
     file: lib/Mac/Finder/Tags.pm
-    version: '0.01'
+    version: '0.02'
   Mac::Finder::Tags::Impl:
     file: lib/Mac/Finder/Tags/Impl.pm
-    version: '0.01'
+    version: '0.02'
   Mac::Finder::Tags::Impl::mdls:
     file: lib/Mac/Finder/Tags/Impl/mdls.pm
-    version: '0.01'
+    version: '0.02'
   Mac::Finder::Tags::Impl::xattr:
     file: lib/Mac/Finder/Tags/Impl/xattr.pm
-    version: '0.01'
+    version: '0.02'
   Mac::Finder::Tags::Tag:
     file: lib/Mac/Finder/Tags/Tag.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Mac::PropertyList: '0'
-  Object::Pad: '0.57'
+  Object::Pad: '0.60'
   Path::Tiny: '0'
   perl: v5.30.0
 resources:
   bugtracker: https://github.com/johannessen/mac-finder-tags/issues
   repository: https://github.com/johannessen/mac-finder-tags.git
-version: '0.01'
-x_generated_by_perl: v5.34.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '0.02'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Artistic-2.0

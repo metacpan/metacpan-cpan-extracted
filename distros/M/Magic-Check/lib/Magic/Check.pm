@@ -1,5 +1,5 @@
 package Magic::Check;
-$Magic::Check::VERSION = '0.001';
+$Magic::Check::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -26,7 +26,7 @@ Magic::Check - Add type/value checks to variables
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -43,9 +43,11 @@ version 0.001
 
 =head2 check_variable
 
- check_variable($variable, $checker)
+ check_variable($variable, $checker, $non_fatal = false)
 
-This function takes a variable and adds set magic to check if the variable matches. This callback must be an object with a C<validate> like provided by L<Type::Tiny|Type::Tiny>: in must have a C<validate> method that returns C<undef> on success and an error message on failure. If the new value does not match, the old value is restored and the message is thrown as an exception.
+This function takes a variable and adds set magic to check if the variable matches. This callback must be an object with a C<validate> like provided by L<Type::Tiny|Type::Tiny>: in must have a C<validate> method that returns C<undef> on success and an error message on failure.
+
+If C<$non-fatal> is not set and the new value does not match, the old value is restored and the message is thrown as an exception. If C<$non_fatal> is set then it will warn with the same message but proceed as usual.
 
 =head1 AUTHOR
 

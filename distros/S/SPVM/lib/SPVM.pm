@@ -5,7 +5,7 @@ use warnings;
 
 use SPVM::Global;
 
-our $VERSION = "0.989038";
+our $VERSION = "0.989042";
 
 require XSLoader;
 XSLoader::load('SPVM', $VERSION);
@@ -20,12 +20,7 @@ sub import {
   }
 }
 
-sub api {
-  unless ($SPVM::Global::INIT_GLOBAL) {
-    SPVM::Global::init_global();
-  }
-  return $SPVM::Global::API;
-}
+sub api { SPVM::Global::api() }
 
 1;
 
@@ -47,7 +42,7 @@ A class of SPVM:
 
   # lib/SPVM/MyMath.spvm
   class MyMath {
-    static method sum : int ($nums : int[]) {
+C<static method sum : int ($nums : int[])>
       
       my $total = 0;
       for (my $i = 0; $i < @$nums; $i++) {

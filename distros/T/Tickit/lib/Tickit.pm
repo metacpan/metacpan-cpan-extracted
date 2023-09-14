@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Tickit 0.73;
+package Tickit 0.74;
 
 use v5.14;
 use warnings;
@@ -436,6 +436,9 @@ Installs a callback to invoke if the given key is pressed, overwriting any
 previous callback for the same key. The code block is invoked as
 
    $code->( $tickit, $key )
+
+The C<$key> name is encoded as given by the C<str> accessor of
+C<Tickit::Event::Key> (see L<Tickit::Event> for detail).
 
 If C<$code> is missing or C<undef>, any existing callback is removed.
 

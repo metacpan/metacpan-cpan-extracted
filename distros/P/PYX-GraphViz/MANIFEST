@@ -1,5 +1,5 @@
 Changes
-examples/ex1.pl
+examples/simple_html_to_png.pl
 images/ex1.png
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm

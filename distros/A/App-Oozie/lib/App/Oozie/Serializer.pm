@@ -1,5 +1,5 @@
 package App::Oozie::Serializer;
-$App::Oozie::Serializer::VERSION = '0.002';
+$App::Oozie::Serializer::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
@@ -8,7 +8,6 @@ use App::Oozie::Util::Plugin qw(
     find_plugins
     load_plugin
 );
-use Data::Dumper;
 use Moo;
 use Types::Standard qw(
     InstanceOf
@@ -111,6 +110,7 @@ sub _assert_type {
 
     my $failed   = $type->validate_explain( $input, 'USER_INPUT' ) || return;
     my $full_msg = join "\n\n", @{ $failed };
+    require Data::Dumper;
     my $d        = Data::Dumper->new( [ $input ], [ '*INPUT' ] );
 
     die sprintf <<'DID_NOT_PASS', $full_msg, $d->Dump;
@@ -136,7 +136,7 @@ App::Oozie::Serializer
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 

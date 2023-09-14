@@ -1,13 +1,11 @@
 #  You may distribute under the terms of the GNU General Public License
 #
-#  (C) Paul Evans, 2008-2010 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2023 -- leonerd@leonerd.org.uk
 
-package Circle::FE::Term;
+package Circle::FE::Term 0.232470;
 
-use strict;
+use v5.26;
 use warnings;
-
-our $VERSION = '0.222060';
 
 use File::ShareDir qw( dist_file );
 

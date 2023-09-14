@@ -3,11 +3,11 @@
 #
 #  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
 
-use v5.20;
+use v5.26;
 use warnings;
-use Object::Pad 0.76 ':experimental(adjust_params)';
+use Object::Pad 0.800 ':experimental(adjust_params)';
 
-package Device::AVR::UPDI 0.13;
+package Device::AVR::UPDI 0.14;
 class Device::AVR::UPDI :strict(params);
 
 use Carp;
@@ -215,7 +215,7 @@ F<share/> directory for more details.
 
 field $_fuseinfo;
 
-method fuseinfo
+method fuseinfo ()
 {
    return $_fuseinfo //= do {
       my $yamlpath = "$SHAREDIR/${\ $self->partinfo->name }.yaml";
@@ -291,7 +291,7 @@ use constant {
    KEY_NVMPROG   => "\x20\x67\x6F\x72\x50\x4D\x56\x4E",
 };
 
-async method _break
+async method _break ()
 {
    my $was_baud = $_fh->getobaud;
 
@@ -308,10 +308,8 @@ async method _break
    $_fh->setbaud( $was_baud );
 }
 
-async method _op_writeread
+async method _op_writeread ( $write, $readlen )
 {
-   my ( $write, $readlen ) = @_;
-
    printf STDERR "WR: => %v02X\n", $write if DEBUG > 1;
    await Future::IO->syswrite_exactly( $_fh, $write );
 
@@ -341,19 +339,15 @@ async method _op_writeread
    return substr( $buf, length( $write ) );
 }
 
-method _pack_op_addr
+method _pack_op_addr ( $op, $addr )
 {
-   my ( $op, $addr ) = @_;
-
    return $_nvm_version >= 2
       ? pack( "C S<C", $op|OP_ADDR24<<2, $addr & 0xFFFF, $addr >> 16 )
       : pack( "C S<",  $op|OP_ADDR16<<2, $addr );
 }
 
-async method _op_write_expecting_ack
+async method _op_write_expecting_ack ( $op, $write )
 {
-   my ( $op, $write ) = @_;
-
    if( $_reg_ctrla & CTRLA_RSD ) {
       # No ACK expected
       await $self->_op_writeread( $write, 0 );
@@ -364,10 +358,8 @@ async method _op_write_expecting_ack
    }
 }
 
-async method stptr
+async method stptr ( $addr )
 {
-   my ( $addr ) = @_;
-
    my $cmd = $_nvm_version >= 2
       ? pack( "C S<C", OP_ST|OP_PTRREG|OP_ADDR24, $addr & 0xFFFF, $addr >> 16 )
       : pack( "C S<",  OP_ST|OP_PTRREG|OP_ADDR16, $addr );
@@ -375,10 +367,8 @@ async method stptr
    await $self->_op_write_expecting_ack( "ST PTR" => SYNC . $cmd );
 }
 
-async method lds8
+async method lds8 ( $addr )
 {
-   my ( $addr ) = @_;
-
    my $ret = unpack "C", await
       $self->_op_writeread( SYNC . $self->_pack_op_addr( OP_LDS, $addr ), 1 );
 
@@ -386,10 +376,8 @@ async method lds8
    return $ret;
 }
 
-async method sts8
+async method sts8 ( $addr, $val )
 {
-   my ( $addr, $val ) = @_;
-
    printf STDERR ">> STS8[%04X] = %02X\n", $addr, $val if DEBUG;
 
    await $self->_op_write_expecting_ack( STS8 =>
@@ -399,10 +387,8 @@ async method sts8
       pack( "C", $val ) );
 }
 
-async method ld
+async method ld ( $addr, $len )
 {
-   my ( $addr, $len ) = @_;
-
    await $self->stptr( $addr );
 
    my $ret = "";
@@ -424,10 +410,8 @@ async method ld
    return $ret;
 }
 
-async method st8
+async method st8 ( $addr, $data )
 {
-   my ( $addr, $data ) = @_;
-
    printf STDERR ">> ST[%04X] = %v02X\n", $addr, $data if DEBUG;
 
    my $len = length( $data );
@@ -451,10 +435,8 @@ async method st8
    }
 }
 
-async method st16
+async method st16 ( $addr, $data )
 {
-   my ( $addr, $data ) = @_;
-
    printf STDERR ">> ST[%04X] = %v02X\n", $addr, $data if DEBUG;
 
    # Count in 16bit words
@@ -488,10 +470,8 @@ async method st16
    }
 }
 
-async method ldcs
+async method ldcs ( $reg )
 {
-   my ( $reg ) = @_;
-
    my $ret = unpack "C", await
       $self->_op_writeread( SYNC . pack( "C", OP_LDCS | $reg ), 1 );
 
@@ -499,20 +479,16 @@ async method ldcs
    return $ret;
 }
 
-async method stcs
+async method stcs ( $reg, $value )
 {
-   my ( $reg, $value ) = @_;
-
    printf STDERR ">> STCS[%02X] = %02X\n", $reg, $value if DEBUG;
 
    await
       $self->_op_writeread( SYNC . pack( "CC", OP_STCS | $reg, $value ), 0 );
 }
 
-async method key
+async method key ( $key )
 {
-   my ( $key ) = @_;
-
    length $key == 8 or
       die "Expected 8 byte key\n";
 
@@ -522,10 +498,8 @@ async method key
       $self->_op_writeread( SYNC . pack( "C a*", OP_KEY, $key ), 0 );
 }
 
-async method set_rsd
+async method set_rsd ( $on )
 {
-   my ( $on ) = @_;
-
    my $val = $on ? $_reg_ctrla | CTRLA_RSD : $_reg_ctrla & ~CTRLA_RSD;
 
    await $self->stcs( REG_CTRLA, $_reg_ctrla = $val ) if $_reg_ctrla != $val;
@@ -542,7 +516,7 @@ of the other commands.
 
 =cut
 
-async method init_link
+async method init_link ()
 {
    # Sleep 100msec before sending BREAK in case of attached UPDI 12V pulse hardware
    await Future::IO->sleep( 0.1 );
@@ -570,7 +544,7 @@ Reads the C<UPDIREV> field of the C<STATUSA> register.
 
 =cut
 
-async method read_updirev
+async method read_updirev ()
 {
    return ( await $self->ldcs( REG_STATUSA ) ) >> 4;
 }
@@ -581,7 +555,7 @@ Reads the C<ASI_SYS_STATUS> register.
 
 =cut
 
-async method read_asi_sys_status
+async method read_asi_sys_status ()
 {
    return await $self->ldcs( REG_ASI_SYS_STATUS );
 }
@@ -603,7 +577,7 @@ This is returned in a HASH reference, containing four keys:
 
 =cut
 
-async method read_sib
+async method read_sib ()
 {
    my $bytes = await
       $self->_op_writeread( SYNC . pack( "C", OP_KEY_READSIB ), 16 );
@@ -627,7 +601,7 @@ returned as a plain byte string of length 3.
 
 =cut
 
-async method read_signature
+async method read_signature ()
 {
    # The ATtiny814 datasheet says
    #   All Atmel microcontrollers have a three-byte signature code which
@@ -652,10 +626,8 @@ reset by momentarilly toggling the request on and off again:
 
 =cut
 
-async method request_reset
+async method request_reset ( $reset )
 {
-   my ( $reset ) = @_;
-
    await $self->stcs( REG_ASI_RESET_REQ, $reset ? ASI_RESET_REQ_SIGNATURE : 0 );
 }
 
@@ -684,10 +656,8 @@ may be required e.g. to recover from a bad C<SYSCFG0> fuse setting.
 
 =cut
 
-async method erase_chip
+async method erase_chip ( %opts )
 {
-   my %opts = @_;
-
    await $self->key( KEY_CHIPERASE );
 
    die "Failed to set CHIPERASE key\n" unless ASI_KEY_CHIPERASE & await $self->ldcs( REG_ASI_KEY_STATUS );
@@ -714,7 +684,7 @@ Requests the chip to enter NVM programming mode.
 
 =cut
 
-async method enable_nvmprog
+async method enable_nvmprog ()
 {
    await $self->key( KEY_NVMPROG );
 
@@ -734,7 +704,7 @@ async method enable_nvmprog
 
 field $_nvmctrl;
 
-method nvmctrl
+method nvmctrl ()
 {
    return $_nvmctrl if defined $_nvmctrl;
 
@@ -761,10 +731,8 @@ address space.
 
 =cut
 
-async method read_flash_page
+async method read_flash_page ( $addr, $len )
 {
-   my ( $addr, $len ) = @_;
-
    return await $self->nvmctrl->read_flash_page( $addr, $len );
 }
 
@@ -777,10 +745,8 @@ C<$addr> is within the flash address space.
 
 =cut
 
-async method write_flash_page
+async method write_flash_page ( $addr, $data )
 {
-   my ( $addr, $data ) = @_;
-
    await $self->nvmctrl->write_flash_page( $addr, $data );
 }
 
@@ -793,10 +759,8 @@ address space.
 
 =cut
 
-async method read_eeprom_page
+async method read_eeprom_page ( $addr, $len )
 {
-   my ( $addr, $len ) = @_;
-
    return await $self->nvmctrl->read_eeprom_page( $addr, $len );
 }
 
@@ -807,10 +771,8 @@ command and C<$addr> is within the EEPROM address space.
 
 =cut
 
-async method write_eeprom_page
+async method write_eeprom_page ( $addr, $data )
 {
-   my ( $addr, $data ) = @_;
-
    await $self->nvmctrl->write_eeprom_page( $addr, $data );
 }
 
@@ -823,10 +785,8 @@ segment, from 0 onwards.
 
 =cut
 
-async method write_fuse
+async method write_fuse ( $idx, $value )
 {
-   my ( $idx, $value ) = @_;
-
    await $self->nvmctrl->write_fuse( $idx, $value );
 }
 
@@ -839,10 +799,8 @@ segment, from 0 onwards.
 
 =cut
 
-async method read_fuse
+async method read_fuse ( $idx )
 {
-   my ( $idx ) = @_;
-
    my $addr = $_partinfo->baseaddr_fuse + $idx;
 
    return await $self->lds8( $addr );
@@ -865,19 +823,17 @@ role # hide from indexer
       $_partinfo = $_updi->partinfo;
    }
 
-   async method nvmctrl_command
+   async method nvmctrl_command ( $cmd )
    {
-      my ( $cmd ) = @_;
-
       await $self->updi->sts8( $self->partinfo->baseaddr_nvmctrl + NVMCTRL_CTRLA, $cmd );
    }
 
-   async method await_nvm_not_busy
+   async method await_nvm_not_busy ()
    {
       my $timeout = 50;
       while( --$timeout ) {
          last if not( NVMCTRL_STATUS_FBUSY & await $self->updi->lds8(
-            $self->partinfo->baseaddr_nvmctrl + NVMCTRL_STATUS, 1 ) );
+            $self->partinfo->baseaddr_nvmctrl + NVMCTRL_STATUS ) );
 
          await Future::IO->sleep( 0.01 );
       }
@@ -903,22 +859,18 @@ class # hide from indexer
       NVMCTRL_ADDR   => 8,
    };
 
-   async method read_flash_page
+   async method read_flash_page ( $addr, $len )
    {
-      my ( $addr, $len ) = @_;
       return await $self->updi->ld( $self->partinfo->baseaddr_flash + $addr, $len );
    }
 
-   async method read_eeprom_page
+   async method read_eeprom_page ( $addr, $len )
    {
-      my ( $addr, $len ) = @_;
       return await $self->updi->ld( $self->partinfo->baseaddr_eeprom + $addr, $len );
    }
 
-   async method _write_page
+   async method _write_page ( $addr, $data, $wordsize, $cmd )
    {
-      my ( $addr, $data, $wordsize, $cmd ) = @_;
-
       my $updi = $self->updi;
 
       # clear page buffer
@@ -945,22 +897,18 @@ class # hide from indexer
       await $self->await_nvm_not_busy;
    }
 
-   async method write_flash_page
+   async method write_flash_page ( $addr, $data )
    {
-      my ( $addr, $data ) = @_;
       await $self->_write_page( $self->partinfo->baseaddr_flash + $addr, $data, 16, NVMCTRL_CMD_WP );
    }
 
-   async method write_eeprom_page
+   async method write_eeprom_page ( $addr, $data )
    {
-      my ( $addr, $data ) = @_;
       await $self->_write_page( $self->partinfo->baseaddr_eeprom + $addr, $data, 8, NVMCTRL_CMD_ERWP );
    }
 
-   async method write_fuse
+   async method write_fuse ( $idx, $value )
    {
-      my ( $idx, $value ) = @_;
-
       my $updi = $self->updi;
 
       my $addr = $self->partinfo->baseaddr_fuse + $idx;
@@ -993,33 +941,26 @@ class # hide from indexer
       NVMCTRL_CTRLB => 1,
    };
 
-   async method _set_flmap
+   async method _set_flmap ( $bank )
    {
-      my ( $bank ) = @_;
-
       await $self->updi->sts8( $self->partinfo->baseaddr_nvmctrl + NVMCTRL_CTRLB, $bank << 4 );
    }
 
-   async method read_flash_page
+   async method read_flash_page ( $addr, $len )
    {
-      my ( $addr, $len ) = @_;
-
       await $self->_set_flmap( $addr >> 15 );
       $addr &= 0x7FFF;
 
       return await $self->updi->ld( $self->partinfo->baseaddr_flash + $addr, $len );
    }
 
-   async method read_eeprom_page
+   async method read_eeprom_page ( $addr, $len )
    {
-      my ( $addr, $len ) = @_;
       return await $self->updi->ld( $self->partinfo->baseaddr_eeprom + $addr, $len );
    }
 
-   async method _write_page
+   async method _write_page ( $addr, $data, $wordsize, $cmd )
    {
-      my ( $addr, $data, $wordsize, $cmd ) = @_;
-
       my $updi = $self->updi;
 
       # set page write mode
@@ -1049,27 +990,21 @@ class # hide from indexer
       await $self->await_nvm_not_busy;
    }
 
-   async method write_flash_page
+   async method write_flash_page ( $addr, $data )
    {
-      my ( $addr, $data ) = @_;
-
       await $self->_set_flmap( $addr >> 15 );
       $addr &= 0x7FFF;
 
       await $self->_write_page( $self->partinfo->baseaddr_flash + $addr, $data, 16, NVMCTRL_CMD_FLWR );
    }
 
-   async method write_eeprom_page
+   async method write_eeprom_page ( $addr, $data )
    {
-      my ( $addr, $data ) = @_;
-
       await $self->_write_page( $self->partinfo->baseaddr_eeprom + $addr, $data, 8, NVMCTRL_CMD_EEERWR );
    }
 
-   async method write_fuse
+   async method write_fuse ( $idx, $value )
    {
-      my ( $idx, $value ) = @_;
-
       # Fuses are written by pretending it's EEPROM
       my $data = pack "C", $value;
 
@@ -1103,35 +1038,20 @@ Paul Evans <leonerd@leonerd.org.uk>
 0x55AA;
 
 __DATA__
-# These data are maintained by ./rebuild-partinfo.pl
+# These data are maintained by rebuild-partinfo.pl
 # name|signature|baseaddr_nvmctl|baseaddr_fuse|baseaddr_sigrow|baseaddr_flash|pagesize_flash|size_flash|baseaddr_eeprom|pagesize_eeprom|size_eeprom|fuses
+ATmega808|1e9326|0x1000|0x1280|0x1100|0x4000|64|8192|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATmega809|1e932a|0x1000|0x1280|0x1100|0x4000|64|8192|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATmega1608|1e9427|0x1000|0x1280|0x1100|0x4000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATmega1609|1e9426|0x1000|0x1280|0x1100|0x4000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATmega3208|1e9530|0x1000|0x1280|0x1100|0x4000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATmega3209|1e9531|0x1000|0x1280|0x1100|0x4000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATmega4808|1e9650|0x1000|0x1280|0x1100|0x4000|128|49152|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATmega4809|1e9651|0x1000|0x1280|0x1100|0x4000|128|49152|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATmega808|1e9326|0x1000|0x1280|0x1100|0x4000|64|8192|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATmega809|1e932a|0x1000|0x1280|0x1100|0x4000|64|8192|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny1604|1e9425|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny1606|1e9424|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny1607|1e9423|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny1614|1e9422|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny1616|1e9421|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny1617|1e9420|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny1624|1e942a|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny1626|1e9429|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny1627|1e9428|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATtiny202|1e9123|0x1000|0x1280|0x1100|0x8000|64|2048|0x1400|32|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATtiny204|1e9122|0x1000|0x1280|0x1100|0x8000|64|2048|0x1400|32|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATtiny212|1e9121|0x1000|0x1280|0x1100|0x8000|64|2048|0x1400|32|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATtiny214|1e9120|0x1000|0x1280|0x1100|0x8000|64|2048|0x1400|32|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny3214|1e9520|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny3216|1e9521|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny3217|1e9522|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny3224|1e9528|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny3226|1e9527|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny3227|1e9526|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATtiny402|1e9227|0x1000|0x1280|0x1100|0x8000|64|4096|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATtiny404|1e9226|0x1000|0x1280|0x1100|0x8000|64|4096|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATtiny406|1e9225|0x1000|0x1280|0x1100|0x8000|64|4096|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
@@ -1151,14 +1071,21 @@ ATtiny817|1e9320|0x1000|0x1280|0x1100|0x8000|64|8192|0x1400|32|128|WDTCFG,BODCFG
 ATtiny824|1e9329|0x1000|0x1280|0x1100|0x8000|64|8192|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATtiny826|1e9328|0x1000|0x1280|0x1100|0x8000|64|8192|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATtiny827|1e9327|0x1000|0x1280|0x1100|0x8000|64|8192|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-AVR128DA28|1e970a|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
-AVR128DA32|1e9709|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
-AVR128DA48|1e9708|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
-AVR128DA64|1e9707|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
-AVR128DB28|1e970e|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
-AVR128DB32|1e970d|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
-AVR128DB48|1e970c|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
-AVR128DB64|1e970b|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+ATtiny1604|1e9425|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny1606|1e9424|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny1607|1e9423|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny1614|1e9422|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny1616|1e9421|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny1617|1e9420|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny1624|1e942a|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny1626|1e9429|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny1627|1e9428|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny3214|1e9520|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny3216|1e9521|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny3217|1e9522|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny3224|1e9528|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny3226|1e9527|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny3227|1e9526|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 AVR32DA28|1e9534|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
 AVR32DA32|1e9533|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
 AVR32DA48|1e9532|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
@@ -1173,3 +1100,11 @@ AVR64DB28|1e9619|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCF
 AVR64DB32|1e9618|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
 AVR64DB48|1e9617|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
 AVR64DB64|1e9616|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR128DA28|1e970a|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR128DA32|1e9709|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR128DA48|1e9708|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR128DA64|1e9707|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR128DB28|1e970e|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR128DB32|1e970d|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR128DB48|1e970c|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR128DB64|1e970b|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE

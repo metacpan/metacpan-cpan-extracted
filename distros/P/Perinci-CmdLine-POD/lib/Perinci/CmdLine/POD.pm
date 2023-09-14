@@ -13,9 +13,9 @@ use String::ShellQuote;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-27'; # DATE
+our $DATE = '2023-07-09'; # DATE
 our $DIST = 'Perinci-CmdLine-POD'; # DIST
-our $VERSION = '0.038'; # VERSION
+our $VERSION = '0.039'; # VERSION
 
 our @EXPORT_OK = qw(gen_pod_for_pericmd_script);
 
@@ -548,14 +548,15 @@ sub gen_pod_for_pericmd_script {
 
         # 1. show usage that comes from common options
 
+        my @usage;
         for my $opt (sort keys %{ $cli->{common_opts} || {} }) {
             my $co_spec = $cli->{common_opts}{$opt};
             if (defined $co_spec->{'usage.alt.fmt.pod'}) {
-                push @sectpod, "B<$program_name> ".$co_spec->{'usage.alt.fmt.pod'}."\n\n";
+                push @usage, "B<$program_name> ".$co_spec->{'usage.alt.fmt.pod'}."\n\n";
             } elsif (defined $co_spec->{usage}) {
                 # text format, the next best thing
                 require String::PodQuote;
-                push @sectpod, "B<$program_name> ".String::PodQuote::pod_escape($co_spec->{usage})."\n\n";
+                push @usage, "B<$program_name> ".String::PodQuote::pod_escape($co_spec->{usage})."\n\n";
             }
         }
 
@@ -565,20 +566,23 @@ sub gen_pod_for_pericmd_script {
                 for my $sc_name (sort keys %clidocdata) {
                     next unless length $sc_name;
                     if (defined $gen_sc) { next unless $sc_name eq $gen_sc }
-                    my $usage = $clidocdata{$sc_name}->{'usage_line.alt.fmt.pod'};
-                    $usage =~ s/\[\[prog\]\]/$program_name $sc_name/g;
-                    push @sectpod, "$usage\n\n";
+                    my $subcmd_usage = $clidocdata{$sc_name}->{'usage_line.alt.fmt.pod'};
+                    $subcmd_usage =~ s/\[\[prog\]\]/$program_name $sc_name/g;
+                    push @usage, "$subcmd_usage\n\n";
                 }
             } else {
-                push @sectpod, "B<$program_name> [I<options>] [I<subcommand>] [I<arg>]...\n\n";
+                push @usage, "B<$program_name> [I<options>] [I<subcommand>] [I<arg>]...\n\n";
             }
-            push @sectpod, "\n\n";
+            push @usage, "\n\n";
         } else {
             # 2b. show main usage line
-            my $usage = $clidocdata{''}->{'usage_line.alt.fmt.pod'};
-            $usage =~ s/\[\[prog\]\]/$program_name/g;
-            push @sectpod, "$usage\n\n";
+            my $main_usage = $clidocdata{''}->{'usage_line.alt.fmt.pod'};
+            $main_usage =~ s/\[\[prog\]\]/$program_name/g;
+            push @usage, "$main_usage\n\n";
         }
+
+        $resmeta->{'func.usage'} = join('', @usage);
+        push @sectpod, @usage;
 
         # point to examples in Examples section, if any
         push @sectpod, "\n\nSee examples in the L</EXAMPLES> section.\n\n" if $has_examples;
@@ -673,14 +677,11 @@ sub gen_pod_for_pericmd_script {
             push @sectpod, "Each subcommand might accept additional options. See each subcommand's documentation for more details.\n\n";
         }
         if ($cli->{subcommands} && !defined $gen_sc) {
-
-            use experimental 'smartmatch';
-
             # currently categorize by subcommand instead of category
 
             my $check_common_arg = sub {
                 my ($opts, $name) = @_;
-                return 1 if 'common' ~~ @{ $opts->{$name}{tags} // []};
+                return 1 if grep { $_ eq 'common' } @{ $opts->{$name}{tags} // []};
                 return 1 if !$opts->{$name}{arg};
                 0;
             };
@@ -887,8 +888,6 @@ _
 
         # section: CONFIGURATION FILE
         {
-            use experimental 'smartmatch';
-
             last if defined $gen_sc;
 
             my @sectpod;
@@ -952,7 +951,7 @@ _
                 push @sectpod, "=head2 Common for all subcommands\n\n" if $gen_scs;
                 my $param2opts = _list_config_params(
                     $clidocdata{$sc_names[0]},
-                    sub { 'common' ~~ @{ $_[0]->{tags} // []} || !$_[0]->{arg} });
+                    sub { grep { $_ eq 'common' } @{ $_[0]->{tags} // []} || !$_[0]->{arg} });
                 for (sort keys %$param2opts) {
                     push @sectpod, " $_ (see $param2opts->{$_})\n";
                 }
@@ -967,7 +966,7 @@ _
                         push @sectpod, "=head2 Configuration for subcommand $sc_name_e\n\n";
                         $param2opts = _list_config_params(
                             $clidocdata{$sc_name},
-                            sub { !('common' ~~ @{ $_[0]->{tags} // []}) && $_[0]->{arg} });
+                            sub { !(grep { $_ eq 'common' } @{ $_[0]->{tags} // []}) && $_[0]->{arg} });
                         for (sort keys %$param2opts) {
                             push @sectpod, " $_ (see $param2opts->{$_})\n";
                         }
@@ -1115,7 +1114,7 @@ Perinci::CmdLine::POD - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.038 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2022-10-27.
+This document describes version 0.039 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2023-07-09.
 
 =head1 SYNOPSIS
 
@@ -1279,7 +1278,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2017 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

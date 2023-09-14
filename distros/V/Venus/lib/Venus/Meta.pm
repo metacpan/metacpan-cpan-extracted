@@ -25,7 +25,7 @@ sub attrs {
   my ($self) = @_;
 
   if ($self->{attrs}) {
-    return $self->{attrs};
+    return wantarray ? (@{$self->{attrs}}) : $self->{attrs};
   }
 
   my $name = $self->{name};
@@ -75,7 +75,7 @@ sub bases {
   my ($self) = @_;
 
   if ($self->{bases}) {
-    return $self->{bases};
+    return wantarray ? (@{$self->{bases}}) : $self->{bases};
   }
 
   my $name = $self->{name};
@@ -167,7 +167,7 @@ sub mixins {
   my ($self) = @_;
 
   if ($self->{mixins}) {
-    return $self->{mixins};
+    return wantarray ? (@{$self->{mixins}}) : $self->{mixins};
   }
 
   my $name = $self->{name};
@@ -222,7 +222,7 @@ sub roles {
   my ($self) = @_;
 
   if ($self->{roles}) {
-    return $self->{roles};
+    return wantarray ? (@{$self->{roles}}) : $self->{roles};
   }
 
   my $name = $self->{name};
@@ -315,7 +315,7 @@ sub subs {
   my ($self) = @_;
 
   if ($self->{subs}) {
-    return $self->{subs};
+    return wantarray ? (@{$self->{subs}}) : $self->{subs};
   }
 
   my $name = $self->{name};
@@ -455,7 +455,7 @@ This package provides the following methods:
 
 =head2 attr
 
-  attr(Str $name) (Bool)
+  attr(string $name) (boolean)
 
 The attr method returns true or false if the package referenced has the
 attribute accessor named.
@@ -494,7 +494,7 @@ I<Since C<1.00>>
 
 =head2 attrs
 
-  attrs() (ArrayRef)
+  attrs() (arrayref)
 
 The attrs method returns all of the attributes composed into the package
 referenced.
@@ -526,7 +526,7 @@ I<Since C<1.00>>
 
 =head2 base
 
-  base(Str $name) (Bool)
+  base(string $name) (boolean)
 
 The base method returns true or false if the package referenced has inherited
 the package named.
@@ -565,7 +565,7 @@ I<Since C<1.00>>
 
 =head2 bases
 
-  bases() (ArrayRef)
+  bases() (arrayref)
 
 The bases method returns returns all of the packages inherited by the package
 referenced.
@@ -594,7 +594,7 @@ I<Since C<1.00>>
 
 =head2 data
 
-  data() (HashRef)
+  data() (hashref)
 
 The data method returns a data structure representing the shallow configuration
 for the package referenced.
@@ -638,7 +638,7 @@ I<Since C<1.00>>
 
 =head2 emit
 
-  emit(Str $name, Any @args) (Any)
+  emit(string $name, any @args) (any)
 
 The emit method invokes the lifecycle hook specified on the underlying package
 and returns the result.
@@ -663,7 +663,7 @@ I<Since C<2.91>>
 
 =head2 find
 
-  find(Str $type, Str $name) (Tuple[Str,Tuple[Int,ArrayRef]])
+  find(string $type, string $name) (tuple[string,tuple[number,arrayref]])
 
 The find method finds and returns the first configuration for the property type
 specified. This method uses the L</search> method to search C<roles>, C<bases>,
@@ -732,7 +732,7 @@ I<Since C<1.02>>
 
 =head2 local
 
-  local(Str $type) (ArrayRef)
+  local(string $type) (arrayref)
 
 The local method returns the names of properties defined in the package
 directly (not inherited) for the property type specified. The C<$type> provided
@@ -813,7 +813,7 @@ I<Since C<1.02>>
 
 =head2 mixin
 
-  mixin(Str $name) (Bool)
+  mixin(string $name) (boolean)
 
 The mixin method returns true or false if the package referenced has consumed
 the mixin named.
@@ -852,7 +852,7 @@ I<Since C<1.02>>
 
 =head2 mixins
 
-  mixins() (ArrayRef)
+  mixins() (arrayref)
 
 The mixins method returns all of the mixins composed into the package
 referenced.
@@ -879,7 +879,7 @@ I<Since C<1.02>>
 
 =head2 new
 
-  new(Any %args | HashRef $args) (Object)
+  new(any %args | hashref $args) (object)
 
 The new method returns a new instance of this package.
 
@@ -917,7 +917,7 @@ I<Since C<1.00>>
 
 =head2 role
 
-  role(Str $name) (Bool)
+  role(string $name) (boolean)
 
 The role method returns true or false if the package referenced has consumed
 the role named.
@@ -956,7 +956,7 @@ I<Since C<1.00>>
 
 =head2 roles
 
-  roles() (ArrayRef)
+  roles() (arrayref)
 
 The roles method returns all of the roles composed into the package referenced.
 
@@ -983,7 +983,7 @@ I<Since C<1.00>>
 
 =head2 search
 
-  search(Str $from, Str $type, Str $name) (ArrayRef[Tuple[Str,Tuple[Int,ArrayRef]]])
+  search(string $from, string $type, string $name) (within[arrayref, tuple[string,tuple[number,arrayref]]])
 
 The search method searches the source specified and returns the configurations
 for the property type specified. The source can be any one of C<bases>,
@@ -1052,7 +1052,7 @@ I<Since C<1.02>>
 
 =head2 sub
 
-  sub(Str $name) (Bool)
+  sub(string $name) (boolean)
 
 The sub method returns true or false if the package referenced has the
 subroutine named on the package directly, or any of its superclasses.
@@ -1091,7 +1091,7 @@ I<Since C<1.00>>
 
 =head2 subs
 
-  subs() (ArrayRef)
+  subs() (arrayref)
 
 The subs method returns all of the subroutines composed into the package
 referenced.
@@ -1136,7 +1136,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

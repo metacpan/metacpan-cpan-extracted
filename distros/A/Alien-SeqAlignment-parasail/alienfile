@@ -1,0 +1,92 @@
+use alienfile;
+use Path::Tiny;
+use IPC::System::Simple   qw(capturex);
+use File::Copy::Recursive qw(dircopy);
+use HTTP::Tiny;
+use Carp;
+
+## not doing system install, so must deal with the package name
+## being not obvious
+plugin 'PkgConfig' =>
+  ( pkg_name => path( '.', 'lib', 'pkgconfig', 'parasail-1.pc' ), );
+
+share {
+    my $install_root;
+    my $path_to_static_lib;
+    my $repo_url;
+    my $repo_response;
+
+    ## use one of two locations to source parasail
+    $repo_url =
+      'https://github.com/jeffdaily/parasail/archive/refs/heads/master.zip';
+    $repo_response = HTTP::Tiny->new->head($repo_url);
+    unless ( $repo_response->{success} )
+    {    ## failed original download, try my fork
+        $repo_url =
+          'https://github.com/chrisarg/parasail/archive/refs/heads/master.zip';
+        $repo_response = HTTP::Tiny->new->head($repo_url);
+        croak "Failed to download parasail from either location"
+          unless $repo_response->{success};
+    }
+
+    start_url $repo_url;
+
+    requires 'Alien::Autotools';
+    plugin 'Download';
+    plugin 'Extract' => 'zip';
+    plugin 'Build::Autoconf';
+    plugin 'Gather::IsolateDynamic';
+
+    ## build dynamic, shared libraries and CLI aligner in one step!
+    build [
+        '%{autoreconf} -fi',
+        '%{configure} --with-pic --enable-shared',
+        '%{make}',
+        '%{make} check',
+        '%{make} install',
+    ];
+
+    ## various postbuild activities to facilitate the gathering of files
+    after 'build' => sub {
+        my ($build) = @_;
+        ## move the bin directories into the final location
+        ## this includes the suite of the parasail library
+        if ( $build->meta_prop->{destdir} ) {
+            my $destdir = $ENV{DESTDIR};
+            $install_root =
+              Path::Tiny->new( $ENV{DESTDIR}, $build->install_prop->{prefix} );
+        }
+        else {
+            $install_root = Path::Tiny->new( $build->install_prop->{stage} );
+        }
+        my $source_directory      = $build->{install_prop}->{extract};
+        my $binary_dest_directory = path $install_root, 'bin';
+        dircopy( path( $source_directory, 'bin' ), $binary_dest_directory );
+        $build->runtime_prop->{command} = 'parasail-aligner';
+        ## remove file statistics utility as it will be replicated in the
+        ## perl interface
+        my $stats_exec =
+          ( $^O eq 'MSWin32' ) ? 'parasail_stats.exe' : 'parasail_stats';
+        $stats_exec = path( $binary_dest_directory, $stats_exec );
+        unlink($stats_exec) if -e $stats_exec;
+    };
+
+    test sub {
+        my ($build) = @_;
+        my $runTests_dir = path( $build->{install_prop}->{extract}, 'tests' );
+
+        my @test_logs = map { path $runTests_dir, $_ }
+          qw(test_basic.log test_isa.log test_verify.log);
+        for (@test_logs) {
+            open my $fh, '<', $_
+              or croak("Can't open test log file $_\n");
+            ## localize record separator to undef and then slurp all
+            ## file contents
+            my $test_output = do { local $/; <$fh> };
+            if ( $test_output !~ /exit status: 0/m ) {
+                ( $_ = $_ =~ s/\.log//r );
+                croak("parasail run time test suite : $_ failed. Exiting now");
+            }
+        }
+    };
+};

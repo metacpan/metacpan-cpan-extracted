@@ -1,6 +1,5 @@
 package Net::CLI::Interact::Transport::Wrapper::Net_Telnet;
-{ $Net::CLI::Interact::Transport::Wrapper::Net_Telnet::VERSION = '2.400000' }
-
+$Net::CLI::Interact::Transport::Wrapper::Net_Telnet::VERSION = '2.400002';
 use Moo;
 use Sub::Quote;
 use MooX::Types::MooseLike::Base qw(Str InstanceOf);
@@ -95,5 +94,19 @@ around '_build_wrapper' => sub {
 after 'disconnect' => sub {
     delete $SIG{CHLD};
 };
+
+=pod
+
+=begin Pod::Coverage
+
+  buffer
+  connect_ready
+  disconnect
+  pump
+  put
+
+=end Pod::Coverage
+
+=cut
 
 1;

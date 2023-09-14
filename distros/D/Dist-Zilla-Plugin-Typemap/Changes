@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-Plugin-Typemap
 
+0.004     2023-09-02 20:39:54+02:00 Europe/Brussels
+          - Only call minimum_pxs if supported
+
+0.003     2023-09-02 17:50:57+02:00 Europe/Brussels
+          - Automatically determine mimimum ParseXS version
+
 0.002     2023-05-09 12:38:13+02:00 Europe/Amsterdam
           - Make plugin a FileMunger
           - Add filename attribute

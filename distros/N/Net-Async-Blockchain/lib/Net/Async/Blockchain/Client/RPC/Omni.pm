@@ -3,7 +3,7 @@ package Net::Async::Blockchain::Client::RPC::Omni;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 =head1 NAME
 
@@ -17,7 +17,7 @@ Net::Async::Blockchain::Client::RPC::Omni - Async Omnicore RPC Client.
         my $http_client = Net::Async::Blockchain::Client::RPC::Omni->new(endpoint => 'http://127.0.0.1:8332', timeout => 100, rpc_user => 'test', rpc_password => 'test')
     );
 
-    my $response = $http_client->get_transaction('txid...')->get;
+    my $response = $http_client->get_omni_transaction('txid...')->get;
 
 =head1 DESCRIPTION
 
@@ -33,46 +33,42 @@ no indirect;
 
 use parent qw(Net::Async::Blockchain::Client::RPC::BTC);
 
-sub jsonrpc { return undef }
+=head2 get_omni_transaction
 
-=head2 get_transaction
-
-https://github.com/OmniLayer/omnicore/blob/master/src/omnicore/doc/rpc-api.md#omni_gettransaction
+https://github.com/omnilayer/omnicore/blob/master/src/omnicore/doc/rpc-api.md#omni_gettransaction
 
 =over 4
 
+=item * C<txid> the hash of the transaction to lookup
+
 =back
 
-L<Future>
+L<Future> - detailed information about an Omni transaction
 
 =cut
 
-sub get_transaction {
+sub get_omni_transaction {
     my ($self, @params) = @_;
     return $self->_request('omni_gettransaction', @params);
 }
 
-=head2 get_detailed_transaction
+=head2 omni_getwalletbalances
 
-https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/wallet/gettransaction/
+https://github.com/OmniLayer/omnicore/blob/master/src/omnicore/doc/rpc-api.md#omni_getwalletbalances
+
+=over 4
+
+=item * C<includewatchonly> include balances of watchonly addresses (default: false)
+
+=back
+
+L<Future> - list of the total token balances of the whole wallet.
 
 =cut
 
-sub get_detailed_transaction {
+sub get_omni_wallet_balances {
     my ($self, @params) = @_;
-    return $self->_request('gettransaction', @params);
-}
-
-=head2 list_by_addresses
-
-https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/wallet/listreceivedbyaddress/
-
-=cut
-
-sub list_by_addresses {
-    my ($self, $address) = @_;
-    return $self->_request("listreceivedbyaddress", 1, \0, \0, $address);
+    return $self->_request('omni_getwalletbalances', @params);
 }
 
 1;
-

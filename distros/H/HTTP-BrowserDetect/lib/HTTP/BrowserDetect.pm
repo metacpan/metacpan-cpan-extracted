@@ -5,7 +5,7 @@ use 5.006;
 
 package HTTP::BrowserDetect;
 
-our $VERSION = '3.38';
+our $VERSION = '3.39';
 
 # Operating Systems
 our @OS_TESTS = qw(
@@ -1600,9 +1600,7 @@ sub _init_os {
             $os_tests->{macppc} = 1;
         }
     }
-    elsif (index( $ua, 'ipod' ) != -1
-        || index( $ua, 'iphone' ) != -1
-        || index( $ua, 'ipad' ) != -1 ) {
+    elsif ( $ua =~ m{\b(ipad|iphone|ipod)\b} ) {
 
         # iOS
         $os = 'ios';
@@ -3075,7 +3073,7 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.38
+version 3.39
 
 =head1 SYNOPSIS
 

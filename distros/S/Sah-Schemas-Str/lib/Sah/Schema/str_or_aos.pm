@@ -3,9 +3,9 @@ package Sah::Schema::str_or_aos;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-23'; # DATE
+our $DATE = '2023-09-03'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 our $schema = [any => {
     summary => 'String or array (0+ length) of (defined) string',
@@ -41,7 +41,7 @@ Sah::Schema::str_or_aos - String or array (0+ length) of (defined) string
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::Schema::str_or_aos (from Perl distribution Sah-Schemas-Str), released on 2022-09-23.
+This document describes version 0.015 of Sah::Schema::str_or_aos (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
 
 =head1 SYNOPSIS
 
@@ -69,7 +69,7 @@ To check data against this schema (requires L<Data::Sah>):
  my $validator = gen_validator("str_or_aos*");
  say $validator->($data) ? "valid" : "INVALID!";
 
-The above schema returns a boolean result (true if data is valid, false if
+The above validator returns a boolean result (true if data is valid, false if
 otherwise). To return an error message string instead (empty string if data is
 valid, a non-empty error message otherwise):
 
@@ -77,23 +77,23 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = ["a"];
+ $data = "a";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
  $data = ["a",[]];
  my $errmsg = $validator->($data); # => "Not of type text"
 
-Often a schema has coercion rule or default value, so after validation the
-validated value is different. To return the validated (set-as-default, coerced,
-prefiltered) value:
+Often a schema has coercion rule or default value rules, so after validation the
+validated value will be different from the original. To return the validated
+(set-as-default, coerced, prefiltered) value:
 
  my $validator = gen_validator("str_or_aos", {return_type=>'str_errmsg+val'});
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = ["a"];
- my $res = $validator->($data); # => ["",["a"]]
+ $data = "a";
+ my $res = $validator->($data); # => ["","a"]
  
  # a sample invalid data
  $data = ["a",[]];
@@ -160,6 +160,36 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  % ./myapp.pl --arg1 ...
 
+=head2 Using on the CLI with validate-with-sah
+
+To validate some data on the CLI, you can use L<validate-with-sah> utility.
+Specify the schema as the first argument (encoded in Perl syntax) and the data
+to validate as the second argument (encoded in Perl syntax):
+
+ % validate-with-sah '"str_or_aos*"' '"data..."'
+
+C<validate-with-sah> has several options for, e.g. validating multiple data,
+showing the generated validator code (Perl/JavaScript/etc), or loading
+schema/data from file. See its manpage for more details.
+
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema (requires
+L<Type::Tiny> as well as L<Type::FromSah>):
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('str_or_aos*', name=>'StrOrAos')
+     );
+ }
+
+ use My::Types qw(StrOrAos);
+ StrOrAos->assert_valid($data);
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schemas-Str>.
@@ -192,7 +222,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

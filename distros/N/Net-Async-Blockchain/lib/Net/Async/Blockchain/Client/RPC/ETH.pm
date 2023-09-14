@@ -3,7 +3,7 @@ package Net::Async::Blockchain::Client::RPC::ETH;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 =head1 NAME
 
@@ -155,4 +155,3 @@ sub get_balance {
 }
 
 1;
-

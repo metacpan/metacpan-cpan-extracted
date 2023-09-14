@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.888';
+our $VERSION = '1.889';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 
@@ -61,10 +61,14 @@ sub get_ncpu {
    OS_CHECK: {
       local $_ = lc $^O;
 
-      /linux/ && do {
+      /linux|android/ && do {
          my ( $count, $fh );
          if ( open $fh, '<', '/proc/stat' ) {
             $count = grep { /^cpu\d/ } <$fh>;
+            close $fh;
+         }
+         elsif ( open $fh, '<', '/proc/cpuinfo' ) {
+            $count = grep { /^processor/ } <$fh>;
             close $fh;
          }
          $ncpu = $count if $count;
@@ -244,7 +248,7 @@ sub _sock_pair {
             AF_UNIX, Socket::SOCK_STREAM(), 0 ) or die "socketpair: $!\n";
       }
 
-      if ($^O ne 'aix' && $^O ne 'linux') {
+      if ($^O !~ /aix|linux|android/) {
          setsockopt($_obj->{$_r_sock}[$_i], SOL_SOCKET, SO_SNDBUF, int $_size);
          setsockopt($_obj->{$_r_sock}[$_i], SOL_SOCKET, SO_RCVBUF, int $_size);
          setsockopt($_obj->{$_w_sock}[$_i], SOL_SOCKET, SO_SNDBUF, int $_size);
@@ -267,7 +271,7 @@ sub _sock_pair {
             AF_UNIX, Socket::SOCK_STREAM(), 0 ) or die "socketpair: $!\n";
       }
 
-      if ($^O ne 'aix' && $^O ne 'linux') {
+      if ($^O !~ /aix|linux|android/) {
          setsockopt($_obj->{$_r_sock}, SOL_SOCKET, SO_SNDBUF, int $_size);
          setsockopt($_obj->{$_r_sock}, SOL_SOCKET, SO_RCVBUF, int $_size);
          setsockopt($_obj->{$_w_sock}, SOL_SOCKET, SO_SNDBUF, int $_size);
@@ -431,7 +435,7 @@ MCE::Util - Utility functions
 
 =head1 VERSION
 
-This document describes MCE::Util version 1.888
+This document describes MCE::Util version 1.889
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,199 @@
+#!/usr/bin/env perl
+#ABSTRACT: Install a "package" in the NBI HPC using a singularity image
+#PODNAME: make_package
+
+use v5.12;
+use warnings;
+use Getopt::Long;
+use File::Basename;
+use File::Path qw(make_path);
+use File::Spec;
+
+my $image     = undef;
+my $package   = undef;
+my $force     = 0;
+my $packages_dir     = '/nbi/software/testing/bin/';
+my $packages_basepath = '/nbi/software/testing/';
+my $permissions = 0755;
+
+
+# Parse command line options
+GetOptions(
+    'i|image=s'   => \$image,
+    'p|package=s' => \$package,
+    'f|force'     => \$force,
+);
+
+my $errors = startup($packages_dir, $packages_basepath, $image, \@ARGV);
+exit 1 if $errors;
+
+# Determine the package name
+$package = get_package_name($image, $package);
+
+# Create the package
+my $package_bin   = File::Spec->catfile($packages_dir, $package);
+my $package_path  = File::Spec->catfile($packages_basepath, $package, '/last/x86_64/bin/');
+
+if (-e $package_bin and not $force) {
+    die "Binary found at $package_bin, use --force to override.\n";
+}
+if (-d $package_path and not $force) {
+    die "Path found at $package_path, use --force to override.\n";
+}
+make_path($package_path);
+
+# Create the binary (source package that)
+open(my $bin, ">", $package_bin);
+print $bin "#!/bin/bash\n";
+print $bin "# Made by Core Bioinformatics :)\n";
+print $bin "export PATH=$package_path:\$PATH\n";
+close $bin;
+
+# Create the launcher script
+my $abs_img     = File::Spec->rel2abs($image);
+my $source_file = File::Spec->catfile($package_path, "singularity.exec");
+open(my $exec, ">", $source_file);
+print $exec "#!/bin/bash\n";
+print $exec "# Launcher for $package made by Core Bioinformatics\n";
+print $exec "singularity exec \"$abs_img\" " . '$(basename "$0") "$@"' . "\n";
+close $exec;
+
+if (chmod($permissions, $source_file)) {
+    print "Permissions of '$source_file' changed to 755.\n";
+} else {
+    die "Failed to change permissions of '$source_file': $!\n";
+}
+
+# Create symbolic links for the provided commands
+for my $command (@ARGV) {
+    say " - $command";
+    my $symlink_name = File::Spec->catfile($package_path, $command);
+    if (-e $symlink_name and $force) {
+        unlink $symlink_name;
+    }
+    if (symlink($source_file, $symlink_name)) {
+        print "  Symbolic link created from '$source_file' to '$symlink_name'.\n";
+    } else {
+        die "  [ERROR] Failed to create symbolic link: $!\n";
+    }
+}
+
+sub usage {
+    say STDERR <<END;
+source_it.pl -i SINGULARITY_IMAGE [-p PACKAGE] COMMANDS...
+
+END
+}
+
+sub startup {
+  my ($packages_dir, $packages_basepath, $image, $commands_list) = @_;
+  my $errors = 0;
+
+  if ( ! -d $packages_dir ) {
+    say STDERR "ERROR: Are you in the NBI HPC?";
+    say STDERR "  -> Directory $packages_dir does not exist\n";
+    $errors++;
+  }
+  if ( ! -d $packages_basepath ) {
+    say STDERR "ERROR: Are you in the NBI HPC?";
+    say STDERR "  -> Directory $packages_basepath does not exist\n";
+    $errors++;
+  }
+
+  if (! -e "$image" ) {
+    say STDERR "ERROR: Image file not found";
+    say STDERR "  -> File $image does not exist\n";
+    $errors++;
+  }
+
+  # Check lenght of commands list, if zero print usage
+    if (scalar @ARGV == 0) {
+        usage();
+        say STDERR "ERROR: No commands supplied.\n";
+        $errors++;
+    }
+  return $errors;
+}
+
+sub get_package_name {
+    my ($image, $package) = @_;
+    if ( ! $package ) {
+        my @suffixlist = qw(.simg .img .apptainer .sif);
+        $package = basename($image, @suffixlist);
+        say STDERR  " - Inferred package name: $package";
+    } else {
+        say STDERR  " - Package name: $package";
+    }
+    return $package;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+make_package - Install a "package" in the NBI HPC using a singularity image
+
+=head1 VERSION
+
+version 0.6.1
+
+=head1 SYNOPSIS
+
+  source_it.pl -i SINGULARITY_IMAGE [-p PACKAGE] COMMANDS...
+
+=head1 DESCRIPTION
+
+This script creates a package for running Singularity containers with specified commands. It creates a binary script that sets the necessary environment variables and launches Singularity with the provided container image.
+
+=head1 NAME
+
+source_it.pl - Create package for installing Singularity containers as HPC packages
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-i, --image SINGULARITY_IMAGE>
+
+Specify the Singularity container image file to be used. Required.
+
+=item B<-p, --package PACKAGE>
+
+Specify the package name. If not provided, the script will infer it from the image filename. It will be used as in C<source package PACKAGENAME>.
+
+=item B<-f, --force>
+
+Force overwriting existing binary or package path if they already exist.
+
+=item B<COMMANDS>
+
+List of binaries shipping with the package, they will all be linked to the same launcher script. 
+At least a "command" is required.
+
+=back
+
+=head1 EXAMPLE
+
+  make_package -i seqfu__1.20.0.simg seqfu fu-orf fu-msa fu-rename fu-tabcheck 
+
+Will generate links to seqfu, fu-orf, fu-msa, fu-rename and fu-tabcheck in the package C<seqfu>, using the specified image (seqfu__1.20.0.simg).
+
+=cut
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

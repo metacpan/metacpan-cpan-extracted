@@ -1,5 +1,5 @@
 package App::Oozie::Deploy::Validate::DAG::Workflow;
-$App::Oozie::Deploy::Validate::DAG::Workflow::VERSION = '0.002';
+$App::Oozie::Deploy::Validate::DAG::Workflow::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
@@ -8,7 +8,6 @@ use namespace::autoclean -except => [qw/_options_data _options_config/];
 use App::Oozie::Deploy::Validate::DAG::Vertex;
 
 use Carp ();
-use Data::Dumper;
 use Graph::Directed;
 use Moo;
 use Ref::Util       qw( is_hashref );
@@ -255,13 +254,16 @@ sub _dump_perl {
     my $self      = shift;
     my $g         = $self->current_graph || die "current_graph is not set!";
     my $all_nodes = $self->current_nodes || die "current_nodes is not set";
+
+    my $debug = {
+        nodes => $all_nodes,
+        graph => $g,
+    };
+
     require Data::Dumper;
-    $self->logger->debug(
-        Dumper {
-            nodes => $all_nodes,
-            graph => $g,
-        }
-    );
+    my $d = Data::Dumper->new([ $debug ], [ 'graph' ]);
+    $self->logger->debug( $d->Dump );
+
     return;
 }
 
@@ -279,7 +281,7 @@ App::Oozie::Deploy::Validate::DAG::Workflow
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 

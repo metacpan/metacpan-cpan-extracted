@@ -101,4 +101,9 @@ subtest 'separate container' => sub {
         "connection to db was closed";
 };
 
+for my $name( silo->ctl->meta->list ) {
+    note "resource $name";
+    note explain silo->ctl->meta->show($name);
+};
+
 done_testing;

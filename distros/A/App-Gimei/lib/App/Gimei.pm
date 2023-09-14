@@ -3,7 +3,7 @@ package App::Gimei;
 use warnings;
 use v5.22;
 
-use version; our $VERSION = version->declare("v0.2.0");
+use version; our $VERSION = version->declare("v0.2.1");
 
 1;
 __END__
@@ -12,7 +12,7 @@ __END__
 
 =head1 NAME
 
-App::Gimei - CLI for Data::Gimei
+App::Gimei - a CLI for Data::Gimei
 
 =head1 SYNOPSIS
 
@@ -46,17 +46,17 @@ Omitting ARGS is equivalent to specifying name:kanji.
 
     [WORD_TYPE] [: WORD_SUBTYPE] [- RENDERING]
 
-    WORD_TYPE:     'name'   or 'address'
-    WORD_SUBTYPE:  'last', 'first' or 'sex'
-                 | 'prefecture', 'city' or 'town'
-    RENDERING:     'kanji', 'hiragana', 'katakana' or 'romaji'
+    WORD_TYPE:               'name' or 'address'
+    WORD_SUBTYPE('name'):    'last', 'first' or 'sex'
+    WORD_SUBTYPE('address'): 'prefecture', 'city' or 'town'
+    RENDERING:               'kanji', 'hiragana', 'katakana' or 'romaji'
 
 - WORD_TYPE 'address' does not support RENDERING romaji.
-- WORD_SUBTYPE 'sex' ignore RENDERING.
+- WORD_SUBTYPE('name') 'sex' ignore RENDERING.
 
 =head1 DESCRIPTION
 
-App::Gimei is CLI for Data::Gimei generates fake data that people's name in Japanese.
+App::Gimei is a CLI for Data::Gimei generates fake data that people's name in Japanese.
 
 =head1 INSTALL
 

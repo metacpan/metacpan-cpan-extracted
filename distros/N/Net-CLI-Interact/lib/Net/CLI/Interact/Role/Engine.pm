@@ -1,6 +1,5 @@
 package Net::CLI::Interact::Role::Engine;
-{ $Net::CLI::Interact::Role::Engine::VERSION = '2.400000' }
-
+$Net::CLI::Interact::Role::Engine::VERSION = '2.400002';
 {
     package # hide from pause
         Net::CLI::Interact::Role::Engine::ExecuteOptions;
@@ -72,7 +71,7 @@ sub last_response {
     (my $resp = $self->last_actionset->item_at(-2)->response) =~ s/$irs_re/\n/g;
     $resp =~ s/\n+$//;
     return (wantarray
-        ? (map {$_ .= "\n"} split m/\n/, $resp)
+        ? (split m/^/, $resp)
         : ($resp ."\n"));
 }
 
@@ -181,6 +180,8 @@ sub _execute_actions {
 
 =pod
 
+=for Pod::Coverage has_default_continuation set_default_continuation
+
 =head1 NAME
 
 Net::CLI::Interact::Role::Engine - Statement execution engine
@@ -206,7 +207,7 @@ The following options are supported:
 =item C<< timeout => $seconds >> (optional)
 
 Sets a value of C<timeout> for the
-L<Transport|Net::CLI::Interact::Transport> local to this call of C<cmd>, that
+Transport local to this call of C<cmd>, that
 overrides whatever is set in the Transport, or the default of 10 seconds.
 
 =item C<< no_ors => 1 >> (optional)
@@ -249,7 +250,7 @@ if there are insufficient parameters.
 =item C<< timeout => $seconds >> (optional)
 
 Sets a value of C<timeout> for the
-L<Transport|Net::CLI::Interact::Transport> local to this call of C<macro>,
+Transport local to this call of C<macro>,
 that overrides whatever is set in the Transport, or the default of 10 seconds.
 
 =back

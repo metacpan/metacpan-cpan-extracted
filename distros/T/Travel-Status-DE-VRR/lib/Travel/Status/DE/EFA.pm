@@ -5,11 +5,9 @@ use warnings;
 use 5.010;
 use utf8;
 
-no if $] >= 5.018, warnings => 'experimental::smartmatch';
+our $VERSION = '1.22';
 
-our $VERSION = '1.21';
-
-use Carp qw(confess cluck);
+use Carp   qw(confess cluck);
 use Encode qw(encode);
 use Travel::Status::DE::EFA::Line;
 use Travel::Status::DE::EFA::Result;
@@ -34,7 +32,9 @@ sub new {
 	if ( not( $opt{name} ) ) {
 		confess('You must specify a name');
 	}
-	if ( $opt{type} and not( $opt{type} ~~ [qw[stop stopID address poi]] ) ) {
+	if ( $opt{type}
+		and not( $opt{type} =~ m{ ^ (?: stop stopID address poi ) $ }x ) )
+	{
 		confess('type must be stop, stopID, address, or poi');
 	}
 
@@ -332,7 +332,7 @@ sub lines {
 		my $type       = $e_info->getAttribute('name');
 		my $mot        = $e->getAttribute('motType');
 		my $route      = ( $e_route ? $e_route->textContent : undef );
-		my $operator   = ( $e_oper ? $e_oper->textContent : undef );
+		my $operator   = ( $e_oper  ? $e_oper->textContent  : undef );
 		my $identifier = $e->getAttribute('stateless');
 
 		push(
@@ -640,7 +640,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 1.21
+version 1.22
 
 =head1 DESCRIPTION
 

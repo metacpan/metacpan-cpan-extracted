@@ -1,5 +1,8 @@
 Revision history for Net-Hadoop-WebHDFS-LWP
 
+0.011 2023-09-06 BURAK
+        PUT now redirects, which we need to handle.
+
 0.010 2017-05-04 BURAK
 	Whitelist setting a cookie jar.
 

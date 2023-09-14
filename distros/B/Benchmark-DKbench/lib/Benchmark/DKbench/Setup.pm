@@ -35,11 +35,15 @@ D/DK/DKECHAG/Astro-Coord-Precession-0.03.tar.gz
 D/DK/DKECHAG/Astro-Coord-Constellations-0.01.tar.gz
 D/DK/DKECHAG/Image-PHash-0.3.tar.gz
 D/DK/DKECHAG/Math-DCT-0.04.tar.gz
+D/DK/DKECHAG/SQL-Inserter-0.02.tar.gz
 M/MI/MIK/CryptX-0.078.tar.gz
 M/MI/MIK/Crypt-JWT-0.034.tar.gz
 M/ML/MLEHMANN/JSON-XS-4.03.tar.gz
 L/LE/LETO/Math-MatrixReal-2.13.tar.gz
+R/RI/RIBASUSHI/SQL-Abstract-Classic-1.91.tar.gz
 T/TO/TONYC/Imager-1.019.tar.gz
+U/UG/UGEXE/Text-Levenshtein-Damerau-XS-3.2.tar.gz
+U/UG/UGEXE/Text-Levenshtein-XS-0.503.tar.gz
 );
 }
 
@@ -62,7 +66,7 @@ sub datadir {
 }
 
 sub has_genbank {
-    my $datadir = datadir();
+    my $datadir = shift || datadir();
     return -f catfile($datadir, "gbbct5.seq");
 }
 

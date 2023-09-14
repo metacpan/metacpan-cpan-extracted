@@ -34,13 +34,6 @@ Should you wish to install this module manually, the procedure is
   make test
   make install
 
-LICENSE
-
-This software is released under the GNU General Public License. You may
-find a copy at
-
-   http://www.fsf.org/copyleft/gpl.html
-
 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2017 by Smithsonian Astrophysical

@@ -8,7 +8,7 @@ use NBI::Opts;
 use base qw(Exporter);
 our @ISA = qw(Exporter);
 our @EXPORT = qw(Job Opts load_config %FORMAT_STRINGS);
-$NBI::Slurm::VERSION = '0.5.0';
+$NBI::Slurm::VERSION = '0.6.1';
 
 
 
@@ -135,7 +135,7 @@ NBI::Slurm - NBI Slurm module
 
 =head1 VERSION
 
-version 0.5.0
+version 0.6.1
 
 =head1 SYNOPSIS
 

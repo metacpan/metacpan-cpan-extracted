@@ -1658,8 +1658,8 @@ or ternary expressions.
 
 Note that this is considered to be a different operation from "vertical
 alignment" because space at just one line is being adjusted, whereas in
-"vertical alignment" the spaces at all lines are being adjusted. So it sort of
-a local version of vertical alignment.
+"vertical alignment" the spaces at all lines are being adjusted. So it is
+sort of a local version of vertical alignment.
 
 Here is an example involving a ternary operator:
 
@@ -2291,6 +2291,34 @@ The default is equivalent to -csb='#<<V'.
 
 This may be used to change the ending comment for a B<--code-skipping> section, and its use is similar to the B<-fse=string>.
 The default is equivalent to -cse='#>>V'.
+
+=back
+
+=head2 Formatting a Limited Range of Lines
+
+A command B<--line-range-tidy=n1:n2> is available to process just a selected
+range of lines of an input stream with perltidy.  This command is mainly of
+interest for programming interactive code editors.  When it is used, the entire
+input stream is read but just the selected range of lines of the input file are
+processed by the perltidy tokenizer and formatter, and then the stream is
+reassembled for output. The selected lines need to contain a complete statement
+or balanced container.  Otherwise, a syntax error will occur and the code will
+not be tidied.  There are a couple of limitations on the use of this command:
+(1) it may not be applied to multiple files, and (2) it only applies to code
+tidying and not, for example, html formatting.
+
+=over 4
+
+=item B<-lrt=n1:n2>,  B<--line-range-tidy=n1:n2>
+
+The range of lines is specified by integers B<n1> and B<n2>, where B<n1> is the first line number to be formatted (start counting with 1) and B<n2> is the last line number to be formatted.  If B<n2> is not given, or exceeds the actual number of lines, then formatting continues to the end of the file.
+
+Examples:
+
+  -line-range-tidy=43:109      # tidy lines 43 through 109
+  -line-range-tidy=' 43 : 109' # tidy lines 43 through 109 (spaces ok in quotes)
+  -line-range-tidy=1:          # tidy all lines
+  -line-range-tidy=0:90        # ERROR (n1 must be >= 1)
 
 =back
 
@@ -2970,11 +2998,7 @@ This format option is quite general but there are some limitations.
 One limitation is that any line length limit still applies and can cause long
 welded sections to be broken into multiple lines.
 
-Another limitation is that an opening symbol which delimits quoted text cannot
-be included in a welded pair.  This is because quote delimiters are treated
-specially in perltidy.
-
-Finally, the stacking of containers defined by this flag have priority over
+Also, the stacking of containers defined by this flag have priority over
 any other container stacking flags.  This is because any welding is done first.
 
 =item B<-wfc>,  B<--weld-fat-comma >
@@ -3744,7 +3768,7 @@ block, with one or more commas.  These parameters only apply to something that
 fits this definition of a list.
 
 Note that a paren-less list of parameters is not a list by this definition, so
-these parameters have no effect on a peren-less list.
+these parameters have no effect on a paren-less list.
 
 Another consequence is that if the only comma in a list is deleted, then it
 cannot later be added back with these parameters because the container no
@@ -3833,6 +3857,86 @@ commas are removed.
 =back
 
 =back
+
+
+=head2 Missing Else Blocks
+
+A defensive programming technique is to require that every B<if-elsif-> chain
+be terminated with an B<else> block, even though it is not strictly required.
+This helps insure that there are no holes in the logic.
+
+For example, consider the following snippet:
+
+    my $type = get_cards();
+    if    ( $type = 1 ) { action("hold 'em") }
+    elsif ( $type = 2 ) { action("fold 'em") }
+    elsif ( $type = 3 ) { action("walk away") }
+
+What if the variable B<$type> is some other value?  It might have been obvious
+that this was okay when the code was first written, but it might not be so
+clear when the code is reviewed a few years later.  A terminal B<else> block
+with a comment would help clarify things.
+
+The parameters in this section can help by either issuing a warning if an
+B<else> is missing, or even inserting an empty B<else> block where one is
+missing, or both.
+
+=over 4
+
+=item B<-wme>,  B<--warn-missing-else>
+
+This flag tells perltidy to issue a warning if a program is missing a terminal B<else> block.  The default is not to issue such a warning.
+
+=item B<-ame>,  B<--add-missing-else>
+
+This flag tells perltidy to output an empty else block wherever a program is
+missing a terminal B<else> block.  To get a warning when this is done you
+should also set B<-wme>.  The default is not to add missing else blocks.
+
+=item B<-amec=s>,  B<--add-missing-else-comment=s>
+
+This string is a side comment which will be written to highlight a
+new empty else block. The default is:
+
+    -amec='##FIXME - added with perltidy -ame'
+
+=back
+
+For example, on the above example we can add a missing else and also get
+a warning notice with:
+
+    # perltidy -ame -wme
+    my $type = get_cards();
+    if    ( $type == 1 ) { action("hold 'em") }
+    elsif ( $type == 2 ) { action("fold 'em") }
+    elsif ( $type == 3 ) { action("walk away") }
+    else {
+        ##FIXME - added with perltidy -ame
+    }
+
+Any B<##FIXME> comments created in this way should be reviewed and changed
+appropriately. For example, one might decide that the code fine as is, and just
+change the comment to indicate that nothing has been overlooked:
+
+    my $type = get_cards();
+    if    ( $type == 1 ) { action("hold 'em") }
+    elsif ( $type == 2 ) { action("fold 'em") }
+    elsif ( $type == 3 ) { action("walk away") }
+    else {
+        # ok - no worries
+    }
+
+Or maybe a deeper analysis reveals that something was missed:
+
+    my $type = get_cards();
+    if    ( $type == 1 ) { action("hold 'em") }
+    elsif ( $type == 2 ) { action("fold 'em") }
+    elsif ( $type == 3 ) { action("walk away") }
+    else                 { action("run") }
+
+Sometimes it turns out that the else block should not reachable, in which case
+an error exit might be appropriate. In any case, having the B<else> block can
+improve code maintainability.
 
 =head2 Retaining or Ignoring Existing Line Breaks
 
@@ -4912,12 +5016,34 @@ by listing them in the string B<s>.  To remove all of the default operators use 
 
 =item B<-uf=s>,   B<--use-feature=s>
 
-This flag tells perltidy to allow the syntax associated a pragma in string
-B<s>. Currently only the recognized values for the string are B<s='class'> or
-string B<s=' '>.  The default is B<--use-feature='class'>.  This enables
-perltidy to recognized the special words B<class>, B<method>, B<field>, and
-B<ADJUST>.  If this causes a conflict with other uses of these words, the
-default can be turned off with B<--use-feature=' '>.
+This flag tells perltidy to allow or disallow the syntax associated a pragma in
+string B<s>.  The current possible settings are:
+
+=over 4
+
+=item *
+
+B<--use-feature='class'>.  This tells perltidy to recognized the special words
+B<class>, B<method>, B<field>, and B<ADJUST> as defined for this feature.
+
+=item *
+
+B<--use-feature='noclass'>.  This tells perltidy B<not> to treat words B<class>, B<method>, B<field>, B<ADJUST> specially.
+
+=item *
+
+B<Neither of these> (B<--use-feature> not defined). This is the DEFAULT and
+recommended setting. In this case perltidy will try to automatically handle
+both the newer --use-feature 'class' syntax as well as some conflicting
+uses of some of these special words by exisiting modules.
+
+=back
+
+Note that this parameter is independent of any B<use feature> control lines
+within a script. Perltidy does not look for or read such control lines.  This
+is because perltidy must be able to work on small chunks of code sent from an
+editor, so it cannot assume that such lines will be within the lines being
+formatted.
 
 =back
 
@@ -5636,24 +5762,24 @@ dot is added, and the backup file will be F<somefile.pl~>  .
 The following list shows all short parameter names which allow a prefix
 'n' to produce the negated form:
 
- D      anl    asbl   asc    ast    asu    atc    atnl   aws    b
- baa    baao   bar    bbao   bbb    bbc    bbs    bl     bli    boa
- boc    bok    bol    bom    bos    bot    cblx   ce     conv   cpb
- cs     csc    cscb   cscw   dac    dbc    dbs    dcbl   dcsc   ddf
- dln    dnl    dop    dp     dpro   drc    dsc    dsm    dsn    dtc
- dtt    dwic   dwls   dwrs   dws    eos    f      fpva   frm    fs
- fso    gcs    hbc    hbcm   hbco   hbh    hbhh   hbi    hbj    hbk
- hbm    hbn    hbp    hbpd   hbpu   hbq    hbs    hbsc   hbv    hbw
- hent   hic    hicm   hico   hih    hihh   hii    hij    hik    him
- hin    hip    hipd   hipu   hiq    his    hisc   hiv    hiw    hsc
- html   ibc    icb    icp    iob    ipc    isbc   iscl   kgb    kgbd
- kgbi   kis    lal    log    lop    lp     lsl    mem    nib    ohbr
- okw    ola    olc    oll    olq    opr    opt    osbc   osbr   otr
- ple    pod    pvl    q      sac    sbc    sbl    scbb   schb   scp
- scsb   sct    se     sfp    sfs    skp    sob    sobb   sohb   sop
- sosb   sot    ssc    st     sts    t      tac    tbc    toc    tp
- tqw    trp    ts     tsc    tso    vbc    vc     viu    vmll   vsc
- w      wfc    wn     x      xbt    xci    xlp    xs
+ D      ame    anl    asbl   asc    ast    asu    atc    atnl   aws
+ b      baa    baao   bar    bbao   bbb    bbc    bbs    bl     bli
+ boa    boc    bok    bol    bom    bos    bot    cblx   ce     conv
+ cpb    cs     csc    cscb   cscw   dac    dbc    dbs    dcbl   dcsc
+ ddf    dln    dnl    dop    dp     dpro   drc    dsc    dsm    dsn
+ dtc    dtt    dwic   dwls   dwrs   dws    eos    f      fpva   frm
+ fs     fso    gcs    hbc    hbcm   hbco   hbh    hbhh   hbi    hbj
+ hbk    hbm    hbn    hbp    hbpd   hbpu   hbq    hbs    hbsc   hbv
+ hbw    hent   hic    hicm   hico   hih    hihh   hii    hij    hik
+ him    hin    hip    hipd   hipu   hiq    his    hisc   hiv    hiw
+ hsc    html   ibc    icb    icp    iob    ipc    isbc   iscl   kgb
+ kgbd   kgbi   kis    lal    log    lop    lp     lsl    mem    nib
+ ohbr   okw    ola    olc    oll    olq    opr    opt    osbc   osbr
+ otr    ple    pod    pvl    q      sac    sbc    sbl    scbb   schb
+ scp    scsb   sct    se     sfp    sfs    skp    sob    sobb   sohb
+ sop    sosb   sot    ssc    st     sts    t      tac    tbc    toc
+ tp     tqw    trp    ts     tsc    tso    vbc    vc     viu    vmll
+ vsc    w      wfc    wme    wn     x      xbt    xci    xlp    xs
 
 Equivalently, the prefix 'no' or 'no-' on the corresponding long names may be
 used.
@@ -5752,7 +5878,7 @@ The perltidy binary uses the Perl::Tidy module and is installed when that module
 
 =head1 VERSION
 
-This man page documents perltidy version 20230701
+This man page documents perltidy version 20230912
 
 =head1 BUG REPORTS
 

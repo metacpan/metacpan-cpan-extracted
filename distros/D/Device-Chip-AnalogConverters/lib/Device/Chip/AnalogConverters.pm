@@ -1,10 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2018-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2018-2023 -- leonerd@leonerd.org.uk
 
-package Device::Chip::AnalogConverters;
-our $VERSION = '0.14';
+package Device::Chip::AnalogConverters 0.15;
+
+use v5.26;
+use warnings;
 
 =head1 NAME
 

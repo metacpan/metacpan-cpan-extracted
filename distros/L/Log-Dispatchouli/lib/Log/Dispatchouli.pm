@@ -1,6 +1,6 @@
 use v5.20;
 use warnings;
-package Log::Dispatchouli 3.006;
+package Log::Dispatchouli 3.007;
 # ABSTRACT: a simple wrapper around Log::Dispatch
 
 use experimental 'postderef'; # Not dangerous.  Is accepted without changed.
@@ -866,7 +866,7 @@ Log::Dispatchouli - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 3.006
+version 3.007
 
 =head1 SYNOPSIS
 
@@ -1325,9 +1325,13 @@ Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Christopher J. Madsen Dagfinn Ilmari Mannsåker Dan Book George Hartzell Jon Stuart Matt Phillips Olivier Mengué Randy Stauner Ricardo Signes Sawyer X
+=for stopwords Charlie Garrison Christopher J. Madsen Dagfinn Ilmari Mannsåker Dan Book George Hartzell Jon Stuart Matt Phillips Olivier Mengué Randy Stauner Ricardo Signes Sawyer X
 
 =over 4
+
+=item *
+
+Charlie Garrison <cng@garrison.com.au>
 
 =item *
 

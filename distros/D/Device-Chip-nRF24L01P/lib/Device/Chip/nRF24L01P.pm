@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.66;
+use warnings;
+use Object::Pad 0.800;
 
-package Device::Chip::nRF24L01P 0.07;
+package Device::Chip::nRF24L01P 0.08;
 class Device::Chip::nRF24L01P
    :isa(Device::Chip);
 

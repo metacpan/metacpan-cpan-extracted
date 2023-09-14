@@ -10,7 +10,6 @@ use strict;
 use warnings;
 use English;
 use SOAP::Lite;
-use Try::Tiny;
 use Data::Dumper;
 
 use Moose;

@@ -1,63 +1,53 @@
 use v5.12;
 use warnings;
 
-# base logic of every color space
+# common code of Graphics::Toolkit::Color::Space::Instance::*
 
 package Graphics::Toolkit::Color::Space;
-use Graphics::Toolkit::Color::SpaceBasis;
+use Graphics::Toolkit::Color::Space::Basis;
+use Graphics::Toolkit::Color::Space::Shape;
 
 sub new {
     my $pkg = shift;
-    my $basis = Graphics::Toolkit::Color::SpaceBasis->new( @_ );
+    my %args = @_;
+    my $basis = Graphics::Toolkit::Color::Space::Basis->new( $args{'axis'}, $args{'short'} );
     return unless ref $basis;
+    my $shape = Graphics::Toolkit::Color::Space::Shape->new( $basis, $args{'range'}, $args{'type'} );
+    return unless ref $shape;
 
     # which formats the constructor will accept, that can be deconverted into list
-    my %deformats = ( hash => sub { $basis->list_from_hash(@_) if $basis->is_hash(@_) },
-               named_array => sub { @{$_[0]}[1 .. $#{$_[0]}]   if $basis->is_named_array(@_) },
+    my %deformats = ( hash => sub { $basis->list_from_hash(@_)   if $basis->is_hash(@_) },
+               named_array => sub { @{$_[0]}[1 .. $#{$_[0]}]     if $basis->is_named_array(@_) },
+                    string => sub { $basis->list_from_string(@_) if $basis->is_string(@_) },
+                css_string => sub { $basis->list_from_css(@_)    if $basis->is_css_string(@_) },
     );
     # which formats we can output
-    my %formats = (list => sub {@_}, hash => sub { $basis->key_hash_from_list(@_) },
-                                char_hash => sub { $basis->shortcut_hash_from_list(@_) },
+    my %formats = (list => sub { @_ },                                 # 1,2,3
+                   hash => sub { $basis->key_hash_from_list(@_) },     # { red => 1, green => 2, blue => 3 }
+              char_hash => sub { $basis->shortcut_hash_from_list(@_) },# { r =>1, g => 2, b => 3 }
+                  array => sub { $basis->named_array_from_list(@_) },  # ['rgb',1,2,3]
+                 string => sub { $basis->named_string_from_list(@_) }, #   rgb: 1, 2, 3
+             css_string => sub { $basis->css_string_from_list(@_) },   #   rgb(1,2,3)
     );
 
-    bless { basis => $basis, format => \%formats, deformat => \%deformats, convert => {},
-            trim => sub { map {$_ < 0 ? 0 : $_} map {$_ > 1 ? 1 : $_} @_ },
-            delta => sub { my ($vector1, $vector2) = @_;
-                           map {$vector2->[$_] - $vector1->[$_] } $basis->iterator },
-    };
+    bless { basis => $basis, shape => $shape, format => \%formats, deformat => \%deformats, convert => {} };
 }
-
 sub basis            { $_[0]{'basis'}}
-sub name             { uc $_[0]->basis->name }
+sub name             { $_[0]->basis->name }
 sub dimensions       { $_[0]->basis->count }
-sub iterator         { $_[0]->basis->iterator }
 sub is_array         { $_[0]->basis->is_array( $_[1] ) }
 sub is_partial_hash  { $_[0]->basis->is_partial_hash( $_[1] ) }
 sub has_format       { (defined $_[1] and exists $_[0]{'format'}{ lc $_[1] }) ? 1 : 0 }
 sub can_convert      { (defined $_[1] and exists $_[0]{'convert'}{ uc $_[1] }) ? 1 : 0 }
 
-sub change_trim_routine {
-    my ($self, $code) = @_;
-    $self->{'trim'} = $code if ref $code eq 'CODE';
-}
-sub trim {
-    my ($self, @vector) = @_;
-    push @vector, 0 while @vector < $self->dimensions;
-    pop  @vector    while @vector > $self->dimensions;
-    return $self->{'trim'}->( @vector );
-}
-
 ########################################################################
 
-sub change_delta_routine {
-    my ($self, $code) = @_;
-    $self->{'delta'} = $code if ref $code eq 'CODE';
-}
-sub delta {
-    my ($self, $vector1, $vector2) = @_;
-    return unless $self->basis->is_array( $vector1 ) and $self->basis->is_array( $vector2 );
-    $self->{'delta'}->( $vector1, $vector2 );
-}
+sub delta      { shift->{'shape'}->delta( @_ ) }    # @values -- @vector, @vector --> |@vector # on normalize values
+sub check      { shift->{'shape'}->check( @_ ) }    # @values -- @range           -->  ?       # pos if carp
+sub clamp      { shift->{'shape'}->clamp( @_ ) }    # @values -- @range           --> |@vector
+sub normalize  { shift->{'shape'}->normalize(@_)}   # @values -- @range           --> |@vector
+sub denormalize{ shift->{'shape'}->denormalize(@_)} # @values -- @range           --> |@vector
+sub denormalize_range{ shift->{'shape'}->denormalize_range(@_)} # @values -- @range           --> |@vector
 
 ########################################################################
 
@@ -91,10 +81,10 @@ sub deformat {
 ########################################################################
 
 sub add_converter {
-    my ($self, $space_name, $to_code, $from_code) = @_;
+    my ($self, $space_name, $to_code, $from_code, $mode) = @_;
     return 0 if not defined $space_name or ref $space_name or ref $from_code ne 'CODE' or ref $to_code ne 'CODE';
     return 0 if $self->can_convert( $space_name );
-    $self->{'convert'}{ uc $space_name } = { from => $from_code, to => $to_code };
+    $self->{'convert'}{ uc $space_name } = { from => $from_code, to => $to_code, mode => $mode };
 }
 sub convert {
     my ($self, $values, $space_name) = @_;
@@ -107,7 +97,5 @@ sub deconvert {
     return unless ref $values eq 'ARRAY' and defined $space_name;
     $self->{'convert'}{ uc $space_name }{'from'}->(@$values) if $self->can_convert( $space_name );
 }
-
-
 
 1;

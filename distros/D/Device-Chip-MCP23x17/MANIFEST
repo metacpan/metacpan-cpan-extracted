@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 examples/mcp23x17.pl

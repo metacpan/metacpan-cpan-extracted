@@ -11,7 +11,7 @@ use t_TestCommon ':silent',
 #   or call  say fmt_tree($body)
 
 use ODF::lpOD;
-use ODF::lpOD_Helper qw/:DEFAULT PARA_COND/;
+use ODF::lpOD_Helper qw/:DEFAULT PARA_FILTER/;
 
 my $master_copy_path = "$Bin/../tlib/Skel.odt";
 my $input_path = tmpcopy_if_writeable($master_copy_path);
@@ -299,7 +299,7 @@ is( $body->Hsearch(qr/.*Unicode .*/s),
   # Insert newline after each paragraph sub-text to match Skel.txt
   # FIXME: Why doesnt this get "use of uninitialized value... in join" ???
   my @paras = $body->descendants(qr/^text:[ph]$/);
-  my $text2 = join("\n", map{$_->Hget_text(prune_cond => PARA_COND)}
+  my $text2 = join("\n", map{$_->Hget_text(prune_cond => PARA_FILTER)}
                          @paras_with_text)."\n";
   is(smashwhite($text2), smashwhite($Skeldottxt), "corresponds to ".basename($input_txt));
 }

@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -21,7 +21,7 @@ await $chip->mount(
    $adapter->expect_write_then_read( "\x00", 7 )
       ->returns( "\x56\x34\x12\x00\x07\x08\x90" );
 
-   is_deeply( [ await $chip->read_time ],
+   is( [ await $chip->read_time ],
       [ 56, 34, 12, 7, 7, 190, 0 ],
       '$chip->read_time' );
 

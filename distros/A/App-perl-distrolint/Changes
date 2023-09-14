@@ -1,5 +1,13 @@
 Revision history for App-perl-distrolint
 
+0.03    2023-09-09
+        [CHANGES]
+         * Additional checks in POD checker, on the formatting of the
+           `=head1 NAME` section
+         * Added a check for deprecated `use feature` imports
+         * Added a check that any file containing non-ASCII has `use utf8`
+           before it
+
 0.02    2023-08-11
         [CHANGES]
          * Improved tree-walking code using newer features of

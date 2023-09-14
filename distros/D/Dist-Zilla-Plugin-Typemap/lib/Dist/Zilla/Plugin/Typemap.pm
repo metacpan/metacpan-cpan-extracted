@@ -1,11 +1,11 @@
 package Dist::Zilla::Plugin::Typemap;
-$Dist::Zilla::Plugin::Typemap::VERSION = '0.002';
+$Dist::Zilla::Plugin::Typemap::VERSION = '0.004';
 use Moose;
 
 with 'Dist::Zilla::Role::FileMunger', 'Dist::Zilla::Role::PrereqSource';
 
 use Dist::Zilla::File::InMemory;
-use List::Util 'first';
+use List::Util qw/first max/;
 use MooseX::Types::Moose qw/ArrayRef Bool Str/;
 use MooseX::Types::Perl qw/StrictVersionStr/;
 use ExtUtils::Typemaps;
@@ -43,8 +43,8 @@ has files => (
 
 has minimum_pxs => (
 	is      => 'ro',
-	isa     => StrictVersionStr,
-	default => '0',
+	isa     => Str,
+	default => 'auto',
 );
 
 has filename => (
@@ -86,7 +86,15 @@ sub register_prereqs {
 	my ($self) = @_;
 
 	my $version = $self->minimum_pxs;
-	if ($version eq 'author') {
+	if ($version eq 'auto') {
+		my @versions = 0;
+		for my $module ($self->modules) {
+			require_module($module);
+			push @versions, $module->minimum_pxs if $module->can('minimum_pxs');
+		}
+		$version = max(@versions);
+	}
+	elsif ($version eq 'author') {
 		require Module::Metadata;
 		$version = Module::Metadata->new_from_module('ExtUtils::ParseXS')->version->stringify;
 	}
@@ -118,7 +126,7 @@ Dist::Zilla::Plugin::Typemap - Manipulate the typemap file for XS distributions 
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -145,7 +153,7 @@ This is the name of the file that the typemap is written to. It defaults to F<ty
 
 =head2 minimum_pxs
 
-This sets a build requirement on a specific version of L<ExtUtils::ParseXS|ExtUtils::ParseXS>, this defaults to C<0>. The special value C<author> is replaced with the version of C<ExtUtils::ParseXS> that the author has installed.
+This sets a build requirement on a specific version of L<ExtUtils::ParseXS|ExtUtils::ParseXS>. The special value C<author> is replaced with the version of C<ExtUtils::ParseXS> that the author has installed. The special value C<auto> (the default) will automatically determine the minimum version using the C<minimum_pxs> method on the typemap class if present.
 
 =head1 AUTHOR
 

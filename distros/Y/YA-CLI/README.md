@@ -24,6 +24,10 @@ A CLI framework for CLI applications that use subcommands
     # This is the action your sub command is selected on
     sub action { 'main' } # can also be an array in case you want aliases
 
+    # This is the subaction your sub command is selected on. This is an
+    # optional sub, you don't need to implement it
+    sub subaction { 'thing' } # can also be an array in case you want aliases
+
     sub run {
         # Logic here
     }
@@ -50,3 +54,9 @@ and `--man` commands.
 
 Define [Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong) options in your module that are used on top of the
 default help and man.
+
+# SEE ALSO
+
+- [YA::CLI::ActionRole](https://metacpan.org/pod/YA%3A%3ACLI%3A%3AActionRole)
+- [YA::CLI::ErrorHandler](https://metacpan.org/pod/YA%3A%3ACLI%3A%3AErrorHandler)
+- [YA::CLI::Usage](https://metacpan.org/pod/YA%3A%3ACLI%3A%3AUsage)

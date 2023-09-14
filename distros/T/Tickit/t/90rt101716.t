@@ -1,8 +1,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 use Tickit::Window;
 use Tickit::Test;
 
@@ -18,9 +17,9 @@ $float->bind_event( expose => sub {
    my $ch = ord 'x';
    $rb->char_at(0, 0, $ch);
 
-   is( exception {
+   ok( lives {
       $rb->get_cell(300, 300)->char
-   }, undef, 'can request position outside renderbuffer');
+   }, 'can request position outside renderbuffer');
 });
 
 $win->expose;

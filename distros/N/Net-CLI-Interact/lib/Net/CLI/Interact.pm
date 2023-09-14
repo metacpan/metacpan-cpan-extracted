@@ -1,6 +1,5 @@
 package Net::CLI::Interact;
-{ $Net::CLI::Interact::VERSION = '2.400000' }
-
+$Net::CLI::Interact::VERSION = '2.400002';
 use Moo;
 use Sub::Quote;
 use Class::Load ();
@@ -108,6 +107,9 @@ sub _build_transport {
 
 =pod
 
+=for Pod::Coverage BUILD BUILDARGS
+=for Pod::Coverage default_log_categories has_logger has_phrasebook has_transport my_args
+
 =head1 NAME
 
 Net::CLI::Interact - Toolkit for CLI Automation
@@ -120,25 +122,25 @@ must interact with a command line interface.
 =head1 SYNOPSIS
 
  use Net::CLI::Interact;
- 
+
  my $s = Net::CLI::Interact->new({
     personality => 'cisco',
     transport   => 'Telnet',
     connect_options => { host => '192.0.2.1' },
  });
- 
+
  # respond to a usename/password prompt
  $s->macro('to_user_exec', {
      params => ['my_username', 'my_password'],
  });
- 
+
  my $interfaces = $s->cmd('show ip interfaces brief');
- 
+
  $s->macro('to_priv_exec', {
      params => ['my_password'],
  });
  # matched prompt is updated automatically
- 
+
  # paged output is slurped into one response
  $s->macro('show_run');
  my $config = $s->last_response;
@@ -248,7 +250,7 @@ character will end all lines.
 
 =head2 transport
 
-Returns the L<Transport|Net::CLI::Interact::Transport> backend which was
+Returns the Transport backend which was
 loaded based on the C<transport> option to C<new>. See the
 L<Telnet|Net::CLI::Interact::Transport::Telnet>,
 L<SSH|Net::CLI::Interact::Transport::SSH>, or

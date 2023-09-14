@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 examples/ad9833.pl

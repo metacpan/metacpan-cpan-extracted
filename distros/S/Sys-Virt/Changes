@@ -1,5 +1,10 @@
 Revision history for perl module Sys::Virt
 
+9.7.0 2023-09-01
+
+ - Add virNetworkSetMetadata/virNetworkGetMetadata and
+   associated constants
+
 9.4.0 2023-06-02
 
  - Add VIR_MIGRATE_PARAM_COMPRESSION_ZLIB_LEVEL and
@@ -359,7 +364,7 @@ Revision history for perl module Sys::Virt
  - Add PERF_PARAM_STALLED_CYCLES_BACKEND constant
  - Add PERF_PARAM_REF_CPU_CYCLES constant
  - Add virStorageVolGetInfoFlags & associated constants
- - Add domain metdata change event
+ - Add domain metadata change event
  - Add secret event APIs
 
 2.5.0 2016-12-05
@@ -645,7 +650,7 @@ Revision history for perl module Sys::Virt
 
  - Add all new APIs and constants in libvirt 0.10.2
  - Add some constants for macros in libvirt.h related
-   to memory/block/cpu/scheduler parametes
+   to memory/block/cpu/scheduler parameters
  - Fix warnings building on Perl with 64 int types
  - Disable unreliable hostname test case
 
@@ -745,7 +750,7 @@ Revision history for perl module Sys::Virt
  - Use thread local error APIs exclusively
  - Fix bogus extra URI parameter in migrate_to_uri function
  - Implement all virStream APIs in Sys::Virt::Stream
- - Impement virDomainGetSysinfo binding
+ - Implement virDomainGetSysinfo binding
  - Call virInitialize when loading module
  - Add all missing error constants
  - Update example RPM spec to match Fedora
@@ -807,7 +812,7 @@ Revision history for perl module Sys::Virt
  - Implement storage, node device, event APIs
  - Full covereage of all APIs in 0.6.1 release of libvirt
  - Full documentation coverage
- - Ability to authenticate when openning connections
+ - Ability to authenticate when opening connections
 
 0.1.2 2008-02-23
 

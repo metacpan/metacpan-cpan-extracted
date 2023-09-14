@@ -7,9 +7,9 @@ use warnings;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-04'; # DATE
+our $DATE = '2023-09-08'; # DATE
 our $DIST = 'Number-Util-Range'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our @EXPORT_OK = qw(convert_number_sequence_to_range);
 our %SPEC;
@@ -17,7 +17,14 @@ our %SPEC;
 $SPEC{'convert_number_sequence_to_range'} = {
     v => 1.1,
     summary => 'Find sequences in number arrays & convert to range '.
-        '(e.g. 100,2,3,4,5,101 -> 100,"2..5",101)',
+    '(e.g. 100,2,3,4,5,101 -> 100,"2..5",101)',
+    description => <<'MARKDOWN',
+
+This routine accepts an array, finds sequences of numbers in it (e.g. 1, 2, 3),
+and converts each sequence into a range ("1..3"). So basically it "compresses" the
+sequence (many elements) into a single element.
+
+MARKDOWN
     args => {
         array => {
             schema => ['array*', of=>'str*'],
@@ -25,9 +32,24 @@ $SPEC{'convert_number_sequence_to_range'} = {
             greedy => 1,
             cmdline_src => 'stdin_or_args',
         },
-        threshold => {
-            schema => 'posint*',
+        min_range_len => {
+            schema => ['posint*', min=>2],
             default => 4,
+            description => <<'MARKDOWN',
+
+Minimum number of items in a sequence to convert to a range. Sequence that has
+less than this number of items will not be converted.
+
+MARKDOWN
+        },
+        max_range_len => {
+            schema => ['posint*',min=>2],
+            description => <<'MARKDOWN',
+
+Maximum number of items in a sequence to convert to a range. Sequence that has
+more than this number of items might be split into two or more ranges.
+
+MARKDOWN
         },
         separator => {
             schema => 'str*',
@@ -62,12 +84,20 @@ $SPEC{'convert_number_sequence_to_range'} = {
             result => [100, "2..6", 101, 102, "-5..-2", 103],
         },
         {
-            summary => 'option: threshold',
+            summary => 'option: min_range_len (1)',
             args => {
                 array => [100, 2, 3, 4, 5, 101],
-                threshold => 5,
+                min_range_len => 5,
             },
             result => [100, 2, 3, 4, 5, 101],
+        },
+        {
+            summary => 'option: min_range_len (2)',
+            args => {
+                array => [100, 2, 3, 4, 101, 'foo'],
+                min_range_len => 3,
+            },
+            result => [100, "2..4", 101, 'foo'],
         },
         {
             summary => 'option: ignore_duplicates',
@@ -77,13 +107,24 @@ $SPEC{'convert_number_sequence_to_range'} = {
             },
             result => ["1..4", 9],
         },
+        {
+            summary => 'option: max_range_len (1)',
+            args => {
+                array => [98, 100..110, 5, 101],
+                max_range_len => 4,
+            },
+            result => [98, "100..103","104..107", 108, 109, 110, 5, 101],
+        },
     ],
 };
 sub convert_number_sequence_to_range {
     my %args = @_;
 
     my $array = $args{array};
-    my $threshold = $args{threshold} // 4;
+    my $min_range_len = $args{min_range_len}
+        // $args{threshold} # old name, DEPRECATED
+        // 4;
+    my $max_range_len = $args{max_range_len};
     my $separator = $args{separator} // '..';
     my $ignore_duplicates = $args{ignore_duplicates};
 
@@ -92,7 +133,7 @@ sub convert_number_sequence_to_range {
 
     my $code_empty_buffer = sub {
         return unless @buf;
-        push @res, @buf >= $threshold ? ("$buf[0]$separator$buf[-1]") : @buf;
+        push @res, @buf >= $min_range_len ? ("$buf[0]$separator$buf[-1]") : @buf;
         @buf = ();
     };
 
@@ -109,6 +150,9 @@ sub convert_number_sequence_to_range {
         }
         if (@buf) {
             if ($el != $buf[-1]+1) { # breaks current sequence
+                $code_empty_buffer->();
+            }
+            if ($max_range_len && @buf >= $max_range_len) {
                 $code_empty_buffer->();
             }
         }
@@ -135,7 +179,7 @@ Number::Util::Range - Find sequences in number arrays & convert to range (e.g. 1
 
 =head1 VERSION
 
-This document describes version 0.003 of Number::Util::Range (from Perl distribution Number-Util-Range), released on 2023-01-04.
+This document describes version 0.006 of Number::Util::Range (from Perl distribution Number-Util-Range), released on 2023-09-08.
 
 =head1 FUNCTIONS
 
@@ -168,15 +212,35 @@ Result:
 
  [100, "2..6", 101, 102, "-5..-2", 103]
 
-=item * option: threshold:
+=item * option: min_range_len (1):
 
- convert_number_sequence_to_range(array => [100, 2 .. 5, 101], threshold => 5); # -> [100, 2 .. 5, 101]
+ convert_number_sequence_to_range(array => [100, 2 .. 5, 101], min_range_len => 5); # -> [100, 2 .. 5, 101]
+
+=item * option: min_range_len (2):
+
+ convert_number_sequence_to_range(array => [100, 2, 3, 4, 101, "foo"], min_range_len => 3);
+
+Result:
+
+ [100, "2..4", 101, "foo"]
 
 =item * option: ignore_duplicates:
 
  convert_number_sequence_to_range(array => [1 .. 4, 2, 9, 9, 9], ignore_duplicates => 1); # -> ["1..4", 9]
 
+=item * option: max_range_len (1):
+
+ convert_number_sequence_to_range(array => [98, 100 .. 110, 5, 101], max_range_len => 4);
+
+Result:
+
+ [98, "100..103", "104..107", 108, 109, 110, 5, 101]
+
 =back
+
+This routine accepts an array, finds sequences of numbers in it (e.g. 1, 2, 3),
+and converts each sequence into a range ("1..3"). So basically it "compresses" the
+sequence (many elements) into a single element.
 
 This function is not exported by default, but exportable.
 
@@ -192,11 +256,17 @@ Arguments ('*' denotes required arguments):
 
 (No description)
 
+=item * B<max_range_len> => I<posint>
+
+Maximum number of items in a sequence to convert to a range. Sequence that has
+more than this number of items might be split into two or more ranges.
+
+=item * B<min_range_len> => I<posint> (default: 4)
+
+Minimum number of items in a sequence to convert to a range. Sequence that has
+less than this number of items will not be converted.
+
 =item * B<separator> => I<str> (default: "..")
-
-(No description)
-
-=item * B<threshold> => I<posint> (default: 4)
 
 (No description)
 
@@ -218,11 +288,18 @@ Source repository is at L<https://github.com/perlancar/perl-Number-Util-Range>.
 L<Data::Dump> also does something similar when dumping arrays of numbers, e.g.
 if you say C<dd [1,2,3,4];> it will dump the array as "[1..4]".
 
-L<String::Util::Range>
+L<String::Util::Range> also convert sequences of letters to range (e.g.
+"a","b","c","d" -> "a..d").
 
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Philippe Bruhat (BooK)
+
+Philippe Bruhat (BooK) <book@cpan.org>
 
 =head1 CONTRIBUTING
 

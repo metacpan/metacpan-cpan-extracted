@@ -5,13 +5,15 @@ use lib qw(lib);
 
 use Test::More 0.88;
 use Test::Exception;
-use Test::Warnings;
+use Test::Warnings 0.010 qw(:no_end_test);
+my $no_warnings;
+use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
 # The duration of this tests depends on the number of tags used on the system.
 # If there is a large number of tags, it may take quite some time to complete.
-plan skip_all => "potentially lengthy test" unless $ENV{AUTHOR_TESTING};
+plan skip_all => "potentially lengthy test" unless $ENV{AUTHOR_TESTING} || $ENV{EXTENDED_TESTING};
 
-plan tests => 1 + 2 + 3 + 1;
+plan tests => 1 + 2 + 3 + $no_warnings;
 
 
 use Mac::Finder::Tags;

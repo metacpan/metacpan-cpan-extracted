@@ -11,7 +11,7 @@ If you don't have an accessible hadoop environment, then you can use the
 docker image provided by Cloudera. See the program `docs/bin/launch-cloudera-docker-image.sh`
 inside this distribution.
 
-To be able to test this tookit, you'd need a running Hadoop + Oozie at least.
+To be able to test this toolkit, you'd need a running Hadoop + Oozie at least.
 
 You might also need a local installation of hadoop command line utilities.
 For example, On MacOS, you can use HomeBrew to install it:
@@ -28,21 +28,22 @@ and its libs. See above for the discussion on that.
 
 See the Oozie documentation for all of the details.
 
-https://oozie.apache.org/docs/5.0.0/DG_QuickStart.html#System_Requirements:
+https://oozie.apache.org/docs/5.2.1/DG_QuickStart.html#System_Requirements
 
-Download the later release from the above link. Untar and cd to that folder,
+Download the latest release from the above link. Untar and cd to that folder,
 and then:
 
 ```
     bin/mkdistro.sh -DskipTests -Puber
 ```
 
-this will take some time and there might be some failures, hence the `skipTests`.
+This will take some time and there might be some failures, hence the `skipTests`.
+
 Read the README if you want to resolve them. You should now have a new distro under
 `distro/target`.
 
 `5.3.0` was the tarball created when testing, your version might be different,
-depending on ehen and where you are building from.
+depending on when and where you are building from.
 
 Switch to the distro folder and locate the client tarball and untar.
 

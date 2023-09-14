@@ -207,7 +207,7 @@ This package provides the following methods:
 
 =head2 print
 
-  print(Any @data) (Any)
+  print(any @data) (any)
 
 The print method prints a stringified representation of the underlying data.
 
@@ -249,7 +249,7 @@ I<Since C<0.01>>
 
 =head2 print_json
 
-  print_json(Str | CodeRef $method, Any @args) (Any)
+  print_json(string | coderef $method, any @args) (any)
 
 The print_json method prints a JSON representation of the underlying data. This
 method supports dispatching, i.e. providing a method name and arguments whose
@@ -289,7 +289,7 @@ I<Since C<2.91>>
 
 =head2 print_pretty
 
-  print_pretty(Any @data) (Any)
+  print_pretty(any @data) (any)
 
 The print_pretty method prints a stringified human-readable representation of
 the underlying data.
@@ -337,7 +337,7 @@ I<Since C<0.01>>
 
 =head2 print_string
 
-  print_string(Str | CodeRef $method, Any @args) (Any)
+  print_string(string | coderef $method, any @args) (any)
 
 The print_string method prints a string representation of the underlying data
 without using a dump. This method supports dispatching, i.e. providing a
@@ -365,7 +365,7 @@ I<Since C<0.09>>
 
 =head2 print_yaml
 
-  print_yaml(Str | CodeRef $method, Any @args) (Any)
+  print_yaml(string | coderef $method, any @args) (any)
 
 The print_yaml method prints a YAML representation of the underlying data. This
 method supports dispatching, i.e. providing a method name and arguments whose
@@ -405,7 +405,7 @@ I<Since C<2.91>>
 
 =head2 say
 
-  say(Any @data) (Any)
+  say(any @data) (any)
 
 The say method prints a stringified representation of the underlying data, with
 a trailing newline.
@@ -448,7 +448,7 @@ I<Since C<0.01>>
 
 =head2 say_json
 
-  say_json(Str | CodeRef $method, Any @args) (Any)
+  say_json(string | coderef $method, any @args) (any)
 
 The say_json method prints a JSON representation of the underlying data. This
 method supports dispatching, i.e. providing a method name and arguments whose
@@ -488,7 +488,7 @@ I<Since C<2.91>>
 
 =head2 say_pretty
 
-  say_pretty(Any @data) (Any)
+  say_pretty(any @data) (any)
 
 The say_pretty method prints a stringified human-readable representation of the
 underlying data, with a trailing newline.
@@ -536,7 +536,7 @@ I<Since C<0.01>>
 
 =head2 say_string
 
-  say_string(Str | CodeRef $method, Any @args) (Any)
+  say_string(string | coderef $method, any @args) (any)
 
 The say_string method prints a string representation of the underlying data
 without using a dump, with a trailing newline. This method supports
@@ -565,7 +565,7 @@ I<Since C<0.09>>
 
 =head2 say_yaml
 
-  say_yaml(Str | CodeRef $method, Any @args) (Any)
+  say_yaml(string | coderef $method, any @args) (any)
 
 The say_yaml method prints a YAML representation of the underlying data. This
 method supports dispatching, i.e. providing a method name and arguments whose
@@ -611,7 +611,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

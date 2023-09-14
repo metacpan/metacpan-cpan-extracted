@@ -161,6 +161,7 @@ lib/Test/Mojo.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.bak
 MANIFEST.SKIP
 README.md
 script/hypnotoad
@@ -221,6 +222,7 @@ t/mojo/lib/Mojo/LoaderTest/E/G.txt
 t/mojo/lib/Mojo/LoaderTestException/A.pm
 t/mojo/lib/Mojo/Server/Morbo/Backend/TestBackend.pm
 t/mojo/lib/Mojo/TestConnectProxy.pm
+t/mojo/lib/myapp-module-true.pl
 t/mojo/lib/myapp.pl
 t/mojo/loader.t
 t/mojo/log.t
@@ -344,6 +346,7 @@ t/mojolicious/secret.txt
 t/mojolicious/signatures_lite_app.t
 t/mojolicious/single_file_test_app.conf
 t/mojolicious/static_lite_app.t
+t/mojolicious/static_prefix_lite_app.t
 t/mojolicious/tag_helper_lite_app.t
 t/mojolicious/templates/23.html.epl
 t/mojolicious/templates/dies_too.html.ep

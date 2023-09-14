@@ -130,26 +130,26 @@ DESCRIPTION
     blogger.com videos (StreamFinder::Blogger), brandnewtube.com and
     ugetube.com videos (StreamFinder::BrandNewTube), brighteon.com videos
     (StreamFinder::Brighteon), castbox.fm podcasts (StreamFinder::Castbox),
-    goodpods.com podcasts (StreamFinder::Goodpods), podcasts.google.com
-    podcasts (StreamFinder::Google), iheartradio.com radio stations and
-    podcasts (StreamFinder::IHeartRadio), www.internetradio.com radio
-    stations (StreamFinder::InternetRadio), www.linktv.org videos
-    (StreamFinder::LinkTV), onlineradiobox.com radio stations
-    (StreamFinder::OnlineRadiobox), odysee.com videos
+    podcasts.google.com podcasts (StreamFinder::Google), iheartradio.com
+    radio stations and podcasts (StreamFinder::IHeartRadio),
+    www.internetradio.com radio stations (StreamFinder::InternetRadio),
+    www.linktv.org videos (StreamFinder::LinkTV), onlineradiobox.com radio
+    stations (StreamFinder::OnlineRadiobox), odysee.com videos
     (StreamFinder::Odysee), podbean.com podcasts (StreamFinder::Podbean),
-    podcastaddict.com podcasts (StreamFinder::PodcastAddict), podchaser.com
-    podcasts (StreamFinder::Podchaser), radio.net radio stations
-    (StreamFinder::RadioNet), rcast.net radio stations
+    podcastaddict.com podcasts (StreamFinder::PodcastAddict) (DEPRECIATED),
+    podchaser.com podcasts (StreamFinder::Podchaser), radio.net radio
+    stations (StreamFinder::RadioNet), rcast.net radio stations
     (StreamFinder::Rcast), rumble.com videos (StreamFinder::Rumble),
     sermonaudio.com sermons: audio and video (StreamFinder::SermonAudio),
     soundcloud.com (non-paywalled) songs (StreamFinder::SoundCloud),
-    spreaker.com podcasts (StreamFinder::Spreaker), tunein.com
-    (non-paywalled) radio stations and podcasts (StreamFinder::Tunein),
-    vimeo.com videos (StreamFinder::Vimeo), youtube.com, et. al and other
-    sites that youtube-dl supports (StreamFinder::Youtube), zeno.fm radio
-    stations and podcasts (StreamFinder::Zeno), and StreamFinder::Anystream
-    - search any (other) webpage URL (not supported by any of the other
-    submodules) for streams.
+    spreaker.com podcasts (StreamFinder::Spreaker), subsplash.com podcasts
+    (StreamFinder::Subsplash) (EXPERIMENTAL), tunein.com (non-paywalled)
+    radio stations and podcasts (StreamFinder::Tunein), vimeo.com videos
+    (StreamFinder::Vimeo), youtube.com, et. al and other sites that
+    youtube-dl supports (StreamFinder::Youtube), zeno.fm radio stations and
+    podcasts (StreamFinder::Zeno), and StreamFinder::Anystream - search any
+    (other) webpage URL (not supported by any of the other submodules) for
+    streams.
 
     NOTE: StreamFinder::Podcastaddict is now considered depreciated and may
     be removed in a later StreamFinder release as it now requires a specific
@@ -158,13 +158,12 @@ DESCRIPTION
     longer possible to obtain a playlist or first episode from them via our
     scripts.
 
-    NOTE: StreamFinder::Reciva and StreamFinder::Radionomy have been
-    removed, as those sites have now closed down.
+    NOTE: StreamFinder::Goodpods has been removed, as that site has redone
+    itself in javascript as to no longer be scrapable for streams.
 
     NOTE: For many sites, ie. Youtube, Vimeo, Apple, Spreaker, Castbox,
     Google, etc. the "station" object actually refers to a specific video or
-    podcast, but functions the same way. For some others, it may be a
-    podcast episode.
+    podcast episode, but functions the same way.
 
     Each site is supported by a separate subpackage
     (StreamFinder::*Package*), which is determined and selected based on the

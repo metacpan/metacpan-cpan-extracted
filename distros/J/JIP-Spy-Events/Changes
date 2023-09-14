@@ -1,5 +1,8 @@
 Revision history for JIP-Spy-Events
 
+v0.0.5    2023-09-02
+  - Small changes in distro. (haarg)
+
 v0.0.4    2023-05-26
   - Added called method.
   - Added not_called method.

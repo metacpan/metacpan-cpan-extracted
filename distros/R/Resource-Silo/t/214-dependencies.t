@@ -66,7 +66,7 @@ subtest 'misdependent resource' => sub {
     my $c = My::App->new;
     throws_ok {
         $c->bad
-    } qr/unexpected.*dependency.*'base'/, "resource with bad dependencies won't initialize";
+    } qr('base'.*unexpected.*'bad'), "resource with bad dependencies won't initialize";
     is_deeply \%connect, {}, "base resource want's initialized";
 };
 
@@ -76,7 +76,7 @@ subtest 'misdependent resource (cache)' => sub {
     is_deeply \%connect, {4 => 1}, "base resource was initialized";
     throws_ok {
         $c->bad
-    } qr/unexpected.*dependency.*'base'/, "resource with bad dependencies won't work over cache, too";
+    } qr('base'.*unexpected.*'bad'), "resource with bad dependencies won't work over cache, too";
 };
 
 subtest 'misdependent resource (fresh)' => sub {
@@ -85,7 +85,7 @@ subtest 'misdependent resource (fresh)' => sub {
     is_deeply \%connect, {5 => 1}, "base resource was initialized";
     throws_ok {
         $c->ctl->fresh("bad");
-    } qr/unexpected.*dependency.*'base'/, "nope! not even via fresh()";
+    } qr('base'.*unexpected.*'bad'), "nope! not even via fresh()";
 };
 
 

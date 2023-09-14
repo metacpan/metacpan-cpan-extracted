@@ -1,5 +1,5 @@
 package App::Oozie::Role::NameNode;
-$App::Oozie::Role::NameNode::VERSION = '0.002';
+$App::Oozie::Role::NameNode::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
@@ -10,6 +10,9 @@ use Moo::Role;
 use MooX::Options;
 use Net::Hadoop::YARN::NameNode::JMX;
 use App::Oozie::Types::Common  qw( ArrayRef Str );
+use App::Oozie::Constants qw(
+    DEFAULT_NAMENODE_RPC_PORT
+);
 
 option yarn_namenodes => (
     is       => 'rw',
@@ -32,7 +35,7 @@ has active_namenode => (
 
 has namenode_rpc_port => (
     is      => 'rw',
-    default => sub { 8020 },
+    default => sub { DEFAULT_NAMENODE_RPC_PORT },
 );
 
 1;
@@ -49,7 +52,7 @@ App::Oozie::Role::NameNode
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 

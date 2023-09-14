@@ -15,6 +15,12 @@ WriteMakefile(
        common::sense     => 0,
        Types::Serialiser => 0,
     },
-    CONFIGURE_REQUIRES => { ExtUtils::MakeMaker => 6.52, Canary::Stability => 0 },
+    TEST_REQUIRES    => {
+       Task::Weaken      => 1.06,
+    },
+    CONFIGURE_REQUIRES => {
+       ExtUtils::MakeMaker => 6.64,
+       Canary::Stability   => 0,
+    },
 );
 

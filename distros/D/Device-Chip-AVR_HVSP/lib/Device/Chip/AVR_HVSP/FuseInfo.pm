@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2014-2015 -- leonerd@leonerd.org.uk
 
-package Device::Chip::AVR_HVSP::FuseInfo 0.06;
+package Device::Chip::AVR_HVSP::FuseInfo 0.07;
 
 use v5.26;
 use warnings;

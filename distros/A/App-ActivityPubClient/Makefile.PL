@@ -11,7 +11,7 @@ WriteMakefile(
 	ABSTRACT  => 'CLI-based client / toolbox for ActivityPub Client-to-Server',
 	AUTHOR    => 'Haelwenn (lanodan) Monnier <contact+ap-client@hacktivis.me>',
 	LICENSE   => 'bsd',
-	VERSION   => 'v0.1.3',
+	VERSION   => 'v0.1.4',
 	EXE_FILES =>
 	  [ 'script/ap-fetch', 'script/ap-represent', 'script/ap-backup' ],
 	MAN1PODS => {

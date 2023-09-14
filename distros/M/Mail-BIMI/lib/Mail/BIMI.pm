@@ -1,6 +1,6 @@
 package Mail::BIMI;
 # ABSTRACT: BIMI object
-our $VERSION = '3.20230607'; # VERSION
+our $VERSION = '3.20230913'; # VERSION
 use 5.20.0;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -204,6 +204,8 @@ sub _build_result($self) {
       SVG_VALIDATION_ERROR
       SVG_MISMATCH
       VMC_REQUIRED
+      VMC_NO_EXPERIMENTAL
+      VMC_DISALLOWED_TYPE
     };
     my $found_error = 0;
 
@@ -266,7 +268,7 @@ Mail::BIMI - BIMI object
 
 =head1 VERSION
 
-version 3.20230607
+version 3.20230913
 
 =head1 DESCRIPTION
 

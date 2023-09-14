@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -71,7 +71,7 @@ local *Device::Chip::MAX7219Panel::_write_raw = sub {
    $chip->draw_hline( 5, 25, 4 );
    await $chip->refresh;
 
-   is_deeply( \@DISPLAY,
+   is( \@DISPLAY,
       [ "00000000.00000000.00000000.00000000",
         "00000000.00000000.00000000.00000000",
         "00100000.00000000.00000000.00000000",
@@ -85,7 +85,7 @@ local *Device::Chip::MAX7219Panel::_write_raw = sub {
    $chip->draw_vline( 27, 1, 6 );
    await $chip->refresh;
 
-   is_deeply( \@DISPLAY,
+   is( \@DISPLAY,
       [ "00000000.00000000.00000000.00000000",
         "00000000.00000000.00000000.00010000",
         "00100000.00000000.00000000.00010000",
@@ -108,7 +108,7 @@ local *Device::Chip::MAX7219Panel::_write_raw = sub {
       "X    X" );
    await $chip->refresh;
 
-   is_deeply( \@DISPLAY,
+   is( \@DISPLAY,
       [ "00000000.00000000.00000000.00000000",
         "00000000.00000001.00001000.00010000",
         "00100000.00000001.10011000.00010000",
@@ -126,7 +126,7 @@ $chip->clear;
 $chip->draw_pixel( 1, 1 );
 await $chip->refresh;
 
-is_deeply( \@DISPLAY, 
+is( \@DISPLAY, 
    [ "00000000.00000000.00000000.00000000",
      "00000000.00000000.00000000.00000010",
     ("00000000.00000000.00000000.00000000") x 6 ],
@@ -138,7 +138,7 @@ $chip->clear;
 $chip->draw_pixel( 1, 1 );
 await $chip->refresh;
 
-is_deeply( \@DISPLAY, 
+is( \@DISPLAY, 
    [("00000000.00000000.00000000.00000000") x 6,
      "00000000.00000000.00000000.00000010",
      "00000000.00000000.00000000.00000000" ],

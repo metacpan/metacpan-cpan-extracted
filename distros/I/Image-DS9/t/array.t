@@ -1,36 +1,52 @@
+#! perl
+
+use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0 '!float';
+use Data::Dump 'pp';
 
 use Image::DS9;
 
-unless ( $Image::DS9::use_PDL )
-{
-  plan( skip_all => 'No PDL; skipping' );
-}
-else
-{
-  eval 'use PDL';
-  plan( tests => 2 );
+BEGIN {
+    skip_all 'No PDL; skipping'
+      unless Image::DS9::HAVE_PDL();
 }
 
-require './t/common.pl';
+use PDL;
+
+use Test::Lib;
+use My::Util;
 
 my $ds9 = start_up();
+$ds9->frame( 'deleteall' );
+$ds9->frame( 'new' );
 
-my $x = zeroes(20,20)->rvals;
+my $x = zeroes( 20, 20 )->rvals;
 
-eval {
-  $ds9->array($x);
+subtest 'PDL' => sub {
+    for my $attr ( {}, { new => 1 }, { mask => 1 } ) {
+        ok( lives { $ds9->array( $x, $attr ) }, 'attr: ' . pp( $attr ) )
+          or note_res_error( $ds9 );
+    }
 };
-diag $@ if $@;
-ok( ! $@, "PDL array" );
+
+subtest 'raw' => sub {
+    my $p    = $x->get_dataref;
+    my @dims = $x->dims;
+    for my $attr ( {}, { new => 1 }, { mask => 1 } ) {
+        my %attr = ( xdim => $dims[0], ydim => $dims[1], bitpix => -64, %$attr );
+        ok( lives { $ds9->array( $$p, \%attr ) }, 'attr: ' . pp( \%attr ) )
+          or note_res_error( $ds9 );
+    }
+};
 
 my $p = $x->get_dataref;
 
 my @dims = $x->dims;
-eval {
-  $ds9->array($$p, { xdim => $dims[0], ydim => $dims[1], bitpix => -64 } );
-};
-ok ( ! $@, "raw array" );
+ok( lives { $ds9->array( $$p, { xdim => $dims[0], ydim => $dims[1], bitpix => -64 } ) },
+    'raw array' )
+  or note $@;
+
+done_testing;

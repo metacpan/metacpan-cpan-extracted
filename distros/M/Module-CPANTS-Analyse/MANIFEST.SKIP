@@ -58,3 +58,6 @@
 
 ^tmp/
 ^xt/
+
+^.travis.yml
+^.github/

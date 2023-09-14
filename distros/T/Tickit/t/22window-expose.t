@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Tickit::Test;
 
@@ -38,10 +38,10 @@ $rootwin->bind_event( expose => sub { $root_exposed++ } );
    is( $root_exposed, 1, '$root expose count 1 after $rootwin->expose' );
    is( $win_exposed,  1, '$win expose count 1 after $rootwin->expose' );
 
-   isa_ok( $exposed_rb, "Tickit::RenderBuffer", '$exposed_rb' );
+   isa_ok( $exposed_rb, [ "Tickit::RenderBuffer" ], '$exposed_rb' );
 
-   is_deeply( \@exposed_rects,
-      [ Tickit::Rect->new( top => 0, left => 0, lines => 4, cols => 20 ) ],
+   is( \@exposed_rects,
+      [ rect( top => 0, left => 0, lines => 4, cols => 20 ) ],
       'Exposed regions after $rootwin->expose'
    );
 
@@ -54,8 +54,8 @@ $rootwin->bind_event( expose => sub { $root_exposed++ } );
    is( $root_exposed, 2, '$root expose count 2 after $win->expose' );
    is( $win_exposed, 2, '$win expose count 2 after $win->expose' );
 
-   is_deeply( \@exposed_rects,
-      [ Tickit::Rect->new( top => 0, left => 0, lines => 4, cols => 20 ) ],
+   is( \@exposed_rects,
+      [ rect( top => 0, left => 0, lines => 4, cols => 20 ) ],
       'Exposed regions after $win->expose'
    );
 
@@ -107,9 +107,9 @@ $rootwin->bind_event( expose => sub { $root_exposed++ } );
 
    is( $win_exposed, 7, '$win expose count 7 after expose two regions' );
 
-   is_deeply( \@exposed_rects,
-      [ Tickit::Rect->new( top => 0, left => 0, lines => 1, cols => 20 ),
-        Tickit::Rect->new( top => 2, left => 0, lines => 1, cols => 20 ) ],
+   is( \@exposed_rects,
+      [ rect( top => 0, left => 0, lines => 1, cols => 20 ),
+        rect( top => 2, left => 0, lines => 1, cols => 20 ) ],
       'Exposed regions after expose two regions'
    );
 
@@ -122,8 +122,8 @@ $rootwin->bind_event( expose => sub { $root_exposed++ } );
 
    is( $win_exposed, 8, '$win expose count 8 after expose separate root+win' );
 
-   is_deeply( \@exposed_rects,
-      [ Tickit::Rect->new( top => 0, left => 5, lines => 1, cols => 10 ) ],
+   is( \@exposed_rects,
+      [ rect( top => 0, left => 5, lines => 1, cols => 10 ) ],
       'Exposed regions after expose separate root+win'
    );
 
@@ -133,8 +133,8 @@ $rootwin->bind_event( expose => sub { $root_exposed++ } );
 
    flush_tickit;
 
-   is_deeply( \@exposed_rects,
-      [ Tickit::Rect->new( top => 0, left => 0, lines => 4, cols => 20 ) ],
+   is( \@exposed_rects,
+      [ rect( top => 0, left => 0, lines => 4, cols => 20 ) ],
       'Exposed regions clipped by window extent'
    );
 
@@ -207,8 +207,8 @@ $rootwin->bind_event( expose => sub { $root_exposed++ } );
    flush_tickit;
 
    ok( $exposed, 'New child window is immediately exposed' );
-   is_deeply( \@exposed,
-      [ Tickit::Rect->new( top => 1, left => 4, lines => 3, cols => 6 ) ],
+   is( \@exposed,
+      [ rect( top => 1, left => 4, lines => 3, cols => 6 ) ],
       'exposed areas after child created' );
 
    undef @exposed;
@@ -216,8 +216,8 @@ $rootwin->bind_event( expose => sub { $root_exposed++ } );
    $subwin->close;
    flush_tickit;
 
-   is_deeply( \@exposed,
-      [ Tickit::Rect->new( top => 1, left => 4, lines => 3, cols => 6 ) ],
+   is( \@exposed,
+      [ rect( top => 1, left => 4, lines => 3, cols => 6 ) ],
       'exposed areas after child destroyed' );
 
    $win->unbind_event_id( $bind_id );

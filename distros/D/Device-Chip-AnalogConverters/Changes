@@ -1,5 +1,11 @@
 Revision history for Device-Chip-AnalogConverters
 
+0.15    2023-08-13
+        [CHANGES]
+         * General module style updates:
+            + Updated for Object::Pad v0.800
+            + Swap unit tests to `Test2::V0`
+
 0.14    2022-12-05
          * Updated for Object::Pad v0.73:
             + Use `field NAME = EXPR` syntax

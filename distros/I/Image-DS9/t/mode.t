@@ -1,17 +1,22 @@
+#! perl
+
+use v5.10;
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test2::V0;
 use Image::DS9;
+use Image::DS9::Constants::V1 'MOUSE_BUTTON_MODES';
 
-require './t/common.pl';
+use Test::Lib;
+use My::Util;
 
-my $ds9 = start_up();
-$ds9->file( 'data/m31.fits.gz' );
+my $ds9 = start_up( image => 1 );
 
-my @modes = qw[ none region crosshair colorbar pan zoom rotate catalog examine ];
+test_stuff(
+    $ds9,
+    (
+        mode => [ map { [] => $_ } MOUSE_BUTTON_MODES ],
+    ) );
 
-test_stuff( $ds9, (
-                   mode => [ map { [] => $_ } @modes ],
-                  ) );
-
+done_testing;

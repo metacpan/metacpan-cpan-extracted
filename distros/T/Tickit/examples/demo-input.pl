@@ -5,46 +5,85 @@ use warnings;
 
 use Tickit;
 
-use Tickit::Widget::Static;
-
-use Tickit::Widget::VBox;
-use Tickit::Widget::HBox;
-
-my $vbox = Tickit::Widget::VBox->new( spacing => 1 );
-
-my $keydisplay;
-$vbox->add( Tickit::Widget::Static->new( text => "Key:" ) );
-$vbox->add( $keydisplay = Tickit::Widget::Static->new( text => "" ) );
-
-my $mousedisplay;
-$vbox->add( Tickit::Widget::Static->new( text => "Mouse:" ) );
-$vbox->add( $mousedisplay = Tickit::Widget::Static->new( text => "" ) );
-
 my $tickit = Tickit->new();
+my $rootwin = $tickit->rootwin;
+
+my $keywin = $rootwin->make_sub( 2, 2, 3, $rootwin->cols - 7 );
+my $keyev;
+$keywin->bind_event( expose => sub {
+   my ( $win, undef, $info ) = @_;
+   my $rb = $info->rb;
+
+   $rb->eraserect( $info->rect );
+
+   $rb->goto( 0, 0 );
+   {
+      $rb->savepen;
+      $rb->setpen( Tickit::Pen->new( fg => 3, b => 1 ) );
+      $rb->text( "Key:" );
+      $rb->restore;
+   }
+
+   $keyev or return 1;
+
+   $rb->goto( 2, 2 );
+   $rb->text( sprintf "%s %s ",
+      $keyev->type, $keyev->str );
+   $rb->text( _modstr( $keyev->mod ) );
+
+   return 1;
+} );
+
+my $mousewin = $rootwin->make_sub( 8, 2, 3, $rootwin->cols - 7 );
+my $mouseev;
+$mousewin->bind_event( expose => sub {
+   my ( $win, undef, $info ) = @_;
+   my $rb = $info->rb;
+
+   $rb->eraserect( $info->rect );
+
+   $rb->goto( 0, 0 );
+   {
+      $rb->savepen;
+      $rb->setpen( Tickit::Pen->new( fg => 3, b => 1 ) );
+      $rb->text( "Mouse:" );
+      $rb->restore;
+   }
+
+   $mouseev or return 1;
+
+   $rb->goto( 2, 2 );
+   $rb->text( sprintf "%s button %s at (%d,%d) ",
+      $mouseev->type, $mouseev->button, $mouseev->line, $mouseev->col );
+   $rb->text( _modstr( $mouseev->mod ) );
+
+   return 1;
+} );
 
 sub _modstr
 {
    my ( $mod ) = @_;
-   return join "-", ( $mod & 2 ? "A" : () ), ( $mod & 4 ? "C" : () ), ( $mod & 1 ? "S" : () );
+   $mod or return "";
+
+   return "<" . join( "|",
+      ( $mod & 2 ? "ALT" : () ), ( $mod & 4 ? "CTRL" : () ), ( $mod & 1 ? "SHIFT" : () )
+   ) . ">";
 }
 
-# Mass hackery
-$tickit->term->bind_event( key => sub {
+$rootwin->bind_event( key => sub {
    my ( undef, $ev, $info ) = @_;
-   $keydisplay->set_text( sprintf "%s %s (mod=%s)",
-      $info->type, $info->str, _modstr( $info->mod )
-   );
+   $keyev = $info;
+   $keywin->expose;
    return 1;
 } );
 
-$tickit->term->bind_event( mouse => sub {
+$rootwin->bind_event( mouse => sub {
    my ( undef, $ev, $info ) = @_;
-   $mousedisplay->set_text( sprintf "%s button %s at (%d,%d) (mod=%s)",
-      $info->type, $info->button, $info->line, $info->col, _modstr( $info->mod )
-   );
+   $mouseev = $info;
+   $mousewin->expose;
    return 1;
 } );
 
-$tickit->set_root_widget( $vbox );
+$rootwin->take_focus;
 
 $tickit->run;

@@ -1,5 +1,7 @@
 Changes to Spreadsheet::Edit, Spreadsheet::Edit::IO, and/or Spreadsheet::Edit::Log
 
+1000.006 : Add openlibreoffice_path() and friends to Spreadsheet::Edit::IO
+1000.004 : Add Spreadsheet::Edit::Log :btw=PFX and :btwN=PFX import tags
 1000.003 : Handle symlink issues on Windows
 1000.002 : Data::Dumper::Interp 6.002; test libs; white space fixes.
 1000.001 : Bumped the version to be > 999.999 to fix a $VERSION problem

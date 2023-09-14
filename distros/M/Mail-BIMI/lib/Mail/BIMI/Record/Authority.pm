@@ -1,6 +1,6 @@
 package Mail::BIMI::Record::Authority;
 # ABSTRACT: Class to model a BIMI authority
-our $VERSION = '3.20230607'; # VERSION
+our $VERSION = '3.20230913'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -77,7 +77,7 @@ Mail::BIMI::Record::Authority - Class to model a BIMI authority
 
 =head1 VERSION
 
-version 3.20230607
+version 3.20230913
 
 =head1 DESCRIPTION
 

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.568-3-g7e5ee1ce
+package JSON::Schema::Modern; # git description: v0.569-9-g357987f3
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.569';
+our $VERSION = '0.570';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -91,17 +91,7 @@ has validate_content_schemas => (
   default => sub { ($_[0]->specification_version//'') eq 'draft7' },
 );
 
-has collect_annotations => (
-  is => 'ro',
-  isa => Bool,
-);
-
-has scalarref_booleans => (
-  is => 'ro',
-  isa => Bool,
-);
-
-has strict => (
+has [qw(collect_annotations scalarref_booleans stringy_numbers strict)] => (
   is => 'ro',
   isa => Bool,
 );
@@ -357,7 +347,7 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
       (map {
         my $val = $config_override->{$_} // $self->$_;
         defined $val ? ( $_ => $val ) : ()
-      } qw(validate_formats validate_content_schemas short_circuit collect_annotations scalarref_booleans strict)),
+      } qw(validate_formats validate_content_schemas short_circuit collect_annotations scalarref_booleans stringy_numbers strict)),
     };
 
     if ($state->{validate_formats}) {
@@ -1038,7 +1028,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.569
+version 0.570
 
 =head1 SYNOPSIS
 
@@ -1101,9 +1091,10 @@ Passed to L<JSON::Schema::Modern::Result/output_format>.
 =head2 short_circuit
 
 When true, evaluation will return early in any execution path as soon as the outcome can be
-determined, rather than continuing to find all errors or annotations. Be aware that this can result
-in invalid results in the presence of keywords that depend on annotations, namely
-C<unevaluatedItems> and C<unevaluatedProperties>.
+determined, rather than continuing to find all errors or annotations.
+This option is safe to use in all circumstances, even in the presence of
+C<unevaluatedItems> and C<unevaluatedProperties> keywords: the validation result will not change;
+only some errors will be omitted from the result.
 
 Defaults to true when C<output_format> is C<flag>, and false otherwise.
 
@@ -1144,7 +1135,7 @@ See L</add_media_type> and L</add_encoding> for adding additional type support.
 =for stopwords shhh
 
 Technically only draft7 allows this and drafts 2019-09 and 2020-12 prohibit ever returning the
-subschema evaluation results together with their parent schema's, so shhh. I'm trying to get this
+subschema evaluation results together with their parent schema's results, so shhh. I'm trying to get this
 fixed for the next draft.
 
 =head2 collect_annotations
@@ -1155,8 +1146,58 @@ Defaults to false.
 
 =head2 scalarref_booleans
 
-When true, any type that is expected to be a boolean B<in the instance data> may also be expressed
+When true, any value that is expected to be a boolean B<in the instance data> may also be expressed
 as the scalar references C<\0> or C<\1> (which are serialized as booleans by JSON backends).
+
+Defaults to false.
+
+=head2 stringy_numbers
+
+When true, any value that is expected to be a number or integer B<in the instance data> may also be
+expressed as a string. This does B<not> apply to the C<const> or C<enum> keywords, but only
+the following keywords:
+
+=over 4
+
+=item *
+
+C<type> (where both C<string> and C<number> (and possibly C<integer>) are considered valid
+
+=item *
+
+C<multipleOf>
+
+=item *
+
+C<maximum>
+
+=item *
+
+C<exclusiveMaximum>
+
+=item *
+
+C<minimum>
+
+=item *
+
+C<exclusiveMinimum>
+
+=back
+
+This allows you to write a schema like this (which validates a string representing an integer):
+
+  type: string
+  pattern: ^[0-9]$
+  multipleOf: 4
+  minimum: 16
+  maximum: 256
+
+Such keywords are only applied if the value looks like a number, and do not generate a failure
+otherwise. Values are determined to be numbers via L<perlapi/looks_like_number>.
+This option is only intended to be used for evaluating data from sources that can only be strings,
+such as the extracted value of an HTTP header or query parameter.
+
 Defaults to false.
 
 =head2 strict
@@ -1198,7 +1239,7 @@ or a URI string indicating the location where such a schema is located.
 
 Optionally, a hashref can be passed as a third parameter which allows changing the values of the
 L</short_circuit>, L</collect_annotations>, L</scalarref_booleans>,
-L</strict>, L</validate_formats>, and/or L</validate_content_schemas>
+L</stringy_numbers>, L</strict>, L</validate_formats>, and/or L</validate_content_schemas>
 settings for just this evaluation call.
 
 You can also pass use these keys to alter behaviour (these are generally only used by custom validation
@@ -1256,7 +1297,7 @@ or a URI string indicating the location where such a schema is located.
 
 Optionally, a hashref can be passed as a third parameter which allows changing the values of the
 L</short_circuit>, L</collect_annotations>, L</scalarref_booleans>,
-L</strict>, L</validate_formats>, and/or L</validate_content_schemas>
+L</stringy_numbers>, L</strict>, L</validate_formats>, and/or L</validate_content_schemas>
 settings for just this evaluation call.
 
 You can also pass use these keys to alter behaviour (these are generally only used by custom validation

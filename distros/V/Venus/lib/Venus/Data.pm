@@ -28,11 +28,13 @@ sub build_self {
 sub assertion {
   my ($self) = @_;
 
-  my $assert = $self->SUPER::assertion;
+  my $assertion = $self->SUPER::assertion;
 
-  $assert->clear->expression('string');
+  $assertion->match('string')->format(sub{
+    (ref $self || $self)->new($_)
+  });
 
-  return $assert;
+  return $assertion;
 }
 
 sub count {
@@ -320,7 +322,7 @@ This package provides the following methods:
 
 =head2 count
 
-  count(HashRef $criteria) (Int)
+  count(hashref $criteria) (number)
 
 The count method uses the criteria provided to L</search> for and return the
 number of blocks found.
@@ -355,7 +357,7 @@ I<Since C<0.01>>
 
 =head2 data
 
-  data() (Str)
+  data() (string)
 
 The data method returns the text between the C<DATA> and C<END> sections of a
 Perl package or file.
@@ -378,7 +380,7 @@ I<Since C<0.01>>
 
 =head2 docs
 
-  docs() (Data)
+  docs() (Venus::Data)
 
 The docs method configures the instance for parsing POD blocks.
 
@@ -400,7 +402,7 @@ I<Since C<0.01>>
 
 =head2 find
 
-  find(Maybe[Str] $list, Maybe[Str] $name) (ArrayRef)
+  find(maybe[string] $list, maybe[string] $name) (arrayref)
 
 The find method is a wrapper around L</search> as shorthand for searching by
 C<list> and C<name>.
@@ -534,7 +536,7 @@ This method can return a list of values in list-context.
 
 =head2 string
 
-  string(Maybe[Str] $list, Maybe[Str] $name) (Str)
+  string(maybe[string] $list, maybe[string] $name) (string)
 
 The string method is a wrapper around L</find> as shorthand for searching by
 C<list> and C<name>, returning only the strings found.
@@ -605,7 +607,7 @@ I<Since C<1.67>>
 
 =head2 text
 
-  text() (Data)
+  text() (Venus::Data)
 
 The text method configures the instance for parsing DATA blocks.
 
@@ -633,7 +635,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

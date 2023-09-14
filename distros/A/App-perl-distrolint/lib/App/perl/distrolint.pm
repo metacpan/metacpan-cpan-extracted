@@ -6,7 +6,7 @@
 use v5.36;
 use Object::Pad 0.800;
 
-package App::perl::distrolint 0.02;
+package App::perl::distrolint 0.03;
 class App::perl::distrolint;
 
 use List::Util qw( max );
@@ -58,11 +58,14 @@ my %FORMAT = (
    bullet => { bold => 1, fgindex => $COL{yellow} },
    pass   => { bold => 1, fgindex => $COL{green} },
    fail   => { bold => 1, fgindex => $COL{red} },
+   note   => { fgindex => $COL{yellow} },
    diag   => { italic => 1 },
 );
 
 my $PASS = String::Tagged::Terminal->new_tagged( "PASS", $FORMAT{pass}->%* );
 my $FAIL = String::Tagged::Terminal->new_tagged( "FAIL", $FORMAT{fail}->%* );
+
+field $notecount;
 
 method run ( @argv )
 {
@@ -72,6 +75,7 @@ method run ( @argv )
 
    my $totalcount = 0;
    my $passcount  = 0;
+   $notecount = 0;
 
    foreach my $check ( @checks ) {
       my $name = $check->{name};
@@ -96,9 +100,11 @@ method run ( @argv )
    print  "\n";
    printf "%d of %d checks passed", $passcount, $totalcount;
    printf " (%d FAILed)", $totalcount - $passcount if $passcount < $totalcount;
+   printf " (and %d notes)", $notecount if $notecount;
    print  "\n";
 
    return 1 if $passcount < $totalcount;
+   return 2 if $notecount;
    return 0;
 }
 
@@ -117,12 +123,23 @@ method checks
    return sort { $a->{sort} <=> $b->{sort} } @checks;
 }
 
+method note ( $format, @args )
+{
+   $notecount++;
+   $self->_print_formatted( note => $format, @args );
+}
+
 method diag ( $format, @args )
+{
+   $self->_print_formatted( diag => $format, @args );
+}
+
+method _print_formatted ( $style, $format, @args )
 {
    my $str = String::Tagged::Terminal->from_sprintf( $format, @args );
 
    # TODO: wish for $st->apply_tags()
-   $str->apply_tag( 0, -1, $_, $FORMAT{diag}{$_} ) for keys $FORMAT{diag}->%*;
+   $str->apply_tag( 0, -1, $_, $FORMAT{$style}{$_} ) for keys $FORMAT{$style}->%*;
 
    foreach my $line ( $str->split( qr/\n/ ) ) {
       ( "    > " . $line )->say_to_terminal;

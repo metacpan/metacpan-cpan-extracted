@@ -7,9 +7,17 @@ use AnyEvent::Pcap::Utils;
 use Net::Pcap;
 use base qw(Class::Accessor::Fast);
 
-our $VERSION = '0.00002';
+our $VERSION = '0.00004';
 
-__PACKAGE__->mk_accessors($_) for qw(utils device filter packet_handler fd);
+__PACKAGE__->mk_accessors($_) for qw(utils device filter packet_handler fd timeout);
+
+# be compatible with old versions of Net::Pcap
+if ($Net::Pcap::VERSION < 0.15) {
+    *Net::Pcap::pcap_lookupdev      = \&Net::Pcap::lookupdev;
+    *Net::Pcap::pcap_open_live      = \&Net::Pcap::open_live;
+    *Net::Pcap::pcap_open_offline   = \&Net::Pcap::open_offline;
+    *Net::Pcap::pcap_file           = \&Net::Pcap::file;
+}
 
 sub new {
     my $class = shift;
@@ -28,12 +36,31 @@ sub _setup_pcap {
       ->();
     croak $err if $err;
 
-    my $pcap = Net::Pcap::pcap_open_live( $device, 1024, 1, 0, \$err );
-    croak $err if $err;
+    my $pcap;
+    my $timeout = $self->timeout || 0;
+    my $netmask = 0;
 
-    my ( $address, $netmask );
-    Net::Pcap::lookupnet( $device, \$address, \$netmask, \$err );
-    croak $err if $err;
+    if ($device =~ s/^file://) {
+        # open the file
+        $pcap = Net::Pcap::pcap_open_offline( $device, \$err );
+        croak $err if $err;
+
+        # get its file descriptor
+        my $fd = Net::Pcap::pcap_file($pcap);
+        $self->fd($fd);
+    } else {
+        # open the device
+        $pcap = Net::Pcap::pcap_open_live( $device, 1024, 1, $timeout, \$err );
+        croak $err if $err;
+
+        # get its file descriptor
+        my $fd = Net::Pcap::fileno($pcap);
+        $self->fd($fd);
+
+        # get the associated network mask
+        Net::Pcap::lookupnet( $device, \my $address, \$netmask, \$err );
+        croak $err if $err;
+    }
 
     my $filter;
     my $filter_string = $self->filter || sub {
@@ -44,8 +71,6 @@ sub _setup_pcap {
     Net::Pcap::compile( $pcap, \$filter, $filter_string, 0, $netmask );
     Net::Pcap::setfilter( $pcap, $filter );
 
-    my $fd = Net::Pcap::fileno($pcap);
-    $self->fd($fd);
     return $pcap;
 }
 
@@ -94,17 +119,21 @@ AnyEvent::Pcap - Net::Pcap wrapper with AnyEvent
   $a_pcap = AnyEvent::Pcap->new(
       device         => "eth0",
       filter         => "tcp port 80",
+      timeout        => 1000,
       packet_handler => sub {
-          my $header = shift;
-          my $packet = shift;
+          my $io     = pop;
+          while (@_) {
+              my $header = shift;
+              my $packet = shift;
   
-          # you can use utils to get an NetPacket::TCP object.
-          my $tcp = $a_pcap->utils->extract_tcp_packet($packet);
+              # you can use utils to get an NetPacket::TCP object.
+              my $tcp = $a_pcap->utils->extract_tcp_packet($packet);
 
-          # or ...
-          $tcp = AnyEvent::Pcap::Utils->extract_tcp_packet($packet); 
+              # or ...
+              $tcp = AnyEvent::Pcap::Utils->extract_tcp_packet($packet); 
 
-          # do something....
+              # do something....
+          }
       }
   );
   
@@ -129,12 +158,22 @@ Also you can use its utils to get NetPacket::IP or NetPacket::TCP object.
   
       # It will be filled up Net::Pcap::pcap_lookupdev() by default
       device => "eth0",
+
+      # It also could be "file:/path/to/file" to load from a saved dump
+      device => "samples/ping-ietf-20pk-le.dmp",
   
       # Default is NULL
       filter => "tcp port 80",
   
+      # How much time to wait before flushing pcap buffer
+      # Default is 0 (unlimited)
+      timeout => 1000,
+  
       # set your coderef
       packet_handler => sub {
+          my $io     = pop;
+
+          # get first pair....
           my $header = shift;
           my $packet = shift;
   
@@ -174,11 +213,19 @@ Running AnyEvent loop.
 
 =item packet_handler(I<[CODEREF]>)
 
+=item timeout(I<[INTEGER]>)
+
 =back
 
 =head1 AUTHOR
 
 Takeshi Miki E<lt>miki@cpan.orgE<gt>
+
+=head1 CONTRIBUTORS
+
+Sébastien Aperghis-Tramoni C<< <sebastien at aperghis.net> >>
+
+Sergei Zhmylev E<lt>zhmylove@cpan.orgE<gt>
 
 =head1 LICENSE
 

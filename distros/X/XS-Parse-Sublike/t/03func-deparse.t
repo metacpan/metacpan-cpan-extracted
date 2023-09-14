@@ -14,6 +14,8 @@ no warnings 'experimental';
 use lib "t";
 use testcase "t::func";
 
+BEGIN { $^H{"t::func/func"}++ }
+
 use B::Deparse;
 
 my $deparser = B::Deparse->new();

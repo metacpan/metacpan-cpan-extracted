@@ -1,5 +1,17 @@
 Revision history for Dist-Zilla-Plugin-CoalescePod
 
+1.0.0 2023-09-13
+ [API CHANGES]
+ - POD files without an associated .pm file are now left alone. 
+   [#5](https://github.com/yanick/Dist-Zilla-Plugin-CoalescePod/pull/5),
+
+ [STATISTICS]
+ - code churn: 6 files changed, 20 insertions(+), 9 deletions(-)
+
+0.3.1 2023-09-13
+ [STATISTICS]
+ - code churn: 5 files changed, 112 insertions(+), 50 deletions(-)
+
 0.3.0 2021-01-18
  [ENHANCEMENTS]
  - Cache pod files in attribute.

@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -21,7 +21,7 @@ await $chip->mount(
    $adapter->expect_write_then_read( "\xF2", 4 )
       ->will_done( "\x00\x00\x00\x00" );
 
-   is_deeply( await $chip->read_config,
+   is( await $chip->read_config,
       {
          FILTER   => "OFF",
          MODE     => "SLEEP",
@@ -52,7 +52,7 @@ await $chip->mount(
    );
 
    # subsequent read does not talk to chip a second time but yields new values
-   is_deeply( await $chip->read_config,
+   is( await $chip->read_config,
       {
          FILTER   => "OFF",
          MODE     => "SLEEP",

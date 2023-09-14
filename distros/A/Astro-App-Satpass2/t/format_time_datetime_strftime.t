@@ -21,6 +21,7 @@ BEGIN {
 }
 
 use constant DATE_TIME_FORMAT => '%Y/%m/%d %H:%M:%S';
+use constant ISO_FORMAT	=> '%Y-%m-%dT%H:%M:%S.%6N';
 
 klass( 'Astro::App::Satpass2::FormatTime::DateTime::Strftime' );
 
@@ -38,6 +39,12 @@ call_m( format_datetime => DATE_TIME_FORMAT, $time,
 call_m( format_datetime_width => DATE_TIME_FORMAT, 19,
     'Compute width required for format' );
 
+call_m( round_time => undef, TRUE, 'Do not round time' );
+
+call_m( format_datetime => ISO_FORMAT, $time + .25,
+    '2011-04-01T00:00:50.250000', 'ISO time with microseconds' );
+
+call_m( round_time => 1, TRUE, 'Round time to nearest second' );
 call_m( gmt => 0, TRUE, 'Turn off gmt' );
 
 call_m( format_datetime => DATE_TIME_FORMAT, $time, 1,

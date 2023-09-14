@@ -1,9 +1,8 @@
 #!/usr/bin/perl
 
-use utf8;
-
 use v5.26;
 use warnings;
+use utf8;
 
 use Device::Chip::BNO055;
 use Device::Chip::Adapter;

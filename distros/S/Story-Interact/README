@@ -71,17 +71,17 @@ DESCRIPTION
     name, grid co-ordinates, etc. Multiple pages may be written for the same
     location.
 
-    The `abstract( $string )` function defines a title or concise summary for
+    The abstract( $string ) function defines a title or concise summary for
     the page. It is not intended to be displayed to the reader, but may be
     useful for the writer as a quick reminder of the purpose of the page.
 
-    The `todo( $bool )` function indicates whether a page still needs writing.
+    The todo( $bool ) function indicates whether a page still needs writing.
     Again, it is not intended to be displayed to the reader, but may be useful
     for the writer.
 
     The `location` function returns a hashref associated with this location.
-    This can be used to store state for this location. You can use `location(
-    $string )` to access another location's hashref; the string match must be
+    This can be used to store state for this location. You can use location(
+    $string ) to access another location's hashref; the string match must be
     exact.
 
     The `world` function returns a hashref for storing story-wide state.
@@ -91,8 +91,8 @@ DESCRIPTION
     character state, including what things the player knows, items the player
     carries, and tasks the player has achieved.
 
-    The `npc( $id )` command returns a Story::Interactive::Character object
-    for a non-player character, if such a character has been defined.
+    The npc( $id ) command returns a Story::Interactive::Character object for
+    a non-player character, if such a character has been defined.
 
     The `define_npc( $id, %data )` function defines a new NPC. If an NPC
     already exists with that identifier, it does nothing. If the player
@@ -105,8 +105,8 @@ DESCRIPTION
 
     The `true` and `false` functions are just to make your code more readable.
 
-    The `random( $arrayref )` function returns a random value from the
-    arrayref, which can be useful for adding some randomness to stories.
+    The random( $arrayref ) function returns a random value from the arrayref,
+    which can be useful for adding some randomness to stories.
 
     The `match( $a, $b )` function is re-exported from match::simple.
 

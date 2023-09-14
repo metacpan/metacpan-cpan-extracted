@@ -1,5 +1,8 @@
 Revision history for Acme::Glue
 
+2023.10
+    - Delorean setup options, thanks to NERDVANA
+
 2023.08
     - soundex "joke" snippet, thanks to MIKESTOK
 
@@ -11,7 +14,7 @@ Revision history for Acme::Glue
 
 2022.05
     - snippet from "How Perl Saved the Human Genome Project"
-	- complete with syntax error :)
+    - complete with syntax error :)
 
 2022.04
     - vec/pack examples from perldoc vec

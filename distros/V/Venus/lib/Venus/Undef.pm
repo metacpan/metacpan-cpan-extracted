@@ -26,11 +26,13 @@ sub build_self {
 sub assertion {
   my ($self) = @_;
 
-  my $assert = $self->SUPER::assertion;
+  my $assertion = $self->SUPER::assertion;
 
-  $assert->clear->expression('undef');
+  $assertion->match('undef')->format(sub{
+    (ref $self || $self)->new
+  });
 
-  return $assert;
+  return $assertion;
 }
 
 sub comparer {
@@ -106,7 +108,7 @@ This package provides the following methods:
 
 =head2 cast
 
-  cast(Str $kind) (Object | Undef)
+  cast(string $kind) (object | undef)
 
 The cast method converts L<"value"|Venus::Kind::Value> objects between
 different I<"value"> object types, based on the name of the type provided. This
@@ -278,7 +280,7 @@ I<Since C<0.08>>
 
 =head2 default
 
-  default() (Undef)
+  default() (undef)
 
 The default method returns the default value, i.e. C<undef>.
 
@@ -300,7 +302,7 @@ I<Since C<0.01>>
 
 =head2 eq
 
-  eq(Any $arg) (Bool)
+  eq(any $arg) (boolean)
 
 The eq method performs an I<"equals"> operation using the argument provided.
 
@@ -471,7 +473,7 @@ I<Since C<0.08>>
 
 =head2 ge
 
-  ge(Any $arg) (Bool)
+  ge(any $arg) (boolean)
 
 The ge method performs a I<"greater-than-or-equal-to"> operation using the
 argument provided.
@@ -643,7 +645,7 @@ I<Since C<0.08>>
 
 =head2 gele
 
-  gele(Any $arg1, Any $arg2) (Bool)
+  gele(any $arg1, any $arg2) (boolean)
 
 The gele method performs a I<"greater-than-or-equal-to"> operation on the 1st
 argument, and I<"lesser-than-or-equal-to"> operation on the 2nd argument.
@@ -815,7 +817,7 @@ I<Since C<0.08>>
 
 =head2 gt
 
-  gt(Any $arg) (Bool)
+  gt(any $arg) (boolean)
 
 The gt method performs a I<"greater-than"> operation using the argument provided.
 
@@ -986,7 +988,7 @@ I<Since C<0.08>>
 
 =head2 gtlt
 
-  gtlt(Any $arg1, Any $arg2) (Bool)
+  gtlt(any $arg1, any $arg2) (boolean)
 
 The gtlt method performs a I<"greater-than"> operation on the 1st argument, and
 I<"lesser-than"> operation on the 2nd argument.
@@ -1158,7 +1160,7 @@ I<Since C<0.08>>
 
 =head2 le
 
-  le(Any $arg) (Bool)
+  le(any $arg) (boolean)
 
 The le method performs a I<"lesser-than-or-equal-to"> operation using the
 argument provided.
@@ -1330,7 +1332,7 @@ I<Since C<0.08>>
 
 =head2 lt
 
-  lt(Any $arg) (Bool)
+  lt(any $arg) (boolean)
 
 The lt method performs a I<"lesser-than"> operation using the argument provided.
 
@@ -1501,7 +1503,7 @@ I<Since C<0.08>>
 
 =head2 ne
 
-  ne(Any $arg) (Bool)
+  ne(any $arg) (boolean)
 
 The ne method performs a I<"not-equal-to"> operation using the argument provided.
 
@@ -1672,7 +1674,7 @@ I<Since C<0.08>>
 
 =head2 numified
 
-  numified() (Int)
+  numified() (number)
 
 The numified method returns the numerical representation of the object. For
 undef objects this method returns C<0>.
@@ -1695,7 +1697,7 @@ I<Since C<0.08>>
 
 =head2 stringified
 
-  stringified() (Str)
+  stringified() (string)
 
 The stringified method always method returns C<''>.
 
@@ -1717,7 +1719,7 @@ I<Since C<0.08>>
 
 =head2 tv
 
-  tv(Any $arg) (Bool)
+  tv(any $arg) (boolean)
 
 The tv method performs a I<"type-and-value-equal-to"> operation using argument
 provided.
@@ -1895,7 +1897,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

@@ -118,15 +118,16 @@ enum
   // possibly future enhancements: (generic) float, (generic) string
 };
 
-#define F_SHRINK          0x00000001UL
-#define F_ALLOW_UNKNOWN   0x00000002UL
-#define F_ALLOW_SHARING   0x00000004UL
-#define F_ALLOW_CYCLES    0x00000008UL
-#define F_FORBID_OBJECTS  0x00000010UL
-#define F_PACK_STRINGS    0x00000020UL
-#define F_TEXT_KEYS       0x00000040UL
-#define F_TEXT_STRINGS    0x00000080UL
-#define F_VALIDATE_UTF8   0x00000100UL
+#define F_SHRINK            0x00000001UL
+#define F_ALLOW_UNKNOWN     0x00000002UL
+#define F_ALLOW_SHARING     0x00000004UL
+#define F_ALLOW_CYCLES      0x00000008UL
+#define F_ALLOW_WEAK_CYCLES 0x00000010UL
+#define F_FORBID_OBJECTS    0x00000020UL
+#define F_PACK_STRINGS      0x00000040UL
+#define F_TEXT_KEYS         0x00000080UL
+#define F_TEXT_STRINGS      0x00000100UL
+#define F_VALIDATE_UTF8     0x00000200UL
 
 #define INIT_SIZE   32 // initial scalar size to be allocated
 
@@ -1196,21 +1197,38 @@ decode_tagged (dec_t *dec)
           if (ecb_expect_false (!dec->shareable))
             dec->shareable = (AV *)sv_2mortal ((SV *)newAV ());
 
-          if (dec->cbor.flags & F_ALLOW_CYCLES)
+          if (ecb_expect_false (dec->cbor.flags & (F_ALLOW_CYCLES | F_ALLOW_WEAK_CYCLES)))
             {
-              sv = newSV (0);
-              av_push (dec->shareable, SvREFCNT_inc_NN (sv));
+              // if cycles are allowed, then we store an AV as value
+              // while it is being decoded, and gather unresolved
+              // references in it, to be re4solved after decoding.
+              int idx, i;
+              AV *av = newAV ();
+              av_push (dec->shareable, (SV *)av);
+              idx = AvFILLp (dec->shareable);
 
-              SV *osv = decode_sv (dec);
-              sv_setsv (sv, osv);
-              SvREFCNT_dec_NN (osv);
+              sv = decode_sv (dec);
+
+              // the AV now contains \undef for all unresolved references,
+              // so we fix them up here.
+              for (i = 0; i <= AvFILLp (av); ++i)
+                SvRV_set (AvARRAY (av)[i], SvREFCNT_inc_NN (SvRV (sv)));
+
+              // weaken all recursive references
+              if (dec->cbor.flags & F_ALLOW_WEAK_CYCLES)
+                for (i = 0; i <= AvFILLp (av); ++i)
+                  sv_rvweaken (AvARRAY (av)[i]);
+
+              // now replace the AV by a reference to the completed value
+              SvREFCNT_dec_NN ((SV *)av);
+              AvARRAY (dec->shareable)[idx] = SvREFCNT_inc_NN (sv);
             }
           else
             {
               av_push (dec->shareable, &PL_sv_undef);
               int idx = AvFILLp (dec->shareable);
               sv = decode_sv (dec);
-              av_store (dec->shareable, idx, SvREFCNT_inc_NN (sv));
+              AvARRAY (dec->shareable)[idx] = SvREFCNT_inc_NN (sv);
             }
         }
         break;
@@ -1225,10 +1243,20 @@ decode_tagged (dec_t *dec)
           if (!dec->shareable || idx >= (UV)(1 + AvFILLp (dec->shareable)))
             ERR ("corrupted CBOR data (sharedref index out of bounds)");
 
-          sv = SvREFCNT_inc_NN (AvARRAY (dec->shareable)[idx]);
+          sv = AvARRAY (dec->shareable)[idx];
 
-          if (sv == &PL_sv_undef)
+          // reference to cycle, we create a new \undef and use that, and also
+          // registerr it in the AV for later fixing
+          if (ecb_expect_false (SvTYPE (sv) == SVt_PVAV))
+            {
+              AV *av = (AV *)sv;
+              sv = newRV_noinc (&PL_sv_undef);
+              av_push (av, SvREFCNT_inc_NN (sv));
+            }
+          else if (ecb_expect_false (sv == &PL_sv_undef)) // not yet decoded, but cycles not allowed
             ERR ("cyclic CBOR data structure found, but allow_cycles is not enabled");
+          else // we decoded the object earlier, no cycle
+            sv = newSVsv (sv);
         }
         break;
 
@@ -1656,15 +1684,16 @@ void new (char *klass)
 
 void shrink (CBOR *self, int enable = 1)
 	ALIAS:
-        shrink          = F_SHRINK
-        allow_unknown   = F_ALLOW_UNKNOWN
-        allow_sharing   = F_ALLOW_SHARING
-        allow_cycles    = F_ALLOW_CYCLES
-        forbid_objects  = F_FORBID_OBJECTS
-        pack_strings    = F_PACK_STRINGS
-        text_keys       = F_TEXT_KEYS
-        text_strings    = F_TEXT_STRINGS
-        validate_utf8   = F_VALIDATE_UTF8
+        shrink            = F_SHRINK
+        allow_unknown     = F_ALLOW_UNKNOWN
+        allow_sharing     = F_ALLOW_SHARING
+        allow_cycles      = F_ALLOW_CYCLES
+        allow_weak_cycles = F_ALLOW_WEAK_CYCLES
+        forbid_objects    = F_FORBID_OBJECTS
+        pack_strings      = F_PACK_STRINGS
+        text_keys         = F_TEXT_KEYS
+        text_strings      = F_TEXT_STRINGS
+        validate_utf8     = F_VALIDATE_UTF8
 	PPCODE:
 {
         if (enable)
@@ -1677,15 +1706,16 @@ void shrink (CBOR *self, int enable = 1)
 
 void get_shrink (CBOR *self)
 	ALIAS:
-        get_shrink          = F_SHRINK
-        get_allow_unknown   = F_ALLOW_UNKNOWN
-        get_allow_sharing   = F_ALLOW_SHARING
-        get_allow_cycles    = F_ALLOW_CYCLES
-        get_forbid_objects  = F_FORBID_OBJECTS
-        get_pack_strings    = F_PACK_STRINGS
-        get_text_keys       = F_TEXT_KEYS
-        get_text_strings    = F_TEXT_STRINGS
-        get_validate_utf8   = F_VALIDATE_UTF8
+        get_shrink            = F_SHRINK
+        get_allow_unknown     = F_ALLOW_UNKNOWN
+        get_allow_sharing     = F_ALLOW_SHARING
+        get_allow_cycles      = F_ALLOW_CYCLES
+        get_allow_weak_cycles = F_ALLOW_WEAK_CYCLES
+        get_forbid_objects    = F_FORBID_OBJECTS
+        get_pack_strings      = F_PACK_STRINGS
+        get_text_keys         = F_TEXT_KEYS
+        get_text_strings      = F_TEXT_STRINGS
+        get_validate_utf8     = F_VALIDATE_UTF8
 	PPCODE:
         XPUSHs (boolSV (self->flags & ix));
 

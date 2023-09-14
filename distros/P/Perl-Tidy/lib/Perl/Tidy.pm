@@ -65,7 +65,6 @@ use Carp;
 use English     qw( -no_match_vars );
 use Digest::MD5 qw(md5_hex);
 use Perl::Tidy::Debugger;
-use Perl::Tidy::DevNull;
 use Perl::Tidy::Diagnostics;
 use Perl::Tidy::FileWriter;
 use Perl::Tidy::Formatter;
@@ -73,8 +72,6 @@ use Perl::Tidy::HtmlWriter;
 use Perl::Tidy::IOScalar;
 use Perl::Tidy::IOScalarArray;
 use Perl::Tidy::IndentationItem;
-use Perl::Tidy::LineSink;
-use Perl::Tidy::LineSource;
 use Perl::Tidy::Logger;
 use Perl::Tidy::Tokenizer;
 use Perl::Tidy::VerticalAligner;
@@ -114,7 +111,7 @@ BEGIN {
     # then the Release version must be bumped, and it is probably past time for
     # a release anyway.
 
-    $VERSION = '20230701';
+    $VERSION = '20230912';
 } ## end BEGIN
 
 sub DESTROY {
@@ -130,7 +127,7 @@ sub AUTOLOAD {
     our $AUTOLOAD;
     return if ( $AUTOLOAD =~ /\bDESTROY$/ );
     my ( $pkg, $fname, $lno ) = caller();
-    print STDERR <<EOM;
+    print {*STDERR} <<EOM;
 ======================================================================
 Unexpected call to Autoload looking for sub $AUTOLOAD
 Called from package: '$pkg'  
@@ -167,6 +164,8 @@ sub streamhandle {
 
     # Case 2. Not given, or an empty string: unencoded binary data is being
     # transferred, set binary mode for files and for stdin.
+
+    # NOTE: sub slurp_stream is now preferred for reading.
 
     my ( $filename, $mode, $is_encoded_data ) = @_;
 
@@ -241,7 +240,7 @@ EOM
     $fh = $New->( $filename, $mode );
     if ( !$fh ) {
 
-        Warn("Couldn't open file:$filename in mode:$mode : $ERRNO\n");
+        Warn("Couldn't open file:$filename in mode:$mode : $OS_ERROR\n");
 
     }
     else {
@@ -272,46 +271,79 @@ EOM
     return $fh, ( $ref or $filename );
 } ## end sub streamhandle
 
-sub find_input_line_ending {
+sub slurp_stream {
 
-    # Peek at a file and return first line ending character.
-    # Return undefined value in case of any trouble.
-    my ($input_file) = @_;
-    my $ending;
+    my ($filename) = @_;
 
-    # silently ignore input from object or stdin
-    if ( ref($input_file) || $input_file eq '-' ) {
-        return $ending;
+    # Read the text in $filename and
+    # return:
+    #    undef if read error, or
+    #    $rinput_string = ref to string of text
+
+    # if $filename is:     Read
+    # ----------------     -----------------
+    # ARRAY  ref           array ref
+    # SCALAR ref           string ref
+    # object ref           object with 'getline' method (exit if no 'getline')
+    # '-'                  STDIN
+    # string               file named $filename
+
+    # Note that any decoding from utf8 must be done by the caller
+
+    my $ref = ref($filename);
+    my $rinput_string;
+
+    # handle a reference
+    if ($ref) {
+        if ( $ref eq 'ARRAY' ) {
+            my $buf = join EMPTY_STRING, @{$filename};
+            $rinput_string = \$buf;
+        }
+        elsif ( $ref eq 'SCALAR' ) {
+            $rinput_string = $filename;
+        }
+        else {
+            if ( $ref->can('getline') ) {
+                my $buf = EMPTY_STRING;
+                while ( defined( my $line = $filename->getline() ) ) {
+                    $buf .= $line;
+                }
+                $rinput_string = \$buf;
+            }
+            else {
+                confess <<EOM;
+------------------------------------------------------------------------
+No 'getline' method is defined for object of class '$ref'
+Please check your call to Perl::Tidy::perltidy.  Trace follows.
+------------------------------------------------------------------------
+EOM
+            }
+        }
     }
 
-    my $fh;
-    open( $fh, '<', $input_file ) || return $ending;
-
-    binmode $fh;
-    my $buf;
-    read( $fh, $buf, 1024 );
-    close $fh || return $ending;
-    if ( $buf && $buf =~ /([\012\015]+)/ ) {
-        my $test = $1;
-
-        # dos
-        if ( $test =~ /^(\015\012)+$/ ) { $ending = "\015\012" }
-
-        # mac
-        elsif ( $test =~ /^\015+$/ ) { $ending = "\015" }
-
-        # unix
-        elsif ( $test =~ /^\012+$/ ) { $ending = "\012" }
-
-        # unknown
-        else { }
+    # handle a string
+    else {
+        if ( $filename eq '-' ) {
+            local $INPUT_RECORD_SEPARATOR = undef;
+            my $buf = <>;
+            $rinput_string = \$buf;
+        }
+        else {
+            if ( open( my $fh, '<', $filename ) ) {
+                local $INPUT_RECORD_SEPARATOR = undef;
+                my $buf = <$fh>;
+                $fh->close() or Warn("Cannot close $filename\n");
+                $rinput_string = \$buf;
+            }
+            else {
+                Warn("Cannot open $filename: $OS_ERROR\n");
+                return;
+            }
+        }
     }
 
-    # no ending seen
-    else { }
-
-    return $ending;
-} ## end sub find_input_line_ending
+    return $rinput_string;
+} ## end sub slurp_stream
 
 {    ## begin closure for sub catfile
 
@@ -329,7 +361,7 @@ sub find_input_line_ending {
         my @parts = @_;
 
         # use File::Spec if we can
-        unless ($missing_file_spec) {
+        if ( !$missing_file_spec ) {
             return File::Spec->catfile(@parts);
         }
 
@@ -354,7 +386,7 @@ sub find_input_line_ending {
 # Here is a map of the flow of data from the input source to the output
 # line sink:
 #
-# LineSource-->Tokenizer-->Formatter-->VerticalAligner-->FileWriter-->
+#             -->Tokenizer-->Formatter-->VerticalAligner-->FileWriter-->
 #       input                         groups                 output
 #       lines   tokens      lines       of          lines    lines
 #                                      lines
@@ -362,8 +394,6 @@ sub find_input_line_ending {
 # The names correspond to the package names responsible for the unit processes.
 #
 # The overall process is controlled by the "main" package.
-#
-# LineSource is the stream of input lines
 #
 # Tokenizer analyzes a line and breaks it into tokens, peeking ahead
 # if necessary.  A token is any section of the input line which should be
@@ -459,13 +489,14 @@ BEGIN {
         _length_function_          => $i++,
         _line_separator_default_   => $i++,
         _line_separator_           => $i++,
+        _line_tidy_begin_          => $i++,
+        _line_tidy_end_            => $i++,
         _logger_object_            => $i++,
         _output_file_              => $i++,
         _postfilter_               => $i++,
         _prefilter_                => $i++,
         _rOpts_                    => $i++,
         _saw_pbp_                  => $i++,
-        _tabsize_                  => $i++,
         _teefile_stream_           => $i++,
         _user_formatter_           => $i++,
         _input_copied_verbatim_    => $i++,
@@ -585,7 +616,7 @@ EOM
         my ($key) = @_;
         my $hash_ref = $input_hash{$key};
         if ( defined($hash_ref) ) {
-            unless ( ref($hash_ref) eq 'HASH' ) {
+            if ( ref($hash_ref) ne 'HASH' ) {
                 my $what = ref($hash_ref);
                 my $but_is =
                   $what ? "but is ref to $what" : "but is not a reference";
@@ -687,7 +718,7 @@ EOM
 
     # validate dump_options_type
     if ( defined($dump_options) ) {
-        unless ( defined($dump_options_type) ) {
+        if ( !defined($dump_options_type) ) {
             $dump_options_type = 'perltidyrc';
         }
         if (   $dump_options_type ne 'perltidyrc'
@@ -711,7 +742,7 @@ EOM
 
         # if the user defines a formatter, there is no output stream,
         # but we need a null stream to keep coding simple
-        $destination_stream = Perl::Tidy::DevNull->new();
+        $destination_stream = \my $tmp;
     }
 
     # see if ARGV is overridden
@@ -845,7 +876,7 @@ EOM
 
     # dump from command line
     if ( $rOpts->{'dump-options'} ) {
-        print STDOUT $readable_options;
+        print {*STDOUT} $readable_options;
         Exit(0);
     }
 
@@ -853,17 +884,18 @@ EOM
     # This is a safety precaution in case a user accidentally adds -dbs to the
     # command line parameters and is expecting formatted output to stdout.
     # Another precaution, added elsewhere, is to  ignore -dbs in a .perltidyrc
-    my $numf = @Arg_files;
-    if ( $rOpts->{'dump-block-summary'} && $numf != 1 ) {
+    my $num_files = @Arg_files;
+    if ( $rOpts->{'dump-block-summary'} && $num_files != 1 ) {
         Die(<<EOM);
---dump-block-summary expects 1 filename in the arg list but saw $numf filenames
+--dump-block-summary expects 1 filename in the arg list but saw $num_files filenames
 EOM
     }
 
     #----------------------------------------
     # check parameters and their interactions
     #----------------------------------------
-    $self->check_options( $is_Windows, $Windows_type, $rpending_complaint );
+    $self->check_options( $is_Windows, $Windows_type, $rpending_complaint,
+        $num_files );
 
     if ($user_formatter) {
         $rOpts->{'format'} = 'user';
@@ -882,7 +914,7 @@ EOM
       $rOpts->{'encode-output-strings'} ? 'eos' : 'neos';
 
     # be sure we have a valid output format
-    unless ( exists $default_file_extension{ $rOpts->{'format'} } ) {
+    if ( !exists $default_file_extension{ $rOpts->{'format'} } ) {
         my $formats = join SPACE,
           sort map { "'" . $_ . "'" } keys %default_file_extension;
         my $fmt = $rOpts->{'format'};
@@ -1136,21 +1168,22 @@ sub check_in_place_modify {
 
 sub backup_method_copy {
 
-    my ( $self, $input_file, $output_file, $backup_extension, $delete_backup )
+    my ( $self, $input_file, $routput_string, $backup_extension,
+        $delete_backup )
       = @_;
 
     # Handle the -b (--backup-and-modify-in-place) option with -bm='copy':
     # - First copy $input file to $backup_name.
-    # - Then open input file and rewrite with contents of $output_file
+    # - Then open input file and rewrite with contents of $routput_string
     # - Then delete the backup if requested
 
     # NOTES:
     # - Die immediately on any error.
-    # - $output_file is actually an ARRAY ref
+    # - $routput_string is a SCALAR ref
 
     my $backup_file = $input_file . $backup_extension;
 
-    unless ( -f $input_file ) {
+    if ( !-f $input_file ) {
 
         # no real file to backup ..
         # This shouldn't happen because of numerous preliminary checks
@@ -1162,13 +1195,13 @@ sub backup_method_copy {
     if ( -f $backup_file ) {
         unlink($backup_file)
           or Die(
-"unable to remove previous '$backup_file' for -b option; check permissions: $ERRNO\n"
+"unable to remove previous '$backup_file' for -b option; check permissions: $OS_ERROR\n"
           );
     }
 
     # Copy input file to backup
     File::Copy::copy( $input_file, $backup_file )
-      or Die("File::Copy failed trying to backup source: $ERRNO");
+      or Die("File::Copy failed trying to backup source: $OS_ERROR");
 
     # set permissions of the backup file to match the input file
     my @input_file_stat = stat($input_file);
@@ -1187,7 +1220,7 @@ sub backup_method_copy {
     # truncate the existing data.
     open( my $fout, ">", $input_file )
       || Die(
-"problem re-opening $input_file for write for -b option; check file and directory permissions: $ERRNO\n"
+"problem re-opening $input_file for write for -b option; check file and directory permissions: $OS_ERROR\n"
       );
 
     if ( $self->[_is_encoded_data_] ) {
@@ -1195,29 +1228,15 @@ sub backup_method_copy {
     }
 
     # Now copy the formatted output to it..
-
-    # if formatted output is in an ARRAY ref (normally this is true)...
-    if ( ref($output_file) eq 'ARRAY' ) {
-        foreach my $line ( @{$output_file} ) {
-            $fout->print($line)
-              or
-              Die("cannot print to '$input_file' with -b option: $OS_ERROR\n");
-        }
-    }
-
-    # or in a SCALAR ref (less efficient, and only used for testing)
-    elsif ( ref($output_file) eq 'SCALAR' ) {
-        foreach my $line ( split /^/, ${$output_file} ) {
-            $fout->print($line)
-              or
-              Die("cannot print to '$input_file' with -b option: $OS_ERROR\n");
-        }
+    # output must be SCALAR ref..
+    if ( ref($routput_string) eq 'SCALAR' ) {
+        $fout->print( ${$routput_string} )
+          or Die("cannot print to '$input_file' with -b option: $OS_ERROR\n");
     }
 
     # Error if anything else ...
-    # This can only happen if the output was changed from \@tmp_buff
     else {
-        my $ref = ref($output_file);
+        my $ref = ref($routput_string);
         Die(<<EOM);
 Programming error: unable to print to '$input_file' with -b option:
 unexpected ref type '$ref'; expecting 'ARRAY' or 'SCALAR'
@@ -1269,7 +1288,7 @@ EOM
         else {
             unlink($backup_file)
               or Die(
-"unable to remove backup file '$backup_file' for -b option; check permissions: $ERRNO\n"
+"unable to remove backup file '$backup_file' for -b option; check permissions: $OS_ERROR\n"
               );
         }
     }
@@ -1291,22 +1310,23 @@ EOM
 
 sub backup_method_move {
 
-    my ( $self, $input_file, $output_file, $backup_extension, $delete_backup )
+    my ( $self, $input_file, $routput_string, $backup_extension,
+        $delete_backup )
       = @_;
 
     # Handle the -b (--backup-and-modify-in-place) option with -bm='move':
     # - First move $input file to $backup_name.
-    # - Then copy $output_file to $input_file.
+    # - Then copy $routput_string to $input_file.
     # - Then delete the backup if requested
 
     # NOTES:
     # - Die immediately on any error.
-    # - $output_file is actually an ARRAY ref
+    # - $routput_string is a SCALAR ref
     # - $input_file permissions will be set by sub set_output_file_permissions
 
     my $backup_name = $input_file . $backup_extension;
 
-    unless ( -f $input_file ) {
+    if ( !-f $input_file ) {
 
         # oh, oh, no real file to backup ..
         # shouldn't happen because of numerous preliminary checks
@@ -1317,7 +1337,7 @@ sub backup_method_move {
     if ( -f $backup_name ) {
         unlink($backup_name)
           or Die(
-"unable to remove previous '$backup_name' for -b option; check permissions: $ERRNO\n"
+"unable to remove previous '$backup_name' for -b option; check permissions: $OS_ERROR\n"
           );
     }
 
@@ -1327,12 +1347,12 @@ sub backup_method_move {
     # we use copy for symlinks, move for regular files
     if ( -l $input_file ) {
         File::Copy::copy( $input_file, $backup_name )
-          or Die("File::Copy failed trying to backup source: $ERRNO");
+          or Die("File::Copy failed trying to backup source: $OS_ERROR");
     }
     else {
         rename( $input_file, $backup_name )
           or Die(
-"problem renaming $input_file to $backup_name for -b option: $ERRNO\n"
+"problem renaming $input_file to $backup_name for -b option: $OS_ERROR\n"
           );
     }
 
@@ -1342,34 +1362,20 @@ sub backup_method_move {
       Perl::Tidy::streamhandle( $input_file, 'w', $is_encoded_data );
     if ( !$fout ) {
         Die(
-"problem re-opening $input_file for write for -b option; check file and directory permissions: $ERRNO\n"
+"problem re-opening $input_file for write for -b option; check file and directory permissions: $OS_ERROR\n"
         );
     }
 
     # Now copy the formatted output to it..
-
-    # if formatted output is in an ARRAY ref ...
-    if ( ref($output_file) eq 'ARRAY' ) {
-        foreach my $line ( @{$output_file} ) {
-            $fout->print($line)
-              or
-              Die("cannot print to '$input_file' with -b option: $OS_ERROR\n");
-        }
-    }
-
-    # or in a SCALAR ref (less efficient, for testing only)
-    elsif ( ref($output_file) eq 'SCALAR' ) {
-        foreach my $line ( split /^/, ${$output_file} ) {
-            $fout->print($line)
-              or
-              Die("cannot print to '$input_file' with -b option: $OS_ERROR\n");
-        }
+    # output must be SCALAR ref..
+    if ( ref($routput_string) eq 'SCALAR' ) {
+        $fout->print( ${$routput_string} )
+          or Die("cannot print to '$input_file' with -b option: $OS_ERROR\n");
     }
 
     # Error if anything else ...
-    # This can only happen if the output was changed from \@tmp_buff
     else {
-        my $ref = ref($output_file);
+        my $ref = ref($routput_string);
         Die(<<EOM);
 Programming error: unable to print to '$input_file' with -b option:
 unexpected ref type '$ref'; expecting 'ARRAY' or 'SCALAR'
@@ -1421,7 +1427,7 @@ EOM
         else {
             unlink($backup_name)
               or Die(
-"unable to remove previous '$backup_name' for -b option; check permissions: $ERRNO\n"
+"unable to remove previous '$backup_name' for -b option; check permissions: $OS_ERROR\n"
               );
         }
     }
@@ -1501,12 +1507,14 @@ sub get_decoded_string_buffer {
 
     # Decode the input buffer if necessary or requested
 
-    # Given
+    # Given:
     #   $input_file   = the input file or stream
     #   $display_name = its name to use in error messages
 
-    # Return
-    #   $buf = string buffer with input, decoded from utf8 if necessary
+    # Set $self->[_line_separator_], and
+
+    # Return:
+    #   $rinput_string = ref to input string, decoded from utf8 if necessary
     #   $is_encoded_data  = true if $buf is decoded from utf8
     #   $decoded_input_as = true if perltidy decoded input buf
     #   $encoding_log_message = messages for log file,
@@ -1516,18 +1524,10 @@ sub get_decoded_string_buffer {
 
     my $rOpts = $self->[_rOpts_];
 
-    my $source_object = Perl::Tidy::LineSource->new(
-        input_file => $input_file,
-        rOpts      => $rOpts,
-    );
+    my $rinput_string = slurp_stream($input_file);
+    return unless ( defined($rinput_string) );
 
-    # return nothing if error
-    return unless ($source_object);
-
-    my $buf = EMPTY_STRING;
-    while ( my $line = $source_object->get_line() ) {
-        $buf .= $line;
-    }
+    $rinput_string = $self->set_line_separator($rinput_string);
 
     my $encoding_in              = EMPTY_STRING;
     my $rOpts_character_encoding = $rOpts->{'character-encoding'};
@@ -1541,7 +1541,7 @@ sub get_decoded_string_buffer {
     # could also happen if the user has done some unusual manipulations of
     # the source.  In any case, we will not attempt to decode it because
     # that could result in an output string in a different mode.
-    if ( is_char_mode($buf) ) {
+    if ( is_char_mode( ${$rinput_string} ) ) {
         $encoding_in = "utf8";
         $rstatus->{'char_mode_source'} = 1;
     }
@@ -1567,21 +1567,24 @@ sub get_decoded_string_buffer {
         # In testing I have found that including additional guess 'suspect'
         # encodings sometimes works but can sometimes lead to disaster by
         # using an incorrect decoding.
-        my $buf_in = $buf;
 
-        my $decoder = guess_encoding( $buf_in, 'utf8' );
-        if ( ref($decoder) ) {
+        my $decoder;
+        if ( ${$rinput_string} =~ /[^[:ascii:]]/ ) {
+            $decoder = guess_encoding( ${$rinput_string}, 'utf8' );
+        }
+        if ( $decoder && ref($decoder) ) {
             $encoding_in = $decoder->name;
             if ( $encoding_in ne 'UTF-8' && $encoding_in ne 'utf8' ) {
                 $encoding_in = EMPTY_STRING;
-                $buf         = $buf_in;
                 $encoding_log_message .= <<EOM;
 Guessed encoding '$encoding_in' is not utf8; no encoding will be used
 EOM
             }
             else {
 
-                if ( !eval { $buf = $decoder->decode($buf_in); 1 } ) {
+                my $buf;
+                if ( !eval { $buf = $decoder->decode( ${$rinput_string} ); 1 } )
+                {
 
                     $encoding_log_message .= <<EOM;
 Guessed encoding '$encoding_in' but decoding was unsuccessful; no encoding is used
@@ -1593,13 +1596,13 @@ EOM
 "file: $display_name: bad guess to decode source as $encoding_in\n"
                     );
                     $encoding_in = EMPTY_STRING;
-                    $buf         = $buf_in;
                 }
                 else {
                     $encoding_log_message .= <<EOM;
 Guessed encoding '$encoding_in' successfully decoded
 EOM
                     $decoded_input_as = $encoding_in;
+                    $rinput_string    = \$buf;
                 }
             }
         }
@@ -1613,9 +1616,10 @@ EOM
     # Case 4. Decode with a specific encoding
     else {
         $encoding_in = $rOpts_character_encoding;
+        my $buf;
         if (
             !eval {
-                $buf = Encode::decode( $encoding_in, $buf,
+                $buf = Encode::decode( $encoding_in, ${$rinput_string},
                     Encode::FB_CROAK | Encode::LEAVE_SRC );
                 1;
             }
@@ -1636,6 +1640,7 @@ EOM
 Specified encoding '$encoding_in' successfully decoded
 EOM
             $decoded_input_as = $encoding_in;
+            $rinput_string    = \$buf;
         }
     }
 
@@ -1649,7 +1654,7 @@ EOM
 
     # Delete any Byte Order Mark (BOM), which can cause trouble
     if ($is_encoded_data) {
-        $buf =~ s/^\x{FEFF}//;
+        ${$rinput_string} =~ s/^\x{FEFF}//;
     }
 
     $rstatus->{'input_name'}       = $display_name;
@@ -1659,7 +1664,7 @@ EOM
 
     # Define the function to determine the display width of character
     # strings
-    my $length_function = sub { return length( $_[0] ) };
+    my $length_function;
     if ($is_encoded_data) {
 
         # Try to load Unicode::GCString for defining text display width, if
@@ -1694,7 +1699,7 @@ EOM
         }
     }
     return (
-        $buf,
+        $rinput_string,
         $is_encoded_data,
         $decoded_input_as,
         $encoding_log_message,
@@ -1702,6 +1707,133 @@ EOM
 
     );
 } ## end sub get_decoded_string_buffer
+
+{ #<<<
+
+my $LF;
+my $CR;
+my $CRLF;
+
+BEGIN {
+    $LF   = chr(10);
+    $CR   = chr(13);
+    $CRLF = $CR . $LF;
+}
+
+sub get_line_separator_default {
+
+    my ( $rOpts, $input_file ) = @_;
+
+    # Get the line separator that will apply unless overridden by a
+    # --preserve-line-endings flag for a specific file
+
+    my $line_separator_default = "\n";
+
+    my $ole = $rOpts->{'output-line-ending'};
+    if ($ole) {
+        my %endings = (
+            dos  => $CRLF,
+            win  => $CRLF,
+            mac  => $CR,
+            unix => $LF,
+        );
+
+        $line_separator_default = $endings{ lc $ole };
+
+        if ( !$line_separator_default ) {
+            my $str = join SPACE, keys %endings;
+            Die(<<EOM);
+Unrecognized line ending '$ole'; expecting one of: $str
+EOM
+        }
+
+        # Check for conflict with -ple
+        if ( $rOpts->{'preserve-line-endings'} ) {
+            Warn("Ignoring -ple; conflicts with -ole\n");
+            $rOpts->{'preserve-line-endings'} = undef;
+        }
+    }
+
+    return $line_separator_default;
+
+} ## end sub get_line_separator_default
+
+sub set_line_separator {
+
+    my ( $self, $rinput_string ) = @_;
+
+    # Set the (output) line separator as requested or necessary
+
+    my $rOpts = $self->[_rOpts_];
+
+    # Start with the default (output) line separator
+    my $line_separator = $self->[_line_separator_default_];
+
+    # First try to find the line separator of the input stream
+    my $input_line_separator;
+
+    # Limit the search to a reasonable number of characters, in case we
+    # have a weird file
+    my $str = substr( ${$rinput_string}, 0, 1024 );
+    if ($str) {
+
+        if ( $str =~ m/(($CR|$LF)+)/ ) {
+
+            my $test = $1;
+
+            # dos
+            if ( $test =~ /^($CRLF)+\z/ ) {
+                $input_line_separator = $CRLF;
+            }
+
+            # mac
+            elsif ( $test =~ /^($CR)+\z/ ) {
+                $input_line_separator = $CR;
+            }
+
+            # unix
+            elsif ( $test =~ /^($LF)+\z/ ) {
+                $input_line_separator = $LF;
+            }
+
+            # unknown
+            else { }
+        }
+
+        # no ending seen
+        else { }
+    }
+
+    # Now change the line separator if requested
+    if ( defined($input_line_separator) ) {
+
+        if ( $rOpts->{'preserve-line-endings'} ) {
+            $line_separator = $input_line_separator;
+        }
+
+        # patch to read raw mac files under unix, dos
+        if ( $input_line_separator ne "\n" && $input_line_separator eq $CR ) {
+
+            # if this file is currently a single line ..
+            my @lines = split /^/, ${$rinput_string};
+            if ( @lines == 1 ) {
+
+                # and becomes multiple lines with the change ..
+                @lines = map { $_ . "\n" } split /$CR/, ${$rinput_string};
+                if ( @lines > 1 ) {
+
+                    # then make the change
+                    my $buf = join EMPTY_STRING, @lines;
+                    $rinput_string = \$buf;
+                }
+            }
+        }
+    }
+
+    $self->[_line_separator_] = $line_separator;
+    return $rinput_string;
+} ## end sub set_line_separator
+}
 
 sub process_all_files {
 
@@ -1732,10 +1864,9 @@ sub process_all_files {
     #   process_iteration_layer - handle any iterations on formatting
     #   process_single_case     - solves one formatting problem
 
-    my $rOpts                  = $self->[_rOpts_];
-    my $dot                    = $self->[_file_extension_separator_];
-    my $diagnostics_object     = $self->[_diagnostics_object_];
-    my $line_separator_default = $self->[_line_separator_default_];
+    my $rOpts              = $self->[_rOpts_];
+    my $dot                = $self->[_file_extension_separator_];
+    my $diagnostics_object = $self->[_diagnostics_object_];
 
     my $destination_stream = $rinput_hash->{'destination'};
     my $errorfile_stream   = $rinput_hash->{'errorfile'};
@@ -1760,17 +1891,19 @@ sub process_all_files {
 
             # If the source is from an array or string, then .LOG output
             # is only possible if a logfile stream is specified.  This prevents
-            # unexpected perltidy.LOG files.
+            # unexpected perltidy.LOG files.  If the stream is not defined
+            # then we will capture it in a string ref but it will not be
+            # accessible. Previously by Perl::Tidy::DevNull (fix c255);
             if ( !defined($logfile_stream) ) {
-                $logfile_stream = Perl::Tidy::DevNull->new();
+                $logfile_stream = \my $tmp;
 
                 # Likewise for .TEE and .DEBUG output
             }
             if ( !defined($teefile_stream) ) {
-                $teefile_stream = Perl::Tidy::DevNull->new();
+                $teefile_stream = \my $tmp;
             }
             if ( !defined($debugfile_stream) ) {
-                $debugfile_stream = Perl::Tidy::DevNull->new();
+                $debugfile_stream = \my $tmp;
             }
         }
         elsif ( $input_file eq '-' ) {    # '-' indicates input from STDIN
@@ -1781,16 +1914,16 @@ sub process_all_files {
         else {
             $fileroot     = $input_file;
             $display_name = $input_file;
-            unless ( -e $input_file ) {
+            if ( !-e $input_file ) {
 
                 # file doesn't exist - check for a file glob
                 if ( $input_file =~ /([\?\*\[\{])/ ) {
 
                     # Windows shell may not remove quotes, so do it
-                    my $input_file = $input_file;
-                    if ( $input_file =~ /^\'(.+)\'$/ ) { $input_file = $1 }
-                    if ( $input_file =~ /^\"(.+)\"$/ ) { $input_file = $1 }
-                    my $pattern = fileglob_to_re($input_file);
+                    my $ifile = $input_file;
+                    if ( $ifile =~ /^\'(.+)\'$/ ) { $ifile = $1 }
+                    if ( $ifile =~ /^\"(.+)\"$/ ) { $ifile = $1 }
+                    my $pattern = fileglob_to_re($ifile);
                     my $dh;
                     if ( opendir( $dh, './' ) ) {
                         my @files =
@@ -1805,7 +1938,7 @@ sub process_all_files {
                 next;
             }
 
-            unless ( -f $input_file ) {
+            if ( !-f $input_file ) {
                 Warn("skipping file: $input_file: not a regular file\n");
                 next;
             }
@@ -1814,7 +1947,7 @@ sub process_all_files {
             # If for example a source file got clobbered somehow,
             # the old .tdy or .bak files might still exist so we
             # shouldn't overwrite them with zero length files.
-            unless ( -s $input_file ) {
+            if ( !-s $input_file ) {
                 Warn("skipping file: $input_file: Zero size\n");
                 next;
             }
@@ -1831,7 +1964,7 @@ sub process_all_files {
                 next;
             }
 
-            unless ( ( -T $input_file ) || $rOpts->{'force-read-binary'} ) {
+            if ( !-T $input_file && !$rOpts->{'force-read-binary'} ) {
                 Warn("skipping file: $input_file: Non-text (override with -f)\n"
                 );
                 next;
@@ -1863,14 +1996,14 @@ sub process_all_files {
 
                 my ( $base, $old_path ) = fileparse($fileroot);
                 my $new_path = $rOpts->{'output-path'};
-                unless ( -d $new_path ) {
-                    unless ( mkdir $new_path, 0777 ) {
-                        Die("unable to create directory $new_path: $ERRNO\n");
-                    }
+                if ( !-d $new_path ) {
+                    mkdir( $new_path, 0777 )
+                      or
+                      Die("unable to create directory $new_path: $OS_ERROR\n");
                 }
                 my $path = $new_path;
                 $fileroot = catfile( $path, $base );
-                unless ($fileroot) {
+                if ( !$fileroot ) {
                     Die(<<EOM);
 ------------------------------------------------------------------------
 Problem combining $new_path and $base to make a filename; check -opath
@@ -1896,7 +2029,7 @@ EOM
 
         # copy source to a string buffer, decoding from utf8 if necessary
         my (
-            $buf,
+            $rinput_string,
             $is_encoded_data,
             $decoded_input_as,
             $encoding_log_message,
@@ -1906,19 +2039,19 @@ EOM
             $rpending_logfile_message );
 
         # Skip this file on any error
-        next if ( !defined($buf) );
+        next if ( !defined($rinput_string) );
 
         # Register this file name with the Diagnostics package, if any.
         $diagnostics_object->set_input_file($input_file)
           if $diagnostics_object;
 
-        # OK: the (possibly decoded) input is now in string $buf. We just need
-        # to to prepare the output and error logger before formatting it.
+        # The (possibly decoded) input is now in string ref $rinput_string.
+        # Now prepare the output stream and error logger.
 
         #--------------------------
         # prepare the output stream
         #--------------------------
-        my $output_file = undef;
+        my $output_file;
         my $output_name = EMPTY_STRING;
         my $actual_output_extension;
 
@@ -1932,17 +2065,21 @@ EOM
                     $msg .= " (-pbp contains -st; see manual)" if ($saw_pbp);
                     Die("$msg\n");
                 }
-                elsif ($destination_stream) {
+
+                if ($destination_stream) {
                     Die(
 "You may not specify a destination array and -o together\n"
                     );
                 }
-                elsif ( defined( $rOpts->{'output-path'} ) ) {
+
+                if ( defined( $rOpts->{'output-path'} ) ) {
                     Die("You may not specify -o and -opath together\n");
                 }
-                elsif ( defined( $rOpts->{'output-file-extension'} ) ) {
+
+                if ( defined( $rOpts->{'output-file-extension'} ) ) {
                     Die("You may not specify -o and -oext together\n");
                 }
+
                 $output_file = $rOpts->{outfile};
                 $output_name = $output_file;
 
@@ -1992,12 +2129,6 @@ EOM
         }
         else {
             if ($in_place_modify) {
-
-                # Send output to a temporary array buffer. This will
-                # allow efficient copying back to the input by
-                # sub backup_and_modify_in_place, below.
-                my @tmp_buff;
-                $output_file = \@tmp_buff;
                 $output_name = $display_name;
             }
             else {
@@ -2042,13 +2173,6 @@ EOM
             $logger_object->complain( ${$rpending_complaint} );
         }
 
-        # Use input line endings if requested
-        my $line_separator = $line_separator_default;
-        if ( $rOpts->{'preserve-line-endings'} ) {
-            my $ls_input = find_input_line_ending($input_file);
-            if ( defined($ls_input) ) { $line_separator = $ls_input }
-        }
-
         # additional parameters needed by lower level routines
         $self->[_actual_output_extension_] = $actual_output_extension;
         $self->[_debugfile_stream_]        = $debugfile_stream;
@@ -2058,63 +2182,32 @@ EOM
         $self->[_fileroot_]                = $fileroot;
         $self->[_is_encoded_data_]         = $is_encoded_data;
         $self->[_length_function_]         = $length_function;
-        $self->[_line_separator_]          = $line_separator;
         $self->[_logger_object_]           = $logger_object;
         $self->[_output_file_]             = $output_file;
         $self->[_teefile_stream_]          = $teefile_stream;
         $self->[_input_copied_verbatim_]   = 0;
         $self->[_input_output_difference_] = 1;    ## updated later if -b used
 
-        #----------------------------------------------------------
-        # Do all formatting of this buffer.
-        # Results will go to the selected output file or streams(s)
-        #----------------------------------------------------------
-        $self->process_filter_layer($buf);
+        #--------------------
+        # process this buffer
+        #--------------------
+        my $routput_string = $self->process_filter_layer($rinput_string);
 
-        #--------------------------------------------------
-        # Handle the -b option (backup and modify in-place)
-        #--------------------------------------------------
-        if ($in_place_modify) {
+        #------------------------------------------------
+        # send the tidied output to its final destination
+        #------------------------------------------------
+        if ( $rOpts->{'format'} eq 'tidy' && defined($routput_string) ) {
 
-            # For -b option, leave the file unchanged if a severe error caused
-            # formatting to be skipped. Otherwise we will overwrite any backup.
-            if ( !$self->[_input_copied_verbatim_] ) {
+            $self->write_tidy_output(
 
-                my $backup_method = $rOpts->{'backup-method'};
+                $routput_string,
 
-                # Option 1, -bm='copy': uses newer version in which original is
-                # copied to the backup and rewritten; see git #103.
-                if ( defined($backup_method) && $backup_method eq 'copy' ) {
-                    $self->backup_method_copy(
-                        $input_file,       $output_file,
-                        $backup_extension, $delete_backup
-                    );
-                }
-
-                # Option 2, -bm='move': uses older version, where original is
-                # moved to the backup and formatted output goes to a new file.
-                else {
-                    $self->backup_method_move(
-                        $input_file,       $output_file,
-                        $backup_extension, $delete_backup
-                    );
-                }
-            }
-            $output_file = $input_file;
-        }
-
-        #-------------------------------------------------------------------
-        # Otherwise set output file ownership and permissions if appropriate
-        #-------------------------------------------------------------------
-        elsif ( $output_file && -f $output_file && !-l $output_file ) {
-            if (@input_file_stat) {
-                if ( $rOpts->{'format'} eq 'tidy' ) {
-                    $self->set_output_file_permissions( $output_file,
-                        \@input_file_stat, $in_place_modify );
-                }
-
-                # else use default permissions for html and any other format
-            }
+                \@input_file_stat,
+                $in_place_modify,
+                $input_file,
+                $backup_extension,
+                $delete_backup,
+            );
         }
 
         $logger_object->finish()
@@ -2124,14 +2217,130 @@ EOM
     return;
 } ## end sub process_all_files
 
+sub write_tidy_output {
+
+    # Write tidied output in '$routput_string' to its final destination
+
+    my (
+        $self,
+
+        $routput_string,
+
+        $rinput_file_stat,
+        $in_place_modify,
+        $input_file,
+        $backup_extension,
+        $delete_backup,
+    ) = @_;
+
+    my $rOpts           = $self->[_rOpts_];
+    my $is_encoded_data = $self->[_is_encoded_data_];
+    my $output_file     = $self->[_output_file_];
+
+    # There are three main output paths:
+
+    #-------------------------------------------------------------------------
+    # PATH 1: $output_file is not defined: --backup and modify in-place option
+    #-------------------------------------------------------------------------
+    if ($in_place_modify) {
+
+        # For -b option, leave the file unchanged if a severe error caused
+        # formatting to be skipped. Otherwise we will overwrite any backup.
+        if ( !$self->[_input_copied_verbatim_] ) {
+
+            my $backup_method = $rOpts->{'backup-method'};
+
+            #-------------------------------------------------------------
+            # PATH 1a: -bm='copy': uses newer version in which original is
+            # copied to the backup and rewritten; see git #103.
+            #-------------------------------------------------------------
+            if ( defined($backup_method) && $backup_method eq 'copy' ) {
+                $self->backup_method_copy(
+                    $input_file,       $routput_string,
+                    $backup_extension, $delete_backup
+                );
+            }
+
+            #-------------------------------------------------------------
+            # PATH 1b: -bm='move': uses older version, where original is
+            # moved to the backup and formatted output goes to a new file.
+            #-------------------------------------------------------------
+            else {
+                $self->backup_method_move(
+                    $input_file,       $routput_string,
+                    $backup_extension, $delete_backup
+                );
+            }
+        }
+    }
+
+    #--------------------------------------------------------------------------
+    # PATH 2: $output_file is a reference (=destination_stream): send output to
+    # a destination stream ref received from an external perl program. We use
+    # a sub to do this because the encoding rules are a bit tricky.
+    #--------------------------------------------------------------------------
+    elsif ( ref($output_file) ) {
+        $self->copy_buffer_to_external_ref( $routput_string, $output_file );
+    }
+
+    #--------------------------------------------------------------------------
+    # PATH 3: $output_file is named file or '-'; send output to the file system
+    #--------------------------------------------------------------------------
+    else {
+
+        #--------------------------
+        # PATH 3a: output to STDOUT
+        #--------------------------
+        if ( $output_file eq '-' ) {
+            my $fh = *STDOUT;
+            if ($is_encoded_data) { binmode $fh, ":raw:encoding(UTF-8)" }
+            else                  { binmode $fh }
+            $fh->print( ${$routput_string} );
+        }
+
+        #--------------------------------
+        # PATH 3b: output to a named file
+        #--------------------------------
+        else {
+            if ( open( my $fh, '>', $output_file ) ) {
+                if ($is_encoded_data) { binmode $fh, ":raw:encoding(UTF-8)" }
+                else                  { binmode $fh }
+                $fh->print( ${$routput_string} );
+                $fh->close() or Die("Cannot close '$output_file': $OS_ERROR\n");
+            }
+            else {
+                Die("Cannot open $output_file to write: $OS_ERROR\n");
+            }
+
+            # set output file ownership and permissions if appropriate
+            if ( $output_file && -f $output_file && !-l $output_file ) {
+                if ( @{$rinput_file_stat} ) {
+                    $self->set_output_file_permissions( $output_file,
+                        \@{$rinput_file_stat}, $in_place_modify );
+                }
+            }
+        }
+
+        # Save diagnostic info
+        if ($is_encoded_data) {
+            $rstatus->{'output_encoded_as'} = 'UTF-8';
+        }
+    }
+
+    return;
+
+} ## end sub write_tidied_output
+
 sub process_filter_layer {
 
-    my ( $self, $buf ) = @_;
+    my ( $self, $rinput_string ) = @_;
 
     # This is the filter layer of processing.
-    # Do all requested formatting on the string '$buf', including any
-    # pre- and post-processing with filters.
-    # Store the results in the selected output file(s) or stream(s).
+    # Do all requested formatting on the string ref '$rinput_string', including
+    # any pre- and post-processing with filters.
+    # Returns:
+    #   $routput_string = ref to tidied output if in 'tidy' mode
+    #   (nothing) if not in 'tidy' mode [these modes handle output separately]
 
     # Total formatting is done with these layers of subroutines:
     #   perltidy                - main routine; checks run parameters
@@ -2141,132 +2350,92 @@ sub process_filter_layer {
     #   process_single_case     - solves one formatting problem
 
     # Data Flow in this layer:
-    #  $buf
-    #   -> optional prefilter operation
+    #  $rinput_string
+    #   -> optional prefilter operations
     #     -> [ formatting by sub process_iteration_layer ]
-    #       -> ( optional postfilter_buffer for postfilter, other operations )
-    #         -> ( optional destination_buffer for encoding )
-    #           -> final sink_object
+    #       -> return if not in 'tidy' mode
+    #         -> optional postfilter operations
+    #           -> $routput_string
 
     # What is done based on format type:
     #  utf8 decoding is done for all format types
     #  prefiltering is applied to all format types
     #   - because it may be needed to get through the tokenizer
     #  postfiltering is only done for format='tidy'
-    #   - might cause problems operating on html text
+    #   - not appropriate for html text, which has already been output
     #  encoding of decoded output is only done for format='tidy'
     #   - because html does its own encoding; user formatter does what it wants
 
-    my $rOpts              = $self->[_rOpts_];
-    my $is_encoded_data    = $self->[_is_encoded_data_];
-    my $logger_object      = $self->[_logger_object_];
-    my $output_file        = $self->[_output_file_];
-    my $user_formatter     = $self->[_user_formatter_];
-    my $destination_stream = $self->[_destination_stream_];
-    my $prefilter          = $self->[_prefilter_];
-    my $postfilter         = $self->[_postfilter_];
-    my $decoded_input_as   = $self->[_decoded_input_as_];
-    my $line_separator     = $self->[_line_separator_];
+    # Be sure the string we received is defined
+    if ( !defined($rinput_string) ) {
+        Fault("bad call: the source string ref \$rinput_string is undefined\n");
+    }
+    if ( ref($rinput_string) ne 'SCALAR' ) {
+        Fault("bad call: the source string ref is not SCALAR\n");
+    }
 
-    my $remove_terminal_newline =
-      !$rOpts->{'add-terminal-newline'} && substr( $buf, -1, 1 ) !~ /\n/;
+    my $rOpts           = $self->[_rOpts_];
+    my $is_encoded_data = $self->[_is_encoded_data_];
+    my $logger_object   = $self->[_logger_object_];
 
-    # vars for postfilter, if used
-    my $use_postfilter_buffer;
-    my $postfilter_buffer;
-
-    # vars for destination buffer, if used
-    my $destination_buffer;
-    my $use_destination_buffer;
-    my $encode_destination_buffer;
-
-    # vars for iterations, if done
-    my $sink_object;
+    # vars for --line-range-tidy filter, if needed
+    my @input_lines_pre;
+    my @input_lines_post;
 
     # vars for checking assertions, if needed
     my $digest_input;
     my $saved_input_buf;
 
-    my $ref_destination_stream = ref($destination_stream);
+    # var for checking --noadd-terminal-newline
+    my $chomp_terminal_newline;
 
-    # Setup vars for postfilter, destination buffer, assertions and sink object
-    # if needed.  These are only used for 'tidy' formatting.
+    # Setup post-filter vars; these apply to 'tidy' mode only
     if ( $rOpts->{'format'} eq 'tidy' ) {
 
-        # evaluate MD5 sum of input file, if needed, before any prefilter
+        #---------------------------------------------------------------------
+        # for --line-range-tidy, clip '$rinput_string' to a limited line range
+        #---------------------------------------------------------------------
+        my $line_tidy_begin = $self->[_line_tidy_begin_];
+        if ($line_tidy_begin) {
+
+            my @input_lines = split /^/, ${$rinput_string};
+
+            my $num = @input_lines;
+            if ( $line_tidy_begin > $num ) {
+                Die(<<EOM);
+#--line-range-tidy=n1:n2 has n1=$line_tidy_begin which exceeds max line number of $num
+EOM
+            }
+            else {
+                my $line_tidy_end = $self->[_line_tidy_end_];
+                if ( !defined($line_tidy_end) || $line_tidy_end > $num ) {
+                    $line_tidy_end = $num;
+                }
+                my $input_string = join EMPTY_STRING,
+                  @input_lines[ $line_tidy_begin - 1 .. $line_tidy_end - 1 ];
+                $rinput_string = \$input_string;
+
+                @input_lines_pre  = @input_lines[ 0 .. $line_tidy_begin - 2 ];
+                @input_lines_post = @input_lines[ $line_tidy_end .. $num - 1 ];
+            }
+        }
+
+        #------------------------------------------
+        # evaluate MD5 sum of input file, if needed
+        #------------------------------------------
         if (   $rOpts->{'assert-tidy'}
             || $rOpts->{'assert-untidy'}
             || $rOpts->{'backup-and-modify-in-place'} )
         {
-            $digest_input    = $md5_hex->($buf);
-            $saved_input_buf = $buf;
+            $digest_input    = $md5_hex->( ${$rinput_string} );
+            $saved_input_buf = ${$rinput_string};
         }
 
-        #-----------------------
-        # Setup postfilter buffer
-        #-----------------------
-        # If we need access to the output for filtering or checking assertions
-        # before writing to its ultimate destination, then we will send it
-        # to a temporary buffer. The variables are:
-        #  $postfilter_buffer     = the buffer to capture the output
-        #  $use_postfilter_buffer = is a postfilter buffer used?
-        # These are used below, just after iterations are made.
-        $use_postfilter_buffer =
-             $postfilter
-          || $remove_terminal_newline
-          || $rOpts->{'assert-tidy'}
-          || $rOpts->{'assert-untidy'}
-          || $rOpts->{'backup-and-modify-in-place'};
+        # When -noadd-terminal-newline is set, and the input does not
+        # have a newline, then we remove the final newline of the output
+        $chomp_terminal_newline = !$rOpts->{'add-terminal-newline'}
+          && substr( ${$rinput_string}, -1, 1 ) !~ /\n/;
 
-        #-------------------------
-        # Setup destination_buffer
-        #-------------------------
-        # If the final output destination is not a file, then we might need to
-        # encode the result at the end of processing.  So in this case we will
-        # send the output to a temporary buffer.
-        # The key variables are:
-        #   $destination_buffer        - receives the formatted output
-        #   $use_destination_buffer    - is $destination_buffer used?
-        #   $encode_destination_buffer - encode $destination_buffer?
-        # These are used by sub 'copy_buffer_to_destination', below
-
-        if ($ref_destination_stream) {
-            $use_destination_buffer = 1;
-            $output_file            = \$destination_buffer;
-            $self->[_output_file_]  = $output_file;
-
-            # Strings and arrays use special encoding rules
-            if (   $ref_destination_stream eq 'SCALAR'
-                || $ref_destination_stream eq 'ARRAY' )
-            {
-                $encode_destination_buffer =
-                  $rOpts->{'encode-output-strings'} && $decoded_input_as;
-            }
-
-            # An object with a print method will use file encoding rules
-            elsif ( $ref_destination_stream->can('print') ) {
-                $encode_destination_buffer = $is_encoded_data;
-            }
-            else {
-                confess <<EOM;
-------------------------------------------------------------------------
-No 'print' method is defined for object of class '$ref_destination_stream'
-Please check your call to Perl::Tidy::perltidy. Trace follows.
-------------------------------------------------------------------------
-EOM
-            }
-        }
-
-        #-------------------------------------------
-        # Make a sink object for the iteration phase
-        #-------------------------------------------
-        $sink_object = Perl::Tidy::LineSink->new(
-            output_file => $use_postfilter_buffer
-            ? \$postfilter_buffer
-            : $output_file,
-            line_separator  => $line_separator,
-            is_encoded_data => $is_encoded_data,
-        );
     }
 
     #-----------------------------------------------------------------------
@@ -2275,118 +2444,102 @@ EOM
     # for all format types ('tidy', 'html', 'user') because it may be needed
     # to avoid tokenization errors.
     #-----------------------------------------------------------------------
-    $buf = $prefilter->($buf) if $prefilter;
+    my $prefilter = $self->[_prefilter_];
+    if ($prefilter) {
+        my $input_string = $prefilter->( ${$rinput_string} );
+        $rinput_string = \$input_string;
+    }
 
-    #----------------------------------------------------------------------
-    # Format contents of string '$buf', iterating if requested.
-    # For 'tidy', formatted result will be written to '$sink_object'
-    # For 'html' and 'user', result goes directly to its ultimate destination.
-    #----------------------------------------------------------------------
-    $self->process_iteration_layer( $buf, $sink_object );
+    #-------------------------------------------
+    # Format contents of string '$rinput_string'
+    #-------------------------------------------
+    my $routput_string = $self->process_iteration_layer($rinput_string);
 
-    #--------------------------------
-    # Do postfilter buffer processing
-    #--------------------------------
-    if ($use_postfilter_buffer) {
+    #-------------------------------
+    # All done if not in 'tidy' mode
+    #-------------------------------
+    if ( $rOpts->{'format'} ne 'tidy' ) {
+        return;
+    }
 
-        my $sink_object_post = Perl::Tidy::LineSink->new(
-            output_file     => $output_file,
-            line_separator  => $line_separator,
-            is_encoded_data => $is_encoded_data,
-        );
+    #---------------------
+    # apply any postfilter
+    #---------------------
+    my $postfilter = $self->[_postfilter_];
+    if ($postfilter) {
+        my $output_string = $postfilter->( ${$routput_string} );
+        $routput_string = \$output_string;
+    }
 
-        #----------------------------------------------------------------------
-        # Apply any postfilter. The postfilter is a code reference that will be
-        # applied to the source after tidying.
-        #----------------------------------------------------------------------
-        my $buf_post =
-            $postfilter
-          ? $postfilter->($postfilter_buffer)
-          : $postfilter_buffer;
+    if ( defined($digest_input) ) {
+        my $digest_output = $md5_hex->( ${$routput_string} );
+        $self->[_input_output_difference_] = $digest_output ne $digest_input;
+    }
 
-        if ( defined($digest_input) ) {
-            my $digest_output = $md5_hex->($buf_post);
-            $self->[_input_output_difference_] =
-              $digest_output ne $digest_input;
-        }
-
-        # Check if file changed if requested, but only after any postfilter
-        if ( $rOpts->{'assert-tidy'} ) {
-            if ( $self->[_input_output_difference_] ) {
-                my $diff_msg =
-                  compare_string_buffers( $saved_input_buf, $buf_post,
-                    $is_encoded_data );
-                $logger_object->warning(<<EOM);
+    #-----------------------------------------------------
+    # check for changes if requested by 'assert-...' flags
+    #-----------------------------------------------------
+    if ( $rOpts->{'assert-tidy'} ) {
+        if ( $self->[_input_output_difference_] ) {
+            my $diff_msg =
+              compare_string_buffers( \$saved_input_buf, $routput_string );
+            $logger_object->warning(<<EOM);
 assertion failure: '--assert-tidy' is set but output differs from input
 EOM
-                $logger_object->interrupt_logfile();
-                $logger_object->warning( $diff_msg . "\n" );
-                $logger_object->resume_logfile();
-            }
+            $logger_object->interrupt_logfile();
+            $logger_object->warning( $diff_msg . "\n" );
+            $logger_object->resume_logfile();
         }
+    }
 
-        if ( $rOpts->{'assert-untidy'} ) {
-            if ( !$self->[_input_output_difference_] ) {
-                $logger_object->warning(
+    if ( $rOpts->{'assert-untidy'} ) {
+        if ( !$self->[_input_output_difference_] ) {
+            $logger_object->warning(
 "assertion failure: '--assert-untidy' is set but output equals input\n"
-                );
-            }
-        }
-
-        my $source_object = Perl::Tidy::LineSource->new(
-            input_file => \$buf_post,
-            rOpts      => $rOpts,
-        );
-
-        # Copy the filtered buffer to the final destination
-        if ( !$remove_terminal_newline ) {
-            while ( my $line = $source_object->get_line() ) {
-                $sink_object_post->write_line($line);
-            }
-        }
-        else {
-
-            # Copy the filtered buffer but remove the newline char from the
-            # final line
-            my $line;
-            while ( my $next_line = $source_object->get_line() ) {
-                $sink_object_post->write_line($line) if ($line);
-                $line = $next_line;
-            }
-            if ($line) {
-                $sink_object_post->set_line_separator(undef);
-                chomp $line;
-                $sink_object_post->write_line($line);
-            }
-        }
-        $sink_object_post->close_output_file();
-        $source_object->close_input_file();
-    }
-
-    #--------------------------------------------------------
-    # Do destination buffer processing, encoding if required.
-    #--------------------------------------------------------
-    if ($use_destination_buffer) {
-        $self->copy_buffer_to_destination( $destination_buffer,
-            $destination_stream, $encode_destination_buffer );
-    }
-    else {
-
-        # output went to a file in 'tidy' mode...
-        if ( $is_encoded_data && $rOpts->{'format'} eq 'tidy' ) {
-            $rstatus->{'output_encoded_as'} = 'UTF-8';
+            );
         }
     }
 
-    # The final formatted result should now be in the selected output file(s)
-    # or stream(s).
-    return;
+    #----------------------------------------
+    # do --line-range-tidy line recombination
+    #----------------------------------------
+    if ( @input_lines_pre || @input_lines_post ) {
+        my $str_pre       = join EMPTY_STRING, @input_lines_pre;
+        my $str_post      = join EMPTY_STRING, @input_lines_post;
+        my $output_string = $str_pre . ${$routput_string} . $str_post;
+        $routput_string = \$output_string;
+    }
 
-} ## end sub process_filter_layer
+    #-------------------------------------------------------------
+    # handle --preserve-line-endings or -output-line-endings flags
+    #-------------------------------------------------------------
+    # The native line separator has been used in all intermediate
+    # iterations and filter operations until here so that string
+    # operations work ok.
+    if ( $self->[_line_separator_] ne "\n" ) {
+        my $line_separator = $self->[_line_separator_];
+        my @output_lines   = split /^/, ${$routput_string};
+        foreach my $line (@output_lines) {
+            chomp $line;
+            $line .= $line_separator;
+        }
+        my $output_string = join EMPTY_STRING, @output_lines;
+        $routput_string = \$output_string;
+    }
+
+    #-----------------------------------------
+    # handle a '--noadd-terminal-newline' flag
+    #-----------------------------------------
+    if ($chomp_terminal_newline) {
+        chomp ${$routput_string};
+    }
+
+    return $routput_string;
+}
 
 sub process_iteration_layer {
 
-    my ( $self, $buf, $sink_object ) = @_;
+    my ( $self, $rinput_string ) = @_;
 
     # This is the iteration layer of processing.
     # Do all formatting, iterating if requested, on the source string $buf.
@@ -2403,26 +2556,16 @@ sub process_iteration_layer {
     #   process_single_case     - solves one formatting problem
 
     # Data Flow in this layer:
-    #      $buf -> [ loop over iterations ] -> $sink_object
-
-    # Only 'tidy' formatting can use multiple iterations.
+    #      $rinput_string -> [ loop over iterations ] -> $routput_string
 
     my $diagnostics_object = $self->[_diagnostics_object_];
     my $display_name       = $self->[_display_name_];
     my $fileroot           = $self->[_fileroot_];
     my $is_encoded_data    = $self->[_is_encoded_data_];
     my $length_function    = $self->[_length_function_];
-    my $line_separator     = $self->[_line_separator_];
     my $logger_object      = $self->[_logger_object_];
     my $rOpts              = $self->[_rOpts_];
-    my $tabsize            = $self->[_tabsize_];
     my $user_formatter     = $self->[_user_formatter_];
-
-    # create a source object for the buffer
-    my $source_object = Perl::Tidy::LineSource->new(
-        input_file => \$buf,
-        rOpts      => $rOpts,
-    );
 
     # make a debugger object if requested
     my $debugger_object;
@@ -2435,23 +2578,23 @@ sub process_iteration_layer {
 
     # make a tee file handle if requested
     my $fh_tee;
+    my $tee_file;
     if (   $rOpts->{'tee-pod'}
         || $rOpts->{'tee-block-comments'}
         || $rOpts->{'tee-side-comments'} )
     {
-        my $tee_file = $self->[_teefile_stream_]
+        $tee_file = $self->[_teefile_stream_]
           || $fileroot . $self->make_file_extension('TEE');
         ( $fh_tee, my $tee_filename ) =
           Perl::Tidy::streamhandle( $tee_file, 'w', $is_encoded_data );
         if ( !$fh_tee ) {
-            Warn("couldn't open TEE file $tee_file: $ERRNO\n");
+            Warn("couldn't open TEE file $tee_file: $OS_ERROR\n");
         }
     }
 
     # vars for iterations and convergence test
     my $max_iterations = 1;
     my $convergence_log_message;
-    my $do_convergence_test;
     my %saw_md5;
 
     # Only 'tidy' formatting can use multiple iterations
@@ -2467,22 +2610,22 @@ sub process_iteration_layer {
         {
             $max_iterations = 1;
         }
-        elsif ( $max_iterations > 6 ) {
+
+        if ( $max_iterations > 6 ) {
             $max_iterations = 6;
         }
 
         # get starting MD5 sum for convergence test
         if ( $max_iterations > 1 ) {
-            $do_convergence_test = 1;
-            my $digest = $md5_hex->($buf);
+            my $digest = $md5_hex->( ${$rinput_string} );
             $saw_md5{$digest} = 0;
         }
     }
 
     # save objects to allow redirecting output during iterations
-    my $sink_object_final   = $sink_object;
     my $logger_object_final = $logger_object;
     my $iteration_of_formatter_convergence;
+    my $routput_string;
 
     #---------------------
     # Loop over iterations
@@ -2491,18 +2634,9 @@ sub process_iteration_layer {
 
         $rstatus->{'iteration_count'} += 1;
 
-        # send output stream to temp buffers until last iteration
-        my $sink_buffer;
-        if ( $iter < $max_iterations ) {
-            $sink_object = Perl::Tidy::LineSink->new(
-                output_file     => \$sink_buffer,
-                line_separator  => $line_separator,
-                is_encoded_data => $is_encoded_data,
-            );
-        }
-        else {
-            $sink_object = $sink_object_final;
-        }
+        # create a string to capture the output
+        my $sink_buffer = EMPTY_STRING;
+        $routput_string = \$sink_buffer;
 
         # Save logger, debugger and tee output only on pass 1 because:
         # (1) line number references must be to the starting
@@ -2513,8 +2647,17 @@ sub process_iteration_layer {
         # being deleted.
         if ( $iter > 1 ) {
 
-            $debugger_object->close_debug_file() if ($debugger_object);
-            $fh_tee->close()                     if ($fh_tee);
+            $debugger_object->close_debug_file()
+              if ($debugger_object);
+
+            if (   $fh_tee
+                && $fh_tee->can('close')
+                && !ref($tee_file)
+                && $tee_file ne '-' )
+            {
+                $fh_tee->close()
+                  or Warn("couldn't close TEE file $tee_file: $OS_ERROR\n");
+            }
 
             $debugger_object = undef;
             $logger_object   = undef;
@@ -2552,7 +2695,7 @@ sub process_iteration_layer {
             $formatter = Perl::Tidy::Formatter->new(
                 logger_object      => $logger_object,
                 diagnostics_object => $diagnostics_object,
-                sink_object        => $sink_object,
+                sink_object        => $routput_string,
                 length_function    => $length_function,
                 is_encoded_data    => $is_encoded_data,
                 fh_tee             => $fh_tee,
@@ -2562,7 +2705,7 @@ sub process_iteration_layer {
             Die("I don't know how to do -format=$rOpts->{'format'}\n");
         }
 
-        unless ($formatter) {
+        if ( !$formatter ) {
             Die("Unable to continue with $rOpts->{'format'} formatting\n");
         }
 
@@ -2570,23 +2713,12 @@ sub process_iteration_layer {
         # create the tokenizer for this file
         #-----------------------------------
         my $tokenizer = Perl::Tidy::Tokenizer->new(
-            source_object      => $source_object,
+            source_object      => $rinput_string,
             logger_object      => $logger_object,
             debugger_object    => $debugger_object,
             diagnostics_object => $diagnostics_object,
-            tabsize            => $tabsize,
             rOpts              => $rOpts,
-
-            starting_level      => $rOpts->{'starting-indentation-level'},
-            indent_columns      => $rOpts->{'indent-columns'},
-            look_for_hash_bang  => $rOpts->{'look-for-hash-bang'},
-            look_for_autoloader => $rOpts->{'look-for-autoloader'},
-            look_for_selfloader => $rOpts->{'look-for-selfloader'},
-            trim_qw             => $rOpts->{'trim-qw'},
-            extended_syntax     => $rOpts->{'extended-syntax'},
-
-            continuation_indentation => $rOpts->{'continuation-indentation'},
-            outdent_labels           => $rOpts->{'outdent-labels'},
+            starting_level     => $rOpts->{'starting-indentation-level'},
         );
 
         #---------------------------------
@@ -2594,10 +2726,9 @@ sub process_iteration_layer {
         #---------------------------------
         $self->process_single_case( $tokenizer, $formatter );
 
-        #-----------------------------------------
-        # close the input source and report errors
-        #-----------------------------------------
-        $source_object->close_input_file();
+        #--------------
+        # report errors
+        #--------------
 
         # see if the formatter is converged
         if (   $max_iterations > 1
@@ -2614,11 +2745,7 @@ sub process_iteration_layer {
         # temporary output buffer
         if ( $iter < $max_iterations ) {
 
-            $sink_object->close_output_file();
-            $source_object = Perl::Tidy::LineSource->new(
-                input_file => \$sink_buffer,
-                rOpts      => $rOpts,
-            );
+            $rinput_string = \$sink_buffer;
 
             # stop iterations if errors or converged
             my $stop_now = $self->[_input_copied_verbatim_];
@@ -2629,7 +2756,9 @@ sub process_iteration_layer {
 Stopping iterations because of severe errors.                       
 EOM
             }
-            elsif ($do_convergence_test) {
+
+            # or do convergence test
+            else {
 
                 # stop if the formatter has converged
                 $stop_now ||= defined($iteration_of_formatter_convergence);
@@ -2657,7 +2786,7 @@ BLINKER. Output for iteration $iter same as for $saw_md5{$digest}.
 EOM
                         $stopping_on_error ||= $convergence_log_message;
                         DEVEL_MODE
-                          && print STDERR $convergence_log_message;
+                          && print {*STDERR} $convergence_log_message;
                         $diagnostics_object->write_diagnostics(
                             $convergence_log_message)
                           if $diagnostics_object;
@@ -2676,7 +2805,7 @@ EOM
                         $rstatus->{'converged'} = 1;
                     }
                 }
-            } ## end if ($do_convergence_test)
+            }
 
             if ($stop_now) {
 
@@ -2688,38 +2817,43 @@ EOM
                         # convergence test above is temporarily skipped for
                         # testing.
                         if ( $iteration_of_formatter_convergence < $iter - 1 ) {
-                            print STDERR
+                            print {*STDERR}
 "STRANGE Early conv in $display_name: Stopping on it=$iter, converged in formatter on $iteration_of_formatter_convergence\n";
                         }
                     }
                     elsif ( !$stopping_on_error ) {
-                        print STDERR
+                        print {*STDERR}
 "STRANGE no conv in $display_name: stopping on it=$iter, but not converged in formatter\n";
+                    }
+                    else {
+                        ## looks ok
                     }
                 }
 
                 # we are stopping the iterations early;
-                # copy the output stream to its final destination
-                $sink_object = $sink_object_final;
-                while ( my $line = $source_object->get_line() ) {
-                    $sink_object->write_line($line);
-                }
-                $source_object->close_input_file();
                 last;
             }
         } ## end if ( $iter < $max_iterations)
     } ## end loop over iterations for one source file
 
-    $sink_object->close_output_file()    if $sink_object;
-    $debugger_object->close_debug_file() if $debugger_object;
-    $fh_tee->close()                     if $fh_tee;
+    $debugger_object->close_debug_file()
+      if $debugger_object;
+
+    if (   $fh_tee
+        && $fh_tee->can('close')
+        && !ref($tee_file)
+        && $tee_file ne '-' )
+    {
+        $fh_tee->close()
+          or Warn("couldn't close TEE file $tee_file: $OS_ERROR\n");
+    }
 
     # leave logger object open for additional messages
     $logger_object = $logger_object_final;
     $logger_object->write_logfile_entry($convergence_log_message)
       if $convergence_log_message;
 
-    return;
+    return $routput_string;
 
 } ## end sub process_iteration_layer
 
@@ -2750,19 +2884,54 @@ sub process_single_case {
     return;
 } ## end sub process_single_case
 
-sub copy_buffer_to_destination {
+sub copy_buffer_to_external_ref {
 
-    my ( $self, $destination_buffer, $destination_stream,
-        $encode_destination_buffer )
-      = @_;
+    my ( $self, $routput, $destination_stream ) = @_;
 
-    # Copy $destination_buffer to the final $destination_stream,
+    # Copy $routput to the final $destination_stream,
     # encoding if the flag $encode_destination_buffer is true.
 
     # Data Flow:
     #    $destination_buffer -> [ encode? ] -> $destination_stream
 
+    my $destination_buffer = EMPTY_STRING;
+    if ( ref($routput) eq 'ARRAY' ) {
+        $destination_buffer = join EMPTY_STRING, @{$routput};
+    }
+    elsif ( ref($routput) eq 'SCALAR' ) {
+        $destination_buffer = ${$routput};
+    }
+    else {
+        Fatal(
+            "'copy_buffer_to_external_ref' expecting ref to ARRAY or SCALAR\n");
+    }
+
     $rstatus->{'output_encoded_as'} = EMPTY_STRING;
+    my $ref_destination_stream = ref($destination_stream);
+
+    # Encode output? Strings and arrays use special encoding rules; see:
+    #   https://github.com/perltidy/perltidy/blob/master/docs/eos_flag.md
+    my $encode_destination_buffer;
+    if (   $ref_destination_stream eq 'SCALAR'
+        || $ref_destination_stream eq 'ARRAY' )
+    {
+        my $rOpts = $self->[_rOpts_];
+        $encode_destination_buffer =
+          $rOpts->{'encode-output-strings'} && $self->[_decoded_input_as_];
+    }
+
+    # An object with a print method will use file encoding rules
+    elsif ( $ref_destination_stream->can('print') ) {
+        $encode_destination_buffer = $self->[_is_encoded_data_];
+    }
+    else {
+        confess <<EOM;
+------------------------------------------------------------------------
+No 'print' method is defined for object of class '$ref_destination_stream'
+Please check your call to Perl::Tidy::perltidy. Trace follows.
+------------------------------------------------------------------------
+EOM
+    }
 
     if ($encode_destination_buffer) {
         my $encoded_buffer;
@@ -2787,12 +2956,12 @@ sub copy_buffer_to_destination {
     }
 
     # Send data for SCALAR, ARRAY & OBJ refs to its final destination
-    if ( ref($destination_stream) eq 'SCALAR' ) {
+    if ( $ref_destination_stream eq 'SCALAR' ) {
         ${$destination_stream} = $destination_buffer;
     }
-    elsif ($destination_buffer) {
+    elsif ( defined($destination_buffer) ) {
         my @lines = split /^/, $destination_buffer;
-        if ( ref($destination_stream) eq 'ARRAY' ) {
+        if ( $ref_destination_stream eq 'ARRAY' ) {
             @{$destination_stream} = @lines;
         }
 
@@ -2801,7 +2970,6 @@ sub copy_buffer_to_destination {
             foreach my $line (@lines) {
                 $destination_stream->print($line);
             }
-            my $ref_destination_stream = ref($destination_stream);
             if ( $ref_destination_stream->can('close') ) {
                 $destination_stream->close();
             }
@@ -2813,7 +2981,7 @@ sub copy_buffer_to_destination {
         # happen for example if user deleted all pod or comments
     }
     return;
-} ## end sub copy_buffer_to_destination
+} ## end sub copy_buffer_to_external_ref
 
 } ## end of closure for sub perltidy
 
@@ -2852,17 +3020,15 @@ sub compare_string_buffers {
 
     # Compare input and output string buffers and return a brief text
     # description of the first difference.
-    my ( $bufi, $bufo, $is_encoded_data ) = @_;
+    my ( $rbufi, $rbufo ) = @_;
 
-    my $leni = length($bufi);
-    my $leno = defined($bufo) ? length($bufo) : 0;
+    my $leni = defined($rbufi) ? length( ${$rbufi} ) : 0;
+    my $leno = defined($rbufo) ? length( ${$rbufo} ) : 0;
     my $msg =
       "Input  file length is $leni chars\nOutput file length is $leno chars\n";
     return $msg unless $leni && $leno;
-
-    my ( $fhi, $fnamei ) = streamhandle( \$bufi, 'r', $is_encoded_data );
-    my ( $fho, $fnameo ) = streamhandle( \$bufo, 'r', $is_encoded_data );
-    return $msg unless ( $fho && $fhi );    # for safety, shouldn't happen
+    my @aryi = split /^/, ${$rbufi};
+    my @aryo = split /^/, ${$rbufo};
     my ( $linei,  $lineo );
     my ( $counti, $counto )                          = ( 0, 0 );
     my ( $last_nonblank_line, $last_nonblank_count ) = ( EMPTY_STRING, 0 );
@@ -2878,8 +3044,8 @@ sub compare_string_buffers {
             $last_nonblank_line  = $linei;
             $last_nonblank_count = $counti;
         }
-        $linei = $fhi->getline();
-        $lineo = $fho->getline();
+        $linei = shift @aryi;
+        $lineo = shift @aryo;
 
         # compare chomp'ed lines
         if ( defined($linei) ) { $counti++; chomp $linei }
@@ -2962,10 +3128,10 @@ sub fileglob_to_re {
 
     # modified (corrected) from version in find2perl
     my $x = shift;
-    $x =~ s#([./^\$()])#\\$1#g;    # escape special characters
-    $x =~ s#\*#.*#g;               # '*' -> '.*'
-    $x =~ s#\?#.#g;                # '?' -> '.'
-    return "^$x\\z";               # match whole word
+    $x =~ s/([.\/^\$()])/\\$1/g;    # escape special characters
+    $x =~ s/\*/.*/g;                # '*' -> '.*'
+    $x =~ s/\?/./g;                 # '?' -> '.'
+    return "^$x\\z";                # match whole word
 } ## end sub fileglob_to_re
 
 sub make_logfile_header {
@@ -3143,6 +3309,7 @@ sub generate_options {
     $add_option->( 'use-unicode-gcstring',       'gcs',   '!' );
     $add_option->( 'warning-output',             'w',     '!' );
     $add_option->( 'add-terminal-newline',       'atnl',  '!' );
+    $add_option->( 'line-range-tidy',            'lrt',   '=s' );
 
     # options which are both toggle switches and values moved here
     # to hide from tidyview (which does not show category 0 flags):
@@ -3381,6 +3548,9 @@ sub generate_options {
     ########################################
     $category = 9;    # Other controls
     ########################################
+    $add_option->( 'warn-missing-else',            'wme',  '!' );
+    $add_option->( 'add-missing-else',             'ame',  '!' );
+    $add_option->( 'add-missing-else-comment',     'amec', '=s' );
     $add_option->( 'delete-block-comments',        'dbc',  '!' );
     $add_option->( 'delete-closing-side-comments', 'dcsc', '!' );
     $add_option->( 'delete-pod',                   'dp',   '!' );
@@ -3435,12 +3605,15 @@ sub generate_options {
     foreach my $opt (@option_string) {
         my $long_name = $opt;
         $long_name =~ s/(!|=.*|:.*)$//;
-        unless ( defined( $option_category{$long_name} ) ) {
+        if ( !defined( $option_category{$long_name} ) ) {
             if ( $long_name =~ /^html-linked/ ) {
                 $category = 10;    # HTML options
             }
             elsif ( $long_name =~ /^pod2html/ ) {
                 $category = 11;    # Pod2html
+            }
+            else {
+                $category = 12;    # HTML properties
             }
             $option_category{$long_name} = $category_name[$category];
         }
@@ -3600,7 +3773,6 @@ sub generate_options {
       noweld-nested-containers
       recombine
       nouse-unicode-gcstring
-      use-feature=class
       valign-code
       valign-block-comments
       valign-side-comments
@@ -3925,7 +4097,7 @@ sub _process_command_line {
         local @ARGV = ();
 
         # do not load the defaults if we are just dumping perltidyrc
-        unless ( $dump_options_type eq 'perltidyrc' ) {
+        if ( $dump_options_type ne 'perltidyrc' ) {
             for my $i ( @{$rdefaults} ) { push @ARGV, "--" . $i }
         }
         if ( !GetOptions( \%Opts, @{$roption_string} ) ) {
@@ -3978,15 +4150,17 @@ sub _process_command_line {
                     }
                 }
             }
-            unless ( -e $config_file ) {
-                Warn("cannot find file given with -pro=$config_file: $ERRNO\n");
+            if ( !-e $config_file ) {
+                Warn(
+                    "cannot find file given with -pro=$config_file: $OS_ERROR\n"
+                );
                 $config_file = EMPTY_STRING;
             }
         }
         elsif ( $i =~ /^-(pro|profile)=?$/ ) {
             Die("usage: -pro=filename or --profile=filename, no spaces\n");
         }
-        elsif ( $i =~ /^-(help|h|HELP|H|\?)$/ ) {
+        elsif ( $i =~ /^-(?: help | [ h \? ] )$/xi ) {
             usage();
             Exit(0);
         }
@@ -4010,6 +4184,9 @@ sub _process_command_line {
             Perl::Tidy::Tokenizer->dump_token_types(*STDOUT);
             Exit(0);
         }
+        else {
+            ## no more special cases
+        }
     }
 
     if ( $saw_dump_profile && $saw_ignore_profile ) {
@@ -4020,7 +4197,7 @@ sub _process_command_line {
     #----------------------------------------
     # read any .perltidyrc configuration file
     #----------------------------------------
-    unless ($saw_ignore_profile) {
+    if ( !$saw_ignore_profile ) {
 
         # resolve possible conflict between $perltidyrc_stream passed
         # as call parameter to perltidy and -pro=filename on command
@@ -4048,25 +4225,25 @@ EOM
           unless $config_file;
 
         # open any config file
-        my $fh_config;
+        my $rconfig_string;
         if ($config_file) {
-            ( $fh_config, $config_file ) =
-              Perl::Tidy::streamhandle( $config_file, 'r' );
-            unless ($fh_config) {
+            $rconfig_string = slurp_stream($config_file);
+            if ( !defined($rconfig_string) ) {
                 ${$rconfig_file_chatter} .=
                   "# $config_file exists but cannot be opened\n";
             }
         }
 
         if ($saw_dump_profile) {
-            dump_config_file( $fh_config, $config_file, $rconfig_file_chatter );
+            dump_config_file( $rconfig_string, $config_file,
+                $rconfig_file_chatter );
             Exit(0);
         }
 
-        if ($fh_config) {
+        if ( defined($rconfig_string) ) {
 
             my ( $rconfig_list, $death_message ) =
-              read_config_file( $fh_config, $config_file, $rexpansion );
+              read_config_file( $rconfig_string, $config_file, $rexpansion );
             Die($death_message) if ($death_message);
 
             # process any .perltidyrc parameters right now so we can
@@ -4270,7 +4447,10 @@ sub cleanup_word_list {
 
 sub check_options {
 
-    my ( $self, $is_Windows, $Windows_type, $rpending_complaint ) = @_;
+    my ( $self, $is_Windows, $Windows_type, $rpending_complaint, $num_files ) =
+      @_;
+
+    # $num_files = number of files to be processed, for error checks
 
     my $rOpts = $self->[_rOpts_];
 
@@ -4281,7 +4461,7 @@ sub check_options {
     # Since perltidy only encodes in utf8, problems can occur if we let it
     # decode anything else.  See discussions for issue git #83.
     my $encoding = $rOpts->{'character-encoding'};
-    if ( $encoding !~ /^\s*(guess|none|utf8|utf-8)\s*$/i ) {
+    if ( $encoding !~ /^\s*(?:guess|none|utf8|utf-8)\s*$/i ) {
         Die(<<EOM);
 --character-encoding = '$encoding' is not allowed; the options are: 'none', 'guess', 'utf8'
 EOM
@@ -4419,28 +4599,14 @@ EOM
         $rOpts->{'default-tabsize'} = 8;
     }
 
-    # Check and clean up any use-feature list
-    my $saw_use_feature_class;
-    if ( $rOpts->{'use-feature'} ) {
-        my $rseen = cleanup_word_list( $rOpts, 'use-feature' );
-        $saw_use_feature_class = $rseen->{'class'};
-    }
-
     # Check and clean up any sub-alias-list
-    if (
-        defined( $rOpts->{'sub-alias-list'} )
-        && length( $rOpts->{'sub-alias-list'} )
-
-        || $saw_use_feature_class
-      )
+    if ( defined( $rOpts->{'sub-alias-list'} )
+        && length( $rOpts->{'sub-alias-list'} ) )
     {
         my @forced_words;
 
         # include 'sub' for convenience if this option is used
         push @forced_words, 'sub';
-
-        # use-feature=class requires method as a sub alias
-        push @forced_words, 'method' if ($saw_use_feature_class);
 
         cleanup_word_list( $rOpts, 'sub-alias-list', \@forced_words );
     }
@@ -4475,59 +4641,46 @@ EOM
         $rOpts->{'logical-padding'} = 0;
     }
 
-    # Define $tabsize, the number of spaces per tab for use in
-    # guessing the indentation of source lines with leading tabs.
-    # Assume same as for this run if tabs are used, otherwise assume
-    # a default value, typically 8
-    $self->[_tabsize_] =
-        $rOpts->{'entab-leading-whitespace'}
-      ? $rOpts->{'entab-leading-whitespace'}
-      : $rOpts->{'tabs'} ? $rOpts->{'indent-columns'}
-      :                    $rOpts->{'default-tabsize'};
-
     # Define the default line ending, before any -ple option is applied
     $self->[_line_separator_default_] = get_line_separator_default($rOpts);
 
-    return;
-} ## end sub check_options
+    $self->[_line_tidy_begin_] = undef;
+    $self->[_line_tidy_end_]   = undef;
+    my $line_range_tidy = $rOpts->{'line-range-tidy'};
+    if ($line_range_tidy) {
 
-sub get_line_separator_default {
-
-    my ( $rOpts, $input_file ) = @_;
-
-    # Get the line separator that will apply unless overridden by a
-    # --preserve-line-endings flag for a specific file
-
-    my $line_separator_default = "\n";
-
-    my $ole = $rOpts->{'output-line-ending'};
-    if ($ole) {
-        my %endings = (
-            dos  => "\015\012",
-            win  => "\015\012",
-            mac  => "\015",
-            unix => "\012",
-        );
-
-        $line_separator_default = $endings{ lc $ole };
-
-        if ( !$line_separator_default ) {
-            my $str = join SPACE, keys %endings;
+        if ( $num_files > 1 ) {
             Die(<<EOM);
-Unrecognized line ending '$ole'; expecting one of: $str
+--line-range-tidy expects no more than 1 filename in the arg list but saw $num_files filenames
 EOM
         }
 
-        # Check for conflict with -ple
-        if ( $rOpts->{'preserve-line-endings'} ) {
-            Warn("Ignoring -ple; conflicts with -ole\n");
-            $rOpts->{'preserve-line-endings'} = undef;
+        $line_range_tidy =~ s/\s+//g;
+        if ( $line_range_tidy =~ /^(\d+):(\d+)?$/ ) {
+            my $n1 = $1;
+            my $n2 = $2;
+            if ( $n1 < 1 ) {
+                Die(<<EOM);
+--line-range-tidy=n1:n2 expects starting line number n1>=1 but n1=$n1
+EOM
+            }
+            if ( defined($n2) && $n2 < $n1 ) {
+                Die(<<EOM);
+--line-range-tidy=n1:n2 expects ending line number n2>=n1 but n1=$n1 and n2=$n2
+EOM
+            }
+            $self->[_line_tidy_begin_] = $n1;
+            $self->[_line_tidy_end_]   = $n2;
+        }
+        else {
+            Die(
+"unrecognized 'line-range-tidy'; expecting format '-lrt=n1:n2'\n"
+            );
         }
     }
 
-    return $line_separator_default;
-
-} ## end sub get_line_separator_default
+    return;
+} ## end sub check_options
 
 sub find_file_upwards {
     my ( $search_dir, $search_file ) = @_;
@@ -4663,7 +4816,7 @@ DIE
 # Debug routine -- this will dump the expansion hash
 sub dump_short_names {
     my $rexpansion = shift;
-    print STDOUT <<EOM;
+    print {*STDOUT} <<EOM;
 List of short names.  This list shows how all abbreviations are
 translated into other abbreviations and, eventually, into long names.
 New abbreviations may be defined in a .perltidyrc file.  
@@ -4672,7 +4825,7 @@ For a list of all long names, use perltidy --dump-long-names (-dln).
 EOM
     foreach my $abbrev ( sort keys %{$rexpansion} ) {
         my @list = @{ $rexpansion->{$abbrev} };
-        print STDOUT "$abbrev --> @list\n";
+        print {*STDOUT} "$abbrev --> @list\n";
     }
     return;
 } ## end sub dump_short_names
@@ -4692,7 +4845,7 @@ sub check_vms_filename {
     $base =~ s/;-?\d*$//
 
       # remove explicit . version ie two dots in filename NB ^ escapes a dot
-      or $base =~ s/(          # begin capture $1
+      or $base =~ s{(          # begin capture $1
                   (?:^|[^^])\. # match a dot not preceded by a caret
                   (?:          # followed by nothing
                     |          # or
@@ -4700,7 +4853,7 @@ sub check_vms_filename {
                   )
                 )              # end capture $1
                 \.-?\d*$       # match . version number
-              /$1/x;
+              }{$1}x;
 
     # normalize filename, if there are no unescaped dots then append one
     $base .= '.' unless $base =~ /(?:^|[^^])\./;
@@ -4765,7 +4918,7 @@ sub Win_OS_Type {
 
     # If $os is undefined, the above code is out of date.  Suggested updates
     # are welcome.
-    unless ( defined $os ) {
+    if ( !defined($os) ) {
         $os = EMPTY_STRING;
 
         # Deactivated this message 20180322 because it was needlessly
@@ -4976,25 +5129,22 @@ sub Win_Config_Locs {
 } ## end sub Win_Config_Locs
 
 sub dump_config_file {
-    my ( $fh, $config_file, $rconfig_file_chatter ) = @_;
-    print STDOUT "${$rconfig_file_chatter}";
-    if ($fh) {
-        print STDOUT "# Dump of file: '$config_file'\n";
-        while ( my $line = $fh->getline() ) { print STDOUT $line }
-        my $ok = eval { $fh->close(); 1 };
-        if ( !$ok && DEVEL_MODE ) {
-            Fault("Could not close file handle(): $EVAL_ERROR\n");
-        }
+    my ( $rconfig_string, $config_file, $rconfig_file_chatter ) = @_;
+    print {*STDOUT} "${$rconfig_file_chatter}";
+    if ($rconfig_string) {
+        my @lines = split /^/, ${$rconfig_string};
+        print {*STDOUT} "# Dump of file: '$config_file'\n";
+        while ( defined( my $line = shift @lines ) ) { print {*STDOUT} $line }
     }
     else {
-        print STDOUT "# ...no config file found\n";
+        print {*STDOUT} "# ...no config file found\n";
     }
     return;
 } ## end sub dump_config_file
 
 sub read_config_file {
 
-    my ( $fh, $config_file, $rexpansion ) = @_;
+    my ( $rconfig_string, $config_file, $rexpansion ) = @_;
     my @config_list = ();
 
     # file is bad if non-empty $death_message is returned
@@ -5003,7 +5153,8 @@ sub read_config_file {
     my $name = undef;
     my $line_no;
     my $opening_brace_line;
-    while ( my $line = $fh->getline() ) {
+    my @lines = split /^/, ${$rconfig_string};
+    while ( defined( my $line = shift @lines ) ) {
         $line_no++;
         chomp $line;
         ( $line, $death_message ) =
@@ -5059,6 +5210,9 @@ sub read_config_file {
                 last;
             }
         }
+        else {
+            ## done
+        }
 
         # Now store any parameters
         if ($body) {
@@ -5089,10 +5243,6 @@ EOM
         $death_message =
 "Didn't see a '}' to match the '{' at line $opening_brace_line in config file '$config_file'\n";
     }
-    my $ok = eval { $fh->close(); 1 };
-    if ( !$ok && DEVEL_MODE ) {
-        Fault("Could not close file handle(): $EVAL_ERROR\n");
-    }
     return ( \@config_list, $death_message );
 } ## end sub read_config_file
 
@@ -5113,7 +5263,7 @@ sub strip_comment {
     }
 
     # handle case of no quotes
-    elsif ( $instr !~ /['"]/ ) {
+    if ( $instr !~ /['"]/ ) {
 
         # We now require a space before the # of a side comment
         # this allows something like:
@@ -5240,7 +5390,7 @@ EOM
 sub dump_long_names {
 
     my @names = @_;
-    print STDOUT <<EOM;
+    print {*STDOUT} <<EOM;
 # Command line long names (passed to GetOptions)
 #--------------------------------------------------
 # here is a summary of the Getopt codes:
@@ -5256,14 +5406,14 @@ sub dump_long_names {
 #--------------------------------------------------
 EOM
 
-    foreach my $name ( sort @names ) { print STDOUT "$name\n" }
+    foreach my $name ( sort @names ) { print {*STDOUT} "$name\n" }
     return;
 } ## end sub dump_long_names
 
 sub dump_defaults {
     my @defaults = @_;
-    print STDOUT "Default command line options:\n";
-    foreach my $line ( sort @defaults ) { print STDOUT "$line\n" }
+    print {*STDOUT} "Default command line options:\n";
+    foreach my $line ( sort @defaults ) { print {*STDOUT} "$line\n" }
     return;
 } ## end sub dump_defaults
 
@@ -5313,7 +5463,7 @@ sub readable_options {
 } ## end sub readable_options
 
 sub show_version {
-    print STDOUT <<"EOM";
+    print {*STDOUT} <<"EOM";
 This is perltidy, v$VERSION 
 
 Copyright 2000-2023, Steve Hancock
@@ -5329,7 +5479,7 @@ EOM
 
 sub usage {
 
-    print STDOUT <<EOF;
+    print {*STDOUT} <<EOF;
 This is perltidy version $VERSION, a perl script indenter.  Usage:
 
     perltidy [ options ] file1 file2 file3 ...

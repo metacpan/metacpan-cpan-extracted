@@ -10,7 +10,7 @@ package Connector;
 # because of the '//' operator in one of the sub-modules.
 use 5.010001;
 
-our $VERSION = '1.47';
+our $VERSION = '1.51';
 
 use strict;
 use warnings;
@@ -320,7 +320,7 @@ sub get { shift; die "No get() method defined";  };
 sub get_list { shift; die "No get_list() method defined";  };
 sub get_hash { shift; die "No get_hash() method defined";  };
 sub get_meta { shift; die "No get_meta() method defined";  };
-sub get_reference { shift; die "No get_hash() method defined";  };
+sub get_reference { shift; die "No get_reference() method defined [deprecated]";  };
 sub set { shift;  die "No set() method defined";  };
 sub cleanup {};
 
@@ -343,7 +343,7 @@ method, which, when given a key, returns the associated value from the
 connector's data source.
 
 Typically, a connector acts as a proxy to a simple data source like
-YAML, Config::Std, Config::Versioned, or to a more complex data source
+YAML, Config::Std, or to a more complex data source
 like an LDAP server or Proc::SafeExec. The standard calling convention
 via get(KEY) makes the connectors interchangeable.
 
@@ -441,7 +441,7 @@ values of all keys (including undef elements if they are explicitly given).
 
 If the node does not exist, an empty list is returned.
 
-=head2 get_reference
+=head2 get_reference [deprecated]
 
 Rarely used, returns the value of a reference node. Currently used by
 Connector::Multi in combination with Connector::Proxy::Config::Versioned

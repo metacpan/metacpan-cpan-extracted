@@ -353,7 +353,7 @@ This package provides the following methods:
 
 =head2 clear
 
-  clear() (Gather)
+  clear() (Venus::Gather)
 
 The clear method resets all gather conditions and returns the invocant.
 
@@ -377,7 +377,7 @@ I<Since C<1.55>>
 
 =head2 data
 
-  data(HashRef $data) (Gather)
+  data(hashref $data) (Venus::Gather)
 
 The data method takes a hashref (i.e. lookup table) and creates gather
 conditions and actions based on the keys and values found.
@@ -459,7 +459,7 @@ I<Since C<1.55>>
 
 =head2 expr
 
-  expr(Str | RegexpRef $expr) (Gather)
+  expr(string | regexp $expr) (Venus::Gather)
 
 The expr method registers a L</when> condition that check if the match value is
 an exact string match of the C<$topic> if the topic is a string, or that it
@@ -529,7 +529,7 @@ I<Since C<1.55>>
 
 =head2 just
 
-  just(Str $topic) (Gather)
+  just(string $topic) (Venus::Gather)
 
 The just method registers a L</when> condition that check if the match value is
 an exact string match of the C<$topic> provided.
@@ -634,7 +634,7 @@ I<Since C<1.55>>
 
 =head2 none
 
-  none(Any | CodeRef $code) (Gather)
+  none(any | coderef $code) (Venus::Gather)
 
 The none method registers a special condition that returns a result only when
 no other conditions have been matched.
@@ -718,7 +718,7 @@ I<Since C<1.55>>
 
 =head2 only
 
-  only(CodeRef $code) (Gather)
+  only(coderef $code) (Venus::Gather)
 
 The only method registers a special condition that only allows matching on the
 value only if the code provided returns truthy.
@@ -796,7 +796,7 @@ I<Since C<1.55>>
 
 =head2 result
 
-  result(Any $data) (Any)
+  result(any $data) (any)
 
 The result method evaluates the registered conditions and returns the result of
 the action (i.e. the L</then> code) or the special L</none> condition if there
@@ -960,7 +960,7 @@ I<Since C<1.55>>
 
 =head2 skip
 
-  skip() (Gather)
+  skip() (Venus::Gather)
 
 The skip method registers a L</then> condition which ignores (i.e. skips) the
 matched line item.
@@ -1002,7 +1002,7 @@ I<Since C<1.55>>
 
 =head2 take
 
-  take() (Gather)
+  take() (Venus::Gather)
 
 The take method registers a L</then> condition which returns (i.e. takes) the
 matched line item as-is.
@@ -1042,7 +1042,7 @@ I<Since C<1.55>>
 
 =head2 then
 
-  then(Any | CodeRef $code) (Gather)
+  then(any | coderef $code) (Venus::Gather)
 
 The then method registers an action to be executed if the corresponding gather
 condition returns truthy.
@@ -1120,7 +1120,7 @@ I<Since C<1.55>>
 
 =head2 when
 
-  when(Str | CodeRef $code, Any @args) (Gather)
+  when(string | coderef $code, any @args) (Venus::Gather)
 
 The when method registers a match condition that will be passed the match value
 during evaluation. If the match condition returns truthy the corresponding
@@ -1170,7 +1170,7 @@ I<Since C<1.55>>
 
 =head2 where
 
-  where() (Gather)
+  where() (Venus::Gather)
 
 The where method registers an action as a sub-match operation, to be executed
 if the corresponding match condition returns truthy. This method returns the
@@ -1272,7 +1272,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

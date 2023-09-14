@@ -1,0 +1,115 @@
+
+NAME
+    FixerIO::API - Access to the fixer.io currency exchange rate API.
+
+VERSION
+    Version 0.1.0
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SYNOPSIS
+        use FixerIO::API;
+
+        my $access_key = <your-key-here>;
+        my $fixer = FixerIO::API->new( $access_key );
+
+        # get latest data
+        my $ld = $fixer->latest;
+
+        use DDP hash_max=>5;
+        p $ld, as=>"Latest Data:";
+
+        Will print,
+        Latest Data:
+        {
+            success     1 (JSON::PP::Boolean),
+            base        "EUR",
+            date        "2023-09-03" (dualvar: 2023),
+            timestamp   1693764783,
+            rates       {
+                AED   3.965325,
+                AFN   79.575894,
+                ALL   108.330797,
+                AMD   418.325847,
+                ANG   1.954454,
+                (...skipping 165 keys...)
+            }
+        }
+
+DESCRIPTION
+    This is a Perl module for accessing the API provided by fixer.io. See,
+    "http://fixer.io/documentation".
+
+    This module doesn't export anything. Nor does it keep any data, other
+    than your API access key. Your script will keep or do what it wants with
+    the data.
+
+    You have to obtain your own API key from the fixer.io web site. There is
+    a free option.
+
+IMPLEMENTED ENDPOINTS
+    Please note that depending on your subscription plan, certain API
+    endpoints may not be available.
+
+  LATEST RATES
+    Returns real-time exchange rate data for all available or a specific set
+    of currencies.
+
+    Specifying symbols is not implemented. Changing the base is not
+    implemented. The etags optimization is not implemented.
+
+EXPORT
+    No exports.
+
+SUBROUTINES/METHODS
+  new
+    Instantiate a new API access object. Pass in your API access key as an
+    argument.
+
+  api_call
+    Perform the HTTP(S) request, return the response data.
+
+  latest
+    Return the latest data.
+
+AUTHOR
+    Harry Wozniak, "<woznotwoz at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-fixerio-api at
+    rt.cpan.org", or through the web interface at
+    <https://rt.cpan.org/NoAuth/ReportBug.html?Queue=FixerIO-API>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc FixerIO::API
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <https://rt.cpan.org/NoAuth/Bugs.html?Dist=FixerIO-API>
+
+    *   CPAN Ratings
+
+        <https://cpanratings.perl.org/d/FixerIO-API>
+
+    *   Search CPAN
+
+        <https://metacpan.org/release/FixerIO-API>
+
+LICENSE AND COPYRIGHT
+    This software is copyright (c) 2023 by Harry Wozniak.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.

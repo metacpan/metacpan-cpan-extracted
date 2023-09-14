@@ -1,10 +1,11 @@
 NAME
-    Acme::CPANModules::XSVersions - List of XS versions of Perl modules
+    Acme::CPANModules::XSVersions - List of Perl modules which have XS
+    implementation or backend
 
 VERSION
-    This document describes version 0.003 of Acme::CPANModules::XSVersions
+    This document describes version 0.004 of Acme::CPANModules::XSVersions
     (from Perl distribution Acme-CPANModules-XSVersions), released on
-    2022-03-18.
+    2023-09-05.
 
 SYNOPSIS
     To install all XS versions of PP modules currently installed on your
@@ -37,307 +38,393 @@ DESCRIPTION
     Additions much welcome.
 
 ACME::CPANMODULES ENTRIES
-    *   Algorithm::Diff - Compute `intelligent' differences between two
-        files / lists
-
+    Algorithm::Diff
         Author: RJBS <https://metacpan.org/author/RJBS>
 
-    *   Algorithm::LUHN - Calculate the Modulus 10 Double Add Double
-        checksum
+        XS module: Algorithm::Diff::XS
 
+    Algorithm::LUHN
         Author: NEILB <https://metacpan.org/author/NEILB>
 
-    *   Algorithm::PageRank - Calculate PageRank in Perl
+        XS module: Algorithm::LUHN_XS
 
+    Algorithm::PageRank
         Author: XERN <https://metacpan.org/author/XERN>
 
-    *   Algorithm::RectanglesContainingDot - find rectangles containing a
-        given dot
+        XS module: Algorithm::PageRank::XS
 
+    Algorithm::RectanglesContainingDot
         Author: SALVA <https://metacpan.org/author/SALVA>
 
-    *   Bytes::Random - Perl extension to generate random bytes.
+        XS module: Algorithm::RectanglesContainingDot_XS
 
+    Bytes::Random
         Author: JOHND <https://metacpan.org/author/JOHND>
 
-    *   Class::Accessor::Fast - Faster, but less expandable, accessors
+        XS module: Bytes::Random::XS
 
+    Class::Accessor::Fast
         Author: KASEI <https://metacpan.org/author/KASEI>
 
-    *   Class::C3 - A pragma to use the C3 method resolution order algorithm
+        XS module: Class::Accessor::Fast::XS
 
+    Class::C3
         Author: HAARG <https://metacpan.org/author/HAARG>
 
-    *   Class::Load - A working (require "Class::Name") and more
+        XS module: Class::C3::XS
 
+    Class::Load
         Author: ETHER <https://metacpan.org/author/ETHER>
 
-    *   Convert::Bencode - Functions for converting to/from bencoded strings
+        XS module: Class::Load::XS
 
+    Convert::Bencode
         Author: ORCLEV <https://metacpan.org/author/ORCLEV>
 
-    *   Crypt::Passwd - Perl wrapper around the UFC Crypt
+        XS module: Convert::Bencode_XS
 
+    Crypt::Passwd
         Author: LUISMUNOZ <https://metacpan.org/author/LUISMUNOZ>
 
-    *   Crypt::TEA_PP - Pure Perl Implementation of the Tiny Encryption
-        Algorithm
+        XS module: Crypt::Passwd::XS
 
+    Crypt::TEA_PP
         Author: JAHIY <https://metacpan.org/author/JAHIY>
 
-    *   Crypt::XXTEA_PP - Pure Perl Implementation of Corrected Block Tiny
-        Encryption Algorithm
+        XS module: Crypt::TEA_XS
 
+    Crypt::XXTEA_PP
         Author: JAHIY <https://metacpan.org/author/JAHIY>
 
-    *   DDC::PP - pure-perl DDC::XS clone: constants
+        XS module: Crypt::XXTEA_XS
 
+    DDC::PP
         Author: MOOCOW <https://metacpan.org/author/MOOCOW>
 
-    *   Crypt::Skip32 - 32-bit block cipher based on Skipjack
+        XS module: DDC::XS
 
+    Crypt::Skip32
         Author: ESH <https://metacpan.org/author/ESH>
 
-    *   Date::Calc
+        XS module: Crypt::Skip32::XS
 
+    Date::Calc
         Author: STBEY <https://metacpan.org/author/STBEY>
 
-    *   Directory::Iterator - Simple, efficient recursive directory listing
+        XS module: Date::Calc::XS
 
+        PP module: Date::Calc::PP
+
+    Directory::Iterator
         Author: SANBEG <https://metacpan.org/author/SANBEG>
 
-    *   Encode - character encodings in Perl
+        XS module: Directory::Iterator::XS
 
+        PP module: Directory::Iterator::PP
+
+    Encode
         Author: DANKOGAI <https://metacpan.org/author/DANKOGAI>
 
-    *   Encoding::FixLatin - takes mixed encoding input and produces UTF-8
-        output
+        XS module: Encode::XS
 
+    Encoding::FixLatin
         Author: GRANTM <https://metacpan.org/author/GRANTM>
 
-    *   File::MMagic - Guess file type
+        XS module: Encoding::FixLatin::XS
 
+    File::MMagic
         Author: KNOK <https://metacpan.org/author/KNOK>
 
-    *   Geo::Coordinates::UTM - Perl extension for Latitiude Longitude
-        conversions.
+        XS module: File::MMagic::XS
 
+    Geo::Coordinates::UTM
         Author: GRAHAMC <https://metacpan.org/author/GRAHAMC>
 
-    *   Geo::Distance - Calculate distances and closest locations.
-        (DEPRECATED)
+        XS module: Geo::Coordinates::UTM::XS
 
+    Geo::Distance
         Author: BLUEFEET <https://metacpan.org/author/BLUEFEET>
 
-    *   Geo::Hash - Encode / decode geohash.org locations.
+        XS module: Geo::Distance::XS
 
+    Geo::Hash
         Author: ANDYA <https://metacpan.org/author/ANDYA>
 
-    *   HTTP::Headers::Fast - faster implementation of HTTP::Headers
+        XS module: Geo::Hash::XS
 
+    HTTP::Headers::Fast
         Author: TOKUHIROM <https://metacpan.org/author/TOKUHIROM>
 
-    *   HTTP::Parser::XS::PP
+        XS module: HTTP::Headers::Fast::XS
 
+    HTTP::Parser::XS::PP
         Author: KAZUHO <https://metacpan.org/author/KAZUHO>
 
-    *   Heap::Simple - Fast and easy to use classic heaps
+        XS module: HTTP::Parser::XS
 
+    Heap::Simple
         Author: THOSPEL <https://metacpan.org/author/THOSPEL>
 
-    *   Image::Info - Extract meta information from image files
+        XS module: Heap::Simple::XS
 
+    Image::Info
         Author: SREZIC <https://metacpan.org/author/SREZIC>
 
-    *   JSON::PP - JSON::XS compatible pure-Perl module.
+        XS module: Image::Info::XS
 
+    JSON
         Author: ISHIGAKI <https://metacpan.org/author/ISHIGAKI>
 
-    *   Language::Befunge::Vector - an opaque, N-dimensional vector class
+        XS module: JSON::XS
 
+        PP module: JSON::PP
+
+    JSON::MaybeXS
+        Author: ETHER <https://metacpan.org/author/ETHER>
+
+        XS module: Cpanel::JSON::XS
+
+    Language::Befunge::Vector
         Author: JQUELIN <https://metacpan.org/author/JQUELIN>
 
-    *   Language::Befunge::Storage::Generic::Vec - a generic N-dimensional
-        LaheySpace
+        XS module: Language::Befunge::Vector::XS
 
+    Language::Befunge::Storage::Generic::Vec
         Author: JQUELIN <https://metacpan.org/author/JQUELIN>
 
-    *   List::BinarySearch - Binary Search within a sorted array.
+        XS module: Language::Befunge::Storage::Generic::Vec::XS
 
+    List::BinarySearch
         Author: DAVIDO <https://metacpan.org/author/DAVIDO>
 
-    *   List::Flatten - Interpolate array references in a list
+        XS module: List::BinarySearch::XS
 
+    List::Flatten
         Author: OBRADOVIC <https://metacpan.org/author/OBRADOVIC>
 
-    *   List::MoreUtils - Provide the stuff missing in List::Util
+        XS module: List::Flatten::XS
 
+    List::MoreUtils
         Author: REHSACK <https://metacpan.org/author/REHSACK>
 
-    *   List::SomeUtils - Provide the stuff missing in List::Util
+        XS module: List::MoreUtils::XS
 
+    List::SomeUtils
         Author: DROLSKY <https://metacpan.org/author/DROLSKY>
 
-    *   List::Util - A selection of general-utility list subroutines
+        XS module: List::SomeUtils::XS
 
+    List::Util
         Author: PEVANS <https://metacpan.org/author/PEVANS>
 
-    *   List::UtilsBy - higher-order list utility functions
+        XS module: List::Util::XS
 
+    List::UtilsBy
         Author: PEVANS <https://metacpan.org/author/PEVANS>
 
-    *   Math::Derivative - Numeric 1st and 2nd order differentiation
+        XS module: List::UtilsBy::XS
 
+    Math::Derivative
         Author: JGAMBLE <https://metacpan.org/author/JGAMBLE>
 
-    *   Math::Gauss - Gaussian distribution function and its inverse
+        XS module: Math::Derivative_XS
 
+    Math::Gauss
         Author: JANERT <https://metacpan.org/author/JANERT>
 
-    *   Math::Utils - Useful mathematical functions not in Perl.
+        XS module: Math::Gauss::XS
 
+    Math::Utils
         Author: JGAMBLE <https://metacpan.org/author/JGAMBLE>
 
-    *   MaxMind::DB::Reader - Read MaxMind DB files and look up IP addresses
+        XS module: Math::Utils::XS
 
+    MaxMind::DB::Reader
         Author: MAXMIND <https://metacpan.org/author/MAXMIND>
 
-    *   Mojo::Base - Minimal base class for Mojo projects
+        XS module: MaxMind::DB::Reader::XS
 
+    Mojo::Base
         Author: SRI <https://metacpan.org/author/SRI>
 
-    *   Net::IP - Perl extension for manipulating IPv4/IPv6 addresses
+        XS module: Mojo::Base::XS
 
+    Moo Author: HAARG <https://metacpan.org/author/HAARG>
+
+        XS module: Class::XSAccessor
+
+    Net::IP
         Author: MANU <https://metacpan.org/author/MANU>
 
-    *   Net::SNMP - Object oriented interface to SNMP
+        XS module: Net::IP::XS
 
+    Net::SNMP
         Author: DTOWN <https://metacpan.org/author/DTOWN>
 
-    *   Number::Closest - Find number(s) closest to a number in a list of
-        numbers
+        XS module: Net::SNMP::XS
 
+    Number::Closest
         Author: ACCARDO <https://metacpan.org/author/ACCARDO>
 
-    *   Object::Tiny - Class building as simple as it gets
+        XS module: Number::Closest::XS
 
-        Author: ETHER <https://metacpan.org/author/ETHER>
-
-    *   Object::Tiny::RW - Class building as simple as it gets (with rw
-        accessors)
-
-        Author: SCHWIGON <https://metacpan.org/author/SCHWIGON>
-
-    *   PPI - Parse, Analyze and Manipulate Perl (without perl)
-
-        Author: OALDERS <https://metacpan.org/author/OALDERS>
-
-    *   Package::Stash - Routines for manipulating stashes
-
-        Author: ETHER <https://metacpan.org/author/ETHER>
-
-    *   Params::Validate - Validate method/function parameters
-
-        Author: DROLSKY <https://metacpan.org/author/DROLSKY>
-
-    *   Path::Hilbert - A no-frills converter between 1D and 2D spaces using
-        the Hilbert curve
-
-        Author: PWBENNETT <https://metacpan.org/author/PWBENNETT>
-
-    *   PerlX::ArraySkip - sub { shift; @_ }
-
+    Object::Adhoc
         Author: TOBYINK <https://metacpan.org/author/TOBYINK>
 
-    *   PerlX::Maybe - return a pair only if they are both defined
+        XS module: Class::XSAccessor
 
-        Author: TOBYINK <https://metacpan.org/author/TOBYINK>
-
-    *   Protocol::Redis - Redis protocol parser/encoder with asynchronous
-        capabilities.
-
-        Author: UNDEF <https://metacpan.org/author/UNDEF>
-
-    *   Readonly - Facility for creating read-only scalars, arrays, hashes
-
-        Author: SANKO <https://metacpan.org/author/SANKO>
-
-    *   Ref::Util - Utility functions for checking references
-
-        Author: ARC <https://metacpan.org/author/ARC>
-
-    *   Set::IntSpan::Fast - Fast handling of sets containing integer spans.
-
-        Author: ANDYA <https://metacpan.org/author/ANDYA>
-
-    *   Set::Product - generates the cartesian product of a set of lists
-
-        Author: GRAY <https://metacpan.org/author/GRAY>
-
-    *   SOAP::WSDL::Deserializer::XSD - Deserializer SOAP messages into
-        SOAP::WSDL::XSD::Typelib:: objects
-
-        Author: SWALTERS <https://metacpan.org/author/SWALTERS>
-
-    *   Sort::Naturally
-
+    Object::Accessor
         Author: BINGOS <https://metacpan.org/author/BINGOS>
 
-    *   String::Numeric - Determine whether a string represents a numeric
-        value
+        XS module: Object::Accessor::XS
 
+    Object::Tiny
+        Author: ETHER <https://metacpan.org/author/ETHER>
+
+        XS module: Object::Tiny::XS
+
+    Object::Tiny::RW
+        Author: SCHWIGON <https://metacpan.org/author/SCHWIGON>
+
+        XS module: Object::Tiny::RW::XS
+
+    PPI Author: OALDERS <https://metacpan.org/author/OALDERS>
+
+        XS module: PPI::XS
+
+    Package::Stash
+        Author: ETHER <https://metacpan.org/author/ETHER>
+
+        XS module: Package::Stash::XS
+
+    Params::Validate
+        Author: DROLSKY <https://metacpan.org/author/DROLSKY>
+
+        XS module: Params::Validate::XS
+
+    Path::Hilbert
+        Author: PWBENNETT <https://metacpan.org/author/PWBENNETT>
+
+        XS module: Path::Hilbert::XS
+
+    PerlX::ArraySkip
+        Author: TOBYINK <https://metacpan.org/author/TOBYINK>
+
+        XS module: PerlX::ArraySkip::XS
+
+    PerlX::Maybe
+        Author: TOBYINK <https://metacpan.org/author/TOBYINK>
+
+        XS module: PerlX::Maybe::XS
+
+    PPI Author: OALDERS <https://metacpan.org/author/OALDERS>
+
+        XS module: PPI::XS
+
+    Protocol::Redis
+        Author: UNDEF <https://metacpan.org/author/UNDEF>
+
+        XS module: Protocol::Redis::XS
+
+    Readonly
+        Author: SANKO <https://metacpan.org/author/SANKO>
+
+        XS module: Readonly::XS
+
+    Ref::Util
+        Author: ARC <https://metacpan.org/author/ARC>
+
+        XS module: Ref::Util::XS
+
+    Set::IntSpan::Fast
+        Author: ANDYA <https://metacpan.org/author/ANDYA>
+
+        XS module: Set::IntSpan::Fast::XS
+
+    Set::Product
+        Author: GRAY <https://metacpan.org/author/GRAY>
+
+        XS module: Set::Product::XS
+
+    SOAP::WSDL::Deserializer::XSD
+        Author: SWALTERS <https://metacpan.org/author/SWALTERS>
+
+        XS module: SOAP::WSDL::Deserializer::XSD_XS
+
+    Sort::Naturally
+        Author: BINGOS <https://metacpan.org/author/BINGOS>
+
+        XS module: Sort::Naturally::XS
+
+    String::Numeric
         Author: CHANSEN <https://metacpan.org/author/CHANSEN>
 
-    *   Template::Alloy
+        XS module: String::Numeric::XS
 
+    Template::Alloy
         Author: RHANDOM <https://metacpan.org/author/RHANDOM>
 
-    *   Template::Stash - Magical storage for template variables
+        XS module: Template::Alloy::XS
 
-        Author: ATOOMIC <https://metacpan.org/author/ATOOMIC>
+    Template::Stash
+        Author: ABW <https://metacpan.org/author/ABW>
 
-    *   Text::CSV - comma-separated values manipulator (using XS or
-        PurePerl)
+        XS module: Template::Stash::XS
 
+    Text::CSV
         Author: ISHIGAKI <https://metacpan.org/author/ISHIGAKI>
 
-    *   Text::Levenshtein::Damerau - Damerau Levenshtein edit distance.
+        XS module: Text::CSV_XS
 
+    Text::Levenshtein::Damerau
         Author: UGEXE <https://metacpan.org/author/UGEXE>
 
-    *   Time::Format - Easy-to-use date/time formatting.
+        XS module: Text::Levenshtein::Damerau::XS
 
+    Time::Format
         Author: ROODE <https://metacpan.org/author/ROODE>
 
-    *   Type::Tiny - tiny, yet Moo(se)-compatible type constraint
+        XS module: Time::Format_XS
 
+    Type::Params
         Author: TOBYINK <https://metacpan.org/author/TOBYINK>
 
-    *   Tree::Object - Generic tree objects
+        XS module: Class::XSAccessor
 
+    Type::Tiny
+        Author: TOBYINK <https://metacpan.org/author/TOBYINK>
+
+        XS module: Type::Tiny::XS
+
+    Tree::Object
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   URL::Encode
+        XS module: Tree::ObjectXS
 
+    URL::Encode
         Author: CHANSEN <https://metacpan.org/author/CHANSEN>
 
-    *   Unix::Uptime::BSD - BSD implementation of Unix::Uptime (for Darwin,
-        DragonFly, and *BSD)
+        XS module: URL::Encode::XS
 
+    Unix::Uptime::BSD
         Author: PIOTO <https://metacpan.org/author/PIOTO>
 
-    *   XML::CompactTree - builder of compact tree structures from XML
-        documents
+        XS module: Unix::Uptime::BSD::XS
 
+    XML::CompactTree
         Author: PAJAS <https://metacpan.org/author/PAJAS>
 
-    *   YAML::PP - YAML 1.2 processor
+        XS module: XML::CompactTree::XS
 
+    YAML::PP
         Author: TINITA <https://metacpan.org/author/TINITA>
 
-    *   match::simple - simplified clone of smartmatch operator
+        XS module: YAML::XS
 
+    match::simple
         Author: TOBYINK <https://metacpan.org/author/TOBYINK>
+
+        XS module: match::simple::XS
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -385,6 +472,8 @@ SEE ALSO
 
     cpanmodules - CLI tool to let you browse/view the lists
 
+    Missing::XS
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
@@ -399,13 +488,13 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2019 by perlancar
+    This software is copyright (c) 2023, 2022, 2019 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

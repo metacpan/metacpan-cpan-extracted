@@ -37,7 +37,7 @@ SYNOPSIS
 DESCRIPTION
 
     This Device::Chip subclass provides specific communication to a Silabs
-    Si5153 chip attached to a computer via an I²C adapter.
+    Si5351 chip attached to a computer via an I²C adapter.
 
     The reader is presumed to be familiar with the general operation of
     this chip; the documentation here will not attempt to explain or define

@@ -3,7 +3,7 @@
 # Copyright © 2020-2023 AP-Client Authors <https://hacktivis.me/git/ap-client/>
 # SPDX-License-Identifier: BSD-3-Clause
 package App::ActivityPubClient;
-our $VERSION = 'v0.1.3';
+our $VERSION = 'v0.1.4';
 use strict;
 use utf8;
 use open ":std", ":encoding(UTF-8)";

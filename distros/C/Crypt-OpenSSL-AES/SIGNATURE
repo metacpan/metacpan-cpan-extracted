@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 8bf4b09e9b7fc8a71c4ff12d36758f45b989337f521d5471b2f9a3fa8d1443a3 AES.xs
+SHA256 7cc9066f7f75b94ed55c2dece66394691743124719b90aeabf50172a1846da48 Changes
+SHA256 cd948c600f91f3af98f6991792b01272e41f1916deeb457fdd870863fbae24a0 MANIFEST
+SHA256 f06cf47a92ffcb2727673c97a84df4fc04d6efd56f1e3a1c59f3967d7f189406 META.json
+SHA256 fd17bba5c5379e4d845cd08c268a7900eb63385e4c4df19bc042876727fd2ae5 META.yml
+SHA256 d23aad96e57fa3a1e3a67783ea566a96a1a2e79be3f26996dd30dfaed666cdc2 Makefile.PL
+SHA256 103e12b06e27b1cb8de385b3ec29e326590918254f3ec1f286b84c06285b7fa5 README
+SHA256 97f90748eacc1db8327fa4319882a067c3b84404ae234038a0ff218586c4cd39 lib/Crypt/OpenSSL/AES.pm
+SHA256 0b6e7fd822f5e966a7f84e20bdc097046a9b9841a36552501b5d63d00db9b10f ppport.h
+SHA256 2f1c4be12b16cac3e00ecf5f8e9d1670c2b3d0caa5458537fa7c9e9d5eda0514 t/Crypt-OpenSSL-AES.t
+SHA256 236d9aecd17407d52214ec3405b416e6687955b1423789e5d463f5a2cd92241b typemap
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEMguXHBCUSzAt6mNu1fh7LgYGpfkFAmUDgBEACgkQ1fh7LgYG
+pfnitQ//dNAvjMkQm8TkJ2ZvqbD8bObada73e+2WaHeWCx6+EjCf5GoZePKsaDMB
+6H7z4RenCvc+0CAOuw7Fy6fQ5gg1uqsRZluSZubgIjjwQOJt2h6HBsYG2jQGI+aK
+LiLrS1/1Bi62GtLobsKUK9SObePV3Gs3gZJqFyCCLOjPyIJaF/5phuW4RVzlWxrA
+2ztK0EwL66crGgNAlr7/nROi4xQk3MwEaJCQ/vyhBJ0ynnBju1DPOwGsoIcD3Q8T
+pmw/HS/EPCY98lAXApM6LkbZH0m2h+25cnEgrrSDPiydBFqS4FyDynp94r+1t7+R
+9bT0n7YEz6OImlApQseorH2WUUCI5NSbbxGv/X7nxA+buDJUicZzsqPboPPzu3oC
+IILCiN0PX+ciZZTjzuhDwVIy3WpKUebgubz+YEhVW/87eV6nfwsBhfYfiOY9m+Gd
+u74I4rSTS3Egip6xud3jKbpELwwGA0uet7BbarreJeCt74lwx/7Q0lmgXFku6y3i
+F98BYrFWimnpa/2g6bemnytpMShhGAdEcAZtSXsH9L4ubLW1F52hpt42ihGOumIE
+l9mQdLmH/9TZzH/O1k+yBWImGTTxhh2Y4l5vOHGGcIGeF/3J9GjwJacDbsgCcYfI
+qNXhcc/u6GB/f7VCCIyfj4aNvwj/BA/A2HarSxn9OzTaCxMvQSc=
+=nNpQ
+-----END PGP SIGNATURE-----

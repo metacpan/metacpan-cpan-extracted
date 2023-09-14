@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2020-2023 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
@@ -39,6 +39,7 @@ static void func_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *_logs
 }
 
 static const struct XSParseSublikeHooks parse_func_hooks = {
+  .permit_hintkey = "t::any/func",
   .pre_subparse    = func_pre_subparse,
   .post_blockstart = func_post_blockstart,
   .pre_blockend    = func_pre_blockend,

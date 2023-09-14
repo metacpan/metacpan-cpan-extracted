@@ -3,9 +3,9 @@
 package TableData::Test::Source::AOH;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-14'; # DATE
+our $DATE = '2023-08-31'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use alias::module 'TableData::AOH';
 
@@ -24,7 +24,7 @@ TableData::Test::Source::AOH - Alias package for TableData::AOH
 
 =head1 VERSION
 
-This document describes version 0.016 of TableData::Test::Source::AOH (from Perl distribution TableDataRoles-Standard), released on 2023-06-14.
+This document describes version 0.017 of TableData::Test::Source::AOH (from Perl distribution TableDataRoles-Standard), released on 2023-08-31.
 
 =head1 METHODS
 

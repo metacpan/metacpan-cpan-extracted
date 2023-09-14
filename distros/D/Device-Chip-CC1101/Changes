@@ -1,5 +1,11 @@
 Revision history for Device-Chip-CC1101
 
+0.09    2023-09-13
+        [CHANGES]
+         * General module style updates:
+            + Updated for Object::Pad v0.800
+            + Swap unit tests to `Test2::V0`
+
 0.08    2022-12-12
          * Updated for Object::Pad v0.73:
             + Use `field NAME = EXPR` syntax

@@ -1,3 +1,11 @@
+0.020   2023-09-03  Released-By: PERLANCAR; Urgency: medium
+
+        - In --detail mode, show the 'status' column first to make it
+          easier to see if an ingredient is not active.
+
+        - [ux] Rename non-RBA scripts to *-old or *-lama.
+
+
 0.019   2023-02-13  Released-By: PERLANCAR; Urgency: medium
 
         - Fix export for RBA.

@@ -228,8 +228,10 @@ reneeb
 rkimball
 robin
 rubylib
+sakakibear
 samsung
 seamonkey
+song
 specialarchiver
 staroffice
 surikov

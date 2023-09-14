@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -34,74 +34,72 @@
       },
       "test" : {
          "requires" : {
+            "Test2::V0" : "0.000149",
             "Test::Builder::Tester" : "0",
-            "Test::Fatal" : "0",
-            "Test::HexString" : "0",
-            "Test::More" : "0.88",
-            "Test::Refcount" : "0"
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "Tickit" : {
          "file" : "lib/Tickit.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Tickit::Debug" : {
          "file" : "lib/Tickit/Debug.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Tickit::Event" : {
          "file" : "lib/Tickit/Event.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Tickit::Pen" : {
          "file" : "lib/Tickit/Pen.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Tickit::Pen::Immutable" : {
          "file" : "lib/Tickit/Pen.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Tickit::Pen::Mutable" : {
          "file" : "lib/Tickit/Pen.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Tickit::Rect" : {
          "file" : "lib/Tickit/Rect.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Tickit::RectSet" : {
          "file" : "lib/Tickit/RectSet.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Tickit::RenderBuffer" : {
          "file" : "lib/Tickit/RenderBuffer.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Tickit::StringPos" : {
          "file" : "lib/Tickit/StringPos.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Tickit::Term" : {
          "file" : "lib/Tickit/Term.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Tickit::Test" : {
          "file" : "lib/Tickit/Test.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Tickit::Test::MockTerm" : {
          "file" : "lib/Tickit/Test/MockTerm.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Tickit::Utils" : {
          "file" : "lib/Tickit/Utils.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       },
       "Tickit::Window" : {
          "file" : "lib/Tickit/Window.pm",
-         "version" : "0.73"
+         "version" : "0.74"
       }
    },
    "release_status" : "stable",
@@ -110,6 +108,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.73",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.74",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

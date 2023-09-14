@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 62-Ed448.t 1868 2022-08-31 20:13:35Z willem $	-*-perl-*-
+# $Id: 62-Ed448.t 1937 2023-09-11 09:27:16Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -14,13 +14,17 @@ my %prerequisite = (
 
 foreach my $package ( sort keys %prerequisite ) {
 	my @revision = grep {$_} $prerequisite{$package};
-	next if eval "use $package @revision; 1;";		## no critic
+	next if eval "use $package @revision; 1;";	## no critic
 	plan skip_all => "missing prerequisite $package @revision";
 	exit;
 }
 
 plan skip_all => "disabled EdDSA"
-		unless eval { Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_raw_private_key') };
+		unless eval { Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_EdDSA') };
+
+Net::DNS::SEC::libcrypto->VERSION =~ /(BoringSSL|LibreSSL)/i;
+plan skip_all => "ED448 not yet supported by $1"
+		unless grep { $_ == 16 } Net::DNS::SEC::EdDSA->_index;
 
 plan tests => 8;
 

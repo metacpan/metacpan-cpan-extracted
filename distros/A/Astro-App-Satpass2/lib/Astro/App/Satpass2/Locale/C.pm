@@ -11,7 +11,7 @@ use Astro::Coord::ECI::TLE 0.059 qw{ :constants };
 use Astro::App::Satpass2::Utils qw{ @CARP_NOT };
 use Scalar::Util ();
 
-our $VERSION = '0.050';
+our $VERSION = '0.051';
 
 my @event_names;
 $event_names[PASS_EVENT_NONE]		= '';
@@ -163,18 +163,8 @@ EOD
     [%- SET data = sp.pass( arg ) %]
 [%- END %]
 [%- CALL title.title_gravity( TITLE_GRAVITY_BOTTOM ) %]
-[%- SET do_mag = sp.want_pass_variant( 'brightest' ) %]
 [%- WHILE title.more_title_lines %]
-    [%- title.time( align_left = 0 ) %]
-        [%= title.local_coord %]
-        [%= title.latitude %]
-        [%= title.longitude %]
-        [%= title.altitude %]
-        [%= title.illumination %]
-	[%- IF do_mag %]
-	    [%= title.magnitude %]
-	[%- END %]
-        [%= title.event( width = '' ) %]
+    [%- format_detail( 'event', title ) %]
 
 [%- END %]
 [%- FOR pass IN data %]
@@ -184,26 +174,42 @@ EOD
     [%- evt.date %]    [% evt.oid %] - [% evt.name( width = '' ) %]
 
     [%- FOREACH evt IN events %]
-        [%- evt.time %]
-            [%= evt.local_coord %]
-            [%= evt.latitude %]
-            [%= evt.longitude %]
-            [%= evt.altitude %]
-            [%= evt.illumination %]
-	    [%- IF do_mag %]
-		[%= evt.magnitude %]
-	    [%- END %]
-            [%= evt.event( width = '' ) %]
-        [%- IF 'apls' == evt.event( units = 'string', width = '' ) %]
-            [%- apls = evt.appulse %]
-
-            [%- title.time( '' ) %]
-                [%= apls.local_coord %]
-                [%= apls.angle %] degrees from [% apls.name( width = '' ) %]
-        [%- END %]
+        [%- format_detail( 'event', evt ) %]
 
     [%- END %]
 [%- END -%]
+EOD
+	'pass:event'	=> <<'EOD',
+[%- evt.time %]
+    [%= evt.local_coord %]
+    [%= evt.latitude %]
+    [%= evt.longitude %]
+    [%= evt.altitude %]
+    [%= evt.illumination %]
+    [%- IF sp.want_pass_variant( 'brightest' ) %]
+	[%= evt.magnitude %]
+    [%- END %]
+    [%= evt.event %]
+EOD
+	'pass:event:almanac'	=> <<'EOD',
+[%- evt.time %]  [% evt.almanac %]
+EOD
+	'pass:event:apls'	=> <<'EOD',
+[%- evt.time %]
+    [%= evt.local_coord %]
+    [%= evt.latitude %]
+    [%= evt.longitude %]
+    [%= evt.altitude %]
+    [%= evt.illumination %]
+    [%- IF sp.want_pass_variant( 'brightest' ) %]
+	[%= evt.magnitude %]
+    [%- END %]
+    [%= evt.event %]
+    [%- apls = evt.appulse %]
+
+    [%- title.time( '' ) %]
+	[%= apls.local_coord %]
+	[%= apls.angle %] degrees from [% apls.name( width = '' ) %]
 EOD
 
 	pass_events	=> <<'EOD',
@@ -212,29 +218,34 @@ EOD
 [%- END %]
 [%- CALL title.title_gravity( TITLE_GRAVITY_BOTTOM ) %]
 [%- WHILE title.more_title_lines %]
-    [%- title.date %] [% title.time %]
-        [%= title.oid %] [% title.event %]
-        [%= title.illumination %] [% title.local_coord %]
+    [%- format_detail( 'event', title ) %]
 
 [%- END %]
 [%- FOREACH evt IN data.events %]
-    [%- evt.date %] [% evt.time %]
-        [%= evt.oid %] [% evt.event %]
-        [%= evt.illumination %] [% evt.local_coord %]
+    [%- format_detail( 'event', evt ) %]
 [% END -%]
+EOD
+	'pass_events:event'	=> <<'EOD',
+[%- evt.date %] [% evt.time %]
+    [%= evt.oid %] [% evt.event %]
+    [%= evt.illumination %] [% evt.local_coord %]
+EOD
+	'pass_events:event:almanac'	=> <<'EOD',
+[%- evt.date %] [% evt.time %] [% evt.almanac %]
 EOD
 
 	pass_ics	=> <<'EOD',
 [% UNLESS data %]
     [%- SET data = sp.pass( arg ) %]
-[%- END %]
-[%- SET do_mag = sp.want_pass_variant( 'brightest' ) -%]
+[%- END -%]
 BEGIN:VCALENDAR
 VERSION:2.0
 [%- FOR pass IN data %]
 [%- events = pass.events %]
 [%- CALL events.fixed_width( 0 ) %]
-[%- first = events.first %]
+[%- tle_events = pass.tle_events %]
+[%- first = tle_events.first %]
+[%- last = tle_events.last %]
 [%- punct = '' %]
 BEGIN:VEVENT
 DTSTART:[% first.date( format = '%Y%m%dT%H%M%SZ', units = 'zulu' ) %]
@@ -249,28 +260,53 @@ END:VALARM
 SUMMARY:[% first.name %]
 DESCRIPTION:
     [%- FOREACH evt IN events %][% punct %]
-	[%- evt_name = evt.event %]
-	[%- end_date = evt.date( format = '%Y%m%dT%H%M%SZ', units = 'z' ) %]
-	[%- evt_name %]
-	[%- IF 'apls' == evt_name %]
-            [%- appulse = evt.appulse %]
-            [%= appulse.angle %]
-	    [%= appulse.name %]
-	[%- END %]
-	[%= evt.time %] Az
-	[%= evt.azimuth( places = 0, bearing = 2 ) %]
-	[%- IF 'rise' != evt_name and 'set' != evt_name %] Ele
-	    [%= evt.elevation( places = 0 ) %]
-	[%- END %]
-	[%- IF do_mag && '' != evt.magnitude %] Mag
-	    [%= evt.magnitude %]
-	[%- END %]
+	[%- format_detail( 'event', evt ) %]
         [%- punct = '\n' %]
     [%- END %]
-DTEND:[% end_date %]
+DTEND:[% last.date( format = '%Y%m%dT%H%M%SZ', units = 'z' ) %]
 END:VEVENT
 [%- END %]
 END:VCALENDAR
+EOD
+	'pass_ics:event'		=> <<'EOD',
+[%- evt.event %]
+[%= evt.time %] [% localize( 'Az' ) %]
+[%= evt.azimuth( places = 0, bearing = 2 ) %] [% localize( 'Ele' ) %]
+[%= evt.elevation( places = 0 ) %]
+[%- IF sp.want_pass_variant( 'brightest' ) && '' != evt.magnitude %]
+    [%= localize( 'Mag' ) %] [% evt.magnitude %]
+[%- END %]
+EOD
+	'pass_ics:event:almanac'	=> <<'EOD',
+[%- evt.almanac %] [% evt.time %]
+EOD
+	'pass_ics:event:apls'		=> <<'EOD',
+[%- evt.event %]
+[%- appulse = evt.appulse %]
+[%= appulse.angle %]
+[%= appulse.name %]
+[%= evt.time %] [% localize( 'Az' ) %]
+[%= evt.azimuth( places = 0, bearing = 2 ) %]
+[%= evt.elevation( places = 0 ) %]
+[%- IF sp.want_pass_variant( 'brightest' ) && '' != evt.magnitude %]
+    [%= localize( 'Mag' ) %] [% evt.magnitude %]
+[%- END %]
+EOD
+	'pass_ics:event:rise'		=> <<'EOD',
+[%- evt.event %]
+[%= evt.time %] [% localize( 'Az' ) %]
+[%= evt.azimuth( places = 0, bearing = 2 ) %]
+[%- IF sp.want_pass_variant( 'brightest' ) && '' != evt.magnitude %]
+    [%= localize( 'Mag' ) %] [% evt.magnitude %]
+[%- END %]
+EOD
+	'pass_ics:event:set'		=> <<'EOD',
+[%- evt.event %]
+[%= evt.time %] [% localize( 'Az' ) %]
+[%= evt.azimuth( places = 0, bearing = 2 ) %]
+[%- IF sp.want_pass_variant( 'brightest' ) && '' != evt.magnitude %]
+    [%= localize( 'Mag' ) %] [% evt.magnitude %]
+[%- END %]
 EOD
 
 	phase	=> <<'EOD',
@@ -401,6 +437,13 @@ EOD
 	    'Latitude'		=> 'Latitude',
 	    'longitude'		=> 'longitude',
 	    'height'		=> 'height',
+	},
+    },
+    '-pass_ics'	=> {
+	string	=> {
+	    'Az'	=> 'Az',
+	    'Ele'	=> 'Ele',
+	    'Mag'	=> 'Mag',
 	},
     },
     almanac	=> {
@@ -698,7 +741,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2022 by Thomas R. Wyant, III
+Copyright (C) 2014-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

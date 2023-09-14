@@ -1,4 +1,5 @@
-package YA::CLI::Example::Something;
+package
+    YA::CLI::Example::Something;
 use Moo;
 use namespace::autoclean;
 

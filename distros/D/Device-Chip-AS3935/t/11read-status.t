@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -20,7 +20,7 @@ await $chip->mount(
    $adapter->expect_write_then_read( "\x3A", 2 )
       ->returns( "\x00\x00" );
 
-   is_deeply( await $chip->read_calib_status,
+   is( await $chip->read_calib_status,
       {
          TRCO_CALIB_DONE => '', TRCO_CALIB_NOK => '',
          SRCO_CALIB_DONE => '', SRCO_CALIB_NOK => '',
@@ -31,7 +31,7 @@ await $chip->mount(
    $adapter->expect_write_then_read( "\x3A", 2 )
       ->returns( "\x80\x80" );
 
-   is_deeply( await $chip->read_calib_status,
+   is( await $chip->read_calib_status,
       {
          TRCO_CALIB_DONE => 1, TRCO_CALIB_NOK => '',
          SRCO_CALIB_DONE => 1, SRCO_CALIB_NOK => '',

@@ -3,8 +3,10 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
+
+use Object::Pad 0.800 ':experimental(mop)';
 
 use Future::AsyncAwait;
 
@@ -23,7 +25,7 @@ await $chip->mount(
    $adapter->expect_write_then_read( "\x81", 1 )
       ->returns( "\x02" );
 
-   is_deeply( await $chip->read_config,
+   is( await $chip->read_config,
       {
          POWER => "OFF",
          GAIN  => 1,
@@ -39,7 +41,6 @@ await $chip->mount(
    $adapter->check_and_clear( '$chip->read_config' );
 
    # gut-wrench to clear test data
-   use Object::Pad ':experimental(mop)';
    undef Object::Pad::MOP::Class->for_class( ref $chip )->get_field( '$_TIMINGbyte' )->value( $chip );
 }
 
@@ -52,7 +53,7 @@ await $chip->mount(
    await $chip->change_config( GAIN => 16 );
 
    # subsequent read does not talk to chip a second time but yields new values
-   is_deeply( await $chip->read_config,
+   is( await $chip->read_config,
       {
          POWER => "OFF",
          GAIN  => 16,
@@ -66,4 +67,3 @@ await $chip->mount(
 }
 
 done_testing;
-

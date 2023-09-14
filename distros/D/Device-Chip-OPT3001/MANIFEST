@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 lib/Device/Chip/OPT3001.pm

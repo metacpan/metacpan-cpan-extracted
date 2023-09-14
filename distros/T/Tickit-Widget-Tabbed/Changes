@@ -1,5 +1,12 @@
 Revision history for Tickit-Widget-Tabbed
 
+0.028     2023-09-04
+          [CHANGES]
+           * Updates for Object::Pad v0.800
+           * Use an internal helper class intead of `Struct::Dumb`
+           * Misc. small updates to keep `perl-distrolint` happy with current
+             Perl module style
+
 0.027     2022-12-14
           [CHANGES]
            * Updated for Object::Pad v0.73

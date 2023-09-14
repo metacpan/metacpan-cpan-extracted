@@ -9,9 +9,9 @@ use PMVersions::Util qw(version_from_pmversions);
 use Require::Hook::Source::DzilBuild;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-16'; # DATE
+our $DATE = '2023-09-03'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-Sah-Schemas'; # DIST
-our $VERSION = '0.030'; # VERSION
+our $VERSION = '0.031'; # VERSION
 
 with (
     'Dist::Zilla::Role::CheckPackageDeclared',
@@ -239,8 +239,8 @@ sub gather_files {
 
 use Test::More;
 
-eval "use Test::Sah::Schema 0.010";
-plan skip_all => "Test::Sah::Schema 0.010 required for testing Sah::Schema::* modules"
+eval "use Test::Sah::Schema 0.016";
+plan skip_all => "Test::Sah::Schema 0.016 required for testing Sah::Schema::* modules"
   if $@;
 
 sah_schema_modules_ok();
@@ -269,7 +269,7 @@ sub register_prereqs {
             type  => 'requires',
             phase => 'develop',
         },
-        'Test::Sah::Schema' => '0.010',
+        'Test::Sah::Schema' => '0.016',
     );
 
     # add prereqs to base schema modules
@@ -325,7 +325,7 @@ Dist::Zilla::Plugin::Sah::Schemas - Plugin to use when building Sah-Schemas-* di
 
 =head1 VERSION
 
-This document describes version 0.030 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2022-12-16.
+This document describes version 0.031 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2023-09-03.
 
 =head1 SYNOPSIS
 
@@ -438,7 +438,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

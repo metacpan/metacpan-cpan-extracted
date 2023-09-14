@@ -1,0 +1,16 @@
+Makefile
+Makefile.old
+*.tar.gz
+*.bak
+*.swp
+pm_to_blib
+blib/
+HTTP-Request-Diff-*
+HTTP-Request-Diff-*/
+.releaserc
+cover_db
+MYMETA.*
+frame-*.png
+*.pl
+.prove
+*.patch

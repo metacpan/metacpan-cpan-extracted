@@ -2,7 +2,6 @@ requires 'Log::Log4perl';
 requires 'Moose';
 requires 'perl', '5.010001';
 recommends 'Config::Std';
-recommends 'Config::Versioned', '0.5';
 recommends 'DBI';
 recommends 'IO::Socket::SSL';
 recommends 'JSON';
@@ -17,7 +16,6 @@ recommends 'YAML';
 on build => sub {
     requires 'Config::Merge';
     requires 'Config::Std';
-    requires 'Config::Versioned';
     requires 'DBD::SQLite';
     requires 'DBI';
     requires 'ExtUtils::MakeMaker', '6.59';
@@ -26,6 +24,7 @@ on build => sub {
     requires 'LWP::Protocol::https';
     requires 'LWP::UserAgent';
     requires 'Proc::SafeExec';
+    requires 'Syntax::Keyword::Try';
     requires 'Template';
     requires 'Test::More';
     requires 'YAML';

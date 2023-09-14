@@ -1,11 +1,12 @@
 package App::Oozie::Deploy::Template;
-$App::Oozie::Deploy::Template::VERSION = '0.002';
+$App::Oozie::Deploy::Template::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
 use App::Oozie::Types::Common qw( IsDir );
+use App::Oozie::Constants qw( TEMPLATE_DEFINE_VAR );
 
 use Config::Properties;
 use Data::Dumper ();
@@ -36,10 +37,6 @@ use Types::Standard qw(
     Str
 );
 use XML::LibXML ();
-
-use constant {
-    DEFINE_VAR_TMPL => q{%s='%s'},
-};
 
 with qw(
     App::Oozie::Role::Log
@@ -125,11 +122,12 @@ sub get_job_conf {
     for my $key ( keys %c ) {
         my $val = $c{ $key };
         if ( is_ref $val ) {
+            my $d = Data::Dumper->new([ $val ], [ $key ]);
             $self->logger->logdie(
                 sprintf 'You seem to have a double definition in %s for %s as %s',
                             $file,
                             $key,
-                            do { my $d = Data::Dumper->new([ $val ], [ $key ]); $d->Dump },
+                            $d->Dump,
             );
         }
         $val =~ s{ [^\\][#] .* \z }{}xms;
@@ -200,7 +198,7 @@ sub compile {
             next;
         }
         push @command,
-            '--define' => sprintf( DEFINE_VAR_TMPL, $prop, $config->{$prop} );
+            '--define' => sprintf( TEMPLATE_DEFINE_VAR, $prop, $config->{$prop} );
     }
     my($validation_errors, $total_errors);
     my $job_properties_file = File::Spec->catfile( $workflow, 'job.properties' );
@@ -209,7 +207,7 @@ sub compile {
         my %job_conf = $self->get_job_conf( $job_properties_file );
         foreach my $name ( keys %job_conf ) {
             push @command,
-                '--define' => sprintf( DEFINE_VAR_TMPL, $name, $job_conf{ $name } );
+                '--define' => sprintf( TEMPLATE_DEFINE_VAR, $name, $job_conf{ $name } );
         }
 
     }
@@ -225,7 +223,7 @@ sub compile {
         for my $tuple ( @rs ) {
             my( $key, $value) = @{ $tuple };
             push @command,
-                '--define' => sprintf( DEFINE_VAR_TMPL, $key, $value );
+                '--define' => sprintf( TEMPLATE_DEFINE_VAR, $key, $value );
         }
     }
 
@@ -512,7 +510,7 @@ App::Oozie::Deploy::Template
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -537,10 +535,6 @@ App::Oozie::Deploy::Template - Template Toolkit compiler for Oozie workflow spec
 =head2 oozie_workflows_base
 
 =head2 possible_readme_file_names
-
-=head1 Constants
-
-=head2 DEFINE_VAR_TMPL
 
 =head1 SEE ALSO
 

@@ -6,6 +6,7 @@ use Carp();
 use English qw( -no_match_vars );
 use File::Spec();
 use File::Temp();
+use Crypt::PasswdMD5();
 
 sub tmp_handle {
     my ( $class, $name ) = @_;
@@ -334,12 +335,30 @@ sub new {
     my %extra     = %parameters;
     my $self      = bless {
         binary    => $parameters{binary},
-        arguments => $parameters{arguments},
+        arguments => \@arguments,
         port      => $parameters{port},
+        debug     => $debug,
         %extra
     }, $class;
+    $self->start();
+    return $self;
+}
+
+sub debug {
+    my ($self) = @_;
+    return $self->{debug};
+}
+
+sub arguments {
+    my ($self) = @_;
+    return @{ $self->{arguments} };
+}
+
+sub start {
+    my ($self) = @_;
     my $dev_null = File::Spec->devnull();
     if ( $self->{pid} = fork ) {
+        return $self->{pid};
     }
     elsif ( defined $self->{pid} ) {
         eval {
@@ -348,7 +367,7 @@ sub new {
             open STDOUT, q[>], $dev_null
               or Carp::croak(
                 "Failed to redirect STDOUT to $dev_null:$EXTENDED_OS_ERROR");
-            if ( !$debug ) {
+            if ( !$self->debug() ) {
                 open STDERR, q[>], $dev_null
                   or Carp::croak(
                     "Failed to redirect STDERR to $dev_null:$EXTENDED_OS_ERROR"
@@ -357,7 +376,7 @@ sub new {
             open STDIN, q[<], $dev_null
               or Carp::croak(
                 "Failed to redirect STDIN to $dev_null:$EXTENDED_OS_ERROR");
-            exec { $self->{binary} } $self->{binary}, @arguments
+            exec { $self->{binary} } $self->{binary}, $self->arguments()
               or Carp::croak(
                 "Failed to exec '$self->{binary}':$EXTENDED_OS_ERROR");
         } or do {
@@ -365,7 +384,7 @@ sub new {
         };
         exit 1;
     }
-    return $self;
+    return;
 }
 
 sub pid {
@@ -389,7 +408,7 @@ sub new_port {
     return $port;
 }
 
-sub quit {
+sub stop {
     my ($self) = @_;
     if ( my $pid = $self->{pid} ) {
         kill $signals_by_name{TERM}, $pid;
@@ -430,20 +449,46 @@ sub available {
     return $class->SUPER::available( $nginx_binary, '-v' );
 }
 
+sub write_passwd {
+    my ( $class, $passwd_path, $username, $password ) = @_;
+    if ( $username || $password ) {
+        my $passwd_handle = FileHandle->new(
+            $passwd_path,
+            Fcntl::O_WRONLY() | Fcntl::O_EXCL() | Fcntl::O_CREAT(),
+            Fcntl::S_IRUSR() | Fcntl::S_IWUSR()
+        ) or Carp::croak("Failed to open $passwd_path:$EXTENDED_OS_ERROR");
+        my $encrypted_password = Crypt::PasswdMD5::unix_md5_crypt($password);
+        print {$passwd_handle} "$username:$encrypted_password\n"
+          or Carp::croak("Failed to write to $passwd_path:$EXTENDED_OS_ERROR");
+        close $passwd_handle
+          or Carp::croak("Failed to close $passwd_path:$EXTENDED_OS_ERROR");
+    }
+    return;
+}
+
 sub new {
     my ( $class, %parameters ) = @_;
     my $listen         = $parameters{listen};
     my $key_size       = $parameters{key_size};
     my $ca             = $parameters{ca};
+    my $username       = $parameters{username};
+    my $password       = $parameters{password};
+    my $realm          = $parameters{realm};
     my $port           = $class->new_port();
     my $base_directory = $class->tmp_directory('nginx');
+    my $passwd_path =
+      File::Spec->catfile( $base_directory->dirname(), 'htpasswd' );
+
+    $class->write_passwd( $passwd_path, $username, $password );
     my $key_path =
       File::Spec->catfile( $base_directory->dirname(), 'nginx.key' );
-    my $key_handle = $ca->new_key( $key_size, $key_path );
     my $certificate_path =
       File::Spec->catfile( $base_directory->dirname(), 'nginx.crt' );
-    my $certificate_handle =
-      $ca->new_cert( $key_path, $listen, $certificate_path );
+    if ( $key_size && $ca ) {
+        my $key_handle = $ca->new_key( $key_size, $key_path );
+        my $certificate_handle =
+          $ca->new_cert( $key_path, $listen, $certificate_path );
+    }
     my $root_name = 'htdocs';
     my $root_directory =
       File::Spec->catfile( $base_directory->dirname(), $root_name );
@@ -522,8 +567,33 @@ http {
     default_type            text/plain;
 
     server  {
+_NGINX_CONF_
+    if ( $key_size && $ca ) {
+        print {$config_handle}
+          <<"_NGINX_CONF_" or Carp::croak("Failed to write to temporary file:$EXTENDED_OS_ERROR");
         listen                     $listen:$port ssl;
+_NGINX_CONF_
+    }
+    else {
+        print {$config_handle}
+          <<"_NGINX_CONF_" or Carp::croak("Failed to write to temporary file:$EXTENDED_OS_ERROR");
+        listen                     $listen:$port;
+_NGINX_CONF_
+    }
+    print {$config_handle}
+      <<"_NGINX_CONF_" or Carp::croak("Failed to write to temporary file:$EXTENDED_OS_ERROR");
         server_name                default;
+_NGINX_CONF_
+    if ( $username || $password ) {
+        print {$config_handle}
+          <<"_NGINX_CONF_" or Carp::croak("Failed to write to temporary file:$EXTENDED_OS_ERROR");
+        auth_basic                 "$realm";
+        auth_basic_user_file       $passwd_path;
+_NGINX_CONF_
+    }
+    if ( $key_size && $ca ) {
+        print {$config_handle}
+          <<"_NGINX_CONF_" or Carp::croak("Failed to write to temporary file:$EXTENDED_OS_ERROR");
         ssl_certificate            $certificate_path;
         ssl_certificate_key        $key_path;
         ssl_protocols              TLSv1.2;
@@ -534,6 +604,10 @@ http {
         ssl_stapling               off;
         ssl_stapling_verify        off;
         ssl_ecdh_curve             secp384r1;
+_NGINX_CONF_
+    }
+    print {$config_handle}
+      <<"_NGINX_CONF_" or Carp::croak("Failed to write to temporary file:$EXTENDED_OS_ERROR");
         server_tokens              off;
         root                       $root_name;
         index                      $index_name;
@@ -576,20 +650,59 @@ sub available {
     return $class->SUPER::available( $squid_binary, '--version' );
 }
 
+sub find_basic_ncsa_auth {
+    my $basic_ncsa_auth_path;
+    foreach my $possible_path (
+        '/usr/lib64/squid/basic_ncsa_auth',    # Redhat, Fedora
+        '/usr/lib/squid/basic_ncsa_auth',      # Alpine Linux, Debian
+        '/usr/local/libexec/squid/basic_ncsa_auth'
+        ,                                      # FreeBSD, DragonflyBSD, OpenBSD
+        '/usr/pkg/libexec/basic_ncsa_auth',    # NetBSD
+      )
+    {
+        if ( -e $possible_path ) {
+            $basic_ncsa_auth_path = $possible_path;
+            last;
+        }
+    }
+    return $basic_ncsa_auth_path;
+}
+
 sub new {
     my ( $class, %parameters ) = @_;
-    my $listen         = $parameters{listen};
-    my $key_size       = $parameters{key_size};
-    my $ca             = $parameters{ca};
-    my $port           = $class->new_port();
-    my $base_directory = $class->tmp_directory('squid');
+    my $listen               = $parameters{listen};
+    my $username             = $parameters{username};
+    my $password             = $parameters{password};
+    my $realm                = $parameters{realm};
+    my $key_size             = $parameters{key_size};
+    my $ca                   = $parameters{ca};
+    my $port                 = $class->new_port();
+    my $base_directory       = $class->tmp_directory('squid');
+    my $basic_ncsa_auth_path = $class->find_basic_ncsa_auth();
+    my $passwd_path =
+      File::Spec->catfile( $base_directory->dirname(), 'htpasswd' );
+
+    if ( $username || $password ) {
+        my $passwd_handle = FileHandle->new(
+            $passwd_path,
+            Fcntl::O_WRONLY() | Fcntl::O_EXCL() | Fcntl::O_CREAT(),
+            Fcntl::S_IRUSR() | Fcntl::S_IWUSR()
+        ) or Carp::croak("Failed to open $passwd_path:$EXTENDED_OS_ERROR");
+        my $encrypted_password = Crypt::PasswdMD5::unix_md5_crypt($password);
+        print {$passwd_handle} "$username:$encrypted_password\n"
+          or Carp::croak("Failed to write to $passwd_path:$EXTENDED_OS_ERROR");
+        close $passwd_handle
+          or Carp::croak("Failed to close $passwd_path:$EXTENDED_OS_ERROR");
+    }
     my $key_path =
       File::Spec->catfile( $base_directory->dirname(), 'squid.key' );
-    my $key_handle = $ca->new_key( $key_size, $key_path );
     my $certificate_path =
       File::Spec->catfile( $base_directory->dirname(), 'squid.crt' );
-    my $certificate_handle =
-      $ca->new_cert( $key_path, $listen, $certificate_path );
+    if ( $key_size && $ca ) {
+        my $key_handle = $ca->new_key( $key_size, $key_path );
+        my $certificate_handle =
+          $ca->new_cert( $key_path, $listen, $certificate_path );
+    }
     my $config_path =
       File::Spec->catfile( $base_directory->dirname(), 'squid.config' );
     my $config_handle = FileHandle->new(
@@ -597,13 +710,55 @@ sub new {
         Fcntl::O_WRONLY() | Fcntl::O_EXCL() | Fcntl::O_CREAT(),
         Fcntl::S_IRUSR() | Fcntl::S_IWUSR()
     ) or Carp::croak("Failed to open $config_path:$EXTENDED_OS_ERROR");
-    print {$config_handle}
-      <<"_SQUID_CONF_" or Carp::croak("Failed to write to temporary file:$EXTENDED_OS_ERROR");
+    if ( $username || $password ) {
+        print {$config_handle}
+          <<"_SQUID_CONF_" or Carp::croak("Failed to write to $config_path:$EXTENDED_OS_ERROR");
+auth_param basic program $basic_ncsa_auth_path $passwd_path
+auth_param basic realm $realm
+auth_param basic casesensitive on
+acl Auth proxy_auth REQUIRED
+_SQUID_CONF_
+    }
+    if ( $parameters{allow_ssl_port} ) {
+        print {$config_handle}
+          <<"_SQUID_CONF_" or Carp::croak("Failed to write to $config_path:$EXTENDED_OS_ERROR");
 acl SSL_ports port $parameters{allow_ssl_port}
 http_access deny !SSL_ports
 http_access deny CONNECT !SSL_ports
+_SQUID_CONF_
+    }
+    elsif ( $parameters{allow_port} ) {
+        print {$config_handle}
+          <<"_SQUID_CONF_" or Carp::croak("Failed to write to $config_path:$EXTENDED_OS_ERROR");
+acl HTTP_ports port $parameters{allow_port}
+http_access deny !HTTP_ports
+http_access deny CONNECT HTTP_ports
+_SQUID_CONF_
+    }
+    if ( $username || $password ) {
+        print {$config_handle}
+          <<"_SQUID_CONF_" or Carp::croak("Failed to write to $config_path:$EXTENDED_OS_ERROR");
+http_access deny !Auth
+_SQUID_CONF_
+    }
+    print {$config_handle}
+      <<"_SQUID_CONF_" or Carp::croak("Failed to write to $config_path:$EXTENDED_OS_ERROR");
 http_access allow localhost
+_SQUID_CONF_
+    if ( $key_size && $ca ) {
+        print {$config_handle}
+          <<"_SQUID_CONF_" or Carp::croak("Failed to write to $config_path:$EXTENDED_OS_ERROR");
 https_port $listen:$port tls-cert=$certificate_path tls-key=$key_path
+_SQUID_CONF_
+    }
+    else {
+        print {$config_handle}
+          <<"_SQUID_CONF_" or Carp::croak("Failed to write to $config_path:$EXTENDED_OS_ERROR");
+http_port $listen:$port
+_SQUID_CONF_
+    }
+    print {$config_handle}
+      <<"_SQUID_CONF_" or Carp::croak("Failed to write to $config_path:$EXTENDED_OS_ERROR");
 shutdown_lifetime 0 seconds
 visible_hostname $listen
 pid_filename none
@@ -706,6 +861,43 @@ sub connect_and_exit {
       '-o=StrictHostKeyChecking=accept-new', '-oExitOnForwardFailure=yes',
       '-L', "$port:127.0.0.1:22", $host, 'exit 0';
     return $result == 0 ? return 1 : return $result;
+}
+
+package Test::Daemon::Socks;
+
+use strict;
+use warnings;
+use Carp();
+use English qw( -no_match_vars );
+
+@Test::Daemon::Socks::ISA = qw(Test::Daemon Test::Binary::Available);
+
+my $ssh_binary = __PACKAGE__->find_binary('ssh');
+
+sub available {
+    my ( $class, %parameters ) = @_;
+    my $listen        = $parameters{listen};
+    my $port          = $class->new_port();
+    my $config_handle = $class->_sshd_config(
+        listen     => $listen,
+        port       => $port
+    );
+    my $config_path = $config_handle->filename();
+    return $class->SUPER::available( $ssh_binary, '-V' );
+}
+
+sub new {
+    my ( $class, %parameters ) = @_;
+    my $listen        = $parameters{listen};
+    my $port          = $class->new_port();
+    my $ssh         = $class->SUPER::new(
+        debug         => $parameters{debug},
+        binary        => $ssh_binary,
+        listen        => $listen,
+        port          => $port,
+        arguments     => [ qw(-ND), "$listen:$port", 'localhost' ]
+    );
+    return $ssh;
 }
 
 1;

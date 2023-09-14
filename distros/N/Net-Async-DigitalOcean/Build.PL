@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Module::Build;
 
-$ENV{'PERL_MB_OPT'} = '--install-base=/usr'; # I could not make this work via the parameters below :/
+# $ENV{'PERL_MB_OPT'} = '--install-base=/usr'; # I could not make this work via the parameters below :/
 $ENV{'DEB_BUILD_OPTIONS'}='nocheck';
 
 my $debian = Module::Build->subclass(

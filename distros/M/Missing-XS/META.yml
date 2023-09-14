@@ -1,0 +1,47 @@
+---
+abstract: 'print warnings about XS modules you should probably install'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test2::Plugin::BailOnFail: '0'
+  Test2::Require::AuthorTesting: '0'
+  Test2::Require::Module: '0'
+  Test2::Tools::Spec: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Missing-XS
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Missing::XS:
+    file: lib/Missing/XS.pm
+    version: '0.001001'
+  issing::XS:
+    file: lib/issing/XS.pm
+    version: '0.001001'
+requires:
+  Module::Runtime: '0'
+  perl: '5.012000'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Missing-XS/project
+  bugtracker: https://github.com/tobyink/p5-missing-xs/issues
+  homepage: https://metacpan.org/release/Missing-XS
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-missing-xs.git
+version: '0.001001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

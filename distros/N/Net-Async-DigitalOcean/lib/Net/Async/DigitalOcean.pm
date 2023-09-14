@@ -11,7 +11,7 @@ sub prepare_request {
     my ($elf, $req) = @_;
 #warn "prepare $elf";
     $elf->SUPER::prepare_request( $req );
-    warn $req->as_string . " >>>> DigitalOcean" if $elf->{digitalocean_trace};
+    warn ">>>>>>>>> DigitalOcean\n" . $req->as_string  if $elf->{digitalocean_trace};
 
     if (my $limits = $elf->{digitalocean_rate_limit}) {                       # if we already experienced some limit information from the server
 #warn "rate_limit current ".Dumper $limits;  # 
@@ -47,7 +47,7 @@ sub prepare_request {
 
 sub process_response {
     my ($elf, $resp) = @_;
-    warn "DigitalOcean >>>> ".$resp->as_string if $elf->{digitalocean_trace};
+    warn "DigitalOcean >>>>>>>>>\n".$resp->as_string if $elf->{digitalocean_trace};
 
     if ($elf->{digitalocean_rate_limit_policy}) { # if this is turned on
 	if (my $limit = $resp->headers->header('RateLimit-Limit')) { # and if we actually got something
@@ -72,7 +72,7 @@ use HTTP::Status qw(:constants);
 
 use Moose;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($DEBUG);
@@ -131,7 +131,8 @@ with the Docker pathway and/or create and run kubernetes structures.
 See the L<DigitalOcean Platform|https://docs.digitalocean.com/products/platform/> for more.
 
 DigitalOcean offers a web console to administrate all this, but also a
-L<RESTy interface|https://docs.digitalocean.com/reference/api/>.
+L<RESTy interface|https://docs.digitalocean.com/reference/api/>
+(and L<Terraform|https://www.digitalocean.com/community/tutorials/how-to-use-terraform-with-digitalocean> for that matter)
 
 =head2 REST API, asynchronous
 
@@ -188,8 +189,8 @@ complete in one go:
 =head2 Success and Failure
 
 When futures succeed, the application will usually get a result in form of a Perl HASH (see below). If
-a future fails and the failure is not handled specifically (by adding a C<< ->on_fail >> handler),
-then an exception will be raised. The library tries to figure out what the real message from the
+a future fails and has been configured to have a C<< ->on_fail >> handler, then that will be invoked.
+Otherwise an exception will be raised. The library tries to figure out what the real message from the
 server was.
 
 =head2 Data Structures

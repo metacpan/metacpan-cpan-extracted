@@ -1,6 +1,7 @@
 .editorconfig
 Build.PL
 Changes
+hax/optree-additions.c.inc
 lib/Object/Pad/FieldAttr/Checked.pm
 lib/Object/Pad/FieldAttr/Checked.xs
 LICENSE

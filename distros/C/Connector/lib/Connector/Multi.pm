@@ -72,7 +72,6 @@ sub get_hash {
     return $hash unless (ref $hash); # undef
 
     # This assumes that all connectors that can handle references
-    # use the symlink syntax introduced with Config::Versioned!
     my @path;
     foreach my $key (keys %{$hash}) {
         # Connector in leaf - resolv it!
@@ -386,12 +385,7 @@ The parameter BASECONNECTOR may either be a class instance or
 the name of the class, in which case the additional arguments
 (e.g.: LOCATION) are passed to the base connector.
 
-  use Connector::Proxy::Config::Versioned;
   use Connector::Multi;
-
-  my $base = Connector::Proxy::Config::Versioned->new({
-    LOCATION => $path_to_internal_config_git_repo,
-  });
 
   my $multi = Connector::Multi->new( {
     BASECONNECTOR => $base,
@@ -404,7 +398,6 @@ or...
   use Connector::Multi;
 
   my $multi = Connector::Multi->new( {
-    BASECONNECTOR => 'Connector::Proxy::Config::Versioned',
     LOCATION => $path_to_internal_config_git_repo,
   });
 

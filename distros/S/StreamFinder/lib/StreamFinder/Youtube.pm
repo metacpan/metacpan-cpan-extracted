@@ -232,7 +232,14 @@ arguments to be passed to the external youtube-dl (or yt-dlp, etc.) program.
 See both the I<-youtube-dl-args> argument description and the manpage for 
 youtube-dl or whatever alternative external program you use to extract 
 video streams for valid arguments for possible inclusion here.  
-Default is I<-none-> (no additional arguments).
+
+DEFAULT I<-none-> (no additional arguments).
+
+The optional I<-youtube-site> argument allows specifying a different default 
+Youtube site if only an video-ID is provided or an embedded video in an 
+iframe doesn't specify a specific Youtube site.
+
+DEFAULT "I<https://www.youtube.com>".
 
 Additional (general StreamFinder) options:
 
@@ -464,6 +471,7 @@ use LWP::UserAgent ();
 use parent 'StreamFinder::_Class';
 
 my $DEBUG = 0;
+my $DEFAULTYTSITE = 'https://www.youtube.com';
 
 sub new
 {
@@ -478,7 +486,9 @@ sub new
 	$DEBUG = $self->{'debug'}  if (defined $self->{'debug'});
 	$self->{'formatonly'} = 0  unless (defined $self->{'formatonly'});
 	$self->{'noiframes'} = 0  unless (defined $self->{'noiframes'});
+	$self->{'notrim'} = 0;
 	$self->{'youtubeonly'} = 0  unless (defined $self->{'youtubeonly'});
+	$self->{'youtube-site'} = $DEFAULTYTSITE;
 	#DEFAULT YOUTUBE-DL ARGUMENTS:
 	$self->{'youtube-dl-args'} = '--get-url --get-format --get-thumbnail --get-title --get-description --get-id'
 			unless (defined $self->{'youtube-dl-args'});
@@ -497,6 +507,15 @@ sub new
 		} elsif ($_[0] =~ /^\-?formatonly$/o) {
 			shift;
 			$self->{'formatonly'} = (defined $_[0]) ? shift : 1;
+		} elsif ($_[0] =~ /^\-?notrim$/o) {   #NOT CURRENTLY USED, RESERVED FOR FUTURE USE.
+			shift;
+			$self->{'notrim'} = (defined $_[0]) ? shift : 1;
+		} elsif ($_[0] =~ /^\-?youtube-site$/o) {
+			shift;
+			$self->{'youtube-site'} = (defined $_[0]) ? shift : $DEFAULTYTSITE;
+			$self->{'youtube-site'} = s#\/$##;
+			$self->{'youtube-site'} = 'https://' . $self->{'youtube-site'}
+					unless ($self->{'youtube-site'} =~ m#^https?\:\/\/#);
 		} elsif ($_[0] =~ /^\-?format$/o) {
 			shift;
 			$self->{'format'} = shift  if (defined $_[0]);
@@ -534,7 +553,7 @@ sub new
 		$self->{'id'} = $1  if (!$self->{'_isaYtPage'} && $url2fetch =~ m#id[\=\:\#]?([^\/\s\=\:\#]+)#);
 	} else {
 		$self->{'id'} = $url;
-		$url2fetch = 'https://youtube.be/watch?v=' . $url;
+		$url2fetch = $self->{'youtube-site'} . '/watch?v=' . $url;
 	}
 	print STDERR "-1 (isYT=".$self->{'_isaYtPage'}.") FETCHING URL=$url2fetch= VIA youtube-dl: ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	$self->{'genre'} = 'Video';
@@ -542,7 +561,8 @@ sub new
 
 	#FIRST, CHECK IF WE'RE A CHANNEL OR USER PAGE, IF SO, FETCH & RETURN LATEST UPLOADED VIDEO (EXCLUDE MARQUEE VIDEO AT TOP):
 
-	if ($self->{'_isaYtPage'} && !$self->{'noiframes'} && $url2fetch =~ m#\/(?:channel|user|c)\/#) {  #WE'RE A CHANNEL PAGE, GRAB 1ST VIDEO!:
+	if ($self->{'_isaYtPage'} && !$self->{'noiframes'} && ($url2fetch =~ m#\/(?:channel|user|c)\/#
+			|| $url2fetch =~ m#$self->{'youtube-site'}\/\@#)) {  #WE'RE A CHANNEL PAGE, GRAB 1ST VIDEO!:
 		print STDERR "..1a:We're a channel or user page!...\n"  if ($DEBUG);
 		my $embedded_video;
 		my $html = '';
@@ -562,7 +582,8 @@ sub new
 			$html =~ s#^.+\:\{\"runs\"\:\[\{\"text\"\:\"Uploads\"\,##s;  #USER PAGES CAN HAVE A BANNER VIDEO, SKIP THIS!
 			if ($html =~ m#\:\{\"url\"\:\"([^\"]+)\"\,\"webPageType\"\:\"WEB\_PAGE\_TYPE\_WATCH\"\,#s) {
 				$url2fetch = $1;
-				$url2fetch =~ s#^\/#https\:\/\/youtube\.be\/#;
+				$url2fetch =~ s#^\/\/#https\:\/\/#;  #URL STARTS WITH "//" (PREMPTIVE)
+				$url2fetch =~ s#^\/#$self->{'youtube-site'}\/#;  #URL IS JUST "/video-id[?other-junk]" (COMMON)
 				$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
 				$self->{'id'} =~ s/^watch\?v\=//;
 				print STDERR "---FOUND 1ST EPISODE! FETCHING=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
@@ -691,7 +712,11 @@ RETRYIT:
 		if ($urlcount <= $#fmtsfound) {
 			push @ytStreams, $_  unless ($self->{'secure'} && $_ !~ /^https/o);
 		} elsif (m#^https?\:\/\/#o && $ytdlArgs =~ /get-thumbnail/o) {
-			$self->{'iconurl'} = $_;  #WILL ALWAYS BE THE LAST URL!
+			if (m#\.(jpe?g|png|gif|com|webp|svg)\b#io) {
+				$self->{'iconurl'} = $_;  #WILL ALWAYS BE THE LAST URL!
+			} else {
+				$self->{'iconurl'} ||= $_;  #(LAST RESORT, AS SOME YOUTUBE IMAGE URLS DON'T HAVE EXTENSIONS!:
+			}
 		} else {
 			$self->{'description'} .= $_ . ' ';
 		}
@@ -713,10 +738,14 @@ RETRYIT:
 	unless ($self->{'fast'}) {  #(FAST MEANS SKIP SCRAPING YOUTUBE PAGE FOR ADDTL. METADATA)
 		$try = 0;
 RETRYPAGE:
-		print STDERR "----(try2=$try= FETCHURL=$url2fetch=\n"  if ($DEBUG);
+		print STDERR "----(try2=$try= FETCHURL=$url2fetch= isYT?=".$self->{'_isaYtPage'}."=\n"  if ($DEBUG);
 		if ($self->{'_isaYtPage'}) {  #WE'RE A YOUTUBE PAGE, FETCH METADATA:
 			#CONVERT "embedded" YT PAGES TO ACTUAL PAGE (EMBEDDED PAGES DON'T HAVE THE METADATA WE'RE SEEKING!:
-			$url2fetch = 'https://youtube.be/watch?v=' .$1  if ($url2fetch =~ m#\/embed\/([a-z0-9\-\_]{11})#i);
+			if ($url2fetch =~ m#^(.+?)\/embed\/([a-z0-9\-\_]{11})#i) {  #TRY FETCHING YOUTUBE SITE FROM THE EMBEDDED URL:
+				$url2fetch = $1.'/watch?v='.$2;
+			} elsif ($url2fetch =~ m#^\/embed\/([a-z0-9\-\_]{11})#i) {  #IF FAIL, TRY www.youtube.com:
+				$url2fetch = $self->{'youtube-site'} . '/watch?v=' .$1;
+			}
 			print STDERR "-2 (TRY=$try) FETCHING SCREEN URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
 			my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
 			$ua->timeout($self->{'timeout'});
@@ -739,7 +768,7 @@ RETRYPAGE:
 			if ($html =~ s#\]\}\,\"title\"\:\{\"runs\"\:\[\{\"text\"\:\"([^\"]+)\"\,\"navigationEndpoint\"\:([^\}]+)##s) {
 				my $two = $2;
 				$self->{'artist'} = $1;
-				$self->{'albumartist'} = 'https://youtube.be' . $1  if ($two =~ m#\"url\"\:\"([^\"]+)#);
+				$self->{'albumartist'} = $self->{'youtube-site'} . $1  if ($two =~ m#\"url\"\:\"([^\"]+)#);
 			}
 			if ($html =~ s#\"videoDetails\"\:\{\"videoId\"\:\"([^\"]+)\"([^\}]+)##s) {
 				my $two = $2;
@@ -763,7 +792,7 @@ RETRYPAGE:
 			print STDERR "--WE ARE NOT A YT PAGE, BUT ytID=".$self->{'_ytID'}."= SO WE WILL TRY AGAIN!\n"  if ($DEBUG);
 			++$try;
 			++$self->{'_isaYtPage'};
-			$url2fetch = 'https://youtube.be/watch?v=' . $self->{'_ytID'};
+			$url2fetch = $self->{'youtube-site'} . '/watch?v=' . $self->{'_ytID'};
 			goto RETRYPAGE;
 		}
 	}
@@ -784,6 +813,11 @@ RETRYPAGE:
 		$self->{$i} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egso;
 	}
 	print STDERR "-2: title=".$self->{'title'}."= id=".$self->{'id'}."= artist=".$self->{'artist'}."= year(Published)=".$self->{'year'}."=\n"  if ($DEBUG);
+	if ($DEBUG) {
+		foreach my $i (sort keys %{$self}) {
+			print STDERR "--KEY=$i= VAL=".$self->{$i}."=\n";
+		}
+	}
 	$self->_log($url2fetch);
 
 	bless $self, $class;   #BLESS IT!

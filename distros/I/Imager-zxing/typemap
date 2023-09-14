@@ -1,2 +1,10 @@
 Imager::zxing::Decoder T_PTROBJ
 Imager::zxing::Decoder::Result T_PTROBJ
+std_string T_STD_STRING
+
+OUTPUT
+
+T_STD_STRING
+        SvUTF8_off($arg);
+        sv_setpvn($arg, $var.data(), $var.size());
+        sv_utf8_decode($arg);

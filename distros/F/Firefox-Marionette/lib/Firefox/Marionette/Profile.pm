@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 
 sub ANY_PORT            { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -225,8 +225,10 @@ sub new {
     $profile->set_value( 'marionette.port',                       ANY_PORT() );
     $profile->set_value( 'network.http.prompt-temp-redirect',     'false', 0 );
     $profile->set_value( 'network.http.request.max-start-delay',  '0',     0 );
+    $profile->set_value( 'network.proxy.socks_remote_dns',        'true',  0 );
     $profile->set_value( 'security.osclientcerts.autoload',       'true',  0 );
     $profile->set_value( 'signon.autofillForms',                  'false', 0 );
+    $profile->set_value( 'signon.autologin.proxy',                'true',  0 );
     $profile->set_value( 'signon.rememberSignons',                'false', 0 );
     $profile->set_value( 'startup.homepage_welcome_url', 'about:blank',    1 );
     $profile->set_value( 'startup.homepage_welcome_url.additional',
@@ -521,7 +523,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 1.43
+Version 1.44
 
 =head1 SYNOPSIS
 

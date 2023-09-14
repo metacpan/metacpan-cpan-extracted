@@ -1,0 +1,58 @@
+---
+abstract: 'Provide the static, dynamic libraries and CLI of the parasail aligner'
+author:
+  - 'Christos Argyropoulos <chrisarg@gmail.com>'
+build_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+  File::Spec: '0'
+  Test2::V0: '0'
+  Test::Alien: '0'
+  Test::Alien::Diag: '0'
+  Test::More: '0'
+configure_requires:
+  Alien::Build: '1.40'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-SeqAlignment-parasail
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Alien::SeqAlignment::parasail:
+    file: lib/Alien/SeqAlignment/parasail.pm
+    version: '0.01'
+requires:
+  Alien::Base: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.01'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
+  requires:
+    share:
+      Alien::Autotools: '0'
+      Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
+      Config: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      Mozilla::CA: '0'
+      Net::SSLeay: '1.49'
+      URI: '0'
+    system: {}
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

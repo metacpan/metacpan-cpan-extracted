@@ -18,9 +18,9 @@ my $builder = Module::Build->new(
         'Test::More' => '0',
     },
     requires => {
-        'Moose'  => '2.2203',
-        'Term::ANSIColor' => '5.01',
-        'Carp'  => '1.52'
+        # 'Moose'  => '2.2203',
+        # 'Term::ANSIColor' => '5.01',
+        # 'Carp'  => '1.52'
    },
     add_to_cleanup     => [ 'App-FileComposer-*' ],
 );

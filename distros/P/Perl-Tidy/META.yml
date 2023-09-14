@@ -22,5 +22,5 @@ requires:
 resources:
   bugtracker: https://github.com/perltidy/perltidy/issues
   repository: https://github.com/perltidy/perltidy.git
-version: '20230701'
+version: '20230912'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

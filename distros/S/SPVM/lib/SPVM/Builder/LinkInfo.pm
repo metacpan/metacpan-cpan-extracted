@@ -94,6 +94,8 @@ sub create_link_command_args {
   my $ldflags = $config->ldflags;
   push @merged_ldflags, @{$config->ldflags};
   
+  push @merged_ldflags, @{$config->thread_ldflags};
+  
   my $lib_dirs = $config->lib_dirs;
   
   my @lib_dirs_ldflags = map { "-L$_" } @$lib_dirs;
@@ -120,7 +122,7 @@ sub create_link_command_args {
 sub to_cmd {
   my ($self) = @_;
 
-  my $link_command = $self->create_link_command;;
+  my $link_command = $self->create_link_command;
   my $link_command_string = "@$link_command";
   
   return $link_command_string;

@@ -105,10 +105,10 @@ provides:
     version: '1.00'
   Onyphe:
     file: lib/Onyphe.pm
-    version: '4.10'
+    version: '4.11'
   Onyphe::Api:
     file: lib/Onyphe/Api.pm
-    version: '4.10'
+    version: '4.11'
 requires:
   Carp: '0'
   Config::INI::Tiny: '0'
@@ -127,5 +127,5 @@ requires:
   Tie::IxHash: '0'
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
-version: '4.10'
+version: '4.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,10 @@
+0.853   2023-07-09  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - Remove usage of smartmatch.
+
+
 0.852   2021-08-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Update test to newer Data::Sah::Normalize (0.051, via Data::Sah

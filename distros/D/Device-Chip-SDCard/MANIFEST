@@ -1,6 +1,8 @@
+.editorconfig
 Build.PL
 Changes
 examples/dump-sd-card
+examples/dump-sd-csd
 lib/Device/Chip/SDCard.pm
 LICENSE
 MANIFEST			This list of files

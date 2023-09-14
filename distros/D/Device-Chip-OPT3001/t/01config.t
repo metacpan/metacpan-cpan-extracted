@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -21,7 +21,7 @@ await $chip->mount(
    $adapter->expect_write_then_read( "\x01", 2 )
       ->returns( "\xC8\x10" );
 
-   is_deeply( await $chip->read_config,
+   is( await $chip->read_config,
       {
          RN  => 12,
          CT  => 800,
@@ -53,7 +53,7 @@ await $chip->mount(
    );
 
    # subsequent read does not talk to chip a second time but yields new values
-   is_deeply( await $chip->read_config,
+   is( await $chip->read_config,
       {
          RN  => 12,
          CT  => 800,

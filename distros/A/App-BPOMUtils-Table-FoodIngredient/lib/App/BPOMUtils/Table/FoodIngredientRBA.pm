@@ -10,9 +10,9 @@ use Exporter 'import';
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-13'; # DATE
+our $DATE = '2023-09-03'; # DATE
 our $DIST = 'App-BPOMUtils-Table-FoodIngredient'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 our @EXPORT_OK = qw(
                        bpom_list_food_ingredients_rba
@@ -7860,6 +7860,14 @@ _
         examples => [
         ],
     },
+    hooks => {
+        before_return => sub {
+            my %args = @_;
+            # XXX adjust other properties e.g. table.field_formats etc
+            $args{_func_res}[3]{'table.fields'} = ['status'];
+            1;
+        },
+    },
 );
 die "Can't generate function: $res->[0] - $res->[1]" unless $res->[0] == 200;
 
@@ -7878,7 +7886,7 @@ App::BPOMUtils::Table::FoodIngredientRBA - List ingredients in BPOM processed fo
 
 =head1 VERSION
 
-This document describes version 0.019 of App::BPOMUtils::Table::FoodIngredientRBA (from Perl distribution App-BPOMUtils-Table-FoodIngredient), released on 2023-02-13.
+This document describes version 0.020 of App::BPOMUtils::Table::FoodIngredientRBA (from Perl distribution App-BPOMUtils-Table-FoodIngredient), released on 2023-09-03.
 
 =head1 FUNCTIONS
 

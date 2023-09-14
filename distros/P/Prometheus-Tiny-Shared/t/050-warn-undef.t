@@ -6,10 +6,10 @@ use strict;
 use Test::More;
 use Test::Warn;
 
-use Prometheus::Tiny;
+use Prometheus::Tiny::Shared;
 
 {
-  my $p = Prometheus::Tiny->new;
+  my $p = Prometheus::Tiny::Shared->new;
   $p->set('some_metric', 10);
   warning_like
     { $p->set('some_metric') }
@@ -21,7 +21,7 @@ EOF
 }
 
 {
-  my $p = Prometheus::Tiny->new;
+  my $p = Prometheus::Tiny::Shared->new;
   $p->set('some_metric', 10);
   warning_like
     { $p->add('some_metric') }
@@ -29,6 +29,18 @@ EOF
     'adding undef value emits a warning';
   is $p->format, <<EOF, 'add metric undef formatted correctly';
 some_metric 10
+EOF
+}
+
+{
+  my $p = Prometheus::Tiny::Shared->new;
+  $p->set('some_metric', 10);
+  warning_like
+    { $p->add('some_metric', 10, { foo => undef }) }
+    qr/label '.+' has an undefined value, dropping it/,
+    'undef label value emits a warning';
+  is $p->format, <<EOF, 'add metric undef label formatted correctly';
+some_metric 20
 EOF
 }
 

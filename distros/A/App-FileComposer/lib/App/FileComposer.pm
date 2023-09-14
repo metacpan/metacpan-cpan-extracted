@@ -4,12 +4,15 @@ use warnings;
 use strict;
 use feature 'say';
 use Term::ANSIColor qw(:constants);
-use Moose;
 use Carp qw(croak);
 
-#// Constructor
-has 'filename', is => 'rw', isa => 'Str';
-has 'origin', is => 'rw', isa => 'Str', default => $ENV{"HOME"} . "/.app-filecomposer";
+sub new {
+  my( $class, $filename ) = @_;
+  my $obj = { filename => $filename,
+              origin   => $ENV{"HOME"}."/.app-filecomposer"
+            };
+            bless $obj, $class;
+}
 
 =head1 NAME
 
@@ -17,11 +20,11 @@ App::FileComposer - Dumps pre defined scripts!
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS

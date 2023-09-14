@@ -34,10 +34,21 @@ DESCRIPTION
 
       * End - scroll to bottom
 
-      * F9 - open the outline view popup. Clicking on an entry will jump
-      directly to it.
+      * F9 - open the outline view popup. See Below.
 
       * q - exit
+
+ Outline View
+
+    The outline view displays an overview of all the section headings in
+    the document.
+
+    Within the outline view, the mouse wheel will scroll the list, and
+    clicking an entry will jump directly to it, dismissing the view.
+
+    Typing text with the outline view open will filter it to just those
+    headings matching the typed text. Pressing the <Enter> key will jump
+    directly to the first highlighted heading, again dismissing the view.
 
 TODO
 

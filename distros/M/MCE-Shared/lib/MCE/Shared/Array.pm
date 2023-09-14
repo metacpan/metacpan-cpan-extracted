@@ -13,12 +13,12 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.885';
+our $VERSION = '1.886';
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
 use MCE::Shared::Base ();
-use base 'MCE::Shared::Base::Common';
+use base 'MCE::Shared::Common';
 
 use overload (
    q("")    => \&MCE::Shared::Base::_stringify,
@@ -383,7 +383,7 @@ MCE::Shared::Array - Array helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Array version 1.885
+This document describes MCE::Shared::Array version 1.886
 
 =head1 DESCRIPTION
 

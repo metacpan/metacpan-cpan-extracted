@@ -24,9 +24,9 @@ push @mysql_headers, 'mysql.h';
 
 our $opt = { "help" => \&Usage, };
 
-my ($test_host, $test_port, $test_socket);
+my ($test_host, $test_port, $test_socket, $test_authplugin);
 {
-local ($::test_host, $::test_port, $::test_user, $::test_socket, $::test_password, $::test_db, $::test_mysql_config, $::test_cflags, $::test_libs);
+local ($::test_host, $::test_port, $::test_user, $::test_socket, $::test_authplugin, $::test_password, $::test_db, $::test_mysql_config, $::test_cflags, $::test_libs);
 eval { require "./t/MariaDB.mtest" } and do {
 $opt->{'testuser'} = $::test_user;
 $opt->{'testpassword'} = $::test_password;
@@ -37,6 +37,7 @@ $opt->{'libs'} = $::test_libs;
 $test_host = $::test_host;
 $test_port = $::test_port;
 $test_socket = $::test_socket;
+$test_authplugin = $::test_authplugin;
 }
 }
 
@@ -49,6 +50,7 @@ Getopt::Long::GetOptions(
     "testuser:s",
     "testpassword:s",
     "testsocket:s",
+    "testauthplugin:s",
     "cflags:s",
     "libs:s",
     "mysql_config:s",
@@ -72,7 +74,7 @@ my $source = {};
   if ($opt->{'mysql_config'})
   {
     if ($opt->{'mysql_config'} ne 'skip') {
-    $opt->{'mysql_config'} = Win32::GetShortPathName($opt->{'mysql_config'})
+    $opt->{'mysql_config'} = Win32::GetShortPathName($opt->{'mysql_config'}) || $opt->{'mysql_config'}
         if $^O eq 'MSWin32';
     if (!CanExecute($opt->{'mysql_config'}))
     {
@@ -104,7 +106,7 @@ MSG
     }
   }
 
-for my $key (qw(testdb testhost testuser testpassword testsocket testport cflags libs))
+for my $key (qw(testdb testhost testuser testpassword testsocket testauthplugin testport cflags libs))
 {
   Configure($opt, $source, $key);
 }
@@ -136,7 +138,7 @@ if ( $opt->{testport} && !$opt->{testhost} ) {
   $source->{testhost} = 'guessed';
 }
 
-foreach (qw(testhost testport testsocket)) {
+foreach (qw(testhost testport testsocket testauthplugin)) {
   next if defined $opt->{$_};
   $opt->{$_} = '';
   $source->{$_} = 'default';
@@ -285,7 +287,7 @@ my $have_deinitialize_ssl = check_lib(
 );
 
 # Check if mysql_server_end() deinitialize OpenSSL library functions
-# See: https://github.com/gooddata/DBD-MariaDB/issues/119
+# See: https://github.com/perl5-dbi/DBD-MariaDB/issues/119
 my $have_problem_with_openssl = !check_lib(
   LIBS => (join ' ', @libdirs, $main_lib),
   ccflags => $opt->{cflags},
@@ -419,12 +421,14 @@ my $fileName = File::Spec->catfile("t", "MariaDB.mtest");
 	      "\$::test_port = \$opt->{'testport'};\n" .
 	      "\$::test_user = \$opt->{'testuser'};\n" .
               "\$::test_socket = \$opt->{'testsocket'};\n" .
+              "\$::test_authplugin = \$opt->{'testauthplugin'};\n" .
 	      "\$::test_password = \$opt->{'testpassword'};\n" .
 	      "\$::test_db = \$opt->{'testdb'};\n" .
 	      "\$::test_dsn = \"DBI:MariaDB:\$::test_db\";\n" .
               "\$::test_dsn .= \":\$::test_host\" if \$::test_host;\n" .
 	      "\$::test_dsn .= \":\$::test_port\" if \$::test_port;\n".
 	      "\$::test_dsn .= \";mariadb_socket=\$::test_socket\" if \$::test_socket;\n" .
+	      "\$::test_dsn .= \";mariadb_auth_plugin=\$::test_authplugin\" if \$::test_authplugin;\n" .
 	      "\$::test_dsn .= \";mariadb_connect_timeout=120;mariadb_read_timeout=120;mariadb_write_timeout=120\";\n" .
 	      "\$::test_mysql_config = \$opt->{'mysql_config'} if \$source->{'mysql_config'} eq 'User\\'s choice';\n" .
 	      "\$::test_cflags = \$opt->{'cflags'} if \$source->{'cflags'} eq 'User\\'s choice';\n" .
@@ -441,34 +445,35 @@ $cflags .= " -DHAVE_GET_CHARSET_NUMBER" if $have_get_charset_number;
 $cflags .= " -DHAVE_GET_OPTION" if $have_get_option;
 $cflags .= " -DHAVE_DEINITIALIZE_SSL" if $have_deinitialize_ssl;
 $cflags .= " -DHAVE_PROBLEM_WITH_OPENSSL" if $have_problem_with_openssl;
-my %o = ( 'NAME' => 'DBD::MariaDB',
-	  'INC' => $cflags,
-	  'dist'         => { 'SUFFIX'       => ".gz",
-			      'DIST_DEFAULT' => 'all tardist',
-			      'COMPRESS'     => "gzip -9f" },
-	  'clean' => { 'FILES' => '*.xsi' },
-		'realclean' => { 'FILES' => 't/MariaDB.mtest' },
-          'C' => ["dbdimp.c", "MariaDB.c", "socket.c"],
-          'XS' => {'MariaDB.xs' => 'MariaDB.c'},
-          'PM' => {
-              'lib/DBD/MariaDB.pm' => '$(INST_LIB)/DBD/MariaDB.pm',
-              'lib/DBD/MariaDB.pod' => '$(INST_LIB)/DBD/MariaDB.pod',
-              'lib/DBD/MariaDB/INSTALL.pod' => '$(INST_LIB)/DBD/MariaDB/INSTALL.pod',
-              'README.pod' => '$(INST_LIB)/DBD/MariaDB/README.pod',
-          },
-          'MAN3PODS' => {
-              'lib/DBD/MariaDB.pod' => '$(INST_MAN3DIR)/DBD::MariaDB.$(MAN3EXT)',
-              'lib/DBD/MariaDB/INSTALL.pod' => '$(INST_MAN3DIR)/DBD::MariaDB::INSTALL.$(MAN3EXT)',
-              'README.pod' => '$(INST_MAN3DIR)/DBD::MariaDB::README.$(MAN3EXT)',
-          },
-	  'OBJECT' => '$(O_FILES)',
-	  'LIBS' => (join ' ', @libdirs, $main_lib, @libs),
-	  @ldflags ? (dynamic_lib => { OTHERLDFLAGS => (join ' ', @ldflags) }) : (),
-	  'VERSION_FROM' => 'lib/DBD/MariaDB.pm'
-	);
-
-if (eval { ExtUtils::MakeMaker->VERSION(5.43) }) {
-  %o=(%o,
+my %o =
+  (
+    'NAME' => 'DBD::MariaDB',
+    'INC' => $cflags,
+    'dist' => {
+      'SUFFIX' => ".gz",
+      'DIST_DEFAULT' => 'all tardist',
+      'TARFLAGS' => '--format=ustar -c -v -f',
+      'COMPRESS' => "gzip -9f",
+    },
+    'clean' => { 'FILES' => '*.xsi' },
+    'realclean' => { 'FILES' => 't/MariaDB.mtest' },
+    'C' => [ "dbdimp.c", "MariaDB.c" ],
+    'XS' => { 'MariaDB.xs' => 'MariaDB.c' },
+    'PM' => {
+      'lib/DBD/MariaDB.pm' => '$(INST_LIB)/DBD/MariaDB.pm',
+      'lib/DBD/MariaDB.pod' => '$(INST_LIB)/DBD/MariaDB.pod',
+      'lib/DBD/MariaDB/INSTALL.pod' => '$(INST_LIB)/DBD/MariaDB/INSTALL.pod',
+      'README.pod' => '$(INST_LIB)/DBD/MariaDB/README.pod',
+    },
+    'MAN3PODS' => {
+      'lib/DBD/MariaDB.pod' => '$(INST_MAN3DIR)/DBD::MariaDB.$(MAN3EXT)',
+      'lib/DBD/MariaDB/INSTALL.pod' => '$(INST_MAN3DIR)/DBD::MariaDB::INSTALL.$(MAN3EXT)',
+      'README.pod' => '$(INST_MAN3DIR)/DBD::MariaDB::README.$(MAN3EXT)',
+    },
+    'OBJECT' => '$(O_FILES)',
+    'LIBS' => (join ' ', @libdirs, $main_lib, @libs),
+    @ldflags ? (dynamic_lib => { OTHERLDFLAGS => (join ' ', @ldflags) }) : (),
+    'VERSION_FROM' => 'lib/DBD/MariaDB.pm',
     ABSTRACT => 'MariaDB and MySQL driver for the Perl5 Database Interface (DBI)',
     AUTHOR => 'Pali <pali@cpan.org>',
     LICENSE => 'perl',
@@ -480,16 +485,16 @@ if (eval { ExtUtils::MakeMaker->VERSION(5.43) }) {
       dynamic_config => 0,
       resources => {
         repository  => {
-          url  => 'git://github.com/gooddata/DBD-MariaDB.git',
-          web  => 'https://github.com/gooddata/DBD-MariaDB',
+          url  => 'https://github.com/perl5-dbi/DBD-MariaDB.git',
+          web  => 'https://github.com/perl5-dbi/DBD-MariaDB',
           type => 'git',
         },
         bugtracker => {
-          web  => 'https://github.com/gooddata/DBD-MariaDB/issues',
+          web  => 'https://github.com/perl5-dbi/DBD-MariaDB/issues',
         },
         x_MailingList => 'mailto:dbi-dev@perl.org',
         license     => [ 'http://dev.perl.org/licenses/' ],
-        homepage    => 'https://github.com/gooddata/DBD-MariaDB',
+        homepage    => 'https://github.com/perl5-dbi/DBD-MariaDB',
         x_IRC       => 'irc://irc.perl.org/#dbi',
       },
       x_contributors => [
@@ -517,16 +522,18 @@ if (eval { ExtUtils::MakeMaker->VERSION(5.43) }) {
         'David Farrell <davidnmfarrell@gmail.com>',
         'David Steinbrunner <dsteinbrunner@pobox.com>',
         'Dominik Sauer <dominik.sauer@gooddata.com>',
+        'E. Choroba <choroba@matfyz.cz>',
         'Giovanni Bechis <giovanni@bigio.snb.it>',
         'Graham Ollis <plicease@cpan.org>',
         'H.Merijn Brand - Tux <h.m.brand@xs4all.nl>',
         'Hanno <hanno@gentoo.org>',
         'James McCoy <jamessan@jamessan.com>',
-        'Jan Holcapek <jan.holcapek@gooddata.com>',
+        'Jan Holčapek <holcapek@gmail.com>',
         'Jim Winstead <jimw@trainedmonkey.com>',
         'Juergen Weigert <jw@suse.com>',
         'Kenny Gryp <kenny.gryp@percona.com>',
         'Lu Shengliang <lushl9301@gmail.com>',
+        'Martin Cermak <martin.cermak2@gooddata.com>',
         'Masahiro Chiba <chiba@everqueue.com>',
         'Matthew Horsfall (alh) <WolfSage@gmail.com>',
         'Michiel Beijen <michiel.beijen@gmail.com>',
@@ -552,6 +559,7 @@ if (eval { ExtUtils::MakeMaker->VERSION(5.43) }) {
         'Tim Mullin <tim@cpanel.net>',
         'Ville Skyttä <ville.skytta@iki.fi>',
         'Vladimir Marek <vlmarek@volny.cz>',
+        'Walt Mankowski <waltman@pobox.com>',
         'katyavoid <katyavoid@gmail.com>',
         'kmx <kmx@cpan.org>',
         'tokuhirom <tokuhirom@gmail.com>',
@@ -594,6 +602,7 @@ if (eval { ExtUtils::MakeMaker->VERSION(5.43) }) {
     },
     TEST_REQUIRES => {
       'bigint' => 0,
+      'constant' => 0,
       'lib' => 0,
       'strict' => 0,
       'utf8' => 0,
@@ -611,7 +620,6 @@ if (eval { ExtUtils::MakeMaker->VERSION(5.43) }) {
       'Time::HiRes' => 0,
     },
   );
-}
 
 WriteMakefile1(%o);
 exit 0;
@@ -653,6 +661,9 @@ Possible options are:
                          the database server; by default unix socket is chosen
                          by mariadb/mysqlclient library; takes effect only
                          when --testhost is set to "localhost"
+  --testauthplugin=<ap>  Use <ap> auth plugin when doing user authentication
+                         handshake with server; for older server versions it is
+                         needed to pass "mysql_native_password"
   --mariadb_config       Synonym for --mysql_config, override it
   --mysql_config=<path>  Specify <path> for mariadb_config or mysql_config script
   --help                 Print this message and exit
@@ -826,6 +837,11 @@ as well as others.
 
 mysql> grant all privileges on test.* to '$user'\@'localhost' identified by 's3kr1t';
 
+For MySQL 8 it is needed to use different syntax:
+
+mysql> create user '$user'\@'localhost' identified by 's3kr1t';
+mysql> grant all privileges on test.* to '$user'\@'localhost';
+
 You can also optionally set the user to run 'make test' with:
 
 perl Makefile.PL --testuser=username
@@ -884,7 +900,7 @@ section "Linker flags" or type
   perl Makefile.PL --help
 MSG
     }
-    elsif ($param eq "testhost" || $param eq "testport" || $param eq "testsocket") {
+    elsif ($param eq "testhost" || $param eq "testport" || $param eq "testsocket" || $param eq "testauthplugin") {
       # known parameter, but do nothing
     }
     else {
@@ -962,8 +978,16 @@ sub WriteMakefile1 {  #Written by Alexandr Ciornii, version 0.21. Added by eumm-
     $params{PREREQ_PM}={ %{$params{PREREQ_PM} || {}} , %{$params{TEST_REQUIRES}} };
     delete $params{TEST_REQUIRES};
   }
-  delete $params{CONFIGURE_REQUIRES} if $eumm_version < 6.52;
-  delete $params{MIN_PERL_VERSION} if $eumm_version < 6.48;
+  if ($params{CONFIGURE_REQUIRES} and $eumm_version < 6.52) {
+    #EUMM prior to 6.52 has problems with CONFIGURE_REQUIRES
+    $params{PREREQ_PM}={ %{$params{PREREQ_PM} || {}} , %{$params{CONFIGURE_REQUIRES}} };
+    delete $params{CONFIGURE_REQUIRES};
+  }
+  if ($params{MIN_PERL_VERSION} and $eumm_version < 6.48) {
+    #EUMM prior to 6.48 has problems with MIN_PERL_VERSION
+    $params{PREREQ_PM}={ %{$params{PREREQ_PM} || {}} , perl => $params{MIN_PERL_VERSION} };
+    delete $params{MIN_PERL_VERSION};
+  }
   delete $params{META_MERGE} if $eumm_version < 6.46;
   delete $params{META_ADD} if $eumm_version < 6.46;
   delete $params{LICENSE} if $eumm_version < 6.31;

@@ -55,13 +55,18 @@ ODF::lpOD_Helper - fix and enhance ODF::lpOD
   $context=>Hinsert_content([ "The author is ", ["bold"], "Stephen King"],
                             position=>WITHIN, offset => ... );
 
-  # Work around bug in ODF::lpOD::Element::get_text(recursive => TRUE) 
+  # Work around bug in ODF::lpOD::Element::get_text(recursive => TRUE)
   # so that tab, line-break, and spacing objects are expanded correctly
   #
   $text = $context->Hget_text(); # include nested paragraphs
 
   # Create or reuse an 'automatic' (pseudo-anonymous) style
   $style = $doc->Hautomatic_style($family, properties...);
+
+  # Remove problematic 'rsid' styles left by LibreOffice which interfere
+  # with cloning content
+  $context->Hclean_for_cloning();
+  do_something( $context->clone );
 
   # Format a node or entire tree for debug messages
   say fmt_node($elt);
@@ -86,11 +91,12 @@ and fonts registered.
 
 package ODF::lpOD_Helper;
 
-our $VERSION = '6.000'; # VERSION
-our $DATE = '2023-08-23'; # DATE
+{ no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
+our $VERSION = '6.004'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-09-08'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
-use Data::Dumper::Interp 6.000 qw/visnew
+use Data::Dumper::Interp 6.004 qw/visnew
      vis  viso  avis  alvis  ivis  dvis  hvis  hlvis
      visq visoq avisq alvisq ivisq dvisq hvisq hlvisq
      rvis rvisq ravis ravisq rhvis rhvisq
@@ -99,19 +105,25 @@ use Data::Dumper::Interp 6.000 qw/visnew
 
 our @EXPORT = qw(
   Hr_STOP Hr_SUBST Hr_RESCAN
+  Hor_cond
   fmt_match fmt_node fmt_tree fmt_node_brief fmt_tree_brief
+  fmt_Hreplace_result fmt_Hreplace_results
 );
 our @EXPORT_OK = qw(
-  hashtostring
+  hashtostring arraytostring
   AUTO_PFX
-  TEXTLEAF_COND PARA_COND TEXTCONTAINER_COND TEXTLEAF_OR_PARA_COND
+  Hr_MASK
+  TEXTLEAF_FILTER PARA_FILTER TEXTCONTAINER_FILTER TEXTLEAF_OR_PARA_FILTER
+  ROW_FILTER COLUMN_FILTER CELL_FILTER TABLE_FILTER
 );
 
 use constant {
   Hr_STOP   => 1,
   Hr_SUBST  => 2,
   Hr_RESCAN => 4,
+  Hr_MASK   => 7,
 };
+
 sub _is_Hr_valid($) { ($_[0]//"invalid") =~ /^[01236]$/ }
 
 use ODF::lpOD;
@@ -130,22 +142,18 @@ BEGIN {
 
 =head1 Transparent Unicode Support
 
-By default ODF::lpOD_Helper patches ODF::lpOD so that methods
+By default ODF::lpOD_Helper patches ODF::lpOD so that all methods
 accept and return arbitrary Perl character strings.
 
 You will B<always> want this unless
 your application really, really needs to pass un-decoded octets
 directly between file/network resources and ODF::lpOD without
-looking at the data along the way.
-Please see B<< L<ODF::lpOD_Helper::Unicode> >>.
+looking at the data along the way. This can be disabled for
+legacy applications.  Please see B<< L<ODF::lpOD_Helper::Unicode> >>.
 
 Currently this patch has global effect but might someday become
-scoped; to be safe put C<use ODF::lpOD_Helper> at the top of every file which 
+scoped; to be safe put C<use ODF::lpOD_Helper> at the top of every file which
 calls ODF::lpOD or ODF::lpOD_Helper methods.
-
-This patch can be disabled for legacy applications, where method
-arguments and results are encoded binary bytes rather than Perl characters.
-Please see L<ODF::lpOD_Helper::Unicode> for how to do this.
 
 Prior to version 6.000 transparent Unicode was not enabled by default,
 but required a now-deprected ':chars' import tag.
@@ -203,7 +211,7 @@ sub import {
     }
   }
 
-  my (@my_args, @exporter_args); 
+  my (@my_args, @exporter_args);
   foreach (@_) {
     if (/^:(chars|bytes)$/) { push @my_args, $_; }
     else                    { push @exporter_args, $_; }
@@ -249,7 +257,7 @@ sub import {
 #  local $_=join("",@_); s/\n\z//s; alert('#'.(caller(0))[2].": $_"); }
 
 sub oops(@) { @_=("\n".__PACKAGE__." oops:\n",@_,"\n"); goto &Carp::confess }
-sub btwN($@) { my $N=shift; local $_=join("",@_); s/\n\z//s; printf "%4d: %s\n",(caller($N))[2],$_; }
+sub btwN($@) { my $N=shift; local $_=join("",@_); s/\n\z//s; printf "H%d: %s\n",(caller($N))[2],$_; }
 sub btw(@) { unshift @_,0; goto &btwN }
 
 use Scalar::Util qw/refaddr blessed reftype weaken isweak/;
@@ -264,17 +272,23 @@ our %perdoc_state;  # "address" => [ { statehash }, $doc_weakened ]
 sub _get_ephemeral_statehash($) {
   my $doc = shift;
   confess "not a Document" unless ref($doc) eq "ODF::lpOD::Document";
-  my $addr = refaddr($doc);
-  my $aref;
-  if (($aref = $perdoc_state{$addr})) {
-    $aref = undef if !defined($aref->[1]); # object destroyed?
+
+  my $result;
+  foreach my $addr (keys %perdoc_state) {
+    my ($statehash, $that_doc) = @{ $perdoc_state{$addr} };
+    if (!defined $that_doc) { # that doc was destroyed
+      delete $perdoc_state{$addr};
+    }
+    elsif ($that_doc == $doc) {
+      $result = $statehash;
+    }
   }
-  unless($aref) {
-    $perdoc_state{$addr} = $aref = [ {}, $doc ];
+  unless ($result) {
+    $perdoc_state{refaddr $doc} = my $aref = [ {}, $doc ];
+    $result = $aref->[0];
     weaken($aref->[1]);
   }
-  oops unless isweak($aref->[1]);
-  return $aref->[0];
+  $result
 }
 use constant AUTO_PFX => "lpODH";
 
@@ -416,7 +430,7 @@ nodes for tab, newline, and consecutive spaces, and may be partly located in
 different I<span>s.
 
 By default all Paragraphs are searched, including nested paragraphs
-inside B<frames> and B<tables>.   
+inside B<frames> and B<tables>.
 Nested paragraphs may be excluded using
 option C<prune_cond =E<gt> 'text:p|text:h'>.
 
@@ -436,15 +450,15 @@ as well as regular PCDATA text.
 OPTIONS may be
 
   offset => NUMBER  # Starting position within the combined virtual
-                    # texts of all paragraphs in C<$context>
+                    # texts of all paragraphs in $context
 
   multi  => BOOL    # Allow multiple matches? (FALSE by default)
 
   prune_cond => STRING or qr/Regex/
-                    # Do not descend into nodes matching the indicated
+                    # Do not descend below nodes matching the indicated
                     # condition.  See "Hnext_elt".
 
-A hash is returned for each match:
+A match hashref is returned for each match:
 
  {
    match        => The matched virtual text
@@ -459,7 +473,7 @@ A hash is returned for each match:
    vend         => Offset+1 of match-end in the combined virtual texts
  }
 
-The following illustrates the 'offset' OPTION and match results:
+The following illustrates how the 'offset' OPTION works:
 
           Para.#1 ║ Paragraph #2 containing a match  │
           (ignored║  straddling the last two segments│
@@ -485,7 +499,7 @@ RETURNS:
 
 =over
 
-In array context, zero or more hashrefs.
+In array context, zero or more match hashrefs.
 
 In scalar context, a hashref or undef if there was no match
 (option 'multi' is not allowed when called in scalar context).
@@ -494,13 +508,13 @@ In scalar context, a hashref or undef if there was no match
 
 =head2 B<Regex Anchoring>
 
-A qr/regex/ is matched against the combined virtual text of each paragraph.
-The match logic is
+If C<$expr> is a qr/regex/ it is matched against the combined
+virtual text of each paragraph.  The match logic is
 
    $paragraph_text =~ /\G.*?(${your_regex})/
 
 with B<pos> set to the position implied by B<$offset>, if relevant,
-or to the position following a previous match (with C<multi =E<gt> TRUE>).
+or to the position following a previous match (when C<multi =E<gt> TRUE>).
 
 Therefore B<\A> will match the start of the paragraph only on the first
 match (when B<pos> is zero), provided B<$offset> is not specified or
@@ -550,7 +564,7 @@ with C<multi =E<gt> TRUE>, all instances are replaced.
 In the second form, the specified sub is called for each match, passing
 a I<match hashref> (see C<Hsearch>) as the only argument.  Its return
 value determines whether any substitutions occur.
-The sub must return one of the following:
+The sub must
 
  return(0)
 
@@ -562,20 +576,15 @@ The sub must return one of the following:
     starting immediately after the replaced text.
 
  return(Hr_SUBST | Hr_STOP, [content])
- return(Hr_SUBST | Hr_STOP, [content], optRESULTS)
 
     [content] is substituted for the matched text and then "Hreplace"
     terminates immediately.
 
-    If optRESULTS is provided, it is returned from "Hreplace" instead
-    of the default substitution-descriptor hashes.
-
  return(Hr_STOP)
- return(Hr_STOP, optRESULTS)
 
     "Hreplace" just terminates.
 
-C<Hreplace> returns, by default, a list of hashes describing the
+C<Hreplace> returns a list of hashes describing the
 substitutions which were performed:
 
   {
@@ -589,9 +598,9 @@ substitutions which were performed:
     para_voffset => offset into the paragraph's virtual text
   }
 
-Nodes following replaced text might be merged out of existence.
+The node following replaced text might be merged out of existence.
 
-=head3 B<Content Specification>
+=head3 B<[content] Specifications>
 
 A C<[content]> value is a ref to an array of zero or more elements,
 each of which is either
@@ -628,111 +637,111 @@ Internally, an ODF "automatic" Style is created for
 each unique combination of properties, re-using styles when possible.
 Fonts are automatically registered.
 
-Alternatively, you can specify an existing (or to-be-created) ODF Style with 
+To use an existing (or to-be-created) ODF Style, use
 
   [style-name => "name of style"]
 
 =cut
 
-use constant TEXTLEAF_COND         => '#TEXT|text:tab|text:line-break|text:s';
-use constant PARA_COND             => 'text:p|text:h';
-use constant TEXTCONTAINER_COND    => PARA_COND."|text:span";
-use constant TEXTLEAF_OR_PARA_COND => TEXTLEAF_COND."|".PARA_COND;
-
-sub ODF::lpOD::Element::Hreplace {
-  my $context = shift;
-  my $expr    = shift;
-  my $repl    = shift;
-  my %opts    = @_;
-  my $debug   = $opts{debug};
-
-  btw dvis 'Hreplace Top: $context $expr $repl %opts' if $debug;
-btw "context:\n", fmt_tree($context) if $debug;
-
-  croak "'expr'  must be a qr/regex/ or plain string\n"
-    if (!defined($expr) or ref($expr) && ref($expr) ne "Regexp");
-
-  my $callback;
-  if (ref($repl) eq "CODE") {
-    croak "Option 'multi' and using a callback are mutually exclusive\n"
-      if defined  $opts{multi};
-    $callback = $repl;
+# Compose multiple XML::Twig search conditions to match any of them ("OR")
+sub Hor_cond(@) {
+  my @regexes;
+  my @coderefs;
+  my $str = "";
+  foreach (@_) {
+    return undef if !defined; # undef means match anything
+    if    (ref eq 'CODE')   { push @coderefs, $_; }
+    elsif (ref eq "Regexp") { push @regexes, $_;  }
+    elsif (ref)             { croak "Unhandled ref type ",ref; }
+    else                    { $str .= "|" if $str; $str .= $_; }
   }
-  elsif (ref($repl) eq "ARRAY") {
-    $callback = $opts{multi} ? sub{ (Hr_SUBST        , $repl) }
-                             : sub{ (Hr_SUBST|Hr_STOP, $repl) } ;
+  # Convert simple regexes into equivalent string conditions.
+  # Benchmark shows that 'text:h|text:p' is 30% faster than qr/^text:[hp]$/
+  foreach (@regexes) {
+    if (/^ \(\?\^u?:\^ ( [:\w]+ ) \$\) $/x # ^ONESTRING$
+        ||
+        /^ \(\?\^u?:\^ \((?:\?:)? ( [:\w]+ (?: \| [:\w]+)* ) \) \$\) $/x # ^(A|B)$
+       ) {
+      $str .= "|" if $str; $str .= $1; $_ = undef;
+    }
+    elsif (/^ \(\?\^u?:\^ ([:\w]+) \[ ([\w]+) \] \$\) $/x) {
+      # (?^u:^string[charset]$) e.g. qr/^text:[hs]$/
+      my ($lhs, $rhs_chars) = ($1, $2);
+      foreach (split //,$rhs_chars) {
+        $str .= "|" if $str; $str .= $lhs.$_;
+      }
+      $_ = undef;
+    }
   }
-  else {
-    croak "Replacement argument must be [content] aref or callback subref",
-          " (not ",qsh($repl),")";
+  @regexes = grep{defined} @regexes;
+  if (@regexes) {
+    if ($str) { push @regexes, qr/^(?:${str})$/; $str = ""; }
+    if (@regexes > 1) {
+      my $restr = join("|", map{ "(?:".$_.")" } @regexes);
+      eval{ @regexes = (qr/$restr/) };  oops "$restr\n$@" if $@;
+    }
   }
+  if (@coderefs) {
+    push @coderefs, sub{ $_[0] =~ qr/$regexes[0]/ } if @regexes;
+    push @coderefs, sub{ $_[0]->passes($str) } if $str;
+    return $coderefs[0] if @coderefs == 1;
+    my $codestr =
+      "sub{ ".join(" || ", map{ "&{\$coderefs[$_]}" } 0..$#coderefs)." }";
+    my $code = eval $codestr || oops "$codestr\n$@";
+    return $code;
+  }
+  return $regexes[0] if @regexes;
+  return $str if $str;
+  oops avis(@_);
+}#Hor_cond
 
-  #  $vtext holds the entire virtual text from the *current* paragraph
-  #  even if option 'offset' points past the beginning of the paragraph.
-  #  The match {offset} is the offset into the first matching segment.
-  #
-  #         ║                                   ║ ║
-  #  Para(s)║           Paragraph 'x'           ║ ║   later Paragraph 'N'
-  #   before║                                   ║ ║
-  # ------------------voffset---►┊              ║ ║
-  # --------------vend----------------------►┊  ║ ║
-  #         ║                    ┊           ┊  ║ ║
-  #         ║              match ┊    match  ┊  ║ ║ match           ║match
-  #         ║             ║-off-►┊ ║--end---►┊  ║ ║offset-►┊        ║end►┊
-  # ╓──╥────╥──╥────╥─────╥──────┬─╥─────────┴──╖ ╓────────┬──╥─────╥────┴──╖
-  # ║XX║XXXX║XX║XXXX║XX   ║      MA║TCHED TXT┊  ║ ║        MAT║CHED ║TEXT┊  ║
-  # ║XX║XXXX║XX║XXXX║XXsea║rched te║xt..........║ ║searched te║xt...║.......║
-  # ╙──╨────╨──╨────╨──┴──╨────────╨────────────╜ ╙───────────╨─────╨───────╜
-  # ┊─OPTION 'offset'─►┊         ┊           ┊  ║ ║                         ║
-  #         ║~~~~~~~~($vtext for para x)~~~~~~~~║ ║~~~($vtext for para N)~~~║
-  #         ║                    ┊           ┊  ║ ║                         ║
-  #         ║◄──────$vtoff──────►┊           ┊  ║ ║                         ║
-  #         ║◄────────────$vtend────────────►┊  ║ ║                         ║
-  #                                             ║                           ║
-  #  ──────────$totlen (@end of para x)────────►║                           ║
-  #  ------------------------------------------$totlen (@end of para N)----►║
+use constant ROW_FILTER              => ODF::lpOD::Matrix::ROW_FILTER;    # 'table:table-row'
+use constant COLUMN_FILTER           => ODF::lpOD::Matrix::COLUMN_FILTER; # 'table:table-column'
+use constant CELL_FILTER             => ODF::lpOD::Matrix::CELL_FILTER;   # qr'table:(covered-|)table-cell'
+use constant TABLE_FILTER            => ODF::lpOD::Matrix::TABLE_FILTER;  # 'table:table'
 
-  my $offset = $opts{offset} // 0;
-  my $match_count = 0;
+use constant TEXTLEAF_FILTER         => '#TEXT|text:tab|text:line-break|text:s';
+use constant PARA_FILTER             => 'text:p|text:h';
+use constant TEXTCONTAINER_FILTER    => Hor_cond(PARA_FILTER, "text:span");
+use constant TEXTLEAF_OR_PARA_FILTER => Hor_cond(TEXTLEAF_FILTER, PARA_FILTER);
 
-  my $totlen = 0;
-  my $para_start_offset;
-
-  my sub _get_seginfo($) {
-    my $node = shift;
+# These used to be lexical subs inside Hreplace, but a Perl bug prevented
+# reentrant searches via callbacks.   The stuff in the $state hash
+# used to be lexicals in Hreplace.  https://github.com/Perl/perl5/issues/18606
+  sub _get_seginfo($$) {
+    my ($state, $node) = @_;
     my @seginfo;
     my $vtext = "";
     # Do not descend into nested paragraphs, which are visited in outer loop
-    for my $e ($node->Hdescendants_or_self(TEXTLEAF_COND, PARA_COND)) {
+    for my $e ($node->Hdescendants_or_self(TEXTLEAF_FILTER, PARA_FILTER)) {
       my $etext = __leaf2vtext($e);
       my $textlen = length($etext);
       push @seginfo, {
         elt    => $e,
         seglen => $textlen,
         vtoff  => length($vtext),
-        voff   => $totlen,
+        voff   => $state->{totlen},
       };
       $vtext .= $etext;
-      $totlen += $textlen;
+      $state->{totlen} += $textlen;
     }
     ($vtext, \@seginfo)
   }
 
-  my sub _first_match($$$) {
-    my ($vtext, $seginfo, $node) = @_;
+  sub _first_match($$$$) {
+    my ($state, $vtext, $seginfo, $node) = @_;
     oops unless @$seginfo; # truly empty paragraphs are not searched
+    my ($debug, $expr) = @$state{qw/debug expr/};
 
-    if ($offset >= $totlen) {
-      btw dvis '  Hr SKIP WHOLE PARA $totlen $offset' if $debug;
+    if ($state->{offset} >= $state->{totlen}) {
+      btw dvis '  Hr SKIP WHOLE PARA $state->{totlen} $state->{offset}' if $debug;
       return ()
     }
 
     my $vtext_pos =
-         $offset > $para_start_offset ? ($offset - $para_start_offset) : 0;
+         $state->{offset} > $state->{para_start_offset} ? ($state->{offset} - $state->{para_start_offset}) : 0;
 
-btw rdvis '_first_match START : $node $vtext\n   $vtext_pos $offset $totlen $expr\n$seginfo' if $debug;
-
-    oops(dvis '$vtext_pos $para_start_offset $totlen $vtext') if $vtext_pos < 0 or $vtext_pos > $totlen;
+    oops(dvis '$vtext_pos $state->{para_start_offset} $state->{totlen} $vtext') if $vtext_pos < 0 or $vtext_pos > $state->{totlen};
 
     my ($vtoffset, $vtend);
     if (ref $expr) { # Regexp
@@ -740,17 +749,14 @@ btw rdvis '_first_match START : $node $vtext\n   $vtext_pos $offset $totlen $exp
       if ($vtext =~ /\G.*?(${expr})/s) {
         $vtoffset = $-[1];
         $vtend    = $+[1];
-btw dvis '### Regex match, $expr $vtoffset $vtend $vtext_pos $vtext' if $debug;
       }
     } else {
       if ((my $off = index($vtext, $expr, $vtext_pos)) >= 0) {
         $vtoffset = $off;
         $vtend    = $vtoffset + length($expr);
-btw dvis '### NON-REGEX match, $vtoffset $vtend $vtext' if $debug;
       }
     }
     if (defined $vtoffset) {
-      ++$match_count;
 
       # Find the first and last segments containing the match.
       # Empty segments at the boundaries are not included in the match
@@ -779,33 +785,33 @@ btw dvis '### NON-REGEX match, $vtoffset $vtend $vtext' if $debug;
         segments   => [ map{$_->{elt}} @$seginfo[$fix..$lix] ],
         offset     => $vtoffset - $$seginfo[$fix]->{vtoff},
         end        => $vtend    - $$seginfo[$lix]->{vtoff},
-        voffset    => $para_start_offset + $vtoffset,
-        vend       => $para_start_offset + $vtend,
+        voffset    => $state->{para_start_offset} + $vtoffset,
+        vend       => $state->{para_start_offset} + $vtend,
         para       => ($node->isa("ODF::lpOD::Paragraph")
                          ? $node : $node->get_parent_paragraph),
         para_voffset => $vtoffset,
       };
-      btw rdvis('  Hr MATCH $fix $lix $offset $para_start_offset $totlen $vtext_pos $vtoffset $vtend $node\n'),fmt_match($m) if $debug;
-      return ($m, $callback->($m));
+      btw rdvis('  Hr MATCH $fix $lix $state->{offset} $state->{para_start_offset} $state->{totlen} $vtext_pos $vtoffset $vtend $node\n'),fmt_match($m) if $debug;
+      return ($m, $state->{callback}->($m));
     }
     btw '_first_match NO MATCH, returning ()' if $debug;
     return ()
   }# _first_match
 
-  my @subst_results;
-  my (%seen_paras, $rescan_count);
-  my sub _process_para($) { # also called if context is a text leaf
-    my $node = shift; # paragraph or total $context if it is a textual leaf
+  sub _process_para($$) { # also called if context is a text leaf
+    # returns 0 to continue, Hr_STOP to stop
+    my ($state, $node) = @_; # paragraph or total $context if a textual leaf
+    my ($debug) = @$state{qw/debug/};
 
-    oops "seen_paras ",fmt_node($node),"\ncontext: ",fmt_tree($context)
-      if $seen_paras{$node}++;
+    oops "seen_paras ",fmt_node($node) if $state->{seen_paras}{$node}++;
 
-    my $para_startcount = scalar @subst_results;
+    my $para_startcount = scalar @{$state->{subst_results}};
     PARA: {
-      btw "Hr PARA ",_abbrev_addrvis($node),dvis(' Top $totlen') if $debug;
+      btw "Hr PARA ",_abbrev_addrvis($node),dvis(' Top $state->{totlen}')
+        if $debug;
 
-      $para_start_offset = $totlen;
-      my ($vtext, $seginfo) = _get_seginfo($node);
+      $state->{para_start_offset} = $state->{totlen};
+      my ($vtext, $seginfo) = _get_seginfo($state, $node);
 
       if (@$seginfo == 0) {
         btw "Hr _no leaves_ " if $debug;
@@ -813,90 +819,168 @@ btw dvis '### NON-REGEX match, $vtoffset $vtend $vtext' if $debug;
       }
 
       MATCH: {
-        my ($m, $r, @args) = _first_match($vtext, $seginfo, $node);
+        my ($m, $r, @args) = _first_match($state, $vtext, $seginfo, $node);
 
         if (defined $m) {
 oops unless @{$m->{segments}};
           if ($r & Hr_SUBST) {
+            croak ivis 'Extraneous return values from callback @args'
+              if @args > 1;
             my $content = shift @args // confess "No [content] after Hr_SUBST";
-            my $new_vlength = Hreplace_match($m, $content, %opts);
+            my $new_vlength = Hreplace_match($m, $content, debug => $debug);
 
-            push @subst_results, {
+            push @{$state->{subst_results}}, {
               #(excessive/unneeded?) match        => $m->{match},
               voffset      => $m->{voffset},
               vlength      => $new_vlength,
               para         => $m->{para},
               para_voffset => $m->{para_voffset},
-            } ;#if defined wantarray;
+            } ;#if defined wantarray in Hreplace();
 
             # Re-process the whole paragraph with $offset set appropriately.
-            $offset = $m->{voffset}; # start of match
+            $state->{offset} = $m->{voffset}; # start of match
             if ($r & Hr_RESCAN) {
-              croak "100 RESCANs in same paragraph" if ++$rescan_count > 100;
+              croak "100 RESCANs in same paragraph" if ++$state->{rescan_count} > 100;
             } else {
-              $offset += $new_vlength; # length of replacement
+              $state->{offset} += $new_vlength; # length of replacement
             }
             unless ($r & Hr_STOP) {
-              btw dvis '  Hr redo PARA after substitution $offset $m->{voffset} $new_vlength' if $debug;
+              btw dvis '  Hr redo PARA after substitution $state->{offset} $m->{voffset} $new_vlength' if $debug;
               if ($m->{match} eq "" && $new_vlength==0) {
                 # Avoid infinite loop
                 btw dvis '  Hr NULL MATCH & REPL: offset++' if $debug;
-                $offset++;
+                $state->{offset}++;
               }
-              $totlen -= length($vtext);
+              $state->{totlen} -= length($vtext);
               redo PARA;
             }
           } else {
+            croak ivis 'Extraneous return values from callback @args'
+              if @args > 0;
             if ($m->{match} eq "") {
               # Avoid infinite loop
               btw dvis '  Hr NULL MATCH: offset++' if $debug;
-              $offset++;
+              $state->{offset}++;
             } else {
-              $offset = $m->{vend}; # just past end of match
+              $state->{offset} = $m->{vend}; # just past end of match
             }
           }
           if ($r & Hr_STOP) {
-            $node->Hnormalize() if $para_startcount != scalar @subst_results;
-            #btw ivis '  Hr STOP  retvals=@args' if $debug; #logged in mainbody
-            return(Hr_STOP, @args);
+            $node->Hnormalize() if $para_startcount != scalar @{$state->{subst_results}};
+            return(Hr_STOP)
           }
-          if ($offset < $totlen) {
-            btw dvis '  Hr CONTINUE: new $offset, *redo MATCH*' if $debug;
+          if ($state->{offset} < $state->{totlen}) {
+            btw dvis '  Hr CONTINUE: new $state->{offset}, *redo MATCH*' if $debug;
             redo MATCH;
           }
         } else {
-          btw '  Hr [no match] expr=',vis($expr),dvis ' $offset $para_start_offset $vtext' if $debug;
+          btw '  Hr [no match] expr=',vis($state->{expr}),dvis '\n $state $vtext' if $debug;
         }
       }#MATCH
     }#PARA
-    $node->Hnormalize() if $para_startcount != scalar @subst_results;
+    $node->Hnormalize() if $para_startcount != scalar @{$state->{subst_results}};
     return (0);
   }#_process_para()
+
+our $recursion_level = 0;
+
+sub ODF::lpOD::Element::Hreplace {
+  my $context = shift;
+  my $expr    = shift;
+  my $repl    = shift;
+  my %opts    = @_;
+  my $debug   = $opts{debug};
+
+  # We can not allow reentrant substitutions (i.e. via callbacks) in the
+  # same paragraph because saved segment data might be invalidated
+  # and crash _first_match().  However recursive search-only calls are ok,
+  # such as via Hsearch.  N.B We don't know whether a substitution will occur
+  # until control returns from a callback.
+  #
+  # Attempted modifications throw an exception if $recursion_level > 1
+  # i.e. only the outer-most level is allowed to change anything.
+  # This is checked in Hreplace_match (in case we ever make that public)
+  local $recursion_level = $recursion_level + 1;
+
+  btw dvis 'Hreplace Top: $context $expr $repl %opts' if $debug;
+
+  croak "'expr'  must be a qr/regex/ or plain string\n"
+    if (!defined($expr) or ref($expr) && ref($expr) ne "Regexp");
+
+  my $callback;
+  if (ref($repl) eq "CODE") {
+    croak "Option 'multi' and using a callback are mutually exclusive\n"
+      if defined  $opts{multi};
+    $callback = $repl;
+  }
+  elsif (ref($repl) eq "ARRAY") {
+    $callback = $opts{multi} ? sub{ (Hr_SUBST        , $repl) }
+                             : sub{ (Hr_SUBST|Hr_STOP, $repl) } ;
+  }
+  else {
+    croak "Replacement argument must be [content] aref or callback subref",
+          " (not '$repl')";
+  }
+
+  #  $vtext holds the entire virtual text from the *current* paragraph
+  #  even if option 'offset' points past the beginning of the paragraph.
+  #  The match {offset} is the offset into the first matching segment.
+  #
+  #         ║                                   ║ ║
+  #  Para(s)║           Paragraph 'x'           ║ ║   later Paragraph 'N'
+  #   before║                                   ║ ║
+  # ------------------voffset---►┊              ║ ║
+  # --------------vend----------------------►┊  ║ ║
+  #         ║                    ┊           ┊  ║ ║
+  #         ║              match ┊    match  ┊  ║ ║ match           ║match
+  #         ║             ║-off-►┊ ║--end---►┊  ║ ║offset-►┊        ║end►┊
+  # ╓──╥────╥──╥────╥─────╥──────┬─╥─────────┴──╖ ╓────────┬──╥─────╥────┴──╖
+  # ║XX║XXXX║XX║XXXX║XX   ║      MA║TCHED TXT┊  ║ ║        MAT║CHED ║TEXT┊  ║
+  # ║XX║XXXX║XX║XXXX║XXsea║rched te║xt..........║ ║searched te║xt...║.......║
+  # ╙──╨────╨──╨────╨──┴──╨────────╨────────────╜ ╙───────────╨─────╨───────╜
+  # ┊─OPTION 'offset'─►┊         ┊           ┊  ║ ║                         ║
+  #         ║~~~~~~~~($vtext for para x)~~~~~~~~║ ║~~~($vtext for para N)~~~║
+  #         ║                    ┊           ┊  ║ ║                         ║
+  #         ║◄──────$vtoff──────►┊           ┊  ║ ║                         ║
+  #         ║◄────────────$vtend────────────►┊  ║ ║                         ║
+  #                                             ║                           ║
+  #  ──────────$totlen (@end of para x)────────►║                           ║
+  #  ------------------------------------------$totlen (@end of para N)----►║
+
+  my $state = {
+    offset            => $opts{offset} // 0,
+    totlen            => 0,
+    para_start_offset => undef,
+    subst_results     => [],
+    seen_paras        => {},
+    rescan_count      => undef,
+    debug             => $debug,
+    expr              => $expr,
+    callback          => $callback,
+  };
 
   ### MAIN BODY OF Hreplace ###
 
   my ($stop, @retvals);
   # If $context itself is a paragraph or a leaf segment, process it first
-  if ($context->passes(TEXTLEAF_OR_PARA_COND)) {
-    ($stop, @retvals) = _process_para($context); # ignores any nested paras
+  if ($context->passes(TEXTLEAF_OR_PARA_FILTER)) {
+    $stop = _process_para($state, $context); # ignores nested paras
   }
-  # Now process paragraphs which are descendants.   This will visit nested
-  # paragraphs in depth-first order (unless blocked by option prune_cond)
+  # Now process paragraphs which are descendants.
+  # _process_para will not descend into nested paragraphs, i.e. it only
+  # looks at the text at that level; nested paragraphs are visited directly
+  # here (after the parent paragraph was visited).
   { my $para = $context ;
-    while ($para = $para->Hnext_elt($context, PARA_COND, $opts{prune_cond})) {
-      ($stop, @retvals) = _process_para($para);
+    while ($para = $para->Hnext_elt($context, PARA_FILTER, $opts{prune_cond})) {
+      $stop = _process_para($state, $para);
       last if $stop & Hr_STOP;
     }
   }
 
   if ($stop & Hr_STOP) {
     btw dvis 'Hreplace STOP. @retvals' if $debug;
-    croak ("Callback specified results to return but context is void")
-      if @retvals && !defined(wantarray);
-    croak ("Callback specified multiple results but context is scalar")
-      if @retvals > 1 && !wantarray;
   }
-  @retvals = @subst_results if @retvals == 0;
+  @retvals = @{$state->{subst_results}};
 
   if (wantarray) {
     btw ivis 'Hreplace RETURNING @retvals' if $debug;
@@ -930,8 +1014,10 @@ sub Hreplace_match($$@) { # *FUNCTION*
   my $content = shift;
   my %opts    = @_;
   my $debug = $opts{debug};
-  btw 'Hrep_m match=',fmt_match(\%match),dvis '\n$content' if $debug;
+  btw 'Hrep_m match=',fmt_match(\%match),dvis '\n $content' if $debug;
 oops unless @{ $match{segments} };
+
+  croak "Recursive substitutions are not permitted to avoid confusing Hreplace\n" if $recursion_level > 1;
 
   # INITIALLY:
   #     $m->{segments}[0]     ...       $m->{...}[-1]
@@ -941,26 +1027,30 @@ oops unless @{ $match{segments} };
   #     ┌────────────────┐ ┌───┐
   # OR  │  A  ┊MMMM┊  B  │ │(C)│  (single-segment case)
   #     └────────────────┘ └───┘
+  my $did_splits;
   if ($match{offset}) {
     # Split off the before-residue ("A"), moving "MMM..." to a new segment
     # which becomes the new segment 0.
     my $rhs = $match{segments}[0]->Hsplit_element_at($match{offset});
-
-    btw dvis 'Hrep_m : Split off pre-residue at offset $match{offset} rhs=',
-    fmt_node($rhs) if $debug;
-
     if (@{$match{segments}}==1) {
       $match{end} -= $match{offset};  oops if $match{end} < 0;
     }
     $match{offset} = 0;
     $match{segments}[0] = $rhs;
+
+    btw dvis 'Hrep_m : Split off pre-residue at offset $match{offset} rhs=$rhs'
+      if $debug;
+    $did_splits = 1;
   }
   if ($match{end} < length($match{segments}[-1]->Hget_text//"")) {
     # Split off the after-residue ("B"), moving it to a new segment
     () = $match{segments}[-1]->Hsplit_element_at($match{end});
-    btw "Hrep_m post-residue has been split off. Now segments[-1]=\n  ",
-        fmt_node($match{segments}[-1]),
-        "\nnext:\n  ",fmt_node($match{segments}[-1]->{next_sibling}) if $debug;
+    btw "Hrep_m post-residue has been split off" if $debug;
+    $did_splits = 1;
+  }
+  if ($debug && $did_splits) {
+    btw "Hrep_m After Split(s) para=",fmt_tree($match{para},wi=>1),
+        " next_sib=", fmt_node($match{segments}[-1]->{next_sibling},wi=>1);
   }
   # ┌───┐ ┌───────────────┐ ┌──────┐ ┌───────────┐ ┌───┐
   # │ A │ │MMMMMMMMMMMMMMM│ │MMMMMM│ │MMMMMMMMMMM│ │ B │
@@ -975,21 +1065,31 @@ oops unless @{ $match{segments} };
                                             debug=>$debug, _nocleanup => TRUE
                                            )->{vlength};
   # ┌───┐ ┌───────────────┐ ┌──────┐ ┌───────────┐ ┌─────────┐ ┌───┐
-  # │ A │ │MMMMMMMMMMMMMMM│ │MMMMMM│ │MMMMMMMMMMM│ │temp_para│ │ B │
+  # │ A │ │M1MMMMMMMMMMMMM│ │M2MMMM│ │M3MMMMMMMMM│ │temp_para│ │ B │
   # └───┘ └───────────────┘ └──────┘ └───────────┘ └─────────┘ └───┘
 
-  # Delete the old segments right-to-left; merging will not occur
-  # because the right neighbor is always the unmergeable paragraph.
+  # Delete all but the first old segment in right-to-left order; then, if
+  # the temp para isn't already the next sibling of M1, move it there
+  # (this occurs when M1 is in a span; we want the substituted result
+  # to always get whatever formatting the first character of the
+  # replaced text had).
   my @nodes;
-  for my $e (reverse @{$match{segments}}) {
+  my $seg_count = @{$match{segments}};
+  for my $e (reverse @{$match{segments}}[1..$seg_count-1]) {
     my $p = $e->parent // oops;
     push @nodes, $p;  # in case it's now an empty span.
     $e->delete();
   }
+  unless (($match{segments}[0]->next_sibling//0) == $temp_para) {
+    btw "Hrep_m (moving temp_para into first seg's style)" if $debug;
+    $temp_para->move(after=>$match{segments}[0]);
+  }
+  # Now delete the remaining (0th) old segment
+  $match{segments}[0]->delete;
 
   # No need to normalize here because Hreplace will do an overall normalize
   #$temp_para->Hnormalize();
-  
+
   # Move the new content out of the temp_para and cut the para
   oops unless length($temp_para->Hget_text//"") == $vlength;
   for my $e ($temp_para->cut_children()) {
@@ -1000,7 +1100,6 @@ oops unless @{ $match{segments} };
   $temp_para->cut;
 
   _cleanup_spans(\@nodes, %opts);
-
   return $vlength
 }#Hreplace_match
 
@@ -1041,23 +1140,23 @@ sub ODF::lpOD::Element::Hoffset_into_vtext {
   my ($context, $offset, $prune_cond) = @_;
   confess ivis 'Invalid offset $offset' if ($offset//-1) < 0;
   my $remaining = $offset;
-  my $elt = $context->passes(TEXTLEAF_COND)
-              // $context->Hnext_elt($context, TEXTLEAF_COND, $prune_cond);
+  my $elt = $context->passes(TEXTLEAF_FILTER)
+              // $context->Hnext_elt($context, TEXTLEAF_FILTER, $prune_cond);
   my $last_leaf;
   while ($elt) {
     my $text = __leaf2vtext($elt);
     if ($remaining >= length($text)) {
       $remaining -= length($text);
       $last_leaf = $elt;
-      $elt = $elt->Hnext_elt($context, TEXTLEAF_COND, $prune_cond);
+      $elt = $elt->Hnext_elt($context, TEXTLEAF_FILTER, $prune_cond);
       next
     }
     return ($elt, $remaining);
-#    my $para = $elt->parent(PARA_COND);
+#    my $para = $elt->parent(PARA_FILTER);
 #    my $poffset = 0;
 #    my $ptxt = $para;
 #    for(;;) {
-#      $ptxt = $ptxt->Hnext_elt($para,TEXTLEAF_COND,$prune_cond) // oops;
+#      $ptxt = $ptxt->Hnext_elt($para,TEXTLEAF_FILTER,$prune_cond) // oops;
 #      last if $ptxt == $elt;
 #      $poffset += length(__leaf2vtext($ptxt));
 #    }
@@ -1156,9 +1255,9 @@ sub ODF::lpOD::Element::Hinsert_element {
     }
     # There are _no_ textual leaves.  Insert as FIRST_CHILD of container
     oops unless $offset==0;
-    oops if $context->passes(TEXTLEAF_COND);
-    my $container = $context->passes(TEXTCONTAINER_COND)
-                         ? $context : $context->next_elt(TEXTCONTAINER_COND);
+    oops if $context->passes(TEXTLEAF_FILTER);
+    my $container = $context->passes(TEXTCONTAINER_FILTER)
+                         ? $context : $context->next_elt(TEXTCONTAINER_FILTER);
     confess "context is not a/has no text container" unless $container;
     return $container->insert_element($to_insert, position => FIRST_CHILD)
   }
@@ -1237,13 +1336,13 @@ relative to C<$context> and others will follow as siblings.
 OPTIONS may contain:
 
   position => ...  # default is FIRST_CHILD.  Always relative to $context.
-                   # See L<Hinsert_content> herein and L<ODF::lpOD::Element>.
+                   # See Hinsert_content herein and ODF::lpOD::Element.
 
   offset   => ...  # Used when position is 'WITHIN', and counts characters
                    # in the virtual text of $context
 
-  prune_cond => qr/^text:[ph]$/  # (for example) skip over nested
-                   # paragraphs when counting 'offset'
+  prune_cond => qr/^text:[ph]$/
+                   # (for example) ignore, i.e. skip over nested paragraphs
 
   chomp => BOOL    # remove \n, if present, from the end of content
 
@@ -1251,11 +1350,12 @@ Returns a hashref:
 
   {
     vlength => total virtual length of the new content
-    # (no other public fields are defined)
+    # (currently no other public fields are defined)
   }
 
 To facilitate further processing, pre-existing segments are never merged;
-Hnormalize() should later be called on $context or the nearest container.
+C<Hnormalize()> should later be called on $context or the nearest
+ancestral container.
 
 =cut
 
@@ -1265,7 +1365,7 @@ sub ODF::lpOD::Element::Hinsert_content($$) {
   my %opts = (position => FIRST_CHILD, @_);
   my $debug = $opts{debug};
 
-  my sub show_context {
+  my sub _show_context {
     my $msg = join("", @_);
     $msg .= "context="._abbrev_addrvis($context);
     my $item = $context;
@@ -1274,8 +1374,7 @@ sub ODF::lpOD::Element::Hinsert_content($$) {
       $msg .= " (showing ancestor para)";
     }
     $msg .= " :\n".fmt_tree($item);
-    @_ = ($msg);
-    goto &btw;  # show caller's line number
+    btwN 1,$msg;
   }
 
   # Hinsert_content might become a superset (i.e. drop-in replacement
@@ -1290,7 +1389,7 @@ sub ODF::lpOD::Element::Hinsert_content($$) {
 
   my @content = @$what;
 
-show_context(dvis '##Hi_c TOP %opts\n     @content\n') if $debug;
+  _show_context(dvis '##Hi_c TOP %opts\n @content\n') if $debug;
 
   croak "option 'Chomp' was renamed 'chomp'" if exists $opts{Chomp};
   if ($opts{chomp} && @content) {
@@ -1399,7 +1498,7 @@ show_context(dvis '##Hi_c TOP %opts\n     @content\n') if $debug;
   _cleanup_spans(\@nodes, %opts) unless $opts{_nocleanup};
 
   my $result = { vlength => $vlength // 0 };
-  show_context(dvis '##Hi_c RESULT: $result\n') if $opts{debug};
+  _show_context(dvis '##Hi_c RESULT: $result\n') if $opts{debug};
 
   confess "Hinsert_content() returns a scalar (a hashref)\n" if wantarray;
   $result;
@@ -1407,17 +1506,17 @@ show_context(dvis '##Hi_c TOP %opts\n     @content\n') if $debug;
 
 ####################################################
 
-=head2 $boolean = $elt=>His_textual()
+=head2 $boolean = $elt->His_textual()
 
 Returns TRUE if C<$elt> is a leaf node which represents text,
 either PCDATA/CDATA or one of the special ODF nodes representing tab,
 line-break or consecutive spaces.
 
-=head2 $boolean = $elt=>His_text_container()
+=head2 $boolean = $elt->His_text_container()
 
 Returns TRUE if C<$elt> is a paragraph, heading or span.
 
-=head2 $newelt = $elt=>Hsplit_element_at($offset)
+=head2 $newelt = $elt->Hsplit_element_at($offset)
 
 C<Hsplit_element_at> is like XML::Twig's C<split_at> but also knows how
 to split text:s nodes.
@@ -1434,22 +1533,23 @@ and the original node will be empty upon return.
 if $offset equals the existing length then the new sibling will be empty.
 
 If a text:s node is split then the new node will also be a text:s node
-"containing" the appropriate number of spaces.  The 'c' attribute will
+"containing" the appropriate number of spaces.  The 'text:c' attribute will
 be zero if the node is "empty".
 
-If a text:tab or text:line-break node is split then either the new node
-will be an empty PCDATA node or the original will be transmuted in-place
-to become an empty PCDATA node.
+If a text:tab or text:line-break node is split then if $offset==0 the new node
+will be an empty PCDATA node,
+or if $offset==1 the original will be transmuted in-place to become
+an empty PCDATA node.
 
 =cut
 
 sub ODF::lpOD::Element::His_textual {
   my $elt = shift;
-  $elt->passes(TEXTLEAF_COND)
+  $elt->passes(TEXTLEAF_FILTER)
 }
 sub ODF::lpOD::Element::His_text_container {
   my $elt = shift;
-  $elt->passes(TEXTCONTAINER_COND)
+  $elt->passes(TEXTCONTAINER_FILTER)
 }
 
 sub ODF::lpOD::Element::Hsplit_element_at {
@@ -1457,7 +1557,7 @@ sub ODF::lpOD::Element::Hsplit_element_at {
   confess "Wrong number of arguments" unless @_==2;
   # see XML::Twig::split_at
   my $text_elt= $elt->His_textual() ? $elt
-                                    : $elt->first_child(TEXTLEAF_COND)
+                                    : $elt->first_child(TEXTLEAF_FILTER)
                                         || confess("no textual leaf found");
   if ($text_elt->tag eq 'text:s') {
     my $existing_count = $text_elt->get_attribute('c') // 1;
@@ -1472,12 +1572,12 @@ sub ODF::lpOD::Element::Hsplit_element_at {
   }
   elsif ($text_elt->tag eq '#PCDATA') {
     my $existing_len = length($text_elt->text);
-    confess ivis 'offset $offset exceeds existing pcdata length($len)'
+    confess ivis 'offset $offset exceeds existing pcdata length ($existing_len)'
       if $offset > $existing_len;
     return $text_elt->split_at($offset);
   }
   elsif ($offset == 0) {
-#my $para = $elt->passes(PARA_COND) ? $elt : $elt->parent(PARA_COND);
+#my $para = $elt->passes(PARA_FILTER) ? $elt : $elt->parent(PARA_FILTER);
 #btw dvis 'BEFORE TRANSMUTE $para = ',fmt_tree($para);
 #btw dvis 'BEFORE TRANSMUTE $elt = ',fmt_tree($elt);
     my $result =
@@ -1514,7 +1614,7 @@ sub ODF::lpOD::Element::Hsplit_element_at {
 =head2 $context->Hget_text(prune_cond => COND)
 
 Gets the combined "virtual text" in or below C<$context>,
-including in any nested paragraphs (e.g. in Frames or Tables).
+by default including in nested paragraphs (e.g. in Frames or Tables).
 The special nodes which represent tabs, line-breaks and
 consecutive spaces are expanded to the corresponding characters.
 
@@ -1525,14 +1625,14 @@ Option B<prune_cond> may be used to omit text below specified node types
 
 C<ODF::lpOD::TextElement::get_text()> with option I<recursive E<gt> TRUE>
 looks like it should do the same thing as C<Hget_text()>, but it has bugs:
-  
+
 =over 4
 
 =item 1.
 
-The special nodes for tab, etc. are expanded only when they are the 
+The special nodes for tab, etc. are expanded only when they are the
 immediate children of $context.  With the 'recursive'
-option #PCDATA nodes in nested paragraphs are expanded but tabs, etc. 
+option #PCDATA nodes in nested paragraphs are expanded but tabs, etc.
 are ignored.
 
 =item 2.
@@ -1543,12 +1643,11 @@ a #PCDATA node, not if it is a tab, etc. node.
 =back
 
 I think get_text's "recursive" option was probably intended to include text from
-paragraphs in possibly-nested frames and tables, and it was an oversight 
+paragraphs in possibly-nested frames and tables, and it was an oversight
 that that special text nodes are not always handled correctly.
 
-Note that there is no 'recursive' option to C<Hget_text>, which behaves
-that way by default.  Hget_text offers the 'prune_cond' option to
-restrict expansion.
+Note that B<Hget_text> is "recursive" by default; the 'prune_cond'
+option is the only way to restrict recursion.
 
 =cut
 
@@ -1560,7 +1659,7 @@ sub ODF::lpOD::Element::Hget_text {
   # by ODF::lpOD, and now does nothing unless our ':bytes' tag is imported.
   ODF::lpOD::Common::output_conversion(
     join "", map{ __leaf2vtext($_) }
-             $self->Hdescendants_or_self(TEXTLEAF_COND, $opt{prune_cond})
+             $self->Hdescendants_or_self(TEXTLEAF_FILTER, $opt{prune_cond})
   )
 }
 
@@ -1569,8 +1668,8 @@ sub ODF::lpOD::Element::Hget_text {
 
 =head2 $context->Hnormalize();
 
-Similar to XML::Twig's C<normalize()> method but also "normalizes"
-text:s usage:
+Similar to XML::Twig's C<normalize()> method but also "normalizes" text:s
+usage.
 
 Nodes are edited so that spaces are represented with the first or only
 space in a #PCDATA node and subsequent consecutive spaces in a text:s node.
@@ -1582,11 +1681,12 @@ $context may be any text container or ancestor up to the document body.
 
 sub ODF::lpOD::Element::Hnormalize {
   my $context = shift;
+  my $debug = 0;
   my @descendants= $context->descendants('#PCDATA|text:s');
-#Carp::cluck "=== Hnormalize BEFORE: ", fmt_tree($context);
+btw dvis 'Hnormalize TOP ',fmt_tree_brief($context,wi=>1) if $debug;
 
   # Relocate spaces between #PCDATA and text:s so that only single spaces are
-  # in #PCDATA and text:s only represents 2nd and subsequent consecutive spaces 
+  # in #PCDATA and text:s only represents 2nd and subsequent consecutive spaces
   DESCENDANT:
   for (my $i=0; $i <= $#descendants; ++$i) {
     my $desc = $descendants[$i];
@@ -1598,38 +1698,31 @@ sub ODF::lpOD::Element::Hnormalize {
       my $s = $desc->insert_element("text:s",
                         position => WITHIN, offset => $offset+1);
       $s->set_attribute("text:c", $len-1);
-      my $rfrag = $s->{next_sibling};
+      my $rfrag = $s->{next_sibling}; oops if grep{$rfrag==$_} @descendants;
       my $rfrag_text = $rfrag->text;
       substr($rfrag_text, 0, $len-1, "") eq (" " x ($len-1)) or oops;
       $rfrag->set_text($rfrag_text);
-#{ my $p = $desc->parent;
-#btw visnew->dvisr('++INSERTED text:s  $desc $desc_text $offset $len $s p:\n'), fmt_tree($p);
-#}
       splice @descendants, $i+1, 0, $s, $rfrag;
       redo;
     }
-    if ($desc_tag eq "text:s" && (my $desc_len = length($desc_text))) {
+    if ($desc_tag eq "text:s" && length($desc_text) > 0) {
       # !! This might not be correct if the last preceding PCDATA has a
       # !! trailing space but it is isolated from $desc by span boundaries.
-      # AFAIK ODF 1.2 permits text:s to hold all spaces without the first 
+      # AFAIK ODF 1.2 permits text:s to hold all spaces without the first
       #   being in a preceding text segment, although it is recommended
-      #   that the first space be sparate.   So for now, I'm leaving text:s 
+      #   that the first space be sparate.   So for now, I'm leaving text:s
       #   unchanged if a span boundary or something else intervenes.
       my $prev = $desc;
       while ($prev = $prev->{prev_sibling}) {
         last unless $prev->tag eq "#PCDATA";
         my $prev_text = $prev->text//"";
         next if length($prev_text) == 0;
-        if (substr($prev_text, -1) ne " ") {
-          # Previous (non-empty) #PCDATA doesn't end with a space.
-          # Move the first text:s space to the end of the #PCDATA segment
-          $prev->set_text($prev_text." ");
-          $desc->set_attribute('c', ($desc->get_attribute('c') // 1) - 1);
-#{ my $p = $desc->parent;
-#btw visnew->dvisr('++MOVED FIRST SPACE from text:s $desc to non-empty $prev $desc_text p:\n'), fmt_tree($p);
-#}
-          next DESCENDANT
-        }
+        last unless substr($prev_text, -1) ne " ";
+        # Previous (non-empty) #PCDATA doesn't end with a space.
+        # Move the first text:s space to the end of the #PCDATA segment
+        $prev->set_text($prev_text." ");
+        $desc->set_attribute('c', ($desc->get_attribute('c') // 1) - 1);
+        next DESCENDANT
       }
       if (! $prev) {
         # text:s not preceded by PCDATA.  Move the first space to a new PCDATA.
@@ -1642,11 +1735,12 @@ sub ODF::lpOD::Element::Hnormalize {
     }
   }
 
+btw dvis 'Hn before cleanup @descendants\n context:',fmt_node($context,wi=>1) if $debug;
   # Now cleanup any empties and merge adjacents
   while( my $desc= shift @descendants) {
     my $desc_len = length($desc->Hget_text);
     if( ! $desc_len) { $desc->delete; next; }
-    while( @descendants 
+    while( @descendants
            && ((my $next_sib = $desc->{next_sibling})//0) == $descendants[0] ) {
       if (! length $next_sib->Hget_text) {
         shift(@descendants)->delete;
@@ -1668,40 +1762,24 @@ sub ODF::lpOD::Element::Hnormalize {
     }
   }
 
-#say "=== Hnormalize AFTER:", fmt_tree($context);
+btw dvis 'Hnormalize FINAL ',fmt_tree($context,wi=>1) if $debug;
   return $context
 }
 
 ###################################################
 
-=head2 $node->self_or_parent($cond)
-
-Returns $node or it's nearest ancestor which matches a condition
-
-Currently this throws an exception if neither $node or an ancestor
-matches $cond.
-
-=cut
-
-sub ODF::lpOD::Element::self_or_parent($$) {
-  my ($node, $cond) = @_;
-  my $e = $node->passes($cond) ? $node : $node->parent($cond);
-  # Should we return undef instead of croaking??
-  croak "Neither node (",addrvis($node),") nor ancestors match ",vis($cond),"\n" unless $e;
-  return $e;
-}
-
 =head2 $next_elt = $prev_elt->Hnext_elt($subtree_root, $cond, $prune_cond);
 
 This are like the "next_elt" method in L<XML::Twig> but
 accepts an additional argument giving a "prune condition", which
-if present suppresses decendants of matching nodes.  
+if present suppresses decendants of matching nodes.
 
 A pruned node is itself returned if it also matches the primary condition.
 
 C<$subtree_root> is never pruned, i.e. it's children are always visited.
 
-If $prune_cond is undef then Hnext_elt works exactly like XML::Twig's next_elt.
+If C<$prune_cond> is undef then Hnext_elt works exactly
+like XML::Twig's next_elt.
 
 =head2 @elts = $context->Hdescendants($cond, $prune_cond);
 
@@ -1715,12 +1793,13 @@ contain encapsulated paragraphs.  To find only top-level paragraphs and
 treat frames as opaque:
 
     # Iterative
-    my $elt = $doc->get_body;
+    my $body = $doc->get_body;
+    my $elt = $body;
     while($elt = $elt->Hnext_elt($body, qr/^text:[ph]$/, 'draw:frame'))
     { ...process paragraph $elt }
 
     # Same thing but getting all the paragraphs at once
-    @paras = $doc->get_body->Hdescendants(qr/^text:[ph]$/, 'draw:frame');
+    @paras = $body->Hdescendants(qr/^text:[ph]$/, 'draw:frame');
 
 EXAMPLE 2: Get all the leaf nodes representing ODF text in a paragraph
 (including under spans), and also any top-level frames;
@@ -1739,7 +1818,8 @@ If the B<$prune_cond> parameter is omitted or undef then these methods
 work exactly like the correspoinding non-B<H> methods.
 
 C<Hnext_elt>, C<Hdescendants> and C<Hdescendants_or_self>
-are installed as methods of XML::Twig::Elt.
+C<Hparent> and C<Hself_or_parent>
+are installed as methods of I<XML::Twig::Elt>.
 
 =cut
 
@@ -1794,6 +1874,67 @@ sub XML::Twig::Elt::Hdescendants_or_self {
   @descendants;
 }
 
+=head2 $node->Hparent($cond, [$stop_cond])
+
+Returns the nearest ancestor which matches condition C<$cond>.
+
+If C<$stop_cond> is defined, then 0 is returned if the search would
+ascend above the nearest ancestor matching the stop condition.
+Undef is returned no ancestor matches either $cond or $stop_cond.
+
+For exmaple,
+
+  my $row = $elt->Hparent("table:table-row", "draw:frame");
+
+would locate the table row containing $elt but return false if $elt was
+encapsulated in a frame and the frame within an enclosing table row (0 result)
+or not in a table at all (undef result).
+
+=head2 $node->Hself_or_parent($cond, [$stop_cond])
+
+Like C<Hparent> but returns $node itself if it matches $cond.
+
+=cut
+
+sub XML::Twig::Elt::Hparent($$;$) {
+  my ($elt, $cond, $stop_cond) = @_;
+  for(;;) {
+    $elt = $elt->{parent} || return undef;
+    return $elt if $elt->passes($cond);
+    return 0 if $stop_cond && $elt->passes($stop_cond);
+  }
+}
+
+sub XML::Twig::Elt::Hself_or_parent($$;$) {
+  my ($elt, $cond, $stop_cond) = @_;
+  return $elt if $elt->passes($cond);
+  goto &XML::Twig::Elt::Hparent;
+}
+
+###################################################
+
+=head2 $cond = Hor_cond(COND, ...)
+
+This function combines multiple L<XML::Twig> search conditions,
+which may be any mixture of string, regex, or code-ref conditions.
+The resulting condition will match any of the input conditions (hence "or").
+
+Example:
+
+  use ODF::lpOD_Helper qw(:DEFAULT PARA_FILTER);
+  use constant MY_PARAORFRAME_FILTER => Hor_cond(PARA_FILTER, 'draw:frame');
+  ...
+  @elts = $context->descendants(MY_PARAORFRAME_FILTER)
+
+This would collect all paragraphs or frames below $context.
+Note that C<PARA_FILTER> might be C<'text:p|text:h'> or C<qr/^text:[ph]$/>
+or C<sub{ $_[0] eq 'text:p' || $_[0] eq 'text:h' }> etc.
+
+C<Hor_cond> optimizes a few regex forms into equivalent string conditions
+measured to be 30% faster.
+
+=cut
+
 ###################################################
 
 =head2 $context->Hgen_style_name($family, SUFFIX)
@@ -1806,7 +1947,7 @@ In the case of a I<style>, the C<$family> must be specified
 ("text", "table", etc.).
 
 SUFFIX is an optional string which will be appended to a generated
-unique name (to make it easier for humans to recognize).
+unique name to make recognition by humans easier.
 
 C<$context> may be the document itself or any Element.
 
@@ -2002,30 +2143,51 @@ sub ODF::lpOD::Document::Hcommon_style($$@) {
 
 =head2 hashtostring($hashref)
 
-Returns a string uniquely representing the keys and values of a hash
-(not exported by default).
+=head2 arraytostring($arrayref)
+
+Returns a signature string uniquely representing the members
+(keys and values in the case of a hash).
+
+References are not recursively examined, but are representing
+using their 'refaddr'.  Therefore signatures of different structures
+will match only if corresponding first-level non-ref values are 'eq'
+and refs are exactly the same refs.
 
 =cut
 
+sub _item_rep(_) {  # encode so that a string can not fake something else
+  ref($_[0]) ? "~".refaddr($_[0])        :
+  substr($_[0],0,1) eq "~" ? visq($_[0]) :
+  index($_[0],"!") >= 0 ? vis($_[0])     :
+  $_[0];
+}
+
 sub hashtostring($) {
   my $href = shift;
-  return join("!", map{ "$_=>$href->{$_}" } sort keys %$href);
+  return join( "!", map{ _item_rep($_)."="._item_rep($href->{$_}) }
+                    sort keys %$href );
+}
+
+sub arraytostring($) {
+  my $aref = shift;
+  return join( "!", map{ _item_rep } @$aref );
 }
 
 ###################################################
 
-=head2 fmt_node($node)
+=head2 fmt_node($node, OPTIONS)
 
-Format a single node for debug messages, without a final newline.
+Format a single ODF::lpOD (really XML::Twig) node for
+debug messages, without a final newline.
 
-C<wrapindent =E<gt> NUM> may be given as assitional arguments
+C<wi =E<gt> NUM> may be given in OPTIONS
 to indent wrapped lines by the indicated number of spaces.
 
-=head2 fmt_tree($subtree_root)
+=head2 fmt_tree($subtree_root, OPTIONS)
 
 Format a node and all of it's children (sans final newline).
 
-=for Pod::Coverage TEXTLEAF_COND PARA_COND TEXTCONTAINER_COND
+=for Pod::Coverage TEXTLEAF_FILTER PARA_FILTER TEXTCONTAINER_FILTER
 =for Pod::Coverage fmt_node_brief fmt_tree_brief fmt_match
 =cut
 
@@ -2055,11 +2217,11 @@ sub _abbrev_addrvis($) {  # like DDI::addrvis() but elides ODF::lpOD:: prefix
 #
 sub fmt_node(_;@) {  # sans final newline
   my $node = shift;
-  my %opts = (showaddr => TRUE, showlen => TRUE, showisa => TRUE, @_);
+  my %opts = (showlevel => FALSE, showaddr => TRUE, showlen => TRUE, showisa => TRUE, @_);
   return "undef" unless defined($node);
   oops unless ref($node);
-  $opts{wrapindent} //= 0;
-  my $wrapspace = " " x $opts{wrapindent};
+  $opts{wi} //= 0;  # wi = "wrap indent"
+  my $wrapspace = " " x $opts{wi};
 
   state $indent_incr = 2;
   state $indent_incr_space = " " x $indent_incr;
@@ -2090,13 +2252,15 @@ sub fmt_node(_;@) {  # sans final newline
     $tagopen .= " ";
   }
   $tagopen .= "{";
-  if (defined $opts{_level}) {
+  if ($opts{showlevel}) {
     $tagopen .= $opts{_level};
     ++$opts{_level};
   }
 
   my @middle_parts;
-  my $mid_visobj = visnew->Pad($wrapspace.$indent_incr_space);
+  my $mid_foldwidth = visnew->Foldwidth() - (($opts{wi}//0) + $indent_incr);
+  my $mid_visobj = visnew->Pad($wrapspace.$indent_incr_space)
+                         ->Foldwidth($mid_foldwidth);
 
   if (defined($opts{parent})) {
     push @middle_parts,
@@ -2108,10 +2272,15 @@ sub fmt_node(_;@) {  # sans final newline
       if $opts{showaddr};
   }
   if (defined(my $att  = $node->get_attributes)) {
-    if (($tag//"") =~ /^(table-cell|sequence)/) {
+    if (($tag//"") =~ /^(table-cell|sequence)/ && !$opts{showall}) {
       push @middle_parts, "att={...}"; # voluminous & uninteresting
     } else {
-      push @middle_parts, "att=".$mid_visobj->vis($att);
+      my %edited_att = map{ ($_ => $att->{$_}) }
+                       grep{ !/^#lpod:/ }  # e.g. #lpod:part circular reference
+                       keys %$att;
+      push @middle_parts,
+           #"att=".$mid_visobj->visq(\%edited_att);
+           "att=".$mid_visobj->Foldwidth1($mid_foldwidth-4)->visq(\%edited_att);
     }
   }
 
@@ -2134,16 +2303,16 @@ sub fmt_node(_;@) {  # sans final newline
                     # so we get back Perl characters (no-op except with :bytes)
                     ODF::lpOD::Common::input_conversion($node->get_text)
                   };
-      $text_pfx .= "[non-leaf]" if defined($text);
+      $text_suf .= "[non-leaf]" if defined($text);
 
     }
     if (! defined $text) {
       $text = $node->text(); # Twig primitive
-      $text_pfx .= "[Frame? Table?]" if defined($text);
+      $text_suf .= "[Frame? Table?]" if defined($text);
     }
   }
   if (defined $text) {
-    $text_suf .= "(len=".length($text).")"
+    $text_suf = "(len=".length($text).")" . $text_suf
       if $opts{showlen} && length($text) > 4;
     if (defined(my $_vtoref = $opts{_vtoref})) {
       $text_pfx .= $$_vtoref.":";
@@ -2156,7 +2325,7 @@ sub fmt_node(_;@) {  # sans final newline
 
   { my @children = $node->children;
     if ($opts{_recursive}) {
-      local $opts{wrapindent} = $opts{wrapindent} + $indent_incr;
+      local $opts{wi} = $opts{wi} + $indent_incr;
       local $opts{parent} = $node;
       foreach my $child (@children) {
         push @middle_parts, __SUB__->($child, %opts);
@@ -2170,7 +2339,7 @@ sub fmt_node(_;@) {  # sans final newline
   }
 
   my $tagclose = "}";
-  if (defined $opts{_level}) {
+  if ($opts{showlevel}) {
     --$opts{_level};
     $tagclose .= $opts{_level};
   }
@@ -2185,11 +2354,11 @@ sub fmt_node(_;@) {  # sans final newline
   #   last child
   # }
 
-  my $minlen = $opts{wrapindent}
+  my $minlen = $opts{wi}
                + length($tagopen) + 1
                + sum0(map{1 + length} @middle_parts)
                + 1 + length($tagclose);
-  my $maxwidth = $opts{maxwidth} // 80;
+  my $maxwidth = $opts{maxwidth} // $ENV{COLUMNS} // 80;
   if ($minlen <= $maxwidth or $maxwidth == 0) {
     return join(" ", $tagopen, @middle_parts, $tagclose);
   }
@@ -2208,8 +2377,8 @@ sub fmt_node_brief(_;@) {
 
 sub fmt_tree(_;@) { # sans final newline
   my $top = shift;
-  my %opts = (showoff => TRUE, @_);
-  my $indent = $opts{indent};
+  my %opts = (showoff => TRUE, showlevel => TRUE, @_);
+  my $indent = $opts{indent} // 0;
   my $string = "";
   my $parent;
   if ($opts{ancestors} and ref $top) {
@@ -2226,10 +2395,7 @@ sub fmt_tree(_;@) { # sans final newline
   my $vtoffset = 0;
   $opts{_vtoref} = \$vtoffset if $opts{showoff};
   $opts{_level} = 0;
-  $string .= fmt_node($top, %opts, _leaftextonly => 1, _recursive => 1);
-
-  #return "------------\n".$string."------------";
-  return $string;
+  fmt_node($top, %opts, _leaftextonly => 1, _recursive => 1);
 }
 sub fmt_tree_brief(_;@) {
   fmt_tree($_[0], showaddr=>FALSE, showlen=>FALSE, showoff=>FALSE, @_[1..$#_])
@@ -2278,9 +2444,9 @@ sub fmt_match(_;@) { # sans final newline
   }
 
   _append_new_line(qw/match/);
-  _append_new_line(qw/voffset vend/);
+  _append_new_line(qw/voffset vend vlength/);
   if (exists $h{para}) {
-    local $opts{wrapindent} += 2;
+    local $opts{wi} += 2;
     $s .= "\n  para => ".fmt_node(delete $h{para}, %opts)."\n ";
   }
   $s .= _collect("para_voffset");
@@ -2292,11 +2458,119 @@ sub fmt_match(_;@) { # sans final newline
     if defined $segments;
 
   return $s."\n}";
+}#fmt_match
+sub fmt_Hreplace_results(@) {
+  my $results = (@_ == 1 && ref($_[0]) eq 'ARRAY') ? $_[0] : \@_;
+  "(".(join ",\n", map{fmt_match($_)} @$results).")";
 }
-#sub fmt_Hinsert_result(_;@) {
-#  my $r = shift;
-#  fmt_match($r, _missings_ok => 1, @_)
-#}
+sub fmt_Hreplace_result(_) {
+  goto &fmt_match
+}
+
+=head1 LIBRE OFFICE 'RSID' WORK-AROUND
+
+Some versions of LibreOffice track revisions by installing special spans
+using "rsid" styles which interfere with cloning.
+The problem is that LO expects these styles to be referenced exactly
+once.  The C<Hclean_for_cloning()> method will remove them.
+
+An old 2015 reference said a "no rsids" feature was added Libre Office
+but AFAIK such a feature is not available in current releases,
+or anyway isn't documented.
+See L<https://bugs.documentfoundation.org/show_bug.cgi?id=68183>
+
+=head2 $doc->Hclean_for_cloning();
+
+This unpleasant hack removes all "rsid" properties from all styles the document.
+
+C<Hclean_for_cloning> should be called before cloning anything
+in a document if the cloned items might have been edited by Libre Office.
+It may be called multiple times; second and subsequent calls do nothing.
+
+Gory detail:
+Every style in the document is examined and any
+B<officeooo:rsid> and B<officeooo:paragraph-rsid> attributes are deleted.
+Then every span in the document body is examined and if the span's
+style is a style which no longer has any properties (i.e. it existed
+only to record an rsid property), then the span is erased, moving up the
+span's children, and the empty style is deleted.
+
+=cut
+
+# Hack to remove officeooo:rsid text properties from text styles,
+# which if cloned or otherwise used for multiple spans cause Libre Office
+# to hang or crash.
+#
+sub ODF::lpOD::Document::Hclean_for_cloning {
+  my ($doc, %opts) = @_;
+
+  my $sh = _get_ephemeral_statehash($doc);
+  return if $sh->{cleaned_for_cloning}++;
+
+  my %rsid_styles; # stylename => style
+  {
+    # Find all children of style:style
+    # (namely style:{paragraph,text}-properties) containing an rsid property
+    # and delete the property from the style.
+
+    my $xp = '//style:style/[@officeooo:paragraph-rsid or @officeooo:rsid]';
+    my @items=($doc->get_elements(STYLES,$xp), $doc->get_elements(CONTENT,$xp));
+    foreach my $item (@items) {
+      # style:paragraph-properties or style:text-properties
+      my $atts = $item->atts;  # XML::Twig
+      # DELETE the rsid property
+      my @attnames = grep{ /rsid/ } keys %$atts;
+      oops unless @attnames;
+      delete @$atts{@attnames};
+      $item->set_atts($atts); # XML::Twig
+      my $style = $item->parent('style:style') // oops;
+      $rsid_styles{$style->get_name} = $style;
+    }
+
+    my @items2=($doc->get_elements(STYLES,$xp), $doc->get_elements(CONTENT,$xp));
+    oops if @items2;
+  }
+
+  # The body is still littered with spans which use now-zero-effect styles
+  # (now that the rsid properties are gone).
+
+  # Check every span in the document body
+  my $body = $doc->get_body;
+  my $span = $body;
+  my @to_be_erased;
+  while ($span = $span->next_elt($body, 'text:span')) {
+    my $tsname = $span->get_attribute('style') // oops;
+    my $style = $rsid_styles{$tsname};
+    unless ($style) {
+#btw dvis 'MM0 $tsname not in rsid_styles' if $opts{debug};
+      next;
+    }
+#btw dvis 'MM1 $span $tsname $style' if $opts{debug};
+    if (ref $style) { # not (yet) deleted
+      oops unless $style->{parent};
+      my $props_remain;
+      foreach my $ch ($style->children) {
+         oops unless $ch->tag() =~ /^style:.*properties$/;
+         #my $atts = $item->atts;  # XML::Twig
+         my $atts = $ch->get_attributes;
+         ($props_remain=1,last) if keys %$atts;
+      }
+      if (! $props_remain) {
+        btw "$tsname : Deleting rsid-only style ",fmt_tree($style, internals=>1)
+          if $opts{debug};
+        $style->delete;
+        $rsid_styles{$tsname} = $style = "DELETED";
+      } else {
+        btw "$tsname : KEEPING style ",fmt_tree($style, internals=>1) if $opts{debug};
+      }
+    }
+    push @to_be_erased, $span if $style eq "DELETED";
+  }
+  foreach my $span (@to_be_erased) {
+    btw "Erasing rsid-only span ",fmt_node($span) if $opts{debug};
+    $span->erase; # XML::Twig
+  }
+}#Hclean_for_cloning
 
 =head1 HISTORY
 
@@ -2306,12 +2580,10 @@ In Aug 2023 a major overhaul was released as rev 6.000 with API changes.
 
 As of Feb 2023, the underlying ODF::lpOD is not actively maintained
 (last updated in 2014, v1.126), and is unusable as-is.
-However with ODF::lpOD_Helper, ODF::lpOD is once again an 
+However with ODF::lpOD_Helper, ODF::lpOD is once again an
 extremely useful tool.
 
-B<Original Motivation:>
-
-ODF::lpOD by itself can be inconvenient because
+B<Motivation:> ODF::lpOD by itself can be inconvenient because
 
 =over
 
@@ -2324,18 +2596,44 @@ for why this is a problem.
 =item 2.
 
 I<search()> can not match segmented strings, and so
-can not match text which was internally fragmented by LibreOffice,
-or which crosses style boundaries;
+can not match text which was internally fragmented by LibreOffice
+(e.g. for rsids), or which crosses style boundaries;
 nor can searches match tab, newline or consecutive spaces (which
 are represented by specialized elements).
 I<replace()> has analogous limitations.
 
 =item 3.
 
+Nested paragraphs (which can occur via frames and tables) are difficult
+or impossible to deal with because of various limitations of L<ODF::lpOD>
+(notably with C<get_text()>).
+
+=item 4.
+
 "Unknown method DESTROY" warnings occur without a patch (ODF::lpOD v1.126;
 L<https://rt.cpan.org/Public/Bug/Display.html?id=97977>)
 
 =back
+
+=head2 Why not just fix ODF::lpOD ?
+
+Ideally bugs in L<ODF::lpOD> would be fixed without API changes,
+enhancements added in a compatible way, and
+there would be a single integrated documentation set for everything.
+
+However the original author of L<ODF::lpOD>, Jean-Marie Gouarne,
+is no longer active and some bugs (notably with C<get_text>) might
+require structural changes to the class hierarchy.
+ODF::lpOD is a complex tool and encodes deep knowledge about ODF.
+It seems too risky at this point in history to make non-trivial
+changes which might de-stabilize ODF::lpOD.
+
+Also, ODF::lpOD_Helper introduced new APIs which partly function at a higher level;
+without futher study is is not obvious how they could be merged into
+ODF::lpOD while remaining consistent with Jean-Marie's
+vision and usage model.  Working this out would require too much
+effort (again, at this point in history), at least from the present
+maintainer of ODF::lpOD_Helper!
 
 =head1 AUTHOR
 
@@ -2347,10 +2645,11 @@ ODF::lpOD_Helper is in the Public Domain or CC0 license.
 However it requires ODF::lpOD to function so as a practical matter
 you must comply with ODF::lpOD's license.
 
-ODF::lpOD (v1.126) may be used under the GPL 3 or Apache 2.0 license.
+ODF::lpOD (as of v1.126) may be used under the GPL 3 or Apache 2.0 license.
 
 =for Pod::Coverage oops btw btwN
 =for Pod::Coverage fmt_node_brief fmt_tree_brief fmt_match
+=for Pod::Coverage fmt_Hreplace_result fmt_Hreplace_results
 
 =cut
 

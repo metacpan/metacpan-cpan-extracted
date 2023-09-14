@@ -9,6 +9,7 @@ use Test::More 0.88;
 
 use lib qw{ inc };
 use My::Module::Test::App;	# For environment clean-up.
+use My::Module::Test::Mock_App;
 
 use Astro::App::Satpass2::Format::Template;
 
@@ -30,6 +31,11 @@ use Astro::Coord::ECI::Utils 0.112 qw{ deg2rad greg_time_gm };
 
 use Cwd ();
 use Time::Local;
+
+use constant APRIL_FOOL_2023	=> greg_time_gm( 0, 0, 0, 1, 3, 2023 );
+use constant FORMAT_VALUE	=> 'Astro::App::Satpass2::FormatValue';
+
+my $app = My::Module::Test::Mock_App->new();
 
 my $sta = Astro::Coord::ECI->new()->geodetic(
     deg2rad( 38.898748 ),
@@ -55,7 +61,9 @@ EOD
 
 HAVE_TLE_IRIDIUM and $sat->rebless( 'iridium' );
 
-my $ft = Astro::App::Satpass2::Format::Template->new()->gmt( 1 );
+my $ft = Astro::App::Satpass2::Format::Template->new(
+    parent	=> $app,
+)->gmt( 1 );
 
 # Encapsulation violation. The _uniq() subroutine may be moved or
 # retracted without notice of any kind.
@@ -67,6 +75,13 @@ is_deeply
     'Check our implementation of uniq()';
 
 ok $ft, 'Instantiate Astro::App::Satpass2::Format::Template';
+
+sub april_fool {
+    my ( undef, $hash ) = @_;
+    $hash ||= {};
+    $hash->{time} = APRIL_FOOL_2023;
+    return $hash;
+}
 
 ok $ft->template( fubar => <<'EOD' ), 'Can set custom template';
 Able was [% arg.0 %] ere [% arg.0 %] saw Elba
@@ -288,7 +303,7 @@ is $ft->format(
 		time => greg_time_gm( 0, 8, 10, 13, 9, 1980 ),
 	    },
 	] ), <<'EOD', 'Pass';
-    Time Eleva  Azimuth      Range Latitude Longitude Altitud Illum Event
+Time     Eleva  Azimuth      Range Latitude Longitude Altitud Illum Event
 
 1980-10-13     88888 - None
 10:07:14  20.1 156.2 SE      537.9  34.8367  -74.8798   204.0 lit   rise

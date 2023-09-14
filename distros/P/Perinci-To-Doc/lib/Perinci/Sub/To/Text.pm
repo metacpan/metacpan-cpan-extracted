@@ -10,9 +10,9 @@ extends 'Perinci::Sub::To::FuncBase';
 with    'Perinci::To::Doc::Role::Section::AddTextLines';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-15'; # DATE
+our $DATE = '2023-07-09'; # DATE
 our $DIST = 'Perinci-To-Doc'; # DIST
-our $VERSION = '0.880'; # VERSION
+our $VERSION = '0.881'; # VERSION
 
 sub BUILD {
     my ($self, $args) = @_;
@@ -36,7 +36,6 @@ sub after_gen_doc {
     $self->add_doc_lines("", $dres->{summary})     if $dres->{summary};
     $self->add_doc_lines("", $dres->{description}) if $dres->{description};
     if (keys %{$dres->{args}}) {
-        use experimental 'smartmatch';
         $self->add_doc_lines(
             "",
             __("Arguments") .
@@ -48,7 +47,7 @@ sub after_gen_doc {
             my $prev_arg_has_ct = $arg_has_ct;
             $arg_has_ct = 0;
             my $ra = $dres->{args}{$name};
-            next if 'hidden' ~~ @{ $ra->{arg}{tags} // [] };
+            next if grep { $_ eq 'hidden' } @{ $ra->{arg}{tags} // [] };
             $self->add_doc_lines("") if $i++ > 0 && $prev_arg_has_ct;
             $self->add_doc_lines(join(
                 "",
@@ -108,7 +107,7 @@ Perinci::Sub::To::Text - Generate text documentation from Rinci function metadat
 
 =head1 VERSION
 
-This document describes version 0.880 of Perinci::Sub::To::Text (from Perl distribution Perinci-To-Doc), released on 2022-10-15.
+This document describes version 0.881 of Perinci::Sub::To::Text (from Perl distribution Perinci-To-Doc), released on 2023-07-09.
 
 =head1 SYNOPSIS
 
@@ -161,7 +160,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

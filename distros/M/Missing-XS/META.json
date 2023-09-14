@@ -1,0 +1,83 @@
+{
+   "abstract" : "print warnings about XS modules you should probably install",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Missing-XS",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Module::Runtime" : "0",
+            "perl" : "5.012000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Plugin::BailOnFail" : "0",
+            "Test2::Require::AuthorTesting" : "0",
+            "Test2::Require::Module" : "0",
+            "Test2::Tools::Spec" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Missing::XS" : {
+         "file" : "lib/Missing/XS.pm",
+         "version" : "0.001001"
+      },
+      "issing::XS" : {
+         "file" : "lib/issing/XS.pm",
+         "version" : "0.001001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tobyink/p5-missing-xs/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Missing-XS",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-missing-xs.git",
+         "web" : "https://github.com/tobyink/p5-missing-xs"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Missing-XS/project"
+   },
+   "version" : "0.001001",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

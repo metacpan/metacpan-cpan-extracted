@@ -1,18 +1,25 @@
 package App::Oozie::Run;
-$App::Oozie::Run::VERSION = '0.002';
+$App::Oozie::Run::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
+use App::Oozie::Constants qw(
+    DEFAULT_END_DATE_DAYS
+    DEFAULT_START_DATE_DAY_FRAME
+    EMPTY_STRING
+    OOZIE_STATES_RUNNING
+    SHORTCUT_METHODS
+    SPACE_CHAR
+);
 use App::Oozie::Date;
 use App::Oozie::Types::DateTime qw( IsDate IsHour IsMinute );
 use App::Oozie::Types::Common qw( IsJobType );
-use App::Oozie::Constants qw( OOZIE_STATES_RUNNING );
+use App::Oozie::Util::Misc qw( remove_newline );
 
 use Config::Properties;
 use Cwd;
-use Data::Dumper;
 use File::Basename;
 use File::Spec;
 use File::Temp;
@@ -21,7 +28,7 @@ use IPC::Cmd        ();
 use Ref::Util       qw( is_ref is_hashref is_arrayref );
 use Template;
 use Types::Standard qw( Int );
-use XML::Simple     qw( XMLin );
+use XML::LibXML::Simple;
 
 use Moo;
 use MooX::Options prefer_commandline => 0,
@@ -30,13 +37,6 @@ use MooX::Options prefer_commandline => 0,
 Usage: %c %o [options] workflow-name
 USAGE
 ;
-
-use constant {
-    DEFAULT_END_DATE_DAYS        => 180,
-    DEFAULT_START_DATE_DAY_FRAME => 7,
-    EMPTY_STRING                 => q{},
-    SPACE_CHAR                   => q{ },
-};
 
 with qw(
     App::Oozie::Role::Log
@@ -47,12 +47,10 @@ with qw(
 
 #------------------------------------------------------------------------------#
 
-sub _remove_n { my $s = shift; $s =~ s{\n+}{ }xmsg; $s }
-
 option appname => (
     is     => 'rw',
     format => 's',
-    doc    => _remove_n( <<'DOC' ),
+    doc    => remove_newline( <<'DOC' ),
 Workflow name, useful if you want to run different instances of the same
 workflow with different parameters. If not set, then this will default to
 the workflow basename.
@@ -71,7 +69,7 @@ option type => (
     is      => 'rw',
     isa     => IsJobType,
     format  => 's',
-    doc     =>  _remove_n( sprintf <<'DOC', $__JOB_TYPES ),
+    doc     => remove_newline( sprintf <<'DOC', $__JOB_TYPES ),
 Defines the type of job the user needs to launch. If nothing is specified,
 the script will check the existence of a coordinator.xml file, to determine
 whether this should be launched as a coordinator or a single workflow.%s
@@ -87,7 +85,7 @@ option define => (
     is      => 'rw',
     format  => 's@',
     default => sub { [] },
-    doc     => q{define extra parameters for oozie, like "--define 'foo=bar'"},
+    doc     => q{Define extra parameters for oozie, like "--define 'foo=bar'"},
 );
 
 option path => (
@@ -102,7 +100,7 @@ option sla_duration => (
     is      => 'rw',
     isa     => Int,
     format  => 'i',
-    doc     =>  _remove_n( <<'DOC' ),
+    doc     => remove_newline( <<'DOC' ),
 the runtime, in minutes, after which a workflow deployed using the --sla
 switch should send an sla-duration-miss email to the errorEmailTo
 recipient(s). This may be adjusted dynamically and automatically after
@@ -116,7 +114,7 @@ option starthour => (
     format  => 's',
     default => sub { 0 },
     isa     => IsHour,
-    doc     =>  _remove_n( <<'DOC' ),
+    doc     => remove_newline( <<'DOC' ),
 hour of day (0 to 23) for the 1st coordinator run. Applies to all
 coordinators, even hourly ones. Defaults to midnight (in UTC)
 DOC
@@ -127,7 +125,7 @@ option startmin => (
     format  => 's',
     default => sub { 0 },
     isa     => IsMinute,
-    doc     =>  _remove_n( <<'DOC' ),
+    doc     => remove_newline( <<'DOC' ),
 minute within starthour 00 to 59 for the coordinator run. Applies to all
 coordinators. Defaults to 00
 DOC
@@ -138,7 +136,7 @@ option endhour => (
     format  => 's',
     default => sub { 0 },
     isa     => IsHour,
-    doc     =>  _remove_n( <<'DOC' ),
+    doc     => remove_newline( <<'DOC' ),
 hour of day (0 to 23) for the last coordinator run. Applies to all
 coordinators, even hourly ones. Defaults to midnight (in UTC)
 DOC
@@ -149,7 +147,7 @@ option endmin => (
     format  => 's',
     default => sub { 0 },
     isa     => IsMinute,
-    doc     =>  _remove_n( <<'DOC' ),
+    doc     => remove_newline( <<'DOC' ),
 minute within endhour 00 to 59 for the coordinator run. Applies to all
 coordinators. Defaults to 00
 DOC
@@ -163,7 +161,7 @@ option startdate => (
     is     => 'rw',
     isa    => IsDate,
     format => 's',
-    doc    =>  _remove_n( sprintf <<'DOC', DEFAULT_START_DATE_DAY_FRAME, join( q{, }, App::Oozie::Date->SHORTCUT_METHODS ) ),
+    doc    => remove_newline( sprintf <<'DOC', DEFAULT_START_DATE_DAY_FRAME, join( q{, }, SHORTCUT_METHODS ) ),
 date at which the first instance of the coordinator should be run. Maximum
 %s days in the past or future, can be overriden with --force, defaults to
 tomorrow. Option can also be: %s
@@ -174,7 +172,7 @@ option enddate => (
     is     => 'rw',
     isa    => IsDate,
     format => 's',
-    doc    =>  _remove_n( sprintf <<'DOC', ( DEFAULT_END_DATE_DAYS ) x 2 ),
+    doc    => remove_newline( sprintf <<'DOC', ( DEFAULT_END_DATE_DAYS ) x 2 ),
 The last date the workflow should run. Maximum %s days from today. Defaults
 to %s days from today.
 DOC
@@ -200,7 +198,7 @@ sub setup_dates {
     # the time it is submitted
     my $startdate = $self->startdate;
     if ( $startdate ) {
-        my %is_shortcut = map { $_ => 1 } $date->SHORTCUT_METHODS;
+        my %is_shortcut = map { $_ => 1 } SHORTCUT_METHODS;
         if ( $is_shortcut{ $startdate } ) {
             $startdate = $date->$startdate();
         }
@@ -502,7 +500,7 @@ sub collect_oozie_cmd_args {
                                         startmin
                                     );
 
-    my $nameNode = $prop{nameNode} || 'hdfs://nameservice1';
+    my $nameNode = $prop{nameNode} || $self->template_namenode;
 
     my %cmd_param = (
         app_name      => $self->appname,
@@ -724,7 +722,8 @@ sub check_coordinator_function_calls {
                         ;
                 $logger->logdie( sprintf $msg, $abs_path );
             }
-            my $oozie_conf =  XMLin( \$raw );
+            my $xs = XML::LibXML::Simple->new;
+            my $oozie_conf = $xs->XMLin( \$raw );
             $loop_xml_conf_hash->( $oozie_conf, $collector );
             1;
         } or do {
@@ -799,11 +798,13 @@ sub collect_properties {
     ) ) {
         my $val = $properties->getProperty( $name ) || next;
         if ( is_ref $val ) {
+            require Data::Dumper;
+            my $d = Data::Dumper->new([ $val ], [ $name ]);
             $self->logger->logdie(
                 sprintf 'You seem to have a double definition in %s for %s as %s',
                             'job.properties',
                             $name,
-                            do { my $d = Data::Dumper->new([ $val ], [ $name ]); $d->Dump },
+                            $d->Dump,
             );
         }
         $rv{ $name } = $val;
@@ -953,7 +954,7 @@ App::Oozie::Run
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -1043,16 +1044,6 @@ App::Oozie::Run - Schedule Oozie Coordinators and Workflows.
 =head3 basedir
 
 =head3 errors
-
-=head1 Constants
-
-=head2 DEFAULT_END_DATE_DAYS
-
-=head2 DEFAULT_START_DATE_DAY_FRAME
-
-=head2 EMPTY_STRING
-
-=head2 SPACE_CHAR
 
 =head1 SEE ALSO
 

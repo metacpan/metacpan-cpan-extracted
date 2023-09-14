@@ -7,6 +7,14 @@ Home page:    <https://metacpan.org/release/Story-Interact>
 Bug tracker:  <https://github.com/tobyink/p5-story-interact/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.001014	2023-09-01
+
+0.001013	2023-09-01
+
+ - Story::Interact::State's load and dump methods now encrypt the
+   compressed state with CAST5 if the PERL_STORY_INTERACT_KEY environment
+   variable contains a key. This change should be mostly transparent.
+
 0.001012	2023-06-12
 
  - Story::Interact::State's load and dump methods now compress the state

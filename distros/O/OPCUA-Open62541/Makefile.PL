@@ -121,6 +121,7 @@ WriteMakefile(
     TEST_REQUIRES	=> {
 	'IO::Socket::SSL::Utils'	=> 0,
 	'MIME::Base64'			=> 0,
+	'Net::SSLeay'			=> 0,
 	'Socket6'			=> 0,
 	'Test::Deep'			=> 0,
 	'Test::EOL'			=> 0,

@@ -1,24 +1,23 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.66;
+use warnings;
+use Object::Pad 0.800;
 
-package Device::Chip::AVR_HVSP 0.06;
+package Device::Chip::AVR_HVSP 0.07;
 class Device::Chip::AVR_HVSP
    :isa(Device::Chip);
 
 use Carp;
 
 use Future::AsyncAwait;
-use Struct::Dumb qw( readonly_struct );
+
+use Object::Pad::ClassAttr::Struct 0.05;
 
 use constant PROTOCOL => "GPIO";
-
-readonly_struct PartInfo   => [qw( signature flash_words flash_pagesize eeprom_words eeprom_pagesize has_efuse )];
-readonly_struct MemoryInfo => [qw( wordsize pagesize words can_write )];
 
 =head1 NAME
 
@@ -163,6 +162,26 @@ the C<power>, C<hv_power> or C<all_power> methods to turn these off if it is
 not required again immediately.
 
 =cut
+
+class Device::Chip::AVR_HVSP::_PartInfo :Struct(readonly)
+{
+   field $signature;
+   field $flash_words;
+   field $flash_pagesize;
+   field $eeprom_words;
+   field $eeprom_pagesize;
+   field $has_efuse;
+}
+sub PartInfo { Device::Chip::AVR_HVSP::_PartInfo->new_values( @_ ) }
+
+class Device::Chip::AVR_HVSP::_MemoryInfo :Struct(readonly)
+{
+   field $wordsize;
+   field $pagesize;
+   field $words;
+   field $can_write;
+}
+sub MemoryInfo { Device::Chip::AVR_HVSP::_MemoryInfo->new_values( @_ ) }
 
 my %PARTS;
 {

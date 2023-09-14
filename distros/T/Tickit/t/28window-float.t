@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Refcount;
+use Test2::V0 0.000149; # is_refcount
 
 use Tickit::Test;
 
@@ -97,7 +96,7 @@ is_refcount( $root, 1, '$root has refcount 1 after ->make_float' );
 
    pressmouse( press => 1, 5, 12 );
 
-   is_deeply( \@mouse_events, [ [ press => 1, -7, -10 ] ] );
+   is( \@mouse_events, [ [ press => 1, -7, -10 ] ] );
    undef @mouse_events;
 
    $popupwin->set_steal_input( 0 );
@@ -164,12 +163,12 @@ $rootfloat->unbind_event_id( $bind_id );
                  SCROLLRECT(15,0,10,80, 3,0) ],
                'Termlog after scroll with floats' );
 
-   is_deeply( \@exposed_rects,
-              [ Tickit::Rect->new( top =>  7, left =>  0, lines => 3, cols => 80 ),
-                Tickit::Rect->new( top => 10, left =>  0, lines => 5, cols => 10 ),
-                Tickit::Rect->new( top => 10, left => 40, lines => 5, cols => 40 ),
-                Tickit::Rect->new( top => 22, left =>  0, lines => 3, cols => 80 ), ],
-              'Exposed regions after scroll with floats' );
+   is( \@exposed_rects,
+       [ rect( top =>  7, left =>  0, lines => 3, cols => 80 ),
+         rect( top => 10, left =>  0, lines => 5, cols => 10 ),
+         rect( top => 10, left => 40, lines => 5, cols => 40 ),
+         rect( top => 22, left =>  0, lines => 3, cols => 80 ), ],
+       'Exposed regions after scroll with floats' );
 
    $root->unbind_event_id( $bind_id );
 }

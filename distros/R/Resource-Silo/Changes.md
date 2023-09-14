@@ -1,5 +1,10 @@
 # Revision history for Resource::Silo
 
+- 0.10    Fri Sep 01 2023
+    - [api] Add meta->show(name) method to inspect resource definitions
+    - [bug] default cleanup_order for literals = inf
+    - [bug] Improve error messages about bad dependencies, add implicit deps as a special case
+
 - 0.09    Mon Aug 28 2023
     - [api][break] Only allow dependencies on previously declared resources
     - [api] Add `loose_deps` flag to allow forward and/or dangling dependencies

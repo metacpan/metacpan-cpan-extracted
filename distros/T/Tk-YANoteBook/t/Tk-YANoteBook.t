@@ -4,8 +4,11 @@ use warnings;
 use Test::Tk;
 use Tk;
 
-use Test::More tests => 4;
-BEGIN { use_ok('Tk::YANoteBook') };
+use Test::More tests => 5;
+BEGIN { 
+	use_ok('Tk::YANoteBook');
+	use_ok('Tk::YANoteBook::NameTab');
+};
 
 $delay = 1500;
 
@@ -13,8 +16,7 @@ createapp;
 
 my $nb;
 if (defined $app) {
-	my $frame = $app->Frame->pack(-expand => 1, -fill => 'both');
-	$nb = $frame->YANoteBook(
+	$nb = $app->YANoteBook(
 		-relief => 'raised',
 		-borderwidth => 2,
 # 		-tabside => 'left',
@@ -34,7 +36,7 @@ if (defined $app) {
 			-relief => 'groove',
 		)->pack();
 	}
-# 	$frame->Label(-width => 1, -height => 3)->pack(-side => 'left', -fill => 'x');
+ 	$app->Label(-text => '------')->pack;
 	$app->geometry('700x500+100+100');
 }
 

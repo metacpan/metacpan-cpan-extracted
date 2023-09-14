@@ -1,15 +1,12 @@
 package PYX::Sort;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use PYX::Parser;
 
-# Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -108,6 +105,7 @@ PYX::Sort - Processing PYX data or file and sort element attributes.
 =head1 SYNOPSIS
 
  use PYX::Sort;
+
  my $obj = PYX::Sort->new(%parameters);
  $obj->parse($pyx, $out);
  $obj->parse_file($input_file, $out);
@@ -158,19 +156,19 @@ PYX::Sort - Processing PYX data or file and sort element attributes.
 
 =head1 EXAMPLE
 
- # Pragmas.
+=for comment filename=sort_element_attributes.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use PYX::Sort;
 
  # Example data.
  my $pyx = <<'END';
  (tag
- Aattr1 value
- Aattr2 value
  Aattr3 value
+ Aattr2 value
+ Aattr1 value
  -text
  )tag
  END
@@ -206,21 +204,22 @@ Install the PYX modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/PYX-Sort>
+L<https://github.com/michal-josef-spacek/PYX-Sort>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2015 Michal Špaček
- BSD 2-Clause License
+© 2011-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

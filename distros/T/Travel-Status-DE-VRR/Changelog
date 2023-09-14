@@ -1,3 +1,7 @@
+Travel::Status::DE::VRR 1.22 - Sat Sep 02 2023
+
+    * Do not use now-deprecated smartmatch features
+
 Travel::Status::DE::VRR 1.21 - Sat Jul 22 2023
 
     * Add service VRR3

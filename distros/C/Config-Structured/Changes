@@ -1,5 +1,8 @@
 Revision history for perl distribution Config::Structured
 
+2.004
+- Switched to Perl6::Junction to avoid smartmatch warnings from Syntax::Keyword::Junction
+
 2.003
 - Added __get_child_node_names method to introspect valid keys from current node
 

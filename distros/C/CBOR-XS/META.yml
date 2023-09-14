@@ -4,11 +4,12 @@ author:
   - unknown
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Task::Weaken: '1.06'
 configure_requires:
   Canary::Stability: '0'
-  ExtUtils::MakeMaker: '6.52'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,4 +22,5 @@ no_index:
 requires:
   Types::Serialiser: '0'
   common::sense: '0'
-version: 1.86
+version: 1.87
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

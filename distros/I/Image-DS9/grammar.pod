@@ -1,0 +1,1485 @@
+=over
+
+=item about
+
+  [ STRING ] = $ds9->about;
+
+=item align
+
+  $ds9->align( BOOL );
+
+  [ BOOL ] = $ds9->align;
+
+=item array
+
+  $ds9->array( PDL, ?{ new => BOOL, mask => BOOL } );
+
+  $ds9->array( SCALARREF, ?{ new => BOOL, mask => BOOL, bitpix =>
+    INTEGER, skip => INTEGER, -o => [ -a => [ xdim => INTEGER, ydim =>
+    INTEGER ], dim => INTEGER ], zdim => INTEGER, endian => ( 'big' |
+    'little' | 'native' ) } );
+
+=item backup
+
+  $ds9->backup( <filename>:STRING );
+
+=item bin
+
+  $ds9->bin( 'about', 'center' );
+  $ds9->bin( 'about', <x>:FLOAT, <y>:FLOAT );
+
+  $ds9->bin( 'buffersize', INTEGER );
+
+  $ds9->bin( 'close' );
+
+  $ds9->bin( 'cols', <xcol>:STRING, <ycol>:STRING );
+  $ds9->bin( 'colsz', <xcol>:STRING, <ycol>:STRING, <zcol>:STRING );
+
+  $ds9->bin( 'depth', INTEGER );
+
+  $ds9->bin( 'factor', <x/y>:FLOAT );
+  $ds9->bin( 'factor', <x>:FLOAT, <y>:FLOAT );
+
+  $ds9->bin( 'filter', <filter>:STRING );
+
+  $ds9->bin( 'function', ( 'average' | 'sum' ) );
+
+  $ds9->bin( 'in' );
+
+  $ds9->bin( 'lock', BOOL );
+
+  $ds9->bin( 'match' );
+
+  $ds9->bin( 'open' );
+
+  $ds9->bin( 'out' );
+
+  $ds9->bin( 'to fit' );
+  $ds9->bin( 'tofit' );
+
+  [ <filter>:STRING ] = $ds9->bin( 'filter' );
+
+  [ <function>:STRING ] = $ds9->bin( 'function' );
+
+  [ <x>:FLOAT, <y>:FLOAT ] = $ds9->bin( 'about' );
+
+  [ ARRAY ] = $ds9->bin( 'cols' );
+  [ ARRAY ] = $ds9->bin( 'factor' );
+  [ ARRAY ] = $ds9->bin( 'factor' );
+
+  [ BOOL ] = $ds9->bin( 'lock' );
+
+  [ INTEGER ] = $ds9->bin( 'buffersize' );
+  [ INTEGER ] = $ds9->bin( 'depth' );
+
+=item blink
+
+  $ds9->blink( 'interval', FLOAT );
+
+  $ds9->blink( BOOL );
+
+  $ds9->blink;
+
+  [ BOOL ] = $ds9->blink( 'state' );
+
+  [ FLOAT ] = $ds9->blink( 'interval' );
+
+=item block
+
+  $ds9->block( '0' );
+  $ds9->block( 'abs', <x/y>:FLOAT );
+  $ds9->block( 'abs', <x>:FLOAT, <y>:FLOAT );
+  $ds9->block( 'close' );
+  $ds9->block( 'lock', BOOL );
+  $ds9->block( 'match' );
+  $ds9->block( 'open' );
+  $ds9->block( 'rel', <x/y>:FLOAT );
+  $ds9->block( 'rel', <x>:FLOAT, <y>:FLOAT );
+  $ds9->block( 'to', 'fit' );
+  $ds9->block( 'to', <x/y>:FLOAT );
+  $ds9->block( 'to', <x>:FLOAT, <y>:FLOAT );
+  $ds9->block( 'tofit' );
+
+  $ds9->block( <x/y>:FLOAT );
+  $ds9->block( <x>:FLOAT, <y>:FLOAT );
+
+  [ ARRAY ] = $ds9->block;
+
+  [ BOOL ] = $ds9->block( 'lock' );
+
+=item cd
+
+  $ds9->cd( STRING );
+
+  [ STRING ] = $ds9->cd;
+
+=item cmap
+
+  $ds9->cmap( 'close' );
+
+  $ds9->cmap( 'file', <filename>:STRING );
+
+  $ds9->cmap( 'invert', BOOL );
+
+  $ds9->cmap( 'load', <filename>:STRING );
+
+  $ds9->cmap( 'open' );
+
+  $ds9->cmap( 'save', <filename>:STRING );
+
+  $ds9->cmap( 'tag', 'delete' );
+  $ds9->cmap( 'tag', 'load', <filename>:STRING );
+  $ds9->cmap( 'tag', 'save', <filename>:STRING );
+
+  $ds9->cmap( 'value', <contrast>:FLOAT, <brightness>:FLOAT );
+
+  $ds9->cmap( <name>:STRING );
+
+  [ <contrast>:FLOAT, <brightness>:FLOAT ] = $ds9->cmap( 'value' );
+
+  [ <filename>:STRING ] = $ds9->cmap( 'file' );
+
+  [ <name>:STRING ] = $ds9->cmap;
+
+  [ BOOL ] = $ds9->cmap( 'invert' );
+
+=item colorbar
+
+  $ds9->colorbar( 'font', ( 'courier' | 'helvetica' | 'times' ) );
+  $ds9->colorbar( 'fontsize', FLOAT );
+  $ds9->colorbar( 'fontslant', ( 'italic' | 'roman' ) );
+  $ds9->colorbar( 'fontweight', ( 'bold' | 'normal' ) );
+  $ds9->colorbar( 'horizontal' );
+  $ds9->colorbar( 'lock' );
+  $ds9->colorbar( 'lock', 'state' );
+  $ds9->colorbar( 'lock', BOOL );
+  $ds9->colorbar( 'match' );
+  $ds9->colorbar( 'numerics', BOOL );
+  $ds9->colorbar( 'orientation', ( 'horizontal' | 'vertical' ) );
+  $ds9->colorbar( 'size', INTEGER );
+  $ds9->colorbar( 'space', ( 'distance' | 'value' ) );
+  $ds9->colorbar( 'ticks', INTEGER );
+  $ds9->colorbar( 'vertical' );
+  $ds9->colorbar( BOOL );
+
+  [ <font>:STRING ] = $ds9->colorbar( 'font' );
+
+  [ <fontslant>:STRING ] = $ds9->colorbar( 'fontslant' );
+
+  [ <fontweight>:STRING ] = $ds9->colorbar( 'fontweight' );
+
+  [ <orientation>:STRING ] = $ds9->colorbar( 'orientation' );
+
+  [ <space>:STRING ] = $ds9->colorbar( 'space' );
+
+  [ BOOL ] = $ds9->colorbar( 'lock', 'state' );
+  [ BOOL ] = $ds9->colorbar( 'numerics' );
+  [ BOOL ] = $ds9->colorbar;
+
+  [ FLOAT ] = $ds9->colorbar( 'fontsize' );
+
+  [ INTEGER ] = $ds9->colorbar( 'size' );
+  [ INTEGER ] = $ds9->colorbar( 'ticks' );
+
+=item contour
+
+  $ds9->contour( 'clear' );
+  $ds9->contour( 'close' );
+  $ds9->contour( 'color', COLOR );
+  $ds9->contour( 'convert' );
+  $ds9->contour( 'copy' );
+  $ds9->contour( 'dash', BOOL );
+  $ds9->contour( 'generate' );
+  $ds9->contour( 'levels', ARRAY );
+  $ds9->contour( 'limits', FLOAT, FLOAT );
+  $ds9->contour( 'load', 'levels', <filename>:STRING );
+  $ds9->contour( 'load', <filename>:STRING );
+  $ds9->contour( 'log', 'exp', FLOAT );
+  $ds9->contour( 'method', ( 'block' | 'smooth' ) );
+  $ds9->contour( 'mode', ( 'minmax' | 'zmax' | 'zscale' ) );
+  $ds9->contour( 'mode', FLOAT );
+  $ds9->contour( 'nlevels', INTEGER );
+  $ds9->contour( 'open' );
+  $ds9->contour( 'paste' );
+  $ds9->contour( 'paste', FRAME_COORD_SYSTEMS, COLOR, FLOAT, BOOL );
+  $ds9->contour( 'save', 'levels', <filename>:STRING );
+  $ds9->contour( 'save', <filename>:STRING, FRAME_COORD_SYSTEMS );
+  $ds9->contour( 'save', <filename>:STRING, FRAME_COORD_SYSTEMS,
+    SKYFRAME );
+
+  $ds9->contour( 'scale', <scale>:STRING );
+  $ds9->contour( 'scope', ( 'global' | 'local' ) );
+  $ds9->contour( 'smooth', INTEGER );
+  $ds9->contour( 'width', INTEGER );
+  $ds9->contour( BOOL );
+  $ds9->contour( FRAME_COORD_SYSTEMS );
+  $ds9->contour( FRAME_COORD_SYSTEMS, SKYFRAME );
+
+  [ <method>:STRING ] = $ds9->contour( 'method' );
+
+  [ <mode>:STRING ] = $ds9->contour( 'mode' );
+
+  [ <scale>:STRING ] = $ds9->contour( 'scale' );
+
+  [ <scope>:STRING ] = $ds9->contour( 'scope' );
+
+  [ ARRAY ] = $ds9->contour( 'levels' );
+
+  [ BOOL ] = $ds9->contour( 'dash' );
+  [ BOOL ] = $ds9->contour;
+
+  [ COLOR ] = $ds9->contour( 'color' );
+
+  [ FLOAT ] = $ds9->contour( 'log', 'exp' );
+  [ FLOAT ] = $ds9->contour( 'mode' );
+
+  [ FLOAT, FLOAT ] = $ds9->contour( 'limits' );
+
+  [ INTEGER ] = $ds9->contour( 'nlevels' );
+  [ INTEGER ] = $ds9->contour( 'smooth' );
+  [ INTEGER ] = $ds9->contour( 'width' );
+
+  [ STRING ] = $ds9->contour( FRAME_COORD_SYSTEMS );
+  [ STRING ] = $ds9->contour( FRAME_COORD_SYSTEMS, SKYFRAME );
+
+=item crosshair
+
+  $ds9->crosshair( 'lock', 'none' );
+  $ds9->crosshair( 'lock', FRAME_COORD_SYSTEMS );
+  $ds9->crosshair( 'match', SKY_COORD_SYSTEMS |
+    FRAME_COORD_SYSTEMS:STRING );
+
+  $ds9->crosshair( <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, FRAME_COORD_SYSTEMS );
+
+  $ds9->crosshair( <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, FRAME_COORD_SYSTEMS, SKYFRAME );
+
+  $ds9->crosshair( FRAME_COORD_SYSTEMS );
+  $ds9->crosshair( FRAME_COORD_SYSTEMS, ( 'degrees' | 'sexagesimal' )
+    );
+
+  $ds9->crosshair( FRAME_COORD_SYSTEMS, SKYFRAME );
+  $ds9->crosshair( FRAME_COORD_SYSTEMS, SKYFRAME, ( 'degrees' |
+    'sexagesimal' ) );
+
+  [ <ra>:STRING, <dec>:STRING ] = $ds9->crosshair( FRAME_COORD_SYSTEMS
+    );
+
+  [ <ra>:STRING, <dec>:STRING ] = $ds9->crosshair( FRAME_COORD_SYSTEMS,
+    ( 'degrees' | 'sexagesimal' ) );
+
+  [ <ra>:STRING, <dec>:STRING ] = $ds9->crosshair( FRAME_COORD_SYSTEMS,
+    SKYFRAME );
+
+  [ <ra>:STRING, <dec>:STRING ] = $ds9->crosshair( FRAME_COORD_SYSTEMS,
+    SKYFRAME, ( 'degrees' | 'sexagesimal' ) );
+
+  [ <ra>:STRING, <dec>:STRING ] = $ds9->crosshair;
+
+  [ FRAME_COORD_SYSTEMS ] = $ds9->crosshair( 'lock' );
+
+=item cube
+
+  $ds9->cube( 'axes', 'lock', BOOL );
+  $ds9->cube( 'axis', INTEGER );
+
+  $ds9->cube( 'close' );
+
+  $ds9->cube( 'first' );
+
+  $ds9->cube( 'interval', FLOAT );
+
+  $ds9->cube( 'last' );
+  $ds9->cube( 'lock', (CUBE_COORD_SYSTEMS | 'none') );
+
+  $ds9->cube( 'match', CUBE_COORD_SYSTEMS );
+
+  $ds9->cube( 'next' );
+
+  $ds9->cube( 'open' );
+  $ds9->cube( 'order', ( '123' | '132' | '213' | '231' | '312' | '321'
+    ) );
+
+  $ds9->cube( 'play' );
+  $ds9->cube( 'prev' );
+
+  $ds9->cube( 'slice', FLOAT, WCS system );
+  $ds9->cube( 'slice', INTEGER );
+  $ds9->cube( 'stop' );
+
+  [ ( '123' | '132' | '213' | '231' | '312' | '321' ) ] = $ds9->cube(
+    'order' );
+
+  [ (CUBE_COORD_SYSTEMS | 'none') ] = $ds9->cube( 'lock' );
+
+  [ BOOL ] = $ds9->cube( 'axes', 'lock' );
+  [ BOOL ] = $ds9->cube( WCS );
+
+  [ FLOAT ] = $ds9->cube( 'interval' );
+
+  [ INTEGER ] = $ds9->cube( 'axis' );
+
+=item cursor
+
+  $ds9->cursor( <x>:FLOAT, <y>:FLOAT );
+
+=item dsseso
+
+  $ds9->dsseso( 'close' );
+  $ds9->dsseso( 'coord', <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL );
+
+  $ds9->dsseso( 'frame', ( 'current' | 'new' ) );
+  $ds9->dsseso( 'name', STRING );
+  $ds9->dsseso( 'open' );
+  $ds9->dsseso( 'save', BOOL );
+  $ds9->dsseso( 'size', <x>:FLOAT, <y>:FLOAT, ( 'arcmin' | 'arcsec' |
+    'degrees' ) );
+
+  $ds9->dsseso( 'survey', DSS_ESO_SURVEYS );
+  $ds9->dsseso( 'update', ( 'crosshair' | 'frame' ) );
+  $ds9->dsseso( <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL );
+
+  $ds9->dsseso( STRING );
+
+  [ <ra>:DECIMAL_OR_SEXAGESIMAL, <dec>:DECIMAL_OR_SEXAGESIMAL, STRING ]
+    = $ds9->dsseso( 'coord' );
+
+  [ <survey>:STRING ] = $ds9->dsseso( 'survey' );
+
+  [ <x>:FLOAT, <y>:FLOAT, ( 'arcmin' | 'arcsec' | 'degrees' ) ] =
+    $ds9->dsseso( 'size' );
+
+  [ BOOL ] = $ds9->dsseso( 'save' );
+
+  [ STRING ] = $ds9->dsseso( 'frame' );
+  [ STRING ] = $ds9->dsseso( 'name' );
+  [ STRING ] = $ds9->dsseso;
+
+=item dsssao
+
+  $ds9->dsssao( 'close' );
+  $ds9->dsssao( 'coord', <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL );
+
+  $ds9->dsssao( 'frame', ( 'current' | 'new' ) );
+  $ds9->dsssao( 'name', STRING );
+  $ds9->dsssao( 'open' );
+  $ds9->dsssao( 'save', BOOL );
+  $ds9->dsssao( 'size', <x>:FLOAT, <y>:FLOAT, ( 'arcmin' | 'arcsec' |
+    'degrees' ) );
+
+  $ds9->dsssao( 'update', ( 'crosshair' | 'frame' ) );
+  $ds9->dsssao( <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL );
+
+  $ds9->dsssao( STRING );
+
+  [ <ra>:DECIMAL_OR_SEXAGESIMAL, <dec>:DECIMAL_OR_SEXAGESIMAL, STRING ]
+    = $ds9->dsssao( 'coord' );
+
+  [ <x>:FLOAT, <y>:FLOAT, ( 'arcmin' | 'arcsec' | 'degrees' ) ] =
+    $ds9->dsssao( 'size' );
+
+  [ BOOL ] = $ds9->dsssao( 'save' );
+
+  [ STRING ] = $ds9->dsssao( 'frame' );
+  [ STRING ] = $ds9->dsssao( 'name' );
+  [ STRING ] = $ds9->dsssao;
+
+=item dssstsci
+
+  $ds9->dssstsci( 'close' );
+  $ds9->dssstsci( 'coord', <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL );
+
+  $ds9->dssstsci( 'frame', ( 'current' | 'new' ) );
+  $ds9->dssstsci( 'name', STRING );
+  $ds9->dssstsci( 'open' );
+  $ds9->dssstsci( 'save', BOOL );
+  $ds9->dssstsci( 'size', <x>:FLOAT, <y>:FLOAT, ( 'arcmin' | 'arcsec' |
+    'degrees' ) );
+
+  $ds9->dssstsci( 'survey', DSS_STSCI_SURVEYS );
+  $ds9->dssstsci( 'update', ( 'crosshair' | 'frame' ) );
+  $ds9->dssstsci( <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL );
+
+  $ds9->dssstsci( STRING );
+
+  [ <ra>:DECIMAL_OR_SEXAGESIMAL, <dec>:DECIMAL_OR_SEXAGESIMAL, STRING ]
+    = $ds9->dssstsci( 'coord' );
+
+  [ <survey>:STRING ] = $ds9->dssstsci( 'survey' );
+
+  [ <x>:FLOAT, <y>:FLOAT, ( 'arcmin' | 'arcsec' | 'degrees' ) ] =
+    $ds9->dssstsci( 'size' );
+
+  [ BOOL ] = $ds9->dssstsci( 'save' );
+
+  [ STRING ] = $ds9->dssstsci( 'frame' );
+  [ STRING ] = $ds9->dssstsci( 'name' );
+  [ STRING ] = $ds9->dssstsci;
+
+=item exit
+
+  $ds9->exit;
+
+=item export
+
+  $ds9->export( 'array', <filename>:STRING );
+  $ds9->export( 'array', <filename>:STRING, ( 'big' | 'little' |
+    'native' ) );
+
+  $ds9->export( 'envi', <filename>:STRING );
+  $ds9->export( 'envi', STRING, STRING, ( 'big' | 'little' | 'native' )
+    );
+
+  $ds9->export( 'gif', <filename>:STRING );
+  $ds9->export( 'jpeg', <filename>:STRING, <quality>:INTEGER );
+  $ds9->export( 'nrrd', <filename>:STRING );
+  $ds9->export( 'nrrd', <filename>:STRING, ( 'big' | 'little' |
+    'native' ) );
+
+  $ds9->export( 'png', <filename>:STRING );
+  $ds9->export( 'tiff', <filename>:STRING );
+  $ds9->export( 'tiff', <filename>:STRING, ( 'deflate' | 'jpeg' |
+    'none' | 'packbits' ) );
+
+=item file
+
+  [ STRING ] = $ds9->file;
+
+=item fits
+
+  $ds9->fits( 'header', 'keyword', STRING );
+  $ds9->fits( 'header', INTEGER );
+  $ds9->fits( 'header', INTEGER, 'keyword', STRING );
+
+  $ds9->fits( 'size' );
+  $ds9->fits( 'size', ( 'arcmin' | 'arcsec' | 'degrees' ) );
+  $ds9->fits( 'size', SKYFRAME, ( 'arcmin' | 'arcsec' | 'degrees' ) );
+  $ds9->fits( 'size', WCS, ( 'arcmin' | 'arcsec' | 'degrees' ) );
+  $ds9->fits( 'size', WCS, SKYFRAME, ( 'arcmin' | 'arcsec' | 'degrees'
+    ) );
+
+  $ds9->fits( <filename>:STRING, ?{ new => BOOL, mask => BOOL, extname
+    => STRING, filter => STRING, bin => ARRAY } );
+
+  $ds9->fits( \$buffer:SCALARREF, ?{ new => BOOL, mask => BOOL, extname
+    => STRING, filter => STRING, bin => ARRAY } );
+
+  [ <x>:FLOAT, <y>:FLOAT ] = $ds9->fits( 'size' );
+  [ <x>:FLOAT, <y>:FLOAT ] = $ds9->fits( 'size', ( 'arcmin' | 'arcsec'
+    | 'degrees' ) );
+
+  [ <x>:FLOAT, <y>:FLOAT ] = $ds9->fits( 'size', SKYFRAME, ( 'arcmin' |
+    'arcsec' | 'degrees' ) );
+
+  [ <x>:FLOAT, <y>:FLOAT ] = $ds9->fits( 'size', WCS, ( 'arcmin' |
+    'arcsec' | 'degrees' ) );
+
+  [ <x>:FLOAT, <y>:FLOAT ] = $ds9->fits( 'size', WCS, SKYFRAME, (
+    'arcmin' | 'arcsec' | 'degrees' ) );
+
+  [ INTEGER ] = $ds9->fits( 'bitpix' );
+  [ INTEGER ] = $ds9->fits( 'depth' );
+  [ INTEGER ] = $ds9->fits( 'height' );
+  [ INTEGER ] = $ds9->fits( 'width' );
+
+  [ STRING ] = $ds9->fits( 'header' );
+  [ STRING ] = $ds9->fits( 'header', 'keyword', STRING );
+  [ STRING ] = $ds9->fits( 'header', INTEGER );
+  [ STRING ] = $ds9->fits( 'header', INTEGER, 'keyword', STRING );
+  [ STRING ] = $ds9->fits( 'image' );
+  [ STRING ] = $ds9->fits( 'slice' );
+  [ STRING ] = $ds9->fits( 'table' );
+  [ STRING ] = $ds9->fits;
+
+=item frame
+
+  $ds9->frame( 'center' );
+  $ds9->frame( 'center', 'all' );
+  $ds9->frame( 'center', INTEGER );
+  $ds9->frame( 'clear' );
+  $ds9->frame( 'clear', 'all' );
+  $ds9->frame( 'clear', INTEGER );
+  $ds9->frame( 'delete' );
+  $ds9->frame( 'delete', 'all' );
+  $ds9->frame( 'delete', INTEGER );
+  $ds9->frame( 'deleteall' );
+  $ds9->frame( 'first' );
+  $ds9->frame( 'frameno', INTEGER );
+  $ds9->frame( 'has', 'contour', 'aux' );
+  $ds9->frame( 'has', 'fits', ( 'bin' | 'cube' | 'mosaic' ) );
+  $ds9->frame( 'has', 'marker', ( 'highlite' | 'paste' | 'select' |
+    'undo' ) );
+
+  $ds9->frame( 'has', 'system', FRAME_COORD_SYSTEMS );
+  $ds9->frame( 'has', 'wcs', ( 'celestial' | 'linear' ) );
+  $ds9->frame( 'has', 'wcs', ( 'celestial' | 'linear' ), WCS system );
+  $ds9->frame( 'has', 'wcs', WCS system );
+  $ds9->frame( 'has', FRAME_COMPONENTS );
+  $ds9->frame( 'hide' );
+  $ds9->frame( 'hide', 'all' );
+  $ds9->frame( 'hide', INTEGER );
+  $ds9->frame( 'last' );
+  $ds9->frame( 'lock', 'none' );
+  $ds9->frame( 'lock', FRAME_COORD_SYSTEMS );
+  $ds9->frame( 'match', FRAME_COORD_SYSTEMS );
+  $ds9->frame( 'move', ( 'back' | 'first' | 'forward' | 'last' ) );
+  $ds9->frame( 'new' );
+  $ds9->frame( 'new', ( '3d' | 'rgb' ) );
+  $ds9->frame( 'next' );
+  $ds9->frame( 'prev' );
+  $ds9->frame( 'refresh' );
+  $ds9->frame( 'refresh', 'all' );
+  $ds9->frame( 'refresh', INTEGER );
+  $ds9->frame( 'reset' );
+  $ds9->frame( 'reset', 'all' );
+  $ds9->frame( 'reset', INTEGER );
+  $ds9->frame( 'show' );
+  $ds9->frame( 'show', 'all' );
+  $ds9->frame( 'show', INTEGER );
+
+  $ds9->frame( INTEGER );
+
+  [ 'none' ] = $ds9->frame( 'lock' );
+
+  [ ARRAY ] = $ds9->frame( 'active' );
+  [ ARRAY ] = $ds9->frame( 'all' );
+
+  [ BOOL ] = $ds9->frame( 'has', 'contour' );
+  [ BOOL ] = $ds9->frame( 'has', 'contour', 'aux' );
+  [ BOOL ] = $ds9->frame( 'has', 'fits' );
+  [ BOOL ] = $ds9->frame( 'has', 'fits', ( 'bin' | 'cube' | 'mosaic' )
+    );
+
+  [ BOOL ] = $ds9->frame( 'has', 'marker', ( 'highlite' | 'paste' |
+    'select' | 'undo' ) );
+
+  [ BOOL ] = $ds9->frame( 'has', 'system', FRAME_COORD_SYSTEMS );
+  [ BOOL ] = $ds9->frame( 'has', 'wcs' );
+  [ BOOL ] = $ds9->frame( 'has', 'wcs', ( 'celestial' | 'linear' ) );
+  [ BOOL ] = $ds9->frame( 'has', 'wcs', ( 'celestial' | 'linear' ), WCS
+    system );
+
+  [ BOOL ] = $ds9->frame( 'has', 'wcs', WCS system );
+  [ BOOL ] = $ds9->frame( 'has', FRAME_COMPONENTS );
+
+  [ FRAME_COORD_SYSTEMS ] = $ds9->frame( 'lock' );
+
+  [ INTEGER ] = $ds9->frame( 'frameno' );
+  [ INTEGER ] = $ds9->frame;
+
+=item gif
+
+  $ds9->gif( 'new', <filename>:STRING );
+  $ds9->gif( 'new', SCALARREF );
+
+  $ds9->gif( 'slice', <filename>:STRING );
+  $ds9->gif( 'slice', SCALARREF );
+
+  $ds9->gif( <filename>:STRING );
+
+  $ds9->gif( SCALARREF );
+
+  [ STRING ] = $ds9->gif;
+
+=item grid
+
+  $ds9->grid( 'axes', 'color', COLOR );
+  $ds9->grid( 'axes', 'dash', BOOL );
+  $ds9->grid( 'axes', 'origin', ORIGIN );
+  $ds9->grid( 'axes', 'type', ( 'external' | 'internal' ) );
+  $ds9->grid( 'axes', 'width', INTEGER );
+  $ds9->grid( 'axes', BOOL );
+
+  $ds9->grid( 'border', 'color', COLOR );
+  $ds9->grid( 'border', 'dash', BOOL );
+  $ds9->grid( 'border', 'width', INTEGER );
+  $ds9->grid( 'border', BOOL );
+
+  $ds9->grid( 'close' );
+
+  $ds9->grid( 'format1', STRING );
+  $ds9->grid( 'format2', STRING );
+
+  $ds9->grid( 'grid', 'color', COLOR );
+  $ds9->grid( 'grid', 'dash', BOOL );
+  $ds9->grid( 'grid', 'gap1', FLOAT );
+  $ds9->grid( 'grid', 'gap2', FLOAT );
+  $ds9->grid( 'grid', 'gap3', FLOAT );
+  $ds9->grid( 'grid', 'width', INTEGER );
+  $ds9->grid( 'grid', BOOL );
+
+  $ds9->grid( 'labels', 'color', COLOR );
+  $ds9->grid( 'labels', 'def1', BOOL );
+  $ds9->grid( 'labels', 'def2', BOOL );
+  $ds9->grid( 'labels', 'font', ( 'courier' | 'helvetica' | 'times' )
+    );
+
+  $ds9->grid( 'labels', 'fontsize', FLOAT );
+  $ds9->grid( 'labels', 'fontslant', ( 'italic' | 'roman' ) );
+  $ds9->grid( 'labels', 'fontweight', ( 'bold' | 'normal' ) );
+  $ds9->grid( 'labels', 'gap1', FLOAT );
+  $ds9->grid( 'labels', 'gap2', FLOAT );
+  $ds9->grid( 'labels', 'text1', STRING );
+  $ds9->grid( 'labels', 'text2', STRING );
+  $ds9->grid( 'labels', BOOL );
+  $ds9->grid( 'load', <filename>:STRING );
+
+  $ds9->grid( 'numerics', 'color', COLOR );
+  $ds9->grid( 'numerics', 'font', ( 'courier' | 'helvetica' | 'times' )
+    );
+
+  $ds9->grid( 'numerics', 'fontsize', FLOAT );
+  $ds9->grid( 'numerics', 'fontslant', ( 'italic' | 'roman' ) );
+  $ds9->grid( 'numerics', 'fontweight', ( 'bold' | 'normal' ) );
+  $ds9->grid( 'numerics', 'gap1', FLOAT );
+  $ds9->grid( 'numerics', 'gap2', FLOAT );
+  $ds9->grid( 'numerics', 'gap3', FLOAT );
+  $ds9->grid( 'numerics', 'type', ( 'external' | 'internal' ) );
+  $ds9->grid( 'numerics', 'vertical', BOOL );
+  $ds9->grid( 'numerics', BOOL );
+
+  $ds9->grid( 'open' );
+
+  $ds9->grid( 'reset' );
+
+  $ds9->grid( 'save', <filename>:STRING );
+  $ds9->grid( 'sky', SKYFRAME );
+  $ds9->grid( 'skyformat', ( 'degrees' | 'sexagesimal' ) );
+  $ds9->grid( 'system', FRAME_COORD_SYSTEMS );
+
+  $ds9->grid( 'tickmarks', 'color', COLOR );
+  $ds9->grid( 'tickmarks', 'dash', BOOL );
+  $ds9->grid( 'tickmarks', 'width', INTEGER );
+  $ds9->grid( 'tickmarks', BOOL );
+  $ds9->grid( 'title', 'color', COLOR );
+  $ds9->grid( 'title', 'def', BOOL );
+  $ds9->grid( 'title', 'font', ( 'courier' | 'helvetica' | 'times' ) );
+  $ds9->grid( 'title', 'fontsize', FLOAT );
+  $ds9->grid( 'title', 'fontslant', ( 'italic' | 'roman' ) );
+  $ds9->grid( 'title', 'fontweight', ( 'bold' | 'normal' ) );
+  $ds9->grid( 'title', 'gap', FLOAT );
+  $ds9->grid( 'title', 'text', STRING );
+  $ds9->grid( 'title', BOOL );
+  $ds9->grid( 'type', ( 'analysis' | 'publication' ) );
+
+  $ds9->grid( BOOL );
+
+  [ ( 'degrees' | 'sexagesimal' ) ] = $ds9->grid( 'skyformat' );
+
+  [ <font>:STRING ] = $ds9->grid( 'labels', 'font' );
+  [ <font>:STRING ] = $ds9->grid( 'numerics', 'font' );
+  [ <font>:STRING ] = $ds9->grid( 'title', 'font' );
+
+  [ <fontslant>:STRING ] = $ds9->grid( 'labels', 'fontslant' );
+  [ <fontslant>:STRING ] = $ds9->grid( 'numerics', 'fontslant' );
+
+  [ <fontslants>:STRING ] = $ds9->grid( 'title', 'fontslant' );
+
+  [ <fontweight>:STRING ] = $ds9->grid( 'labels', 'fontweight' );
+  [ <fontweight>:STRING ] = $ds9->grid( 'numerics', 'fontweight' );
+  [ <fontweight>:STRING ] = $ds9->grid( 'title', 'fontweight' );
+
+  [ <origin>:STRING ] = $ds9->grid( 'axes', 'origin' );
+
+  [ <type>:STRING ] = $ds9->grid( 'axes', 'type' );
+  [ <type>:STRING ] = $ds9->grid( 'numerics', 'type' );
+  [ <type>:STRING ] = $ds9->grid( 'type' );
+
+  [ BOOL ] = $ds9->grid( 'axes' );
+  [ BOOL ] = $ds9->grid( 'axes', 'dash' );
+  [ BOOL ] = $ds9->grid( 'border' );
+  [ BOOL ] = $ds9->grid( 'border', 'dash' );
+  [ BOOL ] = $ds9->grid( 'grid' );
+  [ BOOL ] = $ds9->grid( 'grid', 'dash' );
+  [ BOOL ] = $ds9->grid( 'labels' );
+  [ BOOL ] = $ds9->grid( 'labels', 'def1' );
+  [ BOOL ] = $ds9->grid( 'labels', 'def2' );
+  [ BOOL ] = $ds9->grid( 'numerics' );
+  [ BOOL ] = $ds9->grid( 'numerics', 'vertical' );
+  [ BOOL ] = $ds9->grid( 'tickmarks' );
+  [ BOOL ] = $ds9->grid( 'tickmarks', 'dash' );
+  [ BOOL ] = $ds9->grid( 'title' );
+  [ BOOL ] = $ds9->grid( 'title', 'def' );
+  [ BOOL ] = $ds9->grid;
+
+  [ COLOR ] = $ds9->grid( 'axes', 'color' );
+  [ COLOR ] = $ds9->grid( 'border', 'color' );
+  [ COLOR ] = $ds9->grid( 'grid', 'color' );
+  [ COLOR ] = $ds9->grid( 'labels', 'color' );
+  [ COLOR ] = $ds9->grid( 'numerics', 'color' );
+  [ COLOR ] = $ds9->grid( 'tickmarks', 'color' );
+  [ COLOR ] = $ds9->grid( 'title', 'color' );
+
+  [ FLOAT ] = $ds9->grid( 'grid', 'gap1' );
+  [ FLOAT ] = $ds9->grid( 'grid', 'gap2' );
+  [ FLOAT ] = $ds9->grid( 'grid', 'gap3' );
+  [ FLOAT ] = $ds9->grid( 'labels', 'fontsize' );
+  [ FLOAT ] = $ds9->grid( 'labels', 'gap1' );
+  [ FLOAT ] = $ds9->grid( 'labels', 'gap2' );
+  [ FLOAT ] = $ds9->grid( 'numerics', 'fontsize' );
+  [ FLOAT ] = $ds9->grid( 'numerics', 'gap1' );
+  [ FLOAT ] = $ds9->grid( 'numerics', 'gap2' );
+  [ FLOAT ] = $ds9->grid( 'numerics', 'gap3' );
+  [ FLOAT ] = $ds9->grid( 'title', 'fontsize' );
+  [ FLOAT ] = $ds9->grid( 'title', 'gap' );
+
+  [ FRAME_COORD_SYSTEMS ] = $ds9->grid( 'system' );
+
+  [ INTEGER ] = $ds9->grid( 'axes', 'width' );
+  [ INTEGER ] = $ds9->grid( 'border', 'width' );
+  [ INTEGER ] = $ds9->grid( 'grid', 'width' );
+  [ INTEGER ] = $ds9->grid( 'tickmarks', 'width' );
+
+  [ SKYFRAME ] = $ds9->grid( 'sky' );
+
+  [ STRING ] = $ds9->grid( 'format1' );
+  [ STRING ] = $ds9->grid( 'format2' );
+  [ STRING ] = $ds9->grid( 'labels', 'text1' );
+  [ STRING ] = $ds9->grid( 'labels', 'text2' );
+  [ STRING ] = $ds9->grid( 'title', 'text' );
+
+=item header
+
+  $ds9->header( 'close' );
+  $ds9->header( 'close', INTEGER );
+  $ds9->header( 'save', <filename>:STRING );
+  $ds9->header( 'save', INTEGER, <filename>:STRING );
+  $ds9->header( INTEGER );
+
+  $ds9->header;
+
+=item height
+
+  $ds9->height( INTEGER );
+
+  [ INTEGER ] = $ds9->height;
+
+=item iconify
+
+  $ds9->iconify( BOOL );
+
+  [ BOOL ] = $ds9->iconify;
+
+=item jpeg
+
+  $ds9->jpeg( 'new', SCALARREF );
+  $ds9->jpeg( 'new', STRING );
+
+  $ds9->jpeg( 'slice', SCALARREF );
+  $ds9->jpeg( 'slice', STRING );
+
+  $ds9->jpeg( <filename>:STRING );
+
+  $ds9->jpeg( INTEGER );
+
+  $ds9->jpeg( SCALARREF );
+
+  [ STRING ] = $ds9->jpeg( INTEGER );
+  [ STRING ] = $ds9->jpeg;
+
+=item lock
+
+  $ds9->lock( '3d', BOOL );
+
+  $ds9->lock( 'axes', BOOL );
+
+  $ds9->lock( 'bin', BOOL );
+  $ds9->lock( 'block', BOOL );
+
+  $ds9->lock( 'colorbar', BOOL );
+  $ds9->lock( 'crop', 'none' );
+  $ds9->lock( 'crop', FRAME_COORD_SYSTEMS );
+  $ds9->lock( 'crosshair', 'none' );
+  $ds9->lock( 'crosshair', FRAME_COORD_SYSTEMS );
+
+  $ds9->lock( 'frame', 'none' );
+  $ds9->lock( 'frame', FRAME_COORD_SYSTEMS );
+
+  $ds9->lock( 'scale', BOOL );
+  $ds9->lock( 'scalelimits', BOOL );
+  $ds9->lock( 'slice', 'none' );
+  $ds9->lock( 'slice', FRAME_COORD_SYSTEMS );
+  $ds9->lock( 'smooth', BOOL );
+
+  [ BOOL ] = $ds9->lock( '3d' );
+  [ BOOL ] = $ds9->lock( 'axes' );
+  [ BOOL ] = $ds9->lock( 'bin' );
+  [ BOOL ] = $ds9->lock( 'block' );
+  [ BOOL ] = $ds9->lock( 'colorbar' );
+  [ BOOL ] = $ds9->lock( 'scale' );
+  [ BOOL ] = $ds9->lock( 'scalelimits' );
+  [ BOOL ] = $ds9->lock( 'smooth' );
+
+  [ FRAME_COORD_SYSTEMS ] = $ds9->lock( 'crop' );
+  [ FRAME_COORD_SYSTEMS ] = $ds9->lock( 'crosshair' );
+  [ FRAME_COORD_SYSTEMS ] = $ds9->lock( 'frame' );
+  [ FRAME_COORD_SYSTEMS ] = $ds9->lock( 'slice' );
+
+=item lower
+
+  $ds9->lower;
+
+=item mask
+
+  $ds9->mask( 'blend', ( 'darken' | 'lighten' | 'screen' | 'source' )
+    );
+
+  $ds9->mask( 'clear' );
+  $ds9->mask( 'close' );
+  $ds9->mask( 'color', COLOR );
+
+  $ds9->mask( 'load', <filename>:STRING );
+
+  $ds9->mask( 'mark', MARK );
+
+  $ds9->mask( 'open' );
+
+  $ds9->mask( 'range', <low>:FLOAT, <high>:FLOAT );
+
+  $ds9->mask( 'system', FRAME_COORD_SYSTEMS );
+
+  $ds9->mask( 'transparency', FLOAT );
+
+  [ <blend>:STRING ] = $ds9->mask( 'blend' );
+
+  [ <low>:FLOAT, <high>:FLOAT ] = $ds9->mask( 'range' );
+
+  [ <mark>:STRING ] = $ds9->mask( 'mark' );
+
+  [ COLOR ] = $ds9->mask( 'color' );
+
+  [ FLOAT ] = $ds9->mask( 'transparency' );
+
+  [ FRAME_COORD_SYSTEMS ] = $ds9->mask( 'system' );
+
+=item match
+
+  $ds9->match( '3d' );
+  $ds9->match( 'axes' );
+  $ds9->match( 'bin' );
+  $ds9->match( 'block' );
+  $ds9->match( 'colobar' );
+  $ds9->match( 'crop', FRAME_COORD_SYSTEMS );
+  $ds9->match( 'crosshair', FRAME_COORD_SYSTEMS );
+  $ds9->match( 'frame', FRAME_COORD_SYSTEMS );
+  $ds9->match( 'scale' );
+  $ds9->match( 'scalelimits' );
+  $ds9->match( 'slice', FRAME_COORD_SYSTEMS );
+  $ds9->match( 'smooth' );
+
+=item minmax
+
+  $ds9->minmax( 'interval', INTEGER );
+  $ds9->minmax( 'mode', ( 'datamin' | 'irafmin' | 'sample' | 'scan' )
+    );
+
+  $ds9->minmax( 'rescan' );
+  $ds9->minmax( ( 'datamin' | 'irafmin' | 'sample' | 'scan' ) );
+
+  [ <mode>:STRING ] = $ds9->minmax( 'mode' );
+  [ <mode>:STRING ] = $ds9->minmax;
+
+  [ INTEGER ] = $ds9->minmax( 'interval' );
+
+=item mode
+
+  $ds9->mode( MOUSE_BUTTON_MODES );
+
+  [ <modes>:STRING ] = $ds9->mode;
+
+=item mosaic
+
+  $ds9->mosaic( <filename>:STRING );
+  $ds9->mosaic( ENUM, ( 'mask' | 'new' ), <filename>:STRING );
+  $ds9->mosaic( ENUM, <filename>:STRING );
+  $ds9->mosaic( SCALARREF );
+  $ds9->mosaic( SCALARREF, ENUM );
+  $ds9->mosaic( SCALARREF, ENUM, ( 'mask' | 'new' ) );
+
+  [ STRING ] = $ds9->mosaic;
+
+=item mosaicimage
+
+  $ds9->mosaicimage( <filename>:STRING );
+  $ds9->mosaicimage( ENUM, ( 'mask' | 'new' ), <filename>:STRING );
+  $ds9->mosaicimage( ENUM, <filename>:STRING );
+  $ds9->mosaicimage( SCALARREF );
+  $ds9->mosaicimage( SCALARREF, ENUM );
+  $ds9->mosaicimage( SCALARREF, ENUM, ( 'mask' | 'new' ) );
+
+=item nameserver
+
+  $ds9->nameserver( 'close' );
+  $ds9->nameserver( 'name', STRING );
+  $ds9->nameserver( 'open' );
+  $ds9->nameserver( 'server', NAMESERVERS );
+  $ds9->nameserver( 'skyformat', ( 'degrees' | 'sexagesimal' ) );
+  $ds9->nameserver( STRING );
+
+  [ ( 'degrees' | 'sexagesimal' ) ] = $ds9->nameserver( 'skyformat' );
+
+  [ <nameserver>:STRING ] = $ds9->nameserver( 'server' );
+
+  [ STRING ] = $ds9->nameserver( 'name' );
+  [ STRING ] = $ds9->nameserver;
+
+=item orient
+
+  $ds9->orient( 'close' );
+  $ds9->orient( 'open' );
+  $ds9->orient( ( 'none' | 'x' | 'xy' | 'y' ) );
+
+  [ <orientation>:STRING ] = $ds9->orient;
+
+=item pagesetup
+
+  $ds9->pagesetup( 'orient', ( 'landscape' | 'portrait' ) );
+  $ds9->pagesetup( 'scale', FLOAT );
+  $ds9->pagesetup( 'size', PAGE_SIZES );
+
+  [ <orient>:STRING ] = $ds9->pagesetup( 'orient' );
+
+  [ <size>:STRING ] = $ds9->pagesetup( 'size' );
+
+  [ FLOAT ] = $ds9->pagesetup( 'scale' );
+
+=item pan
+
+  $ds9->pan( 'abs', <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL );
+
+  $ds9->pan( 'abs', <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, FRAME_COORD_SYSTEMS );
+
+  $ds9->pan( 'abs', <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, FRAME_COORD_SYSTEMS, ( 'degrees' |
+    'sexagesimal' ) );
+
+  $ds9->pan( 'abs', <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, FRAME_COORD_SYSTEMS, SKYFRAME );
+
+  $ds9->pan( 'abs', <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, FRAME_COORD_SYSTEMS, SKYFRAME, (
+    'degrees' | 'sexagesimal' ) );
+
+  $ds9->pan( 'close' );
+
+  $ds9->pan( 'open' );
+
+  $ds9->pan( 'rel', <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL );
+
+  $ds9->pan( 'rel', <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, FRAME_COORD_SYSTEMS );
+
+  $ds9->pan( 'rel', <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, FRAME_COORD_SYSTEMS, ( 'degrees' |
+    'sexagesimal' ) );
+
+  $ds9->pan( 'rel', <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, FRAME_COORD_SYSTEMS, SKYFRAME );
+
+  $ds9->pan( 'rel', <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, FRAME_COORD_SYSTEMS, SKYFRAME, (
+    'degrees' | 'sexagesimal' ) );
+
+  $ds9->pan( 'to', <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL );
+
+  $ds9->pan( 'to', <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, FRAME_COORD_SYSTEMS );
+
+  $ds9->pan( 'to', <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, FRAME_COORD_SYSTEMS, ( 'degrees' |
+    'sexagesimal' ) );
+
+  $ds9->pan( 'to', <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, FRAME_COORD_SYSTEMS, SKYFRAME );
+
+  $ds9->pan( 'to', <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, FRAME_COORD_SYSTEMS, SKYFRAME, (
+    'degrees' | 'sexagesimal' ) );
+
+  $ds9->pan( <ra>:DECIMAL_OR_SEXAGESIMAL, <dec>:DECIMAL_OR_SEXAGESIMAL
+    );
+
+  $ds9->pan( <ra>:DECIMAL_OR_SEXAGESIMAL, <dec>:DECIMAL_OR_SEXAGESIMAL,
+    FRAME_COORD_SYSTEMS );
+
+  $ds9->pan( <ra>:DECIMAL_OR_SEXAGESIMAL, <dec>:DECIMAL_OR_SEXAGESIMAL,
+    FRAME_COORD_SYSTEMS, ( 'degrees' | 'sexagesimal' ) );
+
+  $ds9->pan( <ra>:DECIMAL_OR_SEXAGESIMAL, <dec>:DECIMAL_OR_SEXAGESIMAL,
+    FRAME_COORD_SYSTEMS, SKYFRAME );
+
+  $ds9->pan( <ra>:DECIMAL_OR_SEXAGESIMAL, <dec>:DECIMAL_OR_SEXAGESIMAL,
+    FRAME_COORD_SYSTEMS, SKYFRAME, ( 'degrees' | 'sexagesimal' ) );
+
+  $ds9->pan( FRAME_COORD_SYSTEMS );
+  $ds9->pan( FRAME_COORD_SYSTEMS, ( 'degrees' | 'sexagesimal' ) );
+  $ds9->pan( FRAME_COORD_SYSTEMS, SKYFRAME );
+  $ds9->pan( FRAME_COORD_SYSTEMS, SKYFRAME, ( 'degrees' | 'sexagesimal'
+    ) );
+
+  $ds9->pan;
+
+  [ STRING, STRING ] = $ds9->pan( FRAME_COORD_SYSTEMS );
+  [ STRING, STRING ] = $ds9->pan( FRAME_COORD_SYSTEMS, ( 'degrees' |
+    'sexagesimal' ) );
+
+  [ STRING, STRING ] = $ds9->pan( FRAME_COORD_SYSTEMS, SKYFRAME );
+  [ STRING, STRING ] = $ds9->pan( FRAME_COORD_SYSTEMS, SKYFRAME, (
+    'degrees' | 'sexagesimal' ) );
+
+  [ STRING, STRING ] = $ds9->pan;
+
+=item pixeltable
+
+  $ds9->pixeltable( ( 'close' | 'open' ) );
+  $ds9->pixeltable( BOOL );
+
+  [ ( 'close' | 'open' ) ] = $ds9->pixeltable;
+
+  [ BOOL ] = $ds9->pixeltable;
+
+=item png
+
+  $ds9->png( 'new', SCALARREF );
+  $ds9->png( 'new', STRING );
+
+  $ds9->png( 'slice', SCALARREF );
+  $ds9->png( 'slice', STRING );
+
+  $ds9->png( <filename>:STRING );
+
+  $ds9->png( SCALARREF );
+
+  [ STRING ] = $ds9->png;
+
+=item preserve
+
+  $ds9->preserve( 'pan', BOOL );
+  $ds9->preserve( 'regions', BOOL );
+
+  [ BOOL ] = $ds9->preserve( 'pan' );
+  [ BOOL ] = $ds9->preserve( 'regions' );
+
+=item print
+
+  $ds9->print( 'color', ( 'cmyk' | 'gray' | 'rgb' ) );
+  $ds9->print( 'command', STRING );
+  $ds9->print( 'destination', ( 'file' | 'printer' ) );
+  $ds9->print( 'filename', STRING );
+  $ds9->print( 'level', ( '1' | '2' | '3' ) );
+  $ds9->print( 'resolution', PRINT_RESOLUTIONS );
+
+  $ds9->print;
+
+  [ <color>:STRING ] = $ds9->print( 'color' );
+
+  [ <destination>:STRING ] = $ds9->print( 'destination' );
+
+  [ <level>:INTEGER ] = $ds9->print( 'level' );
+
+  [ <resolution>:STRING ] = $ds9->print( 'resolution' );
+
+  [ STRING ] = $ds9->print( 'command' );
+  [ STRING ] = $ds9->print( 'filename' );
+
+=item quit
+
+  $ds9->quit;
+
+=item raise
+
+  $ds9->raise;
+
+=item region
+
+  $ds9->region( 'color', COLOR );
+  $ds9->region( 'deleteall' );
+  $ds9->region( 'format', REGION_FORMATS );
+  $ds9->region( 'load', <filename>:STRING );
+  $ds9->region( 'moveback' );
+  $ds9->region( 'movefront' );
+  $ds9->region( 'save', <filename>:STRING );
+  $ds9->region( 'selectall' );
+  $ds9->region( 'selectnone' );
+  $ds9->region( 'shape', STRING );
+  $ds9->region( 'sky', SKYFRAME );
+  $ds9->region( 'skyformat', ( 'degrees' | 'sexagesimal' ) );
+  $ds9->region( 'strip', BOOL );
+  $ds9->region( 'system', FRAME_COORD_SYSTEMS );
+  $ds9->region( 'width', INTEGER );
+  $ds9->region( SCALARREF );
+  $ds9->region( STRING );
+
+  [ ( 'degrees' | 'sexagesimal' ) ] = $ds9->region( 'skyformat' );
+
+  [ <format>:STRING ] = $ds9->region( 'format' );
+
+  [ BOOL ] = $ds9->region( 'strip' );
+
+  [ COLOR ] = $ds9->region( 'color' );
+
+  [ FRAME_COORD_SYSTEMS ] = $ds9->region( 'system' );
+
+  [ INTEGER ] = $ds9->region( 'width' );
+
+  [ SKYFRAME ] = $ds9->region( 'sky' );
+
+  [ STRING ] = $ds9->region( 'background' );
+  [ STRING ] = $ds9->region( 'exclude' );
+  [ STRING ] = $ds9->region( 'include' );
+  [ STRING ] = $ds9->region( 'selected' );
+  [ STRING ] = $ds9->region( 'shape' );
+  [ STRING ] = $ds9->region( 'source' );
+  [ STRING ] = $ds9->region( ?{ -format => REGION_FORMATS, -system =>
+    FRAME_COORD_SYSTEMS, -sky => SKYFRAME, -skyformat => ( 'degrees' |
+    'sexagesimal' ), -strip => BOOL, -prop => REGION_PROPERTIES } );
+
+=item restore
+
+  $ds9->restore( STRING );
+
+=item rotate
+
+  $ds9->rotate( 'abs', FLOAT );
+  $ds9->rotate( 'close' );
+  $ds9->rotate( 'open' );
+  $ds9->rotate( 'rel', FLOAT );
+  $ds9->rotate( 'to', FLOAT );
+  $ds9->rotate( FLOAT );
+
+  [ FLOAT ] = $ds9->rotate;
+
+=item save
+
+  $ds9->save( 'fits', <filename>:STRING, ( 'image' | 'slice' | 'table'
+    ) );
+
+  $ds9->save( 'mecube', <filename>:STRING, ( 'image' | 'slice' |
+    'table' ) );
+
+  $ds9->save( 'mosaic', <filename>:STRING, ( 'image' | 'slice' |
+    'table' ) );
+
+  $ds9->save( 'mosaicimage', <filename>:STRING, ( 'image' | 'slice' |
+    'table' ) );
+
+  $ds9->save( 'mosaicimagewcs', <filename>:STRING, ( 'image' | 'slice'
+    | 'table' ) );
+
+  $ds9->save( 'mosaicwcs', <filename>:STRING, ( 'image' | 'slice' |
+    'table' ) );
+
+  $ds9->save( 'rgbcube', <filename>:STRING, ( 'image' | 'slice' |
+    'table' ) );
+
+  $ds9->save( 'rgbimage', <filename>:STRING, ( 'image' | 'slice' |
+    'table' ) );
+
+=item saveimage
+
+  $ds9->saveimage( '*.jpeg|*.jpg', INTEGER );
+  $ds9->saveimage( '*.tiff', 'none', 'deflate', 'packbits', 'jpeg' );
+  $ds9->saveimage( 'eps', <filename>:STRING );
+  $ds9->saveimage( 'fits', <filename>:STRING );
+  $ds9->saveimage( 'gif', <filename>:STRING );
+  $ds9->saveimage( 'jpeg', <filename>:STRING );
+  $ds9->saveimage( 'png', <filename>:STRING );
+  $ds9->saveimage( 'tiff', <filename>:STRING );
+
+=item scale
+
+  $ds9->scale( 'close' );
+  $ds9->scale( 'datasec', BOOL );
+  $ds9->scale( 'limits', FLOAT, FLOAT );
+  $ds9->scale( 'lock', 'limits', BOOL );
+  $ds9->scale( 'lock', BOOL );
+  $ds9->scale( 'log', 'exp', FLOAT );
+  $ds9->scale( 'match' );
+  $ds9->scale( 'match', 'limits' );
+  $ds9->scale( 'mode', ( 'minmax' | 'zmax' | 'zscale' ) );
+  $ds9->scale( 'mode', FLOAT );
+  $ds9->scale( 'open' );
+  $ds9->scale( 'scope', ( 'global' | 'local' ) );
+
+  $ds9->scale( SCALE_FUNCTIONS );
+
+  [ <function>:STRING ] = $ds9->scale;
+
+  [ <mode>:STRING ] = $ds9->scale( 'mode' );
+
+  [ <scope>:STRING ] = $ds9->scale( 'scope' );
+
+  [ BOOL ] = $ds9->scale( 'datasec' );
+  [ BOOL ] = $ds9->scale( 'lock' );
+  [ BOOL ] = $ds9->scale( 'lock', 'limits' );
+
+  [ FLOAT ] = $ds9->scale( 'log', 'exp' );
+  [ FLOAT ] = $ds9->scale( 'mode' );
+
+  [ FLOAT, FLOAT ] = $ds9->scale( 'limits' );
+
+=item single
+
+  $ds9->single;
+
+  [ BOOL ] = $ds9->single( 'state' );
+
+=item sleep
+
+  $ds9->sleep( INTEGER );
+
+  $ds9->sleep;
+
+=item smooth
+
+  $ds9->smooth( 'angle', FLOAT );
+  $ds9->smooth( 'close' );
+  $ds9->smooth( 'function', ( 'boxcar' | 'gaussian' | 'tophat' ) );
+  $ds9->smooth( 'lock', BOOL );
+  $ds9->smooth( 'match' );
+  $ds9->smooth( 'open' );
+  $ds9->smooth( 'radius', INTEGER );
+  $ds9->smooth( 'radiusminor', INTEGER );
+  $ds9->smooth( 'sigma', FLOAT );
+  $ds9->smooth( 'sigmaminor', FLOAT );
+  $ds9->smooth( BOOL );
+
+  [ <function>:STRING ] = $ds9->smooth( 'function' );
+
+  [ BOOL ] = $ds9->smooth( 'lock' );
+  [ BOOL ] = $ds9->smooth;
+
+  [ FLOAT ] = $ds9->smooth( 'angle' );
+  [ FLOAT ] = $ds9->smooth( 'sigma' );
+  [ FLOAT ] = $ds9->smooth( 'sigmaminor' );
+
+  [ INTEGER ] = $ds9->smooth( 'radius' );
+  [ INTEGER ] = $ds9->smooth( 'radiusminor' );
+
+=item source
+
+  $ds9->source( STRING );
+
+=item tcl
+
+  $ds9->tcl( STRING );
+
+=item threads
+
+  $ds9->threads( INTEGER );
+
+  [ INTEGER ] = $ds9->threads;
+
+=item tiff
+
+  $ds9->tiff( 'new', SCALARREF );
+  $ds9->tiff( 'new', STRING );
+
+  $ds9->tiff( 'slice', SCALARREF );
+  $ds9->tiff( 'slice', STRING );
+
+  $ds9->tiff( ( 'deflate' | 'jpeg' | 'none' | 'packbits' ) );
+
+  $ds9->tiff( <filename>:STRING );
+
+  $ds9->tiff( SCALARREF );
+
+  [ ( 'deflate' | 'jpeg' | 'none' | 'packbits' ) ] = $ds9->tiff( (
+    'deflate' | 'jpeg' | 'none' | 'packbits' ) );
+
+  [ STRING ] = $ds9->tiff;
+
+=item tile
+
+  $ds9->tile( 'column' );
+
+  $ds9->tile( 'grid' );
+  $ds9->tile( 'grid', 'direction', ( 'x' | 'y' ) );
+  $ds9->tile( 'grid', 'gap', INTEGER );
+  $ds9->tile( 'grid', 'layout', INTEGER, INTEGER );
+  $ds9->tile( 'grid', 'mode', ( 'automatic' | 'manual' ) );
+
+  $ds9->tile( 'mode', ( 'column' | 'grid' | 'row' ) );
+
+  $ds9->tile( 'row' );
+
+  $ds9->tile( BOOL );
+
+  [ ( 'x' | 'y' ) ] = $ds9->tile( 'grid', 'direction' );
+
+  [ <mode>:STRING ] = $ds9->tile( 'grid', 'mode' );
+  [ <mode>:STRING ] = $ds9->tile( 'mode' );
+
+  [ BOOL ] = $ds9->tile( 'state' );
+  [ BOOL ] = $ds9->tile;
+
+  [ INTEGER ] = $ds9->tile( 'grid', 'gap' );
+
+  [ INTEGER, INTEGER ] = $ds9->tile( 'grid', 'layout' );
+
+=item update
+
+  $ds9->update( 'now' );
+  $ds9->update( 'now', INTEGER, FLOAT, FLOAT, FLOAT, FLOAT );
+  $ds9->update( INTEGER, FLOAT, FLOAT, FLOAT, FLOAT );
+
+  $ds9->update;
+
+=item url
+
+  $ds9->url( STRING );
+
+=item version
+
+  [ STRING ] = $ds9->version;
+
+=item view
+
+  $ds9->view( 'blue', BOOL );
+
+  $ds9->view( 'graph', 'horizontal', BOOL );
+  $ds9->view( 'graph', 'vertical', BOOL );
+  $ds9->view( 'green', BOOL );
+
+  $ds9->view( 'keyvalue', STRING );
+
+  $ds9->view( 'layout', VIEW_LAYOUTS );
+
+  $ds9->view( 'red', BOOL );
+
+  $ds9->view( FRAME_COORD_SYSTEMS, BOOL );
+
+  $ds9->view( VIEW_BOOL_COMPONENTS, BOOL );
+
+  [ <layout>:STRING ] = $ds9->view( 'layout' );
+
+  [ BOOL ] = $ds9->view( 'blue' );
+  [ BOOL ] = $ds9->view( 'graph', 'horizontal' );
+  [ BOOL ] = $ds9->view( 'graph', 'vertical' );
+  [ BOOL ] = $ds9->view( 'green' );
+  [ BOOL ] = $ds9->view( 'red' );
+  [ BOOL ] = $ds9->view( FRAME_COORD_SYSTEMS );
+  [ BOOL ] = $ds9->view( VIEW_BOOL_COMPONENTS );
+
+  [ STRING ] = $ds9->view( 'keyvalue' );
+
+=item wcs
+
+  $ds9->wcs( 'align', BOOL );
+
+  $ds9->wcs( 'append', WCS_ARRAY );
+  $ds9->wcs( 'append', WCS_HASH );
+  $ds9->wcs( 'append', WCS_SCALARREF );
+
+  $ds9->wcs( 'close' );
+
+  $ds9->wcs( 'load', <filename>:STRING );
+
+  $ds9->wcs( 'open' );
+
+  $ds9->wcs( 'replace', WCS_ARRAY );
+  $ds9->wcs( 'replace', WCS_HASH );
+  $ds9->wcs( 'replace', WCS_SCALARREF );
+  $ds9->wcs( 'reset' );
+
+  $ds9->wcs( 'save', <filename>:STRING );
+  $ds9->wcs( 'save', INTEGER, <filename>:STRING );
+
+  $ds9->wcs( 'sky', SKYFRAME );
+  $ds9->wcs( 'skyformat', ( 'degrees' | 'sexagesimal' ) );
+
+  $ds9->wcs( 'system', WCS system );
+
+  $ds9->wcs( WCS system );
+
+  [ ( 'degrees' | 'sexagesimal' ) ] = $ds9->wcs( 'skyformat' );
+
+  [ BOOL ] = $ds9->wcs( 'align' );
+
+  [ SKYFRAME ] = $ds9->wcs( 'sky' );
+
+  [ WCS system ] = $ds9->wcs( 'system' );
+  [ WCS system ] = $ds9->wcs;
+
+=item web
+
+  $ds9->web( 'STRING', 'clear' );
+  $ds9->web( 'STRING', 'click', ( 'back' | 'forward' | 'reload' |
+    'stop' ) );
+
+  $ds9->web( 'STRING', 'click', INTEGER );
+  $ds9->web( 'STRING', 'close' );
+
+  $ds9->web( 'new', STRING, STRING );
+
+  $ds9->web( STRING );
+
+  [ STRING ] = $ds9->web;
+
+=item width
+
+  $ds9->width( INTEGER );
+
+  [ INTEGER ] = $ds9->width;
+
+=item xpa
+
+  $ds9->xpa( 'disconnect' );
+
+  $ds9->xpa( BOOL_FALSE );
+
+  [ STRING ] = $ds9->xpa( 'info' );
+
+=item zoom
+
+
+  # alias for 'to fit'
+
+  $ds9->zoom( '0' );
+
+  $ds9->zoom( 'abs', FLOAT );
+
+  $ds9->zoom( 'in' );
+
+  $ds9->zoom( 'out' );
+
+  $ds9->zoom( 'rel', FLOAT );
+
+  $ds9->zoom( 'to', 'fit' );
+  $ds9->zoom( 'to', FLOAT );
+
+  # alias for 'to fit'
+
+  $ds9->zoom( 'tofit' );
+
+  $ds9->zoom( FLOAT );
+
+  [ FLOAT ] = $ds9->zoom;
+
+=item zscale
+
+  $ds9->zscale( 'contrast', FLOAT );
+  $ds9->zscale( 'line', INTEGER );
+  $ds9->zscale( 'sample', INTEGER );
+
+  $ds9->zscale;
+
+  [ FLOAT ] = $ds9->zscale( 'contrast' );
+
+  [ INTEGER ] = $ds9->zscale( 'line' );
+  [ INTEGER ] = $ds9->zscale( 'sample' );
+
+=back
+
+

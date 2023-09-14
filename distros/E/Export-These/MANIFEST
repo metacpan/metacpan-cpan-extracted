@@ -3,6 +3,7 @@ lib/Export/These.pm
 LICENSE
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 README
 README.md
 t/01-subclass.t

@@ -139,6 +139,7 @@ my @files = (
     't/serialization.t',
     't/specification_version.t',
     't/strict.t',
+    't/stringy-numbers.t',
     't/traverse.t',
     't/type.t',
     't/unsupported-keywords.t',

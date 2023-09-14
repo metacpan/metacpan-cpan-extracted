@@ -1,5 +1,9 @@
 Revision history for Net-Silverpeak-Orchestrator
 
+0.008000  2023-09-14 14:21:59+02:00 Europe/Vienna
+    - enable TLS verification by default
+      by requiring HTTP::Tiny 0.088
+
 0.007000  2023-06-22 15:37:13+02:00 Europe/Vienna
     - add get_appliance_extrainfo method
     - add get_deployment method

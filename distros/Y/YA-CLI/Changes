@@ -1,5 +1,12 @@
 Revision history for YA-CLI
 
+TODO: Port to Object::Pad / Corrina
+
+0.004     2023-09-07 14:17:03Z
+
+    * Add sub commands so you could implement logic as this:
+        script.pl mr create --options here
+
 0.003     2023-08-07 21:43:03Z
 
     * Update POD for YA::CLI::ActionRole

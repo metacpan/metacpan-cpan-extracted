@@ -1,5 +1,5 @@
 package App::Oozie::Serializer::Dummy;
-$App::Oozie::Serializer::Dummy::VERSION = '0.002';
+$App::Oozie::Serializer::Dummy::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ App::Oozie::Serializer::Dummy
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 

@@ -15,6 +15,7 @@ lib/Connector/Builtin/Env.pm
 lib/Connector/Builtin/File/Path.pm
 lib/Connector/Builtin/File/SCP.pm
 lib/Connector/Builtin/File/Simple.pm
+lib/Connector/Builtin/Inline.pm
 lib/Connector/Builtin/Memory.pm
 lib/Connector/Builtin/Null.pm
 lib/Connector/Builtin/Static.pm
@@ -25,7 +26,6 @@ lib/Connector/Multi/YAML.pm
 lib/Connector/Proxy.pm
 lib/Connector/Proxy/Authentication/KeyNanny.pm
 lib/Connector/Proxy/Config/Std.pm
-lib/Connector/Proxy/Config/Versioned.pm
 lib/Connector/Proxy/DBI.pm
 lib/Connector/Proxy/HTTP.pm
 lib/Connector/Proxy/JSON.pm
@@ -34,6 +34,7 @@ lib/Connector/Proxy/Net/LDAP.pm
 lib/Connector/Proxy/Net/LDAP/DN.pm
 lib/Connector/Proxy/Net/LDAP/Simple.pm
 lib/Connector/Proxy/Net/LDAP/Single.pm
+lib/Connector/Proxy/Net/SFTP.pm
 lib/Connector/Proxy/Proc/SafeExec.pm
 lib/Connector/Proxy/SOAP/Lite.pm
 lib/Connector/Proxy/YAML.pm
@@ -48,6 +49,7 @@ t/01-builtin-env.t
 t/01-builtin-file-path.t
 t/01-builtin-file-scp.t
 t/01-builtin-file-simple.t
+t/01-builtin-inline.t
 t/01-builtin-memory.t
 t/01-builtin-null.t
 t/01-builtin-password-scheme.t
@@ -56,10 +58,8 @@ t/01-builtin-static.t
 t/01-iterator.t
 t/01-multi-merge.t
 t/01-multi-reference.t
-t/01-multi-yaml.t
 t/01-multi.t
 t/01-proxy-config-std.t
-t/01-proxy-config-versioned.t
 t/01-proxy-ftp.t
 t/01-proxy-http.t
 t/01-proxy-json.t
@@ -72,14 +72,16 @@ t/01-wrapper.t
 t/10-proxy-dbi.t
 t/config/01-iterator.yaml
 t/config/01-multi-flat.conf
+t/config/01-multi-flat.yaml
 t/config/01-multi-merge.d/base.yaml
 t/config/01-multi-sym1.conf
+t/config/01-multi-sym1.yaml
 t/config/01-multi-symlink-owners.yaml
 t/config/01-multi-symlink-tokens.yaml
 t/config/01-multi-yaml.yaml
 t/config/01-proxy-config-versioned-1.conf
 t/config/01-proxy-config-versioned-2.conf
-t/config/01-proxy-net-ldap.conf
+t/config/01-proxy-net-ldap-config.yaml
 t/config/01-tee.yaml
 t/config/config.ini
 t/config/config.json

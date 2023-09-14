@@ -1,9 +1,13 @@
 package App::Oozie::Types::Common;
-$App::Oozie::Types::Common::VERSION = '0.002';
+$App::Oozie::Types::Common::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
 
+use App::Oozie::Constants qw(
+    RE_OOZIE_ID
+    VALID_JOB_TYPES
+);
 use Type::Library -base;
 use Type::Tiny;
 use Type::Utils -all;
@@ -12,19 +16,6 @@ use Sub::Quote qw( quote_sub );
 BEGIN {
     extends 'Types::Standard';
 }
-
-use constant {
-    RE_OOZIE_ID => qr{
-        [0-9]+     -
-        [0-9]+     -
-        oozie-oozi -
-    }xms,
-    VALID_JOB_TYPES => [qw(
-        bundle
-        coord
-        wf
-    )],
-};
 
 # Oozie
 
@@ -122,7 +113,7 @@ App::Oozie::Types::Common
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 

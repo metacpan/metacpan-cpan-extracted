@@ -1,6 +1,5 @@
 package Net::CLI::Interact::Role::Iterator;
-{ $Net::CLI::Interact::Role::Iterator::VERSION = '2.400000' }
-
+$Net::CLI::Interact::Role::Iterator::VERSION = '2.400002';
 use Moo::Role;
 use Sub::Quote;
 use MooX::Types::MooseLike::Base qw(ArrayRef Any Int);
@@ -81,6 +80,9 @@ sub reset { (shift)->_position(-1) }
 
 =pod
 
+=for test_synopsis
+  my $iter;
+
 =head1 NAME
 
 Net::CLI::Interact::Role::Iterator - Array-based Iterator
@@ -88,7 +90,7 @@ Net::CLI::Interact::Role::Iterator - Array-based Iterator
 =head1 SYNOPSIS
 
  my $count = $iter->count;
-  
+
  $iter->reset;
  while ( $iter->has_next ) {
     print $iter->next;

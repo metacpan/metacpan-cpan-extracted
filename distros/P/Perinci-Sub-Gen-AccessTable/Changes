@@ -1,3 +1,10 @@
+0.593   2023-07-09  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - Remove usage of smartmatch.
+
+
 0.592   2023-02-24  Released-By: PERLANCAR; Urgency: medium
 
         - [deprecation] Rename table_spec argument to table_def (old name

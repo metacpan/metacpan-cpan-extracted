@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230614174404;
+our $VERSION = 1.20230903131448;
 
 my $formatters = [
                 {
@@ -114,35 +114,35 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"38656", "Gorica\/Koper\/Postojna",
-"38653", "Gorica\/Koper\/Postojna",
-"38677", "Novo\ Mesto\/Krško",
-"38632", "Celje\/Trbovlje",
-"3861", "Ljubljana",
-"38655", "Gorica\/Koper\/Postojna",
-"38654", "Gorica\/Koper\/Postojna",
-"38678", "Novo\ Mesto\/Krško",
-"38676", "Novo\ Mesto\/Krško",
-"38675", "Novo\ Mesto\/Krško",
-"38673", "Novo\ Mesto\/Krško",
-"38657", "Gorica\/Koper\/Postojna",
-"38658", "Gorica\/Koper\/Postojna",
-"38642", "Kranj",
-"38674", "Novo\ Mesto\/Krško",
-"3862", "Maribor\/Ravne\ na\ Koroškem\/Murska\ Sobota",
-"38647", "Kranj",
-"38634", "Celje\/Trbovlje",
-"38636", "Celje\/Trbovlje",
-"38652", "Gorica\/Koper\/Postojna",
-"38635", "Celje\/Trbovlje",
-"38648", "Kranj",
+$areanames{en} = {"38632", "Celje\/Trbovlje",
 "38633", "Celje\/Trbovlje",
-"38646", "Kranj",
-"38645", "Kranj",
 "38638", "Celje\/Trbovlje",
+"38636", "Celje\/Trbovlje",
+"38634", "Celje\/Trbovlje",
+"38655", "Gorica\/Koper\/Postojna",
+"38675", "Novo\ Mesto\/Krško",
+"38645", "Kranj",
 "38637", "Celje\/Trbovlje",
+"38672", "Novo\ Mesto\/Krško",
+"38642", "Kranj",
+"38673", "Novo\ Mesto\/Krško",
+"38656", "Gorica\/Koper\/Postojna",
+"38658", "Gorica\/Koper\/Postojna",
+"38676", "Novo\ Mesto\/Krško",
+"38646", "Kranj",
+"38648", "Kranj",
+"3862", "Maribor\/Ravne\ na\ Koroškem\/Murska\ Sobota",
+"38678", "Novo\ Mesto\/Krško",
+"38653", "Gorica\/Koper\/Postojna",
+"38652", "Gorica\/Koper\/Postojna",
+"38657", "Gorica\/Koper\/Postojna",
+"38674", "Novo\ Mesto\/Krško",
 "38644", "Kranj",
-"38672", "Novo\ Mesto\/Krško",};
+"38635", "Celje\/Trbovlje",
+"38647", "Kranj",
+"38677", "Novo\ Mesto\/Krško",
+"38654", "Gorica\/Koper\/Postojna",
+"3861", "Ljubljana",};
 
     sub new {
       my $class = shift;

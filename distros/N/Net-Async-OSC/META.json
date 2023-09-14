@@ -1,0 +1,74 @@
+{
+   "abstract" : "send/receive OSC asynchronously",
+   "author" : [
+      "Max Maischein <corion@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Async-OSC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "Getopt::Long" : "0",
+            "IO::Async::Loop" : "0",
+            "IO::Async::Socket" : "0",
+            "IO::Async::Timer::Periodic" : "0",
+            "Moo" : "2",
+            "Music::Chord::Note" : "0",
+            "Music::Scales" : "0",
+            "Music::VoiceGen" : "0",
+            "Protocol::OSC" : "0",
+            "Socket" : "0",
+            "Term::Output::List" : "0",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Corion/Net-Async-OSC/issues"
+      },
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Corion/Net-Async-OSC.git",
+         "web" : "https://github.com/Corion/Net-Async-OSC"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_static_install" : 1
+}

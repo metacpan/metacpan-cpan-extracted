@@ -10,8 +10,36 @@ use Data::Dumper::Interp qw/vis visq dvis dvisq u visnew/;
 
 use Spreadsheet::Edit qw/:all logmsg/;
 
+use Spreadsheet::Edit::Log ':btw=L=${lno} F=${fname} P=${pkg} ::', 'btwN';
+
+use File::Basename qw/basename/;
+use Capture::Tiny qw/capture/;
+
 die "oops" unless ! %Spreadsheet::Edit::pkg2currsheet;
 die "oops" unless ! defined $Spreadsheet::Edit::_inner_apply_sheet;
+
+sub wrapper($@) {
+  my $N = shift;
+  btwN $N,@_;
+}
+{ my $baseline = __LINE__;
+  my ($out, $err, $exit) = capture {
+    { package Foo; main::btw "A1 btw from line ",$baseline+2; }
+    btw "A2 btw from line ",$baseline+3;
+    btwN 0,"BB btwN(0...) from line ",$baseline+4;
+    btwN 0,"B2 btwN(0...) from line ",$baseline+6;
+    wrapper 1,"CC btwN(1,...) from line ",$baseline+6;
+  };
+  local $_ = $out.$err;  # don't care which it goes to
+  #note "OUT:$out\nERR:$err";
+  my $fname = basename(__FILE__);
+  like($_, qr/^\s*L=(\d+) F=\Q$fname\E P=Foo :: A1 .* from line (\1)/m,
+      "A1 btw with custom prefix");
+  like($_, qr/^\s*L=(\d+) F=\Q$fname\E P=main :: A2 .* from line (\1)/m,
+      "A2 btw with custom prefix");
+  like($_, qr/^\s*(\d+): BB .* from line (\1)/m, "BB btwN(0,...)");
+  like($_, qr/^\s*(\d+): CC .* from line (\1)/m, "CC btwN(1,...)");
+}
 
 my $ds1 = "My Source";
 my $sheet1 = new_sheet

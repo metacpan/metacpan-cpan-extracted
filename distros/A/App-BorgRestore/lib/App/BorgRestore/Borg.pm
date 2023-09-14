@@ -55,7 +55,14 @@ method borg_list() {
 	my @archives;
 	my $backup_prefix = $self->{backup_prefix};
 
-	if (Version::Compare::version_compare($self->{borg_version}, "1.1") >= 0) {
+	if (Version::Compare::version_compare($self->{borg_version}, "1.2") >= 0) {
+		$log->debug("Getting archive list via json");
+		run [qw(borg list --glob-archives), "$backup_prefix*", qw(--json), $self->{borg_repo}], '>', \my $output or die $log->error("borg list returned $?")."\n";
+		my $json = decode_json($output);
+		for my $archive (@{$json->{archives}}) {
+			push @archives, $archive->{archive};
+		}
+	} elsif (Version::Compare::version_compare($self->{borg_version}, "1.1") >= 0) {
 		$log->debug("Getting archive list via json");
 		run [qw(borg list --prefix), $backup_prefix, qw(--json), $self->{borg_repo}], '>', \my $output or die $log->error("borg list returned $?")."\n";
 		my $json = decode_json($output);

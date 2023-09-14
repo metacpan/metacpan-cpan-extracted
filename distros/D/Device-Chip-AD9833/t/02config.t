@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -20,7 +20,7 @@ await $chip->mount(
 {
    # Chip can't read back config; we just store this in memory
 
-   is_deeply( await $chip->read_config,
+   is( await $chip->read_config,
       {
          B28     => !!0,
          HLB     => !!0,

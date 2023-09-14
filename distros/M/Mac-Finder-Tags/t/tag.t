@@ -4,9 +4,11 @@ use warnings;
 use lib qw(lib);
 
 use Test::More 0.88;
-use Test::Warnings qw(warning);
+use Test::Warnings 0.010 qw(warning :no_end_test);
+my $no_warnings;
+use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
-plan tests => 12 + 3 + 1;
+plan tests => 12 + 3 + $no_warnings;
 
 
 use Mac::Finder::Tags;

@@ -39,7 +39,7 @@ Try something like...
         $obj = Net::Proxmox::VE->new(
             host     => $host,
             password => $pass,
-            user     => $user,
+            username => $user,
             port     => $port,
             realm    => $realm,
             ssl_opts => {

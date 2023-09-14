@@ -14,9 +14,11 @@ my @files = (
     't/00-compile.t',
     't/01-basic.t',
     't/100-base.t',
+    't/200-subsubcommand.t',
     't/lib/Test/YA/CLI/Example.pm',
     't/lib/Test/YA/CLI/Example/Main.pm',
-    't/lib/Test/YA/CLI/Example/Something.pm'
+    't/lib/Test/YA/CLI/Example/Something.pm',
+    't/lib/Test/YA/CLI/Example/Something/Else.pm'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

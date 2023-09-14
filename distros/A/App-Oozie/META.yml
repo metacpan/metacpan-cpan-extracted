@@ -62,7 +62,7 @@ requires:
   Moo::Role: '0'
   MooX::Options: '0'
   Net::Hadoop::Oozie: '0'
-  Net::Hadoop::WebHDFS::LWP: '0'
+  Net::Hadoop::WebHDFS::LWP: '0.011'
   Net::Hadoop::YARN::NameNode::JMX: '0'
   Path::Tiny: '0'
   Ref::Util: '0'
@@ -82,7 +82,6 @@ requires:
   XML::Compile::Util: '0'
   XML::LibXML: '0'
   XML::LibXML::Simple: '0'
-  XML::Simple: '0'
   XML::Twig: '0'
   YAML::XS: '0'
   constant: '0'
@@ -95,7 +94,7 @@ requires:
 resources:
   bugtracker: https://github.com/Perl-Hadoop/App-Oozie/issues
   repository: git://github.com/Perl-Hadoop/App-Oozie.git
-version: '0.002'
+version: '0.006'
 x_contributors:
   - 'Abdelrahman Elsergani'
   - 'Achyuth Samudrala'

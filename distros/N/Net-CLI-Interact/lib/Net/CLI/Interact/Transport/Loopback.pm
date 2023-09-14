@@ -1,6 +1,5 @@
 package Net::CLI::Interact::Transport::Loopback;
-{ $Net::CLI::Interact::Transport::Loopback::VERSION = '2.400000' }
-
+$Net::CLI::Interact::Transport::Loopback::VERSION = '2.400002';
 use Moo;
 use Sub::Quote;
 use MooX::Types::MooseLike::Base qw(InstanceOf);

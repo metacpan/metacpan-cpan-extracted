@@ -1,6 +1,6 @@
 package Mail::BIMI::Result;
 # ABSTRACT: Class to model a BIMI result
-our $VERSION = '3.20230607'; # VERSION
+our $VERSION = '3.20230913'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -54,6 +54,10 @@ sub get_authentication_results_object($self) {
     my $vmc = $self->bimi_object->record->authority->vmc;
     if ( $vmc ) {
       $header->add_child( Mail::AuthenticationResults::Header::SubEntry->new()->set_key( 'policy.authority' )->safe_set_value( $vmc->is_valid ? 'pass' : 'fail' ) );
+      $header->add_child( Mail::AuthenticationResults::Header::SubEntry->new()->set_key( 'policy.experimental' )->safe_set_value('yes') )
+        if $vmc->is_experimental;
+      $header->add_child( Mail::AuthenticationResults::Header::SubEntry->new()->set_key( 'policy.mark-type' )->safe_set_value($vmc->mark_type) )
+        if $vmc->mark_type;
     }
     else {
       $header->add_child( Mail::AuthenticationResults::Header::SubEntry->new()->set_key( 'policy.authority' )->safe_set_value( 'fail' ) );
@@ -83,7 +87,7 @@ Mail::BIMI::Result - Class to model a BIMI result
 
 =head1 VERSION
 
-version 3.20230607
+version 3.20230913
 
 =head1 DESCRIPTION
 

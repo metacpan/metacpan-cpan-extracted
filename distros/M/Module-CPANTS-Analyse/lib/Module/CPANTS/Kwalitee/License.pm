@@ -4,7 +4,7 @@ use strict;
 use File::Spec::Functions qw(catfile);
 use Software::LicenseUtils;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 $VERSION =~ s/_//; ## no critic
 
 sub order { 100 }
@@ -41,7 +41,7 @@ sub analyse {
 
     # check pod
     my %licenses;
-    foreach my $file (grep { /\.(?:pm|pod|pl|PL)$/ } sort @$files ) {
+    foreach my $file (grep { m!^(?:bin|scripts?)/|\.(?:pm|pod|pl|PL)$! } sort @$files ) {
         next if $file =~ /(?:Makefile|Build)\.PL$/;
         my $path = catfile($distdir, $file);
         next unless -r $path; # skip if not readable
@@ -95,7 +95,8 @@ sub analyse {
             }
         }
         if (@possible_licenses) {
-            @possible_licenses = map { s/^Software::License:://; $_ } @possible_licenses;
+            my %seen;
+            @possible_licenses = grep {!$seen{$_}++} map { s/^Software::License:://; $_ } @possible_licenses;
             push @{$licenses{$_} ||= []}, $file for @possible_licenses;
             $me->d->{files_hash}{$file}{license} = join ',', @possible_licenses;
         } else {

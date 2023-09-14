@@ -8,7 +8,7 @@ use_ok('Media::Convert::Asset');
 
 my $vid = Media::Convert::Asset->new(url => 't/testvids/bbb.mp4');
 isa_ok($vid, 'Media::Convert::Asset');
-ok($vid->duration == 20.024000, 'video duration probed correctly');
+ok(($vid->duration <= 20.024000) && ($vid->duration >= 20), 'video duration probed correctly');
 ok($vid->video_codec eq 'h264', 'video codec probed correctly');
 ok($vid->audio_codec eq 'aac', 'audio codec probed correctly');
 ok($vid->video_size eq '854x480', 'video resolution probed correctly');

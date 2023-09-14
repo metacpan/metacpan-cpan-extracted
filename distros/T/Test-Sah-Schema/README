@@ -2,8 +2,8 @@ NAME
     Test::Sah::Schema - Test Sah::Schema::* modules in distribution
 
 VERSION
-    This document describes version 0.015 of Test::Sah::Schema (from Perl
-    distribution Test-Sah-Schema), released on 2022-11-04.
+    This document describes version 0.016 of Test::Sah::Schema (from Perl
+    distribution Test-Sah-Schema), released on 2023-09-03.
 
 SYNOPSIS
     To check a single Sah::Schema::* module:
@@ -46,7 +46,7 @@ FUNCTIONS
     Look for modules in directory "lib" (or "blib" instead, if it exists),
     and "run sah_schema_module_ok()" on each of them.
 
-    Options are the same as in "sah_schema_module_ok()", plus:
+    Options are the same as in sah_schema_module_ok(), plus:
 
     *   include_modules
 
@@ -61,7 +61,7 @@ SOURCE
     <https://github.com/perlancar/perl-Test-Sah-Schema>.
 
 SEE ALSO
-    test-sah-schema, a command-line interface for "sah_schema_modules_ok()".
+    test-sah-schema, a command-line interface for sah_schema_modules_ok().
 
     Test::Sah to use Sah schema to test data.
 
@@ -85,7 +85,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2020 by perlancar
+    This software is copyright (c) 2023, 2022, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

@@ -9,7 +9,7 @@ use Import::Into;
 use Sub::Util 'set_subname';
 use Syntax::Keyword::Try;
 
-our $VERSION = '1.22'; # VERSION
+our $VERSION = '1.23'; # VERSION
 
 use feature      ();
 use utf8         ();
@@ -107,11 +107,7 @@ sub import {
         not grep { $_ eq 'notry'   } @functions and
         not grep { $_ eq 'trytiny' } @functions
     );
-    eval qq{
-        package $caller {
-            use Try::Tiny;
-        };
-    } if ( grep { $_ eq 'trytiny' } @functions );
+    Try::Tiny->import::into($caller) if ( grep { $_ eq 'trytiny' } @functions );
 
     monkey_patch( $self, $caller, ( map { $_ => \&{ 'PerlX::Maybe::' . $_ } } qw(
         maybe provided provided_deref provided_deref_with_maybe
@@ -129,14 +125,19 @@ sub import {
                 ${"${caller}::INC"}{$pm};
             } );
         }
-        catch {
-            croak($@) unless ( index( $@, q{Can't locate } ) == 0 );
+        catch ($e) {
+            croak($e) unless ( index( $e, qq{Can't locate $pm in } ) == 0 );
             return 0;
         }
 
         ( $no_parent, $late_parent ) = ( undef, undef );
 
-        "$class"->import( $caller, @$params ) if ( "$class"->can('import') );
+        my $is_exact_extension = 0;
+        {
+            no strict 'refs';
+            $is_exact_extension = grep { index( $_, 'exact::' ) == 0 } $class, @{"${class}::ISA"};
+        }
+        $class->import( $params, $caller ) if ( $is_exact_extension and $class->can('import') );
 
         if ($late_parent) {
             push( @late_parents, [ $class, $caller ] );
@@ -148,21 +149,13 @@ sub import {
         return 1;
     };
     for my $class (@classes) {
-        my $params = ( $class =~ s/\(([^\)]+)\)// ) ? [$1] : [];
+        my $params = ( $class =~ s/\(([^\)]+)\)// ) ? $1 : undef;
         ( my $pm = $class ) =~ s{::|'}{/}g;
         $pm .= '.pm';
 
-        $use->(
-            'exact::' . $class,
-            'exact/' . $pm,
-            $caller,
-            $params,
-        ) or $use->(
-            $class,
-            $pm,
-            $caller,
-            $params,
-        ) or croak(
+        $use->( 'exact::' . $class, 'exact/' . $pm, $caller, $params ) or
+        $use->(             $class,            $pm, $caller, $params ) or
+        croak(
             "Can't locate exact/$pm or $pm in \@INC " .
             "(you may need to install the exact::$class or $class module)" .
             '(@INC contains: ' . join( ' ', @INC ) . ')'
@@ -190,7 +183,7 @@ sub add_isa {
     my ( $self, $parent, $child ) = @_;
     {
         no strict 'refs';
-        push( @{"${child}::ISA"}, $parent ) unless ( grep { $_ eq $parent } @{"${child}::ISA"} );
+        push( @{"${child}::ISA"}, $parent ) unless ( $child->isa($parent) );
     }
     return;
 }
@@ -272,7 +265,7 @@ exact - Perl pseudo pragma to enable strict, warnings, features, mro, filehandle
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =for markdown [![test](https://github.com/gryphonshafer/exact/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact)
@@ -481,15 +474,14 @@ It's possible to provide parameters to the C<import> method of the extension.
 =head2 Writing Extensions
 
 An extension may but is not required to have an C<import> method. If such a
-method does exist, it will be passed: the package name, the name of the caller
-of L<exact>, and any parameters passed.
+method does exist, it will be passed the package name and any parameters that
+exist.
 
     package exact::example;
     use exact;
 
-    sub import {
-        my ( $self, $caller, $params ) = @_;
-        exact->monkey_patch( $caller, 'example' => \&example );
+    sub import ( $self, $params, $caller ) {
+        exact->monkey_patch( $caller // caller(), 'example' => \&example );
     }
 
     sub example {

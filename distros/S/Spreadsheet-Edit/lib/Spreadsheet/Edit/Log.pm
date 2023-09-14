@@ -11,25 +11,66 @@ package Spreadsheet::Edit::Log;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.004'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-08-28'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.006'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-09-06'; # DATE from Dist::Zilla::Plugin::OurDate
 
-use Exporter 'import';
+use Carp;
+
+use Exporter 5.57 ();
 our @EXPORT = qw/fmt_call log_call fmt_methcall log_methcall
                  nearest_call abbrev_call_fn_ln_subname/;
 
-our @EXPORT_OK = qw/btw oops/;
+sub _btwTN($$@) {
+  my $pfx=shift; my $N=shift; local $_ = join("",@_);
+  s/\n\z//s;
+  my ($package, $path, $lno) = caller($N);
+  (my $fname = $path) =~ s/.*[\\\/]//;
+  (my $pkg = $package) =~ s/.*:://;
+  my $s = eval "\"${pfx}\"";
+  confess "ERROR IN btw prefix '$pfx': $@" if $@;
+  printf "%s %s\n", $s, $_;
+}
+
+sub _genbtw($$) {
+  my ($pkg, $pfx) = @_;
+  my $btw  = eval{ sub(@) { unshift @_,$pfx,0; goto &_btwTN } } // die $@;
+  no strict 'refs';
+  *{"${pkg}::btw"} = \&$btw;
+}
+sub _genbtwN($$) {
+  my ($pkg, $pfx) = @_;
+  my $btwN  = eval{ sub($@) { unshift @_,$pfx; goto &_btwTN } } // die $@;
+  no strict 'refs';
+  *{"${pkg}::btwN"} = \&$btwN;
+}
+BEGIN {
+  _genbtw(__PACKAGE__,'$lno:');
+  _genbtwN(__PACKAGE__,'$lno:');
+}
+
+sub import {
+  my $class = shift;
+  my $pkg = caller;
+  my @remaining_args;
+  foreach(@_) {
+    if (/:btw=(.*)/)     { _genbtw($pkg,$1) }
+    elsif (/:btwN=(.*)/) { _genbtwN($pkg,$1) }
+    else {
+      push @remaining_args, $_;
+    }
+  }
+  @_ = ($class, @remaining_args);
+  goto &Exporter::import
+}
+
+our @EXPORT_OK = qw/btw btwN oops/;
+
 
 use Scalar::Util qw/reftype refaddr blessed weaken/;
 use List::Util qw/first any all/;
 use File::Basename qw/dirname basename/;
-use Carp;
 
 sub oops(@) { @_=("\n".(caller)." oops:\n",@_,"\n"); goto &Carp::confess }
-
-sub btwN($@) { my $N=shift; local $_=join("",@_); s/\n\z//s; printf "%4d: %s\n",(caller($N))[2],$_; }
-
-sub btw(@) { unshift @_,0; goto &btwN }
 
 use Data::Dumper::Interp qw/dvis vis visq avis hvis visnew addrvis u/;
 
@@ -177,7 +218,7 @@ sub _fmt_call($;$$) {
       # with the same object.
       my $rep = $opts->{fmt_object}->($state, $obj);
       if (defined($rep) && refaddr($rep)) {
-        $msg .= _fmt_list($rep);  # Data::Dumper
+        $msg .= _fmt_list($rep);  # Data::Dumper::Interp
       } else {
         $msg .= $rep;
       }
@@ -260,9 +301,10 @@ Spreadsheet::Edit::Log - log method/function calls, args, and return values
 =head1 DESCRIPTION
 
 (This is generic, no longer specific to Spreadsheet::Edit.  Someday it might
-be published as a stand-alone distribution rather than packaged in Spreadsheet-Edit.)
+be published as a stand-alone distribution rather than packaged with
+Spreadsheet-Edit.)
 
-This provides perhaps-overkill convenience for "verbose logging" and/or debug
+This provides possibly-overkill convenience for "verbose logging" and/or debug
 tracing of subroutine calls.
 
 The resulting message string includes the location of the
@@ -280,7 +322,7 @@ C<< logdest => FILEHANDLE >> is included in I<OPTIONS>.
 
 =head2 $msgstring = fmt_call {OPTIONS}, [INPUTS], [RESULTS]
 
-{OPTIONS} and [RESULTS] are optional, i.e. may be omitted.
+{OPTIONS} and [RESULTS] are optional, i.e. may be entirely omitted.
 
 A message string is composed and returned.   The general form is:
 
@@ -291,7 +333,7 @@ A message string is composed and returned.   The general form is:
 C<[INPUTS]> and C<[RESULTS]> are each a ref to an array of items (or
 a single non-aref item), used to form comma-separated lists.
 
-Each item is formatted like with I<Data::Dumper>, i.e. strings are "quoted"
+Each item is formatted similar to I<Data::Dumper>, i.e. strings are "quoted"
 and complex structures serialized; printable Unicode characters are shown as
 themselves (rather than hex escapes)
 
@@ -301,9 +343,10 @@ themselves (rather than hex escapes)
 
 =item 1.
 
-If an item is a reference to a string then the string is inserted as-is (unquoted),
+If an item is a reference to a string then the string is inserted
+as-is (unquoted),
 and unless the string is empty, adjacent commas are suppressed.
-This allows concatenating arbitrary text with values formatted by Data::Dumper.
+This allows pasting arbitrary text between values.
 
 =item 2.
 
@@ -329,8 +372,8 @@ same C<self> value.
 
 =item fmt_object =E<gt> CODE
 
-Format a reference to a blessed thing, or the value of the C<self> option, if
-passed, whether blessed or not.
+Format a reference to a blessed thing,
+or the value of the C<self> option (if passed) whether blessed or not.
 
 The sub is called with args ($state, $thing).  It should return
 either C<$thing> or an alternative representation string.  By default,
@@ -352,8 +395,8 @@ Your sub should return True if the frame represents the call to be described
 in the message.
 
 The default callback is S<<< C<sub{ $_[1][3] =~ /(?:::|^)[a-z][^:]*$/ }> >>>,
-which looks for any sub named with an initial lower-case letter; this
-is based on the convention that internal subs start with an underscore
+which looks for any sub named with an initial lower-case letter;
+in other words, it assumes that internal subs start with an underscore
 or capital letter (such as for constants).
 
 =back
@@ -364,14 +407,15 @@ A short-hand for
 
   $string = fmt_call {OPTIONS, self => $self}, [INPUTS], [RESULTS]
 
+=head2 log_methcall $self, [INPUTS], [RESULTS]
+
 =head2 log_methcall {OPTIONS}, $self, [INPUTS], [RESULTS]
 
 A short-hand for
 
   log_call {OPTIONS, self => $self}, [INPUTS], [RESULTS]
 
-Usually {OPTIONS} can be omitted, so the short-hand form reduces to
-S<< C<log_methcall $self, [INPUTS], [RESULTS]> >>.
+Usually {OPTIONS} can be omitted for a more succinct form.
 
 =head2 $frame = nearest_call {OPTIONS};
 
@@ -412,12 +456,21 @@ A newline is appended to the message unless the last string
 string already ends with a newline.
 
 This is like C<warn 'message'> when the message omits a final newline;
-but with a nicer presentation.
+but with a different presentation.
 
 C<btwN> displays the line number of the call <numlevels> earlier
 in the call stack.
 
 Not exported by default.
+
+By default messages show only the caller's line number.
+The special tags B<:btw=PFX> or B<:btwN=PFX> will import a customized function
+which prefixes messages with the string B<PFX>.  This string
+may contain
+I<$lno> I<$path> I<$fname> I<$package> or I<$pkg>
+to interpolate respectively
+the calling line number, file path, file basename,
+package name, or S<abbreviated package name (*:: removed).>
 
 =head2 oops string,string,...
 

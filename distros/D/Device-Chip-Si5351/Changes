@@ -1,5 +1,14 @@
 Revision history for Device-Chip-Si5351
 
+0.02    2023-09-13
+        [CHANGES]
+         * General module style updates:
+            + Updated for Object::Pad v0.800
+            + Swap unit tests to `Test2::V0`
+
+        [BUGFIXES]
+         * Multisynths can be set to any ratio up to 2024; not just 900
+
 0.01    2022-04-19
         First version, released on an unsuspecting world.
 

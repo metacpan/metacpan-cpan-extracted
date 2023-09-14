@@ -961,6 +961,30 @@ use Test::More;
     ];
     compile_ok($source);
   }
+  
+  {
+    my $source = 'class MyClass { has x : int; method foo : void () { [has this : MyClass = $self] method : void () { $self->{this}->{x}; }; } }';
+    compile_ok($source);
+  }
+  
+  {
+    my $source = 'class MyClass { has x : int; method foo : void () { [has this : MyClass = $self] method : void () { $self->{this}->{x}; [has this : MyClass = $self->{this}] method : void () { $self->{this}->{x}; }; }; } }';
+    compile_ok($source);
+  }
+  
+  {
+    my $source = [
+      'class MyClass { use MyClass2; has x : protected int; }',
+      'class MyClass2 extends MyClass { method foo : void () { [has this : MyClass2 = $self] method : void () { $self->{this}->{x}; }; } }',
+    ];
+    compile_ok($source);
+  }
+  
+  {
+    my $source = 'class MyClass { use Fn as FUNC; method foo : void () { method : void () { FUNC->INT_MAX; }; } }';
+    compile_ok($source);
+  }
+  
 }
 
 # Field Definition
@@ -1215,6 +1239,21 @@ use Test::More;
     ];
     compile_ok($source);
   }
+  {
+    my $source = [
+      'class MyClass2 extends MyClass { use Point; use Point3D; method main : void ($point : Point3D) {} }',
+      'class MyClass { use Point; use Point3D; method main : void ($point : Point) {} }',
+    ];
+    compile_ok($source);
+  }
+  
+  {
+    my $source = [
+      'class MyClass2 extends MyClass { use Point; use Point3D; method main : void ($point : Point) {} }',
+      'class MyClass { use Point; use Point3D; method main : void ($point : Point3D) {} }',
+    ];
+    compile_not_ok($source, q|The type of the 1th argument of the "main" method in the "MyClass2" class must be able to be assigned to the type of the 1th argument of the "main" method in the "MyClass" class.|);
+  }
 }
 
 # interface Statement
@@ -1236,7 +1275,7 @@ use Test::More;
       'class MyClass { interface MyInterface; method foo : void ($arg1 : int, $arg2 : long) {} }',
       'class MyInterface : interface_t { required method foo : void ($arg1 : int, $arg2 : int); }',
     ];
-    compile_not_ok($source, q|The type of the 2th argument of the "foo" method in the "MyClass" class must be equal to the type of the 2th argument of the "foo" method in the "MyInterface" interface|);
+    compile_not_ok($source, q|The type of the 2th argument of the "foo" method in the "MyClass" class must be able to be assigned to the type of the 2th argument of the "foo" method in the "MyInterface" interface|);
   }
   {
     my $source = [

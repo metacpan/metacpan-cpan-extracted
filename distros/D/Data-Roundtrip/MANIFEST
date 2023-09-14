@@ -19,6 +19,7 @@ t/06-perl2dump-no-escape-unicode-permanently.t
 t/07-perl2dump-escape-unicode-permanently.t
 t/10-scripts.t
 t/11-scripts-pod.t
+t/12-from-file.t
 t/20-synopsis.t
 t/manifest.t
 t/pod-coverage.t

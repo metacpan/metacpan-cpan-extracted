@@ -3,18 +3,17 @@ package exact::lib;
 
 use 5.014;
 use exact;
-use strict;
 use FindBin;
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 sub import {
-    my ( $self, $caller, $input ) = @_;
+    my ( $self, $params ) = @_;
 
-    $input //= 'lib';
-    $input =~ s/(^\s+|\s+$)//g;
+    $params //= 'lib';
+    $params =~ s/(^\s+|\s+$)//g;
 
-    for my $dir ( map { s/\\ / /g; $_ } split( /(?<!\\)\s/, $input ) ) {
+    for my $dir ( map { s/\\ / /g; $_ } split( /(?<!\\)\s/, $params ) ) {
         if ( index( $dir, '/', 0 ) == 0 ) {
             _add_to_inc($dir);
         }
@@ -61,7 +60,7 @@ exact::lib - Compile-time @INC manipulation extension for exact
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =for markdown [![test](https://github.com/gryphonshafer/exact-lib/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-lib/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact-lib/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-lib)

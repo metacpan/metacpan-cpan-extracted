@@ -3,8 +3,9 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'Device::Chip::INA219' );
+require Device::Chip::INA219;
 
+pass( 'Modules loaded' );
 done_testing;

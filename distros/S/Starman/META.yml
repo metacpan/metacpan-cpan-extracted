@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.21, Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.22, Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/miyagawa/Starman/issues
   homepage: https://github.com/miyagawa/Starman
   repository: https://github.com/miyagawa/Starman.git
-version: '0.4016'
+version: '0.4017'
 x_contributors:
   - 'Adam Guthrie <adam.guthrie@dvlgames.com>'
   - 'Alex Vandiver <alex@chmrr.net>'
@@ -64,6 +64,7 @@ x_contributors:
   - 'Robert Olson <olson@mcs.anl.gov>'
   - 'Robert Rothenberg <rrwo@cpan.org>'
   - 'Robert Sedlacek <r.sedlacek@shadowcat.co.uk>'
+  - 'Rob Mueller <robm@fastmailteam.com>'
   - 'Slobodan Mišković <slobodan@miskovic.ca>'
   - 'spleenjack <spleenjack@gmail.com>'
   - 'Tatsuhiko Miyagawa <tmiyagawa@fastly.com>'

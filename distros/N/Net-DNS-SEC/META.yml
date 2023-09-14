@@ -31,5 +31,5 @@ requires:
   MIME::Base64: '2.13'
   Net::DNS: '1.08'
   perl: '5.008009'
-version: '1.21'
+version: '1.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

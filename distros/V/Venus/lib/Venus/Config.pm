@@ -250,7 +250,7 @@ This package provides the following methods:
 
 =head2 edit_file
 
-  edit_file(Str $file, Str | CodeRef $code) (Config)
+  edit_file(string $file, string | coderef $code) (Venus::Config)
 
 The edit_file method does an in-place edit, i.e. it loads a Perl, YAML, or JSON
 configuration file, passes the decoded data to the method or callback provided,
@@ -282,7 +282,7 @@ I<Since C<3.10>>
 
 =head2 read_file
 
-  read_file(Str $path) (Config)
+  read_file(string $path) (Venus::Config)
 
 The read_file method load a Perl, YAML, or JSON configuration file, based on
 the file extension, and returns a new L<Venus::Config> object.
@@ -335,7 +335,7 @@ I<Since C<2.91>>
 
 =head2 read_json
 
-  read_json(Str $data) (Config)
+  read_json(string $data) (Venus::Config)
 
 The read_json method returns a new L<Venus::Config> object based on the JSON
 string provided.
@@ -369,7 +369,7 @@ I<Since C<2.91>>
 
 =head2 read_json_file
 
-  read_json_file(Str $file) (Config)
+  read_json_file(string $file) (Venus::Config)
 
 The read_json_file method uses L<Venus::Path> to return a new L<Venus::Config>
 object based on the file provided.
@@ -394,7 +394,7 @@ I<Since C<2.91>>
 
 =head2 read_perl
 
-  read_perl(Str $data) (Config)
+  read_perl(string $data) (Venus::Config)
 
 The read_perl method returns a new L<Venus::Config> object based on the Perl
 string provided.
@@ -428,7 +428,7 @@ I<Since C<2.91>>
 
 =head2 read_perl_file
 
-  read_perl_file(Str $file) (Config)
+  read_perl_file(string $file) (Venus::Config)
 
 The read_perl_file method uses L<Venus::Path> to return a new L<Venus::Config>
 object based on the file provided.
@@ -453,7 +453,7 @@ I<Since C<2.91>>
 
 =head2 read_yaml
 
-  read_yaml(Str $data) (Config)
+  read_yaml(string $data) (Venus::Config)
 
 The read_yaml method returns a new L<Venus::Config> object based on the YAML
 string provided.
@@ -486,7 +486,7 @@ I<Since C<2.91>>
 
 =head2 read_yaml_file
 
-  read_yaml_file(Str $file) (Config)
+  read_yaml_file(string $file) (Venus::Config)
 
 The read_yaml_file method uses L<Venus::Path> to return a new L<Venus::Config>
 object based on the YAML string provided.
@@ -511,7 +511,7 @@ I<Since C<2.91>>
 
 =head2 write_file
 
-  write_file(Str $path) (Config)
+  write_file(string $path) (Venus::Config)
 
 The write_file method saves a Perl, YAML, or JSON configuration file, based on
 the file extension, and returns a new L<Venus::Config> object.
@@ -582,7 +582,7 @@ I<Since C<2.91>>
 
 =head2 write_json
 
-  write_json() (Str)
+  write_json() (string)
 
 The write_json method returns a JSON encoded string based on the L</value> held
 by the underlying L<Venus::Config> object.
@@ -611,7 +611,7 @@ I<Since C<2.91>>
 
 =head2 write_json_file
 
-  write_json_file(Str $path) (Config)
+  write_json_file(string $path) (Venus::Config)
 
 The write_json_file method saves a JSON configuration file and returns a new
 L<Venus::Config> object.
@@ -640,7 +640,7 @@ I<Since C<2.91>>
 
 =head2 write_perl
 
-  write_perl() (Str)
+  write_perl() (string)
 
 The write_perl method returns a FILE encoded string based on the L</value> held
 by the underlying L<Venus::Config> object.
@@ -669,7 +669,7 @@ I<Since C<2.91>>
 
 =head2 write_perl_file
 
-  write_perl_file(Str $path) (Config)
+  write_perl_file(string $path) (Venus::Config)
 
 The write_perl_file method saves a Perl configuration file and returns a new
 L<Venus::Config> object.
@@ -698,7 +698,7 @@ I<Since C<2.91>>
 
 =head2 write_yaml
 
-  write_yaml() (Str)
+  write_yaml() (string)
 
 The write_yaml method returns a FILE encoded string based on the L</value> held
 by the underlying L<Venus::Config> object.
@@ -727,7 +727,7 @@ I<Since C<2.91>>
 
 =head2 write_yaml_file
 
-  write_yaml_file(Str $path) (Config)
+  write_yaml_file(string $path) (Venus::Config)
 
 The write_yaml_file method saves a YAML configuration file and returns a new
 L<Venus::Config> object.
@@ -762,7 +762,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

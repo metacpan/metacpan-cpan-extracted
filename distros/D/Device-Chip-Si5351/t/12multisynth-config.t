@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -26,7 +26,7 @@ await $chip->mount(
    $adapter->expect_write_then_read( "\xA5", 1 )
       ->returns( "\x00" );
 
-   is_deeply( await $chip->read_multisynth_config( 0 ),
+   is( await $chip->read_multisynth_config( 0 ),
       {
          P1     => 256,
          P2     => 0,
@@ -61,7 +61,7 @@ await $chip->mount(
 
    $adapter->check_and_clear( '->change_multisynth_config' );
 
-   is_deeply( await $chip->read_multisynth_config( 0 ),
+   is( await $chip->read_multisynth_config( 0 ),
       {
          P1      => 5888,
          P2      => 0,
@@ -91,7 +91,7 @@ await $chip->mount(
 
    $adapter->check_and_clear( '->change_multisynth_config whole-integer ratio' );
 
-   is_deeply( await $chip->read_multisynth_config( 0 ),
+   is( await $chip->read_multisynth_config( 0 ),
       {
          P1      => 4608,
          P2      => 0,

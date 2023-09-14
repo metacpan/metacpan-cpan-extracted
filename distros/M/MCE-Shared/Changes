@@ -1,6 +1,12 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.886 Wed Sep 13 18:00:00 EST 2023
+
+  * Add Android support. This required moving MCE::Shared::Base::Common
+    out of MCE::Shared::Base to separate file MCE::Shared::Common.
+  * Bump MCE dependency to 1.889.
+
 1.885 Fri Jun 09 08:00:00 EST 2023
 
   * Fix typo in Queue dequeue_timed documentation.

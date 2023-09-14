@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Tickit;
@@ -45,9 +45,9 @@ $tickit->bind_key(
 $tickit->run;
 
 use 5.026;
-use Object::Pad 0.22;
+use Object::Pad 0.800;
 
-class IndexCard extends Tickit::Widget::Tabbed::Ribbon;
+class IndexCard :isa(Tickit::Widget::Tabbed::Ribbon);
 
 method lines () { 3 }
 
@@ -59,7 +59,7 @@ BEGIN {
                 tab_b  => 0;
 }
 
-class IndexCard::horizontal extends IndexCard;
+class IndexCard::horizontal :isa(IndexCard);
 
 use Tickit::RenderBuffer qw(LINE_SINGLE);
 use Tickit::Utils qw( textwidth );

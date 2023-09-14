@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Device::Chip::TCS3472x;
@@ -28,7 +28,7 @@ await $chip->mount(
    $adapter->expect_write_then_read( "\xAF", 1 )
       ->returns( "\x00" );
 
-   is_deeply( await $chip->read_config,
+   is( await $chip->read_config,
       {
          AEN   => '',
          AIEN  => '',

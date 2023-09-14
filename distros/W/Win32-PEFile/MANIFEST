@@ -1,3 +1,4 @@
+Build
 Build.pl
 Changes
 ignore.txt
@@ -10,17 +11,14 @@ lib/Win32/PEFile/PEWriter.pm
 lib/Win32/PEFile/Resource.pm
 lib/Win32/PEFile/SectionHandlers.pm
 lib/Win32/PEFile.pm
-lib/Win32/PEFile.pm.html
-lib/Win32/pod2htmd.tmp
 LICENSE
 MANIFEST
-PEFile.komodoproject
+MYMETA.json
+MYMETA.yml
 README
 t/01_PEFile.t
 t/PEFile.exe
 t/PEFileNR.exe
-t/test.pl
-t/tmphg67ve.html
 Todo
 Makefile.PL
 META.yml

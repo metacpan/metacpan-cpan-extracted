@@ -40,6 +40,7 @@ lib/Sys/Virt/DomainSnapshot.pm
 lib/Sys/Virt/DomainCheckpoint.pm
 lib/Sys/Virt/Error.pm
 lib/Sys/Virt/Event.pm
+lib/Sys/Virt/EventImpl.pm
 lib/Sys/Virt/Interface.pm
 lib/Sys/Virt/Network.pm
 lib/Sys/Virt/NetworkPort.pm
@@ -67,7 +68,8 @@ t/300-networks.t
 t/400-storage-pools.t
 t/500-storage-vols.t
 t/600-interfaces.t
-t/800-events.t
+t/800-eventimpl.t
+t/801-events-backward-compat.t
 typemap
 Makefile.PL
 META.yml

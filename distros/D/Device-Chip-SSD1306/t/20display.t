@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future::AsyncAwait;
 
@@ -33,7 +33,7 @@ my $chip = Device::Chip::SSD1306->new;
       # all blank
       ( '00'x(128) ) x 8,
    );
-   is_deeply( \@output,
+   is( \@output,
       [
          map {
             my $page = $_;
@@ -69,7 +69,7 @@ my $chip = Device::Chip::SSD1306->new;
       '0000ff' . '00'x29,
       # pages 4 to 7 - no output
    );
-   is_deeply( \@output,
+   is( \@output,
       [
          map {
             my $page = $_;

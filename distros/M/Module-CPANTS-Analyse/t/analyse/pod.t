@@ -22,4 +22,22 @@ test_distribution {
   is $stash->{abstracts_in_pod}{'Module::CPANTS::Analyse::Test'} => 'test abstract';
 };
 
+test_distribution {
+  my ($mca, $dir) = @_;
+
+  my $content = join "\n\n", (
+    '=pod',
+    '=encoding utf-8;',
+    '=head1 NAME',
+    'some-script - test abstract',
+    '=cut',
+  );
+
+  write_pmfile("$dir/bin/some-script", $content);
+
+  my $stash = $mca->run;
+  like $stash->{error}{has_abstract_in_pod} => qr/^unknown encoding: utf-8;/;
+  is $stash->{abstracts_in_pod}{'some-script'} => 'test abstract';
+};
+
 done_testing;

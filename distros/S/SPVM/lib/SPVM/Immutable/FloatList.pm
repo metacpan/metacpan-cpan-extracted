@@ -44,7 +44,7 @@ This field is the length of the elements of the list.
 
 =head2 new
 
-  static method new : Immutable::FloatList ($array : float[] = undef);
+C<static method new : L<Immutable::FloatList|SPVM::Immutable::FloatList> ($array : float[] = undef);>
 
 Create a new L<Immutable::FloatList|SPVM::Immutable::FloatList> object using L</"new_len">.
 
@@ -59,29 +59,29 @@ Examples:
 
 =head2 new_len
 
-  static method new_len : Immutable::FloatList ($length : int);
+C<static method new_len : L<Immutable::FloatList|SPVM::Immutable::FloatList> ($length : int);>
 
-Creates a new L<Immutable::FloatList|SPVM::Immutable::FloatList> object with the $length.
+Creates a new L<Immutable::FloatList|SPVM::Immutable::FloatList> object with $length.
 
-The $length must be greater than or equal to 0. Otherwise an exception is thrown.
+$length must be greater than or equal to 0. Otherwise an exception is thrown.
 
 =head1 Instance Methods
 
 =head2 get
 
-  method get : float ($index : int);
+C<method get : float ($index : int);>
 
-Gets the element of the position of the $index.
+Gets the element of the position of $index.
 
 Exceptions:
 
-The $index must be greater than or equal to 0. Otherwise an exception is thrown.
+$index must be greater than or equal to 0. Otherwise an exception is thrown.
 
-The $index must be less than the length of the $list.
+$index must be less than the length of $list.
 
 =head2 to_array
 
-  method to_array : float[] ();
+C<method to_array : float[] ();>
 
 Converts the list to an array.
 

@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( threads recursion uninitialized );
 
-our $VERSION = '1.009';
+our $VERSION = '1.011';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 
@@ -183,7 +183,7 @@ Mutex::Util - Utility functions for Mutex
 
 =head1 VERSION
 
-This document describes Mutex::Util version 1.009
+This document describes Mutex::Util version 1.011
 
 =head1 SYNOPSIS
 

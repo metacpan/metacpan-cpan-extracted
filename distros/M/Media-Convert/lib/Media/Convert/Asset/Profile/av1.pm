@@ -9,7 +9,7 @@ use Media::Convert::FfmpegInfo;
 
 =head1 NAME
 
-Media::Convert::Asset::Profile::av1 - Create an H.264/AAC video
+Media::Convert::Asset::Profile::av1 - Create an av1/vorbis video
 
 =head1 SYNOPSIS
 
@@ -24,7 +24,7 @@ Media::Convert::Asset::Profile::av1 - Create an H.264/AAC video
 
 =head1 DESCRIPTION
 
-The C<av1> profile re-encodes the input video into AV1 with Opus audio.
+The C<av1> profile re-encodes the input video into AV1 with Vorbis audio.
 
 =cut
 

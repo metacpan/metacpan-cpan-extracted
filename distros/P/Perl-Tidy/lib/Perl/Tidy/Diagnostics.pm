@@ -18,7 +18,7 @@ package Perl::Tidy::Diagnostics;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
-our $VERSION = '20230701';
+our $VERSION = '20230912';
 
 use constant EMPTY_STRING => q{};
 
@@ -31,7 +31,7 @@ sub AUTOLOAD {
     return if ( $AUTOLOAD =~ /\bDESTROY$/ );
     my ( $pkg, $fname, $lno ) = caller();
     my $my_package = __PACKAGE__;
-    print STDERR <<EOM;
+    print {*STDERR} <<EOM;
 ======================================================================
 Error detected in package '$my_package', version $VERSION
 Received unexpected AUTOLOAD call for sub '$AUTOLOAD'
@@ -73,9 +73,9 @@ sub write_diagnostics {
     #  $msg = string describing the event
     #  $line_number = optional line number
 
-    unless ( $self->{_write_diagnostics_count} ) {
+    if ( !$self->{_write_diagnostics_count} ) {
         open( $self->{_fh}, ">", "DIAGNOSTICS" )
-          or Perl::Tidy::Die("couldn't open DIAGNOSTICS: $ERRNO\n");
+          or Perl::Tidy::Die("couldn't open DIAGNOSTICS: $OS_ERROR\n");
     }
 
     if ( defined($line_number) ) {

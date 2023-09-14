@@ -3,24 +3,16 @@ package exact::fun;
 
 use 5.014;
 use exact;
-use Function::Parameters     ();
+use Import::Into;
 use Class::Method::Modifiers ();
+use Function::Parameters     ();
 
-our $VERSION = '1.00'; # VERSION
+our $VERSION = '1.01'; # VERSION
 
 sub import {
-    my ( $self, $caller, $input ) = @_;
-
-    Function::Parameters->import( ( $input and $input =~ /^mod/i ) ? ( qw( :std :modifiers ) ) : ':std' );
-
-    if ( $input and $input =~ /^cmm/i ) {
-        $caller //= caller();
-        eval qq{
-            package $caller {
-                use Class::Method::Modifiers;
-            };
-        };
-    }
+    my ( $self, $params, $caller ) = @_;
+    Function::Parameters->import( ( $params and $params =~ /^mod/i ) ? ( qw( :std :modifiers ) ) : ':std' );
+    Class::Method::Modifiers->import::into( $caller // caller() ) if ( $params and $params =~ /^cmm/i );
 }
 
 1;
@@ -37,7 +29,7 @@ exact::fun - Functions and methods with parameter lists for exact
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =for markdown [![test](https://github.com/gryphonshafer/exact-fun/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-fun/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact-fun/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-fun)

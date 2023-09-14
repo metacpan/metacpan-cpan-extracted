@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-package Tickit::Test 0.73;
+package Tickit::Test 0.74;
 
 use v5.14;
 use warnings;
@@ -30,6 +30,8 @@ our @EXPORT = qw(
    is_display
    is_cursorpos
    is_termctl
+
+   rect
 
    TEXT
    BLANK
@@ -649,6 +651,22 @@ sub is_termctl
 
    # currently all the supported ctls are numeric anyway
    return $tb->is_num( my $got = $term->getctl( $ctl ), $value, $name );
+}
+
+=head2 rect
+
+   is( ..., rect(top => 10, left => 20, lines => 3, cols => 20) );
+
+Helper function for using L<Test2::V0>'s C<is()> deep comparison assertion
+with L<Tickit::Rect> instances.
+
+=cut
+
+sub rect
+{
+   require Test2::V0;
+   require Tickit::Rect;
+   return Test2::V0::string(Tickit::Rect->new( @_ ) );
 }
 
 sub TEXT

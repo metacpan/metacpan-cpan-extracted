@@ -166,7 +166,7 @@ This package provides the following methods:
 
 =head2 serialize
 
-  serialize(Str | CodeRef $code, Any @args) (Any)
+  serialize(string | coderef $code, any @args) (any)
 
 The serialize method serializes the invocant or the return value of a
 dispatched method call, and returns the result.
@@ -450,7 +450,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

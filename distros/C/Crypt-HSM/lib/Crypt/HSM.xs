@@ -1513,19 +1513,33 @@ static int provider_free(pTHX_ SV* sv, MAGIC* magic) {
 
 static const MGVTBL Crypt__HSM_magic = { NULL, NULL, NULL, NULL, provider_free, NULL, provider_dup, NULL };
 
+static int provider_ptr_dup(pTHX_ MAGIC* magic, CLONE_PARAMS* params) {
+	PERL_UNUSED_VAR(params);
+	provider_refcount_increment(*(struct Provider**)magic->mg_ptr);
+	return 0;
+}
+
+static int provider_ptr_free(pTHX_ SV* sv, MAGIC* magic) {
+	PERL_UNUSED_VAR(sv);
+	provider_refcount_decrement(*(struct Provider**)magic->mg_ptr);
+	return 0;
+}
+
 struct Slot {
 	struct Provider* provider;
 	CK_SLOT_ID slot;
 };
 typedef struct Slot* Crypt__HSM__Slot;
 
+static const MGVTBL Crypt__HSM__Slot_magic = { NULL, NULL, NULL, NULL, provider_ptr_free, NULL, provider_ptr_dup, NULL };
+
 static SV* S_new_slot(pTHX_ struct Provider* provider, CK_SLOT_ID slot) {
-	struct Slot* entry;
-	Newxz(entry, 1, struct Slot);
+	struct Slot* entry = PerlMemShared_calloc(1, sizeof(struct Slot*));
 	entry->slot = slot;
 	entry->provider = provider_refcount_increment(provider);
 	SV* object = newSV(0);
-	sv_setref_pv(object, "Crypt::HSM::Slot", (void*)entry);
+	MAGIC* magic = sv_magicext(newSVrv(object, "Crypt::HSM::Slot"), NULL, PERL_MAGIC_ext, &Crypt__HSM__Slot_magic, (const char*)entry, 0);
+	magic->mg_flags = MGf_DUP;
 	return object;
 }
 #define new_slot(provider, slot) S_new_slot(aTHX_ provider, slot)
@@ -1539,14 +1553,16 @@ struct Mechanism {
 };
 typedef struct Mechanism* Crypt__HSM__Mechanism;
 
+static const MGVTBL Crypt__HSM__Mechanism_magic = { NULL, NULL, NULL, NULL, provider_ptr_free, NULL, provider_ptr_dup, NULL };
+
 static SV* S_new_mechanism(pTHX_ struct Provider* provider, CK_SLOT_ID slot, CK_MECHANISM_TYPE mechanism) {
-	struct Mechanism* entry;
-	Newxz(entry, 1, struct Mechanism);
+	struct Mechanism* entry = PerlMemShared_calloc(1, sizeof(struct Mechanism*));
 	entry->mechanism = mechanism;
 	entry->slot = slot;
 	entry->provider = provider_refcount_increment(provider);
 	SV* object = newSV(0);
-	sv_setref_pv(object, "Crypt::HSM::Mechanism", (void*)entry);
+	MAGIC* magic = sv_magicext(newSVrv(object, "Crypt::HSM::Mechanism"), NULL, PERL_MAGIC_ext, &Crypt__HSM__Mechanism_magic, (const char*)entry, 0);
+	magic->mg_flags = MGf_DUP;
 	return object;
 }
 #define new_mechanism(provider, slot, mechanism) S_new_mechanism(aTHX_ provider, slot, mechanism)
@@ -1702,10 +1718,6 @@ OUTPUT:
 
 MODULE = Crypt::HSM	 PACKAGE = Crypt::HSM::Slot
 
-void DESTROY(Crypt::HSM::Slot self)
-CODE:
-	provider_refcount_decrement(self->provider);
-
 CK_SLOT_ID id(Crypt::HSM::Slot self)
 CODE:
 	RETVAL = self->slot;
@@ -1817,10 +1829,6 @@ CODE:
 
 MODULE = Crypt::HSM  PACKAGE = Crypt::HSM::Mechanism
 
-
-void DESTROY(Crypt::HSM::Mechanism self)
-CODE:
-	provider_refcount_decrement(self->provider);
 
 const char* name(Crypt::HSM::Mechanism self)
 CODE:

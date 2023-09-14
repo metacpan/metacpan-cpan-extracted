@@ -10,12 +10,12 @@ use Exporter 'import';
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-13'; # DATE
+our $DATE = '2023-09-03'; # DATE
 our $DIST = 'App-BPOMUtils-Table-FoodIngredient'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 our @EXPORT_OK = qw(
-                       bpom_list_food_ingredients
+                       bpom_list_food_ingredients_old
                );
 
 our %SPEC;
@@ -20955,7 +20955,7 @@ our $data_idn_bpom_bahan_baku_pangan = [
 # END FRAGMENT id=data-idn_bpom_bahan_baku_pangan
 
 my $res = gen_read_table_func(
-    name => 'bpom_list_food_ingredients',
+    name => 'bpom_list_food_ingredients_old',
     summary => 'List ingredients in BPOM processed food division',
     table_data => $data_idn_bpom_bahan_baku_pangan,
     table_spec => $meta_idn_bpom_bahan_baku_pangan,
@@ -20983,7 +20983,7 @@ App::BPOMUtils::Table::FoodIngredient - List ingredients in BPOM processed food 
 
 =head1 VERSION
 
-This document describes version 0.019 of App::BPOMUtils::Table::FoodIngredient (from Perl distribution App-BPOMUtils-Table-FoodIngredient), released on 2023-02-13.
+This document describes version 0.020 of App::BPOMUtils::Table::FoodIngredient (from Perl distribution App-BPOMUtils-Table-FoodIngredient), released on 2023-09-03.
 
 =head1 DESCRIPTION
 
@@ -20991,11 +20991,11 @@ This distribution contains the following CLIs:
 
 =over
 
-=item * L<bpom-daftar-bahan-baku-pangan>
+=item * L<bpom-daftar-bahan-baku-pangan-lama>
 
 =item * L<bpom-daftar-bahan-baku-pangan-rba>
 
-=item * L<bpom-list-food-ingredients>
+=item * L<bpom-list-food-ingredients-old>
 
 =item * L<bpom-list-food-ingredients-rba>
 
@@ -21004,11 +21004,11 @@ This distribution contains the following CLIs:
 =head1 FUNCTIONS
 
 
-=head2 bpom_list_food_ingredients
+=head2 bpom_list_food_ingredients_old
 
 Usage:
 
- bpom_list_food_ingredients(%args) -> [$status_code, $reason, $payload, \%result_meta]
+ bpom_list_food_ingredients_old(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List ingredients in BPOM processed food division.
 

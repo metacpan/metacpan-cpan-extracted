@@ -1,0 +1,251 @@
+# NAME
+
+Config::JSON::Enhanced - JSON-based config with C/Shell-style comments, verbatim sections and variable substitutions
+
+# VERSION
+
+Version 0.02
+
+# SYNOPSIS
+
+This module provides subroutine `config2perl()` for parsing configuration content,
+from files or strings,  based on, what I call, "enhanced JSON" (see section
+["ENHANCED JSON FORMAT"](#enhanced-json-format) for more details). Briefly, it is standard JSON which allows:
+
+- `C`-style, `C++`-style or `shell`-style comments.
+- template variables (e.g. `<% appdir %>`) which are substituted with user-specified data.
+- verbatim sections which are a sort of here-doc for JSON
+which may be spanning multiple
+lines and contained single and double quotes are not required to be escaped.
+This enhances the readbility of long JSON which may contain, in my case,
+long shell scripts with lots of quotes and newlines.
+
+It has been tested with unicode data (see `t/25-config2perl-complex-utf8.t`)
+with success. But who knows ?!?!
+
+Here is an example:
+
+     use Config::JSON::Enhanced qw/config2perl/;
+
+     my $configdata = 'EOJ';
+     {
+         "a" : "abc",
+         "b" : {
+           /* this is a comment */
+           "c" : <%begin-verbatim-section%>
+       This is a multiline string
+     /* all spaces between the start of the line and
+        the first char will be erased.
+        Newlines are escaped and kept.
+     */
+       with "quoted text" and 'this also'
+       and comments like /* this */ or
+       # this
+       will be retained in the string
+     /* white space from beginning and end will be erased */
+
+     <%end-verbatim-section%>
+           ,
+           "d" : [1,2,<% tempvar0 %>],
+           "e" : "< % tempvar1 % > user and <%tempvar2%>!"
+         }
+     }
+     EOJ
+
+     my $perldata = config2perl({
+         'string' => $configdata,
+         'commentstyle' => "C,shell,CPP",
+         'variable-substitutions' => {
+             # substitutions do not add extra quotes
+             'tempvar0' => 42,
+             'tempvar1' => 'hello',
+             'tempvar2' => 'goodbye',
+         },
+     });
+     die "call to config2perl() has failed" unless defined $perldata;
+
+     # and here is the dump of the perl data structure $perldata
+    {
+      "b" => {
+        "d" => [1,2,42],
+        "c" => "This is a multiline string\n\nwith \"quoted text\" and 'this also'\nand comments like  or\n# this\nwill be retained in the string\n",
+        "e" => "hello user and goodbye!"
+      },
+      "a" => "abc"
+    }
+
+# EXPORT
+
+- `config2perl`
+
+# SUBROUTINES
+
+## `config2perl`
+
+    my $ret = config2perl($params);
+
+Arguments:
+
+- `$params`
+
+Return value:
+
+- `$ret` on success or `undef` on failure.
+
+Given _Enhanced JSON_ content it removes any comments,
+it replaces all template strings, if any, and then parses
+what remains as standard JSON into a Perl data structure which
+is returned.
+
+JSON content to-be-parsed can be specified with one of the following
+keys in the input parameters hashref (`$params`):
+
+- `filename` : content is read from a file with this name.
+- `filehandle` : content is read from a file which has already
+been opened for reading by the caller.
+- `string` : content is contained in this string.
+
+Additionally, input parameters can contain the following keys:
+
+- `commentstyle` : specify what comment style(s) to be expected
+in the input content (if any) as a **comma-separated string**. These
+are the values it understands:
+    - `C` : comments take the form of C-style comments which
+    are exclusively within `/* and */`. For example `* I am a comment */`.
+    This is the **default comment style** if none specified.
+    - `CPP` : comments can the the form of C++-style comments
+    which are within `/* and */` or after `//` until the end of line.
+    For example `/* I am a comment */`, `// I am a comment to the end of line`.
+    - `shell` : comments can be after `#` until the end of line.
+    For example, `# I am a comment to the end of line`.
+- `variable-substitutions` : a hashref whose keys are
+variable names as they occur in the input _Enhanced JSON_ content
+and their corresponding values should substitute them. _Enhanced JSON_,
+can contain template variables in the form `<% my-var-1 %>`. These
+must be replaced with data which is supplied to the call of `config2perl()`
+under the parameters key `variable-substitutions`, e.g.::
+
+        config2perl({
+          "variable-substitutions" => {
+            "my-var-1" => 42
+          },
+          "string" => '{ "xyz" : "<% my-var-1 %>" }',
+        });
+
+    Variable substitution will be performed in keys and values of the input JSON.
+
+See section ["ENHANCED JSON FORMAT"](#enhanced-json-format) for details on the format
+of **what I call** _enhanced JSON_.
+
+`config2perl` returns the parsed content as a Perl data structure
+on success or `undef` on failure.
+
+# ENHANCED JSON FORMAT
+
+This is JSON with added reasonable, yet completely ad-hoc, enhancements
+(from my point of view).
+
+These enhancements are:
+
+- **Comments are allowed**:
+    - `C`-style comments take the form of C-style comments which
+    are exclusively within `/* and */`. For example `* I am a comment */`
+    - `C++`-style comments can the the form of C++-style comments
+    which are within `/* and */` or after `//` until the end of line.
+    For example `/* I am a comment */`, `// I am a comment to the end of line.`
+    - `shell`-style comments can be after `#` until the end of line.
+    For example, `# I am a comment to the end of line.`
+- **Template variables support** : template variables in the form of `<%HOMEDIR%>`
+will be substituded with their actual values specified by the user during parsing. Note that variable
+names are case sensitive, they can contain spaces, hyphens etc. and the tags enclosing such
+variables can contain spaces, for example: ` % <   abc-123   xyz %>` (the variable
+name is `abc-123   xyz` (notice the multiple spaces between `123` and `xyz`).
+- Unfortunately, there is not support for ignoring **superfluous commas** in JSON,
+in the manner of glorious Perl.
+
+## Verbatim Sections
+
+A **Verbaitm Section** in this ad-hoc, so-called _Enhanced JSON_ is content
+enclosed within `<%begin-verbatim-section%>`  and `<%end-verbatim-section%>` tags.
+This content may span multiple lines (which when converted to JSON will preserve them
+by escaping), can contain comments (see the beginning of this section) and can
+contain template variables to be substituted with user-specified data.
+
+Here is an example of enhanced JSON which contains comments, a verbatim section
+and template variables:
+
+    my $con = <<'EOC';
+    {
+      "long bash script" : ["/usr/bin/bash",
+    /* This is a verbatim section */
+    <%begin-verbatim-section%>
+      pushd . &> /dev/null
+      echo "My 'appdir' is \"<%appdir%>\""
+      echo "My current dir: " $(echo $PWD) " and bye"
+      popd &> /dev/null
+    <%end-verbatim-section%>
+      ],
+      // this is an example of a template variable
+      "expected result" : "<% expected-res123 %>"
+    }
+    EOC
+
+    # Which, can be processed thusly:
+    my $res = config2perl({
+      'string' => $con,
+      'commentstyle' => 'C,CPP',
+      'variable-substitutions' => {
+        'appdir' => Cwd::abs_path($FindBin::Bin),
+        'expected-res123' => 42
+      },
+    });
+    die "call to config2perl() has failed" unless defined $res;
+
+    # the dump of $res is:
+    {
+      "expected result" => 42,
+      "long bash script" => [
+        "/usr/bin/bash",
+        "pushd . &> /dev/null\necho \"My 'appdir' is \\\"/home/andreas/PROJECTS/CPAN/Config-JSON-Enhanced/t\\\"\"\necho \"My current dir: \" \$(echo \$PWD) \" and bye\"\npopd &> /dev/null"
+      ]
+    };
+
+# AUTHOR
+
+Andreas Hadjiprocopis, `<bliako at cpan.org>`
+
+# BUGS
+
+Please report any bugs or feature requests to `bug-config-json-enhanced at rt.cpan.org`, or through
+the web interface at [https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Config-JSON-Enhanced](https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Config-JSON-Enhanced).  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+# SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Config::JSON::Enhanced
+
+You can also look for information at:
+
+- RT: CPAN's request tracker (report bugs here)
+
+    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-JSON-Enhanced](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-JSON-Enhanced)
+
+- CPAN Ratings
+
+    [https://cpanratings.perl.org/d/Config-JSON-Enhanced](https://cpanratings.perl.org/d/Config-JSON-Enhanced)
+
+- Search CPAN
+
+    [https://metacpan.org/release/Config-JSON-Enhanced](https://metacpan.org/release/Config-JSON-Enhanced)
+
+# ACKNOWLEDGEMENTS
+
+# LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2023 by Andreas Hadjiprocopis.
+
+This is free software, licensed under:
+
+    The Artistic License 2.0 (GPL Compatible)

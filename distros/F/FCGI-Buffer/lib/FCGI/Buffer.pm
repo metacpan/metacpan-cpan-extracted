@@ -21,11 +21,11 @@ FCGI::Buffer - Verify, Cache and Optimise FCGI Output
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 =head1 SYNOPSIS
 
@@ -173,6 +173,17 @@ sub DESTROY {
 	unless($headers || $self->is_cached()) {
 		if($self->{'logger'}) {
 			$self->{'logger'}->debug('There was no output');
+		}
+		if(!defined($headers)) {
+			require HTTP::Status;
+			HTTP::Status->import();
+
+			if(!defined($self->{'status'})) {
+				$self->{'status'} = 200;
+			}
+			print 'Status: ', $self->{status}, ' ',
+				HTTP::Status::status_message($self->{status}),
+				"\n\n";
 		}
 		return;
 	}
@@ -337,7 +348,7 @@ sub DESTROY {
 	if($ENV{'SERVER_PROTOCOL'} &&
 	  (($ENV{'SERVER_PROTOCOL'} eq 'HTTP/1.1') || ($ENV{'SERVER_PROTOCOL'} eq 'HTTP/2.0')) &&
 	  $self->{generate_etag} && defined($self->{body})) {
-	  	$self->_generate_etag();
+		$self->_generate_etag();
 
 		if($ENV{'HTTP_IF_NONE_MATCH'} && $self->{generate_304} && ($self->{status} == 200)) {
 			$self->_check_if_none_match();
@@ -602,7 +613,7 @@ sub DESTROY {
 						}
 						my $bdir = File::Spec->catfile($dir, $browser_type);
 						if($bdir =~ /^([\/\\])(.+)$/) {
-							$bdir = "$1$2"; # Untaint
+							$bdir = "$1$2";	# Untaint
 						}
 						my $ldir = File::Spec->catfile($bdir, $language);
 						my $sdir = File::Spec->catfile($ldir, $self->{info}->script_name());
@@ -614,7 +625,7 @@ sub DESTROY {
 						$file =~ tr/\//_/;
 						my $path = File::Spec->catfile($sdir, "$file.html");
 						if($path =~ /^(.+)$/) {
-							$path = $1; # Untaint
+							$path = $1;	# Untaint
 							$path =~ tr/[\|;]/_/;
 						}
 						if(open(my $fout, '>', $path)) {
@@ -1423,6 +1434,7 @@ sub _compress()
 	my $self = shift;
 	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
+	return unless(defined($self->{'body'}));
 	my $encoding = $params{encoding};
 
 	if((length($encoding) == 0) || (length($self->{body}) < MIN_GZIP_LEN)) {

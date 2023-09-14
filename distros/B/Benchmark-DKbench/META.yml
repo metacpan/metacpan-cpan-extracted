@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl Benchmark'
+abstract: 'Perl CPU Benchmark'
 author:
   - 'Dimitrios Kechagias <dkechag@cpan.org>'
 build_requires:
@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   File::ShareDir::Install: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,24 +25,29 @@ requires:
   Astro::Coord::Precession: '0'
   CSS::Inliner: '0'
   Crypt::JWT: '0.032'
+  DBD::Mock: '0'
+  DBI: '0'
   DateTime: '0'
   File::ShareDir: '0'
   HTML::FormatText: '0'
+  HTML::Parser: '0'
   HTML::TreeBuilder: '0'
   Image::PHash: '0.3'
   Imager: '1'
-  Imager::File::JPEG: '0'
   JSON::XS: '0'
   MCE::Loop: '0'
   Math::DCT: '0'
   Math::MatrixReal: '0'
   Moose: '0'
-  Sys::Info: '0'
+  SQL::Abstract::Classic: '0'
+  SQL::Inserter: '0'
+  System::Info: '0'
   Test::Harness: '0'
-  Test::Output: '0'
   Test::Requires: '0'
+  Text::Levenshtein::Damerau::XS: '0'
+  Text::Levenshtein::XS: '0'
   perl: '5.012000'
 resources:
   repository: git://github.com/dkechag/Benchmark-DKbench.git
-version: '2.0'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '2.1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

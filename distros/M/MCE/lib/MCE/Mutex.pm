@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( threads recursion uninitialized );
 
-our $VERSION = '1.888';
+our $VERSION = '1.889';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
@@ -64,7 +64,7 @@ MCE::Mutex - Locking for Many-Core Engine
 
 =head1 VERSION
 
-This document describes MCE::Mutex version 1.888
+This document describes MCE::Mutex version 1.889
 
 =head1 SYNOPSIS
 
@@ -174,6 +174,13 @@ The C<lock_shared> method is an alias to C<lock> otherwise for non-Fcntl
 implementations.
 
 Current API available since 1.822.
+
+=head2 $guard = $mutex->guard_lock ( void )
+
+This method calls C<lock> and returns a guard object. When the guard object is
+destroyed, it automatically calls C<unlock>.
+
+Current API available since 1.889.
 
 =head2 $mutex->unlock ( void )
 

@@ -1,5 +1,5 @@
 package App::Oozie::Deploy::Validate::Meta;
-$App::Oozie::Deploy::Validate::Meta::VERSION = '0.002';
+$App::Oozie::Deploy::Validate::Meta::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
@@ -10,6 +10,7 @@ use App::Oozie::Types::Workflow qw(
     WorkflowMeta
     WorkflowMetaOrDummy
 );
+use App::Oozie::Constants qw( DEFAULT_META_FILENAME );
 use Moo;
 use MooX::Options;
 use Types::Standard qw( InstanceOf Str );
@@ -22,7 +23,7 @@ with qw(
 has file => (
     is      => 'rwp',
     isa     => Str,
-    default => sub { 'meta.yml' },
+    default => sub { DEFAULT_META_FILENAME },
 );
 
 has coord_directive => (
@@ -134,7 +135,7 @@ App::Oozie::Deploy::Validate::Meta
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 

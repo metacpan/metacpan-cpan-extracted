@@ -138,7 +138,7 @@ For configuration options please see L<App::BorgRestore::Settings>.
 
 =head1 LICENSE
 
-Copyright (C) 2016-2018  Florian Pritz <bluewind@xinu.at>
+Copyright (C) 2016-2023  Florian Pritz <bluewind@xinu.at>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

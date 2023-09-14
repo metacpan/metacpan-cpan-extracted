@@ -1,6 +1,17 @@
 
 Revision history for Perl module Mutex.
 
+1.011 Wed Sep 13 18:00:00 EST 2023
+
+  * Bump version.
+
+1.010 Wed Sep 13 09:00:00 EST 2023
+
+  * Improve mutex synchronize (aka enter) with guard capability.
+    Thank you, José Joaquín Atria.
+  * Fix mutex re-entrant lock on the Windows platform.
+  * Add mutex guard_lock method.
+
 1.009 Tue Jun 06 12:00:00 EST 2023
 
   * Improved reliability on the Windows platform.

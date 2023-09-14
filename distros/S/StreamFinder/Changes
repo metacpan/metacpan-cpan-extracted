@@ -554,3 +554,21 @@ Revision history for StreamFinder
         of excess leading & trailing spacing likely introduced by possible 
         tweaks in their site.  This issue was causing Fauxdacious mediaplayer 
         to fail to properly load display metadata for Rumble streams.
+2.18    2023/09/04
+        - StreamFinder::Anystream - Add -maxstreams option to limit number of 
+        streams that can be returned - some sites contain tons.  Also 
+        add ability to fetch additional metadata (ie. iconurl, description, 
+        channel (artist), etc. from sites that contain them in standard HTML 
+        <meta> tags.  One site that does is:  www.theepochtimes.com/epochtv
+        - StreamFinder::Goodpods - REMOVED due to them javascripting up their 
+        site to where it's no longer possible to scrape any streams.
+2.19    2023/09/12
+        - StreamFinder::Youtube - 1) Fix failure to fetch artist, icon, etc. 
+        sometimes on embedded IFRAME urls (slight site changes) and first 
+        episode from some channels.  2) Add -youtube-site argument to specify 
+        a different default youtube site (default https://www.youtube.com).  
+        3) Add ability to parse youtube channel URLs containing an at-sign, 
+        ie.: https://www.youtube.com/@channelID.
+        - StreamFinder::Subsplash - Restore as EXPERIMENTAL, as this site 
+        seems to now work again, at least for audio streams on some sites.
+        - StreamFinder::Anystream - doc. touchups.

@@ -1,5 +1,24 @@
 Revision history for Perl extension GD::Barcode.
 
+2.00 2023-09-13
+        - 'Production' release, no changes to 1.99_03
+
+1.99_03 2022-01-10 (DEVELOPMENT RELEASE)
+        - Fix cpantesters test for Business::ISBN failing
+          seemingly because of broken version of Business::ISBN:
+          require Business::ISBN 3.007 or later
+
+1.99_02 2021-12-20 (DEVELOPMENT RELEASE)
+        - Fix issue with Code39 barcodes that prevent rendering white
+          background in some cases by Boris Zentner
+        - Add unit tests
+        - Modernize code
+
+1.99_01 2016-10-23 (DEVELOPMENT RELEASE)
+        - Moved modules to lib/
+        - Specified correct dependencies.
+        - Fixed RT#20297 - Auto-size with 'Version'.
+
 1.15  Mon Apr 24 15:50:00 2004
         - Add QRcode support
             based on QRcode image CGI version 0.50   (C)2000-2002,Y.Swetake
@@ -20,4 +39,3 @@ Revision history for Perl extension GD::Barcode.
 
 1.10  Sun Oct 29 10:00:00 2000
         - First release (Converted from KbBarcode.pm)
-

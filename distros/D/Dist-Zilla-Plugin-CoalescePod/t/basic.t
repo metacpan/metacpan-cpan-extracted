@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Test::DZil;
 
@@ -9,7 +9,7 @@ my $tzil = Builder->from_config( { dist_root => "t/corpus" },);
 
 $tzil->build;
 
-is grep( { $_->name =~ /\.pod/ } @{ $tzil->files } ), 0, 'pod files are removed';
+is grep( { $_->name =~ /\.pod/ } @{ $tzil->files } ), 1, 'pod files with associated pm files are removed';
 
 my ($foo) = grep { $_->name =~ /Foo/ } @{ $tzil->files };
 

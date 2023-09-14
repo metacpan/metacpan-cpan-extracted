@@ -3,8 +3,9 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'Device::Chip::CC1101' );
+require Device::Chip::CC1101;
 
+pass( 'Modules loaded' );
 done_testing;

@@ -29,16 +29,16 @@ name: YA-CLI
 provides:
   YA::CLI:
     file: lib/YA/CLI.pm
-    version: '0.003'
+    version: '0.004'
   YA::CLI::ActionRole:
     file: lib/YA/CLI/ActionRole.pm
-    version: '0.003'
+    version: '0.004'
   YA::CLI::ErrorHandler:
     file: lib/YA/CLI/ErrorHandler.pm
-    version: '0.003'
+    version: '0.004'
   YA::CLI::Usage:
     file: lib/YA/CLI/Usage.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Carp: '0'
   Getopt::Long: '2.39'
@@ -53,9 +53,7 @@ requires:
   perl: '5.010'
 resources:
   repository: git://gitlab.com/waterkip/yet-another-cli-module.git
-version: '0.003'
-x_contributors:
-  - 'Wesley Schwengle <waterkip@cpan.org>'
+version: '0.004'
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: BSD

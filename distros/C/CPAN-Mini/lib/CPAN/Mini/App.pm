@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 
-package CPAN::Mini::App;
-$CPAN::Mini::App::VERSION = '1.111016';
+package CPAN::Mini::App 1.111017;
+
 # ABSTRACT: the guts of the minicpan command
 
 #pod =head1 SYNOPSIS
@@ -164,13 +164,23 @@ CPAN::Mini::App - the guts of the minicpan command
 
 =head1 VERSION
 
-version 1.111016
+version 1.111017
 
 =head1 SYNOPSIS
 
   #!/usr/bin/perl
   use CPAN::Mini::App;
   CPAN::Mini::App->run;
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should
+work on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 METHODS
 
@@ -191,7 +201,7 @@ Randal Schwartz's original article, which can be found here:
 
 =item *
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =item *
 

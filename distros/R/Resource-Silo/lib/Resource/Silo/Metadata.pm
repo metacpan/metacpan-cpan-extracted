@@ -2,7 +2,7 @@ package Resource::Silo::Metadata;
 
 use strict;
 use warnings;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 NAME
 
@@ -106,9 +106,10 @@ sub add {
         defined $spec{$_}
             and croak "resource '$name': 'literal' is incompatible with '$_'"
                 for qw( init class argument );
-        $spec{init} = sub { $value };
-        $spec{dependencies} //= [];
-        $spec{derived}      //= 1;
+        $spec{init}            = sub { $value };
+        $spec{dependencies}  //= [];
+        $spec{derived}       //= 1;
+        $spec{cleanup_order} //= 9 ** 9 ** 9;
     };
 
     _make_init_class($self, $name, \%spec)
@@ -135,6 +136,7 @@ sub add {
                 .join( ", ", map { "'$_'" } @fwd)
                     if @fwd;
         } else {
+            $spec{autodeps}  = 1;
             $spec{allowdeps} = {
                 map { $_ => 1 } keys %{ $self->{resource} },
             };
@@ -145,9 +147,11 @@ sub add {
         unless ref $spec{init} and reftype $spec{init} eq $CODE;
 
     if (!defined $spec{argument}) {
+        $spec{orig_argument} = '';
         $spec{argument} = \&_is_empty;
     } elsif (ref $spec{argument} eq $REGEXP) {
         my $rex = qr(^(?:$spec{argument})$);
+        $spec{orig_argument} = $spec{argument};
         $spec{argument} = sub { $_[0] =~ $rex };
     } elsif ((reftype $spec{argument} // '') eq $CODE) {
         # do nothing, we're fine
@@ -175,6 +179,8 @@ sub add {
         push @{ $self->{preload} }, $name;
     };
 
+    $spec{origin} = Carp::shortmess("declared");
+    $spec{origin} =~ s/\s+$//s;
     $self->{resource}{$name} = \%spec;
 
     # Move code generation into Resource::Silo::Container
@@ -263,14 +269,45 @@ sub _make_dsl {
 Returns a list (or arrayref in scalar context)
 containing the names of known resources.
 
+The order is not guaranteed.
+
 B<EXPERIMENTAL>. Return value structure is subject to change.
 
 =cut
 
 sub list {
     my $self = shift;
-    my @list = sort grep { !/^-/ } keys %{ $self->{resource} };
+    my @list = sort keys %{ $self->{resource} };
     return wantarray ? @list : \@list;
+};
+
+=head2 show( $name )
+
+Returns a shallow copy of resource specification.
+
+B<EXPERIMENTAL>. Return value structure is subject to change.
+
+=cut
+
+sub show {
+    my ($self, $name) = @_;
+
+    my $all = $self->{resource};
+    my $spec = $all->{$name};
+    croak "Unknown resource '$name'"
+        unless $spec;
+
+    my %show = %$spec; # shallow copy
+
+    if (my $deps = delete $show{allowdeps}) {
+        $show{dependencies} = [ keys %$deps ];
+    };
+
+    if (exists $show{orig_argument}) {
+        $show{argument} = delete $show{orig_argument};
+    };
+
+    return \%show;
 };
 
 =head2 self_check()

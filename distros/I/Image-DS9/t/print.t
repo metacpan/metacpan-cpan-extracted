@@ -1,35 +1,37 @@
+#! perl
+
+use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Image::DS9;
-use Cwd;
+use Image::DS9::Constants::V1
+  'PRINT_DESTINATIONS',
+  'PRINT_COLORS',
+  'PRINT_LEVELS',
+  'PRINT_RESOLUTIONS';
 
-BEGIN { plan( tests => 15 ) ;}
+use Test::Lib;
+use My::Util;
 
-require './t/common.pl';
+my $ds9     = start_up();
+my $version = $ds9->version;
 
+test_stuff(
+    $ds9,
+    (
+        print => [
+            ( map { ( destination => $_ ) } PRINT_DESTINATIONS ),
+            command  => 'print_this',
+            filename => 'print_this.ps',
+            ( map { ( color => $_ ) } PRINT_COLORS ),
+            ( map { ( level => $_ ) } PRINT_LEVELS ),
+            (
+                map { ( resolution => $_ ) }
+                map { $version <= v8.4.1 && $_ eq 'screen' ? 'Screen' : $_ } PRINT_RESOLUTIONS
+            ),
+        ],
+    ) );
 
-my $ds9 = start_up();
-
-test_stuff( $ds9, (
-                   print =>
-                   [
-                    destination => 'file',
-                    destination => 'printer',
-                    command => 'print_this',
-                    filename => 'print_this.ps',
-                    palette => 'gray',
-                    palette => 'cmyk',
-                    palette => 'rgb',
-                    level => 1,
-                    level => 2,
-                    resolution => 53,
-                    resolution => 72,
-                    resolution => 75,
-                    resolution => 150,
-                    resolution => 300,
-                    resolution => 600,
-                   ],
-                  ) );
-
+done_testing;

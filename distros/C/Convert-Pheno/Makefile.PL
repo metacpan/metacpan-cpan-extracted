@@ -18,7 +18,7 @@ WriteMakefile(
         'dynamic_config' => 0,
         'meta-spec' => { version   => 0 },
         'no_index'  => { directory => [qw(docs t share/api)] },
-        'prereqs'   => { runtime   => { requires => { perl => '5.0261' } } },
+        'prereqs'   => { runtime   => { requires => { perl => '5.026000' } } },
         'resources' => {
             bugtracker => { web => "$GITHUB_URL/issues" },
             homepage   => $GITHUB_URL,
@@ -48,7 +48,7 @@ WriteMakefile(
         'Test::Deep'                     => '1.204',
         'Test::Exception'                => '0.43',
         'Test::Warn'                     => '0.37',
-        'PerlIO::gzip'                   => '0.20',
+       	'Data::Leaf::Walker'	         => '0.21'
         #'IO::Socket::SSL'              => '2.083'
         #'Mojolicious::Plugin::OpenAPI' => '5.09'
     },

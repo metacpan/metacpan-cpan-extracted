@@ -1,5 +1,5 @@
 package YA::CLI;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use Moo;
 
 # ABSTRACT: Yet another CLI framework
@@ -33,18 +33,26 @@ sub _init {
 
     my %cli_args = $class->_get_opts($args);
 
-    my $action;
+    my ($action, $subaction);
     if (@$args && $args->[0] !~ /^--/) {
         $action = shift @$args;
     }
+    if ($action && @$args && $args->[0] !~ /^--/) {
+        $subaction = shift @$args;
+    }
     $action //= $class->default_handler;
 
-    my $handler = $class->_get_action_handler($action);
+    my $handler = $class->_get_action_handler($action, $subaction);
 
     if (!$handler) {
         require YA::CLI::ErrorHandler;
         $handler = 'YA::CLI::ErrorHandler';
-        return $handler->as_help(1, "$action command does not exist!");
+        if (!defined $subaction) {
+            return $handler->as_help(1, "$action command does not exist!");
+        }
+        else {
+            return $handler->as_help(1, "$action $subaction command does not exist!");
+        }
     }
 
     return $handler->as_manpage()  if $cli_args{man};
@@ -86,7 +94,9 @@ sub _get_opts {
 my @PLUGINS;
 
 sub _get_action_handler {
-    my ($class, $action) = @_;
+    my $class     = shift;
+    my $action    = shift;
+    my $subaction = shift;
 
     my $finder = Module::Pluggable::Object->new(
         search_path => $class->default_search_path,
@@ -94,7 +104,7 @@ sub _get_action_handler {
     );
 
     @PLUGINS = $finder->plugins if !@PLUGINS;
-    return first { $_->has_action($action) } @PLUGINS;
+    return first { $_->has_action($action, $subaction) } @PLUGINS;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -111,7 +121,7 @@ YA::CLI - Yet another CLI framework
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -134,6 +144,10 @@ version 0.003
 
     # This is the action your sub command is selected on
     sub action { 'main' } # can also be an array in case you want aliases
+
+    # This is the subaction your sub command is selected on. This is an
+    # optional sub, you don't need to implement it
+    sub subaction { 'thing' } # can also be an array in case you want aliases
 
     sub run {
         # Logic here
@@ -167,6 +181,18 @@ and C<--man> commands.
 
 Define L<Getopt::Long> options in your module that are used on top of the
 default help and man.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<YA::CLI::ActionRole>
+
+=item * L<YA::CLI::ErrorHandler>
+
+=item * L<YA::CLI::Usage>
+
+=back
 
 =head1 AUTHOR
 

@@ -1,5 +1,11 @@
 Revision history for Mac::Finder::Tags
 
+0.02  2023-09-13
+
+ - Avoid syntax that causes warnings in Object::Pad 0.801.
+ - Tests no longer fail for unexpected warnings, except during author testing.
+ - Drop Devel::CheckOS prerequisite (by bundling it).
+
 0.01  2022-03-03
 
  - initial release

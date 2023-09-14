@@ -1306,6 +1306,7 @@ int32_t SPVM_TYPE_can_assign_for_method_definition (
   else {
     if (dist_type_dimension == src_type_dimension && dist_type_flag == src_type_flag) {
       if (SPVM_BASIC_TYPE_is_class_type(compiler, dist_type_basic_type_id)) {
+        
         if (dist_type_basic_type_id == src_type_basic_type_id) {
           assignability = 1;
         }
@@ -1453,7 +1454,7 @@ int32_t SPVM_TYPE_can_cast(
     }
     // Source type is interface type
     else if (SPVM_TYPE_is_interface_type(compiler, src_type_basic_type_id, src_type_dimension, src_type_flag)) {
-      castability = SPVM_BASIC_TYPE_has_interface(compiler, dist_type_basic_type_id, src_type_basic_type_id);;
+      castability = SPVM_BASIC_TYPE_has_interface(compiler, dist_type_basic_type_id, src_type_basic_type_id);
     }
     // Source type is any object type
     else if (SPVM_TYPE_is_any_object_type(compiler, src_type_basic_type_id, src_type_dimension, src_type_flag)) {
@@ -1617,7 +1618,7 @@ int32_t SPVM_TYPE_can_cast(
     }
     // Source type is interface array type
     else if (SPVM_TYPE_is_interface_array_type(compiler, src_type_basic_type_id, src_type_dimension, src_type_flag)) {
-      castability = SPVM_BASIC_TYPE_has_interface(compiler, dist_type_basic_type_id, src_type_basic_type_id);;
+      castability = SPVM_BASIC_TYPE_has_interface(compiler, dist_type_basic_type_id, src_type_basic_type_id);
     }
     // Source type is any object type
     else if (SPVM_TYPE_is_any_object_type(compiler, src_type_basic_type_id, src_type_dimension, src_type_flag)) {

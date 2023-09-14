@@ -7,7 +7,7 @@ use CPAN::Meta::Validator;
 use CPAN::Meta::Converter;
 use List::Util qw/first/;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 $VERSION =~ s/_//; ## no critic
 
 sub order { 10 }
@@ -109,6 +109,7 @@ sub _analyse_json {
         my ($spec, $error) = _validate_meta($meta);
         $me->d->{error}{meta_json_conforms_to_known_spec} = $error if $error;
         $me->d->{meta_json_spec_version} = $spec->{spec};
+        $me->d->{meta_json} = $meta;
     }
     if (!$me->d->{meta_yml}) {
         $me->d->{meta_yml} = $meta;

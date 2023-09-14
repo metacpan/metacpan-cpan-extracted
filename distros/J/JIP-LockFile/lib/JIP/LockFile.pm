@@ -9,7 +9,7 @@ use Carp qw(croak);
 use Fcntl qw(LOCK_EX LOCK_NB);
 use English qw(-no_match_vars);
 
-our $VERSION = '0.063';
+our $VERSION = '0.064';
 
 sub new {
     my ( $class, %param ) = @ARG;

@@ -1,30 +1,31 @@
 NAME
     App::BPOMUtils::Table::FoodCategory - List food categories in BPOM
-    processed food division
+    processed food division (old, pre-RBA version)
 
 VERSION
-    This document describes version 0.017 of
+    This document describes version 0.018 of
     App::BPOMUtils::Table::FoodCategory (from Perl distribution
-    App-BPOMUtils-Table-FoodCategory), released on 2023-02-13.
+    App-BPOMUtils-Table-FoodCategory), released on 2023-09-03.
 
 DESCRIPTION
     This distribution contains the following CLIs:
 
-    *   bpom-daftar-kategori-pangan
+    *   bpom-daftar-kategori-pangan-lama
 
     *   bpom-daftar-kategori-pangan-rba
 
-    *   bpom-list-food-categories
+    *   bpom-list-food-categories-old
 
     *   bpom-list-food-categories-rba
 
 FUNCTIONS
-  bpom_list_food_categories
+  bpom_list_food_categories_old
     Usage:
 
-     bpom_list_food_categories(%args) -> [$status_code, $reason, $payload, \%result_meta]
+     bpom_list_food_categories_old(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-    List food categories in BPOM processed food division.
+    List food categories in BPOM processed food division (old, pre-RBA
+    version).
 
     This function is not exported by default, but exportable.
 

@@ -87,6 +87,7 @@ sub get_spvm_core_header_file_names {
     spvm_interface.h
     spvm_list.h
     spvm_method.h
+    spvm_mutex.h
     spvm_class_file.h
     spvm_native.h
     spvm_object.h
@@ -157,6 +158,7 @@ sub get_spvm_core_source_file_names {
     spvm_interface.c
     spvm_list.c
     spvm_method.c
+    spvm_mutex.c
     spvm_class_file.c
     spvm_op.c
     spvm_opcode_builder.c
@@ -736,7 +738,7 @@ EOS
         }
         else {
           my $dl_error = DynaLoader::dl_error();
-          confess "The DynaLoader::dl_load_file function failed:Can't load the \"$dynamic_lib_file\" file for the $category methods in the $basic_type_name class: $dl_error";
+          confess "The DynaLoader::dl_load_file function failed:Can't load the \"$dynamic_lib_file\" file for $category methods in $basic_type_name class: $dl_error";
         }
       }
       else {
@@ -752,7 +754,7 @@ EOS
 
 sub create_default_config {
   
-  my $config = SPVM::Builder::Config->new_c99(file_optional => 1);
+  my $config = SPVM::Builder::Config->new_gnu99(file_optional => 1);
   
   return $config;
 }
@@ -781,7 +783,7 @@ sub get_version_string {
   }
 
   unless (defined $version_string) {
-    confess "The version string can't be find in the $spvm_class_file file";
+    confess "The version string can't be find in $spvm_class_file file";
   }
   
   return $version_string;
@@ -801,7 +803,7 @@ sub get_spvm_version_string {
   }
   
   unless (defined $version_string) {
-    confess "The version string can't be find in the $spvm_api_header_file file";
+    confess "The version string can't be find in $spvm_api_header_file file";
   }
   
   return $version_string;

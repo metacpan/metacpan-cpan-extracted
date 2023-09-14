@@ -14,9 +14,9 @@ my @module_files = (
 );
 
 my @scripts = (
-    'script/bpom-daftar-kategori-pangan',
+    'script/bpom-daftar-kategori-pangan-lama',
     'script/bpom-daftar-kategori-pangan-rba',
-    'script/bpom-list-food-categories',
+    'script/bpom-list-food-categories-old',
     'script/bpom-list-food-categories-rba'
 );
 

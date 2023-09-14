@@ -14,9 +14,9 @@ my @module_files = (
 );
 
 my @scripts = (
-    'script/bpom-daftar-bahan-baku-pangan',
+    'script/bpom-daftar-bahan-baku-pangan-lama',
     'script/bpom-daftar-bahan-baku-pangan-rba',
-    'script/bpom-list-food-ingredients',
+    'script/bpom-list-food-ingredients-old',
     'script/bpom-list-food-ingredients-rba'
 );
 

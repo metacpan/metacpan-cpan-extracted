@@ -11,7 +11,7 @@ use Readonly;
 Readonly::Array our @EXPORT_OK => qw(attribute char comment end_element instruction
 	start_element);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Encode attribute as PYX.
 sub attribute {
@@ -147,6 +147,8 @@ Returns array of encoded lines.
 
 =head1 EXAMPLE
 
+=for comment filename=serialize_pyx.pl
+
  use strict;
  use warnings;
 
@@ -201,12 +203,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2021 Michal Josef Špaček
+© 2005-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

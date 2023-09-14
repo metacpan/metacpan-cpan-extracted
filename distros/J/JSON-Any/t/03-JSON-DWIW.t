@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More 0.88;
 
 eval "use JSON::Any qw(DWIW)";
 plan skip_all => "JSON::DWIW not installed: $@" if $@;

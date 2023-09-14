@@ -11,7 +11,7 @@ configure_requires:
   XS::Parse::Keyword::Builder: '0.13'
   XS::Parse::Sublike::Builder: '0.14'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,16 +20,16 @@ name: Future-AsyncAwait
 provides:
   Future::AsyncAwait:
     file: lib/Future/AsyncAwait.pm
-    version: '0.65'
+    version: '0.66'
   Future::AsyncAwait::Awaitable:
     file: lib/Future/AsyncAwait/Awaitable.pm
-    version: '0.65'
+    version: '0.66'
   Future::AsyncAwait::ExtensionBuilder:
     file: lib/Future/AsyncAwait/ExtensionBuilder.pm
-    version: '0.65'
+    version: '0.66'
   Test::Future::AsyncAwait::Awaitable:
     file: lib/Test/Future/AsyncAwait/Awaitable.pm
-    version: '0.65'
+    version: '0.66'
 requires:
   Future: '0.50'
   XS::Parse::Keyword: '0.13'
@@ -38,5 +38,5 @@ requires:
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.65'
+version: '0.66'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 package Prometheus::Tiny;
-$Prometheus::Tiny::VERSION = '0.010';
+$Prometheus::Tiny::VERSION = '0.011';
 # ABSTRACT: A tiny Prometheus client
 
 use warnings;
@@ -36,9 +36,14 @@ sub _format_labels {
 
   join ',', map {
     my $lv = $to_format->{$_};
-    $lv =~ s/(["\\])/\\$1/sg;
-    $lv =~ s/\n/\\n/sg;
-    qq{$_="$lv"}
+    if (defined $lv) {
+      $lv =~ s/(["\\])/\\$1/sg;
+      $lv =~ s/\n/\\n/sg;
+      qq{$_="$lv"}
+    } else {
+      carp "label '$_' has an undefined value, dropping it";
+      ()
+    }
   } sort keys %$to_format;
 }
 
@@ -390,7 +395,7 @@ L<https://github.com/robn/Prometheus-Tiny>
 
 =item *
 
-Rob N ★ <robn@robn.io>
+Rob Norris <robn@despairlabs.com>
 
 =back
 
@@ -414,7 +419,7 @@ Michael McClimon <michael@mcclimon.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Rob N ★
+This software is copyright (c) 2017 by Rob Norris <robn@despairlabs.com>
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

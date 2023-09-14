@@ -4,6 +4,13 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Module::CPANTS::TestAnalyse;
 
+my $no_symlinks;
+if ($^O eq 'MSWin32') {
+  plan skip_all => 'requires Test::File 1.993 to test' unless eval { require Test::File; Test::File->VERSION(1.993) };
+
+  $no_symlinks = !Test::File::has_symlinks();
+}
+
 test_distribution {
   my ($mca, $dir) = @_;
   write_file("$dir/MANIFEST", <<"EOF");
@@ -58,7 +65,7 @@ EOF
 
   my $stash = $mca->run;
   ok !$stash->{error}{symlinks}, "symlinks not listed in MANIFEST is ignored for a local distribution";
-};
+} unless $no_symlinks;
 
 test_distribution {
   my ($mca, $dir) = @_;
@@ -75,6 +82,6 @@ EOF
   my $stash = archive_and_analyse($dir, "Module-CPANTS-Analyse-Test-0.01.tar.gz");
 
   ok $stash->{error}{symlinks}, "symlinks not listed in MANIFEST is not ignored for a non-local distribution";
-};
+} unless $no_symlinks;
 
 done_testing;

@@ -34,4 +34,13 @@ lives_and {
     is silo->foo, 4;
 } "explicitly allowed forward declaration";
 
+throws_ok {
+    use Resource::Silo;
+    resource auto => sub { my $self = shift; $self->next };
+    resource next => sub { 42 };
+
+    silo->auto;
+} qr/'next' was unexpectedly required by 'auto'.*explicit.*dependencies/
+    , "implicit dependencies have a clear error message";
+
 done_testing;

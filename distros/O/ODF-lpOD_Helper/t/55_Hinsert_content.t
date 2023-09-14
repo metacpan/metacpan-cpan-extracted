@@ -8,11 +8,11 @@ use t_TestCommon ':silent',
 use LpodhTestUtils qw/verif_normalized/;
 
 use ODF::lpOD;
-use ODF::lpOD_Helper;
+use ODF::lpOD_Helper qw/:DEFAULT Hr_MASK/;
 BEGIN {
   *_abbrev_addrvis = *ODF::lpOD_Helper::_abbrev_addrvis;
-  *TEXTLEAF_COND   = *ODF::lpOD_Helper::TEXTLEAF_COND;
-  *PARA_COND       = *ODF::lpOD_Helper::PARA_COND;
+  *TEXTLEAF_FILTER   = *ODF::lpOD_Helper::TEXTLEAF_FILTER;
+  *PARA_FILTER       = *ODF::lpOD_Helper::PARA_FILTER;
   *__leaf2vtext    = *ODF::lpOD_Helper::__leaf2vtext;
 }
 
@@ -26,6 +26,18 @@ say dvis '$pristine_bodytext' if $debug;
 
 $body->normalize; # just in case it isn't from LibreOffice
 verif_normalized($body);
+
+{ my $ystr = 'Hr_RESCAN';
+  for my $xstr (qw/Hr_STOP Hr_SUBST Hr_RESCAN/) {
+    my $x = eval $xstr // die "eval '$xstr' : $@";
+    my $y = eval $ystr // die "eval '$ystr' : $@";
+    fail("$xstr not contained in Hr_MASK")
+      unless ($x & Hr_MASK) == $x;
+    fail("$xstr overlaps with $ystr")
+      if (($y|$x) ^ $y) != $x or (($y|$x) ^ $x) != $y;
+    $ystr = $xstr;
+  }
+}
 
 #FIXME: replace adjacent to PCTEXT or text:s to check normalization
 
@@ -98,6 +110,7 @@ for my $start_text ("Front Stuff", "  :(3", "  ")
   foreach (@repl_content) {
     my $new_content = $_;
     foreach (@$new_content) { #make unique
+      next if ref;
       s/NEW/sprintf("NEW%03d", $count++)/esg unless ref; 
     }
     my $testname = "Hreplace ".vis($start_text)." with ".vis($new_content);
@@ -105,7 +118,7 @@ for my $start_text ("Front Stuff", "  :(3", "  ")
     my $content_vtext = join("", grep{! ref} @$new_content);
     
     my ($replinfo, @extra) = $body->Hreplace(qr/\Q${start_text}\E/s, 
-                                             $new_content, 
+                                             $new_content,
                                              debug => $debug);
     oops unless $replinfo && !@extra;
     note "AFTER :\n", fmt_tree($para) if $debug;
@@ -141,6 +154,35 @@ for my $start_text ("Front Stuff", "  :(3", "  ")
   note "Final body vtext = ",vis($body->Hget_text())
     if $debug;
 
+}
+
+# Confirm that recursive substitution throws
+{ fail("oops") if $body->Hget_text() =~ /FILBERT/;
+  my @r = $body->Hreplace("Lorem", 
+            sub{ my $m = shift; 
+                 (Hr_SUBST|Hr_STOP, ["FILBERT"]) 
+               });
+  fail("oops") unless $body->Hget_text() =~ /FILBERT/;
+  $r[0]->{para}->Hreplace("FILBERT", ["Lorem"]); # undo
+     @r = $body->Hreplace("Lorem", 
+            sub{ my $m = shift; 
+                 # Recursive search is okay
+                 my @r2 = $m->{para}->Hsearch("Lorem");
+                 is(scalar(@r2), 1, "recursive search is allowed");
+
+                 (Hr_SUBST|Hr_STOP, ["FILBERT"]) 
+               });
+  $r[0]->{para}->Hreplace("FILBERT", ["Lorem"]); # undo
+     @r = $body->Hreplace("Lorem", 
+            sub{ my $m = shift; 
+                 # Recursive modification should throw 
+                 eval {
+                   () = $m->{para}->Hreplace("Lorem", sub{ (Hr_SUBST|Hr_STOP, ["bar"]) });
+                 };
+                 like($@, qr/Recursive sub.*not /, "recursive subst throws");
+
+                 (Hr_SUBST|Hr_STOP, ["FILBERT"]) 
+               });
 }
 
 done_testing();

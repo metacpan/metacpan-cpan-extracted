@@ -3,10 +3,10 @@ use warnings;
 
 package Mac::Finder::Tags;
 # ABSTRACT: Access macOS file tags (aka Finder labels)
-$Mac::Finder::Tags::VERSION = '0.01';
+$Mac::Finder::Tags::VERSION = '0.02';
 
 use Mac::PropertyList 'parse_plist';
-use Object::Pad 0.43;
+use Object::Pad 0.60;
 use Path::Tiny;
 
 use Mac::Finder::Tags::Impl::mdls;
@@ -20,10 +20,10 @@ our $MAX_TRIES = 5;
 
 class Mac::Finder::Tags :strict(params) {
 	
-	has $impl :param = undef;
-	has $caching :param = 0;
-	has $file_cache;
-	has @tags_cache;
+	field $impl :param = undef;
+	field $caching :param = 0;
+	field $file_cache;
+	field @tags_cache;
 	
 	ADJUST {
 		$impl = $caching ? 'xattr' : 'mdls' unless defined $impl;
@@ -110,7 +110,7 @@ Mac::Finder::Tags - Access macOS file tags (aka Finder labels)
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -154,10 +154,6 @@ version 0.01
 This class offers methods to read and write macOS file system tags
 (the feature that replaced Mac OS Finder labels from OS X 10.9).
 
-It is also an attempt to put L<Object::Pad> to some use. As such,
-all the warnings about the experimental status of L<Object::Pad>
-apply directly to this module as well.
-
 This software has pre-release quality. There is little documentation
 and no schedule for further development.
 
@@ -169,7 +165,8 @@ tags for files that have multiple tags. This issue is mitigated
 to some extent when caching is enabled.
 
 When caching is enabled, I<all> tags on the entire system will be
-cached using C<mdfind> at object creation time. C<get_tags()> will
+cached using C<mdfind> at object creation time (however, files in
+locations not indexed by Spotlight are skipped). C<get_tags()> will
 then only perform lookups in this cache, which is extremely fast.
 You should consider caching whenever you intend to look up more
 than maybe a hundred or so files; however, if your system has an
@@ -204,7 +201,7 @@ The following methods are unimplemented in this version:
 =back
 
 This software may not work on other filesystems than HFS+ or APFS.
-So far, it has only been tested on macOS 10.15.
+It has not been tested on all macOS versions.
 
 =head1 AUTHOR
 
@@ -215,7 +212,7 @@ If you contact me by email, please make sure you include the word
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Arne Johannessen.
+This software is Copyright (c) 2022-2023 by Arne Johannessen.
 
 This is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0 or (at your option) the same terms

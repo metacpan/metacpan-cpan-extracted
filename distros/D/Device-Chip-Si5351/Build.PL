@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -8,13 +9,14 @@ my $build = Module::Build->new(
    requires => {
       'perl' => '5.026',
       'Future::AsyncAwait' => '0.38',
-      'Object::Pad' => 0.57,
+      'Object::Pad' => '0.800',
 
       'Data::Bitfield' => 0,
       'Device::Chip::Base::RegisteredI2C' => '0.21',
    },
    test_requires => {
-      'Test::More' => '0.88', # done_testing
+      'Test::Device::Chip::Adapter' => 0,
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

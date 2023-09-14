@@ -1294,7 +1294,7 @@ This package has the following attributes:
 
 =head2 data
 
-  data(ArrayRef $data) (ArrayRef)
+  data(arrayref $data) (arrayref)
 
 The data attribute holds an arrayref of command-line arguments and defaults to
 C<@ARGV>.
@@ -1341,7 +1341,7 @@ This package provides the following methods:
 
 =head2 arg
 
-  arg(Str $name) (Any)
+  arg(string $name) (any)
 
 The arg method returns the value passed to the CLI that corresponds to the
 registered argument using the name provided.
@@ -1476,7 +1476,7 @@ I<Since C<2.55>>
 
 =head2 cmd
 
-  cmd(Str $name) (Any)
+  cmd(string $name) (any)
 
 The cmd method returns truthy or falsy if the value passed to the CLI that
 corresponds to the argument registered and associated with the registered
@@ -1657,7 +1657,7 @@ I<Since C<2.55>>
 
 =head2 exit
 
-  exit(Int $code, Str|CodeRef $code, Any @args) (Any)
+  exit(number $code, string | coderef $code, any @args) (any)
 
 The exit method exits the program using the exit code provided. The exit code
 defaults to C<0>. Optionally, you can dispatch before exiting by providing a
@@ -1725,7 +1725,7 @@ I<Since C<2.55>>
 
 =head2 fail
 
-  fail(Str|CodeRef $code, Any @args) (Any)
+  fail(string | coderef $code, any @args) (any)
 
 The fail method exits the program with the exit code C<1>. Optionally, you can
 dispatch before exiting by providing a method name or coderef, and arguments.
@@ -1764,7 +1764,7 @@ I<Since C<2.55>>
 
 =head2 get
 
-  get(Str $type, Str $name) (Any)
+  get(string $type, string $name) (any)
 
 The get method returns C<arg>, C<opt>, C<cmd>, or C<str> configuration values
 from the configuration database.
@@ -1847,7 +1847,7 @@ I<Since C<2.55>>
 
 =head2 help
 
-  help() (Str)
+  help() (string)
 
 The help method returns a string representing I<"usage"> information based on
 the configuration of the CLI.
@@ -2112,7 +2112,7 @@ I<Since C<2.55>>
 
 =head2 okay
 
-  okay(Str|CodeRef $code, Any @args) (Any)
+  okay(string | coderef $code, any @args) (any)
 
 The okay method exits the program with the exit code C<0>. Optionally, you can
 dispatch before exiting by providing a method name or coderef, and arguments.
@@ -2151,7 +2151,7 @@ I<Since C<2.55>>
 
 =head2 opt
 
-  opt(Str $name) (Any)
+  opt(string $name) (any)
 
 The opt method returns the value passed to the CLI that corresponds to the
 registered option using the name provided.
@@ -2286,7 +2286,7 @@ I<Since C<2.55>>
 
 =head2 parsed
 
-  parsed() (HashRef)
+  parsed() (hashref)
 
 The parsed method returns the values provided to the CLI for all registered
 arguments and options as a hashref.
@@ -2321,7 +2321,7 @@ I<Since C<2.55>>
 
 =head2 parser
 
-  parser() (Opts)
+  parser() (Venus::Opts)
 
 The parser method returns a L<Venus::Opts> object using the L</spec> returned
 based on the CLI configuration.
@@ -2353,7 +2353,7 @@ I<Since C<2.55>>
 
 =head2 pass
 
-  pass(Str|CodeRef $code, Any @args) (Any)
+  pass(string | coderef $code, any @args) (any)
 
 The pass method exits the program with the exit code C<0>. Optionally, you can
 dispatch before exiting by providing a method name or coderef, and arguments.
@@ -2392,7 +2392,7 @@ I<Since C<3.10>>
 
 =head2 set
 
-  set(Str $type, Str $name, Str|HashRef $data) (Any)
+  set(string $type, string $name, string | hashref $data) (any)
 
 The set method stores configuration values for C<arg>, C<opt>, C<cmd>, or
 C<str> data in the configuration database, and returns the invocant.
@@ -2589,7 +2589,7 @@ I<Since C<2.55>>
 
 =head2 str
 
-  str(Str $name) (Any)
+  str(string $name) (any)
 
 The str method gets or sets configuration strings used in CLI help text based
 on the arguments provided. The L</help> method uses C<"name">,
@@ -2619,7 +2619,7 @@ I<Since C<2.55>>
 
 =head2 test
 
-  test(Str $type, Str $name) (Any)
+  test(string $type, string $name) (any)
 
 The test method validates the values for the C<arg> or C<opt> specified and
 returns the value(s) associated. If validation failed an exception is thrown.
@@ -2804,7 +2804,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

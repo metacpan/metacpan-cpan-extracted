@@ -3,21 +3,14 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
+
+use Object::Pad 0.800 ':experimental(mop)';
 
 use Future::AsyncAwait;
 
 use Device::Chip::TSL256x;
-
-sub is_approx
-{
-   my ( $x, $y, $name ) = @_;
-
-   my $builder = Test::More->builder;
-   $builder->ok( abs( $x - $y ) < 0.01, $name ) or
-      $builder->diag( "Got $x, expected approximately $y" );
-}
 
 my $chip = Device::Chip::TSL256x->new;
 
@@ -37,13 +30,12 @@ await $chip->mount(
    # read_config first just to cache the GAIN/INTEG settings
    await $chip->read_config;
 
-   is_approx( scalar await $chip->read_lux, 113.15,
+   is( scalar await $chip->read_lux, within( 113.15, 2 ),
       '->read_lux converts lux level' );
 
    $adapter->check_and_clear( '$chip->read_lux' );
 
    # gut-wrench to clear test data
-   use Object::Pad ':experimental(mop)';
    undef Object::Pad::MOP::Class->for_class( ref $chip )->get_field( '$_TIMINGbyte' )->value( $chip );
 }
 
@@ -57,13 +49,12 @@ await $chip->mount(
    # read_config first just to cache the GAIN/INTEG settings
    await $chip->read_config;
 
-   is_approx( scalar await $chip->read_lux, 113.15,
+   is( scalar await $chip->read_lux, within( 113.15, 2 ),
       '->read_lux converts lux level at GAIN=16' );
 
    $adapter->check_and_clear( '$chip->read_lux at GAIN=16' );
 
    # gut-wrench to clear test data
-   use Object::Pad ':experimental(mop)';
    undef Object::Pad::MOP::Class->for_class( ref $chip )->get_field( '$_TIMINGbyte' )->value( $chip );
 }
 
@@ -77,13 +68,12 @@ await $chip->mount(
    # read_config first just to cache the GAIN/INTEG settings
    await $chip->read_config;
 
-   is_approx( scalar await $chip->read_lux, 112.59,
+   is( scalar await $chip->read_lux, within( 112.59, 2 ),
       '->read_lux converts lux level at INTEG=101ms' );
 
    $adapter->check_and_clear( '$chip->read_lux at INTEG=101ms' );
 
    # gut-wrench to clear test data
-   use Object::Pad ':experimental(mop)';
    undef Object::Pad::MOP::Class->for_class( ref $chip )->get_field( '$_TIMINGbyte' )->value( $chip );
 }
 
@@ -97,14 +87,13 @@ await $chip->mount(
    # read_config first just to cache the GAIN/INTEG settings
    await $chip->read_config;
 
-   is_deeply( [ ( await $chip->read_lux )[1,2] ],
+   is( [ ( await $chip->read_lux )[1,2] ],
       [ 1024, 512 ],
       '->read_lux returns DATA0/DATA1 in list context' );
 
    $adapter->check_and_clear( '$chip->read_lux list context' );
 
    # gut-wrench to clear test data
-   use Object::Pad ':experimental(mop)';
    undef Object::Pad::MOP::Class->for_class( ref $chip )->get_field( '$_TIMINGbyte' )->value( $chip );
 }
 

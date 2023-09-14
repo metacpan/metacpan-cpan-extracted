@@ -4,7 +4,7 @@ StreamFinder::Anystream - Fetch any raw streamable URLs from an HTML page.
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2022 by
+This module is Copyright (C) 2017-2023 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -77,26 +77,32 @@ One or more streams can be returned.
 =over 4
 
 =item B<new>(I<ID>|I<url> [, I<-keep> => "type1,type2?..." | [type1,type2?...] ] 
-[, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ]])
+[, I<-maxstreams> [ => # ]] [, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ]])
 
 Accepts an HTML URL (webpage) and creates and returns a new station 
-object, or I<undef> if the URL contains any valid stream URLs (matching the list of 
-default extensions).  The URL must be the full URL.
+object, or I<undef> if the URL contains any valid stream URLs (matching the 
+list of default extensions).  The URL must be the full URL.
 
-The optional I<-keep> argument can be either a comma-separated string or an array 
-reference ([...]) of stream types (extensions) to keep (include) and returned in 
-order specified (type1, type2...).  Each "type" (extension) can be one of:  
-"mp3", "m4a", "mp4", "pls" (playlist), etc.  
-NOTE:  Since these are actual extensions used to identify streams, there is NO 
+The optional I<-keep> argument can be either a comma-separated string or an 
+array reference ([...]) of stream types (extensions) to keep (include) and 
+returned in order specified (type1, type2...).  Each "type" (extension) can be 
+one of:  "mp3", "m4a", "mp4", "pls" (playlist), etc.  NOTE:  Since these are 
+actual extensions used to identify streams, there is NO 
 "any/all/stream/playlist" catch-all options as used by some of the other 
-(more specific) StreamFinder-supported sites!  Streams will be returned sorted by 
-extension in the order specified in this list.
+(more specific) StreamFinder-supported sites!  Streams will be returned sorted 
+by extension in the order specified in this list.
 
-DEFAULT I<-keep> list is:  "mp3,ogg,flac,mp4,m4a,mpd,aac,m3u8,m3u,pls", meaning that 
-all mp3 streams found (if any), followed by all "ogg" streams, etc.
+DEFAULT I<-keep> list is:  "mp3,ogg,flac,mp4,m4a,mpd,aac,m3u8,m3u,pls", meaning 
+that all mp3 streams found (if any), followed by all "ogg" streams, etc.
 
-The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
-then only secure ("https://") streams will be returned.
+The optional I<-maxstreams> argument specifies the maximum number of streams to 
+consider (some sites have tons of them).  
+
+DEFAULT I<-secure> is 20 - return up to the first 20 streams found.
+The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  
+If 1 then only secure ("https://") streams will be returned.  
+NOTE:  If I<-secure> is specified, the number returned could be less as both 
+secure and unsecure streams are counted against the total as they are found.
 
 DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
@@ -104,8 +110,9 @@ Additional options:
 
 I<-log> => "I<logfile>"
 
-Specify path to a log file.  If a valid and writable file is specified, A line will be 
-appended to this file every time one or more streams is successfully fetched for a url.
+Specify path to a log file.  If a valid and writable file is specified, A line 
+will be appended to this file every time one or more streams is successfully 
+fetched for a url.
 
 DEFAULT I<-none-> (no logging).
 
@@ -113,11 +120,11 @@ I<-logfmt> specifies a format string for lines written to the log file.
 
 DEFAULT "I<[time] [url] - [site]: [title] ([total])>".  
 
-The valid field I<[variables]> are:  [stream]: The url of the first/best stream found.  
-[site]:  The site name (Anystream).  [url]:  The url searched for streams.  
-[time]: Perl timestamp when the line was logged.  [title], [artist], [album], 
-[description], [year], [genre], [total], [albumartist]:  The corresponding field data 
-returned (or "I<-na->", if no value).
+The valid field I<[variables]> are:  [stream]: The url of the first/best 
+stream found.  [site]:  The site name (Anystream).  [url]:  The url searched 
+for streams.  [time]: Perl timestamp when the line was logged.  [title], 
+[artist], [album], [description], [year], [genre], [total], [albumartist]:  
+The corresponding field data returned (or "I<-na->", if no value).
 
 =item $station->B<get>(['playlist'])
 
@@ -133,12 +140,12 @@ the first valid stream found.
 Current options are:  I<"random">, I<"nopls">, and I<"noplaylists">.  
 By default, the first ("best"?) stream is returned.  If I<"random"> is 
 specified, then a random one is selected from the list of streams found.  
-If I<"nopls"> is specified, and the stream to be returned is a ".pls" playlist, 
-it is first fetched and the first entry (or a random entry if I<"random"> is 
-specified) is returned.  This is needed by Fauxdacious Mediaplayer.
-If I<"noplaylists"> is specified, and the stream to be returned is a 
-"playlist" (either .pls or .m3u? extension), it is first fetched and the first 
-entry (or a random entry if I<"random"> is specified) in the playlist 
+If I<"nopls"> is specified, and the stream to be returned is a ".pls" 
+playlist, it is first fetched and the first entry (or a random entry if 
+I<"random"> is specified) is returned.  This is needed by Fauxdacious 
+Mediaplayer.  If I<"noplaylists"> is specified, and the stream to be returned 
+is a "playlist" (either .pls or .m3u? extension), it is first fetched and the 
+first entry (or a random entry if I<"random"> is specified) in the playlist 
 is returned.
 
 =item $station->B<count>()
@@ -221,7 +228,8 @@ and the options are loaded into a hash used only by the specific
 (submodule) specified.  Valid options include 
 I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.  
 
-Options specified here override any specified in I<~/.config/StreamFinder/config>.
+Options specified here override any specified in 
+I<~/.config/StreamFinder/config>.
 
 Among options valid for Anystream streams is the I<-keep> option 
 previously described in the B<new()> function.
@@ -290,7 +298,7 @@ L<http://search.cpan.org/dist/StreamFinder-Anystream/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2022 Jim Turner.
+Copyright 2017-2023 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -351,6 +359,7 @@ sub new
 	$DEBUG = $self->{'debug'}  if (defined $self->{'debug'});
 
 	my @okStreams;
+	$self->{'maxstreams'} = 20;
 	while (@_) {
 		if ($_[0] =~ /^\-?keep$/o) {
 			shift;
@@ -358,6 +367,9 @@ sub new
 				my $keeporder = shift;
 				@okStreams = (ref($keeporder) =~ /ARRAY/) ? @{$keeporder} : split(/\,\s*/, $keeporder);
 			}
+		} elsif ($_[0] =~ /^\-?maxstreams$/o) {
+			shift;
+			$self->{'maxstreams'} = (defined $_[0]) ? shift : 20;
 		} else {
 			shift;
 		}
@@ -434,19 +446,25 @@ sub new
 	$baseURL .= '/'  unless ($baseURL =~ m#\/$#o);
 	$self->{'title'} = $self->{'id'} || $url;
 	$self->{'description'} = $url2fetch;
-	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
-	$self->{'description'} = uri_unescape($self->{'description'});
-	$self->{'title'} = $1  if ($html =~ /\<TITLE>([^\<]+)/is);
-	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
-	$self->{'title'} = uri_unescape($self->{'title'});
-	$self->{'title'} =~ s/^\s+//s;
-	$self->{'title'} =~ s/\s+$//s;
+	$self->{'title'} = $1  if ($html =~ /\<TITLE>([^\<]+)/si);
 	print STDERR "-2: title=".$self->{'title'}."=\n"  if ($DEBUG);
-	$self->{'cnt'} = 0;
+	$self->{'cnt'} = 0;  #LIMIT HOW MANY STREAMS TO CONSIDER - SOME PAGES (ie. $self->{'maxstreams'} CAN HAVE BAGILLIONS:
 	my $streams = '';
 	my $streamExts = join('|',@okStreams);
 	print STDERR "--EXTS=$streamExts=\n"  if ($DEBUG);
-	while ($html =~ s#(https?\:\/\/|\.\.\/)?([^\s\'\"\:\<\>\[\]\{\}]+)\.($streamExts)##s) {
+	my $streamLimiter = 0;
+	while ($html =~ s#\<meta\s+([^\>]+)\>##iso) {
+		my $metatag = $1;
+		if ($metatag =~ m#\scontent\=\"([^\"]+)#io) {
+			my $content = $1;
+			$self->{'iconurl'} ||= $content  if ($metatag =~ /\:?image\"/o);
+			$self->{'title'} ||= $content  if ($metatag =~ /\:?title\"/o);
+			$self->{'description'} ||= $content  if ($metatag =~ /\:?description\"/o);
+			$self->{'artist'} ||= $content  if ($metatag =~ /\:?site_name\"/o);
+		}
+	}
+	while ($html =~ s#(https?\:\/\/|\.\.\/)?([^\s\'\"\:\<\>\[\]\{\}]+)\.($streamExts)##s
+			&& $streamLimiter <= $self->{'maxstreams'}) {
 		(my $one = $1 . $2) =~ s#\\\/#\/#gs;
 		my $ext = $3;
 		my $streamURL = $one.'.'.$ext;
@@ -469,6 +487,7 @@ sub new
 			print STDERR "--2b: baseURL=$tmpbase= stream=$streamURL=\n"  if ($DEBUG);
 		} #OTHERWISE STREAM URL IS A FULL URL (NO CHANGE).
 		$streams .= "$ext=$streamURL|"  unless ($self->{'secure'} && $streamURL !~ /^https/o);
+		$streamLimiter++;
 	}
 	print STDERR "==streams=$streams=\n"  if ($DEBUG);
 	my $stindex = 0;
@@ -479,7 +498,8 @@ sub new
 		$streams = $savestreams;
 		while ($streams =~ /^([^\=]*)\=([^\|]+)/o) {
 			$ext = $1; $one = $2;
-			if ($ext =~ /^${streamtype}$/i && !defined($havestreams{"$ext|$one"})) {
+			if ($ext =~ /^${streamtype}$/i && !defined($havestreams{"$ext|$one"})
+					&& (!$self->{'secure'} || $streamURL =~ /^https/o)) {
 				$self->{'streams'}->[$stindex++] = $one;
 				$havestreams{"$ext|$one"}++;
 			}
@@ -488,6 +508,12 @@ sub new
 	}
 	$self->{'cnt'} = scalar @{$self->{'streams'}};
 	$self->{'total'} = $self->{'cnt'};
+	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
+	$self->{'title'} = uri_unescape($self->{'title'});
+	$self->{'title'} =~ s/^\s+//s;
+	$self->{'title'} =~ s/\s+$//s;
+	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
+	$self->{'description'} = uri_unescape($self->{'description'});
 	if ($self->{'total'} > 0) {
 		$self->{'Url'} = $self->{'streams'}->[0];
 		print STDERR "-SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"  if ($DEBUG);
@@ -497,7 +523,13 @@ sub new
 					. "\n" . ${$self->{'streams'}}[$i] . "\n";
 		}
 	}
-	print STDERR "-9: title=".$self->{'title'}."=\n---id=".$self->{'id'}."=\n---desc=".$self->{'description'}."=\n---artist=".$self->{'artist'}."=\n---albumartist=".$self->{'albumartist'}."=\n"  if ($DEBUG);
+#	print STDERR "-9: title=".$self->{'title'}."=\n---id=".$self->{'id'}."=\n---desc=".$self->{'description'}."=\n---artist=".$self->{'artist'}."=\n---albumartist=".$self->{'albumartist'}."=\n"  if ($DEBUG);
+	if ($DEBUG) {
+		foreach my $i (sort keys %{$self}) {
+			print STDERR "--KEY=$i= VAL=".$self->{$i}."=\n";
+		}
+		print STDERR "--FIRST STREAM=".${$self->{'streams'}}[0]."=\n";
+	}
 	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!

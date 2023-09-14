@@ -1,0 +1,12 @@
+CommonMark Test File
+====================
+
+This file tests the [CommonMark](https://commonmark.org)
+parser — which is powered by [CommonMark](https://p3rl/CommonMark).
+Öy.
+
+``` go
+func main() {
+    fmt.Println("hello")
+}
+```

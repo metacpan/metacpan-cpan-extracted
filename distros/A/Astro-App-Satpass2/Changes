@@ -1,3 +1,19 @@
+0.051		2023-09-11	T. R. Wyant
+    Without DateTime, ParseTime::ISO8601 now accepts any zone. These are
+    handled by setting $ENV{TZ} before the conversion and hoping for the
+    best. The documentation warns that this is a shaky way to handle
+    zones.
+
+    Make Warner->wail() stack dump if $Carp::Verbose true.
+
+    Add --almanac to pass(). This adds almanac data to appropriate
+    passes. --ephemeris is more verbose, adding almanac data to all
+    passes. This change involved refactoring event formatting to use
+    sub-templates, rather than if-elsif-else chains.
+
+    Add 'none' as valid argument to FormatTime->round_time(). It is
+    equivalent to specifying undef, i.e. no rounding.
+
 0.050		2022-09-28	T. R. Wyant
     Silence DM5 deprecation warnings.
 

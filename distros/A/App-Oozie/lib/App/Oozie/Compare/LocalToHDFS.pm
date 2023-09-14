@@ -1,5 +1,5 @@
 package App::Oozie::Compare::LocalToHDFS;
-$App::Oozie::Compare::LocalToHDFS::VERSION = '0.002';
+$App::Oozie::Compare::LocalToHDFS::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
@@ -7,6 +7,7 @@ use warnings;
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
 use App::Oozie::Types::Common qw( IsDir );
+use App::Oozie::Constants qw( HDFS_COMPARE_SKIP_FILES );
 
 use Moo;
 use MooX::Options prefer_commandline => 0,
@@ -22,10 +23,6 @@ use File::Find ();
 use File::Spec::Functions qw( catfile catdir );
 use Scalar::Util          qw( blessed );
 use Types::Standard       qw( Str );
-
-use constant SKIP_FILES => qw(
-    .deployment
-);
 
 with qw(
     App::Oozie::Role::Fields::Common
@@ -117,7 +114,7 @@ sub compare_local_to_hdfs {
     my($local_dirs, $local_files) = $self->find_local_files;
     my($hdfs_dirs,  $hdfs_files ) = $self->find_hdfs_files;
 
-    my %skip_file = map { $_ => 1 } @{ $local_files }, SKIP_FILES;
+    my %skip_file = map { $_ => 1 } @{ $local_files }, HDFS_COMPARE_SKIP_FILES;
     my %skip_dir  = map { $_ => 1 } @{ $local_dirs };
     my @rm_dirs   = map { catdir  $hdfs_path, $_ } grep { ! $skip_dir{  $_ } } @{ $hdfs_dirs };
     my @rm_files  = map { catfile $hdfs_path, $_ } grep { ! $skip_file{ $_ } } @{ $hdfs_files };
@@ -176,7 +173,7 @@ App::Oozie::Compare::LocalToHDFS
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -203,10 +200,6 @@ App::Oozie::Compare::LocalToHDFS - Commpares the local files against the HDFS de
 =head2 find_local_files
 
 =head2 run
-
-=head1 Constants
-
-=head2 SKIP_FILES
 
 =head1 SEE ALSO
 

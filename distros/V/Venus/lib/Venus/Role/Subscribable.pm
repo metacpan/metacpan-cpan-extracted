@@ -137,7 +137,7 @@ This package provides the following methods:
 
 =head2 publish
 
-  publish(Str $name, Any @args) (Self)
+  publish(string $name, any @args) (object)
 
 The publish method notifies all subscribers for a given event and returns the
 invocant.
@@ -208,7 +208,7 @@ I<Since C<1.75>>
 
 =head2 subscribe
 
-  subscribe(Str $name, CodeRef $code) (Self)
+  subscribe(string $name, coderef $code) (object)
 
 The subscribe method registers a subscribers (i.e. callbacks) for a given event,
 and returns the invocant.
@@ -259,7 +259,7 @@ I<Since C<1.75>>
 
 =head2 subscribers
 
-  subscribers(Str $name) (Int)
+  subscribers(string $name) (number)
 
 The subscribers method returns the number of subscribers (i.e. callbacks) for a
 given event.
@@ -318,7 +318,7 @@ I<Since C<1.75>>
 
 =head2 unsubscribe
 
-  unsubscribe(Str $name, CodeRef $code) (Self)
+  unsubscribe(string $name, coderef $code) (object)
 
 The unsubscribe method deregisters all subscribers (i.e. callbacks) for a given
 event, or a specific callback if provided, and returns the invocant.
@@ -401,7 +401,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

@@ -73,7 +73,8 @@ sub create_cert_client {
 		data => $appuri,
 	    }],
 	    purpose => 'digitalSignature,keyEncipherment,dataEncipherment,'
-		. 'nonRepudiation,client',
+		. 'nonRepudiation,client'
+		. ($args{issuer} ? '' : ',keyCertSign'),
 	},
 	%args,
     );
@@ -102,7 +103,8 @@ sub create_cert_server {
 		data => $subalt . $appuri,
 	    }],
 	    purpose => 'digitalSignature,keyEncipherment,dataEncipherment,'
-	    . 'nonRepudiation,server',
+		. 'nonRepudiation,server'
+		. ($args{issuer} ? '' : ',keyCertSign'),
 	},
 	%args,
     );

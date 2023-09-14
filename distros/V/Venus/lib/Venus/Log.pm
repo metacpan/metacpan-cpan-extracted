@@ -226,7 +226,7 @@ This package has the following attributes:
 
 =head2 handler
 
-  handler(CodeRef $code) (CodeRef)
+  handler(coderef $code) (coderef)
 
 The handler attribute holds the callback that handles logging. The handler is
 passed the log level and the log messages.
@@ -253,7 +253,7 @@ I<Since C<1.68>>
 
 =head2 level
 
-  level(Str $name) (Str)
+  level(string $name) (string)
 
 The level attribute holds the current log level. Valid log levels are C<trace>,
 C<debug>, C<info>, C<warn>, C<error> and C<fatal>, and will emit log messages
@@ -283,7 +283,7 @@ I<Since C<1.68>>
 
 =head2 separator
 
-  separator(Any $data) (Any)
+  separator(any $data) (any)
 
 The separator attribute holds the value used to join multiple log message arguments.
 
@@ -333,7 +333,7 @@ This package provides the following methods:
 
 =head2 debug
 
-  debug(Str @data) (Log)
+  debug(string @data) (Venus::Log)
 
 The debug method logs C<debug> information and returns the invocant.
 
@@ -373,7 +373,7 @@ I<Since C<1.68>>
 
 =head2 error
 
-  error(Str @data) (Log)
+  error(string @data) (Venus::Log)
 
 The error method logs C<error> information and returns the invocant.
 
@@ -413,7 +413,7 @@ I<Since C<1.68>>
 
 =head2 fatal
 
-  fatal(Str @data) (Log)
+  fatal(string @data) (Venus::Log)
 
 The fatal method logs C<fatal> information and returns the invocant.
 
@@ -453,7 +453,7 @@ I<Since C<1.68>>
 
 =head2 info
 
-  info(Str @data) (Log)
+  info(string @data) (Venus::Log)
 
 The info method logs C<info> information and returns the invocant.
 
@@ -493,7 +493,7 @@ I<Since C<1.68>>
 
 =head2 input
 
-  input(Str @data) (Str)
+  input(string @data) (string)
 
 The input method returns the arguments provided to the log level methods, to
 the L</output>, and can be overridden by subclasses.
@@ -518,7 +518,7 @@ I<Since C<1.68>>
 
 =head2 output
 
-  output(Str @data) (Str)
+  output(string @data) (string)
 
 The output method returns the arguments returned by the L</input> method, to
 the log handler, and can be overridden by subclasses.
@@ -543,7 +543,7 @@ I<Since C<1.68>>
 
 =head2 string
 
-  string(Any $data) (Str)
+  string(any $data) (string)
 
 The string method returns a stringified representation of any argument provided
 and is used by the L</output> method.
@@ -610,7 +610,7 @@ I<Since C<1.68>>
 
 =head2 trace
 
-  trace(Str @data) (Log)
+  trace(string @data) (Venus::Log)
 
 The trace method logs C<trace> information and returns the invocant.
 
@@ -650,7 +650,7 @@ I<Since C<1.68>>
 
 =head2 warn
 
-  warn(Str @data) (Log)
+  warn(string @data) (Venus::Log)
 
 The warn method logs C<warn> information and returns the invocant.
 
@@ -690,7 +690,7 @@ I<Since C<1.68>>
 
 =head2 write
 
-  write(Str $level, Any @data) (Log)
+  write(string $level, any @data) (Venus::Log)
 
 The write method invokes the log handler, i.e. L</handler>, and returns the invocant.
 
@@ -720,7 +720,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

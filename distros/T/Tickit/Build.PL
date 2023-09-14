@@ -16,10 +16,8 @@ my $build = Module::Build::Using::PkgConfig->new(
    },
    test_requires => {
       'Test::Builder::Tester' => 0,
-      'Test::Fatal' => 0,
-      'Test::HexString' => 0,
+      'Test2::V0' => '0.000149',
       'Test::More' => '0.88', # done_testing
-      'Test::Refcount' => 0,
    },
    license => 'perl',
    create_license => 1,
@@ -27,9 +25,9 @@ my $build = Module::Build::Using::PkgConfig->new(
 );
 
 $build->use_pkgconfig( "tickit",
-   atleast_version => "0.4.3",
+   atleast_version => "0.4.4",
    alien         => "Alien::libtickit",
-   alien_version => "0.13",  # includes 0.4.2a bugfix
+   alien_version => "0.14",
 );
 
 $build->create_build_script;

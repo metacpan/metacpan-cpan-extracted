@@ -16,7 +16,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.885';
+our $VERSION = '1.886';
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
@@ -25,7 +25,7 @@ use Scalar::Util qw( dualvar looks_like_number );
 use Time::HiRes qw( time );
 
 use MCE::Shared::Base ();
-use base 'MCE::Shared::Base::Common';
+use base 'MCE::Shared::Common';
 
 use constant {
    _DATA => 0,  # unordered data
@@ -902,7 +902,7 @@ MCE::Shared::Cache - A hybrid LRU-plain cache helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Cache version 1.885
+This document describes MCE::Shared::Cache version 1.886
 
 =head1 DESCRIPTION
 

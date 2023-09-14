@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -34,7 +34,7 @@ await $chip->mount( $adapter );
    # FEATURE - EN_DPL=0, EN_ACK_PAY=0, EN_DYN_ACK=0
    $adapter->expect_readwrite( "\x1D\x00" )->returns( "\x0E\x00" );
 
-   is_deeply( await $chip->read_config,
+   is( await $chip->read_config,
       {
          ARC         => 3,
          ARD         => 250,
@@ -63,7 +63,7 @@ await $chip->mount( $adapter );
 
    # No SPI
 
-   is_deeply( $chip->latest_status,
+   is( $chip->latest_status,
       {
          MAX_RT  => !!0,
          RX_DR   => !!0,
@@ -102,7 +102,7 @@ await $chip->mount( $adapter );
    # RX_ADDR_P0
    $adapter->expect_readwrite( "\x0A" . "\x00"x5 )->returns( "\x0E" . "\xC2"x5 );
 
-   is_deeply( await $chip->read_rx_config( 0 ),
+   is( await $chip->read_rx_config( 0 ),
       {
          DYNPD     => !!0,
          EN_AA     => 1,

@@ -34,63 +34,105 @@ BTC based RPC calls
 
 =head2 get_transaction
 
-https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/wallet/gettransaction/
+https://bitcoincore.org/en/doc/24.0.0/rpc/wallet/gettransaction/
 
 =over 4
 
+=item * C<txid> The transaction id
+
+=item * C<include_watchonly> default=true for watch-only wallets, otherwise false
+
+=item * C<verbose> Whether to include a `decoded` field containing the decoded transaction
+
 =back
 
-L<Future>
+L<Future> - detailed information about in-wallet transaction C<txid>
 
 =head2 get_raw_transaction
 
-https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/rawtransactions/getrawtransaction/
+https://bitcoincore.org/en/doc/24.0.0/rpc/rawtransactions/getrawtransaction/
 
 =over 4
 
+=item * C<txid> The transaction id
+
+=item * C<verbose> If false, return a string, otherwise return a json object
+
+=item * C<blockhash> The block in which to look for the transaction
+
 =back
 
-L<Future>
+L<Future> - raw transaction data
 
 =head2 get_block
 
-https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/wallet/getblock/
+https://bitcoincore.org/en/doc/24.0.0/rpc/wallet/getblock/
 
 =over 4
 
+=item * C<blockhash> the block hash
+
+=item * C<verbosity> 0 for hex-encoded data, 1 for a JSON object, 2 for JSON object with transaction data, and 3 for JSON object with transaction data including prevout information for inputs
+
 =back
 
-L<Future>
+L<Future> - string based in the verbosity value
 
 =head2 validate_address
 
-https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/util/validateaddress/
+https://bitcoincore.org/en/doc/24.0.0/rpc/util/validateaddress/
 
 =over 4
 
+=item * C<address> - the bitcoin address to validate
+
 =back
 
-L<Future>
+L<Future> - json {isvalid  : true|false, ...}
 
 =head2 get_last_block
 
-https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/blockchain/getblockcount/
+https://bitcoincore.org/en/doc/24.0.0/rpc/blockchain/getblockcount/
 
 =over 4
 
 =back
 
-L<Future>
+L<Future> - The current block count
 
 =head2 get_block_hash
 
-https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/blockchain/getblockhash/
+https://bitcoincore.org/en/doc/24.0.0/rpc/blockchain/getblockhash/
+
+=over 4
+
+=item * C<height> the height index
+
+=back
+
+L<Future> - string block hash
+
+=head2 list_by_addresses
+
+https://bitcoincore.org/en/doc/24.0.0/rpc/wallet/listreceivedbyaddress/
+
+=over 4
+
+=item * C<address> address to return the received transactions
+
+=back
+
+L<Future> - json containing the received transaction details
+
+=head2 get_balances
+
+https://bitcoincore.org/en/doc/24.0.0/rpc/wallet/getbalances/
 
 =over 4
 
 =back
 
-L<Future>
+L<Future> - json object with all balances in BTC
 
 =head1 INHERITED METHODS
 

@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -23,29 +23,29 @@
          "requires" : {
             "Device::Chip" : "0",
             "Future::AsyncAwait" : "0.47",
-            "Object::Pad" : "0.66",
+            "Object::Pad" : "0.800",
             "perl" : "5.026"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Device::Chip::Adapter" : "0.08",
-            "Test::More" : "0.88"
+            "Test2::V0" : "0",
+            "Test::Device::Chip::Adapter" : "0.08"
          }
       }
    },
    "provides" : {
       "Device::Chip::PCF8574" : {
          "file" : "lib/Device/Chip/PCF8574.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Device::Chip::PCF8575" : {
          "file" : "lib/Device/Chip/PCF8575.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Device::Chip::PCF857x" : {
          "file" : "lib/Device/Chip/PCF857x.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

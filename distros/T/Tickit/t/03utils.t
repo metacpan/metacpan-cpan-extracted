@@ -17,7 +17,7 @@ BEGIN {
    import constant CAN_UNICODE => $CAN_UNICODE;
 }
 
-use Test::More;
+use Test2::V0;
 
 # An invalid UTF-8 string
 my $BAD_UTF8 = do { no utf8; "foo\xA9bar" };
@@ -90,23 +90,23 @@ SKIP: {
    is( textwidth( "\x7f" ), undef, 'DEL is invalid for textwidth' );
 }
 
-is_deeply( [ chars2cols "ABC", 0, 1, 3, 4 ],
-           [ 0, 1, 3, 3 ],
-           'chars2cols ASCII' );
+is( [ chars2cols "ABC", 0, 1, 3, 4 ],
+    [ 0, 1, 3, 3 ],
+    'chars2cols ASCII' );
 SKIP: {
    skip "No Unicode", 5 unless CAN_UNICODE;
 
-   is_deeply( [ chars2cols "cafe\x{301}", 3, 4, 5, 6 ],
-              [ 3, 3, 4, 4 ],
-              'chars2cols combining' );
+   is( [ chars2cols "cafe\x{301}", 3, 4, 5, 6 ],
+       [ 3, 3, 4, 4 ],
+       'chars2cols combining' );
 
-   is_deeply( [ chars2cols "caf\x{fffd}", 3, 4, 5 ],
-              [ 3, 4, 4 ],
-              'U+FFFD counts as width 1 for chars2cols' );
+   is( [ chars2cols "caf\x{fffd}", 3, 4, 5 ],
+       [ 3, 4, 4 ],
+       'U+FFFD counts as width 1 for chars2cols' );
 
-   is_deeply( [ chars2cols $BAD_UTF8, 3, 5, 7 ],
-              [ 3, 5, 7 ],
-              'Invalid UTF-8 counts as width 1 for chars2cols' );
+   is( [ chars2cols $BAD_UTF8, 3, 5, 7 ],
+       [ 3, 5, 7 ],
+       'Invalid UTF-8 counts as width 1 for chars2cols' );
 
    is( chars2cols( "\x1b", 1 ), undef, 'C0 control is invalid for chars2cols' );
    is( chars2cols( "\x9b", 1 ), undef, 'C1 control is invalid for chars2cols' );
@@ -116,23 +116,23 @@ is( scalar chars2cols( "ABC", 2 ), 2, 'scalar chars2cols' );
 is( scalar chars2cols( "ABC", 3 ), 3, 'scalar chars2cols EOS' );
 is( scalar chars2cols( "ABC", 4 ), 3, 'scalar chars2cols past EOS' );
 
-is_deeply( [ cols2chars "ABC", 0, 1, 3, 4 ],
-           [ 0, 1, 3, 3 ],
-           'cols2chars ASCII' );
+is( [ cols2chars "ABC", 0, 1, 3, 4 ],
+    [ 0, 1, 3, 3 ],
+    'cols2chars ASCII' );
 SKIP: {
    skip "No Unicode", 5 unless CAN_UNICODE;
 
-   is_deeply( [ cols2chars "cafe\x{301}", 3, 4, 5 ],
-              [ 3, 5, 5 ],
-              'cols2chars combining' );
+   is( [ cols2chars "cafe\x{301}", 3, 4, 5 ],
+       [ 3, 5, 5 ],
+       'cols2chars combining' );
 
-   is_deeply( [ cols2chars "caf\x{fffd}", 3, 4, 5 ],
-              [ 3, 4, 4 ],
-              'U+FFFD counts as width 1 for cols2chars' );
+   is( [ cols2chars "caf\x{fffd}", 3, 4, 5 ],
+       [ 3, 4, 4 ],
+       'U+FFFD counts as width 1 for cols2chars' );
 
-   is_deeply( [ cols2chars $BAD_UTF8, 3, 5, 7 ],
-              [ 3, 5, 7 ],
-              'Invalid UTF-8 counts as width 1 for cols2chars' );
+   is( [ cols2chars $BAD_UTF8, 3, 5, 7 ],
+       [ 3, 5, 7 ],
+       'Invalid UTF-8 counts as width 1 for cols2chars' );
 
    is( cols2chars( "\x1b", 1 ), undef, 'C0 control is invalid for cols2chars' );
    is( cols2chars( "\x9b", 1 ), undef, 'C1 control is invalid for cols2chars' );
@@ -151,12 +151,12 @@ SKIP: {
    is( substrwidth( "cafe\x{301} table", 5, 5 ), "table", 'substrwidth combining after' );
 }
 
-is_deeply( [ align 10, 30, 0.0 ], [  0, 10, 20 ], 'align 10 in 30 by 0.0' );
-is_deeply( [ align 10, 30, 0.5 ], [ 10, 10, 10 ], 'align 10 in 30 by 0.5' );
-is_deeply( [ align 10, 30, 1.0 ], [ 20, 10,  0 ], 'align 10 in 30 by 1.0' );
+is( [ align 10, 30, 0.0 ], [  0, 10, 20 ], 'align 10 in 30 by 0.0' );
+is( [ align 10, 30, 0.5 ], [ 10, 10, 10 ], 'align 10 in 30 by 0.5' );
+is( [ align 10, 30, 1.0 ], [ 20, 10,  0 ], 'align 10 in 30 by 1.0' );
 
-is_deeply( [ align 30, 30, 0.0 ], [  0, 30,  0 ], 'align 30 in 30 by 0.0' );
-is_deeply( [ align 40, 30, 0.0 ], [  0, 30,  0 ], 'align 40 in 30 by 0.0' );
+is( [ align 30, 30, 0.0 ], [  0, 30,  0 ], 'align 30 in 30 by 0.0' );
+is( [ align 40, 30, 0.0 ], [  0, 30,  0 ], 'align 40 in 30 by 0.0' );
 
 is( bound( undef, 20, undef ), 20, 'bound with no limits' );
 is( bound(    10, 20, undef ), 20, 'bound with minimum' );
@@ -172,35 +172,35 @@ is( bound( undef, 50,    40 ), 40, 'bound at maximum' );
    );
 
    distribute( 40, @buckets );
-   is_deeply( \@buckets,
-              [ { base => 10, expand => 1, value => 10, start =>  0, },
-                { base => 10, expand => 2, value => 10, start => 10, },
-                { base => 20,              value => 20, start => 20, } ],
-              'distribute exact' );
+   is( \@buckets,
+       [ { base => 10, expand => 1, value => 10, start =>  0, },
+         { base => 10, expand => 2, value => 10, start => 10, },
+         { base => 20,              value => 20, start => 20, } ],
+       'distribute exact' );
 
    distribute( 50, @buckets );
-   is_deeply( \@buckets,
-              [ { base => 10, expand => 1, value => 13, start =>  0, },
-                { base => 10, expand => 2, value => 17, start => 13, },
-                { base => 20,              value => 20, start => 30, } ],
-              'distribute spare' );
+   is( \@buckets,
+       [ { base => 10, expand => 1, value => 13, start =>  0, },
+         { base => 10, expand => 2, value => 17, start => 13, },
+         { base => 20,              value => 20, start => 30, } ],
+       'distribute spare' );
 
    distribute( 30, @buckets );
-   is_deeply( \@buckets,
-              [ { base => 10, expand => 1, value =>  7, start =>  0, },
-                { base => 10, expand => 2, value =>  8, start =>  7, },
-                { base => 20,              value => 15, start => 15, } ],
-              'distribute short' );
+   is( \@buckets,
+       [ { base => 10, expand => 1, value =>  7, start =>  0, },
+         { base => 10, expand => 2, value =>  8, start =>  7, },
+         { base => 20,              value => 15, start => 15, } ],
+       'distribute short' );
 
    push @buckets, { fixed => 3 };
 
    distribute( 30, @buckets );
-   is_deeply( \@buckets,
-              [ { base => 10, expand => 1, value =>  6, start =>  0, },
-                { base => 10, expand => 2, value =>  7, start =>  6, },
-                { base => 20,              value => 14, start => 13, },
-                { fixed => 3,              value =>  3, start => 27, } ],
-              'distribute short with fixed' );
+   is( \@buckets,
+       [ { base => 10, expand => 1, value =>  6, start =>  0, },
+         { base => 10, expand => 2, value =>  7, start =>  6, },
+         { base => 20,              value => 14, start => 13, },
+         { fixed => 3,              value =>  3, start => 27, } ],
+       'distribute short with fixed' );
 }
 
 done_testing;

@@ -10,9 +10,9 @@ use Exporter 'import';
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-13'; # DATE
+our $DATE = '2023-09-03'; # DATE
 our $DIST = 'App-BPOMUtils-Table-FoodCategory'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 our @EXPORT_OK = qw(
                        bpom_list_food_categories_rba
@@ -8137,6 +8137,14 @@ _
             },
         ],
     },
+    hooks => {
+        before_return => sub {
+            my %args = @_;
+            # XXX adjust other properties e.g. table.field_formats etc
+            $args{_func_res}[3]{'table.fields'} = ['status'];
+            1;
+        },
+    },
 );
 die "Can't generate function: $res->[0] - $res->[1]" unless $res->[0] == 200;
 
@@ -8154,7 +8162,7 @@ App::BPOMUtils::Table::FoodCategoryRBA - List food categories in BPOM processed 
 
 =head1 VERSION
 
-This document describes version 0.017 of App::BPOMUtils::Table::FoodCategoryRBA (from Perl distribution App-BPOMUtils-Table-FoodCategory), released on 2023-02-13.
+This document describes version 0.018 of App::BPOMUtils::Table::FoodCategoryRBA (from Perl distribution App-BPOMUtils-Table-FoodCategory), released on 2023-09-03.
 
 =head1 FUNCTIONS
 

@@ -1,0 +1,44 @@
+---
+abstract: 'added stacktrace to exceptions'
+author:
+  - 'Yaroslav O. Kosmina LL<mailto:dart@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.18, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Aion-Carp
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Aion::Carp:
+    file: lib/Aion/Carp.pm
+    version: '1.5'
+requires:
+  Carp: '1.54'
+  Scalar::Util: '1.63'
+  common::sense: '3.75'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/darviarush/perl-aion-carp/issues
+  homepage: https://github.com/darviarush/perl-aion-carp
+  repository: https://github.com/darviarush/perl-aion-carp.git
+version: '1.5'
+x_authority: cpan:DART
+x_contributors:
+  - 'Yaroslav O. Kosmina <darviarush@mail.ru>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

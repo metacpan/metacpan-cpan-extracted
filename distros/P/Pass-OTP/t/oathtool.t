@@ -95,6 +95,15 @@ t(
     now       => `date -d'2009-02-13 23:31:30 UTC' +%s`,
 );
 
+t(
+"$oathtool --totp=sha512 --digits=8 --now '2009-02-13 23:31:30 UTC' 3132333435363738393031323334353637383930313233343536373839303132",
+    secret    => "3132333435363738393031323334353637383930313233343536373839303132",
+    type      => 'totp',
+    algorithm => 'sha512',
+    digits    => 8,
+    now       => `date -d'2009-02-13 23:31:30 UTC' +%s`,
+);
+
 TODO: {
     local $TODO = "Parameter --window not implemented";
     t(
@@ -117,4 +126,4 @@ TODO: {
     );
 }
 
-done_testing(13);
+done_testing(14);

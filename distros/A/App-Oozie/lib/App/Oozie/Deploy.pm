@@ -1,14 +1,14 @@
 package App::Oozie::Deploy;
-$App::Oozie::Deploy::VERSION = '0.002';
+$App::Oozie::Deploy::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
-use constant {
-    FILE_FIND_FOLLOW_SKIP_IGNORE_DUPLICATES => 2,
-};
-
+use App::Oozie::Constants qw(
+    FILE_FIND_FOLLOW_SKIP_IGNORE_DUPLICATES
+    WEBHDFS_CREATE_CHUNK_SIZE
+);
 use Cwd 'abs_path';
 use Moo;
 use MooX::Options prefer_commandline => 0,
@@ -19,8 +19,6 @@ Usage: %c %o
 Deploys workflows to HDFS. Specifying names as final arguments will upload only those
 USAGE
 ;
-
-use Data::Dumper;
 
 use App::Oozie::Deploy::Template;
 use App::Oozie::Deploy::Validate::Spec;
@@ -56,8 +54,6 @@ use Types::Standard qw(
     StrictNum
     Str
 );
-
-use constant WEBHDFS_CREATE_CHUNK_SIZE => 1024**1024 * 2;
 
 with qw(
     App::Oozie::Role::Log
@@ -112,8 +108,6 @@ option dump_xml_to_json => (
     format  => 's',
     doc     => 'Specify a directory to convert and dump XML files in the workflow as JSON. This implies a dryrun.',
 );
-
-sub _remove_n { my $s = shift; $s =~ s{\n+}{ }xmsg; $s }
 
 #------------------------------------------------------------------------------#
 
@@ -430,7 +424,7 @@ sub __collect_internal_conf {
     # if YARN, use a different property. the oozie syntax doesn't change (still
     # uses the jobtracker property)
     $config->{jobTracker}     = $config->{resourceManager};
-    $config->{nameNode}     //= 'hdfs://nameservice1';
+    $config->{nameNode}     //= $self->template_namenode;
 
     $config->{has_sla}        = $self->sla;
 
@@ -1061,19 +1055,89 @@ sub upload_to_hdfs {
     return $success;
 }
 
-sub _copy_to_hdfs_with_webhdfs {
+
+sub _hdfs_exists_no_exception {
     my $self = shift;
-    my $sourceFolder = shift;
-    my $destFolder = shift;
+    my $path = shift;
     my $hdfs = $self->hdfs;
-    my $logger  = $self->logger;
-    my $verbose = $self->verbose;
+    my $rv;
 
-    $logger->info("copying from $sourceFolder, to $destFolder \n");
+    eval {
+        $rv = $hdfs->exists( $path );
+        1;
+    } or do {
+        my $eval_error = $@ || 'Zombie error';
+        if ( $self->verbose ) {
+            $self->logger->debug(
+                sprintf "WebHDFS exists() failed with exception, however since this is a silent call, it is ignored: %s",
+                            $eval_error,
+            )
+        }
+    };
 
-    if (!$hdfs->exists($destFolder)) {
-        $hdfs->mkdir($destFolder);
-        $hdfs->chmod($destFolder, 775);
+    return $rv;
+}
+
+sub _copy_to_hdfs_with_webhdfs {
+    my $self         = shift;
+    my $sourceFolder = shift;
+    my $destFolder   = shift;
+
+    my $hdfs         = $self->hdfs;
+    my $logger       = $self->logger;
+    my $verbose      = $self->verbose;
+
+    $logger->info(
+        sprintf "copying from `%s` to `%s`",
+                    $sourceFolder,
+                    $destFolder,
+    );
+
+    if ( ! $self->_hdfs_exists_no_exception( $destFolder ) ) {
+        if ( $verbose ) {
+            $logger->debug(
+                sprintf 'HDFS destination %s does not exist',
+                            $destFolder,
+            );
+        }
+        my(undef, @paths) = File::Spec->splitpath( $destFolder );
+        my $remote_base;
+        for my $chunk ( @paths ) {
+            if ( $remote_base ) {
+                $remote_base = File::Spec->catdir( $remote_base, $chunk);
+            }
+            else {
+                $remote_base = $chunk;
+            }
+            if ( $self->_hdfs_exists_no_exception( $remote_base ) ) {
+                next;
+            }
+            if ( $verbose ) {
+                $logger->debug(
+                    sprintf 'Attempting to mkdir HDFS destination %s',
+                                $remote_base,
+                );
+            }
+            $hdfs->mkdir( $remote_base );
+            $hdfs->chmod( $remote_base, 775 );
+        }
+        # since the above calls were silent, see if this throws anything
+        if ( $hdfs->exists($destFolder) ) {
+            if ( $verbose ) {
+                $logger->debug(
+                    sprintf "HDFS destination %s exists",
+                                $destFolder,
+                );
+            }
+        }
+    }
+    else {
+        if ( $verbose ) {
+            $logger->debug(
+                sprintf 'HDFS destination %s exists',
+                            $destFolder,
+            );
+        }
     }
     my $f_rule = File::Find::Rule->new->file->maxdepth(1)->mindepth(1);
 
@@ -1088,7 +1152,13 @@ sub _copy_to_hdfs_with_webhdfs {
         if($verbose){
             $logger->debug("Creating $dest");
         }
-        $hdfs->create($dest, $data, overwrite => "true");
+        $hdfs->touchz( $dest );
+        if ( ! $hdfs->create($dest, $data, overwrite => "true") ) {
+            $logger->logdie(
+                sprintf 'Failed to create %s through WebHDFS',
+                        $dest
+            );
+        }
         $hdfs->chmod($dest, 775);
     }
 
@@ -1116,7 +1186,7 @@ App::Oozie::Deploy
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -1210,12 +1280,6 @@ App::Oozie::Deploy - The program to deploy Oozie workflows.
 =head3 ttlib_base_dir
 
 =head3 ttlib_dynamic_base_dir_name
-
-=head1 Constants
-
-=head2 FILE_FIND_FOLLOW_SKIP_IGNORE_DUPLICATES
-
-=head2 WEBHDFS_CREATE_CHUNK_SIZE
 
 =head1 SEE ALSO
 

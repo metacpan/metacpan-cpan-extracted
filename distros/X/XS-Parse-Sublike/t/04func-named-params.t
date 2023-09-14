@@ -14,6 +14,8 @@ no warnings 'experimental';
 use lib "t";
 use testcase "t::func";
 
+BEGIN { $^H{"t::func/nfunc"}++ }
+
 # a signature with experimental named parameter support
 {
    my %was_rest;
@@ -28,6 +30,10 @@ use testcase "t::func";
    like( dies { withx() },
       qr/^Missing argument 'x' for subroutine main::withx /,
       'complaint from missing named param' );
+
+   nfunc with2x(:$x1, :$x2) { return "x1=$x1 x2=$x2"; }
+   is( with2x( x1 => 10, x2 => 20 ), "x1=10 x2=20",
+      'supports multiple named params' );
 }
 
 # named params can still have defaults
@@ -47,6 +53,30 @@ use testcase "t::func";
    like( dies { withz( z => 1, w => 1 ); 1 },
       qr/^Unrecognised argument 'w' for subroutine main::withz /,
       'complaint from unknown param' );
+}
+
+# mixed positional+named
+{
+   nfunc withboth($x, :$y = "def") { return "x=$x y=$y"; }
+
+   is( withboth(1, y => 2), "x=1 y=2",
+      'supports mixed positional + named' );
+   is( withboth(1), "x=1 y=def",
+      'mixed still applies defaults' );
+}
+
+# diagnostics on duplicates
+{
+   sub warnings_from ( $code ) {
+      my $warnings = "";
+      local $SIG{__WARN__} = sub { $warnings .= $_[0] };
+      eval( "$code; 1" ) or die $@;
+      return $warnings;
+   }
+
+   like( warnings_from( 'nfunc diag1($x, :$x) { }' ),
+      qr/^"my" variable \$x masks earlier declaration in same scope at /,
+      'warning from duplicated parameter name' );
 }
 
 done_testing;

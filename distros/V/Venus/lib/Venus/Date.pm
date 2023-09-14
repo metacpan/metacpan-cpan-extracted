@@ -170,11 +170,13 @@ sub add_years {
 sub assertion {
   my ($self) = @_;
 
-  my $assert = $self->SUPER::assertion;
+  my $assertion = $self->SUPER::assertion;
 
-  $assert->clear->expression('number');
+  $assertion->match('number')->format(sub{
+    (ref $self || $self)->new($_)
+  });
 
-  return $assert;
+  return $assertion;
 }
 
 sub epoch {
@@ -596,7 +598,7 @@ This package provides the following methods:
 
 =head2 add
 
-  add(HashRef $data) (Date)
+  add(hashref $data) (Venus::Date)
 
 The add method increments the date and time attributes specified.
 
@@ -645,7 +647,7 @@ I<Since C<0.01>>
 
 =head2 add_days
 
-  add_days(Int $days) (Any)
+  add_days(number $days) (any)
 
 The add_days method increments the C<day> attribute.
 
@@ -697,7 +699,7 @@ I<Since C<0.01>>
 
 =head2 add_hms
 
-  add_hms(Maybe[Int] $hours, Maybe[Int] $minutes, Maybe[Int] $seconds) (Date)
+  add_hms(maybe[number] $hours, maybe[number] $minutes, maybe[number] $seconds) (Venus::Date)
 
 The add_hms method increments the C<hour>, C<minute>, and C<second> attributes.
 
@@ -749,7 +751,7 @@ I<Since C<0.01>>
 
 =head2 add_hours
 
-  add_hours(Int $hours) (Any)
+  add_hours(number $hours) (any)
 
 The add_hours method increments the C<hour> attribute.
 
@@ -801,7 +803,7 @@ I<Since C<0.01>>
 
 =head2 add_mdy
 
-  add_mdy(Maybe[Int] $months, Maybe[Int] $days, Maybe[Int] $years) (Date)
+  add_mdy(maybe[number] $months, maybe[number] $days, maybe[number] $years) (Venus::Date)
 
 The add_mdy method increments the C<month>, C<day>, and C<years> attributes.
 
@@ -853,7 +855,7 @@ I<Since C<0.01>>
 
 =head2 add_minutes
 
-  add_minutes(Int $minutes) (Date)
+  add_minutes(number $minutes) (Venus::Date)
 
 The add_minutes method increments the C<minute> attribute.
 
@@ -905,7 +907,7 @@ I<Since C<0.01>>
 
 =head2 add_months
 
-  add_months(Int $months) (Date)
+  add_months(number $months) (Venus::Date)
 
 The add_months method increments the C<month> attribute.
 
@@ -957,7 +959,7 @@ I<Since C<0.01>>
 
 =head2 add_seconds
 
-  add_seconds(Int $seconds) (Date)
+  add_seconds(number $seconds) (Venus::Date)
 
 The add_seconds method increments the C<second> attribute.
 
@@ -1009,7 +1011,7 @@ I<Since C<0.01>>
 
 =head2 add_years
 
-  add_years(Int $years) (Date)
+  add_years(number $years) (Venus::Date)
 
 The add_years method increments the C<year> attribute.
 
@@ -1061,7 +1063,7 @@ I<Since C<0.01>>
 
 =head2 epoch
 
-  epoch() (Int)
+  epoch() (number)
 
 The epoch method returns the epoch.
 
@@ -1083,7 +1085,7 @@ I<Since C<0.01>>
 
 =head2 explain
 
-  explain() (Int)
+  explain() (number)
 
 The explain method returns the epoch and is used in stringification operations.
 
@@ -1105,7 +1107,7 @@ I<Since C<0.01>>
 
 =head2 format
 
-  format(Str $format) (Str)
+  format(string $format) (string)
 
 The format method returns the formatted date and time string. See
 L<strftime|http://www.unix.com/man-page/FreeBSD/3/strftime/> for formatting
@@ -1141,7 +1143,7 @@ I<Since C<0.01>>
 
 =head2 hms
 
-  hms() (Str)
+  hms() (string)
 
 The hms method returns the time formatted as C<hh:mm:ss>.
 
@@ -1163,7 +1165,7 @@ I<Since C<0.01>>
 
 =head2 iso8601
 
-  iso8601() (Str)
+  iso8601() (string)
 
 The iso8601 method returns the date and time formatted as an ISO8601 string.
 
@@ -1185,7 +1187,7 @@ I<Since C<0.01>>
 
 =head2 mdy
 
-  mdy() (Str)
+  mdy() (string)
 
 The mdy method returns the date formatted as C<mm-dd-yyyy>.
 
@@ -1207,7 +1209,7 @@ I<Since C<0.01>>
 
 =head2 parse
 
-  parse(Any @data) (Date)
+  parse(any @data) (Venus::Date)
 
 The parse method resets and returns a date object based on the parsed time
 provided. See L<strptime|http://www.unix.com/man-page/FreeBSD/3/strptime/> for
@@ -1233,7 +1235,7 @@ I<Since C<0.01>>
 
 =head2 reset
 
-  reset(Int $time) (Date)
+  reset(number $time) (Venus::Date)
 
 The reset method resets all attributes to correspond with the epoch provided.
 
@@ -1257,7 +1259,7 @@ I<Since C<0.01>>
 
 =head2 restart
 
-  restart(Str $interval) (Date)
+  restart(string $interval) (Venus::Date)
 
 The restart method truncates the date and time to the specified unit of time,
 e.g. C<year>, C<quarter>, C<month>, C<day>, C<hour>, C<minute>, C<second>.
@@ -1310,7 +1312,7 @@ I<Since C<0.01>>
 
 =head2 restart_day
 
-  restart_day() (Date)
+  restart_day() (Venus::Date)
 
 The restart_day method truncates the date and time to the C<day>.
 
@@ -1334,7 +1336,7 @@ I<Since C<1.02>>
 
 =head2 restart_hour
 
-  restart_hour() (Date)
+  restart_hour() (Venus::Date)
 
 The restart_hour method truncates the date and time to the C<hour>.
 
@@ -1358,7 +1360,7 @@ I<Since C<1.02>>
 
 =head2 restart_minute
 
-  restart_minute() (Date)
+  restart_minute() (Venus::Date)
 
 The restart_minute method truncates the date and time to the C<minute>.
 
@@ -1382,7 +1384,7 @@ I<Since C<1.02>>
 
 =head2 restart_month
 
-  restart_month() (Date)
+  restart_month() (Venus::Date)
 
 The restart_month method truncates the date and time to the C<month>.
 
@@ -1406,7 +1408,7 @@ I<Since C<1.02>>
 
 =head2 restart_quarter
 
-  restart_quarter() (Date)
+  restart_quarter() (Venus::Date)
 
 The restart_quarter method truncates the date and time to the C<quarter>.
 
@@ -1430,7 +1432,7 @@ I<Since C<1.02>>
 
 =head2 restart_second
 
-  restart_second() (Date)
+  restart_second() (Venus::Date)
 
 The restart_second method truncates the date and time to the C<second>.
 
@@ -1454,7 +1456,7 @@ I<Since C<1.02>>
 
 =head2 restart_year
 
-  restart_year() (Date)
+  restart_year() (Venus::Date)
 
 The restart_year method truncates the date and time to the C<year>.
 
@@ -1478,7 +1480,7 @@ I<Since C<1.02>>
 
 =head2 rfc1123
 
-  rfc1123() (Str)
+  rfc1123() (string)
 
 The rfc1123 method returns the date and time formatted as an RFC1123 string.
 
@@ -1500,7 +1502,7 @@ I<Since C<0.01>>
 
 =head2 rfc3339
 
-  rfc3339() (Str)
+  rfc3339() (string)
 
 The rfc3339 method returns the date and time formatted as an RFC3339 string.
 
@@ -1522,7 +1524,7 @@ I<Since C<0.01>>
 
 =head2 rfc7231
 
-  rfc7231() (Str)
+  rfc7231() (string)
 
 The rfc7231 method returns the date and time formatted as an RFC7231 string.
 
@@ -1544,7 +1546,7 @@ I<Since C<0.01>>
 
 =head2 rfc822
 
-  rfc822() (Str)
+  rfc822() (string)
 
 The rfc822 method returns the date and time formatted as an RFC822 string.
 
@@ -1566,7 +1568,7 @@ I<Since C<0.01>>
 
 =head2 set
 
-  set(HashRef $data) (Date)
+  set(hashref $data) (Venus::Date)
 
 The set method sets the date and time attributes specified.
 
@@ -1629,7 +1631,7 @@ I<Since C<0.01>>
 
 =head2 set_hms
 
-  set_hms(Maybe[Int] $hours, Maybe[Int] $minutes, Maybe[Int] $seconds) (Date)
+  set_hms(maybe[number] $hours, maybe[number] $minutes, maybe[number] $seconds) (Venus::Date)
 
 The set_hms method sets the C<hour>, C<minute>, and C<second> attributes.
 
@@ -1681,7 +1683,7 @@ I<Since C<0.01>>
 
 =head2 set_mdy
 
-  set_mdy(Maybe[Int] $months, Maybe[Int] $days, Maybe[Int] $years) (Date)
+  set_mdy(maybe[number] $months, maybe[number] $days, maybe[number] $years) (Venus::Date)
 
 The set_mdy method sets the C<month>, C<day>, and C<year> attributes.
 
@@ -1736,7 +1738,7 @@ I<Since C<0.01>>
 
 =head2 string
 
-  string() (Str)
+  string() (string)
 
 The string method returns a date and time string, and is an alias for
 L</rfc3339>.
@@ -1759,7 +1761,7 @@ I<Since C<0.01>>
 
 =head2 sub
 
-  sub(HashRef $data) (Date)
+  sub(hashref $data) (Venus::Date)
 
 The sub method method decrements the date and time attributes specified.
 
@@ -1805,7 +1807,7 @@ I<Since C<0.01>>
 
 =head2 sub_days
 
-  sub_days(Int $days) (Date)
+  sub_days(number $days) (Venus::Date)
 
 The sub_days method decrements the C<day> attribute.
 
@@ -1857,7 +1859,7 @@ I<Since C<0.01>>
 
 =head2 sub_hms
 
-  sub_hms(Maybe[Int] $hours, Maybe[Int] $minutes, Maybe[Int] $seconds) (Date)
+  sub_hms(maybe[number] $hours, maybe[number] $minutes, maybe[number] $seconds) (Venus::Date)
 
 The sub_hms method decrements the C<hour>, C<minute>, and C<second> attributes.
 
@@ -1909,7 +1911,7 @@ I<Since C<0.01>>
 
 =head2 sub_hours
 
-  sub_hours(Int $hours) (Any)
+  sub_hours(number $hours) (any)
 
 The sub_hours method decrements the C<hour> attribute.
 
@@ -1961,7 +1963,7 @@ I<Since C<0.01>>
 
 =head2 sub_mdy
 
-  sub_mdy(Maybe[Int] $months, Maybe[Int] $days, Maybe[Int] $years) (Date)
+  sub_mdy(maybe[number] $months, maybe[number] $days, maybe[number] $years) (Venus::Date)
 
 The sub_mdy method decrements the C<month>, C<day>, and C<year> attributes.
 
@@ -2013,7 +2015,7 @@ I<Since C<0.01>>
 
 =head2 sub_minutes
 
-  sub_minutes(Int $minutes) (Date)
+  sub_minutes(number $minutes) (Venus::Date)
 
 The sub_minutes method decrements the C<minute> attribute.
 
@@ -2065,7 +2067,7 @@ I<Since C<0.01>>
 
 =head2 sub_months
 
-  sub_months(Int $months) (Date)
+  sub_months(number $months) (Venus::Date)
 
 The sub_months method decrements the C<month> attribute.
 
@@ -2117,7 +2119,7 @@ I<Since C<0.01>>
 
 =head2 sub_seconds
 
-  sub_seconds(Int $seconds) (Date)
+  sub_seconds(number $seconds) (Venus::Date)
 
 The sub_seconds method decrements the C<second> attribute.
 
@@ -2169,7 +2171,7 @@ I<Since C<0.01>>
 
 =head2 sub_years
 
-  sub_years(Int $years) (Date)
+  sub_years(number $years) (Venus::Date)
 
 The sub_years method decrements the C<years> attribute.
 
@@ -2243,6 +2245,22 @@ B<example 1>
 
 =over 4
 
+=item operation: C<("")>
+
+This package overloads the C<""> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = "$date";
+
+  # "570672000"
+
+=back
+
+=over 4
+
 =item operation: C<(+)>
 
 This package overloads the C<+> operator.
@@ -2286,38 +2304,6 @@ B<example 1>
   my $result = 0 + $date;
 
   # 570672000
-
-=back
-
-=over 4
-
-=item operation: C<(E<lt>)>
-
-This package overloads the C<E<lt>> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $date < 570672001;
-
-  # 1
-
-=back
-
-=over 4
-
-=item operation: C<(E<lt>=)>
-
-This package overloads the C<E<lt>=> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $date <= 570672000;
-
-  # 1
 
 =back
 
@@ -2371,6 +2357,38 @@ B<example 1>
 
 =over 4
 
+=item operation: C<(E<lt>)>
+
+This package overloads the C<E<lt>> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date < 570672001;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(E<lt>=)>
+
+This package overloads the C<E<lt>=> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date <= 570672000;
+
+  # 1
+
+=back
+
+=over 4
+
 =item operation: C<(eq)>
 
 This package overloads the C<eq> operator.
@@ -2403,22 +2421,6 @@ B<example 1>
 
 =over 4
 
-=item operation: C<("")>
-
-This package overloads the C<""> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = "$date";
-
-  # "570672000"
-
-=back
-
-=over 4
-
 =item operation: C<(~~)>
 
 This package overloads the C<~~> operator.
@@ -2441,7 +2443,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

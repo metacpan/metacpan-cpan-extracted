@@ -4,6 +4,14 @@ Revision history for Perl extension Minion::Backend::mysql.
 
 You must upgrade to v0.30 before upgrading to v1.00 and beyond!
 
+1.002     2023-09-11 13:37:53-05:00 America/Chicago
+
+  [Fixed]
+
+  - Improved performance on repair queries to prevent locking up the
+    jobs table for too long. Thanks @larryl and @GrantStreetGroup for
+    fixing this! (Github #41)
+
 1.001     2022-10-05 13:34:51-05:00 America/Chicago
 
   [Docs]

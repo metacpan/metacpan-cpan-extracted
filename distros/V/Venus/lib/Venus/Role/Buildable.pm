@@ -105,7 +105,7 @@ This package provides the following methods:
 
 =head2 build_arg
 
-  build_arg(Any $data) (HashRef)
+  build_arg(any $data) (hashref)
 
 The build_arg method, if defined, is only called during object construction
 when a single non-hashref is provided.
@@ -149,7 +149,7 @@ I<Since C<0.01>>
 
 =head2 build_args
 
-  build_args(HashRef $data) (HashRef)
+  build_args(hashref $data) (hashref)
 
 The build_args method, if defined, is only called during object construction to
 hook into the handling of the arguments provided.
@@ -191,7 +191,7 @@ I<Since C<0.01>>
 
 =head2 build_nil
 
-  build_nil(HashRef $data) (Any)
+  build_nil(hashref $data) (any)
 
 The build_nil method, if defined, is only called during object construction
 when a single empty hashref is provided.
@@ -232,7 +232,7 @@ I<Since C<0.01>>
 
 =head2 build_self
 
-  build_self(HashRef $data) (Self)
+  build_self(hashref $data) (object)
 
 The build_self method, if defined, is only called during object construction
 after all arguments have been handled and set.
@@ -280,7 +280,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

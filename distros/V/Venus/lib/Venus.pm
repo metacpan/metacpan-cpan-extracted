@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '3.55';
+our $VERSION = '4.11';
 
 # AUTHORITY
 
@@ -28,6 +28,7 @@ sub import {
     arrayref => 1,
     assert => 1,
     async => 1,
+    atom => 1,
     await => 1,
     bool => 1,
     box => 1,
@@ -39,6 +40,7 @@ sub import {
     check => 1,
     clargs => 1,
     cli => 1,
+    clone => 1,
     code => 1,
     config => 1,
     container => 1,
@@ -46,10 +48,12 @@ sub import {
     data => 1,
     date => 1,
     docs => 1,
+    enum => 1,
     error => 1,
     false => 1,
     fault => 1,
     float => 1,
+    future => 1,
     gather => 1,
     hash => 1,
     hashref => 1,
@@ -160,7 +164,7 @@ sub assert ($$) {
 
   require Venus::Assert;
 
-  my $assert = Venus::Assert->new('name', 'assert(?, ?)')->expression($expr);
+  my $assert = Venus::Assert->new->expression($expr);
 
   return $assert->validate($data);
 }
@@ -170,15 +174,23 @@ sub async ($) {
 
   require Venus::Process;
 
-  return Venus::Process->new->async($code);
+  return Venus::Process->new->future($code);
+}
+
+sub atom (;$) {
+  my ($data) = @_;
+
+  require Venus::Atom;
+
+  return Venus::Atom->new($data);
 }
 
 sub await ($;$) {
-  my ($process, $timeout) = @_;
+  my ($future, $timeout) = @_;
 
-  require Venus::Process;
+  require Venus::Future;
 
-  return $process->await($timeout);
+  return $future->wait($timeout);
 }
 
 sub bool (;$) {
@@ -290,7 +302,7 @@ sub check ($$) {
 
   require Venus::Assert;
 
-  return Venus::Assert->new->expression($expr)->check($data);
+  return Venus::Assert->new->expression($expr)->valid($data);
 }
 
 sub clargs (@) {
@@ -313,6 +325,14 @@ sub cli (;$) {
   my $cli = Venus::Cli->new($data || [@ARGV]);
 
   return $cli;
+}
+
+sub clone ($) {
+  my ($data) = @_;
+
+  require Storable;
+
+  return Storable::dclone($data);
 }
 
 sub code ($;$@) {
@@ -397,6 +417,14 @@ sub docs {
   return $data->docs->string(@args > 1 ? @args : (undef, @args));
 }
 
+sub enum {
+  my (@data) = @_;
+
+  require Venus::Enum;
+
+  return Venus::Enum->new(@data);
+}
+
 sub error (;$) {
   my ($data) = @_;
 
@@ -433,6 +461,14 @@ sub float ($;$@) {
   }
 
   return Venus::Float->new($data)->$code(@args);
+}
+
+sub future {
+  my (@data) = @_;
+
+  require Venus::Future;
+
+  return Venus::Future->new(@data);
 }
 
 sub gather ($;&) {
@@ -1158,7 +1194,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-3.55
+4.11
 
 =cut
 
@@ -1290,7 +1326,7 @@ This package provides the following functions:
 
 =head2 args
 
-  args(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+  args(arrayref $value, string | coderef $code, any @args) (any)
 
 The args function builds and returns a L<Venus::Args> object, or dispatches to
 the coderef or method provided.
@@ -1329,7 +1365,7 @@ I<Since C<3.10>>
 
 =head2 array
 
-  array(ArrayRef | HashRef $value, Str | CodeRef $code, Any @args) (Any)
+  array(arrayref | hashref $value, string | coderef $code, any @args) (any)
 
 The array function builds and returns a L<Venus::Array> object, or dispatches
 to the coderef or method provided.
@@ -1368,7 +1404,7 @@ I<Since C<2.55>>
 
 =head2 arrayref
 
-  arrayref(Any @args) (ArrayRef)
+  arrayref(any @args) (arrayref)
 
 The arrayref function takes a list of arguments and returns a arrayref.
 
@@ -1420,7 +1456,7 @@ I<Since C<3.10>>
 
 =head2 assert
 
-  assert(Any $data, Str $expr) (Any)
+  assert(any $data, string $expr) (any)
 
 The assert function builds a L<Venus::Assert> object and returns the result of
 a L<Venus::Assert/validate> operation.
@@ -1451,7 +1487,21 @@ I<Since C<2.40>>
 
   my $assert = assert(1234567890, 'float');
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
+
+=back
+
+=over 4
+
+=item assert example 3
+
+  package main;
+
+  use Venus 'assert';
+
+  my $assert = assert(1234567890, 'number | float');
+
+  # 1234567890
 
 =back
 
@@ -1459,12 +1509,11 @@ I<Since C<2.40>>
 
 =head2 async
 
-  async(CodeRef $code, Any @args) (Process)
+  async(coderef $code, any @args) (Venus::Future)
 
 The async function accepts a callback and executes it asynchronously via
-L<Venus::Process/async>. This function returns a
-L<"dyadic"|Venus::Process/is_dyadic> L<Venus::Process> object which can be used
-with L</await>.
+L<Venus::Process/future>. This function returns a L<Venus::Future> object which
+can be fulfilled via L<Venus::Future/wait>.
 
 I<Since C<3.40>>
 
@@ -1480,7 +1529,35 @@ I<Since C<3.40>>
     'done'
   };
 
-  # bless({...}, 'Venus::Process')
+  # bless({...}, 'Venus::Future')
+
+=back
+
+=cut
+
+=head2 atom
+
+  atom(any $value) (Venus::Atom)
+
+The atom function builds and returns a L<Venus::Atom> object.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item atom example 1
+
+  package main;
+
+  use Venus 'atom';
+
+  my $atom = atom 'super-admin';
+
+  # bless({scope => sub{...}}, "Venus::Atom")
+
+  # "$atom"
+
+  # "super-admin"
 
 =back
 
@@ -1488,12 +1565,12 @@ I<Since C<3.40>>
 
 =head2 await
 
-  await(Process $process, Int $timeout) (Any)
+  await(Venus::Future $future, number $timeout) (any)
 
-The await function accepts a L<"dyadic"|Venus::Process/is_dyadic>
-L<Venus::Process> object and eventually returns a value (or values) for it. The
-value(s) returned are the return values or emissions from the asychronous
-callback executed with L</async> which produced the process object.
+The await function accepts a L<Venus::Future> object and eventually returns a
+value (or values) for it. The value(s) returned are the return values or
+emissions from the asychronous callback executed with L</async> which produced
+the process object.
 
 I<Since C<3.40>>
 
@@ -1508,14 +1585,12 @@ I<Since C<3.40>>
   my $process;
 
   my $async = async sub{
-    ($process) = @_;
-    # in forked process ...
     return 'done';
   };
 
   my $await = await $async;
 
-  # ['done']
+  # bless(..., "Venus::Future")
 
 =back
 
@@ -1523,7 +1598,7 @@ I<Since C<3.40>>
 
 =head2 bool
 
-  bool(Any $value) (Boolean)
+  bool(any $value) (Venus::Boolean)
 
 The bool function builds and returns a L<Venus::Boolean> object.
 
@@ -1561,7 +1636,7 @@ I<Since C<2.55>>
 
 =head2 box
 
-  box(Any $data) (Box)
+  box(any $data) (Venus::Box)
 
 The box function returns a L<Venus::Box> object for the argument provided.
 
@@ -1599,7 +1674,7 @@ I<Since C<2.32>>
 
 =head2 call
 
-  call(Str | Object | CodeRef $data, Any @args) (Any)
+  call(string | object | coderef $data, any @args) (any)
 
 The call function dispatches function and method calls to a package and returns
 the result.
@@ -1674,7 +1749,7 @@ I<Since C<2.32>>
 
 =head2 cast
 
-  cast(Any $data, Str $type) (Object)
+  cast(any $data, string $type) (object)
 
 The cast function returns the argument provided as an object, promoting native
 Perl data types to data type objects. The optional second argument can be the
@@ -1742,7 +1817,7 @@ I<Since C<1.40>>
 
 =head2 catch
 
-  catch(CodeRef $block) (Error, Any)
+  catch(coderef $block) (Venus::Error, any)
 
 The catch function executes the code block trapping errors and returning the
 caught exception in scalar context, and also returning the result as a second
@@ -1802,7 +1877,7 @@ I<Since C<0.01>>
 
 =head2 caught
 
-  caught(Object $error, Str | Tuple[Str, Str] $identity, CodeRef $block) (Any)
+  caught(object $error, string | tuple[string, string] $identity, coderef $block) (any)
 
 The caught function evaluates the exception object provided and validates its
 identity and name (if provided) then executes the code block provided returning
@@ -1978,7 +2053,7 @@ I<Since C<1.95>>
 
 =head2 chain
 
-  chain(Str | Object | CodeRef $self, Str | ArrayRef[Str] @args) (Any)
+  chain(string | object | coderef $self, string | within[arrayref, string] @args) (any)
 
 The chain function chains function and method calls to a package (and return
 values) and returns the result.
@@ -2017,7 +2092,7 @@ I<Since C<2.32>>
 
 =head2 check
 
-  check(Any $data, Str $expr) (Bool)
+  check(any $data, string $expr) (boolean)
 
 The check function builds a L<Venus::Assert> object and returns the result of
 a L<Venus::Assert/check> operation.
@@ -2056,7 +2131,7 @@ I<Since C<2.40>>
 
 =head2 clargs
 
-  clargs(ArrayRef $args, ArrayRef $spec) (Args, Opts, Vars)
+  clargs(arrayref $args, arrayref $spec) (Venus::Args, Venus::Opts, Venus::Vars)
 
 The clargs function accepts a single arrayref of L<Getopt::Long> specs, or an
 arrayref of arguments followed by an arrayref of L<Getopt::Long> specs, and
@@ -2125,7 +2200,7 @@ I<Since C<3.10>>
 
 =head2 cli
 
-  cli(ArrayRef $args) (Cli)
+  cli(arrayref $args) (Venus::Cli)
 
 The cli function builds and returns a L<Venus::Cli> object.
 
@@ -2165,9 +2240,60 @@ I<Since C<2.55>>
 
 =cut
 
+=head2 clone
+
+  clone(ref $value) (ref)
+
+The clone function uses L<Storable/dclone> to perform a deep clone of the
+reference provided and returns a copy.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item clone example 1
+
+  package main;
+
+  use Venus 'clone';
+
+  my $orig = {1..4};
+
+  my $clone = clone $orig;
+
+  $orig->{3} = 5;
+
+  my $result = $clone;
+
+  # {1..4}
+
+=back
+
+=over 4
+
+=item clone example 2
+
+  package main;
+
+  use Venus 'clone';
+
+  my $orig = {1,2,3,{1..4}};
+
+  my $clone = clone $orig;
+
+  $orig->{3}->{3} = 5;
+
+  my $result = $clone;
+
+  # {1,2,3,{1..4}}
+
+=back
+
+=cut
+
 =head2 code
 
-  code(CodeRef $value, Str | CodeRef $code, Any @args) (Any)
+  code(coderef $value, string | coderef $code, any @args) (any)
 
 The code function builds and returns a L<Venus::Code> object, or dispatches
 to the coderef or method provided.
@@ -2206,7 +2332,7 @@ I<Since C<2.55>>
 
 =head2 config
 
-  config(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+  config(hashref $value, string | coderef $code, any @args) (any)
 
 The config function builds and returns a L<Venus::Config> object, or dispatches
 to the coderef or method provided.
@@ -2245,7 +2371,7 @@ I<Since C<2.55>>
 
 =head2 container
 
-  container(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+  container(hashref $value, string | coderef $code, any @args) (any)
 
 The container function builds and returns a L<Venus::Container> object, or
 dispatches to the coderef or method provided.
@@ -2298,7 +2424,7 @@ I<Since C<3.20>>
 
 =head2 cop
 
-  cop(Str | Object | CodeRef $self, Str $name) (CodeRef)
+  cop(string | object | coderef $self, string $name) (coderef)
 
 The cop function attempts to curry the given subroutine on the object or class
 and if successful returns a closure.
@@ -2339,7 +2465,7 @@ I<Since C<2.32>>
 
 =head2 data
 
-  data(Str $value, Str | CodeRef $code, Any @args) (Any)
+  data(string $value, string | coderef $code, any @args) (any)
 
 The data function builds and returns a L<Venus::Data> object, or dispatches
 to the coderef or method provided.
@@ -2378,7 +2504,7 @@ I<Since C<2.55>>
 
 =head2 date
 
-  date(Int $value, Str | CodeRef $code, Any @args) (Any)
+  date(number $value, string | coderef $code, any @args) (any)
 
 The date function builds and returns a L<Venus::Date> object, or dispatches to
 the coderef or method provided.
@@ -2435,7 +2561,7 @@ I<Since C<2.40>>
 
 =head2 docs
 
-  docs(Any @args) (Any)
+  docs(any @args) (any)
 
 The docs function builds a L<Venus::Data> object using L<Venus::Data/docs> for
 the current file, i.e. L<perlfunc/__FILE__> or script, i.e. C<$0>, and returns
@@ -2491,9 +2617,66 @@ I<Since C<3.30>>
 
 =cut
 
+=head2 enum
+
+  enum(arrayref | hashref $value) (Venus::Enum)
+
+The enum function builds and returns a L<Venus::Enum> object.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item enum example 1
+
+  package main;
+
+  use Venus 'enum';
+
+  my $themes = enum ['light', 'dark'];
+
+  # bless({scope => sub{...}}, "Venus::Enum")
+
+  # my $result = $themes->get('dark');
+
+  # bless({scope => sub{...}}, "Venus::Enum")
+
+  # "$result"
+
+  # "dark"
+
+=back
+
+=over 4
+
+=item enum example 2
+
+  package main;
+
+  use Venus 'enum';
+
+  my $themes = enum {
+    light => 'light_theme',
+    dark => 'dark_theme',
+  };
+
+  # bless({scope => sub{...}}, "Venus::Enum")
+
+  # my $result = $themes->get('dark');
+
+  # bless({scope => sub{...}}, "Venus::Enum")
+
+  # "$result"
+
+  # "dark_theme"
+
+=back
+
+=cut
+
 =head2 error
 
-  error(Maybe[HashRef] $args) (Error)
+  error(maybe[hashref] $args) (Venus::Error)
 
 The error function throws a L<Venus::Error> exception object using the
 exception object arguments provided.
@@ -2534,7 +2717,7 @@ I<Since C<0.01>>
 
 =head2 false
 
-  false() (Bool)
+  false() (boolean)
 
 The false function returns a falsy boolean value which is designed to be
 practically indistinguishable from the conventional numerical C<0> value.
@@ -2573,7 +2756,7 @@ I<Since C<0.01>>
 
 =head2 fault
 
-  fault(Str $args) (Fault)
+  fault(string $args) (Venus::Fault)
 
 The fault function throws a L<Venus::Fault> exception object and represents a
 system failure, and isn't meant to be caught.
@@ -2612,7 +2795,7 @@ I<Since C<1.80>>
 
 =head2 float
 
-  float(Str $value, Str | CodeRef $code, Any @args) (Any)
+  float(string $value, string | coderef $code, any @args) (any)
 
 The float function builds and returns a L<Venus::Float> object, or dispatches
 to the coderef or method provided.
@@ -2649,9 +2832,41 @@ I<Since C<2.55>>
 
 =cut
 
+=head2 future
+
+  future(coderef $code) (Venus::Future)
+
+The future function builds and returns a L<Venus::Future> object.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item future example 1
+
+  package main;
+
+  use Venus 'future';
+
+  my $future = future(sub{
+    my ($resolve, $reject) = @_;
+
+    return int(rand(2)) ? $resolve->result('pass') : $reject->result('fail');
+  });
+
+  # bless(..., "Venus::Future")
+
+  # $future->is_pending;
+
+  # false
+
+=back
+
+=cut
+
 =head2 gather
 
-  gather(Any $value, CodeRef $callback) (Any)
+  gather(any $value, coderef $callback) (any)
 
 The gather function builds a L<Venus::Gather> object, passing it and the value
 provided to the callback provided, and returns the return value from
@@ -2754,7 +2969,7 @@ I<Since C<2.50>>
 
 =head2 hash
 
-  hash(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+  hash(hashref $value, string | coderef $code, any @args) (any)
 
 The hash function builds and returns a L<Venus::Hash> object, or dispatches
 to the coderef or method provided.
@@ -2793,7 +3008,7 @@ I<Since C<2.55>>
 
 =head2 hashref
 
-  hashref(Any @args) (HashRef)
+  hashref(any @args) (hashref)
 
 The hashref function takes a list of arguments and returns a hashref.
 
@@ -2859,7 +3074,7 @@ I<Since C<3.10>>
 
 =head2 is_bool
 
-  is_bool(Any $arg) (Bool)
+  is_bool(any $arg) (boolean)
 
 The is_bool function returns L</true> if the value provided is a boolean value,
 not merely truthy, and L</false> otherwise.
@@ -2926,7 +3141,7 @@ I<Since C<3.18>>
 
 =head2 is_false
 
-  is_false(Any $data) (Bool)
+  is_false(any $data) (boolean)
 
 The is_false function accepts a scalar value and returns true if the value is
 falsy.
@@ -2965,7 +3180,7 @@ I<Since C<3.04>>
 
 =head2 is_true
 
-  is_true(Any $data) (Bool)
+  is_true(any $data) (boolean)
 
 The is_true function accepts a scalar value and returns true if the value is
 truthy.
@@ -3004,7 +3219,7 @@ I<Since C<3.04>>
 
 =head2 json
 
-  json(Str $call, Any $data) (Any)
+  json(string $call, any $data) (any)
 
 The json function builds a L<Venus::Json> object and will either
 L<Venus::Json/decode> or L<Venus::Json/encode> based on the argument provided
@@ -3072,7 +3287,7 @@ I<Since C<2.40>>
 
 =head2 list
 
-  list(Any @args) (Any)
+  list(any @args) (any)
 
 The list function accepts a list of values and flattens any arrayrefs,
 returning a list of scalars.
@@ -3125,7 +3340,7 @@ I<Since C<3.04>>
 
 =head2 load
 
-  load(Any $name) (Space)
+  load(any $name) (Venus::Space)
 
 The load function loads the package provided and returns a L<Venus::Space> object.
 
@@ -3149,7 +3364,7 @@ I<Since C<2.32>>
 
 =head2 log
 
-  log(Any @args) (Log)
+  log(any @args) (Venus::Log)
 
 The log function prints the arguments provided to STDOUT, stringifying complex
 values, and returns a L<Venus::Log> object. If the first argument is a log
@@ -3181,7 +3396,7 @@ I<Since C<2.40>>
 
 =head2 make
 
-  make(Str $package, Any @args) (Any)
+  make(string $package, any @args) (any)
 
 The make function L<"calls"|Venus/call> the C<new> routine on the invocant and
 returns the result which should be a package string or an object.
@@ -3220,7 +3435,7 @@ I<Since C<2.32>>
 
 =head2 match
 
-  match(Any $value, CodeRef $callback) (Any)
+  match(any $value, coderef $callback) (any)
 
 The match function builds a L<Venus::Match> object, passing it and the value
 provided to the callback provided, and returns the return value from
@@ -3342,7 +3557,7 @@ I<Since C<2.50>>
 
 =head2 merge
 
-  merge(Any @args) (Any)
+  merge(any @args) (any)
 
 The merge function returns a value which is a merger of all of the arguments
 provided.
@@ -3381,7 +3596,7 @@ I<Since C<2.32>>
 
 =head2 meta
 
-  meta(Str $value, Str | CodeRef $code, Any @args) (Any)
+  meta(string $value, string | coderef $code, any @args) (any)
 
 The meta function builds and returns a L<Venus::Meta> object, or dispatches to
 the coderef or method provided.
@@ -3420,7 +3635,7 @@ I<Since C<2.55>>
 
 =head2 name
 
-  name(Str $value, Str | CodeRef $code, Any @args) (Any)
+  name(string $value, string | coderef $code, any @args) (any)
 
 The name function builds and returns a L<Venus::Name> object, or dispatches to
 the coderef or method provided.
@@ -3459,7 +3674,7 @@ I<Since C<2.55>>
 
 =head2 number
 
-  number(Num $value, Str | CodeRef $code, Any @args) (Any)
+  number(Num $value, string | coderef $code, any @args) (any)
 
 The number function builds and returns a L<Venus::Number> object, or dispatches
 to the coderef or method provided.
@@ -3498,7 +3713,7 @@ I<Since C<2.55>>
 
 =head2 opts
 
-  opts(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+  opts(arrayref $value, string | coderef $code, any @args) (any)
 
 The opts function builds and returns a L<Venus::Opts> object, or dispatches to
 the coderef or method provided.
@@ -3541,7 +3756,7 @@ I<Since C<2.55>>
 
 =head2 pairs
 
-  pairs(Any $data) (ArrayRef)
+  pairs(any $data) (arrayref)
 
 The pairs function accepts an arrayref or hashref and returns an arrayref of
 arrayrefs holding keys (or indices) and values. The function returns an empty
@@ -3609,7 +3824,7 @@ I<Since C<3.04>>
 
 =head2 path
 
-  path(Str $value, Str | CodeRef $code, Any @args) (Any)
+  path(string $value, string | coderef $code, any @args) (any)
 
 The path function builds and returns a L<Venus::Path> object, or dispatches
 to the coderef or method provided.
@@ -3648,7 +3863,7 @@ I<Since C<2.55>>
 
 =head2 perl
 
-  perl(Str $call, Any $data) (Any)
+  perl(string $call, any $data) (any)
 
 The perl function builds a L<Venus::Dump> object and will either
 L<Venus::Dump/decode> or L<Venus::Dump/encode> based on the argument provided
@@ -3716,7 +3931,7 @@ I<Since C<2.40>>
 
 =head2 process
 
-  process(Str | CodeRef $code, Any @args) (Any)
+  process(string | coderef $code, any @args) (any)
 
 The process function builds and returns a L<Venus::Process> object, or
 dispatches to the coderef or method provided.
@@ -3755,7 +3970,7 @@ I<Since C<2.55>>
 
 =head2 proto
 
-  proto(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+  proto(hashref $value, string | coderef $code, any @args) (any)
 
 The proto function builds and returns a L<Venus::Prototype> object, or
 dispatches to the coderef or method provided.
@@ -3799,7 +4014,7 @@ I<Since C<2.55>>
 
 =head2 puts
 
-  puts(Any @args) (ArrayRef)
+  puts(any @args) (arrayref)
 
 The puts function select values from within the underlying data structure using
 L<Venus::Array/path> or L<Venus::Hash/path>, optionally assigning the value to
@@ -3839,7 +4054,7 @@ I<Since C<3.20>>
 
 =head2 raise
 
-  raise(Str $class | Tuple[Str, Str] $class, Maybe[HashRef] $args) (Error)
+  raise(string $class | tuple[string, string] $class, maybe[hashref] $args) (Venus::Error)
 
 The raise function generates and throws a named exception object derived from
 L<Venus::Error>, or provided base class, using the exception object arguments
@@ -3895,7 +4110,7 @@ I<Since C<0.01>>
 
 =head2 random
 
-  random(Str | CodeRef $code, Any @args) (Any)
+  random(string | coderef $code, any @args) (any)
 
 The random function builds and returns a L<Venus::Random> object, or dispatches
 to the coderef or method provided.
@@ -3934,7 +4149,7 @@ I<Since C<2.55>>
 
 =head2 range
 
-  range(Int | Str @args) (ArrayRef)
+  range(number | string @args) (arrayref)
 
 The range function returns the result of a L<Venus::Array/range> operation.
 
@@ -3972,7 +4187,7 @@ I<Since C<3.20>>
 
 =head2 regexp
 
-  regexp(Str $value, Str | CodeRef $code, Any @args) (Any)
+  regexp(string $value, string | coderef $code, any @args) (any)
 
 The regexp function builds and returns a L<Venus::Regexp> object, or dispatches
 to the coderef or method provided.
@@ -4015,7 +4230,7 @@ I<Since C<2.55>>
 
 =head2 render
 
-  render(Str $data, HashRef $args) (Str)
+  render(string $data, hashref $args) (string)
 
 The render function accepts a string as a template and renders it using
 L<Venus::Template>, and returns the result.
@@ -4042,7 +4257,7 @@ I<Since C<3.04>>
 
 =head2 replace
 
-  replace(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+  replace(arrayref $value, string | coderef $code, any @args) (any)
 
 The replace function builds and returns a L<Venus::Replace> object, or
 dispatches to the coderef or method provided.
@@ -4081,7 +4296,7 @@ I<Since C<2.55>>
 
 =head2 resolve
 
-  resolve(HashRef $value, Any @args) (Any)
+  resolve(hashref $value, any @args) (any)
 
 The resolve function builds and returns an object via L<Venus::Container/resolve>.
 
@@ -4127,7 +4342,7 @@ I<Since C<3.30>>
 
 =head2 roll
 
-  roll(Str $name, Any @args) (Any)
+  roll(string $name, any @args) (any)
 
 The roll function takes a list of arguments, assuming the first argument is
 invokable, and reorders the list such that the routine name provided comes
@@ -4168,7 +4383,7 @@ I<Since C<2.32>>
 
 =head2 schema
 
-  schema(Str $value, Str | CodeRef $code, Any @args) (Any)
+  schema(string $value, string | coderef $code, any @args) (any)
 
 The schema function builds and returns a L<Venus::Schema> object, or dispatches
 to the coderef or method provided.
@@ -4207,7 +4422,7 @@ I<Since C<2.55>>
 
 =head2 search
 
-  search(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+  search(arrayref $value, string | coderef $code, any @args) (any)
 
 The search function builds and returns a L<Venus::Search> object, or dispatches
 to the coderef or method provided.
@@ -4246,7 +4461,7 @@ I<Since C<2.55>>
 
 =head2 space
 
-  space(Any $name) (Space)
+  space(any $name) (Venus::Space)
 
 The space function returns a L<Venus::Space> object for the package provided.
 
@@ -4270,7 +4485,7 @@ I<Since C<2.32>>
 
 =head2 string
 
-  string(Str $value, Str | CodeRef $code, Any @args) (Any)
+  string(string $value, string | coderef $code, any @args) (any)
 
 The string function builds and returns a L<Venus::String> object, or dispatches
 to the coderef or method provided.
@@ -4309,7 +4524,7 @@ I<Since C<2.55>>
 
 =head2 syscall
 
-  syscall(Int | Str @args) (Any)
+  syscall(number | string @args) (any)
 
 The syscall function perlforms system call, i.e. a L<perlfunc/qx> operation,
 and returns C<true> if the command succeeds, otherwise returns C<false>. In
@@ -4377,7 +4592,7 @@ I<Since C<3.04>>
 
 =head2 template
 
-  template(Str $value, Str | CodeRef $code, Any @args) (Any)
+  template(string $value, string | coderef $code, any @args) (any)
 
 The template function builds and returns a L<Venus::Template> object, or
 dispatches to the coderef or method provided.
@@ -4418,7 +4633,7 @@ I<Since C<2.55>>
 
 =head2 test
 
-  test(Str $value, Str | CodeRef $code, Any @args) (Any)
+  test(string $value, string | coderef $code, any @args) (any)
 
 The test function builds and returns a L<Venus::Test> object, or dispatches to
 the coderef or method provided.
@@ -4457,7 +4672,7 @@ I<Since C<2.55>>
 
 =head2 text
 
-  text(Any @args) (Any)
+  text(any @args) (any)
 
 The text function builds a L<Venus::Data> object using L<Venus::Data/text> for
 the current file, i.e. L<perlfunc/__FILE__> or script, i.e. C<$0>, and returns
@@ -4565,7 +4780,7 @@ I<Since C<3.30>>
 
 =head2 then
 
-  then(Str | Object | CodeRef $self, Any @args) (Any)
+  then(string | object | coderef $self, any @args) (any)
 
 The then function proxies the call request to the L</call> function and returns
 the result as a list, prepended with the invocant.
@@ -4590,7 +4805,7 @@ I<Since C<2.32>>
 
 =head2 throw
 
-  throw(Str | HashRef $value, Str | CodeRef $code, Any @args) (Any)
+  throw(string | hashref $value, string | coderef $code, any @args) (any)
 
 The throw function builds and returns a L<Venus::Throw> object, or dispatches
 to the coderef or method provided.
@@ -4650,7 +4865,7 @@ I<Since C<2.55>>
 
 =head2 true
 
-  true() (Bool)
+  true() (boolean)
 
 The true function returns a truthy boolean value which is designed to be
 practically indistinguishable from the conventional numerical C<1> value.
@@ -4689,7 +4904,7 @@ I<Since C<0.01>>
 
 =head2 try
 
-  try(Any $data, Str | CodeRef $code, Any @args) (Any)
+  try(any $data, string | coderef $code, any @args) (any)
 
 The try function builds and returns a L<Venus::Try> object, or dispatches to
 the coderef or method provided.
@@ -4754,7 +4969,7 @@ I<Since C<2.55>>
 
 =head2 type
 
-  type(Any $data, Str | CodeRef $code, Any @args) (Any)
+  type(any $data, string | coderef $code, any @args) (any)
 
 The type function builds and returns a L<Venus::Type> object, or dispatches to
 the coderef or method provided.
@@ -4797,7 +5012,7 @@ I<Since C<2.55>>
 
 =head2 unpack
 
-  unpack(Any @args) (Unpack)
+  unpack(any @args) (Venus::Unpack)
 
 The unpack function builds and returns a L<Venus::Unpack> object.
 
@@ -4851,7 +5066,7 @@ I<Since C<2.40>>
 
 =head2 vars
 
-  vars(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+  vars(hashref $value, string | coderef $code, any @args) (any)
 
 The vars function builds and returns a L<Venus::Vars> object, or dispatches to
 the coderef or method provided.
@@ -4890,7 +5105,7 @@ I<Since C<2.55>>
 
 =head2 venus
 
-  venus(Str $name, Any @args) (Any)
+  venus(string $name, any @args) (any)
 
 The venus function build a L<Venus> package via the L</chain> function based on
 the name provided and returns an instance of that package.
@@ -4943,7 +5158,7 @@ I<Since C<2.40>>
 
 =head2 work
 
-  work(CodeRef $callback) (Process)
+  work(coderef $callback) (Venus::Process)
 
 The work function builds a L<Venus::Process> object, forks the current process
 using the callback provided via the L<Venus::Process/work> operation, and
@@ -4973,7 +5188,7 @@ I<Since C<2.40>>
 
 =head2 wrap
 
-  wrap(Str $data, Str $name) (CodeRef)
+  wrap(string $data, string $name) (coderef)
 
 The wrap function installs a wrapper function in the calling package which when
 called either returns the package string if no arguments are provided, or calls
@@ -5031,7 +5246,7 @@ I<Since C<2.32>>
 
 =head2 yaml
 
-  yaml(Str $call, Any $data) (Any)
+  yaml(string $call, any $data) (any)
 
 The yaml function builds a L<Venus::Yaml> object and will either
 L<Venus::Yaml/decode> or L<Venus::Yaml/encode> based on the argument provided
@@ -5543,7 +5758,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

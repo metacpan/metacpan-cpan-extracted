@@ -1,52 +1,57 @@
 TYPEMAP
-	Crypt::HSM              T_PROVIDER
-	Crypt::HSM::Slot        T_PTROBJ
-	Crypt::HSM::Mechanism   T_PTROBJ
-	Crypt::HSM::Session     T_PTROBJ
-	Crypt::HSM::Stream      T_PTROBJ
-	Crypt::HSM::Encrypt     T_PTROBJ
-	Crypt::HSM::Decrypt     T_PTROBJ
-	Crypt::HSM::Digest      T_PTROBJ
-	Crypt::HSM::Sign        T_PTROBJ
-	Crypt::HSM::Verify      T_PTROBJ
-	CK_BBOOL                T_BOOL
-	CK_ULONG                T_U_LONG
-	CK_OBJECT_HANDLE        T_U_LONG
-	CK_SLOT_ID              T_U_LONG
-
-	CK_USER_TYPE            T_USER_TYPE
-
-	CK_MECHANISM_TYPE       T_MECHANISM_TYPE
-	Attributes              T_ATTRIBUTES
-	Session_flags           T_SESSION_FLAGS
+Crypt::HSM	T_MAGICEXT
+Crypt::HSM::Slot	T_MAGICEXT
+Crypt::HSM::Mechanism	T_MAGICEXT
+Crypt::HSM::Session	T_MAGIC
+Crypt::HSM::Stream	T_MAGIC
+Crypt::HSM::Encrypt	T_MAGIC
+Crypt::HSM::Decrypt	T_MAGIC
+Crypt::HSM::Digest	T_MAGIC
+Crypt::HSM::Sign	T_MAGIC
+Crypt::HSM::Verify	T_MAGIC
+CK_BBOOL	T_BOOL
+CK_ULONG	T_U_LONG
+CK_OBJECT_HANDLE	T_U_LONG
+CK_SLOT_ID	T_U_LONG
+CK_USER_TYPE	T_USER_TYPE
+CK_MECHANISM_TYPE	T_MECHANISM_TYPE
+Attributes	T_ATTRIBUTES
+Session_flags	T_SESSION_FLAGS
 
 INPUT
 T_USER_TYPE
 	$var = get_user_type($arg)
-
 T_MECHANISM_TYPE
 	$var = get_mechanism_type($arg)
-
 T_ATTRIBUTES
 	$var = get_attributes($arg)
-
 T_SESSION_FLAGS
 	$var = get_flags(session_flags, $arg)
-
-T_PROVIDER
+T_MAGIC
 	{
-	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, &Crypt__HSM_magic) : NULL;
+	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, NULL) : NULL;
 	if (magic)
-		$var = (Crypt__HSM)magic->mg_ptr;
+		$var = (${type})magic->mg_ptr;
 	else
 		Perl_croak(aTHX_ \"${ntype} object is lacking magic\");
 	}
 
-OUTPUT
-T_PROVIDER
+T_MAGICEXT
 	{
-	SV* referent = newSVrv($arg, \"${ntype}\");
-	MAGIC* magic = sv_magicext(referent, NULL, PERL_MAGIC_ext, &Crypt__HSM_magic, (const char*)$var, 0);
-	if (Crypt__HSM_magic.svt_dup)
-		magic->mg_flags |= MGf_DUP;
+	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, &${type}_magic) : NULL;
+	if (magic)
+		$var = (${type})magic->mg_ptr;
+	else
+		Perl_croak(aTHX_ \"${ntype} object is lacking magic\");
 	}
+
+
+OUTPUT
+T_MAGIC
+	sv_magic(newSVrv($arg, \"${ntype}\"), NULL, PERL_MAGIC_ext, (const char*)$var, 0);
+T_MAGICEXT
+	{
+	MAGIC* magic = sv_magicext(newSVrv($arg, \"${ntype}\"), NULL, PERL_MAGIC_ext, &${type}_magic, (const char*)$var, 0);
+	magic->mg_flags |= MGf_COPY|MGf_DUP;
+	}
+

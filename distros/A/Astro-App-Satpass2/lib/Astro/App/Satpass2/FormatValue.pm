@@ -23,7 +23,7 @@ use POSIX qw{ floor };
 use Scalar::Util 1.26 qw{ isdual reftype };
 use Text::Wrap ();
 
-our $VERSION = '0.050';
+our $VERSION = '0.051';
 
 use constant NONE => undef;
 use constant RE_ALL_DIGITS	=> qr{ \A [0-9]+ \z }smx;
@@ -137,6 +137,11 @@ sub body {	# Required for template 'list', which needs to figure
 		# out whether the body is inertial or not.
     my ( $self ) = @_;
     return $self->_get_eci( 'body' );
+}
+
+sub data {
+    my ( $self ) = @_;
+    return $self->_get( 'data' );
 }
 
 #	Mutators. These should be kept to a minimum.
@@ -262,6 +267,18 @@ sub earth {
 sub events {
     my ( $self ) = @_;
     return [ map { $self->clone( data => $_ ) } $self->__raw_events() ];
+}
+
+sub tle_events {
+    my ( $self ) = @_;
+    my @rslt;
+
+    foreach my $evt ( $self->__raw_events() ) {
+	embodies( $evt->{body}, 'Astro::Coord::ECI::TLE' )
+	    or next;
+	push @rslt, $self->clone( data => $evt );
+    }
+    return \@rslt;
 }
 
 sub __raw_events {
@@ -2656,6 +2673,12 @@ L<Astro::App::Satpass2::Format::Template|Astro::App::Satpass2::Format::Template>
 L<list()|Astro::App::Satpass2::Format::Template/list> method needs to
 look at the body to decide what to display.
 
+=head3 data
+
+ $fmt->data();
+
+This accessor returns the original C<data> argument.
+
 =head2 Mutators
 
 These also are kept to a minimum.
@@ -2804,6 +2827,19 @@ With this,
  $fmt->latitude()
 
 would get you the latitude of the orbiting body.
+
+=head3 tle_events
+
+ foreach my $event ( @{ $fmt->tle_events() || [] } ) {
+     ... do something with the event ...
+ }
+
+This method returns a reference to an array of
+C<Astro::App::Satpass2::FormatValue> objects manufactured out of the
+contents of the C<{events}> key of the invocant's data, but only those
+elements whose C<{body}> key contains an
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> or equivalent. If you
+want all elements in C<{events}>, call L<events()|/events>.
 
 =head2 Formatters
 
@@ -4640,7 +4676,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2022 by Thomas R. Wyant, III
+Copyright (C) 2010-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

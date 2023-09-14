@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -21,7 +21,7 @@ await $chip->mount(
    $adapter->expect_write_then_read( "\x00", 1 )
       ->returns( "\x11" );
 
-   is_deeply( await $chip->read_status,
+   is( await $chip->read_status,
       {
          SYS_INIT  => '',
          LOL_B     => '',

@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -21,7 +21,7 @@ await $chip->mount(
    $adapter->expect_write_then_read( "\x01", 2 )
       ->returns( "\x85\x83" );
 
-   is_deeply( await $chip->read_config,
+   is( await $chip->read_config,
       {
          COMP_LAT  => '',
          COMP_MODE => "TRAD",

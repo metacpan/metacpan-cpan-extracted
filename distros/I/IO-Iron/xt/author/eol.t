@@ -27,8 +27,6 @@ my @files = (
     'lib/IO/Iron/IronWorker/Task.pm',
     'lib/IO/Iron/PolicyBase.pm',
     'lib/IO/Iron/PolicyBase/CharacterGroup.pm',
-    't/00-report-prereqs.dd',
-    't/00-report-prereqs.t',
     't/Iron/client_readconfig.t',
     't/Iron/common.t',
     't/Iron/load.t',
@@ -36,7 +34,8 @@ my @files = (
     't/IronCache/cache_policy2.t',
     't/IronCache/load.t',
     't/IronMQ/load.t',
-    't/IronWorker/load.t'
+    't/IronWorker/load.t',
+    't/lib/IO/Iron/Test/Util.pm'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

@@ -1,4 +1,4 @@
-package Email::MIME::Kit 3.000007;
+package Email::MIME::Kit 3.000008;
 # ABSTRACT: build messages from templates
 
 use v5.20.0;
@@ -297,7 +297,7 @@ Email::MIME::Kit - build messages from templates
 
 =head1 VERSION
 
-version 3.000007
+version 3.000008
 
 =head1 SYNOPSIS
 
@@ -371,13 +371,13 @@ easily as suggested in the L</SYNOPSIS> above.
 
 =head1 PERL VERSION
 
-This library should run on perls released even a long time ago.  It should work
-on any version of perl released in the last five years.
+This library should run on perls released even a long time ago.  It should
+work on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 ENCODING ISSUES
 
@@ -421,7 +421,7 @@ The development of this code was sponsored by Pobox.com.  Thanks, Pobox!
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
@@ -444,10 +444,6 @@ hdp <hdp@1bcdbe44-fcfd-0310-b51b-975661d93aa0>
 =item *
 
 Kaitlyn Parkhurst <symkat@symkat.com>
-
-=item *
-
-Ricardo Signes <cpan@semiotic.systems>
 
 =item *
 

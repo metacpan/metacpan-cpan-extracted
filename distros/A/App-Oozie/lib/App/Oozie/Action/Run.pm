@@ -1,5 +1,5 @@
 package App::Oozie::Action::Run;
-$App::Oozie::Action::Run::VERSION = '0.002';
+$App::Oozie::Action::Run::VERSION = '0.006';
 # This is not in use yet, please go to the parent class
 
 use 5.010;
@@ -21,7 +21,7 @@ App::Oozie::Action::Run
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 

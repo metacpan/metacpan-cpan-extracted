@@ -2,12 +2,13 @@
 #  as Perl itself)
 #
 #  (C) Tom Molesworth 2011,
-#      Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
+#      Paul Evans, 2011-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.73 ':experimental(init_expr adjust_params)';
+use warnings;
+use Object::Pad 0.800 ':experimental(adjust_params)';
 
-package Tickit::Widget::Tabbed 0.027;
+package Tickit::Widget::Tabbed 0.028;
 class Tickit::Widget::Tabbed
         :strict(params)
         :isa(Tickit::ContainerWidget);
@@ -26,7 +27,7 @@ use Tickit::Widget::Tabbed::Ribbon;
 
 =head1 NAME
 
-Tickit::Widget::Tabbed - provide tabbed window support
+C<Tickit::Widget::Tabbed> - provide tabbed window support
 
 =head1 SYNOPSIS
 
@@ -562,7 +563,7 @@ on having that available for implementing a subclass:
 
    use Object::Pad;
 
-   class MyCustomTabClass extends Tickit::Widget::Tabbed::Tab;
+   class MyCustomTabClass :isa(Tickit::Widget::Tabbed::Tab);
 
 Arrange for this class to be used by the tabbed widget either by passing its
 name as a constructor argument called C<tab_class>, or by overriding a method

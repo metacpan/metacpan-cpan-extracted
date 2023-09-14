@@ -3,9 +3,10 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'Device::Chip::AVR_HVSP' );
-use_ok( 'Device::Chip::AVR_HVSP::FuseInfo' );
+require Device::Chip::AVR_HVSP;
+require Device::Chip::AVR_HVSP::FuseInfo;
 
+pass( 'Modules loaded' );
 done_testing;

@@ -9,21 +9,21 @@ my $build = Module::Build->new(
       'Module::Build' => '0.4004', # test_requires
    },
    requires => {
+      'perl' => '5.026',
+      'Future::AsyncAwait' => 0,
+      'Object::Pad' => '0.800',
+      'Object::Pad::ClassAttr::Struct' => '0.04',
+
       'Commandable' => '0.08',
       'File::ShareDir' => 0,
-      'Future::AsyncAwait' => 0,
       'Future::IO' => '0.03',
       'IO::Termios' => 0,
-      'Object::Pad' => '0.76',
-      'Object::Pad::ClassAttr::Struct' => '0.04',
       'YAML' => 0,
-
-      'perl' => '5.020',
    },
    test_requires => {
       'Test::ExpectAndCheck' => '0.04',
       'Test::Future::IO' => '0.04', # ->expect_sys*_anyfh
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    share_dir => {
       module => { "Device::AVR::UPDI" => "share" },

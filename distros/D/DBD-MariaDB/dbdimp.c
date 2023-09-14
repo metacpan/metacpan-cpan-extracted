@@ -2,7 +2,7 @@
  *  DBD::MariaDB - DBI driver for the MariaDB and MySQL database
  *
  *  Copyright (c) 2018      GoodData Corporation
- *  Copyright (c) 2015-2017 Pali Rohár
+ *  Copyright (c) 2015-2022 Pali Rohár
  *  Copyright (c) 2004-2017 Patrick Galbraith
  *  Copyright (c) 2013-2017 Michiel Beijen 
  *  Copyright (c) 2004-2007 Alexey Stroganov 
@@ -1392,6 +1392,51 @@ static void error_no_connection(SV *h, const char *msg)
   mariadb_dr_do_error(h, CR_CONNECTION_ERROR, msg, "HY000");
 }
 
+static int mariadb_dr_socket_cloexec(my_socket sock_os)
+{
+#ifdef _WIN32
+  HANDLE handle = (HANDLE)sock_os;
+  DWORD flags;
+  int error;
+
+  if (!GetHandleInformation(handle, &flags))
+  {
+    error = GetLastError();
+    return error != 0 ? -error : -EINVAL;
+  }
+
+  if (flags & HANDLE_FLAG_INHERIT)
+  {
+    /*
+      Clearing HANDLE_FLAG_INHERIT does not have to work for TCP sockets
+      when certain 3rd party Layered Service Providers are installed.
+      Note that perl's strerror() works also for error codes returned by
+      WinAPI GetLastError() function.
+     */
+    if (!SetHandleInformation(handle, HANDLE_FLAG_INHERIT, 0))
+    {
+      error = GetLastError();
+      return error != 0 ? -error : -EINVAL;
+    }
+  }
+#else
+  int fd = (int)sock_os;
+  int flags;
+
+  flags = fcntl(fd, F_GETFD);
+  if (flags == -1)
+    return errno != 0 ? -errno : -EINVAL;
+
+  if (!(flags & FD_CLOEXEC))
+  {
+    if (fcntl(fd, F_SETFD, flags | FD_CLOEXEC) == -1)
+      return errno != 0 ? -errno : -EINVAL;
+  }
+#endif
+
+  return 0;
+}
+
 /***************************************************************************
  *
  *  Name:    mariadb_dr_connect
@@ -1557,9 +1602,9 @@ static bool mariadb_dr_connect(
           }
 
           if (embedded_groups)
-            imp_drh->embedded_groups = newSVsv(embedded_groups);
+            imp_drh->embedded_groups = newSVsv_nomg(embedded_groups);
           if (embedded_args)
-            imp_drh->embedded_args = newSVsv(embedded_args);
+            imp_drh->embedded_args = newSVsv_nomg(embedded_args);
 
           imp_drh->embedded_started = TRUE;
         }
@@ -1780,12 +1825,12 @@ static bool mariadb_dr_connect(
         {
           UV uv = SvUV_nomg(*svp);
           unsigned long packet_size = (uv <= ULONG_MAX ? uv : ULONG_MAX);
-#if (!defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 50709 && MYSQL_VERSION_ID != 60000) || (defined(MARIADB_VERSION_ID) && MARIADB_VERSION_ID >= 100202)
+#if (!defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 50709 && MYSQL_VERSION_ID != 60000) || (defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 100206 && MYSQL_VERSION_ID != 100300)
           /* MYSQL_OPT_MAX_ALLOWED_PACKET was added in mysql 5.7.9 */
-          /* MYSQL_OPT_MAX_ALLOWED_PACKET was added in MariaDB 10.2.2 */
+          /* MYSQL_OPT_MAX_ALLOWED_PACKET was added in MariaDB 10.2.6 and MariaDB 10.3.1 */
           mysql_options(sock, MYSQL_OPT_MAX_ALLOWED_PACKET, &packet_size);
 #else
-          /* before MySQL 5.7.9 and MariaDB 10.2.2 use max_allowed_packet macro */
+          /* before MySQL 5.7.9 and MariaDB 10.2.6 and MariaDB 10.3.0 use max_allowed_packet macro */
           max_allowed_packet = packet_size;
 #endif
         }
@@ -1805,6 +1850,29 @@ static bool mariadb_dr_connect(
           if (error)
           {
             mariadb_dr_do_error(dbh, CR_CONNECTION_ERROR, "Connection error: mariadb_skip_secure_auth=1 is not supported", "HY000");
+            mariadb_db_disconnect(dbh, imp_dbh);
+            return FALSE;
+          }
+        }
+
+        (void)hv_stores(processed, "mariadb_auth_plugin", &PL_sv_yes);
+        if ((svp = hv_fetchs(hv, "mariadb_auth_plugin", FALSE)) && *svp)
+        {
+          int error = 1;
+          STRLEN len;
+          char *auth_plugin = SvPVutf8(*svp, len);
+          if (strlen(auth_plugin) != len)
+          {
+            error_nul_character(dbh, "mariadb_auth_plugin");
+            mariadb_db_disconnect(dbh, imp_dbh);
+            return FALSE;
+          }
+#if MYSQL_VERSION_ID >= 50507 && MYSQL_VERSION_ID != 60000
+          error = mysql_options(sock, MYSQL_DEFAULT_AUTH, auth_plugin);
+#endif
+          if (error)
+          {
+            mariadb_dr_do_error(dbh, CR_CONNECTION_ERROR, "Connection error: mariadb_auth_plugin is not supported", "HY000");
             mariadb_db_disconnect(dbh, imp_dbh);
             return FALSE;
           }
@@ -1879,13 +1947,8 @@ static bool mariadb_dr_connect(
         }
 
         (void)hv_stores(processed, "mariadb_client_found_rows", &PL_sv_yes);
-        if ((svp = hv_fetchs(hv, "mariadb_client_found_rows", FALSE)) && *svp)
-        {
-          if (SvTRUE(*svp))
-            client_flag |= CLIENT_FOUND_ROWS;
-          else
-            client_flag &= ~CLIENT_FOUND_ROWS;
-        }
+        if ((svp = hv_fetchs(hv, "mariadb_client_found_rows", FALSE)) && *svp && !SvTRUE(*svp))
+          client_flag &= ~CLIENT_FOUND_ROWS;
 
         (void)hv_stores(processed, "mariadb_auto_reconnect", &PL_sv_yes);
         if ((svp = hv_fetchs(hv, "mariadb_auto_reconnect", FALSE)) && *svp)
@@ -1954,13 +2017,11 @@ static bool mariadb_dr_connect(
         }
 
         (void)hv_stores(processed, "mariadb_multi_statements", &PL_sv_yes);
-	if ((svp = hv_fetchs(hv, "mariadb_multi_statements", FALSE)) && *svp)
+        if ((svp = hv_fetchs(hv, "mariadb_multi_statements", FALSE)) && *svp && SvTRUE(*svp))
         {
-	  if (SvTRUE(*svp))
-	    client_flag |= CLIENT_MULTI_STATEMENTS;
-          else
-            client_flag &= ~CLIENT_MULTI_STATEMENTS;
-	}
+          imp_dbh->use_multi_statements = TRUE;
+          client_flag |= CLIENT_MULTI_STATEMENTS;
+        }
 
         (void)hv_stores(processed, "mariadb_server_prepare", &PL_sv_yes);
 	if ((svp = hv_fetchs(hv, "mariadb_server_prepare", FALSE)) && *svp)
@@ -2296,25 +2357,87 @@ static bool mariadb_dr_connect(
       }
     }
 
-    if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
-      PerlIO_printf(DBIc_LOGPIO(imp_xxh), "imp_dbh->mariadb_dr_connect: <-");
-
       /*
         we turn off Mysql's auto reconnect and handle re-connecting ourselves
         so that we can keep track of when this happens.
       */
 #if MYSQL_VERSION_ID >= 50013
+    /* Beginning with MySQL 8.0.34, the automatic reconnection feature is deprecated and disabled by default. */
+#if defined(MARIADB_BASE_VERSION) || MYSQL_VERSION_ID < 80034
     {
       my_bool reconnect = FALSE;
       mysql_options(sock, MYSQL_OPT_RECONNECT, &reconnect);
     }
+#endif
 #else
       sock->reconnect = FALSE;
 #endif
 
+    {
+      my_socket sock_os;
+      int retval;
+
+      /*
+        mysql_get_socket() is not available:
+        - in all MySQL clients
+        - MariaDB clients prior to 5.5.38 and 10.0.11
+        - MariaDB Connector/C clients prior to 2.2.1
+        NOTE: MARIADB_PACKAGE_VERSION_ID is set since MariaDB Connector/C 2.3.5+
+      */
+#if defined(MARIADB_BASE_VERSION) && ((MYSQL_VERSION_ID >= 50538 && MYSQL_VERSION_ID < 100000) || MYSQL_VERSION_ID >= 100011 || (defined(MARIADB_PACKAGE_VERSION_ID) && MARIADB_PACKAGE_VERSION_ID >= 20201))
+      sock_os = mysql_get_socket(sock);
+#else
+      sock_os = sock->net.fd;
+#endif
+      /*
+        Client library returns socket in my_socket type, which is C file
+        descriptor on Linux or Windows native socket type on Windows.
+        Perl requires sockets to always be in C file descriptor type,
+        so on Windows associate it with C file descriptor via Perl's
+        win32_open_osfhandle() function.
+      */
+#ifdef _WIN32
+      imp_dbh->sock_fd = win32_open_osfhandle(sock_os, O_RDWR|O_BINARY);
+#else
+      imp_dbh->sock_fd = sock_os;
+#endif
+
+#ifdef _WIN32
+      {
+        /*
+         * Winsock SO_UPDATE_CONNECT_CONTEXT option needs to be set on the socket,
+         * otherwise getpeername, getsockname, getsockopt, setsockopt, and shutdown
+         * functions would fail with WSAENOTCONN error.
+         */
+        DWORD value = 1;
+        setsockopt(imp_dbh->sock_fd, SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT, (const char *)&value, sizeof(value));
+      }
+#endif
+
+      /*
+        MySQL and MariaDB clients do not set FD_CLOEXEC flag on socket
+        https://bugs.mysql.com/bug.php?id=3779
+        https://jira.mariadb.org/browse/CONC-405
+      */
+      retval = mariadb_dr_socket_cloexec(sock_os);
+      if (retval != 0)
+      {
+        /* Throw DBI warning when setting FD_CLOEXEC flag failed */
+        SV *errstr = DBIc_ERRSTR(imp_xxh);
+        SvUTF8_off(errstr);
+        sv_setpvf(errstr, "Cannot set close-on-exec flag: %s", strerror(-retval));
+        sv_utf8_decode(errstr);
+        sv_setuv(DBIc_ERR(imp_xxh), 0); /* 0 indicates warning */
+        sv_setpv(DBIc_STATE(imp_xxh), "01000"); /* "01000" is generic warning */
+      }
+    }
+
           imp_dbh->async_query_in_flight = NULL;
 
     mariadb_list_add(imp_drh->active_imp_dbhs, imp_dbh->list_entry, imp_dbh);
+
+    if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
+      PerlIO_printf(DBIc_LOGPIO(imp_xxh), "imp_dbh->mariadb_dr_connect: <-\n");
 
     return TRUE;
 }
@@ -2392,6 +2515,7 @@ static bool mariadb_db_my_login(pTHX_ SV* dbh, imp_dbh_t *imp_dbh)
       /* This imp_dbh data belongs to different connection, so destructor should not touch it */
       imp_dbh->list_entry = NULL;
       imp_dbh->pmysql = NULL;
+      imp_dbh->sock_fd = -1;
       mariadb_dr_do_error(dbh, CR_CONNECTION_ERROR, "Connection error: dbi_imp_data is not valid", "HY000");
       return FALSE;
     }
@@ -2448,7 +2572,7 @@ static bool mariadb_db_my_login(pTHX_ SV* dbh, imp_dbh_t *imp_dbh)
   if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
     PerlIO_printf(DBIc_LOGPIO(imp_xxh),
 		  "imp_dbh->mariadb_db_my_login : dbname = %s, uid = %s, pwd = %s,"
-		  "host = %s, port = %u\n",
+		  " host = %s, port = %u\n",
 		  dbname ? dbname : "NULL",
 		  user ? user : "NULL",
 		  !password ? "NULL" : !password[0] ? "" : "****",
@@ -2599,6 +2723,9 @@ IV mariadb_db_do6(SV *dbh, imp_dbh_t *imp_dbh, SV *statement_sv, SV *attribs, I3
   (void)hv_stores((HV *)SvRV(dbh), "Statement", SvREFCNT_inc(statement_sv));
   statement = SvPVutf8_nomg(statement_sv, statement_len);
 
+  if (DBIc_DBISTATE(imp_dbh)->debug >= 2)
+    PerlIO_printf(DBIc_LOGPIO(imp_dbh), "\t-> do() SQL statement: %.1000s%s\n", statement, statement_len > 1000 ? "..." : "");
+
   /*
    * Globally enabled using of server side prepared statement
    * for dbh->do() statements. It is possible to force driver
@@ -2642,16 +2769,16 @@ IV mariadb_db_do6(SV *dbh, imp_dbh_t *imp_dbh, SV *statement_sv, SV *attribs, I3
       if (hv_exists(processed, key, len))
         continue;
 
-      mariadb_dr_do_error(dbh, CR_UNKNOWN_ERROR, SvPVX(sv_2mortal(newSVpvf("Unknown attribute %s", key))), "HY000");
+      error_unknown_attribute(dbh, key);
       return -2;
     }
   }
 
   if (DBIc_DBISTATE(imp_dbh)->debug >= 2)
-    PerlIO_printf(DBIc_LOGPIO(imp_dbh), "mysql.xs do() use_server_side_prepare %d\n", use_server_side_prepare ? 1 : 0);
+    PerlIO_printf(DBIc_LOGPIO(imp_dbh), "\t\tuse_server_side_prepare %d\n", use_server_side_prepare ? 1 : 0);
 
   if (DBIc_DBISTATE(imp_dbh)->debug >= 2)
-    PerlIO_printf(DBIc_LOGPIO(imp_dbh), "mysql.xs do() async %d\n", (async ? 1 : 0));
+    PerlIO_printf(DBIc_LOGPIO(imp_dbh), "\t\tasync %d\n", (async ? 1 : 0));
 
   if (async)
   {
@@ -2971,6 +3098,7 @@ static void mariadb_dr_close_mysql(pTHX_ imp_drh_t *imp_drh, MYSQL *pmysql)
      * - infinite loop when calling mysql_server_end() more then once in case Embedded server was not started
      * Therefore do not call mysql_server_end() when Embedded server was not in used.
      * These bugs were fixed in MariaDB Connector/C 3.0.5, see: https://jira.mariadb.org/browse/CONC-336
+     * And fixed also in MySQL 8.0.20, see: https://bugs.mysql.com/bug.php?id=93276
      * But remains in MariaDB Embedded server, see: https://jira.mariadb.org/browse/MDEV-16578
      */
 #if !defined(HAVE_BROKEN_INIT) && (defined(HAVE_DEINITIALIZE_SSL) || !defined(HAVE_PROBLEM_WITH_OPENSSL))
@@ -3023,6 +3151,21 @@ static void mariadb_db_close_mysql(pTHX_ imp_drh_t *imp_drh, imp_dbh_t *imp_dbh)
   {
     mariadb_dr_close_mysql(aTHX_ imp_drh, imp_dbh->pmysql);
     imp_dbh->pmysql = NULL;
+#ifdef _WIN32
+    /*
+      C file descriptor sock_fd on Windows was opened via win32_open_osfhandle()
+      function from the Windows native socket. Therefore sock_fd needs to be
+      closed via close() function. This function also closes original Windows
+      native socket from which was sock_fd opened. But Windows native socket
+      was already closed by mariadb_dr_close_mysql() function and therefore we
+      need to avoid closing it more times. So first disassociate Windows native
+      socket from C file descriptor sock_fd via _set_osfhnd() function and then
+      close sock_fd via close() function.
+    */
+    _set_osfhnd(imp_dbh->sock_fd, INVALID_HANDLE_VALUE);
+    close(imp_dbh->sock_fd);
+#endif
+    imp_dbh->sock_fd = -1;
     svp = hv_fetchs((HV*)DBIc_MY_H(imp_dbh), "ChildHandles", FALSE);
     if (svp && *svp)
     {
@@ -3214,6 +3357,8 @@ void mariadb_db_destroy(SV* dbh, imp_dbh_t* imp_dbh) {
  *  Returns: 1 for success, 0 otherwise
  *
  **************************************************************************/
+/* DBI expects that on AutoCommit failure driver croaks and does not return */
+#define croak_autocommit_failure() croak("Changing AutoCommit attribute failed: %" SVf, SVfARG(DBIc_ERRSTR(imp_dbh)))
 int
 mariadb_db_STORE_attrib(
                     SV* dbh,
@@ -3230,6 +3375,8 @@ mariadb_db_STORE_attrib(
   if (!imp_dbh->pmysql && !mariadb_db_reconnect(dbh, NULL))
   {
     mariadb_dr_do_error(dbh, CR_SERVER_GONE_ERROR, "MySQL server has gone away", "HY000");
+    if (memEQs(key, kl, "AutoCommit"))
+      croak_autocommit_failure(); /* does not return */
     return 0;
   }
 
@@ -3248,7 +3395,7 @@ mariadb_db_STORE_attrib(
            )
         {
           mariadb_dr_do_error(dbh, mysql_errno(imp_dbh->pmysql), mysql_error(imp_dbh->pmysql), mysql_sqlstate(imp_dbh->pmysql));
-          return 1;  /* 1 means we handled it - important to avoid spurious errors */
+          croak_autocommit_failure(); /* does not return */
         }
       }
       DBIc_set(imp_dbh, DBIcf_AutoCommit, bool_value);
@@ -3331,18 +3478,29 @@ mariadb_db_STORE_attrib(
   #endif
     else if (memEQs(key, kl, "mariadb_max_allowed_packet"))
     {
-#if (!defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 50709 && MYSQL_VERSION_ID != 60000) || (defined(MARIADB_VERSION_ID) && MARIADB_VERSION_ID >= 100202)
+#if (!defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 50709 && MYSQL_VERSION_ID != 60000) || (defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 100206 && MYSQL_VERSION_ID != 100300)
       /* MYSQL_OPT_MAX_ALLOWED_PACKET was added in mysql 5.7.9 */
-      /* MYSQL_OPT_MAX_ALLOWED_PACKET was added in MariaDB 10.2.2 */
+      /* MYSQL_OPT_MAX_ALLOWED_PACKET was added in MariaDB 10.2.6 and MariaDB 10.3.1 */
       UV uv = SvUV_nomg(valuesv);
       unsigned long packet_size = (uv <= ULONG_MAX ? uv : ULONG_MAX);
       mysql_options(imp_dbh->pmysql, MYSQL_OPT_MAX_ALLOWED_PACKET, &packet_size);
 #else
-      /* before MySQL 5.7.9 and MariaDB 10.2.2 it is not possible to change max_allowed_packet after connection was established */
+      /* before MySQL 5.7.9 and MariaDB 10.2.6 and MariaDB 10.3.0 it is not possible to change max_allowed_packet after connection was established */
       if (imp_dbh->connected)
         mariadb_dr_do_error(dbh, CR_UNKNOWN_ERROR, "Changing mariadb_max_allowed_packet is not supported after connection was established", "HY000");
       return 0;
 #endif
+    }
+    else if (memEQs(key, kl, "mariadb_multi_statements"))
+    {
+      if (!imp_dbh->connected) /* When not connected, it is handled in mariadb_dr_connect() */
+        return 0;
+      if (mysql_set_server_option(imp_dbh->pmysql, bool_value ? MYSQL_OPTION_MULTI_STATEMENTS_ON : MYSQL_OPTION_MULTI_STATEMENTS_OFF) != 0)
+      {
+        mariadb_dr_do_error(dbh, mysql_errno(imp_dbh->pmysql), mysql_error(imp_dbh->pmysql), mysql_sqlstate(imp_dbh->pmysql));
+        return 0;
+      }
+      imp_dbh->use_multi_statements = bool_value;
     }
     else
     {
@@ -3524,11 +3682,11 @@ SV* mariadb_db_FETCH_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)
     else if (memEQs(key, kl, "mariadb_max_allowed_packet"))
     {
       unsigned long packet_size;
-#if (!defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 50709 && MYSQL_VERSION_ID != 60000) || (defined(MARIADB_VERSION_ID) && MARIADB_VERSION_ID >= 100202)
+#if (!defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 50709 && MYSQL_VERSION_ID != 60000) || (defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 100206 && MYSQL_VERSION_ID != 100300)
       /* mysql_get_option() is not available in all versions */
       /* if we do not have mysql_get_option() we cannot retrieve max_allowed_packet */
       /* MYSQL_OPT_MAX_ALLOWED_PACKET was added in mysql 5.7.9 */
-      /* MYSQL_OPT_MAX_ALLOWED_PACKET was added in MariaDB 10.2.2 */
+      /* MYSQL_OPT_MAX_ALLOWED_PACKET was added in MariaDB 10.2.6 and MariaDB 10.3.1 */
   #ifdef HAVE_GET_OPTION
       mysql_get_option(imp_dbh->pmysql, MYSQL_OPT_MAX_ALLOWED_PACKET, &packet_size);
   #else
@@ -3536,7 +3694,7 @@ SV* mariadb_db_FETCH_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)
       return Nullsv;
   #endif
 #else
-      /* before MySQL 5.7.9 and MariaDB 10.2.2 use max_allowed_packet macro */
+      /* before MySQL 5.7.9 and MariaDB 10.2.6 and MariaDB 10.3.0 use max_allowed_packet macro */
       packet_size = max_allowed_packet;
 #endif
       result = sv_2mortal(newSVuv(packet_size));
@@ -3588,7 +3746,7 @@ SV* mariadb_db_FETCH_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)
     else if (memEQs(key, kl, "mariadb_sock"))
       result = sv_2mortal(newSViv(PTR2IV(imp_dbh->pmysql)));
     else if (memEQs(key, kl, "mariadb_sockfd"))
-      result = imp_dbh->pmysql ? sv_2mortal(newSViv(imp_dbh->pmysql->net.fd)) : &PL_sv_undef;
+      result = (imp_dbh->sock_fd >= 0) ? sv_2mortal(newSViv(imp_dbh->sock_fd)) : &PL_sv_undef;
     else if (memEQs(key, kl, "mariadb_stat"))
     {
       const char *stats = imp_dbh->pmysql ? mysql_stat(imp_dbh->pmysql) : NULL;
@@ -3605,6 +3763,8 @@ SV* mariadb_db_FETCH_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)
       result = imp_dbh->pmysql ? sv_2mortal(newSVuv(mysql_warning_count(imp_dbh->pmysql))) : &PL_sv_undef;
     else if (memEQs(key, kl, "mariadb_use_result"))
       result = boolSV(imp_dbh->use_mysql_use_result);
+    else if (memEQs(key, kl, "mariadb_multi_statements"))
+      result = boolSV(imp_dbh->use_multi_statements);
     else
     {
       error_unknown_attribute(dbh, key);
@@ -4000,6 +4160,10 @@ static bool mariadb_st_free_result_sets(SV *sth, imp_sth_t *imp_sth, bool free_l
   if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
     PerlIO_printf(DBIc_LOGPIO(imp_xxh), "\t>- mariadb_st_free_result_sets\n");
 
+  /* Iterate over all remaining rows, required when mysql_use_result() was called */
+  if (imp_sth->result)
+    while (mysql_fetch_row(imp_sth->result));
+
   do
   {
     if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
@@ -4084,6 +4248,12 @@ bool mariadb_st_more_results(SV* sth, imp_sth_t* imp_sth)
   if (imp_sth->use_server_side_prepare)
   {
     mariadb_dr_do_error(sth, CR_NOT_IMPLEMENTED, "Processing of multiple result set is not possible with server side prepare", "HY000");
+    return FALSE;
+  }
+
+  if (imp_dbh->async_query_in_flight && !imp_sth->async_result)
+  {
+    mariadb_dr_do_error(sth, CR_UNKNOWN_ERROR, "more_results() without mariadb_async_result()", "HY000");
     return FALSE;
   }
 
@@ -4208,7 +4378,7 @@ bool mariadb_st_more_results(SV* sth, imp_sth_t* imp_sth)
     else
     {
       /* We have a new rowset */
-      imp_sth->row_num = mysql_num_rows(imp_sth->result);
+      imp_sth->row_num = use_mysql_use_result ? (my_ulonglong)-2 : mysql_num_rows(imp_sth->result);
 
       /* Adjust NUM_OF_FIELDS - which also adjusts the row buffer size */
       DBIc_DBISTATE(imp_sth)->set_attr_k(sth, sv_2mortal(newSVpvs("NUM_OF_FIELDS")), 0,
@@ -4354,6 +4524,8 @@ static my_ulonglong mariadb_st_internal_execute(
 
           if (mysql_errno(*svsock))
             rows = -1;
+          else if (use_mysql_use_result)
+            rows = (my_ulonglong)-2;
           else if (*result)
             rows = mysql_num_rows(*result);
           else {
@@ -4671,6 +4843,7 @@ IV mariadb_st_execute_iv(SV* sth, imp_sth_t* imp_sth)
                                                );
     if(imp_dbh->async_query_in_flight) {
         DBIc_ACTIVE_on(imp_sth);
+        imp_sth->async_result = FALSE;
         return 0;
     }
   }
@@ -4802,6 +4975,7 @@ static int mariadb_st_describe(SV* sth, imp_sth_t* imp_sth)
       case MYSQL_TYPE_NULL:
         buffer->buffer_length= 0;
         buffer->buffer= NULL;
+        break;
 
       case MYSQL_TYPE_TINY:
         buffer->buffer_length= sizeof(fbh->numeric_val.tval);
@@ -5243,12 +5417,14 @@ process:
     {
       if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
       {
-        PerlIO_printf(DBIc_LOGPIO(imp_xxh), "\tmariadb_st_fetch, no more rows to fetch");
+        PerlIO_printf(DBIc_LOGPIO(imp_xxh), "\tmariadb_st_fetch, no more rows to fetch\n");
       }
       if (mysql_errno(imp_dbh->pmysql))
         mariadb_dr_do_error(sth, mysql_errno(imp_dbh->pmysql),
                  mysql_error(imp_dbh->pmysql),
                  mysql_sqlstate(imp_dbh->pmysql));
+      else if (imp_sth->row_num == (my_ulonglong)-2)
+        imp_sth->row_num = mysql_num_rows(imp_sth->result);
       if (!mysql_more_results(imp_dbh->pmysql))
         DBIc_ACTIVE_off(imp_sth);
       return Nullav;
@@ -5320,7 +5496,7 @@ process:
         case PERL_TYPE_NUMERIC:
           if (!mysql_field_needs_string_type(&fields[i]))
           {
-            /* Coerce to dobule and set scalar as NV */
+            /* Coerce to double and set scalar as NV */
             sv_setnv(sv, SvNV(sv));
           }
           break;
@@ -5378,8 +5554,10 @@ int mariadb_st_finish(SV* sth, imp_sth_t* imp_sth) {
   D_imp_xxh(sth);
   D_imp_dbh_from_sth;
 
-  if(imp_dbh->async_query_in_flight) {
-    mariadb_db_async_result(sth, &imp_sth->result);
+  if (imp_dbh->async_query_in_flight)
+  {
+    if (mariadb_db_async_result(sth, &imp_sth->result) == (my_ulonglong)-1)
+      return 0;
   }
 
   if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
@@ -6448,7 +6626,7 @@ SV* mariadb_db_quote(SV *dbh, SV *str, SV *type)
 
     SvPOK_on(result);
     SvCUR_set(result, sptr - SvPVX(result));
-    /* Never hurts NUL terminating a Per string */
+    /* Never hurts NUL terminating a Perl string */
     *sptr++= '\0';
 
     if (!is_binary)
@@ -6482,6 +6660,7 @@ my_ulonglong mariadb_db_async_result(SV* h, MYSQL_RES** resp)
   unsigned int num_fields;
   int htype;
   bool async_sth = FALSE;
+  bool use_mysql_use_result;
 
   if(! resp) {
       resp = &_res;
@@ -6492,12 +6671,14 @@ my_ulonglong mariadb_db_async_result(SV* h, MYSQL_RES** resp)
   if(htype == DBIt_DB) {
       D_imp_dbh(h);
       dbh = imp_dbh;
+      use_mysql_use_result = imp_dbh->use_mysql_use_result;
   } else {
       D_imp_sth(h);
       D_imp_dbh_from_sth;
       dbh = imp_dbh;
       async_sth = imp_sth->is_async;
       retval = imp_sth->row_num;
+      use_mysql_use_result = imp_sth->use_mysql_use_result;
   }
 
   if(! dbh->async_query_in_flight) {
@@ -6510,13 +6691,17 @@ my_ulonglong mariadb_db_async_result(SV* h, MYSQL_RES** resp)
       mariadb_dr_do_error(h, CR_UNKNOWN_ERROR, "Gathering async_query_in_flight results for the wrong handle", "HY000");
       return -1;
   }
-  dbh->async_query_in_flight = NULL;
 
   if (htype == DBIt_ST)
   {
     D_imp_sth(h);
+    if (imp_sth->async_result)
+      return retval;
     DBIc_ACTIVE_off(imp_sth);
+    imp_sth->async_result = TRUE;
   }
+
+  dbh->async_query_in_flight = NULL;
 
   svsock= dbh->pmysql;
   if (!svsock)
@@ -6533,7 +6718,7 @@ my_ulonglong mariadb_db_async_result(SV* h, MYSQL_RES** resp)
 
   if (!mysql_read_query_result(svsock))
   {
-    *resp= mysql_store_result(svsock);
+    *resp = use_mysql_use_result ? mysql_use_result(svsock) : mysql_store_result(svsock);
 
     if (mysql_errno(svsock))
     {
@@ -6542,6 +6727,8 @@ my_ulonglong mariadb_db_async_result(SV* h, MYSQL_RES** resp)
     }
     if (!*resp)
       retval= mysql_affected_rows(svsock);
+    else if (use_mysql_use_result)
+      retval = (my_ulonglong)-2;
     else
       retval= mysql_num_rows(*resp);
 
@@ -6591,6 +6778,26 @@ my_ulonglong mariadb_db_async_result(SV* h, MYSQL_RES** resp)
  return retval;
 }
 
+static int mariadb_dr_socket_ready(int fd)
+{
+  dTHX;
+  struct timeval timeout;
+  fd_set fds;
+  int retval;
+
+  FD_ZERO(&fds);
+  FD_SET(fd, &fds);
+
+  timeout.tv_sec = 0;
+  timeout.tv_usec = 0;
+
+  retval = select(fd+1, &fds, NULL, NULL, &timeout);
+  if (retval < 0)
+    return errno > 0 ? -errno : -EINVAL;
+
+  return retval;
+}
+
 int mariadb_db_async_ready(SV* h)
 {
   dTHX;
@@ -6618,9 +6825,9 @@ int mariadb_db_async_ready(SV* h)
 
   if(dbh->async_query_in_flight) {
       if (dbh->async_query_in_flight == imp_xxh) {
-          int retval = mariadb_dr_socket_ready(dbh->pmysql->net.fd);
+          int retval = mariadb_dr_socket_ready(dbh->sock_fd);
           if(retval < 0) {
-              mariadb_dr_do_error(h, -retval, strerror(-retval), "HY000");
+              mariadb_dr_do_error(h, CR_UNKNOWN_ERROR, SvPVX(sv_2mortal(newSVpvf("mariadb_async_ready failed: %s", strerror(-retval)))), "HY000");
           }
           return retval;
       } else {

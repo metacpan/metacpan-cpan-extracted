@@ -4,25 +4,41 @@ use strict;
 use warnings;
 use Test::More 0.96;
 use File::Spec::Functions qw(catfile);
+use File::Basename qw(basename);
+use Text::Markup::Cmd;
 use Carp;
 
 # Need to have at least one test outside subtests, in case no subtests are run
 # at all. So it might as well be this.
 BEGIN { use_ok 'Text::Markup' or die; }
 
-sub slurp($$) {
-    my ($filter, $file) = @_;
-    $filter ||= sub { shift };
+sub slurp($) {
+    my ($file) = @_;
     open my $fh, '<:raw', $file or die "Cannot open $file: $!\n";
     local $/;
-    return $filter->(<$fh>);
+    return <$fh>;
 }
 
-my %filter_for = (
+my %expected_for = (
     mediawiki => sub {
-        $_[0] =~ s/ö/CGI::escapeHTML(do { use utf8; 'ö' })/e
+        my $html = slurp catfile('t', 'html', "mediawiki.html");
+        $html =~ s/ö/CGI::escapeHTML(do { use utf8; 'ö' })/e
             if eval { CGI->VERSION >= 4.11 && CGI->VERSION < 4.14 };
-        return shift;
+        return $html;
+    },
+    asciidoc => sub {
+        my $html = slurp catfile('t', 'html', "asciidoc.html");
+        $html =~ s/ü/\\xFC/ if WIN32;
+        return $html;
+    },
+);
+
+my %parsed_filter_for = (
+    rest => sub {
+        # docutils space character before closing tag of XML declaration in Nov
+        # 2022 (https://github.com/docutils/docutils/commit/f93b895), so remove
+        # it when we run tests against older versions.
+        $_[0] =~ s/ \?>/\?>/;
     },
 );
 
@@ -30,11 +46,18 @@ my @loaded = Text::Markup->formats;
 while (my $data = <DATA>) {
     next if $data =~ /^#/;
     chomp $data;
-    my ($format, $module, $req, @exts) = split /,/ => $data;
-    subtest "Testing $format format" => sub {
-        local $@;
-        eval "use $req; 1;" if $req;
-        plan skip_all => "$module not loading" if $@;
+    my ($name, $format, $module, $req, @exts) = split /,/ => $data;
+    subtest "Testing $name format" => sub {
+        do {
+            local $@;
+            eval "use $req; 1;";
+            if ($@) {
+                die $@ if $ENV{TEXT_MARKUP_TEST_ALL}
+                    && !$ENV{"TEXT_MARKUP_SKIP_\U$name"};
+                plan skip_all => "$req not loading: $@";
+            }
+        } if $req;
+
         plan tests => @exts + 5;
         use_ok $module or next;
 
@@ -48,32 +71,45 @@ while (my $data = <DATA>) {
                 "Should guess that .$ext extension is $format";
         }
 
-        my $expect = slurp $filter_for{$format}, catfile('t', 'html', "$format.html");
-        is $parser->parse(
-            file   => catfile('t', 'markups', "$format.txt"),
+        # Parse the markup.
+        my $html = $parser->parse(
+            file   => catfile('t', 'markups', "$name.txt"),
             format => $format,
-        ), $expect, "Parse $format file";
+        );
+        if (my $f = $parsed_filter_for{$name}) {
+           $f->($html)
+        }
+
+        # Load the expected output.
+        my $loader = $expected_for{$name} ||= sub {
+            slurp catfile('t', 'html', "$name.html")
+        };
+        my $expect = $loader->();
+
+        # They should be the same!
+        is $html, $expect, "Parse $name file";
 
         is $parser->parse(
             file   => catfile('t', 'empty.txt'),
             format => $format,
-        ), undef, "Parse empty $format file";
-
+        ), undef, "Parse empty $name file";
     }
 }
 
 done_testing;
 
 __DATA__
-# Format,Format Module,Required Module,extensions
-markdown,Text::Markup::Markdown,Text::Markdown 1.000004,md,mkdn,mkd,mdown,markdown
-html,Text::Markup::HTML,,html,htm,xhtml,xhtm
-pod,Text::Markup::Pod,Pod::Simple::XHTML 3.15,pod,pm,pl
-trac,Text::Markup::Trac,Text::Trac 0.10,trac,trc
-textile,Text::Markup::Textile,Text::Textile 2.10,textile
-mediawiki,Text::Markup::Mediawiki,Text::MediawikiFormat 1.0,wiki,mwiki,mediawiki
-multimarkdown,Text::Markup::Multimarkdown,Text::MultiMarkdown 1.000033,mmd,mmkdn,mmkd,mmdown,mmarkdown
-rest,Text::Markup::Rest,Text::Markup::Rest,rest,rst
-asciidoc,Text::Markup::Asciidoc,Text::Markup::Asciidoc,asciidoc,asc,adoc
-bbcode,Text::Markup::Bbcode,Parse::BBCode,bbcode,bb
-creole,Text::Markup::Creole,Text::WikiCreole,creole
+# Name,Format,Format Module,Required Module,extensions
+markdown,markdown,Text::Markup::Markdown,Text::Markdown 1.000004,md,mkdn,mkd,mdown,markdown
+commonmark,markdown,Text::Markup::CommonMark,CommonMark 0.290000,md,mkdn,mkd,mdown,markdown
+html,html,Text::Markup::HTML,,html,htm,xhtml,xhtm
+pod,pod,Text::Markup::Pod,Pod::Simple::XHTML 3.15,pod,pm,pl
+trac,trac,Text::Markup::Trac,Text::Trac 0.10,trac,trc
+textile,textile,Text::Markup::Textile,Text::Textile 2.10,textile
+mediawiki,mediawiki,Text::Markup::Mediawiki,Text::MediawikiFormat 1.0,wiki,mwiki,mediawiki
+multimarkdown,multimarkdown,Text::Markup::Multimarkdown,Text::MultiMarkdown 1.000033,mmd,mmkdn,mmkd,mmdown,mmarkdown
+rest,rest,Text::Markup::Rest,Text::Markup::Rest,rest,rst
+asciidoc,asciidoc,Text::Markup::Asciidoc,Text::Markup::Asciidoc,asciidoc,asc,adoc
+asciidoctor,asciidoc,Text::Markup::Asciidoctor,Text::Markup::Asciidoctor,asciidoc,asc,adoc
+bbcode,bbcode,Text::Markup::Bbcode,Parse::BBCode,bbcode,bb
+creole,creole,Text::Markup::Creole,Text::WikiCreole,creole

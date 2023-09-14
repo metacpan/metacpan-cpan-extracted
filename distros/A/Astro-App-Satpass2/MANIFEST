@@ -18,6 +18,7 @@ inc/My/Module/Recommend/All.pm
 inc/My/Module/Recommend/Any.pm
 inc/My/Module/Test/App.pm
 inc/My/Module/Test/Geocode.pm
+inc/My/Module/Test/Mock_App.pm
 lib/Astro/App/Satpass2.pm
 lib/Astro/App/Satpass2/Copier.pm
 lib/Astro/App/Satpass2/Format.pm

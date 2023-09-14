@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -20,7 +20,7 @@ await $chip->mount(
 {
    # initial ->read_config uses in-memory state
 
-   is_deeply( await $chip->read_config,
+   is( await $chip->read_config,
       {
          GAIN => 1,
          PD   => "normal",

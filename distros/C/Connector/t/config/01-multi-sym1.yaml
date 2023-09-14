@@ -1,0 +1,76 @@
+# 01-multi-sym1.yaml
+
+smartcards:
+  tokens@: "connector:connectors.yaml-query-tokens"
+  owners@: "connector:connectors.yaml-query-owners"
+  puk@: "connector:connectors.static-puk"
+
+connectors:
+  yaml-query-tokens:
+    class: Connector::Proxy::YAML
+    LOCATION: t/config/01-multi-symlink-tokens.yaml
+
+  yaml-query-owners:
+    class: Connector::Proxy::YAML
+    LOCATION: t/config/01-multi-symlink-owners.yaml
+
+  static-puk:
+    class: Connector::Builtin::Static
+    LOCATION: 007
+
+meta:
+  inner:
+    hash:
+      key1: value1
+      key2: value2
+
+    list:
+      0: item1
+      1: item2
+
+    single:
+      0: item1
+
+leafref:
+  hash:
+    alice: 0815
+    bob@: "connector:smartcards.puk"
+
+cascaded:
+  reference:
+    bob@: "connector:smartcards.owners.joe.tokenid"
+
+  walkover:
+    source@: "connector:smartcards.owners"
+
+  connector:
+    hook:
+      owners@: "connector:cascaded.connector.base"
+    # Seed the location of the base connector from
+    # the result of the location connector
+    base:
+      class: Connector::Proxy::YAML
+      LOCATION@: "connector:cascaded.connector.location"
+
+    location:
+      class: Connector::Builtin::Static
+      LOCATION: t/config/01-multi-symlink-owners.yaml
+
+envvar:
+  foo:
+  bar@: env:OXI_TEST_FOOBAR
+
+cache_test:
+  branch1:
+    foo@: "connector:connectors.cache_test"
+    connectors:
+      cache_test:
+        class: Connector::Builtin::Static
+        LOCATION: test1
+
+  branch2:
+    foo@: "connector:connectors.cache_test"
+    connectors:
+      cache_test:
+        class: Connector::Builtin::Static
+        LOCATION: test2

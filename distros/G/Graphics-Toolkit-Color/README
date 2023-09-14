@@ -5,12 +5,12 @@ SYNOPSIS
         use Graphics::Toolkit::Color qw/color/;
 
         my $red = Graphics::Toolkit::Color->new('red'); # create color object
-        say $red->add( 'blue' => 256 )->name;           # mix in HSL: 'fuchsia'
+        say $red->add( 'blue' => 255 )->name;           # add blue value: 'fuchsia'
         color( 0, 0, 255)->values('HSL');               # 240, 100, 50 = blue
                                                         # mix blue with a little grey in HSL
-        $blue->blend( with => {H=> 0, S=> 0, L=> 80}, pos => 0.1);
+        $blue->blend( with => { H=> 0, S=> 0, L=> 80 }, pos => 0.1);
         $red->gradient( to => '#0000FF', steps => 10);  # 10 colors from red to blue
-        $red->complementary( 3 );                       # get fitting red green and blue
+        $red->complement( 3 );                          # get fitting red green and blue
 
 DESCRIPTION
     ATTENTION: deprecated methods of the old API will be removed on version
@@ -34,8 +34,9 @@ DESCRIPTION
 
 CONSTRUCTOR
     There are many options to create a color objects. In short you can
-    either use the name of a predefined constant or provide values in
-    several "COLOR-SPACES" in Graphics::Toolkit::Color::Value
+    either use the name of a constant or provide values in several
+    "COLOR-SPACES" in Graphics::Toolkit::Color::Space::Hub and many formats
+    as described in this paragraph.
 
   new('name')
     Get a color by providing a name from the X11, HTML (CSS) or SVG standard
@@ -60,7 +61,7 @@ CONSTRUCTOR
         my $color = Graphics::Toolkit::Color->new('SVG:green');
         my @s = Graphics::ColorNames::all_schemes();          # look up the installed
 
-  new( '#rgb' )
+  new('#rgb')
     Color definitions in hexadecimal format as widely used in the web, are
     also acceptable.
 
@@ -76,28 +77,31 @@ CONSTRUCTOR
         my $red = Graphics::Toolkit::Color->new('RGB' => 255, 0, 0);  # named tuple syntax
         my $red = Graphics::Toolkit::Color->new(['RGB' => 255, 0, 0]); # named ARRAY
 
-    The named array syntax of the last example works for nany supported
-    space.
+    The named array syntax of the last example, as any here following, work
+    for any supported color space.
 
-  new( {r => $r, g => $g, b => $b} )
+  new({ r => $r, g => $g, b => $b })
     Hash with the keys 'r', 'g' and 'b' does the same as shown in previous
     paragraph, only more declarative. Casing of the keys will be normalised
     and only the first letter of each key is significant.
 
         my $red = Graphics::Toolkit::Color->new( r => 255, g => 0, b => 0 );
         my $red = Graphics::Toolkit::Color->new({r => 255, g => 0, b => 0}); # works too
-        ... Color->new( Red => 255, Green => 0, Blue => 0);   # also fine
+                            ... ->new( Red => 255, Green => 0, Blue => 0);   # also fine
+                  ... ->new( Hue => 0, Saturation => 100, Lightness => 50 ); # same color
+                      ... ->new( Hue => 0, whiteness => 0, blackness => 0 ); # still the same
 
-  new( {h => $h, s => $s, l => $l} )
-    To define a color in HSL space, with values for "hue", "saturation" and
-    "lightness", use the following keys, which will be normalized as
-    decribed in previous paragraph. Out of range values will be corrected to
-    the closest value in range. Since "hue" is a polar coordinate, it will
-    be rotated into range, e.g. 361 = 1.
+  new('rgb: $r, $g, $b')
+    String format (good for serialisation) that maximizes readability.
 
-        my $red = Graphics::Toolkit::Color->new( h =>   0, s => 100, l => 50 );
-        my $red = Graphics::Toolkit::Color->new({h =>   0, s => 100, l => 50}); # good too
-        ... ->new( Hue => 0, Saturation => 100, Lightness => 50 ); # also fine
+        my $red = Graphics::Toolkit::Color->new( 'rgb: 255, 0, 0' );
+        my $blue = Graphics::Toolkit::Color->new( 'HSV: 240, 100, 100' );
+
+  new('rgb($r,$g,$b)')
+    Variant of string format that is supported by CSS.
+
+        my $red = Graphics::Toolkit::Color->new( 'rgb(255, 0, 0)' );
+        my $blue = Graphics::Toolkit::Color->new( 'hsv(240, 100, 100)' );
 
   color
     If writing
@@ -118,32 +122,44 @@ GETTER / ATTRIBUTES
   name
     String with normalized name (lower case without *'_'*) of the color as
     in X11 or HTML (SVG) standard or the Pantone report. The name will be
-    found and filled in, even when the object was created with RGB or HSL
-    values. If no color is found, "name" returns an empty string. All names
-    are at: "NAMES" in Graphics::Toolkit::Color::Constant (See als:
-    "new(-'name'-)")
+    found and filled in, even when the object was created numerical values.
+    If no color is found, "name" returns an empty string. All names are at:
+    "NAMES" in Graphics::Toolkit::Color::Name::Constant (See als:
+    "new('name')")
 
   string
-    String that can be serialized back into a color an object (recreated by
-    Graphics::Toolkit::Color->new( $string )). It is either the color "name"
-    (if color has one) or result of "rgb_hex".
+    DEPRECATED: String that can be serialized back into a color an object
+    (recreated by Graphics::Toolkit::Color->new( $string )). It is either
+    the color "name" (if color has one) or result of "rgb_hex".
 
   values
-    Returns the color values.
+    Returns the values of the color in given color space and with given
+    format. In short any format acceptable by the constructor can also be
+    reproduce by a getter method and in most cases by this one.
 
-    First argument is the name of a color space: The options are: 'rgb'
-    (default), hsl, cmyk and cmy.
+    First argument is the name of a color space (named argument "in"). The
+    options are to be found under: "COLOR-SPACES" in
+    Graphics::Toolkit::Color::Space::Hub This is the only argument where the
+    name can be left out.
 
-    Second argument is the format. That can vary from space to space but
-    generally available are "list" (default), "hash", "char_hash" and names
-    or initials of the value names of that particular space. RGB also
-    provides the option "hex" to get values like '#aabbcc'.
+    Second argument is the format (named argument "as"). Not all formats are
+    available under all color spaces, but the alway present options are:
+    "list" (default), "hash", "char_hash" and "array".
 
-        say $color->values();                      # get list of rgb : 0, 0, 255
-        say $blue->values('RGB', 'hash');          # { red => 0. green => 0, blue => 255}
-        say $blue->values('RGB', 'char_hash');     # { r => 0. g => 0, b => 255}
-        say $blue->values('RGB', 'hex');           # '#00FFFF'
-        say $color->values('HSL', 'saturation');   # 100
+    Third named argument is the upper border of the range inide which the
+    numerical values have to be. RGB are normally between 0..255 and CMYK
+    between 0 .. 1. If you want to change that order a different range. Only
+    a range of 1 a.k.a. "normal" displays decimals.
+
+        $blue->values();                              # get list of rgb : 0, 0, 255
+        $blue->values( in => 'RGB', as => 'list');    # same call
+        $blue->values('RGB', as => 'hash');           # { red => 0. green => 0, blue => 255}
+        $blue->values('RGB', as =>'char_hash');       # { r => 0. g => 0, b => 255}
+        $blue->values('RGB', as => 'hex');            # '#00FFFF'
+        $color->values(in => 'HSL');                  # 240, 100, 50
+        $color->values(in => 'HSL', range => 1);      # 0.6666, 1, 0.5
+        $color->values(in => 'RGB', range => 16);     # values in RGB16
+        $color->values('HSB', as => 'hash')->{'hue'}; # how to get single values
 
   hue
     DEPRECATED: Integer between 0 .. 359 describing the angle (in degrees)
@@ -188,30 +204,25 @@ COLOR RELATION METHODS
     create new, related color (objects) or compute similarity of colors
 
   distance
-    A floating pointnumber that measures the distance (difference) between
-    two colors (color of the calling object and C2, first argument). The
-    *distance* is measured in HSL space unless told otherwise. It takes
-    three arguments, only the first is required.
+    Is a floating point number that measures the Euclidean distance between
+    two colors. One color is the calling object itself and the second (C2)
+    has to provided as a named argument (*to*), which is the only required
+    one. It ca come in the form of a second GTC object or any scalar color
+    definition *new* would accept. The *distance* is measured in HSL color
+    space unless told otherwise by the argument *in*. The third argument is
+    named *metric*. It's useful if you want to notice only certain
+    dimensions. Metric is the long or short name of that dimension or the
+    short names of several dimensions. They all have to come from one color
+    space and one shortcut letter can be used several times to heighten the
+    weight of this dimension. The last argument in named *range* and is a
+    range definition, unless you don't want to compute the distance with the
+    default ranges of the selected color space.
 
-    1. Second color (C2) in any scalar definition as *new* would accept (see
-    chapter "CONSTRUCTOR").
-
-    2. The color space the difference is measured in. (see "COLOR-SPACES" in
-    Graphics::Toolkit::Color::Value)
-
-    3. The subspace as a string. For instance you want to ignore lightness
-    in HSL, then you subspace would be *'hs'* (initials of the other two
-    dimensions). If you want to observe only one dimension of a color space
-    you can name is also fully (*Hue*).
-
-        # how close is blue to lapis color?
-        my $d = $blue->distance( to => 'lapisblue' );
-        # same amount of blue?
-        $d = $blue->distance( to => 'airyblue', in => 'RGB', notice_only => 'Blue');
-        # same hue ?
-        $d = $color->distance( to => $c2, in => 'HSL', notice_only => 'hue' );
-        # same command in hash syntax:
-        $d = $color->distance( {to => $c2, in => 'HSL', notice_only => 'Hue' });
+        my $d = $blue->distance( to => 'lapisblue' );              # how close is blue to lapis color?
+        $d = $blue->distance( to => 'airyblue', in => 'RGB', metric => 'Blue'); # same amount of blue?
+        $d = $color->distance( to => $c2, in => 'HSL', metric => 'hue' );                  # same hue?
+        # compute distance when with all value ranges 0 .. 1
+        $d = $color->distance( to => $c2, in => 'HSL', metric => 'hue', range => 'normal' );
 
   set
     Create a new object that differs in certain values defined in the
@@ -232,7 +243,7 @@ COLOR RELATION METHODS
     being added. Negative values of that factor lead to darkening of result
     colors, but its not subtractive color mixing, since this module does not
     support CMY color space. All RGB operations follow the logic of additive
-    mixing, and the result will be rounded (trimmed), to keep it inside the
+    mixing, and the result will be rounded (clamped), to keep it inside the
     defined RGB space.
 
         my $blue = Graphics::Toolkit::Color->new('blue');
@@ -251,12 +262,12 @@ COLOR RELATION METHODS
 
     2. Blend position is a floating point number, which defaults to 0.5.
     (blending ratio of 1:1 ). 0 represents here C1 and 1 is pure C2. Numbers
-    below 0 and above 1 are possible, butlikely to be trimmed to fit inside
+    below 0 and above 1 are possible, butlikely to be clamped to fit inside
     the color space. Name of the argument is *pos*.
 
     3. Color space name (default is *HSL* - all can be seen unter
-    "COLOR-SPACES" in Graphics::Toolkit::Color::Value). Name of the argument
-    is *in*.
+    "COLOR-SPACES" in Graphics::Toolkit::Color::Space::Hub). Name of the
+    argument is *in*.
 
         # a little more silver than $color in the mix
         $color->blend( with => 'silver', pos => 0.6 );
@@ -296,7 +307,7 @@ COLOR SET CREATION METHODS
         # none linear gradient in HSL space :
         @colors = $c1->gradient( to =>[14,10,222], steps => 10, dynamic => 3 );
 
-  complementary
+  complement
     Creates a set of complementary colors. It accepts 3 numerical arguments:
     n, delta_S and delta_L.
 
@@ -319,7 +330,7 @@ COLOR SET CREATION METHODS
     circle a tilt, so that the complementary colors will differ in
     lightness.
 
-        my @colors = $c->complementary( 3, +20, -10 );
+        my @colors = $c->complement( 3, +20, -10 );
 
 SEE ALSO
     *   Color::Scheme

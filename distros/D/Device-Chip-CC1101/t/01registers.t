@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -53,14 +53,14 @@ await $chip->mount(
    $adapter->expect_readwrite( "\xBD" )
       ->returns( "\x10" );
 
-   is_deeply( await $chip->read_chipstatus_rx,
+   is( await $chip->read_chipstatus_rx,
       { STATE => "RX", FIFO_BYTES_AVAILABLE => 0 },
       '->read_chipstatus_rx yields status' );
 
    $adapter->expect_readwrite( "\x3D" )
       ->returns( "\x2F" );
 
-   is_deeply( await $chip->read_chipstatus_tx,
+   is( await $chip->read_chipstatus_tx,
       { STATE => "TX", FIFO_BYTES_AVAILABLE => 15 },
       '->read_chipstatus_tx yields status' );
 
@@ -72,7 +72,7 @@ await $chip->mount(
    $adapter->expect_write_then_read( "\xF8", 1 )
       ->returns( "\x30" );
 
-   is_deeply( await $chip->read_pktstatus,
+   is( await $chip->read_pktstatus,
       { CCA => 1, CRC_OK => '', CS => '', GDO0 => '', GDO2 => '', PQT_REACHED => 1, SFD => '' },
       '->read_pktstatus yields status' );
 

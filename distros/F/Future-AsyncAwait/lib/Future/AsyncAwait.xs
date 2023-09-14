@@ -2357,6 +2357,7 @@ static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hook
 }
 
 static struct XSParseSublikeHooks hooks_async = {
+  .permit_hintkey = "Future::AsyncAwait/async",
   .flags = XS_PARSE_SUBLIKE_FLAG_PREFIX,
 
   .post_blockstart = parse_post_blockstart,

@@ -1083,7 +1083,7 @@ This package provides the following methods:
 
 =head2 code
 
-  code() (Str | Undef)
+  code() (string | undef)
 
 The code method returns the name of the value's data type.
 
@@ -1137,7 +1137,7 @@ I<Since C<0.01>>
 
 =head2 coded
 
-  coded(Str $code) (Bool)
+  coded(string $code) (boolean)
 
 The coded method return true or false if the data type name provided matches
 the result of L</code>.
@@ -1172,7 +1172,7 @@ I<Since C<1.23>>
 
 =head2 deduce
 
-  deduce() (Object)
+  deduce() (object)
 
 The deduce methods returns the argument as a data type object.
 
@@ -1242,7 +1242,7 @@ I<Since C<0.01>>
 
 =head2 deduce_deep
 
-  deduce_deep() (Object)
+  deduce_deep() (object)
 
 The deduce_deep function returns any arguments as data type objects, including
 nested data.
@@ -1297,7 +1297,7 @@ I<Since C<0.01>>
 
 =head2 detract
 
-  detract() (Any)
+  detract() (any)
 
 The detract method returns the argument as native Perl data type value.
 
@@ -1375,7 +1375,7 @@ I<Since C<0.01>>
 
 =head2 detract_deep
 
-  detract_deep() (Any)
+  detract_deep() (any)
 
 The detract_deep method returns any arguments as native Perl data type values,
 including nested data.
@@ -1420,7 +1420,7 @@ I<Since C<0.01>>
 
 =head2 identify
 
-  identify() (Bool, Bool, Str)
+  identify() (boolean, boolean, string)
 
 The identify method returns the value's data type, or L</code>, in scalar
 context. In list context, this method will return a tuple with (defined,
@@ -1495,7 +1495,7 @@ I<Since C<1.23>>
 
 =head2 package
 
-  package() (Str)
+  package() (string)
 
 The code method returns the package name of the objectified value, i.e.
 C<ref()>.
@@ -1540,7 +1540,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

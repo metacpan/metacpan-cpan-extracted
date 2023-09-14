@@ -1,3 +1,10 @@
+1.063   2023-07-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Remove use of smartmatch.
+
+
 1.062   2022-11-29  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Add short option alias -B for --render-as-benchmark-pm.

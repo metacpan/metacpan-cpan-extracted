@@ -1,0 +1,8 @@
+Revision history for Config-EnhancedJSON
+
+0.01    08-09-2023 / 17:20
+        First version, released on an unsuspecting world.
+
+0.02	08-09-2023 / 23:30
+	Subroutine config2perl is exported by default,
+	fixed test files which import it during loading.

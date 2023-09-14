@@ -1,5 +1,5 @@
 package Net::Hadoop::WebHDFS::LWP;
-$Net::Hadoop::WebHDFS::LWP::VERSION = '0.010';
+$Net::Hadoop::WebHDFS::LWP::VERSION = '0.011';
 use strict;
 use warnings;
 use parent 'Net::Hadoop::WebHDFS';
@@ -197,7 +197,13 @@ sub _create_ua {
     my $class = ref $self;
 
     $self->{ua} = LWP::UserAgent->new(
-                        %{ $self->{ua_opts} }
+                        requests_redirectable => [qw(
+                            GET
+                            HEAD
+                            POST
+                            PUT
+                        )],
+                        %{ $self->{ua_opts} },
                     );
 
     $self->{ua}->agent(
@@ -275,7 +281,7 @@ Net::Hadoop::WebHDFS::LWP - Client library for Hadoop WebHDFS and HttpFs, with K
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

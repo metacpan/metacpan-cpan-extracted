@@ -1,6 +1,5 @@
 package Net::CLI::Interact::Role::Prompt;
-{ $Net::CLI::Interact::Role::Prompt::VERSION = '2.400000' }
-
+$Net::CLI::Interact::Role::Prompt::VERSION = '2.400002';
 use Moo::Role;
 use MooX::Types::MooseLike::Base qw(Str RegexpRef);
 use Net::CLI::Interact::ActionSet;
@@ -148,6 +147,8 @@ sub find_prompt {
 
 =pod
 
+=for Pod::Coverage has_wake_up_msg
+
 =head1 NAME
 
 Net::CLI::Interact::Role::Prompt - Command-line prompt management
@@ -235,7 +236,7 @@ repeated up to "C<$wake_up>" times.
 
 Text sent to a device within the C<find_prompt> method if no output has so far
 matched any known named Prompt. Default is the value of the I<output record
-separator> from the L<Transport|Net::CLI::Interact::Transport> (one newline).
+separator> from the Transport (one newline).
 
 =head2 last_prompt
 

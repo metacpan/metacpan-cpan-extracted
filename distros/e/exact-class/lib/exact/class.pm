@@ -3,33 +3,32 @@ package exact::class;
 
 use 5.014;
 use exact;
-use Role::Tiny ();
-use Scalar::Util ();
+use Import::Into;
+use feature                  ();
 use Class::Method::Modifiers ();
+use Role::Tiny               ();
+use Scalar::Util             ();
 
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.19'; # VERSION
 
 my $store;
+my ($perl_version) = $^V =~ /^v5\.(\d+)/;
 
 sub import {
-    my ( $self, $caller ) = @_;
+    my ( $self, $params, $caller ) = @_;
 
     if ($caller) {
         exact->late_parent;
     }
     else {
         $caller //= caller();
-        exact->add_isa( $self, $caller ) if ( $self eq 'exact::class');
+        exact->add_isa( $self, $caller ) if ( $self eq 'exact::class' );
     }
 
     $store->{struc}{$caller} = {};
 
-    eval qq{
-        package $caller {
-            use Class::Method::Modifiers;
-            no feature 'class';
-        };
-    };
+    Class::Method::Modifiers->import::into($caller);
+    feature->unimport('class') if ( $perl_version > 36 );
 
     exact->monkey_patch( $caller, $_, \&$_ ) for ( qw( has class_has with ) );
 }
@@ -278,7 +277,7 @@ exact::class - Simple class interface extension for exact
 
 =head1 VERSION
 
-version 1.18
+version 1.19
 
 =for markdown [![test](https://github.com/gryphonshafer/exact-class/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-class/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact-class/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-class)

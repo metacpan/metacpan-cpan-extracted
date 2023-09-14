@@ -13,7 +13,7 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Config-Structured",
-  "LICENSE" => "perl",
+  "LICENSE" => "mit",
   "MIN_PERL_VERSION" => "5.022",
   "NAME" => "Config::Structured",
   "PREREQ_PM" => {
@@ -27,8 +27,8 @@ my %WriteMakefileArgs = (
     "Mojo::DynamicMethods" => 0,
     "Moose" => 0,
     "Moose::Util::TypeConstraints" => 0,
+    "Perl6::Junction" => 0,
     "Readonly" => 0,
-    "Syntax::Keyword::Junction" => 0,
     "Syntax::Keyword::Try" => 0,
     "Text::Glob" => 0,
     "YAML::XS" => 0,
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Warn" => 0
   },
-  "VERSION" => "2.003",
+  "VERSION" => "2.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,8 +65,8 @@ my %FallbackPrereqs = (
   "Mojo::DynamicMethods" => 0,
   "Moose" => 0,
   "Moose::Util::TypeConstraints" => 0,
+  "Perl6::Junction" => 0,
   "Readonly" => 0,
-  "Syntax::Keyword::Junction" => 0,
   "Syntax::Keyword::Try" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,

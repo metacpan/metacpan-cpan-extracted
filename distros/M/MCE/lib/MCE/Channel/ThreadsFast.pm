@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( uninitialized once );
 
-our $VERSION = '1.888';
+our $VERSION = '1.889';
 
 use threads;
 use threads::shared;
@@ -233,19 +233,14 @@ sub send2 {
    my $data = ''.shift;
 
    local $\ = undef if (defined $\);
-   local $MCE::Signal::SIG;
 
    {
       my $c_sock = $self->{c2_sock} || $self->{c_sock};
 
-      local $MCE::Signal::IPC = 1;
       CORE::lock $self->{cw_mutex};
-
       MCE::Util::_sock_ready_w( $c_sock ) if $is_MSWin32;
       print { $c_sock } pack('i', length $data), $data;
    }
-
-   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
 
    return 1;
 }
@@ -326,7 +321,7 @@ MCE::Channel::ThreadsFast - Fast channel for producer(s) and many consumers
 
 =head1 VERSION
 
-This document describes MCE::Channel::ThreadsFast version 1.888
+This document describes MCE::Channel::ThreadsFast version 1.889
 
 =head1 DESCRIPTION
 

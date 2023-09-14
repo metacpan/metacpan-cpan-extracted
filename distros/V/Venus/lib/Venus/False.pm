@@ -68,7 +68,7 @@ This package provides the following methods:
 
 =head2 value
 
-  value() (Bool)
+  value() (boolean)
 
 The value method returns value representing the global C<false> value.
 
@@ -96,7 +96,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

@@ -3728,6 +3728,66 @@ UA_ServerConfig_setServerUrls(config, ...)
 #endif
 
 void
+UA_ServerConfig_setEndpointDescriptions(config, endpointsSV)
+	OPCUA_Open62541_ServerConfig	config
+	SV *				endpointsSV
+    PREINIT:
+	ssize_t				top;
+	AV *				endpointsAV;
+	ssize_t				i;
+	SV **				endpointSV;
+    CODE:
+	if (!SvOK(endpointsSV) || !SvROK(endpointsSV) ||
+	    SvTYPE(SvRV(endpointsSV)) != SVt_PVAV)
+		CROAK("Not an ARRAY reference for endpoints");
+
+	endpointsAV = (AV*)SvRV(endpointsSV);
+	top = av_top_index(endpointsAV);
+
+	UA_Array_delete(config->svc_serverconfig->endpoints,
+	    config->svc_serverconfig->endpointsSize,
+	    &UA_TYPES[UA_TYPES_ENDPOINTDESCRIPTION]);
+	config->svc_serverconfig->endpoints = NULL;
+	config->svc_serverconfig->endpointsSize = 0;
+
+	if (top == -1)
+		XSRETURN_EMPTY;
+
+	config->svc_serverconfig->endpoints = UA_Array_new(top + 1,
+	    &UA_TYPES[UA_TYPES_ENDPOINTDESCRIPTION]);
+	if (config->svc_serverconfig->endpoints == NULL)
+		CROAKE("UA_Array_new size %zd", top + 1);
+	config->svc_serverconfig->endpointsSize = top + 1;
+
+	for (i = 0; i <= top; i++) {
+		endpointSV = av_fetch(endpointsAV, i, 0);
+		if (endpointSV != NULL)
+			config->svc_serverconfig->endpoints[i] =
+			    XS_unpack_UA_EndpointDescription(*endpointSV);
+	}
+
+SV *
+UA_ServerConfig_getEndpointDescriptions(config)
+	OPCUA_Open62541_ServerConfig	config
+    PREINIT:
+	AV *				endpointsAV;
+	size_t				i;
+	SV *				endpointSV;
+    CODE:
+	endpointsAV = (AV*)sv_2mortal((SV*)newAV());
+	av_extend(endpointsAV, config->svc_serverconfig->endpointsSize);
+	for (i = 0; i < config->svc_serverconfig->endpointsSize; i++) {
+		endpointSV = newSV(0);
+		av_push(endpointsAV, endpointSV);
+		pack_UA_EndpointDescription(
+		    endpointSV, &config->svc_serverconfig->endpoints[i]);
+	}
+
+	RETVAL = newRV_inc((SV*)endpointsAV);
+    OUTPUT:
+	RETVAL
+
+void
 UA_ServerConfig_setGlobalNodeLifecycle(config, lifecycle);
 	OPCUA_Open62541_ServerConfig		config
 	OPCUA_Open62541_GlobalNodeLifecycle	lifecycle

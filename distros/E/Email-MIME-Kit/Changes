@@ -1,5 +1,8 @@
 Revision history for Email-MIME-Kit
 
+3.000008  2023-09-02 20:46:18-04:00 America/New_York
+        - update packaging and metadata
+
 3.000007  2023-01-09 20:33:45-05:00 America/New_York
         - update packaging and metadata
         - minimum required Perl is now v5.12

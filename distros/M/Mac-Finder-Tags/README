@@ -1,10 +1,10 @@
-Mac::Finder::Tags 0.01
+Mac::Finder::Tags 0.02
 
 This class offers methods to read and write macOS file system tags (the
 feature that replaced Mac OS Finder labels from OS X 10.9).
 
 More information about this software:
-https://metacpan.org/release/Mac-Finder-Tags
+https://metacpan.org/dist/Mac-Finder-Tags
 
 
 INSTALLATION
@@ -18,7 +18,7 @@ For example:
 If you already have downloaded the distribution, you can alternatively
 point your tool directly at the archive file or the directory:
 
-  cpanm .
+  cpanm Mac-Finder-Tags-0.02.tar.gz
 
 You can also install the module manually by following these steps:
 
@@ -33,7 +33,7 @@ on installing CPAN modules.
 
 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Arne Johannessen.
+This software is Copyright (c) 2022-2023 by Arne Johannessen.
 
 This is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0 or (at your option) the same terms

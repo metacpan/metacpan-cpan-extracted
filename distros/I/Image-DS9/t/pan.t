@@ -1,21 +1,27 @@
 #! perl
 
+use v5.10;
+
 use strict;
 use warnings;
 
-use Test::More tests => 1;
-use Test::Deep;
+use Test2::V0;
 
 use Image::DS9;
+use Image::DS9::Constants::V1 -angular_formats, -sky_coord_systems;
 
-require './t/common.pl';
+use Test::Lib;
+use My::Util;
 
-my $ds9 = start_up();
-$ds9->file( 'data/m31.fits.gz' );
+my $ds9 = start_up( image => 1 );
 
 my @coords = qw( 00:42:41.377 +41:15:24.28 );
-$ds9->pan( to => @coords, qw( wcs fk5) );
+$ds9->pan( to => @coords, wcs => SKY_COORDSYS_FK5 );
 
-my @exp = ( re( qr/0?0:42:41.377/ ), re( qr/\+41:15:24.280?/ ) );
+my @exp = ( qr/0?0:42:41.377/, qr/[+]41:15:24.280?/ );
 
-cmp_deeply( scalar $ds9->pan( qw( wcs fk5 sexagesimal ) ), \@exp, 'pan', );
+my $got = $ds9->pan( wcs => SKY_COORDSYS_FK5, ANGULAR_FORMAT_SEXAGESIMAL );
+
+like( $got, \@exp, 'pan' );
+
+done_testing;

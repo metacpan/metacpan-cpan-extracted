@@ -24,4 +24,5 @@ t/corpus/lib/Data.pm
 t/corpus/lib/Data.pod
 t/corpus/lib/Foo.pm
 t/corpus/lib/Foo.pod
+t/corpus/lib/LeftAlone.pod
 xt/release/unused-vars.t

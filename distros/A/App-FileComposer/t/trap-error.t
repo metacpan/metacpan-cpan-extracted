@@ -8,7 +8,7 @@ use App::FileComposer;
 
 
 my $default_dir = "$ENV{HOME}/.app-filecomposer";
-my $obj = App::FileComposer->new(filename => 'hello.pl');
+my $obj = App::FileComposer->new('hello.pl');
 
 #// Check for fake directory names
     eval{
@@ -28,4 +28,4 @@ my $obj = App::FileComposer->new(filename => 'hello.pl');
 
 
    
-done_testing;
+done_testing();

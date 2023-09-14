@@ -1,23 +1,47 @@
+#! perl
+
+use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Image::DS9;
 
-BEGIN { plan( tests => 3 ) ;}
+use Test::Lib;
+use My::Util;
 
-require './t/common.pl';
+my $ds9 = start_up( events => 1, image => 1, clear => 1 );
 
+test_stuff(
+    $ds9,
+    (
+        blink => [
+            ['interval'] => 0.2,
+            ['interval'] => 3,
+        ],
+    ) );
 
-my $ds9 = start_up();
-load_events( $ds9 );
-$ds9->file( 'data/m31.fits.gz', { new => 1 } );
+subtest 'no args' => sub {
+    ok( lives { $ds9->blink() }, 'blink' )
+      or do { note( $@ ); return };
+    is( $ds9->blink( 'state' ), T(), 'state' );
+};
 
-$ds9->blink();
-ok( 1 == $ds9->blink('state'), "single" );
-ok( 0 == $ds9->single('state'), "single; blink off");
-ok( 0 == $ds9->tile('state'), "single; tile off");
+subtest 'false' => sub {
+    ok( lives { $ds9->blink( !!0 ) }, 'blink' )
+      or do { note( $@ ); return };
+    is( $ds9->blink( 'state' ), F(), 'state' );
+};
 
-$ds9->single(); # return to sanity
+subtest 'on' => sub {
+    ok( lives { $ds9->blink( !!1 ) }, 'blink' )
+      or do { note( $@ ); return };
 
+    is( $ds9->blink( 'state' ), T(), 'on' );
+};
 
+END {
+    $ds9->single;    # return to sanity
+}
+
+done_testing;

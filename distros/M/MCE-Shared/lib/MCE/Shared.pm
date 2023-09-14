@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.885';
+our $VERSION = '1.886';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -460,7 +460,7 @@ MCE::Shared - MCE extension for sharing data supporting threads and processes
 
 =head1 VERSION
 
-This document describes MCE::Shared version 1.885
+This document describes MCE::Shared version 1.886
 
 =head1 SYNOPSIS
 
@@ -622,10 +622,10 @@ isn't used for anything else.
  my $q1 = MCE::Shared->queue();
  my $q2 = MCE::Shared->queue( await => 1 );
 
-For platforms where L<IO::FDPass> isn't possible (e.g. Cygwin), construct
-C<condvar> and C<queue> before other classes. The shared-manager process
-will be delayed until sharing other classes (e.g. Array, Hash) or starting
-explicitly.
+For platforms where L<IO::FDPass> isn't possible (e.g. Cygwin, Android),
+construct C<condvar> and C<queue> before other classes. The shared-manager
+process will be delayed until sharing other classes (e.g. Array, Hash) or
+starting explicitly.
 
  use MCE::Shared;
 

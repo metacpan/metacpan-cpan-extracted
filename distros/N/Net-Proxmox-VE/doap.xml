@@ -52,6 +52,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>MartijnLievaart</foaf:name>
+      <foaf:mbox rdf:resource="mailto:github@rtij.nl" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Martijn Lievaart</foaf:name>
       <foaf:mbox rdf:resource="mailto:m@rtij.nl" />
     </foaf:Person>
@@ -84,6 +90,12 @@
     <foaf:Person>
       <foaf:name>PIQUET Damien</foaf:name>
       <foaf:mbox rdf:resource="mailto:piqudam@gmail.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>poptix</foaf:name>
+      <foaf:mbox rdf:resource="mailto:poptix@poptix.net" />
     </foaf:Person>
   </helper>
   <license rdf:resource="http://www.opensource.org/licenses/mit-license.php" />

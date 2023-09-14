@@ -10,23 +10,23 @@ my $module = 'Graphics::Toolkit::Color';
 eval "use $module";
 is( not( $@), 1, 'could load the module');
 
-warning_like {Graphics::Toolkit::Color->new()}                    {carped => qr/constructor of/},  "need argument to create object";
-warning_like {Graphics::Toolkit::Color->new('weirdcolorname')}    {carped => qr/unknown color/},   "accept only known color names";
-warning_like {Graphics::Toolkit::Color->new('CHIMNEY:red')}       {carped => qr/ not installed/},  "accept only known palletes";
-warning_like {Graphics::Toolkit::Color->new('#23232')       }     {carped => qr/constructor of/},  "hex definition too short";
-warning_like {Graphics::Toolkit::Color->new('#232321f')     }     {carped => qr/constructor of/},  "hex definition too long";
-warning_like {Graphics::Toolkit::Color->new('#23232g')       }    {carped => qr/constructor of/},  "hex definition has forbidden chars";
-warning_like {Graphics::Toolkit::Color->new('#2322%E')       }    {carped => qr/constructor of/},  "hex definition has forbidden special chars";
-warning_like {Graphics::Toolkit::Color->new(1,1)}                 {carped => qr/constructor of/},  "too few positional args";
-warning_like {Graphics::Toolkit::Color->new(1,1,1,1,1)}           {carped => qr/constructor of/},  "too many positional args";
-warning_like {Graphics::Toolkit::Color->new([1,1])}               {carped => qr/constructor of/},  "too few positional args in ref";
-warning_like {Graphics::Toolkit::Color->new([1,1,1,1])}           {carped => qr/constructor of/},  "too many positional args in ref";
-warning_like {Graphics::Toolkit::Color->new({ r=>1, g=>1})}       {carped => qr/constructor of/},  "too few named args in ref";
-warning_like {Graphics::Toolkit::Color->new({r=>1,g=>1,b=>1,h=>1,})} {carped => qr/constructor of/},"too many name args in ref";
-warning_like {Graphics::Toolkit::Color->new( r=>1)}               {carped => qr/constructor of/},  "too few named args";
+warning_like {Graphics::Toolkit::Color->new()}                    {carped => qr/constructor of/},       "need argument to create object";
+warning_like {Graphics::Toolkit::Color->new('weirdcolorname')}    {carped => qr/unknown color/},        "accept only known color names";
+warning_like {Graphics::Toolkit::Color->new('CHIMNEY:red')}       {carped => qr/ not installed/},       "accept only known palletes";
+warning_like {Graphics::Toolkit::Color->new('#23232')       }     {carped => qr/could not recognize/},  "hex definition too short";
+warning_like {Graphics::Toolkit::Color->new('#232321f')     }     {carped => qr/not recognize color/},  "hex definition too long";
+warning_like {Graphics::Toolkit::Color->new('#23232g')       }    {carped => qr/not recognize color/},  "hex definition has forbidden chars";
+warning_like {Graphics::Toolkit::Color->new('#2322%E')       }    {carped => qr/not recognize color/},  "hex definition has forbidden special chars";
+warning_like {Graphics::Toolkit::Color->new(1,1)}                 {carped => qr/constructor of/},       "too few positional args";
+warning_like {Graphics::Toolkit::Color->new(1,1,1,1,1)}           {carped => qr/constructor of/},       "too many positional args";
+warning_like {Graphics::Toolkit::Color->new([1,1])}               {carped => qr/not recognize color/},  "too few positional args in ref";
+warning_like {Graphics::Toolkit::Color->new([1,1,1,1])}           {carped => qr/not recognize color/},  "too many positional args in ref";
+warning_like {Graphics::Toolkit::Color->new({ r=>1, g=>1})}       {carped => qr/not recognize color/},  "too few named args in ref";
+warning_like {Graphics::Toolkit::Color->new({r=>1,g=>1,b=>1,h=>1,})} {carped => qr/not recognize color/},"too many name args in ref";
+warning_like {Graphics::Toolkit::Color->new( r=>1)}               {carped => qr/constructor of/},       "too few named args";
 warning_like {Graphics::Toolkit::Color->new(r=>1,g=>1,b=>1,h=>1,a=>1)} {carped => qr/constructor of/},  "too many name args";
-warning_like {Graphics::Toolkit::Color->new(r=>1,g=>1,h=>1)}      {carped => qr/constructor of/},   "don't mix named args";
-warning_like {Graphics::Toolkit::Color->new(r=>1,g=>1,t=>1)}      {carped => qr/constructor of/},   "don't invent named args";
+warning_like {Graphics::Toolkit::Color->new(r=>1,g=>1,h=>1)}      {carped => qr/not recognize color/},   "don't mix named args";
+warning_like {Graphics::Toolkit::Color->new(r=>1,g=>1,t=>1)}      {carped => qr/not recognize color/},   "don't invent named args";
 
 
 my $red = Graphics::Toolkit::Color->new('red');
@@ -53,12 +53,12 @@ is( $red->rgb_hash->{'blue'},   0, 'named red has correct blue value in rgb HASH
 is( $red->hsl_hash->{'hue'},          0, 'named red has correct hue value in hsl HASH');
 is( $red->hsl_hash->{'saturation'}, 100, 'named red has correct saturation value in hsl HASH');
 is( $red->hsl_hash->{'lightness'},   50, 'named red has correct lightness value in hsl HASH');
-is( $red->string,                 'red', 'named red does stringify correctly');
-is( Graphics::Toolkit::Color->new(15,12,13)->string, '#0f0c0d', 'random color does stringify correctly');
+is( $red->string,    'red', 'named red does stringify correctly');
+is( Graphics::Toolkit::Color->new(15,12,13)->string, 'rgb: 15, 12, 13', 'random color does stringify correctly');
 
 
 $red = Graphics::Toolkit::Color->new('#FF0000');
-is( ref $red,     $module, 'could create object by hex value');
+is( ref $red,        $module, 'could create object by hex value');
 is( $red->red,           255, 'hex red has correct red component value');
 is( $red->green,           0, 'hex red has correct green component value');
 is( $red->blue,            0, 'hex red has correct blue component value');
@@ -187,7 +187,7 @@ is( $c->red,            1, 'random color has correct red component value');
 is( $c->green,          2, 'random color has correct green component value');
 is( $c->blue,           3, 'random color has correct blue component value');
 is( $c->name,          '', 'random color has no name');
-is( $c->string, '#010203', 'blue color was stringified to hex');
+is( $c->string, 'rgb: 1, 2, 3', 'blue color was stringified to hex');
 
 my $blue = Graphics::Toolkit::Color->new( 'blue' );
 is( $blue->red,        0,  'blue has correct red component value');
@@ -197,7 +197,6 @@ is( $blue->hue,      240,  'blue has correct hue component value');
 is( $blue->saturation,100, 'blue has correct saturation component value');
 is( $blue->lightness,  50, 'blue has correct lightness component value');
 is( $blue->name,   'blue', 'blue color has correct name');
-
 
 my $recursive = Graphics::Toolkit::Color->new( $red );
 is(  ref $recursive,                                  $module,   "recursive constructor option works");

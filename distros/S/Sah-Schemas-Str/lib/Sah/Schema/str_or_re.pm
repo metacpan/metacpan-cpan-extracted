@@ -3,9 +3,9 @@ package Sah::Schema::str_or_re;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-23'; # DATE
+our $DATE = '2023-09-03'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 our $schema = [any => {
     summary => 'String or regex (if string is of the form `/.../`)',
@@ -66,7 +66,7 @@ Sah::Schema::str_or_re - String or regex (if string is of the form `/.../`)
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::Schema::str_or_re (from Perl distribution Sah-Schemas-Str), released on 2022-09-23.
+This document describes version 0.015 of Sah::Schema::str_or_re (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
 
 =head1 SYNOPSIS
 
@@ -106,7 +106,7 @@ To check data against this schema (requires L<Data::Sah>):
  my $validator = gen_validator("str_or_re*");
  say $validator->($data) ? "valid" : "INVALID!";
 
-The above schema returns a boolean result (true if data is valid, false if
+The above validator returns a boolean result (true if data is valid, false if
 otherwise). To return an error message string instead (empty string if data is
 valid, a non-empty error message otherwise):
 
@@ -114,27 +114,27 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "qr(foo)is";
+ $data = "/foo";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = "/foo[/";
- my $errmsg = $validator->($data); # => "Invalid regex: Unmatched [ in regex; marked by <-- HERE in m/foo[ <-- HERE / at (eval 2658) line 1.\n"
+ $data = {};
+ my $errmsg = $validator->($data); # => "Not of type text"
 
-Often a schema has coercion rule or default value, so after validation the
-validated value is different. To return the validated (set-as-default, coerced,
-prefiltered) value:
+Often a schema has coercion rule or default value rules, so after validation the
+validated value will be different from the original. To return the validated
+(set-as-default, coerced, prefiltered) value:
 
  my $validator = gen_validator("str_or_re", {return_type=>'str_errmsg+val'});
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "qr(foo)is";
- my $res = $validator->($data); # => ["",qr(foo)si]
+ $data = "/foo";
+ my $res = $validator->($data); # => ["","/foo"]
  
  # a sample invalid data
- $data = "/foo[/";
- my $res = $validator->($data); # => ["Invalid regex: Unmatched [ in regex; marked by <-- HERE in m/foo[ <-- HERE / at (eval 2672) line 1.\n","/foo[/"]
+ $data = {};
+ my $res = $validator->($data); # => ["Not of type text",{}]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -197,6 +197,36 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  % ./myapp.pl --arg1 ...
 
+=head2 Using on the CLI with validate-with-sah
+
+To validate some data on the CLI, you can use L<validate-with-sah> utility.
+Specify the schema as the first argument (encoded in Perl syntax) and the data
+to validate as the second argument (encoded in Perl syntax):
+
+ % validate-with-sah '"str_or_re*"' '"data..."'
+
+C<validate-with-sah> has several options for, e.g. validating multiple data,
+showing the generated validator code (Perl/JavaScript/etc), or loading
+schema/data from file. See its manpage for more details.
+
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema (requires
+L<Type::Tiny> as well as L<Type::FromSah>):
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('str_or_re*', name=>'StrOrRe')
+     );
+ }
+
+ use My::Types qw(StrOrRe);
+ StrOrRe->assert_valid($data);
+
 =head1 DESCRIPTION
 
 Either string or Regexp object is accepted.
@@ -219,6 +249,10 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Str>.
 
 =head1 SEE ALSO
+
+L<Sah::Schema::str_or_re_or_code>
+
+L<Sah::Schema::str_or_code>
 
 L<Sah::PSchema::re_from_str>
 
@@ -248,7 +282,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

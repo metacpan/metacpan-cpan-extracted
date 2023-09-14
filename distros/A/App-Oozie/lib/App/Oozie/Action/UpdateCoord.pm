@@ -1,5 +1,5 @@
 package App::Oozie::Action::UpdateCoord;
-$App::Oozie::Action::UpdateCoord::VERSION = '0.002';
+$App::Oozie::Action::UpdateCoord::VERSION = '0.006';
 # This is not in use yet, please go to the parent class
 
 use 5.010;
@@ -21,7 +21,7 @@ App::Oozie::Action::UpdateCoord
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 

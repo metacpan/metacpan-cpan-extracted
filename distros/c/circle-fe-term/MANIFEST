@@ -1,3 +1,4 @@
+.editorconfig
 bin/circle-fe-term
 Build.PL
 Changes
@@ -8,10 +9,10 @@ lib/Circle/FE/Term/Widget/Box.pm
 lib/Circle/FE/Term/Widget/Entry.pm
 lib/Circle/FE/Term/Widget/Label.pm
 lib/Circle/FE/Term/Widget/Scroller.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 share/circle-fe-term.theme
 t/00use.t
-README
-LICENSE
-META.yml
-META.json

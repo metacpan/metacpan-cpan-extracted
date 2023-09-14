@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DBM-Deep",
    "no_index" : {
@@ -47,7 +47,7 @@
    "provides" : {
       "DBM::Deep" : {
          "file" : "lib/DBM/Deep.pm",
-         "version" : "2.0016"
+         "version" : "2.0017"
       },
       "DBM::Deep::Array" : {
          "file" : "lib/DBM/Deep/Array.pm"
@@ -127,13 +127,16 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/DrHyde/perl-modules-DBM-Deep/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/robkinyon/dbm-deep"
+         "url" : "https://github.com/DrHyde/perl-modules-DBM-Deep"
       }
    },
-   "version" : "2.0016",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "2.0017",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

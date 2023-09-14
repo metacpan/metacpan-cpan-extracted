@@ -3,7 +3,7 @@ use warnings;
 
 package Mac::Finder::Tags::Impl::mdls;
 # ABSTRACT: Provides get_tags based on the mdls tool
-$Mac::Finder::Tags::Impl::mdls::VERSION = '0.01';
+$Mac::Finder::Tags::Impl::mdls::VERSION = '0.02';
 
 use Object::Pad 0.57;
 

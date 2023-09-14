@@ -6,7 +6,7 @@
 use v5.36;
 use Object::Pad 0.800;
 
-class App::perl::distrolint::Check::Editorconfig 0.02;
+class App::perl::distrolint::Check::Editorconfig 0.03;
 
 use constant DESC => "check that .editorconfig exists";
 use constant SORT => 5;

@@ -3,7 +3,7 @@ package Export::These;
 use strict;
 use warnings;
 
-our $VERSION="v0.1.1";
+our $VERSION="v0.1.2";
 
 sub import {
   my $package=shift;
@@ -109,6 +109,8 @@ sub import {
 
         \$name=substr \$_, 1 if \$type;
         \$type//="CODE";
+
+        no warnings "redefine";
         eval { *{\$target."::".\$name}= *{ \\\${__PACKAGE__ ."::"}{\$name}}{\$type}; };
         die "Could not export \$prefix\$name from ".__PACKAGE__ if \$\@;
 
@@ -205,6 +207,11 @@ imported. This is the 'hook' location where its safe to call C<-E<gt>import> on
 any dependencies modules it might want to export. The symbols from these
 packages will automatically be installed into the target package with no extra
 configuration needed.
+
+Finally warnings about symbols redefinition in the export process (i.e. exporting
+to two subroutines with the same name into the same namespace) are silenced to
+keep warning noise to a minimum. The last symbol definition will ultimately be
+the one used.
 
 
 

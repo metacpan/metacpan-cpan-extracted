@@ -9,9 +9,7 @@ BEGIN {
    $ENV{TERM} = "xterm";
 }
 
-use Test::More;
-use Test::HexString;
-use Test::Refcount;
+use Test2::V0 0.000149; # is_refcount
 
 use Errno qw( EAGAIN );
 
@@ -26,12 +24,12 @@ my $tickit = Tickit->new(
    term_out => $term_wr,
 );
 
-isa_ok( $tickit, "Tickit", '$tickit' );
+isa_ok( $tickit, [ "Tickit" ], '$tickit' );
 is_oneref( $tickit, '$tickit has refcount 1 initially' );
 
 my $term = $tickit->term;
 
-isa_ok( $term, "Tickit::Term", '$tickit->term' );
+isa_ok( $term, [ "Tickit::Term" ], '$tickit->term' );
 
 # For unit-test purposes force the size of the terminal to 80x24
 $term->set_size( 24, 80 );
@@ -57,7 +55,7 @@ sub stream_is
               $stream ne substr( $expect, 0, length $stream );
    }
 
-   is_hexstr( substr( $stream, 0, length $expect, "" ), $expect, $name );
+   is( substr( $stream, 0, length $expect, "" ), $expect, $name );
 }
 
 $term->print( "Hello" );
@@ -76,7 +74,7 @@ stream_is( "\xc4\x89", 'print outputs UTF-8' );
 
 my $rootwin = $tickit->rootwin;
 
-isa_ok( $rootwin, "Tickit::Window", '$tickit->rootwin' );
+isa_ok( $rootwin, [ "Tickit::Window" ], '$tickit->rootwin' );
 
 cmp_ok( $rootwin->tickit, '==', $tickit, '$tickit->rootwin->tickit is $tickit' );
 

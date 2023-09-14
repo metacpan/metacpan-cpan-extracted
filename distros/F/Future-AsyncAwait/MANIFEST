@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 hax/cv_copy_flags.c.inc
@@ -56,6 +57,7 @@ t/45sub-signatures.t
 t/50future-subclass.t
 t/51awaitable-role.t
 t/52awaitable-future.t
+t/70await+feature-class.t
 t/70await+feature-try.t
 t/80async-method.t
 t/80async-multi-sub.t

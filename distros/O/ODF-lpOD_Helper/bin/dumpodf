@@ -1,0 +1,75 @@
+#!/usr/bin/env perl
+# License: Public Domain or CC0 See
+# https://creativecommons.org/publicdomain/zero/1.0/
+# The author, Jim Avera (jim.avera at gmail) has waived all copyright and
+# related or neighboring rights to the content of this file.
+# Attribution is requested but is not required.
+
+# This utility script ships with ODF::lpOD_Helper
+
+use strict; use warnings; use feature qw/say/;
+our $VERSION = '6.004'; # VERSION
+
+my $progname = basename($0);
+my $usage = <<EOF;
+
+USAGE: $progname <path>
+
+Dumps the internals of an ODF document to stdout in a peculiar Perlish
+format intended to make human inspection easier.  Instead of xml
+<tag> ... </tag>, hierarchy is represended using nested {blocks},
+wrapped intelligently to your terminal width.
+
+A node hierarchy looks like this:
+
+  Tag {
+    att={AtrributeName => VALUE, ...}
+    "text string"
+    ChildTag { ... }
+    ChildTag { ... }
+    ...
+  }
+
+EOF
+
+use open IO => ':locale';
+use Getopt::Long qw/GetOptions/;
+use File::Basename qw/basename/;
+use Data::Dumper::Interp qw/visnew u visq qsh dvis/;
+use ODF::lpOD;
+use ODF::lpOD_Helper qw/fmt_tree/;
+
+my $width;
+my %fmt_options = (showaddr => 0, showoff => 0, showisa => 0, showlevel => 0);
+Getopt::Long::Configure('gnu_compat');
+GetOptions(
+  'o|option=s' => \%fmt_options,
+  'w|width=n'  => \$width,
+) or die $usage;
+die $usage unless @ARGV==1;
+my $path = $ARGV[0];
+
+# If not width was specified, D::D::I uses the terminal width
+$Data::Dumper::Interp::Foldwidth = $width if defined($width);
+
+my $numcols = visnew->Foldwidth();
+sub print_header($) {
+  my $label = shift;
+  say sprintf "=====%s%s", $label, ("=" x ($numcols-1-7-length($label)));
+}
+
+say "Dumping ",qsh($path), "    # vim: filetype=perl";
+
+my $doc = odf_get_document($path) // die "$path : $!\n";
+
+print_header " mimetype ";
+say visq($doc->get_mimetype);
+
+foreach my $part (qw{content.xml styles.xml META-INF/manifest.xml settings.xml}) {
+  print_header " $part ";
+  say fmt_tree( $doc->get_element($part, '//'), %fmt_options );
+}
+
+print_header " (end) ";
+
+exit 0;

@@ -1,10 +1,19 @@
 use strict;
 use warnings;
 package File::Meta::Cache;
-our $VERSION="v0.1.1";
+
+our $VERSION="v0.2.0";
+
 # Default Opening Mode
 use Fcntl qw(O_RDONLY);
-use enum qw<key_ fd_ fh_ stat_ valid_ user_>;
+use constant::more {
+  key_=>0,
+  fd_=>1,
+  fh_=>2,
+  stat_=>3,
+  valid_=>4,
+  user_=>5
+};
 
 use Object::Pad;
 
@@ -14,7 +23,21 @@ use feature qw<say state>;
 use Log::ger;   # Logger
 use Log::OK;    # Logger enabler
 
-use POSIX();
+
+
+my ($_open, $_close, $_dup2);
+
+if(eval "require IO::FD"){
+  $_open=\&IO::FD::open;
+  $_close=\&IO::FD::close;
+  $_dup2=\&IO::FD::dup2;
+}
+else {
+  require POSIX;
+  $_open=\&POSIX::open;
+  $_close=\&POSIX::close;
+  $_dup2=\&POSIX::dup2;
+}
 
 
 
@@ -77,7 +100,8 @@ method opener{
         };
 
         my @entry;
-        $in_fd=POSIX::open($key_path, $mode);
+        #$in_fd=POSIX::open($key_path, $mode);
+        $in_fd=$_open->($key_path, $mode);
 
 
 
@@ -85,8 +109,10 @@ method opener{
           
           if($existing_entry){
             # Duplicate and Close unused fd
-            POSIX::dup2 $in_fd, $existing_entry->[fd_];
-            POSIX::close $in_fd;
+            #POSIX::dup2 $in_fd, $existing_entry->[fd_];
+            $_dup2->($in_fd, $existing_entry->[fd_]);
+            #POSIX::close $in_fd;
+            $_close->($in_fd);
 
             # Copy stat into existing array 
             $existing_entry->[stat_]->@*=@stat;
@@ -123,9 +149,11 @@ method opener{
 method disable{
   $_enabled=undef;
   for(values %_cache){
-    POSIX::close($_cache{$_}[0]);
+    #POSIX::close($_cache{$_}[0]);
+    $_close->($_->[fd_]);
   }
   %_cache=();
+  $self;
 }
 
 # Generates a sub to close a cached fd
@@ -139,7 +167,8 @@ method closer {
         if($actual){
           # Attempt to close only if the entry exists
           $actual->[valid_]=0;  #Mark as invalid
-          POSIX::close($actual->[fd_]);
+          #POSIX::close($actual->[fd_]);
+          $_close->($actual->[fd_]);
           $actual->[fh_]=undef;
         }
         else {
@@ -178,7 +207,7 @@ method sweep {
   $self->sweeper->&*;
 }
 
-method enable{ $_enabled=1; }
+method enable{ $_enabled=1; $self }
 
 1;
 

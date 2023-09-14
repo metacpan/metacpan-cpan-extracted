@@ -3,7 +3,7 @@ package Net::Async::Blockchain::Client::RPC;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 =head1 NAME
 
@@ -127,7 +127,7 @@ Use any argument as the method parameter for the client RPC call
 
 =back
 
-L<Future>
+L<Future> - node response as decoded json
 
 =cut
 
@@ -139,9 +139,12 @@ async sub _request {
         method => $method,
         params => [@params],
     };
+
     # for Geth JSON-RPC spec requires the version field to be exactly "jsonrpc": "2.0"
-    $obj->{jsonrpc} = $self->jsonrpc if $self->jsonrpc;
+    $obj->{jsonrpc} = $self->jsonrpc if $self->can('jsonrpc');
+
     my @post_params = ($self->endpoint, encode_json_utf8($obj), content_type => 'application/json');
+
     # for ETH based, we don't require user+password. Check to send user+password if exists.
     push @post_params, (user => $self->rpc_user)     if $self->rpc_user;
     push @post_params, (pass => $self->rpc_password) if $self->rpc_password;

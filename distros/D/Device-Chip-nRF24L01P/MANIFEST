@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 examples/nRF24L01+_CONTWAVE.pl

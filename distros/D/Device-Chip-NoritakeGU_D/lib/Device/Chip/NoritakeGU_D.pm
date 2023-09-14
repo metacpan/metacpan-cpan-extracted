@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2023 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
-use Object::Pad 0.66;
+use warnings;
+use Object::Pad 0.800;
 
-package Device::Chip::NoritakeGU_D 0.05;
+package Device::Chip::NoritakeGU_D 0.06;
 class Device::Chip::NoritakeGU_D
    :isa(Device::Chip);
 

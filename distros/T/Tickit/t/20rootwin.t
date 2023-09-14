@@ -3,14 +3,13 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Refcount;
+use Test2::V0 0.000149; # is_refcount
 
 use Tickit::Test;
 
 my ( $term, $win ) = mk_term_and_window;
 
-isa_ok( $win, "Tickit::Window", '$win isa Tickit::Window' );
+isa_ok( $win, [ "Tickit::Window" ], '$win isa Tickit::Window' );
 
 is_refcount( $win, 1, '$win has refcount 1 initially' );
 
@@ -23,37 +22,37 @@ is( $win->abs_left, 0, '$win->abs_left is 0' );
 is( $win->lines, 25, '$win->lines is 25' );
 is( $win->cols,  80, '$win->cols is 80' );
 
-isa_ok( $win->term, "Tickit::Term", '$win->term' );
+isa_ok( $win->term, [ "Tickit::Term" ], '$win->term' );
 
-isa_ok( $win->tickit, "Tickit", '$win->tickit' );
+isa_ok( $win->tickit, [ "Tickit" ], '$win->tickit' );
 
 # window pen
 {
-   isa_ok( $win->pen, "Tickit::Pen", '$win->pen isa Tickit::Pen' );
+   isa_ok( $win->pen, [ "Tickit::Pen" ], '$win->pen isa Tickit::Pen' );
 
-   is_deeply( { $win->pen->getattrs },
-              {},
-              '$win->pen has no attrs set' );
+   is( { $win->pen->getattrs },
+       {},
+       '$win->pen has no attrs set' );
 
    is( $win->getpenattr( 'fg' ), undef, '$win has pen fg undef' );
 
-   is_deeply( { $win->get_effective_pen->getattrs },
-              {},
-              '$win->get_effective_pen has no attrs set' );
+   is( { $win->get_effective_pen->getattrs },
+       {},
+       '$win->get_effective_pen has no attrs set' );
 
    is( $win->get_effective_penattr( 'fg' ), undef, '$win has effective pen fg undef' );
 
    $win->pen->chattr( fg => 3 );
 
-   is_deeply( { $win->pen->getattrs },
-              { fg => 3 },
-              '$win->pen->getattrs has fg => 3' );
+   is( { $win->pen->getattrs },
+       { fg => 3 },
+       '$win->pen->getattrs has fg => 3' );
 
    is( $win->getpenattr( 'fg' ), 3, '$win has pen fg 3' );
 
-   is_deeply( { $win->get_effective_pen->getattrs },
-              { fg => 3 },
-              '$win->get_effective_pen has fg => 3' );
+   is( { $win->get_effective_pen->getattrs },
+       { fg => 3 },
+       '$win->get_effective_pen has fg => 3' );
 
    is( $win->get_effective_penattr( 'fg' ), 3, '$win has effective pen fg 3' );
 
@@ -63,9 +62,9 @@ isa_ok( $win->tickit, "Tickit", '$win->tickit' );
 
    $win->set_pen( $newpen );
 
-   is_deeply( { $win->pen->getattrs },
-              { fg => 3, u => 1 },
-              '$win->set_pen replaces window pen' );
+   is( { $win->pen->getattrs },
+       { fg => 3, u => 1 },
+       '$win->set_pen replaces window pen' );
 
    $win->pen->chattr( u => undef );
 }
@@ -109,33 +108,33 @@ isa_ok( $win->tickit, "Tickit", '$win->tickit' );
    $win->scroll( 1, 0 );
    flush_tickit;
 
-   is_deeply( \@exposed_rects,
-              [ Tickit::Rect->new( top => 24, bottom => 25, left => 0, right => 80 ) ],
-              'Exposed area after ->scroll downward' );
+   is( \@exposed_rects,
+       [ rect( top => 24, bottom => 25, left => 0, right => 80 ) ],
+       'Exposed area after ->scroll downward' );
    undef @exposed_rects;
 
    $win->scroll( -1, 0 );
    flush_tickit;
 
-   is_deeply( \@exposed_rects,
-              [ Tickit::Rect->new( top => 0, bottom => 1, left => 0, right => 80 ) ],
-              'Exposed area after ->scroll upward' );
+   is( \@exposed_rects,
+       [ rect( top => 0, bottom => 1, left => 0, right => 80 ) ],
+       'Exposed area after ->scroll upward' );
    undef @exposed_rects;
 
    $win->scroll( 0, 1 );
    flush_tickit;
 
-   is_deeply( \@exposed_rects,
-              [ Tickit::Rect->new( top => 0, bottom => 25, left => 79, right => 80 ) ],
-              'Exposed area after ->scroll rightward' );
+   is( \@exposed_rects,
+       [ rect( top => 0, bottom => 25, left => 79, right => 80 ) ],
+       'Exposed area after ->scroll rightward' );
    undef @exposed_rects;
 
    $win->scroll( 0, -1 );
    flush_tickit;
 
-   is_deeply( \@exposed_rects,
-              [ Tickit::Rect->new( top => 0, bottom => 25, left => 0, right => 1 ) ],
-              'Exposed area after ->scroll leftward' );
+   is( \@exposed_rects,
+       [ rect( top => 0, bottom => 25, left => 0, right => 1 ) ],
+       'Exposed area after ->scroll leftward' );
    undef @exposed_rects;
 
    # Test that ->scroll updates pending damage
@@ -144,10 +143,10 @@ isa_ok( $win->tickit, "Tickit", '$win->tickit' );
    $win->scroll( 2, 0 );
    flush_tickit;
 
-   is_deeply( \@exposed_rects,
-              [ Tickit::Rect->new( top => 8, bottom => 10, left => 0, right => 80 ),
-                Tickit::Rect->new( top => 23, bottom => 25, left => 0, right => 80 ) ],
-              'Damage area updated after ->scroll' );
+   is( \@exposed_rects,
+       [ rect( top => 8, bottom => 10, left => 0, right => 80 ),
+         rect( top => 23, bottom => 25, left => 0, right => 80 ) ],
+       'Damage area updated after ->scroll' );
 
    drain_termlog;
 }

@@ -42,8 +42,8 @@
             "Browser::Open" : "0",
             "Capture::Tiny" : "0",
             "Chart::Gnuplot" : "0",
-            "Complete::Module" : "0.262",
-            "Complete::Util" : "0.608",
+            "Complete::Module" : "0.263",
+            "Complete::Util" : "0.616",
             "Data::Clean::ForJSON" : "0",
             "Data::Clone" : "0",
             "Data::Dmp" : "0.242",
@@ -60,7 +60,7 @@
             "JSON::MaybeXS" : "0",
             "List::MoreUtils" : "0",
             "List::Util" : "1.54",
-            "List::Util::Uniq" : "0.003",
+            "List::Util::Uniq" : "0.005",
             "Log::ger" : "0.038",
             "Math::ScientificNotation::Util" : "0",
             "Module::Load" : "0",
@@ -79,7 +79,6 @@
             "Sys::Info" : "0",
             "Text::Table::More" : "0",
             "Time::HiRes" : "0",
-            "experimental" : "0",
             "parent" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -99,103 +98,103 @@
    "provides" : {
       "Bencher::Backend" : {
          "file" : "lib/Bencher/Backend.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Formatter" : {
          "file" : "lib/Bencher/Formatter.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Formatter::AddComparisonFields" : {
          "file" : "lib/Bencher/Formatter/AddComparisonFields.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Formatter::CodeStartup" : {
          "file" : "lib/Bencher/Formatter/CodeStartup.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Formatter::DeleteConstantFields" : {
          "file" : "lib/Bencher/Formatter/DeleteConstantFields.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Formatter::DeleteNotesFieldIfEmpty" : {
          "file" : "lib/Bencher/Formatter/DeleteNotesFieldIfEmpty.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Formatter::DeleteSeqField" : {
          "file" : "lib/Bencher/Formatter/DeleteSeqField.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Formatter::ModuleStartup" : {
          "file" : "lib/Bencher/Formatter/ModuleStartup.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Formatter::RenderAsBenchmarkPm" : {
          "file" : "lib/Bencher/Formatter/RenderAsBenchmarkPm.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Formatter::RenderAsTextTable" : {
          "file" : "lib/Bencher/Formatter/RenderAsTextTable.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Formatter::RoundNumbers" : {
          "file" : "lib/Bencher/Formatter/RoundNumbers.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Formatter::ScaleRate" : {
          "file" : "lib/Bencher/Formatter/ScaleRate.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Formatter::ScaleSize" : {
          "file" : "lib/Bencher/Formatter/ScaleSize.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Formatter::ScaleTime" : {
          "file" : "lib/Bencher/Formatter/ScaleTime.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Formatter::ShowEnv" : {
          "file" : "lib/Bencher/Formatter/ShowEnv.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Formatter::Sort" : {
          "file" : "lib/Bencher/Formatter/Sort.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Role::FieldMunger" : {
          "file" : "lib/Bencher/Role/FieldMunger.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Role::ResultMunger" : {
          "file" : "lib/Bencher/Role/ResultMunger.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Role::ResultRenderer" : {
          "file" : "lib/Bencher/Role/ResultRenderer.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Scenario::Example" : {
          "file" : "lib/Bencher/Scenario/Example.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Scenario::Example::CmdLineTemplate" : {
          "file" : "lib/Bencher/Scenario/Example/CmdLineTemplate.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Scenario::Example::CommandNotFound" : {
          "file" : "lib/Bencher/Scenario/Example/CommandNotFound.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Scenario::Example::MultipleArgValues::Array" : {
          "file" : "lib/Bencher/Scenario/Example/MultipleArgValues/Array.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Bencher::Scenario::Example::MultipleArgValues::Hash" : {
          "file" : "lib/Bencher/Scenario/Example/MultipleArgValues/Hash.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       },
       "Benchmark::Dumb::SimpleTime" : {
          "file" : "lib/Benchmark/Dumb/SimpleTime.pm",
-         "version" : "1.062"
+         "version" : "1.063"
       }
    },
    "release_status" : "stable",
@@ -210,7 +209,7 @@
          "web" : "https://github.com/perlancar/perl-Bencher-Backend"
       }
    },
-   "version" : "1.062",
+   "version" : "1.063",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -310,7 +309,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Filter/PERLANCAR::BeforeBuild",
-            "version" : "0.606"
+            "version" : "0.608"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -433,7 +432,7 @@
          {
             "class" : "Dist::Zilla::Plugin::OurDate",
             "name" : "@Filter/OurDate",
-            "version" : "0.03"
+            "version" : "0.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDist",
@@ -572,7 +571,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.784"
+                        "version" : "0.786"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
@@ -597,7 +596,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Sah::Schemas",
                         "name" : "-Sah::Schemas",
-                        "version" : "0.072"
+                        "version" : "0.073"
                      }
                   ]
                }

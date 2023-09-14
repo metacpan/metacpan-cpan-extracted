@@ -9,8 +9,7 @@ BEGIN {
    $ENV{TERM} = "xterm";
 }
 
-use Test::More;
-use Test::Refcount;
+use Test2::V0 0.000149; # is_refcount
 
 use Tickit qw( BIND_FIRST );
 use Tickit::Term;
@@ -112,14 +111,14 @@ is_oneref( $term, '$term has refcount 1 initially' );
 
    $term->emit_key( type => "key", str => "X" );
 
-   is_deeply( \@called, [qw( A B )], 'both event handlers called when first returns 0' );
+   is( \@called, [qw( A B )], 'both event handlers called when first returns 0' );
 
    $first_ret = 1;
    @called = ();
 
    $term->emit_key( type => "key", str => "X" );
 
-   is_deeply( \@called, [qw( A )], 'second event handlers not called when first returns 1' );
+   is( \@called, [qw( A )], 'second event handlers not called when first returns 1' );
 
    $term->unbind_event_id( $_ ) for @ids;
 }
@@ -134,7 +133,7 @@ is_oneref( $term, '$term has refcount 1 initially' );
 
    $term->emit_key( type => "key", str => "X" );
 
-   is_deeply( \@called, [qw( B A )], 'event handlers called in reverse order with BIND_FIRST' );
+   is( \@called, [qw( B A )], 'event handlers called in reverse order with BIND_FIRST' );
 
    $term->unbind_event_id( $_ ) for @ids;
 }
@@ -175,7 +174,7 @@ is_oneref( $term, '$term has refcount 1 initially' );
 
    my $term = Tickit::Term->new( input_handle => $rd );
 
-   isa_ok( $term, "Tickit::Term", '$term isa Tickit::Term' );
+   isa_ok( $term, [ "Tickit::Term" ], '$term isa Tickit::Term' );
    is( $term->get_input_handle->fileno, $rd->fileno,
       '$term->get_input_handle->fileno is $rd' );
 }

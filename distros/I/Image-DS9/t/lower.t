@@ -1,18 +1,18 @@
+#! perl
+
+use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Image::DS9;
 
-BEGIN { plan( tests => 1 ) ;}
-
-require './t/common.pl';
-
+use Test::Lib;
+use My::Util;
 
 my $ds9 = start_up();
 
-eval {
-  $ds9->lower();
-};
-diag $@ if $@;
-ok ( ! $@, 'version' );
+ok( lives { $ds9->lower(); }, 'lower' )
+  or note $@;
+
+done_testing;

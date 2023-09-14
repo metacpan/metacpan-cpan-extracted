@@ -1,5 +1,5 @@
 package YA::CLI::ActionRole;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use Moo::Role;
 use namespace::autoclean;
 
@@ -7,7 +7,7 @@ use namespace::autoclean;
 
 use YA::CLI::Usage;
 use Getopt::Long;
-use List::Util qw(any);
+use List::Util qw(none any);
 
 requires qw(
     action
@@ -57,8 +57,17 @@ sub get_opts {
 }
 
 sub has_action {
-    my ($self, $action) = @_;
-    return any { $action eq $_ } $self->action;
+    my $self = shift;
+    my $action  = shift;
+    my $subaction = shift;
+
+    return if none { $action eq $_ } $self->action;
+
+    if ($self->can('subaction')) {
+        return 0 unless defined $subaction;
+        return any { $subaction eq $_ } $self->subaction;
+    }
+    return defined $subaction ? 0 : 1;
 }
 
 sub as_help {
@@ -105,7 +114,7 @@ YA::CLI::ActionRole - Action handler role
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -117,6 +126,7 @@ version 0.003
     sub cli_options { return qw(foo=s) }
 
     sub action { "action" }
+    sub subaction { "subaction" }
     sub run { ...; }
 
 =head1 DESCRIPTION
@@ -133,6 +143,17 @@ The action it handles, eg. C<provider>
 =item run
 
 How the action should be run
+
+=back
+
+The following method doesn't need to be implemented if an action doesn't have a
+subcommand
+
+=over
+
+=item subaction
+
+The sub action it handles, eg. C<create>
 
 =back
 
@@ -163,7 +184,7 @@ Returns an L<YA::CLI::Usage> object which runs as a manpage
 
 =head2 has_action
 
-Checks if the supplied action is supported by the sub command
+Checks if the supplied action is supported by the action handler
 
 =head2 new_from_args
 

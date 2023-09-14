@@ -1,5 +1,5 @@
 package Net::Silverpeak::Orchestrator;
-$Net::Silverpeak::Orchestrator::VERSION = '0.007000';
+$Net::Silverpeak::Orchestrator::VERSION = '0.008000';
 # ABSTRACT: Silverpeak Orchestrator REST API client library
 
 use 5.024;
@@ -452,7 +452,7 @@ Net::Silverpeak::Orchestrator - Silverpeak Orchestrator REST API client library
 
 =head1 VERSION
 
-version 0.007000
+version 0.008000
 
 =head1 SYNOPSIS
 
@@ -720,7 +720,7 @@ save them.
 =item http 500 response on api key authentication
 
 Orchestrator versions before version 9.0.4 respond with a http 500 error on
-every request using an api key that has no expriation date set.
+every request using an api key that has no expiration date set.
 The only workaround is to set an expiration date for it.
 
 =back

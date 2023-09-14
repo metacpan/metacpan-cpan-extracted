@@ -1,3 +1,98 @@
+0.989042 2023-09-12
+  [Incompatible Changes]
+    * The create_default_config function in the SPVM::Builder::Util module return gnu99 instead of c99.
+    * The default config become gnu99 instead of c99 in all places.
+    * The default value of the dynamic_lib_ccflags in the SPVM::Builder::Config module.
+      [Before]
+        if ($Config{cccdlflags} =~ /-fPIC\b/) {
+          $self->dynamic_lib_ccflags(['-fPIC']);
+        }
+        else {
+          $self->dynamic_lib_ccflags([]);
+        }
+      [After]
+        if ($^O eq 'MSWin32') {
+          $self->dynamic_lib_ccflags([]);
+        }
+        else {
+          $self->dynamic_lib_ccflags(['-fPIC']);
+        }
+  [New Features]
+    * The following fidlds are added to the SPVM::Builder::Config module.
+    
+      thread_ccflags
+      thread_ldflags
+    
+    * All modules are compiled and linked with "-pthread" option except for Windows.
+      This is because of using mutex features.
+      
+    * All SPVM source files are compiled and linked with "-pthread" option except for Windows.
+      This is because of using mutex features.
+    
+    * Add spvm_mutex.h and spvm_mutex.c.
+  [Document Improvement]
+    * Class names in the return value and argument in method definitions in doc are linked.
+0.989041 2023-09-09
+  [New Features]
+    * The call_method method in the SPVM::ExchangeAPI class: any object argument can receive a value of string type.
+    
+  [Exception Messages Changes]
+    * English syntax is improved. "the $arg" is changeded to "$arg".
+    * SPVM.xs: Exception messages are improved.
+  [Bug Fix]
+    * Fix a bug that when the global Exchange API object is refered from sub routnie, a segfault occur.
+    * Fix a bug that the plcae that needs only a basic type name uses SPVM::BlessedObject::String.
+      Segfault occured in some places.
+      
+0.989040 2023-09-06
+  [Changes]
+    * Anon class has the same access constrol as the outer class.
+    * Anon class has the same alias names as the outer class.
+  [Test Bug Fix]
+    * Tests of the add_before_link_cb in the SPVM::Builder::Config are fixed.
+0.989039 2023-09-05
+  [New Features]
+    * The following methods are added to the Array class.
+
+      static method merge_byte : byte[] ($array1 : byte[], $array2 : byte[]);
+
+      static method merge_short : short[] ($array1 : short[], $array2 : short[]);
+
+      static method merge_int : int[] ($array1 : int[], $array2 : int[]);
+
+      static method merge_long : long[] ($array1 : long[], $array2 : long[]);
+
+      static method merge_float : float[] ($array1 : float[], $array2 : float[]);
+
+      static method merge_double : double[] ($array1 : double[], $array2 : double[]);
+
+      static method merge_string : string[] ($array1 : string[], $array2 : string[]);
+
+      static method merge_object : object[] ($array1 : object[], $array2 : object[]);
+
+  [Bug Fix]
+    * A bug fix: The following tests has not succeeded.
+    
+      {
+        my $source = [
+          'class MyClass2 extends MyClass { use Point; use Point3D; method main : void ($point : Point3D) {} }',
+          'class MyClass { use Point; use Point3D; method main : void ($point : Point) {} }',
+        ];
+        compile_ok($source);
+      }
+      
+      {
+        my $source = [
+          'class MyClass2 extends MyClass { use Point; use Point3D; method main : void ($point : Point) {} }',
+          'class MyClass { use Point; use Point3D; method main : void ($point : Point3D) {} }',
+        ];
+        compile_not_ok($source, q|The type of the 1th argument of the "main" method in the "MyClass2" class must be able to be assigned to the type of the 1th argument of the "main" method in the "MyClass" class.|);
+      }
+
+0.989039 2023-08-30
+  [Warnings Fix]
+    * Suppress warning: unknown warning option ‘-Wno-compound-token-split-by-macro’ [-Wunknown-warning-option] in Mac.
+    
 0.989038 2023-08-29
   [New Features]
     * Here document is supported.

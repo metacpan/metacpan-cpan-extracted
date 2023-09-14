@@ -1,0 +1,45 @@
+NAME
+    Missing::XS - print warnings about XS modules you should probably install
+
+SYNOPSIS
+      perl -Missing::XS "path/to/your/script.pl"
+
+DESCRIPTION
+    This module provides an `END {}` block which will run *after* your script
+    and print warnings about modules your script used which are being forced
+    to use their pure Perl backend instead of a faster XS backend which is
+    available on CPAN.
+
+    For example, if your script loads Package::Stash but you don't have
+    Package::Stash::XS installed, then you will see a warning.
+
+    The following will provide a quick copy-and-paste command for installing
+    the missing XS modules with `cpanm`:
+
+      perl -Missing::XS=cpanm "path/to/your/script.pl"
+
+ENVIRONMENT
+    The `PERL_MISSING_XS_NO_END` environment variable suppresses the printing
+    of the warnings in the `END {}` block.
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/p5-missing-xs/issues>.
+
+SEE ALSO
+    Acme::CPANModules::XSVersions: I stole some data from here.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2023 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

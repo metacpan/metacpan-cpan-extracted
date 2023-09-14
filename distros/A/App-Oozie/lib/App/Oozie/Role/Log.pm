@@ -1,5 +1,5 @@
 package App::Oozie::Role::Log;
-$App::Oozie::Role::Log::VERSION = '0.002';
+$App::Oozie::Role::Log::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
@@ -41,7 +41,7 @@ App::Oozie::Role::Log
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 

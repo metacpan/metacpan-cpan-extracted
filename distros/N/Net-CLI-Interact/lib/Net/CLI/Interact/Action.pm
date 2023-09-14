@@ -1,6 +1,5 @@
 package Net::CLI::Interact::Action;
-{ $Net::CLI::Interact::Action::VERSION = '2.400000' }
-
+$Net::CLI::Interact::Action::VERSION = '2.400002';
 use Moo;
 use Sub::Quote;
 use MooX::Types::MooseLike::Base qw(Any Bool Str ArrayRef InstanceOf RegexpRef);
@@ -70,7 +69,7 @@ sub BUILDARGS {
 
 # Only a shallow copy so all the reference based slots still
 # share data with the original Action's slots.
-# 
+#
 # I asked in #web-simple and was told that if the object is more magical than
 # a simple hashref, then someone is trying to be far too clever. agreed!
 sub clone {
@@ -90,6 +89,8 @@ sub num_params {
 1;
 
 =pod
+
+=for Pod::Coverage BUILDARGS
 
 =head1 NAME
 

@@ -6,6 +6,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test2::Plugin::NoWarnings: '0'
   Test2::V0: '0'
   Test::More: '0'
   perl: '5.014'
@@ -39,7 +40,7 @@ resources:
   bugtracker: https://github.com/gryphonshafer/exact/issues
   homepage: https://github.com/gryphonshafer/exact
   repository: https://github.com/gryphonshafer/exact.git
-version: '1.22'
+version: '1.23'
 x_generated_by_perl: v5.38.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Artistic-2.0

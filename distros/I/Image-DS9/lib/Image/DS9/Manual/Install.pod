@@ -1,0 +1,164 @@
+# PODNAME: Image::DS9::Manual::Install
+
+# ABSTRACT: Installation and testing of Image::DS9
+
+__END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory ds9 cpanm xvfb
+
+=head1 NAME
+
+Image::DS9::Manual::Install - Installation and testing of Image::DS9
+
+=head1 VERSION
+
+version v1.0.0
+
+=head1 DESCRIPTION
+
+=head2 Dependencies
+
+These dependencies are special (the others are all CPAN modules which
+should install easily).
+
+=over
+
+=item L<Alien::XPA>, L<IPC::XPA>
+
+These are on CPAN, and should automatically be installed by your CPAN
+client. This I<should> be straightforward on *nix platforms. The
+distributions test well on CPAN Testers.
+
+Experience on Windows is sparse, and not well tested by CPAN testers.
+
+=item L<ds9|https://sites.google.com/cfa.harvard.edu/saoimageds9/home>
+
+B<ds9> is available for Linux, MacOS, and Windows.  Please install this
+prior to installation of L<Image::DS9>.
+
+=back
+
+=head2 Testing
+
+Because B<ds9> runs in a separate process from the Perl tests,
+coordination is required between the two to ensure that an instance of
+B<ds9> is available when the tests expect it to be.
+
+B<Note:> A graphical environment is required.
+
+B<ds9> is a graphical program; if it is started outside of such an
+environment, it will exit, and the tests will fail.
+
+An initial test, F<t/000-graphical_environment.t> attempts to run B<ds9>;
+if B<ds9> exits with error, the entire test suite will be skipped.
+
+=head3 Starting an instance of B<ds9>
+
+By default each test file will automatically attempt to start an
+instance of B<ds9>, run tests with it, and then shut it down.  The
+repeated starting and stopping of B<ds9> is tiresome, and is very
+slow.
+
+There are alternatives:
+
+=over
+
+=item Semi-Manual start
+
+Set (and export) the environment variables
+
+  export TEST_IMAGE_DS9_TERMINATE_ON_DESTROY=no
+
+before running the CPAN client (e.g. B<cpan>, B<cpanm>).  The first
+test will start B<ds9> and detach it from the test framework and keep
+it running for the rest of the tests.
+
+You will need to manually shut down the instance of B<ds9> after the
+tests are complete.
+
+=item Manual Start
+
+First, ensure that all of the test dependencies are installed. This
+can be accomplished with cpanm after extracting the distribution file.
+
+  cpanm --installdeps .
+
+Start B<ds9> prior to running the tests via
+
+  export TEST_IMAGE_DS9_TERMINATE_ON_DESTROY=no
+  perl -Ilib t/lib/TestServer.pm
+
+Don't try running B<ds9> directly; the tests require it be available
+running in a particular environment.
+
+You will need to shut B<ds9> down after the tests are complete.
+
+=item xvfb-run
+
+If the C<xvfb-run> command is available on your platform, it can be
+used to run the tests in a X server running in a virtual frame buffer.
+Set the following environment variables
+
+  export TEST_IMAGE_DS9_TERMINATE_ON_DESTROY=no
+  export TEST_IMAGE_DS9_XVFB=yes
+
+before running your CPAN client.  You will need to manually shut C<ds9>
+down (the virtual X server will shut down as well)
+
+  XPA_METHOD=local perl-MImage::DS9 \
+     -e 'Image::DS9->new( {Server => q{ImageDS9} })->quit'
+
+=back
+
+=head3 Parallel tests
+
+Don't.  The tests don't start up independent copies of B<ds9>, and
+simultaneously running tests will leave B<ds9> in a different state
+than tests expect.
+
+It is possible to rewrite the tests to each use independent instances,
+but it's not really worth it.
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-image-ds9@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/image-ds9
+
+and may be cloned from
+
+  https://gitlab.com/djerius/image-ds9.git
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Image::DS9|Image::DS9>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

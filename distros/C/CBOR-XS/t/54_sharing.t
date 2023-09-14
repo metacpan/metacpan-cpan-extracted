@@ -1,7 +1,8 @@
-BEGIN { $| = 1; print "1..11\n"; }
+BEGIN { $| = 1; print "1..16\n"; }
 BEGIN { $^W = 0 } # hate
 
 use CBOR::XS;
+use Scalar::Util ();
 
 print "ok 1\n";
 
@@ -29,5 +30,14 @@ $dec = CBOR::XS->new->allow_cycles->decode (pack "H*", "d81c81d81d00");
 print ARRAY:: eq ref $dec ? "" : "not ", "ok 9\n";
 print $dec == $dec->[0] ? "" : "not ", "ok 10\n";
 
-print "ok 11\n";
+$dec = CBOR::XS->new->allow_weak_cycles->decode (pack "H*", "82d81c81d81d00d81d00");
+
+print $dec->[0] == $dec->[1]    ? "" : "not ", "ok 11\n";
+print $dec->[0] == $dec->[0][0] ? "" : "not ", "ok 12\n";
+
+print Scalar::Util::isweak $dec->[0]    ? "not " : "", "ok 13\n";
+print Scalar::Util::isweak $dec->[1]    ? "not " : "", "ok 14\n";
+print Scalar::Util::isweak $dec->[0][0] ? "" : "not ", "ok 15\n";
+
+print "ok 16\n";
 

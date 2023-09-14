@@ -10,9 +10,9 @@ requires 'doc_indent_str';
 has doc_wrap => (is => 'rw', default => sub {1});
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-15'; # DATE
+our $DATE = '2023-07-09'; # DATE
 our $DIST = 'Perinci-To-Doc'; # DIST
-our $VERSION = '0.880'; # VERSION
+our $VERSION = '0.881'; # VERSION
 
 sub add_doc_lines {
     my $self = shift;
@@ -114,7 +114,7 @@ Perinci::To::Doc::Role::Section::AddTextLines - Provide add_doc_lines() to add t
 
 =head1 VERSION
 
-This document describes version 0.880 of Perinci::To::Doc::Role::Section::AddTextLines (from Perl distribution Perinci-To-Doc), released on 2022-10-15.
+This document describes version 0.881 of Perinci::To::Doc::Role::Section::AddTextLines (from Perl distribution Perinci-To-Doc), released on 2023-07-09.
 
 =head1 DESCRIPTION
 
@@ -198,7 +198,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

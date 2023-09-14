@@ -659,8 +659,10 @@ int
 get_general_value(Conf__Libconfig conf, const char *path, SV **svref)
 {
     config_setting_t *elem = path != NULL && strlen(path) == 0 ? config_root_setting(conf) : config_lookup(conf, path);
-    if (!elem)
+    if (NULL == elem)
     {
+        // Perl_warn(aTHX_ "[WARN] elem is null in %s", path);
+        *svref = newSVpvn("", 0);
         return LIBCONFIG_ERR_INPUT;
     }
     switch (config_setting_type(elem))
@@ -708,7 +710,7 @@ get_general_value(Conf__Libconfig conf, const char *path, SV **svref)
 int get_general_array(config_setting_t *setting, SV **sv_pptr)
 {
     AV *child_av_ptr = newAV();
-    if (setting->type != CONFIG_TYPE_ARRAY)
+    if (setting == NULL || setting->type != CONFIG_TYPE_ARRAY)
     {
         *sv_pptr = newRV_inc((SV *)child_av_ptr);
         return LIBCONFIG_ERR_COMMON;
@@ -761,7 +763,7 @@ int get_general_array(config_setting_t *setting, SV **sv_pptr)
 int get_general_list(config_setting_t *setting, SV **sv_pptr)
 {
     AV *child_av_ptr = newAV();
-    if (setting->type != CONFIG_TYPE_LIST)
+    if (setting == NULL || setting->type != CONFIG_TYPE_LIST)
     {
         *sv_pptr = newRV_inc((SV *)child_av_ptr);
         return LIBCONFIG_ERR_INPUT;
@@ -844,7 +846,7 @@ int get_general_list(config_setting_t *setting, SV **sv_pptr)
 int get_general_object(config_setting_t *setting, SV **sv_pptr)
 {
     HV *child_hv_ptr = newHV();
-    if (setting->type != CONFIG_TYPE_GROUP)
+    if (setting == NULL || setting->type != CONFIG_TYPE_GROUP)
     {
         *sv_pptr = newRV_inc((SV *)child_hv_ptr);
         return LIBCONFIG_ERR_INPUT;
@@ -1150,6 +1152,7 @@ libconfig_fetch_array(conf, path)
     const char *path
     PREINIT:
         config_setting_t *settings;
+        SV *sv;
     CODE:
     {
         if (path != NULL && strlen(path) == 0)
@@ -1158,7 +1161,6 @@ libconfig_fetch_array(conf, path)
         } else {
             settings = config_lookup(conf, path);
         }
-        SV *sv;
         get_general_array(settings, &sv);
         if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV)
         {
@@ -1176,6 +1178,7 @@ libconfig_fetch_hashref(conf, path)
     const char *path
     PREINIT:
         config_setting_t *settings;
+        SV *sv;
     CODE:
     {
         if (path != NULL && strlen(path) == 0)
@@ -1184,7 +1187,6 @@ libconfig_fetch_hashref(conf, path)
         } else {
             settings = config_lookup(conf, path);
         }
-        SV *sv;
         get_general_object(settings, &sv);
         if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVHV)
         {

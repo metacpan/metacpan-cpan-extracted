@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -21,7 +21,7 @@ await $chip->mount(
    $adapter->expect_write_then_read( "\xF7", 8 )
       ->will_done( "\x53\x93\x00\x7F\xB4\x00\x64\xC0" );
 
-   is_deeply( [ await $chip->read_raw ],
+   is( [ await $chip->read_raw ],
       [ 342320, 523072, 25792 ],
       '->read_raw returns raw ADC values'
    );
@@ -47,7 +47,7 @@ await $chip->mount(
       ->will_done( "\x78\x01\x00\x11\x2E\x03\x1E" );
 
    # Round values to 2DP to avoid floating inaccuracies
-   is_deeply( [ map { sprintf "%.1f", $_ } await $chip->read_sensor ],
+   is( [ map { sprintf "%.1f", $_ } await $chip->read_sensor ],
       [ 97032.6, 21.8, 42.7 ], # 97032.6Pa, 21.8C, 42.7%
       '->read_sensor returns converted values'
    );

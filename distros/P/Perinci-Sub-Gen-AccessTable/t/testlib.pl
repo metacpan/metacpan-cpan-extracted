@@ -1,7 +1,6 @@
 use 5.010;
 use strict;
 use warnings;
-use experimental 'smartmatch';
 
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 use Test::More 0.96;
@@ -132,7 +131,7 @@ sub test_random_order {
     my @x;
     for (1 .. $n) {
         my $a = $func->(%$args)->[2];
-        push @x, $a->[0] unless $a->[0] ~~ @x;
+        push @x, $a->[0] unless grep { $_ eq $a->[0] } @x;
     }
 
     is_deeply([sort {$a cmp $b} @x],

@@ -6,7 +6,7 @@
 use v5.36;
 use Object::Pad 0.800;
 
-class App::perl::distrolint::Check::UseVERSION 0.02
+class App::perl::distrolint::Check::UseVERSION 0.03
    :does(App::perl::distrolint::CheckRole::EachFile)
    :does(App::perl::distrolint::CheckRole::TreeSitterPerl);
 

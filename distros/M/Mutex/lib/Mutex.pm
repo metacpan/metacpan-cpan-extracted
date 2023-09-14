@@ -9,7 +9,7 @@ package Mutex;
 use strict;
 use warnings;
 
-our $VERSION = '1.009';
+our $VERSION = '1.011';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
@@ -54,7 +54,7 @@ Mutex - Various locking implementations supporting processes and threads
 
 =head1 VERSION
 
-This document describes Mutex version 1.009
+This document describes Mutex version 1.011
 
 =head1 SYNOPSIS
 
@@ -160,6 +160,13 @@ The method C<lock_exclusive> is an alias for C<lock>.
 
 Like C<lock_exclusive>, but attempts to grab a shared lock instead.
 For non-Fcntl implementations, C<lock_shared> is an alias for C<lock>.
+
+=head2 $guard = $mutex->guard_lock ( void )
+
+This method calls C<lock> and returns a guard object. When the guard object is
+destroyed, it automatically calls C<unlock>.
+
+Current API available since 1.010.
 
 =head2 $mutex->unlock ( void )
 

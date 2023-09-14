@@ -1,10 +1,11 @@
 #!/usr/bin/perl
 
-use v5.20;
+use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'Device::AVR::UPDI' );
+require Device::AVR::UPDI;
 
+pass( 'Modules loaded' );
 done_testing;

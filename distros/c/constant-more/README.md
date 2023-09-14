@@ -1,6 +1,6 @@
 # NAME
 
-constant::more - Assign values to constants from the command arguments
+constant::more - Constants and Enumerations. Assign constant values from the command line
 
 # SYNOPSIS
 
@@ -23,6 +23,16 @@ Can use as a direct alternative to `use constant`:
         YDAY  => 7,
         ISDST => 8,
     };
+```
+
+Can use as a alternative to `use enum`:
+
+```perl
+use constant::more qw(Sun=0 Mon Tue Wed Thu Fri Sat);
+# Sun == 0, Mon == 1, etc
+
+use constant::More qw(Forty=40 FortyOne Five=5 Six Seven);
+# Yes, you can change the start indexes at any time as in C
 ```
 
 Parse command line arguments and/or environment variables to assign
@@ -71,10 +81,11 @@ to constants:
 
 # DESCRIPTION
 
-Performs similar tasks as `use constant`, but adds features to assign values
-of constants from the command line or environment variables.
+On the surface this module performs similar tasks as `use constant` and `use
+enum`. Digging a little deeper, it has the ability to assign values to
+constants from the command line arguments or environment variables.
 
-In addition, constants are only defined/set if they don't exist already, making
+These constants are only defined/set if they don't exist already, making
 configuring and overriding constants defined in sub modules possible. A module
 can specify a default value which is used if the constant hasn't been defined
 by the top level script. 
@@ -82,11 +93,14 @@ by the top level script.
 [GetOpt::Long](https://metacpan.org/pod/GetOpt%3A%3ALong) option specification is used for processing command line
 options to give flexibility in how and what switches are used.  To save on
 memory, [GetOpt::Long](https://metacpan.org/pod/GetOpt%3A%3ALong) is only loaded if option processing is wanted (i.e. the
-`opt` field non disabled).
+`opt` field not disabled).
 
 In advanced form, a user subroutine can be supplied to give control of
 processing. This is used by [Log::OK](https://metacpan.org/pod/Log%3A%3AOK) for example to generate multiple
 constants from a single input level.
+
+From **v0.3.0** constants can be also defined from a flat list and enumerations
+can be declared. 
 
 # MOTIVATION
 
@@ -103,14 +117,15 @@ module under the hood.
 
 ## Implementation Details
 
-It is important to `use constant::more` before other modules that also `use
-constant::more`. This ensures that you can manipulate constant values from the
-top level of the program.  Otherwise you risk sub modules overriding your top
-level applications logic.
-
 Constants are defined in a callers package unless the name includes a package.
 A name with '::' in it is classed as a full name for a variable. Use this to
 declare constants in a common namespace for example.
+
+If you intend to set constants from the command line, it is important to `use
+constant::more` before other modules that also `use constant::more`. This
+ensures that you can manipulate constant values from the top level of the
+program.  Otherwise you risk sub modules overriding your top level applications
+logic.
 
 In the case of the `val` field, command line and environment processing all
 being enabled simultaneously, the precedence of a constant's value is: command
@@ -127,11 +142,17 @@ value of your constants. These are detailed in the following sections.
 
 ## Simple Form
 
-In its simplest form, defining an constant (or multiple) is just like the 
-`use constant` pragma:
+In its simplest form, defining an constant (or multiple) is just like the `use
+constant` pragma. It also supports setting multiple constants from a flat list
+of arguments:
 
 ```perl
     use constant::more NAME=>"value";       #Set a single constant
+
+    use constant::more                      #Set multiple constants (from v0.3.0)
+                    NAME=>"value",
+                    ANOTHER=>"one",
+    ;
             
     use constant::more {                    #Set multiple constants
                     NAME=>"value",
@@ -139,7 +160,28 @@ In its simplest form, defining an constant (or multiple) is just like the
     };
 ```
 
-The key of the hash becomes the name of the constant. 
+The key of the hash (or kv pair) becomes the name of the constant. 
+
+## Enumeration Form
+
+From **v0.3.0**, if the first item from the flat list looks like it has a '=' in
+the name, the list is treated as a enumeration declaration. Each time a '=' is
+seen the value after it is used as the value for the enumeration. The value
+before it is used as the constant name.
+
+Each successive item in the list without a '=' causes the enumerated value to
+increment by 1:
+
+```perl
+use constant::more  "my_enum=0";    #Single set of value
+
+# Set enumeration value multiple times
+use constant::more  "my_enum=0", "another", "onemore=10";
+
+
+# Use standard perl globbing to to add a prefix to each name
+use constat::more <MY_PREFIX_{A=0,B,C,D,E=100,F};
+```
 
 ## Normal Form
 
@@ -246,7 +288,7 @@ Ruben Westerberg, <drclaw@mac.com>
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2022 by Ruben Westerberg
+Copyright (C) 2023 by Ruben Westerberg
 
 Licensed under MIT
 

@@ -3,9 +3,9 @@ package Sah::Schemas::Str;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-23'; # DATE
+our $DATE = '2023-09-03'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 1;
 # ABSTRACT: Various string schemas
@@ -22,7 +22,7 @@ Sah::Schemas::Str - Various string schemas
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::Schemas::Str (from Perl distribution Sah-Schemas-Str), released on 2022-09-23.
+This document describes version 0.015 of Sah::Schemas::Str (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
 
 =head1 SAH SCHEMAS
 
@@ -96,6 +96,21 @@ String or array (0+ length) of (defined) string.
 
 String or array (1+ length) of (defined) string.
 
+=item * L<str_or_code|Sah::Schema::str_or_code>
+
+String or coderef (if string is of the form `sub {...}`).
+
+Either string or coderef is accepted.
+
+If string matches the regex C<qr/\Asub\s*\{.*\}\z/s>, then it will be eval'ed
+into a coderef. If the code fails to compile, the value will be rejected. Note
+that this means you accept arbitrary code from the user to execute! Please make
+sure first and foremost that this is acceptable in your case.
+
+This schema is handy if you want to accept string or coderef from the
+command-line.
+
+
 =item * L<str_or_re|Sah::Schema::str_or_re>
 
 String or regex (if string is of the form `E<sol>...E<sol>`).
@@ -110,6 +125,28 @@ Currently, unlike in normal Perl, for the C<qr(...)> form, only parentheses C<(>
 and C<)> are allowed as the delimiter.
 
 Currently modifiers C<i>, C<m>, and C<s> after the second C</> are allowed.
+
+
+=item * L<str_or_re_or_code|Sah::Schema::str_or_re_or_code>
+
+String, or regex (if string is of the form `E<sol>...E<sol>`), or coderef (if string is in the form of `sub { ... }`).
+
+Either string, Regexp object, or coderef is accepted.
+
+If string is of the form of C</.../> or C<qr(...)>, then it will be compiled into
+a Regexp object. If the regex pattern inside C</.../> or C<qr(...)> is invalid,
+value will be rejected. Currently, unlike in normal Perl, for the C<qr(...)>
+form, only parentheses C<(> and C<)> are allowed as the delimiter. Currently
+modifiers C<i>, C<m>, and C<s> after the second C</> are allowed.
+
+If string matches the regex C<qr/\Asub\s*\{.*\}\z/s>, then it will be eval'ed
+into a coderef. If the code fails to compile, the value will be rejected. Note
+that this means you accept arbitrary code from the user to execute! Please make
+sure first and foremost that this is acceptable in your case. Currently string
+is eval'ed in the C<main> package, without C<use strict> or C<use warnings>.
+
+This schema is handy if you want to accept string or regex or coderef from the
+command-line.
 
 
 =back
@@ -127,6 +164,10 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Str>.
 L<Sah> - schema specification
 
 L<Data::Sah> - Perl implementation of Sah
+
+=head2 Related schemas from L<Sah::Schemas::Re>
+
+L<Sah::Schema::re_from_str>
 
 =head1 AUTHOR
 
@@ -152,7 +193,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

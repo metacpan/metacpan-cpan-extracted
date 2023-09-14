@@ -3,7 +3,7 @@ use warnings;
 
 package Mac::Finder::Tags::Impl::xattr;
 # ABSTRACT: Provides get_tags based on the xattr tool
-$Mac::Finder::Tags::Impl::xattr::VERSION = '0.01';
+$Mac::Finder::Tags::Impl::xattr::VERSION = '0.02';
 
 use Mac::PropertyList 'parse_plist';
 use Object::Pad 0.57;

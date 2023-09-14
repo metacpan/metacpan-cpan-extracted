@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -49,7 +49,7 @@ local *Device::Chip::MAX7219Panel::_write_raw = sub {
    $panel->draw_vline( 12, 0, $panel->rows-1 );
    await $panel->refresh;
 
-   is_deeply( \@DISPLAY,
+   is( \@DISPLAY,
       [ "00000000.00001000.00000000.00000000.00000000.00000000.00000000.00000000",
         "00000000.00001000.00000000.00000000.00000000.00000000.00000000.00000000",
         "00000000.00001000.00000000.00000000.00000000.00000000.00000000.00000000",
@@ -85,7 +85,7 @@ local *Device::Chip::MAX7219Panel::_write_raw = sub {
    $panel->draw_vline( 12, 0, $panel->rows-1 );
    await $panel->refresh;
 
-   is_deeply( \@DISPLAY,
+   is( \@DISPLAY,
       [ "00000000.00001000.00000000.00000000.00000000.00001000.00000000.00000000",
         "00000000.00001000.00000000.00000000.00000000.00001000.00000000.00000000",
         "00000000.00001000.00000000.00000000.00000000.00001000.00000000.00000000",

@@ -3,7 +3,6 @@
 use 5.010;
 use strict;
 use warnings;
-use experimental 'smartmatch';
 use FindBin '$Bin';
 use lib "$Bin/lib";
 
@@ -586,9 +585,9 @@ subtest "action: list" => sub {
         posttest => sub {
             my ($res) = @_;
             ok(@{$res->[2]} > 5, "number of results"); # safe number
-            ok("noop" ~~ @{$res->[2]}, "has entry: noop"); # testing some result
-            ok("\$Var1" ~~ @{$res->[2]}, "has entry: \$Var1"); # ditto
-            ok("Completion/" ~~ @{$res->[2]}, "has entry: Completion/"); # ditto
+            ok((grep { $_ eq "noop" } @{$res->[2]}), "has entry: noop"); # testing some result
+            ok((grep { $_ eq "\$Var1" } @{$res->[2]}), "has entry: \$Var1"); # ditto
+            ok((grep { $_ eq "Completion/" } @{$res->[2]}), "has entry: Completion/"); # ditto
             ok(!ref($res->[2][0]), "record is scalar");
         },
     );
@@ -672,7 +671,7 @@ subtest "action: call" => sub {
         status => 200,
         posttest => sub {
             my ($res) = @_;
-            is(~~@{ $res->[2] }, 5);
+            is(scalar(@{ $res->[2] }), 5);
         },
     );
     test_request(

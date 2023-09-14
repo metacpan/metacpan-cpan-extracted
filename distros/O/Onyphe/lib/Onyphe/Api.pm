@@ -1,11 +1,11 @@
 #
-# $Id: Api.pm,v d8b98095b893 2023/08/30 05:24:07 gomor $
+# $Id: Api.pm,v e8e4d5336c13 2023/09/06 12:20:39 gomor $
 #
 package Onyphe::Api;
 use strict;
 use warnings;
 
-our $VERSION = '4.10';
+our $VERSION = '4.11';
 
 use experimental qw(signatures);
 
@@ -15,7 +15,7 @@ our @AS = qw(endpoint apikey username password);
 __PACKAGE__->cgBuildAccessorsScalar(\@AS);
 __PACKAGE__->cgBuildIndices;
 
-use utf8;
+#use utf8;
 use File::Temp qw(tempfile);
 use File::Slurp qw(read_file);
 use Mojo::URL;
@@ -513,7 +513,7 @@ sub bulk_discovery ($self, $api, $file, $oql = undef, $params = undef, $cb = und
       for (@lines) {
          chomp;
          my $line = "$_ $oql";
-         utf8::encode($line);
+         #utf8::encode($line);  # Not required, already in UTF-8
          print $fh "$line\n";
       }
       close($fh);

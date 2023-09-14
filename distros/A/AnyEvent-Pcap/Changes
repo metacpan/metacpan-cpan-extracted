@@ -1,5 +1,13 @@
 Revision history for Perl extension AnyEvent::Pcap
 
+0.00004  2023/09/6
+        - add offline mode (file:) support.
+        - improve compatibility with old versions of Net::Pcap.
+
+0.00003  2023/09/6
+        - implement timeout for pcap_open_live().
+        - improve documentation to avoid packages mishandle.
+
 0.00002  2011/10/3
         - fix a POD's bug. 
 

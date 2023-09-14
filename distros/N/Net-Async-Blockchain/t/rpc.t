@@ -65,4 +65,3 @@ subtest 'max connections per host' => sub {
 };
 
 done_testing;
-

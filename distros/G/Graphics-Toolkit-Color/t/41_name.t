@@ -8,7 +8,7 @@ use Test::Warn;
 BEGIN { unshift @INC, 'lib', '../lib'}
 my $module = 'Graphics::Toolkit::Color::Name';
 
-eval "use $module qw/:all/";
+eval "use $module";
 is( not($@), 1, 'could load the module');
 
 my @names = Graphics::Toolkit::Color::Name::all();
@@ -22,7 +22,7 @@ my $get_name_hsl   = \&Graphics::Toolkit::Color::Name::name_from_hsl;
 my $get_name_range = \&Graphics::Toolkit::Color::Name::names_in_hsl_range;
 
 warning_like {$add_rgb->()} {carped => qr/missing first arg/},          "can't get color without name";
-warning_like {$add_rgb->( 'one',1,1)}    {carped => qr/need exactly 3/},'not enough args to add color';
+warning_like {$add_rgb->( 'one',1,1)}    {carped => qr/needs 3 values/},'not enough args to add color';
 warning_like {$add_rgb->( 'one', 0, -1, 25)} {carped => qr/green/},     'too small green value got cought';
 warning_like {$add_rgb->( 'one', 0, 1, 256)} {carped => qr/blue/},      'too large blue value got cought';
 warning_like {$add_rgb->( 'white', 0, 3, 22 )} {carped => qr/already/}, 'got cought overwriting white';
@@ -69,12 +69,12 @@ is( int @rgb, 3,     'upper case gets cleaned from color name');
 @rgb = Graphics::Toolkit::Color::Name::rgb_from_name('O_ne');
 is( int @rgb, 3,     'under score gets cleaned from color name');
 
-warning_like{ $get_name_range->( []) }                     {carped => qr/two arguments/},"can't get names in range without hsl values";
-warning_like{ $get_name_range->( [1,1,1],[1,1,1],[1,1,1])} {carped => qr/two arguments/},'too many array arg';
-warning_like{ $get_name_range->( [1,2],[1,2,3])}           {carped => qr/first argument/},'range center is missing a value';
-warning_like{ $get_name_range->( [1,2,3],[2,3])}     {carped => qr/second argument/},    'tolerances are missing a value';
+warning_like{ $get_name_range->( []) }                     {carped => qr/array with h s l values/},"can't get names in range without hsl values";
+warning_like{ $get_name_range->( [1,1,1],[1,1,1],[1,1,1])} {carped => qr/array with h s l values/},'too many array arg';
+warning_like{ $get_name_range->( [1,2],[1,2,3])}           {carped => qr/in HSL needs 3 values/},'range center is missing a value';
+warning_like{ $get_name_range->( [1,2,3],[2,3])}     {carped => qr/in HSL needs 3 values/},    'tolerances are missing a value';
 warning_like{ $get_name_range->( [-1,2,3],[1,2,3])}  {carped => qr/hue value/},          'first value of search center is too small';
-warning_like{ $get_name_range->( [360,2,3],[1,2,3])} {carped => qr/hue value/},          'first value of search center is too large';
+warning_like{ $get_name_range->( [361,2,3],[1,2,3])} {carped => qr/hue value/},          'first value of search center is too large';
 warning_like{ $get_name_range->( [1,-1,3],[2,10,3])} {carped => qr/saturation value/},  'saturation center value is too small';
 warning_like{ $get_name_range->( [1,101,3],[2,1,3])} {carped => qr/saturation value/},  'saturation center value is too large';
 warning_like{ $get_name_range->( [1,1,-1],[2,10,3])} {carped => qr/lightness value/},   'first lightness value is too small';
@@ -85,7 +85,7 @@ is( int @names, 1,          'only one color has distance of 0 to white');
 is( $names[0], 'white',     'only white has distance of 0 to white');
 
 @names = sort $get_name_range->( [0, 0, 100], 5);
-is( int @names, 6,             '6 colors are in short distance to white');
+is( int @names, 5,             '5 colors are in short distance to white');
 @names = grep { /whitesmoke/ } @names;
 is( int @names, 1,  'whitesmoke is near to white');
 

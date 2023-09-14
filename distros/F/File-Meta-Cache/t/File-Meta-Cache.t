@@ -108,4 +108,11 @@ ok $entry->[File::Meta::Cache::stat_][7]== 10, "File size";
 # Clean up
 
 unlink $_ for @file;
+
+# Very basic code coverage of disable and enable
+
+ok defined $cache->disable, "Disable ok";
+
+ok defined $cache->enable;
+
 done_testing;

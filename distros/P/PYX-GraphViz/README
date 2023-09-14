@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use PYX::GraphViz;
+
      my $obj = PYX::GraphViz->new(%parameters);
      $obj->parse($pyx, $out);
      $obj->parse_file($input_file, $out);
@@ -81,11 +82,9 @@ ERRORS
                     Unknown parameter '%s'.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use PYX::GraphViz;
 
      # Example PYX data.
@@ -120,17 +119,18 @@ SEE ALSO
         Install the PYX modules.
 
 REPOSITORY
-    <https://github.com/tupinek/PYX-GraphViz>
+    <https://github.com/michal-josef-spacek/PYX-GraphViz>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2011-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2011-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

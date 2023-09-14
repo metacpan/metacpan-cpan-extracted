@@ -1,14 +1,19 @@
+#! perl
+
+use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Image::DS9;
 
-BEGIN { plan( tests => 1 ) ;}
+use Test::Lib;
+use My::Util;
 
-require './t/common.pl';
+plan( 'skip_all' => "file is mapped to fits for backwards compatibility" );
 
 my $ds9 = start_up();
 load_events( $ds9 );
-ok( 'data/snooker.fits.gz[RAYTRACE]' eq $ds9->file(),
-    "file name retrieval" );
+is( SNOOKER_FITS . '[RAYTRACE]', $ds9->file(), 'file name retrieval' );
+
+done_testing

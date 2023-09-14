@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Storage;
-$Net::Proxmox::VE::Storage::VERSION = '0.37';
+$Net::Proxmox::VE::Storage::VERSION = '0.38';
 use parent 'Exporter';
 
 use Carp qw( croak );
@@ -113,7 +113,7 @@ Net::Proxmox::VE::Storage - Store object
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 SYNOPSIS
 

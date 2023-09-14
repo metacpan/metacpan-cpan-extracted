@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE;
-$Net::Proxmox::VE::VERSION = '0.37';
+$Net::Proxmox::VE::VERSION = '0.38';
 
 use Carp qw( croak );
 use HTTP::Headers;
@@ -223,27 +223,38 @@ sub new {
           or croak 'new() requires a hash for params';
     }
 
-    croak 'host param is required'     unless $params{'host'};
-    croak 'password param is required' unless $params{'password'};
+    my $host     = delete $params{host}     || croak 'host param is required';
+    my $password = delete $params{password} || croak 'password param is required';
+    my $port     = delete $params{port}     || 8006;
+    my $username = delete $params{username} || 'root';
+    my $realm    = delete $params{realm}    || 'pam';
+    my $debug    = delete $params{debug};
+    my $timeout  = delete $params{timeout}  || 10;
+    my $ssl_opts = delete $params{ssl_opts};
+    croak 'unknown parameters to new: ' . join(', ', keys %params) if keys %params;
 
-    $params{port}     ||= 8006;
-    $params{username} ||= 'root';
-    $params{realm}    ||= 'pam';
-    $params{debug}    ||= undef;
-    $params{timeout}  ||= 10;
+    my $self->{params} = {
+            host => $host,
+            password => $password,
+            port => $port,
+            username => $username,
+            realm => $realm,
+            debug => $debug,
+            timeout => $timeout,
+            ssl_opts => $ssl_opts,
+    };
 
-    my $self->{params} = \%params;
     $self->{'ticket'}           = undef;
     $self->{'ticket_timestamp'} = undef;
     $self->{'ticket_life'}      = 7200;    # 2 Hours
 
     my %lwpUserAgentOptions;
-    if ($self->{params}->{ssl_opts}) {
-        $lwpUserAgentOptions{ssl_opts} = $self->{params}->{ssl_opts};
+    if ($ssl_opts) {
+        $lwpUserAgentOptions{ssl_opts} = $ssl_opts;
     }
 
     my $ua = LWP::UserAgent->new( %lwpUserAgentOptions );
-    $ua->timeout($self->{params}->{timeout});
+    $ua->timeout($timeout);
     $self->{ua} = $ua;
 
     bless $self, $class;
@@ -323,7 +334,7 @@ Net::Proxmox::VE - Pure perl API for Proxmox virtualisation
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 SYNOPSIS
 
@@ -350,7 +361,7 @@ This also handles the ticket headers required for authentication
 More details on the API can be found at L<http://pve.proxmox.com/wiki/Proxmox_VE_API> and
 L<http://pve.proxmox.com/pve2-api-doc/>
 
-This class provides the building blocks for someone wanting to use PHP to talk to Proxmox 2.0. Relatively simple piece of code, just provides a get/put/post/delete abstraction layer as methods on top of Proxmox's REST API, while also handling the Login Ticket headers required for authentication.
+This class provides the building blocks for someone wanting to use Perl to talk to Proxmox 2.0. Relatively simple piece of code, just provides a get/put/post/delete abstraction layer as methods on top of Proxmox's REST API, while also handling the Login Ticket headers required for authentication.
 
 =head1 WARNING
 

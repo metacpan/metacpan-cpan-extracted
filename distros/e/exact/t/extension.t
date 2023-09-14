@@ -11,7 +11,8 @@ SKIP: {
         use exact;
 
         sub import {
-            my ( $self, $caller, $params ) = @_;
+            my ( $self, $params, $caller ) = @_;
+            $caller //= caller();
             {
                 no strict 'refs';
                 *{ $caller . '::thx' } = \&thx;

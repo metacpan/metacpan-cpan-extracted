@@ -1,6 +1,5 @@
 package Net::CLI::Interact::Transport::Platform::Unix;
-{ $Net::CLI::Interact::Transport::Platform::Unix::VERSION = '2.400000' }
-
+$Net::CLI::Interact::Transport::Platform::Unix::VERSION = '2.400002';
 use Moo;
 use Class::Load qw(try_load_class);
 
@@ -28,5 +27,11 @@ BEGIN {
         default => quote_sub('0'),
     );
 }
+
+=pod
+
+=for Pod::Coverage can_use_pty
+
+=cut
 
 1;

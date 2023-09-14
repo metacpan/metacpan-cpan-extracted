@@ -12,11 +12,11 @@ App::FileCleanerByDiskUage - Removes files based on disk space usage till it dro
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.1
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.1';
 
 =head1 SYNOPSIS
 
@@ -100,6 +100,8 @@ The returned value is a hash ref.
     - path :: The value of path that it was called with. This will always be a array, regardless of if a array or
               scalar was passed as internally converts a scalars into a array containing just a single item.
 
+    - missing_paths :: Paths that were passed to it, but don't exist.
+
     - unlinked :: Array of hashes of data for files that have been removed.
 
     - unlinked_count :: A count of how many files were unlinked
@@ -136,29 +138,37 @@ The files hash is composed as below.
 sub clean {
 	my ( $empty, %opts ) = @_;
 
+	my @missing_paths;
+	my @paths;
+
 	my $du_path;
+	# file paths should end with / or other wise if it is a symlink File::Find::Rule will skip it
+	# so fix that up while we are doing the path check
 	if ( !defined( $opts{path} ) ) {
 		die('$opts{path} is not defined');
 	} elsif ( ref( $opts{path} ) ne 'ARRAY' && !-d $opts{path} ) {
-		die( '$opts{path} is set to "' . $opts{path} . '" which is not a directory or does not exist' );
+		push( @missing_paths, $opts{path} );
 	} elsif ( ref( $opts{path} ) eq 'ARRAY' ) {
 		if ( !defined( $opts{path}[0] ) ) {
 			die('$opts{path}[0] is not defined');
 		}
 		my $int = 0;
 		while ( defined( $opts{path}[$int] ) ) {
+			$opts{path}[$int] = $opts{path}[$int] . '/';
+			$opts{path}[$int] =~ s/\/+$/\//;
 			if ( !-d $opts{path}[$int] ) {
-				die(      '$opts{path}['
-						. $int
-						. '] is set to "'
-						. $opts{path}[$int]
-						. '" which is not a directory or does not exist' );
+				push( @missing_paths, $opts{path}[$int] );
+			} else {
+				push( @paths, $opts{path}[$int] );
 			}
 			$int++;
 		} ## end while ( defined( $opts{path}[$int] ) )
 		$du_path = $opts{path}[0];
 	} else {
-		$du_path = $opts{path} = [ $opts{path} ];
+		$opts{path} = $opts{path} . '/';
+		$opts{path} =~ s/\/+$/\//;
+		$du_path = $opts{path};
+		push( @paths, $opts{path} );
 	}
 
 	if ( !defined( $opts{du} ) ) {
@@ -194,8 +204,13 @@ sub clean {
 		du_ending           => $df->{per},
 		min_files           => 0,
 		dry_run             => $opts{dry_run},
-		path                => $opts{path},
+		path                => \@paths,
+		missing_paths       => \@missing_paths,
 	};
+
+	if ( !defined( $paths[0] ) ) {
+		return $results;
+	}
 
 	if ( $df->{per} < $opts{du} ) {
 		return $results;
@@ -205,9 +220,9 @@ sub clean {
 	if ( defined( $opts{ignore} ) ) {
 		my $ignore_rule = File::Find::Rule->new;
 		$ignore_rule->name(qr/$opts{ignore}/);
-		@files = File::Find::Rule->file()->not($ignore_rule)->in( @{ $opts{path} } );
+		@files = File::Find::Rule->file()->not($ignore_rule)->in(@paths);
 	} else {
-		@files = File::Find::Rule->file()->in( @{ $opts{path} } );
+		@files = File::Find::Rule->file()->in(@paths);
 	}
 	$results->{found_files_count} = $#files + 1;
 

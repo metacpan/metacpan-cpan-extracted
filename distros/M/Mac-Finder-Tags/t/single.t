@@ -5,7 +5,9 @@ use lib qw(lib);
 
 use Test::More 0.88;
 use Test::Exception;
-use Test::Warnings;
+use Test::Warnings 0.010 qw(:no_end_test);
+my $no_warnings;
+use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
 
 plan skip_all => "mdfind utility required" unless `which mdfind`;
@@ -17,7 +19,7 @@ eval {
 };
 plan skip_all => "at least one pre-existing tagged file required" unless $path;
 
-plan tests => 10 + 1;
+plan tests => 10 + $no_warnings;
 
 
 use Mac::Finder::Tags;

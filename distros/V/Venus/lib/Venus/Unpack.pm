@@ -76,7 +76,7 @@ sub checks {
     my ($self, $data, $expr, $index) = @_;
 
     my $name = 'argument #' . ($index + 1);
-    return scalar Venus::Assert->new($name)->expression($expr)->check($data);
+    return scalar Venus::Assert->new($name)->expression($expr)->valid($data);
   };
 
   return $self->list('foreach', $code, @args);
@@ -347,7 +347,7 @@ This package provides the following methods:
 
 =head2 all
 
-  all() (Unpack)
+  all() (Venus::Unpack)
 
 The all method selects all arguments for processing returns the invocant.
 
@@ -371,7 +371,7 @@ I<Since C<2.01>>
 
 =head2 arg
 
-  arg(Str $index) (Any)
+  arg(string $index) (any)
 
 The arg method returns the argument at the index specified.
 
@@ -423,7 +423,7 @@ I<Since C<2.01>>
 
 =head2 args
 
-  args(Any @args) (ArrayRef)
+  args(any @args) (arrayref)
 
 The args method returns all arugments as an arrayref, or list in list context.
 If arguments are provided they will overwrite the existing arugment list.
@@ -486,7 +486,7 @@ I<Since C<2.01>>
 
 =head2 cast
 
-  cast(Str $name) (ArrayRef)
+  cast(string $name) (arrayref)
 
 The cast method processes the selected arguments, passing each value to the
 class name specified, or the L<Venus::Type/cast> method, and returns results.
@@ -533,7 +533,7 @@ I<Since C<2.01>>
 
 =head2 checks
 
-  checks(Str @types) (ArrayRef)
+  checks(string @types) (arrayref)
 
 The checks method processes the selected arguments, passing each value to the
 L<Venus::Assert/check> method with the type expression provided, and returns
@@ -615,7 +615,7 @@ I<Since C<2.01>>
 
 =head2 copy
 
-  copy(Str @pairs) (Unpack)
+  copy(string @pairs) (Venus::Unpack)
 
 The copy method copies values from the arugment list as properties of the
 underlying object and returns the invocant.
@@ -668,7 +668,7 @@ I<Since C<2.01>>
 
 =head2 first
 
-  first() (Unpack)
+  first() (Venus::Unpack)
 
 The first method selects the first argument for processing returns the
 invocant.
@@ -693,7 +693,7 @@ I<Since C<2.01>>
 
 =head2 from
 
-  from(Str $data) (Unpack)
+  from(string $data) (Venus::Unpack)
 
 The from method names the source of the unpacking operation and is used in
 exception messages whenever the L<Venus::Unpack/signature> operation fails.
@@ -733,7 +733,7 @@ I<Since C<2.23>>
 
 =head2 get
 
-  get(Str $index) (Any)
+  get(string $index) (any)
 
 The get method returns the argument at the index specified.
 
@@ -813,7 +813,7 @@ I<Since C<2.01>>
 
 =head2 into
 
-  into(Str @args) (Any)
+  into(string @args) (any)
 
 The into method processes the selected arguments, passing each value to the
 class name specified, and returns results.
@@ -878,7 +878,7 @@ I<Since C<2.01>>
 
 =head2 last
 
-  last() (Unpack)
+  last() (Venus::Unpack)
 
 The last method selects the last argument for processing returns the
 invocant.
@@ -903,7 +903,7 @@ I<Since C<2.01>>
 
 =head2 list
 
-  list(Str | CodeRef $code, Any @args) (ArrayRef)
+  list(string | coderef $code, any @args) (arrayref)
 
 The list method returns the result of the dispatched method call as an
 arrayref, or list in list context.
@@ -983,7 +983,7 @@ I<Since C<2.01>>
 
 =head2 move
 
-  move(Str @pairs) (Unpack)
+  move(string @pairs) (Venus::Unpack)
 
 The move method moves values from the arugment list, reducing the arugment
 list, as properties of the underlying object and returns the invocant.
@@ -1036,7 +1036,7 @@ I<Since C<2.01>>
 
 =head2 name
 
-  name(Str $data) (Unpack)
+  name(string $data) (Venus::Unpack)
 
 The name method names the unpacking operation and is used in exception messages
 whenever the L<Venus::Unpack/signature> operation fails. This method returns
@@ -1076,7 +1076,7 @@ I<Since C<2.23>>
 
 =head2 one
 
-  one(Str | CodeRef $code, Any @args) (Any)
+  one(string | coderef $code, any @args) (any)
 
 The one method returns the first result of the dispatched method call.
 
@@ -1118,7 +1118,7 @@ I<Since C<2.01>>
 
 =head2 reset
 
-  reset(Any @args) (Unpack)
+  reset(any @args) (Venus::Unpack)
 
 The reset method resets the arugments list (if provided) and deselects all
 arguments (selected for processing) and returns the invocant.
@@ -1157,7 +1157,7 @@ I<Since C<2.01>>
 
 =head2 set
 
-  set(Str $index, Any $value) (Any)
+  set(string $index, any $value) (any)
 
 The set method assigns the value provided at the index specified and returns
 the value.
@@ -1238,7 +1238,7 @@ I<Since C<2.01>>
 
 =head2 signature
 
-  signature(Str $name, Str @types) (ArrayRef)
+  signature(string $name, string @types) (arrayref)
 
 The signature method processes the selected arguments, passing each value to
 the L<Venus::Assert/validate> method with the type expression provided and
@@ -1291,7 +1291,7 @@ I<Since C<2.01>>
     'string', 'number',
   );
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =back
 
@@ -1307,7 +1307,7 @@ I<Since C<2.01>>
     'string',
   );
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =back
 
@@ -1323,7 +1323,7 @@ I<Since C<2.01>>
     'object',
   );
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =back
 
@@ -1331,7 +1331,7 @@ I<Since C<2.01>>
 
 =head2 types
 
-  types(Str @types) (Unpack)
+  types(string @types) (Venus::Unpack)
 
 The types method processes the selected arguments, passing each value to the
 L<Venus::Assert/validate> method with the type expression provided, and unlike
@@ -1403,7 +1403,7 @@ I<Since C<2.01>>
 
 =head2 use
 
-  use(Int @args) (Unpack)
+  use(number @args) (Venus::Unpack)
 
 The use method selects the arguments specified (by index) for processing
 returns the invocant.
@@ -1456,7 +1456,7 @@ I<Since C<2.01>>
 
 =head2 validate
 
-  validate(Str @types) (Unpack)
+  validate(string @types) (Venus::Unpack)
 
 The validate method processes the selected arguments, passing each value to the
 L<Venus::Assert/validate> method with the type expression provided and throws
@@ -1502,7 +1502,7 @@ I<Since C<2.01>>
 
   my $results = $unpack->all->validate('string', 'number');
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =back
 
@@ -1516,7 +1516,7 @@ I<Since C<2.01>>
 
   my $results = $unpack->all->validate('string');
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =back
 
@@ -1530,7 +1530,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

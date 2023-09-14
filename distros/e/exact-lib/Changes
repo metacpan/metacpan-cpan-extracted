@@ -1,5 +1,9 @@
 Revision history for exact::lib
 
+1.04      2023-09-12 21:09:28-07:00 America/Los_Angeles
+        - Remove redundant strict (since it's provided by exact)
+        - New import signature change required by exact v1.23
+
 1.03      2022-03-19 17:35:37-07:00 America/Los_Angeles
         - Minor documentation update
 

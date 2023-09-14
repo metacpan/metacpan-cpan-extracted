@@ -3,26 +3,26 @@ NAME
     processed food division
 
 VERSION
-    This document describes version 0.019 of
+    This document describes version 0.020 of
     App::BPOMUtils::Table::FoodIngredient (from Perl distribution
-    App-BPOMUtils-Table-FoodIngredient), released on 2023-02-13.
+    App-BPOMUtils-Table-FoodIngredient), released on 2023-09-03.
 
 DESCRIPTION
     This distribution contains the following CLIs:
 
-    *   bpom-daftar-bahan-baku-pangan
+    *   bpom-daftar-bahan-baku-pangan-lama
 
     *   bpom-daftar-bahan-baku-pangan-rba
 
-    *   bpom-list-food-ingredients
+    *   bpom-list-food-ingredients-old
 
     *   bpom-list-food-ingredients-rba
 
 FUNCTIONS
-  bpom_list_food_ingredients
+  bpom_list_food_ingredients_old
     Usage:
 
-     bpom_list_food_ingredients(%args) -> [$status_code, $reason, $payload, \%result_meta]
+     bpom_list_food_ingredients_old(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List ingredients in BPOM processed food division.
 

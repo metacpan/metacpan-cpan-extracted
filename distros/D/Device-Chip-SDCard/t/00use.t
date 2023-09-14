@@ -3,8 +3,9 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'Device::Chip::SDCard' );
+require Device::Chip::SDCard;
 
+pass( 'Modules loaded' );
 done_testing;

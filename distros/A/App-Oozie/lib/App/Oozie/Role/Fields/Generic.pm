@@ -1,18 +1,18 @@
 package App::Oozie::Role::Fields::Generic;
-$App::Oozie::Role::Fields::Generic::VERSION = '0.002';
+$App::Oozie::Role::Fields::Generic::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
 
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
+use App::Oozie::Constants qw(
+    DEFAULT_TIMEOUT
+);
+
 use Moo::Role;
 use MooX::Options;
 use Types::Standard qw( Int );
-
-use constant {
-    DEFAULT_TIMEOUT => 60 * 3,
-};
 
 option dryrun => (
     is       => 'rw',
@@ -70,7 +70,7 @@ App::Oozie::Role::Fields::Generic
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -104,10 +104,6 @@ Overridable generic fields for internal programs/libs.
 =head2 Overridable from sub-classes
 
 =head3 effective_username
-
-=head1 Constants
-
-=head2 DEFAULT_TIMEOUT
 
 =head1 SEE ALSO
 

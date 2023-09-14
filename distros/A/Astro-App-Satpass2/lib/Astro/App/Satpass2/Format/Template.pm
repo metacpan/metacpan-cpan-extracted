@@ -27,7 +27,9 @@ use Template::Provider;
 use Text::Abbrev;
 use Text::Wrap qw{ wrap };
 
-our $VERSION = '0.050';
+our $VERSION = '0.051';
+
+use constant FORMAT_VALUE	=> 'Astro::App::Satpass2::FormatValue';
 
 sub new {
     my ($class, @args) = @_;
@@ -79,7 +81,7 @@ sub add_formatter_method {
     $self->{formatter_method}{$fmtr_name}
 	and $self->{warner}->wail(
 	"Formatter method $fmtr_name already exists" );
-    Astro::App::Satpass2::FormatValue->can( $fmtr_name )
+    FORMAT_VALUE->can( $fmtr_name )
 	and $self->{warner}->wail(
 	"Formatter $fmtr_name can not override built-in formatter" );
     $self->{formatter_method}{$fmtr_name} =
@@ -226,7 +228,7 @@ sub format : method {	## no critic (ProhibitBuiltInHomonyms)
 
     local $Template::Stash::LIST_OPS->{events} = sub {
 	my @args = @_;
-	return $self->_all_events( @args );
+	return $self->_all_events( $args[0] );
     };
 
     local $Template::Stash::LIST_OPS->{fixed_width} = sub {
@@ -241,6 +243,34 @@ sub format : method {	## no critic (ProhibitBuiltInHomonyms)
 
     $data{localize} = sub {
 	return _localize( $tplt_name, @_ );
+    };
+
+    # NOTE - must come after $data{localize} because
+    # $data{format_detail} uses $data{localize}
+    $data{format_detail} = sub {
+	my ( $kind, $evt ) = @_;
+
+	instance( $evt, 'Astro::App::Satpass2::FormatValue' )
+	    or return;
+	defined ( my $type = $evt->$kind( width => '' ) )
+	    or return;
+	$type =~ s/ \s+ \z //smx;
+
+	foreach my $name ( "$kind:$type", $kind ) {
+	    defined ( my $tplt = $self->template( "$tplt:$name" ) )
+		or next;
+	    my $output = $self->_process( \$tplt,
+		evt		=> $evt,
+		localize	=> $data{localize},
+		sp		=> $data{sp},
+	    );
+
+	    chomp $output;
+	    return $output;
+	}
+	return __localize(
+	    text	=> [ '+template', "$tplt:$kind" ],
+	);
     };
 
     my $output = $self->_process( $tplt, %data );
@@ -418,7 +448,7 @@ sub _wrap {
     $data ||= {};
     $default ||= $self->__default();
 
-    if ( instance( $data, 'Astro::App::Satpass2::FormatValue' ) ) {
+    if ( instance( $data, FORMAT_VALUE ) ) {
 	# Do nothing
     } elsif ( ! defined $data || HASH_REF eq ref $data ) {
 	my $value_formatter = $self->value_formatter();
@@ -752,6 +782,51 @@ Nothing is returned.
 
 =back
 
+Also, the following subroutines are defined:
+
+=over
+
+=item localize
+
+ [% localize( text ) %]
+
+This localizes the given text. It is (more pr less) a wrapper for
+L<__localize()|Astro::App::Satpass2::Locale/__localize>, which is called
+as
+
+ scalar __localize(
+     text    => [ "-$report", string => $text ],
+     default => $text,
+ );
+
+where C<$report> is the template being executed.
+
+=item format_detail
+
+ [% format_detail( 'event', evt ) %]
+
+This is a generalized (though probably not generalized enough) mechanism
+for inserting data formatted by sub-templates that are selected based on
+the data being formatted. The arguments are the desired data type (which
+must be a method on
+L<Astro::App::Satpass2::FormatValue|Astro::App::Satpass2::FormatValue>)
+and an object of type
+L<Astro::App::Satpass2::FormatValue|Astro::App::Satpass2::FormatValue>).
+In practice, the specified method should return an enumerated value.
+
+At the moment, C<'event'> is the only data type being used.
+
+The implementation uses the first-found template named
+C<"$report:event:$type">, C<"$report:event">, where C<$report> is the
+name of the main template (e.g. C<'pass_ics'>, the C<'event'> is the
+method called to retrieve the data, and the C<$type> is a specific value
+returned by the method.
+
+B<Note> that C<localize()> is available, but it refers to the main
+template, not the sub-template.
+
+=back
+
 =head3 add_formatter_method
 
  $tplt->add_formatter_method( \%definition );
@@ -825,6 +900,11 @@ option is specified.
 This template is used by the C<pass()> method if the C<-events> option
 is specified. It orders events chronologically without respect to their
 source.
+
+=head3 pass_ics
+
+This template is used by the C<pass()> method if the C<-ics> option
+is specified. It formats passes as iCal entries.
 
 =head3 phase
 
@@ -960,7 +1040,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2022 by Thomas R. Wyant, III
+Copyright (C) 2010-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

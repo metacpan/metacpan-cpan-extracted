@@ -2,7 +2,7 @@ NAME
     Win32::PEFile - Microsoft Portable Executable file parser
 
 VERSION
-    Version 0.7007
+    Version 0.7008
 
 SYNOPSIS
     use Win32::PEFile;

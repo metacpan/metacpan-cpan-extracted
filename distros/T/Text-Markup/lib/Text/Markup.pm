@@ -6,7 +6,7 @@ use warnings;
 use Text::Markup::None;
 use Carp;
 
-our $VERSION = '0.24';
+our $VERSION = '0.31';
 
 my %_PARSER_FOR;
 my %REGEX_FOR = (
@@ -62,7 +62,7 @@ sub parse {
     return $parser->(
         $file,
         $p{encoding} || $self->default_encoding,
-        $p{options}
+        $p{options} || [],
     );
 }
 
@@ -123,27 +123,27 @@ This distribution includes support for a number of markup formats:
 
 =over
 
-=item * L<Asciidoc|http://www.methods.co.nz/asciidoc/>
+=item * L<Asciidoc|https://asciidoc.org>
 
-=item * L<BBcode|http://www.bbcode.org/>
+=item * L<BBcode|https://www.bbcode.org/>
 
-=item * L<Creole|http://www.wikicreole.org/>
+=item * L<Creole|https://www.wikicreole.org/>
 
-=item * L<HTML|http://whatwg.org/html>
+=item * L<HTML|https://whatwg.org/html>
 
-=item * L<Markdown|http://daringfireball.net/projects/markdown/>
+=item * L<Markdown|https://daringfireball.net/projects/markdown/>
 
-=item * L<MultiMarkdown|http://fletcherpenney.net/multimarkdown/>
+=item * L<MediaWiki|https://en.wikipedia.org/wiki/Help:Contents/Editing_Wikipedia>
 
-=item * L<MediaWiki|http://en.wikipedia.org/wiki/Help:Contents/Editing_Wikipedia>
+=item * L<MultiMarkdown|https://fletcherpenney.net/multimarkdown/>
 
 =item * L<Pod|perlpod>
 
-=item * L<reStructuredText|http://docutils.sourceforge.net/docs/user/rst/quickref.html>
+=item * L<reStructuredText|https://docutils.sourceforge.io/rst.html>
 
-=item * L<Textile|http://textism.com/tools/textile/>
+=item * L<Textile|https://textile-lang.com/>
 
-=item * L<Trac|http://trac.edgewall.org/wiki/WikiFormatting>
+=item * L<Trac|https://trac.edgewall.org/wiki/WikiFormatting>
 
 =back
 
@@ -230,7 +230,7 @@ entire file and wraps it in a C<< <pre> >> element.
 
 The character encoding to assume the source file is encoded in (if such cannot
 be determined by other means, such as a
-L<BOM|http://en.wikipedia.org/wiki/Byte_order_mark>). If not specified, the
+L<BOM|https://en.wikipedia.org/wiki/Byte_order_mark>). If not specified, the
 value of the C<default_encoding> attribute will be used, and if that attribute
 is not set, UTF-8 will be assumed.
 
@@ -333,8 +333,8 @@ In such a case, read in the file as raw bytes:
 
 The returned HTML, however, B<must be encoded in UTF-8>. Please include an
 L<encoding
-declaration|http://en.wikipedia.org/wiki/Character_encodings_in_HTML>, such as
-a content-type C<< <meta> >> element:
+declaration|https://en.wikipedia.org/wiki/Character_encodings_in_HTML>, such
+as a content-type C<< <meta> >> element:
 
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
@@ -459,13 +459,12 @@ L<Markup::Unified> offers similar functionality.
 
 =head1 Support
 
-This module is stored in an open L<GitHub
-repository|http://github.com/theory/text-markup/>. Feel free to fork and
-contribute!
+This module is stored in an open
+L<GitHub repository|https://github.com/theory/text-markup/>. Feel free to
+fork and contribute!
 
-Please file bug reports via L<GitHub
-Issues|http://github.com/theory/text-markup/issues/> or by sending mail to
-L<bug-Text-Markup@rt.cpan.org|mailto:bug-Text-Markup@rt.cpan.org>.
+Please file bug reports via
+L<GitHub Issues|https://github.com/theory/text-markup/issues/>.
 
 =head1 Author
 
@@ -473,7 +472,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011-2019 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2011-2023 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

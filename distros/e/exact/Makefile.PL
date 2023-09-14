@@ -36,10 +36,11 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Test2::Plugin::NoWarnings" => 0,
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.22",
+  "VERSION" => "1.23",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,6 +57,7 @@ my %FallbackPrereqs = (
   "PerlX::Maybe" => 0,
   "Sub::Util" => 0,
   "Syntax::Keyword::Try" => "0.18",
+  "Test2::Plugin::NoWarnings" => 0,
   "Test2::V0" => 0,
   "Test::More" => 0,
   "Try::Tiny" => 0,

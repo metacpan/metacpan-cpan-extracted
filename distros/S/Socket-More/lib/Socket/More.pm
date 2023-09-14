@@ -1,23 +1,13 @@
 package Socket::More;
 
 use 5.036000;
-use strict;
-use warnings;
-use Carp;
 
 use Socket ":all";
 
-use List::Util qw<uniq>;
-use Exporter "import";
-
-use AutoLoader;
+#use AutoLoader;
 
 use Net::IP::Lite qw<ip2bin>;
 use Data::Cmp qw<cmp_data>;
-
-use Sort::Key::Multi qw<siikeysort>;
-
-#use Scalar::Util qw<looks_like_number>;
 use Data::Combination;
 
 
@@ -178,7 +168,7 @@ BEGIN{
 
 
 
-our %EXPORT_TAGS = ( 'all' => [ qw(
+use Export::These qw<
 	getifaddrs
 	sockaddr_passive
 	socket
@@ -195,43 +185,43 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	has_IPv6_interface
   reify_ports
   reify_ports_unshared
+>;
 
-) ] );
+sub _reexport {
+  # Rexport symbols from socket
+  my $target=shift;
+  Socket->import(":all") if @_;
+}
 
-our @EXPORT_OK = ( @{$EXPORT_TAGS{'all'} } );
-
-our @EXPORT = qw(
-
-	
-);
-
-our $VERSION = 'v0.4.2';
+our $VERSION = 'v0.4.3';
 
 sub getifaddrs;
 sub string_to_family;
 sub string_to_sock;
-sub AUTOLOAD {
-    # This AUTOLOAD is used to 'autoload' constants from the constant()
-    # XS function.
-
-    my $constname;
-    our $AUTOLOAD;
-    ($constname = $AUTOLOAD) =~ s/.*:://;
-    croak "&Socket::More::constant not defined" if $constname eq 'constant';
-    my ($error, $val) = constant($constname);
-    if ($error) { croak $error; }
-    {
-	no strict 'refs';
-	# Fixed between 5.005_53 and 5.005_61
-#XXX	if ($] >= 5.00561) {
-#XXX	    *$AUTOLOAD = sub () { $val };
-#XXX	}
-#XXX	else {
-	    *$AUTOLOAD = sub { $val };
-#XXX	}
-    }
-    goto &$AUTOLOAD;
-}
+##############################################################################
+# sub AUTOLOAD {                                                             #
+#     # This AUTOLOAD is used to 'autoload' constants from the constant()    #
+#     # XS function.                                                         #
+#                                                                            #
+#     my $constname;                                                         #
+#     our $AUTOLOAD;                                                         #
+#     ($constname = $AUTOLOAD) =~ s/.*:://;                                  #
+#     die "&Socket::More::constant not defined" if $constname eq 'constant'; #
+#     my ($error, $val) = constant($constname);                              #
+#     if ($error) { die $error; }                                            #
+#     {                                                                      #
+#         no strict 'refs';                                                  #
+#         # Fixed between 5.005_53 and 5.005_61                              #
+# #XXX    if ($] >= 5.00561) {                                               #
+# #XXX        *$AUTOLOAD = sub () { $val };                                  #
+# #XXX    }                                                                  #
+# #XXX    else {                                                             #
+#             *$AUTOLOAD = sub { $val };                                     #
+# #XXX    }                                                                  #
+#     }                                                                      #
+#     goto &$AUTOLOAD;                                                       #
+# }                                                                          #
+##############################################################################
 
 require XSLoader;
 XSLoader::load('Socket::More', $VERSION);
@@ -346,7 +336,7 @@ sub sockaddr_passive{
 		unshift $r->{port}->@*, undef;
 	}
 	else {
-		$r->{port}=[undef, $r->{port}];#AF_INET, AF_INET6, AF_UNIX];
+		$r->{port}=[undef, $r->{port}];
 	}
 
 
@@ -354,10 +344,10 @@ sub sockaddr_passive{
 		unshift $r->{path}->@*, undef;
 	}
 	else {
-		$r->{path}=[undef, $r->{path}];#AF_INET, AF_INET6, AF_UNIX];
+		$r->{path}=[undef, $r->{path}];
 	}
 
-	carp "No port number specified, no address information will be returned" if ($r->{port}->@*==0) or ($r->{path}->@*==0);
+	die "No port number specified, no address information will be returned" if ($r->{port}->@*==0) or ($r->{path}->@*==0);
 
 	#Delete from combination specification... no need to make more combos
 	my $address=delete $spec->{address};
@@ -475,20 +465,14 @@ sub sockaddr_passive{
 				$clone->{address}=inet_ntop($fam, $ip);
 				#$interface->{port}=$_->{port};
 				$clone->{interface}=$interface->{name};
-				#$clone->{group}=Net::IP::XS::ip_iptypev4(Net::IP::XS->new($clone->{address})->binip);
 				$clone->{group}=ip_iptypev4 ip2bin($clone->{address});
-				#$clone->{group}=Net::IP->new($clone->{address})->iptype;
 			}
 			elsif($fam == AF_INET6){
 				my(undef, $ip, $scope, $flow_info)=unpack_sockaddr_in6($interface->{addr});
 				$clone->{addr}=pack_sockaddr_in6($_->{port},$ip, $scope,$flow_info);
 				$clone->{address}=inet_ntop($fam, $ip);
 				$clone->{interface}=$interface->{name};
-				#$clone->{group}=Net::IP::XS::ip_iptypev6(Net::IP::XS->new($clone->{address})->binip);
-				
 				$clone->{group}=ip_iptypev6 ip2bin($clone->{address});
-
-				#$clone->{group}=Net::IP->new($clone->{address})->iptype;
 			}
 			elsif($fam == AF_UNIX){
 				my $suffix=$_->{type}==SOCK_STREAM?"_S":"_D";
@@ -520,17 +504,19 @@ sub sockaddr_passive{
 	my @list;
 
 	#Ensure items in list are unique
-        push @list, $output[0] if @output;
-        for(my $i=1; $i<@output; $i++){
-                my $out=$output[$i];
-		#my $found=List::Util::first {eq_deeply $_, $out} @list;
-                my $found=List::Util::first {cmp_data($_, $out)==0} @list;
-                push @list, $out unless $found;
-        }
+  push @list, $output[0] if @output;
+  for(my $i=1; $i<@output; $i++){
+          my $out=$output[$i];
+          my $found=grep {cmp_data($_, $out)} @list; 
+          push @list, $out unless $found;
+  }
 
 	
-	@output=@list;
-	@output=siikeysort {$_->{interface}, $_->{family}, $_->{type}} @output;
+        #@output=@list;
+  #@output=siikeysort {$_->{interface}, $_->{family}, $_->{type}} @output;
+  @output=sort {
+    $a->{interface} cmp $b->{interface} || $a->{family} cmp $b->{family}|| $a->{type} cmp $b->{type}
+  } @list;
 }
 
 #Parser for CLI  -l options

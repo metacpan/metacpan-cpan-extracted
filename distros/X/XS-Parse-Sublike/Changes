@@ -1,5 +1,27 @@
 Revision history for XS-Parse-Sublike
 
+0.20    2023-09-09
+        [BUGFIXES]
+         * Correct ->VERSION check for Object::Pad or Future::AsyncAwait
+           cross-module tests (RT149700)
+         * Don't upset gcc's -Wformat by passing an unbounded STRLEN into
+           %.*s format (RT133035)
+         * Avoid colons in filename of t/71extended+Object-Pad.t because
+           Windows doesn't like them (RT149712)
+         * Ensure that mixed positional + named params in signatures work
+           properly (thanks alh)
+         * Ensure name shadowing of param names prints the right diagnostic
+           warning (thanks alh)
+
+0.19    2023-09-07
+        [CHANGES]
+         * Added `Sublike::Extended`, a prefix keyword to enable the extended
+           signature parser for named params and attributes
+         * Beginnings of an (experimental) XS-level API for attributes on
+           parameters
+         * Complain on attempts to register a sublike keyword with neither a
+           permit function nor hinthash key
+
 0.18    2023-06-14
         [CHANGES]
          * Swap all the unit tests from Test::More to Test2::V0

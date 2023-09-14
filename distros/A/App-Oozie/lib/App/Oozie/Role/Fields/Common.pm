@@ -1,5 +1,5 @@
 package App::Oozie::Role::Fields::Common;
-$App::Oozie::Role::Fields::Common::VERSION = '0.002';
+$App::Oozie::Role::Fields::Common::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
@@ -7,6 +7,10 @@ use warnings;
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
 use App::Oozie::Types::Common qw( IsUserName );
+use App::Oozie::Constants qw(
+    DEFAULT_CLUSTER_NAME
+    DEFAULT_HDFS_WF_PATH
+);
 use Moo::Role;
 use MooX::Options;
 use Types::Standard qw( Bool Str );
@@ -20,7 +24,7 @@ with qw(
 option cluster_name => (
     is      => 'rw',
     isa     => Str,
-    default => sub { 'MyCluster' },
+    default => sub { DEFAULT_CLUSTER_NAME },
     format  => 's',
     doc     => 'The Hadoop cluster name',
 );
@@ -56,7 +60,7 @@ option oozie_uri => (
 option default_hdfs_destination => (
     is      => 'rw',
     format  => 's',
-    default => sub { '/oozie_wfs' },
+    default => sub { DEFAULT_HDFS_WF_PATH },
     doc     => 'The HDFS destination for the compiled Oozie workflows',
 );
 
@@ -87,7 +91,7 @@ App::Oozie::Role::Fields::Common
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 

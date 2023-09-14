@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( uninitialized once );
 
-our $VERSION = '1.888';
+our $VERSION = '1.889';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
@@ -55,7 +55,7 @@ sub new {
    my $impl = defined( $argv{impl} ) ? ucfirst( lc $argv{impl} ) : 'Mutex';
 
    # Replace 'fast' with 'Fast' in the implementation value.
-   $impl =~ s/fast$/Fast/;
+   $impl =~ s/fast/Fast/;
 
    $impl = 'Threads'     if ( $impl eq 'Mutex' && $^O eq 'MSWin32' );
    $impl = 'ThreadsFast' if ( $impl eq 'MutexFast' && $^O eq 'MSWin32' );
@@ -131,7 +131,7 @@ MCE::Channel - Queue-like and two-way communication capability
 
 =head1 VERSION
 
-This document describes MCE::Channel version 1.888
+This document describes MCE::Channel version 1.889
 
 =head1 SYNOPSIS
 

@@ -49,51 +49,71 @@
    "provides" : {
       "Graphics::Toolkit::Color" : {
          "file" : "lib/Graphics/Toolkit/Color.pm",
-         "version" : "1.54"
+         "version" : "1.61"
       },
       "Graphics::Toolkit::Color::Name" : {
          "file" : "lib/Graphics/Toolkit/Color/Name.pm",
-         "version" : "1.54"
+         "version" : "1.61"
       },
       "Graphics::Toolkit::Color::Name::Constant" : {
          "file" : "lib/Graphics/Toolkit/Color/Name/Constant.pm",
-         "version" : "1.54"
+         "version" : "1.61"
       },
       "Graphics::Toolkit::Color::Space" : {
          "file" : "lib/Graphics/Toolkit/Color/Space.pm",
-         "version" : "1.54"
+         "version" : "1.61"
       },
-      "Graphics::Toolkit::Color::SpaceBasis" : {
-         "file" : "lib/Graphics/Toolkit/Color/SpaceBasis.pm",
-         "version" : "1.54"
+      "Graphics::Toolkit::Color::Space::Basis" : {
+         "file" : "lib/Graphics/Toolkit/Color/Space/Basis.pm",
+         "version" : "1.61"
       },
-      "Graphics::Toolkit::Color::Util" : {
-         "file" : "lib/Graphics/Toolkit/Color/Util.pm",
-         "version" : "1.54"
+      "Graphics::Toolkit::Color::Space::Hub" : {
+         "file" : "lib/Graphics/Toolkit/Color/Space/Hub.pm",
+         "version" : "1.61"
       },
-      "Graphics::Toolkit::Color::Value" : {
-         "file" : "lib/Graphics/Toolkit/Color/Value.pm",
-         "version" : "1.54"
+      "Graphics::Toolkit::Color::Space::Instance::CMY" : {
+         "file" : "lib/Graphics/Toolkit/Color/Space/Instance/CMY.pm",
+         "version" : "1.61"
       },
-      "Graphics::Toolkit::Color::Value::CMY" : {
-         "file" : "lib/Graphics/Toolkit/Color/Value/CMY.pm",
-         "version" : "1.54"
+      "Graphics::Toolkit::Color::Space::Instance::CMYK" : {
+         "file" : "lib/Graphics/Toolkit/Color/Space/Instance/CMYK.pm",
+         "version" : "1.61"
       },
-      "Graphics::Toolkit::Color::Value::CMYK" : {
-         "file" : "lib/Graphics/Toolkit/Color/Value/CMYK.pm",
-         "version" : "1.54"
+      "Graphics::Toolkit::Color::Space::Instance::HSB" : {
+         "file" : "lib/Graphics/Toolkit/Color/Space/Instance/HSB.pm",
+         "version" : "1.61"
       },
-      "Graphics::Toolkit::Color::Value::HSL" : {
-         "file" : "lib/Graphics/Toolkit/Color/Value/HSL.pm",
-         "version" : "1.54"
+      "Graphics::Toolkit::Color::Space::Instance::HSL" : {
+         "file" : "lib/Graphics/Toolkit/Color/Space/Instance/HSL.pm",
+         "version" : "1.61"
       },
-      "Graphics::Toolkit::Color::Value::HSV" : {
-         "file" : "lib/Graphics/Toolkit/Color/Value/HSV.pm",
-         "version" : "1.54"
+      "Graphics::Toolkit::Color::Space::Instance::HSV" : {
+         "file" : "lib/Graphics/Toolkit/Color/Space/Instance/HSV.pm",
+         "version" : "1.61"
       },
-      "Graphics::Toolkit::Color::Value::RGB" : {
-         "file" : "lib/Graphics/Toolkit/Color/Value/RGB.pm",
-         "version" : "1.54"
+      "Graphics::Toolkit::Color::Space::Instance::HWB" : {
+         "file" : "lib/Graphics/Toolkit/Color/Space/Instance/HWB.pm",
+         "version" : "1.61"
+      },
+      "Graphics::Toolkit::Color::Space::Instance::RGB" : {
+         "file" : "lib/Graphics/Toolkit/Color/Space/Instance/RGB.pm",
+         "version" : "1.61"
+      },
+      "Graphics::Toolkit::Color::Space::Instance::YIQ" : {
+         "file" : "lib/Graphics/Toolkit/Color/Space/Instance/YIQ.pm",
+         "version" : "1.61"
+      },
+      "Graphics::Toolkit::Color::Space::Shape" : {
+         "file" : "lib/Graphics/Toolkit/Color/Space/Shape.pm",
+         "version" : "1.61"
+      },
+      "Graphics::Toolkit::Color::Space::Util" : {
+         "file" : "lib/Graphics/Toolkit/Color/Space/Util.pm",
+         "version" : "1.61"
+      },
+      "Graphics::Toolkit::Color::Values" : {
+         "file" : "lib/Graphics/Toolkit/Color/Values.pm",
+         "version" : "1.61"
       }
    },
    "release_status" : "stable",
@@ -104,7 +124,7 @@
          "web" : "https://github.com/lichtkind/Graphics-Color-Toolkit"
       }
    },
-   "version" : "1.54",
+   "version" : "1.61",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

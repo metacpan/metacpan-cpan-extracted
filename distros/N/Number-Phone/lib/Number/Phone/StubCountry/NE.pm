@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230614174404;
+our $VERSION = 1.20230903131448;
 
 my $formatters = [
                 {
@@ -35,7 +35,7 @@ my $formatters = [
                   'leading_digits' => '
             [089]|
             2[013]|
-            7[04]
+            7[047]
           ',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 }
@@ -83,7 +83,7 @@ my $validators = {
                 'mobile' => '
           (?:
             23|
-            7[04]|
+            7[047]|
             [89]\\d
           )\\d{6}
         ',
@@ -94,24 +94,24 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"2272045", "Arlit",
-"2272071", "Tillabéry",
-"2272072", "Niamey",
-"2272068", "Gaya",
-"2272064", "Konni",
-"2272075", "Niamey",
-"227202", "Niamey",
-"2272073", "Niamey",
-"2272041", "Maradi",
-"2272051", "Zinder",
+$areanames{en} = {"2272044", "Agadez",
+"2272045", "Arlit",
 "227203", "Niamey",
-"2272077", "Filingué",
-"2272074", "Niamey",
 "2272061", "Tahoua",
+"2272071", "Tillabéry",
+"2272054", "Diffa",
+"2272073", "Niamey",
+"2272077", "Filingué",
+"2272064", "Konni",
+"2272074", "Niamey",
+"2272051", "Zinder",
+"2272072", "Niamey",
+"227202", "Niamey",
 "2272078", "Say",
+"2272075", "Niamey",
 "2272065", "Dosso",
-"2272044", "Agadez",
-"2272054", "Diffa",};
+"2272068", "Gaya",
+"2272041", "Maradi",};
 
     sub new {
       my $class = shift;

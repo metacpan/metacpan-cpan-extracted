@@ -8,6 +8,8 @@ use Test2::V0;
 use lib "t";
 use testcase "t::any";
 
+BEGIN { $^H{"t::any/func"}++ }
+
 our $LOG; BEGIN { $LOG = "" };
 
 prefixed func example {

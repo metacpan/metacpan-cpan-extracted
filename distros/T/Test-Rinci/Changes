@@ -1,3 +1,10 @@
+0.156   2023-07-09  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - Remove usage of smartmatch.
+
+
 0.155   2020-09-23  Released-By: PERLANCAR; Urgency: medium
 
 	- Update to Rinci 1.1.94 (recognize function example's env_result &

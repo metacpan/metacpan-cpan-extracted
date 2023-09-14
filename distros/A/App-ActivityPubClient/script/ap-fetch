@@ -5,7 +5,7 @@
 use strict;
 use utf8;
 use open ":std", ":encoding(UTF-8)";
-our $VERSION = 'v0.1.3';
+our $VERSION = 'v0.1.4';
 
 use Getopt::Std;
 use LWP::UserAgent;
@@ -91,10 +91,10 @@ if ($res->is_success) {
 			print "\n";
 		}
 	} else {
-		print STDERR "Got $content_type instead of $content_match\n";
+		print STDERR "Got \"$content_type\" instead of \"$content_match\"\n";
 		exit 1;
 	}
 } else {
-	print STDERR "Got $res->status_line instead of 2xx\n";
+	print STDERR "Got ", $res->status_line, " instead of 2xx\n";
 	exit 1;
 }

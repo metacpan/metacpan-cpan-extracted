@@ -5,7 +5,7 @@ use warnings;
 package Story::Interact::Character;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001012';
+our $VERSION   = '0.001014';
 
 use Moo;
 use Types::Common -types;

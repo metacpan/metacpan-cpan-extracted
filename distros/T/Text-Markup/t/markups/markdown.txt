@@ -1,6 +1,12 @@
 Markdown Test File
 ==================
 
-This file tests the [Markdown](http://daringfireball.net/projects/markdown/)
-parser — which is powered by [Text::Markdown](http://p3rl/Text::Markdown).
+This file tests the [Markdown](https://daringfireball.net/projects/markdown/)
+parser — which is powered by [Text::Markdown](https://p3rl/Text::Markdown).
 Öy.
+
+``` go
+func main() {
+    fmt.Println("hello")
+}
+```

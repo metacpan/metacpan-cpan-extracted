@@ -1,5 +1,29 @@
 Revision history for Perl distribution Convert-Pheno
 
+0.13 2023-09-12T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Pushing new version after passing all tests
+
+0.12_3 2023-09-12T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Added support for Windows Server OS
+ - Added changes to pass windows-latest tests in GitHub
+    o Replaced PerlIO::gzip by core IO::Uncompress::G[un]zip
+    o Adapted t/{args,cli.t}
+
+0.12_2 2023-09-07T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Added Data::Leaf::Walker to Makefile.PL
+
+0.12_1 2023-09-06T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Extended the documentation (e.g., docs/tbl/*md)
+ - Excluded unnecessary files in CPAN via MANIFEST.SKIP
+ - Changed Google Drive location of ohdsi.db
+ - Increased coverage of PXF<-->BFF term mapping
+ - Added READMEs to t/*/in/
+ - Updated t/pxf2bff/in/pxf.json and added YAML version
+
 0.12 2023-07-19T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
  - Pushing new version after passing all tests
@@ -20,7 +44,7 @@ Revision history for Perl distribution Convert-Pheno
 0.11_1 2023-07-09T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
  - Reverted change in Makefile.PL for 'IO::Socket::SSL'
- - IO::Socker::SSL only is used in if installed
+ - IO::Socker::SSL only is used if installed
 
 0.11  2023-07-09T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
  - Uncommented 'IO::Socket::SSL' in Makefile.PL to pass self-validation of mapping schema in t/

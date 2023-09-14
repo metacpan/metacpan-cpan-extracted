@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -19,21 +19,21 @@
             "Data::Bitfield" : "0",
             "Device::Chip" : "0",
             "Future::AsyncAwait" : "0.38",
-            "Object::Pad" : "0.66",
+            "Object::Pad" : "0.800",
             "perl" : "5.026"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Device::Chip::Adapter" : "0",
-            "Test::More" : "0.88"
+            "Test2::V0" : "0",
+            "Test::Device::Chip::Adapter" : "0"
          }
       }
    },
    "provides" : {
       "Device::Chip::nRF24L01P" : {
          "file" : "lib/Device/Chip/nRF24L01P.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -42,6 +42,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -1,5 +1,7 @@
+.editorconfig
 Build.PL
 Changes
+examples/all-pixels-on.pl
 examples/clock.pl
 examples/scroller.pl
 lib/Device/Chip/MAX7219.pm

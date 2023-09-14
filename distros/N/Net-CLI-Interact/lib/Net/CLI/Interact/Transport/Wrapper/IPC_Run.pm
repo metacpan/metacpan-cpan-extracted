@@ -1,6 +1,5 @@
 package Net::CLI::Interact::Transport::Wrapper::IPC_Run;
-{ $Net::CLI::Interact::Transport::Wrapper::IPC_Run::VERSION = '2.400000' }
-
+$Net::CLI::Interact::Transport::Wrapper::IPC_Run::VERSION = '2.400002';
 use Moo;
 use Sub::Quote;
 use MooX::Types::MooseLike::Base qw(ScalarRef InstanceOf);
@@ -19,7 +18,9 @@ use IPC::Run ();
 has '_in' => (
     is => 'rw',
     isa => ScalarRef,
+    ## no critic (ProhibitStringyEval)
     default => sub { \eval "''" },
+    ## use critic
 );
 
 # writer for the _in slot
@@ -28,7 +29,9 @@ sub put { ${ (shift)->_in } .= join '', @_ }
 has '_out' => (
     is => 'ro',
     isa => ScalarRef,
+    ## no critic (ProhibitStringyEval)
     default => sub { \eval "''" },
+    ## use critic
 );
 
 sub buffer {
@@ -41,7 +44,9 @@ sub buffer {
 has '_err' => (
     is => 'ro',
     isa => ScalarRef,
+    ## no critic (ProhibitStringyEval)
     default => sub { \eval "''" },
+    ## use critic
 );
 
 has '_timeout_obj' => (
@@ -79,5 +84,18 @@ before 'disconnect' => sub {
     my $self = shift;
     $self->wrapper->kill_kill(grace => 1);
 };
+
+=pod
+
+=begin Pod::Coverage
+
+  buffer
+  connect_ready
+  disconnect
+  put
+
+=end Pod::Coverage
+
+=cut
 
 1;

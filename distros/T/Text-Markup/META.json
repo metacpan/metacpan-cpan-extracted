@@ -4,7 +4,7 @@
       "David E. Wheeler <david@justatheory.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -17,20 +17,23 @@
       "build" : {
          "requires" : {
             "File::Spec::Functions" : "0",
-            "Module::Build" : "0.30",
+            "Module::Build" : "0.4209",
             "Test::More" : "0.96"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.30"
+            "Module::Build" : "0.4209"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.06",
+            "Test::Spelling" : "0.25"
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.06"
-         },
          "requires" : {
             "File::BOM" : "0.14",
             "HTML::Entities" : "0",
@@ -52,70 +55,75 @@
    "provides" : {
       "Text::Markup" : {
          "file" : "lib/Text/Markup.pm",
-         "version" : "0.24"
+         "version" : "0.31"
       },
       "Text::Markup::Asciidoc" : {
          "file" : "lib/Text/Markup/Asciidoc.pm",
-         "version" : "0.24"
+         "version" : "0.31"
+      },
+      "Text::Markup::Asciidoctor" : {
+         "file" : "lib/Text/Markup/Asciidoctor.pm",
+         "version" : "0.31"
       },
       "Text::Markup::Bbcode" : {
          "file" : "lib/Text/Markup/Bbcode.pm",
-         "version" : "0.24"
+         "version" : "0.31"
+      },
+      "Text::Markup::Cmd" : {
+         "file" : "lib/Text/Markup/Cmd.pm"
+      },
+      "Text::Markup::CommonMark" : {
+         "file" : "lib/Text/Markup/CommonMark.pm",
+         "version" : "0.31"
       },
       "Text::Markup::Creole" : {
          "file" : "lib/Text/Markup/Creole.pm",
-         "version" : "0.24"
+         "version" : "0.31"
       },
       "Text::Markup::HTML" : {
          "file" : "lib/Text/Markup/HTML.pm",
-         "version" : "0.24"
+         "version" : "0.31"
       },
       "Text::Markup::Markdown" : {
          "file" : "lib/Text/Markup/Markdown.pm",
-         "version" : "0.24"
+         "version" : "0.31"
       },
       "Text::Markup::Mediawiki" : {
          "file" : "lib/Text/Markup/Mediawiki.pm",
-         "version" : "0.24"
+         "version" : "0.31"
       },
       "Text::Markup::Multimarkdown" : {
          "file" : "lib/Text/Markup/Multimarkdown.pm",
-         "version" : "0.24"
+         "version" : "0.31"
       },
       "Text::Markup::None" : {
          "file" : "lib/Text/Markup/None.pm",
-         "version" : "0.24"
+         "version" : "0.31"
       },
       "Text::Markup::Pod" : {
          "file" : "lib/Text/Markup/Pod.pm",
-         "version" : "0.24"
+         "version" : "0.31"
       },
       "Text::Markup::Rest" : {
          "file" : "lib/Text/Markup/Rest.pm",
-         "version" : "0.24"
+         "version" : "0.31"
       },
       "Text::Markup::Textile" : {
          "file" : "lib/Text/Markup/Textile.pm",
-         "version" : "0.24"
+         "version" : "0.31"
       },
       "Text::Markup::Trac" : {
          "file" : "lib/Text/Markup/Trac.pm",
-         "version" : "0.24"
+         "version" : "0.31"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "http://github.com/theory/text-markup/issues/"
-      },
-      "homepage" : "http://search.cpan.org/dist/Text-Markup/",
+      "homepage" : "https://metacpan.org/pod/Text::Markup",
       "license" : [
          "http://dev.perl.org/licenses/"
-      ],
-      "repository" : {
-         "url" : "http://github.com/theory/text-markup"
-      }
+      ]
    },
-   "version" : "0.24",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.31",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

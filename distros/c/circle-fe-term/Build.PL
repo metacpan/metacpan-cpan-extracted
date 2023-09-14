@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -7,6 +8,10 @@ my $build = Module::Build->new(
    module_name => 'Circle::FE::Term',
    dist_name   => 'circle-fe-term',
    requires => {
+      'perl' => '5.026',
+      'Object::Pad' => 0,
+      'Syntax::Keyword::Match' => 0,
+
       'Convert::Color' => '0.06',
       'Convert::Color::XTerm' => 0,
       'IO::Async' => '0.14',
@@ -24,7 +29,7 @@ my $build = Module::Build->new(
       'Tickit::Widget::Entry::Plugin::Completion' => 0,
       'Tickit::Widget::HBox' => '0.32',
       'Tickit::Widget::Scroller' => '0.15',
-      'Tickit::Widget::Tabbed' => '0.019',
+      'Tickit::Widget::Tabbed' => '0.028',
       'Tickit::Widget::VBox' => '0.31',
       'Tickit::Window' => '0.42',
    },

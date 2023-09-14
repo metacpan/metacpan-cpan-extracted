@@ -1,5 +1,11 @@
 Revision history for Perl extension Export::These.
 
+v0.1.2 2023-09-07
+  [fixes]
+    - Prevent noisy warnings regarding redefinitions for subroutines and
+      constants.
+    - Update POD to refelect changes
+
 v0.1.1 2023-08-14
   [fixes]
     - Don't die when a tag is specified without a group or an empty group.

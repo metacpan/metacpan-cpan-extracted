@@ -1,0 +1,159 @@
+#!/usr/bin/env perl
+#ABSTRACT: Create a Singularity/Apptainer image from micromamba
+#PODNAME: make_image_from_bioconda
+
+use v5.12;
+use warnings;
+use Getopt::Long qw(:config no_ignore_case);
+use Pod::Usage;
+
+my $output  = undef;
+my $move   = 0;
+my $def_file = undef;
+my $dest = '/qib/platforms/Informatics/transfer/outgoing/singularity/core/';
+
+GetOptions(
+    'o|output=s'  => \$output,
+    'd|def=s'     => \$def_file,
+    'm|move'      => \$move,
+);
+my ($package, $version) = @ARGV;
+
+if ( ! -d $dest ) {
+    die "Destination directory $dest does not exist.\n";
+}
+if (not defined $package) {
+    pod2usage(-verbose => 1);
+}
+
+$version = last_ver($package) if not defined $version;
+
+if (not defined $output) {
+    $output = $package . '__' . $version . '.simg';
+}
+
+say STDERR "
+Package:     $package
+Version:     $version
+Output:      $output
+Destination: $dest/$output
+";
+
+if ( ! connected() ) {
+    say STDERR "[WARNING] Not connected to the internet, are you in the software node?";
+}
+
+if ( -e $def_file) {
+    # Use the provided definition file
+} else {
+    my $def = template();
+    $def =~ s/\{package\}/$package/g;
+    $def =~ s/\{version\}/$version/g;
+
+    my $tmp_file = $ENV{TMPDIR} // '/tmp' . '/' . $package . '.def';
+    open(my $fh, ">", $tmp_file);
+    print $fh $def;
+    close $fh;
+
+    $def_file = $tmp_file;
+}
+
+my $cmd = "sudo singularity build $output $def_file";
+
+if (system($cmd) != 0) {
+    die "Error building image.\n";
+} 
+
+if ($move) {
+    my $mv_cmd = "mv $output $dest";
+    if (system($mv_cmd) != 0) {
+        die "Error moving image to $dest.\n";
+    }
+}
+sub last_ver {
+    my $channel = 'bioconda';
+    my $package = shift;
+    my $answer = `curl --silent -X GET --header 'Accept: application/json' 'https://api.anaconda.org/package/$channel/$package'| grep latest_version | cut -f4 -d\\"`;
+    chomp($answer);
+    return $answer;
+
+}
+
+sub connected {
+    my $cmd = "curl ifconfig.me";
+    my $ip = `$cmd`;
+    if ($ip =~/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+sub template {
+my $template =<<'EOF';
+Bootstrap: docker
+From: mambaorg/micromamba:latest
+
+%post
+    micromamba create --quiet -y -n package_env -c conda-forge -c bioconda -c defaults {package}={version}
+    micromamba clean --all --yes
+
+%environment
+    export PATH=/opt/conda/envs/package_env/bin:$PATH
+EOF
+
+return $template;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+make_image_from_bioconda - Create a Singularity/Apptainer image from micromamba
+
+=head1 VERSION
+
+version 0.6.1
+
+=head1 SYNOPSIS
+
+    make_image [options] package_name package_version
+
+=head1 DESCRIPTION
+
+Create a Singularity/Apptainer image from a single micromamba package
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-o, --output> I<FILENAME>
+
+The name of the output image file. Default: singularity.simg
+
+=item B<-d, --def> I<FILENAME>
+
+The name of the definition file [optional]
+
+=item B<-m, --move>
+
+Move to the Core Bioinformatics repository
+
+=back
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

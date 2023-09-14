@@ -12,36 +12,37 @@ use SPVM ();
 use SPVM::Builder;
 use SPVM::ExchangeAPI;
 
-use SPVM 'Native::Compiler';
-use SPVM 'Native::Runtime';
-use SPVM 'Native::Env';
-use SPVM 'Native::Stack';
-
-our $BUILDER;
-our $ENV;
-our $STACK;
-our $API;
+my $API;
 
 END {
-  $API = undef;
-  if ($ENV) {
-    $ENV->destroy_class_vars($STACK);
+  if ($API) {
+    # Remove circular reference
+    my $env = delete $API->{env};
+    my $stack = delete $API->{stack};
+    
+    $env->destroy_class_vars($stack);
   }
-  $STACK = undef;
-  $ENV = undef;
-  $BUILDER = undef;
+}
+
+sub api {
+  unless ($API) {
+    &init_api();
+  }
+  return $API;
 }
 
 sub build_module {
   my ($basic_type_name, $file, $line) = @_;
   
-  &init_global();
+  &init_api();
   
   # Add module informations
   my $build_success;
   if (defined $basic_type_name) {
     
-    my $compiler = $ENV->compiler;
+    my $env = $API->env;
+    
+    my $compiler = $env->compiler;
     
     my $start_runtime = $compiler->get_runtime;
     my $start_basic_types_length = $start_runtime->get_basic_types_length;
@@ -64,23 +65,24 @@ sub build_module {
     
     for (my $basic_type_id = $start_basic_types_length; $basic_type_id < $basic_types_length; $basic_type_id++) {
       my $basic_type = $runtime->get_basic_type_by_id($basic_type_id);
-      &load_dynamic_lib($runtime, $basic_type->get_name);
+      &load_dynamic_lib($runtime, $basic_type->get_name->to_string);
     }
     
     &bind_to_perl($basic_type_name);
     
-    $ENV->call_init_methods($STACK);
+    my $stack = $API->stack;
+    
+    $env->call_init_methods($stack);
   }
 }
 
-my $INIT_GLOBAL;
-sub init_global {
-  unless ($INIT_GLOBAL) {
+sub init_api {
+  unless ($API) {
     my $build_dir = SPVM::Builder::Util::get_normalized_env('SPVM_BUILD_DIR');
-    $BUILDER = SPVM::Builder->new(build_dir => $build_dir);
+    my $builder = SPVM::Builder->new(build_dir => $build_dir);
     
     my $builder_compiler = SPVM::Builder::Compiler->new(
-      include_dirs => $BUILDER->include_dirs
+      include_dirs => $builder->include_dirs
     );
     
     my @native_compiler_basic_type_names = qw(
@@ -127,30 +129,28 @@ sub init_global {
     my $builder_api = SPVM::ExchangeAPI->new(env => $builder_env, stack => $builder_stack);
     
     my $compiler = $builder_api->class("Native::Compiler")->new;
-    for my $include_dir (@{$BUILDER->include_dirs}) {
+    for my $include_dir (@{$builder->include_dirs}) {
       $compiler->add_include_dir($include_dir);
     }
     $compiler->compile(undef);
     
-    $ENV = $builder_api->class("Native::Env")->new($compiler);
+    my $env = $builder_api->class("Native::Env")->new($compiler);
     
-    $STACK = $ENV->new_stack;
+    my $stack = $env->new_stack;
     
-    $API = SPVM::ExchangeAPI->new(env => $ENV, stack => $STACK);
+    $API = SPVM::ExchangeAPI->new(env => $env, stack => $stack);
     
-    $ENV->set_command_info_program_name($STACK, $0);
+    $env->set_command_info_program_name($stack, $0);
     
-    $ENV->set_command_info_argv($STACK, \@ARGV);
+    $env->set_command_info_argv($stack, \@ARGV);
     my $base_time = $^T + 0; # For Perl 5.8.9
-    $ENV->set_command_info_base_time($STACK, $base_time);
-    
-    $INIT_GLOBAL = 1;
+    $env->set_command_info_base_time($stack, $base_time);
   }
 }
 
 sub load_dynamic_lib {
   my ($runtime, $basic_type_name) = @_;
-    
+  
   my $basic_type = $runtime->get_basic_type_by_name($basic_type_name);
   
   my $spvm_class_dir = $basic_type->get_class_dir;
@@ -190,7 +190,9 @@ sub load_dynamic_lib {
           
           my $precompile_source = $runtime->build_precompile_module_source($basic_type)->to_string;
           
-          $dynamic_lib_file = $BUILDER->build_at_runtime(
+          my $build_dir = SPVM::Builder::Util::get_normalized_env('SPVM_BUILD_DIR');
+          my $builder = SPVM::Builder->new(build_dir => $build_dir);
+          $dynamic_lib_file = $builder->build_at_runtime(
             $basic_type_name,
             {
               class_file => $class_file,
@@ -234,7 +236,9 @@ my $BIND_TO_PERL_BASIC_TYPE_NAME_H = {};
 sub bind_to_perl {
   my ($basic_type_name) = @_;
   
-  my $compiler = $ENV->compiler;
+  my $env = $API->env;
+  
+  my $compiler = $env->compiler;
   
   my $runtime = $compiler->get_runtime;
     
@@ -250,7 +254,7 @@ sub bind_to_perl {
     # The inheritance
     my @isa;
     if (defined $parent_basic_type) {
-      my $parent_basic_type_name = $parent_basic_type->get_name;
+      my $parent_basic_type_name = $parent_basic_type->get_name->to_string;
       push @isa, "$perl_basic_type_name_base$parent_basic_type_name";
     }
     push @isa, 'SPVM::BlessedObject::Class';
@@ -267,7 +271,7 @@ sub bind_to_perl {
     for (my $method_index = 0; $method_index < $methods_length; $method_index++) {
       my $method = $basic_type->get_method_by_index($method_index);
       
-      my $method_name = $method->get_name;
+      my $method_name = $method->get_name->to_string;
       
       # Destrutor is skip
       if ($method_name eq 'DESTROY') {

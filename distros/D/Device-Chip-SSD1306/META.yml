@@ -3,12 +3,12 @@ abstract: 'chip driver for monochrome OLED modules'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
+  Test2::V0: '0'
   Test::Device::Chip::Adapter: '0'
-  Test::More: '0.88'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,19 +17,19 @@ name: Device-Chip-SSD1306
 provides:
   Device::Chip::SSD1306:
     file: lib/Device/Chip/SSD1306.pm
-    version: '0.13'
+    version: '0.14'
   Device::Chip::SSD1306::I2C:
     file: lib/Device/Chip/SSD1306/I2C.pm
-    version: '0.13'
+    version: '0.14'
   Device::Chip::SSD1306::SPI4:
     file: lib/Device/Chip/SSD1306/SPI4.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   Device::Chip: '0'
   Future::AsyncAwait: '0.39'
-  Object::Pad: '0.74'
+  Object::Pad: '0.800'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,9 @@
+0.031   2023-09-03  Released-By: PERLANCAR; Urgency: medium
+
+        - Bump generated prereq's version: Test::Sah::Schema 0.010 ->
+          0.016.
+
+
 0.030   2022-12-16  Released-By: PERLANCAR; Urgency: medium
 
         - Add configuration: preamble & postamble.

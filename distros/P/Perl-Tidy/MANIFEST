@@ -37,7 +37,6 @@ INSTALL.md
 lib/Perl/Tidy.pm
 lib/Perl/Tidy.pod
 lib/Perl/Tidy/Debugger.pm
-lib/Perl/Tidy/DevNull.pm
 lib/Perl/Tidy/Diagnostics.pm
 lib/Perl/Tidy/FileWriter.pm
 lib/Perl/Tidy/Formatter.pm
@@ -45,9 +44,6 @@ lib/Perl/Tidy/HtmlWriter.pm
 lib/Perl/Tidy/IndentationItem.pm
 lib/Perl/Tidy/IOScalar.pm
 lib/Perl/Tidy/IOScalarArray.pm
-lib/Perl/Tidy/LineBuffer.pm
-lib/Perl/Tidy/LineSink.pm
-lib/Perl/Tidy/LineSource.pm
 lib/Perl/Tidy/Logger.pm
 lib/Perl/Tidy/Tokenizer.pm
 lib/Perl/Tidy/VerticalAligner.pm
@@ -100,5 +96,6 @@ t/testwide-tidy.pl.srctdy
 t/testwide-tidy.t
 t/testwide.pl.src
 t/testwide.t
+t/zero.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

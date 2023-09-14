@@ -34,11 +34,13 @@ sub build_self {
 sub assertion {
   my ($self) = @_;
 
-  my $assert = $self->SUPER::assertion;
+  my $assertion = $self->SUPER::assertion;
 
-  $assert->clear->expression('number');
+  $assertion->match('number')->format(sub{
+    (ref $self || $self)->new($_)
+  });
 
-  return $assert;
+  return $assertion;
 }
 
 sub bit {
@@ -295,7 +297,7 @@ This package provides the following methods:
 
 =head2 bit
 
-  bit() (Int)
+  bit() (number)
 
 The bit method returns a C<1> or C<0> value, randomly.
 
@@ -323,7 +325,7 @@ I<Since C<1.11>>
 
 =head2 boolean
 
-  boolean() (Bool)
+  boolean() (boolean)
 
 The boolean method returns a C<true> or C<false> value, randomly.
 
@@ -351,7 +353,7 @@ I<Since C<1.11>>
 
 =head2 byte
 
-  byte() (Str)
+  byte() (string)
 
 The byte method returns random byte characters, randomly.
 
@@ -379,7 +381,7 @@ I<Since C<1.11>>
 
 =head2 character
 
-  character() (Str)
+  character() (string)
 
 The character method returns a random character, which is either a L</digit>,
 L</letter>, or L</symbol> value.
@@ -408,7 +410,7 @@ I<Since C<1.11>>
 
 =head2 collect
 
-  collect(Int $times, Str|CodeRef $code, Any @args) (Int|Str)
+  collect(number $times, string | coderef $code, any @args) (number | string)
 
 The collect method dispatches to the specified method or coderef, repeatedly
 based on the number of C<$times> specified, and returns the random concatenated
@@ -496,7 +498,7 @@ I<Since C<1.11>>
 
 =head2 digit
 
-  digit() (Int)
+  digit() (number)
 
 The digit method returns a random digit between C<0> and C<9>.
 
@@ -524,7 +526,7 @@ I<Since C<1.11>>
 
 =head2 float
 
-  float(Int $place, Int $from, Int $upto) (Num)
+  float(number $place, number $from, number $upto) (number)
 
 The float method returns a random float.
 
@@ -606,7 +608,7 @@ I<Since C<1.11>>
 
 =head2 letter
 
-  letter() (Str)
+  letter() (string)
 
 The letter method returns a random letter, which is either an L</uppercased> or
 L</lowercased> value.
@@ -635,7 +637,7 @@ I<Since C<1.11>>
 
 =head2 lowercased
 
-  lowercased() (Str)
+  lowercased() (string)
 
 The lowercased method returns a random lowercased letter.
 
@@ -663,7 +665,7 @@ I<Since C<1.11>>
 
 =head2 nonzero
 
-  nonzero(Str|CodeRef $code, Any @args) (Int|Str)
+  nonzero(string | coderef $code, any @args) (number | string)
 
 The nonzero method dispatches to the specified method or coderef and returns
 the random value ensuring that it's never zero, not even a percentage of zero.
@@ -747,7 +749,7 @@ I<Since C<1.11>>
 
 =head2 number
 
-  number(Int $from, Int $upto) (Num)
+  number(number $from, number $upto) (number)
 
 The number method returns a random number within the range provided. If no
 arguments are provided, the range is from C<0> to C<2147483647>. If only the
@@ -898,7 +900,7 @@ I<Since C<1.23>>
 
 =head2 range
 
-  range(Str $from, Str $to) (Int)
+  range(string $from, string $to) (number)
 
 The range method returns a random number within the range provided. If no
 arguments are provided, the range is from C<0> to C<2147483647>.
@@ -981,7 +983,7 @@ I<Since C<1.11>>
 
 =head2 repeat
 
-  repeat(Int $times, Str|CodeRef $code, Any @args) (Int|Str)
+  repeat(number $times, string | coderef $code, any @args) (number | string)
 
 The repeat method dispatches to the specified method or coderef, repeatedly
 based on the number of C<$times> specified, and returns the random results from
@@ -1054,7 +1056,7 @@ I<Since C<1.11>>
 
 =head2 reseed
 
-  reseed(Str $seed) (Random)
+  reseed(string $seed) (Venus::Random)
 
 The reseed method sets the L<perlfunc/srand> (i.e. the PRNG seed) to the value
 provided, or the default value used on instanstiation when no seed is passed to
@@ -1102,7 +1104,7 @@ I<Since C<1.11>>
 
 =head2 reset
 
-  reset() (Random)
+  reset() (Venus::Random)
 
 The reset method sets the L<perlfunc/srand> (i.e. the PRNG seed) to the default
 value used on instanstiation when no seed is passed to the constructor. This
@@ -1128,7 +1130,7 @@ I<Since C<1.11>>
 
 =head2 restore
 
-  restore() (Random)
+  restore() (Venus::Random)
 
 The restore method sets the L<perlfunc/srand> (i.e. the PRNG seed) to the
 original value used by L<perlfunc/rand>. This method returns the object that
@@ -1154,7 +1156,7 @@ I<Since C<1.11>>
 
 =head2 select
 
-  select(ArrayRef|HashRef $data) (Any)
+  select(arrayref | hashref $data) (any)
 
 The select method returns a random value from the I<"hashref"> or I<"arrayref">
 provided.
@@ -1201,7 +1203,7 @@ I<Since C<1.11>>
 
 =head2 symbol
 
-  symbol() (Str)
+  symbol() (string)
 
 The symbol method returns a random symbol.
 
@@ -1229,7 +1231,7 @@ I<Since C<1.11>>
 
 =head2 uppercased
 
-  uppercased() (Str)
+  uppercased() (string)
 
 The uppercased method returns a random uppercased letter.
 
@@ -1263,7 +1265,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

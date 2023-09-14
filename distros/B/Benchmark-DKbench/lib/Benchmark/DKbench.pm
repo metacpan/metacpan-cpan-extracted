@@ -16,6 +16,7 @@ use Astro::Coord::Precession 'precess';
 use Crypt::JWT qw(encode_jwt decode_jwt);
 use CSS::Inliner;
 use DateTime;
+use DBI;
 use File::ShareDir 'dist_dir';
 use HTML::FormatText;
 use HTML::TreeBuilder;
@@ -26,18 +27,21 @@ use JSON::XS;
 use Math::DCT ':all';
 use Math::MatrixReal;
 use MCE::Loop;
-use Sys::Info;
-use Sys::Info::Constants qw( :device_cpu );
+use SQL::Abstract::Classic;
+use SQL::Inserter;
+use System::Info;
+use Text::Levenshtein::Damerau::XS;
+use Text::Levenshtein::XS;
 
 use Exporter 'import';
 our @EXPORT = qw(system_identity suite_run calc_scalability);
 our $datadir = dist_dir("Benchmark-DKbench");
 
-our $VERSION = '2.0';
+our $VERSION = '2.1';
 
 =head1 NAME
 
-Benchmark::DKbench - Perl Benchmark
+Benchmark::DKbench - Perl CPU Benchmark
 
 =head1 SYNOPSIS
 
@@ -45,8 +49,8 @@ Benchmark::DKbench - Perl Benchmark
  # Will print scores for the two runs and multi/single thread scalability
  dkbench
 
- # A dual-thread run with times instead of scores
- dkbench -j 2 -t
+ # A dual-thread "quick" run (with times instead of scores)
+ dkbench -j 2 -q
 
  # If BioPerl is installed, enable the BioPerl benchmarks by downloading Genbank data
  dkbench --setup
@@ -58,30 +62,51 @@ Benchmark::DKbench - Perl Benchmark
 
 A Perl benchmark suite for general compute, created to evaluate the comparative
 performance of systems when running computationally intensive Perl (both pure Perl
-and XS) workloads. Runs single and multi-threaded and can be fully customized to
-the benchmarks that better suit your own scenario.
+and C/XS) workloads. It is a good overall indicator for generic CPU performance in
+real-world scenarios. It runs single and multi-threaded (able to scale to hundreds
+of CPUs) and can be fully customized to run the benchmarks that better suit your own
+scenario.
 
-The only non-CPAN libraries required to install/run the suite are libdb, libjpeg
-(with headers). There are a few prerequisite CPAN libraries, plus an optional one
-(L<BioPerl>, requires libxml on system) which enables extra benchmarks.
+=head1 INSTALLATION
+
+The only non-CPAN software required to install/run the suite is a build environment
+for the C/XS modules (C compiler, make etc.) and Perl. On the most popular Linux
+package managers you can easily set up such an environment (as root or with sudo):
+
+ # Debian/Ubuntu etc
+ apt-get update
+ apt-get -y install build-essential perl cpanminus
+
+ # CentOS/Red Hat
+ yum update
+ yum -y install gcc make patch perl perl-App-cpanminus
+
+After that, you can use L<App::cpanminus> to install the benchmark suite (as
+root/sudo is the easiest, will install for all users):
+
+ cpanm -n Benchmark::DKbench
+
+See the C<setup_dkbench> script below for more on the installation of a couple of
+optional benchmarks and standardizing your benchmarking environment.
 
 =head1 SCRIPTS
 
-You should only ever need the main script C<dkbench> for the benchmark suite, and,
-perhaps C<setup_dkbench> can help with setup or standardizing/normalizing your
+You will most likely only ever need the main script C<dkbench> which launches the
+suite, although C<setup_dkbench> can help with setup or standardizing/normalizing your
 benchmarking environment.
 
 =head2 C<dkbench>
 
 The main script that runs the DKbench benchmark suite. If L<BioPerl> is installed,
-you may want to start your first run with C<dkbench --setup>. Otherwise, there are
-many options to control number of threads, iterations, which benchmarks to run etc:
+you may want to start with C<dkbench --setup>. But beyond that, there are many
+options to control number of threads, iterations, which benchmarks to run etc:
 
  dkbench [options]
 
  Options:
  --threads <i>, -j <i> : Number of benchmark threads (default is 1).
  --multi,       -m     : Multi-threaded using all your CPU cores/threads.
+ --max_threads <i>     : Override the cpu detection to specify max cpu threads.
  --iter <i>,    -i <i> : Number of suite iterations (with min/max/avg at the end).
  --include <regex>     : Run only benchmarks that match regex.
  --exclude <regex>     : Do not run benchmarks that match regex.
@@ -89,20 +114,21 @@ many options to control number of threads, iterations, which benchmarks to run e
  --quick,       -q     : Quick benchmark run (implies -t).
  --no_mce              : Do not run under MCE::Loop (implies -j 1).
  --skip_bio            : Skip BioPerl benchmarks.
- --skip_timep          : Skip Time::Piece benchmark (see benchmark details on why).
+ --skip_timep          : Skip Time::Piece benchmark (see benchmark details).
  --skip_prove          : Skip Moose prove benchmark.
  --bio_codons          : Run optional BioPerl Codons benchmark (does not scale well).
  --sleep <i>           : Sleep for <i> secs after each benchmark.
  --setup               : Download the Genbank data to enable the BioPerl tests.
  --datapath <path>     : Override the path where the expected benchmark data is found.
+ --ver <num>           : Skip benchmarks added after the specified version.
 
 The default run (no options) will run all the benchmarks both single-threaded and
 multi-threaded (using all detected CPU cores/hyperthreads) and show you scores and
 multi vs single threaded scalability.
 
-The scores are such that a reference CPU (Intel Xeon Platinum 8481C - Sapphire Rapids)
-would get 1000 on a single core benchmark run using the default software configuration
-(Linux/Perl 5.36.0/ref CPAN modules).
+The scores are calibrated such that a reference CPU (Intel Xeon Platinum 8481C -
+Sapphire Rapids) would achieve a score of 1000 in a single-core benchmark run using
+the default software configuration (Linux/Perl 5.36.0 with reference CPAN modules).
 
 The multi-thread scalability should approach 100% if each thread runs on a full core
 (i.e. no SMT), and the core can maintain the clock speed it had on the single-thread
@@ -120,8 +146,8 @@ there is an option to disable it, which forces a single-thread run.
 Simple installer to check/get the reference versions of CPAN modules and download
 the Genbank data file required for the BioPerl benchmarks of the DKbench suite.
 
-It assumes that you have some software already installed (e.g. C<cpanm>), try
-C<setup_dkbench --help> for more details on that.
+It assumes that you have some software already installed (see INSTALLATION above),
+try C<setup_dkbench --help> will give you more details.
 
  setup_dkbench [--force --sudo --test --data=s --help]
 
@@ -138,18 +164,19 @@ C<dkbench --setup>) and use C<cpanm> to install any missing libraries.
 Using it with C<--force> will install the reference CPAN module versions, including
 BioPerl which is not a requirement for DKbench, but enables the BioPerl benchmarks.
 
-The reference CPAN versions are suggested if you want a fair comparison between
-systems and also for the benchmark Pass/Fail results to be reliable.
+The reference Perl and CPAN versions are suggested if you want a fair comparison
+between systems and also for the benchmark Pass/Fail results to be reliable.
 
 =head1 BENCHMARKS
 
-The suite consists of 19 benchmarks. With a successful installation of the DKbench
-package, 18 will run by default, although the C<BioPerl Monomers> requires BioPerl
-to be installed and Genbank data to be downloaded (C<dkbench --setup> can do the
-latter).
+The suite consists of 21 benchmarks, 20 will run by default. However, the
+C<BioPerl Monomers> requires the optional L<BioPerl> to be installed and Genbank
+data to be downloaded (C<dkbench --setup> can do the latter), so you will only
+see 19 benchmarks running just after a standard install. Because the overall score
+is an average, it is generally unaffected by skipping a benchmark or two.
 
-On MacOS only, the C<Time::Piece> benchmark will be skipped, unless you try a single
-thread run without MCE (C<--skip_mce>).
+On MacOS only, the C<Time::Piece> benchmark will be skipped, unless you use C<--no_mce>
+(making it single-thread only - see why below).
 
 =over 4
 
@@ -173,6 +200,10 @@ using L<Crypt::JWT>.
 
 =item * C<DateTime> : Creates and manipulates L<DateTime> objects.
 
+=item * C<DBI/SQL> : Creates a mock L<DBI> connection (using L<DBD::Mock>) and passes
+it insert/select statements using L<SQL::Inserter> and L<SQL::Abstract::Classic>.
+The latter is quite slow at creating the statements, but it is widely used.
+
 =item * C<Digest> : Creates MD5, SH1 and SHA-512 digests of a large string.
 
 =item * C<Encode> : Encodes/decodes large strings from/to UTF-8/16, cp-1252.
@@ -194,9 +225,9 @@ matrices.
 =item * C<Moose> : Creates L<Moose> objects.
 
 =item * C<Moose prove> : Runs 110 tests from the Moose 2.2201 test suite. The least
-CPU-intensive test, most of the time will be spent loading the interpreter and
-the Moose module for each test, which is behaviour representative of how a Perl
-test suite runs by default.
+CPU-intensive test (which is why there is the option C<--no_prove> to disable it),
+most of the time will be spent loading the interpreter and the Moose module for each
+test, which is behaviour representative of how a Perl test suite runs by default.
 
 =item * C<Primes> : Calculates all primes up to 7.5 million. Small number with
 repeat was chosen to keep low memory (this is a pure Perl function no Math libraries).
@@ -208,6 +239,9 @@ repeat was chosen to keep low memory (this is a pure Perl function no Math libra
 =item * C<Regex/Subst utf8> : Exactly the same as C<Regex/Subst>, but reads into
 a utf8 string. Perl version can make a big difference, as Unicode behaviour has
 changed (old Perl versions are faster but less strict in general).
+
+=item * C<Text::Levenshtein> : The edit distance for strings of various lengths (up
+to 2500) are calculated using L<Text::Levenshtein::XS> and L<Text::Levenshtein::Damerau::XS>.
 
 =item * C<Time::Piece> : Creates and manipulates/converts Time::Piece objects. It
 is disabled by default on MacOS (unless C<--no_mce> is specified), as it runs
@@ -248,9 +282,27 @@ You can see the L<original perl blog post|http://blogs.perl.org/users/dimitrios_
 as well as the L<2023 follow-up|https://dev.to/dkechag/cloud-vm-performance-value-comparison-2023-perl-more-1kpp>.
 
 The benchmarks for the first version were more tuned to what I would expect to run
-on the servers I was testing, to choose the optimal types for the company I was
-working for. The second version has expanded a bit over that and is friendlier to
-use.
+on the servers I was testing, in order to choose the optimal types for the company
+I was working for. The second version has expanded a bit over that, and is friendlier
+to use.
+
+Althought this benchmark is in general a good indicator of general CPU performance
+and can be customized to your needs, no benchmark is as good as running your own
+actual workload.
+
+=head2 SCORES
+
+Some sample DKbench score results from various systems for comparison (all on
+reference setup with Perl 5.36.0):
+
+ CPU                                     Cores/HT   Single   Multi   Scalability
+ Intel i7-4750HQ @ 2.0 (MacOS)                4/8     612     2332      46.9%
+ AMD Ryzen 5 PRO 4650U @ 2.1 (WSL)           6/12     906     4166      38.2% 
+ Apple M1 Pro @ 3.2 (MacOS)                 10/10    1283    10026      78.8%
+ Apple M2 Pro @ 3.5 (MacOS)                 12/12    1415    12394      73.1%
+ Ampere Altra @ 3.0 (Linux)                 48/48     708    32718      97.7%
+ Intel Xeon Platinum 8481C @ 2.7 (Linux)   88/176    1000    86055      48.9%
+ AMD EPYC Milan 7B13 @ 2.45 (Linux)       112/224     956   104536      49.3%
 
 =head1 AUTHOR
 
@@ -277,56 +329,89 @@ the same terms as the Perl 5 programming language system itself.
 =cut
 
 sub benchmark_list {
-    return {               # idx : 0 = result, 1 = ref time, 2 = func, 3 = quick test, 4 = normal test
-        'Astro'            => ['e71c7ae08f16fe26aea7cfdb72785873', 5.674, \&bench_astro, 20000, 80000],
-        'BioPerl Codons'   => ['97c443c099886ca60e99f7ab9df689b5', 8.752, \&bench_bioperl_codons, 3, 5, 1],
-        'BioPerl Monomers' => ['d29ed0a5c205c803c112be1338d1f060', 5.241, \&bench_bioperl_mono, 6, 20],
-        'Crypt::JWT'       => ['d41d8cd98f00b204e9800998ecf8427e', 6.451, \&bench_jwt, 250, 900],
-        'CSS::Inliner'     => ['82c1b6de9ca0500a48f8a8df0998df3c', 4.603, \&bench_css, 2, 5],
-        'DateTime'         => ['b08d2eeb994083b7422f6c9d86fed2c6', 6.198, \&bench_datetime, 5000, 15000],
-        'Digest'           => ['4b69f6cf0f53cbf6c3444f2f767dd21d', 4.513, \&bench_digest, 50, 250],
-        'Encode'           => ['PASS 1025',                        5.725, \&bench_encode, 40, 120],
-        'HTML::FormatText' => ['8c2589f0a5276252805e11301fc2ab56', 4.756, \&bench_formattext, 4, 10],
-        'Imager'           => ['8829cb3703e884054eb025496f336c63', 6.783, \&bench_imager, 4, 16],
-        'JSON::XS'         => ['PASS',                             5.388, \&bench_json, 600, 2200],
-        'Math::DCT'        => ['766e3bfd7a2276f452bb3d1bd21939bc', 7.147, \&bench_dct, 25000, 100_000],
-        'Math::MatrixReal' => ['4606231b1309fb21ae1223fa0043fd76', 4.293, \&bench_matrixreal, 200, 650],
-        'Moose'            => ['d1cb92c513f6378506dfa11f694cffac', 4.968, \&bench_moose, 10_000, 30_000],
-        'Moose prove'      => ['PASS',                             7.974, \&bench_moose_prv, 0.5, 1],
-        'Primes'           => ['4266f70a7a9efb3484cf5d98eba32244', 3.680, \&bench_primes_m, 2, 5],
-        'Regex/Subst'      => ['30ce365b25f3d597578b3bdb14aa3f57', 4.652, \&bench_regex_asc, 8, 24],
-        'Regex/Subst utf8' => ['857eb4e63a4d174ca4a16fe678f7626f', 5.703, \&bench_regex_utf8, 3, 10],
-        'Time::Piece'      => ['5d393b000a42a626bad7208f8be4121e', 5.907, \&bench_timepiece, 75_000, 275_000],
+    return {               # idx : 0 = result, 1 = ref time, 2 = func, 3 = quick test, 4 = normal test, 5 = ver
+        'Astro'             => ['e71c7ae08f16fe26aea7cfdb72785873', 5.674, \&bench_astro, 20000, 80000],
+        'BioPerl Codons'    => ['97c443c099886ca60e99f7ab9df689b5', 8.752, \&bench_bioperl_codons, 3, 5, 1],
+        'BioPerl Monomers'  => ['d29ed0a5c205c803c112be1338d1f060', 5.241, \&bench_bioperl_mono, 6, 20],
+        'Crypt::JWT'        => ['d41d8cd98f00b204e9800998ecf8427e', 6.451, \&bench_jwt, 250, 900],
+        'CSS::Inliner'      => ['82c1b6de9ca0500a48f8a8df0998df3c', 4.603, \&bench_css, 2, 5],
+        'DBI/SQL'           => ['2b8252daad9568a5b39038c696df4be3', 5.700, \&bench_dbi, 5000, 15000, 2.1],
+        'DateTime'          => ['b08d2eeb994083b7422f6c9d86fed2c6', 6.198, \&bench_datetime, 5000, 15000],
+        'Digest'            => ['4b69f6cf0f53cbf6c3444f2f767dd21d', 4.513, \&bench_digest, 50, 250],
+        'Encode'            => ['PASS 1025',                        5.725, \&bench_encode, 40, 120],
+        'HTML::FormatText'  => ['8c2589f0a5276252805e11301fc2ab56', 4.756, \&bench_formattext, 4, 10],
+        'Imager'            => ['8829cb3703e884054eb025496f336c63', 6.792, \&bench_imager, 4, 16],
+        'JSON::XS'          => ['PASS',                             5.388, \&bench_json, 600, 2200],
+        'Math::DCT'         => ['766e3bfd7a2276f452bb3d1bd21939bc', 7.147, \&bench_dct, 25000, 100_000],
+        'Math::MatrixReal'  => ['4606231b1309fb21ae1223fa0043fd76', 4.293, \&bench_matrixreal, 200, 650],
+        'Moose'             => ['d1cb92c513f6378506dfa11f694cffac', 4.968, \&bench_moose, 10_000, 30_000],
+        'Moose prove'       => ['PASS',                             7.974, \&bench_moose_prv, 0.5, 1],
+        'Primes'            => ['4266f70a7a9efb3484cf5d98eba32244', 3.680, \&bench_primes_m, 2, 5],
+        'Regex/Subst'       => ['30ce365b25f3d597578b3bdb14aa3f57', 4.652, \&bench_regex_asc, 8, 24],
+        'Regex/Subst utf8'  => ['857eb4e63a4d174ca4a16fe678f7626f', 5.703, \&bench_regex_utf8, 3, 10],
+        'Text::Levenshtein' => ['2948a300ed9131fa0ce82bb5eabb8ded', 5.539, \&bench_textlevenshtein, 7, 25, 2.1],
+        'Time::Piece'       => ['2d4b149fe7f873a27109fc376d69211b', 5.907, \&bench_timepiece, 75_000, 275_000],
     };
 }
 
 sub system_identity {
-    my $info  = Sys::Info->new;
-    my $cpu   = $info->device( 'CPU' );
-    my @data  = $cpu->identify;
-    my $speed = $cpu->speed ? " @ ".(int($cpu->speed+0.5))."MHz" : '';
-    my $cores = $cpu->count || 1;
-    my $ht    = $cpu->ht ?  $cpu->ht == $cores ? " (h-threads)" : " (".$cpu->ht." threads)" : '';
-    my $arch  = $data[0]->{architecture} ? " ($data[0]->{architecture})" : '';
-    my $model = $data[0]->{chip_name} || $data[0]->{name} || $data[0]->{model} || 'Unknown';
-    my $os    = $info->os;
-    my $osn   = eval{$os->name(long => 1)} || $^O;
-    if ($^O =~ /darwin/ && $model =~ /^Mac|Unknown/) {
+    my ($physical, $cores, $ncpu) =
+        $^O =~ /bsd|darwin|dragonfly/ ? bsd_cpu() : linux_cpu();
+    $ncpu ||= MCE::Util::get_ncpu() || 1;
+    local $^O = 'linux' if $^O =~ /android/;
+    my $info  = System::Info->sysinfo_hash;
+    my $osn   = $info->{distro} || $info->{os} || $^O;
+    my $model = $info->{cpu};
+    my $arch  = $info->{cpu_type} || '';
+    $arch = " ($arch)" if $arch;
+    if ($^O =~ /darwin/ && $model =~ /^Mac|nknown/) {
         my $brand = `sysctl -a |grep brand`;
-        if ($brand =~ /brand_string: (.*)/) {
-            $model = $1;
-        }
+        $model = $1 if $brand =~ /brand_string: (.*)/;
     }
-    $speed = '' if $model =~ /@|GHz|MHz/;
-
-    print "------------ Software ------------\nDKbench v$VERSION\n";
+    $model =~ s/\s+/ /g;
+    $model =~ s/\(R\)//g;
+    print "--------------- Software ---------------\nDKbench v$VERSION\n";
     print "Perl $^V\n";
-    print "OS: $osn\n------------ Hardware ------------\n";
-    print "CPU type: $model$speed$arch\n";
-    print "Cores: $cores$ht\n".("-"x34)."\n";
+    print "OS: $osn\n--------------- Hardware ---------------\n";
+    print "CPU type: $model$arch\n";
+    print "CPUs: $ncpu";
+    my @extra;
+    push @extra, "$physical Processors" if $physical && $physical > 1;
+    push @extra, "$cores Cores" if $cores;
+    push @extra, "$ncpu Threads" if $cores && $cores != $ncpu;
+    print " (".join(', ', @extra).")" if @extra;
+    print "\n".("-"x40)."\n";
 
-    return $cores;
+    return $ncpu;
 };
+
+sub bsd_cpu {
+    chomp( my $cpus = `sysctl -n hw.ncpu 2>/dev/null` );
+    return unless $cpus;
+    chomp( my $cores = `sysctl -n hw.physicalcpu 2>/dev/null` );
+    $cores ||= $cpus;
+    return (undef, $cores, $cpus);
+}
+
+sub linux_cpu {
+    my (@physical, @cores, $phys, $cpus);
+    if ( -f '/proc/cpuinfo' && open my $fh, '<', '/proc/cpuinfo' ) {
+        while (<$fh>) {
+            $cpus++ if /^processor\s*:/;
+            push @physical, $1 if /^physical id\s*:\s*(\d+)/;
+            push @cores, $1 if /^cpu cores\s*:\s*(\d+)/;
+        }
+        return undef, $cores[0], $cpus if !@physical && @cores;
+        @cores = (0) unless @cores;
+        my %hash;
+        $hash{$physical[$_]} = $_ < scalar(@cores) ? $cores[$_] : $cores[0]
+            for 0 .. $#physical;
+        my $phys  = keys %hash || undef;
+        my $cores = sum(values %hash) || $cpus;
+        return $phys, $cores, $cpus;
+    }
+    return;
+}
 
 sub suite_run {
     my $opt = shift;
@@ -339,7 +424,7 @@ sub suite_run {
     MCE::Loop::init {
         max_workers => $opt->{threads},
         chunk_size  => 1,
-    };
+    } unless $opt->{no_mce};
 
     foreach (1..$opt->{iter}) {
         print "Iteration $_ of $opt->{iter}...\n" if $opt->{iter} > 1;
@@ -360,18 +445,20 @@ sub calc_scalability {
     my (@perf, @scal);
     print "Multi thread Scalability:\n".pad_to("Benchmark",24).pad_to("Multi perf xSingle",24).pad_to("Multi scalability %",24);
     print "\n";
+    my $cnt;
     foreach my $bench (sort keys %$benchmarks) {
         next unless $stats1->{$bench}->{times} && $stats2->{$bench}->{times};
+        $cnt++;
         my @res1 = min_max_avg($stats1->{$bench}->{times});
         my @res2 = min_max_avg($stats2->{$bench}->{times});
         push @perf, $res1[2]/$res2[2]*$threads if $res2[2];
         push @scal, $res1[2]/$res2[2]*100 if $res2[2];
         print pad_to("$bench:",24).pad_to(sprintf("%.2f",$perf[-1]),24).pad_to(sprintf("%2.0f",$scal[-1]),24)."\n";
     }
-    print (("-"x34)."\n");
-    my ($avg1) = min_max_avg($stats1->{total}->{$display});
-    my ($avg2) = min_max_avg($stats2->{total}->{$display});
-    print "DKbench summary:\n";
+    print (("-"x40)."\n");
+    my $avg1 = min_max_avg($stats1->{total}->{$display});
+    my $avg2 = min_max_avg($stats2->{total}->{$display});
+    print "DKbench summary ($cnt benchmarks, $stats2->{threads} threads):\n";
     print pad_to("Single:").sprintf($opt->{f}, $avg1)."\n";
     print pad_to("Multi:").sprintf($opt->{f}, $avg2)."\n";
     my @newperf = Benchmark::DKbench::drop_outliers(\@perf, -1);
@@ -395,6 +482,7 @@ sub run_iteration {
         next if $opt->{skip_prove} && $bench =~ /prove/;
         next if !$opt->{bio_codons} && $bench =~ /Codons/;
         next if $opt->{skip_timep} && $bench =~ /Time::Piece/;
+        next if $opt->{ver} && $benchmarks->{$bench}->[5] && $opt->{ver} < $benchmarks->{$bench}->[5];
         next if $opt->{exclude} && $bench =~ /$opt->{exclude}/;
         next if $opt->{include} && $bench !~ /$opt->{include}/;
         if ($bench =~ /Bio/) {
@@ -548,6 +636,31 @@ sub bench_datetime {
     return $d->hexdigest;
 }
 
+sub bench_dbi {
+    my $iter = shift;
+    my $d    = Digest->new("MD5");
+    my $dbh  = DBI->connect( 'DBI:Mock:', '', '' );
+    my ($data, $cols) = _db_data();
+
+    foreach (1..$iter) {
+        my $inserter = SQL::Inserter->new(
+            dbh    => $dbh,
+            table  => 'table',
+            cols   => $cols,
+            buffer => 2
+        );
+        $inserter->insert($data->[int(rand(20))]) for 1..2;
+        $d->add($dbh->last_insert_id);
+        my $sql = SQL::Abstract::Classic->new();
+        my ($stmt, @bind) = $sql->insert('table', $data->[int(rand(20))]);
+        $d->add($dbh->quote($stmt));
+        ($stmt, @bind) = $sql->select('table', $cols->[int(rand(20))], [map {_rand_where()} 1..int(rand(3)+1)]);
+        $d->add($dbh->quote($stmt._random_str(5)));
+        my $dbh2 = DBI->connect( 'DBI:Mock:', '', '' );
+    }
+    return $d->hexdigest;
+}
+
 sub bench_dct {
     my $iter = shift;
     my $d    = Digest->new("MD5");
@@ -620,12 +733,12 @@ sub bench_imager {
     my $d    = Digest->new("MD5");
 
     my $data;
-    open (my $fh, '<:raw', catfile($datadir,'M31.jpg')) or die $!;
+    open (my $fh, '<:raw', catfile($datadir,'M31.bmp')) or die $!;
     read($fh, $data, -s $fh);
     close($fh);
 
     foreach (1..$iter) {
-        my $img = Imager->new(data=>$data) or die Imager->errstr();
+        my $img = Imager->new(data=>$data, type=>'bmp') or die Imager->errstr();
         my $thumb = $img->scale(scalefactor=>.3);
         my $newimg = $img->scale(scalefactor=>1.15);
         $newimg->filter(type=>'autolevels');
@@ -867,6 +980,29 @@ sub bench_subst {
     return "$count Replaced";
 }
 
+sub bench_textlevenshtein {
+    my $iter = shift;
+    my $d    = Digest->new("MD5");
+    my $data = _fuzzy_data();
+    my $diff;
+    foreach (1..$iter) {
+        foreach my $sz (qw/10 100 1000 2500/) {
+            my $n = scalar @{$data->{$sz}};
+            my $i = int(rand($n));
+            $diff = Text::Levenshtein::XS::distance(
+                $data->{$sz}->[$i], $data->{$sz}->[$_]
+            ) for 0..$n-1;
+            $d->add($diff || -1);
+            next if $sz > 1000;
+            $diff = Text::Levenshtein::Damerau::XS::xs_edistance(
+                $data->{$sz}->[$i], $data->{$sz}->[$_]
+            ) for 0..$n-1;
+            $d->add($diff);
+        }
+    }
+    return $d->hexdigest;
+}
+
 sub bench_timepiece {
     my $iter = shift;
     my $t    = Time::Piece::localtime(1692119499);
@@ -877,8 +1013,8 @@ sub bench_timepiece {
     for (1..$iter) {
         $t += int(rand(1000)-500)*$day;
         $t += 100000*$day if $t->year < 1970;
-        my $str = $t->strftime("%a, %d %b %Y %H:%M:%S");
-        $t = Time::Piece->strptime($str, "%a, %d %b %Y %H:%M:%S");
+        my $str = $t->strftime("%w, %d %m %Y %H:%M:%S");
+        eval '$t = Time::Piece->strptime($str, "%w, %d %m %Y %H:%M:%S")';
         my $jd = $t->julian_day;
         $d->add($str,$jd);
     }
@@ -965,9 +1101,10 @@ sub _read_wiki_files {
 
 sub _random_str {
     my $length = shift || 1;
-    my $str    = "";
-
-    $str .= chr(int(rand(95))+32) for 1..$length;
+    my $abc    = shift;
+    my ($base, $rng) = $abc ? (65, 26) : (32, 95);
+    my $str = "";
+    $str .= chr(int(rand($rng))+$base) for 1..$length;
     return $str;
 }
 
@@ -976,6 +1113,43 @@ sub _random_uchar {
     $chr += 128 if $chr > 127; # Skip Latin 1 supplement
     $chr += 288 if $chr > 591; # Skip pre-Greek blocks
     return chr($chr);
+}
+
+sub _fuzzy_data {
+    my %data;
+    push @{$data{10}}, join('', map {_random_uchar()} 1..(8+int(rand(5))))
+        for 0..99;
+    push @{$data{100}}, $data{10}->[$_]x10 for 0..49;
+    push @{$data{1000}}, _random_str(50,1)x20 for 0..7;
+    push @{$data{2500}}, _random_str(50,1)x50 for 0..3;
+    return \%data;
+}
+
+sub _rand_where {
+    my $p = rand();
+    if ($p > 0.5) {
+        return {foo => rand(10)};
+    } elsif ($p > 0.2) {
+        return {bar => {-in => [int($p*10)..int($p*20)]}};
+    } else {
+        my $op = $p > 0.1 ? '-and' : '-or';
+        my @cond = map {_rand_where()} 1..int(rand(3)+1);
+        return {$op => [@cond]};
+    }
+}
+
+sub _db_data {
+    my (@data, @cols);
+    foreach (1..20) {
+        my $d = {
+        id   => int(rand(10000000)),
+        date => \"NOW()",
+        map {"data".$_ => "foo bar" x int(rand(5)+1)} 1..int(rand(20)+1)
+        };
+        push @data, $d;
+        push @cols, [sort keys %$d];
+    }
+    return \@data, \@cols;
 }
 
 sub compare_obj {

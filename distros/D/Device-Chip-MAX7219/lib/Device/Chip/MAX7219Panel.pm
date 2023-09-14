@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
+use warnings;
+use Object::Pad 0.800 ':experimental(adjust_params)';
 
-package Device::Chip::MAX7219Panel 0.08;
+package Device::Chip::MAX7219Panel 0.09;
 class Device::Chip::MAX7219Panel
    :isa(Device::Chip);
 

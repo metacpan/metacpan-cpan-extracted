@@ -7,15 +7,18 @@ use lib qw{ inc };
 
 use Test::More 0.88;
 use My::Module::Test::App;
+use My::Module::Test::Mock_App;
 
 use Astro::App::Satpass2::Format;
+
+my $app = My::Module::Test::Mock_App->new();
 
 klass( 'Astro::App::Satpass2::Format' );
 
 {
     no warnings qw{ uninitialized };	# Needed by 5.8.8.
     local $ENV{TZ} = undef;	# Tests explicitly assume no TZ.
-    call_m( 'new', INSTANTIATE, 'Instantiate' );
+    call_m( 'new', parent => $app, INSTANTIATE, 'Instantiate' );
 }
 
 call_m( gmt => 1, TRUE, 'Set gmt to 1' );

@@ -1,0 +1,101 @@
+
+[![Windows](https://github.com/Corion/HTTP-Request-Diff/workflows/windows/badge.svg)](https://github.com/Corion/HTTP-Request-Diff/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/HTTP-Request-Diff/workflows/macos/badge.svg)](https://github.com/Corion/HTTP-Request-Diff/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/HTTP-Request-Diff/workflows/linux/badge.svg)](https://github.com/Corion/HTTP-Request-Diff/actions?query=workflow%3Alinux)
+
+# NAME
+
+HTTP::Request::Diff - create diffs between HTTP request
+
+# SYNOPSIS
+
+    my $diff = HTTP::Request::Diff->new(
+        reference => $req,
+        #actual    => $req2,
+        skip_headers => \@skip,
+        ignore_headers => \@skip2,
+        mode => 'exact', # default is 'semantic'
+    );
+
+    my @differences = $diff->diff( $actual );
+    say Dumper $differences[0];
+    # {
+    #   'kind' => 'value',
+    #   'type' => 'query.foo',
+    #   'reference' => [
+    #                    undef
+    #                  ],
+    #   'actual' => [
+    #                 'bar'
+    #               ]
+    # }
+    #
+
+# METHODS
+
+## `->new`
+
+    my $diff = HTTP::Request::Diff->new(
+        mode => 'semantic',
+    );
+
+### Options
+
+- `mode`
+
+        mode => 'strict',
+
+    The comparison mode. The default is semantic comparison, which considers some
+    differences insignificant:
+
+    - The order of HTTP headers
+    - The boundary strings of multipart POST requests
+    - The order of query parameters
+    - The order of form parameters
+
+    `strict` mode wants the requests to be as identical as possible.
+    `lax` mode considers query parameters in the POST body as equivalent.
+
+- `reference`
+
+    (optional) The reference request to compare against. Alternatively pass in
+    the request in the call to `->diff`.
+
+- `skip_headers`
+
+        skip_headers => ['X-Proxied-For'],
+
+    List of headers to skip when comparing. Missing headers are not significant.
+
+- `ignore_headers`
+
+        ignore_headers => ['Accept-Encoding'],
+
+    List of headers to ignore when comparing. Missing headers are significant.
+
+- `canonicalize`
+
+    Callback to canonicalize a request. The request will be passed in unmodified
+    either as a string or a [HTTP::Request](https://metacpan.org/pod/HTTP%3A%3ARequest).
+
+- `compare`
+
+    Arrayref of things to compare.
+
+## `->diff`
+
+    my @diff = $diff->diff( $reference, $actual );
+    my @diff = $diff->diff( $actual );
+
+Performs the diff and returns an array of hashrefs with differences.
+
+## `->as_table( @diff )`
+
+    my @diff = $diff->diff( $request1, $request2 );
+    print $diff->as_table( @diff );
+    # +-----------------+-----------+--------+
+    # | Type            | Reference | Actual |
+    # | request.content | Ümloud    | Umloud |
+    # +-----------------+-----------+--------+
+
+Renders a diff as a table, using [Text::Table::Any](https://metacpan.org/pod/Text%3A%3ATable%3A%3AAny).

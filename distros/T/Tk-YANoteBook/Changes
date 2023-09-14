@@ -1,5 +1,14 @@
 Revision history for Perl extension Tk::YANoteBook.
 
+0.04  Thu Sep 14 2023
+	tidied up documentation.
+	gave the NameTab widget it's own pm file
+	added -autoupdate option
+	added -onlyselect option
+	addid -rigid option
+	added -unselecttabcall option
+	fixed some minor bugs
+	
 0.03  Fri Jun 9 2023
 	fixed highlightthickness of tab buttons (set it to 0)
 	fixed deep recursion issue on UpdateTabs

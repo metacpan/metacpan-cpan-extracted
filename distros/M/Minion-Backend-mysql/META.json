@@ -56,7 +56,7 @@
    "provides" : {
       "Minion::Backend::mysql" : {
          "file" : "lib/Minion/Backend/mysql.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#mojo"
    },
-   "version" : "1.001",
+   "version" : "1.002",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
       "Alexander Nalobin <nalobin@reg.ru>",
@@ -80,6 +80,7 @@
       "Hu Yin <huyin8@gmail.com>",
       "Jason A. Crome <jcrome@empoweredbenefits.com>",
       "Larry Leszczynski <larryl@cpan.org>",
+      "Larry Leszczynski <larryl@emailplus.org>",
       "Olaf Alders <olaf@wundersolutions.com>",
       "Paul Cochrane <paul@liekut.de>",
       "Sergey Andreev <40195653+saintserge@users.noreply.github.com>",

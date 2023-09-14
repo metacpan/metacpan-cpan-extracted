@@ -3,8 +3,9 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'Device::Chip::OPT3001' );
+require Device::Chip::OPT3001;
 
+pass( 'Modules loaded' );
 done_testing;

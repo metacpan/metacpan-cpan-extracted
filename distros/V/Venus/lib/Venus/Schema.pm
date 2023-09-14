@@ -33,7 +33,7 @@ sub assert {
 
   require Venus::Assert;
 
-  my $assert = Venus::Assert->new('schema');
+  my $assert = Venus::Assert->new;
 
   return $assert->expression($assert->render('hashkeys', $self->definition));
 }
@@ -43,7 +43,7 @@ sub check {
 
   my $assert = $self->assert;
 
-  return $assert->check($data);
+  return $assert->valid($data);
 }
 
 sub deduce {
@@ -61,7 +61,7 @@ sub error {
 
   my $error = $self->catch('validate', $data);
 
-  die $error if $error && !$error->isa('Venus::Assert::Error');
+  die $error if $error && !$error->isa('Venus::Check::Error');
 
   return $error;
 }
@@ -117,7 +117,7 @@ This package has the following attributes:
 
 =head2 definition
 
-  definition(HashRef $data) (HashRef)
+  definition(hashref $data) (hashref)
 
 The definition attribute is read-write, accepts C<(HashRef)> values, and is
 optional.
@@ -172,7 +172,7 @@ This package provides the following methods:
 
 =head2 assert
 
-  assert() (Assert)
+  assert() (Venus::Assert)
 
 The assert method builds and returns a L<Venus::Assert> object based on the
 L</definition>.
@@ -215,7 +215,7 @@ I<Since C<2.55>>
 
 =head2 check
 
-  check(HashRef $data) (Bool)
+  check(hashref $data) (boolean)
 
 The check method builds an assert object using L</assert> and returns the
 result of the L<Venus::Assert/check> method.
@@ -232,7 +232,7 @@ I<Since C<2.55>>
 
   my $check = $schema->check;
 
-  # 0
+  # false
 
 =back
 
@@ -254,7 +254,7 @@ I<Since C<2.55>>
 
   my $check = $schema->check({});
 
-  # 0
+  # false
 
 =back
 
@@ -279,7 +279,7 @@ I<Since C<2.55>>
     role => {},
   });
 
-  # 0
+  # false
 
 =back
 
@@ -307,7 +307,7 @@ I<Since C<2.55>>
     },
   });
 
-  # 1
+  # true
 
 =back
 
@@ -315,7 +315,7 @@ I<Since C<2.55>>
 
 =head2 deduce
 
-  deduce(HashRef $data) (Hash)
+  deduce(hashref $data) (Venus::Hash)
 
 The deduce method builds an assert object using L</assert> and validates the
 value provided using L<Venus::Assert/validate>, passing the result to
@@ -333,7 +333,7 @@ I<Since C<2.55>>
 
   my $deduce = $schema->deduce;
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =back
 
@@ -355,7 +355,7 @@ I<Since C<2.55>>
 
   my $deduce = $schema->deduce({});
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =back
 
@@ -380,7 +380,7 @@ I<Since C<2.55>>
     role => {},
   });
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =back
 
@@ -416,7 +416,7 @@ I<Since C<2.55>>
 
 =head2 error
 
-  error(HashRef $data) (Error)
+  error(hashref $data) (Venus::Error)
 
 The error method builds an assert object using L</assert> and validates the
 value provided using L<Venus::Assert/validate>, catching any error thrown and
@@ -434,7 +434,7 @@ I<Since C<2.55>>
 
   my $error = $schema->error;
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =back
 
@@ -456,7 +456,7 @@ I<Since C<2.55>>
 
   my $error = $schema->error({});
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =back
 
@@ -481,7 +481,7 @@ I<Since C<2.55>>
     role => {},
   });
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =back
 
@@ -517,7 +517,7 @@ I<Since C<2.55>>
 
 =head2 validate
 
-  validate(HashRef $data) (HashRef)
+  validate(hashref $data) (hashref)
 
 The validate method builds an assert object using L</assert> and validates the
 value provided using L<Venus::Assert/validate>, returning the result unless the
@@ -535,7 +535,7 @@ I<Since C<2.55>>
 
   my $validate = $schema->validate;
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =back
 
@@ -557,7 +557,7 @@ I<Since C<2.55>>
 
   my $validate = $schema->validate({});
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =back
 
@@ -582,7 +582,7 @@ I<Since C<2.55>>
     role => {},
   });
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =back
 
@@ -624,7 +624,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

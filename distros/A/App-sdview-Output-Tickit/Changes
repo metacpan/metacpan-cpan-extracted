@@ -1,5 +1,15 @@
 Revision history for App-sdview-Output-Tickit
 
+0.03    2023-09-13
+        [CHANGES]
+         * Type within the outline treeview to filter; Enter to jump to the
+           first highlighted item
+
+        [BUGFIXES]
+         * Await `Tickit::Term` startup to avoid terminal output on shell if
+           app crashes early
+         * Declare depends on `String::Tagged` 0.17
+
 0.02    2023-08-30
         [CHANGES]
          * Added a popup outline view with jump scrolling on click

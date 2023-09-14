@@ -1,0 +1,7 @@
+0.02 2023-09-01T14:12:51+02:00
+ - Add ERRORS section to doc.
+ - Reflect example name of real hash in Digest.
+ - Skip requirement of author test for BUILD().
+
+0.01 2023-09-01T06:34:26+02:00
+ - First version.

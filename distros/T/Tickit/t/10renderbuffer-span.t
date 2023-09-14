@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-use Test::More;
+use Test2::V0;
 use Tickit::Test;
 
 use Tickit::RenderBuffer;
@@ -18,7 +18,7 @@ my $rb = Tickit::RenderBuffer->new(
    cols  => 20,
 );
 
-isa_ok( $rb, "Tickit::RenderBuffer", '$rb isa Tickit::RenderContext' );
+isa_ok( $rb, [ "Tickit::RenderBuffer" ], '$rb isa Tickit::RenderContext' );
 
 is( $rb->lines, 10, '$rb->lines' );
 is( $rb->cols,  20, '$rb->cols' );

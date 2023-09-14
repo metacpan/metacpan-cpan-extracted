@@ -21,7 +21,7 @@ my $builder = Module::Build->new(
         'perl'          => '5.26.0',
         'Carp'          => '0',
         'List::UtilsBy' => '0',
-        'Object::Pad'   => '0.52',
+        'Object::Pad'   => '0.802',
         'Scalar::Util'  => '0',
     },
     add_to_cleanup => ['Food-Ratio-*'],

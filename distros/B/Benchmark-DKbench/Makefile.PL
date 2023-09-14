@@ -6,6 +6,12 @@ use File::ShareDir::Install;
 
 install_share dist => 'data';
 
+# Optional except for cpancover, cpantesters etc.
+my $extra_test =
+  ( $ENV{EXTENDED_TESTING} || $ENV{AUTOMATED_TESTING} )
+  ? 'requires'
+  : 'recommends';
+
 my %WriteMakefileArgs = (
     NAME               => 'Benchmark::DKbench',
     AUTHOR             => q{Dimitrios Kechagias <dkechag@cpan.org>},
@@ -23,26 +29,31 @@ my %WriteMakefileArgs = (
         'Test2::V0'               => '0',
     },
     PREREQ_PM => {
-        'Astro::Coord::Constellations' => '0',
-        'Astro::Coord::Precession'     => '0',
-        'Crypt::JWT'                   => '0.032',
-        'CSS::Inliner'                 => '0',
-        'DateTime'                     => '0',
-        'File::ShareDir'               => '0',
-        'HTML::FormatText'             => '0',
-        'HTML::TreeBuilder'            => '0',
-        'Imager'                       => '1',
-        'Imager::File::JPEG'           => '0',
-        'Image::PHash'                 => '0.3',
-        'JSON::XS'                     => '0',
-        'Math::MatrixReal'             => '0',
-        'Math::DCT'                    => '0',
-        'Moose'                        => '0',
-        'MCE::Loop'                    => '0',
-        'Sys::Info'                    => '0',
-        'Test::Harness'                => '0',
-        'Test::Output'                 => '0',
-        'Test::Requires'               => '0',
+        'Astro::Coord::Constellations'   => '0',
+        'Astro::Coord::Precession'       => '0',
+        'Crypt::JWT'                     => '0.032',
+        'CSS::Inliner'                   => '0',
+        'DateTime'                       => '0',
+        'DBD::Mock'                      => '0',
+        'DBI'                            => '0',
+        'File::ShareDir'                 => '0',
+        'HTML::FormatText'               => '0',
+        'HTML::Parser'                   => '0',
+        'HTML::TreeBuilder'              => '0',
+        'Imager'                         => '1',
+        'Image::PHash'                   => '0.3',
+        'JSON::XS'                       => '0',
+        'Math::MatrixReal'               => '0',
+        'Math::DCT'                      => '0',
+        'Moose'                          => '0',
+        'MCE::Loop'                      => '0',
+        'SQL::Inserter'                  => '0',
+        'SQL::Abstract::Classic'         => '0',
+        'System::Info'                   => '0',
+        'Test::Harness'                  => '0',
+        'Test::Requires'                 => '0',
+        'Text::Levenshtein::XS'          => '0',
+        'Text::Levenshtein::Damerau::XS' => '0',
     },
     dist => {
         COMPRESS => 'gzip -9f',
@@ -50,6 +61,13 @@ my %WriteMakefileArgs = (
     },
     META_MERGE        => {
         "meta-spec" => { version => 2 },
+        prereqs => {
+            test => {
+                $extra_test => {
+                    'Test::MockFile' => '0',
+                }
+            },
+        },
         resources => {
             repository => {
                 type => 'git',

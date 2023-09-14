@@ -57,7 +57,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Waffle';
-our $VERSION  = '9.33';
+our $VERSION  = '9.34';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -526,6 +526,9 @@ see L<Mojolicious::Controller/"session"> for more information about working with
 
 For serving static files from your C<public> directories, defaults to a L<Mojolicious::Static> object.
 
+  # Serve static files only with a "/static" prefix
+  $app->static->prefix('/static');
+
   # Add another "public" directory
   push @{$app->static->paths}, '/home/sri/public';
 
@@ -775,6 +778,11 @@ Licensed under the BSD License, L<https://github.com/highlightjs/highlight.js/bl
   Copyright 2011-2020 Twitter, Inc.
 
 Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
+
+=head2 Font Awesome
+
+Licensed under the CC-BY License, Version 4.0 L<https://creativecommons.org/licenses/by/4.0/> and SIL OFL, Version 1.1
+L<https://opensource.org/licenses/OFL-1.1>.
 
 =head1 CODE NAMES
 

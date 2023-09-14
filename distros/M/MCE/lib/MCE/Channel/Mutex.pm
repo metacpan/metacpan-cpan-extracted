@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( uninitialized once );
 
-our $VERSION = '1.888';
+our $VERSION = '1.889';
 
 use base 'MCE::Channel';
 use MCE::Mutex ();
@@ -219,17 +219,9 @@ sub send2 {
    my $data = $freeze->([ @_ ]);
 
    local $\ = undef if (defined $\);
-   local $MCE::Signal::SIG;
-
-   {
-      local $MCE::Signal::IPC = 1;
-      ( my $c_mutex = $self->{c_mutex} )->lock2;
-
+   $self->{c_mutex}->synchronize2( sub {
       print { $self->{c_sock} } pack('i', length $data), $data;
-      $c_mutex->unlock2;
-   }
-
-   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
+   });
 
    return 1;
 }
@@ -304,7 +296,7 @@ MCE::Channel::Mutex - Channel for producer(s) and many consumers
 
 =head1 VERSION
 
-This document describes MCE::Channel::Mutex version 1.888
+This document describes MCE::Channel::Mutex version 1.889
 
 =head1 DESCRIPTION
 

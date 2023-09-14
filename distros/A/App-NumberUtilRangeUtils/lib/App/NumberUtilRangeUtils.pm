@@ -3,9 +3,9 @@ package App::NumberUtilRangeUtils;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-04'; # DATE
+our $DATE = '2023-09-08'; # DATE
 our $DIST = 'App-NumberUtilRangeUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: CLIs for Number::Util::Range
@@ -22,7 +22,7 @@ App::NumberUtilRangeUtils - CLIs for Number::Util::Range
 
 =head1 VERSION
 
-This document describes version 0.002 of App::NumberUtilRangeUtils (from Perl distribution App-NumberUtilRangeUtils), released on 2023-01-04.
+This document describes version 0.003 of App::NumberUtilRangeUtils (from Perl distribution App-NumberUtilRangeUtils), released on 2023-09-08.
 
 =head1 DESCRIPTION
 

@@ -26,9 +26,9 @@ our @EXPORT_OK = qw/oops btw btwN/;
 use Import::Into;
 use Carp;
 
-sub oops(@) { 
+sub oops(@) {
   my $pkg = caller;
-  my $pfx = "\n"; 
+  my $pfx = "\n";
   $pfx .= "$pkg " if $pkg ne 'main';
   $pfx .= "oops:\n";
   @_ = ($pfx, @_, "\n");
@@ -37,13 +37,13 @@ sub oops(@) {
 
 # "By The Way" messages showing file:linenum of the call
 sub btw(@) { unshift @_,0; goto &btwN }
-sub btwN($@) { 
-  my $N=shift; 
+sub btwN($@) {
+  my $N=shift;
   my ($fn, $lno) = (caller($N))[1,2];
-  $fn =~ s/.*[\\\/]//;  
+  $fn =~ s/.*[\\\/]//;
   $fn =~ s/(.)\.[a-z]+$/$1/a;
-  local $_ = join("",@_); 
-  s/\n\z//s; 
+  local $_ = join("",@_);
+  s/\n\z//s;
   printf "%s:%d: %s\n", $fn, $lno, $_;
 }
 
@@ -142,7 +142,7 @@ sub import {
   require Guard;
   Guard->import::into($target, qw(scope_guard guard));
 
-  use Data::Dumper::Interp 6.003 (); # 6.003 fixed AUTOLOAD $@ corruption
+  use Data::Dumper::Interp 6.005 ();
   unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
     # unless we are testing DDI
     Data::Dumper::Interp->import::into($target,

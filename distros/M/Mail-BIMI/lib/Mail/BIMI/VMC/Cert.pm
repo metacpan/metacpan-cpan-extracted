@@ -1,6 +1,6 @@
 package Mail::BIMI::VMC::Cert;
 # ABSTRACT: Class to model a VMC Cert
-our $VERSION = '3.20230607'; # VERSION
+our $VERSION = '3.20230913'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -108,6 +108,16 @@ sub is_expired($self) {
 }
 
 
+sub is_experimental($self) {
+  return if !$self->x509_object;
+  my $exts = eval{ $self->x509_object->extensions_by_oid() };
+  return if !$exts;
+  my $key = IS_EXPERIMENTAL_OID;
+  return if !exists $exts->{$key};
+  return 1;
+}
+
+
 sub has_valid_usage($self) {
   return if !$self->x509_object;
   my $exts = eval{ $self->x509_object->extensions_by_oid() };
@@ -147,7 +157,7 @@ Mail::BIMI::VMC::Cert - Class to model a VMC Cert
 
 =head1 VERSION
 
-version 3.20230607
+version 3.20230913
 
 =head1 DESCRIPTION
 
@@ -260,6 +270,10 @@ Crypt::OpenSSL::X509 object for the Certificate
 =head2 I<is_expired()>
 
 Return true if this cert has expired
+
+=head2 I<is_experimental()>
+
+Returns true if the cert is marked as experimental
 
 =head2 I<has_valid_usage()>
 

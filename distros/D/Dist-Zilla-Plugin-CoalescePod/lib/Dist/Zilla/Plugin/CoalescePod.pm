@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::CoalescePod;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: merge .pod files into their .pm counterparts
-$Dist::Zilla::Plugin::CoalescePod::VERSION = '0.3.0';
+$Dist::Zilla::Plugin::CoalescePod::VERSION = '1.0.0';
 use strict;
 use warnings;
 
@@ -33,31 +33,31 @@ sub munge_file {
 
     my @content = ( $file->content );
 
-    if( $content[0] =~ s/(^__DATA__.*)//ms ) {
-        push @content, $1;
-    }
+    push @content, $1 if $content[0] =~ s/(^__DATA__.*)//ms;
 
     # inject the pod
     splice @content, 1, 0, $podfile->content;
 
     $file->content( join "\n\n", @content );
-
-    return;
 }
 
 sub prune_files {
    my ($self) = @_;
 
    my @files = @{ $self->zilla->files };
+
    foreach my $file ( @files ) {
       next unless $file->name =~ m/\.pod$/;
       next if $file->name =~ /t\/corpus/;
 
+      my $pm = $file->name =~ s/\.pod$/.pm/r;
+
+      # only deal with pod files with associated pm files
+      next unless grep { $_->name eq $pm } @files;
+
       push @{ $self->_pod_files }, $file;
       $self->zilla->prune_file($file);
    }
-
-   return;
 }
 
 1;
@@ -77,7 +77,7 @@ Foo - merge .pod files into their .pm counterparts
 
 =head1 VERSION
 
-version 0.3.0
+version 1.0.0
 
 =head1 SYNOPSIS
 
@@ -96,7 +96,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2014, 2013, 2012 by Yanick Champoux.
+This software is copyright (c) 2023 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

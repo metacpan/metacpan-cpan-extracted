@@ -3,17 +3,19 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'Tickit' );
+require Tickit;
 
-use_ok( 'Tickit::Term' );
-use_ok( 'Tickit::Pen' );
-use_ok( 'Tickit::Rect' );
-use_ok( 'Tickit::RectSet' );
-use_ok( 'Tickit::Utils' );
-use_ok( 'Tickit::StringPos' );
+require Tickit::Term;
+require Tickit::Pen;
+require Tickit::Rect;
+require Tickit::RectSet;
+require Tickit::Utils;
+require Tickit::StringPos;
 
-use_ok( 'Tickit::Window' );
+require Tickit::Window;
+require Tickit::RenderBuffer;
 
+pass( 'Modules loaded' );
 done_testing;

@@ -2,9 +2,8 @@ package constant::more;
 use strict;
 use warnings;
 
-our $VERSION="v0.2.1";
+our $VERSION="v0.3.0";
 
-#use feature qw<state>;
 no warnings "experimental";
 
 our %seen;
@@ -13,19 +12,35 @@ sub import {
 
 	my $package =shift;
 	return unless @_;
-	#check if first item is a hash ref.
+
 	my $flags;
 	if(ref($_[0]) eq "HASH"){
+    # Hash ref of keys and values
 		$flags=shift;
 	}
-	elsif(ref($_[0]) eq ""){
-		#flat list of 2 items expected
-		$flags={$_[0]=>$_[1]};
+  else{
+    # Flat list
+    if($_[0] =~/=/){
+      # Enumerations.
+      my $c=0;
+      my @out;
+
+      for(@_){
+        my @f=split /=/;
+        if(@f == 2){
+          #update c to desired value 
+          $c=$f[1];
+        }
+        push @out, $f[0], $c++;
+      }
+      $flags={@out};
+    }
+    else {
+      # Normal
+      die "constant::more note enough items" if @_ % 2;
+      $flags={@_};
+    }
 	}
-	else {
-    die "Flat list or hash ref expected";
-	}
-	
 	
 	my $caller=caller;
 	no strict "refs";
@@ -88,6 +103,7 @@ sub import {
 			
 
 		#CMD line argument override
+    
 		if($entry->{opt} and @ARGV){	
 			require Getopt::Long;
 			if($entry->{keep}){
@@ -95,8 +111,6 @@ sub import {
 				
 				my @array=@ARGV; #copy
 				$parser->getoptionsfromarray(\@array, $entry->{opt}, $wrapper) or die "Invalid options";
-
-
 			}
 			else{
 				my $parser=Getopt::Long::Parser->new(
@@ -105,7 +119,6 @@ sub import {
 					]
 				);
 				$parser->getoptions( $entry->{opt}, $wrapper) or die "Invalid options";
-
 			}
 		}
 

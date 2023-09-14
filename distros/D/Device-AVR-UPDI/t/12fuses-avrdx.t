@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use v5.20;
+use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Future::IO;
 
 use lib 't/lib';

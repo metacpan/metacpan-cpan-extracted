@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter 0.05;  # ->expect_assert_ss, etc..
 
 use Future::AsyncAwait;
@@ -26,7 +26,7 @@ await $chip->mount(
       ->returns( "\x00\x6F\x00\x32\x5B\x5A\x83\xC0\x76\xDB\xDF\xFF\x0A\x80" . "\xFF\xFF" );
    $adapter->expect_release_ss;
 
-   is_deeply( await $chip->read_csd,
+   is( await $chip->read_csd,
       {
          TAAC                => "60ms",
          NSAC                => "0ck",

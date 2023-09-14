@@ -1,10 +1,13 @@
 package App::Oozie::Types::DateTime;
-$App::Oozie::Types::DateTime::VERSION = '0.002';
+$App::Oozie::Types::DateTime::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
 
 use App::Oozie::Date;
+use App::Oozie::Constants qw(
+    SHORTCUT_METHODS
+);
 use Date::Parse ();
 use DateTime    ();
 
@@ -43,7 +46,7 @@ declare IsDate => as Str,
         # The TZ values doesn't matter in here as this is only
         # doing a syntactical check
         state $date     = App::Oozie::Date->new( timezone => 'UTC' );
-        state $is_short = { map { $val => 1 } $date->SHORTCUT_METHODS };
+        state $is_short = { map { $val => 1 } SHORTCUT_METHODS };
         return if ! $val;
         return 1 if $is_short->{ $val };
         return if ! $date->is_valid( $val );
@@ -83,7 +86,7 @@ App::Oozie::Types::DateTime
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 

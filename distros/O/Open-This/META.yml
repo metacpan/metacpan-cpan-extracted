@@ -45,13 +45,13 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/oalders/open-this/issues
-  homepage: https://github.com/oalders/open-this
-  repository: https://github.com/oalders/open-this.git
-version: '0.000032'
+  bugtracker: https://github.com/perl-ide/open-this/issues
+  homepage: https://github.com/perl-ide/open-this
+  repository: https://github.com/perl-ide/open-this.git
+version: '0.000033'
 x_Dist_Zilla:
   perl:
-    version: '5.036000'
+    version: '5.038000'
   plugins:
     -
       class: Dist::Zilla::Plugin::PromptIfStale
@@ -361,7 +361,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.40.1
+          git_version: 2.42.0
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.048'
@@ -369,7 +369,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.40.1
+          git_version: 2.42.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -461,7 +461,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.40.1
+          git_version: 2.42.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -474,11 +474,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000032
+          tag: v0.000033
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.40.1
+          git_version: 2.42.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -516,7 +516,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.40.1
+          git_version: 2.42.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -530,7 +530,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.40.1
+          git_version: 2.42.0
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.048'
@@ -621,10 +621,11 @@ x_contributors:
   - 'E. Choroba <choroba@matfyz.cz>'
   - 'José Joaquín Atria <jjatria@gmail.com>'
   - 'Manni Heumann <github@lxxi.org>'
+  - 'mcneb10 <37050201+mcneb10@users.noreply.github.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Olaf Alders <olaf.alders@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
-x_generated_by_perl: v5.36.0
+x_generated_by_perl: v5.38.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

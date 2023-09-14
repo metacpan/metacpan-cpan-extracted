@@ -18,9 +18,11 @@ my %WriteMakefileArgs = (
   "NAME" => "exact::class",
   "PREREQ_PM" => {
     "Class::Method::Modifiers" => 0,
+    "Import::Into" => 0,
     "Role::Tiny" => 0,
     "Scalar::Util" => 0,
-    "exact" => "1.21",
+    "exact" => "1.23",
+    "feature" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -31,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.18",
+  "VERSION" => "1.19",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,11 +45,13 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Import::Into" => 0,
   "Role::Tiny" => 0,
   "Scalar::Util" => 0,
   "Test2::V0" => 0,
   "Test::More" => 0,
-  "exact" => "1.21",
+  "exact" => "1.23",
+  "feature" => 0,
   "strict" => 0,
   "warnings" => 0
 );

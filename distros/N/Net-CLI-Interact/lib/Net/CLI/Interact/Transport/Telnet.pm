@@ -1,6 +1,5 @@
 package Net::CLI::Interact::Transport::Telnet;
-{ $Net::CLI::Interact::Transport::Telnet::VERSION = '2.400000' }
-
+$Net::CLI::Interact::Transport::Telnet::VERSION = '2.400002';
 use Moo;
 use Sub::Quote;
 use MooX::Types::MooseLike::Base qw(InstanceOf);
@@ -130,7 +129,7 @@ this option, which should be an array reference.
 On Windows platforms, each item on the list will be passed to the C<plink.exe>
 application, separated by a single space character. On Unix platforms, if depends
 whether you have L<IO::Pty> installed (which in turn depends on a compiler).
-Typically, the L<Net::Telnet> library is used for TELNET connections, so the 
+Typically, the L<Net::Telnet> library is used for TELNET connections, so the
 list can be any options taken by its C<new()> constructor. Otherwise the local
 C<telnet> application is used.
 

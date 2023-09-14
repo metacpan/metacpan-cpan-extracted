@@ -118,7 +118,8 @@ GetOptions(
   "v|verbose"         => \$verbose,
 ) or die "bad args";
 Getopt::Long::Configure("default");
-say "> ARGV PASSED THROUGH: ",join(",",map{ "'${_}'" } @ARGV) if $debug;
+say "> ARGV PASSED THROUGH: ",join(",",map{ "'${_}'" } @ARGV)
+  if @ARGV && $debug;
 
 $dvs{debug}   = $debug   if defined($debug);
 $dvs{verbose} = $verbose if defined($verbose);

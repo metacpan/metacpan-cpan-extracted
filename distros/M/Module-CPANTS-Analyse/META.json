@@ -5,7 +5,7 @@
       "Kenichi Ishigaki <ishigaki@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "CPANTS",
       "kwalitee"
@@ -32,7 +32,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker::CPANfile" : "0.08",
+            "ExtUtils::MakeMaker::CPANfile" : "0.09",
             "perl" : "5.008001"
          }
       },
@@ -41,7 +41,6 @@
             "Archive::Any::Lite" : "0.06",
             "Archive::Tar" : "1.76",
             "Array::Diff" : "0.04",
-            "CPAN::DistnameInfo" : "0.06",
             "CPAN::Meta::Validator" : "2.133380",
             "CPAN::Meta::YAML" : "0.008",
             "Class::Accessor" : "0.19",
@@ -50,6 +49,7 @@
             "JSON::PP" : "0",
             "List::Util" : "1.33",
             "Module::Find" : "0",
+            "Parse::Distname" : "0",
             "Perl::PrereqScanner::NotQuiteLite" : "0.9901",
             "Software::License" : "0.103012",
             "Text::Balanced" : "0",
@@ -79,6 +79,6 @@
          "url" : "https://github.com/cpants/Module-CPANTS-Analyse"
       }
    },
-   "version" : "1.01",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

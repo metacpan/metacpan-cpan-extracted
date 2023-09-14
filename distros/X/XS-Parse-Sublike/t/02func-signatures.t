@@ -14,6 +14,8 @@ no warnings 'experimental';
 use lib "t";
 use testcase "t::func";
 
+BEGIN { $^H{"t::func/func"}++ }
+
 # basic sig
 {
    func withparam($x) { return $x + 1 }

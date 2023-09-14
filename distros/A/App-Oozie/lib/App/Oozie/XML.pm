@@ -1,5 +1,5 @@
 package App::Oozie::XML;
-$App::Oozie::XML::VERSION = '0.002';
+$App::Oozie::XML::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
@@ -114,7 +114,7 @@ sub _init_data {
             # parsed document.
             #
             # The alternative might be to feed the document to a function which
-            # does not do schema validation (like XML::SImple) -- which will lead
+            # does not do schema validation (like XML::Simple) -- which will lead
             # to double parsing -- or just try to parse the error message like
             # down below.
             #
@@ -360,6 +360,10 @@ sub _build_schema {
 
         # get the namespace and version
         my %attr      = map +( $_->name, $_->value ), $XML_SCHEMA->attributes;
+        if ( ! exists $attr{targetNamespace} ) {
+            # seems to be a change in new version
+            next;
+        }
         my $namespace = delete $attr{targetNamespace};
         my $version   = ( split /:/, $namespace )[-1];                       # assuming uri:oozie:...:$version
         my $prefix = ( split /:/, ( grep $attr{$_} eq $namespace, keys %attr )[0] )[-1];
@@ -422,7 +426,7 @@ App::Oozie::XML
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 

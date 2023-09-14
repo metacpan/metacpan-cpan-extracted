@@ -22,9 +22,9 @@ my $expected_enc = pack("C*", 0x9b, 0xc3, 0x7f, 0x1b, 0x92, 0x93, 0xcc, 0xf9, 0x
 
 my $c = new Crypt::OpenSSL::AES($key);
 
-ok(($encrypted = $c->encrypt($plaintext)) eq $expected_enc, "Encrypt");
+ok(($encrypted = $c->encrypt($plaintext)) eq $expected_enc, "Encrypted Successfully");
 
-ok($c->decrypt($encrypted) eq $plaintext, "Decrypt");
+ok($c->decrypt($encrypted) eq $plaintext, "Decrypted Successfully");
 
-ok($c->decrypt($c->encrypt("Hello World. 123")) eq "Hello World. 123", "Simple String");
+ok($c->decrypt($c->encrypt("Hello World. 123")) eq "Hello World. 123", "Simple String Encrypted/Decrypted Successfully");
 

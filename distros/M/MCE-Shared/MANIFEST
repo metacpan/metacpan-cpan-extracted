@@ -11,6 +11,7 @@ lib/MCE/Shared.pm
 lib/MCE/Shared/Array.pm
 lib/MCE/Shared/Base.pm
 lib/MCE/Shared/Cache.pm
+lib/MCE/Shared/Common.pm
 lib/MCE/Shared/Condvar.pm
 lib/MCE/Shared/Handle.pm
 lib/MCE/Shared/Hash.pm

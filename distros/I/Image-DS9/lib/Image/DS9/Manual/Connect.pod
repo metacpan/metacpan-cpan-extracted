@@ -1,0 +1,297 @@
+# PODNAME: Image::DS9::Manual::Connect
+
+# ABSTRACT: Controlling the communications with DS9
+
+__END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory QueryTimeOut ResErrCroak
+ResErrIgnore ResErrWarn StartTimeOut WaitTimeOut XPA attrs daemonize ds9
+nservers
+
+=head1 NAME
+
+Image::DS9::Manual::Connect - Controlling the communications with DS9
+
+=head1 VERSION
+
+version v1.0.0
+
+=head1 DESCRIPTION
+
+L<Image::DS9> uses the L<IPC::XPA> module to communicate (via the
+B<XPA> library) with one or more instances of C<DS9>.  It provides an
+API which mimics the commands which C<DS9> provides.
+
+The methods documented here provide control over those communications,
+either by initializing it (e.g. L</new>) or by allowing the user to
+bypass the L<Image::DS9> layer and send commands directly to C<DS9>
+via L<IPC::XPA>. This is useful if L<Image::DS9> doesn't directly
+support some functionality.
+
+For reference documentation for the methods which map onto C<DS9>'s
+commands, see L<Image::DS9::Manual::API>.
+
+For more information on calling conventions, see L<Image::DS9::Manual::Interface>.
+
+=head1 CONSTRUCTORS
+
+=head3 new
+
+  $ds9 = new Image::DS9;
+  $ds9 = new Image::DS9( \%attrs );
+
+Construct and return an object representing the connection to C<DS9>.
+It throws an exception on error.
+
+The optional hash B<attrs> may contain one of the following keys:
+
+=over
+
+=item Server
+
+The title of the C<ds9> process with which to communicate.  It
+defaults to C<ds9>.
+
+=item WaitTimeOut
+
+B<DEPRECATED>; use L</QueryTimeOut> and L</StartTimeOut>
+
+The default number of seconds that the B<wait()> method should
+try to contact B<DS9> servers. It defaults to C<2> seconds.
+
+=item QueryTimeOut
+
+The number of seconds that the B<wait()> method should try to contact
+existing B<DS9> servers. It defaults to C<2> seconds.
+
+=item StartTimeOut
+
+The number of seconds that the B<wait()> method should wait for a
+connection after starting a B<DS9> server. It defaults to C<2>
+seconds.
+
+=item max_servers
+
+The maximum number of servers to which to communicate.  It defaults to
+the number of C<DS9> servers running at the time the constructor is
+called.
+
+=item min_servers
+
+The minimum number of servers which should respond to commands.  If
+a response is not received from at least this many servers, an exception
+will be thrown.  It defaults to C<1>.
+
+=item auto_start
+
+Create a B<ds9> process with the title specified by the C<Server>
+attribute if one does not exist. It polls for an existing process
+for the time period specified via L</QueryTimeOut> before creating
+a new one.
+
+=item ds9
+
+Path to the C<ds9> executable.  It defaults to C<ds9>, which will find it
+in the user's executable path, but may be set to any other valid path.
+
+=item terminate_on_destroy
+
+A flag to determine if and when to terminate the B<ds9> process when the B<Image::DS9>
+object is destroyed.  The flag is set with constants available via:
+
+  use Image::DS9::Constants::V1 -terminate_ds9;
+
+The bitwise I<or> of the following values:
+
+=over
+
+=item TERMINATE_DS9_STARTED
+
+terminate if this process started the B<ds9> process.
+
+=item TERMINATE_DS9_ATTACHED
+
+terminate if this process attached to an existing B<ds9> process.
+
+=back
+
+or the following values
+
+=over
+
+=item TERMINATE_DS9_YES
+
+Essentially C<TERMINATE_DS9_STARTED> | C<TERMINATE_DS9_ATTACHED>.
+
+=item TERMINATE_DS9_NO
+
+Don't terminate on object destruction.  Don't I<or> this with anything, it won't do
+
+=back
+
+=item kill_on_destroy
+
+B<DEPRECATED>; use L</terminate_on_destroy>.  A true value is translated into C<TERMINATE_DS9_YES>,
+and a false value is translated into C<TERMINATE_DS9_NO>
+
+=item daemonize
+
+B<Caveat: *nix Only>
+
+If true the B<ds9> process will be detached from the current process.
+This is useful in situations where the current process is launched
+under a process manager which will only exit when all of its
+sub-processes have completed. The L</terminate_on_destroy> option
+can be used with L</daemonize>.
+
+=item ResErrCroak
+
+If true, queries sent to B<ds9> which returns fewer values than
+expected will result in B<croak()>s.  This may be a problem if B<ds9>
+is queried for inappropriate information. For example, it will return
+an empty result if a image (i.e. not a binned event list) is displayed
+in the current frame and the names of the binned columns are queried
+(which of course makes no sense).  See the C<ResErrWarn> and
+C<ResErrIgnore> attributes for ways of handling this.
+
+If too I<many> results are returned, this module will always croak.
+B<ResErrCroak> is the default mode.
+
+=item ResErrWarn
+
+If true, queries sent to B<ds9> which returns fewer values than
+expected will result in B<carp()>s and will be compensated for by
+filling in the missing values with empty strings.
+
+=item ResErrIgnore
+
+Queries sent to B<ds9> which returns fewer values than expected are
+silently compensated for by filling in the missing values with
+empty strings.
+
+For example,
+
+        $ds9 = new Image::DS9( { max_servers => 3 } );
+
+=back
+
+=head1 METHODS
+
+=head3 nservers
+
+  $nservers = $ds9->nservers;
+
+This returns the number of servers which the object is communicating
+with.
+
+=head3 res
+
+  %res = $ds9->res;
+
+In case of error, the returned results from the failing B<XPA> call
+are available via this method.  It returns a hash, keyed off of the
+server signature(s). See the L<IPC::XPA> documentation for more
+information on what the hashes contain.
+
+=head3 wait
+
+  $ds9->wait();
+  $ds9->wait($timeout);
+
+Try to contact the B<DS9> servers, and wait until at least
+B<min_servers> have replied.  It will attempt this for
+B<QueryTimeOut> seconds if no timeout is supplied, else
+the given time.  It returns true upon success.
+
+=head3 set_attr
+
+  $ds9->set_attr( $attr_name => $attr_value, ... );
+
+Set the attribute to the given value.  The following attributes may be
+set:
+
+  StartTimeOut
+  QueryTimeOut
+  WaitTimeInterval
+  min_servers
+  kill_on_destroy
+  auto_start
+  verbose
+
+Changing other attributes will result in undefined behavior.
+
+=head3 get_attr
+
+  $attr_value = $ds9->get_attr( $attr_name );
+
+Retrieve the value of an attribute.  Valid attribute names
+are those which can be passed to L</new>.
+
+=head3 Set
+
+  $ds9->Set( $cmd, $buf )
+
+Send an arbitrary XPA Set command to the DS9 server.  If there was an
+error sending the command to the server, or fewer than expected
+servers responded, it'll B<croak()>.  Messages from the server will be
+made available via the B<res()> method.  See L<IPC::XPA> for more
+information on the format of those messages.
+
+=head3 Get
+
+  %results = $ds9->Get( $cmd )
+
+Send an arbitrary XPA Get command to the DS9 Server.   If there was an
+error sending the command to the server, or fewer than expected
+servers responded, it'll B<croak()>.  Messages from the server will be
+made available via the B<res()> method.
+
+Upon success, it'll return the results of the command.  If called in
+scalar mode, it'll return just one result (if there is more than one
+server, it returns results from an arbitrary server). In array mode,
+it'll return a hash.  See L<Image::DS9::Manual::API> for more
+information.
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-image-ds9@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/image-ds9
+
+and may be cloned from
+
+  https://gitlab.com/djerius/image-ds9.git
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Image::DS9|Image::DS9>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

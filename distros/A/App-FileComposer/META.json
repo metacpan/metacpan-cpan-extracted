@@ -19,13 +19,6 @@
             "Module::Build" : "0.4004"
          }
       },
-      "runtime" : {
-         "requires" : {
-            "Carp" : "1.52",
-            "Moose" : "2.2203",
-            "Term::ANSIColor" : "5.01"
-         }
-      },
       "test" : {
          "requires" : {
             "Test::More" : "0"
@@ -35,10 +28,10 @@
    "provides" : {
       "App::FileComposer" : {
          "file" : "lib/App/FileComposer.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

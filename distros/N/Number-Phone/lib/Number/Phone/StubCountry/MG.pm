@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230614174404;
+our $VERSION = 1.20230903131448;
 
 my $formatters = [
                 {
@@ -66,26 +66,26 @@ my $validators = {
                 'voip' => '22\\d{7}'
               };
 my %areanames = ();
-$areanames{en} = {"2612047", "Ambositra",
-"2612057", "Maroantsetra\/Sainte\ Marie",
-"26120722", "Manakara",
+$areanames{en} = {"2612069", "Maintirano",
+"2612047", "Ambositra",
 "2612044", "Antsirabe",
-"26120729", "Mananjary",
-"2612094", "Toliary",
-"2612054", "Ambatondrazaka",
 "2612056", "Moramanga",
-"2612082", "Antsiranana",
-"2612062", "Mahajanga",
-"2612075", "Fianarantsoa",
+"2612022", "Antananarivo",
+"2612057", "Maroantsetra\/Sainte\ Marie",
 "2612073", "Farafangana",
-"2612092", "Taolañaro",
+"2612054", "Ambatondrazaka",
+"26120722", "Manakara",
+"2612095", "Morondava",
 "2612086", "Nosy\ Be",
-"2612088", "Sambava",
 "2612067", "Antsohihy",
 "2612053", "Toamasina",
-"2612095", "Morondava",
-"2612069", "Maintirano",
-"2612022", "Antananarivo",};
+"26120729", "Mananjary",
+"2612088", "Sambava",
+"2612062", "Mahajanga",
+"2612082", "Antsiranana",
+"2612075", "Fianarantsoa",
+"2612094", "Toliary",
+"2612092", "Taolañaro",};
 
     sub new {
       my $class = shift;

@@ -1,7 +1,7 @@
 package Web::Query;
 our $AUTHORITY = 'cpan:TOKUHIROM';
 # ABSTRACT: Yet another scraping library like jQuery
-$Web::Query::VERSION = '0.39';
+$Web::Query::VERSION = '1.00';
 use strict;
 use warnings;
 use 5.008001;
@@ -21,12 +21,9 @@ our $RESPONSE;
 
 sub wq { Web::Query->new(@_) }
 
-our $UserAgent = LWP::UserAgent->new();
+our $UserAgent; 
 
-sub __ua {
-    $UserAgent ||= LWP::UserAgent->new( agent => __PACKAGE__ . "/" . __PACKAGE__->VERSION );
-    $UserAgent;
-}
+sub __ua { $UserAgent ||= LWP::UserAgent->new }
 
 sub _build_tree {
     my( $self, $options ) = @_;
@@ -89,7 +86,12 @@ sub new_from_url {
 
     $RESPONSE = __ua()->get($url);
 
-    return undef unless $RESPONSE->is_success;
+    no warnings 'uninitialized';
+
+    unless( $RESPONSE->is_success ) {
+        die "failed to retrieve '$url', " . $RESPONSE->code. " "
+            . $RESPONSE->message."\n";
+    };
 
     return $class->new_from_html($RESPONSE->decoded_content,$options);
 }
@@ -725,7 +727,7 @@ Web::Query - Yet another scraping library like jQuery
 
 =head1 VERSION
 
-version 0.39
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -1255,7 +1257,7 @@ it under the same terms as Perl itself.
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/tokuhirom/Web-Query/issues
+L<https://github.com/tokuhirom/Web-Query/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

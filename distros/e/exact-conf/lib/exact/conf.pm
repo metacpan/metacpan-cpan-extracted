@@ -3,12 +3,11 @@ package exact::conf;
 
 use 5.014;
 use exact;
-use strict;
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.08'; # VERSION
 
 sub import {
-    my ( $self, $caller, $params ) = @_;
+    my ( $self, $params, $caller ) = @_;
     $caller //= caller();
 
     my @params = grep { length } split( /[,\s]+/, $params || '' );
@@ -42,7 +41,7 @@ exact::conf - Cascading merged application configuration extension for exact
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =for markdown [![test](https://github.com/gryphonshafer/exact-conf/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-conf/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact-conf/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-conf)

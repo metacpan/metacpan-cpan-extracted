@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait 0.65;
+package Future::AsyncAwait 0.66;
 
 use v5.14;
 use warnings;
@@ -495,31 +495,42 @@ modifier can be applied to C<async sub>.
 
 sub import
 {
-   my $class = shift;
+   my $pkg = shift;
    my $caller = caller;
 
-   $class->import_into( $caller, @_ );
+   $pkg->import_into( $caller, @_ );
 }
+
+sub unimport
+{
+   my $pkg = shift;
+   my $caller = caller;
+
+   $pkg->unimport_into( $caller, @_ );
+}
+
+sub import_into   { shift->apply( sub { $^H{ $_[0] }++ },      @_ ) }
+sub unimport_into { shift->apply( sub { delete $^H{ $_[0] } }, @_ ) }
 
 my @EXPERIMENTAL = qw( cancel );
 
-sub import_into
+sub apply
 {
-   my $class = shift;
-   my $caller = shift;
+   my $pkg = shift;
+   my ( $cb, $caller, @syms ) = @_;
 
-   $^H{"Future::AsyncAwait/async"}++; # Just always turn this on
+   $cb->( "Future::AsyncAwait/async" ); # Just always turn this on
 
-   SYM: while( @_ ) {
-      my $sym = shift;
+   SYM: while( @syms ) {
+      my $sym = shift @syms;
 
-      $^H{"Future::AsyncAwait/future"} = shift, next if $sym eq "future_class";
+      $^H{"Future::AsyncAwait/future"} = shift @syms, next if $sym eq "future_class";
 
       foreach ( @EXPERIMENTAL ) {
-         $^H{"Future::AsyncAwait/experimental($_)"}++, next SYM if $sym eq ":experimental($_)";
+         $cb->( "Future::AsyncAwait/experimental($_)" ), next SYM if $sym eq ":experimental($_)";
       }
       if( $sym eq ":experimental" ) {
-         $^H{"Future::AsyncAwait/experimental($_)"}++ for @EXPERIMENTAL;
+         $cb->( "Future::AsyncAwait/experimental($_)" ) for @EXPERIMENTAL;
          next SYM;
       }
 

@@ -1,3 +1,10 @@
+0.824   2023-07-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Remove the use of smartmatch.
+
+        - Add function: Perinci::Examples::Completion::simple().
+
+
 0.823   2022-04-15  Released-By: PERLANCAR; Urgency: medium
 
         - [module Perinci::Examples::Table] sales(): Add more table metadata.

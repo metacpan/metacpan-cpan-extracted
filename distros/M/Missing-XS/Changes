@@ -1,0 +1,14 @@
+Missing-XS
+==========
+
+Created:      2023-09-04
+Home page:    <https://metacpan.org/release/Missing-XS>
+Bug tracker:  <https://github.com/tobyink/p5-missing-xs/issues>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.001001	2023-09-05
+
+ - Updated: Add more modules, mostly taken from
+   Acme::CPANModules::XSVersions.
+
+0.001000	2023-09-04	Initial release

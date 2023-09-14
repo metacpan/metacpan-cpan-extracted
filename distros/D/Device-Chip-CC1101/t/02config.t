@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -26,7 +26,7 @@ await $chip->mount(
    $adapter->expect_write_then_read( "\xFE", 8 )
       ->returns( "\xC6\x00\x00\x00\x00\x00\x00\x00" );
 
-   is_deeply(
+   is(
       { await $chip->read_config },
       {
          # IOCFG2

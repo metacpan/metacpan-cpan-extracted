@@ -1,5 +1,6 @@
 Revision history for App-FileComposer
 
-0.01    14-august/18:00
-        First version, release.
+0.02    1-set/2023 7:42Pm
+        Fixing Broken Dependencies and removing moose to 
+        improve speed installation.
 

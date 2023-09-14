@@ -79,7 +79,7 @@ This package provides the following methods:
 
 =head2 do
 
-  do(Str | CodeRef $method, Any @args) (Self)
+  do(string | coderef $method, any @args) (object)
 
 The do method dispatches the method call or executes the callback and returns
 the invocant. This method supports dispatching, i.e. providing a method name
@@ -113,7 +113,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

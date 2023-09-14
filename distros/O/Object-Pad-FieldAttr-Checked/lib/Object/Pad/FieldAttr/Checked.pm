@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad::FieldAttr::Checked 0.04;
+package Object::Pad::FieldAttr::Checked 0.06;
 
 use v5.14;
 use warnings;
@@ -76,15 +76,16 @@ more general, more powerful system being added in future.
    field $name :Checked(EXPRESSION) ...;
 
 Declares that any value assigned to the field during the constructor or using
-an accessor method must conform to the constraint checking object specified by
-the expression. Attempts to assign a non-conforming value will throw an
-exception and the field will not be modified. Currently only scalar fields are
+an accessor method must conform to the constraint checker specified by the
+expression. Attempts to assign a non-conforming value will throw an exception
+and the field will not be modified. Currently only scalar fields are
 supported.
 
 At compiletime, the string given by I<EXPRESSION> is C<eval()>'ed in scalar
 context, and its result is stored as part of the field's definition. The
-expression must yield either an object reference, or a string containing the
-name of a package. In either case, a method called C<check> must exist on it.
+expression must yield either an object reference, a code reference, or a
+string containing the name of a package. In the case of an object or package,
+a method called C<check> must exist on it.
 
 During the string C<eval()> of the expression, the C<strict 'subs'> pragma is
 specifically disabled, allowing a bareword to be used as the name of a
@@ -95,13 +96,23 @@ names if required.
 
 At runtime, this constraint checker is used every time an attempt is made to
 assign a value to the field I<from outside the object class>, whether that is
-from C<:param> initialisation, or invoking a C<:writer> accessor. The checker
-is used as the invocant for invoking a C<check> method, and the new value for
-the field is passed as an argument. If the method returns true, the assignment
-is allowed. If false, it is rejected with an exception and the field itself
-remains unmodified.
+from C<:param> initialisation, or invoking a C<:writer> or C<:accessor>. The
+checker is used as the invocant for invoking a C<check> method, and the new
+value for  the field is passed as an argument. If the method returns true, the
+assignment is allowed. If false, it is rejected with an exception and the
+field itself remains unmodified.
 
-   $ok = $checker->check( $value );
+   $ok = $checkerobj->check( $value );  # if an object
+
+   $ok = $checkersub->( $value );       # if a code reference
+
+   $ok = $checkerpkg->check( $value );  # if a package name
+
+(For performance reasons, the C<check> method is actually resolved into a
+function at compiletime when the C<:Checked> attribute is applied, and this
+stored function is the one that is called at assignment time. If the method
+itself is replaced later by globref assignment or other trickery, this updated
+function will not be used.)
 
 As this is the interface supported by L<Types::Standard>, any constraint
 object provided by that module is already supported here.
@@ -118,12 +129,6 @@ slow, or flat-out impossible. I<Prior to version 0.04> this module used to
 claim that even direct assignments would be checked. but this gave a false
 sense of safety if deeply-nested containers were involved and modified from
 within.
-
-(For performance reasons, the C<check> method is actually resolved into a
-function at compiletime when the C<:Checked> attribute is applied, and this
-stored function is the one that is called at assignment time. If the method
-itself is replaced later by globref assignment or other trickery, this updated
-function will not be used.)
 
 =cut
 
@@ -143,7 +148,8 @@ sub unimport
 
 =item *
 
-Support C<:accessor> and C<:mutator> accessors as well as C<:writer>.
+Support C<:mutator> accessors as well. This is a bit harder because lvalue
+magic.
 
 =back
 

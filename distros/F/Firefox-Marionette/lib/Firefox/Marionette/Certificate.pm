@@ -3,7 +3,7 @@ package Firefox::Marionette::Certificate;
 use strict;
 use warnings;
 
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 
 sub _NUMBER_OF_MICROSECOND_DIGITS { return -6 }
 
@@ -26,18 +26,12 @@ sub common_name {
 
 sub _cert_type {
     my ($self) = @_;
-    if ( defined $self->{certType} ) {
-        return $self->{certType};
-    }
-    return 0;
+    return $self->{certType};
 }
 
 sub is_any_cert {
     my ($self) = @_;
-    if ( defined $self->{ANY_CERT} ) {
-        return $self->{ANY_CERT} & $self->_cert_type();
-    }
-    return 0;
+    return $self->{ANY_CERT} & $self->_cert_type();
 }
 
 sub email_address {
@@ -177,7 +171,7 @@ Firefox::Marionette::Certificate - Represents a x509 Certificate from Firefox
 
 =head1 VERSION
 
-Version 1.43
+Version 1.44
 
 =head1 SYNOPSIS
 

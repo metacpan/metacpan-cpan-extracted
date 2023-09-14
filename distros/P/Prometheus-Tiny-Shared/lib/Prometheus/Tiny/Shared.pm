@@ -1,18 +1,19 @@
 package Prometheus::Tiny::Shared;
-$Prometheus::Tiny::Shared::VERSION = '0.026';
+$Prometheus::Tiny::Shared::VERSION = '0.027';
 # ABSTRACT: A tiny Prometheus client with a shared database behind it
 
 use warnings;
 use strict;
 
-use Prometheus::Tiny 0.010;
+use Prometheus::Tiny 0.011;
 use parent 'Prometheus::Tiny';
 
 use Hash::SharedMem qw(shash_open shash_get shash_set shash_cset shash_keys_array shash_group_get_hash);
 use JSON::XS qw(encode_json decode_json);
 use File::Temp qw(tempdir);
 use File::Path qw(rmtree);
-use Carp qw(croak);
+use Carp qw(croak carp);
+use Scalar::Util qw(looks_like_number);
 
 sub new {
   my ($class, %args) = @_;
@@ -44,6 +45,11 @@ EOF
 sub set {
   my ($self, $name, $value, $labels, $timestamp) = @_;
 
+  unless (looks_like_number $value) {
+    carp "setting '$name' to non-numeric value, using 0 instead";
+    $value = 0;
+  }
+
   my $key = join('-', 'k', $name, $self->_format_labels($labels));
   shash_set($self->{_shash}, $key, encode_json([$value, $timestamp]));
 
@@ -52,6 +58,11 @@ sub set {
 
 sub add {
   my ($self, $name, $diff, $labels) = @_;
+
+  unless (looks_like_number $diff) {
+    carp "adjusting '$name' by non-numeric value, adding 0 instead";
+    $diff = 0;
+  }
 
   my $key = join('-', 'k', $name, $self->_format_labels($labels));
 
@@ -222,13 +233,13 @@ L<https://github.com/robn/Prometheus-Tiny-Shared>
 
 =item *
 
-Rob N ★ <robn@robn.io>
+Rob N ★ <robn@despairlabs.com>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Rob N ★
+This software is copyright (c) 2017 by Rob Norris <robn@despairlabs.com>
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

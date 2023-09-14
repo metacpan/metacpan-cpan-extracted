@@ -9,10 +9,10 @@ use feature qw(say);
 use utf8;
 use Data::Dumper;
 use JSON::XS;
-use Time::HiRes  qw(gettimeofday);
-use POSIX        qw(strftime);
+use Time::HiRes qw(gettimeofday);
+use POSIX qw(strftime);
 use Scalar::Util qw(looks_like_number);
-use List::Util   qw(first);
+use List::Util qw(first);
 use Convert::Pheno::SQLite;
 binmode STDOUT, ':encoding(utf-8)';
 use Exporter 'import';
@@ -342,7 +342,7 @@ sub map_omop_visit_occurrence {
     my $visit_occurrence    = $self->{visit_occurrence};
 
     # Premature return
-    return undef if $visit_occurrence_id eq '\\N';
+    return undef if $visit_occurrence_id eq '\\N';    # perlcritic Severity: 5
 
 # *** IMPORTANT ***
 # EUNOMIA instance has mismatches between the person_id -- visit_occurrence_id
@@ -356,7 +356,7 @@ sub map_omop_visit_occurrence {
           if DEVEL_MODE;
 
         # Premature return
-        return undef;
+        return undef;    # perlcritic Severity: 5
     }
 
     # Getting pointer to the hash element

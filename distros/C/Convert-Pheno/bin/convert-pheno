@@ -4,7 +4,7 @@
 #
 #   This file is part of Convert::Pheno
 #
-#   Last Modified: Jun/27/2023
+#   Last Modified: Jul/26/2023
 #
 #   $VERSION taken from Convert::Pheno
 #
@@ -17,16 +17,16 @@ package main;
 use strict;
 use warnings;
 use autodie;
-use feature      qw(say);
+use feature qw(say);
 use Getopt::Long qw(:config no_ignore_case);
 use Pod::Usage;
 use Data::Dumper;
 use Sys::Hostname;
-use POSIX                 qw(strftime);
+use POSIX qw(strftime);
 use File::Spec::Functions qw(catdir catfile);
 use File::Basename;
 use File::ShareDir::ProjectDistDir qw(dist_dir);
-use FindBin                        qw($Bin);
+use FindBin qw($Bin);
 use lib "$Bin/../lib";
 use Term::ANSIColor qw(:constants);
 use Convert::Pheno;
@@ -284,16 +284,33 @@ sub write_log {
 
     my ( $log, $data ) = @_;
 
-    # NB: We will use anonymous (no effect on $data)
-    chomp( my $ncpuhost = qx{/usr/bin/nproc} ) // 1;
+    # NB: Darwin does not have nproc to show #logical-cores, using sysctl instead
+    my $os = $^O;
+    chomp(
+        my $ncpuhost =
+          lc($os) eq 'darwin' ? qx{/usr/sbin/sysctl -n hw.logicalcpu}
+        : $os eq 'MSWin32' ? qx{wmic cpu get NumberOfLogicalProcessors}
+        :                    qx{/usr/bin/nproc} // 1
+    );
+
+    # For the Windows command, the result will also contain the string
+    # "NumberOfLogicalProcessors" which is the header of the output.
+    # So we need to extract the actual number from it:
+    if ( $os eq 'MSWin32' ) {
+        ($ncpuhost) = $ncpuhost =~ /(\d+)/;
+    }
+    $ncpuhost = 0 + $ncpuhost;    # coercing it to be a number
 
     my $info = {
-        date     => ( strftime "%a %b %e %H:%M:%S %Y", localtime ),
-        ncpuhost => ( 0 + $ncpuhost ),                                # coercing it to be a number
-        hostname => hostname,
-        id       => time . substr( "00000$$", -5 ),                   # string
-        version  => $VERSION,
-        user     => $ENV{LOGNAME} || $ENV{USER} || getpwuid($<)
+        date      => ( strftime "%a %b %e %H:%M:%S %Y", localtime ),
+        ncpuhost  => $ncpuhost,
+        hostname  => hostname,
+        id        => time . substr( "00000$$", -5 ),                   # string
+        version   => $VERSION,
+             user => $ENV{'LOGNAME'}
+          || $ENV{'USER'}
+          || $ENV{'USERNAME'}
+          || 'dummy-user'
     };
 
     # Saving file
@@ -435,7 +452,7 @@ And then run:
 
 To run the container (detached) execute:
 
-  docker run -tid --name convert-pheno cnag/convert-pheno:latest
+  docker run -tid -e USERNAME=root --name convert-pheno cnag/convert-pheno:latest
 
 To enter:
 
@@ -537,7 +554,7 @@ B<Option 3:> Install Convert-Pheno and the dependencies in a "virtual environmen
 
 =head3 System requirements
 
-  * Ideally a Debian-based distribution (Ubuntu or Mint), but any other (e.g., CentOs, OpenSuse) should do as well.
+  * Ideally a Debian-based distribution (Ubuntu or Mint), but any other (e.g., CentOs, OpenSuse, MacOS) should do as well.
   * Perl 5 (>= 5.26 core; installed by default in most Linux distributions). Check the version with "perl -v".
   * >= 4GB of RAM
   * 1 core
@@ -557,15 +574,15 @@ A text file in one of the accepted formats. With C<--iomop> I/O files can be gzi
 
 Athena-OHDSI database
 
-The database file is available at this L<link|https://drive.google.com/drive/folders/104_Bgl3IxM3U6u-wn-1LUvNZXevD2DRm?usp=sharing> (~2.2GB). The database may be needed when using C<-iomop>.
+The database file is available at this L<link|https://drive.google.com/drive/folders/1-5Ywf-hhwb8bX1sRNV2Tf3EjH4TCaC8P?usp=sharing> (~2.2GB). The database may be needed when using C<-iomop>.
 
 Regardless if you're using the containerized or non-containerized version, the download procedure is the same. In Linux you can use C<wget>, C<curl> or C<aria2c>:
 
- $ wget 'https://drive.google.com/uc?export=download&id=104ciON3zRc3ScAzzrL_3GO14aCnBLh-c&confirm=t' -O ohdsi.db
+ $ wget 'https://drive.google.com/uc?export=download&id=1-Ls1nmgxp-iW-8LkRIuNNdNytXa8kgNw&confirm=t' -O ohdsi.db --no-check-certificate
  or
- $ curl -L 'https://drive.google.com/uc?export=download&id104ciON3zRc3ScAzzrL_3GO14aCnBLh-c' > ohdsi.db
+ $ curl -L 'https://drive.google.com/uc?export=download&id=1-Ls1nmgxp-iW-8LkRIuNNdNytXa8kgNw&confirm=t' > ohdsi.db
  or
- $ aria2c -x2 'https://drive.google.com/uc?export=download&id=104ciON3zRc3ScAzzrL_3GO14aCnBLh-c&confirm=t' -o ohdsi.db
+ $ aria2c -x2 'https://drive.google.com/uc?export=download&id=1-Ls1nmgxp-iW-8LkRIuNNdNytXa8kgNw&confirm=t' -o ohdsi.db
 
 (you can install C<wget>, C<curl> or C<aria2c> inside the container by typing C<sudo apt install wget>, C<sudo apt install curl> or C<sudo apt install aria2>.
 

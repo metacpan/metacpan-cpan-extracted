@@ -4,7 +4,7 @@
       "Gryphon Shafer <gryphon@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -36,9 +36,8 @@
       "runtime" : {
          "requires" : {
             "FindBin" : "0",
-            "exact" : "0",
-            "perl" : "5.014",
-            "strict" : "0"
+            "exact" : "1.23",
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -49,6 +48,7 @@
             "Test2::V0" : "0",
             "Test::More" : "0",
             "perl" : "5.014",
+            "strict" : "0",
             "warnings" : "0"
          }
       }
@@ -65,9 +65,9 @@
          "web" : "https://github.com/gryphonshafer/exact-lib"
       }
    },
-   "version" : "1.03",
-   "x_generated_by_perl" : "v5.35.4",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "version" : "1.04",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

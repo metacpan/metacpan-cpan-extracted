@@ -8,7 +8,6 @@ lib/StreamFinder/Blogger.pm
 lib/StreamFinder/BrandNewTube.pm
 lib/StreamFinder/Brighteon.pm
 lib/StreamFinder/Castbox.pm
-lib/StreamFinder/Goodpods.pm
 lib/StreamFinder/Google.pm
 lib/StreamFinder/IHeartRadio.pm
 lib/StreamFinder/InternetRadio.pm
@@ -24,6 +23,7 @@ lib/StreamFinder/Rumble.pm
 lib/StreamFinder/SermonAudio.pm
 lib/StreamFinder/SoundCloud.pm
 lib/StreamFinder/Spreaker.pm
+lib/StreamFinder/Subsplash.pm
 lib/StreamFinder/Tunein.pm
 lib/StreamFinder/Vimeo.pm
 lib/StreamFinder/Youtube.pm

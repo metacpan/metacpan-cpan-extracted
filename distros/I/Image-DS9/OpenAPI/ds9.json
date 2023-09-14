@@ -1,0 +1,473 @@
+{
+   "info" : {
+      "version" : "0.01",
+      "title" : "DS9 XPA/SAMP Interface"
+   },
+   "components" : {
+      "schemas" : {
+         "endian" : {
+            "enum" : [
+               "big",
+               "little",
+               "native"
+            ],
+            "type" : "string"
+         },
+         "sexagesimal_dec" : {
+            "pattern" : "[+-]?\\d{2}:\\d{2}:\\d{2}(?:.\\d+)?"
+         },
+         "object_name" : {
+            "type" : "string"
+         },
+         "skyformat" : {
+            "type" : "string",
+            "enum" : [
+               "degrees",
+               "sexagesimal"
+            ]
+         },
+         "coords" : {
+            "type" : "object",
+            "properties" : {
+               "ra" : {
+                  "$ref" : "#/components/schemas/sexagesimal_ra"
+               },
+               "dec" : {
+                  "$ref" : "#/components/schemas/sexagesimal_dec"
+               }
+            }
+         },
+         "frame_location" : {
+            "emum" : [
+               "new",
+               "location"
+            ],
+            "type" : "string"
+         },
+         "skyframe" : {
+            "type" : "string",
+            "enum" : [
+               "fk4",
+               "fk5",
+               "icrs",
+               "galactic",
+               "ecliptic"
+            ]
+         },
+         "positive_integer" : {
+            "type" : "integer",
+            "exclusiveMminimum" : 0
+         },
+         "coordsys" : {
+            "enum" : [
+               "physical",
+               "image",
+               "wcs",
+               "wcsa",
+               "wcsb",
+               "wcsc",
+               "wcsd",
+               "wcse",
+               "wcsf",
+               "wcsg",
+               "wcsh",
+               "wcsi",
+               "wcsj",
+               "wcsk",
+               "wcsl",
+               "wcsm",
+               "wcsn",
+               "wcso",
+               "wcsp",
+               "wcsq",
+               "wcsr",
+               "wcss",
+               "wcst",
+               "wcsu",
+               "wcsv",
+               "wcsw",
+               "wcsx",
+               "wcsy",
+               "wcsz"
+            ],
+            "type" : "string"
+         },
+         "angle_unit" : {
+            "enum" : [
+               "degrees",
+               "arcmin",
+               "arcsec"
+            ],
+            "type" : "string"
+         },
+         "2mass_surveys" : {
+            "type" : "string",
+            "enum" : [
+               "j",
+               "h",
+               "k"
+            ]
+         },
+         "positive_number" : {
+            "type" : "number",
+            "exclusiveMminimum" : 0
+         },
+         "surveySize" : {
+            "properties" : {
+               "width" : {
+                  "$ref" : "#/components/schemas/positive_number"
+               },
+               "unit" : {
+                  "$ref" : "#/components/schemas/angle_unit"
+               },
+               "height" : {
+                  "$ref" : "#/components/schemas/positive_number"
+               }
+            },
+            "type" : "object"
+         },
+         "sexagesimal_ra" : {
+            "pattern" : "\\d{2}:\\d{2}:\\d{2}(?:.\\d+)?"
+         }
+      },
+      "parameters" : {
+         "angular_unitParam" : {
+            "required" : "true",
+            "name" : "angular_unit",
+            "schema" : {
+               "$ref" : "#/components/schemas/angular_unit"
+            },
+            "in" : "path"
+         },
+         "widthParam" : {
+            "in" : "path",
+            "schema" : {
+               "$ref" : "#/components/schemas/positive_number"
+            },
+            "name" : "width",
+            "required" : "true"
+         },
+         "frame_locationParam" : {
+            "in" : "path",
+            "schema" : {
+               "$ref" : "#/components/schemas/frame_location"
+            },
+            "name" : "location",
+            "required" : "true"
+         },
+         "heightParam" : {
+            "in" : "path",
+            "required" : "true",
+            "name" : "width",
+            "schema" : {
+               "$ref" : "#/components/schemas/positive_number"
+            }
+         }
+      },
+      "responses" : {
+         "emptySuccess" : {
+            "content" : {},
+            "description" : "empty success"
+         },
+         "surveySize" : {
+            "description" : "size of survey image",
+            "content" : {
+               "*/*" : {
+                  "schema" : {
+                     "$ref" : "#/components/schemas/surveySize"
+                  }
+               }
+            }
+         },
+         "objectName" : {
+            "description" : "object name",
+            "content" : {
+               "*/*" : {
+                  "schema" : {
+                     "$ref" : "#/components/schemas/object_name"
+                  }
+               }
+            }
+         }
+      }
+   },
+   "paths" : {
+      "/2mass/open" : {
+         "put" : {
+            "responses" : {
+               "200" : {
+                  "$ref" : "#/components/responses/emptySuccess"
+               }
+            },
+            "operationId" : "2mass_put_open"
+         }
+      },
+      "/2mass/close" : {
+         "put" : {
+            "operationId" : "2mass_put_close",
+            "responses" : {
+               "200" : {
+                  "$ref" : "#/components/responses/emptySuccess"
+               }
+            }
+         }
+      },
+      "/2mass" : {
+         "summary" : "pop up 2mass catalogue requestor",
+         "put" : {
+            "responses" : {
+               "200" : {
+                  "$ref" : "#/components/responses/emptySuccess"
+               }
+            },
+            "operationId" : "2pmass_put"
+         },
+         "get" : {
+            "responses" : {
+               "200" : {
+                  "$ref" : "#/components/responses/emptySuccess"
+               }
+            },
+            "operationId" : "2pmass_get"
+         }
+      },
+      "/2mass/name/clear" : {
+         "put" : {
+            "responses" : {
+               "200" : {
+                  "$ref" : "#/components/responses/emptySuccess"
+               }
+            },
+            "operationId" : "2mass_name_clear"
+         }
+      },
+      "/2mass/name" : {
+         "get" : {
+            "operationId" : "2mass_name",
+            "responses" : {
+               "200" : {
+                  "$ref" : "#/components/responses/object_name"
+               }
+            }
+         }
+      },
+      "/2mass/size" : {
+         "get" : {
+            "operationId" : "2mass_get_size",
+            "responses" : {
+               "200" : {
+                  "$ref" : "#/components/responses/surveySize"
+               }
+            }
+         }
+      },
+      "/2mass/size/{width}/{height}/{angular_unit}" : {
+         "parameters" : [
+            {
+               "$ref" : "#/components/parameters/widthParam"
+            },
+            {
+               "$ref" : "#/components/parameters/heightParam"
+            },
+            {
+               "$ref" : "#/components/parameters/angular_unitParam"
+            }
+         ],
+         "put" : {
+            "responses" : {
+               "200" : {
+                  "$ref" : "#/components/responses/emptySuccess"
+               }
+            },
+            "operationId" : "2mass_put_size"
+         }
+      },
+      "/2mass/survey" : {
+         "get" : {
+            "operationId" : "2mass_get_survey",
+            "responses" : {
+               "200" : {
+                  "content" : {
+                     "*/*" : {
+                        "schema" : {
+                           "$ref" : "#/components/schemas/2mass_surveys"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/2mass/save" : {
+         "get" : {
+            "operationId" : "2mass_get_save",
+            "responses" : {
+               "200" : {
+                  "content" : {
+                     "*/*" : {
+                        "schema" : {
+                           "type" : "boolean"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/2mass/coord" : {
+         "get" : {
+            "description" : "retrieve coordinate of object",
+            "operationId" : "get2MassCoord",
+            "responses" : {
+               "200" : {
+                  "content" : {
+                     "*/*" : {
+                        "schema" : {
+                           "$ref" : "#/components/schemas/coords"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/2mass/name/{object}" : {
+         "put" : {
+            "responses" : {
+               "200" : {
+                  "$ref" : "#/components/responses/emptySuccess"
+               }
+            },
+            "operationId" : "2mass_name_object"
+         },
+         "parameters" : [
+            {
+               "in" : "path",
+               "schema" : {
+                  "$ref" : "#/components/schema/object_name"
+               },
+               "name" : "object",
+               "required" : "true"
+            }
+         ]
+      },
+      "/2mass/frame" : {
+         "get" : {
+            "operationId" : "2mass_get_frame",
+            "responses" : {
+               "200" : {
+                  "content" : {
+                     "*/*" : {
+                        "schema" : {
+                           "$ref" : "#/components/schemas/frame_location"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/2mass/save/{save}" : {
+         "parameters" : [
+            {
+               "in" : "path",
+               "schema" : {
+                  "type" : "boolean"
+               },
+               "name" : "save",
+               "required" : 1
+            }
+         ],
+         "put" : {
+            "operationId" : "2mass_put_save",
+            "responses" : {
+               "200" : {
+                  "$ref" : "#/components/responses/emptySuccess"
+               }
+            }
+         }
+      },
+      "/2mass/name/{ra}/{dec}" : {
+         "parameters" : [
+            {
+               "schema" : {
+                  "$ref" : "#/components/schema/sexagesimal_ra"
+               },
+               "name" : "ra",
+               "required" : "true",
+               "in" : "path"
+            },
+            {
+               "required" : "true",
+               "name" : "dec",
+               "schema" : {
+                  "$ref" : "#/components/schema/sexagesimal_dec"
+               },
+               "in" : "path"
+            }
+         ],
+         "put" : {
+            "operationId" : "2mass_name_put"
+         }
+      },
+      "/2mass/frame/{location}" : {
+         "parameters" : [
+            {
+               "$ref" : "#/components/parameters/frame_locationParam"
+            }
+         ],
+         "put" : {
+            "responses" : {
+               "200" : {
+                  "$ref" : "#/components/responses/emptySuccess"
+               }
+            },
+            "operationId" : "2mass_put_frame"
+         }
+      },
+      "/2mass/survey/{survey}" : {
+         "put" : {
+            "responses" : {
+               "200" : {
+                  "$ref" : "#/components/responses/emptySuccess"
+               }
+            },
+            "operationId" : "2mass_put_survey"
+         },
+         "parameters" : [
+            {
+               "required" : 1,
+               "name" : "survey",
+               "schema" : {
+                  "$ref" : "#/components/schemas/2mass_surveys"
+               }
+            }
+         ]
+      },
+      "/2mass/update/{what}" : {
+         "put" : {
+            "operationId" : "2mass_put_update",
+            "responses" : {
+               "200" : {
+                  "$ref" : "#/components/responses/emptySuccess"
+               }
+            }
+         },
+         "parameters" : [
+            {
+               "schema" : {
+                  "enum" : [
+                     "frame",
+                     "crosshair"
+                  ],
+                  "type" : "string"
+               },
+               "name" : "what",
+               "required" : 1
+            }
+         ]
+      }
+   },
+   "openapi" : "3.0.3"
+}
+

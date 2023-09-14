@@ -35,12 +35,16 @@ lib/Venus.pm
 lib/Venus/Args.pm
 lib/Venus/Array.pm
 lib/Venus/Assert.pm
+lib/Venus/Atom.pm
 lib/Venus/Boolean.pm
 lib/Venus/Box.pm
+lib/Venus/Check.pm
 lib/Venus/Class.pm
 lib/Venus/Cli.pm
 lib/Venus/Code.pm
+lib/Venus/Coercion.pm
 lib/Venus/Config.pm
+lib/Venus/Constraint.pm
 lib/Venus/Container.pm
 lib/Venus/Core.pm
 lib/Venus/Core/Class.pm
@@ -49,10 +53,12 @@ lib/Venus/Core/Role.pm
 lib/Venus/Data.pm
 lib/Venus/Date.pm
 lib/Venus/Dump.pm
+lib/Venus/Enum.pm
 lib/Venus/Error.pm
 lib/Venus/False.pm
 lib/Venus/Fault.pm
 lib/Venus/Float.pm
+lib/Venus/Future.pm
 lib/Venus/Gather.pm
 lib/Venus/Hash.pm
 lib/Venus/Json.pm
@@ -92,6 +98,7 @@ lib/Venus/Role/Mappable.pm
 lib/Venus/Role/Matchable.pm
 lib/Venus/Role/Mockable.pm
 lib/Venus/Role/Optional.pm
+lib/Venus/Role/Patchable.pm
 lib/Venus/Role/Pluggable.pm
 lib/Venus/Role/Printable.pm
 lib/Venus/Role/Proxyable.pm
@@ -100,6 +107,7 @@ lib/Venus/Role/Rejectable.pm
 lib/Venus/Role/Serializable.pm
 lib/Venus/Role/Stashable.pm
 lib/Venus/Role/Subscribable.pm
+lib/Venus/Role/Superable.pm
 lib/Venus/Role/Testable.pm
 lib/Venus/Role/Throwable.pm
 lib/Venus/Role/Tryable.pm
@@ -109,6 +117,7 @@ lib/Venus/Role/Valuable.pm
 lib/Venus/Run.pm
 lib/Venus/Scalar.pm
 lib/Venus/Schema.pm
+lib/Venus/Sealed.pm
 lib/Venus/Search.pm
 lib/Venus/Space.pm
 lib/Venus/String.pm
@@ -127,12 +136,16 @@ t/Venus.t
 t/Venus_Args.t
 t/Venus_Array.t
 t/Venus_Assert.t
+t/Venus_Atom.t
 t/Venus_Boolean.t
 t/Venus_Box.t
+t/Venus_Check.t
 t/Venus_Class.t
 t/Venus_Cli.t
 t/Venus_Code.t
+t/Venus_Coercion.t
 t/Venus_Config.t
+t/Venus_Constraint.t
 t/Venus_Container.t
 t/Venus_Core.t
 t/Venus_Core_Class.t
@@ -141,10 +154,12 @@ t/Venus_Core_Role.t
 t/Venus_Data.t
 t/Venus_Date.t
 t/Venus_Dump.t
+t/Venus_Enum.t
 t/Venus_Error.t
 t/Venus_False.t
 t/Venus_Fault.t
 t/Venus_Float.t
+t/Venus_Future.t
 t/Venus_Gather.t
 t/Venus_Hash.t
 t/Venus_Json.t
@@ -184,6 +199,7 @@ t/Venus_Role_Mappable.t
 t/Venus_Role_Matchable.t
 t/Venus_Role_Mockable.t
 t/Venus_Role_Optional.t
+t/Venus_Role_Patchable.t
 t/Venus_Role_Pluggable.t
 t/Venus_Role_Printable.t
 t/Venus_Role_Proxyable.t
@@ -192,6 +208,7 @@ t/Venus_Role_Rejectable.t
 t/Venus_Role_Serializable.t
 t/Venus_Role_Stashable.t
 t/Venus_Role_Subscribable.t
+t/Venus_Role_Superable.t
 t/Venus_Role_Testable.t
 t/Venus_Role_Throwable.t
 t/Venus_Role_Tryable.t
@@ -201,6 +218,7 @@ t/Venus_Role_Valuable.t
 t/Venus_Run.t
 t/Venus_Scalar.t
 t/Venus_Schema.t
+t/Venus_Sealed.t
 t/Venus_Search.t
 t/Venus_Space.t
 t/Venus_String.t
@@ -250,6 +268,8 @@ t/data/sections
 t/data/sun
 t/path/001
 t/path/etc/dump.pl
+t/path/pod/example
+t/path/pod/test
 t/path/user/bin/app3
 t/path/user/bin/app3.exe
 t/path/user/bin/cmd

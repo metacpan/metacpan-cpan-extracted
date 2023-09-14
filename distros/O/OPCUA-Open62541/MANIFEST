@@ -72,6 +72,7 @@ t/server-client-variable.t
 t/server-config-accesscontrol.t
 t/server-config-cutomhostname.t
 t/server-config-default.t
+t/server-config-endpoints.t
 t/server-config-minimal.t
 t/server-config-readonly.t
 t/server-config-setlogincheck.t

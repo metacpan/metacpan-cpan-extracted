@@ -21,7 +21,7 @@
 
 =head1 NAME
 
-Sys::Virt::Error - error object for libvirt APIs
+Sys::Virt::Error - Error object for libvirt APIs
 
 =head1 DESCRIPTION
 
@@ -54,7 +54,7 @@ sub stringify {
     return "libvirt error code: " . $self->{code} . ", message: " . $self->{message} . ($self->{message} =~ /\n$/ ? "" : "\n");
 }
 
-=item my $code = $err->level
+=item my $level = $err->level
 
 Return the raw error level represented by this error. One of the
 ERROR LEVEL CONSTANTS
@@ -437,7 +437,7 @@ handled separately from generic error handling.
 
 =item Sys::Virt::Error::ERR_AUTH_FAILED
 
-Authentication falure when connecting to a driver
+Authentication failure when connecting to a driver
 
 =item Sys::Virt::Error::ERR_CALL_FAILED
 
@@ -879,6 +879,10 @@ The checkpoint is inconsistent
 =item Sys::Virt::Error::ERR_MULTIPLE_DOMAINS
 
 More than one matching domain found
+
+=item Sys::Virt::Error::ERR_NO_NETWORK_METADATA
+
+The requested metadata does not exist
 
 =back
 

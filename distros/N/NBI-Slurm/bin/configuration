@@ -43,7 +43,7 @@ configuration_file_info - How to make your configuration file for NBI::Slurm too
 
 =head1 VERSION
 
-version 0.5.0
+version 0.6.1
 
 =head1 LOCATION
 

@@ -1,3 +1,10 @@
+0.881   2023-07-09  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - Remove usage of smartmatch.
+
+
 0.880   2022-10-15  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] In generated argument POD, use '(No description)' as

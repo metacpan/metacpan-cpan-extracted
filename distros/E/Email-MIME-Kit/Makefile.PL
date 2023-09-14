@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker 6.78;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "build messages from templates",
-  "AUTHOR" => "Ricardo Signes <rjbs\@cpan.org>",
+  "AUTHOR" => "Ricardo Signes <cpan\@semiotic.systems>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.78"
   },
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "3.000007",
+  "VERSION" => "3.000008",
   "test" => {
     "TESTS" => "t/*.t"
   }

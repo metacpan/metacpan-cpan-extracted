@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp::Clan" => "6.07",
     "HTTP::CookieJar" => "0.010",
+    "HTTP::Tiny" => "0.088",
     "JSON" => "2.97001",
     "List::Util" => "1.55",
     "Moo" => "2.003004",
@@ -32,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => "0.000135",
     "Test::More" => 0
   },
-  "VERSION" => "0.007000",
+  "VERSION" => "0.008000",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,6 +44,7 @@ my %FallbackPrereqs = (
   "Carp::Clan" => "6.07",
   "File::Spec" => 0,
   "HTTP::CookieJar" => "0.010",
+  "HTTP::Tiny" => "0.088",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON" => "2.97001",

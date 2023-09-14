@@ -83,8 +83,8 @@ my $res = $mailgun->message({
 # send MIME message via a string:
     use MIME::Entity; 
     my $str = MIME::Entity->build(
-            From    => 'justin@dadamailproject.com',
-    To      => 'justin@dadamailproject.com',
+            From    => 'foo@example.com',
+    To      => 'bar@example.com',
     Subject => "Subject",
     Data    => 'Messag4')->as_string;
     

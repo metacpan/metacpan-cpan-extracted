@@ -16,38 +16,22 @@ BEGIN {
     }
 
     use_ok( 'Net::LDAP' );
-    use_ok( 'Config::Versioned' );
     use_ok( 'Connector::Multi' );
-    use_ok( 'Connector::Proxy::Config::Versioned' );
     use_ok( 'Connector::Proxy::Net::LDAP' );
 }
 
 require_ok( 'Net::LDAP' );
-require_ok( 'Config::Versioned' );
 require_ok( 'Connector::Multi' );
-require_ok( 'Connector::Proxy::Config::Versioned' );
 require_ok( 'Connector::Proxy::Net::LDAP' );
 
 ###########################################################################
 
-my $cv = Config::Versioned->new(
-    {
-            dbpath => 't/config/01-proxy-net-ldap-config.git',
-            autocreate => 1,
-            filename => '01-proxy-net-ldap.conf',
-            path => [ qw( t/config ) ],
-            author_name => 'Test User',
-            author_mail => 'test@example.com',
-    }
-) or die "Error creating Config::Versioned: $@";
-
-
 Log::Log4perl->easy_init($ERROR);
 
+my $base = Connector::Multi::YAML->new({
+        LOCATION => 't/config/01-proxy-net-ldap-config.yaml',
+    });
 
-my $base = Connector::Proxy::Config::Versioned->new( {
-    LOCATION => 't/config/01-proxy-net-ldap-config.git',
-});
 my $conn = Connector::Multi->new( {
     BASECONNECTOR => $base,
 });
@@ -55,7 +39,7 @@ my $conn = Connector::Multi->new( {
 SKIP: {
 # Check if connector is set up
 if (!$conn->get('connectors.do_tests')) {
-    skip 'Please setup ldap config in 01-proxy-net-ldap.conf', 11;
+    skip 'Please setup ldap config in 01-proxy-net-ldap.yaml', 11;
 }
 
 my $sSubject = sprintf "%01x.example.org", rand(10000000);

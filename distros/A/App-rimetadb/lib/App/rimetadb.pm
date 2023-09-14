@@ -1,15 +1,16 @@
 package App::rimetadb;
 
-our $DATE = '2020-04-08'; # DATE
-our $VERSION = '0.225'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
-use experimental 'smartmatch';
 use Log::ger;
 
 use Module::Load qw(autoload load);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-07-09'; # DATE
+our $DIST = 'App-rimetadb'; # DIST
+our $VERSION = '0.226'; # VERSION
 
 our $db_schema_spec = {
     latest_v => 5,
@@ -198,7 +199,7 @@ sub _complete_package {
     my $word = $args{word};
 
     # only run under pericmd
-    my $cmdline = $args{cmdline} or return undef;
+    my $cmdline = $args{cmdline} or return undef; ## no critic: TestingAndDebugging::ProhibitExplicitReturnUndef
     my $r = $args{r};
 
     # allow writing Mod::SubMod as Mod/SubMod
@@ -211,7 +212,7 @@ sub _complete_package {
     my $pargs = $pres->[2];
 
     my ($res, $dbh) = _connect_db($pargs);
-    return undef unless $res->[0] == 200;
+    return undef unless $res->[0] == 200; ## no critic: TestingAndDebugging::ProhibitExplicitReturnUndef
 
     my @words;
     my $sth = $dbh->prepare("SELECT DISTINCT name FROM package ORDER BY name");
@@ -236,7 +237,7 @@ sub _complete_func {
     my $word = $args{word};
 
     # only run under pericmd
-    my $cmdline = $args{cmdline} or return undef;
+    my $cmdline = $args{cmdline} or return undef; ## no critic: TestingAndDebugging::ProhibitExplicitReturnUndef
     my $r = $args{r};
 
     # force read config file, because by default it is turned off when in
@@ -246,7 +247,7 @@ sub _complete_func {
     my $pargs = $pres->[2];
 
     my ($res, $dbh) = _connect_db($pargs);
-    return undef unless $res->[0] == 200;
+    return undef unless $res->[0] == 200; ## no critic: TestingAndDebugging::ProhibitExplicitReturnUndef
 
     my @words;
     my @wheres;
@@ -278,7 +279,7 @@ sub _complete_fqfunc_or_package {
     my $word = $args{word};
 
     # only run under pericmd
-    my $cmdline = $args{cmdline} or return undef;
+    my $cmdline = $args{cmdline} or return undef; ## no critic: TestingAndDebugging::ProhibitExplicitReturnUndef
     my $r = $args{r};
 
     # allow writing Mod::SubMod as Mod/SubMod
@@ -291,7 +292,7 @@ sub _complete_fqfunc_or_package {
     my $pargs = $pres->[2];
 
     my ($res, $dbh) = _connect_db($pargs);
-    return undef unless $res->[0] == 200;
+    return undef unless $res->[0] == 200; ## no critic: TestingAndDebugging::ProhibitExplicitReturnUndef
 
     my @words;
     my $sth = $dbh->prepare("SELECT DISTINCT name FROM package ORDER BY name");
@@ -451,14 +452,14 @@ sub update_from_modules {
         if ($entry =~ /\A\+(.+)::\z/) {
             # package prefix
             log_debug("Listing all packages under $1 ...");
-            for (Package::Util::Lite::list_subpackages($1, 1)) {
-                next if $_ ~~ @pkgs || _is_excluded($_, $exc);
+            for my $p (Package::Util::Lite::list_subpackages($1, 1)) {
+                next if (grep { $_ eq $p } @pkgs) || _is_excluded($_, $exc);
                 push @pkgs, $_;
             }
         } elsif ($entry =~ /\A\+(.+)/) {
             # package name
             my $pkg = $1;
-            next if $pkg ~~ @pkgs || _is_excluded($pkg, $exc);
+            next if (grep { $_ eq $pkg } @pkgs) || _is_excluded($pkg, $exc);
             push @pkgs, $pkg;
         } elsif ($entry =~ /(.+::)\z/) {
             # module prefix
@@ -466,14 +467,14 @@ sub update_from_modules {
             my $res = Module::List::list_modules(
                 $1, {list_modules=>1, recurse=>1});
             for my $mod (sort keys %$res) {
-                next if $mod ~~ @pkgs || _is_excluded($mod, $exc);
+                next if (grep { $_ eq $mod } @pkgs) || _is_excluded($mod, $exc);
                 log_debug("Loading module $mod ...");
                 load $mod;
                 push @pkgs, $mod;
             }
         } else {
             # module name
-            next if $entry ~~ @pkgs || _is_excluded($entry, $exc);
+            next if (grep { $_ eq $entry } @pkgs) || _is_excluded($entry, $exc);
             log_debug("Loading module $entry ...");
             load $entry;
             push @pkgs, $entry;
@@ -483,7 +484,7 @@ sub update_from_modules {
     my @excluded_pkgs;
     my $progress = $args{-progress};
     $progress->pos(0) if $progress;
-    $progress->target(~~@pkgs) if $progress;
+    $progress->target(scalar @pkgs) if $progress;
     my $i = 0;
   PKG:
     for my $pkg (@pkgs) {
@@ -556,7 +557,7 @@ sub update_from_modules {
     }
     $progress->finish if $progress;
 
-    @pkgs = grep { !($_ ~~ @excluded_pkgs) } @pkgs;
+    @pkgs = grep { my $p = $_; !(grep { $_ eq $p } @excluded_pkgs) } @pkgs;
 
     if ($args{delete} // 1) {
         my @deleted_pkgs;
@@ -564,7 +565,7 @@ sub update_from_modules {
         $sth->execute;
         while (my $row = $sth->fetchrow_hashref) {
             next unless _package_in_list_of_modnames_or_prefixes($row->{name}, $args{module_or_package});
-            next if $row->{name} ~~ @pkgs;
+            next if grep { $_ eq $row->{name} } @pkgs;
             log_info("Package $row->{name} no longer exists, deleting from database ...");
             push @deleted_pkgs, $row->{name};
         }
@@ -1033,7 +1034,7 @@ App::rimetadb - Manage a Rinci metadata database
 
 =head1 VERSION
 
-This document describes version 0.225 of App::rimetadb (from Perl distribution App-rimetadb), released on 2020-04-08.
+This document describes version 0.226 of App::rimetadb (from Perl distribution App-rimetadb), released on 2023-07-09.
 
 =head1 SYNOPSIS
 
@@ -1046,7 +1047,7 @@ See the included CLI script L<rimetadb>.
 
 Usage:
 
- argument_stats(%args) -> [status, msg, payload, meta]
+ argument_stats(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Show statistics on function arguments from the database.
 
@@ -1078,12 +1079,12 @@ DBI connection user.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1093,7 +1094,7 @@ Return value:  (any)
 
 Usage:
 
- arguments(%args) -> [status, msg, payload, meta]
+ arguments(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List function arguments in the database.
 
@@ -1104,6 +1105,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<detail> => I<bool>
+
+(No description)
 
 =item * B<dsn> => I<str>
 
@@ -1128,6 +1131,8 @@ DBI connection password.
 
 =item * B<query> => I<str>
 
+(No description)
+
 =item * B<type> => I<str>
 
 Select arguments with specific type only.
@@ -1141,12 +1146,12 @@ DBI connection user.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1156,7 +1161,7 @@ Return value:  (any)
 
 Usage:
 
- delete(%args) -> [status, msg, payload, meta]
+ delete(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Delete a package or function metadata from the database.
 
@@ -1177,7 +1182,11 @@ Note: has been tested with MySQL and SQLite only.
 
 =item * B<function> => I<str>
 
+(No description)
+
 =item * B<package>* => I<perl::modname>
+
+(No description)
 
 =item * B<password> => I<str>
 
@@ -1192,12 +1201,12 @@ DBI connection user.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1207,7 +1216,7 @@ Return value:  (any)
 
 Usage:
 
- function_stats(%args) -> [status, msg, payload, meta]
+ function_stats(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Show some statistics on functions from the database.
 
@@ -1239,12 +1248,12 @@ DBI connection user.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1254,7 +1263,7 @@ Return value:  (any)
 
 Usage:
 
- functions(%args) -> [status, msg, payload, meta]
+ functions(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List functions in the database.
 
@@ -1265,6 +1274,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<detail> => I<bool>
+
+(No description)
 
 =item * B<dsn> => I<str>
 
@@ -1285,6 +1296,8 @@ DBI connection password.
 
 =item * B<query> => I<str>
 
+(No description)
+
 =item * B<user> => I<str>
 
 DBI connection user.
@@ -1294,12 +1307,12 @@ DBI connection user.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1309,7 +1322,7 @@ Return value:  (any)
 
 Usage:
 
- meta(%args) -> [status, msg, payload, meta]
+ meta(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Get packageE<sol>function metadata from the database.
 
@@ -1345,12 +1358,12 @@ DBI connection user.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1360,7 +1373,7 @@ Return value:  (any)
 
 Usage:
 
- packages(%args) -> [status, msg, payload, meta]
+ packages(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List packages in the database.
 
@@ -1371,6 +1384,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<detail> => I<bool>
+
+(No description)
 
 =item * B<dsn> => I<str>
 
@@ -1387,6 +1402,8 @@ DBI connection password.
 
 =item * B<query> => I<str>
 
+(No description)
+
 =item * B<user> => I<str>
 
 DBI connection user.
@@ -1396,12 +1413,12 @@ DBI connection user.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1411,7 +1428,7 @@ Return value:  (any)
 
 Usage:
 
- stats(%args) -> [status, msg, payload, meta]
+ stats(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Show some statistics from the database.
 
@@ -1443,12 +1460,12 @@ DBI connection user.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1458,7 +1475,7 @@ Return value:  (any)
 
 Usage:
 
- update(%args) -> [status, msg, payload, meta]
+ update(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 AddE<sol>update a package or function metadata in the database.
 
@@ -1473,6 +1490,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<dist> => I<str>
 
+(No description)
+
 =item * B<dsn> => I<str>
 
 DBI connection DSN.
@@ -1484,11 +1503,19 @@ Note: has been tested with MySQL and SQLite only.
 
 =item * B<extra> => I<str>
 
+(No description)
+
 =item * B<function> => I<str>
+
+(No description)
 
 =item * B<metadata>* => I<hash>
 
+(No description)
+
 =item * B<package>* => I<perl::modname>
+
+(No description)
 
 =item * B<password> => I<str>
 
@@ -1503,12 +1530,12 @@ DBI connection user.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1518,7 +1545,7 @@ Return value:  (any)
 
 Usage:
 
- update_from_modules(%args) -> [status, msg, payload, meta]
+ update_from_modules(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Update Rinci metadata database from local Perl modules.
 
@@ -1633,12 +1660,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1650,14 +1677,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-rimeta
 
 Source repository is at L<https://github.com/perlancar/perl-App-rimetadb>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-rimetadb>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Rinci>
@@ -1666,11 +1685,43 @@ L<Rinci>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-rimetadb>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

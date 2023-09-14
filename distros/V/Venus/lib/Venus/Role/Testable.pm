@@ -89,7 +89,7 @@ This package provides the following methods:
 
 =head2 is_false
 
-  is_false(Str | CodeRef $method, Any @args) (Bool)
+  is_false(string | coderef $method, any @args) (boolean)
 
 The is_false method dispatches the method call or executes the callback and
 returns truthy returns as C<false> and falsy returns as C<true>
@@ -143,7 +143,7 @@ I<Since C<0.08>>
 
 =head2 is_true
 
-  is_true(Str | CodeRef $method, Any @args) (Bool)
+  is_true(string | coderef $method, any @args) (boolean)
 
 The is_true method dispatches the method call or executes the callback and
 returns truthy returns as C<true> and falsy returns as C<false>
@@ -203,7 +203,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

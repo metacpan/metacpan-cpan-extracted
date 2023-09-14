@@ -70,34 +70,14 @@ unless ($optimize) {
 # CCFLAGS
 my $ccflags = $Config{ccflags};
 
-# Removed  -D__USE_MINGW_ANSI_STDIO because MinGW maybe changes the beheivior of functions in stdio.h.
-# -std=c99 defines this definition automatically.
-$ccflags =~ s/-D__USE_MINGW_ANSI_STDIO//;
-
 $ccflags .= " -std=$std";
 
-# Fix compile warnings
-{
-  my $compiler_name;
-  my $compiler_major_version;
-  my $compiler_minor_version;
-  
-  my $config_gcc_version = $Config{gccversion};
-  
-  if ($config_gcc_version =~ /clang-(\d{2})(\d{2})\b/) {
-    $compiler_name = 'clang';
-    $compiler_major_version = $1;
-    $compiler_minor_version = $2;
-  }
-  
-  if (defined $compiler_name) {
-    if ($compiler_name eq 'clang') {
-      if ($compiler_major_version >= 12) {
-        $ccflags .= ' -Wno-compound-token-split-by-macro';
-      }
-    }
-  }
-}
+$ccflags .= " " . join(' ', @{$default_config->thread_ccflags});
+
+# LDDLFLAGS
+my $lddlflags = $Config{lddlflags};
+
+$lddlflags .= " " . join(' ', @{$default_config->thread_ldflags});
 
 # I want to print warnings, but if gcc version is different, can't suppress no needed warning message.
 # so I dicide not to print warning in release version
@@ -127,7 +107,9 @@ WriteMakefile(
     (ABSTRACT_FROM => 'lib/SPVM.pm', # retrieve abstract from module
      AUTHOR => 'Yuki Kimoto<kimoto.yuki@gmail.com>') : ()),
   CCFLAGS => $ccflags,
+  LDDLFLAGS => $lddlflags,
   OPTIMIZE => $optimize,
+  LDDLFLAGS => $lddlflags,
   C => [@csource_files],
   H => [@header_files],
   OBJECT => '$(O_FILES)', # link all the C files too
@@ -165,7 +147,7 @@ sub MY::postamble {
   
   # The content of Makefile
   my $make_rule = '';
-
+  
   unless ($no_build_spvm_modules) {
     require SPVM::Builder::Util::API;
     

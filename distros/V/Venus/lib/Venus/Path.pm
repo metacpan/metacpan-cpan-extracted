@@ -34,11 +34,13 @@ sub _exitcode {
 sub assertion {
   my ($self) = @_;
 
-  my $assert = $self->SUPER::assertion;
+  my $assertion = $self->SUPER::assertion;
 
-  $assert->clear->expression('string');
+  $assertion->match('string')->format(sub{
+    (ref $self || $self)->new($_)
+  });
 
-  return $assert;
+  return $assertion;
 }
 
 sub absolute {
@@ -941,7 +943,7 @@ This package provides the following methods:
 
 =head2 absolute
 
-  absolute() (Path)
+  absolute() (Venus::Path)
 
 The absolute method returns a path object where the value (path) is absolute.
 
@@ -963,7 +965,7 @@ I<Since C<0.01>>
 
 =head2 basename
 
-  basename() (Str)
+  basename() (string)
 
 The basename method returns the path base name.
 
@@ -985,7 +987,7 @@ I<Since C<0.01>>
 
 =head2 child
 
-  child(Str $path) (Path)
+  child(string $path) (Venus::Path)
 
 The child method returns a path object representing the child path provided.
 
@@ -1007,7 +1009,7 @@ I<Since C<0.01>>
 
 =head2 children
 
-  children() (ArrayRef[Path])
+  children() (within[arrayref, Venus::Path])
 
 The children method returns the files and directories under the path. This
 method can return a list of values in list-context.
@@ -1045,7 +1047,7 @@ I<Since C<0.01>>
 
 =head2 chmod
 
-  chmod(Str $mode) (Path)
+  chmod(string $mode) (Venus::Path)
 
 The chmod method changes the file permissions of the file or directory.
 
@@ -1067,7 +1069,7 @@ I<Since C<0.01>>
 
 =head2 chown
 
-  chown(Str @args) (Path)
+  chown(string @args) (Venus::Path)
 
 The chown method changes the group and/or owner or the file or directory.
 
@@ -1089,7 +1091,7 @@ I<Since C<0.01>>
 
 =head2 copy
 
-  copy(Str | Path $path) (Path)
+  copy(string | Venus::Path $path) (Venus::Path)
 
 The copy method uses L<File::Copy/copy> to copy the file represented by the
 invocant to the path provided and returns the invocant.
@@ -1114,7 +1116,7 @@ I<Since C<2.80>>
 
 =head2 default
 
-  default() (Str)
+  default() (string)
 
 The default method returns the default value, i.e. C<$ENV{PWD}>.
 
@@ -1136,7 +1138,7 @@ I<Since C<0.01>>
 
 =head2 directories
 
-  directories() (ArrayRef[Path])
+  directories() (within[arrayref, Venus::Path])
 
 The directories method returns a list of children under the path which are
 directories. This method can return a list of values in list-context.
@@ -1159,7 +1161,7 @@ I<Since C<0.01>>
 
 =head2 exists
 
-  exists() (Bool)
+  exists() (boolean)
 
 The exists method returns truthy or falsy if the path exists.
 
@@ -1193,7 +1195,7 @@ I<Since C<0.01>>
 
 =head2 explain
 
-  explain() (Str)
+  explain() (string)
 
 The explain method returns the path string and is used in stringification
 operations.
@@ -1216,7 +1218,7 @@ I<Since C<0.01>>
 
 =head2 extension
 
-  extension(Str $name) (Str | Path)
+  extension(string $name) (string | Venus::Path)
 
 The extension method returns a new path object using the extension name
 provided. If no argument is provided this method returns the extension for the
@@ -1292,7 +1294,7 @@ I<Since C<2.55>>
 
 =head2 files
 
-  files() (ArrayRef[Path])
+  files() (within[arrayref, Venus::Path])
 
 The files method returns a list of children under the path which are files.
 This method can return a list of values in list-context.
@@ -1330,7 +1332,7 @@ I<Since C<0.01>>
 
 =head2 find
 
-  find(Str | Regexp $expr) (ArrayRef[Path])
+  find(string | regexp $expr) (within[arrayref, Venus::Path])
 
 The find method does a recursive depth-first search and returns a list of paths
 found, matching the expression provided, which defaults to C<*>. This method
@@ -1399,7 +1401,7 @@ I<Since C<0.01>>
 
 =head2 glob
 
-  glob(Str | Regexp $expr) (ArrayRef[Path])
+  glob(string | regexp $expr) (within[arrayref, Venus::Path])
 
 The glob method returns the files and directories under the path matching the
 expression provided, which defaults to C<*>. This method can return a list of
@@ -1438,7 +1440,7 @@ I<Since C<0.01>>
 
 =head2 is_absolute
 
-  is_absolute() (Bool)
+  is_absolute() (boolean)
 
 The is_absolute method returns truthy or falsy is the path is absolute.
 
@@ -1460,7 +1462,7 @@ I<Since C<0.01>>
 
 =head2 is_directory
 
-  is_directory() (Bool)
+  is_directory() (boolean)
 
 The is_directory method returns truthy or falsy is the path is a directory.
 
@@ -1482,7 +1484,7 @@ I<Since C<0.01>>
 
 =head2 is_file
 
-  is_file() (Bool)
+  is_file() (boolean)
 
 The is_file method returns truthy or falsy is the path is a file.
 
@@ -1504,7 +1506,7 @@ I<Since C<0.01>>
 
 =head2 is_relative
 
-  is_relative() (Bool)
+  is_relative() (boolean)
 
 The is_relative method returns truthy or falsy is the path is relative.
 
@@ -1526,7 +1528,7 @@ I<Since C<0.01>>
 
 =head2 lineage
 
-  lineage() (ArrayRef[Path])
+  lineage() (within[arrayref, Venus::Path])
 
 The lineage method returns the list of parent paths up to the root path. This
 method can return a list of values in list-context.
@@ -1553,7 +1555,7 @@ I<Since C<0.01>>
 
 =head2 lines
 
-  lines(Str|Regexp $separator, Str $binmode) (ArrayRef[Str])
+  lines(string | regexp $separator, string $binmode) (within[arrayref, string])
 
 The lines method returns the list of lines from the underlying file. By default
 the file contents are separated by newline.
@@ -1588,7 +1590,7 @@ I<Since C<1.23>>
 
 =head2 mkcall
 
-  mkcall(Any @data) (Any)
+  mkcall(any @data) (any)
 
 The mkcall method returns the result of executing the path as an executable. In
 list context returns the call output and exit code.
@@ -1647,7 +1649,7 @@ I<Since C<0.01>>
 
 =head2 mkdir
 
-  mkdir(Maybe[Str] $mode) (Path)
+  mkdir(maybe[string] $mode) (Venus::Path)
 
 The mkdir method makes the path as a directory.
 
@@ -1689,7 +1691,7 @@ I<Since C<0.01>>
 
 =head2 mkdirs
 
-  mkdirs(Maybe[Str] $mode) (ArrayRef[Path])
+  mkdirs(maybe[string] $mode) (within[arrayref, Venus::Path])
 
 The mkdirs method creates parent directories and returns the list of created
 directories. This method can return a list of values in list-context.
@@ -1737,7 +1739,7 @@ I<Since C<0.01>>
 
 =head2 mkfile
 
-  mkfile() (Path)
+  mkfile() (Venus::Path)
 
 The mkfile method makes the path as an empty file.
 
@@ -1779,7 +1781,7 @@ I<Since C<0.01>>
 
 =head2 mktemp_dir
 
-  mktemp_dir() (Path)
+  mktemp_dir() (Venus::Path)
 
 The mktemp_dir method uses L<File::Temp/tempdir> to create a temporary
 directory which isn't automatically removed and returns a new path object.
@@ -1804,7 +1806,7 @@ I<Since C<2.80>>
 
 =head2 mktemp_file
 
-  mktemp_file() (Path)
+  mktemp_file() (Venus::Path)
 
 The mktemp_file method uses L<File::Temp/tempfile> to create a temporary file
 which isn't automatically removed and returns a new path object.
@@ -1829,7 +1831,7 @@ I<Since C<2.80>>
 
 =head2 move
 
-  move(Str | Path $path) (Path)
+  move(string | Venus::Path $path) (Venus::Path)
 
 The move method uses L<File::Copy/move> to move the file represented by the
 invocant to the path provided and returns the invocant.
@@ -1856,7 +1858,7 @@ I<Since C<2.80>>
 
 =head2 name
 
-  name() (Str)
+  name() (string)
 
 The name method returns the path as an absolute path.
 
@@ -1878,7 +1880,7 @@ I<Since C<0.01>>
 
 =head2 open
 
-  open(Any @data) (FileHandle)
+  open(any @data) (FileHandle)
 
 The open method creates and returns an open filehandle.
 
@@ -1952,7 +1954,7 @@ I<Since C<0.01>>
 
 =head2 parent
 
-  parent() (Path)
+  parent() (Venus::Path)
 
 The parent method returns a path object representing the parent directory.
 
@@ -1974,7 +1976,7 @@ I<Since C<0.01>>
 
 =head2 parents
 
-  parents() (ArrayRef[Path])
+  parents() (within[arrayref, Venus::Path])
 
 The parents method returns is a list of parent directories. This method can
 return a list of values in list-context.
@@ -2000,7 +2002,7 @@ I<Since C<0.01>>
 
 =head2 parts
 
-  parts() (ArrayRef[Str])
+  parts() (within[arrayref, string])
 
 The parts method returns an arrayref of path parts.
 
@@ -2022,7 +2024,7 @@ I<Since C<0.01>>
 
 =head2 read
 
-  read(Str $binmode) (Str)
+  read(string $binmode) (string)
 
 The read method reads the file and returns its contents.
 
@@ -2062,7 +2064,7 @@ I<Since C<0.01>>
 
 =head2 relative
 
-  relative(Str $root) (Path)
+  relative(string $root) (Venus::Path)
 
 The relative method returns a path object representing a relative path
 (relative to the path provided).
@@ -2105,7 +2107,7 @@ I<Since C<0.01>>
 
 =head2 rename
 
-  rename(Str | Path $path) (Path)
+  rename(string | Venus::Path $path) (Venus::Path)
 
 The rename method performs a L</move> unless the path provided is only a file
 name, in which case it attempts a rename under the directory of the invocant.
@@ -2132,7 +2134,7 @@ I<Since C<2.91>>
 
 =head2 rmdir
 
-  rmdir() (Path)
+  rmdir() (Venus::Path)
 
 The rmdir method removes the directory and returns a path object representing
 the deleted directory.
@@ -2175,7 +2177,7 @@ I<Since C<0.01>>
 
 =head2 rmdirs
 
-  rmdirs() (ArrayRef[Path])
+  rmdirs() (within[arrayref, Venus::Path])
 
 The rmdirs method removes that path and its child files and directories and
 returns all paths removed. This method can return a list of values in
@@ -2208,7 +2210,7 @@ I<Since C<0.01>>
 
 =head2 rmfiles
 
-  rmfiles() (ArrayRef[Path])
+  rmfiles() (within[arrayref, Venus::Path])
 
 The rmfiles method recursively removes files under the path and returns the
 paths removed. This method does not remove the directories found. This method
@@ -2248,7 +2250,7 @@ I<Since C<0.01>>
 
 =head2 root
 
-  root(Str $spec, Str $base) (Maybe[Path])
+  root(string $spec, string $base) (maybe[Venus::Path])
 
 The root method performs a search up the file system heirarchy returns the
 first path (i.e. absolute path) matching the file test specification and base
@@ -2285,7 +2287,7 @@ I<Since C<2.32>>
 
 =head2 seek
 
-  seek(Str $spec, Str $base) (Maybe[Path])
+  seek(string $spec, string $base) (maybe[Venus::Path])
 
 The seek method performs a search down the file system heirarchy returns the
 first path (i.e. absolute path) matching the file test specification and base
@@ -2326,7 +2328,7 @@ I<Since C<2.32>>
 
 =head2 sibling
 
-  sibling(Str $path) (Path)
+  sibling(string $path) (Venus::Path)
 
 The sibling method returns a path object representing the sibling path provided.
 
@@ -2348,7 +2350,7 @@ I<Since C<0.01>>
 
 =head2 siblings
 
-  siblings() (ArrayRef[Path])
+  siblings() (within[arrayref, Venus::Path])
 
 The siblings method returns all sibling files and directories for the current
 path. This method can return a list of values in list-context.
@@ -2374,7 +2376,7 @@ I<Since C<0.01>>
 
 =head2 test
 
-  test(Str $expr) (Bool)
+  test(string $expr) (boolean)
 
 The test method evaluates the current path against the stackable file test
 operators provided.
@@ -2417,7 +2419,7 @@ I<Since C<0.01>>
 
 =head2 unlink
 
-  unlink() (Path)
+  unlink() (Venus::Path)
 
 The unlink method removes the file and returns a path object representing the
 removed file.
@@ -2460,7 +2462,7 @@ I<Since C<0.01>>
 
 =head2 write
 
-  write(Str $data, Str $binmode) (Path)
+  write(string $data, string $binmode) (Venus::Path)
 
 The write method write the data provided to the file.
 
@@ -2834,6 +2836,38 @@ B<example 1>
 
 =over 4
 
+=item error: C<error_on_unlink>
+
+This package may raise an error_on_unlink exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $input = {
+    throw => 'error_on_unlink',
+    error => $!,
+    path => '/nowhere',
+  };
+
+  my $error = $path->catch('error', $input);
+
+  # my $name = $error->name;
+
+  # "on_unlink"
+
+  # my $message = $error->render;
+
+  # "Can't unlink \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=back
+
+=over 4
+
 =item error: C<error_on_write_binmode>
 
 This package may raise an error_on_write_binmode exception.
@@ -2933,43 +2967,37 @@ B<example 1>
 
 =back
 
-=over 4
-
-=item error: C<error_on_unlink>
-
-This package may raise an error_on_unlink exception.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_unlink',
-    error => $!,
-    path => '/nowhere',
-  };
-
-  my $error = $path->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_unlink"
-
-  # my $message = $error->render;
-
-  # "Can't unlink \"/nowhere\": $!"
-
-  # my $path = $error->stash('path');
-
-  # "/nowhere"
-
-=back
-
 =head1 OPERATORS
 
 This package overloads the following operators:
 
 =cut
+
+=over 4
+
+=item operation: C<("")>
+
+This package overloads the C<""> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = "$path";
+
+  # "t/data/planets"
+
+B<example 2>
+
+  # given: synopsis;
+
+  my $mercury = $path->child('mercury');
+
+  my $result = "$path, $path";
+
+  # "t/data/planets, t/data/planets"
+
+=back
 
 =over 4
 
@@ -3037,32 +3065,6 @@ B<example 1>
 
 =over 4
 
-=item operation: C<("")>
-
-This package overloads the C<""> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = "$path";
-
-  # "t/data/planets"
-
-B<example 2>
-
-  # given: synopsis;
-
-  my $mercury = $path->child('mercury');
-
-  my $result = "$path, $path";
-
-  # "t/data/planets, t/data/planets"
-
-=back
-
-=over 4
-
 =item operation: C<(~~)>
 
 This package overloads the C<~~> operator.
@@ -3085,7 +3087,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

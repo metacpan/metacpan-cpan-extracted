@@ -32,4 +32,16 @@ some_metric 10
 EOF
 }
 
+{
+  my $p = Prometheus::Tiny->new;
+  $p->set('some_metric', 10);
+  warning_like
+    { $p->add('some_metric', 10, { foo => undef }) }
+    qr/label '.+' has an undefined value, dropping it/,
+    'undef label value emits a warning';
+  is $p->format, <<EOF, 'add metric undef label formatted correctly';
+some_metric 20
+EOF
+}
+
 done_testing;

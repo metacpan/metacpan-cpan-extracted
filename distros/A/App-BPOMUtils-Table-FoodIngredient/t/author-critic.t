@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/BPOMUtils/Table/FoodIngredient.pm','lib/App/BPOMUtils/Table/FoodIngredientRBA.pm','script/bpom-daftar-bahan-baku-pangan','script/bpom-daftar-bahan-baku-pangan-rba','script/bpom-list-food-ingredients','script/bpom-list-food-ingredients-rba'];
+my $filenames = ['lib/App/BPOMUtils/Table/FoodIngredient.pm','lib/App/BPOMUtils/Table/FoodIngredientRBA.pm','script/bpom-daftar-bahan-baku-pangan-lama','script/bpom-daftar-bahan-baku-pangan-rba','script/bpom-list-food-ingredients-old','script/bpom-list-food-ingredients-rba'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

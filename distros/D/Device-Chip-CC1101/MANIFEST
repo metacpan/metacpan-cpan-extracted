@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 examples/cc1101.pl

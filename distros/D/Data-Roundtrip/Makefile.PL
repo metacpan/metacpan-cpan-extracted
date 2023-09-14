@@ -33,7 +33,15 @@ my %WriteMakefileArgs = (
         'Test::Script' => '1.28',
         'Test::Pod' => '1.51',
         'Test::More' => '0',
+	'Test2::Plugin::UTF8' => '0', # rids of the Wide Character in TAP message!
+	'File::Spec' => '0',
+	'File::Temp' => '0',
+
         'Benchmark' => '0',
+	# WARNING (30.06.2023): CPAN tests fail when
+	# Data::Random is not installed in their system.
+	# We have no direct dependency on Data::Random.
+	# I guess Data::Random::Structure must declare this dependency.
 	'Data::Random::Structure' => '0',
 	'Data::Random::Structure::UTF8' => '0.06',
     },
@@ -57,14 +65,14 @@ my %WriteMakefileArgs = (
 	  requires    => { perl => '5.0.8' },
           resources   => {
             license    => 'artistic_2',
-	    homepage   => 'https://metacpan.org/module/App::Appupdater',
+	    homepage   => 'https://metacpan.org/module/Data::Roundtrip',
             repository => {
-                url  => 'https://github.com/hadjiprocopis/app-appupdater',
-                web  => 'https://github.com/hadjiprocopis/app-appupdater',
+                url  => 'https://github.com/hadjiprocopis/data-roundtrip',
+                web  => 'https://github.com/hadjiprocopis/data-roundtrip',
                 type => 'git',
             },
             bugtracker => {
-                web => 'https://github.com/hadjiprocopis/app-appupdater/issues',
+                web => 'https://github.com/hadjiprocopis/data-roundtrip/issues',
             }
         },
     },
@@ -92,8 +100,7 @@ WriteMakefile(%WriteMakefileArgs);
 
 sub MY::postamble {
     my (undef,%h) = @_;
-    require Data::Dumper;
-    #print STDERR Data::Dumper->Dump([\%h], [qw(mm_args{postamble})]);
+    # require Data::Dumper; print STDERR Data::Dumper->Dump([\%h], [qw(mm_args{postamble})]);
     return "BENCHMARK_FILES=$h{BENCHMARK_FILES}\n"
 	. <<'POSTAMBLE';
 TEST_D = $(ABSPERLRUN) -MExtUtils::Command -e test_d --

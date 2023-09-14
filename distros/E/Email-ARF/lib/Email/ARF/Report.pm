@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Email::ARF::Report 0.011;
+package Email::ARF::Report 0.012;
 # ABSTRACT: interpret Abuse Reporting Format (ARF) messages
 
 use Carp ();
@@ -303,7 +303,7 @@ Email::ARF::Report - interpret Abuse Reporting Format (ARF) messages
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 WARNING
 
@@ -329,15 +329,15 @@ to an email provider.  It includes mechanisms for providing machine-readable
 details about the incident, a human-readable description, and a copy of the
 offending message.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has a long-term perl support period.  That means it will not
-require a version of perl released fewer than five years ago.
+This library should run on perls released even a long time ago.  It should
+work on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 METHODS
 
@@ -426,11 +426,11 @@ L<RFC 5965|http://tools.ietf.org/html/rfc5965>
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo Signes.
+This software is copyright (c) 2023 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

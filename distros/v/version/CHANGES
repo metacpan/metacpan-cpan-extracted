@@ -4,6 +4,11 @@ This is not a complete list of changes.  See repository for full details:
 
     https://github.com/Perl/version.pm
 
+0.9930
+  * Permit a colon after a vstring, thus allowing an attrlist to follow a version declaration on a 'class' statement (Perl5 #20891)
+  * Simplify and fix w.r.t locale handling
+  * Make tests not fail when path to dist includes "panic"
+
 0.9929
   * Upgrade to ppport 3.62
   * Import fix for core build warning

@@ -16,15 +16,15 @@ name: Food-Ratio
 provides:
   Food::Ratio:
     file: lib/Food/Ratio.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Carp: '0'
   List::UtilsBy: '0'
-  Object::Pad: '0.52'
+  Object::Pad: '0.802'
   Scalar::Util: '0'
   perl: v5.26.0
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
   repository: https://thrig.me/src/Food-Ratio.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

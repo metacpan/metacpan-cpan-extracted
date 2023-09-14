@@ -13,9 +13,9 @@ use Test::Builder;
 use Test::More ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-04'; # DATE
+our $DATE = '2023-09-03'; # DATE
 our $DIST = 'Test-Sah-Schema'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 my $Test = Test::Builder->new;
 
@@ -139,17 +139,24 @@ sub sah_schema_module_ok {
                                     $Test->ok(1, "Value should be valid");
                                 }
 
-                                my $validated_value =
-                                    exists $eg->{validated_value} ? $eg->{validated_value} :
-                                    exists $eg->{res} ? $eg->{res} :
-                                    exists $eg->{value} ? $eg->{value} : $eg->{data};
-                                Test::More::is_deeply($vdr_res, $validated_value, 'Validated value matches') or do {
-                                    $Test->diag($Test->explain($vdr_res));
-                                    $ok = 0;
-                                };
+                                if ($eg->{code_validate}) {
+                                    Test::More::ok($eg->{code_validate}->($vdr_res), "Validation value validates with code_validate") or do {
+                                        $Test->diag($Test->explain($vdr_res));
+                                        $ok = 0;
+                                    };
+                                } else {
+                                    my $validated_value =
+                                        exists $eg->{validated_value} ? $eg->{validated_value} :
+                                        exists $eg->{res} ? $eg->{res} :
+                                        exists $eg->{value} ? $eg->{value} : $eg->{data};
+                                    Test::More::is_deeply($vdr_res, $validated_value, 'Validated value matches') or do {
+                                        $Test->diag($Test->explain($vdr_res));
+                                        $ok = 0;
+                                    };
+                                }
 
                                 if ($wsub) {
-                                    Test::More::is_deeply($wsub_res, [200, "OK", $validated_value], "Wrapped sub should return successful result") or do {
+                                    Test::More::ok($wsub_res->[0]==200, "Wrapped sub should return successful status") or do {
                                         $Test->diag($Test->explain($wsub_res));
                                         $ok = 0;
                                     };
@@ -161,6 +168,12 @@ sub sah_schema_module_ok {
                                     $ok = 0;
                                     return;
                                 } else {
+                                    if ($eg->{code_validate}) {
+                                        Test::More::ok(!$eg->{code_validate}->($vdr_res), "Validation result does not validate with code_validate") or do {
+                                            $Test->diag($Test->explain($vdr_res));
+                                            $ok = 0;
+                                        };
+                                    }
                                     $Test->ok(1, "Value should not be valid");
 
                                     if ($wsub) {
@@ -308,7 +321,7 @@ Test::Sah::Schema - Test Sah::Schema::* modules in distribution
 
 =head1 VERSION
 
-This document describes version 0.015 of Test::Sah::Schema (from Perl distribution Test-Sah-Schema), released on 2022-11-04.
+This document describes version 0.016 of Test::Sah::Schema (from Perl distribution Test-Sah-Schema), released on 2023-09-03.
 
 =head1 SYNOPSIS
 
@@ -411,7 +424,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

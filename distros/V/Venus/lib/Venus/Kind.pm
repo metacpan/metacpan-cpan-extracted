@@ -23,16 +23,9 @@ with 'Venus::Role::Throwable';
 with 'Venus::Role::Assertable';
 with 'Venus::Role::Serializable';
 with 'Venus::Role::Mockable';
+with 'Venus::Role::Patchable';
 
 # METHODS
-
-sub assertion {
-  my ($self) = @_;
-
-  require Venus::Assert;
-
-  return Venus::Assert->new(ref $self || $self)->any;
-}
 
 sub checksum {
   my ($self) = @_;
@@ -185,6 +178,8 @@ L<Venus::Role::Matchable>
 
 L<Venus::Role::Mockable>
 
+L<Venus::Role::Patchable>
+
 L<Venus::Role::Printable>
 
 L<Venus::Role::Reflectable>
@@ -207,7 +202,7 @@ This package provides the following methods:
 
 =head2 assertion
 
-  assertion() (Assert)
+  assertion() (Venus::Assert)
 
 The assertion method returns a L<Venus::Assert> object based on the invocant.
 
@@ -231,7 +226,7 @@ I<Since C<1.23>>
 
 =head2 checksum
 
-  checksum() (Str)
+  checksum() (string)
 
 The checksum method returns an md5 hash string representing the stringified
 object value (or the object itself).
@@ -276,7 +271,7 @@ I<Since C<0.08>>
 
 =head2 numified
 
-  numified() (Int)
+  numified() (number)
 
 The numified method returns the numerical representation of the object which is
 typically the length (or character count) of the stringified object.
@@ -321,7 +316,7 @@ I<Since C<0.08>>
 
 =head2 renew
 
-  renew(Any @args) (Object)
+  renew(any @args) (object)
 
 The renew method returns a new instance of the invocant by instantiating the
 underlying class passing all recognized class attributes to the constructor.
@@ -393,7 +388,7 @@ I<Since C<1.23>>
 
 =head2 safe
 
-  safe(Str | CodeRef $code, Any @args) (Any)
+  safe(string | coderef $code, any @args) (any)
 
 The safe method dispatches the method call or executes the callback and returns
 the result, supressing warnings and exceptions. If an exception is thrown this
@@ -446,7 +441,7 @@ I<Since C<0.08>>
 
 =head2 self
 
-  self() (Any)
+  self() (any)
 
 The self method returns the invocant.
 
@@ -470,7 +465,7 @@ I<Since C<1.23>>
 
 =head2 stringified
 
-  stringified() (Str)
+  stringified() (string)
 
 The stringified method returns the object, stringified (i.e. a dump of the
 object's value).
@@ -518,7 +513,7 @@ I<Since C<0.08>>
 
 =head2 trap
 
-  trap(Str | CodeRef $code, Any @args) (Tuple[ArrayRef, ArrayRef, ArrayRef])
+  trap(string | coderef $code, any @args) (tuple[arrayref, arrayref, arrayref])
 
 The trap method dispatches the method call or executes the callback and returns
 a tuple (i.e. a 3-element arrayref) with the results, warnings, and exceptions
@@ -619,7 +614,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

@@ -29,7 +29,7 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(otp hotp totp);
 
-our $VERSION = '1.5';
+our $VERSION = '1.6';
 
 =head1 DESCRIPTION
 
@@ -73,10 +73,12 @@ sub hotp {
     my ($hex) = $C->as_hex =~ /^0x(.*)/;
     $hex = "0" x (16 - length($hex)) . $hex;
 
-    my $digest = Digest::SHA->new($options{algorithm} =~ /sha(\d+)/);
+    my ($algorithm) = $options{algorithm} =~ /sha(\d+)/;
+    my $digest = Digest::SHA->new($algorithm);
     my $hmac   = Digest::HMAC->new(
         $options{base32} ? decode_base32($options{secret} =~ s/ //gr) : pack('H*', $options{secret}),
         $digest,
+        $algorithm < 384? 64 : 128,
     );
     $hmac->add(pack 'H*', $hex);
     my $hash = $hmac->digest;

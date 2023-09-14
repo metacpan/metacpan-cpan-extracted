@@ -1,14 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.19;
+use warnings;
+use Object::Pad 0.800;
 
-package Device::Chip::SDCard 0.03;
+package Device::Chip::SDCard 0.04;
 class Device::Chip::SDCard
-   extends Device::Chip;
+   :isa(Device::Chip);
 
 use Future::AsyncAwait;
 

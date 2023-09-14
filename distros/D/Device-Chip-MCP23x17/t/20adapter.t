@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -19,7 +19,7 @@ await $chip->mount(
 my $protocol = $chip->as_adapter->make_protocol( "GPIO" );
 ok( $protocol, 'defined $protocol' );
 
-is_deeply( [ $protocol->list_gpios ],
+is( [ $protocol->list_gpios ],
    [qw( A0 A1 A2 A3 A4 A5 A6 A7 B0 B1 B2 B3 B4 B5 B6 B7 )],
    '->list_gpios' );
 
@@ -41,7 +41,7 @@ is_deeply( [ $protocol->list_gpios ],
    $adapter->expect_readwrite( "\x41\x12\x00\x00" )
       ->returns( "\x00\x00\x02\x00" );
 
-   is_deeply( await $protocol->read_gpios( [qw( A0 A1 )] ),
+   is( await $protocol->read_gpios( [qw( A0 A1 )] ),
       { A0 => 0, A1 => 1 }, '->read_gpios returns pin levels' );
 
    $adapter->check_and_clear( '->read_gpios' );

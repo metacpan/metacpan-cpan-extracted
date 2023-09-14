@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -21,7 +21,9 @@
             "File::ShareDir" : "1.00",
             "IO::Async" : "0.14",
             "Net::Async::Tangence::Client" : "0.15",
+            "Object::Pad" : "0",
             "String::Tagged" : "0",
+            "Syntax::Keyword::Match" : "0",
             "Tangence::ObjectProxy" : "0.20_001",
             "Text::Balanced" : "0",
             "Tickit" : "0.55",
@@ -34,40 +36,44 @@
             "Tickit::Widget::Entry::Plugin::Completion" : "0",
             "Tickit::Widget::HBox" : "0.32",
             "Tickit::Widget::Scroller" : "0.15",
-            "Tickit::Widget::Tabbed" : "0.019",
+            "Tickit::Widget::Tabbed" : "0.028",
             "Tickit::Widget::VBox" : "0.31",
-            "Tickit::Window" : "0.42"
+            "Tickit::Window" : "0.42",
+            "perl" : "5.026"
          }
       }
    },
    "provides" : {
       "Circle::FE::Term" : {
          "file" : "lib/Circle/FE/Term.pm",
-         "version" : "0.222060"
+         "version" : "0.232470"
       },
       "Circle::FE::Term::Ribbon" : {
-         "file" : "lib/Circle/FE/Term/Ribbon.pm"
-      },
-      "Circle::FE::Term::Ribbon::horizontal" : {
-         "file" : "lib/Circle/FE/Term/Ribbon.pm"
+         "file" : "lib/Circle/FE/Term/Ribbon.pm",
+         "version" : "0.232470"
       },
       "Circle::FE::Term::Tab" : {
-         "file" : "lib/Circle/FE/Term/Tab.pm"
+         "file" : "lib/Circle/FE/Term/Tab.pm",
+         "version" : "0.232470"
       },
       "Circle::FE::Term::Widget::Box" : {
-         "file" : "lib/Circle/FE/Term/Widget/Box.pm"
+         "file" : "lib/Circle/FE/Term/Widget/Box.pm",
+         "version" : "0.232470"
       },
       "Circle::FE::Term::Widget::Entry" : {
-         "file" : "lib/Circle/FE/Term/Widget/Entry.pm"
+         "file" : "lib/Circle/FE/Term/Widget/Entry.pm",
+         "version" : "0.232470"
       },
       "Circle::FE::Term::Widget::Entry::Widget" : {
          "file" : "lib/Circle/FE/Term/Widget/Entry.pm"
       },
       "Circle::FE::Term::Widget::Label" : {
-         "file" : "lib/Circle/FE/Term/Widget/Label.pm"
+         "file" : "lib/Circle/FE/Term/Widget/Label.pm",
+         "version" : "0.232470"
       },
       "Circle::FE::Term::Widget::Scroller" : {
-         "file" : "lib/Circle/FE/Term/Widget/Scroller.pm"
+         "file" : "lib/Circle/FE/Term/Widget/Scroller.pm",
+         "version" : "0.232470"
       },
       "Circle::FE::Term::Widget::Scroller::Widget" : {
          "file" : "lib/Circle/FE/Term/Widget/Scroller.pm"
@@ -79,6 +85,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.222060",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.232470",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

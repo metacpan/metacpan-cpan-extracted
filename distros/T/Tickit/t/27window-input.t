@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Tickit::Test;
 
@@ -27,7 +27,7 @@ my $bind_id_key = $win->bind_event( key => sub {
 {
    presskey( text => "A" );
 
-   is_deeply( \@key_events, [ [ text => "A" ] ], 'on_key A' );
+   is( \@key_events, [ [ text => "A" ] ], 'on_key A' );
    cmp_ok( $key_events[0][0], '==', Tickit::KEYEV_TEXT, 'event type numerically ==' );
    cmp_ok( $key_events[0][0], 'eq', "text",             'event type stringily eq' );
 
@@ -39,7 +39,7 @@ my $bind_id_key = $win->bind_event( key => sub {
 
    presskey( key => "C-a", 4 );
 
-   is_deeply( \@key_events, [ [ key => "C-a" ] ], 'on_key C-a' );
+   is( \@key_events, [ [ key => "C-a" ] ], 'on_key C-a' );
 
    ok( !$keyev->mod_is_shift, 'C-a key is not shift' );
    ok(  $keyev->mod_is_ctrl,  'C-a key is ctrl' );
@@ -58,12 +58,12 @@ my $bind_id_mouse = $win->bind_event( mouse => sub {
    undef @mouse_events;
    pressmouse( press => 1, 5, 15 );
 
-   is_deeply( \@mouse_events, [ [ press => 1, 2, 5 ] ], 'on_mouse abs@15,5' );
+   is( \@mouse_events, [ [ press => 1, 2, 5 ] ], 'on_mouse abs@15,5' );
 
    undef @mouse_events;
    pressmouse( press => 1, 1, 2 );
 
-   is_deeply( \@mouse_events, [], 'no event for mouse abs@2,1' );
+   is( \@mouse_events, [], 'no event for mouse abs@2,1' );
 }
 
 # Event passing to subwindows
@@ -91,15 +91,15 @@ my $bind_id_mouse = $win->bind_event( mouse => sub {
 
    presskey( text => "B" );
 
-   is_deeply( \@subkey_events, [ [ text => "B" ] ], 'on_key B on subwin' );
-   is_deeply( \@key_events,    [ ],                 'on_key B on win' );
+   is( \@subkey_events, [ [ text => "B" ] ], 'on_key B on subwin' );
+   is( \@key_events,    [ ],                 'on_key B on win' );
 
    undef @mouse_events;
 
    pressmouse( press => 1, 5, 15 );
 
-   is_deeply( \@submouse_events, [ [ press => 1, 0, 3 ] ], 'on_mouse abs@15,5 on subwin' );
-   is_deeply( \@mouse_events,    [ ],                      'on_mouse abs@15,5 on win' );
+   is( \@submouse_events, [ [ press => 1, 0, 3 ] ], 'on_mouse abs@15,5 on subwin' );
+   is( \@mouse_events,    [ ],                      'on_mouse abs@15,5 on win' );
 
    $subret = 0;
 
@@ -108,16 +108,16 @@ my $bind_id_mouse = $win->bind_event( mouse => sub {
 
    presskey( text => "C" );
 
-   is_deeply( \@subkey_events, [ [ text => "C" ] ], 'on_key C on subwin' );
-   is_deeply( \@key_events,    [ [ text => "C" ] ], 'on_key C on win' );
+   is( \@subkey_events, [ [ text => "C" ] ], 'on_key C on subwin' );
+   is( \@key_events,    [ [ text => "C" ] ], 'on_key C on win' );
 
    undef @mouse_events;
    undef @submouse_events;
 
    pressmouse( press => 1, 5, 15 );
 
-   is_deeply( \@submouse_events, [ [ press => 1, 0, 3 ] ], 'on_mouse abs@15,5 on subwin' );
-   is_deeply( \@mouse_events,    [ [ press => 1, 2, 5 ] ], 'on_mouse abs@15,5 on win' );
+   is( \@submouse_events, [ [ press => 1, 0, 3 ] ], 'on_mouse abs@15,5 on subwin' );
+   is( \@mouse_events,    [ [ press => 1, 2, 5 ] ], 'on_mouse abs@15,5 on win' );
 
    my $otherwin = $rootwin->make_sub( 10, 10, 4, 20 );
    flush_tickit;
@@ -130,7 +130,7 @@ my $bind_id_mouse = $win->bind_event( mouse => sub {
 
    presskey( text => "D" );
 
-   is_deeply( \@handlers, [qw( subwin win otherwin )], 'on_key D propagates to otherwin after win' );
+   is( \@handlers, [qw( subwin win otherwin )], 'on_key D propagates to otherwin after win' );
 
    $subwin->hide;
 
@@ -138,7 +138,7 @@ my $bind_id_mouse = $win->bind_event( mouse => sub {
 
    presskey( text => "E" );
 
-   is_deeply( \@handlers, [qw( win otherwin )], 'hidden windows do not receive input events' );
+   is( \@handlers, [qw( win otherwin )], 'hidden windows do not receive input events' );
 
    $subwin->close;
    flush_tickit;

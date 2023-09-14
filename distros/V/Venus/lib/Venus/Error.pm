@@ -88,11 +88,13 @@ sub as {
 sub assertion {
   my ($self) = @_;
 
-  my $assert = $self->SUPER::assertion;
+  my $assertion = $self->SUPER::assertion;
 
-  $assert->clear->expression('string');
+  $assertion->match('string')->format(sub{
+    (ref $self || $self)->new($_)
+  });
 
-  return $assert;
+  return $assertion;
 }
 
 sub callframe {
@@ -392,7 +394,7 @@ This package provides the following methods:
 
 =head2 arguments
 
-  arguments(Int $index) (Any)
+  arguments(number $index) (any)
 
 The arguments method returns the stashed arguments under L</captured>, or a
 specific argument if an index is provided.
@@ -447,7 +449,7 @@ I<Since C<2.55>>
 
 =head2 as
 
-  as(Str $name) (Error)
+  as(string $name) (Venus::Error)
 
 The as method returns an error object using the return value(s) of the "as"
 method specified, which should be defined as C<"as_${name}">, which will be
@@ -592,7 +594,7 @@ I<Since C<1.02>>
 
 =head2 callframe
 
-  callframe(Int $index) (Any)
+  callframe(number $index) (any)
 
 The callframe method returns the stashed callframe under L</captured>, or a
 specific argument if an index is provided.
@@ -647,7 +649,7 @@ I<Since C<2.55>>
 
 =head2 captured
 
-  captured() (HashRef)
+  captured() (hashref)
 
 The captured method returns the value stashed as C<"captured">.
 
@@ -669,7 +671,7 @@ I<Since C<2.55>>
 
 =head2 explain
 
-  explain() (Str)
+  explain() (string)
 
 The explain method returns the error message and is used in stringification
 operations.
@@ -692,7 +694,7 @@ I<Since C<0.01>>
 
 =head2 frame
 
-  frame(Int $index) (HashRef)
+  frame(number $index) (hashref)
 
 The frame method returns the data from C<caller> on the frames captured, and
 returns a hashref where the keys map to the keys described by
@@ -752,7 +754,7 @@ I<Since C<1.11>>
 
 =head2 frames
 
-  frames() (ArrayRef)
+  frames() (arrayref)
 
 The frames method returns the compiled and stashed stack trace data.
 
@@ -781,7 +783,7 @@ I<Since C<0.01>>
 
 =head2 is
 
-  is(Str $name) (Bool)
+  is(string $name) (boolean)
 
 The is method returns truthy or falsy based on the return value(s) of the "is"
 method specified, which should be defined as C<"is_${name}">, which will be
@@ -956,7 +958,7 @@ I<Since C<1.02>>
 
 =head2 of
 
-  of(Str $name) (Bool)
+  of(string $name) (boolean)
 
 The of method returns truthy or falsy based on the return value(s) of the "of"
 method specified, which should be defined as C<"of_${name}">, which will be
@@ -1131,7 +1133,7 @@ I<Since C<1.11>>
 
 =head2 render
 
-  render() (Str)
+  render() (string)
 
 The render method replaces tokens in the message with values from the stash and
 returns the formatted string. The token style and formatting operation is
@@ -1161,7 +1163,7 @@ I<Since C<3.30>>
 
 =head2 throw
 
-  throw(Any @data) (Error)
+  throw(any @data) (Venus::Error)
 
 The throw method throws an error if the invocant is an object, or creates an
 error object using the arguments provided and throws the created object.
@@ -1184,7 +1186,7 @@ I<Since C<0.01>>
 
 =head2 trace
 
-  trace(Int $offset, Int $limit) (Error)
+  trace(number $offset, number $limit) (Venus::Error)
 
 The trace method compiles a stack trace and returns the object. By default it
 skips the first frame.
@@ -1237,6 +1239,22 @@ This package overloads the following operators:
 
 =over 4
 
+=item operation: C<("")>
+
+This package overloads the C<""> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = "$error";
+
+  # "Exception!"
+
+=back
+
+=over 4
+
 =item operation: C<(eq)>
 
 This package overloads the C<eq> operator.
@@ -1285,22 +1303,6 @@ B<example 1>
 
 =over 4
 
-=item operation: C<("")>
-
-This package overloads the C<""> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = "$error";
-
-  # "Exception!"
-
-=back
-
-=over 4
-
 =item operation: C<(~~)>
 
 This package overloads the C<~~> operator.
@@ -1323,7 +1325,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

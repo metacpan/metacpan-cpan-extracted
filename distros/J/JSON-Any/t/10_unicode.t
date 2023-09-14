@@ -1,8 +1,9 @@
 use strict;
 use warnings;
 
+use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use utf8;
-use Test::More;
+use Test::More 0.88;
 use JSON::Any;
 
 $ENV{JSON_ANY_CONFIG} = "utf8=1";
@@ -62,9 +63,6 @@ sub compare_strings {
     require Data::Dumper;
     no warnings 'once';
     local $Data::Dumper::Terse = 1;
-
-    binmode $_, ':utf8' foreach 'STDOUT', 'STDERR',
-        map { Test::Builder->new->$_ } qw(output failure_output);
 
     diag 'raw form: ', Data::Dumper::Dumper({
         got => $got,

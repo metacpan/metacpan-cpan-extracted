@@ -1,3 +1,15 @@
+2.400002  2023-09-07 14:07:36+02:00 Europe/Vienna
+
+  * Fix missing dependencies
+
+2.400001  2023-09-07 12:48:53+02:00 Europe/Vienna
+
+  * Fix author tests.
+  * Fix Cisco NX-OS prompt matching
+    at least version 9.3(9) sends a carriage-return before the prompt,
+    after the reguar carriage-return plus line-feed
+  * Change Cisco configure prompt regex to match the other prompt regexes
+
 2.400000 2023-08-25
 
   * Fix Cisco privileged prompt discovery

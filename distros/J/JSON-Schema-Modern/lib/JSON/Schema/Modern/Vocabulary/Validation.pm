@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Validation vocabulary
 
-our $VERSION = '0.569';
+our $VERSION = '0.570';
 
 use 5.020;
 use Moo;
@@ -17,6 +17,7 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use List::Util 'any';
 use Ref::Util 0.100 'is_plain_arrayref';
+use Scalar::Util 'looks_like_number';
 use if "$]" >= 5.022, POSIX => 'isinf';
 use JSON::Schema::Modern::Utilities qw(is_type get_type is_equal is_elements_unique E assert_keyword_type assert_pattern jsonp sprintf_num);
 use Math::BigFloat;
@@ -65,12 +66,16 @@ sub _eval_keyword_type ($self, $data, $schema, $state) {
   if (is_plain_arrayref($schema->{type})) {
     return 1 if any {
       $type eq $_ or ($_ eq 'number' and $type eq 'integer')
+        or ($type eq 'string' and $state->{stringy_numbers} and looks_like_number($data)
+            and ($_ eq 'number' or ($_ eq 'integer' and $data == int($data))))
         or ($_ eq 'boolean' and $state->{scalarref_booleans} and $type eq 'reference to SCALAR')
     } $schema->{type}->@*;
     return E($state, 'got %s, not one of %s', $type, join(', ', $schema->{type}->@*));
   }
   else {
     return 1 if $type eq $schema->{type} or ($schema->{type} eq 'number' and $type eq 'integer')
+      or ($type eq 'string' and $state->{stringy_numbers} and looks_like_number($data)
+          and ($schema->{type} eq 'number' or ($schema->{type} eq 'integer' and $data == int($data))))
       or ($schema->{type} eq 'boolean' and $state->{scalarref_booleans} and $type eq 'reference to SCALAR');
     return E($state, 'got %s, not %s', $type, $schema->{type});
   }
@@ -106,7 +111,9 @@ sub _traverse_keyword_multipleOf ($self, $schema, $state) {
 }
 
 sub _eval_keyword_multipleOf ($self, $data, $schema, $state) {
-  return 1 if not is_type('number', $data);
+  return 1 if not is_type('number', $data)
+    and not ($state->{stringy_numbers} and is_type('string', $data) and looks_like_number($data)
+      and do { $data = 0+$data; 1 });
 
   # if either value is a float, use the bignum library for the calculation for an accurate remainder
   if (ref($data) =~ /^Math::Big(?:Int|Float)$/
@@ -120,7 +127,7 @@ sub _eval_keyword_multipleOf ($self, $data, $schema, $state) {
   }
   else {
     my $quotient = $data / $schema->{multipleOf};
-    return E($state, 'overflow while calculating quotient')
+    return E($state, 'overflow while calculating quotient of integers')
       if "$]" >= 5.022 ? isinf($quotient) : $quotient =~ /^-?Inf$/i;
     return 1 if int($quotient) == $quotient;
   }
@@ -131,32 +138,36 @@ sub _eval_keyword_multipleOf ($self, $data, $schema, $state) {
 sub _traverse_keyword_maximum { goto \&_assert_number }
 
 sub _eval_keyword_maximum ($self, $data, $schema, $state) {
-  return 1 if not is_type('number', $data);
-  return 1 if $data <= $schema->{maximum};
+  return 1 if not is_type('number', $data)
+    and not ($state->{stringy_numbers} and is_type('string', $data) and looks_like_number($data));
+  return 1 if 0+$data <= $schema->{maximum};
   return E($state, 'value is larger than %s', sprintf_num($schema->{maximum}));
 }
 
 sub _traverse_keyword_exclusiveMaximum { goto \&_assert_number }
 
 sub _eval_keyword_exclusiveMaximum ($self, $data, $schema, $state) {
-  return 1 if not is_type('number', $data);
-  return 1 if $data < $schema->{exclusiveMaximum};
+  return 1 if not is_type('number', $data)
+    and not ($state->{stringy_numbers} and is_type('string', $data) and looks_like_number($data));
+  return 1 if 0+$data < $schema->{exclusiveMaximum};
   return E($state, 'value is equal to or larger than %s', sprintf_num($schema->{exclusiveMaximum}));
 }
 
 sub _traverse_keyword_minimum { goto \&_assert_number }
 
 sub _eval_keyword_minimum ($self, $data, $schema, $state) {
-  return 1 if not is_type('number', $data);
-  return 1 if $data >= $schema->{minimum};
+  return 1 if not is_type('number', $data)
+    and not ($state->{stringy_numbers} and is_type('string', $data) and looks_like_number($data));
+  return 1 if 0+$data >= $schema->{minimum};
   return E($state, 'value is smaller than %s', sprintf_num($schema->{minimum}));
 }
 
 sub _traverse_keyword_exclusiveMinimum { goto \&_assert_number }
 
 sub _eval_keyword_exclusiveMinimum ($self, $data, $schema, $state) {
-  return 1 if not is_type('number', $data);
-  return 1 if $data > $schema->{exclusiveMinimum};
+  return 1 if not is_type('number', $data)
+    and not ($state->{stringy_numbers} and is_type('string', $data) and looks_like_number($data));
+  return 1 if 0+$data > $schema->{exclusiveMinimum};
   return E($state, 'value is equal to or smaller than %s', sprintf_num($schema->{exclusiveMinimum}));
 }
 
@@ -339,7 +350,7 @@ JSON::Schema::Modern::Vocabulary::Validation - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.569
+version 0.570
 
 =head1 DESCRIPTION
 

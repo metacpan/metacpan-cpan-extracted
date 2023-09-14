@@ -1,7 +1,7 @@
 package Web::Query::LibXML;
 our $AUTHORITY = 'cpan:TOKUHIROM';
 # ABSTRACT: fast, drop-in replacement for Web::Query
-$Web::Query::LibXML::VERSION = '0.39';
+$Web::Query::LibXML::VERSION = '1.00';
 
 use 5.008005;
 use strict;
@@ -68,7 +68,7 @@ Web::Query::LibXML - fast, drop-in replacement for Web::Query
 
 =head1 VERSION
 
-version 0.39
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -115,7 +115,7 @@ L<Web::Query>, L<HTML::TreeBuilder::LibXML>, L<XML::LibXML>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/tokuhirom/Web-Query/issues
+L<https://github.com/tokuhirom/Web-Query/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

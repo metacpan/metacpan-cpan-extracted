@@ -1,12 +1,16 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+
+/* We need to be able to see FEATURE_*_IS_ENABLED */
+#define PERL_EXT
+#include "feature.h"
 
 #include "XSParseSublike.h"
 
@@ -20,33 +24,17 @@
 #  define HAVE_FEATURE_CLASS
 #endif
 
+/* We always need this included to get the struct and function definitions
+ * visible, even though we won't be calling it
+ */
+#include "parse_subsignature_ex.h"
+
 #if HAVE_PERL_VERSION(5, 26, 0)
-#  if HAVE_PERL_VERSION(5, 31, 3)
-    /* We're going to need to have access to *both* core and haxlib's
-     * parse_subsignature(). In order to do that we'll do some fairly fun
-     * hackery here
-     */
-#    define CORE_parse_subsignature(flags)  S_CORE_parse_subsignature(aTHX_ flags)
-    static OP *S_CORE_parse_subsignature(pTHX_ U32 flags)
-    {
-      return parse_subsignature(flags);
-    }
-#    undef parse_subsignature
-#  endif
-#  include "parse_subsignature.c.inc"
-
-#  define HAX_parse_subsignature(flags)  S_HAX_parse_subsignature(aTHX_ flags)
-  static OP *S_HAX_parse_subsignature(pTHX_ U32 flags)
-  {
-    return parse_subsignature(flags);
-  }
-
-#  if HAVE_PERL_VERSION(5, 31, 3)
-#    undef parse_subsignature
-#    define parse_subsignature CORE_parse_subsignature
-#  endif
-
 #  include "make_argcheck_aux.c.inc"
+
+#  if !HAVE_PERL_VERSION(5, 31, 3)
+#    define parse_subsignature(flags)  parse_subsignature_ex(0) /* ignore core flags as there are none */
+#  endif
 
 #  define HAVE_PARSE_SUBSIGNATURE
 #endif
@@ -61,6 +49,9 @@
 #endif
 
 #include "lexer-additions.c.inc"
+
+#define QUOTED_PVNf             "\"%.*s\"%s"
+#define QUOTED_PVNfARG(pv,len)  ((len) <= 255 ? (int)(len) : 255), (pv), ((len) <= 255 ? "" : "...")
 
 struct HooksAndData {
   const struct XSParseSublikeHooks *hooks;
@@ -216,6 +207,18 @@ static int parse(pTHX_
     lex_read_unichar(0);
     lex_read_space(0);
 
+    if(require_parts & XS_PARSE_SUBLIKE_PART_SIGNATURE) {
+#if HAVE_PERL_VERSION(5, 32, 0)
+      SAVEI32(PL_compiling.cop_features);
+      PL_compiling.cop_features |= FEATURE_SIGNATURES_BIT;
+#else
+      /* So far this is only used by the "method" keyword hack for perl 5.38
+       * onwards so this doesn't technically matter. Yet...
+       */
+      croak("TODO: import_pragma(\"feature\", \"signatures\")");
+#endif
+    }
+
 #if HAVE_PERL_VERSION(5, 31, 3)
     /* core's parse_subsignature doesn't seem able to handle empty sigs
      *   RT132284
@@ -247,14 +250,16 @@ static int parse(pTHX_
     else
 #endif
     {
-      bool signature_named_params = false;
+      U32 flags = 0;
       FOREACH_HOOKS_FORWARD {
         if(hooks->flags & XS_PARSE_SUBLIKE_FLAG_SIGNATURE_NAMED_PARAMS)
-          signature_named_params = true;
+          flags |= PARSE_SUBSIGNATURE_NAMED_PARAMS;
+        if(hooks->flags & XS_PARSE_SUBLIKE_FLAG_SIGNATURE_PARAM_ATTRIBUTES)
+          flags |= PARSE_SUBSIGNATURE_PARAM_ATTRIBUTES;
       }
 
-      if(signature_named_params)
-        sigop = HAX_parse_subsignature(PARSE_SUBSIGNATURE_NAMED_PARAMS);
+      if(flags)
+        sigop = parse_subsignature_ex(flags);
       else
         sigop = parse_subsignature(0);
 
@@ -463,10 +468,13 @@ static void register_sublike(pTHX_ const char *kw, const void *hooks, void *hook
   reg->hooks = hooks;
   reg->hookdata = hookdata;
 
-  if(reg->ver >= 4 && reg->hooks->permit_hintkey)
+  if(reg->hooks->permit_hintkey)
     reg->permit_hintkey_len = strlen(reg->hooks->permit_hintkey);
   else
     reg->permit_hintkey_len = 0;
+
+  if(!reg->hooks->permit && !reg->hooks->permit_hintkey)
+    croak("Third-party sublike keywords require a permit callback or hinthash key");
 
   REGISTRATIONS_LOCK;
   {
@@ -526,8 +534,8 @@ static int IMPL_xs_parse_sublike_any_v4(pTHX_ const struct XSParseSublikeHooks *
   if(kwlen != 3 || !strEQ(kw, "sub")) {
     reg = find_permitted(aTHX_ kw, kwlen);
     if(!reg)
-      croak("Expected a keyword to introduce a sub or sub-like construction, found \"%.*s\"",
-        kwlen, kw);
+      croak("Expected a keyword to introduce a sub or sub-like construction, found " QUOTED_PVNf,
+        QUOTED_PVNfARG(kw, kwlen));
   }
 
   SvREFCNT_dec(kwsv);
@@ -551,6 +559,24 @@ static int IMPL_xs_parse_sublike_any_v3(pTHX_ const void *hooksA, void *hookdata
   croak("XS::Parse::Sublike ABI v3 is no longer supported; the caller should be rebuilt to use v4");
 }
 
+static void IMPL_register_xps_signature_attribute(pTHX_ const char *name, const struct XPSSignatureAttributeFuncs *funcs, void *funcdata)
+{
+  if(funcs->ver < 5)
+    croak("Mismatch in signature param attribute ABI version field: module wants %d; we require >= 5\n",
+      funcs->ver);
+  if(funcs->ver > XSPARSESUBLIKE_ABI_VERSION)
+    croak("Mismatch in signature param attribute ABI version field: module wants %d; we support <= %d\n",
+      funcs->ver, XSPARSESUBLIKE_ABI_VERSION);
+
+  if(!name || !(name[0] >= 'A' && name[0] <= 'Z'))
+    croak("Signature param attribute names must begin with a capital letter");
+
+  if(!funcs->permit_hintkey)
+    croak("Signature param attributes require a permit hinthash key");
+
+  register_subsignature_attribute(name, funcs, funcdata);
+}
+
 #ifdef HAVE_FEATURE_CLASS
 static bool permit_core_method(pTHX_ void *hookdata)
 {
@@ -565,6 +591,7 @@ static void pre_subparse_core_method(pTHX_ struct XSParseSublikeContext *ctx, vo
 static const struct XSParseSublikeHooks hooks_core_method = {
   .permit = &permit_core_method,
   .pre_subparse = &pre_subparse_core_method,
+  .require_parts = XS_PARSE_SUBLIKE_PART_SIGNATURE, /* enable signatures feature */
 };
 #endif
 
@@ -610,8 +637,8 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
 
     reg = find_permitted(aTHX_ kw, kwlen);
     if(!reg)
-      croak("Expected a keyword to introduce a sub or sub-like construction, found \"%.*s\"",
-          kwlen, kw);
+      croak("Expected a keyword to introduce a sub or sub-like construction, found " QUOTED_PVNf,
+        QUOTED_PVNfARG(kw, kwlen));
 
     hooks = (struct XSParseSublikeHooks *)reg->hooks;
 
@@ -639,9 +666,12 @@ BOOT:
   /* Newer mechanism */
   sv_setiv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/ABIVERSION_MIN", 1), 4);
   sv_setiv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/ABIVERSION_MAX", 1), XSPARSESUBLIKE_ABI_VERSION);
+
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parse()@4",    1), PTR2UV(&IMPL_xs_parse_sublike_v4));
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/register()@4", 1), PTR2UV(&IMPL_register_xs_parse_sublike_v4));
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parseany()@4", 1), PTR2UV(&IMPL_xs_parse_sublike_any_v4));
+
+  sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/register_sigattr()@5", 1), PTR2UV(&IMPL_register_xps_signature_attribute));
 #ifdef HAVE_FEATURE_CLASS
   register_sublike(aTHX_ "method", &hooks_core_method, NULL, 4);
 #endif

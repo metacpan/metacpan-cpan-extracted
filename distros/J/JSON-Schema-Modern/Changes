@@ -1,5 +1,10 @@
 Revision history for JSON-Schema-Modern
 
+0.570     2023-09-02 20:42:03Z
+          - small performance improvements to 'date-time' and 'date' format
+            validation
+          - new stringy_numbers option, for validating numbers more loosely
+
 0.569     2023-07-08 23:36:06Z
           - fixed some edge cases with ipv6 format validation
 

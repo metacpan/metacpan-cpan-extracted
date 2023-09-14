@@ -12,6 +12,11 @@
 #9 xbt.xbt1
 #10 xbt.xbt2
 #11 xbt.xbt3
+#12 lrt.def
+#13 lrt.lrt
+#14 ame.ame
+#15 ame.def
+#16 git124.def
 
 # To locate test #13 you can search for its name or the string '#13'
 
@@ -29,8 +34,10 @@ BEGIN {
     # BEGIN SECTION 1: Parameter combinations #
     ###########################################
     $rparams = {
+        'ame'    => "--add-missing-else",
         'def'    => "",
         'git116' => "-viu",
+        'lrt'    => "--line-range-tidy=2:3",
         'olbxl2' => <<'----------',
 -olbxl='*'
 ----------
@@ -46,11 +53,34 @@ BEGIN {
     ############################
     $rsources = {
 
+        'ame' => <<'----------',
+    if    ( $level == 3 ) { $val = $global{'section'} }
+    elsif ( $level == 2 ) { $val = $global{'chapter'} }
+----------
+
         'git116' => <<'----------',
 print "Tried to add: @ResolveRPM\n" if ( @ResolveRPM and !$Quiet );
 print "Would need: @DepList\n" if ( @DepList and !$Quiet );
 print "RPM Output:\n" unless $Quiet;
 print join( "\n", @RPMOutput ) . "\n" unless $Quiet;
+----------
+
+        'git124' => <<'----------',
+sub git124 {
+    return [
+        gather while ( my $foo = $bar->foobar )
+        {
+            ...;
+        }
+    ];
+}
+----------
+
+        'lrt' => <<'----------',
+=pod
+sub hello{ print
+"Hello World!"}
+=cut
 ----------
 
         'olbxl' => <<'----------',
@@ -301,6 +331,66 @@ my @matches = @{$nodes_ref} > 1 ? @{$nodes_ref}[ 1 .. $#{$nodes_ref} ] : ();
 *{$name} = $sub;
 grep {defined &{${"${class}::"}{$_}}} &{"${class}::Clear"}();
 #11...........
+        },
+
+        'lrt.def' => {
+            source => "lrt",
+            params => "def",
+            expect => <<'#12...........',
+
+=pod
+sub hello{ print
+"Hello World!"}
+=cut
+#12...........
+        },
+
+        'lrt.lrt' => {
+            source => "lrt",
+            params => "lrt",
+            expect => <<'#13...........',
+=pod
+sub hello {
+    print "Hello World!";
+}
+=cut
+#13...........
+        },
+
+        'ame.ame' => {
+            source => "ame",
+            params => "ame",
+            expect => <<'#14...........',
+    if    ( $level == 3 ) { $val = $global{'section'} }
+    elsif ( $level == 2 ) { $val = $global{'chapter'} }
+    else {
+        ##FIXME - added with perltidy -ame
+    }
+#14...........
+        },
+
+        'ame.def' => {
+            source => "ame",
+            params => "def",
+            expect => <<'#15...........',
+    if    ( $level == 3 ) { $val = $global{'section'} }
+    elsif ( $level == 2 ) { $val = $global{'chapter'} }
+#15...........
+        },
+
+        'git124.def' => {
+            source => "git124",
+            params => "def",
+            expect => <<'#16...........',
+sub git124 {
+    return [
+        gather while ( my $foo = $bar->foobar )
+        {
+            ...;
+        }
+    ];
+}
+#16...........
         },
     };
 

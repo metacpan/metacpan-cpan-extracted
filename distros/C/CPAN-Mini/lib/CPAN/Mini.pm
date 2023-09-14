@@ -2,8 +2,8 @@ use 5.006;
 use strict;
 use warnings;
 
-package CPAN::Mini;
-$CPAN::Mini::VERSION = '1.111016';
+package CPAN::Mini 1.111017;
+
 # ABSTRACT: create a minimal mirror of CPAN
 
 ## no critic RequireCarping
@@ -89,7 +89,7 @@ use Compress::Zlib 1.20 ();
 #pod
 #pod * C<exact_mirror>
 #pod
-#pod If true, the C<files_allowed> method will allow all extra files to be mirrored.
+#pod If true, the C<file_allowed> method will allow all extra files to be mirrored.
 #pod
 #pod * C<ignore_source_control>
 #pod
@@ -293,6 +293,8 @@ sub new {
   substr($self->{local}, 0, 1, $class->__homedir)
     if substr($self->{local}, 0, 1) eq q{~};
 
+  $self->{local} = File::Spec->rel2abs($self->{local});
+
   Carp::croak "local mirror path exists but is not a directory"
     if (-e $self->{local})
     and not(-d $self->{local});
@@ -469,9 +471,14 @@ sub mirror_file {
     );
 
     $self->log($path, { no_nl => 1 });
-    my $res = $self->{__lwp}->mirror($remote_uri, $local_file);
+    my $res = eval { $self->{__lwp}->mirror($remote_uri, $local_file) };
 
-    if ($res->is_success) {
+    if (! $res) {
+      my $error = $@ || "(unknown error)";
+      $self->log(" ... resulted in an HTTP client error");
+      $self->log_warn("$remote_uri: $error");
+      return;
+    } elsif ($res->is_success) {
       utime undef, undef, $local_file if $arg->{update_times};
       $checksum_might_be_up_to_date = 0;
       $self->_recent($path);
@@ -515,21 +522,26 @@ sub mirror_file {
 #pod =cut
 
 sub __do_filter {
-  my ($self, $filter, $file) = @_;
+  my ($self, $what, $filter, $file) = @_;
   return unless $filter;
 
   if (ref($filter) eq 'ARRAY') {
     for (@$filter) {
-      return 1 if $self->__do_filter($_, $file);
+      return 1 if $self->__do_filter($what, $_, $file);
     }
     return;
   }
 
+  my $match;
   if (ref($filter) eq 'CODE') {
-    return $filter->($file);
+    $match = $filter->($file);
   } else {
-    return $file =~ $filter;
+    $match = $file =~ $filter;
   }
+
+  $self->log_debug("skipping $file because $what matches $filter") if $match;
+  return 1 if $match;
+  return;
 }
 
 sub _filter_module {
@@ -544,8 +556,8 @@ sub _filter_module {
     return 1 if $args->{path} =~ m{/\bperl_mlb\.zip}i;
   }
 
-  return 1 if $self->__do_filter($self->{path_filters},   $args->{path});
-  return 1 if $self->__do_filter($self->{module_filters}, $args->{module});
+  return 1 if $self->__do_filter(path   => $self->{path_filters}, $args->{path});
+  return 1 if $self->__do_filter(module => $self->{module_filters}, $args->{module});
   return 0;
 }
 
@@ -685,7 +697,7 @@ sub trace {
 
 sub log_debug {
   my ($self, @rest) = @_;
-  return unless $_[0]->log_level eq 'debug';
+  return unless ($_[0]->log_level || '') eq 'debug';
   $_[0]->log_unconditionally($_[1], $_[2]);
 }
 
@@ -946,7 +958,7 @@ CPAN::Mini - create a minimal mirror of CPAN
 
 =head1 VERSION
 
-version 1.111016
+version 1.111017
 
 =head1 SYNOPSIS
 
@@ -986,6 +998,16 @@ the newest version of every distribution.  Those files are:
 the last non-developer release of every dist for every author
 
 =back
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should
+work on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 METHODS
 
@@ -1036,7 +1058,7 @@ directories.  It defaults to 0711.
 
 C<exact_mirror>
 
-If true, the C<files_allowed> method will allow all extra files to be mirrored.
+If true, the C<file_allowed> method will allow all extra files to be mirrored.
 
 =item *
 
@@ -1293,11 +1315,51 @@ Thanks to David Golden for some important bugfixes and refactoring.
 
 =item *
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =item *
 
 Randal Schwartz <merlyn@stonehenge.com>
+
+=back
+
+=head1 CONTRIBUTORS
+
+=for stopwords Brian Wightman David Golden Fabrice Gabolde Gabor Szabo Jeff Bisbee Jeffrey Thalhammer Ricardo Signes Stephen Thirlwall
+
+=over 4
+
+=item *
+
+Brian Wightman <MidLifeXis@wightmanfam.org>
+
+=item *
+
+David Golden <dagolden@cpan.org>
+
+=item *
+
+Fabrice Gabolde <fgabolde@weborama.com>
+
+=item *
+
+Gabor Szabo <gabor@szabgab.com>
+
+=item *
+
+Jeff Bisbee <jbisbee@cpan.org>
+
+=item *
+
+Jeffrey Thalhammer <jeff@imaginative-software.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
+
+Stephen Thirlwall <sdt@dr.com>
 
 =back
 

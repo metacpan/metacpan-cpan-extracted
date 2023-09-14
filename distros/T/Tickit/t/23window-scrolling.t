@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Tickit::Test;
 
@@ -35,9 +35,9 @@ $win->bind_event( expose => sub { push @exposed_rects, $_[2]->rect } );
                  SCROLLRECT(5,0,10,80,1,0) ],
                'Termlog after fullwidth $win->scroll downward' );
 
-   is_deeply( \@exposed_rects,
-              [ Tickit::Rect->new( top => 9, lines => 1, left => 0, cols => 80 ) ],
-              'Exposed area after ->scroll downward' );
+   is( \@exposed_rects,
+       [ rect( top => 9, lines => 1, left => 0, cols => 80 ) ],
+       'Exposed area after ->scroll downward' );
 
    undef @exposed_rects;
 }
@@ -51,9 +51,9 @@ $win->bind_event( expose => sub { push @exposed_rects, $_[2]->rect } );
                  SCROLLRECT(5,0,10,80,-1,0) ],
                'Termlog after fullwidth $win->scroll upward' );
 
-   is_deeply( \@exposed_rects,
-              [ Tickit::Rect->new( top => 0, lines => 1, left => 0, cols => 80 ) ],
-              'Exposed area after ->scroll upward' );
+   is( \@exposed_rects,
+       [ rect( top => 0, lines => 1, left => 0, cols => 80 ) ],
+       'Exposed area after ->scroll upward' );
 
    undef @exposed_rects;
 }
@@ -67,9 +67,9 @@ $win->bind_event( expose => sub { push @exposed_rects, $_[2]->rect } );
                  SCROLLRECT(5,0,10,80, 0,1) ],
                'Termlog after fullwidth $win->scroll rightward' );
 
-   is_deeply( \@exposed_rects,
-              [ Tickit::Rect->new( top => 0, lines => 10, left => 79, cols => 1 ) ],
-              'Exposed area after ->scroll rightward' );
+   is( \@exposed_rects,
+       [ rect( top => 0, lines => 10, left => 79, cols => 1 ) ],
+       'Exposed area after ->scroll rightward' );
 
    undef @exposed_rects;
 }
@@ -83,9 +83,9 @@ $win->bind_event( expose => sub { push @exposed_rects, $_[2]->rect } );
                  SCROLLRECT(5,0,10,80, 0,-1) ],
                'Termlog after fullwidth $win->scroll leftward' );
 
-   is_deeply( \@exposed_rects,
-              [ Tickit::Rect->new( top => 0, lines => 10, left => 0, cols => 1 ) ],
-              'Exposed area after ->scroll leftward' );
+   is( \@exposed_rects,
+       [ rect( top => 0, lines => 10, left => 0, cols => 1 ) ],
+       'Exposed area after ->scroll leftward' );
 
    undef @exposed_rects;
 }
@@ -101,9 +101,9 @@ $win->bind_event( expose => sub { push @exposed_rects, $_[2]->rect } );
                  SCROLLRECT(7,0,3,80,-1,0) ],
                'Termlog after fullwidth $win->scrollrect downward' );
 
-   is_deeply( \@exposed_rects,
-              [ Tickit::Rect->new( top => 2, lines => 1, left => 0, cols => 80 ) ],
-              'Exposed area after ->scroll downward' );
+   is( \@exposed_rects,
+       [ rect( top => 2, lines => 1, left => 0, cols => 80 ) ],
+       'Exposed area after ->scroll downward' );
 
    undef @exposed_rects;
 }
@@ -118,9 +118,9 @@ $win->bind_event( expose => sub { push @exposed_rects, $_[2]->rect } );
                  SCROLLRECT(7,0,3,80,1,0) ],
                'Termlog after fullwidth $win->scrollrect upward' );
 
-   is_deeply( \@exposed_rects,
-              [ Tickit::Rect->new( top => 4, lines => 1, left => 0, cols => 80 ) ],
-              'Exposed area after ->scroll upward' );
+   is( \@exposed_rects,
+       [ rect( top => 4, lines => 1, left => 0, cols => 80 ) ],
+       'Exposed area after ->scroll upward' );
 
    undef @exposed_rects;
 }
@@ -134,9 +134,9 @@ $win->bind_event( expose => sub { push @exposed_rects, $_[2]->rect } );
    is_termlog( [],
                'Termlog empty after scrollrect further than area' );
 
-   is_deeply( \@exposed_rects,
-              [ Tickit::Rect->new( top => 2, left => 0, lines => 3, cols => 80 ) ],
-              'Exposed area after ->scrollrect further than area' );
+   is( \@exposed_rects,
+       [ rect( top => 2, left => 0, lines => 3, cols => 80 ) ],
+       'Exposed area after ->scrollrect further than area' );
 
    undef @exposed_rects;
 }
@@ -160,17 +160,17 @@ $win->bind_event( expose => sub { push @exposed_rects, $_[2]->rect } );
                  SCROLLRECT(9,0,6,80, 2,0) ],
                'Termlog after ->scrollrect with pending damage' );
 
-   is_deeply( \@exposed_rects,
-              [ # outside
-                Tickit::Rect->new( top => 1, left => 4, lines => 2, cols => 10 ),
-                # split part outside
-                Tickit::Rect->new( top => 3, left => 10, lines => 1, cols => 5 ),
-                # translated+truncated inside
-                Tickit::Rect->new( top => 4, left => 20, lines => 1, cols => 10 ),
-                # exposed
-                Tickit::Rect->new( top => 8, left => 0, lines => 2, cols => 80 ),
-              ],
-              'Exposed area after ->scrollrect with pending damage' );
+   is( \@exposed_rects,
+       [ # outside
+         rect( top => 1, left => 4, lines => 2, cols => 10 ),
+         # split part outside
+         rect( top => 3, left => 10, lines => 1, cols => 5 ),
+         # translated+truncated inside
+         rect( top => 4, left => 20, lines => 1, cols => 10 ),
+         # exposed
+         rect( top => 8, left => 0, lines => 2, cols => 80 ),
+       ],
+       'Exposed area after ->scrollrect with pending damage' );
 
    undef @exposed_rects;
 }
@@ -189,9 +189,9 @@ $win->bind_event( expose => sub { push @exposed_rects, $_[2]->rect } );
                  SCROLLRECT(8, 0,7,80, 0,4) ],
                'Termlog after scroll with obscuring child' );
 
-   is_deeply( \@exposed_rects,
-              [ Tickit::Rect->new( top => 0, left => 76, lines => 10, cols => 4 ) ],
-              'Exposed area after scroll with obscuring child' );
+   is( \@exposed_rects,
+       [ rect( top => 0, left => 76, lines => 10, cols => 4 ) ],
+       'Exposed area after scroll with obscuring child' );
 
    $child->hide;
    flush_tickit;
@@ -204,9 +204,9 @@ $win->bind_event( expose => sub { push @exposed_rects, $_[2]->rect } );
                  SCROLLRECT(5,0,10,80, 0,4) ],
                'Termlog after scroll with hidden obscuring child' );
 
-   is_deeply( \@exposed_rects,
-              [ Tickit::Rect->new( top => 0, left => 76, lines => 10, cols => 4 ) ],
-              'Exposed area after scroll with hidden obscuring child' );
+   is( \@exposed_rects,
+       [ rect( top => 0, left => 76, lines => 10, cols => 4 ) ],
+       'Exposed area after scroll with hidden obscuring child' );
 
    $child->close;
    flush_tickit;
@@ -226,9 +226,9 @@ $win->bind_event( expose => sub { push @exposed_rects, $_[2]->rect } );
                  SCROLLRECT(5,0,10,80, -2,0) ],
                'Termlog after ->scroll_with_children' );
 
-   is_deeply( \@exposed_rects,
-              [ Tickit::Rect->new( top => 0, left => 0, lines => 2, cols => 80 ) ],
-              'Exposed area after ->scroll_with_children' );
+   is( \@exposed_rects,
+       [ rect( top => 0, left => 0, lines => 2, cols => 80 ) ],
+       'Exposed area after ->scroll_with_children' );
 
    $child->close;
    flush_tickit;
@@ -251,10 +251,10 @@ $win->bind_event( expose => sub { push @exposed_rects, $_[2]->rect } );
                  SCROLLRECT(10,0,5,80, -2,0) ],
                'Termlog after ->scroll_with_children with sibling' );
 
-   is_deeply( \@exposed_rects,
-              [ Tickit::Rect->new( top => 0, left => 20, lines => 5, cols => 60 ),
-                Tickit::Rect->new( top => 5, left =>  0, lines => 2, cols => 80 ) ],
-              'Exposed area after ->scroll_with_children with sibling' );
+   is( \@exposed_rects,
+       [ rect( top => 0, left => 20, lines => 5, cols => 60 ),
+         rect( top => 5, left =>  0, lines => 2, cols => 80 ) ],
+       'Exposed area after ->scroll_with_children with sibling' );
 
    undef @exposed_rects;
 
@@ -270,9 +270,9 @@ $win->bind_event( expose => sub { push @exposed_rects, $_[2]->rect } );
                  SCROLLRECT(5,0,10,80, -2,0) ],
                'Termlog after ->scroll_with_children with hidden sibling' );
 
-   is_deeply( \@exposed_rects,
-              [ Tickit::Rect->new( top => 0, left => 0, lines => 2, cols => 80 ) ],
-              'Exposed area after ->scroll_with_children with hidden sibling' );
+   is( \@exposed_rects,
+       [ rect( top => 0, left => 0, lines => 2, cols => 80 ) ],
+       'Exposed area after ->scroll_with_children with hidden sibling' );
 
    $win->close;
    $sibling->close;

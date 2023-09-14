@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-23'; # DATE
+our $DATE = '2023-09-03'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 sub meta {
     +{
@@ -55,7 +55,7 @@ Data::Sah::Filter::perl::Str::maybe_convert_to_re - Convert string to regex if s
 
 =head1 VERSION
 
-This document describes version 0.013 of Data::Sah::Filter::perl::Str::maybe_convert_to_re (from Perl distribution Sah-Schemas-Str), released on 2022-09-23.
+This document describes version 0.015 of Data::Sah::Filter::perl::Str::maybe_convert_to_re (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
 
 =head1 DESCRIPTION
 
@@ -98,7 +98,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

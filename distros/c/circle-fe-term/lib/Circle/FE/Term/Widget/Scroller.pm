@@ -1,13 +1,15 @@
 #  You may distribute under the terms of the GNU General Public License
 #
-#  (C) Paul Evans, 2010-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2023 -- leonerd@leonerd.org.uk
 
-package Circle::FE::Term::Widget::Scroller;
+package Circle::FE::Term::Widget::Scroller 0.232470;
 
-use strict;
-use feature qw( switch );
+use v5.26;
+use warnings;
+
 use constant type => "Scroller";
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
+
+use Syntax::Keyword::Match;
 
 use Circle::FE::Term;
 
@@ -121,15 +123,15 @@ sub insert_event
    my @items = ( $self->format_event( $timestamp . $format, $args ) );
 
    my $widget = $self->{widget};
-   given( $end ) {
-      when( "bottom" ) {
+   match( $end : eq ) {
+      case( "bottom" ) {
          unshift @items, $self->format_event( Circle::FE::Term->get_theme_var( "datemessage" ), { datestamp => $datestamp } )
             if $datestamp ne $self->{last_datestamp};
 
          $widget->push( @items );
          $self->{last_datestamp} = $datestamp;
       }
-      when( "top" ) {
+      case( "top" ) {
          push @items, $self->format_event( Circle::FE::Term->get_theme_var( "datemessage" ), { datestamp => $self->{last_datestamp_top} } )
             if $datestamp ne $self->{last_datestamp_top} and length $self->{last_datestamp_top};
 

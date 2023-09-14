@@ -731,7 +731,7 @@ This package provides the following methods:
 
 =head2 args
 
-  args() (HashRef)
+  args() (hashref)
 
 The args method returns the task argument declarations.
 
@@ -760,7 +760,7 @@ I<Since C<2.91>>
 
 =head2 cmds
 
-  cmds() (HashRef)
+  cmds() (hashref)
 
 The cmds method returns the task command declarations.
 
@@ -793,7 +793,7 @@ I<Since C<2.91>>
 
 =head2 conf
 
-  conf() (HashRef)
+  conf() (hashref)
 
 The conf method loads the configuration file returned by L</file>, then decodes
 and returns the information as a hashref.
@@ -930,7 +930,7 @@ I<Since C<2.91>>
 
 =head2 file
 
-  file() (Str)
+  file() (string)
 
 The file method returns the configuration file specified in the C<VENUS_FILE>
 environment variable, or the discovered configuration file in the current
@@ -1070,7 +1070,7 @@ I<Since C<2.91>>
 
 =head2 footer
 
-  footer() (Str)
+  footer() (string)
 
 The footer method returns examples and usage information used in usage text.
 
@@ -1094,7 +1094,7 @@ I<Since C<2.91>>
 
 =head2 handler
 
-  handler(HashRef $data) (Any)
+  handler(hashref $data) (any)
 
 The handler method processes the data provided and executes the request then
 returns the invocant unless the program is exited.
@@ -1793,7 +1793,7 @@ I<Since C<2.91>>
 
 =head2 init
 
-  init() (HashRef)
+  init() (hashref)
 
 The init method returns the default configuration to be used when initializing
 the system with a new configuration file.
@@ -1858,7 +1858,7 @@ I<Since C<2.91>>
 
 =head2 name
 
-  name() (Str)
+  name() (string)
 
 The name method returns the default name for the task. This is used in usage
 text and can be controlled via the C<VENUS_TASK_NAME> environment variable, or
@@ -1916,7 +1916,7 @@ I<Since C<2.91>>
 
 =head2 opts
 
-  opts() (HashRef)
+  opts() (hashref)
 
 The opts method returns the task options declarations.
 
@@ -2280,7 +2280,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

@@ -9,9 +9,9 @@ use Role::Tiny;
 requires 'render_result';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-29'; # DATE
+our $DATE = '2023-07-08'; # DATE
 our $DIST = 'Bencher-Backend'; # DIST
-our $VERSION = '1.062'; # VERSION
+our $VERSION = '1.063'; # VERSION
 
 1;
 # ABSTRACT: Results renderer role
@@ -28,7 +28,7 @@ Bencher::Role::ResultRenderer - Results renderer role
 
 =head1 VERSION
 
-This document describes version 1.062 of Bencher::Role::ResultRenderer (from Perl distribution Bencher-Backend), released on 2022-11-29.
+This document describes version 1.063 of Bencher::Role::ResultRenderer (from Perl distribution Bencher-Backend), released on 2023-07-08.
 
 =for Pod::Coverage .*
 
@@ -64,7 +64,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -76,7 +76,7 @@ Use any argument as the method parameter for the client RPC call
 
 =back
 
-L<Future>
+L<Future> - node response as decoded json
 
 =head1 INHERITED METHODS
 

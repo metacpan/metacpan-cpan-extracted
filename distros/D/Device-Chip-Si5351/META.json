@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -24,20 +24,21 @@
             "Data::Bitfield" : "0",
             "Device::Chip::Base::RegisteredI2C" : "0.21",
             "Future::AsyncAwait" : "0.38",
-            "Object::Pad" : "0.57",
+            "Object::Pad" : "0.800",
             "perl" : "5.026"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::V0" : "0",
+            "Test::Device::Chip::Adapter" : "0"
          }
       }
    },
    "provides" : {
       "Device::Chip::Si5351" : {
          "file" : "lib/Device/Chip/Si5351.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -46,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -1,9 +1,9 @@
-package JSON::Any; # git description: v1.38-9-ga958b5a
+package JSON::Any; # git description: v1.39-25-gd13a0fd
 
 use warnings;
 use strict;
 
-our $VERSION = '1.39';
+our $VERSION = '1.40';
 
 use Carp qw(croak carp);
 
@@ -56,13 +56,12 @@ BEGIN {
                 $self->[HANDLER] = $obj;
             },
         },
-        json_2 => {
+        json_pp => {
             encoder       => 'encode_json',
             decoder       => 'decode_json',
-            get_true      => sub { return JSON::true(); },
-            get_false     => sub { return JSON::false(); },
+            get_true      => sub { return JSON::PP::true(); },
+            get_false     => sub { return JSON::PP::false(); },
             create_object => sub {
-                JSON->import( '-support_by_pp', '-no_export' );
                 my ( $self, $conf ) = @_;
                 my @params = qw(
                   ascii
@@ -114,7 +113,7 @@ BEGIN {
                 $self->[ENCODER] = 'to_json';
                 $self->[DECODER] = 'from_json';
                 $self->[HANDLER] =
-                  $handler->new( { map { $_ => $conf->{$_} } @params } );
+                  $handler->new( { map +($_ => $conf->{$_}), @params } );
             },
         },
         json_xs_1 => {
@@ -206,10 +205,21 @@ BEGIN {
         },
     );
 
-    # JSON::PP has the same API as JSON.pm v2
-    $conf{json_pp} = { %{ $conf{json_2} } };
-    $conf{json_pp}{get_true}  = sub { return JSON::PP::true(); };
-    $conf{json_pp}{get_false} = sub { return JSON::PP::false(); };
+    # JSON.pm v2 has the same API as JSON::PP
+    $conf{json_2} = { %{ $conf{json_pp} } };
+    $conf{json_2}{get_true}  = sub { return JSON::true(); };
+    $conf{json_2}{get_false} = sub { return JSON::false(); };
+    {
+      my $create = $conf{json_2}{create_object};
+      $conf{json_2}{create_object} = sub {
+        JSON->import( '-support_by_pp', '-no_export' );
+        goto &$create;
+      };
+    }
+
+    # JSON.pm v3 and v4 are the same as v2
+    $conf{json_3} = { %{ $conf{json_2} } };
+    $conf{json_4} = { %{ $conf{json_3} } };
 
     # Cpanel::JSON::XS is a fork of JSON::XS (currently)
     $conf{cpanel_json_xs} = { %{ $conf{json_xs_2} } };
@@ -220,6 +230,9 @@ BEGIN {
     $conf{json_xs_3} = { %{ $conf{json_xs_2} } };
     $conf{json_xs_3}{get_true}  = sub { return Types::Serialiser::true(); };
     $conf{json_xs_3}{get_false} = sub { return Types::Serialiser::false(); };
+
+    # JSON::XS v4 is the same as v3
+    $conf{json_xs_4} = { %{ $conf{json_xs_3} } };
 }
 
 sub _make_key {
@@ -270,7 +283,7 @@ sub import {
 
     if (@order) {
         ( $handler, $encoder, $decoder ) = _try_loading(@order);
-        if ( $handler && grep { "JSON::$_" eq $handler } @deprecated ) {
+        if ( $handler && grep "JSON::$_" eq $handler, @deprecated ) {
             my @upgrade_to = grep { my $mod = $_; !grep { $mod eq $_ } @deprecated } @order;
             @upgrade_to = @default if not @upgrade_to;
             carp "Found deprecated package $handler. Please upgrade to ",
@@ -296,7 +309,7 @@ sub import {
 }
 
 sub _module_name_list {
-    my @list = map { _module_name($_) } @_;
+    my @list = map _module_name($_), @_;
     my $last = pop @list;
     return (@list
         ? (join(', ' => @list), " or $last")
@@ -317,8 +330,12 @@ sub _module_name_list {
 #pod actually). If you're producing new code it is recommended to use L<JSON::MaybeXS> which
 #pod will optionally use L<Cpanel::JSON::XS> for speed purposes.
 #pod
-#pod JSON::Any will continue to be maintained for compatibility with existing code,
+#pod JSON::Any will continue to be maintained for compatibility with existing code
+#pod (as well as for rare cases where you want L<JSON::DWIW> as a backend),
 #pod but for new code you should strongly consider using L<JSON::MaybeXS> instead.
+#pod
+#pod For more information about the various options and which are preferred, see
+#pod L<Matt Trout's analysis|http://shadow.cat/blog/matt-s-trout/mstpan-7>.
 #pod
 #pod =head1 DESCRIPTION
 #pod
@@ -417,7 +434,7 @@ sub _module_name_list {
 #pod
 #pod =head2 C<new>
 #pod
-#pod =for :stopwords recognised unicode
+#pod =for stopwords recognised unicode
 #pod
 #pod Will take any of the parameters for the underlying system and pass them
 #pod through. However these values don't map between JSON modules, so, from a
@@ -448,8 +465,7 @@ sub new {
         my @config;
         # undocumented! and yet, people are using this...
         if ( $ENV{JSON_ANY_CONFIG} ) {
-            push @config, map { split /=/, $_ } split /,\s*/,
-              $ENV{JSON_ANY_CONFIG};
+            push @config, map split(/=/, $_), split(/,\s*/, $ENV{JSON_ANY_CONFIG});
         }
         push @config, @_;
         $creator->( $self, my $conf = {@config} );
@@ -628,7 +644,7 @@ JSON::Any - (DEPRECATED) Wrapper Class for the various JSON classes
 
 =head1 VERSION
 
-version 1.39
+version 1.40
 
 =head1 SYNOPSIS
 
@@ -723,8 +739,12 @@ The original need for L<JSON::Any> has been solved (quite some time ago
 actually). If you're producing new code it is recommended to use L<JSON::MaybeXS> which
 will optionally use L<Cpanel::JSON::XS> for speed purposes.
 
-JSON::Any will continue to be maintained for compatibility with existing code,
+JSON::Any will continue to be maintained for compatibility with existing code
+(as well as for rare cases where you want L<JSON::DWIW> as a backend),
 but for new code you should strongly consider using L<JSON::MaybeXS> instead.
+
+For more information about the various options and which are preferred, see
+L<Matt Trout's analysis|http://shadow.cat/blog/matt-s-trout/mstpan-7>.
 
 =head1 WARNING
 
@@ -743,7 +763,7 @@ L<Types::Serialiser> package, please try upgrading L<JSON.pm|JSON> to 2.90 or hi
 
 =head2 C<new>
 
-=for :stopwords recognised unicode
+=for stopwords recognised unicode
 
 Will take any of the parameters for the underlying system and pass them
 through. However these values don't map between JSON modules, so, from a
@@ -814,18 +834,25 @@ underlying JSON module.
 
 =head1 ACKNOWLEDGEMENTS
 
-=for :stopwords Dimas Wistow mst
+=for stopwords Dimas Wistow mst
 
 This module came about after discussions on irc.perl.org about the fact
 that there were now six separate JSON perl modules with different interfaces.
 
-In the spirit of Class::Any, JSON::Any was created with the considerable
+In the spirit of L<Class::Any>, JSON::Any was created with the considerable
 help of Matt 'mst' Trout.
 
 Simon Wistow graciously supplied a patch for backwards compatibility with JSON::XS
-versions previous to 2.01
+versions previous to 2.01.
 
 San Dimas High School Football Rules!
+
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=JSON-Any>
+(or L<bug-JSON-Any@rt.cpan.org|mailto:bug-JSON-Any@rt.cpan.org>).
+
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHORS
 
@@ -855,7 +882,7 @@ Tomas Doran <bobtfish@bobtfish.net>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge יובל קוג'מן (Yuval Kogman) Dagfinn Ilmari Mannsåker Justin Hunter Todd Rinaldo Matthew Horsfall
+=for stopwords Karen Etheridge יובל קוג'מן (Yuval Kogman) Dagfinn Ilmari Mannsåker Graham Knop Justin Hunter Matthew Horsfall Todd Rinaldo
 
 =over 4
 
@@ -873,19 +900,23 @@ Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
 
 =item *
 
-Justin Hunter <justin.d.hunter@gmail.com>
+Graham Knop <haarg@haarg.org>
 
 =item *
 
-Todd Rinaldo <toddr@cpan.org>
+Justin Hunter <justin.d.hunter@gmail.com>
 
 =item *
 
 Matthew Horsfall <wolfsage@gmail.com>
 
+=item *
+
+Todd Rinaldo <toddr@cpan.org>
+
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2007 by Chris Thompson.
 

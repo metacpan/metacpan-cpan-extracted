@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More tests => 17;
 
 my $kTestFile;
 my $kTestNRFile;
@@ -79,10 +79,6 @@ is(scalar @exports, 1, "List all exports");
 
 my %imports = $pe->getImportNames();
 is(keys %imports, 2, "List all imports");
-
-my @importNames = $pe->getImportNamesArray();
-is($importNames[0], 'MSVCR90.dll', "Import name 0");
-is($importNames[1], 'KERNEL32.dll', "Import name 1");
 
 # PE file without a version resource tests
 $pe = Win32::PEFile->new(-file => $kTestNRFile);

@@ -1,4 +1,17 @@
 Revision history for Perl extension constant::more
+
+v0.3.0 2023-09-13
+  [Features]
+  - Direct support for enumerations
+  - Supports flat list of declarations, not just hash ref
+
+  [Tests]
+  - Added tests for flat list and enumeration features
+
+  [POD]
+  - Updated POD for new features
+
+
 v0.2.1  2023-08-27
   [improvements]
   - only load Getopt::Long if the opt field is used AND if there are arguments to process in @ARGV

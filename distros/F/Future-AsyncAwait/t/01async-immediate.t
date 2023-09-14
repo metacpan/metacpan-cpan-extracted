@@ -81,4 +81,13 @@ use Future::AsyncAwait;
    isa_ok( shift @ret, [ "Future" ], 'Single result was a Future' );
 }
 
+# unimport
+{
+   no Future::AsyncAwait;
+
+   sub async { return "normal function" }
+
+   is( async, "normal function", 'async() parses as a normal function call' );
+}
+
 done_testing;

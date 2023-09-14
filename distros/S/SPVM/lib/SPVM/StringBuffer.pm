@@ -52,83 +52,83 @@ The length of the string buffer.
 
 =head2 new
 
-  static method new : StringBuffer ($string : string = undef, $capacity : int = -1);
+C<static method new : L<StringBuffer|SPVM::StringBuffer> ($string : string = undef, $capacity : int = -1);>
 
 Creates a new C<StringBuffer> object using L</"new_len">.
 
-The passed $length to L</"new_len"> is the length of the $string. If the string is undef, it is 0.
+The passed $length to L</"new_len"> is the length of $string. If the string is undef, it is 0.
 
-The $string is copied to the value of the the created string buffer.
+$string is copied to the value of the the created string buffer.
 
 =head2 new_len
 
-  static method new_len : StringBuffer ($length : int, $capacity : int = -1);
+C<static method new_len : L<StringBuffer|SPVM::StringBuffer> ($length : int, $capacity : int = -1);>
 
-Creates a new C<StringBuffer> object with the $length and the $capacity.
+Creates a new C<StringBuffer> object with $length and $capacity.
 
-If the $capacity is less than 0, the $capacity is set to the value of L</"DEFAULT_CAPACITY">.
+If $capacity is less than 0, $capacity is set to the value of L</"DEFAULT_CAPACITY">.
 
-If the $length is greater than the $capacity, the $capacity is set to the $length.
+If $length is greater than $capacity, $capacity is set to $length.
 
 Exceptions:
 
-The $length must be greater than or equal to 0. Otherwise an exception is thrown.
+$length must be greater than or equal to 0. Otherwise an exception is thrown.
 
 =head1 Instance Methods
 
 =head2 push
 
-  method push : void ($string : string, $offset : int = 0, $length : int = -1);
+C<method push : void ($string : string, $offset : int = 0, $length : int = -1);>
 
-Adds a $string from the $offset to the position proceeded by the $length after the end of the string in the string buffer.
+Adds a $string from $offset to the position proceeded by $length after the end of the string in the string buffer.
 
 Exceptions:
 
-The $string must be defined. Otherwise an exception is thrown.
+$string must be defined. Otherwise an exception is thrown.
 
-The $offset must be greater than or equal to 0. Otherwise an exception is thrown.
+$offset must be greater than or equal to 0. Otherwise an exception is thrown.
 
-The $offset + $length must be less than or equal to the length of the $string. Otherwise an exception is thrown.
+$offset + $length must be less than or equal to the length of $string. Otherwise an exception is thrown.
 
 =head2 push_char
 
-  method push_char : void ($char : int);
+C<method push_char : void ($char : int);>
 
 Adds Ascii $char after the end of the string in the string buffer.
 
 =head2 replace
 
-  method replace : void ($offset : int, $length : int, $replace : string);
+C<method replace : void ($offset : int, $length : int, $replace : string);>
 
-Replace the characters of the range specified by the $offset and the $length in the buffer with the $replace string.
+Replace the characters of the range specified by $offset and $length in the buffer with $replace string.
 
 Exceptions:
 
-The $offset must be greater than or equal to 0. Otherwise an exception is thrown.
+$offset must be greater than or equal to 0. Otherwise an exception is thrown.
 
-The $offset + the $length must be less than or equal to the length of the string buffer. Otherwise an exception is thrown.
+$offset + $length must be less than or equal to the length of the string buffer. Otherwise an exception is thrown.
 
 =head2 reserve
 
-  method reserve : void ($new_capacity : int);
+C<method reserve : void ($new_capacity : int);>
 
-Reserves the characters that size is the $new_capacity.
+Reserves the characters that size is $new_capacity.
 
-If the $new_capacity is greater than the capacity of the string buffer, the capacity of the string buffer is extended to the $new_capacity.
+If $new_capacity is greater than the capacity of the string buffer, the capacity of the string buffer is extended to $new_capacity.
 
 Exceptions:
 
-The $new_capacity must be greater than or equal to 0. Otherwise an exception is thrown.
+$new_capacity must be greater than or equal to 0. Otherwise an exception is thrown.
 
 =head2 to_string
 
-  method to_string : string ();
+C<method to_string : string ();>
 
 Creates a new string with the length of the buffer and copies all characters in the buffer into the new string, and returns it.
 
 =head2 get_string_unsafe
 
-  method get_string_unsafe : string ();
+C<method get_string_unsafe : string ();>
 
 Gets the internally string. 
 

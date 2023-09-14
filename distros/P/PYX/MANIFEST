@@ -1,6 +1,6 @@
 Changes
-examples/ex1.pl
-examples/ex2.pl
+examples/pyx_parser.pl
+examples/serialize_pyx.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm
@@ -52,10 +52,11 @@ t/PYX-Format/02-version.t
 t/PYX-Parser/01-use.t
 t/PYX-Parser/02-version.t
 t/PYX-Parser/03-new.t
-t/PYX-Parser/04-parse_file.t
-t/PYX-Parser/06-parse_file-encoding_latin2.t
-t/PYX-Parser/06-parse_file-encoding_utf8.t
-t/PYX-Parser/07-parse_file-rewrite.t
+t/PYX-Parser/04-parse.t
+t/PYX-Parser/05-parse_file.t
+t/PYX-Parser/07-parse_file-encoding_latin2.t
+t/PYX-Parser/07-parse_file-encoding_utf8.t
+t/PYX-Parser/08-parse_file-rewrite.t
 t/PYX/01-use.t
 t/PYX/02-version.t
 t/PYX/03-char.t

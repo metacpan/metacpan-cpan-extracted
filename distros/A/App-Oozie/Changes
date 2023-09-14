@@ -1,4 +1,20 @@
 Revision history for App-Oozie
 
+0.006     2023-09-08 12:47:12+02:00 Europe/Brussels
+- New option template_namenode to giving the ability
+  to override the Oozie variable nameNode from cli.
+
+0.005     2023-09-06 20:03:36+02:00 Europe/Brussels
+- Depends on a newer Net::Hadoop::WebHDFS::LWP for create() operations.
+- Handle the upload gracefully and properly.
+- More logging.
+
+0.004     2023-09-05 12:09:01+02:00 Europe/Brussels
+- Remove a left over hard coded version number.
+
+0.003     2023-09-04 09:51:18+02:00 Europe/Brussels
+- Remove XML::Simple.
+- Internal cleanup.
+
 0.002     2023-08-31 15:55:08+02:00 Europe/Brussels
 - Initial version

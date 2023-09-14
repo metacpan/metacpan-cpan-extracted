@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-04'; # DATE
+our $DATE = '2023-09-08'; # DATE
 our $DIST = 'App-NumberUtilRangeUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Number/Util/Range/convert_number_sequence_to_range",
@@ -38,7 +38,7 @@ convert-number-sequence-to-range - Find sequences in number arrays & convert to 
 
 =head1 VERSION
 
-This document describes version 0.002 of convert-number-sequence-to-range (from Perl distribution App-NumberUtilRangeUtils), released on 2023-01-04.
+This document describes version 0.003 of convert-number-sequence-to-range (from Perl distribution App-NumberUtilRangeUtils), released on 2023-09-08.
 
 =head1 SYNOPSIS
 
@@ -46,11 +46,17 @@ B<convert-number-sequence-to-range> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"
 
 B<convert-number-sequence-to-range> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<convert-number-sequence-to-range> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--ignore-duplicates|/"--ignore-duplicates">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--separator|/"--separator=s">>=I<str>] [B<L<--threshold|/"--threshold=s">>=I<L<posint|Sah::Schema::posint>>] -- [I<L<array|/"--array=s@">>] ...
+B<convert-number-sequence-to-range> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--ignore-duplicates|/"--ignore-duplicates">>] [B<L<--max-range-len|/"--max-range-len=s">>=I<L<posint|Sah::Schema::posint>>] [B<L<--min-range-len|/"--min-range-len=s">>=I<L<posint|Sah::Schema::posint>>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--separator|/"--separator=s">>=I<str>] -- [I<L<array|/"--array=s@">>] ...
 
 
 
 See examples in the L</EXAMPLES> section.
+
+=head1 DESCRIPTION
+
+This routine accepts an array, finds sequences of numbers in it (e.g. 1, 2, 3),
+and converts each sequence into a range ("1..3"). So basically it "compresses" the
+sequence (many elements) into a single element.
 
 =head1 OPTIONS
 
@@ -80,17 +86,27 @@ Can be specified multiple times.
 (No description)
 
 
+=item B<--max-range-len>=I<s>
+
+Maximum number of items in a sequence to convert to a range. Sequence that has
+more than this number of items might be split into two or more ranges.
+
+
+=item B<--min-range-len>=I<s>
+
+Default value:
+
+ 4
+
+Minimum number of items in a sequence to convert to a range. Sequence that has
+less than this number of items will not be converted.
+
+
 =item B<--separator>=I<s>
 
 Default value:
 
  ".."
-
-=item B<--threshold>=I<s>
-
-Default value:
-
- 4
 
 =back
 
@@ -231,9 +247,9 @@ For fish and zsh, install L<shcompgen> as described above.
  -5..-2
  103
 
-=head2 option: threshold
+=head2 option: min_range_len (1)
 
- % convert-number-sequence-to-range 100 2 3 4 5 101 --threshold 5
+ % convert-number-sequence-to-range 100 2 3 4 5 101 --min-range-len 5
  100
  2
  3
@@ -241,11 +257,31 @@ For fish and zsh, install L<shcompgen> as described above.
  5
  101
 
+=head2 option: min_range_len (2)
+
+ % convert-number-sequence-to-range 100 2 3 4 101 foo --min-range-len 3
+ 100
+ 2..4
+ 101
+ foo
+
 =head2 option: ignore_duplicates
 
  % convert-number-sequence-to-range 1 2 3 4 2 9 9 9 --ignore-duplicates 1
  1..4
  9
+
+=head2 option: max_range_len (1)
+
+ % convert-number-sequence-to-range 98 100 101 102 103 104 105 106 107 108 109 110 5 101 --max-range-len 4
+ 98
+ 100..103
+ 104..107
+ 108
+ 109
+ 110
+ 5
+ 101
 
 =head1 HOMEPAGE
 

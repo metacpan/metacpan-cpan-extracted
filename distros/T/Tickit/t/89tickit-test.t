@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Tickit::Test;
 
@@ -11,10 +11,10 @@ use Time::HiRes qw( time );
 
 my $tickit = mk_tickit;
 
-isa_ok( $tickit, "Tickit", '$tickit' );
+isa_ok( $tickit, [ "Tickit" ], '$tickit' );
 
-isa_ok( $tickit->term, "Tickit::Term", '$tickit->term' );
-isa_ok( $tickit->rootwin, "Tickit::Window", '$tickit->rootin' );
+isa_ok( $tickit->term, [ "Tickit::Term" ], '$tickit->term' );
+isa_ok( $tickit->rootwin, [ "Tickit::Window" ], '$tickit->rootin' );
 
 # TODO: IO will be difficult to mock
 

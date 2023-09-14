@@ -2,13 +2,13 @@
 
 #  You may distribute under the terms of the GNU General Public License
 #
-#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2023 -- leonerd@leonerd.org.uk
 
-use strict;
+use v5.26;
 use warnings;
 
 use Tickit::Async;
-use Tickit::Widget::Tabbed 0.005;
+use Tickit::Widget::Tabbed 0.028;
 use Tickit::Widget::VBox;
 use Tickit::Window 0.57;  # ->bind_event
 
@@ -104,7 +104,10 @@ my $top_vbox = Tickit::Widget::VBox->new;
 
 my $tabbed = Tickit::Widget::Tabbed->new(
    tab_position => "bottom",
-   pen_active   => Tickit::Pen->new( b => 1, u => 1 ),
+   style => {
+      'b:active' => 1,
+      'u:active' => 1,
+   },
    tab_class    => "Circle::FE::Term::Tab",
    ribbon_class => "Circle::FE::Term::Ribbon",
 );

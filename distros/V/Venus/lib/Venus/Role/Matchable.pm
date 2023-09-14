@@ -84,7 +84,7 @@ This package provides the following methods:
 
 =head2 match
 
-  match(Str | CodeRef $method, Any @args) (Match)
+  match(string | coderef $method, any @args) (Venus::Match)
 
 The match method returns a L<Venus::Match> object having the match value set to
 the invocant or the result of a dispatch. This method supports dispatching,
@@ -145,7 +145,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

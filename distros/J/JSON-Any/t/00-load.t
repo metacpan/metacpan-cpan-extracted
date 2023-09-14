@@ -1,14 +1,12 @@
-#!perl -T
-
 use strict;
 use warnings;
-use Test::More;
+use Test::More 0.88;
 
 BEGIN {
 
     # Count who's installed
     my @order = qw(Cpanel::JSON::XS JSON::XS JSON::PP JSON JSON::DWIW JSON::Syck);
-    my $count = scalar grep { eval "require $_"; 1; } @order;
+    my $count = scalar grep eval "require $_; 1", @order;
 
     ok($count, 'have at least one JSON backend installed');
 

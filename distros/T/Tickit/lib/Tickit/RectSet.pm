@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2012-2016 -- leonerd@leonerd.org.uk
 
-package Tickit::RectSet 0.73;
+package Tickit::RectSet 0.74;
 
 use v5.14;
 use warnings;

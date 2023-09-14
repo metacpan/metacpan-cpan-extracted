@@ -11,12 +11,13 @@ STDOUT->autoflush;
 STDERR->autoflush;
 
 use ODF::lpOD;
-use ODF::lpOD_Helper qw/:DEFAULT TEXTLEAF_COND TEXTLEAF_OR_PARA_COND PARA_COND/;
+use ODF::lpOD_Helper qw/:DEFAULT TEXTLEAF_FILTER TEXTLEAF_OR_PARA_FILTER PARA_FILTER/;
 BEGIN {
   *_abbrev_addrvis = *ODF::lpOD_Helper::_abbrev_addrvis;
 }
 
-use constant FRAME_COND => 'draw:frame';
+use constant FRAME_FILTER => 'draw:frame';
+use constant SECTION_FILTER => 'text:section';
 
 use Encode qw/encode decode/;
 
@@ -37,7 +38,7 @@ my $para2_only_text =
 my $para2_recursive_text =
   " \n{Tok3 2nd Para in outer Frame (preceded by SP,NL)}AAA"
  ."{Tok4 1st Para in inner Frame (entire para)}"
- ."AAA{Tok5 with local format spans }BBBB"
+ ."AAA{Tok5 with local format spans }BBBBIn Section"
  ."{Tok6 3rd Para in inner Frame (entire) tab:\t:tab 2spaces:  :2spaces}"
  ."{Tok7 Just chars immediately following Inner-Frame-as-Character}" ;
 
@@ -45,7 +46,7 @@ my $para1_recursive_text =
   "{Tok2 1st para in outer Frame (entire para)}"
  ." \n{Tok3 2nd Para in outer Frame (preceded by SP,NL)}AAA"
  ."{Tok4 1st Para in inner Frame (entire para)}"
- ."AAA{Tok5 with local format spans }BBBB"
+ ."AAA{Tok5 with local format spans }BBBBIn Section"
  ."{Tok6 3rd Para in inner Frame (entire) tab:\t:tab 2spaces:  :2spaces}"
  ."{Tok7 Just chars immediately following Inner-Frame-as-Character}"
  ."{Tok8 Para following ‘Just chars’}" ;
@@ -69,16 +70,16 @@ say "para2=",fmt_node_brief($para2) if $debug;
 #################################
 {
   is($para0->get_text(),  $para0_only_text, "p0 get_text (non-rec)");
-  is($para0->Hget_text(prune_cond => PARA_COND), $para0_only_text, 
+  is($para0->Hget_text(prune_cond => PARA_FILTER), $para0_only_text,
      "p0 Hget_text (non-rec)");
-  is($para0->Hget_text(), $para0_recursive_text, 
+  is($para0->Hget_text(), $para0_recursive_text,
      "Hget_text recursive (now the default)");
   is($para1->get_text(),  $para1_text, "p1 get_text (non-rec)");
-  is($para1->Hget_text(prune_cond => PARA_COND),  $para1_text, 
+  is($para1->Hget_text(prune_cond => PARA_FILTER),  $para1_text,
      "p1 Hget_text (non-rec)");
 
   is($para2->get_text(),  $para2_only_text, "p2 get_text (non-rec)");
-  is($para2->Hget_text(prune_cond => PARA_COND), $para2_only_text, 
+  is($para2->Hget_text(prune_cond => PARA_FILTER), $para2_only_text,
      "p2 Hget_text (non-rec)");
   is($para2->Hget_text(), $para2_recursive_text, "p2 Hget_text recursive ");
 
@@ -145,7 +146,7 @@ sub call_Hdescendants($@) {
   fail(Carp::cluck "Hdescendants_or_self wrong result",
                    "\nsubtree_root:", fmt_tree($subtree_root),
                    "\nst_root->passes = ", vis($subtree_root->passes($args[0])),
-                   dvis '\n@args\n@segs1\n@segs3') 
+                   dvis '\n@args\n@segs1\n@segs3')
      unless "@segs1" eq "@segs3";
 
   @segs1
@@ -154,25 +155,26 @@ sub call_Hdescendants($@) {
 ##### more Hnext_elt tests #####
 
 # para2 is inside the outer frame.
-{ my @r = call_Hdescendants($para2, PARA_COND, PARA_COND);
+{ my @r = call_Hdescendants($para2, PARA_FILTER, PARA_FILTER);
   # All 3 paras inside the inner frame
   is(scalar(@r), 3, "Hnext_elt #1", dvis '@r\npara2:', fmt_tree($para2));
 }
-{ my @r = call_Hdescendants($para2, PARA_COND, "draw:frame");
+{ my @r = call_Hdescendants($para2, PARA_FILTER, "draw:frame");
   # 0 paras inside the inner frame
   is(scalar(@r), 0, "Hnext_elt masking frame");
 }
 
-foreach my $stroot (call_Hdescendants($body, FRAME_COND."|".PARA_COND)) {
+foreach my $stroot (call_Hdescendants($body, Hor_cond(FRAME_FILTER,PARA_FILTER,SECTION_FILTER))) {
   # This triggered a bug fixed 8/22/23 where a pruned node is the
-  # last sibling of a parent whic itself it the last sibling under
+  # last sibling of a parent which itself it the last sibling under
   # a subtree_root, and the subtree_root does have a sibling
-  my @nodes = call_Hdescendants($stroot, undef, PARA_COND);
+  my @nodes = call_Hdescendants($stroot, undef, PARA_FILTER);
   foreach my $elt (@nodes) {
     fail("escaped from subtree_root ??  elt=".fmt_node($elt)."\nstroot:".fmt_tree($stroot))
       unless $elt->parent == $stroot
               || $elt->parent->parent == $stroot
-              || $elt->parent->parent->parent == $stroot;
+              || $elt->parent->parent->parent == $stroot
+              || $elt->parent->parent->parent->parent == $stroot;
   }
 }
 
@@ -230,6 +232,49 @@ my $textleaf_cond = '#TEXT|text:tab|text:line-break|text:s';
   is($text, $para0_recursive_text, "Hnext_elt w prune_cond that never matches");
 }
 
+#################################
+# Hparent
+#################################
+{ my $m = $body->Hsearch("Tok5") // oops;
+  my $leaf_elt = $m->{segments}->[0]; # the leaf where "Tok5" starts
+  { my $elt = $leaf_elt->Hparent(FRAME_FILTER) // fail("Hparent w/o stop failed completely");
+    like($elt->Hget_text, qr/^\{Tok4.*AAA.*BBB.*Tok6.*2spaces\}$/, "Hparent w/o stop");
+  }
+  { my $elt = $leaf_elt->Hparent(FRAME_FILTER, SECTION_FILTER);
+    is ($elt, 0, "Hparent with stop did stop");
+  }
+  { my $section = $leaf_elt->Hparent(SECTION_FILTER, SECTION_FILTER)
+      // fail("Hparent cond==stop_cond failed!");
+    is ($section->tag, "text:section");
+    like($section->Hget_text, qr/^AAA.*BBBBIn Section$/, "Hparent cond==stop ok");
+    for my $start_elt ($leaf_elt, $m->{para}, $section) {
+      my $testname = $start_elt->tag()."->Hself_or_parent cond=".SECTION_FILTER." stop=".SECTION_FILTER;
+      my $r = $start_elt->Hself_or_parent(SECTION_FILTER, SECTION_FILTER);
+      ref_is($r, $section, $testname);
+    }
+  }
+  { my $elt = $leaf_elt->Hself_or_parent("office:text", SECTION_FILTER);
+    is($elt, 0, $leaf_elt->tag()."->Hself_or_parent cond=office:text stop=".SECTION_FILTER." == 0");
+  }
+  { my $elt = $leaf_elt->parent("office:text") // fail();
+    ok($elt == $body, "regular parent office:text");
+  }
+  { my $elt = $leaf_elt->Hparent("office:text") // fail();
+    ok($elt == $body, "Hparent office:text");
+  }
+  { my $elt = $leaf_elt->Hparent("office:text") // fail();
+    ok($elt == $body, "Hparent office:text");
+  }
+  { my $elt = $leaf_elt->Hparent("office:text", "office:text") // fail();
+    ok($elt == $body, "Hparent office:text, office:text");
+  }
+  { my $elt = $leaf_elt->Hparent("office:Bogon");
+    is($elt, undef, "Hparent offfice:Bogon");
+  }
+  { my $elt = $leaf_elt->Hparent("office:Bogon", "office:text");
+    ok($elt == 0, "Hparent office::bogon, office:text");
+  }
+}
 
 done_testing();
 

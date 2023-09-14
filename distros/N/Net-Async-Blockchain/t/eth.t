@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 use Test::MockModule;
-use Test::Exception;
+use Test::Fatal;
 
 use IO::Async::Loop;
 use IO::Async::Test;
@@ -22,7 +22,11 @@ testing_loop($loop);
 subtest "subscribe _ wrong subscription type" => sub {
 
     $loop->add(my $blockchain_eth = Net::Async::Blockchain::ETH->new());
-    dies_ok { $blockchain_eth->subscribe('dummy')->get } 'expecting to die due to wrong subscription type';
+    like(
+        exception { $blockchain_eth->subscribe('dummy')->get },
+        qr/Invalid or not implemented subscription/,
+        'expecting to die due to wrong subscription type'
+    );
 };
 
 subtest "subscribe" => sub {

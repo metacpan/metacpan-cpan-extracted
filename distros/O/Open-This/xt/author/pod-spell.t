@@ -10,6 +10,7 @@ use Pod::Wordlist;
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+37050201
 Alders
 Alders'
 Anwar
@@ -34,6 +35,7 @@ github
 jjatria
 lib
 libs
+mcneb10
 mohammad
 olaf
 ot

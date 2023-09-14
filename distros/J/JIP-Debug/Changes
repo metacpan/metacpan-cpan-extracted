@@ -1,36 +1,39 @@
 Revision history for JIP-Debug
 
-0.031        2023-03-01
-        Added Perl 5.36 into ".travis.yml".
-        Small changes in distro.
+0.032    2023-09-02
+  - Small changes in distro.
 
-0.03         2018-04-22
-        Added function to_debug_truncate.
-        Updated Data::Dumper requirement to 2.160.
-        Added DUMPER_TRAILING_COMMA=1 to configuration.
+0.031    2023-03-01
+  - Added Perl 5.36 into ".travis.yml".
+  - Small changes in distro.
 
-0.021        2018-01-07
-        Updated Makefile.PL for version 2 of the CPAN distribution metadata specification.
+0.03    2018-04-22
+  - Added function to_debug_truncate.
+  - Updated Data::Dumper requirement to 2.160.
+  - Added DUMPER_TRAILING_COMMA=1 to configuration.
 
-0.02         2018-01-03
-        Improved documentation.
+0.021    2018-01-07
+  - Updated Makefile.PL for version 2 of the CPAN distribution metadata specification.
 
-0.01         2018-01-01
-        Improved documentation.
-        Added Perl 5.26 to .travis.yml.
+0.02    2018-01-03
+  - Improved documentation.
+
+0.01    2018-01-01
+  - Improved documentation.
+  - Added Perl 5.26 to .travis.yml.
 
 0.999_004    2017-07-30
-        Added ".travis.yml".
-        Updated Term::ANSIColor requirement to 3.00.
-        Modernized Makefile.PL.
-        Bug fixes and other minor improvements.
+  - Added ".travis.yml".
+  - Updated Term::ANSIColor requirement to 3.00.
+  - Modernized Makefile.PL.
+  - Bug fixes and other minor improvements.
 
 0.999_003    2017-07-22
-        Added function to_debug_count.
-        Added function to_debug_trace.
+  - Added function to_debug_count.
+  - Added function to_debug_trace.
 
 0.999_002    2017-06-21
-        Small changes.
+  - Small changes.
 
 0.999_001    2017-06-18
-        First version, released on an unsuspecting world.
+  - First version, released on an unsuspecting world.

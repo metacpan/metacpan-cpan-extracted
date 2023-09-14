@@ -1,5 +1,8 @@
 Revision history for IO-Async-DigitalOcean
 
-0.01    Tue Apr 27 15:03:18 CEST 2021
-	- supporting most on droplets, domains, keys, volumes
+0.05    Sun 10 Sep 2023 11:37:24 AM CEST
+	- dropped install path override in Build.PL
+
+0.04	Tue May  4 18:27:06 CEST 2021
+	- first half-way complete/usable version, released
 

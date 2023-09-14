@@ -7,7 +7,7 @@ use Number::Phone::UK::Data;
 
 use base 'Number::Phone';
 
-our $VERSION = '1.71';
+our $VERSION = '1.72';
 
 my $cache = {};
 
@@ -51,7 +51,7 @@ C<< Number::Phone::UK::Data->slurp() >> from your code, which will pull the enti
 into memory. This will take a few minutes, and on a 64-bit machine will consume of the
 order of 200MB of memory.
 
-The database uses L<DBM::Deep>. This apparently has some problems if you connect to it,
+The database uses L<Data::CompactReadonly>. This may have some problems if you connect to it,
 C<fork()>, and then try to access the database from multiple processes. We attempt to
 work around this by re-connecting to the database after forking. This is, of course,
 not a problem if you C<slurp()> the database before forking.
@@ -142,25 +142,26 @@ sub is_valid {
     # 07, 02x and 011x are always ten digits
     return $cache->{$number}->{is_valid} = 0 if($cleaned_number =~ /^([27]|11)/ && length($cleaned_number) != 10);
 
-    my $telco_and_length_code = 
-        (
-            map  { Number::Phone::UK::Data::db()->{telco_and_length}->{$_} }
-            grep { exists(Number::Phone::UK::Data::db()->{telco_and_length}->{$_}) }
-            @prefixes
-        )[0];
+    my $telco;
+    my $format;
+    foreach my $prefix (@prefixes) {
+        if(exists(Number::Phone::UK::Data::db()->{telco}->{$prefix})) {
+            $telco = Number::Phone::UK::Data::db()->{telco}->{$prefix};
+            last;
+        }
+    }
+    foreach my $prefix (@prefixes) {
+        if(exists(Number::Phone::UK::Data::db()->{format}->{$prefix})) {
+            $format = Number::Phone::UK::Data::db()->{format}->{$prefix};
+            last;
+        }
+    }
 
     $cache->{$number}->{is_allocated} = 0;
-    if(
-        # if we've got a telco, we've been allocated
-        $telco_and_length_code &&
-        Number::Phone::UK::Data::db()->{telco_format}->{$telco_and_length_code}->{telco}
-    ) {
+    $cache->{$number}->{format} = $format;
+    if($telco) {
         $cache->{$number}->{is_allocated} = 1;
-        $cache->{$number}->{operator} = Number::Phone::UK::Data::db()->{telco_format}->{$telco_and_length_code}->{telco};
-        $cache->{$number}->{format} = Number::Phone::UK::Data::db()->{telco_format}->{$telco_and_length_code}->{format}
-    } elsif($telco_and_length_code) {
-        # if not we might still have a format, eg for Protected numbers
-        $cache->{$number}->{format} = Number::Phone::UK::Data::db()->{telco_format}->{$telco_and_length_code}->{format}
+        $cache->{$number}->{operator} = $telco;
     }
 
     if($cache->{$number}->{format} && $cache->{$number}->{format} =~ /\+/) {
@@ -173,7 +174,9 @@ sub is_valid {
         $cache->{$number}->{areaname} = (
             map {
                 Number::Phone::UK::Data::db()->{areanames}->{$_}
-            } grep { Number::Phone::UK::Data::db()->{areanames}->{$_} } @prefixes
+            } grep {
+                exists(Number::Phone::UK::Data::db()->{areanames}->{$_})
+            } @prefixes
         )[0];
         if(!grep { length($cache->{$number}->{subscriber}) == $_ } @subscriberlengths) {
             # number wrong length!
@@ -238,19 +241,21 @@ foreach my $is (qw(
         if(!exists($cache->{${$self}}->{"is_$is"})) {
           $cache->{${$self}}->{"is_$is"} = 
             grep {
-              Number::Phone::UK::Data::db()->{
-                { geographic      => 'geo_prefices',
-                  network_service => 'network_svc_prefices',
-                  tollfree        => 'free_prefices',
-                  corporate       => 'corporate_prefices',
-                  personal        => 'personal_prefices',
-                  pager           => 'pager_prefices',
-                  mobile          => 'mobile_prefices',
-                  specialrate     => 'special_prefices',
-                  adult           => 'adult_prefices',
-                  ipphone         => 'ip_prefices'
-                }->{$is}
-              }->{$_}
+              exists(
+                Number::Phone::UK::Data::db()->{
+                  { geographic      => 'geo_prefices',
+                    network_service => 'network_svc_prefices',
+                    tollfree        => 'free_prefices',
+                    corporate       => 'corporate_prefices',
+                    personal        => 'personal_prefices',
+                    pager           => 'pager_prefices',
+                    mobile          => 'mobile_prefices',
+                    specialrate     => 'special_prefices',
+                    adult           => 'adult_prefices',
+                    ipphone         => 'ip_prefices'
+                  }->{$is}
+                }->{$_}
+              );
             } _prefixes(_clean_number(${$self}));
         }
         $cache->{${$self}}->{"is_$is"};

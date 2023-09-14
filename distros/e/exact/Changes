@@ -1,5 +1,8 @@
 Revision history for exact
 
+1.23      2023-09-12 16:06:03-07:00 America/Los_Angeles
+        - Improve/fix import of packages into other packages (resolves issue #4)
+
 1.22      2023-08-22 08:18:14-07:00 America/Los_Angeles
         - Relocate no experimental warnings (order of operations)
 

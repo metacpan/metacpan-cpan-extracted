@@ -6,7 +6,7 @@
 use v5.36;
 use Object::Pad 0.800;
 
-class App::perl::distrolint::Check::POD 0.02
+class App::perl::distrolint::Check::POD 0.03
    :does(App::perl::distrolint::CheckRole::EachFile)
    :does(App::perl::distrolint::CheckRole::TreeSitterPerl);
 
@@ -45,6 +45,10 @@ my $HEAD_QUERY = <<'EOF';
 (head_paragraph
    (head_directive _ @directive) (#eq? @directive "=head1")
    _ @content)
+(plain_paragraph
+   _ @content)
+(verbatim_paragraph
+   _ @content)
 EOF
 
 method check_file ( $file, $app )
@@ -72,6 +76,8 @@ method check_file ( $file, $app )
    my $text = $tree->text;
 
    my @head1_titles;
+   my $last_head1;
+   my %content_per_head1;
 
    foreach my $pod ( @pod_nodes ) {
       my $podtree = $TSPOD->parse_string_range( $text,
@@ -89,14 +95,57 @@ method check_file ( $file, $app )
       $qc->exec( $QUERY, $podtree->root_node );
 
       while( my $captures = $qc->next_match_captures ) {
-         push @head1_titles, $captures->{content}->text;
+         my $contentnode = $captures->{content};
+         my $content = $contentnode->text;
+         $content =~ s/\n// unless $contentnode->type eq "verbatim_paragraph";
+
+         if( defined $captures->{directive} ) {
+            push @head1_titles, $content;
+            $last_head1 = $content;
+         }
+         else {
+            push $content_per_head1{$last_head1}->@*, $content;
+
+            if( $content =~ m/^\s*TODO\s*$/ ) {
+               $app->note( "%s contains a TODO paragraph in POD", $file );
+            }
+         }
       }
    }
 
    foreach my $title (qw( NAME DESCRIPTION AUTHOR )) {
-      any { $_ eq $title } @head1_titles and next;
+      unless( any { $_ eq $title } @head1_titles ) {
+         $app->diag( "%s is missing a '=head1 %s' POD section", $file, $title );
+         return 0;
+      }
 
-      $app->diag( "%s is missing a '=head1 %s' POD section", $file, $title );
+      my $meth = $self->can( "check_para_$title" ) or
+         next;
+      $meth->( $self, $file, $app, join "\n\n", ( $content_per_head1{$title} // [] )->@* ) or
+         return 0;
+   }
+
+   return 1;
+}
+
+method check_para_NAME ( $file, $app, $content )
+{
+   if( $content =~ m/\n\n/ ) {
+      $app->diag( "%s has more than one paragraph under =head1 NAME", $file );
+      return 0;
+   }
+
+   unless( $content =~ m/^C<(.*)> - (.*)$/ ) {
+      $app->diag( "%s =head1 NAME section does not look like C<Package::Name> - description", $file );
+      return 0;
+   }
+   my ( $pkgname, $description ) = ( $1, $2 );
+
+   $file =~ m{^lib/(.*).pm$} or return 1;
+   my $pkgname_from_file = $1 =~ s{/}{::}gr;
+
+   unless( $pkgname eq $pkgname_from_file ) {
+      $app->diag( "%s =head1 NAME section should start C<$pkgname_from_file> - ...", $file );
       return 0;
    }
 

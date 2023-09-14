@@ -231,6 +231,23 @@ sub get_port_by_uuid {
     return Sys::Virt::NetworkPort->_new(network => $self, uuid => $uuid);
 }
 
+=item my $str = $net->get_metadata($type, $uri, $flags =0)
+
+Returns the metadata element of type C<$type> associated
+with the network. If C<$type> is C<Sys::Virt::Network::METADATA_ELEMENT>
+then the C<$uri> parameter specifies the XML namespace to
+retrieve, otherwise C<$uri> should be C<undef>. The optional
+C<$flags> parameter takes one of the XML UPDATE FLAGS values,
+and defaults to zero.
+
+=item $net->set_metadata($type, $val, $key, $uri, $flags=0)
+
+Sets the metadata element of type C<$type> to hold the value
+C<$val>. If C<$type> is  C<Sys::Virt::Network::METADATA_ELEMENT>
+then the C<$key> and C<$uri> elements specify an XML namespace
+to use, otherwise they should both be C<undef>. The optional
+C<$flags> parameter takes one of the XML UPDATE FLAGS values,
+and defaults to zero.
 
 =back
 
@@ -451,6 +468,26 @@ The persistent configuration has gone away
 
 =back
 
+=head2 METADATA TYPE CONSTANTS
+
+The following constants control the type of metadata being
+accessed
+
+=over 4
+
+=item Sys::Virt::Network::METADATA_TITLE
+
+The short human friendly title of the network
+
+=item Sys::Virt::Network::METADATA_DESCRIPTION
+
+The long free text description of the network
+
+=item Sys::Virt::Network::METADATA_ELEMENT
+
+The structured metadata elements for the network
+
+=back
 
 =cut
 

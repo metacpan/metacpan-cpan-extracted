@@ -1,0 +1,9 @@
+0.002   2023-01-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist
+          Bencher-Scenarios-{HTTPTinyPlugin,HTTP-Tiny-Plugin}.
+
+
+0.001   2019-05-04  Released-By: PERLANCAR
+
+        - First release.

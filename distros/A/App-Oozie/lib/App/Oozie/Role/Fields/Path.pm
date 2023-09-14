@@ -1,5 +1,5 @@
 package App::Oozie::Role::Fields::Path;
-$App::Oozie::Role::Fields::Path::VERSION = '0.002';
+$App::Oozie::Role::Fields::Path::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
@@ -8,6 +8,7 @@ use namespace::autoclean -except => [qw/_options_data _options_config/];
 use App::Oozie::Types::Common qw( IsExecutable IsFile IsDir );
 use Moo::Role;
 use MooX::Options;
+use Types::Standard qw( Str );
 
 option oozie_cli => (
     is       => 'rw',
@@ -33,6 +34,15 @@ option local_oozie_code_path => (
     required => 1,
 );
 
+option template_namenode => (
+    is       => 'rw',
+    isa      => Str,
+    format   => 's',
+    doc      => 'The value of the nameNode variable set in Oozie job config',
+    default  => sub { 'hdfs://nameservice1' },
+    required => 1,
+);
+
 1;
 
 __END__
@@ -47,7 +57,7 @@ App::Oozie::Role::Fields::Path
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 

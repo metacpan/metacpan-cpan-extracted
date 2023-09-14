@@ -29,5 +29,5 @@ requires:
   Scalar::Util: '0'
 resources:
   repository: https://hacktivis.me/git/ap-client.git/
-version: v0.1.3
+version: v0.1.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

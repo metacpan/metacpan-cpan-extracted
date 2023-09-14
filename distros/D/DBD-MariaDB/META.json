@@ -67,6 +67,7 @@
             "Test::More" : "0.90",
             "Time::HiRes" : "0",
             "bigint" : "0",
+            "constant" : "0",
             "lib" : "0",
             "strict" : "0",
             "utf8" : "0",
@@ -83,21 +84,21 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/gooddata/DBD-MariaDB/issues"
+         "web" : "https://github.com/perl5-dbi/DBD-MariaDB/issues"
       },
-      "homepage" : "https://github.com/gooddata/DBD-MariaDB",
+      "homepage" : "https://github.com/perl5-dbi/DBD-MariaDB",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/gooddata/DBD-MariaDB.git",
-         "web" : "https://github.com/gooddata/DBD-MariaDB"
+         "url" : "https://github.com/perl5-dbi/DBD-MariaDB.git",
+         "web" : "https://github.com/perl5-dbi/DBD-MariaDB"
       },
       "x_IRC" : "irc://irc.perl.org/#dbi",
       "x_MailingList" : "mailto:dbi-dev@perl.org"
    },
-   "version" : "1.22",
+   "version" : "1.23",
    "x_contributors" : [
       "Alexandr Ciornii <alexchorny@gmail.com>",
       "Alexey Molchanov <alexey.molchanov@portaone.com>",
@@ -120,16 +121,18 @@
       "David Farrell <davidnmfarrell@gmail.com>",
       "David Steinbrunner <dsteinbrunner@pobox.com>",
       "Dominik Sauer <dominik.sauer@gooddata.com>",
+      "E. Choroba <choroba@matfyz.cz>",
       "Giovanni Bechis <giovanni@bigio.snb.it>",
       "Graham Ollis <plicease@cpan.org>",
       "H.Merijn Brand - Tux <h.m.brand@xs4all.nl>",
       "Hanno <hanno@gentoo.org>",
       "James McCoy <jamessan@jamessan.com>",
-      "Jan Holcapek <jan.holcapek@gooddata.com>",
+      "Jan Holčapek <holcapek@gmail.com>",
       "Jim Winstead <jimw@trainedmonkey.com>",
       "Juergen Weigert <jw@suse.com>",
       "Kenny Gryp <kenny.gryp@percona.com>",
       "Lu Shengliang <lushl9301@gmail.com>",
+      "Martin Cermak <martin.cermak2@gooddata.com>",
       "Masahiro Chiba <chiba@everqueue.com>",
       "Matthew Horsfall (alh) <WolfSage@gmail.com>",
       "Michiel Beijen <michiel.beijen@gmail.com>",
@@ -155,6 +158,7 @@
       "Tim Mullin <tim@cpanel.net>",
       "Ville Skyttä <ville.skytta@iki.fi>",
       "Vladimir Marek <vlmarek@volny.cz>",
+      "Walt Mankowski <waltman@pobox.com>",
       "katyavoid <katyavoid@gmail.com>",
       "kmx <kmx@cpan.org>",
       "tokuhirom <tokuhirom@gmail.com>",

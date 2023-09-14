@@ -74,7 +74,7 @@ ot - parse text and (hopefully) open an editor with the correct arguments
 
 =head1 VERSION
 
-version 0.000032
+version 0.000033
 
 =head1 SYNOPSIS
 
@@ -134,7 +134,7 @@ version 0.000032
     ot -e kate Foo::Bar
 
     # Don't open anything. Just print to STDOUT. [-p|--print]
-    ot -p kate Foo::Bar
+    ot -p -e kate Foo::Bar
 
 =head1 DESCRIPTION
 
@@ -198,7 +198,7 @@ other appropriate place in your dot files.
 =head1 SUPPORTED EDITORS
 
 This code has been well tested with C<vim>.  It should also work with C<nvim>,
-C<emacs>, C<pico>, C<nano> and C<kate>.  Patches for other editors are very
+C<emacs>, C<pico>, C<nano>, IntelliJ IDEA, Visual Studio Code, VSCodium and C<kate>.  Patches for other editors are very
 welcome.
 
 =head1 AUTHOR

@@ -3,7 +3,8 @@
 
 requires "Class::Method::Modifiers" => "0";
 requires "Function::Parameters" => "0";
-requires "exact" => "1.14";
+requires "Import::Into" => "0";
+requires "exact" => "1.23";
 requires "perl" => "5.014";
 
 on 'test' => sub {

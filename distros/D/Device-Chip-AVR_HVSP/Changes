@@ -1,5 +1,11 @@
 Revision history for Device-Chip-AVR_HVSP
 
+0.07    2023-09-13
+        [CHANGES]
+         * General module style updates:
+            + Updated for Object::Pad v0.800
+            + Swap unit tests to `Test2::V0`
+
 0.06    2022-12-05
         [CHANGES]
          * Updated for perl 5.26+ - use signatures

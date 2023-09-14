@@ -1,5 +1,8 @@
 Revision history for App-Cronjob
 
+1.200014  2023-09-11 15:34:04-04:00 America/New_York
+        - fix documentation to add missing switches
+
 1.200013  2022-12-31 21:12:32-05:00 America/New_York
         - update author contact info
 
@@ -19,7 +22,7 @@ Revision history for App-Cronjob
         - make cronjob --help and perldoc cronjob agree
 
 1.200008  2020-03-09 15:48:21-04:00 America/New_York
-        - new switch --email-headers to let you put extra headers in any
+        - new switch --email-header to let you put extra headers in any
           generated email
 
 1.200007  2018-01-29 16:24:36-05:00 America/New_York

@@ -1,7 +1,7 @@
 /* Hej, Emacs, this is -*- C -*- mode!
 
    Copyright (c) 2018      GoodData Corporation
-   Copyright (c) 2015-2017 Pali Rohár
+   Copyright (c) 2015-2022 Pali Rohár
    Copyright (c) 2004-2017 Patrick Galbraith
    Copyright (c) 2013-2017 Michiel Beijen
    Copyright (c) 2004-2007 Alexey Stroganov
@@ -65,7 +65,7 @@ BOOT:
 #undef newTypeSub
 #if defined(HAVE_DEINITIALIZE_SSL) && defined(HAVE_PROBLEM_WITH_OPENSSL)
   /* Do not deinitialize OpenSSL library after mysql_server_end()
-   * See: https://github.com/gooddata/DBD-MariaDB/issues/119 */
+   * See: https://github.com/perl5-dbi/DBD-MariaDB/issues/119 */
   mariadb_deinitialize_ssl = 0;
 #endif
 #ifndef _WIN32
@@ -164,7 +164,7 @@ mariadb_sockfd(dbh)
     SV* dbh
   CODE:
     D_imp_dbh(dbh);
-    RETVAL = imp_dbh->pmysql ? newSViv(imp_dbh->pmysql->net.fd) : &PL_sv_undef;
+    RETVAL = (imp_dbh->sock_fd >= 0) ? newSViv(imp_dbh->sock_fd) : &PL_sv_undef;
   OUTPUT:
     RETVAL
 
@@ -181,6 +181,8 @@ mariadb_async_result(dbh)
             XSRETURN_PV("0E0");
         else if (retval == (my_ulonglong)-1)
             XSRETURN_UNDEF;
+        else if (retval == (my_ulonglong)-2)
+            XSRETURN_IV(-1);
 
         RETVAL = my_ulonglong2sv(retval);
     }
@@ -236,7 +238,7 @@ rows(sth)
             XSRETURN_UNDEF;
         }
     }
-    if (imp_sth->row_num == (my_ulonglong)-1)
+    if (imp_sth->row_num == (my_ulonglong)-1 || imp_sth->row_num == (my_ulonglong)-2)
         XSRETURN_IV(-1);
     RETVAL = my_ulonglong2sv(imp_sth->row_num);
   OUTPUT:
@@ -274,6 +276,9 @@ mariadb_async_result(sth)
 
         if (retval == (my_ulonglong)-1)
             XSRETURN_UNDEF;
+
+        if (retval == (my_ulonglong)-2)
+            XSRETURN_IV(-1);
 
         if (retval == 0)
             XSRETURN_PV("0E0");

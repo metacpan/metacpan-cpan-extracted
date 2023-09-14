@@ -57,6 +57,6 @@
          "web" : "https://github.com/outtaspace/jip_datapath"
       }
    },
-   "version" : "0.043",
+   "version" : "0.044",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

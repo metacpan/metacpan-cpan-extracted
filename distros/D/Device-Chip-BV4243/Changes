@@ -1,5 +1,15 @@
 Revision history for Device-Chip-BV4243
 
+0.04    2023-09-13
+        [CHANGES]
+         * General module style updates:
+            + Updated for Object::Pad v0.800
+            + Swap unit tests to `Test2::V0`
+
+0.03    2020-12-15
+        [BUGFIXES]
+         * Re-packed tarball, removing stale Makefile.PL
+
 0.02    2020-12-06
         [CHANGES]
          * Updated to Object::Pad + Future::AsyncAwait

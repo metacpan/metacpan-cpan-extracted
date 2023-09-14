@@ -1,7 +1,7 @@
 package Mail::DKIM::ARC::Signer;
 use strict;
 use warnings;
-our $VERSION = '1.20230630'; # VERSION
+our $VERSION = '1.20230911'; # VERSION
 # ABSTRACT: generates a DKIM signature for a message
 
 # Copyright 2017 FastMail Pty Ltd.  All Rights Reserved.
@@ -248,6 +248,10 @@ sub finish_header {
             KeyFile   => $self->{KeyFile},
             ( $self->{Timestamp} ? ( Timestamp => $self->{Timestamp} ) : () ),
             ( $self->{Expiration} ? ( Expiration => $self->{Expiration} ) : () ),
+            (
+                $self->{'Tags'} ? ( Tags => $self->{'Tags'} )
+                : ()
+            ),
         )
     );
 
@@ -314,6 +318,11 @@ sub finish_body {
             KeyFile   => $self->{KeyFile},
             ( $self->{Timestamp} ? ( Timestamp => $self->{Timestamp} ) : () ),
             ( $self->{Expiration} ? ( Expiration => $self->{Expiration} ) : () ),
+            (
+                $self->{'SealTags'} ? ( Tags => $self->{'SealTags'} )
+                : ()
+            ),
+
         )
     );
 
@@ -594,7 +603,7 @@ Mail::DKIM::ARC::Signer - generates a DKIM signature for a message
 
 =head1 VERSION
 
-version 1.20230630
+version 1.20230911
 
 =head1 SYNOPSIS
 
@@ -728,6 +737,16 @@ The list of headers signed by default is as follows
     In-Reply-To References
     List-Id List-Help List-Unsubscribe List-Subscribe
     List-Post List-Owner List-Archive
+
+=item Tags
+
+An optional hashref of additional tags to be added to the ARC
+signature generated.
+
+=item SealTags
+
+An optional hashref of additional tags to be added to the ARC
+seal generated.
 
 =back
 

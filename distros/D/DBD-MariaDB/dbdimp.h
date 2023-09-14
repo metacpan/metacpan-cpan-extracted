@@ -21,10 +21,14 @@
 /*
  * On WIN32 windows.h and winsock.h need to be included before mysql.h
  * Otherwise SOCKET type which is needed for mysql.h is not defined
+ * SO_UPDATE_CONNECT_CONTEXT is not defined in all MinGW versions.
  */
 #ifdef _WIN32
 #include <windows.h>
 #include <winsock.h>
+#ifndef SO_UPDATE_CONNECT_CONTEXT
+#define SO_UPDATE_CONNECT_CONTEXT 0x7010
+#endif
 #endif
 
 #include <mysql.h>  /* Comes with MySQL-devel */
@@ -37,6 +41,11 @@
 
 #include <DBIXS.h>  /* installed by the DBI module */
 #include <stdint.h> /* For uint32_t */
+
+
+/*******************************************************************************
+ * Standard MariaDB macros which are not defined in every MySQL/MariaDB client *
+ *******************************************************************************/
 
 #if !defined(MARIADB_BASE_VERSION) && defined(MARIADB_PACKAGE_VERSION)
 #define MARIADB_BASE_VERSION
@@ -77,6 +86,11 @@
 #define CR_STMT_CLOSED 2056
 #endif
 
+
+/********************************************************************
+ * Standard Perl macros which are not defined in every Perl version *
+ ********************************************************************/
+
 #ifndef PERL_STATIC_INLINE
 #define PERL_STATIC_INLINE static
 #endif
@@ -91,6 +105,22 @@
 
 #ifndef SSize_t_MAX
 #define SSize_t_MAX (SSize_t)(~(Size_t)0 >> 1)
+#endif
+
+/* _set_osfhnd() is copied from Perl source file win32.h */
+#ifdef _WIN32
+typedef intptr_t ioinfo;
+extern __declspec(dllimport) ioinfo* __pioinfo[];
+#  define IOINFO_L2E 5
+#  define IOINFO_ARRAY_ELTS (1 << IOINFO_L2E)
+#  define _ioinfo_size (_msize((void*)__pioinfo[0]) / IOINFO_ARRAY_ELTS)
+#  define _pioinfo(i) ((intptr_t *) \
+    (((Size_t)__pioinfo[(i) >> IOINFO_L2E])/* * to head of array ioinfo [] */\
+     /* offset to the head of a particular ioinfo struct */ \
+     + (((i) & (IOINFO_ARRAY_ELTS - 1)) * _ioinfo_size)) \
+   )
+#  define _osfhnd(i) (*(_pioinfo(i)))
+#  define _set_osfhnd(fh, osfh) (void)(_osfhnd(fh) = (intptr_t)osfh)
 #endif
 
 /* PERL_UNUSED_ARG does not exist prior to perl 5.9.3 */
@@ -111,6 +141,28 @@
 
 #ifndef SvPV_nomg_nolen
 #define SvPV_nomg_nolen(sv) ((SvFLAGS(sv) & (SVf_POK)) == SVf_POK ? SvPVX(sv) : sv_2pv_flags(sv, &PL_na, 0))
+#endif
+
+/* Remove wrong SV_NOSTEAL macro defined by ppport.h */
+#if defined(SV_NOSTEAL) && (SV_NOSTEAL == 0)
+#undef SV_NOSTEAL
+#endif
+
+#ifndef newSVsv_nomg
+PERL_STATIC_INLINE SV *newSVsv_nomg(pTHX_ SV *sv)
+{
+  SV *ret = newSV(0);
+#ifndef SV_NOSTEAL
+  U32 tmp = SvFLAGS(sv) & SVs_TEMP;
+  SvTEMP_off(sv);
+  sv_setsv_flags(ret, sv, 0);
+  SvFLAGS(sv) |= tmp;
+#else
+  sv_setsv_flags(ret, sv, SV_NOSTEAL);
+#endif
+  return ret;
+}
+#define newSVsv_nomg(sv) newSVsv_nomg(aTHX_ (sv))
 #endif
 
 /* looks_like_number() process get magic prior to perl 5.15.4, so reimplement it */
@@ -159,10 +211,8 @@ PERL_STATIC_INLINE char * SvPVbyte_nomg(pTHX_ SV *sv, STRLEN *len)
 #endif
 
 #ifndef SvTRUE_nomg
-#define SvTRUE_nomg SvTRUE /* SvTRUE does not process get magic for scalars with already cached values, so we are safe */
+#define SvTRUE_nomg(sv) (!SvGMAGICAL((sv)) ? SvTRUE((sv)) : SvTRUEx(sv_2mortal(newSVsv_nomg((sv)))))
 #endif
-
-/* Sorry, there is no way to handle integer magic scalars properly prior to perl 5.9.1 */
 
 /* Remove wrong SvIV_nomg macro defined by ppport.h */
 #if defined(SvIV_nomg) && (PERL_VERSION < 9 | (PERL_VERSION == 9 && PERL_SUBVERSION < 1))
@@ -172,42 +222,19 @@ PERL_STATIC_INLINE char * SvPVbyte_nomg(pTHX_ SV *sv, STRLEN *len)
 #ifndef SvIV_nomg
 PERL_STATIC_INLINE IV SvIV_nomg(pTHX_ SV *sv)
 {
-  UV uv;
-  char *str;
-  STRLEN len;
-  int num_type;
-  if (SvIOK(sv) || SvIOKp(sv))
-  {
-    if (!SvIsUV(sv))
-      return SvIVX(sv);
-    uv = SvUVX(sv);
-    if (uv > (UV)IV_MAX)
-      return IV_MAX;
-    return (IV)uv;
-  }
-  if (SvNOK(sv) || SvNOKp(sv))
-    return (IV)SvNVX(sv);
-  str = SvPV_nomg(sv, len);
-  num_type = grok_number(str, len, &uv);
-  if (!(num_type & (IS_NUMBER_IN_UV)) || (num_type & IS_NUMBER_NOT_INT))
-  {
-    warner(packWARN(WARN_NUMERIC), "Argument \"%s\" isn't numeric", str);
-    return 0;
-  }
-  if (num_type & IS_NUMBER_NEG)
-  {
-    if (uv > (UV)IV_MAX+1)
-      return IV_MIN;
-    return -(IV)uv;
-  }
+  IV iv;
+  SV *tmp;
+  if (!SvGMAGICAL(sv))
+    return SvIV(sv);
+  tmp = sv_2mortal(newSVsv_nomg(sv));
+  iv = SvIV(tmp);
+  if (SvIsUV(tmp))
+    SvIsUV_on(sv);
   else
-  {
-    if (uv > (UV)IV_MAX)
-      return IV_MAX;
-    return (IV)uv;
-  }
+    SvIsUV_off(sv);
+  return iv;
 }
-#define SvIV_nomg(sv) SvIV_nomg(aTHX_ sv)
+#define SvIV_nomg(sv) SvIV_nomg(aTHX_ (sv))
 #endif
 
 /* Remove wrong SvUV_nomg macro defined by ppport.h */
@@ -218,52 +245,27 @@ PERL_STATIC_INLINE IV SvIV_nomg(pTHX_ SV *sv)
 #ifndef SvUV_nomg
 PERL_STATIC_INLINE UV SvUV_nomg(pTHX_ SV *sv)
 {
-  IV iv;
   UV uv;
-  char *str;
-  STRLEN len;
-  int num_type;
-  if (SvIOK(sv) || SvIOKp(sv))
-  {
-    if (SvIsUV(sv))
-      return SvUVX(sv);
-    iv = SvIVX(sv);
-    if (iv < 0)
-      return 0;
-    return (UV)iv;
-  }
-  if (SvNOK(sv) || SvNOKp(sv))
-    return (UV)SvNVX(sv);
-  str = SvPV_nomg(sv, len);
-  num_type = grok_number(str, len, &uv);
-  if (!(num_type & (IS_NUMBER_IN_UV)) || (num_type & IS_NUMBER_NOT_INT))
-  {
-    warner(packWARN(WARN_NUMERIC), "Argument \"%s\" isn't numeric", str);
-    return 0;
-  }
-  if (num_type & IS_NUMBER_NEG)
-    return 0;
+  SV *tmp;
+  if (!SvGMAGICAL(sv))
+    return SvUV(sv);
+  tmp = sv_2mortal(newSVsv_nomg(sv));
+  uv = SvUV(tmp);
+  if (SvIsUV(tmp))
+    SvIsUV_on(sv);
+  else
+    SvIsUV_off(sv);
   return uv;
 }
-#define SvUV_nomg(sv) SvUV_nomg(aTHX_ sv)
+#define SvUV_nomg(sv) SvUV_nomg(aTHX_ (sv))
 #endif
 
-/* Sorry, there is no way to handle numeric magic scalars properly prior to perl 5.13.2 */
 #ifndef SvNV_nomg
-#define SvNV_nomg(sv)                       \
-  ((SvNOK(sv) || SvNOKp(sv))                \
-    ? SvNVX(sv)                             \
-    : (SvIOK(sv) || SvIOKp(sv))             \
-      ? (SvIsUV(sv)                         \
-        ? ((NV)SvUVX(sv))                   \
-        : ((NV)SvIVX(sv)))                  \
-      : (SvPOK(sv) || SvPOKp(sv))           \
-        ? ((NV)Atof(SvPVX(sv)))             \
-        : ((NV)Atof(SvPV_nomg_nolen(sv))))
+#define SvNV_nomg(sv) (!SvGMAGICAL((sv)) ? SvNV((sv)) : SvNVx(sv_2mortal(newSVsv_nomg((sv)))))
 #endif
 
 #ifndef sv_cmp_flags
-#define sv_cmp_flags(a,b,c) sv_cmp(a,b) /* Sorry, there is no way to compare magic scalars properly prior to perl 5.13.6 */
+#define sv_cmp_flags(sv1, sv2, flags) (((flags) & SV_GMAGIC) ? sv_cmp((sv1), (sv2)) : sv_cmp((!SvGMAGICAL((sv1)) ? (sv1) : sv_2mortal(newSVsv_nomg((sv1)))), (!SvGMAGICAL((sv2)) ? (sv2) : sv_2mortal(newSVsv_nomg((sv2))))))
 #endif
 
 #ifndef gv_stashpvs
@@ -294,6 +296,10 @@ PERL_STATIC_INLINE UV SvUV_nomg(pTHX_ SV *sv)
 #define strBEGINs(s1, s2) strnEQ((s1), "" s2 "", sizeof((s2))-1)
 #endif
 
+
+/**************************************
+ * Custom DBD-MariaDB specific macros *
+ **************************************/
 
 #define GEO_DATATYPE_VERSION 50007
 #define NEW_DATATYPE_VERSION 50003
@@ -348,12 +354,18 @@ PERL_STATIC_INLINE unsigned long mariadb_get_client_version(void)
 #define mysql_get_client_version() mariadb_get_client_version()
 #endif
 
+/* mysql_commit() and mysql_rollback() are broken in MariaDB Connector/C prior to version 3.1.3, see: https://jira.mariadb.org/browse/CONC-400 */
+#if defined(MARIADB_PACKAGE_VERSION) && MARIADB_PACKAGE_VERSION_ID < 30103
+#define mysql_commit(mysql) ((my_bool)(mysql_real_query((mysql), "COMMIT", 6)))
+#define mysql_rollback(mysql) ((my_bool)(mysql_real_query((mysql), "ROLLBACK", 8)))
+#endif
+
 /* MYSQL_SECURE_AUTH became a no-op from MySQL 5.7.5 and is removed from MySQL 8.0.3 */
 #if defined(MARIADB_BASE_VERSION) || MYSQL_VERSION_ID <= 50704
 #define HAVE_SECURE_AUTH
 #endif
 
-/* mysql_error(NULL) returns last error message, needs MySQL 5.0.60+ or 5.1.24+; does not work with MariaDB Connector/C yet */
+/* mysql_error(NULL) returns last error message, needs MySQL 5.0.60+ or 5.1.24+; does not work with MariaDB Connector/C yet: https://jira.mariadb.org/browse/CONC-374 */
 #if ((MYSQL_VERSION_ID >= 50060 && MYSQL_VERSION_ID < 50100) || MYSQL_VERSION_ID >= 50124) && !defined(MARIADB_PACKAGE_VERSION)
 #define HAVE_LAST_ERROR
 #endif
@@ -361,9 +373,9 @@ PERL_STATIC_INLINE unsigned long mariadb_get_client_version(void)
 /*
  * MySQL and MariaDB Embedded are affected by https://jira.mariadb.org/browse/MDEV-16578
  * MariaDB 10.2.2+ prior to 10.2.19 and 10.3.9 and MariaDB Connector/C prior to 3.0.5 are affected by https://jira.mariadb.org/browse/CONC-336
- * MySQL 8.0.4+ is affected too by https://bugs.mysql.com/bug.php?id=93276
+ * MySQL 8.0.4+ prior to 8.0.20 is affected too by https://bugs.mysql.com/bug.php?id=93276
  */
-#if defined(HAVE_EMBEDDED) || (!defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 80004) || (defined(MARIADB_PACKAGE_VERSION) && (!defined(MARIADB_PACKAGE_VERSION_ID) || MARIADB_PACKAGE_VERSION_ID < 30005)) || (defined(MARIADB_VERSION_ID) && ((MARIADB_VERSION_ID >= 100202 && MARIADB_VERSION_ID < 100219) || (MARIADB_VERSION_ID >= 100300 && MARIADB_VERSION_ID < 100309)))
+#if defined(HAVE_EMBEDDED) || (!defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 80004 && MYSQL_VERSION_ID < 80020) || (defined(MARIADB_PACKAGE_VERSION) && (!defined(MARIADB_PACKAGE_VERSION_ID) || MARIADB_PACKAGE_VERSION_ID < 30005)) || (defined(MARIADB_BASE_VERSION) && ((MYSQL_VERSION_ID >= 100202 && MYSQL_VERSION_ID < 100219) || (MYSQL_VERSION_ID >= 100300 && MYSQL_VERSION_ID < 100309)))
 #define HAVE_BROKEN_INIT
 #endif
 
@@ -513,6 +525,7 @@ struct imp_dbh_st {
 
     struct mariadb_list_entry *list_entry; /* Entry of imp_drh->active_imp_dbhs list */
     MYSQL *pmysql;
+    int sock_fd;
     bool connected;          /* Set to true after DBI->connect finished */
     bool auto_reconnect;
     bool bind_type_guessing;
@@ -524,6 +537,7 @@ struct imp_dbh_st {
                                */
     bool use_server_side_prepare;
     bool disable_fallback_for_server_prepare;
+    bool use_multi_statements;
     void* async_query_in_flight;
     my_ulonglong insertid;
     struct {
@@ -626,6 +640,7 @@ struct imp_sth_st {
                           /* mysql_store_result */
 
     bool is_async;
+    bool async_result;
 };
 
 
@@ -693,5 +708,3 @@ bool mariadb_db_reconnect(SV *h, MYSQL_STMT *stmt);
 
 my_ulonglong mariadb_db_async_result(SV* h, MYSQL_RES** resp);
 int mariadb_db_async_ready(SV* h);
-
-int mariadb_dr_socket_ready(my_socket fd);

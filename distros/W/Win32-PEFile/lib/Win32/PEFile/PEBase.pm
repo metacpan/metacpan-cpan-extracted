@@ -14,6 +14,10 @@ sub new {
 }
 
 
+sub DESTROY {
+}
+
+
 sub AUTOLOAD {
     my ($self, @args) = @_;
     my $myClass = ref $self;

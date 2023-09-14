@@ -1,6 +1,6 @@
 use v5.20;
 use warnings;
-package Log::Dispatchouli::Proxy 3.006;
+package Log::Dispatchouli::Proxy 3.007;
 # ABSTRACT: a simple wrapper around Log::Dispatch
 
 use experimental 'postderef'; # Not dangerous.  Is accepted without changed.
@@ -83,6 +83,10 @@ sub get_debug {
   return $_[0]{debug} if defined $_[0]{debug};
   return $_[0]->parent->get_debug;
 }
+
+sub is_debug { $_[0]->get_debug }
+sub is_info  { 1 }
+sub is_fatal { 1 }
 
 sub mute   { $_[0]{muted} = 1 }
 sub unmute { $_[0]{muted} = 0 }
@@ -197,7 +201,7 @@ Log::Dispatchouli::Proxy - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 3.006
+version 3.007
 
 =head1 DESCRIPTION
 

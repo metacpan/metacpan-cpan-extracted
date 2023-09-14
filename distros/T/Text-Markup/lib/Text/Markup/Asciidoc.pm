@@ -3,53 +3,15 @@ package Text::Markup::Asciidoc;
 use 5.8.1;
 use strict;
 use warnings;
-use File::Spec;
-use constant WIN32  => $^O eq 'MSWin32';
-use Symbol 'gensym';
-use IPC::Open3;
+use Text::Markup::Cmd;
 use utf8;
 
-our $VERSION = '0.24';
+our $VERSION = '0.31';
 
-# Find Asciidoc.
-my $ASCIIDOC;
-FIND: {
-    my @path = (
-        File::Spec->path,
-        WIN32 ? (map { "C:\\asciidoc$_" } '', '-8.6.6') : ()
-    );
-    EXE: {
-        for my $exe (qw(asciidoc asciidoc.py)) {
-            for my $p (@path) {
-                my $path = File::Spec->catfile($p, $exe);
-                next unless -f $path && -x $path;
-                $ASCIIDOC = $path;
-                last EXE;
-            }
-        }
-    }
-
-    unless ($ASCIIDOC) {
-        use Carp;
-        my $sep = WIN32 ? ';' : ':';
-        Carp::croak(
-            "Cannot find asciidoc or asciidoc.py in path " . join $sep => @path
-        );
-    }
-
-    # Make sure it looks like it will work.
-    my $output = gensym;
-    my $pid = open3 undef, $output, $output, $ASCIIDOC, '--version';
-    waitpid $pid, 0;
-    if ($?) {
-        use Carp;
-        local $/;
-        Carp::croak(
-            qq{$ASCIIDOC will not execute\n},
-            <$output>
-        );
-    }
-}
+my $ASCIIDOC = find_cmd([
+    (map { (WIN32 ? ("$_.exe", "$_.bat") : ($_)) } qw(asciidoc)),
+    'asciidoc.py',
+], '--version');
 
 # Arguments to pass to asciidoc.
 # Restore --safe if Asciidoc ever fixes it with the XHTML back end.
@@ -63,7 +25,7 @@ my @OPTIONS = qw(
 sub parser {
     my ($file, $encoding, $opts) = @_;
     my $html = do {
-        my $fh = _fh(
+        my $fh = open_pipe(
             $ASCIIDOC, @OPTIONS,
             '--attribute' => "encoding=$encoding",
             $file
@@ -77,7 +39,7 @@ sub parser {
     # Make sure we have something.
     return unless $html =~ /\S/;
     utf8::encode $html;
-    return $html if $opts->{raw};
+    return $html if { @{ $opts } }->{raw};
     return qq{<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -87,28 +49,6 @@ $html
 </body>
 </html>
 };
-}
-
-# Stolen from SVN::Notify.
-sub _fh {
-    # Ignored; looks like docutils always emits UTF-8.
-    if (WIN32) {
-        my $cmd = join join(q{" "}, @_) . q{"|};
-        open my $fh, $cmd or die "Cannot fork: $!\n";
-        return $fh;
-    }
-
-    my $pid = open my $fh, '-|';
-    die "Cannot fork: $!\n" unless defined $pid;
-
-    if ($pid) {
-        # Parent process, return the file handle.
-        return $fh;
-    } else {
-        # Child process. Execute the commands.
-        exec @_ or die "Cannot exec $_[0]: $!\n";
-        # Not reached.
-    }
 }
 
 1;
@@ -122,15 +62,20 @@ Text::Markup::Asciidoc - Asciidoc parser for Text::Markup
 
   use Text::Markup;
   my $html = Text::Markup->new->parse(file => 'hello.adoc');
-  my $raw_asciidoc = Text::Markup->new->parse(file => 'hello.adoc', raw => 1 );
+  my $raw = Text::Markup->new->parse(
+      file    => 'hello.adoc',
+      options => [raw => 1],
+  );
 
 =head1 Description
 
-This is the L<Asciidoc|http://www.methods.co.nz/asciidoc/> parser for
-L<Text::Markup>. It depends on the C<asciidoc> command-line application, for
-which there are many
-L<binary distributions|http://www.methods.co.nz/asciidoc/INSTALL.html>. It
-recognizes files with the following extensions as Asciidoc:
+This is the L<Asciidoc|https://asciidoc.org/> parser for L<Text::Markup>. It
+depends on the L<C<asciidoc>|https://asciidoc-py.github.io> command-line
+application. See the L<installation docs|https://asciidoc-py.github.io/INSTALL.html>
+for details, or use the command C<pip3 install asciidoc>.
+
+Text::Markup::Asciidoc recognizes files with the following extensions as
+Asciidoc:
 
 =over
 
@@ -152,7 +97,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2012-2019 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2012-2023 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

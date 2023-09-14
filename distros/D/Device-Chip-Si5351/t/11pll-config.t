@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -24,7 +24,7 @@ await $chip->mount(
    $adapter->expect_write_then_read( "\x0F", 1 )
       ->returns( "\x00" );
 
-   is_deeply( await $chip->read_pll_config( "A" ),
+   is( await $chip->read_pll_config( "A" ),
       {
          P1  => 3174,
          P2  => 2,
@@ -60,7 +60,7 @@ await $chip->mount(
 
    $adapter->check_and_clear( '->change_pll_config' );
 
-   is_deeply( await $chip->read_pll_config( "A" ),
+   is( await $chip->read_pll_config( "A" ),
       {
          P1      => 3262,
          P2      => 546,
@@ -90,7 +90,7 @@ await $chip->mount(
 
    $adapter->check_and_clear( '->change_pll_config whole-integer ratio' );
 
-   is_deeply( await $chip->read_pll_config( "A" ),
+   is( await $chip->read_pll_config( "A" ),
       {
          P1      => 3328,
          P2      => 0,

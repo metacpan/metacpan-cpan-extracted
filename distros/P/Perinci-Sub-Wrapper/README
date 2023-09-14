@@ -2,8 +2,8 @@ NAME
     Perinci::Sub::Wrapper - A multi-purpose subroutine wrapping framework
 
 VERSION
-    This document describes version 0.852 of Perinci::Sub::Wrapper (from
-    Perl distribution Perinci-Sub-Wrapper), released on 2021-08-01.
+    This document describes version 0.853 of Perinci::Sub::Wrapper (from
+    Perl distribution Perinci-Sub-Wrapper), released on 2023-07-09.
 
 SYNOPSIS
     For dynamic usage:
@@ -74,7 +74,7 @@ DESCRIPTION
         necessary code to implement your specification. An example is
         "timeout" to specify execution time limit, implemented by
         Perinci::Sub::Property::timeout which generates code to call
-        function inside an "eval()" block and use "alarm()" to limit the
+        function inside an eval() block and use alarm() to limit the
         execution. Another example is "retry" property, implemented by
         Perinci::Sub::Property::retry which generates code to call function
         inside a simple retry loop.
@@ -91,22 +91,22 @@ EXTENDING
 
     The internal uses OO.
 
-    The main wrapper building mechanism is in the "wrap()" method.
+    The main wrapper building mechanism is in the wrap() method.
 
-    For each Rinci property, it will call "handle_NAME()" wrapper handler
-    method. The "handlemeta_NAME()" methods are called first, to determine
+    For each Rinci property, it will call handle_NAME() wrapper handler
+    method. The handlemeta_NAME() methods are called first, to determine
     order of processing. You can supply these methods either by subclassing
     the class or, more simply, monkeypatching the method in the
     "Perinci::Sub::Wrapper" package.
 
     The wrapper handler method will be called with a hash argument,
     containing these keys: value (property value), new (this key will exist
-    if "convert" argument of "wrap()" exists, to convert a property to a new
+    if "convert" argument of wrap() exists, to convert a property to a new
     value).
 
     For properties that have name in the form of "NAME1.NAME2.NAME3" (i.e.,
     dotted) only the first part of the name will be used (i.e.,
-    "handle_NAME1()").
+    handle_NAME1()).
 
 VARIABLES
   $Log_Wrapper_Code (BOOL)
@@ -141,8 +141,8 @@ PERFORMANCE NOTES
     "OK"] }" can be called around 5.3 mil/sec.
 
     Wrapping this subroutine "sub { [200, "OK"] }" and this simple metadata
-    "{v=>1.1}" using default options yields call performance for "$sub->()"
-    of about 0.9 mil/sec. With "validate_args=>0" and "validate_result=>0",
+    "{v=>1.1}" using default options yields call performance for $sub->() of
+    about 0.9 mil/sec. With "validate_args=>0" and "validate_result=>0",
     it's 1.5 mil/sec.
 
     As more (and more complex) arguments are introduced and validated,
@@ -362,13 +362,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Perinci-Sub-Wrapper>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Wrapper>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Perinci, Rinci
 
@@ -384,12 +377,35 @@ AUTHOR
 CONTRIBUTORS
     *   s1 <s1@backpacker.localdomain>
 
-    *   Steven Haryanto <sharyanto@cpan.org>
+    *   Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2019, 2017, 2016, 2015, 2014, 2013,
-    2012, 2011 by perlancar@cpan.org.
+    This software is copyright (c) 2023, 2019, 2017, 2016, 2015, 2014, 2013,
+    2012, 2011 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Wrapper>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

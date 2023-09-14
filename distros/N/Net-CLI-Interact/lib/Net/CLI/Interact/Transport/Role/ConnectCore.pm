@@ -1,6 +1,5 @@
 package Net::CLI::Interact::Transport::Role::ConnectCore;
-{ $Net::CLI::Interact::Transport::Role::ConnectCore::VERSION = '2.400000' }
-
+$Net::CLI::Interact::Transport::Role::ConnectCore::VERSION = '2.400002';
 use Moo::Role;
 use MooX::Types::MooseLike::Base qw(Int);
 
@@ -10,7 +9,7 @@ sub connect_core {
     my $self = shift;
 
     if ($self->use_net_telnet_connection) {
-        my $app = shift; # unused
+        shift; # unused
         return $self->_via_native(@_);
     }
     else {
@@ -51,8 +50,7 @@ has 'childpid' => (
 
 sub REAPER {
     # http://www.perlmonks.org/?node_id=10516
-    my $stiff;
-    1 while (($stiff = waitpid(-1, &WNOHANG)) > 0);
+    1 while ((waitpid(-1, &WNOHANG)) > 0);
     $SIG{CHLD} = \&REAPER;
 }
 
@@ -77,7 +75,7 @@ sub _spawn_command {
 
     if (! defined ($pid)) {
         die "Cannot fork: $!" if $^W;
-        return undef;
+        return;
     }
 
     if($pid) { # parent
@@ -95,7 +93,7 @@ sub _spawn_command {
         if ($errstatus) {
             $! = $errno+0;
             die "Cannot exec(@command): $!\n" if $^W;
-            return undef;
+            return;
         }
 
         # store pid for killing if we're in cygwin
@@ -113,15 +111,15 @@ sub _spawn_command {
         CORE::close($pty);
 
         CORE::close(STDIN);
-        open(STDIN,"<&". $slv->fileno())
+        open(STDIN, '<&', $slv->fileno())
             or die "Couldn't reopen STDIN for reading, $!\n";
- 
+
         CORE::close(STDOUT);
-        open(STDOUT,">&". $slv->fileno())
+        open(STDOUT, '>&', $slv->fileno())
             or die "Couldn't reopen STDOUT for writing, $!\n";
 
         CORE::close(STDERR);
-        open(STDERR,">&". $slv->fileno())
+        open(STDERR, '>&', $slv->fileno())
             or die "Couldn't reopen STDERR for writing, $!\n";
 
         { exec(@command) };
@@ -131,5 +129,11 @@ sub _spawn_command {
 
     return $pty;
 }
+
+=pod
+
+=for Pod::Coverage REAPER connect_core
+
+=cut
 
 1;

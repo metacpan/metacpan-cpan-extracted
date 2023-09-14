@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/rjbs/Log-Dispatchouli/issues
   homepage: https://github.com/rjbs/Log-Dispatchouli
   repository: https://github.com/rjbs/Log-Dispatchouli.git
-version: '3.006'
+version: '3.007'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -351,7 +351,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '3.006'
+          tag: '3.007'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -438,6 +438,7 @@ x_Dist_Zilla:
       is_trial: 0
     version: '6.030'
 x_contributors:
+  - 'Charlie Garrison <cng@garrison.com.au>'
   - 'Christopher J. Madsen <perl@cjmweb.net>'
   - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
   - 'Dan Book <grinnz@gmail.com>'

@@ -360,7 +360,15 @@ subtest "JSON-ification of refrefs" => sub {
   messages_ok(
     $logger,
     [
-      'event=json-demo foo.a=1 bar="{{{\"a\": 1}}}" baz="{{[12, 34]}}"',
+      # XS and PP versions of JSON differ on space, so we need "12, 34" and
+      # "12,34" both.  Then things get weird, because the version with no
+      # spaces (pure perl, at least as of today) doesn't need to be quoted to
+      # be used as a logfmt value, so the quotes are now optional.  Wild.
+      # -- rjbs, 2023-09-02
+      any(
+        'event=json-demo foo.a=1 bar="{{{\"a\": 1}}}" baz="{{[12, 34]}}"',
+        'event=json-demo foo.a=1 bar="{{{\"a\": 1}}}" baz={{[12,34]}}',
+      ),
     ],
     "refref becomes JSON flogged",
   );
@@ -373,7 +381,7 @@ subtest "JSON-ification of refrefs" => sub {
       event   => 'json-demo',
       'foo.a' => 1,
       bar     => "{{{\"a\": 1}}}",
-      baz     => "{{[12, 34]}}",
+      baz     => any("{{[12, 34]}}", "{{[12,34]}}"),
     ],
     "parsing gets us JSON string out, because it is just strings",
   );

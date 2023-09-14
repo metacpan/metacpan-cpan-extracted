@@ -3,7 +3,7 @@ package Net::DNS::SEC::ECDSA;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: ECDSA.pm 1853 2021-10-11 10:40:59Z willem $)[2];
+our $VERSION = (qw$Id: ECDSA.pm 1937 2023-09-11 09:27:16Z willem $)[2];
 
 
 =head1 NAME
@@ -50,8 +50,8 @@ BEGIN { die 'ECDSA disabled or application has no "use Net::DNS::SEC"' unless EC
 
 
 my %parameters = (
-	13 => [415, 32, Net::DNS::SEC::libcrypto::EVP_sha256()],
-	14 => [715, 48, Net::DNS::SEC::libcrypto::EVP_sha384()],
+	13 => ['P-256', 32, Net::DNS::SEC::libcrypto::EVP_sha256()],
+	14 => ['P-384', 48, Net::DNS::SEC::libcrypto::EVP_sha384()],
 	);
 
 sub _index { return keys %parameters }
@@ -61,11 +61,11 @@ sub sign {
 	my ( $class, $sigdata, $private ) = @_;
 
 	my $algorithm = $private->algorithm;
-	my ( $nid, $keylen, $evpmd ) = @{$parameters{$algorithm} || []};
-	die 'private key not ECDSA' unless $nid;
+	my ( $curve, $keylen, $evpmd ) = @{$parameters{$algorithm} || []};
+	die 'private key not ECDSA' unless $curve;
 
 	my $rawkey = pack "a$keylen", decode_base64( $private->PrivateKey );
-	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_ECDSA( $nid, $rawkey, '' );
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_ECDSA( $curve, $rawkey, '' );
 
 	my $asn1 = Net::DNS::SEC::libcrypto::EVP_sign( $sigdata, $evpkey, $evpmd );
 	return _ASN1decode( $asn1, $keylen );
@@ -76,13 +76,13 @@ sub verify {
 	my ( $class, $sigdata, $keyrr, $sigbin ) = @_;
 
 	my $algorithm = $keyrr->algorithm;
-	my ( $nid, $keylen, $evpmd ) = @{$parameters{$algorithm} || []};
-	die 'public key not ECDSA' unless $nid;
+	my ( $curve, $keylen, $evpmd ) = @{$parameters{$algorithm} || []};
+	die 'public key not ECDSA' unless $curve;
 
 	return unless $sigbin;
 
 	my ( $x, $y ) = unpack "a$keylen a$keylen", $keyrr->keybin;
-	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_ECDSA( $nid, $x, $y );
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_ECDSA( $curve, $x, $y );
 
 	my $asn1 = _ASN1encode( $sigbin, $keylen );
 	return Net::DNS::SEC::libcrypto::EVP_verify( $sigdata, $asn1, $evpkey, $evpmd );

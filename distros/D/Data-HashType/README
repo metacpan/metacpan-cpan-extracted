@@ -1,0 +1,106 @@
+NAME
+    Data::HashType - Data object for hash type.
+
+SYNOPSIS
+     use Data::HashType;
+
+     my $obj = Data::HashType->new(%params);
+     my $active = $obj->active;
+     my $id = $obj->id;
+     my $name = $obj->name;
+
+METHODS
+  "new"
+     my $obj = Data::HashType->new(%params);
+
+    Constructor.
+
+    *       "active"
+
+            Flag for activity of hash type. Possible valuea are 0/1. Default
+            value is 1 (active).
+
+    *       "id"
+
+            Id of record. Id could be number. It's optional. Default value
+            is undef.
+
+    *       "name"
+
+            Hash type name. Maximal length of value is 50 characters. It's
+            required.
+
+    Returns instance of object.
+
+  "active"
+     my $active = $obj->active;
+
+    Get active flag.
+
+    Returns 0/1.
+
+  "id"
+     my $id = $obj->id;
+
+    Get hash type record id.
+
+    Returns number.
+
+  "name"
+     my $name = $obj->name;
+
+    Get hash type name.
+
+    Returns string.
+
+ERRORS
+     new():
+             Parameter 'active' must be a bool (0/1).
+                     Value: %s
+             Parameter 'id' must be a number.
+                     Value: %s
+             Parameter 'name' has length greater than '50'.
+                     Value: %s
+             Parameter 'name' is required.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Data::HashType;
+
+     my $obj = Data::HashType->new(
+             'active' => 1,
+             'id' => 10,
+             'name' => 'SHA-256',
+     );
+
+     # Print out.
+     print 'Name: '.$obj->name."\n";
+     print 'Active: '.$obj->active."\n";
+     print 'Id: '.$obj->id."\n";
+
+     # Output:
+     # Name: SHA-256
+     # Active: 1
+     # Id: 10
+
+DEPENDENCIES
+    Mo, Mo::utils.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-HashType>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

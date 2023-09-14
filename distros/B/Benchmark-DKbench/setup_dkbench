@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-setup_dkbench - DKbench Perl Benchmark utility setup script
+setup_dkbench - DKbench Perl CPU Benchmark utility setup script
 
 =head1 DESCRIPTION
 
@@ -29,16 +29,36 @@ may show 'Fail' under Pass/Fail and scores may not be comparable to the baseline
 This might be perfectly fine for your purposes - in fact it might be intended if
 you are benchmarking to compare different software instead of hardware.
 
-This installer assumes you have at least gunzip, File::Fetch and cpanm already
-installed (e.g. yum install perl-App-cpanminus for CentOS 7, apt install cpanminus
-for Debian buster).
+This installer assumes you have at least cpanm already installed
+(C<curl -L https://cpanmin.us | perl - --sudo App::cpanminus>).
 
-In some systems you might need to install some packages (XML etc) with the package
-manager: e.g. 'yum install libdb-devel perl-XML-LibXML perl-XML-Parser libjpeg-devel'
-for CentOS or 'apt install libdb-dev libxml-simple-perl libjpeg-dev' for Debian.
+You will also need to have a build enviroment set up (compiler, make etc). If you
+want to add a couple of optional BioPerl bencharks you'd want an XML library in
+addition. Example commands to have everything you might need installed with the
+most popular pqckage managers (run as root or with sudo):
+
+ # Debian/Ubuntu etc
+ apt-get update
+ apt-get -y install wget build-essential perl cpanminus libxml-simple-perl
+
+ # CentOS/Redhat
+ yum update
+ yum -y install wget gcc make patch perl perl-App-cpanminus perl-XML-LibXML perl-XML-Parser
+
+The above will have you ready for using the default (system) perl. If you want to
+specifically install the reference perl version for this suite (currently 5.36.0),
+the simplest way is using perlbrew (no need for root/sudo):
+
+ \curl -L https://install.perlbrew.pl | bash
+ source ~/perl5/perlbrew/etc/bashrc
+ perlbrew install perl-5.36.0 -n -j 4
+ perlbrew use perl-5.36.0
+ perlbrew install-cpanm
 
 Note that the suite can be installed to as low as perl 5.12, however if you have a perl
-version lower than 5.14 make sure you install L<IO::Socket::IP> 0.41 or lower first.
+version lower than 5.14 make sure you install L<IO::Socket::IP> 0.41 or lower first:
+
+ cpanm -n http://cpan.metacpan.org/authors/id/P/PE/PEVANS/IO-Socket-IP-0.41.tar.gz
 
 =cut
 
@@ -69,32 +89,15 @@ Benchmark::DKbench::Setup::fetch_genbank();
 
 system "cp -r $data/* ".Benchmark::DKbench::Setup::datadir() if $data;
 
-my @packages = qw(
-O/OA/OALDERS/HTML-Parser-3.81.tar.gz
-K/KE/KENTNL/HTML-Tree-5.07.tar.gz
-N/NI/NIGELM/HTML-Formatter-2.16.tar.gz
-K/KA/KAMELKEV/CSS-Inliner-4018.tar.gz
-C/CJ/CJFIELDS/BioPerl-1.7.8.tar.gz
-E/ET/ETHER/Moose-2.2206.tar.gz
-D/DR/DROLSKY/DateTime-TimeZone-2.60.tar.gz
-D/DR/DROLSKY/DateTime-1.59.tar.gz
-D/DK/DKECHAG/Astro-Coord-Precession-0.03.tar.gz
-D/DK/DKECHAG/Astro-Coord-Constellations-0.01.tar.gz
-D/DK/DKECHAG/Image-PHash-0.3.tar.gz
-D/DK/DKECHAG/Math-DCT-0.04.tar.gz
-M/MI/MIK/CryptX-0.078.tar.gz
-M/MI/MIK/Crypt-JWT-0.034.tar.gz
-M/ML/MLEHMANN/JSON-XS-4.03.tar.gz
-L/LE/LETO/Math-MatrixReal-2.13.tar.gz
-T/TO/TONYC/Imager-1.019.tar.gz
-);
+my @packages = Benchmark::DKbench::Setup::cpan_packages();
 
-print $force ? "Installing reference cpan verions ...\n" : "Checking cpan modules ...\n";
+print $force ? "Installing reference cpan versions ...\n" : "Checking cpan modules ...\n";
 foreach (@packages) {
-    m#/([a-z]+)(?:-([a-z]+))?(?:-([a-z]+))?[^/]+$#i;
+    m#/([a-z]+)(?:-([a-z]+))?(?:-([a-z]+))?(?:-([a-z]+))?[^/]+$#i;
     my $mod = $1;
     $mod .= "::$2" if $2;
     $mod .= "::$3" if $3;
+    $mod .= "::$4" if $4;
     my $ver = eval "use $mod; return \$${mod}::VERSION";
     if (!$force && !$@) {
         print "Skipping $mod (found version $ver)\n";
@@ -102,4 +105,4 @@ foreach (@packages) {
         system "$sudo cpanm $t http://cpan.metacpan.org/authors/id/$_";
     }
 }
-system "$sudo cpanm $t Imager::File::JPEG Sys::Info MCE::Loop Test::Harness Test::Output Test::Requires";
+system "$sudo cpanm $t System::Info MCE::Loop Test::Harness Test::Output Test::Requires";

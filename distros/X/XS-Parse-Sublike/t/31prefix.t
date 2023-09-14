@@ -8,6 +8,11 @@ use Test2::V0;
 use lib "t";
 use testcase "t::prefix";
 
+BEGIN {
+   $^H{"t::prefix/func"}++;
+   $^H{"t::prefix/prefixed"}++;
+}
+
 our $LOG; BEGIN { $LOG = "" };
 
 prefixed func example {

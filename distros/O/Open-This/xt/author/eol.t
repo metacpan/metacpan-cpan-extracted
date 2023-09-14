@@ -15,6 +15,7 @@ my @files = (
     't/bin/date',
     't/git.t',
     't/github.t',
+    't/intellij.t',
     't/kate.t',
     't/lib/Foo/Bar.pm',
     't/lib/Foo/Require.pm',
@@ -30,6 +31,7 @@ my @files = (
     't/test-data/foo/bar/baz.html.ep',
     't/test-data/foo/bar/test.go',
     't/vim.t',
+    't/vscode_family.t',
     't/which.t'
 );
 

@@ -1,3 +1,15 @@
+0.05 2023-09-11T23:32:16+02:00
+ - Fix Makefile.PL which fails with no '.' in @INC.
+ - Fix link to image in doc.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Rename example file to better name.
+ - Rewrite bugtracker to github.
+ - Rewrite to new author github username.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+ - Update my name to actual version.
+
 0.04 2015-10-13T15:23:16+02:00
  - Add Task::PYX to SEE ALSO section in doc.
  - Add output image to example.

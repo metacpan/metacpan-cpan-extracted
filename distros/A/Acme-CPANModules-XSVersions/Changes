@@ -1,3 +1,15 @@
+0.004   2023-09-05  Released-By: PERLANCAR; Urgency: medium
+
+        - Fix/switch PP module and main module JSON <-> JSON::PP.
+
+        - Add entries from Missing::XS: JSON::MaybeXS, Moo, Object::Adhoc,
+          Object::Accessor, PPI, Type::Params (from Missing::XS).
+
+        - [doc] Tweak summary/Abstract.
+
+        - [doc] Mention Missing::XS.
+
+
 0.003   2022-03-18  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

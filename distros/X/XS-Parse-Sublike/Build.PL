@@ -5,7 +5,7 @@ use warnings;
 use lib 'inc';
 use Module::Build::with::XSTests;
 
-my @extra_compiler_flags = qw( -I. -Ihax );
+my @extra_compiler_flags = qw( -I. -Iinclude -Ihax );
 
 # Perl 5.36 made -std=c99 standard; before then we'll have to request it specially
 push @extra_compiler_flags, qw( -std=c99 ) if $^V lt v5.36.0;
@@ -30,6 +30,7 @@ my $build = Module::Build::with::XSTests->new(
    create_readme  => 1,
 
    extra_compiler_flags => \@extra_compiler_flags,
+   c_source => [ "src/" ],
 );
 
 $build->create_build_script;

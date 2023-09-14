@@ -7,17 +7,18 @@ use warnings;
 use Role::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-14'; # DATE
+our $DATE = '2023-08-31'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 with 'TableDataRole::Spec::Basic';
+with 'TableDataRole::Spec::GetRowByPos';
 
 sub new {
     my ($class, %args) = @_;
 
     my $column_names = delete $args{column_names} or die "Please specify 'column_names' argument";
-    my $aoa = delete $args{aoa}     or die "Please specify 'aoa' argument";
+    my $aoa = delete $args{aoa} or die "Please specify 'aoa' argument";
     die "Unknown argument(s): ". join(", ", sort keys %args)
         if keys %args;
 
@@ -53,9 +54,7 @@ sub get_next_item {
 
 sub get_next_row_hashref {
     my $self = shift;
-    my $aoa = $self->{aoa};
-    die "StopIteration" unless $self->{pos} < @{$aoa};
-    my $row_aryref = $aoa->[ $self->{pos}++ ];
+    my $row_aryref = $self->get_next_item;
     +{ map { $self->{column_names}[$_] => $row_aryref->[$_] } 0..$#{$self->{column_names}} };
 }
 
@@ -74,6 +73,30 @@ sub get_iterator_pos {
     $self->{pos};
 }
 
+sub get_item_at_pos {
+    my ($self, $index) = @_;
+
+    die "OutOfBounds" if
+        $index <  0 && -$index >  @{ $self->{aoa} } ||
+        $index >= 0 &&  $index >= @{ $self->{aoa} };
+    $self->{aoa}->[$index];
+}
+
+sub get_row_at_pos_hashref {
+    my ($self, $index) = @_;
+    my $row_aryref = $self->get_item_at_pos($index);
+    +{ map { $self->{column_names}[$_] => $row_aryref->[$_] } 0..$#{$self->{column_names}} };
+}
+
+sub has_item_at_pos {
+    my ($self, $index) = @_;
+
+    return 0 if
+        $index <  0 && -$index >  @{ $self->{aoa} } ||
+        $index >= 0 &&  $index >= @{ $self->{aoa} };
+    1;
+}
+
 1;
 # ABSTRACT: Get table data from an array of arrays
 
@@ -89,7 +112,7 @@ TableDataRole::Source::AOA - Get table data from an array of arrays
 
 =head1 VERSION
 
-This document describes version 0.016 of TableDataRole::Source::AOA (from Perl distribution TableDataRoles-Standard), released on 2023-06-14.
+This document describes version 0.017 of TableDataRole::Source::AOA (from Perl distribution TableDataRoles-Standard), released on 2023-08-31.
 
 =head1 SYNOPSIS
 
@@ -103,11 +126,17 @@ This document describes version 0.016 of TableDataRole::Source::AOA (from Perl d
 This role retrieves rows from an array of arrayrefs. You also need to supply
 C<column_names> containing array of column names.
 
+Notes:
+
+C<get_item_at_pos> does not modify iterator position.
+
 =for Pod::Coverage ^(.+)$
 
 =head1 ROLES MIXED IN
 
 L<TableDataRole::Spec::Basic>
+
+L<TableDataRole::Spec::GetRowByPos>
 
 =head1 HOMEPAGE
 

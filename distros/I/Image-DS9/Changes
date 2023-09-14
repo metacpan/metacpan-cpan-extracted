@@ -1,5 +1,35 @@
 Revision history for Image-DS9
 
+v1.0.0    2023-09-02 20:14:04-04:00 America/New_York
+
+  [API BREAKAGE]
+
+    * Updated to work with DS9 8.5.  Many ds9 commands have changed
+      their API since the last release of Image::DS9, which supported
+      DS9 7.5
+
+  [DEPRECATED]
+
+    * Image::DS9::Constants::V0 is deprecated
+
+  [ ENHANCEMENTS ]
+
+    * API documentation is now generated automatically from an
+      internal model of the ds9 command grammar
+
+    * Image::DS9::Constants::V1 provides more constants
+
+    * daemonize option provided to detach the ds9 process from the
+      Perl process (on *nix).
+
+  [ BUILD ]
+
+    * switch to Test2
+
+    * See Image::DS9::Manual::Install for tips on installation and
+      testing
+
+
 0.188     2017-10-27 17:02:12-04:00 America/New_York
 
   [ ENHANCEMENTS ]
@@ -54,28 +84,28 @@ Revision history for Image-DS9
 
         - updated grammar to match DS9 5.7 for commands cd, frame,
           height, width, view, frame
-	- fixed broken wcs append & replace
+        - fixed broken wcs append & replace
         - added pan query for just physical & image
 
 0.181	2009-06-01T11:52:22-04:00
 
         - tests now pass against ds9 5.6.3.  They have not been extended
-	  to match all of the new functionality, but at least they pass.
+          to match all of the new functionality, but at least they pass.
 
 0.18	2002-09-30T20:40:36-04:00
 
         - added ResErrXXX options
-	- fixed contour save/load grammar
-	- bin cols could return 3 values; kludge that in
-	- sometimes? when DESTROY'ing object would have undefined xpa
-	  object.  why?? now checks for that.
-	- error message clean up in Parser
-	- now accepts colormap as an alias for cmap.
+        - fixed contour save/load grammar
+        - bin cols could return 3 values; kludge that in
+        - sometimes? when DESTROY'ing object would have undefined xpa
+          object.  why?? now checks for that.
+        - error message clean up in Parser
+        - now accepts colormap as an alias for cmap.
 
 0.17	2002-09-26T19:31:01-04:00
 
         - added Image::DS9::Constants
-	- revamped test suite
+        - revamped test suite
 
 0.16	2002-09-23T18:44:44-04:00
 
@@ -85,16 +115,16 @@ Revision history for Image-DS9
           data conversion between Perl and DS9.
 
         - realized the futility of keeping the docs up-to-date in
-	  parallel with DS9.  Now just list the options supported,
-	  rather than duplicate the DS9 docs.
+          parallel with DS9.  Now just list the options supported,
+          rather than duplicate the DS9 docs.
 
         - the display() and tile_mode() methods are no longer supported.
           display() was an attempt to unify tile, blink, and single
           in a clean way.  I've decided to just track the actual
-	  XPA access methods rather than foist my view of how things
-	  should tie together. So, display() should be replaced with
-	  the appropriate calls to tile(), blink(), or single().
-	  tile_mode() was really tile() all along...
+          XPA access methods rather than foist my view of how things
+          should tie together. So, display() should be replaced with
+          the appropriate calls to tile(), blink(), or single().
+          tile_mode() was really tile() all along...
 
         - earlier versions of this package had a gadzillion constants
           for all of the commands and subcommands and enumerated values.
@@ -110,136 +140,135 @@ Revision history for Image-DS9
         - updated nservers() to track new IPC::XPA::Access API.
 
 0.13	2002-01-11T10:01:32-05:00
-	- results buffer splitting didn't ignore leading white space,
-	  leading to extra leading elements in the returned array.
-	- added pan function
-	- added regions load and save options
-	- scale(S_limits) wasn't calling _Get properly to return the limits.
-	- wcs query had wrong value of res_wanthash in _Get call
-	- DS9 v2.1 uses 'cmap' instead of 'colormap'.  I've switched
-	  over to 'cmap' since everyone should upgrade to DS9 v2.1.
+        - results buffer splitting didn't ignore leading white space,
+          leading to extra leading elements in the returned array.
+        - added pan function
+        - added regions load and save options
+        - scale(S_limits) wasn't calling _Get properly to return the limits.
+        - wcs query had wrong value of res_wanthash in _Get call
+        - DS9 v2.1 uses 'cmap' instead of 'colormap'.  I've switched
+          over to 'cmap' since everyone should upgrade to DS9 v2.1.
 
 0.12	2001-10-22T10:18:27-04:00
-	- removed definitions of TRUE and FALSE; was causing Export problems.
+        - removed definitions of TRUE and FALSE; was causing Export problems.
 
 0.11	2001-10-12T13:30:36-04:00
 
         - implemented scale datasec
         - frame hide now takes an argument (so can do hide all)
-	- frame all implemented so can get list of all frames
-	- updated tile_mode so that one can set/get the grid mode attributes.
+        - frame all implemented so can get list of all frames
+        - updated tile_mode so that one can set/get the grid mode attributes.
 
 0.106	2001-08-14T12:23:50-04:00
 
-	- more aggressive cleaning of WCS keywords
+        - more aggressive cleaning of WCS keywords
 
 0.105	2001-08-13T14:57:52-04:00
 
-	- colormap was incorrectly looking at $state
-	  instead of $colormap when looking for the inversion tag
+        - colormap was incorrectly looking at $state
+          instead of $colormap when looking for the inversion tag
 
 0.104	2001-08-13T14:18:43-04:00
 
         - ensured that the CTYPE? WCS keywords are surrounded by
-	  apostrophes
+          apostrophes
 
 0.103	2001-07-20T19:57:21-04:00
-	- didn't create the wcs export tag
+        - didn't create the wcs export tag
 
 0.102	2001-03-14T19:25:17-05:00
-	- Forget Rg_file in export list
-	- array() may now take a one-dimensional piddle
-	- cleaned up detection of piddles
+        - Forget Rg_file in export list
+        - array() may now take a one-dimensional piddle
+        - cleaned up detection of piddles
 
 0.10	2001-02-20T18:17:20-05:00
 
-	Externals:
-	- added invert option to colormap()
-	- added save option to file()
-	- added bin()
-	- added crosshair()
-	- added cursor()
-	- added lower()
-	- added raise()
-	- added regions()
-	- added wcs()
-	- added view()
-	- renamed T_Grid, T_Column, and T_Row to T_grid, T_column,
-	  T_row
+        Externals:
+        - added invert option to colormap()
+        - added save option to file()
+        - added bin()
+        - added crosshair()
+        - added cursor()
+        - added lower()
+        - added raise()
+        - added regions()
+        - added wcs()
+        - added view()
+        - renamed T_Grid, T_Column, and T_Row to T_grid, T_column,
+          T_row
 
-	- iconify() didn't return a true/false value (it directly
-	  returned what DS9 sent it).
-	- bugs fixed in display() code for queries which had errors
-	- fixed up return for scale(S_limits) to be more consistent
+        - iconify() didn't return a true/false value (it directly
+          returned what DS9 sent it).
+        - bugs fixed in display() code for queries which had errors
+        - fixed up return for scale(S_limits) to be more consistent
 
-	- Set() and Get() (low level access to XPA channel) are
-	  now documented
+        - Set() and Get() (low level access to XPA channel) are
+          now documented
 
-	Internals:
-	- cleaned up module setup code and creation of export tags
-	- lots more error checking of arguments. this may make
-	  following updates to DS9 a little more work, but makes
-	  it easier for users of this module
-	- improvements to documentation
+        Internals:
+        - cleaned up module setup code and creation of export tags
+        - lots more error checking of arguments. this may make
+          following updates to DS9 a little more work, but makes
+          it easier for users of this module
+        - improvements to documentation
 
 0.09	2000-09-08T23:32:48-04:00
 
-	- confused max index with number of elements in check
-	  for correct number of arguments for scale( 'limits' )
+        - confused max index with number of elements in check
+          for correct number of arguments for scale( 'limits' )
 
 0.08	2000-08-02T18:51:49-04:00
 
         - made compatible with API change in IPC::XPA v0.04.
-	- _Get() now more flexible about chomping buf and messages;
-	- implemented res_wanthash attribute
-	- implemented verbose attribute
-	- most ops arrays available as useful ones as @xxx_ops_dbg
-	- cleaned up ops stuff a bit to make less problematic to add stuff
-	- queries now take into account whether in list or scalar mode
+        - _Get() now more flexible about chomping buf and messages;
+        - implemented res_wanthash attribute
+        - implemented verbose attribute
+        - most ops arrays available as useful ones as @xxx_ops_dbg
+        - cleaned up ops stuff a bit to make less problematic to add stuff
+        - queries now take into account whether in list or scalar mode
           and return either the hash or the value of {buf}, respectively
-	- added iconify(), mode(), orient(), rotate().
-	- made scale(), zoom(), and display() queryable
+        - added iconify(), mode(), orient(), rotate().
+        - made scale(), zoom(), and display() queryable
 
 0.07	2000-07-05T11:35:28-04:00
 
-	- max_servers could default to zero if no servers
-	  were running; this would cause problems later if
-	  one was started up.  it now defaults to at least one.
-	- $self->{res} is always updated after Set.
-	- the frame show command was incorrectly implemented.
+        - max_servers could default to zero if no servers
+          were running; this would cause problems later if
+          one was started up.  it now defaults to at least one.
+        - $self->{res} is always updated after Set.
+        - the frame show command was incorrectly implemented.
 
 0.06	2000-05-10T13:27:29-04:00
 
-	- renamed frame ops once more
-	- renamed file ops to filetype
-	- removed tile() and blink()
-	- move _Set() and _Get to Set() and Get(); no docs yet
-	- added display(), scale(), zoom()
-	- returned buffers from Get are now chomped
+        - renamed frame ops once more
+        - renamed file ops to filetype
+        - removed tile() and blink()
+        - move _Set() and _Get to Set() and Get(); no docs yet
+        - added display(), scale(), zoom()
+        - returned buffers from Get are now chomped
 
 0.05	2000-05-09T11:37:58-04:00
 
-	- added more frame op tags
-	- made op tags more readable (lowercased)
-	- added set_attrs method (not yet documented)
-	- set max_servers to nservers() in the constructure
-	- fixed many stupid details I forgot when adding the file method
+        - added more frame op tags
+        - made op tags more readable (lowercased)
+        - added set_attrs method (not yet documented)
+        - set max_servers to nservers() in the constructure
+        - fixed many stupid details I forgot when adding the file method
 
 0.04	2000-05-08T19:30:49-04:00
 
-	- added file method
+        - added file method
 
 0.03	2000-05-04T10:04:49-04:00
 
-	- revised check for PDL to be cleaner
-	- added min_servers check & croak
+        - revised check for PDL to be cleaner
+        - added min_servers check & croak
 
 0.02	2000-04-26T15:19:46-04:00
 
-	- added tile and tile_mode.
-	- if max_server == 1, return nicer output from retrieves.
+        - added tile and tile_mode.
+        - if max_server == 1, return nicer output from retrieves.
 
 0.01	2000-04-25T15:17:38-04:00
 
-	- original version; created by h2xs 1.18
-
+        - original version; created by h2xs 1.18

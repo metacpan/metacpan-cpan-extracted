@@ -17,8 +17,8 @@ use ODF::lpOD;
 use ODF::lpOD_Helper;
 BEGIN {
   *_abbrev_addrvis = *ODF::lpOD_Helper::_abbrev_addrvis;
-  *TEXTLEAF_COND   = *ODF::lpOD_Helper::TEXTLEAF_COND;
-  *PARA_COND       = *ODF::lpOD_Helper::PARA_COND;
+  *TEXTLEAF_FILTER   = *ODF::lpOD_Helper::TEXTLEAF_FILTER;
+  *PARA_FILTER       = *ODF::lpOD_Helper::PARA_FILTER;
   *__leaf2vtext    = *ODF::lpOD_Helper::__leaf2vtext;
 }
 
@@ -41,13 +41,13 @@ my @paras; # { para, vt_local, vt_recur, offset }
     my $vt_local = "";
     my $vt_recur = "";
     my $elt = $para;
-    while ($elt = $elt->Hnext_elt($para, undef, PARA_COND)) {
+    while ($elt = $elt->Hnext_elt($para, undef, PARA_FILTER)) {
       say dvis '## $ix $elt ',vis($elt->get_text) if $debug;
-      if ($elt->passes(PARA_COND)) {
+      if ($elt->passes(PARA_FILTER)) {
         __SUB__->($elt); # recurse into nested paragraph, updating $offset
         $vt_recur .= $elt->Hget_text();
       }
-      elsif ($elt->passes(TEXTLEAF_COND)) {
+      elsif ($elt->passes(TEXTLEAF_FILTER)) {
         my $text = __leaf2vtext($elt);
         $vt_local .= $text;
         $offset += length($text);
@@ -57,7 +57,7 @@ my @paras; # { para, vt_local, vt_recur, offset }
     $paras[$ix]->{vt_local} = $vt_local;
     $paras[$ix]->{vt_recur} = $vt_recur;
   }
-  foreach ($body->Hdescendants(PARA_COND, PARA_COND)) { # top-level paragraphs
+  foreach ($body->Hdescendants(PARA_FILTER, PARA_FILTER)) { # top-level paragraphs
     handle_para($_);
   }
 }

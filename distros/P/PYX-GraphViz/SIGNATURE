@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,41 +12,46 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 0cea5221e48f665c602a4b5ddfda06e6c4740a3e Changes
-SHA1 1179f98d0de353aafbd6ac4d01401f030d8a1003 LICENSE
-SHA1 52e85dc134ae00a27628720e5ad0eead63d234a4 MANIFEST
-SHA1 f6b7fe0f898f6681153451d65ba9446e56e29937 META.yml
-SHA1 58f3503001d5313c73d6cd0eee75ee3bfa882312 Makefile.PL
-SHA1 f713f80e10762493d8dba1484c5a16fd2d4e852e README
-SHA1 719fda40a79af51e5236537927cc6096f074e4f4 examples/ex1.pl
-SHA1 3ed6c15d2a457ccd14dfe5771e6fd564f8bf1f97 images/ex1.png
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 f41e64d6130833dfa89e705e1a2de2ac9e7a13c2 lib/PYX/GraphViz.pm
-SHA1 dbf59ba6250b6a2785e2c0b0ace9b2ccad1e5257 t/PYX-GraphViz/01-use.t
-SHA1 d58db93c11478b1e38074b459bab92eeaea1a299 t/PYX-GraphViz/02-version.t
-SHA1 a42a4b6270207d93bcb5fb0e112419a8b9e4fcc4 t/PYX-GraphViz/03-new.t
-SHA1 80de05e51233f4cd6a2bff3aa29d0d50aaf4c489 xt/PYX-GraphViz/01-pod_coverage.t
-SHA1 a9903b94282c8d09f864c43d0148440c20e7a11b xt/PYX-GraphViz/02-pod.t
+SHA256 c4502662fc8b6e7ee5aaac0d88343fa74f6ba134c7b38c274fe0b91e3c84171c Changes
+SHA256 87d2d6a8ff525f3196b8248f454083e94e0bccbf575c707c36f6a70adbc21399 LICENSE
+SHA256 3943d52db4f370913d8096c1bb618ed086ef83f4df5e792dec3416d521242ccc MANIFEST
+SHA256 85f6c041f22184a8d69da873154bf250bb3934fbf490166353088725092c5713 META.yml
+SHA256 cc5162f327e2ed1c8ce0db4f0ffdac7ae9b0b76f5fc30cc3f82d169d087f0ff4 Makefile.PL
+SHA256 77a7851f32a604b7a455f60de8439f4a93eff63e45880793cb9c14ac9a356ca7 README
+SHA256 e527f08ba7e9d7268ad83bff7b92ed14abce742c66b667b5d98fc247208ce547 examples/simple_html_to_png.pl
+SHA256 791f2250250765c247442aeb41fd7f8a0431165262995118c7be753ad530d346 images/ex1.png
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 40c1d86a67e796efaf723f5639d3a01c5c312595428de14317611d177ca4580e lib/PYX/GraphViz.pm
+SHA256 afe1f04d2c7baa078bc6a137776b5e8cada9afb201297b3db7c30550f4af8932 t/PYX-GraphViz/01-use.t
+SHA256 9aca65b94a8cf2520a4aa6f8c2a542bd5f1aca5d1b7ac714cb7f90d08b5bd8ec t/PYX-GraphViz/02-version.t
+SHA256 60a16325856af1312b247af6702cdcb7099295098dc445e709b1722ae1fcb41d t/PYX-GraphViz/03-new.t
+SHA256 eac92ca7cb6a7c4abfd6d19cf1a412e68a3d51861cde4083dbe0ffbd1d7c0b71 xt/PYX-GraphViz/01-pod_coverage.t
+SHA256 ed17c2a43e83ac09d05255acb641fae52a86b257ccfd301a34004639b873badd xt/PYX-GraphViz/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWHQXHAAoJEJe+XXKaIuTlg7IIALE0i4BMQiFyYhoKl2oCJ0j3
-3hnMt9/zyxA3GYHs6B3JS01tfHU+BIEI79RURCh/3deLWX5+3qdj6oMDL52p0gZi
-oBPE0OTVOAxdRJsaYFFIQmJjj6eAZZmeq99jr/PMfwDnao+rT0qO4xUf+agNjJ6k
-bFjb3mnx2xq36hymryrKPF+eS+1e6lyewehs6VWSSAil9bzNhV5L8lhWRxa6fTdE
-ArZm3tT8/w98jJHTMv+eXAvLI7CZOrZhJIZ9ZSip1PxsYx59GKoWq2hvEONuq064
-a7hSezeQfoCEyTtnCxb3V/46lFKIjipPzVhDJiFO47OumiDWN9IQxftpIPmPl/M=
-=AjFo
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmT/h2IACgkQojV9Rpe/
+B8tRehAAkrk4fGaltuhoUfbQyVXcEdNHZE4GTO5UxDFkuK9RxDolpG5Mg9mzVe1M
+hVNlNp+R2U58wh0y5FQe/28UpZXvVJfBzEGdSaBEyeA1UXQGzlkd160UZ8gp2of/
+mC/Sww8hu1dTLW/61dVlL8ARYbfUq10w4mqFJyATvQ+R1cMU/OnWZR4B9CmBWBOi
+RKlaNz87f3UXRhMnPQe3S2CaBgmjXGx5inKoeFKCH9IbGtJkkiZFAvjBarcTYTYO
+seVbd3cL6sEswbYh6bhT//4SR60/KmcXmcwT4ve2mQoHIH+C5e10ZYhbv5MLnwaT
+JT6cI9QCUWtwozFjUTVaKQ+x8RUuoMfvlI9ZVe1IHPLPzznIoIdGdHDWr9OnhsXq
+F1mGFc4pjK0nDfbBkBS/hJ81a3GIniIdR0x0DcMgzAsiB0lnR9WVmEDdYhYN3wnI
+Cfo83gv3bB5Iu+ydfz0JEkfMhQZPucbTTWD7BHc2llEkztACK/REv1N5QIK/V/1m
+1D86IAxlkk/SuqlE2ZqEMvR6skg5K3qd7k+BsNCIk2Zb+zKeyVzSXCsFRfrOY7cl
+GfH6kRWQS22pMsSfyCX8qbrZaCmV2YZAoOVMqnkR5oY99ClLqHKt1YnvsNA1o+nb
+p4mV50sSXz2nycK7Dg0sN7LOAqkpYrIzaX3MBsLktGebKebY4Og=
+=SbSq
 -----END PGP SIGNATURE-----

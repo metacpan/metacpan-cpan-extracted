@@ -63,6 +63,11 @@ any dependencies modules it might want to export. The symbols from these
 packages will automatically be installed into the target package with no extra
 configuration needed.
 
+Finally warnings about symbols redefinition in the export process (i.e. exporting
+to two subroutines with the same name into the same namespace) are silenced to
+keep warning noise to a minimum. The last symbol definition will ultimately be
+the one used.
+
 # MOTIVATION
 
 Suppose you have a server module, which uses a configuration module to process

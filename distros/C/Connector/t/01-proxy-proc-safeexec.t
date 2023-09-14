@@ -4,9 +4,9 @@
 use strict;
 use warnings;
 use English;
-use Try::Tiny;
+use Syntax::Keyword::Try;
 
-use Test::More tests => 22;
+use Test::More tests => 23;
 
 use Log::Log4perl;
 Log::Log4perl->easy_init( { level   => 'ERROR' } );
@@ -33,6 +33,7 @@ SKIP: {
     my $conn = Connector::Proxy::Proc::SafeExec->new(
         {   LOCATION => 't/config/test.sh',
             args     => ['foo'],
+            content => '[% payload %]',
             timeout  => 2,
         }
     );
@@ -51,8 +52,8 @@ SKIP: {
     try {
         $conn->get();
     }
-    catch {
-        $exception = $_;
+    catch ($error) {
+        $exception = $error;
     };
     like(
         $exception,
@@ -68,8 +69,8 @@ SKIP: {
     try {
         $conn->get();
     }
-    catch {
-        $exception = $_;
+    catch($error) {
+        $exception = $error;
     };
     like( $exception, qr/^System command timed out/, 'Timeout: triggered' );
 
@@ -125,6 +126,19 @@ SKIP: {
     ok ($conn->exists(''), 'Connector exists');
     ok ($conn->exists('foo'), 'Node Exists');
     ok ($conn->exists( [ 'foo' ] ), 'Node Exists Array');
+
+
+    # basic tests for set
+    $conn->stdin();
+    $conn->args(['--echo','[% FILE %]']);
+
+    SKIP_CF: {
+        skip "Not supported on MacOS", 1 if $^O eq 'darwin';
+        like( $conn->set('foo', { payload => "Hello World" } ), qr@/tmp/\w+/\w+@ , 'Creating file');
+    }
+
+    $conn->args(['--cat','[% FILE %]']);
+    is( $conn->set('foo', { payload => 'Hello World' } ), 'Hello World', 'Writing file');
 
 }
 

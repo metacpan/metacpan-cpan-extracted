@@ -10,7 +10,7 @@ BEGIN {
       plan skip_all => "Types::Standard is not available";
 }
 
-use Object::Pad;
+use Object::Pad 0.800;
 use Object::Pad::FieldAttr::Checked;
 
 class Point {

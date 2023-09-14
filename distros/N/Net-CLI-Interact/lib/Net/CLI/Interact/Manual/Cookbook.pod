@@ -166,7 +166,7 @@ what is sent and received by each command).
 
 You can override or add to the device command phrasebooks which ship with this
 distribution. To start with, check the shipped dictionary for your device's
-current level of support, at L<Net::CLI::Interact::Manual::Phasebook>.
+current level of support, at L<https://github.com/ollyg/Net-CLI-Interact/tree/master/share/phrasebook>.
 
 If you want to add either some prompts or macros, first read the documentation
 for these systems at L<Net::CLI::Interact::Phrasebook>.

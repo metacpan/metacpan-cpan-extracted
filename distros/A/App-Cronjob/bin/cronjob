@@ -11,24 +11,24 @@ App::Cronjob->run;
 #pod =head1 SYNOPSIS
 #pod
 #pod   cronjob [-cEfhjrs] [long options...]
-#pod     -c STR --command STR             command to run (passed to ``)
-#pod     -s STR --subject STR             subject of mail to send (defaults to
-#pod                                      command)
-#pod     -r STR... --rcpt STR...          recipient of mail; may be given many
-#pod                                      times
-#pod     -E --errors-only                 do not send mail if exit code 0,
-#pod                                      even with output
-#pod     -f STR --sender STR              sender for message
-#pod     -j STR --jobname STR             job name; used for locking, if given
-#pod     --timeout INT                    fail if the child isn't completed
-#pod                                      within n seconds
-#pod     --ignore-errors STR...           error types to ignore (like: lock)
-#pod     -h STR... --email-header STR...  add header to the report email, if
-#pod                                      you send one
-#pod     --temp-ignore-lock-errors INT    failure to lock only signals an
-#pod                                      error after this long
-#pod     --[no-]lock                      lock this job (defaults to true;
-#pod                                      --no-lock for off)
+#pod     --command STR (or -c)          command to run (passed to ``)
+#pod     --subject STR (or -s)          subject of mail to send (defaults to
+#pod                                    command)
+#pod     --rcpt STR... (or -r)          recipient of mail; may be given many
+#pod                                    times
+#pod     --errors-only (or -E)          do not send mail if exit code 0, even
+#pod                                    with output
+#pod     --sender STR (or -f)           sender for message
+#pod     --jobname STR (or -j)          job name; used for locking, if given
+#pod     --timeout INT                  fail if the child isn't completed
+#pod                                    within n seconds
+#pod     --ignore-errors STR...         error types to ignore (like: lock)
+#pod     --email-header STR... (or -h)  add header to the report email, if you
+#pod                                    send one
+#pod     --temp-ignore-lock-errors INT  failure to lock only signals an error
+#pod                                    after this long
+#pod     --[no-]lock                    lock this job (defaults to true;
+#pod                                    --no-lock for off)
 #pod
 #pod =head1 DESCRIPTION
 #pod
@@ -111,29 +111,29 @@ cronjob - wrap up programs to be run as cron jobs
 
 =head1 VERSION
 
-version 1.200013
+version 1.200014
 
 =head1 SYNOPSIS
 
   cronjob [-cEfhjrs] [long options...]
-    -c STR --command STR             command to run (passed to ``)
-    -s STR --subject STR             subject of mail to send (defaults to
-                                     command)
-    -r STR... --rcpt STR...          recipient of mail; may be given many
-                                     times
-    -E --errors-only                 do not send mail if exit code 0,
-                                     even with output
-    -f STR --sender STR              sender for message
-    -j STR --jobname STR             job name; used for locking, if given
-    --timeout INT                    fail if the child isn't completed
-                                     within n seconds
-    --ignore-errors STR...           error types to ignore (like: lock)
-    -h STR... --email-header STR...  add header to the report email, if
-                                     you send one
-    --temp-ignore-lock-errors INT    failure to lock only signals an
-                                     error after this long
-    --[no-]lock                      lock this job (defaults to true;
-                                     --no-lock for off)
+    --command STR (or -c)          command to run (passed to ``)
+    --subject STR (or -s)          subject of mail to send (defaults to
+                                   command)
+    --rcpt STR... (or -r)          recipient of mail; may be given many
+                                   times
+    --errors-only (or -E)          do not send mail if exit code 0, even
+                                   with output
+    --sender STR (or -f)           sender for message
+    --jobname STR (or -j)          job name; used for locking, if given
+    --timeout INT                  fail if the child isn't completed
+                                   within n seconds
+    --ignore-errors STR...         error types to ignore (like: lock)
+    --email-header STR... (or -h)  add header to the report email, if you
+                                   send one
+    --temp-ignore-lock-errors INT  failure to lock only signals an error
+                                   after this long
+    --[no-]lock                    lock this job (defaults to true;
+                                   --no-lock for off)
 
 =head1 DESCRIPTION
 
@@ -215,13 +215,13 @@ C<--ignore-errors> option for that type.
 
 =head1 PERL VERSION
 
-This library should run on perls released even a long time ago.  It should work
-on any version of perl released in the last five years.
+This library should run on perls released even a long time ago.  It should
+work on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 AUTHOR
 

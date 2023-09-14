@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Sublike 0.18;
+package XS::Parse::Sublike 0.20;
 
 use v5.14;
 use warnings;
@@ -242,10 +242,16 @@ definition.
 
 The parameter signature of the function.
 
-This part can be skipped, but the bit is ignored when in I<require_parts>. It
-is always permitted not to provide a signature for a function definition,
-because such syntax only applies when C<use feature 'signatures'> is in
-effect, and only on supporting perl versions.
+This part can be skipped, but it is always permitted not to provide a
+signature for a function definition even if the bit it set in
+I<require_parts>. This is because such syntax only applies when
+C<use feature 'signatures'> is in effect, and only on supporting perl
+versions.
+
+However, setting the bit in I<require_parts> instead has the effect of
+enabling C<use feature 'signatures'> (at least on supporting perl versions),
+thus permitting the syntax to use a signature even if the signatures feature
+was not previously enabled.
 
 =item XS_PARSE_SUBLIKE_PART_BODY
 

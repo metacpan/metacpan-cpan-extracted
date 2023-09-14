@@ -1,6 +1,15 @@
 
 Revision history for Perl module MCE.
 
+1.889 Wed Sep 13 18:00:00 EST 2023
+
+  * Add Android support. Thank you, Dimitrios Kechagias.
+  * Revert defer signal-handling in MCE::Channel (send2 method).
+  * Improve mutex synchronize (aka enter) with guard capability.
+    Thank you, José Joaquín Atria.
+  * Fix mutex re-entrant lock on the Windows platform.
+  * Add mutex guard_lock method.
+
 1.888 Wed Jun 21 17:00:00 EST 2023
 
   * Fix typos caught by lintian. Thank you, Étienne Mollier.

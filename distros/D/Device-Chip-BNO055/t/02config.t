@@ -1,11 +1,10 @@
 #!/usr/bin/perl
 
-use utf8;
-
 use v5.26;
 use warnings;
+use utf8;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -28,7 +27,7 @@ await $chip->mount(
    $adapter->expect_write_then_read( "\x08", 4 )
       ->returns( "\x0D\x0B\x38\x00" );
 
-   is_deeply( await $chip->read_config,
+   is( await $chip->read_config,
       {
          # Page 0 config
          ACC_Unit    => "m/s²",

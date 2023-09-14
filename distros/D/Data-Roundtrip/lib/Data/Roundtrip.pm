@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 # import params is just one 'no-unicode-escape-permanently'
 # if set, then unicode escaping will not happen at
@@ -59,8 +59,8 @@ BEGIN {
 	my @file = qw{read_from_file write_to_file};
 	my @fh = qw{read_from_filehandle write_to_filehandle};
 	my @io = (@file, @fh);
-	my @json = qw{perl2json json2perl json2dump json2yaml json2json};
-	my @yaml = qw{perl2yaml yaml2perl yaml2json yaml2dump yaml2yaml};
+	my @json = qw{perl2json json2perl json2dump json2yaml json2json jsonfile2perl};
+	my @yaml = qw{perl2yaml yaml2perl yaml2json yaml2dump yaml2yaml yamlfile2perl};
 	my @dump = qw{perl2dump perl2dump_filtered perl2dump_homebrew
 		      dump2perl dump2json dump2yaml dump2dump};
 	my @all = (@io, @json, @yaml, @dump);
@@ -196,6 +196,15 @@ sub	yaml2perl {
 	if( $@ || ! defined($pv) ){ warn "yaml2perl() : error, call to YAML::Load() has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
 	return $pv
 }
+sub	yamlfile2perl {
+	my $yaml_file = $_[0];
+	#my $params = defined($_[1]) ? $_[1] : {};
+	my $contents = read_from_file($yaml_file);
+	if( ! defined $contents ){ warn "yamlfile2perl() : error, failed to read from file '${yaml_file}'."; return undef }
+	my $pv = yaml2perl($contents);
+	if( ! defined $pv ){ warn "yamlfile2perl() : error, call to yaml2perl() has failed after reading yaml string from file '${yaml_file}'."; return undef }
+	return $pv;
+}
 sub	json2perl {
 	my $json_string = $_[0];
 	#my $params = defined($_[1]) ? $_[1] : {};
@@ -209,6 +218,15 @@ sub	json2perl {
 		$pv = eval { JSON::decode_json($json_string) };
 		if( $@ || ! defined($pv) ){ warn "json2perl() :  error, call to json2perl() has failed".(defined($@)?" with this exception: $@":""); return undef }
 	}
+	return $pv;
+}
+sub	jsonfile2perl {
+	my $json_file = $_[0];
+	#my $params = defined($_[1]) ? $_[1] : {};
+	my $contents = read_from_file($json_file);
+	if( ! defined $contents ){ warn "jsonfile2perl() : error, failed to read from file '${json_file}'."; return undef }
+	my $pv = json2perl($contents);
+	if( ! defined $pv ){ warn "jsonfile2perl() : error, call to json2perl() has failed after reading json string from file '${json_file}'."; return undef }
 	return $pv;
 }
 sub	json2json {
@@ -545,6 +563,7 @@ sub	_has_utf8 { return $_[0] =~ /[^\x00-\x7f]/ }
 sub	_qquote_redefinition_by_Corion {
   local($_) = shift;
 
+  return qq("") unless defined $_;
   s/([\\\"\@\$])/\\$1/g;
 
   return qq("$_") unless /[[:^print:]]/;  # fast exit if only printables
@@ -598,7 +617,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =head1 SYNOPSIS
 
@@ -704,14 +723,16 @@ C<perl2json()>,
 C<json2perl()>,
 C<json2dump()>,
 C<json2yaml()>,
-C<json2json()>
+C<json2json()>,
+C<jsonfile2perl()>
 
 =item * C<:yaml> :
 C<perl2yaml()>,
 C<yaml2perl()>,
 C<yaml2dump()>,
 C<yaml2yaml()>,
-C<yaml2json()>
+C<yaml2json()>,
+C<yamlfile2perl()>
 
 =item * C<:dump> :
 C<perl2dump()>,
@@ -881,7 +902,7 @@ a nested data structure, but not an object), it will return
 the equivalent YAML string. In C<$optional_paramshashref>
 one can specify whether to escape unicode with
 C<< 'escape-unicode' => 1 >>. Prettify is not supported yet.
-The output can fed to L</yaml2perl>
+The output can be fed to L</yaml2perl>
 for getting the Perl variable back.
 
 Returns the YAML string on success or C<undef> on failure.
@@ -909,6 +930,31 @@ Return value:
 Given an input C<$yamlstring> as a string, it will return
 the equivalent Perl data structure using
 C<YAML::Load($yamlstring)>
+
+Returns the Perl data structure on success or C<undef> on failure.
+
+=head2 C<yamlfile2perl>
+
+    my $ret = yamlfile2perl($filename)
+
+Arguments:
+
+=over 4
+
+=item * C<$filename>
+
+=back
+
+Return value:
+
+=over 4
+
+=item * C<$ret>
+
+=back
+
+Given an input C<$filename> which points to a file containing YAML content,
+it will return the equivalent Perl data structure.
 
 Returns the Perl data structure on success or C<undef> on failure.
 
@@ -947,7 +993,7 @@ Additionally, use terse output with C<< 'terse' => 1 >> and remove
 all the incessant indentation with C<< 'indent' => 1 >>
 which unfortunately goes to the other extreme of
 producing a space-less output, not fit for human consumption.
-The output can fed to L</dump2perl>
+The output can be fed to L</dump2perl>
 for getting the Perl variable back.
 
 It returns the string representation of the input perl variable
@@ -1164,12 +1210,30 @@ C<JSON::decode_json(Encode::encode_utf8($jsonstring))>.
 
 Returns the Perl data structure on success or C<undef> on failure.
 
-In C<$optional_paramshashref>
-one can specify whether to escape unicode with
-C<< 'escape-unicode' => 1 >>
-and/or prettify the returned result with C<< 'pretty' => 1 >>.
+=head2 C<jsonfile2perl>
 
-Returns the yaml string on success or C<undef> on failure.
+    my $ret = jsonfile2perl($filename)
+
+Arguments:
+
+=over 4
+
+=item * C<$filename>
+
+=back
+
+Return value:
+
+=over 4
+
+=item * C<$ret>
+
+=back
+
+Given an input C<$filename> which points to a file containing JSON content,
+it will return the equivalent Perl data structure.
+
+Returns the Perl data structure on success or C<undef> on failure.
 
 =head2 C<json2yaml>
 

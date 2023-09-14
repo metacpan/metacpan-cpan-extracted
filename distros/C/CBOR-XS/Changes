@@ -2,12 +2,25 @@ Revision history for Perl extension CBOR::XS
 
 TODO: pack_keys?
 TODO: document encode_cbor_sharing?
-TODO: weaken cyclic structures?
 TODO: large negative integers
 TODO: type cast tests.
 TODO: round-tripping of types, such as float16 - maybe types::Serialiser support?
 TODO: possibly implement https://peteroupc.github.io/CBOR/extended.html, but NaNs are nonportable. rely on libecb?
 TODO: https://github.com/svaarala/cbor-specs/blob/master/cbor-nonutf8-string-tags.rst, but maybe that is overkill?
+
+1.87 Fri 08 Sep 2023 22:14:18 CEST
+        - shared references were not decoded correctly: instead of getting
+          multiple references to the same object, you got the same
+          reference to the same object, causing a number of issues. For
+          example, modifying the reference would modify all places the
+          reference was used, and encoding the decoded structure would
+          unshare the previously shared hashes, as trheir reference count
+          would be 1. Fixing this was rather involved, as perl lacks the
+          ability to easily swap or copy arrays and hashes.
+	- \0, \1, \undef do not work, and were not intended to ever work, as
+          special values, despite being mentioned in the documentation (reported
+          by nuclightq).
+        - new feature: allow_weak_cycles.
 
 1.86 Thu 04 Nov 2021 17:48:16 CET
 	- fixed a wrong printf format specifier (reported by Petr Písař).

@@ -1,5 +1,9 @@
 Revision history for Prometheus-Tiny-Shared
 
+0.027     2023-09-07 11:02:15+10:00 Australia/Melbourne
+- Update for Prometheus::Tiny 0.010 undef value protection (properly this time!)
+- Update for Prometheus::Tiny 0.011 undef label value protection
+
 0.026     2022-02-01 08:31:26+11:00 Australia/Melbourne
 - Update for Prometheus::Tiny 0.010 undef value protection
 

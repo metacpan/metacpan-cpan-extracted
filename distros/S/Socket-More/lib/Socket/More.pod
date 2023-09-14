@@ -1,18 +1,13 @@
 =head1 NAME
 
-Socket::More - Interface scoped passive/listener addressing
+Socket::More - List network interfaces and scope passive sockets to them
 
 =head1 SYNOPSIS
 
-Bring into your namespace. This overrides C<socket> also:
+Bring into your namespace. 
 
 	use v5.36;
-	use Socket::More ":all";
-
-Or import any of the functions by name:
-
-	use v5.36;
-	use Socket::More qw<getifaddrs sockaddr_passive ...>;
+	use Socket::More;
 
 
 Simple list of all network interfaces:
@@ -21,12 +16,12 @@ Simple list of all network interfaces:
 	my @ifs=getifaddrs;
 	say $_->{name} for @ifs;
 
-
 Flexible way to create interface scoped passive (listen) address across
 families. Special 'unix' interface for ease of use. All invalid combinations of
 family, port  and paths are discarded:
 
-	#Create passive (listening) sockets for selected interfaces
+	# Create passive (listening) sockets for selected interfaces
+  #
 	my @passive=sockaddr_passive {
 		interface=>	["eth0", "unix"],
 		port=>		[5566, 7788],
@@ -35,6 +30,7 @@ family, port  and paths are discarded:
 		
 	#All invalid family/interface/port/path  combinations are filtered out
 	#leaving only valid info for socket creation and binding:
+  #
 	for(@passive){
 		say $_->{address};
 		socket my $socket, $_->{family}, $_->{type}, 0;
@@ -44,12 +40,16 @@ family, port  and paths are discarded:
 
 =head1 DESCRIPTION
 
-This module makes it easier to generate the data structures to bind multiple
-sockets of multiple addresses, types, and families (including unix) on a
-particular set of interfaces by name. 
+At the surface level this module is a binding to C<getifaddrs>,
+C<if_nametoindex>, C<if_indextoname> and C<if_nameindex> to query the
+interfaces available on the host machine.
 
-It implements C<sockaddr_passive>, which facilitates solutions to requirements
-like these:
+However its main purpose is to concisely generate data structures needed to
+bind multiple passive (listen) sockets scoped to an named interface. It
+implements the combinatorics, filtering of invalid combinations and a terse
+command line processing option to make configuring passive sockets easy.
+
+It solves problems like this:
 
 	'listen on interfaces eth0 and eth1, using IPv6 and port numbers 9090
 	and 9091, but limit to link local addresses, and stream types'.
@@ -60,19 +60,15 @@ like these:
 	'listen on all interfaces on port 8080 and 8081, but only on link local
 	ipv6 address'
 
-In addition it also makes it easy to specify multiple listen/passive addresses
-from the command line, using concise key/value notation and string to socket
-family/type conversions.
 
 It also makes it easy to generate 'random' ports to bind to, B<before> your
-program binds, to aid in testing scenarios.
+program binds, to aid in testing server scenarios.
 
-Several 'inet.h' and similar routines are also implemented (eg C<getifaddrs>,
-C<if_nametoindex>, C<if_indextoname>, C<if_nameindex>).
 
-No symbols are exported by default. All symbols can be exported with the ":all"
-tag or individually by name.  Please see the L<API> section for a complete
-listing.
+
+All subroutines are exported, including all symbols from C<Socket>. 
+
+Please see the L<API> section for a complete listing.
 
 
 =head1 MOTIVATION
@@ -86,12 +82,11 @@ is a waste of resources and a potential security problem.
 Manually creating the multitude of potential addresses on the same interface
 (especially for IPv6) is a pain to maintain. This module reduces the effort by
 generating all combinations of parameters and then filters out what doesn't
-make sense and what you don't want
-
+make sense and what you don't want. See C<sockaddr_passive> below for more
+information.
 
 
 =head1 API
-
 
 
 =head2 getifaddrs
@@ -205,7 +200,7 @@ abbreviated names can be matched.
 Returns a list of 'interface' structures (similar to getifaddr above) which
 provide meta data and packed address structures suitable for passive use (i.e
 bind) and matching the C<$specification>. The resulting data is sorted by
-interface name, then but family and finally by type.
+interface name, then by family and finally by type.
 
 It has some overlapping function of C<getaddrinfo>, however it is specifically
 for creating addresses for binding, allows the use of interface names and
@@ -615,7 +610,7 @@ Please report any bugs via git hub: L<http://github.com/drclaw1394/perl-socket-m
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2022 by Ruben Westerberg
+Copyright (C) 2023 by Ruben Westerberg
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl or the MIT license.

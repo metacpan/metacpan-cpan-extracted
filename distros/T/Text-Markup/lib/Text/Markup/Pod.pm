@@ -3,12 +3,12 @@ package Text::Markup::Pod;
 use 5.8.1;
 use strict;
 use warnings;
-use Pod::Simple::XHTML '3.15';
+use Pod::Simple::XHTML 3.15;
 
 # Disable the use of HTML::Entities.
 $Pod::Simple::XHTML::HAS_HTML_ENTITIES = 0;
 
-our $VERSION = '0.24';
+our $VERSION = '0.31';
 
 sub parser {
     my ($file, $encoding, $opts) = @_;
@@ -85,7 +85,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011-2019 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2011-2023 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

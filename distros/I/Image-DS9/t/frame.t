@@ -1,43 +1,50 @@
+#! perl
+
+use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Image::DS9;
 
-BEGIN {
-        plan( tests => 9 );
-      }
+use Test::Lib;
+use My::Util;
 
-require './t/common.pl';
+diag( "tests are incomplete" );
 
-my $ds9 = start_up();
-clear($ds9);
+my $ds9 = start_up( image => 1, clear => 1 );
 
-$ds9->frame(3);
-ok( 3 == $ds9->frame(), "frame create" );
+$ds9->frame( 3 );
+is( $ds9->frame(), 3, 'frame create' );
 
-$ds9->frame(4);
-ok( 4 == $ds9->frame(), "frame create" );
+$ds9->frame( 4 );
+is( $ds9->frame(), 4, 'frame create' );
 
-ok( eq_array([ 1, 3, 4 ], scalar $ds9->frame('all')), 'frame all' );
+is( [ 1, 3, 4 ], scalar $ds9->frame( 'all' ), 'frame all' );
 
 $ds9->frame( 'first' );
-ok( 1 == $ds9->frame(), "frame first" );
+is( $ds9->frame(), 1, 'frame first' );
 
 $ds9->frame( 'last' );
-ok( 4 == $ds9->frame(), "frame last" );
+is( $ds9->frame(), 4, 'frame last' );
 
 $ds9->frame( 'prev' );
-ok( 3 == $ds9->frame(), "frame prev" );
+is( $ds9->frame(), 3, 'frame prev' );
 
 $ds9->frame( 'next' );
-ok( 4 == $ds9->frame(), "frame next" );
+is( $ds9->frame(), 4, 'frame next' );
 
 # avoid strange timing crash on some X servers
-sleep(1);
+sleep( 1 );
 
 $ds9->frame( 'delete' );
-ok( 3 == $ds9->frame(), "frame delete" );
+is( $ds9->frame(), 3, 'frame delete' );
 
 $ds9->frame( 'new' );
-ok( 5 == $ds9->frame(), "frame new" );
+is( $ds9->frame(), 5, 'frame new' );
+
+
+$ds9->frame( 1 );
+ok( $ds9->frame( has => 'wcs' ), 'has wcs' );
+
+done_testing;

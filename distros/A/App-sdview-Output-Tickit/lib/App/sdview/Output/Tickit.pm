@@ -10,13 +10,14 @@ use utf8;
 use Object::Pad 0.800;
 use Object::Pad ':experimental(adjust_params)';
 
-package App::sdview::Output::Tickit 0.02;
+package App::sdview::Output::Tickit 0.03;
 class App::sdview::Output::Tickit
    :strict(params);
 
 use constant format => "tickit";
 
 use App::sdview::Style 0.12;
+use String::Tagged 0.17; # ->join method
 
 =head1 NAME
 
@@ -72,14 +73,25 @@ C<End> - scroll to bottom
 
 =item *
 
-C<F9> - open the outline view popup. Clicking on an entry will jump directly
-to it.
+C<F9> - open the outline view popup. See Below.
 
 =item
 
 C<q> - exit
 
 =back
+
+=head2 Outline View
+
+The outline view displays an overview of all the section headings in the
+document.
+
+Within the outline view, the mouse wheel will scroll the list, and clicking an
+entry will jump directly to it, dismissing the view.
+
+Typing text with the outline view open will filter it to just those headings
+matching the typed text. Pressing the C<< <Enter> >> key will jump directly to
+the first highlighted heading, again dismissing the view.
 
 =cut
 
@@ -99,6 +111,7 @@ ADJUST
    require Tickit::Utils;
 
    $t = Tickit->new;
+   $t->term->await_started( 0.050 );
 
    $t->bind_key( q => sub { $t->stop; } );
 
@@ -218,7 +231,7 @@ method _output_para ( $para, %opts )
       $leaderstyle{$_} and $leader->apply_tag( 0, $leaderlen, $_ => $leaderstyle{$_} )
          for qw( fg bg bold under italic monospace );
 
-      if( $leaderlen <= $indent ) {
+      if( $leaderlen + 1 <= $indent ) {
          # Leader will fit on the same line
          $lines[0] = $leader . " "x($indent - $leaderlen) . $lines[0];
       }
@@ -364,13 +377,28 @@ class App::sdview::Output::Tickit::_OutlineTree
    :isa(Tickit::Widget)
 {
    use constant WIDGET_PEN_FROM_STYLE => 1;
+   use constant CAN_FOCUS => 1;
 
    use Tickit::Style;
    style_definition base =>
       bg => "blue",
-      selected_b => 1;
 
-   field @items;
+      selected_b => 1,
+
+      highlighted_fg => "black",
+      highlighted_bg => "yellow";
+
+   class App::sdview::Output::Tickit::_OutlineTree::Item {
+      field $label   :reader :param;
+      field $indent  :reader :param;
+      field $itemidx :reader :param;
+   }
+
+   field @all_items;
+
+   field $filter = "";
+
+   field @displayed_items;
    field $scrolloff = 0;
 
    method _normalize_scrolloff
@@ -378,7 +406,7 @@ class App::sdview::Output::Tickit::_OutlineTree
       $scrolloff = 0 if $scrolloff < 0;
 
       my $lines = $self->window->lines;
-      my $maxoff = scalar @items - $lines;
+      my $maxoff = scalar @displayed_items - $lines;
       $maxoff = 0 if $maxoff < 0;
 
       $scrolloff = $maxoff if $scrolloff > $maxoff;
@@ -390,20 +418,37 @@ class App::sdview::Output::Tickit::_OutlineTree
 
    field $current;
 
-   method lines { return scalar @items }
+   method lines { return scalar @displayed_items }
    method cols  { 1 }
 
    method add_item ( $label, $level, $itemidx )
    {
-      push @items, [ $label, ($level-1) * 2 + 1, $itemidx ];
+      push @all_items, App::sdview::Output::Tickit::_OutlineTree::Item->new(
+         label   => $label,
+         indent  => ($level-1) * 2 + 1,
+         itemidx => $itemidx,
+      );
+      push @displayed_items, $all_items[-1];
+   }
+
+   method _update_filter
+   {
+      if( length $filter ) {
+         my $re = qr/\Q$filter/i;
+         @displayed_items = grep { $_->label =~ $re } @all_items;
+      }
+      else {
+         @displayed_items = @all_items;
+      }
+      $self->redraw;
    }
 
    method set_current_itemidx ( $itemidx )
    {
       # TODO: binary search would be faster
-      foreach my $i ( reverse 0 .. $#items ) {
-         my $item = $items[$i];
-         next if $item->[2] > $itemidx;
+      foreach my $i ( reverse 0 .. $#all_items ) {
+         my $item = $all_items[$i];
+         next if $item->itemidx > $itemidx;
 
          $current = $i;
          last;
@@ -417,15 +462,19 @@ class App::sdview::Output::Tickit::_OutlineTree
       elsif( $current > $scrolloff + $bottom ) {
          $scrolloff = $current - $bottom;
       }
+
+      $self->redraw if $self->window && $self->window->is_visible;
    }
 
    method render_to_rb ( $rb, $rect )
    {
       $rb->eraserect( $rect );
 
-      foreach my $line ( $rect->top .. $rect->bottom ) {
-         ($line + $scrolloff) < @items or last;
-         my ( $label, $indent ) = $items[$line + $scrolloff]->@*;
+      my $re = length $filter ? qr/\Q$filter/i : undef;
+
+      foreach my $line ( $rect->top .. $rect->bottom - 2 ) {
+         ($line + $scrolloff) < @displayed_items or last;
+         my $item = $displayed_items[$line + $scrolloff];
 
          $rb->goto( $line, 0 );
          $rb->savepen;
@@ -434,12 +483,69 @@ class App::sdview::Output::Tickit::_OutlineTree
             $rb->setpen( $self->get_style_pen( 'selected' ) );
             $rb->text( ">" );
          }
-         $rb->erase_to( $indent );
+         $rb->erase_to( $item->indent );
 
-         $rb->text( $label );
+         my $label = $item->label;
+         if( defined $re ) {
+            my $oldpos = 0;
+            while( $label =~ m/$re/gc ) {
+               $rb->text( substr $label, $oldpos, $-[0]-$oldpos ) if $-[0] > $oldpos;
+
+               $rb->savepen;
+               $rb->setpen( $self->get_style_pen( 'highlighted' ) );
+               $rb->text( substr $label, $-[0], $+[0]-$-[0] ); # TODO: highlight pen
+               $rb->restore;
+
+               $oldpos = $+[0];
+            }
+            $rb->text( substr $label, $oldpos ) if $oldpos < length $label;
+         }
+         else {
+            $rb->text( $label );
+         }
 
          $rb->restore;
       }
+
+      $rb->goto( $rect->bottom - 1, 0 );
+      if( length $filter ) {
+         $rb->text( "Search: " . $filter );
+      }
+      else {
+         $rb->savepen;
+         $rb->setpen( Tickit::Pen::Immutable->new( i => 1 ) );
+         $rb->text( "Type to search" );
+         $rb->restore;
+      }
+
+      $rb->vline_at( $rect->top, $rect->bottom, $rect->right-1,
+         Tickit::RenderBuffer::LINE_SINGLE, undef, Tickit::RenderBuffer::CAP_BOTH );
+   }
+
+   method on_key ( $ev )
+   {
+      if( $ev->type eq "text" ) {
+         $filter .= $ev->str;
+         $self->_update_filter;
+         return 1;
+      }
+
+      my $key = $ev->str;
+      if( $key eq "Backspace" ) {
+         substr( $filter, -1, 1 ) = "" if length $filter;
+         $self->_update_filter;
+      }
+      elsif( $key eq "Enter" ) {
+         my $item = $displayed_items[0];
+         $filter = "";
+         $self->_update_filter;
+         $on_select_item->( itemidx => $item->itemidx );
+      }
+      else {
+         return 0;
+      }
+
+      return 1;
    }
 
    method on_mouse ( $ev )
@@ -450,9 +556,9 @@ class App::sdview::Output::Tickit::_OutlineTree
          $self->_normalize_scrolloff;
          $self->redraw;
       }
-      elsif( $ev->type eq "press" ) {
-         if( my $item = $items[$ev->line + $scrolloff] ) {
-            $on_select_item->( itemidx => $item->[2] );
+      elsif( $ev->type eq "press" && $ev->button == 1 ) {
+         if( my $item = $displayed_items[$ev->line + $scrolloff] ) {
+            $on_select_item->( itemidx => $item->itemidx );
          }
       }
 

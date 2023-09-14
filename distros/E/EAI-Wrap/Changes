@@ -1,0 +1,6 @@
+0.01  Wed Apr 26 16:00:00 2023
+	- original version
+0.02  Mon Sep 11 18:00:00 2023
+	- fixed author test 3b_Wrap_Integration.t for automated tests, enhanced 2_File.t with excel format_skip (+ improved logging)
+0.03  Wed Sep 13 23:00:00 2023
+	- completed getConn/setConn in EAI::DB and getHandle/setHandle in in EAI::FTP, added task{redoTimestampPatternPart} for redo improvement, added task{execOnly} and process{onlyExecFor} for selecting specific loads for execution, added checkParam for easier checking required parameters for EAI::Wrap API Calls, moved setting ErrSubject into EAI::Common::extractConfigs

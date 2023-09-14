@@ -1,6 +1,6 @@
 package Terse::Static;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 1;
 
@@ -12,7 +12,7 @@ Terse::Static - Serve static resources
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
@@ -26,7 +26,7 @@ Version 0.09
 
 	package MyApp::Controller::Static;
 
-	use base 'Terse::Controller::Static';
+	use base 'Terse::Controller::DelayedStatic';
 
 	1;
 

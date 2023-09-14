@@ -164,8 +164,10 @@ static SV *S_tickit_mouseevbutton2sv(pTHX_ int type, int button)
   const char *name = NULL;
   if(type == TICKIT_MOUSEEV_WHEEL)
     switch(button) {
-      case TICKIT_MOUSEWHEEL_UP:   name = "up";   break;
-      case TICKIT_MOUSEWHEEL_DOWN: name = "down"; break;
+      case TICKIT_MOUSEWHEEL_UP:    name = "up";    break;
+      case TICKIT_MOUSEWHEEL_DOWN:  name = "down";  break;
+      case TICKIT_MOUSEWHEEL_LEFT:  name = "left";  break;
+      case TICKIT_MOUSEWHEEL_RIGHT: name = "right"; break;
     }
   return newSVivpv(button, name);
 }
@@ -180,6 +182,12 @@ static int S_tickit_name2mousewheel(pTHX_ const char *name)
     case 'u':
       return streq(name+1, "p") ? TICKIT_MOUSEWHEEL_UP
                                 : -1;
+    case 'l':
+      return streq(name+1, "eft") ? TICKIT_MOUSEWHEEL_LEFT
+                                  : -1;
+    case 'r':
+      return streq(name+1, "ight") ? TICKIT_MOUSEWHEEL_RIGHT
+                                   : -1;
   }
   return -1;
 }
@@ -1362,6 +1370,20 @@ static void S_setup_constants(pTHX)
 
   DO_CONSTANT(TICKIT_MOUSEWHEEL_UP);
   DO_CONSTANT(TICKIT_MOUSEWHEEL_DOWN);
+  DO_CONSTANT(TICKIT_MOUSEWHEEL_LEFT);
+  DO_CONSTANT(TICKIT_MOUSEWHEEL_RIGHT);
+
+  stash = gv_stashpvn("Tickit::Pen", 11, TRUE);
+  export = get_av("Tickit::Pen::EXPORT_OK", TRUE);
+
+  DO_CONSTANT(TICKIT_PEN_UNDER_NONE);
+  DO_CONSTANT(TICKIT_PEN_UNDER_SINGLE);
+  DO_CONSTANT(TICKIT_PEN_UNDER_DOUBLE);
+  DO_CONSTANT(TICKIT_PEN_UNDER_WAVY);
+
+  DO_CONSTANT(TICKIT_PEN_SIZEPOS_NORMAL);
+  DO_CONSTANT(TICKIT_PEN_SIZEPOS_SUPERSCRIPT);
+  DO_CONSTANT(TICKIT_PEN_SIZEPOS_SUBSCRIPT);
 
   stash = gv_stashpvn("Tickit::Term", 12, TRUE);
   export = get_av("Tickit::Term::EXPORT_OK", TRUE);

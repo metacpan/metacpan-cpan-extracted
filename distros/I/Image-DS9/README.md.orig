@@ -1,0 +1,87 @@
+# NAME
+
+Image::DS9 - interface to the DS9 image display and analysis program
+
+# VERSION
+
+version v1.0.0
+
+# SYNOPSIS
+
+    use Image::DS9;
+
+    $dsp = new Image::DS9;
+    $dsp = new Image::DS9( \%attrs );
+
+# DESCRIPTION
+
+This class provides access to the **DS9** image display and analysis
+program through its **XPA** access points.
+
+**DS9** is a rather flexible and feature-rich image display program.
+Rather than extol its virtues, please consult the website in
+["REQUIREMENTS"](#requirements).
+
+While one could communicate with **DS9** solely via the [IPC::XPA](https://metacpan.org/pod/IPC%3A%3AXPA)
+class, this class provides a cleaner, less error prone interface,
+as it checks the passed commands and arguments for syntax and data
+type.  It also cleans up returned data from **DS9**.
+
+To use this class, first construct a **Image::DS9** object, and
+then apply its methods.  It is possible to both address more
+than one **DS9** with a single object, as well as having
+multiple **Image::DS9** objects communicate with their own
+**DS9** invocations.  Eventually there will be documentation
+spelling out how to do this.
+
+# DOCUMENTATION
+
+Please see:
+
+- [Image::DS9::Manual::Connect](https://metacpan.org/pod/Image%3A%3ADS9%3A%3AManual%3A%3AConnect)
+
+    How to create the connection to `DS9`
+
+- [Image::DS9::Manual::Interface](https://metacpan.org/pod/Image%3A%3ADS9%3A%3AManual%3A%3AInterface)
+
+    Understanding how arguments are passed to `DS9` and what is returned.
+
+- [Image::DS9::Manual::API](https://metacpan.org/pod/Image%3A%3ADS9%3A%3AManual%3A%3AAPI)
+
+    A reference manual to the methods which map onto `DS9`'s commands.
+
+- [Image::DS9::Constants](https://metacpan.org/pod/Image%3A%3ADS9%3A%3AConstants)
+
+    Constants provided for your ease and protection.
+
+- [Image::DS9::Manual::Install](https://metacpan.org/pod/Image%3A%3ADS9%3A%3AManual%3A%3AInstall)
+
+    Installation and testing hints.  Please read this before installation.
+
+# SUPPORT
+
+## Bugs
+
+Please report any bugs or feature requests to bug-image-ds9@rt.cpan.org  or through the web interface at: [https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9](https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9)
+
+## Source
+
+Source is available at
+
+    https://gitlab.com/djerius/image-ds9
+
+and may be cloned from
+
+    https://gitlab.com/djerius/image-ds9.git
+
+# AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+    The GNU General Public License, Version 3, June 2007

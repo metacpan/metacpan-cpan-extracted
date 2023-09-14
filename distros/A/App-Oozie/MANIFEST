@@ -67,6 +67,7 @@ lib/App/Oozie/Types/Workflow.pm
 lib/App/Oozie/Update/Coordinator.pm
 lib/App/Oozie/Util/Log4perl.pm
 lib/App/Oozie/Util/Log4perl/Templates/simple.l4p
+lib/App/Oozie/Util/Misc.pm
 lib/App/Oozie/Util/Plugin.pm
 lib/App/Oozie/XML.pm
 t/00-compile.t

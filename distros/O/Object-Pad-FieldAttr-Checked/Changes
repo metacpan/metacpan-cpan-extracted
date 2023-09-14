@@ -1,5 +1,17 @@
 Revision history for Object-Pad-FieldAttr-Checked
 
+0.06    2023-09-05
+        [CHANGES]
+         * Permit checker values to be plain coderefs, invoked on a single
+           argument
+         * Internal code adjustments for latest bleadperl
+
+0.05    2023-09-01
+        [CHANGES]
+         * Also support fields with `:accessor`
+         * Handle latest bleadperl that adds its own `newLISTOPn()`
+         * Use `G_USEHINTS` on supported perls
+
 0.04    2023-08-23
         [CHANGES]
          * No longer applies constraint at every modification; only during

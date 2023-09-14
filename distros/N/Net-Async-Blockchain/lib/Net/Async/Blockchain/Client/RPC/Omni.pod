@@ -22,7 +22,7 @@ Net::Async::Blockchain::Client::RPC::Omni - Async Omnicore RPC Client.
         my $http_client = Net::Async::Blockchain::Client::RPC::Omni->new(endpoint => 'http://127.0.0.1:8332', timeout => 100, rpc_user => 'test', rpc_password => 'test')
     );
 
-    my $response = $http_client->get_transaction('txid...')->get;
+    my $response = $http_client->get_omni_transaction('txid...')->get;
 
 =head1 DESCRIPTION
 
@@ -32,23 +32,29 @@ Omnicore based RPC calls
 
 =back
 
-=head2 get_transaction
+=head2 get_omni_transaction
 
-https://github.com/OmniLayer/omnicore/blob/master/src/omnicore/doc/rpc-api.md#omni_gettransaction
+https://github.com/omnilayer/omnicore/blob/master/src/omnicore/doc/rpc-api.md#omni_gettransaction
 
 =over 4
 
+=item * C<txid> the hash of the transaction to lookup
+
 =back
 
-L<Future>
+L<Future> - detailed information about an Omni transaction
 
-=head2 get_detailed_transaction
+=head2 omni_getwalletbalances
 
-https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/wallet/gettransaction/
+https://github.com/OmniLayer/omnicore/blob/master/src/omnicore/doc/rpc-api.md#omni_getwalletbalances
 
-=head2 list_by_addresses
+=over 4
 
-https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/wallet/listreceivedbyaddress/
+=item * C<includewatchonly> include balances of watchonly addresses (default: false)
+
+=back
+
+L<Future> - list of the total token balances of the whole wallet.
 
 =head1 INHERITED METHODS
 
@@ -56,7 +62,7 @@ https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/wallet/listreceivedbyaddress/
 
 =item L<Net::Async::Blockchain::Client::RPC::BTC>
 
-L<get_block|Net::Async::Blockchain::Client::RPC::BTC/get_block>, L<get_block_hash|Net::Async::Blockchain::Client::RPC::BTC/get_block_hash>, L<get_last_block|Net::Async::Blockchain::Client::RPC::BTC/get_last_block>, L<get_raw_transaction|Net::Async::Blockchain::Client::RPC::BTC/get_raw_transaction>, L<validate_address|Net::Async::Blockchain::Client::RPC::BTC/validate_address>
+L<get_balances|Net::Async::Blockchain::Client::RPC::BTC/get_balances>, L<get_block|Net::Async::Blockchain::Client::RPC::BTC/get_block>, L<get_block_hash|Net::Async::Blockchain::Client::RPC::BTC/get_block_hash>, L<get_last_block|Net::Async::Blockchain::Client::RPC::BTC/get_last_block>, L<get_raw_transaction|Net::Async::Blockchain::Client::RPC::BTC/get_raw_transaction>, L<get_transaction|Net::Async::Blockchain::Client::RPC::BTC/get_transaction>, L<list_by_addresses|Net::Async::Blockchain::Client::RPC::BTC/list_by_addresses>, L<validate_address|Net::Async::Blockchain::Client::RPC::BTC/validate_address>
 
 =item L<Net::Async::Blockchain::Client::RPC>
 

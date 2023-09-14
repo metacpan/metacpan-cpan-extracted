@@ -1351,13 +1351,13 @@ SKIP: {
 }
 
 SKIP: {
-	my $proxyPort = empty_port();
-	diag("Starting new firefox for testing proxies again using proxy port TCP/$proxyPort");
+	my $proxyPort = Firefox::Marionette::Proxy::DEFAULT_SQUID_PORT();
+	diag("Starting new firefox for testing proxies again using default proxy port TCP/$proxyPort");
 	my $visible = 1;
 	if (($ENV{FIREFOX_HOST}) && ($ENV{FIREFOX_HOST} eq 'localhost') && ($ENV{FIREFOX_USER})) {
 		$visible = 'local';
 	}
-	($skip_message, $firefox) = start_firefox($visible, seer => 1, chatty => 1, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(proxy => Firefox::Marionette::Proxy->new( host => 'localhost:' . $proxyPort, none => 'localhost')));
+	($skip_message, $firefox) = start_firefox($visible, seer => 1, chatty => 1, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(proxy => Firefox::Marionette::Proxy->new( host => 'localhost', none => 'localhost')));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
@@ -2464,6 +2464,9 @@ SKIP: {
 		}
 	}
 	ok(scalar $firefox->logins() == 0, "\$firefox->logins() shows the correct number (0) of records");
+	my $test_login = Firefox::Marionette::Login->new(host => 'https://github.com', user => 'ddick@cpan.org', password => 'qwerty', user_field => 'login', password_field => 'password', creation_in_ms => 0, last_used_in_ms => undef);
+	ok(!defined $test_login->last_used_time(), "Firefox::Marionette::Login->new()->last_used_time() correctly returns undef for an undefined parameter to new");
+	ok($test_login->creation_time() == 0, "Firefox::Marionette::Login->new()->creation_time() correctly returns 0 for a 0 parameter to new");
 	ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
 }
 
@@ -3933,6 +3936,14 @@ SKIP: {
 				$firefox->go($daemon->url() . '?format=txt');
 				ok($firefox->strip() eq $txt_document, "Correctly retrieved TXT document");
 				diag($firefox->strip());
+				if ($major_version >= 61) {
+					my $handle = $firefox->download($daemon->url() . '?format=txt');
+					my $output = <$handle>;
+					ok($output eq $txt_document, "Correctly downloaded TXT document without timeout");
+					$handle = $firefox->download($daemon->url() . '?format=txt', 50);
+					$output = <$handle>;
+					ok($output eq $txt_document, "Correctly downloaded TXT document with explicit timeout");
+				}
 				while(kill 0, $pid) {
 					kill $signals_by_name{TERM}, $pid;
 					sleep 1;
@@ -4377,6 +4388,11 @@ _CERT_
 				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " is NOT an email cert");
 			}
 			ok($certificate->issuer_name(), Encode::encode('UTF-8', display_name($certificate)) . " has an issuer_name of " . Encode::encode('UTF-8', $certificate->issuer_name()));
+			if (defined $certificate->nickname()) {
+				ok($certificate->nickname(), Encode::encode('UTF-8', display_name($certificate)) . " has a nickname of " . $certificate->nickname());
+			} else {
+				ok(1, Encode::encode('UTF-8', display_name($certificate)) . " does not have a specified nickname");
+			}
 			ok(defined $certificate->common_name(), Encode::encode('UTF-8', display_name($certificate)) . " has a common_name of " . Encode::encode('UTF-8', $certificate->common_name()));
 			if (defined $certificate->email_address()) {
 				ok($certificate->email_address(), Encode::encode('UTF-8', display_name($certificate)) . " has an email_address of " . $certificate->email_address());

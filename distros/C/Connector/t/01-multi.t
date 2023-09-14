@@ -16,65 +16,24 @@ Log::Log4perl->easy_init( { level   => 'WARN' } );
 my ($base, $conn);
 
 BEGIN {
-    use_ok( 'Config::Versioned' );
     use_ok( 'Connector::Multi' );
-    use_ok( 'Connector::Proxy::YAML' );
-    use_ok( 'Connector::Proxy::Config::Versioned' );
+    use_ok( 'Connector::Multi::YAML' );
 }
 
-require_ok( 'Config::Versioned' );
+SKIP: {
+    skip "broken after deprecating Config::Versioned", 47;
+
 require_ok( 'Connector::Multi' );
-require_ok( 'Connector::Proxy::YAML' );
-require_ok( 'Connector::Proxy::Config::Versioned' );
-
-# The Connector::Multi uses Connector::Proxy::Config::Versioned, which
-# must first be initialized with our test data.
-my @test_data = (
-    {
-        dbpath => 't/config/01-multi-flat.git',
-        filename => '01-multi-flat.conf',
-        path => [ qw( t/config ) ],
-    },
-    {
-        dbpath => 't/config/01-multi-sym1.git',
-        filename => '01-multi-sym1.conf',
-        path => [ qw( t/config ) ],
-    },
-);
-
-foreach my $data ( @test_data ) {
-    dir($data->{dbpath})->rmtree;
-    my $cv = Config::Versioned->new(
-        {
-            dbpath => $data->{dbpath},
-            autocreate => 1,
-            filename => $data->{filename},
-            path => $data->{path},
-            commit_time => $data->{commit_time} ||
-                DateTime->from_epoch( epoch => 1240341682 ),
-            author_name => $data->{author_name} || 'Test User',
-            author_mail => $data->{author_mail} || 'test@example.com',
-        }
-    ) or die "Error creating Config::Versioned: $@";
-}
-
+require_ok( 'Connector::Multi::YAML' );
 
 ###########################################################################
-#my $base = Connector::Proxy::Config::Versioned->new({
-#	LOCATION  => $test_data[0]->{dbpath},
-#});
-#
-#is($base->get('smartcards.tokens.token_1.status'), 'ACTIVATED',
-#    'check base connector (1)');
-#is($base->get('smartcards.owners.joe.tokenid'), 'token_1',
-#    'check base connector (2)');
-#is($base->get('smartcards.tokens.token_1.nonexistent'), undef,
-#    'check base connector (3)');
 
+$base = Connector::Multi::YAML->new({
+    LOCATION => 't/config/01-multi-flat.yaml',
+});
 $conn = Connector::Multi->new( {
-    BASECONNECTOR => 'Connector::Proxy::Config::Versioned',
-    LOCATION => $test_data[0]->{dbpath},
-    });
+    BASECONNECTOR => $base,
+});
 
 
 is($conn->get('smartcards.tokens.token_1.status'), 'ACTIVATED',
@@ -85,11 +44,14 @@ is($conn->get('smartcards.tokens.token_1.nonexistent'), undef, 'multi with simpl
 
 # Reuse $base and $conn to ensure we don't accidentally test previous
 # connectors.
-$base = Connector::Proxy::Config::Versioned->new({
-    LOCATION  => $test_data[1]->{dbpath},
+$base = Connector::Multi::YAML->new({
+    LOCATION => 't/config/01-multi-sym1.yaml',
 });
 
+diag "\$base=$base";
 my $sym = $base->get('smartcards.tokens');
+diag "\$sym=$sym";
+diag "sym=$sym, ref(\$sym)=" . ref($sym);
 is( ref($sym), 'SCALAR', 'check value of symlink is anon ref to scalar');
 is( ${ $sym }, 'connector:connectors.yaml-query-tokens', 'check target of symlink');
 
@@ -170,3 +132,4 @@ is( $conn->get('foo'), undef, 'Cache with prefix - no prefix' );
 
 $conn->cleanup();
 is(scalar keys %{ $conn->_config() }, 1);
+}

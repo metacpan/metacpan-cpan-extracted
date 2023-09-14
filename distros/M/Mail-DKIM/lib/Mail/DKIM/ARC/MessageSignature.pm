@@ -1,7 +1,7 @@
 package Mail::DKIM::ARC::MessageSignature;
 use strict;
 use warnings;
-our $VERSION = '1.20230630'; # VERSION
+our $VERSION = '1.20230911'; # VERSION
 # ABSTRACT: Subclass of Mail::DKIM::Signature which represents a ARC-Message-Signature header
 
 # Copyright 2017 FastMail Pty Ltd. All Rights Reserved.
@@ -30,6 +30,7 @@ sub new {
     $self->selector( $prms{'Selector'} );
     $self->timestamp( $prms{'Timestamp'} )   if defined $prms{'Timestamp'};
     $self->expiration( $prms{'Expiration'} ) if defined $prms{'Expiration'};
+    $self->tags( $prms{'Tags'} ) if defined $prms{'Tags'};
     $self->key( $prms{'Key'} )               if defined $prms{'Key'};
 
     return $self;
@@ -69,7 +70,7 @@ Mail::DKIM::ARC::MessageSignature - Subclass of Mail::DKIM::Signature which repr
 
 =head1 VERSION
 
-version 1.20230630
+version 1.20230911
 
 =head1 CONSTRUCTORS
 

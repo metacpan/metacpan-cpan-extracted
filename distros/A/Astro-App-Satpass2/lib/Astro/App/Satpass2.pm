@@ -91,7 +91,7 @@ use constant NULL_REF	=> ref NULL;
 
 use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
 
-our $VERSION = '0.050';
+our $VERSION = '0.051';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -520,7 +520,7 @@ sub almanac : Verb( choose=s@ dump! horizon|rise|set! transit! twilight! quarter
 	$opt, 0, qw{ horizon transit twilight quarter } );
 
     my $almanac_start = $self->__parse_time(
-	shift @args, $self->_get_today_midnight());
+	shift @args, $self->_get_day_midnight());
     my $almanac_end = $self->__parse_time (shift @args || '+1');
 
     $almanac_start >= $almanac_end
@@ -560,14 +560,7 @@ sub almanac : Verb( choose=s@ dump! horizon|rise|set! transit! twilight! quarter
 
     # Localize the event descriptions if appropriate.
 
-    foreach my $event ( @almanac ) {
-	$event->{almanac}{description} = __localize(
-	    text	=> [ almanac => $event->{body}->get( 'name' ),
-		$event->{almanac}{event}, $event->{almanac}{detail} ],
-	    default	=> $event->{almanac}{description},
-	    argument	=> $event->{body},
-	);
-    }
+    _almanac_localize( @almanac );
 
 #	Sort the almanac data by date, and display the results.
 
@@ -577,6 +570,18 @@ sub almanac : Verb( choose=s@ dump! horizon|rise|set! transit! twilight! quarter
 	    @almanac
 	], $opt );
 
+}
+sub _almanac_localize {
+    my @almanac = @_;
+    foreach my $event ( @almanac ) {
+	$event->{almanac}{description} = __localize(
+	    text	=> [ almanac => $event->{body}->get( 'name' ),
+		$event->{almanac}{event}, $event->{almanac}{detail} ],
+	    default	=> $event->{almanac}{description},
+	    argument	=> $event->{body},
+	);
+    }
+    return;
 }
 
 sub begin : Verb() Tweak( -unsatisfied ) {
@@ -958,7 +963,7 @@ sub flare : Verb( algorithm=s am! choose=s@ day! dump! pm! questionable|spare! q
     HAVE_TLE_IRIDIUM
 	or $self->wail( 'Astro::Coord::ECI::TLE::Iridium not available' );
     my $pass_start = $self->__parse_time (
-	shift @args, $self->_get_today_noon());
+	shift @args, $self->_get_day_noon());
     my $pass_end = $self->__parse_time (shift @args || '+7');
     $pass_start >= $pass_end
 	and $self->wail( 'End time must be after start time' );
@@ -1938,12 +1943,20 @@ sub magnitude_table : Verb( name! reload! ) {
 sub pass : Verb( :compute __pass_options ) {
     my ( $self, $opt, @args ) = __arguments( @_ );
 
+    $opt->{ephemeris}
+	and $opt->{almanac} = 1;
+    $opt->{almanac}
+	and not defined $opt->{ephemeris}
+	and $opt->{ephemeris} = {
+	pass_ics	=> 1,
+    }->{$opt->{_template}};
+
     $self->_apply_boolean_default(
 	$opt, 0, qw{ horizon illumination transit appulse } );
     $self->_apply_boolean_default( $opt, 0, qw{ am pm } );
     $opt->{am} or $opt->{pm} or $opt->{am} = $opt->{pm} = 1;
     my $pass_start = $self->__parse_time (
-	shift @args, $self->_get_today_noon());
+	shift @args, $self->_get_day_noon());
     my $pass_end = $self->__parse_time (shift @args || '+7');
     $pass_start >= $pass_end
 	and $self->wail( 'End time must be after start time' );
@@ -2024,45 +2037,112 @@ sub pass : Verb( :compute __pass_options ) {
 	};
     }
 
-    unless ( $opt->{am} && $opt->{pm} ) {
-	if ( $opt->{am} ) {
-	    @accumulate = map { $_->[0] } grep { $_->[1] < 43200 } map {
-		[ $_, _local_tod( $_->{time} ) ] } @accumulate;
-	} else {
-	    @accumulate = map { $_->[0] } grep { $_->[1] >= 43200 } map {
-		[ $_, _local_tod( $_->{time} ) ] } @accumulate;
-	}
-    }
+    @accumulate = $self->__pass_filter_am_pm( $opt, @accumulate );
 
     $opt->{chronological}
 	and @accumulate = sort { $a->{time} <=> $b->{time} }
 	    @accumulate;
 
-    # Record number of events found
+    # Record number of events found.
+    # NOTE that in this case an event is an entire pass.
 
     $self->{events} += @accumulate;
+
+    if ( $opt->{almanac} ) {
+	my %almanac;
+	foreach my $pass ( @accumulate ) {
+	    my $illum = $pass->{body}->get( 'illum' );
+	    my $noon = $self->_get_day_noon( $pass->{time} );
+	    $almanac{$noon}{$illum} ||= do {
+		my @day;
+
+		my @events = grep { {
+			horizon		=> 1,
+			twilight	=> 1,
+		    }->{$_->{almanac}{event}}
+		} $illum->almanac_hash(
+		    $self->_get_day_midnight( $pass->{time} ) );
+
+		_almanac_localize( @events );
+
+		foreach my $evt ( @events ) {
+		    $evt->{event} = 'almanac';
+		    my $pm = $evt->{time} >= $noon ? 1 : 0;
+		    push @{ $day[$pm] }, $evt;
+		}
+
+		\@day;
+	    };
+
+	    $pass->{_pm} = my $pm = $pass->{time} >= $noon ? 1 : 0;
+	    # TODO this way ALL passes get the almanac events. Is this
+	    # what I want? It varies. For --ics it is. For --events it
+	    # is not. For neither it's probably not.
+	    if ( $opt->{ephemeris} ) {
+		@{ $pass->{events} } = sort { $a->{time} <=> $b->{time}
+		    } @{ $pass->{events} }, @{ $almanac{$noon}{$illum}[$pm] };
+	    }
+	}
+
+	unless( $opt->{ephemeris} ) {
+	    foreach my $pass ( @accumulate ) {
+		$pass->{_pm}
+		    or next;
+		my $illum = $pass->{body}->get( 'illum' );
+		my $noon = $self->_get_day_noon( $pass->{time} );
+		$almanac{$noon}{$illum}[1]
+		    or next;
+		@{ $pass->{events} } = sort { $a->{time} <=> $b->{time} }
+		    @{ $pass->{events} },
+		    @{ $almanac{$noon}{$illum}[1] };
+		$almanac{$noon}{$illum}[1] = undef;
+	    }
+	    foreach my $pass ( reverse @accumulate ) {
+		$pass->{_pm}
+		    and next;
+		my $illum = $pass->{body}->get( 'illum' );
+		my $noon = $self->_get_day_noon( $pass->{time} );
+		$almanac{$noon}{$illum}[0]
+		    or next;
+		@{ $pass->{events} } = sort { $a->{time} <=> $b->{time} }
+		    @{ $pass->{events} },
+		    @{ $almanac{$noon}{$illum}[0] };
+		$almanac{$noon}{$illum}[0] = undef;
+	    }
+	}
+    }
 
     return $self->__format_data(
 	$opt->{_template} => \@accumulate, $opt );
 
 }
 
+sub __pass_filter_am_pm {
+    my ( $self, $opt, @accumulate ) = @_;
+    $opt ||= {};
+    $opt->{am} xor $opt->{pm}
+	or return @accumulate;
+    return (
+	map { $_->[0] }
+	grep { $opt->{am} xor $_->[1] }
+	map { [
+	    $_,
+	    $_->{time} >= $self->_get_day_noon( $_->{time} )
+	    ] } @accumulate
+    );
+}
+
 sub __pass_options {
     my ( $self, $opt ) = @_;
     return [
 	qw{
-	    choose=s@ am! appulse! brightest|magnitude!
-	    chronological! dump! horizon|rise|set! illumination! pm!
+	    almanac! am! appulse! brightest|magnitude! choose=s@
+	    chronological! ephemeris! dump! horizon|rise|set!
+	    illumination! pm!
 	    quiet! transit|maximum|culmination!
 	},
 	$self->_templates_to_options( pass => $opt ),
     ];
-}
-
-# Compute local time of day in seconds since midnight.
-sub _local_tod {
-    my @tl = localtime $_[0];
-    return ( $tl[2] * 60 + $tl[1] ) * 60 + $tl[0];
 }
 
 {
@@ -2214,7 +2294,7 @@ sub pwd : Verb() {
 	my ( $self, $opt, @args ) = __arguments( @_ );
 
 	my $start = $self->__parse_time (
-	    $args[0], $self->_get_today_midnight() );
+	    $args[0], $self->_get_day_midnight() );
 	my $end = $self->__parse_time ($args[1] || '+30');
 
 	$self->_apply_boolean_default( $opt, 0, map { "q$_" } 0 .. 3 );
@@ -2590,6 +2670,8 @@ sub _set_copyable {
 	    "$cls is missing methods. This can happen on a ",
 	    'case-tolerant system if you specify the class ',
 	    'name in the wrong case.' );
+	$cls->can( 'parent' )
+	    and push @args, parent => $self;
 	$obj = $cls->new(
 	    warner	=> $self->{_warner},
 	    @args,
@@ -3536,7 +3618,7 @@ sub validate : Verb( quiet! ) {
     my ( $self, $opt, @args ) = __arguments( @_ );
 
     my $pass_start = $self->__parse_time (
-	shift @args, $self->_get_today_noon());
+	shift @args, $self->_get_day_noon());
     my $pass_end = $self->__parse_time (shift @args || '+7');
     $pass_start >= $pass_end
 	and $self->wail( 'End time must be after start time' );
@@ -3562,7 +3644,7 @@ sub version : Verb() {
 
 @{[__PACKAGE__]} $VERSION - Satellite pass predictor
 based on Astro::Coord::ECI @{[Astro::Coord::ECI->VERSION]}
-Copyright (C) 2009-2022 by Thomas R. Wyant, III
+Copyright (C) 2009-2023 by Thomas R. Wyant, III
 
 EOD
 }
@@ -4086,7 +4168,8 @@ sub __format_data {
     return $self->_get_formatter_object( $opt )->format(
 	sp	=> $self,
 	template => $action,
-	data => $data
+	data	=> $data,
+	opt	=> $opt,
     );
 }
 
@@ -4613,19 +4696,23 @@ sub _get_spacetrack_default {
     );
 }
 
-sub _get_today_midnight {
-    my $self = shift;
+sub _get_day_midnight {
+    my ( $self, $day ) = @_;
+    defined $day
+	or $day = time;
     my $gmt = $self->get( 'formatter' )->gmt();
-    my @time = $gmt ? gmtime() : localtime();
+    my @time = $gmt ? gmtime( $day ) : localtime( $day );
     $time[0] = $time[1] = $time[2] = 0;
     $time[5] += 1900;
     return $gmt ? greg_time_gm(@time) : greg_time_local(@time);
 }
 
-sub _get_today_noon {
-    my $self = shift;
+sub _get_day_noon {
+    my ( $self, $day ) = @_;
+    defined $day
+	or $day = time;
     my $gmt = $self->get( 'formatter' )->gmt();
-    my @time = $gmt ? gmtime() : localtime();
+    my @time = $gmt ? gmtime( $day ) : localtime( $day );
     $time[0] = $time[1] = 0;
     $time[2] = 12;
     $time[5] += 1900;
@@ -7346,6 +7433,13 @@ how to specify times.
 
 The following options are available:
 
+C<-almanac> requests the inclusion of illuminating body rise/set and
+begin/end twilight times. These will be applied only to the last AM
+event of the day, and the first PM event of the day. Unless the
+L<visible|/visible> attribute is true, this may not do what you want.
+What it really should do is apply them to the last event before Sunrise
+and the first event after Sunset.
+
 C<-am> selects morning passes (i.e. between midnight and noon).
 
 C<-appulse> selects appulses for display. It can be negated by
@@ -7373,6 +7467,12 @@ chronological for a particular satellite.
 C<-dump> is a debugging tool. It is unsupported in the sense that the
 author reserves the right to change or revoke its functionality without
 notice.
+
+C<-ephemeris> should probably be called something like
+C<-almanac-verbose>, but that was too long. The relevant almanac
+information (AM or PM) is applied to all events. If C<-almanac> is also
+specified, C<-ephemeris> trumps it. If not specified, this defaults to
+true if C<-ics> is specified; otherwise it defaults to false.
 
 C<-events> causes the output to be individual events rather than passes.
 These events will be displayed in chronological order irrespective of
@@ -9675,7 +9775,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2022 by Thomas R. Wyant, III
+Copyright (C) 2009-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

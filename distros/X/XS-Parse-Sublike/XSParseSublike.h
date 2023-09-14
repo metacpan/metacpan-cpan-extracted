@@ -1,7 +1,7 @@
 #ifndef __XS_PARSE_SUBLIKE_H__
 #define __XS_PARSE_SUBLIKE_H__
 
-#define XSPARSESUBLIKE_ABI_VERSION 4
+#define XSPARSESUBLIKE_ABI_VERSION 5
 
 struct XSParseSublikeContext {
   SV *name;  /* may be NULL for anon subs */
@@ -27,6 +27,8 @@ enum {
 
   /* *Experimental* named parameter parsing support */
   XS_PARSE_SUBLIKE_FLAG_SIGNATURE_NAMED_PARAMS = 1<<3,
+  /* *Experimental* parameter attribute parsing support */
+  XS_PARSE_SUBLIKE_FLAG_SIGNATURE_PARAM_ATTRIBUTES = 1<<4,
 
   /* Back-compat flags we hope to remove in the next ABI version */
   XS_PARSE_SUBLIKE_COMPAT_FLAG_DYNAMIC_ACTIONS = 1<<15,
@@ -95,6 +97,43 @@ static int S_xs_parse_sublike_any(pTHX_ const struct XSParseSublikeHooks *hooks,
   return (*parseany_xs_parse_sublike_func)(aTHX_ hooks, hookdata, op_ptr);
 }
 
+
+/* Experimental support for subroutine parameter attributes.
+ * Only supported on Perl v5.26 or later
+ */
+
+struct XPSSignatureParamContext {
+  bool is_named;
+  PADOFFSET padix;
+  OP *varop;
+  /* apply phase runs here */
+  OP *defop;
+  OP *op;
+  /* post_defop phase runs here */
+};
+
+struct XPSSignatureAttributeFuncs {
+  U32 ver;  /* caller must initialise to XSPARSESUBLIKE_ABI_VERSION */
+  U32 flags;
+  const char *permit_hintkey;
+
+  void (*apply)(pTHX_ struct XPSSignatureParamContext *ctx, SV *attrvalue, void **attrdata_ptr, void *funcdata);
+  void (*post_defop)(pTHX_ struct XPSSignatureParamContext *ctx, void *attrdata, void *funcdata);
+
+  void (*free)(pTHX_ void *attrdata, void *funcdata);
+};
+
+static void (*register_xps_signature_attribute_func)(pTHX_ const char *name, const struct XPSSignatureAttributeFuncs *funcs, void *funcdata);
+#define register_xps_signature_attribute(name, funcs, funcdata) S_register_xps_signature_attribute(aTHX_ name, funcs, funcdata)
+static void S_register_xps_signature_attribute(pTHX_ const char *name, const struct XPSSignatureAttributeFuncs *funcs, void *funcdata)
+{
+  if(!register_xps_signature_attribute_func)
+    croak("Must call boot_xs_parse_sublike() first");
+
+  (*register_xps_signature_attribute_func)(aTHX_ name, funcs, funcdata);
+}
+
+
 #define boot_xs_parse_sublike(ver) S_boot_xs_parse_sublike(aTHX_ ver)
 static void S_boot_xs_parse_sublike(pTHX_ double ver) {
   SV **svp;
@@ -124,6 +163,9 @@ static void S_boot_xs_parse_sublike(pTHX_ double ver) {
 
   parseany_xs_parse_sublike_func = INT2PTR(int (*)(pTHX_ const struct XSParseSublikeHooks *, void *, OP**),
       SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parseany()@4", 0)));
+
+  register_xps_signature_attribute_func = INT2PTR(void (*)(pTHX_ const char *, const struct XPSSignatureAttributeFuncs *, void *),
+      SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/register_sigattr()@5", 0)));
 }
 
 #endif

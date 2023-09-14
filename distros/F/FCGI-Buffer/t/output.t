@@ -121,7 +121,7 @@ OUTPUT: {
 
 	$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
 	delete($ENV{'HTTP_ACCEPT_ENCODING'});
-	if($^O eq 'MSWin32') {
+	if(($^O eq 'MSWin32') || ($^O eq 'openbsd')) {
 		$ENV{'HTTP_TE'} = 'gzip';
 	} else {
 		$ENV{'HTTP_TE'} = 'br,gzip';
@@ -153,7 +153,7 @@ OUTPUT: {
 
 	ok(defined($body));
 	ok(length($body) eq $length);
-	if($^O eq 'MSWin32') {
+	if(($^O eq 'MSWin32') || ($^O eq 'openbsd')) {
 		TODO: {
 			local $TODO = "IO::Compress::Brotli doesn't support Windows";
 			ok($headers =~ /^Content-Encoding: br/m);
@@ -164,6 +164,9 @@ OUTPUT: {
 		}
 	} else {
 		ok($headers =~ /^Content-Encoding: br/m);
+
+		require IO::Compress::Brotli;
+		IO::Compress::Brotli->import();
 
 		$body = IO::Compress::Brotli::unbro($body, 1024);
 		ok($body =~ /<HTML><HEAD><TITLE>Hello, world<\/TITLE><\/HEAD><BODY><P>The quick brown fox jumped over the lazy dog.<\/P><\/BODY><\/HTML>\n$/);

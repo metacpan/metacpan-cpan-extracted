@@ -225,7 +225,7 @@ This package provides the following methods:
 
 =head2 default
 
-  default() (Str)
+  default() (string)
 
 The default method returns the default value, i.e. C<'Venus'>.
 
@@ -247,7 +247,7 @@ I<Since C<0.01>>
 
 =head2 dist
 
-  dist() (Str)
+  dist() (string)
 
 The dist method returns a package distribution representation of the name.
 
@@ -269,7 +269,7 @@ I<Since C<0.01>>
 
 =head2 explain
 
-  explain() (Str)
+  explain() (string)
 
 The explain method returns the package name and is used in stringification
 operations.
@@ -292,7 +292,7 @@ I<Since C<0.01>>
 
 =head2 file
 
-  file() (Str)
+  file() (string)
 
 The file method returns a file representation of the name.
 
@@ -314,7 +314,7 @@ I<Since C<0.01>>
 
 =head2 format
 
-  format(Str $method, Str $format) (Str)
+  format(string $method, string $format) (string)
 
 The format method calls the specified method passing the result to the core
 L</sprintf> function with itself as an argument. This method supports
@@ -339,7 +339,7 @@ I<Since C<0.01>>
 
 =head2 label
 
-  label() (Str)
+  label() (string)
 
 The label method returns a label (or constant) representation of the name.
 
@@ -361,7 +361,7 @@ I<Since C<0.01>>
 
 =head2 lookslike_a_file
 
-  lookslike_a_file() (Str)
+  lookslike_a_file() (string)
 
 The lookslike_a_file method returns truthy if its state resembles a filename.
 
@@ -383,7 +383,7 @@ I<Since C<0.01>>
 
 =head2 lookslike_a_label
 
-  lookslike_a_label() (Str)
+  lookslike_a_label() (string)
 
 The lookslike_a_label method returns truthy if its state resembles a label (or
 constant).
@@ -406,7 +406,7 @@ I<Since C<0.01>>
 
 =head2 lookslike_a_package
 
-  lookslike_a_package() (Str)
+  lookslike_a_package() (string)
 
 The lookslike_a_package method returns truthy if its state resembles a package
 name.
@@ -429,7 +429,7 @@ I<Since C<0.01>>
 
 =head2 lookslike_a_path
 
-  lookslike_a_path() (Str)
+  lookslike_a_path() (string)
 
 The lookslike_a_path method returns truthy if its state resembles a file path.
 
@@ -451,7 +451,7 @@ I<Since C<0.01>>
 
 =head2 lookslike_a_pragma
 
-  lookslike_a_pragma() (Str)
+  lookslike_a_pragma() (string)
 
 The lookslike_a_pragma method returns truthy if its state resembles a pragma.
 
@@ -473,7 +473,7 @@ I<Since C<0.01>>
 
 =head2 package
 
-  package() (Str)
+  package() (string)
 
 The package method returns a package name representation of the name given.
 
@@ -495,7 +495,7 @@ I<Since C<0.01>>
 
 =head2 path
 
-  path() (Str)
+  path() (string)
 
 The path method returns a path representation of the name.
 
@@ -520,6 +520,30 @@ I<Since C<0.01>>
 This package overloads the following operators:
 
 =cut
+
+=over 4
+
+=item operation: C<("")>
+
+This package overloads the C<""> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = "$name";
+
+  # "Foo/Bar"
+
+B<example 2>
+
+  # given: synopsis;
+
+  my $result = "$name, $name";
+
+  # "Foo/Bar, Foo/Bar"
+
+=back
 
 =over 4
 
@@ -613,30 +637,6 @@ B<example 1>
 
 =over 4
 
-=item operation: C<("")>
-
-This package overloads the C<""> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = "$name";
-
-  # "Foo/Bar"
-
-B<example 2>
-
-  # given: synopsis;
-
-  my $result = "$name, $name";
-
-  # "Foo/Bar, Foo/Bar"
-
-=back
-
-=over 4
-
 =item operation: C<(~~)>
 
 This package overloads the C<~~> operator.
@@ -659,7 +659,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

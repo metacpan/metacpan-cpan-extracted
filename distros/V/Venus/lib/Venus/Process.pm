@@ -104,11 +104,13 @@ sub build_self {
 sub assertion {
   my ($self) = @_;
 
-  my $assert = $self->SUPER::assertion;
+  my $assertion = $self->SUPER::assertion;
 
-  $assert->clear->expression('string');
+  $assertion->match('string')->format(sub{
+    (ref $self || $self)->new($_)
+  });
 
-  return $assert;
+  return $assertion;
 }
 
 sub async {
@@ -126,7 +128,7 @@ sub async {
 
   $parent->register;
 
-  $parent->work(sub{
+  my $pid = $parent->work(sub{
     my ($process) = @_;
 
     $process->untrap;
@@ -135,18 +137,33 @@ sub async {
 
     $process->register;
 
-    my $result = $process->try($code, @args)->any->result;
+    $process->watch($process->ppid);
+
+    $process->ppid(undef);
+
+    my $error;
+
+    my $result = $process->try($code, @args)->error(\$error)->result;
+
+    if (defined $error) {
+      require Scalar::Util;
+      require Venus::Error;
+      $error = Venus::Error->new($error) if !Scalar::Util::blessed($error);
+      $result = $error;
+    }
 
     $process->sendall($result) if defined $result;
 
     return;
   });
 
-  $parent->trap(INT => sub {
+  $parent->watch($pid);
+
+  $parent->trap(int => sub {
     $parent->killall;
   });
 
-  $parent->trap(TERM => sub {
+  $parent->trap(term => sub {
     $parent->killall;
   });
 
@@ -162,18 +179,25 @@ sub await {
 
   $PATH = $self->{directory};
 
-  my $result;
+  my $result = [];
 
   if (defined $timeout) {
-    (my $error, $result) = $self->catch('poll', $timeout, 'recvall');
+    if ($timeout == 0) {
+      (my $error, @{$result}) = $self->catch('recvall');
+    }
+    else {
+      (my $error, @{$result}) = $self->catch('poll', $timeout, 'recvall');
+    }
   }
   else {
-    do{$result = $self->recvall} while !@{$result};
+    do{@{$result} = $self->recvall} while !@{$result};
   }
+
+  $self->check($_) for ($self->watchlist);
 
   $PATH = $path;
 
-  return wantarray ? ($result ? (@{$result}) : ()) : $result;
+  return wantarray ? (@{$result}) : $result;
 }
 
 sub chdir {
@@ -329,7 +353,6 @@ sub fork {
     $PPID = $PID;
     $PID = $$;
     my $process = $self->class->new;
-
     my $orig_seed = srand;
     my $self_seed = substr(((time ^ $$) ** 2), 0, length($orig_seed));
     srand $self_seed;
@@ -368,6 +391,40 @@ sub forks {
   return wantarray ? ($process ? ($process, []) : ($process, [@pids]) ) : $process;
 }
 
+sub future {
+  my ($self, $code, @args) = @_;
+
+  my $async = $self->async($code, @args);
+
+  require Venus::Future;
+
+  my $retry = 0;
+
+  my $future = Venus::Future->new(sub{
+    my ($resolve, $reject) = @_;
+    my ($result) = $async->try('await', 0)->error(\my $error)->result;
+    if (defined $error) {
+      return $reject->result($error);
+    }
+    if (defined $result) {
+      if (UNIVERSAL::isa($result, 'Venus::Error')) {
+        return $reject->result($result);
+      }
+      else {
+        return $resolve->result($result);
+      }
+    }
+    if ($retry++ > 1 && !$async->ping($async->watchlist)) {
+      return $reject->result($async->catch('error', {
+        throw => 'error_on_ping',
+        pid => ($async->watchlist)[0]
+      }));
+    }
+  });
+
+  return $future;
+}
+
 sub is_dyadic {
   my ($self) = @_;
 
@@ -377,8 +434,7 @@ sub is_dyadic {
 
   my $temporary = $PATH = $directory if $directory;
 
-  my $is_dyadic = $directory && ($temporary) && $self->is_registered && ($self->ppid || $self->count == 1)
-    ? true : false;
+  my $is_dyadic = $directory && ($temporary) && $self->is_registered && ($self->count == 1) ? true : false;
 
   $PATH = $path;
 
@@ -926,7 +982,7 @@ sub trap {
 
   $SIG{uc($name)} = !ref($expr) ? uc($expr) : sub {
     local($!, $?);
-    return $self->$expr->(uc($name), @_);
+    return $self->$expr->(uc($name), @_) if ref $expr eq 'CODE';
   };
 
   return $self;
@@ -1004,9 +1060,14 @@ sub write {
 
   $path->catch('mkdirs') if !$path->exists;
 
-  require Time::HiRes;
+  state $atom = 0;
+  state $time = time;
 
-  $path = $path->child(CORE::join '.', Time::HiRes::gettimeofday(), 'data');
+  ($atom = ($time == time) ? $atom + 1 : 1);
+
+  $path = $path->child(CORE::join '.', time, $atom, 'data');
+
+  $time = time;
 
   $path->write($data);
 
@@ -1063,9 +1124,10 @@ sub DESTROY {
 
   $self->SUPER::DESTROY(@data);
 
-  require Venus::Path;
-
-  Venus::Path->new($self->{directory})->rmdirs if $self->is_dyadic && $self->is_leader;
+  if ($self->is_dyadic && !$self->others) {
+    $self->unregister;
+    require Venus::Path; Venus::Path->new($self->{directory})->rmdirs;
+  }
 
   return $self;
 }
@@ -1124,6 +1186,25 @@ sub error_on_fork_support {
 
   my $result = {
     name => 'on.fork.support',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
+}
+
+sub error_on_ping {
+  my ($self, $data) = @_;
+
+  my $message = 'Process {{pid}} not responding to ping';
+
+  my $stash = {
+    pid => $data->{pid},
+  };
+
+  my $result = {
+    name => 'on.ping',
     raise => true,
     stash => $stash,
     message => $message,
@@ -1338,7 +1419,7 @@ This package has the following attributes:
 
 =head2 alarm
 
-  alarm(Int $seconds) (Int)
+  alarm(number $seconds) (number)
 
 The alarm attribute is used in calls to L<alarm> when the process is forked,
 installing an alarm in the forked process if set.
@@ -1405,7 +1486,7 @@ This package provides the following methods:
 
 =head2 async
 
-  async(CodeRef $code, Any @args) (Process)
+  async(coderef $code, any @args) (Venus::Process)
 
 The async method creates a new L<Venus::Process> object and asynchronously runs
 the callback provided via the L</work> method. Both process objects are
@@ -1436,7 +1517,7 @@ I<Since C<3.40>>
 
 =head2 await
 
-  await(Int $timeout) (Any)
+  await(number $timeout) (arrayref)
 
 The await method expects to operate on a L<"dyadic"|/is_dyadic> process object
 and blocks the execution of the current process until a value is received from
@@ -1560,7 +1641,7 @@ I<Since C<3.40>>
 
 =head2 chdir
 
-  chdir(Str $path) (Process)
+  chdir(string $path) (Venus::Process)
 
 The chdir method changes the working directory the current process is operating
 within.
@@ -1607,7 +1688,7 @@ I<Since C<0.06>>
 
 =head2 check
 
-  check(Int $pid) (Int, Int)
+  check(number $pid) (number, number)
 
 The check method does a non-blocking L<perlfunc/waitpid> operation and returns
 the wait status. In list context, returns the specified process' exit code (if
@@ -1688,7 +1769,7 @@ I<Since C<0.06>>
 
 =head2 count
 
-  count(Str | CodeRef $code, Any @args) (Int)
+  count(string | coderef $code, any @args) (number)
 
 The count method dispatches to the method specified (or the L</watchlist> if
 not specified) and returns a count of the items returned from the dispatched
@@ -1752,7 +1833,7 @@ I<Since C<2.40>>
 
 =head2 daemon
 
-  daemon() (Process)
+  daemon() (Venus::Process)
 
 The daemon method detaches the process from controlling terminal and runs it in
 the background as system daemon. This method internally calls L</disengage> and
@@ -1778,7 +1859,7 @@ I<Since C<0.06>>
 
 =head2 data
 
-  data(Int @pids) (Int)
+  data(number @pids) (number)
 
 The data method returns the number of messages sent to the current process,
 from the PID or PIDs provided (if any). If no PID list is provided, the count
@@ -1914,7 +1995,7 @@ I<Since C<2.91>>
 
 =head2 decode
 
-  decode(Str $data) (Any)
+  decode(string $data) (any)
 
 The decode method accepts a string representation of a Perl value and returns
 the Perl value.
@@ -1939,7 +2020,7 @@ I<Since C<2.91>>
 
 =head2 disengage
 
-  disengage() (Process)
+  disengage() (Venus::Process)
 
 The disengage method limits the interactivity of the process by changing the
 working directory to the root directory and redirecting its standard file
@@ -1964,7 +2045,7 @@ I<Since C<0.06>>
 
 =head2 encode
 
-  encode(Any $data) (Str)
+  encode(any $data) (string)
 
 The encode method accepts a Perl value and returns a string representation of
 that Perl value.
@@ -1989,7 +2070,7 @@ I<Since C<2.91>>
 
 =head2 engage
 
-  engage() (Process)
+  engage() (Venus::Process)
 
 The engage method ensures the interactivity of the process by changing the
 working directory to the directory used to launch the process, and by
@@ -2014,7 +2095,7 @@ I<Since C<0.06>>
 
 =head2 exchange
 
-  exchange(Str $name) (Any)
+  exchange(string $name) (any)
 
 The exchange method gets and/or sets the name of the data exchange. The
 exchange is the ontext in which processes can register and cooperate. Process
@@ -2074,7 +2155,7 @@ I<Since C<2.91>>
 
 =head2 exit
 
-  exit(Int $status) (Int)
+  exit(number $status) (number)
 
 The exit method exits the program immediately.
 
@@ -2108,7 +2189,7 @@ I<Since C<0.06>>
 
 =head2 followers
 
-  followers() (ArrayRef)
+  followers() (arrayref)
 
 The followers method returns the list of PIDs registered under the current
 L</exchange> who are not the L</leader>.
@@ -2161,7 +2242,7 @@ I<Since C<2.91>>
 
 =head2 fork
 
-  fork(Str | CodeRef $code, Any @args) (Process, Int)
+  fork(string | coderef $code, any @args) (Venus::Process, number)
 
 The fork method calls the system L<perlfunc/fork> function and creates a new
 process running the same program at the same point (or call site). This method
@@ -2291,7 +2372,7 @@ I<Since C<0.06>>
 
 =head2 forks
 
-  forks(Str | CodeRef $code, Any @args) (Process, ArrayRef[Int])
+  forks(string | coderef $code, any @args) (Venus::Process, within[arrayref, number])
 
 The forks method creates multiple forks by calling the L</fork> method C<n>
 times, based on the count specified. As with the L</fork> method, this method
@@ -2381,9 +2462,173 @@ I<Since C<0.06>>
 
 =cut
 
+=head2 future
+
+  future(coderef $code, any @args) (Venus::Future)
+
+The future method creates a new object via L</async> which runs the callback
+asynchronously and returns a L<Venus::Future> object with a promise which
+eventually resolves to the value emitted or error raised.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item future example 1
+
+  # given: synopsis;
+
+  my $future = $parent->future(sub{
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  # bless({...}, 'Venus::Future')
+
+=back
+
+=over 4
+
+=item future example 2
+
+  # given: synopsis;
+
+  my $future = $parent->future(sub{
+    ($process) = @_;
+    # in forked process ...
+    return 'done';
+  });
+
+  # $future->fulfill;
+
+  # true
+
+  # $future->value;
+
+  # 'done'
+
+=back
+
+=over 4
+
+=item future example 3
+
+  # given: synopsis;
+
+  my $future = $parent->future(sub{
+    ($process) = @_;
+    # in forked process ...
+    return {status => 'done'};
+  });
+
+  # $future->fulfill;
+
+  # true
+
+  # $future->value
+
+  # {status => 'done'}
+
+=back
+
+=over 4
+
+=item future example 4
+
+  # given: synopsis;
+
+  my $future = $parent->future(sub{
+    ($process) = @_;
+    # in forked process ...
+    return ['done'];
+  });
+
+  # $future->fulfill;
+
+  # true
+
+  # my ($await) = $future->value;
+
+  # ['done']
+
+=back
+
+=over 4
+
+=item future example 5
+
+  # given: synopsis;
+
+  my $future = $parent->future(sub{
+    ($process) = @_;
+    # in forked process ...
+    $process->sendall(['send 1', 'send 2', 'send 3']);
+    $process->sendall(['send 4']);
+    $process->sendall(['send 5']);
+    return;
+  });
+
+  # $future->fulfill;
+
+  # true
+
+  # my ($await) = $future->value;
+
+  # ['send 1', 'send 2', 'send 3']
+
+=back
+
+=cut
+
+=head2 is_dyadic
+
+  is_dyadic() (boolean)
+
+The is_dyadic method returns true is the process is configured to exclusively
+communicate with one other process, otherwise returns false.
+
+I<Since C<3.40>>
+
+=over 4
+
+=item is_dyadic example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  my $is_dyadic = $process->is_dyadic;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_dyadic example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new->async(sub{
+    return 'done';
+  });
+
+  my $is_dyadic = $process->is_dyadic;
+
+  # true
+
+=back
+
+=cut
+
 =head2 is_follower
 
-  is_follower() (Bool)
+  is_follower() (boolean)
 
 The is_follower method returns true if the process is not the L</leader>, otherwise
 returns false.
@@ -2462,7 +2707,7 @@ I<Since C<2.91>>
 
 =head2 is_leader
 
-  is_leader() (Bool)
+  is_leader() (boolean)
 
 The is_leader method returns true if the process is the L</leader>, otherwise
 returns false.
@@ -2541,7 +2786,7 @@ I<Since C<2.91>>
 
 =head2 is_registered
 
-  is_registered() (Bool)
+  is_registered() (boolean)
 
 The is_registered method returns true if the process has registered using the
 L</register> method, otherwise returns false.
@@ -2584,7 +2829,7 @@ I<Since C<2.91>>
 
 =head2 is_unregistered
 
-  is_unregistered() (Bool)
+  is_unregistered() (boolean)
 
 The is_unregistered method returns true if the process has unregistered using
 the L</unregister> method, or had never registered at all, otherwise returns
@@ -2644,7 +2889,7 @@ I<Since C<2.91>>
 
 =head2 join
 
-  join(Str $name) (Process)
+  join(string $name) (Venus::Process)
 
 The join method sets the L</exchange>, registers the process with the exchange
 using L</register>, and clears the L</watchlist>, then returns the invocant.
@@ -2687,7 +2932,7 @@ I<Since C<2.91>>
 
 =head2 kill
 
-  kill(Str $signal, Int @pids) (Int)
+  kill(string $signal, number @pids) (number)
 
 The kill method calls the system L<perlfunc/kill> function which sends a signal
 to a list of processes and returns truthy or falsy. B<Note:> A truthy result
@@ -2716,7 +2961,7 @@ I<Since C<0.06>>
 
 =head2 killall
 
-  killall(Str $name, Int @pids) (ArrayRef)
+  killall(string $name, number @pids) (arrayref)
 
 The killall method accepts a list of PIDs (or uses the L</watchlist> if not
 provided) and returns the result of calling the L</kill> method for each PID.
@@ -2766,7 +3011,7 @@ I<Since C<2.40>>
 
 =head2 leader
 
-  leader() (Int)
+  leader() (number)
 
 The leader method uses a simple leader election algorithm to determine the
 process leader and returns the PID for that process. The leader is always the
@@ -2834,7 +3079,7 @@ I<Since C<2.91>>
 
 =head2 leave
 
-  leave(Str $name) (Process)
+  leave(string $name) (Venus::Process)
 
 The leave method sets the L</exchange> to undefined, unregisters the process
 using L</unregister>, and clears the L</watchlist>, then returns the invocant.
@@ -2877,7 +3122,7 @@ I<Since C<2.91>>
 
 =head2 limit
 
-  limit(Int $count) (Bool)
+  limit(number $count) (boolean)
 
 The limit method blocks the execution of the current process until the number
 of processes in the L</watchlist> falls bellow the count specified. The method
@@ -2934,7 +3179,7 @@ I<Since C<3.40>>
 
 =head2 others
 
-  others() (ArrayRef)
+  others() (arrayref)
 
 The others method returns all L</registrants> other than the current process,
 i.e. all other registered process PIDs whether active or inactive.
@@ -2987,7 +3232,7 @@ I<Since C<2.91>>
 
 =head2 others_active
 
-  others_active() (ArrayRef)
+  others_active() (arrayref)
 
 The others_active method returns all L</registrants> other than the current
 process which are active, i.e. all other registered process PIDs that responds
@@ -3027,7 +3272,7 @@ I<Since C<2.91>>
 
 =head2 others_inactive
 
-  others_inactive() (ArrayRef)
+  others_inactive() (arrayref)
 
 The others_inactive method returns all L</registrants> other than the current
 process which are inactive, i.e. all other registered process PIDs that do not
@@ -3067,7 +3312,7 @@ I<Since C<2.91>>
 
 =head2 pid
 
-  pid() (Int)
+  pid() (number)
 
 The pid method returns the PID of the current process.
 
@@ -3093,7 +3338,7 @@ I<Since C<2.40>>
 
 =head2 pids
 
-  pids() (ArrayRef)
+  pids() (arrayref)
 
 The pids method returns the PID of the current process, and the PIDs of any
 child processes.
@@ -3138,7 +3383,7 @@ I<Since C<2.40>>
 
 =head2 ping
 
-  ping(Int @pids) (Int)
+  ping(number @pids) (number)
 
 The ping method returns truthy if the process of the PID provided is active. If
 multiple PIDs are provided, this method will return the count of active PIDs.
@@ -3166,7 +3411,7 @@ I<Since C<2.01>>
 
 =head2 poll
 
-  poll(Int $timeout, Str | CodeRef $code, Any @args) (ArrayRef)
+  poll(number $timeout, string | coderef $code, any @args) (arrayref)
 
 The poll method continuously calls the named method or coderef and returns the
 result that's not undefined, or throws an exception on timeout. If no method
@@ -3236,7 +3481,7 @@ I<Since C<2.91>>
 
 =head2 pool
 
-  pool(Int $count, Int $timeout) (Process)
+  pool(number $count, number $timeout) (Venus::Process)
 
 The pool method blocks the execution of the current process until the number of
 L</other> processes are registered and pingable. This method returns the
@@ -3328,7 +3573,7 @@ I<Since C<2.91>>
 
 =head2 ppid
 
-  ppid() (Int)
+  ppid() (number)
 
 The ppid method returns the PID of the parent process (i.e. the process which
 forked the current process, if any).
@@ -3367,7 +3612,7 @@ I<Since C<2.91>>
 
 =head2 prune
 
-  prune() (Process)
+  prune() (Venus::Process)
 
 The prune method removes all stopped processes and returns the invocant.
 
@@ -3440,7 +3685,7 @@ I<Since C<2.40>>
 
 =head2 recall
 
-  recall(Int $pid) (Any)
+  recall(number $pid) (any)
 
 The recall method returns the earliest message, sent by the current process to
 the process specified by the PID provided, which is no longer active (i.e.
@@ -3480,7 +3725,7 @@ I<Since C<2.91>>
 
 =head2 recallall
 
-  recallall() (ArrayRef)
+  recallall() (arrayref)
 
 The recallall method performs a L</recall> on the parent process (if any) via
 L</ppid> and any process listed in the L</watchlist>, and returns the results.
@@ -3527,7 +3772,7 @@ I<Since C<2.91>>
 
 =head2 recv
 
-  recv(Int $pid) (Any)
+  recv(number $pid) (any)
 
 The recv method returns the earliest message found from the process specified
 by the PID provided.
@@ -3586,7 +3831,7 @@ I<Since C<2.91>>
 
 =head2 recvall
 
-  recvall() (ArrayRef)
+  recvall() (arrayref)
 
 The recvall method performs a L</recv> on the parent process (if any) via
 L</ppid> and any process listed in the L</watchlist>, and returns the results.
@@ -3671,7 +3916,7 @@ I<Since C<2.91>>
 
 =head2 register
 
-  register() (Process)
+  register() (Venus::Process)
 
 The register method declares that the process is willing to cooperate with
 others (e.g. L</send> nad L</recv> messages), in a way that's discoverable by
@@ -3697,7 +3942,7 @@ I<Since C<2.91>>
 
 =head2 registrants
 
-  registrants() (ArrayRef)
+  registrants() (arrayref)
 
 The registrants method returns the PIDs for all the processes that registered
 using the L</register> method whether they're currently active or not.
@@ -3736,7 +3981,7 @@ I<Since C<2.91>>
 
 =head2 restart
 
-  restart(CodeRef $callback) (ArrayRef)
+  restart(coderef $callback) (arrayref)
 
 The restart method executes the callback provided for each PID returned by the
 L</stopped> method, passing the pid and the results of L</check> to the
@@ -3771,7 +4016,7 @@ I<Since C<2.40>>
 
 =head2 send
 
-  send(Int $pid, Any $data) (Process)
+  send(number $pid, any $data) (Venus::Process)
 
 The send method makes the data provided available to the process specified by
 the PID provided.
@@ -3828,7 +4073,7 @@ I<Since C<2.91>>
 
 =head2 sendall
 
-  sendall(Any $data) (Process)
+  sendall(any $data) (Venus::Process)
 
 The sendall method performs a L</send> on the parent process (if any) via
 L</ppid> and any process listed in the L</watchlist>, and returns the invocant.
@@ -3869,7 +4114,7 @@ I<Since C<2.91>>
 
 =head2 serve
 
-  serve(Int $count, CodeRef $callback) (Process)
+  serve(number $count, coderef $callback) (Venus::Process)
 
 The serve method executes the callback using L</work> until L</limit> blocks
 the execution of the current process, indefinitely. It has the effect of
@@ -3926,7 +4171,7 @@ I<Since C<3.40>>
 
 =head2 setsid
 
-  setsid() (Int)
+  setsid() (number)
 
 The setsid method calls the L<POSIX/setsid> function and sets the process group
 identifier of the current process.
@@ -3961,7 +4206,7 @@ I<Since C<0.06>>
 
 =head2 started
 
-  started() (ArrayRef)
+  started() (arrayref)
 
 The started method returns a list of PIDs whose processes have been started and
 which have not terminated. Returns a list in list context.
@@ -4004,7 +4249,7 @@ I<Since C<2.40>>
 
 =head2 status
 
-  status(CodeRef $callback) (ArrayRef)
+  status(coderef $callback) (arrayref)
 
 The status method executes the callback provided for each PID in the
 L</watchlist>, passing the pid and the results of L</check> to the callback as
@@ -4086,7 +4331,7 @@ I<Since C<2.40>>
 
 =head2 stderr
 
-  stderr(Str $path) (Process)
+  stderr(string $path) (Venus::Process)
 
 The stderr method redirects C<STDERR> to the path provided, typically
 C</dev/null> or some equivalent. If called with no arguments C<STDERR> will be
@@ -4122,7 +4367,7 @@ I<Since C<0.06>>
 
 =head2 stdin
 
-  stdin(Str $path) (Process)
+  stdin(string $path) (Venus::Process)
 
 The stdin method redirects C<STDIN> to the path provided, typically
 C</dev/null> or some equivalent. If called with no arguments C<STDIN> will be
@@ -4158,7 +4403,7 @@ I<Since C<0.06>>
 
 =head2 stdout
 
-  stdout(Str $path) (Process)
+  stdout(string $path) (Venus::Process)
 
 The stdout method redirects C<STDOUT> to the path provided, typically
 C</dev/null> or some equivalent. If called with no arguments C<STDOUT> will be
@@ -4194,7 +4439,7 @@ I<Since C<0.06>>
 
 =head2 stopped
 
-  stopped() (ArrayRef)
+  stopped() (arrayref)
 
 The stopped method returns a list of PIDs whose processes have terminated.
 Returns a list in list context.
@@ -4237,7 +4482,7 @@ I<Since C<2.40>>
 
 =head2 sync
 
-  sync(Int $count, Int $timeout) (Process)
+  sync(number $count, number $timeout) (Venus::Process)
 
 The sync method blocks the execution of the current process until the number of
 L</other> processes are registered, pingable, and have each sent at-least one
@@ -4340,7 +4585,7 @@ I<Since C<2.91>>
 
 =head2 trap
 
-  trap(Str $name, Str | CodeRef $expr) (Process)
+  trap(string $name, string | coderef $expr) (Venus::Process)
 
 The trap method registers a process signal trap (or callback) which will be
 invoked whenever the current process receives that matching signal. The signal
@@ -4369,7 +4614,7 @@ I<Since C<0.06>>
 
 =head2 unregister
 
-  unregister() (Process)
+  unregister() (Venus::Process)
 
 The unregister method declares that the process is no longer willing to
 cooperate with others (e.g. L</send> nad L</recv> messages), and will no longer
@@ -4395,7 +4640,7 @@ I<Since C<2.91>>
 
 =head2 untrap
 
-  untrap(Str $name) (Process)
+  untrap(string $name) (Venus::Process)
 
 The untrap method restores the process signal trap specified to its default
 behavior. If called with no arguments, it restores all signal traps overwriting
@@ -4439,7 +4684,7 @@ I<Since C<0.06>>
 
 =head2 unwatch
 
-  unwatch(Int @pids) (ArrayRef)
+  unwatch(number @pids) (arrayref)
 
 The unwatch method removes the PIDs provided from the watchlist and returns the
 list of PIDs remaining to be watched. In list context returns a list.
@@ -4502,7 +4747,7 @@ I<Since C<2.40>>
 
 =head2 wait
 
-  wait(Int $pid) (Int, Int)
+  wait(number $pid) (number, number)
 
 The wait method does a blocking L<perlfunc/waitpid> operation and returns the
 wait status. In list context, returns the specified process' exit code (if
@@ -4583,7 +4828,7 @@ I<Since C<0.06>>
 
 =head2 waitall
 
-  waitall(Int @pids) (ArrayRef)
+  waitall(number @pids) (arrayref)
 
 The waitall method does a blocking L</wait> call for all processes based on the
 PIDs provided (or the PIDs returned by L</watchlist> if not provided) and
@@ -4651,7 +4896,7 @@ I<Since C<2.40>>
 
 =head2 watch
 
-  watch(Int @pids) (ArrayRef)
+  watch(number @pids) (arrayref)
 
 The watch method records PIDs to be watched, e.g. using the L</status> method
 and returns all PIDs being watched. Returns a list in list context.
@@ -4744,7 +4989,7 @@ I<Since C<2.40>>
 
 =head2 watchlist
 
-  watchlist() (ArrayRef)
+  watchlist() (arrayref)
 
 The watchlist method returns the recorded PIDs. Returns a list in list context.
 
@@ -4788,7 +5033,7 @@ I<Since C<2.40>>
 
 =head2 work
 
-  work(Str | CodeRef $code, Any @args) (Int)
+  work(string | coderef $code, any @args) (number)
 
 The work method forks the current process, runs the callback provided in the
 child process, and immediately exits after. This method returns the I<PID> of
@@ -4818,7 +5063,7 @@ I<Since C<0.06>>
 
 =head2 works
 
-  works(Int $count, CodeRef $callback, Any @args) (ArrayRef)
+  works(number $count, coderef $callback, any @args) (arrayref)
 
 The works method creates multiple forks by calling the L</work> method C<n>
 times, based on the count specified. The works method runs the callback
@@ -4951,6 +5196,37 @@ B<example 1>
   # my $pid = $error->stash('pid');
 
   # 123
+
+=back
+
+=over 4
+
+=item error: C<error_on_ping>
+
+This package may raise an error_on_ping exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $input = {
+    throw => 'error_on_ping',
+    pid => 123,
+  };
+
+  my $error = $parent->catch('error', $input);
+
+  # my $name = $error->name;
+
+  # "on_ping"
+
+  # my $message = $error->render;
+
+  # "Process 123 not responding to ping"
+
+  # my $pid = $error->stash('pid');
+
+  # "123"
 
 =back
 
@@ -5275,7 +5551,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

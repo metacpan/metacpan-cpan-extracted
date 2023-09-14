@@ -288,6 +288,16 @@ sub _init_bind {
        $self->_log_and_die("Could not instantiate ldap object ($@)");
     }
 
+    $self->rebind($ldap);
+    return $ldap;
+}
+
+sub rebind() {
+
+    my $self = shift;
+    # this as the potential for an inifinte loop so be careful ;)
+    my $ldap = shift || $self->ldap();
+
     my $mesg;
     if (defined $self->binddn()) {
         $self->log()->debug('Binding with ' . $self->binddn());
@@ -308,7 +318,8 @@ sub _init_bind {
     if ($mesg->is_error()) {
         $self->_log_and_die(sprintf("LDAP bind failed with error code %s (error: %s)",  $mesg->code(), $mesg->error_desc()));
     }
-    return $ldap;
+
+    return $mesg;
 }
 
 sub ldap {

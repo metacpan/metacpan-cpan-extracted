@@ -7,32 +7,36 @@ use warnings;
 
 use Venus::Role 'fault';
 
-# AUDIT
-
-sub AUDIT {
-  my ($self, $from) = @_;
-
-  my $name = ref $self || $self;
-
-  if (!$from->can('assertion')) {
-    fault "${from} requires 'assertion' to consume ${name}";
-  }
-
-  return $self;
-}
-
 # METHODS
 
 sub assert {
   my ($self, $data) = @_;
 
-  return $self->assertion->validate($data);
+  return $self->assertion->result($data);
+}
+
+sub assertion {
+  my ($self) = @_;
+
+  require Venus::Assert;
+
+  my $class = ref $self || $self;
+
+  my $assert = Venus::Assert->new($class);
+
+  $assert->match('hashref')->format(sub{
+    $class->new($_)
+  });
+
+  $assert->accept($class);
+
+  return $assert;
 }
 
 sub check {
   my ($self, $data) = @_;
 
-  return $self->assertion->check($data);
+  return $self->assertion->valid($data);
 }
 
 sub coerce {
@@ -46,13 +50,13 @@ sub make {
 
   return UNIVERSAL::isa($data, ref $self || $self)
     ? $data
-    : $self->new($self->assert($self->coerce($data)));
+    : $self->assert($data);
 }
 
 # EXPORTS
 
 sub EXPORT {
-  ['assert', 'check', 'coerce', 'make']
+  ['assert', 'assertion', 'check', 'coerce', 'make']
 }
 
 1;
@@ -81,9 +85,7 @@ Assertable Role for Perl 5
   with 'Venus::Role::Assertable';
 
   sub assertion {
-    Venus::Assert->new('Example')->constraint('object', sub{
-      $_->value->isa('Example')
-    })
+    Venus::Assert->new('Example')->accept('Example')
   }
 
   package main;
@@ -109,7 +111,7 @@ This package provides the following methods:
 
 =head2 assert
 
-  assert(Any $data) (Any)
+  assert(any $data) (any)
 
 The assert method returns the data provided if it passes the registered type
 constraints, or throws an exception.
@@ -126,7 +128,7 @@ I<Since C<1.23>>
 
   my $assert = $example->assert;
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =back
 
@@ -140,7 +142,7 @@ I<Since C<1.23>>
 
   my $assert = $example->assert({});
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =back
 
@@ -162,7 +164,7 @@ I<Since C<1.23>>
 
 =head2 assertion
 
-  assertion() (Assert)
+  assertion() (Venus::Assert)
 
 The assertion method receives no arguments and should returns a
 L<Venus::Assert> object.
@@ -187,7 +189,7 @@ I<Since C<1.23>>
 
 =head2 check
 
-  check(Any $data) (Bool)
+  check(any $data) (boolean)
 
 The check method returns true if the data provided passes the registered type
 constraints, or returns false.
@@ -240,7 +242,7 @@ I<Since C<1.23>>
 
 =head2 coerce
 
-  coerce(Any $data) (Any)
+  coerce(any $data) (any)
 
 The coerce method returns a coerced value if the data provided matches any of
 the registered type coercions, or returns the data provided.
@@ -257,7 +259,7 @@ I<Since C<1.23>>
 
   my $assertion = $example->assertion;
 
-  $assertion->coercion('string', sub{ucfirst(lc($_->value))});
+  $assertion->match('string')->format(sub{ucfirst(lc($_))});
 
   my $coerce = $assertion->coerce;
 
@@ -275,7 +277,7 @@ I<Since C<1.23>>
 
   my $assertion = $example->assertion;
 
-  $assertion->coercion('string', sub{ucfirst(lc($_->value))});
+  $assertion->match('string')->format(sub{ucfirst(lc($_))});
 
   my $coerce = $assertion->coerce({});
 
@@ -293,7 +295,7 @@ I<Since C<1.23>>
 
   my $assertion = $example->assertion;
 
-  $assertion->coercion('string', sub{ucfirst(lc($_->value))});
+  $assertion->match('string')->format(sub{ucfirst(lc($_))});
 
   my $coerce = $assertion->coerce('hello');
 
@@ -305,7 +307,7 @@ I<Since C<1.23>>
 
 =head2 make
 
-  make(Any $data) (Object)
+  make(any $data) (object)
 
 The make method returns an instance of the invocant, if the data provided
 passes the registered type constraints, allowing for any coercion, or throws an
@@ -324,7 +326,7 @@ I<Since C<1.23>>
 
   my $make = $example->make;
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =back
 
@@ -352,7 +354,7 @@ I<Since C<1.23>>
 
   my $make = $example->make({});
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =back
 
@@ -366,7 +368,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

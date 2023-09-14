@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -21,7 +21,7 @@ await $chip->mount(
    $adapter->expect_read( 5 )
       ->returns( "\xC0\x80\x00\x08\x00" );
 
-   is_deeply( await $chip->read_config,
+   is( await $chip->read_config,
       {
          RDY        => 1,
          POR        => 1,

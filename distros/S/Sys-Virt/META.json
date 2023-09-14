@@ -41,7 +41,7 @@
    "provides" : {
       "Sys::Virt" : {
          "file" : "lib/Sys/Virt.pm",
-         "version" : "v9.4.0"
+         "version" : "v9.7.0"
       },
       "Sys::Virt::Domain" : {
          "file" : "lib/Sys/Virt/Domain.pm"
@@ -57,6 +57,9 @@
       },
       "Sys::Virt::Event" : {
          "file" : "lib/Sys/Virt/Event.pm"
+      },
+      "Sys::Virt::EventImpl" : {
+         "file" : "lib/Sys/Virt/EventImpl.pm"
       },
       "Sys::Virt::Interface" : {
          "file" : "lib/Sys/Virt/Interface.pm"
@@ -100,6 +103,6 @@
       },
       "x_MailingList" : "http://www.redhat.com/mailman/listinfo/libvir-list"
    },
-   "version" : "v9.4.0",
+   "version" : "v9.7.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

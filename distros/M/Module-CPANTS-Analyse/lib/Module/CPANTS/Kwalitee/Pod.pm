@@ -5,7 +5,7 @@ use File::Spec::Functions qw/catfile/;
 use Encode;
 use Data::Binary qw/is_binary/;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 $VERSION =~ s/_//; ## no critic
 
 our @ABSTRACT_STUBS = (
@@ -24,18 +24,22 @@ sub order { 100 }
 sub analyse {
     my ($class, $me) = @_;
     my $distdir = $me->distdir;
-    my %abstract;
     my @errors;
-    for my $module (@{$me->d->{modules} || []}) {
-        my ($package, $abstract, $error, $has_binary_data) = $class->_parse_abstract(catfile($distdir, $module->{file}));
-        push @errors, "$error ($package)" if $error;
-        $me->d->{abstracts_in_pod}{$package} = $abstract if $package;
-        $me->d->{files_hash}{$module->{file}}{has_binary_data} = 1 if $has_binary_data;
+
+    my @files = map { $_->{file} } @{$me->d->{modules} || []};
+
+    for my $file (@{$me->d->{files_array} || []}) {
+        # sometimes pod for .pm file is put into .pod
+        # and scripts may have abstract
+        if (
+            ( $file =~ /\.pod$/ && ($file =~ m!^lib/! or $file =~ m!^[^/]+$!) )
+            or $file =~ m!^(?:bin|scripts?)/!
+        ) {
+            push @files, $file;
+        }
     }
 
-    # sometimes pod for .pm file is put into .pod
-    for my $file (@{$me->d->{files_array} || []}) {
-        next unless $file =~ /\.pod$/ && ($file =~ m!^lib/! or $file =~ m!^[^/]+$!);
+    for my $file (@files) {
         local $@;
         my ($package, $abstract, $error, $has_binary_data) = $class->_parse_abstract(catfile($distdir, $file));
         push @errors, "$error ($package)" if $error;

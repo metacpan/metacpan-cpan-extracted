@@ -71,6 +71,12 @@
   <helper>
     <foaf:Person>
       <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@babyl.ca" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
       <foaf:mbox rdf:resource="mailto:yanick@cpan.org" />
     </foaf:Person>
   </helper>
@@ -299,6 +305,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.38</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2016-07-03</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.39</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-08-21</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

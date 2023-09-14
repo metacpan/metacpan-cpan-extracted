@@ -1,0 +1,56 @@
+{
+   "abstract" : "Create barcode image with GD",
+   "author" : [
+      "Kawai Takanori <GCD00051@nifty.ne.jp>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "GD-Barcode",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000060"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mbeijen/GD-Barcode/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/mbeijen/GD-Barcode"
+      }
+   },
+   "version" : "2.00",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

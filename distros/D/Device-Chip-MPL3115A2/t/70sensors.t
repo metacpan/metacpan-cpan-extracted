@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 use Test::ExpectAndCheck::Future 0.02;  # deferred results
 

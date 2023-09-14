@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
     "Data::Structure::Util" => 0,
     "Data::Visitor" => "0.32",
     "Exporter" => "5.57",
-    "List::Util" => "1.33",
+    "List::Util" => "1.45",
     "Moose" => 0,
     "POSIX" => 0,
     "Regexp::Common" => 0,
@@ -73,7 +73,7 @@ my %WriteMakefileArgs = (
     "parent" => 0,
     "vars" => 0
   },
-  "VERSION" => "6.005",
+  "VERSION" => "6.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -102,7 +102,7 @@ my %FallbackPrereqs = (
   "Guard" => 0,
   "Import::Into" => 0,
   "JSON" => 0,
-  "List::Util" => "1.33",
+  "List::Util" => "1.45",
   "Math::BigFloat" => "1.999837",
   "Math::BigInt" => "1.999837",
   "Math::BigRat" => "0.2624",

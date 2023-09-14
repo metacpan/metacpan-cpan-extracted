@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 22-RSA-SHA1.t 1863 2022-03-14 14:59:21Z willem $	-*-perl-*-
+# $Id: 22-RSA-SHA1.t 1937 2023-09-11 09:27:16Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -14,7 +14,7 @@ my %prerequisite = (
 
 foreach my $package ( sort keys %prerequisite ) {
 	my @revision = grep {$_} $prerequisite{$package};
-	next if eval "use $package @revision; 1;";		## no critic
+	next if eval "use $package @revision; 1;";	## no critic
 	plan skip_all => "missing prerequisite $package @revision";
 	exit;
 }
@@ -75,7 +75,7 @@ my $private = Net::DNS::SEC::Private->new($keyfile);
 ok( $private, 'set up RSA private key' );
 
 
-my $sigdata = 'arbitrary data';
+my $sigdata = Net::DNS::RR->new('. TXT arbitrary data')->txtdata;    # character set independent
 my $corrupt = 'corrupted data';
 
 my $signature = $class->sign( $sigdata, $private );

@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -21,7 +21,7 @@ await $chip->mount(
    $adapter->expect_readwrite( "\x00\x00\x00\x00" )
       ->returns( "\x20\x12\x34\x50" );
 
-   is_deeply( await $chip->read_adc,
+   is( await $chip->read_adc,
       {
          EOC => 1,
          EXR => '',

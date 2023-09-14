@@ -1,11 +1,9 @@
 package App::Oozie;
-
+$App::Oozie::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
 use namespace::autoclean -except => [qw/_options_data _options_config/];
-
-our $VERSION = '0.001';
 
 use Moo;
 use MooX::Options prefer_commandline => 0,
@@ -92,7 +90,7 @@ App::Oozie
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 

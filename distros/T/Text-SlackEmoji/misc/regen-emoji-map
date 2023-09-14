@@ -14,6 +14,8 @@ use warnings;
 # perl5280delta - 5.28.0 == Unicode 10   - V10_0
 # perl5300delta - 5.30.0 == Unicode 12.1 - V12_1
 # perl5320delta - 5.32.0 == Unicode 13   - V13_0
+# perl5360delta - 5.36.0 == Unicode 14   - V14_0
+# perl5380delta - 5.38.0 == Unicode 15   - V15_0
 my %min_perl = (
   52  => '5.012',
   60  => '5.014',
@@ -28,7 +30,8 @@ my %min_perl = (
   120 => '5.030',
   121 => '5.030',
   130 => '5.032',
-  140 => '5.035004',
+  140 => '5.036',
+  150 => '5.038',
 );
 
 use HTTP::Tiny;

@@ -7,7 +7,7 @@
 package Perl::Tidy::HtmlWriter;
 use strict;
 use warnings;
-our $VERSION = '20230701';
+our $VERSION = '20230912';
 
 use English qw( -no_match_vars );
 use File::Basename;
@@ -62,7 +62,7 @@ sub AUTOLOAD {
     return if ( $AUTOLOAD =~ /\bDESTROY$/ );
     my ( $pkg, $fname, $lno ) = caller();
     my $my_package = __PACKAGE__;
-    print STDERR <<EOM;
+    print {*STDERR} <<EOM;
 ======================================================================
 Error detected in package '$my_package', version $VERSION
 Received unexpected AUTOLOAD call for sub '$AUTOLOAD'
@@ -102,8 +102,8 @@ sub new {
     my $html_fh;
     ( $html_fh, my $html_filename ) =
       Perl::Tidy::streamhandle( $html_file, 'w' );
-    unless ($html_fh) {
-        Perl::Tidy::Warn("can't open $html_file: $ERRNO\n");
+    if ( !$html_fh ) {
+        Perl::Tidy::Warn("can't open $html_file: $OS_ERROR\n");
         return;
     }
     $html_file_opened = 1;
@@ -159,7 +159,7 @@ PRE_END
     my $toc_filename;
     my $src_filename;
     if ( $rOpts->{'frames'} ) {
-        unless ($extension) {
+        if ( !$extension ) {
             Perl::Tidy::Warn(
 "cannot use frames without a specified output extension; ignoring -frm\n"
             );
@@ -179,7 +179,7 @@ PRE_END
     # ----------------------------------------------------------
 
     my $title = $rOpts->{'title'};
-    unless ($title) {
+    if ( !$title ) {
         ( $title, my $path ) = fileparse($input_file);
     }
     my $toc_item_count = 0;
@@ -208,14 +208,6 @@ PRE_END
         _rlast_level       => \$last_level,         # brace indentation level
     }, $class;
 } ## end sub new
-
-sub close_object {
-    my ($object) = @_;
-
-    # returns true if close works, false if not
-    # failure probably means there is no close method
-    return eval { $object->close(); 1 };
-} ## end sub close_object
 
 sub add_toc_item {
 
@@ -256,7 +248,7 @@ EOM
     };
 
     # start the table of contents on the first item
-    unless ( ${$rtoc_item_count} ) {
+    if ( !${$rtoc_item_count} ) {
 
         # but just quit if we hit EOF without any other entries
         # in this case, there will be no toc
@@ -287,7 +279,7 @@ TOC_END
     # start/stop lists of subs
     if ( $type eq 'sub' ) {
         my $package = $rpackage_stack->[ ${$rlast_level} ];
-        unless ($package) { $package = 'main' }
+        if ( !$package ) { $package = 'main' }
 
         # if we're already in a package/sub list, be sure its the right
         # package or else close it
@@ -296,7 +288,7 @@ TOC_END
         }
 
         # start a package/sub list if necessary
-        unless ( ${$rin_toc_package} ) {
+        if ( !${$rin_toc_package} ) {
             $start_package_list->( $unique_name, $package );
         }
     }
@@ -370,6 +362,7 @@ BEGIN {
 
     # When adding NEW_TOKENS: update this hash table
     # $type => $short_name
+    # c250: changed 'M' to 'S'
     %token_short_names = (
         '#'  => 'c',
         'n'  => 'n',
@@ -390,13 +383,15 @@ BEGIN {
         'f'  => 'sc',
         '('  => 'p',
         ')'  => 'p',
-        'M'  => 'm',
-        'P'  => 'pd',
+        'S'  => 'm',
+        'pd' => 'pd',
         'A'  => 'co',
     );
 
     # These token types will all be called identifiers for now
-    my @identifier = qw< i t U C Y Z G :: CORE::>;
+    # Fix for c250: added new type 'P', formerly 'i'
+    # ( but package statements will eventually be split into 'k' and 'i')
+    my @identifier = qw< i t U C Y Z G P :: CORE::>;
     @token_short_names{@identifier} = ('i') x scalar(@identifier);
 
     # These token types will be called 'structure'
@@ -590,7 +585,7 @@ sub check_options {
         # forgets to specify the style sheet, like this:
         #    perltidy -html -css myfile1.pl myfile2.pl
         # This would cause myfile1.pl to parsed as the style sheet by GetOpts
-        unless ( -e $css_linkname ) {
+        if ( !-e $css_linkname ) {
             write_style_sheet_file($css_linkname);
         }
     }
@@ -601,12 +596,16 @@ sub check_options {
 sub write_style_sheet_file {
 
     my $filename = shift;
-    my $fh;
-    unless ( $fh = IO::File->new("> $filename") ) {
-        Perl::Tidy::Die("can't open $filename: $ERRNO\n");
+    my $fh       = IO::File->new("> $filename");
+    if ( !$fh ) {
+        Perl::Tidy::Die("can't open $filename: $OS_ERROR\n");
     }
     write_style_sheet_data($fh);
-    close_object($fh);
+    if ( $fh->can('close') && $filename ne '-' && !ref($filename) ) {
+        $fh->close()
+          or
+          Perl::Tidy::Warn("can't close style sheet '$filename' : $OS_ERROR\n");
+    }
     return;
 } ## end sub write_style_sheet_file
 
@@ -695,13 +694,13 @@ sub pod_to_html {
     my $success_flag = 0;
 
     # don't try to use pod2html if no pod
-    unless ($pod_string) {
+    if ( !$pod_string ) {
         return $success_flag;
     }
 
     # Pod::Html requires a real temporary filename
     my ( $fh_tmp, $tmpfile ) = File::Temp::tempfile();
-    unless ($fh_tmp) {
+    if ( !$fh_tmp ) {
         Perl::Tidy::Warn(
             "unable to open temporary file $tmpfile; cannot use pod2html\n");
         return $success_flag;
@@ -715,7 +714,12 @@ sub pod_to_html {
 
     # write the pod text to the temporary file
     $fh_tmp->print($pod_string);
-    $fh_tmp->close();
+
+    if ( !$fh_tmp->close() ) {
+        Perl::Tidy::Warn(
+            "unable to close temporary file $tmpfile; cannot use pod2html\n");
+        return $success_flag;
+    }
 
     # Hand off the pod to pod2html.
     # Note that we can use the same temporary filename for input and output
@@ -743,6 +747,9 @@ sub pod_to_html {
                 $kwd =~ s/^pod//;
                 push @args, "--no$kwd";
             }
+            else {
+                ## ok - not defined
+            }
         }
 
         # "flush",
@@ -759,7 +766,7 @@ sub pod_to_html {
         Pod::Html::pod2html(@args);
     }
     $fh_tmp = IO::File->new( $tmpfile, 'r' );
-    unless ($fh_tmp) {
+    if ( !$fh_tmp ) {
 
         # this error shouldn't happen ... we just used this filename
         Perl::Tidy::Warn(
@@ -791,7 +798,7 @@ sub pod_to_html {
         my $date = localtime;
         $timestamp = "on $date";
     }
-    while ( my $line = $fh_tmp->getline() ) {
+    while ( defined( my $line = $fh_tmp->getline() ) ) {
 
         if ( $line =~ /^\s*<html>\s*$/i ) {
             ##my $date = localtime;
@@ -930,7 +937,7 @@ sub pod_to_html {
         elsif ( $line =~ /^\s*<\/body>\s*$/i ) {
             $saw_body_end = 1;
             if ( @{$rpre_string_stack} ) {
-                unless ( $self->{_pod_cut_count} > 1 ) {
+                if ( $self->{_pod_cut_count} <= 1 ) {
                     $html_print->('<hr />');
                 }
                 while ( my $rpre_string = shift( @{$rpre_string_stack} ) ) {
@@ -947,27 +954,29 @@ sub pod_to_html {
     }
 
     $success_flag = 1;
-    unless ($saw_body) {
+    if ( !$saw_body ) {
         Perl::Tidy::Warn("Did not see <body> in pod2html output\n");
         $success_flag = 0;
     }
-    unless ($saw_body_end) {
+    if ( !$saw_body_end ) {
         Perl::Tidy::Warn("Did not see </body> in pod2html output\n");
         $success_flag = 0;
     }
-    unless ($saw_index) {
+    if ( !$saw_index ) {
         Perl::Tidy::Warn("Did not find INDEX END in pod2html output\n");
         $success_flag = 0;
     }
 
-    close_object($html_fh);
+    if ( $html_fh->can('close') ) {
+        $html_fh->close();
+    }
 
     # note that we have to unlink tmpfile before making frames
     # because the tmpfile may be one of the names used for frames
     if ( -e $tmpfile ) {
-        unless ( unlink($tmpfile) ) {
+        if ( !unlink($tmpfile) ) {
             Perl::Tidy::Warn(
-                "couldn't unlink temporary file $tmpfile: $ERRNO\n");
+                "couldn't unlink temporary file $tmpfile: $OS_ERROR\n");
             $success_flag = 0;
         }
     }
@@ -1015,7 +1024,7 @@ sub make_frame {
     # 2. The current .html filename is renamed to be the contents panel
     rename( $html_filename, $src_filename )
       or Perl::Tidy::Die(
-        "Cannot rename $html_filename to $src_filename: $ERRNO\n");
+        "Cannot rename $html_filename to $src_filename: $OS_ERROR\n");
 
     # 3. Then use the original html filename for the frame
     write_frame_html(
@@ -1030,7 +1039,7 @@ sub write_toc_html {
     # write a separate html table of contents file for frames
     my ( $title, $toc_filename, $src_basename, $rtoc, $src_frame_name ) = @_;
     my $fh = IO::File->new( $toc_filename, 'w' )
-      or Perl::Tidy::Die("Cannot open $toc_filename: $ERRNO\n");
+      or Perl::Tidy::Die("Cannot open $toc_filename: $OS_ERROR\n");
     $fh->print(<<EOM);
 <html>
 <head>
@@ -1061,7 +1070,7 @@ sub write_frame_html {
     ) = @_;
 
     my $fh = IO::File->new( $frame_filename, 'w' )
-      or Perl::Tidy::Die("Cannot open $toc_basename: $ERRNO\n");
+      or Perl::Tidy::Die("Cannot open $toc_basename: $OS_ERROR\n");
 
     $fh->print(<<EOM);
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN"
@@ -1127,7 +1136,7 @@ sub change_anchor_names {
             my $post = $5;
             my $href = "$filename#$name";
             $line = "$pre<a href=\"$href\" target=\"$target\">$post\n";
-            unless ($first_anchor) { $first_anchor = $href }
+            if ( !$first_anchor ) { $first_anchor = $href }
         }
     }
     return $first_anchor;
@@ -1149,7 +1158,8 @@ sub close_html_file {
         $html_fh->print( <<"PRE_END");
 </pre>
 PRE_END
-        close_object($html_fh);
+        $html_fh->close()
+          if ( $html_fh->can('close') );
         return;
     }
 
@@ -1172,14 +1182,19 @@ PRE_END
     my $css_string;
     my $fh_css = Perl::Tidy::IOScalar->new( \$css_string, 'w' );
 
-    # use css linked to another file
+    # use css linked to another file,
     if ( $rOpts->{'html-linked-style-sheet'} ) {
         $fh_css->print(
             qq(<link rel="stylesheet" href="$css_linkname" type="text/css" />));
     }
 
-    # use css embedded in this file
-    elsif ( !$rOpts->{'nohtml-style-sheets'} ) {
+    # or no css,
+    elsif ( $rOpts->{'nohtml-style-sheets'} ) {
+
+    }
+
+    # or use css embedded in this file
+    else {
         $fh_css->print( <<'ENDCSS');
 <style type="text/css">
 <!--
@@ -1270,7 +1285,8 @@ END_PRE
 </body>
 </html>
 HTML_END
-    close_object($html_fh);
+    $html_fh->close()
+      if ( $html_fh->can('close') );
 
     if ( $rOpts->{'frames'} ) {
         ##my @toc = map { $_ .= "\n" } split /\n/, ${$rtoc_string};
@@ -1298,14 +1314,14 @@ sub markup_tokens {
         # blocks and go out of scope when we leave the block.
         #-------------------------------------------------------
         if ( $level > ${$rlast_level} ) {
-            unless ( $rpackage_stack->[ $level - 1 ] ) {
+            if ( !$rpackage_stack->[ $level - 1 ] ) {
                 $rpackage_stack->[ $level - 1 ] = 'main';
             }
             $rpackage_stack->[$level] = $rpackage_stack->[ $level - 1 ];
         }
         elsif ( $level < ${$rlast_level} ) {
             my $package = $rpackage_stack->[$level];
-            unless ($package) { $package = 'main' }
+            if ( !$package ) { $package = 'main' }
 
             # if we change packages due to a nesting change, we
             # have to make an entry in the toc
@@ -1313,23 +1329,27 @@ sub markup_tokens {
                 $self->add_toc_item( $package, 'package' );
             }
         }
+        else {
+            ## level unchanged
+        }
         ${$rlast_level} = $level;
 
         #-------------------------------------------------------
         # Intercept a sub name here; split it
         # into keyword 'sub' and sub name; and add an
         # entry in the toc
+        # Fix for c250: switch from 'i' to 'S'
         #-------------------------------------------------------
-        if ( $type eq 'i' && $token =~ /^(sub\s+)(\w.*)$/ ) {
+        if ( $type eq 'S' && $token =~ /^(\w+\s+)(\w.*)$/ ) {
             $token = $self->markup_html_element( $1, 'k' );
             push @colored_tokens, $token;
             $token = $2;
-            $type  = 'M';
+            $type  = 'S';
 
             # but don't include sub declarations in the toc;
             # these will have leading token types 'i;'
             my $signature = join EMPTY_STRING, @{$rtoken_type};
-            unless ( $signature =~ /^i;/ ) {
+            if ( $signature !~ /^i;/ ) {
                 my $subname = $token;
                 $subname =~ s/[\s\(].*$//; # remove any attributes and prototype
                 $self->add_toc_item( $subname, 'sub' );
@@ -1341,7 +1361,8 @@ sub markup_tokens {
         # into keyword 'package' and name; add to the toc,
         # and update the package stack
         #-------------------------------------------------------
-        if ( $type eq 'i' && $token =~ /^(package\s+)(\w.*)$/ ) {
+        # Fix for c250: switch from 'i' to 'P' and allow 'class' or 'package'
+        if ( $type eq 'P' && $token =~ /^(\w+\s+)(\w.*)$/ ) {
             $token = $self->markup_html_element( $1, 'k' );
             push @colored_tokens, $token;
             $token = $2;
@@ -1459,7 +1480,10 @@ sub write_line {
             $self->add_toc_item( '__DATA__', '__DATA__' );
         }
         elsif ( $line_type =~ /^POD/ ) {
-            $line_character = 'P';
+
+            # fix for c250: changed 'P' to 'pd' here and in %token_short_names
+            # to allow use of 'P' as new package token type
+            $line_character = 'pd';
             if ( $rOpts->{'pod2html'} ) {
                 my $html_pod_fh = $self->{_html_pod_fh};
                 if ( $line_type eq 'POD_START' ) {

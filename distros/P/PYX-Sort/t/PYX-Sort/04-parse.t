@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use File::Object;
 use PYX::Sort;
 use Perl6::Slurp qw(slurp);

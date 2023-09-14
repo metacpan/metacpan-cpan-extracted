@@ -9,9 +9,7 @@ BEGIN {
    $ENV{TERM} = "xterm";
 }
 
-use Test::More;
-use Test::HexString;
-use Test::Refcount;
+use Test2::V0 0.000149; # is_refcount
 
 use Tickit::Term qw( TERM_MOUSEMODE_DRAG );
 use Tickit::Pen;
@@ -23,7 +21,7 @@ sub stream_is
 {
    my ( $expect, $name ) = @_;
 
-   is_hexstr( substr( $stream, 0, length $expect, "" ), $expect, $name );
+   is( substr( $stream, 0, length $expect, "" ), $expect, $name );
 }
 
 my $writer = bless [], "TestWriter";
@@ -32,7 +30,7 @@ sub TestWriter::write { $stream .= $_[1] }
 my $term = Tickit::Term->new( writer => $writer );
 $term->set_size( 25, 80 );
 
-isa_ok( $term, "Tickit::Term", '$term isa Tickit::Term' );
+isa_ok( $term, [ "Tickit::Term" ], '$term isa Tickit::Term' );
 
 is( $term->get_output_handle, undef, '$term->get_output_handle undef' );
 
@@ -188,7 +186,7 @@ is_oneref( $writer, '$writer has refcount 1 before EOF' );
 
    my $term = Tickit::Term->new( output_handle => $wr );
 
-   isa_ok( $term, "Tickit::Term", '$term isa Tickit::Term' );
+   isa_ok( $term, [ "Tickit::Term" ], '$term isa Tickit::Term' );
    is( $term->get_output_handle->fileno, $wr->fileno,
       '$term->get_output_handle->fileno is $wr' );
 }

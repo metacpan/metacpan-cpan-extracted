@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Tickit;
@@ -45,9 +45,9 @@ $tickit->bind_key(
 $tickit->run;
 
 use 5.026;
-use Object::Pad 0.22;
+use Object::Pad 0.800;
 
-class CustomRibbon extends Tickit::Widget::Tabbed::Ribbon;
+class CustomRibbon :isa(Tickit::Widget::Tabbed::Ribbon);
 
 use Tickit::Style -copy;
 
@@ -56,7 +56,7 @@ BEGIN {
                 current_fg => 8;
 }
 
-class CustomRibbon::horizontal extends CustomRibbon;
+class CustomRibbon::horizontal :isa(CustomRibbon);
 
 use Tickit::Utils qw( textwidth );
 

@@ -244,7 +244,7 @@ This package provides the following methods:
 
 =head2 eq
 
-  eq(Any $arg) (Bool)
+  eq(any $arg) (boolean)
 
 The eq method performs an I<"equals"> operation using the invocant and the
 argument provided. The operation will be performed as either a numerical or
@@ -299,7 +299,7 @@ I<Since C<0.08>>
 
 =head2 ge
 
-  ge(Any $arg) (Bool)
+  ge(any $arg) (boolean)
 
 The ge method performs a I<"greater-than-or-equal-to"> operation using the
 invocant and argument provided. The operation will be performed as either a
@@ -354,7 +354,7 @@ I<Since C<0.08>>
 
 =head2 gele
 
-  gele(Any $arg1, Any $arg2) (Bool)
+  gele(any $arg1, any $arg2) (boolean)
 
 The gele method performs a I<"greater-than-or-equal-to"> operation on the 1st
 argument, and I<"lesser-than-or-equal-to"> operation on the 2nd argument. The
@@ -410,7 +410,7 @@ I<Since C<0.08>>
 
 =head2 gt
 
-  gt(Any $arg) (Bool)
+  gt(any $arg) (boolean)
 
 The gt method performs a I<"greater-than"> operation using the invocant and
 argument provided. The operation will be performed as either a numerical or
@@ -465,7 +465,7 @@ I<Since C<0.08>>
 
 =head2 gtlt
 
-  gtlt(Any $arg1, Any $arg2) (Bool)
+  gtlt(any $arg1, any $arg2) (boolean)
 
 The gtlt method performs a I<"greater-than"> operation on the 1st argument, and
 I<"lesser-than"> operation on the 2nd argument. The operation will be performed
@@ -520,7 +520,7 @@ I<Since C<0.08>>
 
 =head2 is
 
-  is(Any $arg) (Bool)
+  is(any $arg) (boolean)
 
 The is method performs an I<"is-exactly"> operation using the invocant and the
 argument provided. If the argument provided is blessed and exactly the same as
@@ -575,7 +575,7 @@ I<Since C<1.80>>
 
 =head2 le
 
-  le(Any $arg) (Bool)
+  le(any $arg) (boolean)
 
 The le method performs a I<"lesser-than-or-equal-to"> operation using the
 invocant and argument provided. The operation will be performed as either a
@@ -630,7 +630,7 @@ I<Since C<0.08>>
 
 =head2 lt
 
-  lt(Any $arg) (Bool)
+  lt(any $arg) (boolean)
 
 The lt method performs a I<"lesser-than"> operation using the invocant and
 argument provided. The operation will be performed as either a numerical or
@@ -685,7 +685,7 @@ I<Since C<0.08>>
 
 =head2 ne
 
-  ne(Any $arg) (Bool)
+  ne(any $arg) (boolean)
 
 The ne method performs a I<"not-equal-to"> operation using the invocant and
 argument provided. The operation will be performed as either a numerical or
@@ -740,7 +740,7 @@ I<Since C<0.08>>
 
 =head2 st
 
-  st(Object $arg) (Bool)
+  st(object $arg) (boolean)
 
 The st method performs a I<"same-type"> operation using the invocant and
 argument provided. If the argument provided is an instance of the invocant, or
@@ -818,7 +818,7 @@ I<Since C<1.80>>
 
 =head2 tv
 
-  tv(Any $arg) (Bool)
+  tv(any $arg) (boolean)
 
 The tv method performs a I<"type-and-value-equal-to"> operation using the
 invocant and argument provided. The operation will be performed as either a
@@ -899,7 +899,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

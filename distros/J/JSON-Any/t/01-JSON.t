@@ -1,5 +1,5 @@
 use strict;
-use Test::More;
+use Test::More 0.88;
 use Test::Without::Module qw(JSON::XS);
 
 eval "use JSON::Any qw(JSON)";

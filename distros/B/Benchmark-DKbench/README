@@ -6,7 +6,10 @@ INSTALLATION
 
 Normally you would expect to use a package manager like cpanm to install as:
 
-    cpanm Benchmark::DKbench
+    cpanm -n Benchmark::DKbench
+
+(This assumes you have the perl package App::cpanminus on your system, as well
+as a C/make build environment - e.g. the "build-essential" apt package).
 
 To install this module manually, run the following commands:
 
@@ -15,8 +18,7 @@ To install this module manually, run the following commands:
     make test
     make install
 
-This, however requires certain CPAN modules and libraries (e.g. dev versions of
-libjpeg, libdb) to be installed. See setup_dkbench for more details.
+This, however requires several CPAN modules. See setup_dkbench for more details.
 
 SUPPORT AND DOCUMENTATION
 

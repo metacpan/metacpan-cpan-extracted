@@ -51,7 +51,7 @@ The GNU General Public License, Version 2, June 1991
 =cut 
 
 #run scripts
-&withparameters(@ARGV) if $ARGV[0] =~ /\b(\w+\.\w{1,4})\b/i;
+&withparameters(@ARGV) if $ARGV[0] =~ /\b(\w+\..{1,5})\b/i;
 
 #reload directory configuration
 &reconf() if $ARGV[0] =~ /(--reconf)/;
@@ -66,7 +66,7 @@ sub withparameters {
    die "Error: Invalid parameter, you forgot to load the file extension."
    unless $newfile =~ /(\.\w+)\b/i;
 
-            my $obj = App::FileComposer->new(filename => $newfile);
+            my $obj = App::FileComposer->new($newfile);
             my $source_file = $obj->load(); 
 
             &postmsg($obj->get_sourcePath, $source_file) if $source_file;

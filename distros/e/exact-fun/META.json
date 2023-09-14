@@ -37,7 +37,8 @@
          "requires" : {
             "Class::Method::Modifiers" : "0",
             "Function::Parameters" : "0",
-            "exact" : "1.14",
+            "Import::Into" : "0",
+            "exact" : "1.23",
             "perl" : "5.014"
          }
       },
@@ -66,7 +67,7 @@
          "web" : "https://github.com/gryphonshafer/exact-fun"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_generated_by_perl" : "v5.38.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-2.0"

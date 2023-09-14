@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use bigint;
 use Data::Dumper;
-use Test::More tests => 23;
+use Test::More tests => 26;
 
 use Conf::Libconfig;
 
@@ -143,3 +143,18 @@ is(
         "item test",
     );
 }
+
+is_deeply($foo2->value("conffile_option"),
+	["F", "conffile"],
+	"conffile_option value - status ok",
+);
+
+is_deeply($foo2->fetch_array("includes"),
+	[],
+	"includes value - status ok",
+);
+
+is_deeply($foo2->value("includes"),
+	"",
+	"includes value - status ok",
+);

@@ -1,5 +1,14 @@
 Revision history for Circle-FE-Term
 
+0.232470 2023-09-04
+        [CHANGES]
+         * Updated for Tickit::Widget::Tabbed v0.028; bugfix `tab_position`
+           parameter handling
+         * Use `Syntax::Keyword::Match` instead of `feature 'switch'`
+         * Compress the ribbon labels even further by hiding lower level tabs
+           entirely if there isn't room for all the numbers
+         * General small code style updates and fixes
+
 0.222060 2022-07-26
         [CHANGES]
          * Support -4 and -6 commandline flags to force IPv4/IPv6 connection

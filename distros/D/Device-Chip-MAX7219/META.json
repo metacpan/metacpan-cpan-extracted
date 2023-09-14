@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -23,25 +23,25 @@
          "requires" : {
             "Device::Chip" : "0.03",
             "Future::AsyncAwait" : "0.47",
-            "Object::Pad" : "0.74",
+            "Object::Pad" : "0.800",
             "perl" : "5.026"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Device::Chip::Adapter" : "0",
-            "Test::More" : "0.88"
+            "Test2::V0" : "0",
+            "Test::Device::Chip::Adapter" : "0"
          }
       }
    },
    "provides" : {
       "Device::Chip::MAX7219" : {
          "file" : "lib/Device/Chip/MAX7219.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Device::Chip::MAX7219Panel" : {
          "file" : "lib/Device/Chip/MAX7219Panel.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

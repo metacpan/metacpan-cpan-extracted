@@ -55,7 +55,11 @@ sub _build_version {
 	open my $ffmpeg, "-|", "ffmpeg -version 2>/dev/null";
 	foreach my $line(<$ffmpeg>) {
 		if($line =~ /ffmpeg version ([0-9.]+)/) {
-			return SemVer->new($1);
+			my $ver = $1;
+			while(scalar(split /\./, $ver) < 3) {
+				$ver .= ".0";
+			}
+			return SemVer->new($ver);
 		}
 	}
 }

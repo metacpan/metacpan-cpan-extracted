@@ -6,7 +6,7 @@ use strict;
 use warnings FATAL => 'all';
 no warnings 'recursion';
 
-our $VERSION = q(2.0016);
+our $VERSION = q(2.0017);
 
 use Scalar::Util ();
 
@@ -647,13 +647,13 @@ sub _warnif {
    # to avoid this hack. warnings.pm did not allow us to specify
    # exactly the call frame we want, so we have to look at the bitmask
    # ourselves.
-   if(  vec $bitmask, $warnings'Offsets{$_[0]}, 1,
-     || vec $bitmask, $warnings'Offsets{all}, 1,
+   if(  vec $bitmask, $warnings::Offsets{$_[0]}, 1,
+     || vec $bitmask, $warnings::Offsets{all}, 1,
      ) {
       my $msg = $_[1] =~ /\n\z/ ? $_[1] : "$_[1] at $file line $line.\n";
       die $msg
-       if  vec $bitmask, $warnings'Offsets{$_[0]}+1, 1,
-        || vec $bitmask, $warnings'Offsets{all}+1, 1;
+       if  vec $bitmask, $warnings::Offsets{$_[0]}+1, 1,
+        || vec $bitmask, $warnings::Offsets{all}+1, 1;
       warn $msg;
    }
   }

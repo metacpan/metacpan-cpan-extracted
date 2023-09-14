@@ -42,6 +42,7 @@ GetOptions (
     'repeat|r=i',
     'no_mce|n',
     'sleep=i',
+    'ver=s',
     'setup',
     'datapath=s',
 );
@@ -61,17 +62,18 @@ $opt{threads} = 1 if ($opt{threads} && $opt{threads} < 0) || $opt{no_mce};
 my $mce = $opt{no_mce} ? 'no MCE' :'MCE';
 
 if ($opt{threads} || !$max_threads || $max_threads == 1) {
+    $opt{threads} ||= 1;
     print "DKbench threads: $opt{threads} (".($opt{no_mce} ? 'no ':'')."MCE)\n";
     suite_run(\%opt);
 } else {
     print "DKbench single-thread run:\n";
     $opt{threads} = 1;
     my %stat1 = suite_run(\%opt);
-    print (("-"x34)."\n");
+    print (("-"x40)."\n");
     print "DKbench multi-thread run ($max_threads threads):\n";
     $opt{threads} = $max_threads;
     my %stat2 = suite_run(\%opt);
-    print (("-"x34)."\n");
+    print (("-"x40)."\n");
     calc_scalability(\%opt, \%stat1, \%stat2);
 }
 
@@ -82,33 +84,33 @@ sub check_kit {
     my %mod_ver = Benchmark::DKbench::Setup::cpan_versions();
 
     foreach my $module (sort keys %mod_ver) {
-        next if $opt{skip_bio} && $module =~ /Bio::/;
+        next if $opt{skip_bio} && $module =~ /^Bio/;
         eval "use $module";
         my $ver = eval "\$${module}::VERSION" || 'none';
         unless ($ver eq $mod_ver{$module}) {
             my $msg = "! $module $mod_ver{$module} recommended as a comparison base ($ver found).";
             $msg .= " Older installed versions may cause issues to benchmarks."
                 if $mod_ver{$module} cmp $ver; # $ver is less
-            if ($module =~ /Bio::/ && $ver eq 'none') {
+            if ($module =~ /^Bio/ && $ver eq 'none') {
                 $opt{skip_bio}   = 1;
                 $opt{bio_codons} = 0;
-                $msg = "! BioPerl not found. You can install it to enable the BioPerl benchmarks.\n...applying --skip_bio.\n";
+                $msg = "* BioPerl not found. You can install it to enable the optional BioPerl benchmarks.\n...applying --skip_bio.\n";
             }
             warn "$msg\n";
         }
     }
 
-    my $datadir = Benchmark::DKbench::Setup::datadir();
-    die "!! No ditribution data found (expected at $datadir). Refer to documentation for installation etc.\n" unless $datadir && -f catfile($datadir, "wiki0.html") && -f catfile($datadir, "M31.jpg");
+    my $datadir = $opt{datapath} || Benchmark::DKbench::Setup::datadir();
+    die "!! No distribution data found (expected at $datadir). You could define a different data directory (containing M31.bmp, wikiX.html etc) with the -datapath option. Refer to the documentation for more about installation etc.\n" unless $datadir && -f catfile($datadir, "wiki0.html") && -f catfile($datadir, "M31.bmp");
 
     unless ($opt{skip_prove} || -e catfile($datadir, 't', 'recipes')) {
         $opt{skip_proove} = 1;
         warn "!! Moose test data folder not found. Was the distribution not installed properly? Applying --skip-prove.\n";
     }
 
-    unless ($opt{skip_bio} || Benchmark::DKbench::Setup::has_genbank()) {
+    unless ($opt{skip_bio} || Benchmark::DKbench::Setup::has_genbank($opt{datapath})) {
         $opt{skip_bio} = 1;
-        warn "!! gbbct5.seq missing, applying --skip_bio. Use --setup to fetch (or setup_dkbench.pl).\n";
+        warn "!! gbbct5.seq missing, applying --skip_bio. Use --setup to fetch (or setup_dkbench).\n";
     }
 
     if (!$opt{skip_timep} && $^O =~ /darwin/ && !$opt{no_mce}) {

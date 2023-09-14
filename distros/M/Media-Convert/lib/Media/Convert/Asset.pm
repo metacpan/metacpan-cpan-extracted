@@ -7,6 +7,7 @@ use v5.24;
 our $VERSION;
 
 use Media::Convert;
+use Carp;
 
 =head1 NAME
 
@@ -145,7 +146,27 @@ sub _probe_duration {
 	if($self->has_reference) {
 		return $self->reference->duration;
 	}
-	return $self->_get_probedata->{format}{duration};
+	if($self->duration_style eq "seconds") {
+		return $self->_get_probedata->{format}{duration};
+	} else {
+		return $self->duration_frames;
+	}
+}
+
+=head2 duration_frames
+
+The number of frames in this asset.
+
+=cut
+
+has 'duration_frames' => (
+	is => 'rw',
+	builder => '_probe_duration_frames',
+	lazy => 1,
+);
+
+sub _probe_duration_frames {
+	return shift->_get_videodata->{duration_ts};
 }
 
 =head2 duration_style
@@ -153,11 +174,19 @@ sub _probe_duration {
 The time unit is used for the C<duration> attribute. One of 'seconds'
 (default) or 'frames'. Will not be probed.
 
+Deprecated; will be removed in a future release. Use duration_frames
+instead of setting this to a non-default value.
+
 =cut
+
+sub _warn_duration {
+	carp "setting duration_style is deprecated. Rather use duration_frames."
+}
 
 has 'duration_style' => (
 	is => 'rw',
 	default => 'seconds',
+	trigger => \&_warn_duration,
 );
 
 =head2 video_codec
@@ -840,6 +869,8 @@ sub writeopts {
 		} else {
 			push @opts, ('-frames:v', $self->duration);
 		}
+	} elsif(defined($self->duration_frames)) {
+		push @opts, ('-frames:v', $self->duration_frames);
 	}
 	if(defined($self->pix_fmt)) {
 		push @opts, ('-pix_fmt', $self->pix_fmt);

@@ -1,0 +1,86 @@
+NAME
+    Sort::Sub::by_spec - Sort by spec
+
+VERSION
+    This document describes version 0.002 of Sort::Sub::by_spec (from Perl
+    distribution Sort-Sub-by_spec), released on 2023-09-06.
+
+SYNOPSIS
+    Generate sorter (accessed as variable) via Sort::Sub import:
+
+     use Sort::Sub '$by_spec'; # use '$by_spec<i>' for case-insensitive sorting, '$by_spec<r>' for reverse sorting
+     my @sorted = sort $by_spec ('item', ...);
+
+    Generate sorter (accessed as subroutine):
+
+     use Sort::Sub 'by_spec<ir>';
+     my @sorted = sort {by_spec} ('item', ...);
+
+    Generate directly without Sort::Sub:
+
+     use Sort::Sub::by_spec;
+     my $sorter = Sort::Sub::by_spec::gen_sorter(
+         ci => 1,      # default 0, set 1 to sort case-insensitively
+         reverse => 1, # default 0, set 1 to sort in reverse order
+     );
+     my @sorted = sort $sorter ('item', ...);
+
+    Use in shell/CLI with sortsub (from App::sortsub):
+
+     % some-cmd | sortsub by_spec
+     % some-cmd | sortsub by_spec --ignore-case -r
+
+DESCRIPTION
+SORT ARGUMENTS
+    "*" marks required arguments.
+
+  spec*
+    any.
+
+    Either an array of str|re|code's or a code that returns the former.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sort-Sub-by_spec>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Sort-Sub-by_spec>.
+
+SEE ALSO
+    Sort::BySpec
+
+    Sort::Sub
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sort-Sub-by_spec>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

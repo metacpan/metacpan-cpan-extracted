@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( threads recursion uninitialized );
 
-our $VERSION = '1.888';
+our $VERSION = '1.889';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -629,8 +629,9 @@ sub spawn {
    MCE::Util::_sock_pair($self, qw(_dat_r_sock _dat_w_sock), $_, 1)
       for (1 .. $_data_channels);
 
-   setsockopt($self->{_dat_r_sock}->[0], SOL_SOCKET, SO_RCVBUF, pack('i', 4096))
-      if ($^O ne 'aix' && $^O ne 'linux');
+   if ($^O !~ /linux|android|aix/) {
+      setsockopt($self->{_dat_r_sock}->[0], SOL_SOCKET, SO_RCVBUF, pack('i', 4096));
+   }
 
    if (defined $self->{init_relay}) {                               # relay
       unless ($INC{'MCE/Relay.pm'}) {

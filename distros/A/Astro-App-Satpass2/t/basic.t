@@ -5,6 +5,10 @@ use warnings;
 
 use Test::More 0.88;
 
+use lib 'inc';
+
+use My::Module::Test::Mock_App;
+
 delete $ENV{TZ};
 
 my @copier_methods =
@@ -24,6 +28,8 @@ my @geocode_methods = ( @copier_methods,
 my @parse_time_methods = ( @copier_methods,
     qw{ new base config delegate decode parse parse_time_absolute reset
     tz use_perltime } );
+
+my $app = My::Module::Test::Mock_App->new();
 
 defined $ENV{TZ}
     and diag "\$ENV{TZ} is '$ENV{TZ}'";
@@ -213,7 +219,11 @@ require_ok 'Astro::App::Satpass2::Format::Dump'
 isa_ok 'Astro::App::Satpass2::Format::Dump', 'Astro::App::Satpass2::Format'
     or BAIL_OUT;
 
-instantiate( 'Astro::App::Satpass2::Format::Dump' )
+instantiate(
+    'Astro::App::Satpass2::Format::Dump',
+    parent	=> $app,
+    'Astro::App::Satpass2::Format',
+)
     or BAIL_OUT;
 
 can_ok 'Astro::App::Satpass2::Format::Dump', @format_methods
@@ -238,7 +248,11 @@ isa_ok 'Astro::App::Satpass2::Format::Template',
 can_ok 'Astro::App::Satpass2::Format', @format_methods
     or BAIL_OUT;
 
-instantiate( 'Astro::App::Satpass2::Format::Template' )
+instantiate(
+    'Astro::App::Satpass2::Format::Template',
+    parent	=> $app,
+    'Astro::App::Satpass2::Format',
+)
     or BAIL_OUT;
 
 require_ok 'Astro::App::Satpass2::ParseTime'

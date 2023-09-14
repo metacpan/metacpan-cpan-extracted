@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20230614174403;
+our $VERSION = 1.20230903131447;
 
 my $formatters = [
                 {
@@ -93,26 +93,26 @@ my $validators = {
                 'voip' => '9[17]0\\d{6}'
               };
 my %areanames = ();
-$areanames{en} = {"42046", "Pardubice\ Region",
-"42039", "South\ Bohemian\ Region",
-"42038", "South\ Bohemian\ Region",
-"42057", "Zlín\ Region",
-"42041", "Ústí\ nad\ Labem\ Region",
-"42059", "Moravian\-Silesian\ Region",
-"42058", "Olomouc\ Region",
-"42037", "Plzeň\ Region",
-"42031", "Central\ Bohemian\ Region",
-"4202", "Prague",
-"42056", "Vysočina\ Region",
-"42053", "South\ Moravian\ Region",
-"42047", "Ústí\ nad\ Labem\ Region",
-"42032", "Central\ Bohemian\ Region",
-"42055", "Moravian\-Silesian\ Region",
-"42049", "Hradec\ Králové\ Region",
-"42051", "South\ Moravian\ Region",
+$areanames{en} = {"42037", "Plzeň\ Region",
 "42054", "South\ Moravian\ Region",
+"42047", "Ústí\ nad\ Labem\ Region",
 "42035", "Karlovy\ Vary\ Region",
-"42048", "Liberec\ Region",};
+"42055", "Moravian\-Silesian\ Region",
+"42057", "Zlín\ Region",
+"42053", "South\ Moravian\ Region",
+"4202", "Prague",
+"42048", "Liberec\ Region",
+"42051", "South\ Moravian\ Region",
+"42038", "South\ Bohemian\ Region",
+"42046", "Pardubice\ Region",
+"42059", "Moravian\-Silesian\ Region",
+"42039", "South\ Bohemian\ Region",
+"42058", "Olomouc\ Region",
+"42031", "Central\ Bohemian\ Region",
+"42041", "Ústí\ nad\ Labem\ Region",
+"42056", "Vysočina\ Region",
+"42049", "Hradec\ Králové\ Region",
+"42032", "Central\ Bohemian\ Region",};
 
     sub new {
       my $class = shift;

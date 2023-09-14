@@ -8,7 +8,7 @@ use Test::More;
 use English qw(-no_match_vars);
 
 BEGIN {
-    use_ok 'JIP::Spy::Event', 'v0.0.4';
+    use_ok 'JIP::Spy::Event';
 }
 
 subtest 'Require some module' => sub {

@@ -27,5 +27,5 @@ resources:
   bugtracker: https://github.com/outtaspace/jip_datapath/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/outtaspace/jip_datapath.git
-version: '0.043'
+version: '0.044'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

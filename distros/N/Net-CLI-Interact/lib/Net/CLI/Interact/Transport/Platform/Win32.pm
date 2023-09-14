@@ -1,6 +1,5 @@
 package Net::CLI::Interact::Transport::Platform::Win32;
-{ $Net::CLI::Interact::Transport::Platform::Win32::VERSION = '2.400000' }
-
+$Net::CLI::Interact::Transport::Platform::Win32::VERSION = '2.400002';
 use Moo;
 extends 'Net::CLI::Interact::Transport::Wrapper::IPC_Run';
 
@@ -10,5 +9,9 @@ extends 'Net::CLI::Interact::Transport::Wrapper::IPC_Run';
     use Moo;
     extends 'Net::CLI::Interact::Transport::Wrapper::Options';
 }
+
+=pod
+
+=cut
 
 1;

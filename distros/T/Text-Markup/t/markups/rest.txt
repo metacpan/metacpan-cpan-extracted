@@ -7,7 +7,7 @@ And I am its subtitle
 Rest__ allows *inline* **style** and other stuff,
 but I guess this ``code`` is enough.
 
-.. __: http://docutils.sourceforge.net/
+.. __: https://docutils.sourceforge.io
 
 .. unknown:: arg1 arg2
     :option: foo

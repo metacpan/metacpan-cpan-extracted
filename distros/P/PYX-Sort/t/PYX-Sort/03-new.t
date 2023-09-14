@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use English qw(-no_match_vars);
 use PYX::Sort;
 use Test::More 'tests' => 4;

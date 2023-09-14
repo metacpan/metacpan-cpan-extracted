@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -44,7 +44,7 @@ await $chip->mount(
    $adapter->expect_write_then_read( "\xFF", 6 )
       ->returns( "ABCD\x30\xA0" );
 
-   is_deeply( await $chip->receive,
+   is( await $chip->receive,
       {
          data   => "ABCD",
          CRC_OK => 1,
@@ -77,7 +77,7 @@ await $chip->mount(
    $adapter->expect_write_then_read( "\xFF", 6 )
       ->returns( "EFGH\x32\xA1" );
 
-   is_deeply( await $chip->receive,
+   is( await $chip->receive,
       {
          data   => "EFGH",
          CRC_OK => 1,

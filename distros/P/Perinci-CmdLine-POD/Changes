@@ -1,3 +1,10 @@
+0.039   2023-07-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Remove usage of smartmatch.
+
+        - Return usage in func.usage also so it can be used separately.
+
+
 0.038   2022-10-27  Released-By: PERLANCAR; Urgency: medium
 
         - In showing examples, Replace *all* occurrences of '[[prog]]'

@@ -3,33 +3,38 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Tickit::RectSet;
 
 use Tickit::Rect;
+
+sub rect
+{
+   return Test2::V0::string(Tickit::Rect->new( @_ ) );
+}
 
 # Distinct regions
 {
    my $rectset = Tickit::RectSet->new;
 
    ok( defined $rectset, '$rectset defined' );
-   isa_ok( $rectset, "Tickit::RectSet", '$rectset isa Tickit::RectSet' );
+   isa_ok( $rectset, [ "Tickit::RectSet" ], '$rectset isa Tickit::RectSet' );
 
    is( scalar $rectset->rects, 0, '$rectset initially empty' );
 
    $rectset->add( Tickit::Rect->new( top => 10, left => 10, lines => 5, cols => 20 ) );
 
-   is_deeply( [ $rectset->rects ],
-              [ Tickit::Rect->new( top => 10, left => 10, lines => 5, cols => 20 ) ],
-              '$rectset contains 1 rect after first add' );
+   is( [ $rectset->rects ],
+       [ rect( top => 10, left => 10, lines => 5, cols => 20 ) ],
+       '$rectset contains 1 rect after first add' );
 
    $rectset->add( Tickit::Rect->new( top => 20, left => 10, lines => 2, cols => 20 ) );
 
-   is_deeply( [ $rectset->rects ],
-              [ Tickit::Rect->new( top => 10, left => 10, lines => 5, cols => 20 ),
-                Tickit::Rect->new( top => 20, left => 10, lines => 2, cols => 20 ) ],
-              '$rectset contains 2 rects after second add' );
+   is( [ $rectset->rects ],
+       [ rect( top => 10, left => 10, lines => 5, cols => 20 ),
+         rect( top => 20, left => 10, lines => 2, cols => 20 ) ],
+       '$rectset contains 2 rects after second add' );
 
    $rectset->clear;
 
@@ -73,25 +78,25 @@ while( <DATA> ) {
    my @input = split m/\s+/, $input;
    my $method = shift @input;
    my @inputrects  = map _newrect($_), @input;
-   my @outputrects = map _newrect($_), split m/\s+/, $output;
+   my @outputrects = map string(_newrect($_)), split m/\s+/, $output;
 
    if( $method eq "add" ) {
       my $rectset = Tickit::RectSet->new;
       $rectset->add( $_ ) for @inputrects;
 
-      is_deeply( [ $rectset->rects ], \@outputrects, "Output for $name $input" );
+      is( [ $rectset->rects ], \@outputrects, "Output for $name $input" );
 
       $rectset = Tickit::RectSet->new;
       $rectset->add( $_ ) for reverse @inputrects;
 
-      is_deeply( [ $rectset->rects ], \@outputrects, "Output for $name $input reversed" );
+      is( [ $rectset->rects ], \@outputrects, "Output for $name $input reversed" );
    }
    if( $method eq "subtract" ) {
       my $rectset = Tickit::RectSet->new;
       $rectset->add( shift @inputrects );
       $rectset->subtract( $_ ) for @inputrects;
 
-      is_deeply( [ $rectset->rects ], \@outputrects, "Output for $name $input" );
+      is( [ $rectset->rects ], \@outputrects, "Output for $name $input" );
    }
 }
 

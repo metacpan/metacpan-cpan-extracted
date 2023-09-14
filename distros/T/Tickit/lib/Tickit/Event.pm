@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2016 -- leonerd@leonerd.org.uk
 
-package Tickit::Event 0.73;
+package Tickit::Event 0.74;
 
 use v5.14;
 use warnings;
@@ -96,6 +96,28 @@ A dualvar giving the key event type as an integer or string event name (C<text> 
 =head2 str
 
 A string containing the key event string.
+
+Printing keys besides Space (letters, numbers, symbols) are encoded as a
+single-character string. Numbered function keys are named C<F1>, C<F2>, etc...
+Other non-printing keys such as arrows, cursor control, and Space use a
+multi-character name taken from a list of known names, which includes:
+
+   Backspace  Tab  Enter  Escape  Space
+   Up  Down  Left  Right
+   Insert  Delete  PageUp  PageDown  Home  End
+
+Modifiers are prefixed onto this string with a hyphen each; C<M-> for Meta
+(or Alt), C<C-> for Control and C<S-> for Shift. Printing keys will never
+include a Shift modifier; non-printing keys might.
+
+For example,
+
+   a
+   Space
+   C-b
+   C-Enter
+   M-S-Left
+   S-Backspace
 
 =head2 mod
 

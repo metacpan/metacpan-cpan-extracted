@@ -8,7 +8,7 @@
 package Perl::Tidy::Logger;
 use strict;
 use warnings;
-our $VERSION = '20230701';
+our $VERSION = '20230912';
 use English qw( -no_match_vars );
 
 use constant DEVEL_MODE   => 0;
@@ -24,7 +24,7 @@ sub AUTOLOAD {
     return if ( $AUTOLOAD =~ /\bDESTROY$/ );
     my ( $pkg, $fname, $lno ) = caller();
     my $my_package = __PACKAGE__;
-    print STDERR <<EOM;
+    print {*STDERR} <<EOM;
 ======================================================================
 Error detected in package '$my_package', version $VERSION
 Received unexpected AUTOLOAD call for sub '$AUTOLOAD'
@@ -68,11 +68,11 @@ sub new {
     my $fh_warnings = $rOpts->{'standard-error-output'} ? $fh_stderr : undef;
 
     # remove any old error output file if we might write a new one
-    unless ( $fh_warnings || ref($warning_file) ) {
+    if ( !$fh_warnings && !ref($warning_file) ) {
         if ( -e $warning_file ) {
             unlink($warning_file)
               or Perl::Tidy::Die(
-                "couldn't unlink warning file $warning_file: $ERRNO\n");
+                "couldn't unlink warning file $warning_file: $OS_ERROR\n");
         }
     }
 
@@ -161,7 +161,7 @@ sub resume_logfile {
 
 sub we_are_at_the_last_line {
     my $self = shift;
-    unless ( $self->{_wrote_line_information_string} ) {
+    if ( !$self->{_wrote_line_information_string} ) {
         $self->write_logfile_entry("Last line\n\n");
     }
     $self->{_at_end_of_file} = 1;
@@ -375,7 +375,7 @@ sub warning {
     Perl::Tidy::Warn_count_bump();
 
     my $rOpts = $self->{_rOpts};
-    unless ( $rOpts->{'quiet'} ) {
+    if ( !$rOpts->{'quiet'} ) {
 
         my $warning_count   = $self->{_warning_count};
         my $fh_warnings     = $self->{_fh_warnings};
@@ -385,7 +385,7 @@ sub warning {
             ( $fh_warnings, my $filename ) =
               Perl::Tidy::streamhandle( $warning_file, 'w', $is_encoded_data );
             $fh_warnings
-              or Perl::Tidy::Die("couldn't open $filename: $ERRNO\n");
+              or Perl::Tidy::Die("couldn't open $filename: $OS_ERROR\n");
             Perl::Tidy::Warn_msg("## Please see file $filename\n")
               unless ref($warning_file);
             $self->{_fh_warnings} = $fh_warnings;
@@ -506,11 +506,13 @@ sub finish {
         if ($fh) {
             my $routput_array = $self->{_output_array};
             foreach my $line ( @{$routput_array} ) { $fh->print($line) }
-            if ( $log_file ne '-' && !ref $log_file ) {
-                my $ok = eval { $fh->close(); 1 };
-                if ( !$ok && DEVEL_MODE ) {
-                    Fault("Could not close file handle(): $EVAL_ERROR\n");
-                }
+            if (   $fh->can('close')
+                && !ref($log_file) ne '-'
+                && $log_file ne '-' )
+            {
+                $fh->close()
+                  or Perl::Tidy::Warn(
+                    "Error closing LOG file '$log_file': $OS_ERROR\n");
             }
         }
     }

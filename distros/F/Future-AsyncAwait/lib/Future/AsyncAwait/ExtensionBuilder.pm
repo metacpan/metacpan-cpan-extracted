@@ -3,14 +3,14 @@
 #
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait::ExtensionBuilder 0.65;
+package Future::AsyncAwait::ExtensionBuilder 0.66;
 
 use v5.14;
 use warnings;
 
 =head1 NAME
 
-C<Future::AsyncAwait::ExtensonBuilder> - build-time support for extensions to C<Future::AsyncAwait>
+C<Future::AsyncAwait::ExtensionBuilder> - build-time support for extensions to C<Future::AsyncAwait>
 
 =head1 SYNOPSIS
 

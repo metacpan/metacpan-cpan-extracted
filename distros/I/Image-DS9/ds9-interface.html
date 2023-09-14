@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>ds9-interface.html</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+
+</head>
+
+<body>
+
+<h1>Language agnostic encoding of the DS9 client API</h1>
+
+<h2>RPC Transport protocols</h2>
+
+<p>DS9 supports two RPC transport protocols: XPA and SAMP.  XPA is
+supported via a C library or via executable programs.</p>
+
+<h2>Command Syntax</h2>
+
+<p>The native ds9 API resembles most a free-formatted string based
+command line interface.  The syntax takes the following form</p>
+
+<blockquote>
+<pre><code>command [&lt;subcommand&gt;] [&lt;arguments&gt;]
+</code></pre>
+</blockquote>
+
+<p>A subcommand may consist of multiple tokens, e.g.the <code>regions</code> command
+has a <code>load all</code> subcommand.</p>
+
+<p>Arguments are typically positional, but some commands may use named arguments.
+Positional arguments may be variable or constants, e.g. in the <code>regions</code> command</p>
+
+<blockquote>
+  <p>regions template foo.tpl at 13:29:55.92 +47:12:48.02 fk5</p>
+</blockquote>
+
+<p>The token <code>at</code> is a constant string, while <code>foo.tpl</code>, <code>13:29:55.92</code>,
+<code>+47:12:48.02</code>, and <code>fk5</code> are variable.</p>
+
+<p>Named arguments consist of <em>name - value</em> pairs with no required order
+between the arguments.  For example,</p>
+
+<blockquote>
+<pre><code>regions -format ds9 -system wcs -sky fk5 -skyformat sexagesimal -prop edit 1 -group foo
+</code></pre>
+</blockquote>
+
+<p>In some cases, the named arguments are embedded in a single token,
+e.g. for the <code>array</code> command,</p>
+
+<blockquote>
+<pre><code>array foo.arr[dim=512,bitpix=-32,endian=little]
+</code></pre>
+</blockquote>
+
+<p>Some named arguments exclude others and require others. For example,
+the <code>array</code> command's <code>xdim</code> and <code>ydim</code> arguments must appear together, but must not appear with <code>dims</code>.</p>
+
+<h2>Data Serialization</h2>
+
+<p>Most data sent to and received from DS9 is encoded as free-form ASCII
+text. When communicating with DS9 via XPA, certain commands accept or
+send binary encoded data through a separate channel.</p>
+
+<p>In most cases, outgoing and incoming data for a command share the same
+format.</p>
+
+<h2>Client Interface</h2>
+
+<p>Client support for the DS9 API should include data validation,
+serialization and unserialization of data and error reporting</p>
+
+<p>Mapping the components onto a native language binding should not
+necessarily follow the native DS9 syntax, as that may be an unnatural
+fit for the language.  For example, client code may prefer to use
+different combinations of positional and named parameters.  For
+example, the above <code>array</code> command might be coded in Perl as:</p>
+
+<blockquote>
+<pre><code>$ds9-&gt;array( file =&gt; $file, dim =&gt; 512, bitpix =&gt; -32, endian =&gt; 'little' );
+</code></pre>
+</blockquote>
+
+<p>Additionally, some languages provide type conversions which would allow, for instance,
+conversion between real numbers and sexagesimal coordinate notation.</p>
+
+<p>Building interfaces for multiple languages, requires a machine
+readable, language agnostic API specification. DS9 itself uses
+generated lexer and parser Tcl code to interpret commands sent to it.
+The parser and lexer specifications are in a proprietary DSL and
+include Tcl code specific to DS9's internals, so are not easily
+converted into a more generic grammar specification.</p>
+
+<p>Of late encoding of HTTP REST API's has become commonplace via the
+OpenAPI Specification (OAS) and RAML initiatives. These encode API
+endpoints (<em>paths</em>), parameters and results as <code>YAML</code> or <code>JSON</code> data
+structures (<code>RAML</code> only uses <code>YAML</code>).  Parameters and results may have
+complex structures with types specified by<code>JSON</code> schema. 
+As most languages in current use have some form of <code>JSON
+Schema</code> validation, this provides a simple path to client-side parameter validation.
+Tools exist to validate an API description, and to create test servers
+and clients to evaluate it.</p>
+
+<p>There are a few disadvantages of these specifications.</p>
+
+<ol>
+<li>Code generators for client support assume HTTP transport.  DS9 has three methods for transport.</li>
+<li>The specifications are designed for the HTTP protocol, and explicitly follow its structure, e.g., responses categories are identified by HTTP error codes.</li>
+</ol>
+
+</body>
+</html>

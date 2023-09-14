@@ -5,9 +5,9 @@ use strict;
 
 use Number::Phone;
 
-our $VERSION = "2.0001";
+our $VERSION = "2.0002";
 
-use DBM::Deep;
+use Data::CompactReadonly;
 use File::ShareDir;
 
 my $file = Number::Phone::_find_data_file('Number-Phone-UK-Data.db');
@@ -22,8 +22,7 @@ sub db {
         # we want to re-open the DB if we've forked, because of
         # https://github.com/DrHyde/perl-modules-Number-Phone/issues/72
         $pid = $$;
-        open(my $ro_fh, '<:bytes', $file) || die(__PACKAGE__.": can't open $file: $!\n");
-        $db = DBM::Deep->new(fh => $ro_fh);
+        $db = Data::CompactReadonly->read($file, tie => 1, fast_collections => 1);
     }
     return $db
 }

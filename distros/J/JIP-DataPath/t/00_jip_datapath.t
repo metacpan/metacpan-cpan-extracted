@@ -14,7 +14,7 @@ use English qw(-no_match_vars);
 BEGIN {
     plan tests => 13;
 
-    use_ok 'JIP::DataPath', '0.043';
+    use_ok 'JIP::DataPath';
 }
 
 subtest 'Require some module' => sub {

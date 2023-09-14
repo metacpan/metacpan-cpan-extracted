@@ -1,0 +1,39 @@
+{
+   "abstract" : "Find Smallest Set of Smallest Rings in graphs",
+   "author" : [
+      "Andrius Merkys <merkys@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Graph-SSSR",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/merkys/graph-sssr/issues"
+      },
+      "homepage" : "https://search.cpan.org/dist/Graph-SSSR",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/merkys/graph-sssr.git",
+         "web" : "https://github.com/merkys/graph-sssr"
+      }
+   },
+   "version" : "0.1.0",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+}
+

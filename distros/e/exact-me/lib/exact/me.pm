@@ -3,13 +3,12 @@ package exact::me;
 
 use 5.014;
 use exact;
-use strict;
 use FindBin;
 
-our $VERSION = '1.04'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 sub import {
-    my ( $self, $caller ) = @_;
+    my ( $self, $params, $caller ) = @_;
     $caller //= caller();
 
     {
@@ -61,7 +60,7 @@ exact::me - Original program path locations extension for exact
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =for markdown [![test](https://github.com/gryphonshafer/exact-me/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-me/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact-me/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-me)

@@ -1,5 +1,9 @@
 Revision history for JSON-Any
 
+1.40      2023-09-09 21:59:01Z
+    - fix issues on perl 5.39.1 with 'import' subs
+    - added support for JSON v3, v4, JSON::XS v4
+
 1.39      2015-06-10 04:37:49Z
     - mark this distribution as deprecated in metadata
     - drop dependency on namespace::clean

@@ -6,13 +6,21 @@
 
     sudo cpanm Net::Async::DigitalOcean
 
+=item * installation via Github export
+
+    git clone git@github.com:drrrho/net-async-digitalocean-perl.git
+    cd net-async-digitalocean-perl/
+    perl Build.PL
+    sudo ./Build installdeps --cpan_client 'cpan -T'
+    sudo ./Build install
+
 =item * installation via downloaded .tgz file
 
     ls -al Net-Async-DigitalOcean-*.tar.gz
     tar zxvf Net*
     pushd Net-Async-DigitalOcean-*
     perl Build.PL
-    sudo ./Build installdeps
+    sudo ./Build installdeps --cpan_client 'cpan -T'
     sudo ./Build install
 
 =item * access to proprietary Debian repository http://packages.devc.at/

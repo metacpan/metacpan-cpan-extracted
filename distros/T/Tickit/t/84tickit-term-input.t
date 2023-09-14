@@ -12,7 +12,7 @@ BEGIN {
    $ENV{TERM} = "xterm";
 }
 
-use Test::More;
+use Test2::V0;
 
 use IO::Handle;  # ->binmode
 use Tickit;
@@ -58,7 +58,7 @@ is( $got_Ctrl_A, 1, 'got Ctrl-A after ->tick' );
    syswrite( $my_wr, "A" );
    $tickit->tick;
 
-   is_deeply( \@key_events, [ [ text => "A" ] ], 'on_key A' );
+   is( \@key_events, [ [ text => "A" ] ], 'on_key A' );
 
    # We'll test with a Unicode character outside of Latin-1, to ensure it
    # roundtrips correctly
@@ -70,12 +70,12 @@ is( $got_Ctrl_A, 1, 'got Ctrl-A after ->tick' );
    syswrite( $my_wr, "\xc4\x89" );
    $tickit->tick;
 
-   is_deeply( \@key_events, [ [ text => "\x{109}" ] ], 'on_key UTF-8' );
+   is( \@key_events, [ [ text => "\x{109}" ] ], 'on_key UTF-8' );
 
    syswrite( $my_wr, "\e[M !!" );
    $tickit->tick;
 
-   is_deeply( \@mouse_events, [ [ press => 1, 0, 0 ] ], 'on_mouse @0,0' );
+   is( \@mouse_events, [ [ press => 1, 0, 0 ] ], 'on_mouse @0,0' );
 }
 
 # input events on term
@@ -86,7 +86,7 @@ is( $got_Ctrl_A, 1, 'got Ctrl-A after ->tick' );
    # behave sensibly
    $tickit->term->bind_event( key => sub {
       my ( $term, undef, $info ) = @_;
-      isa_ok( $term, "Tickit::Term", '$term' );
+      isa_ok( $term, [ "Tickit::Term" ], '$term' );
       push @key_events, [ $info->type => $info->str ];
       return 0;
    } );
@@ -94,7 +94,7 @@ is( $got_Ctrl_A, 1, 'got Ctrl-A after ->tick' );
    syswrite( $my_wr, "B" );
    $tickit->tick;
 
-   is_deeply( \@key_events, [ [ text => "B" ] ], 'term on_key B' );
+   is( \@key_events, [ [ text => "B" ] ], 'term on_key B' );
 }
 
 done_testing;

@@ -1,0 +1,51 @@
+
+[![Windows](https://github.com/Corion/Net-Async-OSC/workflows/windows/badge.svg)](https://github.com/Corion/Net-Async-OSC/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/Net-Async-OSC/workflows/macos/badge.svg)](https://github.com/Corion/Net-Async-OSC/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/Net-Async-OSC/workflows/linux/badge.svg)](https://github.com/Corion/Net-Async-OSC/actions?query=workflow%3Alinux)
+
+# NAME
+
+Net::Async::OSC - send/receive OSC asynchronously
+
+# SYNOPSIS
+
+    my $loop = IO::Async::Loop->new();
+    my $osc = Net::Async::OSC->new(
+        loop => $loop,
+    );
+
+    $osc->connect('127.0.0.1', 4560)->get;
+    $osc->send_osc(
+        "/trigger/melody" => 'ii',
+        1,0);
+
+# METHODS
+
+## `->connect`
+
+    $osc->connect('127.0.0.1', 4560)->get;
+
+Connect to host/port.
+
+## `->send_osc`
+
+    $osc->send_osc(
+        "/trigger/melody" => 'ii',
+        1,0);
+
+Sends an OSC message as a list. The list will be packed according to
+[OSC::Protocol](https://metacpan.org/pod/OSC%3A%3AProtocol).
+
+## `->send_osc_msg`
+
+    my $msg = $protocol->message(
+        "/trigger/melody" => 'ii',
+        1,0
+    );
+    $osc->send_osc_msg($msg);
+
+Sends an pre-packed OSC message.
+
+# SEE ALSO
+
+[Protocol::OSC](https://metacpan.org/pod/Protocol%3A%3AOSC)

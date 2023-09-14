@@ -1,46 +1,57 @@
 package Image::DS9;
 
-# ABSTRACT: a really awesome library
+# ABSTRACT: interface to the DS9 image display and analysis program
+
+use v5.10;
 
 use strict;
 use warnings;
-use Carp;
 
 use Module::Runtime 'use_module';
 
-our $VERSION = '0.188';
-
-our $use_PDL;
-
-BEGIN {
-    $use_PDL =
-      eval {
-          use_module( 'PDL::Core' );
-          use_module( 'PDL::Types' );
-          1;
-      };
-}
+our $VERSION = 'v1.0.0';
 
 use IPC::XPA;
+use Safe::Isa;
 
 use Image::DS9::Command;
+use Image::DS9::Util 'parse_version';
 use Time::HiRes qw[ sleep ];
+use Ref::Util 'is_ref', 'is_arrayref';
+use List::Util 'any', 'first';
+use Log::Any '$log', prefix => ( __PACKAGE__ . q{: } );
+use Image::DS9::Constants::V1 -terminate_ds9, 'TERMINATE_DS9';
 
 use constant SERVER => 'ds9';
 
 use namespace::clean;
 
+use constant HAVE_PDL => eval {    ## no critic(ErrorHandling::RequireCheckingReturnValueOfEval)
+    use_module( 'PDL::Core' );
+    use_module( 'PDL::Types' );
+    1;
+};
+
 #####################################################################
 
-# Preloaded methods go here.
+sub _flatten_hash {
+    my ( $hash ) = @_;
 
-sub _flatten_hash
-{
-  my ( $hash ) = @_;
+    return q{} unless keys %$hash;
 
-  return '' unless keys %$hash;
+    join( q{,}, map { "$_=" . $hash->{$_} } keys %$hash );
+}
 
-  join( ',', map { "$_=" . $hash->{$_} } keys %$hash );
+sub _croak {
+    require Carp;
+    my $fmt = shift;
+    @_ = sprintf( $fmt, @_ );
+    goto \&Carp::croak;
+}
+
+sub _pp {
+    require Data::Dump;
+    goto \&Data::Dump::pp;
 }
 
 #####################################################################
@@ -48,172 +59,171 @@ sub _flatten_hash
 # create new XPA object
 {
 
-  my %def_obj_attrs = ( Server => SERVER,
-                        WaitTimeOut => 2,
-                        WaitTimeInterval => 0.1,
-                        min_servers => 1,
-                        res_wanthash => 1,
-                        kill_on_destroy => 0,
-                        auto_start => 0,
-                        verbose => 0
-                      );
+    my %def_obj_attrs = (
+        Server               => SERVER,
+        StartTimeOut         => 2,
+        QueryTimeOut         => 2,
+        WaitTimeInterval     => 0.1,
+        min_servers          => 1,
+        res_wanthash         => 1,
+        terminate_on_destroy => TERMINATE_DS9_NO,
+        daemonize            => 0,
+        auto_start           => 0,
+        verbose              => 0,
+        ds9                  => 'ds9',
+        origin               => undef,
+    );
 
-  my %def_xpa_attrs = ( max_servers => 1 );
+    my %def_xpa_attrs = ( max_servers => 1 );
 
+    my %def_cmd_attrs = (
+        ResErrCroak  => 0,
+        ResErrWarn   => 0,
+        ResErrIgnore => 0,
+    );
 
-  my %def_cmd_attrs = (
-                        ResErrCroak => 0,
-                        ResErrWarn => 0,
-                        ResErrIgnore => 0
-                      );
+    sub new {
+        my ( $class, $u_attrs ) = @_;
+        $class = ref( $class ) || $class;
 
+        # load up attributes, first from defaults, then
+        # from user.  ignore bogus elements in user attributes hash
 
-  sub new
-  {
-    my ( $class, $u_attrs ) = @_;
-    $class = ref($class) || $class;
+        my $self = bless {
+            xpa => IPC::XPA->Open,
+            %def_obj_attrs,
+            xpa_attrs => {%def_xpa_attrs},
+            cmd_attrs => {%def_cmd_attrs},
+            res       => undef,
+        }, $class;
 
-    # load up attributes, first from defaults, then
-    # from user.  ignore bogus elements in user attributes hash
+        _croak( 'error creating XPA object' )
+          unless defined $self->{xpa};
 
-    my $self = bless {
-                      xpa => IPC::XPA->Open,
-                      %def_obj_attrs,
-                      xpa_attrs => { %def_xpa_attrs },
-                      cmd_attrs => { %def_cmd_attrs },
-                      res => undef
-                     }, $class;
+        # backwards compatibility
+        my %u_attrs = %{ $u_attrs // {} };
+        if ( defined( my $WaitTimeOut = delete $u_attrs{WaitTimeOut} ) ) {
+            $u_attrs{StartTimeOut} = $u_attrs{QueryTimeOut} = $WaitTimeOut;
+        }
+        if ( defined( my $kill_on_destroy = delete $u_attrs{kill_on_destroy} ) ) {
+            $u_attrs{terminate_on_destroy} = !!$kill_on_destroy ? TERMINATE_DS9_YES : TERMINATE_DS9_NO;
+        }
 
-    croak( __PACKAGE__, "->new: error creating XPA object" )
-      unless defined $self->{xpa};
+        if ( defined $u_attrs{terminate_on_destroy} ) {
+            defined first { $u_attrs{terminate_on_destroy} == $_ } TERMINATE_DS9
+              or _croak( 'illegal value for terminate_on_destroy: %s', $u_attrs{terminate_on_destroy} );
+        }
 
-    $self->{xpa_attrs}{max_servers} = $self->nservers || 1;
+        $self->set_attr( %u_attrs );
 
-    $self->set_attr( %$u_attrs);
+        $self->{cmd_attrs}{ResErrCroak} = 1
+          unless $self->{cmd_attrs}{ResErrWarn}
+          || $self->{cmd_attrs}{ResErrIgnore};
 
-    $self->{cmd_attrs}{ResErrCroak} = 1
-      unless $self->{cmd_attrs}{ResErrWarn} ||
-             $self->{cmd_attrs}{ResErrIgnore};
+        _croak( 'inconsistent ResErrXXX attributes' )
+          unless 1 == ( !!$self->{cmd_attrs}{ResErrCroak}
+              + !!$self->{cmd_attrs}{ResErrWarn}
+              + !!$self->{cmd_attrs}{ResErrIgnore} );
 
-    croak( __PACKAGE__, "->new: inconsistent ResErrXXX attributes" )
-      unless 1 == (!!$self->{cmd_attrs}{ResErrCroak} +
-                   !!$self->{cmd_attrs}{ResErrWarn} +
-                   !!$self->{cmd_attrs}{ResErrIgnore});
+        $self->{xpa_attrs}{max_servers} = $self->nservers || 1;
 
-    $self->_start_server( $self->{auto_start} )
-      if $self->{auto_start} && !$self->nservers;
+        $self->_start_server( $self->{StartTimeOut}, $self->{QueryTimeOut} )
+          if $self->{auto_start};
 
-
-    $self;
-  }
-
-  sub set_attr
-  {
-    my $self = shift;
-
-    my %attr = @_;
-
-    $self->{xpa_attrs}{$_} = delete $attr{$_}
-      foreach grep { exists $def_xpa_attrs{$_} } keys %attr;
-
-    $self->{cmd_attrs}{$_} = delete $attr{$_}
-      foreach grep { exists $def_cmd_attrs{$_} } keys %attr;
-
-    $self->{$_} = delete $attr{$_}
-      foreach grep { exists $def_obj_attrs{$_} } keys %attr;
-
-    croak( __PACKAGE__, ": unknown attribute(s): ",
-           join( ', ', sort keys %attr ) )
-      if keys %attr;
-  }
-
-  sub get_attr {
-
-    my ( $self, $attr ) = @_;
-
-    exists $_->{$attr} && return $_->{$attr}
-      for $self, $self->{xpa_attrs}, $self->{cmd_attrs};
-
-    croak( __PACKAGE__, ": unknown attribute: $attr" );
-
-  }
-
-}
-
-sub DESTROY
-{
-    my $self = shift;
-
-    if ( defined $self->{xpa} ) {
-        $self->quit
-          if $self->get_attr( 'kill_on_destroy' );
-        $self->{xpa}->Close;
+        $self;
     }
 
-    # note that if we had to start up a bespoke ds9 instance, the
-    # Proc::Simple object will also kill the process upon destruction.
+    sub set_attr {
+        my $self = shift;
 
+        my %attr = @_;
+
+        $self->{xpa_attrs}{$_} = delete $attr{$_} foreach grep { exists $def_xpa_attrs{$_} } keys %attr;
+
+        $self->{cmd_attrs}{$_} = delete $attr{$_} foreach grep { exists $def_cmd_attrs{$_} } keys %attr;
+
+        $self->{$_} = delete $attr{$_} foreach grep { exists $def_obj_attrs{$_} } keys %attr;
+
+        _croak( 'unknown attribute(s): %s', join( ', ', sort keys %attr ) )
+          if keys %attr;
+    }
+
+    sub get_attr {
+
+        my ( $self, $attr ) = @_;
+
+        exists $_->{$attr} && return $_->{$attr} for $self, $self->{xpa_attrs}, $self->{cmd_attrs};
+
+        _croak( 'unknown attribute: %s', $attr );
+    }
+
+}
+
+sub DESTROY {
+    my $self = shift;
+    return unless defined $self->{xpa};
+
+    # xpa may be up, but we may not have found our ds9, so origin will
+    # be undefined.
+    $self->quit
+      if defined $self->{origin}
+      && $self->get_attr( 'terminate_on_destroy' ) & $self->{origin};
+    $self->{xpa}->Close;
 }
 
 #####################################################################
 
-sub nservers
-{
-  my $self = shift;
+sub nservers {
+    my $self = shift;
 
-  my %res = $self->{xpa}->Access( $self->{Server}, 'gs' );
+    my %res = $self->{xpa}->Access( $self->{Server}, 'gs' );
 
-  if ( grep { defined $_->{message} } values %res )
-  {
-    $self->{res} = \%res;
-    croak( __PACKAGE__, ": error sending data to server" );
-  }
+    if ( any { defined $_->{message} } values %res ) {
+        $self->{res} = \%res;
+        _croak( 'error sending data to server' );
+    }
 
-  keys %res;
+    keys %res;
 }
 
 #####################################################################
 
-sub res
-{
-  %{$_[0]->{res} || {}};
+sub res {
+    %{ $_[0]->{res} || {} };
 }
 
 #####################################################################
 
-sub wait
-{
-  my $self = shift;
-  my $timeout = shift || $self->{WaitTimeOut};
-  my $timeinterval = $self->{WaitTimeInterval};
+sub wait {    ## no critic(Subroutines::ProhibitBuiltinHomonyms)
+    my $self         = shift;
+    my $timeout      = shift || $self->{StartTimeOut};
+    my $timeinterval = $self->{WaitTimeInterval};
 
-  unless( $self->nservers )
-  {
-    my $cnt = 0;
-    sleep( $timeinterval )
-      until $self->nservers >= $self->{min_servers}
-            || ($cnt += $timeinterval) > $timeout;
-  }
+    unless ( $self->nservers ) {
+        my $cnt = 0;
+        sleep( $timeinterval )
+          until ( exists $self->{_process} && !$self->{_process}->alive )
+          || $self->nservers >= $self->{min_servers}
+          || ( $cnt += $timeinterval ) > $timeout;
+    }
 
-  return $self->nservers >= $self->{min_servers};
+    return $self->nservers >= $self->{min_servers};
 }
-
 
 sub _start_server {
 
-    my ( $self, $timeout ) = @_;
+    my ( $self, $start_timeout, $query_timeout ) = @_;
 
-    $timeout = $timeout < 0 ? -$timeout : $self->get_attr( 'WaitTimeOut' );
+    $start_timeout = abs( $start_timeout // $self->get_attr( 'StartTimeOut' ) );
+    $query_timeout = abs( $query_timeout // $self->get_attr( 'QueryTimeOut' ) );
 
-    return if $self->wait( $timeout );
-
-    require Proc::Simple;
-
-    $self->{_process} = Proc::Simple->new;
-    $self->{_process}->kill_on_destroy( $self->get_attr( 'kill_on_destroy' ) );
+    if ( $self->wait( $query_timeout ) ) {
+        $self->{origin} = TERMINATE_DS9_ATTACHED;
+        return;
+    }
 
     my @cmd = (
-        'ds9',
+        ( is_arrayref( $self->{ds9} ) ? @{ $self->{ds9} } : $self->{ds9} ),
         (
             defined $self->{Server}
             ? ( -title => $self->{Server} )
@@ -221,235 +231,209 @@ sub _start_server {
         ),
     );
 
+    my $terminate_on_destroy = $self->get_attr( 'terminate_on_destroy' ) & TERMINATE_DS9_STARTED;
 
-    $self->{_process}->start( @cmd )
-      or croak( "error running @cmd\n" );
+    if ( $self->get_attr( 'daemonize' ) ) {
+        require Image::DS9::Daemon;
+        $self->{_process} = Image::DS9::Daemon->new( terminate_on_destroy => $terminate_on_destroy, );
 
-    $self->wait() or croak( "error connecting to ds9 (@cmd)\n " );
+        # this craziness is because Proc::Daemon always uses the
+        # simplified version of exec which uses the shell to launch
+        # processes and we don't want that
+        unless ( $self->{_process}->Init ) {
+            exec { $cmd[0] } @cmd
+              or die( 'error running ', join( ', ', @cmd ) );
+        }
+    }
+    else {
+        require Proc::Background;
+        $self->{_process} = Proc::Background->new( {
+            command       => \@cmd,
+            autodie       => 1,
+            autoterminate => $terminate_on_destroy,
+        } );
+    }
 
+
+    $self->wait( $start_timeout ) or _croak( 'error connecting to ds9: %s', join( q{ }, @cmd ) );
+
+    $self->{origin} = TERMINATE_DS9_STARTED;
 }
 
 
 #####################################################################
 
 {
-  # mapping between PDL
-  my %map;
+    # mapping between PDL
+    my %map;
 
-  if ( $use_PDL )
-  {
-    %map = (
+    if ( HAVE_PDL ) {
+        %map = (
             $PDL::Types::PDL_B => 8,
             $PDL::Types::PDL_S => 16,
             $PDL::Types::PDL_S => 16,
             $PDL::Types::PDL_L => 32,
             $PDL::Types::PDL_F => -32,
-            $PDL::Types::PDL_D => -64
-           );
-  }
-
-  sub array
-  {
-    my $self = shift;
-
-    my $cmd;
-
-    {
-      local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-
-      $cmd = Image::DS9::Command->new( 'array', { %{$self->{cmd_attrs}},
-                                                  nocmd => 1 }, @_ );
+            $PDL::Types::PDL_D => -64,
+        );
     }
 
-    defined $cmd
-      or croak( __PACKAGE__, ":internal error: unknown method `array'\n" );
+    sub array {
+        my $self = shift;
 
-    my $data = $cmd->bufarg;
+        my $cmd = Image::DS9::Command->new( 'array', { %{ $self->{cmd_attrs} }, nocmd => 1 }, @_ );
+
+        defined $cmd
+          or _croak( q{internal error: unknown method `array'} );
+
+        my $data  = $cmd->bufarg;
+        my %attrs = $cmd->attrs;
+
+        $log->is_debug and $log->debug( '->array: attrs => ', _pp( \%attrs ) );
+
+        if ( HAVE_PDL && $data->$_isa( 'PDL' ) ) {
+            $attrs{bitpix} = $map{ $data->get_datatype };
+            ( $attrs{xdim}, $attrs{ydim} ) = $data->dims;
+            $data = ${ $data->get_dataref };
+            $attrs{ydim} = 1 unless defined $attrs{ydim};
+        }
+
+        if ( exists $attrs{dim} ) {
+            delete $attrs{xdim};
+            delete $attrs{ydim};
+        }
+        elsif ( !( exists $attrs{xdim} && exists $attrs{ydim} ) ) {
+            _croak( q{->array() specify either (<xdim>, <ydim>) or (<dim>)} );
+        }
+
+        my @cmd = ( 'array' );
+
+        {
+            my @spec_attr = ( 'new', 'mask' );
+            my %types     = map { $_ => !!$cmd->{special_attrs}{$_} } @spec_attr;
+
+            my @type = grep { $types{$_} } keys %types;
+            _croak( q{->array() specify  only one of <new> or <mask>} )
+              if @type > 1;
+            push @cmd, $type[0] if @type;
+        }
+
+        _croak( q{->array() requires that the 'bitpix' attribute be specified} )
+          unless exists $attrs{bitpix};
+
+        push @cmd, '[' . _flatten_hash( \%attrs ) . ']';
+
+        my $cmdstr = join( q{ }, @cmd );
+
+        $self->Set( $cmdstr, $data );
+    }
+}
+
+
+#####################################################################
+
+sub fits {
+    my $self = shift;
+
+    my $cmd = Image::DS9::Command->new( 'fits', { %{ $self->{cmd_attrs} }, noattrs => 1 }, @_ )
+      or _croak( q{internal error: unknown method `fits'} );
+
+    return $self->_get( $cmd )
+      if $cmd->query;
+
     my %attrs = $cmd->attrs;
 
-    if ( $use_PDL && ref( $data ) && UNIVERSAL::isa( $data, 'PDL' ))
-    {
-      $attrs{bitpix} = $map{$data->get_datatype};
-      ($attrs{xdim}, $attrs{ydim}) = $data->dims;
-      $data = ${$data->get_dataref};
-      $attrs{ydim} = 1 unless defined $attrs{ydim};
-    }
+    my @mods;
+    push @mods, '[' . $attrs{$_} . ']' foreach grep { exists $attrs{$_} } qw( extname filter );
 
-    if ( exists $attrs{dim} )
-    {
-      delete $attrs{xdim};
-      delete $attrs{ydim};
-    }
-    elsif ( ! (exists $attrs{xdim} && exists $attrs{ydim} ) )
-    {
-      croak( __PACKAGE__,
-             '->array -- either (xdim, ydim) or (dim) must be specified' );
-    }
+    push @mods, '[bin=', join( q{,}, @{ $attrs{bin} } ), ']'
+      if exists $attrs{bin};
 
-    croak( __PACKAGE__,
-           "->array: `bitpix' attribute must be specified" )
-      unless exists $attrs{bitpix};
+    my ( $commands, $args ) = $cmd->command_list;
 
-    $self->Set( 'array ['._flatten_hash(\%attrs).']', $data );
-  }
-}
+    unshift @mods, pop( @$args ) if @$args;
 
 
-#####################################################################
-
-sub fits
-{
-  my $self = shift;
-
-  my $cmd;
-
-  {
-    local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-    $cmd = Image::DS9::Command->new( 'fits', { %{$self->{cmd_attrs}},
-                                               noattrs => 1}, @_ )
-      or croak( __PACKAGE__, ":internal error: unknown method `fits'\n" );
-  }
-
-  return $self->_get( $cmd )
-    if $cmd->query;
-
-  my %attrs = $cmd->attrs;
-
-  my @mods;
-  push @mods, '[' . $attrs{$_} . ']'
-    foreach grep { exists $attrs{$_}} qw( extname filter );
-
-  push @mods, '[bin=', join( ',', @{$attrs{bin}} ), ']'
-    if exists $attrs{bin};
-
-  $self->Set( $cmd->command . join('', @mods), $cmd->bufarg );
+    $self->Set( join( q{ }, @$commands, @$args, join( q{}, @mods ) ), $cmd->bufarg );
 }
 
 #####################################################################
 
-sub file
-{
-  my $self = shift;
-
-  my $cmd;
-
-  {
-    local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-    $cmd = Image::DS9::Command->new( 'file', { %{$self->{cmd_attrs}},
-                                               noattrs => 1}, @_ )
-      or croak( __PACKAGE__, ":internal error: unknown method `file'\n" );
-  }
-  return $self->_get( $cmd )
-    if $cmd->query;
-
-  my %attrs = $cmd->attrs;
-
-  my @mods;
-  push @mods, '[' . $attrs{$_} . ']'
-    foreach grep { exists $attrs{$_}} qw( extname filter );
-
-  push @mods, '[bin=', join( ',', @{$attrs{bin}} ), ']'
-    if exists $attrs{bin};
-
-  $self->Set( $cmd->command . join('', @mods), $cmd->bufarg );
-}
-
-#####################################################################
-
-sub version
-{
+sub version {
     my $self = shift;
 
-    my $cmd;
-    {
-        local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-        $cmd = Image::DS9::Command->new( 'version', { %{$self->{cmd_attrs}},
-                                                  noattrs => 1}, @_ )
-          or croak( __PACKAGE__, ":internal error: unknown method `version'\n" );
-    }
+    my $cmd = Image::DS9::Command->new( 'version', { %{ $self->{cmd_attrs} }, noattrs => 1 }, @_ )
+      or _croak( q{:internal error: unknown method `version'} );
 
-    my $version = $self->_get( $cmd );
-    $version =~ s/^(\S+)\s+//;
-
-    return $version;
+    return parse_version( scalar $self->_get( $cmd ) );
 }
-
-
-
 
 #####################################################################
 
-sub Set
-{
-  my $self = shift;
-  my $cmd = shift;
+sub Set {
+    my $self = shift;
+    my $cmd  = shift;
 
-  print STDERR ( __PACKAGE__, "->Set: $cmd\n" )
-    if $self->{verbose};
+    if ( $log->is_debug ) {
+        my $text
+          = ( !defined $_[0] || !defined ${ $_[0] } ) ? undef
+          : is_ref( $_[0] )                           ? ${ $_[0] }
+          :                                             $_[0];
+        $log->debug( '->Set(): ', { cmd => $cmd, ( defined $text ? ( data => $text ) : () ) } );
+    }
 
-  my %res = $self->{xpa}->Set( $self->{Server}, $cmd, $_[0],
-                                            $self->{xpa_attrs} );
+    my %res = $self->{xpa}->Set( $self->{Server}, $cmd, $_[0], $self->{xpa_attrs} );
 
-  # chomp messages
-  foreach my $res ( values %res )
-  {
-    chomp $res->{message} if exists $res->{message};
-  }
+    # chomp messages
+    foreach my $res ( values %res ) {
+        chomp $res->{message} if exists $res->{message};
+    }
 
-  if ( grep { defined $_->{message} } values %res )
-  {
-    $self->{res} = \%res;
-    croak( __PACKAGE__, ": error sending data to server" );
-  }
+    if ( any { defined $_->{message} } values %res ) {
+        $self->{res} = \%res;
+        _croak( 'error sending data to server' );
+    }
 
-  if ( keys %res < $self->{min_servers} )
-  {
-    $self->{res} = \%res;
-    croak( __PACKAGE__, ": fewer than ", $self->{min_servers},
-           " server(s) responded" )
-  }
+    if ( keys %res < $self->{min_servers} ) {
+        $self->{res} = \%res;
+        _croak( 'fewer than %d server(s) responded', $self->{min_servers} );
+    }
 }
 
 #####################################################################
 
 # wrapper for _Get for use by outsiders
 # set res_wanthash according to scalar or array mode
-sub Get
-{
-  my $self = shift;
-  my $cmd = shift;
-  $self->_Get( $cmd, { res_wanthash => wantarray() } );
+sub Get {
+    my $self = shift;
+    my $cmd  = shift;
+    $self->_Get( $cmd, { res_wanthash => wantarray() } );    ## no critic (Community::Wantarray)
 }
 
 #####################################################################
 
 # wrapper for _Get for internal use.  handles single and multiple
 # value returns by splitting the latter into an array
-sub _get
-{
-  my $self = shift;
-  my $cmd = shift;
+sub _get {
+    my $self = shift;
+    my $cmd  = shift;
 
-  my %results = $self->_Get( $cmd->command,
-                           { chomp => $cmd->chomp, res_wanthash => 1 } );
+    my %results = $self->_Get( $cmd->command, { chomp => $cmd->chomp, res_wanthash => 1 } );
 
-  unless ( wantarray() )
-  {
-    my ( $server ) = keys %results;
-    $cmd->cvt_get( $results{$server}{buf} );
-    return
-      ( $cmd->retref && !ref($results{$server}{buf}) ) ?
-        \($results{$server}{buf}) : $results{$server}{buf};
-  }
-
-  else
-  {
-    for my $res ( values %results )
-    {
-      $cmd->cvt_get( $res->{buf} );
+    unless ( wantarray() ) {    ## no critic (Community::WantArray)
+        my ( $server ) = keys %results;
+        $cmd->cvt_get( $results{$server}{buf} );
+        return ( $cmd->retref && !ref( $results{$server}{buf} ) )
+          ? \( $results{$server}{buf} )
+          : $results{$server}{buf};
     }
-    return %results;
-  }
+
+    else {
+        for my $res ( values %results ) {
+            $cmd->cvt_get( $res->{buf} );
+        }
+        return %results;
+    }
 
 }
 
@@ -465,52 +449,43 @@ sub _get
 
 # chomp attribute: removes trailing newline from returned data
 
-sub _Get
-{
-  my ( $self, $cmd, $attr ) = @_;
+sub _Get {
+    my ( $self, $cmd, $attr ) = @_;
 
-  print STDERR ( __PACKAGE__, "->_Get: $cmd\n" )
-    if $self->{verbose};
+    $log->debug( '->_Get', { cmd => $cmd } );
 
-  my %attr = ( $attr ? %$attr : () );
+    my %attr = ( $attr ? %$attr : () );
 
-  $attr{res_wanthash} = $self->{res_wanthash}
-    unless defined $attr{res_wanthash};
+    $attr{res_wanthash} = $self->{res_wanthash}
+      unless defined $attr{res_wanthash};
 
-  my %res = $self->{xpa}->Get( $self->{Server}, $cmd,
-                               $self->{xpa_attrs} );
+    my %res = $self->{xpa}->Get( $self->{Server}, $cmd, $self->{xpa_attrs} );
 
-  # chomp results
-  $attr{chomp} ||= 0;
-  foreach my $res ( values %res )
-  {
-    chomp $res->{message} if exists $res->{message};
-    chomp $res->{buf} if exists $res->{buf} && $attr{chomp};
-  }
+    # chomp results
+    $attr{chomp} ||= 0;
+    foreach my $res ( values %res ) {
+        chomp $res->{message} if exists $res->{message};
+        chomp $res->{buf}     if exists $res->{buf} && $attr{chomp};
+    }
 
-  if ( grep { defined $_->{message} } values %res )
-  {
-    $self->{res} = \%res;
-    croak( __PACKAGE__, ": error sending data to server" );
-  }
+    if ( any { defined $_->{message} } values %res ) {
+        $self->{res} = \%res;
+        _croak( 'error sending data to server' );
+    }
 
-  if ( keys %res < $self->{min_servers} )
-  {
-    $self->{res} = \%res;
-    croak( __PACKAGE__, ": fewer than ", $self->{min_servers},
-           " servers(s) responded" )
-  }
+    if ( keys %res < $self->{min_servers} ) {
+        $self->{res} = \%res;
+        _croak( 'fewer than %d servers(s) responded', $self->{min_servers} );
+    }
 
-  unless ( $attr{res_wanthash} )
-  {
-    my ( $server ) = keys %res;
-    return $res{$server}->{buf};
-  }
+    unless ( $attr{res_wanthash} ) {
+        my ( $server ) = keys %res;
+        return $res{$server}->{buf};
+    }
 
-  else
-  {
-    return %res;
-  }
+    else {
+        return %res;
+    }
 }
 
 
@@ -518,20 +493,16 @@ sub _Get
 
 our $AUTOLOAD;
 
-sub AUTOLOAD
-{
-  my $self = shift;
-  (my $sub = $AUTOLOAD) =~ s/.*:://;
+sub AUTOLOAD {    ## no critic (ClassHierarchies::ProhibitAutoloading)
+    my $self = shift;
+    ( my $sub = $AUTOLOAD ) =~ s/.*:://;
 
-  $sub = 'cmap' if $sub eq 'colormap';
+    my $cmd = Image::DS9::Command->new( $sub, { %{ $self->{cmd_attrs} } }, @_ )
+      or _croak( 'unknown method: %s', $sub );
 
-  local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-  my $cmd = Image::DS9::Command->new( $sub, {%{$self->{cmd_attrs}}}, @_ )
-    or croak( __PACKAGE__, ": unknown method `$sub'\n" );
-
-  $cmd->query ?
-    $self->_get( $cmd ) :
-      $self->Set( $cmd->command, $cmd->bufarg );
+    $cmd->query
+      ? $self->_get( $cmd )
+      : $self->Set( $cmd->command, $cmd->bufarg );
 }
 
 
@@ -551,18 +522,87 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory XPA
+
 =head1 NAME
 
-Image::DS9 - a really awesome library
+Image::DS9 - interface to the DS9 image display and analysis program
 
 =head1 VERSION
 
-version 0.188
+version v1.0.0
 
-=head1 BUGS AND LIMITATIONS
+=head1 SYNOPSIS
 
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9>.
+  use Image::DS9;
+
+  $dsp = new Image::DS9;
+  $dsp = new Image::DS9( \%attrs );
+
+=head1 DESCRIPTION
+
+This class provides access to the B<DS9> image display and analysis
+program through its B<XPA> access points.
+
+B<DS9> is a rather flexible and feature-rich image display program.
+Rather than extol its virtues, please consult the website in
+L</REQUIREMENTS>.
+
+While one could communicate with B<DS9> solely via the L<IPC::XPA>
+class, this class provides a cleaner, less error prone interface,
+as it checks the passed commands and arguments for syntax and data
+type.  It also cleans up returned data from B<DS9>.
+
+To use this class, first construct a B<Image::DS9> object, and
+then apply its methods.  It is possible to both address more
+than one B<DS9> with a single object, as well as having
+multiple B<Image::DS9> objects communicate with their own
+B<DS9> invocations.  Eventually there will be documentation
+spelling out how to do this.
+
+=head1 DOCUMENTATION
+
+Please see:
+
+=over
+
+=item L<Image::DS9::Manual::Connect>
+
+How to create the connection to C<DS9>
+
+=item L<Image::DS9::Manual::Interface>
+
+Understanding how arguments are passed to C<DS9> and what is returned.
+
+=item L<Image::DS9::Manual::API>
+
+A reference manual to the methods which map onto C<DS9>'s commands.
+
+=item L<Image::DS9::Constants>
+
+Constants provided for your ease and protection.
+
+=item L<Image::DS9::Manual::Install>
+
+Installation and testing hints.  Please read this before installation.
+
+=back
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-image-ds9@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/image-ds9
+
+and may be cloned from
+
+  https://gitlab.com/djerius/image-ds9.git
 
 =head1 AUTHOR
 

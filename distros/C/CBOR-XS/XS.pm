@@ -66,7 +66,7 @@ package CBOR::XS;
 
 use common::sense;
 
-our $VERSION = 1.86;
+our $VERSION = 1.87;
 our @ISA = qw(Exporter);
 
 our @EXPORT = qw(encode_cbor decode_cbor);
@@ -218,7 +218,7 @@ communication partner supports the value sharing extensions to CBOR
 resulting data structure might be unusable.
 
 Detecting shared values incurs a runtime overhead when values are encoded
-that have a reference counter large than one, and might unnecessarily
+that have a reference counter larger than one, and might unnecessarily
 increase the encoded size, as potentially shared values are encoded as
 shareable whether or not they are actually shared.
 
@@ -247,10 +247,22 @@ isn't prepared for this will not leak memory.
 If C<$enable> is false (the default), then C<decode> will throw an error
 when it encounters a self-referential/cyclic data structure.
 
-FUTURE DIRECTION: the motivation behind this option is to avoid I<real>
-cycles - future versions of this module might chose to decode cyclic data
-structures using weak references when this option is off, instead of
-throwing an error.
+This option does not affect C<encode> in any way - shared values and
+references will always be encoded properly if present.
+
+=item $cbor = $cbor->allow_weak_cycles ([$enable])
+
+=item $enabled = $cbor->get_allow_weak_cycles
+
+This works like C<allow_cycles> in that it allows the resulting data
+structures to contain cycles, but unlike C<allow_cycles>, those cyclic
+rreferences will be weak. That means that code that recurrsively walks
+the data structure must be prepared with cycles, but at least not special
+precautions must be implemented to free these data structures.
+
+Only those references leading to actual cycles will be weakened - other
+references, e.g. when the same hash or arrray is referenced multiple times
+in an arrray, will be normal references.
 
 This option does not affect C<encode> in any way - shared values and
 references will always be encoded properly if present.
@@ -475,7 +487,7 @@ CBOR stream incrementally, using a similar to using "decode_prefix" to see
 if a full CBOR object is available, but is much more efficient.
 
 It basically works by parsing as much of a CBOR string as possible - if
-the CBOR data is not complete yet, the pasrer will remember where it was,
+the CBOR data is not complete yet, the parser will remember where it was,
 to be able to restart when more data has been accumulated. Once enough
 data is available to either decode a complete CBOR value or raise an
 error, a real decode will be attempted.
@@ -637,8 +649,7 @@ create such objects.
 =item Types::Serialiser::true, Types::Serialiser::false, Types::Serialiser::error
 
 These special values become CBOR true, CBOR false and CBOR undefined
-values, respectively. You can also use C<\1>, C<\0> and C<\undef> directly
-if you want.
+values, respectively.
 
 =item other blessed objects
 

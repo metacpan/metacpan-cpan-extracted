@@ -41,15 +41,16 @@ sub build_self {
 
 # METHODS
 
-
 sub assertion {
   my ($self) = @_;
 
-  my $assert = $self->SUPER::assertion;
+  my $assertion = $self->SUPER::assertion;
 
-  $assert->clear->expression('arrayref');
+  $assertion->match('arrayref')->format(sub{
+    (ref $self || $self)->new($_)
+  });
 
-  return $assert;
+  return $assertion;
 }
 
 sub default {
@@ -218,7 +219,7 @@ This package provides the following methods:
 
 =head2 default
 
-  default() (ArrayRef)
+  default() (arrayref)
 
 The default method returns the default value, i.e. C<@ARGV>.
 
@@ -242,7 +243,7 @@ I<Since C<0.01>>
 
 =head2 exists
 
-  exists(Str $key) (Bool)
+  exists(string $key) (boolean)
 
 The exists method returns truthy or falsy if an index or alias value exists.
 
@@ -288,7 +289,7 @@ I<Since C<0.01>>
 
 =head2 get
 
-  get(Str $key) (Any)
+  get(string $key) (any)
 
 The get method returns the value of the index or alias.
 
@@ -334,7 +335,7 @@ I<Since C<0.01>>
 
 =head2 indexed
 
-  indexed() (HashRef)
+  indexed() (hashref)
 
 The indexed method returns a set of indices and values.
 
@@ -356,7 +357,7 @@ I<Since C<0.01>>
 
 =head2 name
 
-  name(Str $key) (Str | Undef)
+  name(string $key) (string | undef)
 
 The name method resolves and returns the index for an index or alias, and
 returns undefined if not found.
@@ -377,7 +378,7 @@ I<Since C<0.01>>
 
 =head2 set
 
-  set(Str $key, Any $data) (Any)
+  set(string $key, any $data) (any)
 
 The set method sets and returns the value of an index or alias.
 
@@ -423,7 +424,7 @@ I<Since C<0.01>>
 
 =head2 unnamed
 
-  unnamed() (ArrayRef)
+  unnamed() (arrayref)
 
 The unnamed method returns a list of unaliases indices.
 
@@ -477,7 +478,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

@@ -1,5 +1,5 @@
 ---
-abstract: 'Assign values to constants from the command arguments'
+abstract: 'Constants and Enumerations. Assign constant values from the command line'
 author:
   - 'Ruben Westerberg <drclaw@mac.com>'
 build_requires:
@@ -21,5 +21,5 @@ requires:
   perl: '5.024000'
 resources:
   repository: git://github.com/drclaw1394/perl-constant-more.git
-version: v0.2.1
+version: v0.3.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

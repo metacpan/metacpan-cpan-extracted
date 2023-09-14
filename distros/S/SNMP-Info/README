@@ -2,7 +2,7 @@ NAME
     SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 VERSION
-    SNMP::Info - Version 3.94
+    SNMP::Info - Version 3.95
 
 AUTHOR
     SNMP::Info is maintained by team of Open Source authors headed by Eric
@@ -2044,6 +2044,7 @@ SNMP::INFO INTERNALS
                         '1000000000' => '1.0 Gbps',
                         '2000000000' => '2.0 Gbps',
                         '2488000000' => 'OC-48',
+                        '2500000000' => '2.5 Gbps',
                      )
 
         Note: high speed interfaces (usually 1 Gbps or faster) have their

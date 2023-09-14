@@ -34,7 +34,7 @@ subtest 'receive msg' => sub {
                 }
                 zmq_sendmsg($sock, zmq_msg_init_data("last"), 0);
             }
-            exit 0;
+            zmq_term($ctxt);
         });
 
     my $port = $server->port;

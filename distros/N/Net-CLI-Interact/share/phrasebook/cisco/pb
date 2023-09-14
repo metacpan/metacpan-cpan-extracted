@@ -1,11 +1,11 @@
 prompt generic
-    match /(?m:^)[\/a-zA-Z0-9._\[\]-]+ ?(?:\(config[^)]*\))? ?[#>] ?$/
+    match /(?m:^)\r?[\/a-zA-Z0-9._\[\]-]+ ?(?:\(config[^)]*\))? ?[#>] ?$/
 
 prompt privileged
-    match /(?m:^)[\/a-zA-Z0-9._\[\]-]+ ?# ?$/
+    match /(?m:^)\r?[\/a-zA-Z0-9._\[\]-]+ ?# ?$/
 
 prompt configure
-    match /\(config[^)]*\)# ?$/
+    match /(?m:^)\r?[\/a-zA-Z0-9._\[\]-]+ ?(?:\(config[^)]*\))? ?# ?$/
 
 prompt user
     match /[Uu]sername: ?$/

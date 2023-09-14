@@ -1,24 +1,24 @@
+#! perl
+
+use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Image::DS9;
 
-BEGIN { plan( tests => 1 ) ;}
+use Test::Lib;
+use My::Util;
 
-require './t/common.pl';
+my $ds9 = start_up( image => 1 );
 
+test_stuff(
+    $ds9,
+    (
+        cursor => [
+            [ 1, 1 ] => {},
+        ],
+    ),
+);
 
-my $ds9 = start_up();
-$ds9->file( 'data/m31.fits.gz');
-
-eval {
-  $ds9->cursor( 1,1 );
-};
-diag $@ if $@;
-ok ( ! $@, "cursor" );
-
-
-
-
-
+done_testing;

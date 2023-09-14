@@ -27,4 +27,4 @@ requires:
   NetPacket::TCP: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.00002
+version: 0.00004

@@ -2,7 +2,7 @@ package Test2::Util::Importer;
 use strict; no strict 'refs';
 use warnings; no warnings 'once';
 
-our $VERSION = '0.000155';
+our $VERSION = '0.000156';
 
 my %SIG_TO_SLOT = (
     '&' => 'CODE',
@@ -778,7 +778,7 @@ __END__
 
 =head1 NAME
 
-Test2::Util Importer - Inline copy of L<Importer>.
+Test2::Util::Importer - Inline copy of L<Importer>.
 
 =head1 DESCRIPTION
 

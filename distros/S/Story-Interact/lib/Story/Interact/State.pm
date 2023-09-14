@@ -4,8 +4,10 @@ use warnings;
 
 package Story::Interact::State;
 
+warn "LOADED DEV VERSION!";
+
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001012';
+our $VERSION   = '0.001014';
 
 use Story::Interact::Character ();
 
@@ -75,13 +77,41 @@ sub update_from_page {
 	return $self;
 }
 
+sub _maybe_encrypt {
+	my ( $self, $data ) = @_;
+	my $key = $ENV{PERL_STORY_INTERACT_KEY} or return $data;
+	
+	require Crypt::Mode::OFB;
+	require Bytes::Random::Secure;
+	my $iv = Bytes::Random::Secure::random_string_from( 'abcdefghijklmnopqrstuvwxyz0123456789', 8 );
+	my $m = Crypt::Mode::OFB->new( 'CAST5' );
+	return sprintf( 'CRYPTX:%s:%s', $iv, $m->encrypt( $data, $key, $iv ) );
+}
+
+sub _maybe_decrypt {
+	my ( $class, $data ) = @_;
+	
+	if ( substr( $data, 0, 7 ) eq 'CRYPTX:' ) {
+		my $key = $ENV{PERL_STORY_INTERACT_KEY} or die 'PERL_STORY_INTERACT_KEY not found!';
+		require Crypt::Mode::OFB;
+		my $m = Crypt::Mode::OFB->new( 'CAST5' );
+		my $iv = substr( $data, 7, 8 );
+		my $ciphertext = substr( $data, 16 );
+		return $m->decrypt( $ciphertext, $key, $iv );
+	}
+	
+	die 'Failed to load non-encrypted state!!!' if $ENV{PERL_STORY_INTERACT_FORCE_ENCRYPTED};
+	return $data;
+}
+
 sub dump {
 	my ( $self ) = @_;
 	require Storable;
 	require MIME::Base64;
 	require Compress::Bzip2;
 	my $frozen = Compress::Bzip2::memBzip( Storable::nfreeze( $self ) );
-	return MIME::Base64::encode_base64( $frozen );
+	my $encrypted = $self->_maybe_encrypt( $frozen );
+	return MIME::Base64::encode_base64( $encrypted );
 }
 
 sub load {
@@ -90,10 +120,11 @@ sub load {
 	require MIME::Base64;
 	require Compress::Bzip2;
 	my $frozen = MIME::Base64::decode_base64( $data );
-	if ( my $unzipped = Compress::Bzip2::memBunzip($frozen) ) {
+	my $decrypted = $class->_maybe_decrypt( $frozen );
+	if ( my $unzipped = Compress::Bzip2::memBunzip( $decrypted ) ) {
 		return Storable::thaw( $unzipped );
 	}
-	return Storable::thaw( $frozen );
+	return Storable::thaw( $decrypted );
 }
 
 1;

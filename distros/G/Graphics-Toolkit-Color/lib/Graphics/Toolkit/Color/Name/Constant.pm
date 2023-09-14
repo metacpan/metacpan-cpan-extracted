@@ -4,8 +4,8 @@ use v5.12;
 
 package Graphics::Toolkit::Color::Name::Constant;
 
-our %rgbhsl_from_name = (                                       # 2.6 MB
-# http://en.wikipedia.org/wiki/Web_colors#X11_color_names
+{
+# http://en.wikipedia.org/wiki/Web_colors#X11_color_names    # 2.6 MB
     'white'               => [ 255, 255, 255,   0,   0, 100 ],
     'black'               => [   0,   0,   0,   0,   0,   0 ],
     'red'                 => [ 255,   0,   0,   0, 100,  50 ],
@@ -726,10 +726,7 @@ our %rgbhsl_from_name = (                                       # 2.6 MB
     'buttercream'         => [ 239, 225, 206,  35,  51,  87 ],
     'desertmist'          => [ 224, 181, 137,  30,  58,  71 ],
     'willow'              => [ 154, 139,  79,  48,  32,  46 ],
-);
-
-
-1;
+};
 
 __END__
 

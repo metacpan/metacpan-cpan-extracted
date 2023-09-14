@@ -10,12 +10,12 @@ use Exporter 'import';
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-13'; # DATE
+our $DATE = '2023-09-03'; # DATE
 our $DIST = 'App-BPOMUtils-Table-FoodCategory'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 our @EXPORT_OK = qw(
-                       bpom_list_food_categories
+                       bpom_list_food_categories_old
                );
 
 our %SPEC;
@@ -10772,8 +10772,8 @@ our $data_idn_bpom_kategori_pangan = [
 # END FRAGMENT id=data-idn_bpom_kategori_pangan
 
 my $res = gen_read_table_func(
-    name => 'bpom_list_food_categories',
-    summary => 'List food categories in BPOM processed food division',
+    name => 'bpom_list_food_categories_old',
+    summary => 'List food categories in BPOM processed food division (old, pre-RBA version)',
     table_data => $data_idn_bpom_kategori_pangan,
     table_spec => $meta_idn_bpom_kategori_pangan,
     description => <<'_',
@@ -10809,7 +10809,7 @@ _
 );
 die "Can't generate function: $res->[0] - $res->[1]" unless $res->[0] == 200;
 
-# ABSTRACT: List food categories in BPOM processed food division
+# ABSTRACT: List food categories in BPOM processed food division (old, pre-RBA version)
 
 __END__
 
@@ -10819,11 +10819,11 @@ __END__
 
 =head1 NAME
 
-App::BPOMUtils::Table::FoodCategory - List food categories in BPOM processed food division
+App::BPOMUtils::Table::FoodCategory - List food categories in BPOM processed food division (old, pre-RBA version)
 
 =head1 VERSION
 
-This document describes version 0.017 of App::BPOMUtils::Table::FoodCategory (from Perl distribution App-BPOMUtils-Table-FoodCategory), released on 2023-02-13.
+This document describes version 0.018 of App::BPOMUtils::Table::FoodCategory (from Perl distribution App-BPOMUtils-Table-FoodCategory), released on 2023-09-03.
 
 =head1 DESCRIPTION
 
@@ -10831,11 +10831,11 @@ This distribution contains the following CLIs:
 
 =over
 
-=item * L<bpom-daftar-kategori-pangan>
+=item * L<bpom-daftar-kategori-pangan-lama>
 
 =item * L<bpom-daftar-kategori-pangan-rba>
 
-=item * L<bpom-list-food-categories>
+=item * L<bpom-list-food-categories-old>
 
 =item * L<bpom-list-food-categories-rba>
 
@@ -10844,13 +10844,13 @@ This distribution contains the following CLIs:
 =head1 FUNCTIONS
 
 
-=head2 bpom_list_food_categories
+=head2 bpom_list_food_categories_old
 
 Usage:
 
- bpom_list_food_categories(%args) -> [$status_code, $reason, $payload, \%result_meta]
+ bpom_list_food_categories_old(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-List food categories in BPOM processed food division.
+List food categories in BPOM processed food division (old, pre-RBA version).
 
 This function is not exported by default, but exportable.
 

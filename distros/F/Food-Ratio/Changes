@@ -1,5 +1,8 @@
 Revision history for Food-Ratio
 
+0.04    2023-08-31
+        Fix some Object::Pad deprecations.
+
 0.03    2023-05-22
         foodratio(1) can parse foodratio(1) output. More documentation
         improvements.

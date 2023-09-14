@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.888';
+our $VERSION = '1.889';
 
 use if $^O eq 'MSWin32', 'threads';
 use if $^O eq 'MSWin32', 'threads::shared';
@@ -26,6 +26,13 @@ my $tid = $INC{'threads.pm'} ? threads->tid() : 0;
 
 sub CLONE {
     $tid = threads->tid() if $INC{'threads.pm'};
+}
+
+sub MCE::Mutex::Channel2::_guard::DESTROY {
+    my ($pid, $obj) = @{ $_[0] };
+    CORE::syswrite($obj->{_r_sock}, '0'), $obj->{$pid.'b'} = 0 if $obj->{$pid.'b'};
+
+    return;
 }
 
 ###############################################################################
@@ -56,12 +63,18 @@ sub new {
 sub lock2 {
     my ($pid, $obj) = ($tid ? $$ .'.'. $tid : $$, shift);
 
-    CORE::lock($obj->{_t_lock2}), MCE::Util::_sock_ready($obj->{_w_sock})
-        if $is_MSWin32;
-    MCE::Util::_sysread($obj->{_w_sock}, my($b), 1), $obj->{ $pid.'b' } = 1
-        unless $obj->{ $pid.'b' };
+    unless ($obj->{ $pid.'b' }) {
+        CORE::lock($obj->{_t_lock2}), MCE::Util::_sock_ready($obj->{_w_sock})
+            if $is_MSWin32;
+        MCE::Util::_sysread($obj->{_w_sock}, my($b), 1), $obj->{ $pid.'b' } = 1;
+    }
 
     return;
+}
+
+sub guard_lock2 {
+    &lock2(@_);
+    bless([ $tid ? $$ .'.'. $tid : $$, $_[0] ], MCE::Mutex::Channel2::_guard::);
 }
 
 *lock_exclusive2 = \&lock2;
@@ -83,16 +96,15 @@ sub synchronize2 {
     return unless ref($code) eq 'CODE';
 
     # lock, run, unlock - inlined for performance
-    CORE::lock($obj->{_t_lock2}), MCE::Util::_sock_ready($obj->{_w_sock})
-        if $is_MSWin32;
-    MCE::Util::_sysread($obj->{_w_sock}, $b, 1), $obj->{ $pid.'b' } = 1
-        unless $obj->{ $pid.'b' };
-
+    my $guard = bless([ $pid, $obj ], MCE::Mutex::Channel2::_guard::);
+    unless ($obj->{ $pid.'b' }) {
+        CORE::lock($obj->{_t_lock2}), MCE::Util::_sock_ready($obj->{_w_sock})
+            if $is_MSWin32;
+        MCE::Util::_sysread($obj->{_w_sock}, $b, 1), $obj->{ $pid.'b' } = 1;
+    }
     (defined wantarray)
       ? @ret = wantarray ? $code->(@_) : scalar $code->(@_)
       : $code->(@_);
-
-    CORE::syswrite($obj->{_r_sock}, '0'), $obj->{ $pid.'b' } = 0;
 
     return wantarray ? @ret : $ret[-1];
 }
@@ -142,7 +154,7 @@ MCE::Mutex::Channel2 - Provides two mutexes using a single channel
 
 =head1 VERSION
 
-This document describes MCE::Mutex::Channel2 version 1.888
+This document describes MCE::Mutex::Channel2 version 1.889
 
 =head1 DESCRIPTION
 
@@ -171,6 +183,8 @@ The API is described in L<MCE::Mutex>.
 
 =item lock_shared
 
+=item guard_lock
+
 =item unlock
 
 =item synchronize
@@ -190,6 +204,8 @@ The API is described in L<MCE::Mutex>.
 =item lock_exclusive2
 
 =item lock_shared2
+
+=item guard_lock2
 
 =item unlock2
 

@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.66;
+use warnings;
+use Object::Pad 0.800;
 
-package Device::Chip::CCS811 0.02;
+package Device::Chip::CCS811 0.03;
 class Device::Chip::CCS811
    :isa(Device::Chip::Base::RegisteredI2C);
 

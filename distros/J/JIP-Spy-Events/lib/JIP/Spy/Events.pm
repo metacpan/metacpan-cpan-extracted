@@ -10,7 +10,7 @@ use English qw(-no_match_vars);
 
 use JIP::Spy::Event;
 
-our $VERSION = version->declare('v0.0.4');
+our $VERSION = version->declare('v0.0.5');
 our $AUTOLOAD;
 
 sub new {
@@ -198,7 +198,7 @@ JIP::Spy::Events - the most basic function spy ability
 
 =head1 VERSION
 
-This document describes L<JIP::Spy::Events> version C<v0.0.4>.
+This document describes L<JIP::Spy::Events> version C<v0.0.5>.
 
 =head1 SYNOPSIS
 

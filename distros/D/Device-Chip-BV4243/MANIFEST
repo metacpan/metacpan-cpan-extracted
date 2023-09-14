@@ -1,5 +1,7 @@
+.editorconfig
 Build.PL
 Changes
+examples/bv4243.pl
 examples/dump-eeprom
 examples/echo
 lib/Device/Chip/BV4243.pm

@@ -80,7 +80,7 @@
          "web" : "https://github.com/rjbs/Log-Dispatchouli"
       }
    },
-   "version" : "3.006",
+   "version" : "3.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"
@@ -470,7 +470,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "3.006",
+                  "tag" : "3.007",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -587,6 +587,7 @@
       }
    },
    "x_contributors" : [
+      "Charlie Garrison <cng@garrison.com.au>",
       "Christopher J. Madsen <perl@cjmweb.net>",
       "Dagfinn Ilmari Manns\u00e5ker <ilmari@ilmari.org>",
       "Dan Book <grinnz@gmail.com>",

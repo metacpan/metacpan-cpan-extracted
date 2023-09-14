@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( uninitialized once );
 
-our $VERSION = '1.888';
+our $VERSION = '1.889';
 
 use base 'MCE::Channel';
 
@@ -231,16 +231,8 @@ sub send2 {
    my $data = ''.shift;
 
    local $\ = undef if (defined $\);
-   local $MCE::Signal::SIG;
-
-   {
-      local $MCE::Signal::IPC = 1;
-
-      MCE::Util::_sock_ready_w( $self->{c_sock} ) if $is_MSWin32;
-      print { $self->{c_sock} } pack('i', length $data) . $data;
-   }
-
-   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
+   MCE::Util::_sock_ready_w( $self->{c_sock} ) if $is_MSWin32;
+   print { $self->{c_sock} } pack('i', length $data) . $data;
 
    return 1;
 }
@@ -308,7 +300,7 @@ MCE::Channel::SimpleFast - Fast channel tuned for one producer and one consumer
 
 =head1 VERSION
 
-This document describes MCE::Channel::SimpleFast version 1.888
+This document describes MCE::Channel::SimpleFast version 1.889
 
 =head1 DESCRIPTION
 

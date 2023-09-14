@@ -241,6 +241,9 @@ METHODS
 
        $code->( $tickit, $key )
 
+    The $key name is encoded as given by the str accessor of
+    Tickit::Event::Key (see Tickit::Event for detail).
+
     If $code is missing or undef, any existing callback is removed.
 
     As a convenience for the common application use case, the Ctrl-C key is

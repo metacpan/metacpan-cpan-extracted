@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use warnings;
+use Object::Pad 0.800;
 
-package Device::Chip::BME280 0.05;
+package Device::Chip::BME280 0.06;
 class Device::Chip::BME280
    :isa(Device::Chip::Base::RegisteredI2C);
 
@@ -212,9 +213,9 @@ async method read_raw ()
 
 # Compensation formulae directly from BME280 datasheet section 8.1
 
-has $_t_fine;
+field $_t_fine;
 
-has @_dig_T;
+field @_dig_T;
 
 async method _compensate_temperature ( $adc_T )
 {
@@ -229,7 +230,7 @@ async method _compensate_temperature ( $adc_T )
    return $T;
 }
 
-has @_dig_P;
+field @_dig_P;
 
 async method _compensate_pressure ( $adc_P )
 {
@@ -251,7 +252,7 @@ async method _compensate_pressure ( $adc_P )
    return $P;
 }
 
-has @_dig_H;
+field @_dig_H;
 
 async method _compensate_humidity ( $adc_H )
 {
@@ -302,7 +303,7 @@ async method read_sensor
    );
 }
 
-has $_pending_read_f;
+field $_pending_read_f;
 
 method _next_read
 {

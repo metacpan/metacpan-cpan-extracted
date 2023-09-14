@@ -7,7 +7,7 @@ use File::stat;
 use ExtUtils::Manifest qw(maniskip);
 $ExtUtils::Manifest::Quiet = 1;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 $VERSION =~ s/_//; ## no critic
 
 our $RespectManiskip = 1;  # for Test::Kwalitee and its friends

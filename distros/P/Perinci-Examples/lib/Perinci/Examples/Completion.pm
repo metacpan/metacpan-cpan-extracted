@@ -3,12 +3,11 @@ package Perinci::Examples::Completion;
 use 5.010;
 use strict;
 use warnings;
-use experimental 'smartmatch';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-04-15'; # DATE
+our $DATE = '2023-07-09'; # DATE
 our $DIST = 'Perinci-Examples'; # DIST
-our $VERSION = '0.823'; # VERSION
+our $VERSION = '0.824'; # VERSION
 
 our %SPEC;
 
@@ -38,10 +37,10 @@ $SPEC{fruits} = {
                 );
                 my $ary = $args{args}{fruits};
                 my $res = [];
-                for (keys %allfruits) {
-                    next unless /\A\Q$word\E/i;
-                    push @$res, {word=>$_, summary=>$allfruits{$_}}
-                        unless $_ ~~ @$ary;
+                for my $fruit (keys %allfruits) {
+                    next unless $fruit =~ /\A\Q$word\E/i;
+                    push @$res, {word=>$fruit, summary=>$allfruits{$fruit}}
+                        unless grep { $fruit eq $_ } @$ary;
                 }
                 $res;
             },
@@ -102,7 +101,7 @@ $SPEC{animals} = {
                 'white',
                 'yellow',
             ],
-            pos => 0,
+            pos => 1,
         },
     },
     description => <<'_',
@@ -114,6 +113,22 @@ and can be used for testing, documentation, or completion.
 _
 };
 sub animals {
+    [200, "OK", {@_}];
+}
+
+$SPEC{simple} = {
+    v => 1.1,
+    summary => 'Simple completion demo',
+    args => {
+        in_clause => {
+            schema => ['str*', in=>[qw/one two three four fiv/]],
+        },
+        int_up_to_12 => {
+            schema => ['int*', min=>1, max=>12],
+        },
+    },
+};
+sub simple {
     [200, "OK", {@_}];
 }
 
@@ -132,7 +147,7 @@ Perinci::Examples::Completion - More completion examples
 
 =head1 VERSION
 
-This document describes version 0.823 of Perinci::Examples::Completion (from Perl distribution Perinci-Examples), released on 2022-04-15.
+This document describes version 0.824 of Perinci::Examples::Completion (from Perl distribution Perinci-Examples), released on 2023-07-09.
 
 =for Pod::Coverage .*
 
@@ -159,7 +174,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<animal> => I<str>
 
+(No description)
+
 =item * B<color> => I<str>
+
+(No description)
 
 
 =back
@@ -196,6 +215,46 @@ Arguments ('*' denotes required arguments):
 This argument contains valid values and their summaries in the schema.
 
 =item * B<fruits> => I<array[str]>
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 simple
+
+Usage:
+
+ simple(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Simple completion demo.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<in_clause> => I<str>
+
+(No description)
+
+=item * B<int_up_to_12> => I<int>
+
+(No description)
 
 
 =back
@@ -236,13 +295,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

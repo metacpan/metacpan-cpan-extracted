@@ -1,17 +1,14 @@
 package PYX::GraphViz;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use GraphViz;
 use PYX::Parser;
 
-# Version.
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -177,6 +174,7 @@ PYX::GraphViz - GraphViz output for PYX handling.
 =head1 SYNOPSIS
 
  use PYX::GraphViz;
+
  my $obj = PYX::GraphViz->new(%parameters);
  $obj->parse($pyx, $out);
  $obj->parse_file($input_file, $out);
@@ -270,11 +268,11 @@ Constructor
 
 =head1 EXAMPLE
 
- # Pragmas.
+=for comment filename=simple_html_to_png.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use PYX::GraphViz;
 
  # Example PYX data.
@@ -303,8 +301,8 @@ Constructor
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/tupinek/PYX-Hist/master/images/ex1.png">
-  <img src="https://raw.githubusercontent.com/tupinek/PYX-Hist/master/images/ex1.png" alt="Output of example" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/PYX-GraphViz/master/images/ex1.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/PYX-GraphViz/master/images/ex1.png" alt="Output of example" width="300px" height="300px" />
 </a>
 
 =end html
@@ -328,21 +326,22 @@ Install the PYX modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/PYX-GraphViz>
+L<https://github.com/michal-josef-spacek/PYX-GraphViz>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2015 Michal Špaček
- BSD 2-Clause License
+© 2011-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

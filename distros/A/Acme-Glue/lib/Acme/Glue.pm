@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-$Acme::Glue::VERSION = "2023.08";
+$Acme::Glue::VERSION = "2023.10";
 
 =encoding utf8
 
@@ -14,7 +14,7 @@ Acme::Glue - A placeholder module for code accompanying a Perl photo project
 
 =head1 VERSION
 
-2023.08
+2023.10
 
 =head1 DESCRIPTION
 
@@ -139,6 +139,14 @@ Here are the snippets that may accompany the photo project
       y;AEHIOUWYBFPVCGJKQSXZDTLMNR;00000000111122222222334556;;
       y;;;cs;y;0;;d;s;^;$f;;s;$;0000;;m;(^.{4});;$1;}:q;;;
     }
+
+=head2 NERDVANA (delorean_ options.pl)
+
+    GetOptions(
+        'help|h|?'       => sub { pod2usage(1) },
+        'serial-dev|d=s' => \my $opt_serial_dev= '/dev/delorean',
+        'socket|S=s'     => \my $opt_socket= '/run/uctl-daemon.sock',
+    ) or pod2usage(2);
 
 =head2 SLU (MAZE.BAS)
 

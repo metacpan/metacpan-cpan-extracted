@@ -156,7 +156,7 @@ This package provides the following methods:
 
 =head2 all
 
-  all(CodeRef $code) (Bool)
+  all(coderef $code) (boolean)
 
 The all method should return true if the callback returns true for all of the
 elements provided.
@@ -179,7 +179,7 @@ I<Since C<0.01>>
 
 =head2 any
 
-  any(CodeRef $code) (Bool)
+  any(coderef $code) (boolean)
 
 The any method should return true if the callback returns true for any of the
 elements provided.
@@ -205,7 +205,7 @@ I<Since C<0.01>>
 
 =head2 count
 
-  count() (Num)
+  count() (number)
 
 The count method should return the number of top-level element in the data
 structure.
@@ -229,7 +229,7 @@ I<Since C<0.01>>
 
 =head2 delete
 
-  delete(Str $key) (Any)
+  delete(string $key) (any)
 
 The delete method returns should remove the item in the data structure based on
 the key provided, returning the item.
@@ -253,7 +253,7 @@ I<Since C<0.01>>
 
 =head2 each
 
-  each(CodeRef $code) (ArrayRef)
+  each(coderef $code) (arrayref)
 
 The each method should execute the callback for each item in the data structure
 passing the key and value as arguments.
@@ -302,7 +302,7 @@ I<Since C<0.01>>
 
 =head2 exists
 
-  exists(Str $key) (Bool)
+  exists(string $key) (boolean)
 
 The exists method should return true if the item at the key specified exists,
 otherwise it returns false.
@@ -326,7 +326,7 @@ I<Since C<0.01>>
 
 =head2 grep
 
-  grep(CodeRef $code) (ArrayRef)
+  grep(coderef $code) (arrayref)
 
 The grep method should execute a callback for each item in the array, passing
 the value as an argument, returning a value containing the items for which the
@@ -353,7 +353,7 @@ I<Since C<0.01>>
 
 =head2 iterator
 
-  iterator() (CodeRef)
+  iterator() (coderef)
 
 The iterator method should return a code reference which can be used to iterate
 over the data structure. Each time the iterator is executed it will return the
@@ -379,7 +379,7 @@ I<Since C<0.01>>
 
 =head2 keys
 
-  keys() (ArrayRef)
+  keys() (arrayref)
 
 The keys method should return an array reference consisting of the keys of the
 data structure.
@@ -403,7 +403,7 @@ I<Since C<0.01>>
 
 =head2 map
 
-  map(CodeRef $code) (ArrayRef)
+  map(coderef $code) (arrayref)
 
 The map method should iterate over each item in the data structure, executing
 the code reference supplied in the argument, passing the routine the value at
@@ -431,7 +431,7 @@ I<Since C<0.01>>
 
 =head2 none
 
-  none(CodeRef $code) (Bool)
+  none(coderef $code) (boolean)
 
 The none method should return true if none of the items in the data structure
 meet the criteria set by the operand and rvalue.
@@ -457,7 +457,7 @@ I<Since C<0.01>>
 
 =head2 one
 
-  one(CodeRef $code) (Bool)
+  one(coderef $code) (boolean)
 
 The one method should return true if only one of the items in the data
 structure meet the criteria set by the operand and rvalue.
@@ -483,7 +483,7 @@ I<Since C<0.01>>
 
 =head2 pairs
 
-  pairs(CodeRef $code) (Tuple[ArrayRef, ArrayRef])
+  pairs(coderef $code) (tuple[arrayref, arrayref])
 
 The pairs method should return an array reference of tuples where each tuple is
 an array reference having two items corresponding to the key and value for each
@@ -510,7 +510,7 @@ I<Since C<0.01>>
 
 =head2 random
 
-  random() (Any)
+  random() (any)
 
 The random method should return a random item from the data structure.
 
@@ -533,7 +533,7 @@ I<Since C<0.01>>
 
 =head2 reverse
 
-  reverse() (ArrayRef)
+  reverse() (arrayref)
 
 The reverse method should returns an array reference containing the items in
 the data structure in reverse order if the items in the data structure are
@@ -558,7 +558,7 @@ I<Since C<0.01>>
 
 =head2 slice
 
-  slice(Str @keys) (ArrayRef)
+  slice(string @keys) (arrayref)
 
 The slice method should return a new data structure containing the elements in
 the invocant at the key(s) specified in the arguments.
@@ -588,7 +588,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

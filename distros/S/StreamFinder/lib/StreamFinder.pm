@@ -134,7 +134,6 @@ blogger.com videos (L<StreamFinder::Blogger>),
 brandnewtube.com and ugetube.com videos (L<StreamFinder::BrandNewTube>), 
 brighteon.com videos (L<StreamFinder::Brighteon>), 
 castbox.fm podcasts (L<StreamFinder::Castbox>), 
-goodpods.com podcasts (L<StreamFinder::Goodpods>), 
 podcasts.google.com podcasts (L<StreamFinder::Google>), 
 iheartradio.com radio stations and podcasts (L<StreamFinder::IHeartRadio>), 
 www.internetradio.com radio stations (L<StreamFinder::InternetRadio>), 
@@ -142,7 +141,7 @@ www.linktv.org videos (L<StreamFinder::LinkTV>),
 onlineradiobox.com radio stations (L<StreamFinder::OnlineRadiobox>), 
 odysee.com videos (L<StreamFinder::Odysee>), 
 podbean.com podcasts (L<StreamFinder::Podbean>), 
-podcastaddict.com podcasts (L<StreamFinder::PodcastAddict>), 
+podcastaddict.com podcasts (L<StreamFinder::PodcastAddict>) (DEPRECIATED), 
 podchaser.com podcasts (L<StreamFinder::Podchaser>), 
 radio.net radio stations (L<StreamFinder::RadioNet>), 
 rcast.net radio stations (L<StreamFinder::Rcast>), 
@@ -150,6 +149,7 @@ rumble.com videos (L<StreamFinder::Rumble>),
 sermonaudio.com sermons: audio and video (L<StreamFinder::SermonAudio>), 
 soundcloud.com (non-paywalled) songs (L<StreamFinder::SoundCloud>), 
 spreaker.com podcasts (L<StreamFinder::Spreaker>), 
+subsplash.com podcasts (L<StreamFinder::Subsplash>) (EXPERIMENTAL), 
 tunein.com (non-paywalled) radio stations and podcasts 
 (L<StreamFinder::Tunein>), vimeo.com videos (L<StreamFinder::Vimeo>), 
 youtube.com, et. al and other sites that youtube-dl supports 
@@ -164,12 +164,12 @@ episode page to fetch streams from, as Podcastaddict.com has javascripted up
 their podcast pages now to the point that it is no longer possible to obtain 
 a playlist or first episode from them via our scripts.  
 
-NOTE:  StreamFinder::Reciva and StreamFinder::Radionomy have been removed, as 
-those sites have now closed down.
+NOTE:  StreamFinder::Goodpods has been removed, as that site has redone itself 
+in javascript as to no longer be scrapable for streams.
 
 NOTE:  For many sites, ie. Youtube, Vimeo, Apple, Spreaker, Castbox, Google, 
-etc. the "station" object actually refers to a specific video or podcast, but 
-functions the same way.  For some others, it may be a podcast episode.
+etc. the "station" object actually refers to a specific video or podcast 
+episode, but functions the same way.  
 
 Each site is supported by a separate subpackage (StreamFinder::I<Package>), 
 which is determined and selected based on the URL argument passed to it when 
@@ -537,16 +537,16 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '2.17';
+our $VERSION = '2.19';
 our $DEBUG = 0;
 
 require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
-my @supported_mods = (qw(Anystream Apple Bitchute Blogger BrandNewTube Brighteon Castbox Goodpods 
+my @supported_mods = (qw(Anystream Apple Bitchute Blogger BrandNewTube Brighteon Castbox  
 		Google IHeartRadio InternetRadio Odysee OnlineRadiobox Podbean PodcastAddict Podchaser 
-		RadioNet Rcast Rumble SermonAudio SoundCloud	Spreaker	Tunein Vimeo Youtube LinkTV Zeno));
+		RadioNet Rcast Rumble SermonAudio SoundCloud	Spreaker	Tunein Vimeo Youtube LinkTV Zeno Subsplash));
 
 my %useit;
 
@@ -640,9 +640,6 @@ sub new
 	} elsif ($url =~ m#\bsoundcloud\.# && $useit{'SoundCloud'}) {
 		eval { require 'StreamFinder/SoundCloud.pm'; $haveit = 1; };
 		return new StreamFinder::SoundCloud($url, @args)  if ($haveit);
-	} elsif ($url =~ m#\bgoodpods\.# && $useit{'Goodpods'}) {
-		eval { require 'StreamFinder/Goodpods.pm'; $haveit = 1; };
-		return new StreamFinder::Goodpods($url, @args)  if ($haveit);
 	} elsif ($url =~ m#\brcast\.# && $useit{'Rcast'}) {
 		eval { require 'StreamFinder/Rcast.pm'; $haveit = 1; };
 		return new StreamFinder::Rcast($url, @args)  if ($haveit);
@@ -655,6 +652,9 @@ sub new
 	} elsif ($url =~ m#\bzeno\.# && $useit{'Zeno'}) {
 		eval { require 'StreamFinder/Zeno.pm'; $haveit = 1; };
 		return new StreamFinder::Zeno($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\bsubsplash\.# && $useit{'Subsplash'}) {
+		eval { require 'StreamFinder/Subsplash.pm'; $haveit = 1; };
+		return new StreamFinder::Subsplash($url, @args)  if ($haveit);
 	} elsif ($useit{'Youtube'}) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
 		eval { require 'StreamFinder/Youtube.pm'; $haveit = 1; };
 		if ($haveit) {

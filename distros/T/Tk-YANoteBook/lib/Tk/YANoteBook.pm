@@ -1,116 +1,5 @@
 package Tk::YANoteBook;
 
-package NameTab;
-
-use strict;
-use warnings;
-use Tk;
-use base qw(Tk::Derived Tk::Frame);
-Construct Tk::Widget 'NameTab';
-
-sub Populate {
-	my ($self,$args) = @_;
-	
-	my $closebutton = delete $args->{'-closebutton'};
-	$closebutton = 0 unless defined $closebutton;
-
-	my $closeimage;
-	if ($closebutton) {
-		$closeimage = delete $args->{'-closeimage'};
-		$closeimage = $self->Pixmap(-file => Tk->findINC('close_icon.xpm')) unless defined $closeimage;
-	}
-
-	$self->SUPER::Populate($args);
-	my $l = $self->Label(
-	)->pack(
-		-side => 'left',
-		-expand => 1,
-		-fill => 'both',
-		-padx => 2,
-		-pady => 6,
-	);
-	$self->Advertise('Label' => $l);
-
-	$self->bind('<Motion>', [$self, 'TabMotion', Ev('x'), Ev('y')]);
-	$l->bind('<Motion>', [$self, 'ItemMotion', $l, Ev('x'), Ev('y')]);
-
-	$self->bind('<Button-1>', [$self, 'OnClick']);
-	$l->bind('<Button-1>', [$self, 'OnClick']);
-
-	$self->bind('<ButtonRelease-1>', [$self, 'OnRelease']);
-	$l->bind('<ButtonRelease-1>', [$self, 'OnRelease']);
-	
-	my $b;
-	if ($closebutton) {
-		$b = $self->Button(
-			-image => $closeimage,
-			-command => ['TabClose', $self],
-			-relief => 'flat',
-			-highlightthickness => 0,
-		)->pack(
-			-side => 'right',
-			-padx => 2,
-			-pady => 2,
-		);
-		$b->bind('<Motion>', [$self, 'ItemMotion', $b, Ev('x'), Ev('y')]);
-	}
-	
-	my @conf = ();
-	if (defined $b) {
-		@conf = (
-			-background => [[$self, $l, $b], 'background', 'Background',],
-		)
-	} else {
-		@conf = (
-			-background => [[$self, $l], 'background', 'Background',]
-		)
-	}
-	
-	$self->ConfigSpecs(@conf,
-		-name => ['PASSIVE', undef, undef, ''],
-		-clickcall => ['CALLBACK', undef, undef, sub {}],
-		-closecall => ['CALLBACK', undef, undef, sub {}],
-		-motioncall => ['CALLBACK', undef, undef, sub {}],
-		-releasecall => ['CALLBACK', undef, undef, sub {}],
-		-relief => ['SELF'],
-		-title => [{-text => $l}],
-		-titleimg => [{-image => $l}],
-		DEFAULT => [$l],
-	);
-}
-
-sub ItemMotion {
-	my ($self, $item, $x, $y) = @_;
-	$x = $x + $item->x;
-	$y = $y + $item->y;
-	$self->TabMotion($x, $y);
-}
-
-sub OnClick {
-	my $self = shift;
-	my $name = $self->cget('-name');
-	$self->Callback('-clickcall', $name);
-}
-
-sub OnRelease {
-	my $self = shift;
-	my $name = $self->cget('-name');
-	$self->Callback('-releasecall', $name);
-}
-
-sub TabClose {
-	my $self = shift;
-	$self->Callback('-closecall', $self->cget('-name'));
-}
-
-sub TabMotion {
-	my ($self, $x, $y) = @_;
-	my $name = $self->cget('-name');
-	$self->Callback('-motioncall', $name, $x, $y);
-}
-
-package main;
-
 =head1 NAME
 
 Tk::YANoteBook - Yet another NoteBook widget
@@ -120,9 +9,10 @@ Tk::YANoteBook - Yet another NoteBook widget
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 use Tk;
+require Tk::YANoteBook::NameTab;
 
 use base qw(Tk::Derived Tk::Frame);
 Construct Tk::Widget 'YANoteBook';
@@ -144,9 +34,17 @@ It has an overload if tabs won't fit any more.
 
 You can specify a close button for a tab.
 
-=head1 B<CONFIG VARIABLES>
+=head1 CONFIG VARIABLES
 
 =over 4
+
+=item Switch: B<-autoupdate>
+
+Default value 1. The widget automatically updates the tab bar after
+a change is made. You can switch this off, make some massive changes,
+then change it back on to have only one update call.
+
+Corresponds with the B<autoupdate> method below.
 
 =item Name: B<-backPageColor>
 
@@ -170,6 +68,11 @@ Calback, called before a tab is closed. Shoud return a boolean value.
 Image to be used for the more button.
 Default value none.
 
+=item Switch: B<-onlyselect>
+
+Defaut value is 1. If cleared it will unselect a selected page when 
+clicked, leaving no pages selected.
+
 =item Switch: B<-selectoptions>
 
 Configuring the selected tab.
@@ -177,7 +80,11 @@ Default value [ -relief => 'raised' ].
 
 =item Switch: B<-selecttabcall>
 
-Calback, called when a tab is selected with the mouse.
+Calback, called when a tab is selected.
+
+=item Switch: B<-rigid>
+
+Default is 1. When cleared the widget will resize to minium when no page is selected.
 
 =item Switch: B<-tabside>
 
@@ -194,6 +101,10 @@ Default value 'More'.
 Configuring the unselected tab.
 Default value [ -relief => 'flat'].
 
+=item Switch: B<-unselecttabcall>
+
+Calback, called when a tab is unselected.
+
 =back
 
 =cut
@@ -204,6 +115,9 @@ sub Populate {
 	my $tabside = delete $args->{-'tabside'};
 	$tabside = 'top' unless defined $tabside;
 	$self->{TABSIDE} = $tabside;
+
+
+	$self->SUPER::Populate($args);
 
 	my @barpack = ();
 	my @tabpack = ();
@@ -221,7 +135,6 @@ sub Populate {
 	}
 	$self->{TABPACK} = \@tabpack;
 
-	$self->SUPER::Populate($args);
 	
 	my $barframe = $self->Frame(
 		-relief => 'sunken',
@@ -265,29 +178,37 @@ sub Populate {
 	$listbox->bind('<ButtonRelease-1>', [$self, 'Select', Ev('x'), Ev('y')]);
 	$self->bind('<Button-1>', [$self, 'ListPopDown']);
 
-	my $pageframe = $self->Frame->pack(-side => $tabside, -expand => 1, -fill => 'both');
+	my @pfpack = (-side => $tabside, -expand => 1, -fill => 'both');
+	my $pageframe = $self->Frame(
+	)->pack(@pfpack);
 	$self->Advertise('PageFrame' => $pageframe);
 
 	$self->bind('<Configure>', [$self, 'ConfigureCall']);
 	$self->{ACTIVE} = 0;
+	$self->{AUTOUPDATE} = 1;
 	$self->{DISPLAYED} = [];
 	$self->{INMAINLOOP} = 0;
 	$self->{PAGES} = {};
+	$self->{PFPACK} = \@pfpack;
 	$self->{SELECTED} = undef;
 	$self->{UNDISPLAYED} = \@values;
 	$self->{POPPED} = 0;
 
 	$self->ConfigSpecs(
+		-autoupdate => ['METHOD', undef, undef, 1],
 		-backpagecolor => [{-background => $tabframe}, 'backPageColor', 'BackPageColor', '#8f8f8f'],
 		-closeimage => ['PASSIVE', undef, undef, $self->Pixmap(-file => Tk->findINC('close_icon.xpm'))],
 		-closetabcall => ['CALLBACK', undef, undef, sub { return 1 }],
 		-image => [$morebutton],
+		-onlyselect => ['PASSIVE', undef, undef, 1], 
+		-rigid => ['PASSIVE', undef, undef, 1], 
 		-selectoptions => ['PASSIVE', undef, undef, [
 			-relief => 'raised',
 		]],
 		-selecttabcall => ['CALLBACK', undef, undef, sub {}],
 		-text => [$morebutton, undef, undef, 'More'],
 		-tabpack => ['PASSIVE', undef, undef, \@tabpack], 
+		-unselecttabcall => ['CALLBACK', undef, undef, sub {}],
 		-unselectoptions => ['PASSIVE', undef, undef, [
 			-relief => 'flat',
 		]],
@@ -356,15 +277,36 @@ sub addPage {
 
 	my $pages = $self->{PAGES};
 	$self->{PAGES}->{$name} = [$tab, $page];
-	$self->UpdateTabs if $self->{INMAINLOOP};
+	$self->UpdateTabs if $self->{INMAINLOOP} and $self->autoupdate;
 
 	return $page
+}
+
+=item B<autoupdate>I<(?$boolean?)>
+
+Sets and returns the B<autoupdate> flag.
+See the B<-autoupdate> option.
+
+=cut
+
+sub autoupdate {
+	my ($self, $flag) = @_;
+	if (defined $flag) {
+		$self->{AUTOUPDATE} = $flag;
+		$self->UpdateTabs if $flag and $self->{INMAINLOOP};
+	}
+	return $self->{AUTOUPDATE};
 }
 
 sub ClickCall {
 	my ($self, $name) = @_;
 	$self->{ACTIVE} = 1;
-	$self->selectPage($name);
+	my $sel = $self->Selected;
+	if ((defined $sel) and ($sel eq $name)) {
+		$self->unselectPage unless $self->cget('-onlyselect');
+	} else {
+		$self->selectPage($name);
+	}
 }
 
 sub ConfigureCall {
@@ -394,7 +336,8 @@ sub deletePage {
 	}
 	if ($self->Callback('-closetabcall', $name)) {
 		my $newselect;
-		if ($self->Selected eq $name) {
+		my $selected = $self->Selected;
+		if ((defined $selected) and ($self->Selected eq $name)) {
 			if ($self->pageCount > 1) {
 				my $pos = $self->tabPosition($name);
 				if (defined $pos) {
@@ -403,7 +346,7 @@ sub deletePage {
 					$newselect = $dp->[$pos - 1] unless ((defined $newselect) and ($pos > 1));
 				}
 			}
-			$self->UnselectPage;
+			$self->unselectPage;
 		}
 		if ($self->isDisplayed($name)) {
 			my $dp = $self->{DISPLAYED};
@@ -417,8 +360,10 @@ sub deletePage {
 		my $pg = delete $self->{PAGES}->{$name};
 		$pg->[0]->destroy;
 		$pg->[1]->destroy;
-		$self->UpdateTabs;
-		$self->selectPage($newselect) if defined $newselect;
+		if ($self->autoupdate) {
+			$self->UpdateTabs;
+			$self->selectPage($newselect) if ((defined $newselect) and ($self->cget('-onlyselect')));
+		}
 		return 1
 	}
 	return 0
@@ -651,7 +596,7 @@ sub PostInit {
 	$self->{INMAINLOOP} = 1;
 	$self->UpdateTabs;
 	my $dp = $self->{DISPLAYED};
-	$self->selectPage($dp->[0]) if (@$dp);
+	$self->selectPage($dp->[0]) if ((@$dp) and ($self->cget('-onlyselect')));
 }
 
 sub ReleaseCall {
@@ -713,7 +658,9 @@ sub selectPage {
 	return if (defined $sel) and ($name eq $sel);
 	my $page = $self->{PAGES}->{$name};
 	if (defined $page) {
-		$self->UnselectPage;
+		$self->unselectPage;
+		my $pfpack = $self->{PFPACK};
+		$self->Subwidget('PageFrame')->pack(@$pfpack) unless $self->cget('-rigid');
 		unless ($self->isDisplayed($name)) {
 			my $ud = $self->{UNDISPLAYED};
 			my @undisp = @$ud;
@@ -766,7 +713,7 @@ sub tabPosition {
 	return $index
 }
 
-sub UnselectPage {
+sub unselectPage {
 	my $self = shift;
 	my $name = $self->{SELECTED};
 	if (defined $name) {
@@ -778,6 +725,8 @@ sub UnselectPage {
 		);
 		$frame->packForget;
 		$self->{SELECTED} = undef;
+		$self->Subwidget('PageFrame')->packForget unless $self->cget('-rigid');;
+		$self->Callback('-unselecttabcall', $name);
 	}
 }
 

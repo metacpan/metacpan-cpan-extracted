@@ -159,6 +159,85 @@ method walk_each_query_match ( $src, $node, $method, @args )
    return 1;
 }
 
+=head2 extract_use_module_imports
+
+   @imports = $check->extract_use_module_imports( $node );
+
+Given a C<(use_statement)> node, analyse it to determine a list of
+statically-known import strings and return it. Simple string literals in
+C<'single quotes'>, C<"double quotes"> or C<qw( quoted word lists )> are
+parsed fairly simply. Other kinds of expressions are ignored.
+
+=cut
+
+method extract_use_module_imports ( $node )
+{
+   $node->type eq "use_statement" or
+      die "Expected a (use_statement) node";
+
+   # TODO this would be a lot neater if tree-sitter-perl named the imports list
+
+   my @named_kids = $node->field_names_with_child_nodes;
+
+   # First kid is "use" keyword
+   shift @named_kids; shift @named_kids;
+
+   # Second kid really better be the module
+   shift @named_kids eq "module" or die "Expected a 'module:' named node"; shift @named_kids;
+
+   # Might be a version now
+   if( @named_kids and ($named_kids[0]//"") eq "version" ) {
+      shift @named_kids; shift @named_kids;
+   }
+
+   my @imports;
+
+   while( @named_kids ) {
+      my $name = shift @named_kids;
+      my $kid  = shift @named_kids;
+
+      last if $kid->type eq ";";
+
+      push @imports, $self->extract_literal_list( $kid );
+   }
+
+   return @imports;
+}
+
+method extract_literal_list ( $node )
+{
+   match( my $type = $node->type : eq ) {
+      case( "string_literal" ) {
+         my $val = $node->text;
+         $val =~ s/^'(.*)'$/$1/;
+         $val =~ s/q\s*.(.*).$/$1/;
+         return $val;
+      }
+      case( "interpolated_string_literal" ) {
+         my $val = $node->text;
+         $val =~ s/^"(.*)"$/$1/;
+         $val =~ s/qq\s*.(.*).$/$1/;
+         # TODO: This check isn't very good; could be improved
+         $val =~ m/\$/ and
+            warn( "Unable to handle interpolation in string literal" ), next;
+         return $val;
+      }
+      case( "quoted_word_list" ) {
+         my $val = $node->text;
+         $val =~ s/qw\s*.(.*).$/$1/;
+
+         return grep { length } split /\s+/, $val;
+      }
+      case( "list_expression" ) {
+         return map { $_->type eq "," ? () : $self->extract_literal_list( $_ ) } $node->child_nodes;
+      }
+      default {
+         warn "Unsure how to handle a ($type) node";
+         return ();
+      }
+   }
+}
+
 =head1 AUTHOR
 
 Paul Evans <leonerd@leonerd.org.uk>

@@ -1,6 +1,5 @@
 package Net::CLI::Interact::Phrasebook;
-{ $Net::CLI::Interact::Phrasebook::VERSION = '2.400000' }
-
+$Net::CLI::Interact::Phrasebook::VERSION = '2.400002';
 use Moo;
 use MooX::Types::MooseLike::Base qw(InstanceOf Str Any HashRef);
 
@@ -182,7 +181,9 @@ sub load_phrasebooks {
                 $send =~ s/^["']//; $send =~ s/["']$//;
                 $data->{actions}->[-1]->{continuation} = [
                     {type => 'match', value => [qr/$match/]},
+                    ## no critic (ProhibitStringyEval)
                     {type => 'send',  value => eval "qq{$send}", no_ors => 1}
+                    ## use critic
                 ];
                 next;
             }
@@ -263,6 +264,8 @@ sub _gather_pb_from {
 1;
 
 =pod
+
+=for Pod::Coverage BUILD load_phrasebooks logger
 
 =head1 NAME
 
@@ -483,7 +486,7 @@ instead:
 
  prompt priv_exec
      match /# ?$/
- 
+
  macro to_priv_exec
      send enable
      match /[Pp]assword: ?$/

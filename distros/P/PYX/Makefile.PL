@@ -30,11 +30,12 @@ resources 'repository' => 'git://github.com/michal-josef-spacek/PYX';
 test_requires 'English' => 0;
 test_requires 'Error::Pure::Utils' => 0.16;
 test_requires 'File::Object' => 0.07;
+test_requires 'Perl6::Slurp' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 1.02;
 tests_recursive;
-version '0.08';
+version '0.09';
 
 # Run.
 WriteAll();

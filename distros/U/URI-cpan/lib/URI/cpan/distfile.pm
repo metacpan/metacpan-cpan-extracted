@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package URI::cpan::distfile 1.008;
+package URI::cpan::distfile 1.009;
 # ABSTRACT: cpan:///distfile/AUTHOR/Dist-1.234.tar.gz
 
 use parent qw(URI::cpan);
@@ -93,7 +93,7 @@ URI::cpan::distfile - cpan:///distfile/AUTHOR/Dist-1.234.tar.gz
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 SYNOPSIS
 
@@ -102,13 +102,13 @@ format AUTHOR/DISTFILE
 
 =head1 PERL VERSION
 
-This library should run on perls released even a long time ago.  It should work
-on any version of perl released in the last five years.
+This library should run on perls released even a long time ago.  It should
+work on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 METHODS
 
@@ -132,7 +132,7 @@ This returns the name of the author whose file is referred to.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

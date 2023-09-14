@@ -1,5 +1,5 @@
 package App::Oozie::Util::Log4perl;
-$App::Oozie::Util::Log4perl::VERSION = '0.002';
+$App::Oozie::Util::Log4perl::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
@@ -35,7 +35,7 @@ App::Oozie::Util::Log4perl
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -44,7 +44,7 @@ version 0.002
 
 =head1 DESCRIPTION
 
-Internal modile.
+Internal module.
 
 =head1 NAME
 

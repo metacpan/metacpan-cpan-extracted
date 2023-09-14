@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -8,14 +9,14 @@ my $build = Module::Build->new(
    requires => {
       'perl' => '5.026',
       'Future::AsyncAwait' => '0.38', # async method
-      'Object::Pad' => '0.66',
+      'Object::Pad' => '0.800',
 
       'Data::Bitfield' => 0,
       'Device::Chip' => 0,
    },
    test_requires => {
-      'Test::More' => '0.88', # done_testing
       'Test::Device::Chip::Adapter' => 0,
+      'Test2::V0' => 0,
    },
    auto_configure_requires => 0, # Don't add M::B to configure_requires
    license => 'perl',

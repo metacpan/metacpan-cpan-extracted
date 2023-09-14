@@ -1,5 +1,11 @@
 Revision history for Device-Chip-MPL3115A2
 
+0.13    2023-09-13
+        [CHANGES]
+         * General module style updates:
+            + Updated for Object::Pad v0.800
+            + Swap unit tests to `Test2::V0`
+
 0.12    2022-12-11
         [CHANGES]
          * Updated for Object::Pad v0.66 - use `field` instead of `has`

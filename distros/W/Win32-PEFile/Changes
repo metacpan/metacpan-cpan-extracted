@@ -1,7 +1,8 @@
 Revision history for Perl module Win32::PEFile
 
-0.7007 Mon Jun 15 22:02:00 2015
-    - Added getImportNamesArray or .idata section
+0.7008 Sun Sep 10 12:43:00 2023
+    - RT-CPAN #149685 - Invalid condition for _parse_idata()
+    - Supply default DESTROY to fix test 17
 
 0.7006 Thu Mar 20 18:33:51 2014
     - Remove more defined or use!

@@ -5,7 +5,7 @@ use warnings;
 use Module::Build;
 use Object::Pad::ExtensionBuilder;
 
-my @extra_compiler_flags;
+my @extra_compiler_flags = qw( -Ihax );
 
 push @extra_compiler_flags, qw( -DDEBUGGING=-g ) if $^X =~ m|/debugperl|;
 

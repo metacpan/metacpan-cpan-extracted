@@ -31,6 +31,7 @@ my @files = (
     't/features.t',
     't/maybe.t',
     't/no_dup_add_isa.t',
+    't/package.t',
     't/release-kwalitee.t',
     't/try.t',
     't/v10.t'

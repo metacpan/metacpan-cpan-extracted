@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use warnings;
+use Object::Pad 0.800;
 
-package Device::Chip::MCP4725 0.14;
+package Device::Chip::MCP4725 0.15;
 class Device::Chip::MCP4725
    :isa(Device::Chip);
 

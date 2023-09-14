@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -22,7 +22,7 @@ await $chip->mount( $adapter );
    # OBSERVE_TX
    $adapter->expect_readwrite( "\x08\x00" )->returns( "\x0E\x12" );
 
-   is_deeply( await $chip->observe_tx_counts,
+   is( await $chip->observe_tx_counts,
       {
          ARC_CNT  => 2,
          PLOS_CNT => 1,
@@ -48,7 +48,7 @@ await $chip->mount( $adapter );
    # FIFO_STATUS
    $adapter->expect_readwrite( "\x17\x00" )->returns( "\x0E\x11" );
 
-   is_deeply( await $chip->fifo_status,
+   is( await $chip->fifo_status,
       {
          RX_EMPTY => 1,
          RX_FULL  => !!0,

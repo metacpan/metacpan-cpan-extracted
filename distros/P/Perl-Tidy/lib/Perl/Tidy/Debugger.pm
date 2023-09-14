@@ -8,7 +8,7 @@ package Perl::Tidy::Debugger;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
-our $VERSION = '20230701';
+our $VERSION = '20230912';
 
 use constant EMPTY_STRING => q{};
 use constant SPACE        => q{ };
@@ -33,7 +33,7 @@ sub really_open_debug_file {
     my ( $fh, $filename ) =
       Perl::Tidy::streamhandle( $debug_file, 'w', $is_encoded_data );
     if ( !$fh ) {
-        Perl::Tidy::Warn("can't open $debug_file: $ERRNO\n");
+        Perl::Tidy::Warn("can't open $debug_file: $OS_ERROR\n");
     }
     $self->{_debug_file_opened} = 1;
     $self->{_fh}                = $fh;
@@ -46,9 +46,16 @@ sub close_debug_file {
 
     my $self = shift;
     if ( $self->{_debug_file_opened} ) {
-        if ( !eval { $self->{_fh}->close(); 1 } ) {
-
-            # ok, maybe no close function
+        my $fh         = $self->{_fh};
+        my $debug_file = $self->{_debug_file};
+        if (   $fh
+            && $fh->can('close')
+            && $debug_file ne '-'
+            && !ref($debug_file) )
+        {
+            $fh->close()
+              or Perl::Tidy::Warn(
+                "can't close DEBUG file '$debug_file': $OS_ERROR\n");
         }
     }
     return;
@@ -78,7 +85,9 @@ sub write_debug_entry {
     my $pattern   = EMPTY_STRING;
     my @next_char = ( '"', '"' );
     my $i_next    = 0;
-    unless ( $self->{_debug_file_opened} ) { $self->really_open_debug_file() }
+    if ( !$self->{_debug_file_opened} ) {
+        $self->really_open_debug_file();
+    }
     my $fh = $self->{_fh};
 
     foreach my $j ( 0 .. @{$rtoken_type} - 1 ) {

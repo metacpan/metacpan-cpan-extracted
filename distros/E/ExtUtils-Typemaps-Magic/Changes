@@ -1,0 +1,7 @@
+Revision history for ExtUtils-Typemaps-Magic
+
+0.002     2023-09-02 17:48:55+02:00 Europe/Brussels
+          - Add minimal_pxs method
+
+0.001     2023-09-02 15:31:49+02:00 Europe/Brussels
+          Initial release to an unsuspecting world

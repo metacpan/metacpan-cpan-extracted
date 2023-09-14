@@ -1,18 +1,20 @@
 package Test::Perinci::Sub::Wrapper;
 
-our $DATE = '2021-08-01'; # DATE
-our $VERSION = '0.852'; # VERSION
-
 use 5.010;
 use strict;
 use warnings;
+use Test::More 0.96;
 
+use Exporter qw(import);
 use Function::Fallback::CoreOrPP qw(clone);
 #use List::Util qw(shuffle);
 use Perinci::Sub::Wrapper qw(wrap_sub);
-use Test::More 0.96;
 
-our @ISA = qw(Exporter);
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-07-09'; # DATE
+our $DIST = 'Perinci-Sub-Wrapper'; # DIST
+our $VERSION = '0.853'; # VERSION
+
 our @EXPORT_OK = qw(test_wrap);
 
 sub test_wrap {
@@ -93,7 +95,7 @@ sub test_wrap {
                     $src->{postamble},
                     '}; # sub',
                 );
-                $sub = eval $eval_src;
+                $sub = eval $eval_src; ## no critic: BuiltinFunctions::ProhibitStringyEval
                 my $eval_err = $@;
                 ok(!$eval_err, "embed code compiles ok") or do {
                     diag "eval err: ", $eval_err;
@@ -234,7 +236,7 @@ Test::Perinci::Sub::Wrapper - Provide test_wrap() to test wrapper
 
 =head1 VERSION
 
-This document describes version 0.852 of Test::Perinci::Sub::Wrapper (from Perl distribution Perinci-Sub-Wrapper), released on 2021-08-01.
+This document describes version 0.853 of Test::Perinci::Sub::Wrapper (from Perl distribution Perinci-Sub-Wrapper), released on 2023-07-09.
 
 =for Pod::Coverage test_wrap
 
@@ -246,6 +248,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Su
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-Wrapper>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Wrapper>
@@ -253,16 +284,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -2,336 +2,758 @@ package Image::DS9::PConsts;
 
 # ABSTRACT: Internal Constants
 
+use v5.10;
+
 use strict;
 use warnings;
+use overload ();
 
-our $VERSION = '0.188';
+use Data::Visitor::Tiny ();
+use Ref::Util qw( is_regexpref is_coderef is_blessed_ref is_ref is_arrayref is_refref is_scalarref);
+use Scalar::Util 'reftype';
 
-require Exporter;
+our $VERSION = 'v1.0.0';
 
-our @ISA = qw( Exporter );
+use Types::TypeTiny 'is_StringLike';
 
-our @EXPORT =
-  qw(
-     %TypeCvt
+use Image::DS9::Util 'is_TODO';
 
-     T_FLOAT
-     T_INT
-     T_BOOL
-     T_COORD
-     T_WCSS
-     T_COORDSYS
-     T_SKYFRAME
-     T_SKYFORMAT
-     T_SEXAGESIMAL_RA
-     T_SEXAGESIMAL_DEC
-     T_COLOR
-     T_ARRAY
-     T_HASH
-     T_WCS_HASH
-     T_WCS_ARRAY
-     T_WCS_SCALARREF
-     T_PDL
-     T_OTHER
-     T_EPHEMERAL
-     T_REWRITE
-     T_STRING
-     T_STRING_STRIP
-     T_STRING_NL
-     T_ANGLE_UNIT
+use Image::DS9::Constants::V1
+  'COLORS',
+  'FRAME_COORD_SYSTEMS',
+  'SKY_COORD_SYSTEMS',
+  'ANGULAR_UNITS',
+  'ANGULAR_FORMATS',
+  'WCS';
 
-     BOOL
-     FLOAT
-     INT
-     STRING
-     STRING_STRIP
-     STRING_NL
-     HASH
-     PDL
-     ANGLE_UNIT
-     SEXAGESIMAL_RA
-     SEXAGESIMAL_DEC
-     COORD_RA
-     COORD_DEC
-     WCSS
-     COORDSYS
-     SKYFRAME
-     SKYFORMAT
-     COLOR
-     QNONE
-     QATTR
-     QARGS
-     QONLY
-     QYES
-     WCS_HASH
-     WCS_ARRAY
-     WCS_SCALARREF
-     SCALARREF
+use parent 'Exporter';
+use Safe::Isa;
 
-     type_cvt
-     CvtSet
-     CvtGet
-     ENUM
-     ARRAY
-     EPHEMERAL
-     REWRITE
-    );
+## no critic (Modules::ProhibitAutomaticExportation)
+our @EXPORT = qw(
+  %TypeCvt
+
+  T_ANGLE_UNIT
+  T_ARRAY
+  T_BOOL
+  T_COLOR
+  T_COORD
+  T_COORDSYS
+  T_EPHEMERAL
+  T_FALSE
+  T_FLOAT
+  T_HASH
+  T_INT
+  T_JPEG_FILE
+  T_OTHER
+  T_PDL
+  T_REWRITE
+  T_SEXAGESIMAL_DEC
+  T_SEXAGESIMAL_RA
+  T_SKYFORMAT
+  T_SKYFRAME
+  T_STRING
+  T_STRING_NL
+  T_STRING_QUOTE
+  T_STRING_STRIP
+  T_TIFF_FILE
+  T_WCSS
+  T_WCS_ARRAY
+  T_WCS_HASH
+  T_WCS_SCALARREF
+
+  ANGLE_UNIT
+  BOOL
+  BOOL_FALSE
+  COLOR
+  COORDSYS
+  COORD_DEC
+  COORD_RA
+  FILENAME
+  FLOAT
+  HASH
+  INT
+  JPEG_FILE
+  PDL
+  QARGS
+  QATTR
+  QNONE
+  QONLY
+  QYES
+  SCALARREF
+  SEXAGESIMAL_DEC
+  SEXAGESIMAL_RA
+  SKYFORMAT
+  SKYFRAME
+  STRING
+  STRING_NL
+  STRING_QUOTE
+  STRING_STRIP
+  TIFF_FILE
+  WCSS
+  WCS_ARRAY
+  WCS_HASH
+  WCS_SCALARREF
+
+  tokenize
+  ENUM
+  ARRAY
+  EPHEMERAL
+  REWRITE
+);
 
 
 our $FLOAT;
 our $SEXAGESIMAL_RA;
 our $SEXAGESIMAL_DEC;
-our $WCSS;
 our $TRUE;
 our $FALSE;
 
 BEGIN {
-  sub ENUM { my $pat = join( '|', @_ ); qr/^($pat)$/i };
 
-  $FLOAT       = qr/[+-]?(?:\d+[.]?\d*|[.]\d+)(?:[eE][+-]?\d+)?/;
-  $SEXAGESIMAL_DEC = qr/[+-]?\d{2}:\d{2}:\d{2}(?:.\d+)?/;
-  $SEXAGESIMAL_RA = qr/\d{2}:\d{2}:\d{2}(?:.\d+)?/;
-  $WCSS        = ENUM('wcs', map { 'wcs' . $_ } ('a'..'z'));
+    $FLOAT           = qr/[+-]?(?:\d+[.]?\d*|[.]\d+)(?:[eE][+-]?\d+)?/;
+    $SEXAGESIMAL_DEC = qr/[+-]?\d{2}:\d{2}:\d{2}(?:.\d+)?/;
+    $SEXAGESIMAL_RA  = qr/\d{2}:\d{2}:\d{2}(?:.\d+)?/;
 
-  $TRUE        = qr/1|yes|true/i;
-  $FALSE       = qr/0|no|false/i;
-
-};
+    $TRUE  = qr/1|yes|true/i;
+    $FALSE = qr/0|no|false/i;
+}
 
 
-use constant CvtSet        => 0;
-use constant CvtGet        => 1;
+use enum qw( CvtSet CvtGet );
 
 # mustn't be 0
-use constant T_FLOAT       =>  1;
-use constant T_INT         =>  2;
-use constant T_BOOL        =>  3;
-use constant T_COORD       =>  4;
-use constant T_WCSS        =>  5;
-use constant T_COORDSYS    =>  6;
-use constant T_SKYFRAME    =>  7;
-use constant T_SKYFORMAT   =>  8;
-use constant T_COLOR       => 10;
-use constant T_HASH        => 11;
-use constant T_STRING      => 12;
-use constant T_PDL         => 13;
-use constant T_SCALARREF   => 14;
-use constant T_WCSARRAY    => 15;
-use constant T_WCSHASH     => 16;
-use constant T_EPHEMERAL   => 17;
-use constant T_SEXAGESIMAL_RA => 18;
-use constant T_SEXAGESIMAL_DEC => 19;
-use constant T_REWRITE     => 20;
-use constant T_STRING_NL   => 21;       # trailing \n added on output if necessary
-use constant T_WCS_SCALARREF => 22;
-use constant T_STRING_STRIP => 23;      # strip blanks from string on set
-use constant T_ANGLE_UNIT   => 24;
-use constant T_ARRAY       => 1024;
-use constant T_OTHER       => 8192;
+use enum (
+    ':T_=1',
+    'ANGLE_UNIT',
+    'ARRAY',
+    'BOOL',
+    'COLOR',
+    'COORD',
+    'COORDSYS',
+    'EPHEMERAL',
+    'FALSE',
+    'FLOAT',
+    'HASH',
+    'INT',
+    'JPEG_FILE',
+    'OTHER',
+    'PDL',
+    'REWRITE',
+    'SCALARREF',
+    'SEXAGESIMAL_DEC',
+    'SEXAGESIMAL_RA',
+    'SKYFORMAT',
+    'SKYFRAME',
+    'STRING',
+    'STRING_NL',       # trailing \n added on output if necessary
+    'STRING_QUOTE',    # wrap string with quote chars
+    'STRING_STRIP',    # strip blanks from string on set
+    'TIFF_FILE',
+    'WCSARRAY',
+    'WCSHASH',
+    'WCSS',
+    'WCS_SCALARREF',
+);
+
+## no critic (Modules::ProhibitMultiplePackages)
+## no critic (ClassHierarchies::ProhibitExplicitISA)
+
+# These should be split out, but at the moment they require constants
+# from Pconsts, and the tokens are defined in Pconsts, so there's a
+# circular import loop.
+
+{
+    package    #
+      Image::DS9::Parser::Token;
+    use Ref::Util ();
+    sub new {
+        my ( $class, %fields ) = @_;
+
+        unless ( Ref::Util::is_ref( $fields{check} ) ) {
+            my $check = $fields{check};
+            $fields{check} = sub { $_[0] eq $check ? \$_[0] : undef };
+        }
+        return bless \%fields, $class;
+    }
+    sub check {
+        $_[0]{check}->( $_[1] );
+    }
+
+    sub extra { $_[0]{extra} }
+    sub name  { $_[0]{name} }
+    sub tag   { $_[0]{tag} }
+    sub value { $_[0]{value} }
+    sub desc  { $_[0]{desc} }
+
+    sub to_string {
+        my $self = shift;
+        die sprintf( q{%s (%s) didn't implement 'to_string'}, Scalar::Util::blessed( $self ), $self->name );
+    }
+
+    sub is_ephemeral { $_[0]{tag} eq Image::DS9::PConsts::T_EPHEMERAL }
+    sub is_rewrite   { $_[0]{tag} eq Image::DS9::PConsts::T_REWRITE }
 
 
-use constant BOOL          => [ T_BOOL, qr/$TRUE|$FALSE/ ];
-use constant FLOAT         => [ T_FLOAT, $FLOAT ];
-use constant INT           => [ T_INT, qr/[+-]?\d+/ ];
-use constant STRING        => [ T_STRING, sub { ! ref $_[0] } ];
-use constant STRING_STRIP  => [ T_STRING_STRIP, sub { ! ref $_[0] } ];
-use constant STRING_NL     => [ T_STRING_NL, sub { ! ref $_[0] || 'SCALAR' eq ref $_[0] } ];
-use constant HASH          => [ T_HASH, sub { 'HASH' eq ref $_[0] } ];
-use constant SCALARREF     => [ T_SCALARREF, sub { ! ref $_[0] || 'SCALAR' eq ref $_[0] } ];
-use constant WCS_HASH      => [ T_WCSHASH, sub { 'HASH' eq ref $_[0] } ];
-use constant WCS_ARRAY     => [ T_WCSARRAY, sub { 'ARRAY' eq ref $_[0] } ];
-use constant WCS_SCALARREF  => [ T_WCS_SCALARREF, sub { ! ref $_[0] || 'SCALAR' eq ref $_[0] } ];
+    sub cvt_from_get {
+        my $self = shift;
+        die unless @_;
 
-use constant PDL           => [ T_PDL, sub { UNIVERSAL::isa( $_[0], 'PDL' ) } ];
+        my $valref = shift;
+        return Image::DS9::PConsts::type_cvt( Image::DS9::PConsts::CvtGet, $self->tag, $valref );
+    }
 
-use constant SEXAGESIMAL_RA   => [ T_SEXAGESIMAL_RA, $SEXAGESIMAL_RA ];
-use constant SEXAGESIMAL_DEC   => [ T_SEXAGESIMAL_DEC, $SEXAGESIMAL_DEC ];
+    sub cvt_for_set {
+        my $self = shift;
+        die unless @_;
 
-use constant COORD_RA     => [ T_COORD, qr/$FLOAT|$SEXAGESIMAL_RA/ ];
-use constant COORD_DEC     => [ T_COORD, qr/$FLOAT|$SEXAGESIMAL_DEC/ ];
+        my $valref = shift;
+        return Image::DS9::PConsts::type_cvt( Image::DS9::PConsts::CvtSet, $self->tag, $valref );
+    }
 
-use constant WCSS      => [ T_WCSS, $WCSS ];
-
-use constant COORDSYS  => [ T_COORDSYS,
-                               ENUM( qw ( physical image wcs ), $WCSS ) ];
-
-use constant ANGLE_UNIT => [ T_ANGLE_UNIT,
-                               ENUM( qw( degrees arcmin arcsec ) ) ];
-
-use constant SKYFRAME  => [ T_SKYFRAME,
-                               ENUM( qw ( fk4 fk5 icrs galactic ecliptic ) ) ];
-
-use constant SKYFORMAT => [ T_SKYFORMAT, ENUM( qw ( degrees sexagesimal ) ) ];
-
-use constant COLOR     => [ T_COLOR, ENUM( qw ( black white red green blue
-                                     cyan magenta yellow ) ) ];
-
-# can't do a query; if the arguments aren't present, it's an error
-use constant QNONE => 0b0000;
-
-# can do query;
-use constant QYES  => 0b0001;
+    sub _arg_names {
+        return ( 'name', 'value', 'tag', 'desc' );
+    }
 
 
-# query may have attributes, otherwise must have no attributes
-use constant QATTR => 0b0100;
+    sub _extract_args {
+        my ( $class, $args ) = @_;
 
-# query only
-use constant QONLY => 0b1000;
+        my %args = map { $_ => delete $args->{$_} } $class->_arg_names;
 
-# query must have the specified args, otherwise must have no args
-use constant QARGS => 0b0010 | QONLY;
+        if ( keys %$args ) {
+            require Data::Dump;
+            die(
+                sprintf(
+                    q{%s doesn't support extra args: %s\n%s},
+                    $class,
+                    Data::Dump::pp( [%$args] ),
+                    Data::Dump::pp( [ \%args ] ),
+                ) );
+        }
+
+        my @missing = grep !exists $args{$_}, keys %args;
+        die( 'missing args: ' . join( ', ', @missing ) ) if @missing;
+
+        return %args;
+    }
+
+}
+
+
+{
+    package    #
+      Image::DS9::Parser::Token::Enum;
+
+    our @ISA = ( 'Image::DS9::Parser::Token' );
+
+    sub new {
+        my ( $class, %args ) = @_;
+
+        $args{name} //= 'ENUM';
+        %args = $class->_extract_args( \%args );
+
+        die( 'value must be an arrayref' ) unless Ref::Util::is_arrayref( $args{value} );
+
+        my $check = join( q{|}, q{}, ( map { lc $_ } @{ $args{value} } ), q{} );
+
+        return $class->SUPER::new(
+            %args,
+            check => sub {
+                index( $check, q{|} . lc( $_[0] ) . q{|} ) > -1 ? \$_[0] : undef;
+            },
+        );
+    }
+
+    sub to_string {
+        my $self = shift;
+        return '( ' . join( ' | ', map { "'$_'" } sort @{ $self->value } ) . ' )';
+    }
+
+}
+
+{
+    package    #
+      Image::DS9::Parser::Token::Regexp;
+
+    our @ISA = ( 'Image::DS9::Parser::Token' );
+
+    sub new {
+        my ( $class, %args ) = @_;
+
+        %args = $class->_extract_args( \%args );
+        my $qr = delete $args{value};
+
+        $qr = qr/^(?:$qr)$/;
+
+        return $class->SUPER::new(
+            %args,
+            value => $qr,
+            check => sub { $_[0] =~ $qr ? \$_[0] : undef },
+        );
+
+    }
+
+    sub to_string {
+        my $self = shift;
+        return q{} . $self->value;
+    }
+
+}
+
+{
+    package    #
+      Image::DS9::Parser::Token::Constant;
+
+    our @ISA = ( 'Image::DS9::Parser::Token' );
+
+    sub new {
+        my ( $class, %args ) = @_;
+
+        %args = $class->_extract_args( \%args );
+
+        my $constant = $args{value};
+        return $class->SUPER::new( %args, check => sub { $_[0] eq $constant ? \$_[0] : undef }, );
+    }
+
+    sub to_string {
+        my $self = shift;
+        return q{'} . $self->value . q{'};
+    }
+
+}
+
+{
+    package    #
+      Image::DS9::Parser::Token::Rewrite;
+
+    our @ISA = ( 'Image::DS9::Parser::Token::Constant' );
+
+    sub _arg_names {
+        my $class = shift;
+        return ( $class->SUPER::_arg_names, 'extra' );
+    }
+
+    sub new {
+        my ( $class, %args ) = @_;
+        return $class->SUPER::new( %args );
+    }
+
+}
+
+
+{
+    package    #
+      Image::DS9::Parser::Token::Code;
+
+    our @ISA = ( 'Image::DS9::Parser::Token' );
+
+    sub new {
+        my ( $class, %args ) = @_;
+
+        %args = $class->_extract_args( \%args );
+
+        my $code = $args{value};
+        return $class->SUPER::new( %args, check => sub { $code->( $_[0] ) ? \$_[0] : undef }, );
+    }
+
+    sub to_string {
+        my $self = shift;
+        return $self->desc // $self->name;
+    }
+}
+
+{
+    package    #
+      Image::DS9::Parser::Token::Object;
+
+    our @ISA = ( 'Image::DS9::Parser::Token' );
+
+    sub new {
+        my ( $class, %attr ) = @_;
+
+        %attr = $class->_extract_args( \%attr );
+        my $object = $attr{value};
+
+        return $class->SUPER::new(
+            %attr,
+            check => sub {
+                $object->check( $_[0] );
+            },
+        );
+    }
+
+    sub to_string {
+        my $self = shift;
+        return $self->value->to_string;
+    }
+
+
+}
+
+sub ENUM {
+    my $name = is_scalarref( $_[0] )  ? ${ shift @_ } : undef;
+    my $desc = is_scalarref( $_[-1] ) ? ${ pop @_ }   : undef;
+
+    return Image::DS9::Parser::Token::Enum->new(
+        tag   => T_STRING,
+        desc  => defined $desc ? "$desc:STRING" : undef,
+        name  => $name // 'ENUM',
+        value => [@_],
+    );
+}
+
+sub FILENAME {
+    my $name = is_scalarref( $_[0] )  ? ${ shift @_ } : undef;
+    my $desc = is_scalarref( $_[-1] ) ? ${ pop @_ }   : undef;
+
+    return Image::DS9::Parser::Token::Code->new(
+        tag   => T_STRING,
+        desc  => defined $desc ? "<$desc>:STRING" : '<filename>:STRING',
+        name  => $name // 'FILENAME',
+        value => \&is_StringLike,
+    );
+}
+
+
+sub token {
+    my ( $name, $tag, $value, $desc ) = @_;
+
+    my $class
+      = is_regexpref( $value )   ? 'Image::DS9::Parser::Token::Regexp'
+      : is_coderef( $value )     ? 'Image::DS9::Parser::Token::Code'
+      : is_blessed_ref( $value ) ? 'Image::DS9::Parser::Token::Object'
+      : is_arrayref( $value )    ? 'Image::DS9::Parser::Token::Enum'
+      :                            'Image::DS9::Parser::Token::Constant';
+
+    ## no critic( TestingAndDebugging::ProhibitNoStrict )
+    no strict 'refs';
+    *{$name} = sub {
+
+        my $ndesc = shift;
+
+        my $type = $desc // $name;
+
+        $class->new(
+            name  => $name,
+            tag   => $tag,
+            value => $value,
+            desc  => defined $ndesc ? "$ndesc:$type" : $desc,
+        );
+    };
+}
+
+sub _visit {
+    my ( $key, $vref, $context ) = @_;
+
+    # don't touch scalars which don't hold types
+    return if index( '|query|bufarg|cvt|chomp|retref|', "|$key|" ) != -1;
+
+    my $attrs = $context->{attrs} //= [];
+    pop @{$attrs} while @{$attrs} && $attrs->[-1]{depth} > $context->{_depth};
+
+    # top 'attrs' arrayref or a sub-array in an attrs arrayref.
+    if ( is_arrayref( $_ ) && ( $_[0] eq 'attrs' || @{$attrs} ) ) {
+        push @{$attrs}, { depth => $context->{_depth} + 1 };
+        return;
+    }
+
+    # in all arrays below an attrs key, the arrays elements
+    # are ordered as (key, value), pairs
+    return if @{$attrs} && !( $key % 2 );
+    return if is_ref( $_ );
+
+    ${$vref} = Image::DS9::Parser::Token::Constant->new(
+        name  => 'STRING',
+        tag   => T_STRING,
+        value => $_
+    );
+}
+
+
+sub tokenize {
+    my ( %hash ) = @_;
+
+    Data::Visitor::Tiny::visit( $_, \&_visit ) for grep { !is_TODO( $_ ) } values %hash;
+
+    return %hash;
+}
+
+
+token ANGLE_UNIT => ( T_ANGLE_UNIT, ENUM( ANGULAR_UNITS ) );
+
+token BOOL => ( T_BOOL, sub { $_[0] =~ /$TRUE|$FALSE/ or $_[0] == !!0 or $_[0] == !!1 }, 'BOOL' );
+token COLOR => ( T_COLOR, ENUM( COLORS ) );
+
+token COORD_RA  => ( T_COORD, qr/$FLOAT|$SEXAGESIMAL_RA/,  'DECIMAL_OR_SEXAGESIMAL' );
+token COORD_DEC => ( T_COORD, qr/$FLOAT|$SEXAGESIMAL_DEC/, 'DECIMAL_OR_SEXAGESIMAL' );
+
+token COORDSYS => ( T_COORDSYS, ENUM( FRAME_COORD_SYSTEMS ), 'FRAME_COORD_SYSTEMS' );
+
+token FLOAT => ( T_FLOAT, $FLOAT, 'FLOAT' );
+token HASH  => ( T_HASH,  sub { 'HASH' eq ref $_[0] } );
+token INT   => ( T_INT,   qr/[+-]?\d+/, 'INTEGER' );
+
+token JPEG_FILE => ( T_JPEG_FILE, qr/[.]jpe?g$/, '*.jpeg|*.jpg' );
+
+
+token STRING       => ( T_STRING,       \&is_StringLike );
+token STRING_STRIP => ( T_STRING_STRIP, \&is_StringLike, 'STRING' );
+token STRING_QUOTE => ( T_STRING_QUOTE, \&is_StringLike, 'STRING' );
+token STRING_NL    => ( T_STRING_NL,    \&is_StringLike, 'STRING' );
+
+token PDL => ( T_PDL, sub { $_[0]->$_isa( 'PDL' ) } );
+
+token SCALARREF => ( T_SCALARREF, sub { !ref $_[0] || 'SCALAR' eq ref $_[0] } );
+
+token SEXAGESIMAL_RA  => ( T_SEXAGESIMAL_RA,  $SEXAGESIMAL_RA,  'SEXAGESIMAL' );
+token SEXAGESIMAL_DEC => ( T_SEXAGESIMAL_DEC, $SEXAGESIMAL_DEC, 'SEXAGESIMAL' );
+
+token SKYFORMAT => ( T_SKYFORMAT, ENUM( ANGULAR_FORMATS ) );
+token SKYFRAME  => ( T_SKYFRAME,  ENUM( SKY_COORD_SYSTEMS ) );
+
+token TIFF_FILE => ( T_TIFF_FILE, qr/[.]tiff$/, '*.tiff' );
+
+token BOOL_FALSE    => ( T_FALSE,         sub { $_[0] =~ /$FALSE/ or $_[0] == !!0 } );
+token WCS_HASH      => ( T_WCSHASH,       sub { 'HASH' eq ref $_[0] } );
+token WCS_ARRAY     => ( T_WCSARRAY,      sub { 'ARRAY' eq ref $_[0] } );
+token WCS_SCALARREF => ( T_WCS_SCALARREF, sub { !ref $_[0] || 'SCALAR' eq ref $_[0] } );
+
+token WCSS => ( T_WCSS, ENUM( WCS ), 'WCS system' );
+
+use enum (
+    'ENUM:',       # set to zero
+    'QNONE',       # no query
+    'BITMASK:',    # start creating bitmasks
+    'QARGS',       # only query, must have the specified args
+    'QATTR',       # query may have attributes
+    'QONLY',       # only query, no args
+    'QYES',        # can query, no arguments
+);
+
+sub _croak {
+    require Carp;
+    my $fmt = shift;
+    @_ = sprintf( $fmt, @_ );
+    goto \&Carp::croak;
+}
+
 
 # it's an array type, with the passed number of elements
-sub ARRAY
-{
-  my ( $min, $max ) = @_;
+sub ARRAY {
+    my ( $min, $max ) = @_;
 
-  # no args, don't care about size
-  if ( 0 == @_ )
-  {
-    [ T_ARRAY, sub { 'ARRAY' eq ref $_[0] } ]
-  }
+    ## no critic (ControlStructures::ProhibitCascadingIfElse)
 
-  # ($fixed_size)
-  elsif( 1 == @_ )
-  {
-    [ T_ARRAY, sub { 'ARRAY' eq ref $_[0]
-                       && $min == @{$_[0]}
-                   } ]
-  }
+    my $sub = do {
 
-  # (0,$max)
-  elsif ( 0 == $min )
-  {
-    [ T_ARRAY, sub { 'ARRAY' eq ref $_[0]
-                       && @{$_[0]} <= $max
-                   } ]
-  }
+        # no args, don't care about size
+        if ( 0 == @_ ) {
+            sub { 'ARRAY' eq ref $_[0] };
+        }
+
+        # ($fixed_size)
+        elsif ( 1 == @_ ) {
+            sub {
+                'ARRAY' eq ref $_[0]
+                  && $min == @{ $_[0] };
+            };
+        }
+
+        # (0,$max)
+        elsif ( 0 == $min ) {
+            sub {
+                'ARRAY' eq ref $_[0]
+                  && @{ $_[0] } <= $max;
+            };
+        }
 
 
-  # ($min, -1) => lower limit only
-  elsif ( -1 == $max )
-  {
-    [ T_ARRAY, sub { 'ARRAY' eq ref $_[0]
-                       && $min <= @{$_[0]}
-                   } ]
-  }
+        # ($min, -1) => lower limit only
+        elsif ( -1 == $max ) {
+            sub {
+                'ARRAY' eq ref $_[0]
+                  && $min <= @{ $_[0] };
+            };
+        }
 
-  # ($min,$max) lower and upper
-  else
-  {
-    [ T_ARRAY, sub { 'ARRAY' eq ref $_[0]
-                       && $min <= @{$_[0]}
-                       && @{$_[0]} <= $max
-                   } ]
-  }
+        # ($min,$max) lower and upper
+        else {
+            sub {
+                'ARRAY' eq ref $_[0]
+                  && $min <= @{ $_[0] }
+                  && @{ $_[0] } <= $max;
+            };
+        }
+    };
+
+    return Image::DS9::Parser::Token::Code->new(
+        name  => 'ARRAY',
+        tag   => T_ARRAY,
+        value => $sub,
+    );
 }
 
 sub EPHEMERAL {
-  [ T_EPHEMERAL, $_[0] ]
+    return Image::DS9::Parser::Token::Constant->new(
+        name  => 'EPHEMERAL',
+        tag   => T_EPHEMERAL,
+        value => $_[0],
+    );
 }
 
 sub REWRITE {
-  [ T_REWRITE, $_[0], \( $_[1] ) ]
+    return Image::DS9::Parser::Token::Rewrite->new(
+        name  => 'REWRITE',
+        tag   => T_REWRITE,
+        value => $_[0],
+        extra => \( $_[1] ),
+    );
+}
+
+sub _to_string {
+    my $mth = overload::Method( ${ $_[0] }, q{""} );
+    defined $mth ? \( ${ $_[0] }->$mth ) : $_[0];
 }
 
 # these must return references!  $_[0] is always a reference;
 # return $_[0] if no change
-our %TypeCvt = (
-        T_BOOL() => [
-                   # outgoing
-                   sub { \( ${$_[0]} =~ $TRUE ? 'yes' : 'no' ) },
-                   # incoming
-                   sub { \( ${$_[0]} =~ $TRUE ? 1 : 0 ) }
-                  ],
+my %TypeCvt = (
+    T_BOOL() => [
+        # outgoing
+        sub {
+            \(
+                  ${ $_[0] } == !!1 || ${ $_[0] } =~ $TRUE  ? 'yes'
+                : ${ $_[0] } == !!0 || ${ $_[0] } =~ $FALSE ? 'no'
+                :                                             _croak( 'untranslatable boolean: %s', ${ $_[0] } ),
+            );
+        },
+        # incoming
+        sub { \( ${ $_[0] } =~ $TRUE ? !!1 : !!0 ) },
+    ],
 
-        T_WCSHASH() => [
-                       # outgoing
-                       sub
-                       {
-                         my $wcs = '';
-                         while( my ($key, $val ) = each %{$_[0]} )
-                         {
-                           # remove blank lines
-                           next if $key eq '';
+    T_WCSHASH() => [
+        # outgoing
+        sub {
+            my $wcs  = q{};
+            my $href = ${ $_[0] };
+            for my $key ( keys %{$href} ) {
+                my $val = $href->{$key};
 
-                           # aggressively remove surrounding apostrophes
-                           $val =~ s/^'+//;
-                           $val =~ s/'+$//;
+                # remove blank lines
+                next if $key eq q{};
 
-                           # remove unnecessary blanks
-                           $val =~ s/^\s+//;
-                           $val =~ s/\s+$//;
+                # aggressively remove surrounding apostrophes
+                $val =~ s/^'+//;
+                $val =~ s/'+$//;
 
-                           # surround all values with apostrophes
-                           $wcs .= uc( $key ) . ($val ne '' ? " = '$val'\n" : "\n" );
-                         }
-                         $wcs;
-                       }
+                # remove unnecessary blanks
+                $val =~ s/^\s+//;
+                $val =~ s/\s+$//;
 
-                      ],
+                # surround all values with apostrophes
+                $wcs .= uc( $key ) . ( $val ne q{} ? " = '$val'\n" : "\n" );
+            }
+            $wcs;
+        },
 
-        T_WCSARRAY() => [
-                       # outgoing
-                       sub{
-                         $_[0] = \( join( "\n", @{$_[0]}) . "\n" );
-                         ${$_[0]} =~ s/^\s+//gm;
-                         ${$_[0]} =~ s/^\s*\n//gm;
-                         $_[0];
+    ],
 
-                       },
-                       ],
+    T_WCSARRAY() => [
+        # outgoing
+        sub {
+            my $aref = ${ $_[0] };
+            my $ret  = join( "\n", @{$aref} ) . "\n";
+            $ret =~ s/^\s+//gm;
+            $ret =~ s/^\s*\n//gm;
+            \$ret;
+        },
+    ],
 
-        T_WCS_SCALARREF() => [
-                          sub {
-                                ${$_[0]} =~ s/^\s+//gm;
-                                ${$_[0]} =~ s/^\s*\n//gm;
-                                $_[0] = \( ${$_[0]} . "\n" )
-                                 unless substr(${$_[0]},-1,1) eq '\n';
-                               $_[0];
-                             }
-                         ],
+    T_WCS_SCALARREF() => [
+        sub {
+            $_[0] = ${ $_[0] } if is_refref( $_[0] );
 
-
-        T_ARRAY() => [
-                      # outgoing
-                      undef,
-
-                      # incoming
-                      sub {
-                          ( my $s = ${$_[0]} ) =~ s/^\s+//;
-                          $s =~ s/\s+$//;
-                          $_[0] = [ split( / /, $s ) ];
-                          $_[0];
-                        }
-                     ],
-
-        T_STRING_NL() => [
-                          sub {
-                            $_[0] = \( ${$_[0]} . "\n" )
-                                 unless substr(${$_[0]},-1,1) eq '\n';
-                            $_[0];
-                             }
-                         ],
-
-        T_STRING_STRIP() => [
-                          sub {
-                            ${$_[0]} =~ s/\s+//g;
-                            $_[0];
-                             }
-                         ],
-
-       );
+            ${ $_[0] } =~ s/^\s+//gm;
+            ${ $_[0] } =~ s/^\s*\n//gm;
+            $_[0] = \( ${ $_[0] } . "\n" )
+              unless substr( ${ $_[0] }, -1, 1 ) eq '\n';
+            $_[0];
+        },
+    ],
 
 
-sub type_cvt
-{
-  my $dir = shift;
-  my $type = shift;
+    T_ARRAY() => [
+        # outgoing; convert from reference to arrayref to arrayref
+        sub {
+            _croak( 'Expected ref to arrayref, got something else' ) unless reftype( ${ $_[0] } ) eq 'ARRAY';
+            ${ $_[0] };
+        },
 
-  defined $TypeCvt{$type}[$dir] ? $TypeCvt{$type}[$dir]->($_[0]) :
-           ref( $_[0] ) ? $_[0] : \( $_[0] );
+        # incoming
+        sub {
+            ( my $s = ${ $_[0] } ) =~ s/^\s+//;
+
+            $s =~ s/\s+$//;
+            $_[0] = [ split( / /, $s ) ];
+            $_[0];
+        },
+    ],
+
+    # turn it into a number
+    T_FLOAT() => [ sub { \( 0+ ${ $_[0] } ) }, sub { \( 0+ ${ $_[0] } ) }, ],
+    T_INT()   => [ sub { \( 0+ ${ $_[0] } ) }, sub { \( 0+ ${ $_[0] } ) }, ],
+
+    T_SCALARREF() => [
+        # outgoing; convert from reference to scalarref to scalarref
+        sub { ${ $_[0] } },
+    ],
+
+    T_STRING() => [ \&_to_string, ],
+
+    T_STRING_NL() => [
+        sub {
+            # this stringifies it if it's an object
+            $_[0] = _to_string( $_[0] );
+            $_[0] = \( ${ $_[0] } . "\n" )
+              unless substr( ${ $_[0] }, -1, 1 ) eq '\n';
+            $_[0];
+        },
+    ],
+
+    T_PDL() => [
+        # outgoing; convert from reference to PDL to PDL
+        sub { ${ $_[0] } },
+    ],
+
+    T_STRING_STRIP() => [
+        sub {
+            # this stringifies it if it's an object
+            ${ $_[0] } =~ s/\s+//g;
+            $_[0];
+        },
+    ],
+
+    # quote string.
+    T_STRING_QUOTE() => [
+        sub {
+            # this stringifies it if it's an object
+            my $quote = ${ $_[0] } =~ /[']/ ? q{"} : q{'};
+            ${ $_[0] } = $quote . ${ $_[0] } . $quote;
+            $_[0];
+        },
+    ],
+
+);
+
+
+sub type_cvt {
+    my $dir  = shift;
+    my $type = shift;
+
+    defined $TypeCvt{$type}[$dir] ? $TypeCvt{$type}[$dir]->( $_[0] )
+      : ref( $_[0] )              ? $_[0]
+      :                             \( $_[0] );
 }
 
 #
@@ -349,18 +771,31 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
 =head1 NAME
 
 Image::DS9::PConsts - Internal Constants
 
 =head1 VERSION
 
-version 0.188
+version v1.0.0
 
-=head1 BUGS AND LIMITATIONS
+=head1 SUPPORT
 
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9>.
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-image-ds9@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/image-ds9
+
+and may be cloned from
+
+  https://gitlab.com/djerius/image-ds9.git
 
 =head1 SEE ALSO
 

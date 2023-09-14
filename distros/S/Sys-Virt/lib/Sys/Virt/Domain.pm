@@ -1374,7 +1374,7 @@ Set the post-copy speed instead of the pre-copy speed.
 
 =item $bandwidth = $dom->migrate_get_max_speed($flags=0)
 
-Get the maximum allowed bandwidth during migration fo the guest.
+Get the maximum allowed bandwidth during migration of the guest.
 The returned <bandwidth> value is measured in MB/second.
 The C<$flags> parameter is accepts the same constants as
 C<migrate_set_max_speed>.
@@ -3356,11 +3356,13 @@ It corresponds to the "perf.branch_misses" field in the *Stats
 APIs.
 
 =item Sys::Virt::Domain::PERF_PARAM_BUS_CYCLES
+
 The bus_cycles perf event counter which can be used to measure
 the count of bus cycles by applications running on the platform.
 It corresponds to the "perf.bus_cycles" field in the *Stats APIs.
 
 =item Sys::Virt::Domain::PERF_PARAM_STALLED_CYCLES_FRONTEND
+
 The stalled_cycles_frontend perf event counter which can be used
 to measure the count of stalled cpu cycles in the frontend of the
 instruction processor pipeline by applications running on the
@@ -3368,6 +3370,7 @@ platform. It corresponds to the "perf.stalled_cycles_frontend"
 field in the *Stats APIs.
 
 =item Sys::Virt::Domain::PERF_PARAM_STALLED_CYCLES_BACKEND
+
 The stalled_cycles_backend perf event counter which can be used
 to measure the count of stalled cpu cycles in the backend of the
 instruction processor pipeline by application running on the
@@ -3375,6 +3378,7 @@ platform. It corresponds to the "perf.stalled_cycles_backend"
 field in the *Stats APIs.
 
 =item Sys::Virt::Domain::PERF_PARAM_REF_CPU_CYCLES
+
 The ref_cpu_cycles perf event counter which can be used to
 measure the count of total cpu cycles not affected by CPU
 frequency scaling by applications running on the platform.
@@ -3382,54 +3386,63 @@ It corresponds to the "perf.ref_cpu_cycles" field in the
 *Stats APIs.
 
 =item Sys::Virt::Domain::PERF_PARAM_CPU_CLOCK
+
 The cpu_clock perf event counter which can be used to
 measure the count of cpu clock time by applications
 running on the platform. It corresponds to the
 "perf.cpu_clock" field in the *Stats APIs.
 
 =item Sys::Virt::Domain::PERF_PARAM_TASK_CLOCK
+
 The task_clock perf event counter which can be used to
 measure the count of task clock time by applications
 running on the platform. It corresponds to the
 "perf.task_clock" field in the *Stats APIs.
 
 =item Sys::Virt::Domain::PERF_PARAM_PAGE_FAULTS
+
 The page_faults perf event counter which can be used to
 measure the count of page faults by applications running
 on the platform. It corresponds to the "perf.page_faults"
 field in the *Stats APIs.
 
 =item Sys::Virt::Domain::PERF_PARAM_CONTEXT_SWITCHES
+
 The context_switches perf event counter which can be used to
 measure the count of context switches by applications running
 on the platform. It corresponds to the "perf.context_switches"
 field in the *Stats APIs.
 
 =item Sys::Virt::Domain::PERF_PARAM_CPU_MIGRATIONS
+
 The cpu_migrations perf event counter which can be used to
 measure the count of cpu migrations by applications running
 on the platform. It corresponds to the "perf.cpu_migrations"
 field in the *Stats APIs.
 
 =item Sys::Virt::Domain::PERF_PARAM_PAGE_FAULTS_MIN
+
 The page_faults_min perf event counter which can be used to
 measure the count of minor page faults by applications running
 on the platform. It corresponds to the "perf.page_faults_min"
 field in the *Stats APIs.
 
 =item Sys::Virt::Domain::PERF_PARAM_PAGE_FAULTS_MAJ
+
 The page_faults_maj perf event counter which can be used to
 measure the count of major page faults by applications running
 on the platform. It corresponds to the "perf.page_faults_maj"
 field in the *Stats APIs.
 
 =item Sys::Virt::Domain::PERF_PARAM_ALIGNMENT_FAULTS
+
 The alignment_faults perf event counter which can be used to
 measure the count of alignment faults by applications running
 on the platform. It corresponds to the "perf.alignment_faults"
 field in the *Stats APIs.
 
 =item Sys::Virt::Domain::PERF_PARAM_EMULATION_FAULTS
+
 The emulation_faults perf event counter which can be used to
 measure the count of emulation faults by applications running
 on the platform. It corresponds to the "perf.emulation_faults"

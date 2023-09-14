@@ -7,9 +7,6 @@ use warnings;
 
 use Venus::Class 'attr', 'base', 'with';
 
-use Venus::Match;
-use Venus::Type;
-
 base 'Venus::Kind::Utility';
 
 with 'Venus::Role::Buildable';
@@ -21,8 +18,6 @@ use overload (
 
 # ATTRIBUTES
 
-attr 'expects';
-attr 'message';
 attr 'name';
 
 # BUILDERS
@@ -38,18 +33,6 @@ sub build_arg {
 sub build_self {
   my ($self, $data) = @_;
 
-  if (!$self->name) {
-    $self->name('Unknown')
-  }
-
-  if (!$self->message) {
-    $self->message('Type assertion (%s) failed: received (%s), expected (%s)');
-  }
-
-  if (!$self->expects) {
-    $self->expects([])
-  }
-
   $self->conditions;
 
   return $self;
@@ -57,146 +40,54 @@ sub build_self {
 
 # METHODS
 
-sub any {
-  my ($self) = @_;
-
-  $self->constraints->when(sub{true})->then(sub{true});
-
-  return $self;
-}
-
 sub accept {
   my ($self, $name, @args) = @_;
 
-  if (!$name) {
-    return $self;
-  }
-  if ($self->can($name)) {
-    return $self->$name(@args);
-  }
-  else {
-    return $self->identity($name, @args);
-  }
-}
+  return $self if !$name;
 
-sub array {
-  my ($self, @code) = @_;
-
-  $self->constraint('array', @code ? @code : sub{true});
-
-  return $self;
-}
-
-sub arrayref {
-  my ($self, @code) = @_;
-
-  return $self->array(@code);
-}
-
-sub attributes {
-  my ($self, @pairs) = @_;
-
-  $self->object(sub{
-    my $check = 0;
-    my $value = $_->value;
-    return false if @pairs % 2;
-    for (my $i = 0; $i < @pairs;) {
-      my ($key, $data) = (map $pairs[$_], $i++, $i++);
-      my ($match, @args) = (ref $data) ? (@{$data}) : ($data);
-      $check++ if $value->can($key)
-        && $self->new->do($match, @args)->check($value->$key);
-    }
-    ((@pairs / 2) == $check) ? true : false
-  });
-
-  return $self;
-}
-
-sub assertion {
-  my ($self) = @_;
-
-  my $assert = $self->SUPER::assertion;
-
-  $assert->clear->expression('string');
-
-  return $assert;
-}
-
-sub boolean {
-  my ($self, @code) = @_;
-
-  $self->constraint('boolean', @code ? @code : sub{true});
+  $self->check->accept($name, @args);
 
   return $self;
 }
 
 sub check {
-  my ($self, $data) = @_;
+  my ($self, @args) = @_;
 
-  my $value = Venus::Type->new(value => $data);
+  require Venus::Check;
 
-  my @args = (value => $value, on_none => sub{false});
+  $self->{check} = $args[0] if @args;
 
-  return $self->constraints->renew(@args)->result;
-}
+  $self->{check} ||= Venus::Check->new;
 
-sub checker {
-  my ($self, $data) = @_;
-
-  $self->expression($data) if $data;
-
-  return $self->defer('check');
+  return $self->{check};
 }
 
 sub clear {
   my ($self) = @_;
 
-  $self->constraints->clear;
-  $self->coercions->clear;
+  $self->check->clear;
+  $self->constraint->clear;
+  $self->coercion->clear;
 
   return $self;
-}
-
-sub code {
-  my ($self, @code) = @_;
-
-  $self->constraint('code', @code ? @code : sub{true});
-
-  return $self;
-}
-
-sub coderef {
-  my ($self, @code) = @_;
-
-  return $self->code(@code);
 }
 
 sub coerce {
   my ($self, $data) = @_;
 
-  my $value = Venus::Type->new(value => $data);
-
-  my @args = (value => $value, on_none => sub{$data});
-
-  return $self->coercions->renew(@args)->result;
+  return $self->coercion->result($self->value($data));
 }
 
 sub coercion {
-  my ($self, $type, $code) = @_;
+  my ($self, @args) = @_;
 
-  $self->coercions->when('coded', $type)->then($code);
+  require Venus::Coercion;
 
-  return $self;
-}
+  $self->{coercion} = $args[0] if @args;
 
-sub coercions {
-  my ($self) = @_;
+  $self->{coercion} ||= Venus::Coercion->new->do('check', $self->check);
 
-  my $match = Venus::Match->new;
-
-  return $self->{coercions} ||= $match if ref $self;
-
-  return $match;
+  return $self->{coercion};
 }
 
 sub conditions {
@@ -206,60 +97,21 @@ sub conditions {
 }
 
 sub constraint {
-  my ($self, $type, $code) = @_;
+  my ($self, @args) = @_;
 
-  $self->constraints->when('coded', $type)->then($code);
+  require Venus::Constraint;
 
-  return $self;
+  $self->{constraint} = $args[0] if @args;
+
+  $self->{constraint} ||= Venus::Constraint->new->do('check', $self->check);
+
+  return $self->{constraint};
 }
 
-sub constraints {
-  my ($self) = @_;
-
-  my $match = Venus::Match->new;
-
-  return $self->{constraints} ||= $match if ref $self;
-
-  return $match;
-}
-
-sub consumes {
-  my ($self, $role) = @_;
-
-  my $where = $self->constraint('object', sub{true})->constraints->where;
-
-  $where->when(sub{$_->value->DOES($role)})->then(sub{true});
-
-  return $self;
-}
-
-sub defined {
+sub ensure {
   my ($self, @code) = @_;
 
-  $self->constraints->when(sub{CORE::defined($_->value)})
-    ->then(@code ? @code : sub{true});
-
-  return $self;
-}
-
-sub either {
-  my ($self, @data) = @_;
-
-  for (my $i = 0; $i < @data; $i++) {
-    my ($match, @args) = (ref $data[$i]) ? (@{$data[$i]}) : ($data[$i]);
-    $self->accept($match, @args);
-  }
-
-  return $self;
-}
-
-sub enum {
-  my ($self, @data) = @_;
-
-  for my $item (@data) {
-    $self->constraints->when(sub{CORE::defined($_->value) && $_->value eq $item})
-      ->then(sub{true});
-  }
+  $self->constraint->ensure(@code);
 
   return $self;
 }
@@ -272,169 +124,48 @@ sub expression {
   $data =
   $data =~ s/\s*\n+\s*/ /gr =~ s/^\s+|\s+$//gr =~ s/\[\s+/[/gr =~ s/\s+\]/]/gr;
 
-  $self->expects([$data]);
+  $self->name($data) if !$self->name;
 
-  my @parsed = $self->parse($data);
+  my $parsed = $self->parse($data);
 
-  $self->either(@parsed);
-
-  return $self;
-}
-
-sub float {
-  my ($self, @code) = @_;
-
-  $self->constraint('float', @code ? @code : sub{true});
+  $self->accept(
+    @{$parsed} > 0
+    ? ((ref $parsed->[0] eq 'ARRAY') ? @{$parsed->[0]} : @{$parsed})
+    : @{$parsed}
+  );
 
   return $self;
 }
 
 sub format {
-  my ($self, $name, @code) = @_;
-
-  if (!$name) {
-    return $self;
-  }
-  if (lc($name) eq 'array') {
-    return $self->coercion('array', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'boolean') {
-    return $self->coercion('boolean', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'code') {
-    return $self->coercion('code', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'float') {
-    return $self->coercion('float', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'hash') {
-    return $self->coercion('hash', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'number') {
-    return $self->coercion('number', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'object') {
-    return $self->coercion('object', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'regexp') {
-    return $self->coercion('regexp', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'scalar') {
-    return $self->coercion('scalar', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'string') {
-    return $self->coercion('string', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'undef') {
-    return $self->coercion('undef', @code ? (@code) : sub{$_->value});
-  }
-  else {
-    return $self->coercion('object', sub {
-      UNIVERSAL::isa($_->value, $name)
-        ? (@code ? $code[0]->($_->value) : $_->value)
-        : $_->value;
-    });
-  }
-}
-
-sub hash {
   my ($self, @code) = @_;
 
-  $self->constraint('hash', @code ? @code : sub{true});
+  $self->coercion->format(@code);
 
   return $self;
 }
 
-sub hashkeys {
-  my ($self, @pairs) = @_;
+sub match {
+  my ($self, @args) = @_;
 
-  $self->constraints->when(sub{
-    CORE::defined($_->value) && UNIVERSAL::isa($_->value, 'HASH')
-      && (keys %{$_->value}) > 0
-  })->then(sub{
-    my $check = 0;
-    my $value = $_->value;
-    return false if @pairs % 2;
-    for (my $i = 0; $i < @pairs;) {
-      my ($key, $data) = (map $pairs[$_], $i++, $i++);
-      my ($match, @args) = (ref $data) ? (@{$data}) : ($data);
-      $check++ if $self->new->do($match, @args)->check($value->{$key});
-    }
-    ((@pairs / 2) == $check) ? true : false
-  });
+  require Venus::Coercion;
+  my $match = Venus::Coercion->new->accept(@args);
 
-  return $self;
+  push @{$self->matches}, sub {
+    my ($source, $value) = @_;
+    local $_ = $value;
+    return $match->result($value);
+  };
+
+  return $match;
 }
 
-sub hashref {
-  my ($self, @code) = @_;
-
-  return $self->hash(@code);
-}
-
-sub identity {
-  my ($self, $name) = @_;
-
-  $self->constraint('object', sub {$_->value->isa($name) ? true : false});
-
-  return $self;
-}
-
-sub inherits {
-  my ($self, $name) = @_;
-
-  $self->constraint('object', sub {$_->value->isa($name) ? true : false});
-
-  return $self;
-}
-
-sub integrates {
-  my ($self, $name) = @_;
-
-  $self->constraint('object', sub {
-    $_->value->can('does') ? ($_->value->does($name) ? true : false) : false
-  });
-
-  return $self;
-}
-
-sub maybe {
-  my ($self, $match, @args) = @_;
-
-  $self->$match(@args) if $match;
-  $self->undef;
-
-  return $self;
-}
-
-sub number {
-  my ($self, @code) = @_;
-
-  $self->constraint('number', @code ? @code : sub{true});
-
-  return $self;
-}
-
-sub object {
-  my ($self, @code) = @_;
-
-  $self->constraint('object', @code ? @code : sub{true});
-
-  return $self;
-}
-
-sub package {
+sub matches {
   my ($self) = @_;
 
-  my $where = $self->constraint('string', sub{true})->constraints->where;
+  my $matches = $self->{'matches'} ||= [];
 
-  $where->when(sub{$_->value =~ /^[A-Z](?:(?:\w|::)*[a-zA-Z0-9])?$/})->then(sub{
-    require Venus::Space;
-
-    Venus::Space->new($_->value)->loaded
-  });
-
-  return $self;
+  return wantarray ? (@{$matches}) : $matches;
 }
 
 sub parse {
@@ -492,226 +223,63 @@ sub received {
   }
 }
 
-sub reference {
-  my ($self, @code) = @_;
-
-  $self->constraints
-    ->when(sub{CORE::defined($_->value) && ref($_->value)})
-    ->then(@code ? @code : sub{true});
-
-  return $self;
-}
-
-sub regexp {
-  my ($self, @code) = @_;
-
-  $self->constraint('regexp', @code ? @code : sub{true});
-
-  return $self;
-}
-
 sub render {
   my ($self, $into, $data) = @_;
 
   return _type_render($into, $data);
 }
 
-sub routines {
-  my ($self, @data) = @_;
+sub result {
+  my ($self, $data) = @_;
 
-  $self->object->constraints->then(sub{
-    my $value = $_->value;
-    (@data == grep $value->can($_), @data) ? true : false
-  });
-
-  return $self;
+  return $self->coerce($self->validate($self->value($data)));
 }
 
-sub scalar {
-  my ($self, @code) = @_;
+sub valid {
+  my ($self, $data) = @_;
 
-  $self->constraint('scalar', @code ? @code : sub{true});
-
-  return $self;
-}
-
-sub scalarref {
-  my ($self, @code) = @_;
-
-  return $self->scalar(@code);
-}
-
-sub string {
-  my ($self, @code) = @_;
-
-  $self->constraint('string', @code ? @code : sub{true});
-
-  return $self;
-}
-
-sub tuple {
-  my ($self, @data) = @_;
-
-  $self->constraints->when(sub{
-    CORE::defined($_->value) && CORE::ref($_->value) eq 'ARRAY'
-      && @data == @{$_->value}
-  })->then(sub{
-    my $check = 0;
-    my $value = $_->value;
-    return false if @data != @$value;
-    for (my $i = 0; $i < @data; $i++) {
-      my ($match, @args) = (ref $data[$i]) ? (@{$data[$i]}) : ($data[$i]);
-      $check++ if $self->new->do($match, @args)->check($value->[$i]);
-    }
-    (@data == $check) ? true : false
-  });
-
-  return $self;
-}
-
-sub undef {
-  my ($self, @code) = @_;
-
-  $self->constraint('undef', @code ? @code : sub{true});
-
-  return $self;
+  return $self->constraint->result($self->value($data));
 }
 
 sub validate {
   my ($self, $data) = @_;
 
-  my $valid = $self->check($data);
+  my $valid = $self->valid($data);
 
   return $data if $valid;
 
-  return $self->error({throw => 'error_on_validate', value => $data});
+  my $error = $self->check->catch('result');
+
+  my $received = $self->received($data);
+
+  my $message = join("\n\n",
+    'Type:',
+    ($self->name || 'Unknown'),
+    'Failure:',
+    $error->message,
+    'Received:',
+    (defined $data ? ($received eq '' ? '""' : $received) : ('(undefined)')),
+  );
+
+  $error->message($message);
+
+  return $error->throw;
 }
 
 sub validator {
-  my ($self, $data) = @_;
-
-  $self->expression($data) if $data;
+  my ($self) = @_;
 
   return $self->defer('validate');
 }
 
 sub value {
-  my ($self, @code) = @_;
-
-  $self->constraints
-    ->when(sub{CORE::defined($_->value) && !ref($_->value)})
-    ->then(@code ? @code : sub{true});
-
-  return $self;
-}
-
-sub within {
-  my ($self, $type, @next) = @_;
-
-  if (!$type) {
-    return $self;
-  }
-
-  my $where = $self->new;
-
-  if (lc($type) eq 'hash' || lc($type) eq 'hashref') {
-    $self->constraints->when(sub{
-      CORE::defined($_->value) && UNIVERSAL::isa($_->value, 'HASH')
-        && (keys %{$_->value}) > 0
-    })->then(sub{
-      my $value = $_->value;
-      UNIVERSAL::isa($value, 'HASH')
-        && CORE::values(%$value) == grep $where->check($_), CORE::values(%$value)
-    });
-  }
-  elsif (lc($type) eq 'array' || lc($type) eq 'arrayref') {
-    $self->constraints->when(sub{
-      CORE::defined($_->value) && UNIVERSAL::isa($_->value, 'ARRAY')
-        && @{$_->value} > 0
-    })->then(sub{
-      my $value = $_->value;
-      UNIVERSAL::isa($value, 'ARRAY')
-        && @$value == grep $where->check($_), @$value
-    });
-  }
-  else {
-    $self->error({throw => 'error_on_within', type => $type, args => [@next]});
-  }
-
-  $where->accept(map +(ref($_) ? @$_ : $_), $next[0]) if @next;
-
-  return $where;
-}
-
-sub yesno {
-  my ($self, @code) = @_;
-
-  $self->constraints->when(sub{
-    CORE::defined($_->value) && $_->value =~ /^(?:1|y(?:es)?|0|n(?:o)?)$/i
-  })->then(@code ? @code : sub{true});
-
-  return $self;
-}
-
-# ERRORS
-
-sub error_on_validate {
   my ($self, $data) = @_;
 
-  require Venus::Type;
+  my $result = $data;
 
-  my $legend = {
-    array => 'arrayref',
-    code => 'coderef',
-    hash => 'hashref',
-    regexp => 'regexpref',
-    scalar => 'scalarref',
-    scalar => 'scalarref',
-  };
-
-  my $value = $data->{value};
-
-  my $identified = Venus::Type->new(value => $value)->identify;
-  my $identity = $legend->{lc($identified)} || lc($identified);
-
-  my $expected = (join(' OR ', @{$self->expects})) || 'indescribable constraints';
-  my $received = $self->received($value);
-
-  my $message = join(' ', sprintf($self->message, $self->name, $identity, $expected),
-    join("\n\n", "Received:", $received, ''));
-
-  my $stash = {
-    identity => $identity,
-    variable => $value,
-  };
-
-  my $result = {
-    name => 'on.validate',
-    raise => true,
-    stash => $stash,
-    message => $message,
-  };
-
-  return $result;
-}
-
-sub error_on_within {
-  my ($self, $data) = @_;
-
-  my $message = 'Invalid type ("{{type}}") provided to the "within" method';
-
-  my $stash = {
-    self => $self,
-    type => $data->{type},
-    args => $data->{args},
-  };
-
-  my $result = {
-    name => 'on.within',
-    raise => true,
-    stash => $stash,
-    message => $message,
-  };
+  for my $match ($self->matches) {
+    $result = $match->($self, $result);
+  }
 
   return $result;
 }
@@ -725,7 +293,7 @@ sub _type_parse {
 
   @items = map _type_parse_nested($_), @items;
 
-  return wantarray && !$either ? @items : [$either ? ("either") : (), @items];
+  return wantarray && !$either ? (@items) : [$either ? ("either") : (), @items];
 }
 
 sub _type_parse_lists {
@@ -983,20 +551,24 @@ Assert Class for Perl 5
 
   use Venus::Assert;
 
-  my $assert = Venus::Assert->new('Example');
+  my $assert = Venus::Assert->new('Float');
 
-  # $assert->format(float => sub {sprintf('%.2f', $_->value)});
+  # $assert->accept('float');
 
-  # $assert->accept(float => sub {$_->value > 1});
+  # $assert->format(sub{sprintf('%.2f', $_)});
 
-  # $assert->check;
+  # $assert->result(123.456);
+
+  # 123.46
 
 =cut
 
 =head1 DESCRIPTION
 
 This package provides a mechanism for asserting type constraints and coercions
-on data.
+on data. Type constraints are handled via L<Venus::Constraint>, and coercions
+are handled via L<Venus::Coercion>, using L<Venus::Check> to perform data type
+validations.
 
 =cut
 
@@ -1006,27 +578,44 @@ This package has the following attributes:
 
 =cut
 
-=head2 expects
-
-  expects(ArrayRef)
-
-This attribute is read-write, accepts C<(ArrayRef)> values, and is optional.
-
-=cut
-
-=head2 message
-
-  message(Str)
-
-This attribute is read-write, accepts C<(Str)> values, and is optional.
-
-=cut
-
 =head2 name
 
-  name(Str)
+  name(string $data) (string)
 
-This attribute is read-write, accepts C<(Str)> values, and is optional.
+The name attribute is read-write, accepts C<(string)> values, and is
+optional.
+
+I<Since C<1.40>>
+
+=over 4
+
+=item name example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $set_name = $assert->name("Example");
+
+  # "Example"
+
+=back
+
+=over 4
+
+=item name example 2
+
+  # given: synopsis
+
+  # given: example-1 name
+
+  package main;
+
+  my $get_name = $assert->name;
+
+  # "Example"
+
+=back
 
 =cut
 
@@ -1054,17 +643,10 @@ This package provides the following methods:
 
 =head2 accept
 
-  accept(Str $name, Any @args) (Object)
+  accept(string $name, any @args) (Venus::Assert)
 
-The accept method registers a constraint based on the built-in type or package
-name provided as the first argument. The built-in types are I<"array">,
-I<"boolean">, I<"code">, I<"float">, I<"hash">, I<"number">, I<"object">,
-I<"regexp">, I<"scalar">, I<"string">, or I<"undef">.  Any name given that is
-not a built-in type is assumed to be a method (i.e. a method call) or an
-I<"object"> of the name provided. Additional arguments are assumed to be
-arguments for the dispatched method call. Optionally, you can provide a
-callback to further constrain/validate the provided value, returning truthy or
-falsy, for methods that support it.
+The accept method registers a condition via L</check> based on the arguments
+provided. The built-in types are defined as methods in L<Venus::Check>.
 
 I<Since C<1.40>>
 
@@ -1080,15 +662,13 @@ I<Since C<1.40>>
 
   # bless(..., "Venus::Assert")
 
-  # ...
+  # $assert->valid;
 
-  # $assert->check;
+  # false
 
-  # 0
+  # $assert->valid(1.01);
 
-  # $assert->check(1.01);
-
-  # 1
+  # true
 
 =back
 
@@ -1104,15 +684,13 @@ I<Since C<1.40>>
 
   # bless(..., "Venus::Assert")
 
-  # ...
+  # $assert->valid(1.01);
 
-  # $assert->check(1.01);
+  # false
 
-  # 0
+  # $assert->valid(1_01);
 
-  # $assert->check(1_01);
-
-  # 1
+  # true
 
 =back
 
@@ -1140,23 +718,21 @@ I<Since C<1.40>>
 
   # bless(..., "Venus::Assert")
 
-  # ...
+  # $assert->valid;
 
-  # $assert->check;
+  # false
 
-  # 0
+  # $assert->valid(qr//);
 
-  # $assert->check(qr//);
+  # false
 
-  # 0
+  # $assert->valid(Example1->new);
 
-  # $assert->check(Example1->new);
+  # true
 
-  # 1
+  # $assert->valid(Example2->new);
 
-  # $assert->check(Example2->new);
-
-  # 1
+  # true
 
 =back
 
@@ -1184,209 +760,21 @@ I<Since C<1.40>>
 
   # bless(..., "Venus::Assert")
 
-  # ...
-
-  # $assert->check;
-
-  # 0
-
-  # $assert->check(qr//);
-
-  # 0
-
-  # $assert->check(Example1->new);
-
-  # 1
-
-  # $assert->check(Example2->new);
-
-  # 0
-
-=back
-
-=cut
-
-=head2 any
-
-  any() (Assert)
-
-The any method configures the object to accept any value and returns the
-invocant.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item any example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->any;
-
-  # $assert->check;
-
-  # true
-
-=back
-
-=cut
-
-=head2 array
-
-  array(CodeRef $check) (Assert)
-
-The array method configures the object to accept array references and returns
-the invocant.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item array example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->array;
-
-  # $assert->check([]);
-
-  # true
-
-=back
-
-=cut
-
-=head2 arrayref
-
-  arrayref(CodeRef $check) (Assert)
-
-The arrayref method configures the object to accept array references and
-returns the invocant.
-
-I<Since C<1.71>>
-
-=over 4
-
-=item arrayref example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->arrayref;
-
-  # $assert->check([]);
-
-  # true
-
-=back
-
-=cut
-
-=head2 attributes
-
-  attributes(Str | ArrayRef[Str] @pairs) (Assert)
-
-The attributes method configures the object to accept objects containing
-attributes whose values' match the attribute names and types specified, and
-returns the invocant.
-
-I<Since C<2.01>>
-
-=over 4
-
-=item attributes example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->attributes;
-
-  # $assert->check(Venus::Assert->new);
-
-  # true
-
-=back
-
-=over 4
-
-=item attributes example 2
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->attributes(name => 'string');
-
-  # $assert->check(bless{});
+  # $assert->valid;
 
   # false
 
-  # $assert->check(Venus::Assert->new);
-
-  # true
-
-=back
-
-=over 4
-
-=item attributes example 3
-
-  # given: synopsis
-
-  package Example3;
-
-  use Venus::Class;
-
-  attr 'name';
-
-  package main;
-
-  $assert = $assert->attributes(name => 'string', message => 'string');
-
-  # $assert->check(bless{});
+  # $assert->valid(qr//);
 
   # false
 
-  # $assert->check(Venus::Assert->new);
+  # $assert->valid(Example1->new);
 
   # true
 
-  # $assert->check(Example3->new);
+  # $assert->valid(Example2->new);
 
   # false
-
-=back
-
-=cut
-
-=head2 boolean
-
-  boolean(CodeRef $check) (Assert)
-
-The boolean method configures the object to accept boolean values and returns
-the invocant.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item boolean example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->boolean;
-
-  # $assert->check(false);
-
-  # true
 
 =back
 
@@ -1394,12 +782,12 @@ I<Since C<1.40>>
 
 =head2 check
 
-  check(Any $data) (Bool)
+  check(Venus::Check $data) (Venus::Check)
 
-The check method returns true or false if the data provided passes the
-registered constraints.
+The check method gets or sets the L<Venus::Check> object used for performing
+runtime data type validation.
 
-I<Since C<1.23>>
+I<Since C<3.55>>
 
 =over 4
 
@@ -1409,11 +797,9 @@ I<Since C<1.23>>
 
   package main;
 
-  $assert->constraint(float => sub { $_->value > 1 });
+  my $check = $assert->check(Venus::Check->new);
 
-  my $check = $assert->check;
-
-  # 0
+  # bless(..., 'Venus::Check')
 
 =back
 
@@ -1425,76 +811,11 @@ I<Since C<1.23>>
 
   package main;
 
-  $assert->constraint(float => sub { $_->value > 1 });
+  $assert->check(Venus::Check->new);
 
-  my $check = $assert->check('0.01');
+  my $check = $assert->check;
 
-  # 0
-
-=back
-
-=over 4
-
-=item check example 3
-
-  # given: synopsis
-
-  package main;
-
-  $assert->constraint(float => sub { $_->value > 1 });
-
-  my $check = $assert->check('1.01');
-
-  # 1
-
-=back
-
-=over 4
-
-=item check example 4
-
-  # given: synopsis
-
-  package main;
-
-  $assert->constraint(float => sub { $_->value > 1 });
-
-  my $check = $assert->check(time);
-
-  # 0
-
-=back
-
-=cut
-
-=head2 checker
-
-  checker(Str $expr) (CodeRef)
-
-The checker method calls L</expression> with the type assertion signature
-provided and returns a coderef which calls the L</check> method when called.
-
-I<Since C<2.32>>
-
-=over 4
-
-=item checker example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $checker = $assert->checker('string');
-
-  # sub { ... }
-
-  # $checker->('hello');
-
-  # true
-
-  # $checker->(['goodbye']);
-
-  # false
+  # bless(..., 'Venus::Check')
 
 =back
 
@@ -1502,10 +823,10 @@ I<Since C<2.32>>
 
 =head2 clear
 
-  clear() (Assert)
+  clear() (Venus::Assert)
 
-The clear method resets all match conditions for both constraints and coercions
-and returns the invocant.
+The clear method resets the L</check>, L</constraint>, and L</coercion>
+attributes and returns the invocant.
 
 I<Since C<1.40>>
 
@@ -1517,6 +838,8 @@ I<Since C<1.40>>
 
   package main;
 
+  $assert->accept('string');
+
   $assert = $assert->clear;
 
   # bless(..., "Venus::Assert")
@@ -1525,68 +848,14 @@ I<Since C<1.40>>
 
 =cut
 
-=head2 code
-
-  code(CodeRef $check) (Assert)
-
-The code method configures the object to accept code references and returns
-the invocant.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item code example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->code;
-
-  # $assert->check(sub{});
-
-  # true
-
-=back
-
-=cut
-
-=head2 coderef
-
-  coderef(CodeRef $check) (Assert)
-
-The coderef method configures the object to accept code references and returns
-the invocant.
-
-I<Since C<1.71>>
-
-=over 4
-
-=item coderef example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->coderef;
-
-  # $assert->check(sub{});
-
-  # true
-
-=back
-
-=cut
-
 =head2 coerce
 
-  coerce(Any $data) (Any)
+  coerce(any $data) (any)
 
-The coerce method returns the coerced data if the data provided matches any of
-the registered coercions.
+The coerce method dispatches to the L</coercion> object and returns the result
+of the L<Venus::Coercion/result> operation.
 
-I<Since C<1.23>>
+I<Since C<3.55>>
 
 =over 4
 
@@ -1596,11 +865,13 @@ I<Since C<1.23>>
 
   package main;
 
-  $assert->coercion(float => sub { sprintf('%.2f', $_->value) });
+  $assert->accept('float');
 
-  my $coerce = $assert->coerce;
+  $assert->format(sub{sprintf('%.2f', $_)});
 
-  # undef
+  my $coerce = $assert->coerce(123.456);
+
+  # 123.46
 
 =back
 
@@ -1612,43 +883,13 @@ I<Since C<1.23>>
 
   package main;
 
-  $assert->coercion(float => sub { sprintf('%.2f', $_->value) });
+  $assert->accept('string');
 
-  my $coerce = $assert->coerce('1.01');
+  $assert->format(sub{ucfirst lc $_});
 
-  # "1.01"
+  my $coerce = $assert->coerce('heLLo');
 
-=back
-
-=over 4
-
-=item coerce example 3
-
-  # given: synopsis
-
-  package main;
-
-  $assert->coercion(float => sub { sprintf('%.2f', $_->value) });
-
-  my $coerce = $assert->coerce('1.00001');
-
-  # "1.00"
-
-=back
-
-=over 4
-
-=item coerce example 4
-
-  # given: synopsis
-
-  package main;
-
-  $assert->coercion(float => sub { sprintf('%.2f', $_->value) });
-
-  my $coerce = $assert->coerce('hello world');
-
-  # "hello world"
+  # "Hello"
 
 =back
 
@@ -1656,11 +897,12 @@ I<Since C<1.23>>
 
 =head2 coercion
 
-  coercion(Str $type, CodeRef $code) (Object)
+  coercion(Venus::Coercion $data) (Venus::Coercion)
 
-The coercion method registers a coercion based on the type provided.
+The coercion method gets or sets the L<Venus::Coercion> object used for
+performing runtime data type coercions.
 
-I<Since C<1.23>>
+I<Since C<3.55>>
 
 =over 4
 
@@ -1670,33 +912,25 @@ I<Since C<1.23>>
 
   package main;
 
-  $assert = $assert->coercion(float => sub { sprintf('%.2f', $_->value) });
+  my $coercion = $assert->coercion(Venus::Coercion->new);
 
-  # bless(..., "Venus::Assert")
+  # bless(..., 'Venus::Coercion')
 
 =back
 
-=cut
-
-=head2 coercions
-
-  coercions() (Match)
-
-The coercions method returns the registered coercions as a L<Venus::Match> object.
-
-I<Since C<1.23>>
-
 =over 4
 
-=item coercions example 1
+=item coercion example 2
 
   # given: synopsis
 
   package main;
 
-  my $coercions = $assert->coercions;
+  $assert->coercion(Venus::Coercion->new);
 
-  # bless(..., "Venus::Match")
+  my $coercion = $assert->coercion;
+
+  # bless(..., 'Venus::Coercion')
 
 =back
 
@@ -1704,7 +938,7 @@ I<Since C<1.23>>
 
 =head2 conditions
 
-  conditions() (Assert)
+  conditions() (Venus::Assert)
 
 The conditions method is an object construction hook that allows subclasses to
 configure the object on construction setting up constraints and coercions and
@@ -1722,6 +956,8 @@ I<Since C<1.40>>
 
   $assert = $assert->conditions;
 
+  # bless(..., 'Venus::Assert')
+
 =back
 
 =over 4
@@ -1735,8 +971,8 @@ I<Since C<1.40>>
   sub conditions {
     my ($self) = @_;
 
-    $self->number(sub {
-      $_->value >= 0
+    $self->accept('number', sub {
+      $_ >= 0
     });
 
     return $self;
@@ -1746,15 +982,15 @@ I<Since C<1.40>>
 
   my $assert = Example::Type::PositveNumber->new;
 
-  # $assert->check(0);
+  # $assert->valid(0);
 
   # true
 
-  # $assert->check(1);
+  # $assert->valid(1);
 
   # true
 
-  # $assert->check(-1);
+  # $assert->valid(-1);
 
   # false
 
@@ -1764,11 +1000,12 @@ I<Since C<1.40>>
 
 =head2 constraint
 
-  constraint(Str $type, CodeRef $code) (Object)
+  constraint(Venus::Constraint $data) (Venus::Constraint)
 
-The constraint method registers a constraint based on the type provided.
+The constraint method gets or sets the L<Venus::Constraint> object used for
+performing runtime data type constraints.
 
-I<Since C<1.23>>
+I<Since C<3.55>>
 
 =over 4
 
@@ -1778,172 +1015,54 @@ I<Since C<1.23>>
 
   package main;
 
-  $assert = $assert->constraint(float => sub { $_->value > 1 });
+  my $constraint = $assert->constraint(Venus::Constraint->new);
 
-  # bless(..., "Venus::Assert")
+  # bless(..., 'Venus::Constraint')
 
 =back
 
-=cut
-
-=head2 constraints
-
-  constraints() (Match)
-
-The constraints method returns the registered constraints as a L<Venus::Match>
-object.
-
-I<Since C<1.23>>
-
 =over 4
 
-=item constraints example 1
+=item constraint example 2
 
   # given: synopsis
 
   package main;
 
-  my $constraints = $assert->constraints;
+  $assert->constraint(Venus::Constraint->new);
 
-  # bless(..., "Venus::Match")
+  my $constraint = $assert->constraint;
 
-=back
-
-=cut
-
-=head2 defined
-
-  defined(CodeRef $check) (Assert)
-
-The defined method configures the object to accept any value that's not
-undefined and returns the invocant.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item defined example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->defined;
-
-  # $assert->check(0);
-
-  # true
+  # bless(..., 'Venus::Constraint')
 
 =back
 
 =cut
 
-=head2 either
+=head2 ensure
 
-  either(Str | ArrayRef[Str|ArrayRef] $dispatch) (Assert)
+  ensure(coderef $code) (Venus::Assert)
 
-The either method configures the object to accept "either" of the conditions
-provided, which may be a string or arrayref representing a method call, and
+The ensure method registers a custom (not built-in) constraint condition and
 returns the invocant.
 
-I<Since C<2.01>>
+I<Since C<3.55>>
 
 =over 4
 
-=item either example 1
+=item ensure example 1
 
   # given: synopsis
 
   package main;
 
-  $assert = $assert->either('string');
+  $assert->accept('number');
 
-  # $assert->check('1');
+  my $ensure = $assert->ensure(sub {
+    $_ >= 0
+  });
 
-  # true
-
-  # $assert->check(1);
-
-  # false
-
-=back
-
-=over 4
-
-=item either example 2
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->either('string', 'number');
-
-  # $assert->check(true);
-
-  # false
-
-  # $assert->check('1');
-
-  # true
-
-  # $assert->check(1);
-
-  # true
-
-=back
-
-=over 4
-
-=item either example 3
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->either('number', 'boolean');
-
-  # $assert->check(true);
-
-  # true
-
-  # $assert->check('1');
-
-  # false
-
-  # $assert->check(1);
-
-  # true
-
-=back
-
-=cut
-
-=head2 enum
-
-  enum(Any @data) (Assert)
-
-The enum method configures the object to accept any one of the provide options,
-and returns the invocant.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item enum example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->enum('s', 'm', 'l', 'xl');
-
-  # $assert->check('s');
-
-  # true
-
-  # $assert->check('xs');
-
-  # false
+  # bless(.., "Venus::Assert")
 
 =back
 
@@ -1951,11 +1070,11 @@ I<Since C<1.40>>
 
 =head2 expression
 
-  expression(Str $expr) (Assert)
+  expression(string $expr) (Venus::Assert)
 
-The expression method parses a string representation of an type assertion
-signature, registers the subexpressions using the L</either> and L</accept>
-methods, and returns the invocant.
+The expression method parses a string representation of an type assertion,
+registers the subexpressions using the L</accept> method, and returns the
+invocant.
 
 I<Since C<1.71>>
 
@@ -1969,11 +1088,13 @@ I<Since C<1.71>>
 
   $assert = $assert->expression('string');
 
-  # $assert->check('hello');
+  # bless(..., 'Venus::Assert')
+
+  # $assert->valid('hello');
 
   # true
 
-  # $assert->check(['goodbye']);
+  # $assert->valid(['goodbye']);
 
   # false
 
@@ -1989,15 +1110,17 @@ I<Since C<1.71>>
 
   $assert = $assert->expression('string | coderef');
 
-  # $assert->check('hello');
+  # bless(..., 'Venus::Assert')
+
+  # $assert->valid('hello');
 
   # true
 
-  # $assert->check(sub{'hello'});
+  # $assert->valid(sub{'hello'});
 
   # true
 
-  # $assert->check(['goodbye']);
+  # $assert->valid(['goodbye']);
 
   # false
 
@@ -2013,19 +1136,21 @@ I<Since C<1.71>>
 
   $assert = $assert->expression('string | coderef | Venus::Assert');
 
-  # $assert->check('hello');
+  # bless(..., 'Venus::Assert')
+
+  # $assert->valid('hello');
 
   # true
 
-  # $assert->check(sub{'hello'});
+  # $assert->valid(sub{'hello'});
 
   # true
 
-  # $assert->check($assert);
+  # $assert->valid($assert);
 
   # true
 
-  # $assert->check(['goodbye']);
+  # $assert->valid(['goodbye']);
 
   # false
 
@@ -2041,23 +1166,25 @@ I<Since C<1.71>>
 
   $assert = $assert->expression('Venus::Assert | within[arrayref, Venus::Assert]');
 
-  # $assert->check('hello');
+  # bless(..., 'Venus::Assert')
+
+  # $assert->valid('hello');
 
   # false
 
-  # $assert->check(sub{'hello'});
+  # $assert->valid(sub{'hello'});
 
   # false
 
-  # $assert->check($assert);
+  # $assert->valid($assert);
 
   # true
 
-  # $assert->check(['goodbye']);
+  # $assert->valid(['goodbye']);
 
   # false
 
-  # $assert->check([$assert]);
+  # $assert->valid([$assert]);
 
   # true
 
@@ -2080,54 +1207,29 @@ I<Since C<1.71>>
       ]
   ');
 
-  # $assert->check('hello');
+  # bless(..., 'Venus::Assert')
+
+  # $assert->valid('hello');
 
   # true
 
-  # $assert->check(sub{'hello'});
+  # $assert->valid(sub{'hello'});
 
   # false
 
-  # $assert->check($assert);
+  # $assert->valid($assert);
 
   # false
 
-  # $assert->check([]);
+  # $assert->valid([]);
 
   # false
 
-  # $assert->check([{'test' => ['okay']}]);
+  # $assert->valid([{'test' => ['okay']}]);
 
   # false
 
-  # $assert->check([{'test' => 'okay'}]);
-
-  # true
-
-=back
-
-=cut
-
-=head2 float
-
-  float(CodeRef $check) (Assert)
-
-The float method configures the object to accept floating-point values and
-returns the invocant.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item float example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->float;
-
-  # $assert->check(1.23);
+  # $assert->valid([{'test' => 'okay'}]);
 
   # true
 
@@ -2137,15 +1239,12 @@ I<Since C<1.40>>
 
 =head2 format
 
-  format(Str $name, CodeRef $callback) (Object)
+  format(coderef $code) (Venus::Assert)
 
-The format method registers a coercion based on the built-in type or package
-name and callback provided. The built-in types are I<"array">, I<"boolean">,
-I<"code">, I<"float">, I<"hash">, I<"number">, I<"object">, I<"regexp">,
-I<"scalar">, I<"string">, or I<"undef">.  Any name given that is not a built-in
-type is assumed to be an I<"object"> of the name provided.
+The format method registers a custom (not built-in) coercion condition and
+returns the invocant.
 
-I<Since C<1.40>>
+I<Since C<3.55>>
 
 =over 4
 
@@ -2155,468 +1254,13 @@ I<Since C<1.40>>
 
   package main;
 
-  $assert = $assert->format('float', sub{int $_->value});
+  $assert->accept('number');
 
-  # bless(..., "Venus::Assert")
+  my $format = $assert->format(sub {
+    sprintf '%.2f', $_
+  });
 
-  # ...
-
-  # $assert->coerce;
-
-  # undef
-
-  # $assert->coerce(1.01);
-
-  # 1
-
-=back
-
-=over 4
-
-=item format example 2
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->format('number', sub{ sprintf('%.2f', $_->value) });
-
-  # bless(..., "Venus::Assert")
-
-  # ...
-
-  # $assert->coerce(1.01);
-
-  # 1.01
-
-  # $assert->coerce(1_01);
-
-  # 101.00
-
-=back
-
-=over 4
-
-=item format example 3
-
-  # given: synopsis
-
-  package Example1;
-
-  sub new {
-    bless {};
-  }
-
-  package Example2;
-
-  sub new {
-    bless {};
-  }
-
-  package main;
-
-  $assert = $assert->format('object', sub{ ref $_->value });
-
-  # bless(..., "Venus::Assert")
-
-  # ...
-
-  # $assert->coerce(qr//);
-
-  # qr//
-
-  # $assert->coerce(Example1->new);
-
-  # "Example1"
-
-  # $assert->coerce(Example2->new);
-
-  # "Example2"
-
-=back
-
-=over 4
-
-=item format example 4
-
-  # given: synopsis
-
-  package Example1;
-
-  sub new {
-    bless {};
-  }
-
-  package Example2;
-
-  sub new {
-    bless {};
-  }
-
-  package main;
-
-  $assert = $assert->format('Example1', sub{ ref $_->value });
-
-  # bless(..., "Venus::Assert")
-
-  # ...
-
-  # $assert->coerce(qr//);
-
-  # qr//
-
-  # $assert->coerce(Example1->new);
-
-  # "Example1"
-
-  # $assert->coerce(Example2->new);
-
-  # bless({}, "Example2")
-
-=back
-
-=cut
-
-=head2 hash
-
-  hash(CodeRef $check) (Assert)
-
-The hash method configures the object to accept hash references and returns
-the invocant.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item hash example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->hash;
-
-  # $assert->check({});
-
-  # true
-
-=back
-
-=cut
-
-=head2 hashkeys
-
-  hashkeys(Str | ArrayRef[Str] @pairs) (Assert)
-
-The hashkeys method configures the object to accept hash based values
-containing the keys whose values' match the specified types, and returns the
-invocant.
-
-I<Since C<2.01>>
-
-=over 4
-
-=item hashkeys example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->hashkeys;
-
-  # $assert->check({});
-
-  # false
-
-  # $assert->check({random => rand});
-
-  # true
-
-=back
-
-=over 4
-
-=item hashkeys example 2
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->hashkeys(random => 'float');
-
-  # $assert->check({});
-
-  # false
-
-  # $assert->check({random => rand});
-
-  # true
-
-  # $assert->check({random => time});
-
-  # false
-
-=back
-
-=over 4
-
-=item hashkeys example 3
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->hashkeys(random => ['either', 'float', 'number']);
-
-  # $assert->check({});
-
-  # false
-
-  # $assert->check({random => rand});
-
-  # true
-
-  # $assert->check({random => time});
-
-  # true
-
-  # $assert->check({random => 'okay'});
-
-  # false
-
-  # $assert->check(bless{random => rand});
-
-  # true
-
-  # $assert->check(bless{random => time});
-
-  # true
-
-  # $assert->check(bless{random => 'okay'});
-
-  # false
-
-=back
-
-=cut
-
-=head2 hashref
-
-  hashref(CodeRef $check) (Assert)
-
-The hashref method configures the object to accept hash references and returns
-the invocant.
-
-I<Since C<1.71>>
-
-=over 4
-
-=item hashref example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->hashref;
-
-  # $assert->check({});
-
-  # true
-
-=back
-
-=cut
-
-=head2 identity
-
-  identity(Str $name) (Assert)
-
-The identity method configures the object to accept objects of the type
-specified as the argument, and returns the invocant.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item identity example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->identity('Venus::Assert');
-
-  # $assert->check(Venus::Assert->new);
-
-  # true
-
-=back
-
-=cut
-
-=head2 inherits
-
-  inherits(Str $name) (Assert)
-
-The inherits method configures the object to accept objects of the type
-specified as the argument, and returns the invocant. This method is a proxy for
-the L</identity> method.
-
-I<Since C<2.01>>
-
-=over 4
-
-=item inherits example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->inherits('Venus::Assert');
-
-  # $assert->check(Venus::Assert->new);
-
-  # true
-
-=back
-
-=cut
-
-=head2 integrates
-
-  integrates(Str $name) (Assert)
-
-The integrates method configures the object to accept objects that support the
-C<"does"> behavior and consumes the "role" specified as the argument, and
-returns the invocant.
-
-I<Since C<2.01>>
-
-=over 4
-
-=item integrates example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->integrates('Venus::Role::Doable');
-
-  # $assert->check(Venus::Assert->new);
-
-  # true
-
-=back
-
-=cut
-
-=head2 maybe
-
-  maybe(Str $type, Any @args) (Assert)
-
-The maybe method configures the object to accept the type provided as an
-argument, or undef, and returns the invocant.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item maybe example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->maybe('code');
-
-  # $assert->check(sub{});
-
-  # true
-
-  # $assert->check(undef);
-
-  # true
-
-=back
-
-=cut
-
-=head2 number
-
-  number(CodeRef $check) (Assert)
-
-The number method configures the object to accept numberic values and returns
-the invocant.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item number example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->number;
-
-  # $assert->check(0);
-
-  # true
-
-=back
-
-=cut
-
-=head2 object
-
-  object(CodeRef $check) (Assert)
-
-The object method configures the object to accept objects and returns the
-invocant.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item object example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->object;
-
-  # $assert->check(bless{});
-
-  # true
-
-=back
-
-=cut
-
-=head2 package
-
-  package() (Assert)
-
-The package method configures the object to accept package names (which are
-loaded) and returns the invocant.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item package example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->package;
-
-  # $assert->check('Venus');
-
-  # true
+  # bless(.., "Venus::Assert")
 
 =back
 
@@ -2624,11 +1268,11 @@ I<Since C<1.40>>
 
 =head2 parse
 
-  parse(Str $expr) (Any)
+  parse(string $expr) (any)
 
-The parse method accepts a string representation of a type assertion signature
-and returns a data structure representing one or more method calls to be used
-for validating the assertion signature.
+The parse method accepts a string representation of a type assertion and
+returns a data structure representing one or more method calls to be used for
+validating the assertion signature.
 
 I<Since C<2.01>>
 
@@ -2804,63 +1448,9 @@ I<Since C<2.01>>
 
 =cut
 
-=head2 reference
-
-  reference(CodeRef $check) (Assert)
-
-The reference method configures the object to accept references and returns the
-invocant.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item reference example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->reference;
-
-  # $assert->check(sub{});
-
-  # true
-
-=back
-
-=cut
-
-=head2 regexp
-
-  regexp(CodeRef $check) (Assert)
-
-The regexp method configures the object to accept regular expression objects
-and returns the invocant.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item regexp example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->regexp;
-
-  # $assert->check(qr//);
-
-  # true
-
-=back
-
-=cut
-
 =head2 render
 
-  render(Str $into, Str $expression) (Str)
+  render(string $into, string $expression) (string)
 
 The render method builds and returns a type expressions suitable for providing
 to L</expression> based on the data provided.
@@ -2944,164 +1534,93 @@ I<Since C<2.55>>
 
 =cut
 
-=head2 routines
+=head2 result
 
-  routines(Str @names) (Assert)
+  result(any $data) (any)
 
-The routines method configures the object to accept an object having all of the
-routines provided, and returns the invocant.
+The result method validates the value provided against the registered
+constraints and if valid returns the result of the value having any registered
+coercions applied. If the value is invalid an exception from L<Venus::Check>
+will be thrown.
 
-I<Since C<1.40>>
+I<Since C<3.55>>
 
 =over 4
 
-=item routines example 1
+=item result example 1
 
   # given: synopsis
 
   package main;
 
-  $assert = $assert->routines('new', 'print', 'say');
+  $assert->accept('number')->format(sub{sprintf '%.2f', $_});
 
-  # $assert->check(Venus::Assert->new);
+  my $result = $assert->result(1);
 
-  # true
+  # "1.00"
+
+=back
+
+=over 4
+
+=item result example 2
+
+  # given: synopsis
+
+  package main;
+
+  $assert->accept('number')->format(sub{sprintf '%.2f', $_});
+
+  my $result = $assert->result('hello');
+
+  # Exception! (isa Venus::Check::Error) (see error_on_coded)
 
 =back
 
 =cut
 
-=head2 scalar
+=head2 valid
 
-  scalar(CodeRef $check) (Assert)
+  valid(any $data) (any)
 
-The scalar method configures the object to accept scalar references and returns
-the invocant.
+The valid method dispatches to the L</constraint> object and returns the result
+of the L<Venus::Constraint/result> operation.
 
-I<Since C<1.40>>
+I<Since C<3.55>>
 
 =over 4
 
-=item scalar example 1
+=item valid example 1
 
   # given: synopsis
 
   package main;
 
-  $assert = $assert->scalar;
+  $assert->accept('float');
 
-  # $assert->check(\1);
+  $assert->ensure(sub{$_ >= 1});
+
+  my $valid = $assert->valid('1.00');
 
   # true
 
 =back
 
-=cut
-
-=head2 scalarref
-
-  scalarref(CodeRef $check) (Assert)
-
-The scalarref method configures the object to accept scalar references and returns
-the invocant.
-
-I<Since C<1.71>>
-
 =over 4
 
-=item scalarref example 1
+=item valid example 2
 
   # given: synopsis
 
   package main;
 
-  $assert = $assert->scalarref;
+  $assert->accept('float');
 
-  # $assert->check(\1);
+  $assert->ensure(sub{$_ >= 1});
 
-  # true
+  my $valid = $assert->valid('0.99');
 
-=back
-
-=cut
-
-=head2 string
-
-  string(CodeRef $check) (Assert)
-
-The string method configures the object to accept string values and returns the
-invocant.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item string example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->string;
-
-  # $assert->check('');
-
-  # true
-
-=back
-
-=cut
-
-=head2 tuple
-
-  tuple(Str | ArrayRef[Str] @types) (Assert)
-
-The tuple method configures the object to accept array references which conform
-to a tuple specification, and returns the invocant. The value being evaluated
-must contain at-least one element to match.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item tuple example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->tuple('number', ['maybe', 'array'], 'code');
-
-  # $assert->check([200, [], sub{}]);
-
-  # true
-
-=back
-
-=cut
-
-=head2 undef
-
-  undef(CodeRef $check) (Assert)
-
-The undef method configures the object to accept undefined values and returns
-the invocant.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item undef example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->undef;
-
-  # $assert->check(undef);
-
-  # true
+  # false
 
 =back
 
@@ -3109,12 +1628,13 @@ I<Since C<1.40>>
 
 =head2 validate
 
-  validate(Any $data) (Any)
+  validate(any $data) (any)
 
-The validate method returns the data provided if the data provided passes the
-registered constraints, or throws an exception.
+The validate method validates the value provided against the registered
+constraints and if valid returns the value. If the value is invalid an
+exception from L<Venus::Check> will be thrown.
 
-I<Since C<1.23>>
+I<Since C<3.55>>
 
 =over 4
 
@@ -3124,11 +1644,11 @@ I<Since C<1.23>>
 
   package main;
 
-  $assert->constraint(float => sub { $_->value > 1 });
+  $assert->accept('number');
 
-  my $result = $assert->validate;
+  my $validate = $assert->validate(1);
 
-  # Exception! (isa Venus::Assert::Error) (see error_on_validate)
+  # 1
 
 =back
 
@@ -3140,43 +1660,11 @@ I<Since C<1.23>>
 
   package main;
 
-  $assert->constraint(float => sub { $_->value > 1 });
+  $assert->accept('number');
 
-  my $result = $assert->validate('0.01');
+  my $validate = $assert->validate('hello');
 
-  # Exception! (isa Venus::Assert::Error) (see error_on_validate)
-
-=back
-
-=over 4
-
-=item validate example 3
-
-  # given: synopsis
-
-  package main;
-
-  $assert->constraint(float => sub { $_->value > 1 });
-
-  my $result = $assert->validate('1.01');
-
-  # "1.01"
-
-=back
-
-=over 4
-
-=item validate example 4
-
-  # given: synopsis
-
-  package main;
-
-  $assert->constraint(float => sub { $_->value > 1 });
-
-  my $result = $assert->validate(time);
-
-  # Exception! (isa Venus::Assert::Error) (see error_on_validate)
+  # Exception! (isa Venus::Check::Error) (see error_on_coded)
 
 =back
 
@@ -3184,13 +1672,12 @@ I<Since C<1.23>>
 
 =head2 validator
 
-  validator(Str $expr) (CodeRef)
+  validator(any @args) (coderef)
 
-The validator method returns a coderef that can be used as a value validator,
-which returns the data provided if the data provided passes the registered
-constraints, or throws an exception.
+The validator method returns a coderef which calls the L</validate> method with
+the invocant when called.
 
-I<Since C<1.40>>
+I<Since C<3.55>>
 
 =over 4
 
@@ -3200,300 +1687,39 @@ I<Since C<1.40>>
 
   package main;
 
-  my $validator = $assert->validator('string');
+  $assert->accept('string');
 
-  # sub { ... }
+  my $validator = $assert->validator;
 
-  # $validator->('hello');
+  # sub{...}
+
+  # my $result = $validator->();
+
+  # Exception! (isa Venus::Check::Error) (see error_on_coded)
+
+=back
+
+=over 4
+
+=item validator example 2
+
+  # given: synopsis
+
+  package main;
+
+  $assert->accept('string');
+
+  my $validator = $assert->validator;
+
+  # sub{...}
+
+  # my $result = $validator->('hello');
 
   # "hello"
 
-  # $validator->(['goodbye']);
-
-  # Exception! (isa Venus::Error) (see error_on_validate)
-
 =back
 
 =cut
-
-=head2 value
-
-  value(CodeRef $check) (Assert)
-
-The value method configures the object to accept defined, non-reference,
-values, and returns the invocant.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item value example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->value;
-
-  # $assert->check(1_000_000);
-
-  # true
-
-=back
-
-=cut
-
-=head2 within
-
-  within(Str $type) (Assert)
-
-The within method configures the object, registering a constraint action as a
-sub-match operation, to accept array or hash based values, and returns a
-L<Venus::Assert> instance for the sub-match operation (not the invocant).  This
-operation can traverse blessed array or hash based values. The value being
-evaluated must contain at-least one element to match.
-
-I<Since C<1.40>>
-
-=over 4
-
-=item within example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $within = $assert->within('array')->code;
-
-  my $action = $assert;
-
-  # $assert->check([]);
-
-  # false
-
-  # $assert->check([sub{}]);
-
-  # true
-
-  # $assert->check([{}]);
-
-  # false
-
-  # $assert->check(bless[]);
-
-  # false
-
-  # $assert->check(bless[sub{}]);
-
-  # true
-
-=back
-
-=over 4
-
-=item within example 2
-
-  # given: synopsis
-
-  package main;
-
-  my $within = $assert->within('hash')->code;
-
-  my $action = $assert;
-
-  # $assert->check({});
-
-  # false
-
-  # $assert->check({test => sub{}});
-
-  # true
-
-  # $assert->check({test => {}});
-
-  # false
-
-  # $assert->check({test => bless{}});
-
-  # false
-
-  # $assert->check({test => bless sub{}});
-
-  # false
-
-=back
-
-=over 4
-
-=item within example 3
-
-  # given: synopsis
-
-  package main;
-
-  my $within = $assert->within('hashref', 'code');
-
-  my $action = $assert;
-
-  # $assert->check({});
-
-  # false
-
-  # $assert->check({test => sub{}});
-
-  # true
-
-  # $assert->check({test => {}});
-
-  # false
-
-  # $assert->check({test => bless{}});
-
-  # false
-
-  # $assert->check({test => bless sub{}});
-
-  # false
-
-=back
-
-=cut
-
-=head2 yesno
-
-  yesno(CodeRef $check) (Assert)
-
-The yesno method configures the object to accept a string value that's either
-C<"yes"> or C<1>, C<"no"> or C<0>, and returns the invocant.
-
-I<Since C<2.01>>
-
-=over 4
-
-=item yesno example 1
-
-  # given: synopsis
-
-  package main;
-
-  $assert = $assert->yesno;
-
-  # $assert->check(undef);
-
-  # false
-
-  # $assert->check(0);
-
-  # true
-
-  # $assert->check('No');
-
-  # true
-
-  # $assert->check('n');
-
-  # true
-
-  # $assert->check(1);
-
-  # true
-
-  # $assert->check('Yes');
-
-  # true
-
-  # $assert->check('y');
-
-  # true
-
-  # $assert->check('Okay');
-
-  # false
-
-=back
-
-=cut
-
-=head1 ERRORS
-
-This package may raise the following errors:
-
-=cut
-
-=over 4
-
-=item error: C<error_on_validate>
-
-This package may raise an error_on_validate exception.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_validate',
-    value => '...',
-  };
-
-  my $error = $assert->catch('error', $input);
-
-  # my $name = $error->name;
-
-  # "on_validate"
-
-  # my $message = $error->message;
-
-  # "..."
-
-  # my $identity = $error->stash('identity');
-
-  # "string"
-
-  # my $variable = $error->stash('variable');
-
-  # "..."
-
-=back
-
-=over 4
-
-=item error: C<error_on_within>
-
-This package may raise an error_on_within exception.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $input = {
-    throw => 'error_on_within',
-    type => 'coderef',
-    args => ['string'],
-  };
-
-  my $error = $assert->catch('error', $input);
-
-  # my $ = $error->name;
-
-  # "on_within"
-
-  # my $message = $error->render;
-
-  # "Invalid type (\"$type\") palid ed to the \"within\" method"
-
-  # my $self = $error->stash('self');
-
-  # $assert
-
-  # my $type = $error->stash('type');
-
-  # "coderef"
-
-  # my $args = $error->stash('args');
-
-  # ["string"]
-
-=back
 
 =head1 AUTHORS
 
@@ -3503,7 +1729,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

@@ -1,19 +1,19 @@
 #  You may distribute under the terms of the GNU General Public License
 #
-#  (C) Paul Evans, 2012-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2023 -- leonerd@leonerd.org.uk
 
-package Circle::FE::Term::Ribbon;
-
-use strict;
+use v5.26;
 use warnings;
+use Object::Pad;
+
+package Circle::FE::Term::Ribbon 0.232470;
 
 use base qw( Tickit::Widget::Tabbed::Ribbon );
 
-package Circle::FE::Term::Ribbon::horizontal;
-use base qw( Circle::FE::Term::Ribbon );
+class Circle::FE::Term::Ribbon::horizontal
+   :isa(Tickit::Widget::Tabbed::Ribbon::horizontal);
 
-use feature qw( switch );
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
+use Syntax::Keyword::Match;
 
 use Tickit::Utils qw( textwidth );
 use List::Util qw( max first );
@@ -65,6 +65,8 @@ sub render_to_rb
       #                 [3] = initialise all names
       #                 [4] = hide level<2 names, initialise others
       #                 [5] = hide all names
+      #                 [6] = hide all names, hide level<2 tabs entirely
+      #                 [7] = hide all names, hide level<3 tabs entirely
 
       foreach my $idx ( 0 .. $#tabs ) {
          my $tab = $tabs[$idx];
@@ -82,21 +84,24 @@ sub render_to_rb
          $used[3] += 1 +              $width_short;
          $used[4] += 1 + $level < 2 ? $width_hide : $width_short;
          $used[5] += 1 +              $width_hide;
+         $used[6] += 1 +              $width_hide                if $level >= 2;
+         $used[7] += 1 +              $width_hide                if $level >= 3;
       }
 
       my $space = $win->cols - $col - $rhswidth;
 
       my $format;
-      given( Circle::FE::Term->get_theme_var( "label_format" ) ) {
-         when( "name_and_number" ) { $format = 0 }
-         when( "initial" )         { $format = 3 }
-         when( "number" )          { $format = 5 }
+      match( Circle::FE::Term->get_theme_var( "label_format" ) : eq ) {
+         case( "name_and_number" ) { $format = 0 }
+         case( "initial" )         { $format = 3 }
+         case( "number" )          { $format = 5 }
          default                   { die "Unrecognised label_format $_"; $format = 0 }
       }
 
       $format++ while $format < $#used and $used[$format] > $space;
 
       my $first = 1;
+      my $hiddencount = 0;
 
       TAB: foreach my $idx ( 0 .. $#tabs ) {
          my $tab = $tabs[$idx];
@@ -105,17 +110,19 @@ sub render_to_rb
          next unless my $level = $tab->level;
 
          my $label;
-
-         for( $format ) {
-            $label =             sprintf "%d:%s", $idx + 1, $tab->label;
-            when( 0 ) { ; }
-            when( 1 ) { $label = sprintf "%d:%s", $idx + 1, $tab->label_short if $level < 2 }
-            when( 2 ) { $label = sprintf "%d:%s", $idx + 1, $tab->label_short if $level < 3 }
-            $label =             sprintf "%d:%s", $idx + 1, $tab->label_short;
-            when( 3 ) { ; }
-            when( 4 ) { $label = sprintf "%d", $idx + 1 if $level < 2 }
-            when( 5 ) { $label = sprintf "%d", $idx + 1 }
+         match( $format : == ) {
+            case( 0 ) { $label =              $tab->label }
+            case( 1 ) { $label = $level < 2 ? $tab->label_short : $tab->label }
+            case( 2 ) { $label = $level < 3 ? $tab->label_short : $tab->label }
+            case( 3 ) { $label =              $tab->label_short }
+            case( 4 ) { $label = $level < 2 ? undef             : $tab->label_short }
+            case( 5 ) { }
+            case( 6 ) { $level >= 2 or $hiddencount++, next TAB }
+            case( 7 ) { $level >= 3 or $hiddencount++, next TAB }
          }
+
+         my $text = sprintf "%d", $idx + 1;
+         $text .= ":$label" if defined $label;
 
          {
             $rb->savepen;
@@ -127,8 +134,8 @@ sub render_to_rb
             }
 
             $rb->setpen( $tab->pen );
-            $rb->text( $label );
-            my $width = textwidth $label;
+            $rb->text( $text );
+            my $width = textwidth $text;
 
             push @tabpos, [ $idx, $col, $width ]; 
 
@@ -138,6 +145,13 @@ sub render_to_rb
          }
 
          $first = 0;
+      }
+
+      if( $hiddencount ) {
+         $rb->savepen;
+         $rb->setpen( Circle::FE::Term->get_theme_pen( "level1" ) );
+         $rb->text( " + $hiddencount more" );
+         $rb->restore;
       }
    }
 

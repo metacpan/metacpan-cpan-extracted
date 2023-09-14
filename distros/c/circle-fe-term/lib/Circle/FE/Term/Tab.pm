@@ -1,10 +1,10 @@
 #  You may distribute under the terms of the GNU General Public License
 #
-#  (C) Paul Evans, 2012-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2023 -- leonerd@leonerd.org.uk
 
-package Circle::FE::Term::Tab;
+package Circle::FE::Term::Tab 0.232470;
 
-use strict;
+use v5.26;
 use warnings;
 
 use Tickit::Widget::Tabbed;

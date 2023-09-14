@@ -40,6 +40,17 @@ virtual machine management APIs. This allows machines running
 within arbitrary virtualization containers to be managed with
 a consistent API.
 
+=head1 CALLBACK HANDLING
+
+Each callback registration routine returns a C<$callbackID> (except for
+C<domain_event_register> and C<register_close_callback>). This return value
+must be retained and used for callback deregistration.
+
+B<IMPORTANT:> All callbacks must be deregistered (including the ones
+registered using C<domain_event_register> and C<register_close_callback>);
+failing to do so prevents the C<Sys::Virt> object from being garbage collected
+and the connection to C<libvirtd> from being closed.
+
 =head1 ERROR HANDLING
 
 Any operations in the Sys::Virt API which have failure scenarios
@@ -81,7 +92,7 @@ use Sys::Virt::DomainSnapshot;
 use Sys::Virt::DomainCheckpoint;
 use Sys::Virt::Stream;
 
-our $VERSION = '9.4.0';
+our $VERSION = '9.7.0';
 require XSLoader;
 XSLoader::load('Sys::Virt', $VERSION);
 
@@ -1352,7 +1363,7 @@ Return the name of the host with which this connection is associated.
 
 Return the URI associated with the open connection. This may be different
 from the URI used when initially connecting to libvirt, when 'auto-probing'
-or drivers occurrs.
+or drivers occurs.
 
 =item my $xml = $conn->get_sysinfo()
 
@@ -1516,7 +1527,7 @@ method.
 
 Returns an array containing information about the CPUs available
 on the host. The first element, C<totcpus>, specifies the total
-number of CPUs available to the host regardles of their online
+number of CPUs available to the host regardless of their online
 stat. The second element, C<onlinemap>, provides a bitmap detailing
 which CPUs are currently online. The third element, C<totonline>,
 specifies the total number of online CPUs. The values in the bitmap
@@ -1664,7 +1675,7 @@ released in garbage collection.
 Unregister a callback, allowing the connection object to be garbage
 collected.
 
-=item $callback = $conn->domain_event_register_any($dom, $eventID, $callback)
+=item $callbackID = $conn->domain_event_register_any($dom, $eventID, $callback)
 
 Register a callback to received notifications of domain events.
 The C<$dom> parameter can be C<undef> to request events on all
@@ -1728,7 +1739,7 @@ unregistering the event.
 Unregister a callback, associated with the C<$callbackID> previously
 obtained from C<domain_event_register_any>.
 
-=item $callback = $conn->network_event_register_any($net, $eventID, $callback)
+=item $callbackID = $conn->network_event_register_any($net, $eventID, $callback)
 
 Register a callback to received notifications of network events.
 The C<$net> parameter can be C<undef> to request events on all
@@ -1760,7 +1771,7 @@ unregistering the event.
 Unregister a callback, associated with the C<$callbackID> previously
 obtained from C<network_event_register_any>.
 
-=item $callback = $conn->storage_pool_event_register_any($pool, $eventID, $callback)
+=item $callbackID = $conn->storage_pool_event_register_any($pool, $eventID, $callback)
 
 Register a callback to received notifications of storage pool events.
 The C<$pool> parameter can be C<undef> to request events on all
@@ -1796,7 +1807,7 @@ unregistering the event.
 Unregister a callback, associated with the C<$callbackID> previously
 obtained from C<storage_pool_event_register_any>.
 
-=item $callback = $conn->node_device_event_register_any($dev, $eventID, $callback)
+=item $callbackID = $conn->node_device_event_register_any($dev, $eventID, $callback)
 
 Register a callback to received notifications of node device events.
 The C<$dev> parameter can be C<undef> to request events on all
@@ -1828,7 +1839,7 @@ unregistering the event.
 Unregister a callback, associated with the C<$callbackID> previously
 obtained from C<node_device_event_register_any>.
 
-=item $callback = $conn->secret_event_register_any($secret, $eventID, $callback)
+=item $callbackID = $conn->secret_event_register_any($secret, $eventID, $callback)
 
 Register a callback to received notifications of secret events.
 The C<$secret> parameter can be C<undef> to request events on all
@@ -2004,7 +2015,7 @@ allocate for. Each entry is a further array reference where the
 first element is the page size and the second element is the
 page count. The same number of pages will be allocated on each
 NUMA node in the range C<$start> to C<$end> inclusive. The
-C<$flags> parameter accepts two contants
+C<$flags> parameter accepts two constants
 
 =over 4
 

@@ -1,5 +1,5 @@
 package App::Oozie::Update::Coordinator;
-$App::Oozie::Update::Coordinator::VERSION = '0.002';
+$App::Oozie::Update::Coordinator::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
@@ -8,7 +8,6 @@ use namespace::autoclean -except => [qw/_options_data _options_config/];
 use App::Oozie::Types::Common qw( IsCOORDID );
 use Config::General qw( ParseConfig );
 use Cwd;
-use Data::Dumper ();
 use Date::Format ();
 use Date::Parse  ();
 use File::Spec::Functions qw( catfile );
@@ -214,11 +213,13 @@ FYI
         for my $name ( keys %job_properties ) {
             my $val = $job_properties{ $name};
             if ( is_ref $val ) {
+                require Data::Dumper;
+                my $d = Data::Dumper->new([ $val ], [ $name ]);
                 $logger->logdie(
                     sprintf 'You seem to have a double definition in %s for %s as %s',
                                 'job.properties',
                                 $name,
-                                do { my $d = Data::Dumper->new([ $val ], [ $name ]); $d->Dump },
+                                $d->Dump,
                 );
             }
         }
@@ -460,7 +461,7 @@ App::Oozie::Update::Coordinator
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 

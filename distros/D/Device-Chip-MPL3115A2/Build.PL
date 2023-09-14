@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -7,7 +8,7 @@ my $build = Module::Build->new(
    module_name => 'Device::Chip::MPL3115A2',
    requires => {
       'perl' => '5.026',
-      'Object::Pad' => '0.66',
+      'Object::Pad' => '0.800',
       'Future::AsyncAwait' => '0.47', # toplevel await
 
       'Data::Bitfield' => '0.02',

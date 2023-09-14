@@ -1,4 +1,5 @@
-package YA::CLI::Example;
+package
+    YA::CLI::Example;
 use Moo;
 
 extends 'YA::CLI';

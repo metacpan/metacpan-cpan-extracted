@@ -1,0 +1,7 @@
+use Test2::V0;
+
+use GD::Barcode::EAN8;
+
+is(GD::Barcode::EAN8->new("1234567")->barcode(), 'G0G00110010010011011110101000110G0G01001110101000010001001110010G0G', 'EAN8/7');
+
+done_testing;

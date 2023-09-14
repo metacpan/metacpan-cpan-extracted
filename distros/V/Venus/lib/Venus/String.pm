@@ -35,11 +35,25 @@ sub append_with {
 sub assertion {
   my ($self) = @_;
 
-  my $assert = $self->SUPER::assertion;
+  my $assertion = $self->SUPER::assertion;
 
-  $assert->clear->expression('string | number | float | boolean');
+  $assertion->match('bool')->format(sub{
+    (ref $self || $self)->new($_)
+  });
 
-  return $assert;
+  $assertion->match('float')->format(sub{
+    (ref $self || $self)->new($_)
+  });
+
+  $assertion->match('number')->format(sub{
+    (ref $self || $self)->new($_)
+  });
+
+  $assertion->match('string')->format(sub{
+    (ref $self || $self)->new($_)
+  });
+
+  return $assertion;
 }
 
 sub camelcase {
@@ -443,7 +457,7 @@ This package provides the following methods:
 
 =head2 append
 
-  append(Str @parts) (Str)
+  append(string @parts) (string)
 
 The append method appends arugments to the string using spaces.
 
@@ -465,7 +479,7 @@ I<Since C<0.01>>
 
 =head2 append_with
 
-  append_with(Str $delimiter, Str @parts) (Str)
+  append_with(string $delimiter, string @parts) (string)
 
 The append_with method appends arugments to the string using the delimiter
 provided.
@@ -488,7 +502,7 @@ I<Since C<0.01>>
 
 =head2 camelcase
 
-  camelcase() (Str)
+  camelcase() (string)
 
 The camelcase method converts the string to camelcase.
 
@@ -510,7 +524,7 @@ I<Since C<0.01>>
 
 =head2 cast
 
-  cast(Str $kind) (Object | Undef)
+  cast(string $kind) (object | undef)
 
 The cast method converts L<"value"|Venus::Kind::Value> objects between
 different I<"value"> object types, based on the name of the type provided. This
@@ -682,7 +696,7 @@ I<Since C<0.08>>
 
 =head2 chomp
 
-  chomp() (Str)
+  chomp() (string)
 
 The chomp method removes the newline (or the current value of $/) from the end
 of the string.
@@ -725,7 +739,7 @@ I<Since C<0.01>>
 
 =head2 chop
 
-  chop() (Str)
+  chop() (string)
 
 The chop method removes and returns the last character of the string.
 
@@ -751,7 +765,7 @@ I<Since C<0.01>>
 
 =head2 concat
 
-  concat(Str @parts) (Str)
+  concat(string @parts) (string)
 
 The concat method returns the string with the argument list appended to it.
 
@@ -777,7 +791,7 @@ I<Since C<0.01>>
 
 =head2 contains
 
-  contains(Str $expr) (Bool)
+  contains(string $expr) (boolean)
 
 The contains method searches the string for a substring or expression returns
 true or false if found.
@@ -836,7 +850,7 @@ I<Since C<0.01>>
 
 =head2 default
 
-  default() (Str)
+  default() (string)
 
 The default method returns the default value, i.e. C<''>.
 
@@ -858,7 +872,7 @@ I<Since C<0.01>>
 
 =head2 eq
 
-  eq(Any $arg) (Bool)
+  eq(any $arg) (boolean)
 
 The eq method performs an I<"equals"> operation using the argument provided.
 
@@ -1029,7 +1043,7 @@ I<Since C<0.08>>
 
 =head2 format
 
-  format(Any @args) (Str)
+  format(any @args) (string)
 
 The format method performs a L<perlfunc/sprintf> operation using the underlying
 string and arguments provided and returns the result.
@@ -1072,7 +1086,7 @@ I<Since C<3.30>>
 
 =head2 ge
 
-  ge(Any $arg) (Bool)
+  ge(any $arg) (boolean)
 
 The ge method performs a I<"greater-than-or-equal-to"> operation using the
 argument provided.
@@ -1244,7 +1258,7 @@ I<Since C<0.08>>
 
 =head2 gele
 
-  gele(Any $arg1, Any $arg2) (Bool)
+  gele(any $arg1, any $arg2) (boolean)
 
 The gele method performs a I<"greater-than-or-equal-to"> operation on the 1st
 argument, and I<"lesser-than-or-equal-to"> operation on the 2nd argument.
@@ -1416,7 +1430,7 @@ I<Since C<0.08>>
 
 =head2 gt
 
-  gt(Any $arg) (Bool)
+  gt(any $arg) (boolean)
 
 The gt method performs a I<"greater-than"> operation using the argument provided.
 
@@ -1587,7 +1601,7 @@ I<Since C<0.08>>
 
 =head2 gtlt
 
-  gtlt(Any $arg1, Any $arg2) (Bool)
+  gtlt(any $arg1, any $arg2) (boolean)
 
 The gtlt method performs a I<"greater-than"> operation on the 1st argument, and
 I<"lesser-than"> operation on the 2nd argument.
@@ -1759,7 +1773,7 @@ I<Since C<0.08>>
 
 =head2 hex
 
-  hex() (Str)
+  hex() (string)
 
 The hex method returns the value resulting from interpreting the string as a
 hex string.
@@ -1786,7 +1800,7 @@ I<Since C<0.01>>
 
 =head2 index
 
-  index(Str $substr, Int $start) (Num)
+  index(string $substr, number $start) (number)
 
 The index method searches for the argument within the string and returns the
 position of the first occurrence of the argument.
@@ -1845,7 +1859,7 @@ I<Since C<0.01>>
 
 =head2 kebabcase
 
-  kebabcase() (Str)
+  kebabcase() (string)
 
 The kebabcase method converts the string to kebabcase.
 
@@ -1867,7 +1881,7 @@ I<Since C<0.09>>
 
 =head2 lc
 
-  lc() (Str)
+  lc() (string)
 
 The lc method returns a lowercased version of the string.
 
@@ -1893,7 +1907,7 @@ I<Since C<0.01>>
 
 =head2 lcfirst
 
-  lcfirst() (Str)
+  lcfirst() (string)
 
 The lcfirst method returns a the string with the first character lowercased.
 
@@ -1919,7 +1933,7 @@ I<Since C<0.01>>
 
 =head2 le
 
-  le(Any $arg) (Bool)
+  le(any $arg) (boolean)
 
 The le method performs a I<"lesser-than-or-equal-to"> operation using the
 argument provided.
@@ -2091,7 +2105,7 @@ I<Since C<0.08>>
 
 =head2 length
 
-  length() (Int)
+  length() (number)
 
 The length method returns the number of characters within the string.
 
@@ -2113,7 +2127,7 @@ I<Since C<0.01>>
 
 =head2 lines
 
-  lines() (ArrayRef[Str])
+  lines() (within[arrayref, string])
 
 The lines method returns an arrayref of parts by splitting on 1 or more newline
 characters.
@@ -2152,7 +2166,7 @@ I<Since C<0.01>>
 
 =head2 lowercase
 
-  lowercase() (Str)
+  lowercase() (string)
 
 The lowercase method is an alias to the lc method.
 
@@ -2178,7 +2192,7 @@ I<Since C<0.01>>
 
 =head2 lt
 
-  lt(Any $arg) (Bool)
+  lt(any $arg) (boolean)
 
 The lt method performs a I<"lesser-than"> operation using the argument provided.
 
@@ -2349,7 +2363,7 @@ I<Since C<0.08>>
 
 =head2 ne
 
-  ne(Any $arg) (Bool)
+  ne(any $arg) (boolean)
 
 The ne method performs a I<"not-equal-to"> operation using the argument provided.
 
@@ -2520,7 +2534,7 @@ I<Since C<0.08>>
 
 =head2 numified
 
-  numified() (Int)
+  numified() (number)
 
 The numified method returns the numerical representation of the object. For
 string objects this method returns the underlying value, if that value looks
@@ -2560,7 +2574,7 @@ I<Since C<0.08>>
 
 =head2 pascalcase
 
-  pascalcase() (Str)
+  pascalcase() (string)
 
 The pascalcase method converts the string to pascalcase.
 
@@ -2582,7 +2596,7 @@ I<Since C<0.01>>
 
 =head2 prepend
 
-  prepend(Str @parts) (Str)
+  prepend(string @parts) (string)
 
 The prepend method prepends arugments to the string using spaces.
 
@@ -2604,7 +2618,7 @@ I<Since C<0.01>>
 
 =head2 prepend_with
 
-  prepend_with(Str $delimiter, Str @parts) (Str)
+  prepend_with(string $delimiter, string @parts) (string)
 
 The prepend_with method prepends arugments to the string using the delimiter
 provided.
@@ -2627,7 +2641,7 @@ I<Since C<0.01>>
 
 =head2 render
 
-  render(HashRef $tokens) (Str)
+  render(hashref $tokens) (string)
 
 The render method treats the string as a template and performs a simple token
 replacement using the argument provided.
@@ -2654,7 +2668,7 @@ I<Since C<0.01>>
 
 =head2 repeat
 
-  repeat(Num $number, Str $delimiter) (Str)
+  repeat(number $number, string $delimiter) (string)
 
 The repeat method repeats the string value N times based on the number provided
 and returns a new concatenated string. Optionally, a delimiter can be provided
@@ -2698,7 +2712,7 @@ I<Since C<0.01>>
 
 =head2 replace
 
-  replace(Regexp $regexp, Str $replace, Str $flags) (Replace)
+  replace(regexp $regexp, string $replace, string $flags) (Venus::Replace)
 
 The replace method performs a search and replace operation and returns the
 L<Venus::Replace> object.
@@ -2727,7 +2741,7 @@ I<Since C<0.01>>
 
 =head2 reverse
 
-  reverse() (Str)
+  reverse() (string)
 
 The reverse method returns a string where the characters in the string are in
 the opposite order.
@@ -2750,7 +2764,7 @@ I<Since C<0.01>>
 
 =head2 rindex
 
-  rindex(Str $substr, Int $start) (Str)
+  rindex(string $substr, number $start) (string)
 
 The rindex method searches for the argument within the string and returns the
 position of the last occurrence of the argument.
@@ -2809,7 +2823,7 @@ I<Since C<0.01>>
 
 =head2 search
 
-  search(Regexp $regexp) (Search)
+  search(regexp $regexp) (Venus::Search)
 
 The search method performs a search operation and returns the L<Venus::Search>
 object.
@@ -2837,7 +2851,7 @@ I<Since C<0.01>>
 
 =head2 snakecase
 
-  snakecase() (Str)
+  snakecase() (string)
 
 The snakecase method converts the string to snakecase.
 
@@ -2859,7 +2873,7 @@ I<Since C<0.01>>
 
 =head2 split
 
-  split(Str | Regexp $expr, Maybe[Int] $limit) (ArrayRef)
+  split(string | regexp $expr, maybe[number] $limit) (arrayref)
 
 The split method returns an arrayref by splitting the string on the argument.
 
@@ -2917,7 +2931,7 @@ I<Since C<0.01>>
 
 =head2 stringified
 
-  stringified() (Str)
+  stringified() (string)
 
 The stringified method returns the object, stringified (i.e. a dump of the
 object's value).
@@ -2956,7 +2970,7 @@ I<Since C<0.08>>
 
 =head2 strip
 
-  strip() (Str)
+  strip() (string)
 
 The strip method returns the string replacing occurences of 2 or more
 whitespaces with a single whitespace.
@@ -2983,7 +2997,7 @@ I<Since C<0.01>>
 
 =head2 substr
 
-  substr(Num $offset, Num $length, Str $replace) (Str)
+  substr(number $offset, number $length, string $replace) (string)
 
 The substr method calls the core L</substr> function with the object's string
 value. In list context returns the result and the subject.
@@ -3058,7 +3072,7 @@ I<Since C<0.01>>
 
 =head2 template
 
-  template(Str | CodeRef $code, Any @args) (Any)
+  template(string | coderef $code, any @args) (any)
 
 The template method uses the underlying string value to build and return a
 L<Venus::Template> object, or dispatches to the coderef or method provided.
@@ -3103,7 +3117,7 @@ I<Since C<3.04>>
 
 =head2 titlecase
 
-  titlecase() (Str)
+  titlecase() (string)
 
 The titlecase method returns the string capitalizing the first character of
 each word.
@@ -3126,7 +3140,7 @@ I<Since C<0.01>>
 
 =head2 trim
 
-  trim() (Str)
+  trim() (string)
 
 The trim method removes one or more consecutive leading and/or trailing spaces
 from the string.
@@ -3153,7 +3167,7 @@ I<Since C<0.01>>
 
 =head2 tv
 
-  tv(Any $arg) (Bool)
+  tv(any $arg) (boolean)
 
 The tv method performs a I<"type-and-value-equal-to"> operation using argument
 provided.
@@ -3325,7 +3339,7 @@ I<Since C<0.08>>
 
 =head2 uc
 
-  uc() (Str)
+  uc() (string)
 
 The uc method returns an uppercased version of the string.
 
@@ -3347,7 +3361,7 @@ I<Since C<0.01>>
 
 =head2 ucfirst
 
-  ucfirst() (Str)
+  ucfirst() (string)
 
 The ucfirst method returns a the string with the first character uppercased.
 
@@ -3369,7 +3383,7 @@ I<Since C<0.01>>
 
 =head2 uppercase
 
-  uppercase() (Str)
+  uppercase() (string)
 
 The uppercase method is an alias to the uc method.
 
@@ -3391,7 +3405,7 @@ I<Since C<0.01>>
 
 =head2 words
 
-  words() (ArrayRef[Str])
+  words() (within[arrayref, string])
 
 The words method returns an arrayref by splitting on 1 or more consecutive
 spaces.
@@ -3489,7 +3503,7 @@ B<example 1>
 
   my $result = $string ne 'Hello world';
 
-  1;
+  # 1
 
 B<example 2>
 
@@ -3530,7 +3544,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

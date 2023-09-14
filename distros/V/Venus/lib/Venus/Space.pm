@@ -54,6 +54,8 @@ sub array {
 
   my $class = $self->package;
 
+  no warnings 'once';
+
   @{"${class}::${name}"} = @data if @data;
 
   return [@{"${class}::${name}"}];
@@ -277,6 +279,8 @@ sub hash {
 
   my $class = $self->package;
 
+  no warnings 'once';
+
   %{"${class}::${name}"} = (@data) if @data;
 
   return {%{"${class}::${name}"}};
@@ -443,6 +447,28 @@ sub parts {
   return $self->parse;
 }
 
+sub patch {
+  my ($self, $name, $code) = @_;
+
+  my $patched = $self->{'$patched'} ||= {};
+
+  my $orig = $self->swap($name, $code);
+
+  $patched->{$name} = $orig;
+
+  return $self;
+}
+
+sub patched {
+  my ($self, $name) = @_;
+
+  my $patched = $self->{'$patched'};
+
+  return false if !$patched;
+
+  return $name ? ($patched->{$name} ? true : false) : true;
+}
+
 sub pfile {
   my ($self) = @_;
 
@@ -517,6 +543,8 @@ sub routine {
 
   my $class = $self->package;
 
+  no warnings 'redefine';
+
   *{"${class}::${name}"} = $code if $code;
 
   return *{"${class}::${name}"}{"CODE"};
@@ -541,6 +569,8 @@ sub scalar {
   no strict 'refs';
 
   my $class = $self->package;
+
+  no warnings 'once';
 
   ${"${class}::${name}"} = $data[0] if @data;
 
@@ -711,6 +741,23 @@ sub unloaded {
   my ($self) = @_;
 
   return $self->loaded ? false : true;
+}
+
+sub unpatch {
+  my ($self, @names) = @_;
+
+  my $patched = $self->{'$patched'} ||= {};
+
+  @names = keys %{$patched} if !@names;
+
+  for my $name (@names) {
+    my $orig = delete $patched->{$name} or next;
+    $self->routine($name, $orig);
+  }
+
+  delete $self->{'$patched'} if !keys %{$patched};
+
+  return $self;
 }
 
 sub visible {
@@ -918,7 +965,7 @@ This package provides the following methods:
 
 =head2 all
 
-  all(Str $method, Any @args) (ArrayRef[Tuple[Str, Any]])
+  all(string $method, any @args) (within[arrayref, tuple[string, any]])
 
 The all method executes any available method on the instance and all instances
 representing packages inherited by the package represented by the invocant.
@@ -995,7 +1042,7 @@ I<Since C<0.01>>
 
 =head2 append
 
-  append(Str @path) (Space)
+  append(string @path) (Venus::Space)
 
 The append method modifies the object by appending to the package namespace
 parts.
@@ -1030,7 +1077,7 @@ I<Since C<0.01>>
 
 =head2 array
 
-  array(Str $name, Any @data) (ArrayRef)
+  array(string $name, any @data) (arrayref)
 
 The array method gets or sets the value for the given package array variable name.
 
@@ -1076,7 +1123,7 @@ I<Since C<0.01>>
 
 =head2 arrays
 
-  arrays() (ArrayRef)
+  arrays() (arrayref)
 
 The arrays method searches the package namespace for arrays and returns their
 names.
@@ -1106,7 +1153,7 @@ I<Since C<0.01>>
 
 =head2 attributes
 
-  attributes() (ArrayRef)
+  attributes() (arrayref)
 
 The attributes method searches the package namespace for attributes and returns
 their names. This will not include attributes from roles, mixins, or superclasses.
@@ -1170,7 +1217,7 @@ I<Since C<1.02>>
 
 =head2 authority
 
-  authority() (Maybe[Str])
+  authority() (maybe[string])
 
 The authority method returns the C<AUTHORITY> declared on the target package,
 if any.
@@ -1219,7 +1266,7 @@ I<Since C<0.01>>
 
 =head2 basename
 
-  basename() (Str)
+  basename() (string)
 
 The basename method returns the last segment of the package namespace parts.
 
@@ -1288,7 +1335,7 @@ I<Since C<0.01>>
 
 =head2 build
 
-  build(Any @args) (Self)
+  build(any @args) (Self)
 
 The build method attempts to call C<new> on the package namespace and if
 successful returns the resulting object.
@@ -1359,7 +1406,7 @@ I<Since C<0.01>>
 
 =head2 call
 
-  call(Any @args) (Any)
+  call(any @args) (any)
 
 The call method attempts to call the given subroutine on the package namespace
 and if successful returns the resulting value.
@@ -1438,7 +1485,7 @@ I<Since C<0.01>>
 
 =head2 chain
 
-  chain(Str | Tuple[Str, Any] @steps) (Any)
+  chain(string | tuple[string, any] @steps) (any)
 
 The chain method chains one or more method calls and returns the result.
 
@@ -1520,7 +1567,7 @@ I<Since C<0.01>>
 
 =head2 child
 
-  child(Str @path) (Space)
+  child(string @path) (Venus::Space)
 
 The child method returns a new L<Venus::Space> object for the child
 package namespace.
@@ -1543,7 +1590,7 @@ I<Since C<0.01>>
 
 =head2 children
 
-  children() (ArrayRef[Object])
+  children() (within[arrayref, object])
 
 The children method searches C<%INC> and C<@INC> and retuns a list of
 L<Venus::Space> objects for each child namespace found (one level deep).
@@ -1575,7 +1622,7 @@ I<Since C<0.01>>
 
 =head2 cop
 
-  cop(Str $method, Any @args) (CodeRef)
+  cop(string $method, any @args) (coderef)
 
 The cop method attempts to curry the given subroutine on the package namespace
 and if successful returns a closure. This method supports dispatching, i.e.
@@ -1628,7 +1675,7 @@ I<Since C<0.01>>
 
 =head2 data
 
-  data() (Str)
+  data() (string)
 
 The data method attempts to read and return any content stored in the C<DATA>
 section of the package namespace.
@@ -1651,7 +1698,7 @@ I<Since C<0.01>>
 
 =head2 eval
 
-  eval(Str @data) (Any)
+  eval(string @data) (any)
 
 The eval method takes a list of strings and evaluates them under the namespace
 represented by the instance.
@@ -1694,7 +1741,7 @@ I<Since C<0.01>>
 
 =head2 explain
 
-  explain() (Str)
+  explain() (string)
 
 The explain method returns the package name and is used in stringification
 operations.
@@ -1717,7 +1764,7 @@ I<Since C<0.01>>
 
 =head2 hash
 
-  hash(Str $name, Any @data) (HashRef)
+  hash(string $name, any @data) (hashref)
 
 The hash method gets or sets the value for the given package hash variable name.
 
@@ -1767,7 +1814,7 @@ I<Since C<0.01>>
 
 =head2 hashes
 
-  hashes() (ArrayRef)
+  hashes() (arrayref)
 
 The hashes method searches the package namespace for hashes and returns their
 names.
@@ -1802,7 +1849,7 @@ I<Since C<0.01>>
 
 =head2 id
 
-  id() (Str)
+  id() (string)
 
 The id method returns the fully-qualified package name as a label.
 
@@ -1824,7 +1871,7 @@ I<Since C<0.01>>
 
 =head2 included
 
-  included() (Str | Undef)
+  included() (string | undef)
 
 The included method returns the path of the namespace if it exists in C<%INC>.
 
@@ -1850,7 +1897,7 @@ I<Since C<0.01>>
 
 =head2 inherits
 
-  inherits() (ArrayRef)
+  inherits() (arrayref)
 
 The inherits method returns the list of superclasses the target package is
 derived from.
@@ -1903,7 +1950,7 @@ I<Since C<0.01>>
 
 =head2 init
 
-  init() (Str)
+  init() (string)
 
 The init method ensures that the package namespace is loaded and, whether
 created in-memory or on-disk, is flagged as being loaded and loadable.
@@ -1930,7 +1977,7 @@ I<Since C<0.01>>
 
 =head2 inject
 
-  inject(Str $name, Maybe[CodeRef] $coderef) (Any)
+  inject(string $name, maybe[coderef] $coderef) (any)
 
 The inject method monkey-patches the package namespace, installing a named
 subroutine into the package which can then be called normally, returning the
@@ -1958,7 +2005,7 @@ I<Since C<0.01>>
 
 =head2 integrates
 
-  integrates() (ArrayRef)
+  integrates() (arrayref)
 
 The integrates method returns the list of roles integrated into the target
 package.
@@ -1999,7 +2046,7 @@ I<Since C<1.30>>
 
 =head2 lfile
 
-  lfile() (Str)
+  lfile() (string)
 
 The lfile method returns a C<.pm> file path for the underlying package.
 
@@ -2023,7 +2070,7 @@ I<Since C<1.30>>
 
 =head2 load
 
-  load() (Str)
+  load() (string)
 
 The load method checks whether the package namespace is already loaded and if
 not attempts to load the package. If the package is not loaded and is not
@@ -2070,7 +2117,7 @@ I<Since C<0.01>>
 
 =head2 loaded
 
-  loaded() (Bool)
+  loaded() (boolean)
 
 The loaded method checks whether the package namespace is already loaded and
 returns truthy or falsy.
@@ -2119,7 +2166,7 @@ I<Since C<0.01>>
 
 =head2 locate
 
-  locate() (Str)
+  locate() (string)
 
 The locate method checks whether the package namespace is available in
 C<@INC>, i.e. on disk. This method returns the file if found or an empty
@@ -2165,7 +2212,7 @@ I<Since C<0.01>>
 
 =head2 meta
 
-  meta() (Meta)
+  meta() (Venus::Meta)
 
 The meta method returns a L<Venus::Meta> object representing the underlying
 package namespace. To access the meta object for the instance itself, use the
@@ -2205,7 +2252,7 @@ I<Since C<1.02>>
 
 =head2 mock
 
-  mock() (Space)
+  mock() (Venus::Space)
 
 The mock method returns a L<Venus::Space> object representing an anonymous
 package that derives from the invoking package.
@@ -2232,7 +2279,7 @@ I<Since C<1.50>>
 
 =head2 name
 
-  name() (Str)
+  name() (string)
 
 The name method returns the fully-qualified package name.
 
@@ -2254,7 +2301,7 @@ I<Since C<0.01>>
 
 =head2 parent
 
-  parent() (Space)
+  parent() (Venus::Space)
 
 The parent method returns a new L<Venus::Space> object for the parent package
 namespace.
@@ -2277,7 +2324,7 @@ I<Since C<0.01>>
 
 =head2 parse
 
-  parse() (ArrayRef)
+  parse() (arrayref)
 
 The parse method parses the string argument and returns an arrayref of package
 namespace segments (parts).
@@ -2364,7 +2411,7 @@ I<Since C<0.01>>
 
 =head2 parts
 
-  parts() (ArrayRef)
+  parts() (arrayref)
 
 The parts method returns an arrayref of package namespace segments (parts).
 
@@ -2420,9 +2467,153 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 patch
+
+  patch(string $name, coderef $code) (Venus::Space)
+
+The patch method overwrites the named subroutine in the underlying package
+using the L</swap> operation, stashing the original subroutine reference to be
+reset later using L</unpatch>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item patch example 1
+
+  package Foo::Far;
+
+  use Venus::Class;
+
+  sub execute {
+    1
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/far');
+
+  my $patch = $space->patch('execute', sub {
+    $_[0]->() + 1
+  });
+
+  # bless(..., "Venus::Space")
+
+  # $patch->patched;
+
+  # true
+
+  # Foo::Far->new->execute;
+
+  # 2
+
+=back
+
+=cut
+
+=head2 patched
+
+  patched(string $name) (boolean)
+
+The patched method confirms whether a subroutine in the underlying namespace
+has been patched using the L</patch> operation. If no name is provided, this
+method will return true if any subroutines have been patched.  If a name is
+provided, this method will return true only if the named subroutine has been
+patched, and otherwise returns false.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item patched example 1
+
+  package Foo::Far;
+
+  use Venus::Class;
+
+  sub execute {
+    1
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/far');
+
+  $space->patch('execute', sub {
+    $_[0]->() + 1
+  });
+
+  my $patched = $space->patched;
+
+  # true
+
+=back
+
+=over 4
+
+=item patched example 2
+
+  package Foo::Far;
+
+  use Venus::Class;
+
+  sub execute {
+    1
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/far');
+
+  $space->patch('execute', sub {
+    $_[0]->() + 1
+  });
+
+  my $patched = $space->patched('execute');
+
+  # true
+
+=back
+
+=over 4
+
+=item patched example 3
+
+  package Foo::Far;
+
+  use Venus::Class;
+
+  sub execute {
+    1
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/far');
+
+  $space->patch('execute', sub {
+    $_[0]->() + 1
+  });
+
+  my $patched = $space->patched('prepare');
+
+  # false
+
+=back
+
+=cut
+
 =head2 pfile
 
-  pfile() (Str)
+  pfile() (string)
 
 The pfile method returns a C<.pod> file path for the underlying package.
 
@@ -2446,7 +2637,7 @@ I<Since C<1.30>>
 
 =head2 prepend
 
-  prepend(Str @path) (Space)
+  prepend(string @path) (Venus::Space)
 
 The prepend method modifies the object by prepending to the package namespace
 parts.
@@ -2516,7 +2707,7 @@ I<Since C<1.02>>
 
 =head2 rebase
 
-  rebase(Str @path) (Space)
+  rebase(string @path) (Venus::Space)
 
 The rebase method returns an object by prepending the package namespace
 specified to the base of the current object's namespace.
@@ -2539,7 +2730,7 @@ I<Since C<0.01>>
 
 =head2 reload
 
-  reload() (Str)
+  reload() (string)
 
 The reload method attempts to delete and reload the package namespace using the
 L</load> method. B<Note:> Reloading is additive and will overwrite existing
@@ -2589,7 +2780,7 @@ I<Since C<0.01>>
 
 =head2 require
 
-  require(Str $target) (Any)
+  require(string $target) (any)
 
 The require method executes a C<require> statement within the package namespace
 specified.
@@ -2612,7 +2803,7 @@ I<Since C<0.01>>
 
 =head2 root
 
-  root() (Str)
+  root() (string)
 
 The root method returns the root package namespace segments (parts). Sometimes
 separating the C<root> from the C<parts> helps identify how subsequent child
@@ -2636,7 +2827,7 @@ I<Since C<0.01>>
 
 =head2 routine
 
-  routine(Str $name, CodeRef $code) (CodeRef)
+  routine(string $name, coderef $code) (coderef)
 
 The routine method gets or sets the subroutine reference for the given subroutine
 name.
@@ -2699,7 +2890,7 @@ I<Since C<0.01>>
 
 =head2 routines
 
-  routines() (ArrayRef)
+  routines() (arrayref)
 
 The routines method searches the package namespace for routines and returns
 their names.
@@ -2736,7 +2927,7 @@ I<Since C<0.01>>
 
 =head2 scalar
 
-  scalar(Str $name, Any @data) (Any)
+  scalar(string $name, any @data) (any)
 
 The scalar method gets or sets the value for the given package scalar variable name.
 
@@ -2782,7 +2973,7 @@ I<Since C<0.01>>
 
 =head2 scalars
 
-  scalars() (ArrayRef)
+  scalars() (arrayref)
 
 The scalars method searches the package namespace for scalars and returns their
 names.
@@ -2813,7 +3004,7 @@ I<Since C<0.01>>
 
 =head2 sibling
 
-  sibling(Str $path) (Space)
+  sibling(string $path) (Venus::Space)
 
 The sibling method returns a new L<Venus::Space> object for the sibling package
 namespace.
@@ -2836,7 +3027,7 @@ I<Since C<0.01>>
 
 =head2 siblings
 
-  siblings() (ArrayRef[Object])
+  siblings() (within[arrayref, object])
 
 The siblings method searches C<%INC> and C<@INC> and retuns a list of
 L<Venus::Space> objects for each sibling namespace found (one level deep).
@@ -2867,7 +3058,7 @@ I<Since C<0.01>>
 
 =head2 splice
 
-  splice(Int $offset, Int $length, Any @list) (Space)
+  splice(number $offset, number $length, any @list) (Venus::Space)
 
 The splice method perform a Perl L<perlfunc/splice> operation on the package
 namespace.
@@ -2942,7 +3133,7 @@ I<Since C<0.09>>
 
 =head2 swap
 
-  swap(Str $name, CodeRef $code) (CodeRef)
+  swap(string $name, coderef $code) (coderef)
 
 The swap method overwrites the named subroutine in the underlying package with
 the code reference provided and returns the original subroutine as a code
@@ -3005,7 +3196,7 @@ I<Since C<1.95>>
 
 =head2 tfile
 
-  tfile() (Str)
+  tfile() (string)
 
 The tfile method returns a C<.t> file path for the underlying package.
 
@@ -3029,7 +3220,7 @@ I<Since C<1.30>>
 
 =head2 tryload
 
-  tryload() (Bool)
+  tryload() (boolean)
 
 The tryload method attempt to C<load> the represented package using the
 L</load> method and returns truthy/falsy based on whether the package was
@@ -3106,9 +3297,156 @@ I<Since C<1.02>>
 
 =cut
 
+=head2 unloaded
+
+  unloaded() (boolean)
+
+The unloaded method checks whether the package namespace is not loaded and
+returns truthy or falsy.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item unloaded example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Kit');
+
+  $space->init;
+
+  $space->unload;
+
+  my $unloaded = $space->unloaded;
+
+  # 1
+
+=back
+
+=over 4
+
+=item unloaded example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Kit');
+
+  $space->init;
+
+  my $unloaded = $space->unloaded;
+
+  # 0
+
+=back
+
+=cut
+
+=head2 unpatch
+
+  unpatch(string @names) (Venus::Space)
+
+The unpatch method restores a subroutine which has been patched using the
+L</patch> operation to its original subroutine reference. If no name is
+provided, this method will restore all subroutines have been patched. If a name
+is provided, this method will only restore the named subroutine has been
+patched.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item unpatch example 1
+
+  package Foo::Far;
+
+  use Venus::Class;
+
+  sub execute {
+    1
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/far');
+
+  $space->patch('execute', sub {
+    $_[0]->() + 1
+  });
+
+  my $unpatch = $space->unpatch;
+
+  # bless(..., "Venus::Space")
+
+=back
+
+=over 4
+
+=item unpatch example 2
+
+  package Foo::Far;
+
+  use Venus::Class;
+
+  sub execute {
+    1
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/far');
+
+  $space->patch('execute', sub {
+    $_[0]->() + 1
+  });
+
+  my $unpatch = $space->unpatch('execute');
+
+  # bless(..., "Venus::Space")
+
+=back
+
+=over 4
+
+=item unpatch example 3
+
+  package Foo::Far;
+
+  use Venus::Class;
+
+  sub execute {
+    1
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/far');
+
+  $space->patch('execute', sub {
+    $_[0]->() + 1
+  });
+
+  my $unpatch = $space->unpatch('prepare');
+
+  # bless(..., "Venus::Space")
+
+=back
+
+=cut
+
 =head2 use
 
-  use(Str | Tuple[Str, Str] $target, Any @params) (Space)
+  use(string | tuple[string, string] $target, any @params) (Venus::Space)
 
 The use method executes a C<use> statement within the package namespace
 specified.
@@ -3165,7 +3503,7 @@ I<Since C<0.01>>
 
 =head2 variables
 
-  variables() (ArrayRef[Tuple[Str, ArrayRef]])
+  variables() (within[arrayref, tuple[string, arrayref]])
 
 The variables method searches the package namespace for variables and returns
 their names.
@@ -3204,7 +3542,7 @@ I<Since C<0.01>>
 
 =head2 version
 
-  version() (Maybe[Str])
+  version() (maybe[string])
 
 The version method returns the C<VERSION> declared on the target package, if
 any.
@@ -3255,7 +3593,7 @@ I<Since C<0.01>>
 
 =head2 visible
 
-  visible() (Bool)
+  visible() (boolean)
 
 The visible method returns truthy is the package namespace is visible, i.e. has
 symbols defined.
@@ -3594,7 +3932,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

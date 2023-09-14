@@ -60,7 +60,7 @@ reduces the number of open file descriptors required, which allows more files
 to be accessed without adjusting process/user resource limits. 
 
 Files are 'opened' and 'closed' via the cache in order to track how many
-references to an entry are active (not perl reference counting btw). When an
+references to an entry are active (not Perl reference counting BTW). When an
 entry has no references, it is eligible to be removed by 'sweeping' the cache.
 This should be done a regular interval to keep the meta data fresh, but long
 enough to make the cache useful.  To make this module event system agnostic it
@@ -80,7 +80,7 @@ headers, etc), which only need to be computed when the file was opened.
 
 Note this module is tuned for performance rather than nice programming style.
 Thus fields within a cache entry are accessible by their position in an array
-instead of a nice hash name or accessor methods.  
+instead of a nice hash name or accessors methods.  
 
 =head1 API
 

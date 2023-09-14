@@ -24,8 +24,8 @@ my %prereq_pm = (
 	'DBI' => 0
 );
 
-if($^O ne 'MSWin32') {
-	# Doen't work on Windows
+if(($^O ne 'MSWin32') && ($^O ne 'openbsd')) {
+	# Doesn't work on Windows or compile on OpenBSD
 	$prereq_pm{'IO::Compress::Brotli'} = 0.003;
 }
 

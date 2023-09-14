@@ -1,19 +1,19 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2023 -- leonerd@leonerd.org.uk
 
-package Tickit::Pen 0.73;
+package Tickit::Pen 0.74;
 
 use v5.14;
 use warnings;
 
 use Carp;
 
-our @ALL_ATTRS = qw( fg bg b u i rv strike af blink );
+our @ALL_ATTRS = qw( fg bg b u i rv strike af blink sizepos );
 
 our @BOOL_ATTRS = qw( b u i rv strike blink );
-our @INT_ATTRS  = qw( fg bg af );
+our @INT_ATTRS  = qw( fg bg af sizepos );
 
 # Load the XS code
 require Tickit;
@@ -85,8 +85,6 @@ version.
 
 =item b => BOOL
 
-=item u => BOOL
-
 =item i => BOOL
 
 =item rv => BOOL
@@ -95,11 +93,23 @@ version.
 
 =item blink => BOOL
 
-Bold, underline, italics, reverse video, strikethrough, blink.
+Bold, italics, reverse video, strikethrough, blink.
+
+=item u => INT
+
+Underline. Should be one of the exported constants
+
+   PEN_UNDER_NONE  PEN_UNDER_SINGLE  PEN_UNDER_DOUBLE  PEN_UNDER_WAVY
 
 =item af => INT
 
 Alternate font.
+
+=item sizepos => INT
+
+Size/positioning effects. Should be one of the exported constants
+
+   PEN_SIZEPOS_NORMAL  PEN_SIZEPOS_SUPERSCRIPT  PEN_SIZEPOS_SUBSCRIPT
 
 =back
 
@@ -352,13 +362,13 @@ use overload
 use Scalar::Util qw( refaddr );
 use overload '==' => sub { refaddr($_[0]) == refaddr($_[1]) };
 
-package Tickit::Pen::Immutable 0.73;
+package Tickit::Pen::Immutable 0.74;
 use base qw( Tickit::Pen );
 use constant mutable => 0;
 
 sub as_immutable { return $_[0] }
 
-package Tickit::Pen::Mutable 0.73;
+package Tickit::Pen::Mutable 0.74;
 use base qw( Tickit::Pen );
 use constant mutable => 1;
 

@@ -228,7 +228,7 @@ add_alias us xx         => 1
 
 add_alias a b           => 'ERROR: add_alias: name does not exist: a'
 
-add_alias Sark xx       => 'ERROR: add_alias: alias already in use: xx'
+add_alias Hungary xx    => 'ERROR: add_alias: alias already in use: xx'
 
 show_errors 0           => 0
 
@@ -296,13 +296,13 @@ type country             => 0
 
 rename_code a b bar      => 'ERROR: rename_code: unknown code/codeset: a [bar]'
 
-rename_code us Sark alpha-2 => 'ERROR: rename_code: rename to an existing name not allowed'
+rename_code us Hungary alpha-2 => 'ERROR: rename_code: rename to an existing name not allowed'
 
 show_errors 0            => 0
 
 rename_code a b bar      => 0
 
-rename_code us Sark alpha-2 => 0
+rename_code us Hungary alpha-2 => 0
 
 #####
 

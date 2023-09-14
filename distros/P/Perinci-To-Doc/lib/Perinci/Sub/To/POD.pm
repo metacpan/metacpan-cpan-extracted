@@ -9,9 +9,9 @@ use Locale::TextDomain::UTF8 'Perinci-To-Doc';
 extends 'Perinci::Sub::To::FuncBase';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-15'; # DATE
+our $DATE = '2023-07-09'; # DATE
 our $DIST = 'Perinci-To-Doc'; # DIST
-our $VERSION = '0.880'; # VERSION
+our $VERSION = '0.881'; # VERSION
 
 sub BUILD {
     my ($self, $args) = @_;
@@ -342,11 +342,10 @@ sub after_gen_doc {
             "=over 4",
             "",
         );
-        use experimental 'smartmatch';
         for my $name (sort keys %{$dres->{args}}) {
             my $ra = $dres->{args}{$name};
-            next if 'hidden'     ~~ @{ $ra->{arg}{tags} // [] };
-            next if 'hidden-mod' ~~ @{ $ra->{arg}{tags} // [] };
+            next if grep { $_ eq 'hidden' }     @{ $ra->{arg}{tags} // [] };
+            next if grep { $_ eq 'hidden-mod' } @{ $ra->{arg}{tags} // [] };
             $self->add_doc_lines(join(
                 "",
                 "=item * B<".(($orig_args_as =~ /array/ && defined($ra->{arg}{pos}) ? '$' : '').$name).">",
@@ -454,7 +453,7 @@ Perinci::Sub::To::POD - Generate POD documentation from Rinci function metadata
 
 =head1 VERSION
 
-This document describes version 0.880 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2022-10-15.
+This document describes version 0.881 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2023-07-09.
 
 =head1 SYNOPSIS
 
@@ -502,7 +501,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

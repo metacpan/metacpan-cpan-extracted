@@ -28,6 +28,6 @@ is(length(Benchmark::DKbench::_random_str()), 1, 'Default len 1');
 
 $Benchmark::DKbench::datadir = '';
 
-like(dies {Benchmark::DKbench::bench_imager(1)}, qr/file/, "No image file found");
+ok(dies {Benchmark::DKbench::bench_imager(1)}, "No image file found");
 
 done_testing();

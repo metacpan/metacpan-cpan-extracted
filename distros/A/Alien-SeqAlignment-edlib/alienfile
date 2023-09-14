@@ -1,0 +1,125 @@
+use alienfile;
+use Path::Tiny;
+use IPC::System::Simple   qw(capturex);
+use File::Copy::Recursive qw(dircopy);
+use HTTP::Tiny;
+use Carp;
+
+## not doing system install, so must deal with the package name
+## being not obvious
+plugin 'PkgConfig' =>
+  ( pkg_name => path( '.', 'lib', 'pkgconfig', 'edlib-1.pc' ), );
+
+share {
+    my $install_root;
+    my $path_to_static_lib;
+    my $repo_url;
+    my $repo_response;
+
+    ## use one of two locations to source edlib
+    $repo_url =
+      'https://github.com/Martinsos/edlib/archive/refs/heads/master.zip';
+    $repo_response = HTTP::Tiny->new->head($repo_url);
+    unless ( $repo_response->{success} )
+    {    ## failed original download, try my fork
+        $repo_url =
+          'https://github.com/chrisarg/edlib/archive/refs/heads/master.zip';
+        $repo_response = HTTP::Tiny->new->head($repo_url);
+        croak "Failed to download edlib from either location"
+          unless $repo_response->{success};
+    }
+
+    start_url $repo_url;
+    plugin 'Download';
+    plugin 'Extract' => 'zip';
+    plugin 'Build::CMake';
+    plugin 'Gather::IsolateDynamic';
+
+    ## build the dynamic library first and the dynamically linked
+    ## executables (which will be overwritten afterwards)
+    build [
+        [
+            '%{cmake}',
+            @{ meta->prop->{plugin_build_cmake}->{args} },
+            '-DBUILD_SHARED_LIBS=on',
+            '-D CMAKE_BUILD_TYPE=Release',
+            '-Wno-dev',
+            '%{.install.extract}',
+        ],
+        ['%{make}'],
+        ['%{make} install'],
+
+        ## build the static library and the (statically linked)
+        ## executables
+        [
+            '%{cmake}',
+            @{ meta->prop->{plugin_build_cmake}->{args} },
+            '-DBUILD_SHARED_LIBS=off',
+            '-D CMAKE_BUILD_TYPE=Release',
+            '-Wno-dev',
+            '%{.install.extract}',
+        ],
+        ['%{make}'],
+        ['%{make} install'],
+    ];
+
+    ## various postbuild activities to facilitate the gathering of files
+    after 'build' => sub {
+        my ($build) = @_;
+        ## move the bin directories into the final location
+        ## this includes the suite of the edlib library
+        if ( $build->meta_prop->{destdir} ) {
+            my $destdir = $ENV{DESTDIR};
+            $install_root =
+              Path::Tiny->new( $ENV{DESTDIR}, $build->install_prop->{prefix} );
+        }
+        else {
+            $install_root = Path::Tiny->new( $build->install_prop->{stage} );
+        }
+        my $source_directory      = $build->{install_prop}->{extract};
+        my $binary_dest_directory = path $install_root, 'bin';
+        dircopy( path( $source_directory, 'bin' ), $binary_dest_directory );
+        my $hw_exec = $^O eq 'MSWin32' ? 'helloWorld.exe' : 'helloWorld';
+        $hw_exec = path( $binary_dest_directory, $hw_exec );
+        unlink($hw_exec) if -e $hw_exec;
+
+        $build->runtime_prop->{command} = 'edlib-aligner'
+          if $^O ne 'MSWin32';
+    };
+
+    test sub {
+        my ($build) = @_;
+        my $binary_dest_directory =
+          path( $build->install_prop->{stage}, 'bin' );
+        my $runTests_exec = $^O eq 'MSWin32' ? 'runTests.exe' : 'runTests';
+        $runTests_exec = path( $binary_dest_directory, $runTests_exec );
+        print("Can't find test executable") if not -e $runTests_exec;
+        my $test_output = capturex($runTests_exec)
+          || die "failed to run edlib library tests";
+        if (   $test_output =~ /FAIL/m
+            || $test_output !~ /All specific tests passed/m )
+        {
+            die "edlib run time tests failed!";
+        }
+        unlink $runTests_exec;
+    };
+};
+
+## the pkgconfig invocation replaces this convoluted code which
+## was necessitated by the way the build of edlib was setup.
+##
+##    gather [
+##        [
+##            'pkg-config',                 '--modversion',
+##            './lib/pkgconfig/edlib-1.pc', \'%{.runtime.version}'
+##        ],
+##        [
+##            'pkg-config',                 '--cflags',
+##            './lib/pkgconfig/edlib-1.pc', \'%{.runtime.cflags}'
+##       ],
+##        [
+##            'pkg-config',                 '--libs',
+##            './lib/pkgconfig/edlib-1.pc', \'%{.runtime.libs}'
+##        ],
+##    ];
+

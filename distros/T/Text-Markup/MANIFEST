@@ -2,7 +2,10 @@ Build.PL
 Changes
 lib/Text/Markup.pm
 lib/Text/Markup/Asciidoc.pm
+lib/Text/Markup/Asciidoctor.pm
 lib/Text/Markup/Bbcode.pm
+lib/Text/Markup/Cmd.pm
+lib/Text/Markup/CommonMark.pm
 lib/Text/Markup/Creole.pm
 lib/Text/Markup/HTML.pm
 lib/Text/Markup/Markdown.pm
@@ -20,7 +23,9 @@ t/base.t
 t/empty.txt
 t/formats.t
 t/html/asciidoc.html
+t/html/asciidoctor.html
 t/html/bbcode.html
+t/html/commonmark.html
 t/html/creole.html
 t/html/html.html
 t/html/markdown.html
@@ -31,7 +36,9 @@ t/html/rest.html
 t/html/textile.html
 t/html/trac.html
 t/markups/asciidoc.txt
+t/markups/asciidoctor.txt
 t/markups/bbcode.txt
+t/markups/commonmark.txt
 t/markups/creole.txt
 t/markups/html.txt
 t/markups/markdown.txt

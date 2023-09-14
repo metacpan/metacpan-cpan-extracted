@@ -6,7 +6,7 @@
 use v5.36;
 use Object::Pad 0.800;
 
-class App::perl::distrolint::Check::HardTabs 0.02
+class App::perl::distrolint::Check::HardTabs 0.03
    :does(App::perl::distrolint::CheckRole::EachFile);
 
 use constant DESC => "check that no source code file contains HT characters";

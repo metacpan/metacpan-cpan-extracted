@@ -1,24 +1,25 @@
+#! perl
+
+use v5.10;
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Image::DS9;
 
-BEGIN { plan( tests => 4 ) ;}
+use Test::Lib;
+use My::Util;
 
-require './t/common.pl';
+my $ds9 = start_up( image => 1 );
 
+test_stuff(
+    $ds9,
+    (
+        orient => [
+            ( map { ( [] => $_ ) } qw( x y xy none ) ),
+            open  => {},
+            close => {},
+        ],
+    ) );
 
-my $ds9 = start_up();
-$ds9->file( 'data/m31.fits.gz' );
-
-test_stuff( $ds9, (
-                   orient =>
-                   [
-                    [] => 'x',
-                    [] => 'y',
-                    [] => 'xy',
-                    [] => 'none',
-                   ],
-                  ) );
-
+done_testing;

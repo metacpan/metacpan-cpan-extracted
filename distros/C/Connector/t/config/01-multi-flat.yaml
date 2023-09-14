@@ -1,0 +1,14 @@
+# 01-multi-flat.yaml
+
+smartcards:
+  tokens:
+    token_1:
+      status: ACTIVATED
+    token_2:
+      status: DEACTIVATED
+
+  owners:
+    joe:
+      tokenid: token_1
+    bob:
+      tokenid: token_2

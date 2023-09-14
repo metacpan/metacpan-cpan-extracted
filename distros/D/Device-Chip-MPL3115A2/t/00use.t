@@ -3,8 +3,9 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'Device::Chip::MPL3115A2' );
+require Device::Chip::MPL3115A2;
 
+pass( 'Modules loaded' );
 done_testing;

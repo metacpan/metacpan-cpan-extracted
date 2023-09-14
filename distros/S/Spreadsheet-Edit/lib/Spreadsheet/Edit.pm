@@ -15,8 +15,8 @@ package Spreadsheet::Edit;
 # Allow "use <thismodule> <someversion>;" in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
 
-our $VERSION = '1000.004'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-08-28'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.006'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-09-06'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # FIXME: cmd_nesting does nothing except prefix >s to log messages.
 #        Shouldn't it skip that many "public" call frames???
@@ -204,8 +204,8 @@ sub _generateHash_crow {  # %crow indexes cells in the current row during apply
 #
 ########################### End of Exporting stuff ##########################
 
-use Spreadsheet::Edit::Log qw/log_call fmt_call log_methcall fmt_methcall
-                              btw oops/;
+use Spreadsheet::Edit::Log qw/log_call fmt_call log_methcall fmt_methcall oops/,
+                           ':btw=SE${lno}:' ;
 
 use Data::Dumper ();
 use Data::Dumper::Interp 6.002 qw/:all/;

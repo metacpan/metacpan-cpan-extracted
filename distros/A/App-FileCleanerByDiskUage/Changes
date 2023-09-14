@@ -1,5 +1,11 @@
 Revision history for App-FileCleanerByDiskUage
 
+0.2.1   2023-09-01/14:30
+        - Fix handling of extra / on the end of the path.
+
+0.2.0   2023-09-01/14:00
+        - Don't die on missing directories, but return them under .missing_paths.
+
 0.1.0   2023-07-31/13:45
         - Enable -p to be used more than once.
 

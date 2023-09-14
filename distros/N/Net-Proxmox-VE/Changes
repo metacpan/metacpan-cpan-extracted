@@ -1,6 +1,13 @@
 Revision history for perl Net::Proxmox::VE
 
-0.37 2023-07-2023
+0.38 2023-09-11
+- fix/use correct parameter name for user in tests thanks to MartijnLivaart
+- Feat/check new arguments thanks to MartijnLivaart
+- Fix/test access directory thanks to MartijnLivaart via GH#27
+- feat: check if debug parameter propagates from new() thanks to MartijnLivaart via GH#29
+- Pod corrections thanks to poptix via GH#31
+
+0.37 2023-07-20
 - Fix up debug() method thanks to MartijnLivaart via GH#25
 - Change to JSON::MaybeXS
 - Some pod fixes

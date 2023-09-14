@@ -10,6 +10,5 @@ tags
 Makefile$
 MYMETA.*
 version-.+\.tar\.gz
-vutil/Makefile\.PL
 vutil/MYMETA.*
 t/test-all

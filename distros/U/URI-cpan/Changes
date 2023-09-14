@@ -1,5 +1,8 @@
 Revision history for URI-cpan
 
+1.009     2023-09-02 20:44:58-04:00 America/New_York
+        - updates to dist metadata only
+
 1.008     2021-12-15 15:53:55-05:00 America/New_York
         - fix prereqs to rely on URI, not the unindexed URI::_generic
 

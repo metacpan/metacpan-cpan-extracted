@@ -4,7 +4,7 @@ use strict;
 use File::Spec::Functions qw(catfile);
 use Text::Balanced qw/extract_bracketed/;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 $VERSION =~ s/_//; ## no critic
 
 sub order { 100 }
@@ -24,9 +24,14 @@ sub analyse {
     $class->_from_dist_ini($me);
 }
 
+sub _flatten_and_sort {
+    my $res = shift;
+    [sort {$a->{requires} cmp $b->{requires} or $a->{type} cmp $b->{type}} map {@$_} values %$res];
+}
+
 sub _from_meta {
     my ($class, $me) = @_;
-    my $meta = $me->d->{meta_yml};
+    my $meta = $me->d->{meta_yml}; # $me->d->{meta_json} || $me->d->{meta_yml};
     return unless $meta && ref $meta eq ref {};
 
     my $spec = $meta->{'meta-spec'};
@@ -63,7 +68,7 @@ sub _from_meta {
     }
 
     return unless %res;
-    $me->d->{prereq} = [sort {$a->{requires} cmp $b->{requires}} map {@$_} values %res];
+    $me->d->{prereq} = _flatten_and_sort(\%res);
     $me->d->{got_prereq_from} = 'META.yml';
 }
 
@@ -78,7 +83,7 @@ sub _from_cpanfile {
     my %res = $class->_handle_prereqs_v2($prereqs);
     return unless %res;
 
-    $me->d->{prereq} = [sort {$a->{requires} cmp $b->{requires}} map {@$_} values %res];
+    $me->d->{prereq} = _flatten_and_sort(\%res);
     $me->d->{got_prereq_from} = 'cpanfile';
 }
 
@@ -120,7 +125,7 @@ sub _from_build_pl {
 
         $build_pl = $left;
     }
-    $me->d->{prereq} = [sort {$a->{requires} cmp $b->{requires}} map {@$_} values %res];
+    $me->d->{prereq} = _flatten_and_sort(\%res);
     $me->d->{got_prereq_from} = 'Build.PL';
 }
 
@@ -186,7 +191,7 @@ sub _from_makefile_pl {
             }
         }
     }
-    $me->d->{prereq} = [sort {$a->{requires} cmp $b->{requires}} map {@$_} values %res];
+    $me->d->{prereq} = _flatten_and_sort(\%res);
     $me->d->{got_prereq_from} = 'Makefile.PL';
 }
 
@@ -283,7 +288,7 @@ sub _from_dist_ini {
             };
         }
     }
-    $me->d->{prereq} = [sort {$a->{requires} cmp $b->{requires}} map {@$_} values %res];
+    $me->d->{prereq} = _flatten_and_sort(\%res);
     $me->d->{got_prereq_from} = 'dist.ini';
 }
 

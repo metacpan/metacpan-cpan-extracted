@@ -1,6 +1,6 @@
 ## MCE::Shared for Perl
 
-This document describes MCE::Shared version 1.885.
+This document describes MCE::Shared version 1.886.
 
 ### Description
 
@@ -115,9 +115,9 @@ MCE::Shared utilizes the following modules:
     Errno
     IO::FDPass  1.2+ (optional, recommended on UNIX and Windows)
     IO::Handle
-    MCE::Mutex  1.886+
-    MCE::Util   1.886+
-    MCE::Signal 1.886+
+    MCE::Mutex  1.889+
+    MCE::Util   1.889+
+    MCE::Signal 1.889+
     POSIX
     Scalar::Util 1.22+
     Sereal::Decoder 3.015+ (optional)

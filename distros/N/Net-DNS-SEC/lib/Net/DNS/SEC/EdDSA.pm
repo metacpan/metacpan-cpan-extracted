@@ -3,7 +3,7 @@ package Net::DNS::SEC::EdDSA;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: EdDSA.pm 1853 2021-10-11 10:40:59Z willem $)[2];
+our $VERSION = (qw$Id: EdDSA.pm 1937 2023-09-11 09:27:16Z willem $)[2];
 
 
 =head1 NAME
@@ -44,14 +44,14 @@ public key resource record.
 use integer;
 use MIME::Base64;
 
-use constant EdDSA_configured => Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_raw_public_key');
+use constant EdDSA_configured => Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_EdDSA');
 
 BEGIN { die 'EdDSA disabled or application has no "use Net::DNS::SEC"' unless EdDSA_configured }
 
 
 my %parameters = (
-	15 => [1087, 32, 64],
-	16 => [1088, 57, 114],
+	15 => ['ED25519', 32, 64],
+	16 => ['ED448',	  57, 114],
 	);
 
 sub _index { return keys %parameters }
@@ -61,11 +61,11 @@ sub sign {
 	my ( $class, $sigdata, $private ) = @_;
 
 	my $algorithm = $private->algorithm;
-	my ( $nid, $keylen ) = @{$parameters{$algorithm} || []};
-	die 'private key not EdDSA' unless $nid;
+	my ( $curve, $keylen ) = @{$parameters{$algorithm} || []};
+	die 'private key not EdDSA' unless $curve;
 
 	my $rawkey = pack "a$keylen", decode_base64( $private->PrivateKey );
-	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_raw_private_key( $nid, $rawkey );
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_EdDSA( $curve, '', $rawkey );
 
 	return Net::DNS::SEC::libcrypto::EVP_sign( $sigdata, $evpkey );
 }
@@ -75,17 +75,22 @@ sub verify {
 	my ( $class, $sigdata, $keyrr, $signature ) = @_;
 
 	my $algorithm = $keyrr->algorithm;
-	my ( $nid, $keylen, $siglen ) = @{$parameters{$algorithm} || []};
-	die 'public key not EdDSA' unless $nid;
+	my ( $curve, $keylen, $siglen ) = @{$parameters{$algorithm} || []};
+	die 'public key not EdDSA' unless $curve;
 
 	return unless $signature;
 
 	my $rawkey = pack "a$keylen", $keyrr->keybin;
-	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_raw_public_key( $nid, $rawkey );
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_EdDSA( $curve, $rawkey );
 
 	my $sigbin = pack "a$siglen", $signature;
 	return Net::DNS::SEC::libcrypto::EVP_verify( $sigdata, $sigbin, $evpkey );
 }
+
+
+my $key448 = decode_base64 '69oJdWluramCzd28zK6E/LIZzL6MxVkQ0drFQ/dyeFQon2Tso03D0jCrP1NZ965ASnIC5N+sgwOA';
+my $evpkey = eval { Net::DNS::SEC::libcrypto::EVP_PKEY_new_EdDSA( 'ED448', $key448 ) };
+delete $parameters{16} unless defined $evpkey;	## disallow ED448 if using BoringSSL|LibreSSL
 
 
 1;

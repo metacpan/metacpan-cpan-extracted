@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use warnings;
+use Object::Pad 0.800;
 
-package Device::Chip::BNO055 0.03;
+package Device::Chip::BNO055 0.04;
 class Device::Chip::BNO055
    :isa(Device::Chip);
 
@@ -135,12 +136,12 @@ bitfield { format => "bytes-LE" }, CONFIG =>
    GYR_Power_Mode => enumfield(11*8+0, qw( normal fast-powerup deep-suspend suspend advanced-powersave . . . )),
    ;
 
-has $_reg_page = 0;
-has $_regcache = "";
+field $_reg_page = 0;
+field $_regcache = "";
 
-has $_ACC_Unit;
-has $_GYR_Unit;
-has $_EUL_Unit;
+field $_ACC_Unit;
+field $_GYR_Unit;
+field $_EUL_Unit;
 
 async method read_reg ( $reg, $len )
 {

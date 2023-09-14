@@ -17,7 +17,7 @@ minicpan - uses CPAN::Mini to create or update a local mirror
 
 =head1 VERSION
 
-version 1.111016
+version 1.111017
 
 =head1 SYNOPSIS
 
@@ -46,6 +46,16 @@ version 1.111016
 
 This simple shell script just updates (or creates) a miniature CPAN mirror as
 described in CPAN::Mini.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should
+work on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 CONFIGURATION FILE
 
@@ -94,7 +104,7 @@ Randal Schwartz's original article, which can be found here:
 
 =item *
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =item *
 

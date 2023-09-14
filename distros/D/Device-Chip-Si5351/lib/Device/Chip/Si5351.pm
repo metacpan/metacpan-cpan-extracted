@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use warnings;
+use Object::Pad 0.800;
 
-package Device::Chip::Si5351 0.01;
+package Device::Chip::Si5351 0.02;
 class Device::Chip::Si5351
    :isa(Device::Chip::Base::RegisteredI2C);
 use Device::Chip::Base::RegisteredI2C 0.21;
@@ -63,7 +64,7 @@ C<Device::Chip::Si5351> - chip driver for F<Si5351>
 =head1 DESCRIPTION
 
 This L<Device::Chip> subclass provides specific communication to a F<Silabs>
-F<Si5153> chip attached to a computer via an I²C adapter.
+F<Si5351> chip attached to a computer via an I²C adapter.
 
 The reader is presumed to be familiar with the general operation of this chip;
 the documentation here will not attempt to explain or define chip-specific
@@ -500,7 +501,7 @@ async method change_multisynth_config ( $idx, %changes )
    if( exists $changes{ratio} ) {
       my $ratio = delete $changes{ratio};
 
-      8 <= $ratio and $ratio <= 900 or
+      8 <= $ratio and $ratio <= 2048 or
          croak "Cannot set Multisynth divider ratio to $ratio";
       $ratio == int $ratio or
          croak "Cannot use 'ratio' to set a non-integer ratio; please supply ratio_a, ratio_b, ratio_c individually";

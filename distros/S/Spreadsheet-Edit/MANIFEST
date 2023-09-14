@@ -15,6 +15,7 @@ t/10_Preload.t
 t/20_logmsg.t
 t/60_all.t
 t/90_Log.t
+t/LpodhTestUtils.pm
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/autodetect.pl

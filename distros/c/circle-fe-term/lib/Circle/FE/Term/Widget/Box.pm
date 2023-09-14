@@ -1,10 +1,11 @@
 #  You may distribute under the terms of the GNU General Public License
 #
-#  (C) Paul Evans, 2010-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2023 -- leonerd@leonerd.org.uk
 
-package Circle::FE::Term::Widget::Box;
+package Circle::FE::Term::Widget::Box 0.232470;
 
-use strict;
+use v5.26;
+use warnings;
 use constant type => "Box";
 
 use Tickit::Widget::HBox;

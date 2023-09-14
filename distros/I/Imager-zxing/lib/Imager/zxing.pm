@@ -5,7 +5,7 @@ use Imager;
 
 our $VERSION;
 BEGIN {
-  $VERSION = "1.000";
+  $VERSION = "1.001";
   use XSLoader;
   XSLoader::load("Imager::zxing" => $VERSION);
 }
@@ -30,7 +30,7 @@ Imager::zxing - decode barcodes from Imager images using libzxing
 
   # decode any barcodes
   my $im = Imager->new(file => "somefile.png");
-  my @results = $decoder->decoder($im);
+  my @results = $decoder->decode($im);
 
   for my $result (@results) {
     print $result->text, "\n";
@@ -39,6 +39,8 @@ Imager::zxing - decode barcodes from Imager images using libzxing
 =head1 DESCRIPTION
 
 A primitive wrapper around zxing-cpp
+
+This requires at least 1.4.0 of zxing-cpp, but 2.1.0 is preferable.
 
 Currently only supports decoding and doesn't expose much of the
 interface.

@@ -41,6 +41,7 @@ use App::Oozie::Types::States;
 use App::Oozie::Types::Workflow;
 use App::Oozie::Update::Coordinator;
 use App::Oozie::Util::Log4perl;
+use App::Oozie::Util::Misc;
 use App::Oozie::Util::Plugin;
 use App::Oozie::XML;
 use App::Oozie;

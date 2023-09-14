@@ -1,6 +1,6 @@
 package Crypt::OpenSSL::AES;
 
-# Copyright (C) 2006 DelTel, Inc.
+# Copyright (C) 2006 - 2023 DelTel, Inc.
 #
 # This library is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself, either Perl version 5.8.5 or,
@@ -31,7 +31,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.02';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Crypt::OpenSSL::AES', $VERSION);
@@ -66,11 +66,6 @@ that utilize a block cipher to make a stream cipher).
 This module is an alternative to the implementation provided by 
 Crypt::Rijndael which implements AES itself. In contrast, this module
 is simply a wrapper around the OpenSSL library.
-
-The Crypt::Rijndael implementation seems to produce inaccurate
-results on 64-bit x86 machines. By using OpenSSL, this module
-aims to avoid architecture specific problems, allowing the OpenSSL
-maintainers to overcome such issues.
 
 =over 4
 
@@ -139,7 +134,7 @@ Algorithm and was developed by Vincent Rijmen and Joan Daemen.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006 DelTel, Inc.
+Copyright (C) 2006 - 2023 DelTel, Inc.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.5 or,

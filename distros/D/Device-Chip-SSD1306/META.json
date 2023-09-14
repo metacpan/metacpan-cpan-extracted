@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -23,29 +23,29 @@
          "requires" : {
             "Device::Chip" : "0",
             "Future::AsyncAwait" : "0.39",
-            "Object::Pad" : "0.74",
+            "Object::Pad" : "0.800",
             "perl" : "5.026"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Device::Chip::Adapter" : "0",
-            "Test::More" : "0.88"
+            "Test2::V0" : "0",
+            "Test::Device::Chip::Adapter" : "0"
          }
       }
    },
    "provides" : {
       "Device::Chip::SSD1306" : {
          "file" : "lib/Device/Chip/SSD1306.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Device::Chip::SSD1306::I2C" : {
          "file" : "lib/Device/Chip/SSD1306/I2C.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Device::Chip::SSD1306::SPI4" : {
          "file" : "lib/Device/Chip/SSD1306/SPI4.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

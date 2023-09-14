@@ -45,6 +45,22 @@ has "audio_channels" => (
 	default => "mono",
 );
 
+=head2 loop
+
+If truthy, loops over the PNG files given. Useful if there is only one
+PNG file, but then a video length for the output file should be given.
+If falsy, stops after all the input files are processed.
+
+Defaults to true.
+
+=cut
+
+has "loop" => (
+	is => "rw",
+	isa => "Bool",
+	default => 1,
+);
+
 =head1 BUGS
 
 This module does not work correctly with L<Media::Convert::Map>. If you
@@ -61,7 +77,12 @@ sub readopts {
 		carp "Video resolution does not match image resolution. Will scale, but the result may be suboptimal...";
 
 	}
-	return ('-loop', '1', '-framerate', $output->video_framerate, '-i', $self->url, '-f', 'lavfi', '-i', 'anullsrc=channel_layout=' . $self->audio_channels);
+	my @rv;
+	if($self->loop) {
+		push @rv, ("-loop", '1');
+	}
+	push @rv, ('-framerate', $output->video_framerate, '-i', $self->url, '-f', 'lavfi', '-i', 'anullsrc=channel_layout=' . $self->audio_channels);
+	return @rv;
 }
 
 no Moose;

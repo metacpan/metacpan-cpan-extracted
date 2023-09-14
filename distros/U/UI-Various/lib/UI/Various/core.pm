@@ -37,7 +37,7 @@ use warnings 'once';
 use Carp;
 use Storable ();
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 use UI::Various::language::en;
 

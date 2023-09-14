@@ -79,3 +79,10 @@ Revision history for Data-Roundtrip
 0.17	2023-06-02
 	Requires Test::Script v1.28 because Test::Script::script_fails()
 	used by t/10-scripts.t was introduced there.
+
+0.18	2023-09-01
+	Added two extra functions: jsonfile2perl() and yamlfile2perl()
+	which read JSON and YAML from a file into a perl data structure.
+	Added a new test file '12-from-file.t' which tests file-related
+	functionality including said two functions.
+	Documentation supplemented.

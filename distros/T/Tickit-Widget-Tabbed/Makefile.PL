@@ -1,4 +1,4 @@
-
+use v5;
 use strict;
 use warnings;
 
@@ -25,11 +25,10 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.026",
   "NAME" => "Tickit::Widget::Tabbed",
   "PREREQ_PM" => {
-    "Object::Pad" => "0.74", # 0.73 + bugfix
+    "Object::Pad" => "0.800",
 
     "List::Util" => "1.26",
     "Scalar::Util" => 0,
-    "Struct::Dumb" => 0,
     "Tickit::ContainerWidget" => "0.44",
     "Tickit::Widget" => "0.36",
     "Tickit::Window" => "0.28",

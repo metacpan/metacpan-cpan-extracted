@@ -1,0 +1,162 @@
+# PODNAME: Image::DS9::Manual::Interface
+
+# ABSTRACT: Image::DS9 Interface
+
+__END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
+=head1 NAME
+
+Image::DS9::Manual::Interface - Image::DS9 Interface
+
+=head1 VERSION
+
+version v1.0.0
+
+=head1 DOCUMENTATION
+
+The document describes the general concepts of how the interface with
+C<DS9> works.
+
+=head2 Arguments
+
+Commands sent to DS9 are sent as strings.  Many of the option strings
+are available as Perl constants.  See L<Image::DS9::Constants> for
+more details.
+
+=head2 Boolean values
+
+Some methods take boolean values; these may be the strings C<on>, C<off>,
+C<yes>, C<no>, or the integers C<1> or C<0>.
+
+=head2 Return Values
+
+Because a single L<Image::DS9> object may communicate with multiple
+instances of B<DS9>, queries may return more than one value.
+Because one usually communicates with a single B<DS9> instance,
+if a query is made in scalar mode, the result is returned as a scalar,
+i.e.:
+
+  $cmap = $dsp->cmap();
+
+In this mode, if more than one server responds, you'll get the results
+for a randomly chosen server.  Some methods, in particular C<fits>,
+may return a scalar I<reference> when called in scalar mode, as the
+returned data may be large, and it makes no sense to have multiple
+copies of the data floating about.  See each method's documentation
+(in L<Image::DS9::Manual::Connect>, and L<Image::DS9::Manual::API>) for details.
+
+If a return value is multi-valued, a query in scalar context yields a
+reference to an array.  For instance:
+
+  ($x, $y) = $dsp->bin( 'about' )->@*;
+
+returns a reference to an array, while
+
+  $size = $dsp->bin( 'buffersize' );
+
+returns a scalar.  Don't attempt to do
+
+  ($x, $y ) = $dsp->bin( 'about' ); # ERROR DON"T DO THIS
+
+as it will return a full blown hash as documented next.
+
+When queries are made in list mode, the return values are hashes,
+rather than scalars.  The hash keys are the names of the servers,
+and the values are references to hashes with the keys C<name>,
+C<buf> and C<message>.  The C<message> element is present if there was
+an error. The C<buf> element contains the results of a query.
+
+For example,
+
+  use Data::Dump;
+
+  dd scalar $dsp-cmap;
+
+yields
+
+  "grey"
+
+while
+
+  dd $dsp->cmap;
+
+yields
+
+  (
+    "DS9:ds9 7f000001:43117",
+    { buf => "grey", name => "DS9:ds9 7f000001:43117" },
+  )
+
+Ordinarily, the C<buf> element will be unaltered (except for the
+removal of trailing newlines) from what B<DS9> outputs.  For
+multi-valued return results, C<buf> is set to an array containing
+the values:
+
+  use Data::Dump;
+  dd $dsp->bin( 'about' );
+
+yields.
+
+  (
+    "DS9:ds9 7f000001:43117",
+    { buf => [0, 0], name => "DS9:ds9 7f000001:43117" },
+  )
+
+Sending data doesn't result in a return value; if there's an error an
+exception is thrown.
+
+=head2 Error Returns
+
+In case of error, an exception is thrown via B<croak()>.  The L<Image::DS9::Manual::Connect/res>
+method will return a hash, keyed off of the servers' names.  For each
+server which had an error, the hash value will be a reference to a
+hash containing the keys C<name> and C<message>; the latter will
+contain error information.  For those commands which return data, and
+for those servers which did not have an error, the C<buf> key will be
+available.
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-image-ds9@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/image-ds9
+
+and may be cloned from
+
+  https://gitlab.com/djerius/image-ds9.git
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Image::DS9|Image::DS9>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

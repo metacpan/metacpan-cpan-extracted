@@ -1,0 +1,512 @@
+#! /usr/bin/env perl
+
+use v5.26;
+use strict;
+use warnings;
+use Feature::Compat::Try;
+use experimental 'declared_refs', 'refaliasing', 'signatures', 'builtin';
+use builtin 'true', 'false';
+
+
+use Image::DS9::Grammar;
+use Image::DS9::PConsts;
+use DDP;
+use Data::Dump;
+
+## no critic (Modules::ProhibitMultiplePackages)
+
+package    #
+  SubCommand {
+    use Moo;
+    use MooX::StrictConstructor;
+    use experimental 'declared_refs', 'refaliasing', 'signatures';
+
+    use Ref::Util 'is_arrayref';
+    use Safe::Isa;
+
+    use Image::DS9::PConsts qw( QNONE QARGS QYES QONLY STRING );
+
+    use Types::Standard       qw( ArrayRef Bool InstanceOf );
+    use Types::Common::String qw( NonEmptyStr );
+
+    use constant Token => 'Image::DS9::Parser::Token';
+
+    use constant TokenType => InstanceOf [Token];
+
+    has tokens => (
+        is      => 'ro',
+        isa     => ArrayRef [ NonEmptyStr | TokenType ],
+        default => sub { [] },
+    );
+
+    sub has_tokens ( $self ) {
+        !!$self->tokens->@*;
+    }
+
+    has comment => (
+        is        => 'ro',
+        predicate => 1,
+    );
+
+    has query => (
+        is      => 'ro',
+        default => QYES,
+    );
+
+    has rvals => (
+        is        => 'ro',
+        isa       => ArrayRef [TokenType],
+        predicate => 1,
+    );
+
+    has args => (
+        is      => 'ro',
+        isa     => ArrayRef [TokenType],
+        default => sub { [] },
+    );
+
+    sub has_args ( $self ) {
+        !!$self->args->@*;
+    }
+
+    has attrs => (
+        is      => 'ro',
+        isa     => ArrayRef,
+        default => sub { [] },
+    );
+
+    sub has_attrs ( $self ) { !!$self->attrs->@* }
+
+    has [ 'bufarg', 'chomp', 'cvt', 'retref' ] => (
+        is  => 'ro',
+        isa => Bool,
+    );
+
+    sub tokens_to_string ( $self ) {
+        return $self->tokens->@*
+          ? join( ', ', map { $_->$_isa( Token ) ? $_->desc // $_->name : qq{'$_'} } $self->tokens->@* )
+          : undef;
+    }
+
+    sub _thing_to_string ( $self, $thing, $max_length = 50 ) {
+
+        my $value = $thing->value;
+
+        $value = $value->value
+          if $value->$_isa( 'Image::DS9::Parser::Token::Enum' );
+
+        return $thing->desc // $thing->name
+          if is_arrayref( $value )
+          && length( $thing->to_string ) > $max_length;
+
+        return $thing->desc // $thing->to_string;
+    }
+
+    sub _arr_to_string ( $self, $arr, $max_length = 50 ) {
+        my @values = map { $self->_thing_to_string( $_ ) } $arr->@*;
+        return @values ? join( ', ', @values ) : undef;
+    }
+
+
+    sub args_to_string ( $self ) {
+        return $self->_arr_to_string( $self->args );
+    }
+
+    sub rvals_to_string ( $self ) {
+        return $self->_arr_to_string( $self->rvals, 20 );
+    }
+
+    sub _attr_value_to_string ( $self, $value ) {
+
+        if ( is_arrayref( $value ) ) {
+            $value = $self->_attrs_to_string( $value );
+            return sprintf( q{[ %s ]}, $value );
+        }
+        else {
+            return $self->_thing_to_string( $value );
+        }
+
+    }
+
+    sub _attrs_to_string ( $self, $attrs ) {
+
+        my @attrs = $attrs->@*;
+        my @pairs;
+        while ( my ( $key, $value ) = splice( @attrs, 0, 2 ) ) {
+            push @pairs, sprintf( q{%s => %s}, $key, $self->_attr_value_to_string( $value ) );
+        }
+
+        return join( ', ', @pairs );
+    }
+
+    sub attrs_to_string ( $self ) {
+        return $self->has_attrs ? $self->_attrs_to_string( $self->attrs ) : undef;
+    }
+
+    sub components_to_string ( $self ) {
+        return {
+            tokens => $self->tokens_to_string,
+            args   => $self->args_to_string,
+            rvals  => $self->rvals_to_string,
+        };
+    }
+
+    around BUILDARGS => sub ( $orig, $class, @args ) {
+
+        my $args = $class->$orig( @args );
+
+        # this repeats logic in Parser::parse_spec. Shouldn't
+        $args->{query} //= QYES;
+
+        # sanity checks
+        die( 'query is QONLY and found args: ', Data::Dump::pp( $args ) )
+          if $args->{query} & QONLY && ( $args->{args} // [] )->@*;
+
+        if ( $args->{query} != QNONE && $args->{query} != QONLY ) {
+            $args->{rvals} //= $args->{args}
+              if exists $args->{args};
+        }
+
+        if ( $args->{query} != QNONE ) {
+            # by default it just returns things as a string if
+            # rvals wasn't specified.
+            $args->{rvals} //= [STRING];
+        }
+
+        return $args;
+    };
+
+}
+
+package    #
+  Command {
+
+    use DDP;
+    use Data::Dump qw( dd pp );
+    use Moo;
+    use MooX::StrictConstructor;
+    use builtin 'true', 'false';
+    use experimental 'declared_refs', 'refaliasing', 'signatures', 'builtin';
+
+    use Safe::Isa;
+    use Ref::Util 'is_arrayref', 'is_blessed_ref', 'is_ref', 'is_coderef', 'is_regexpref';
+
+    use Types::Standard       qw( ArrayRef Bool InstanceOf );
+    use Types::Common::String qw( NonEmptyStr );
+    use Iterator::Flex::Common 'iproduct', 'iter';
+    use Image::DS9::PConsts qw( QNONE QARGS QYES QONLY QATTR );
+    use Image::DS9::Util 'is_TODO';
+    use Feature::Compat::Try;
+
+    has name => (
+        is       => 'ro',
+        required => 1,
+        isa      => NonEmptyStr,
+    );
+
+    has implemented => (
+        is       => 'ro',
+        required => 1,
+        isa      => Bool,
+    );
+
+    has subcommands => (
+        is       => 'ro',
+        isa      => ArrayRef [ InstanceOf ['SubCommand'] ],
+        required => 1,
+    );
+
+    sub _generate_output ( $self, $subcommand, $form_query = false ) {
+
+        my $format = q{};
+        my @values;
+
+        my $query = $subcommand->query;
+
+        return () if $form_query && $query == QNONE;
+
+        return () if !$form_query && $query & QONLY;
+
+        if ( $form_query ) {
+            $format .= '[ %s ] = ';
+            push @values, $subcommand->rvals_to_string;
+        }
+
+        $format .= '$ds9->%s';
+        push @values, $self->name;
+
+        my @args;
+
+        push @args, $subcommand->tokens_to_string if $subcommand->has_tokens;
+
+        push @args, $subcommand->args_to_string
+          if $subcommand->has_args && ( !$form_query || ( $form_query && $query != QYES ) );
+
+        push @args, sprintf( '?{ %s }', $subcommand->attrs_to_string )
+          if $subcommand->has_attrs && ( !$form_query || ( $form_query && $query & QATTR ) );
+
+        if ( @args ) {
+            $format .= '( %s )';
+            push @values, join( ', ', @args );
+        }
+
+        $format .= q{;};
+
+        sprintf( $format, @values );
+    }
+
+    sub to_string ( $self ) {
+
+        my @alt;
+
+        for my $subcommand ( $self->subcommands->@* ) {
+
+            my %cmd;
+
+            $cmd{comment} = $subcommand->comment->value
+              if $subcommand->has_comment;
+
+            my $query = $subcommand->query;
+
+            $cmd{set} = $self->_generate_output( $subcommand, false )
+              if $query != QONLY;
+
+            if ( $query != QNONE ) {
+
+                die( pp( $self ), pp( $subcommand ) ) unless $subcommand->has_rvals;
+                $cmd{get} = $self->_generate_output( $subcommand, true );
+            }
+
+            push @alt, \%cmd;
+        }
+
+        return @alt;
+    }
+
+    sub _resolve_token {
+        my $token = shift;
+
+        my $value = $token->value;
+
+        return $value if is_arrayref( $value );
+
+        return [ defined $value ? $value : () ]
+          if !is_ref( $value );
+
+        return [ $token->desc // $token->name ]
+          if is_coderef( $value ) || is_regexpref( $value );
+
+        return _resolve_token( $value )
+          if is_blessed_ref( $value );
+
+        die "Unconverted token object: $value";
+    }
+
+    around BUILDARGS => sub ( $orig, $class, @args ) {
+
+        my $args = $class->$orig( @args );
+
+        my $stanza = delete $args->{stanza};
+        defined $stanza and is_TODO( $stanza ) || is_arrayref( $stanza ) or die;
+
+        my @subcommands;
+
+        for my $subcommand ( $stanza->@* ) {
+            my ( \@tokens, @alternates ) = $subcommand->@*;
+
+            # tokens may be enums, need to get the cartesian product
+            # if there are multiple tokens.
+
+            my @resolved = map { _resolve_token( $_ ) } @tokens;
+
+            if ( @resolved ) {
+                my $n = 1;
+                $n *= @{$_} for @resolved;
+
+                @resolved = map { [$_] } @tokens
+                  if ( $n > 10 );
+            }
+
+            my $iter;
+            $iter = @resolved ? iproduct( @resolved ) : iter( [ [] ] );
+
+            while ( my $tokens = $iter->next ) {
+                for my $alt ( @alternates ) {
+                    try {
+                        push @subcommands, SubCommand->new( tokens => $tokens, $alt->%* );
+                    }
+                    catch ( $e ) {
+                        warn "Command = $args->{name}";
+                        warn $e;
+                        p $alt;
+                    }
+                }
+            }
+        }
+
+        $args->{implemented} = ! is_TODO( $stanza );
+        $args->{subcommands} = \@subcommands;
+        return $args;
+    };
+
+}
+
+my \%Grammar = Image::DS9::Grammar::grammar();
+my @keys = @ARGV ? @ARGV : sort keys %Grammar;
+my @commands
+  = map { Command->new( name => $_, stanza => $Grammar{$_} ) } @keys;
+
+use Text::Wrap 'wrap';
+$Text::Wrap::columns = 72;
+
+my $template = do { $/ = undef; <DATA> };
+
+my $indent = q{ } x 2;
+
+my @docs;
+
+for my $command ( @commands ) {
+    my $name = $command->name;
+
+    push @docs, ( q{}, "=method $name", q{} );
+
+    if ( !  $command->implemented ) {
+
+        push @docs, 'I<Not implemented>';
+    }
+
+    my @alt = $command->to_string;
+
+    for my $dir ( 'set', 'get' ) {
+
+        for my $cmd ( sort { $a->{$dir} cmp $b->{$dir} } grep { defined $_->{$dir} } @alt ) {
+
+            push @docs, q{}, sprintf( '%s# %s', $indent, $cmd->{comment} )
+              if defined $cmd->{comment};
+
+            my $doc = wrap( $indent, q{    }, $cmd->{$dir} );
+
+            push @docs, q{}
+              if length $docs[-1] and substr( $docs[-1], 0, 16 ) ne substr( $doc, 0, 16 );
+
+            push @docs, split( /\n/, $doc );
+        }
+        push @docs, q{} unless @docs && !length $docs[-1];
+    }
+
+    pop @docs while @docs && !length $docs[-1];
+}
+
+my $docs = join( "\n", @docs );
+$template =~ s/%DOCS%/$docs/;
+
+say $template;
+
+
+__END__
+
+# ABSTRACT: Image::DS9 API Reference
+# PODNAME: Image::DS9::Manual::API.pod
+
+=pod
+
+=for stopwords
+XPA
+cmap
+colorbar
+crosshair
+dsseso
+dsssao
+dssstsci
+envi
+fp
+gif
+iconify
+iis
+ixem
+jpeg
+mecube
+minmax
+mosaicimage
+multiframe
+nameserver
+nrrd
+nvss
+pagesetup
+pixeltable
+png
+prefs
+rgb
+rgbarray
+rgbcube
+rgbimage
+samp
+saveimage
+shm
+sia
+skyview
+threed
+vla
+vlss
+vo
+wcs
+xpa
+zscale
+
+=head1 DESCRIPTION
+
+L<Image::DS9> provides the user access to C<DS9>'s directives via
+methods which closely mirror their syntax.  This document provides the
+list of methods, as generated from L<Image::DS9>'s internal grammar
+
+Most methods exactly parallel the B<DS9> B<XPA> commands.  For more
+information on what the methods do, or how the arguments affect
+things, please consult the B<DS9> documentation.
+
+In general each element in a command is passed as a separate argument
+to the method.  For example, to change the binning factor:
+
+  $dsp->bin( factor => 0.2 );
+
+Some commands have more arguments:
+
+  $dsp->bin( smooth => function => 'boxcar' );
+  $dsp->bin( smooth => radius => 33 );
+  $dsp->bin( about => ( 3, 3 ) );
+  $dsp->bin( cols => ( 'rt_x', 'rt_y' ) );
+
+Note the use of the C<=E<gt>> operator to force preceding barewords to be
+treated as strings, and the frivolous use of extra parenthesis for
+aesthetics.  Some arguments are concatenated to avoid confusion; see
+the documentation for the individual methods.
+
+Some commands can query B<DS9> for state information as well as set it.
+For example,
+
+        $function = $dsp->bin( smooth => function );
+
+B<Image::DS9> differentiates between the setting and requesting of
+values by the presence or absence of the argument containing the information.
+
+Some commands take a hash as their last argument, which contains
+attributes which are passed on to B<DS9>.
+
+True Boolean values may be one of the following:  C<1>, C<yes>, C<true>.
+False Boolean values may be one of the following:  C<0>, C<no>,
+C<false>.  Boolean values returned by a command are always translated
+into either C<0> or C<1>.
+
+The documentation for the commands lists the options supported and
+any deviations from the general approach described above.  Refer
+to the B<DS9> B<XPA> documentation to determine which commands permit
+queries and the allowed data types for the arguments.  B<Image::DS9>
+checks that all data passed to B<DS9> is of the appropriate type.
+
+=head2 Arguments and Return values
+
+Please see L<Image::DS9::Manual::Interface> for the general concepts
+around argument passing and return values.
+
+%DOCS%
+
+=cut

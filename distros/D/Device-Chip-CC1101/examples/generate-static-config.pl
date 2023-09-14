@@ -6,7 +6,7 @@ use warnings;
 use Device::Chip::CC1101;
 
 use Future::AsyncAwait;
-use Object::Pad;
+use Object::Pad 0.800;
 
 use Getopt::Long qw( :config no_ignore_case );
 

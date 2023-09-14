@@ -3,7 +3,7 @@ package Net::Async::Blockchain::Client::RPC::BTC;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 =head1 NAME
 
@@ -33,17 +33,21 @@ no indirect;
 
 use parent qw(Net::Async::Blockchain::Client::RPC);
 
-sub jsonrpc { return undef }
-
 =head2 get_transaction
 
-https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/wallet/gettransaction/
+https://bitcoincore.org/en/doc/24.0.0/rpc/wallet/gettransaction/
 
 =over 4
 
+=item * C<txid> The transaction id
+
+=item * C<include_watchonly> default=true for watch-only wallets, otherwise false
+
+=item * C<verbose> Whether to include a `decoded` field containing the decoded transaction
+
 =back
 
-L<Future>
+L<Future> - detailed information about in-wallet transaction C<txid>
 
 =cut
 
@@ -56,13 +60,19 @@ use parent qw(Net::Async::Blockchain::Client::RPC);
 
 =head2 get_raw_transaction
 
-https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/rawtransactions/getrawtransaction/
+https://bitcoincore.org/en/doc/24.0.0/rpc/rawtransactions/getrawtransaction/
 
 =over 4
 
+=item * C<txid> The transaction id
+
+=item * C<verbose> If false, return a string, otherwise return a json object
+
+=item * C<blockhash> The block in which to look for the transaction
+
 =back
 
-L<Future>
+L<Future> - raw transaction data
 
 =cut
 
@@ -73,13 +83,17 @@ sub get_raw_transaction {
 
 =head2 get_block
 
-https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/wallet/getblock/
+https://bitcoincore.org/en/doc/24.0.0/rpc/wallet/getblock/
 
 =over 4
 
+=item * C<blockhash> the block hash
+
+=item * C<verbosity> 0 for hex-encoded data, 1 for a JSON object, 2 for JSON object with transaction data, and 3 for JSON object with transaction data including prevout information for inputs
+
 =back
 
-L<Future>
+L<Future> - string based in the verbosity value
 
 =cut
 
@@ -90,13 +104,15 @@ sub get_block {
 
 =head2 validate_address
 
-https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/util/validateaddress/
+https://bitcoincore.org/en/doc/24.0.0/rpc/util/validateaddress/
 
 =over 4
 
+=item * C<address> - the bitcoin address to validate
+
 =back
 
-L<Future>
+L<Future> - json {isvalid  : true|false, ...}
 
 =cut
 
@@ -107,13 +123,13 @@ sub validate_address {
 
 =head2 get_last_block
 
-https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/blockchain/getblockcount/
+https://bitcoincore.org/en/doc/24.0.0/rpc/blockchain/getblockcount/
 
 =over 4
 
 =back
 
-L<Future>
+L<Future> - The current block count
 
 =cut
 
@@ -124,13 +140,15 @@ sub get_last_block {
 
 =head2 get_block_hash
 
-https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/blockchain/getblockhash/
+https://bitcoincore.org/en/doc/24.0.0/rpc/blockchain/getblockhash/
 
 =over 4
 
+=item * C<height> the height index
+
 =back
 
-L<Future>
+L<Future> - string block hash
 
 =cut
 
@@ -139,5 +157,40 @@ sub get_block_hash {
     return $self->_request('getblockhash', @params);
 }
 
-1;
+=head2 list_by_addresses
 
+https://bitcoincore.org/en/doc/24.0.0/rpc/wallet/listreceivedbyaddress/
+
+=over 4
+
+=item * C<address> address to return the received transactions
+
+=back
+
+L<Future> - json containing the received transaction details
+
+=cut
+
+sub list_by_addresses {
+    my ($self, $address) = @_;
+    return $self->_request("listreceivedbyaddress", 1, \0, \0, $address);
+}
+
+=head2 get_balances
+
+https://bitcoincore.org/en/doc/24.0.0/rpc/wallet/getbalances/
+
+=over 4
+
+=back
+
+L<Future> - json object with all balances in BTC
+
+=cut
+
+sub get_balances {
+    my ($self, @params) = @_;
+    return $self->_request('getbalances', @params);
+}
+
+1;

@@ -4,7 +4,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 # VERSION
 
-Version 0.17
+Version 0.18
 
 # SYNOPSIS
 
@@ -108,13 +108,15 @@ By default no symbols are exported. However, the following export tags are avail
 `json2perl()`,
 `json2dump()`,
 `json2yaml()`,
-`json2json()`
+`json2json()`,
+`jsonfile2perl()`
 - `:yaml` :
 `perl2yaml()`,
 `yaml2perl()`,
 `yaml2dump()`,
 `yaml2yaml()`,
-`yaml2json()`
+`yaml2json()`,
+`yamlfile2perl()`
 - `:dump` :
 `perl2dump()`,
 `perl2dump_filtered()`,
@@ -251,7 +253,7 @@ a nested data structure, but not an object), it will return
 the equivalent YAML string. In `$optional_paramshashref`
 one can specify whether to escape unicode with
 `'escape-unicode' => 1`. Prettify is not supported yet.
-The output can fed to ["yaml2perl"](#yaml2perl)
+The output can be fed to ["yaml2perl"](#yaml2perl)
 for getting the Perl variable back.
 
 Returns the YAML string on success or `undef` on failure.
@@ -271,6 +273,23 @@ Return value:
 Given an input `$yamlstring` as a string, it will return
 the equivalent Perl data structure using
 `YAML::Load($yamlstring)`
+
+Returns the Perl data structure on success or `undef` on failure.
+
+## `yamlfile2perl`
+
+    my $ret = yamlfile2perl($filename)
+
+Arguments:
+
+- `$filename`
+
+Return value:
+
+- `$ret`
+
+Given an input `$filename` which points to a file containing YAML content,
+it will return the equivalent Perl data structure.
 
 Returns the Perl data structure on success or `undef` on failure.
 
@@ -300,7 +319,7 @@ Additionally, use terse output with `'terse' => 1` and remove
 all the incessant indentation with `'indent' => 1`
 which unfortunately goes to the other extreme of
 producing a space-less output, not fit for human consumption.
-The output can fed to ["dump2perl"](#dump2perl)
+The output can be fed to ["dump2perl"](#dump2perl)
 for getting the Perl variable back.
 
 It returns the string representation of the input perl variable
@@ -469,12 +488,22 @@ the equivalent Perl data structure using
 
 Returns the Perl data structure on success or `undef` on failure.
 
-In `$optional_paramshashref`
-one can specify whether to escape unicode with
-`'escape-unicode' => 1`
-and/or prettify the returned result with `'pretty' => 1`.
+## `jsonfile2perl`
 
-Returns the yaml string on success or `undef` on failure.
+    my $ret = jsonfile2perl($filename)
+
+Arguments:
+
+- `$filename`
+
+Return value:
+
+- `$ret`
+
+Given an input `$filename` which points to a file containing JSON content,
+it will return the equivalent Perl data structure.
+
+Returns the Perl data structure on success or `undef` on failure.
 
 ## `json2yaml`
 

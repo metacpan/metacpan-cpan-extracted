@@ -3,7 +3,6 @@ package Perinci::Sub::Gen::AccessTable;
 use 5.010001;
 use strict;
 use warnings;
-use experimental 'smartmatch';
 use Log::ger;
 
 use Exporter 'import';
@@ -17,9 +16,9 @@ use Perinci::Sub::Util qw(err);
 #use String::Trim::More qw(trim_blank_lines);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-24'; # DATE
+our $DATE = '2023-07-09'; # DATE
 our $DIST = 'Perinci-Sub-Gen-AccessTable'; # DIST
-our $VERSION = '0.592'; # VERSION
+our $VERSION = '0.593'; # VERSION
 
 our @EXPORT_OK = qw(gen_read_table_func);
 
@@ -357,10 +356,8 @@ _
                                    "does not equal specified value"),
         );
 
-        # .in & .not_in should be applicable to arrays to, but it is currently
-        # implemented with perl's ~~ which can't handle this transparently. as
-        # for bool, it's not that important.
-        unless ($ftype ~~ [qw/array bool/]) {
+        # TODO .in & .not_in should be applicable to arrays too
+        unless (grep { $_ eq $ftype } (qw/array bool/)) {
             _add_arg(
                 func_meta   => $func_meta,
                 langs       => $langs,
@@ -561,8 +558,8 @@ sub __parse_query {
         }
     } # SELECT_FIELDS
 
-    for (@requested_fields) {
-        return err(400, "Unknown field $_") unless $_ ~~ @fields;
+    for my $f (@requested_fields) {
+        return err(400, "Unknown field $f") unless grep { $_ eq $f } @fields;
     }
     $query->{requested_fields} = \@requested_fields;
 
@@ -590,7 +587,7 @@ sub __parse_query {
             $exists++;
             push @filters, [$f, $ftype, "truth", $args->{$f}, $ftype, $cic];
         }
-        push @filter_fields, $f if $exists && !($f ~~ @filter_fields);
+        push @filter_fields, $f if $exists && !(grep { $_ eq $f } @filter_fields);
     }
 
     for my $f (grep {$frschemas{$_}{type} eq 'array'} @fields) {
@@ -605,10 +602,10 @@ sub __parse_query {
             $exists++;
             push @filters, [$f, $ftype, "!~~", $args->{"$f.lacks"}, $ftype, $cic];
         }
-        push @filter_fields, $f if $exists && !($f ~~ @filter_fields);
+        push @filter_fields, $f if $exists && !(grep { $_ eq $f } @filter_fields);
     }
 
-    for my $f (grep {!($frschemas{$_}{type} ~~ ['array','bool'])} @fields) {
+    for my $f (grep { $frschemas{$_}{type} ne 'array' && $frschemas{$_}{type} ne 'bool' } @fields) {
         my $fspec = $fspecs->{$f};
         my $ftype = $frschemas{$f}{type};
         my $exists;
@@ -659,7 +656,7 @@ sub __parse_query {
             $exists++;
             push @filters, [$f, $ftype, '<', $args->{"$f.xmax"}, $cic];
         }
-        push @filter_fields, $f if $exists && !($f ~~ @filter_fields);
+        push @filter_fields, $f if $exists && !(grep { $_ eq $f } @filter_fields);
     }
 
     for my $f (grep {$frschemas{$_}{type} =~ /^str$/} @fields) {
@@ -682,7 +679,7 @@ sub __parse_query {
             $exists++;
             push @filters, [$f, $ftype, '!~', $args->{"$f.not_matches"}, $cic];
         }
-        push @filter_fields, $f if $exists && !($f ~~ @filter_fields);
+        push @filter_fields, $f if $exists && !(grep { $_ eq $f } @filter_fields);
     }
     $query->{filters}       = \@filters;
     $query->{filter_fields} = \@filter_fields;
@@ -691,8 +688,8 @@ sub __parse_query {
     while (my ($cfn, $cf) = each %$cff) {
         next unless defined $args->{$cfn};
         push @filters, [$cf->{fields}, undef, 'call', [$cf->{code}, $args->{$cfn}], $cic];
-        for (@{$cf->{fields} // []}) {
-            push @filter_fields, $_ if !($_ ~~ @filter_fields);
+        for my $f (@{$cf->{fields} // []}) {
+            push @filter_fields, $f if !(grep { $_ eq $f } @filter_fields);
         }
     }
 
@@ -734,7 +731,7 @@ sub __parse_query {
         for my $f (@{ $args->{sort} }) {
             my $desc = $f =~ s/^-//;
             return err(400, "Unknown field in sort: $f")
-                unless $f ~~ @fields;
+                unless grep { $_ eq $f } @fields;
             my $fspec = $fspecs->{$f};
             my $ftype = $frschemas{$f}{type};
             return err(400, "Field $f is not sortable")
@@ -891,40 +888,68 @@ sub _gen_func {
                 if ($op eq 'truth') {
                     next REC if $r_h->{$f} xor $opn;
                 } elsif ($op eq '~~') {
-                    if ($stringy && $cic) {
-                        my @vals = map {lc} @{$r_h->{$f}};
-                        for (@$opn) {
-                            next REC unless lc($_) ~~ @vals;
+                    if ($stringy) {
+                        if ($cic) {
+                            my @vals = map {lc} @{$r_h->{$f}};
+                            for my $o (@$opn) {
+                                my $lc_o = lc $o;
+                                next REC unless grep { $_ eq $lc_o } @vals;
+                            }
+                        } else {
+                            for my $o (@$opn) {
+                                next REC unless grep { $_ eq $o } @{$r_h->{$f}};
+                            }
                         }
                     } else {
-                        for (@$opn) {
-                            next REC unless $_ ~~ @{$r_h->{$f}};
+                        for my $o (@$opn) {
+                            next REC unless grep { $_ eq $o } @{$r_h->{$f}};
                         }
                     }
                 } elsif ($op eq '!~~') {
-                    if ($stringy && $cic) {
-                        my @vals = map {lc} @{$r_h->{$f}};
-                        for (@$opn) {
-                            next REC if lc($_) ~~ @vals;
+                    if ($stringy) {
+                        if ($cic) {
+                            my @vals = map {lc} @{$r_h->{$f}};
+                            for my $o (@$opn) {
+                                my $lc_o = lc $o;
+                                next REC if grep { $_ eq $lc_o } @vals;
+                            }
+                        } else {
+                            for my $o (@$opn) {
+                                next REC if grep { $_ eq $o } @{$r_h->{$f}};
+                            }
                         }
                     } else {
-                        for (@$opn) {
-                            next REC if $_ ~~ @{$r_h->{$f}};
+                        for my $o (@$opn) {
+                            next REC if grep { $_ eq $o } @{$r_h->{$f}};
                         }
                     }
                 } elsif ($op eq 'in') {
-                    if ($stringy && $cic) {
-                        my @vals = map {lc} @$opn;
-                        next REC unless lc($r_h->{$f}) ~~ @vals;
+                    if ($stringy) {
+                        if ($cic) {
+                            my @vals = map {lc} @$opn;
+                            my $lc = lc($r_h->{$f});
+                            next REC unless grep { $_ eq $lc } @vals;
+                            #next REC unless $lc ~~ @vals;
+                        } else {
+                            next REC unless grep { $_ eq $r_h->{$f} } @$opn;
+                            #next REC unless $r_h->{$f} ~~ @$opn;
+                        }
                     } else {
-                        next REC unless $r_h->{$f} ~~ @$opn;
+                        next REC unless grep { $_ == $r_h->{$f} } @$opn;
                     }
                 } elsif ($op eq 'not_in') {
-                    if ($stringy && $cic) {
-                        my @vals = map {lc} @$opn;
-                        next REC if $r_h->{$f} ~~ @vals;
+                    if ($stringy) {
+                        if ($cic) {
+                            my @vals = map {lc} @$opn;
+                            my $lc = lc($r_h->{$f});
+                            next REC if grep { $_ eq $lc } @vals;
+                            #next REC if $lc ~~ @vals;
+                        } else {
+                            next REC if grep { $_ eq $r_h->{$f} } @$opn;
+                            #next REC if $r_h->{$f} ~~ @$opn;
+                        }
                     } else {
-                        next REC if $r_h->{$f} ~~ @$opn;
+                        next REC if grep { $_ == $r_h->{$f} } @$opn;
                     }
                 } elsif ($op eq '==' && $stringy && $cic) {
                     next REC unless lc $r_h->{$f} eq lc $opn;
@@ -1101,9 +1126,9 @@ sub _gen_func {
             }
             if ($args{with_field_names}) {
                 my @f = keys %$fspecs;
-                for (@f) {
-                    delete $r->{$_}
-                        unless $_ ~~ @{$query->{requested_fields}};
+                for my $f (@f) {
+                    delete $r->{$f}
+                        unless grep { $_ eq $f } @{$query->{requested_fields}};
                 }
             } else {
                 $r = [map {$r->{$_}} @{$query->{requested_fields}}];
@@ -1684,7 +1709,7 @@ Perinci::Sub::Gen::AccessTable - Generate function (and its metadata) to read ta
 
 =head1 VERSION
 
-This document describes version 0.592 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2023-02-24.
+This document describes version 0.593 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2023-07-09.
 
 =head1 SYNOPSIS
 

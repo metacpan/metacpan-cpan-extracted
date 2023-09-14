@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::latin_uppercase_alpha;
 
-our $DATE = '2022-09-23'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2023-09-03'; # DATE
+our $VERSION = '0.015'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nUppercase letters will be coerced to lowercase.\n\n",examples=>[{valid=>1,value=>""},{valid=>1,validated_value=>"ABZ",value=>"Abz"},{summary=>"Contains numbers",valid=>0,value=>"foo123"}],match=>qr(\A[A-Z]*\z),summary=>"String containing only zero or more uppercase Latin letters, i.e. A-Z","x.perl.coerce_rules"=>["From_str::to_upper"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::latin_uppercase_alpha - String containing only zero or more upperc
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::SchemaR::latin_uppercase_alpha (from Perl distribution Sah-Schemas-Str), released on 2022-09-23.
+This document describes version 0.015 of Sah::SchemaR::latin_uppercase_alpha (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

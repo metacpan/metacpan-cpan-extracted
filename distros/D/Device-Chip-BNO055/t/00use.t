@@ -3,8 +3,9 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'Device::Chip::BNO055' );
+require Device::Chip::BNO055;
 
+pass( 'Loaded modules' );
 done_testing;

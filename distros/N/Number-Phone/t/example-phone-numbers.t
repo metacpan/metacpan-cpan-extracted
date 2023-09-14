@@ -15376,24 +15376,6 @@
     },
 {
         class   => 'Number::Phone::Lib',
-        args    => ['NZ','+6426123456'],
-        methods => ['is_pager'],
-        test_country => 1,
-    },
-{
-        class   => 'Number::Phone::Lib',
-        args    => ['NZ','26123456'],
-        methods => ['is_pager'],
-        test_country => 1,
-    },
-{
-        class   => 'Number::Phone::Lib',
-        args    => ['+6426123456'],
-        methods => ['is_pager'],
-        test_country => 1,
-    },
-{
-        class   => 'Number::Phone::Lib',
         args    => ['NZ','+64800123456'],
         methods => ['is_tollfree'],
         test_country => 1,
@@ -16956,6 +16938,24 @@
         class   => 'Number::Phone::Lib',
         args    => ['+262810123456'],
         methods => ['is_specialrate'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['RE','+262939901234'],
+        methods => ['is_ipphone'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['RE','939901234'],
+        methods => ['is_ipphone'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['+262939901234'],
+        methods => ['is_ipphone'],
         test_country => 1,
     },
 {
@@ -22032,6 +22032,24 @@
         class   => 'Number::Phone::Lib',
         args    => ['+262801234567'],
         methods => ['is_tollfree'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['YT','+262939801234'],
+        methods => ['is_ipphone'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['YT','939801234'],
+        methods => ['is_ipphone'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['+262939801234'],
+        methods => ['is_ipphone'],
         test_country => 1,
     },
 {

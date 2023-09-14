@@ -133,6 +133,10 @@ This is similar to the behavior of the C<mariadb> or C<mysql> command line
 client. Also, C<SELECT DATABASE()> will return the current database active for
 the handle.
 
+The DBD::MariaDB driver understands any connection attribute specified in
+L</DATABASE HANDLES> section which is read/write and additionally also any
+other attribute described below.
+
 =over
 
 =item host
@@ -160,19 +164,12 @@ should be used. Example DSN:
 
 =item mariadb_client_found_rows
 
-Enables (logical true value) or disables (logical false value) the flag
-C<CLIENT_FOUND_ROWS> while connecting to the MariaDB or MySQL server. This has a
-somewhat funny effect. Without I<mariadb_client_found_rows>, if you perform a
-query like
+If TRUE (Default), sets the C<CLIENT_FOUND_ROWS> flag when connecting to the
+MariaDB or MySQL server. This causes C<UPDATE> statements to return the number
+of rows B<matched>, not the number of rows actually changed.
 
-  UPDATE t SET id = 1 WHERE id = 1;
-
-then the MariaDB or MySQL engine will always return 0, because no rows have
-changed. With I<mariadb_client_found_rows> however, it will return the number of
-rows that have an id 1, as some people are expecting. At least for compatibility
-to other engines.
-
-By default I<mariadb_client_found_rows> is enabled.
+If you want the number of rows changed in response to an C<UPDATE> statement,
+specify C<mariadb_client_found_rows=0> in the DSN.
 
 =item mariadb_compression
 
@@ -255,11 +252,24 @@ server. This is done, for example, with
 Usually there's no need for this option, unless you are using another location
 for the socket than that built into the client.
 
+=item mariadb_auth_plugin
+
+Specify authentication method used during connection to MariaDB or MySQL server.
+MySQL protocol uses C<mysql_native_password> authentication method and MySQL
+version 5.5.7 extended protocol and added support for using other authentication
+methods which can be provided to clients by plugins. MySQL version 8.0.4 changed
+the default authentication method to C<caching_sha2_password>.
+
+Example how to use C<caching_sha2_password> authentication method:
+
+  my $dsn = 'DBI:MariaDB:database=test;host=hostname;'
+          . 'mariadb_auth_plugin=caching_sha2_password';
+
 =item mariadb_ssl
 
-A true value turns on the C<CLIENT_SSL> flag when connecting to the MariaDB or
-MySQL server and enforce SSL encryption. A false value (which is default)
-disable SSL encryption with the MariaDB or MySQL server.
+A true value enforces SSL encryption when connecting to the MariaDB or MySQL
+server. A false value (which is default) disables SSL encryption with the MariaDB
+or MySQL server.
 
 When enabling SSL encryption you should set also other SSL options, at least
 L<I<mariadb_ssl_ca_file>|/mariadb_ssl_ca_file> or
@@ -343,58 +353,6 @@ client library by default. If your DSN contains the option
 C<mariadb_local_infile=1>, C<LOAD DATA LOCAL> will be enabled. However, this
 option is B<ineffective> if the server has also been configured to disallow
 C<LOCAL>.
-
-=item mariadb_multi_statements
-
-Support for multiple statements separated by a semicolon (C<;>) may be enabled
-by using this option. Enabling this option may cause problems if server-side
-prepared statements are also enabled.
-
-=item mariadb_server_prepare
-
-This option is used to enable server side prepared statements. By default
-prepared statements are not used and placeholder replacement is done by
-DBD::MariaDB prior to sending SQL statement to MariaDB or MySQL server.
-
-This default behavior may change in the future.
-
-To use server side prepared statements, all you need to do is set the variable
-I<mariadb_server_prepare> in the connect:
-
-  my $dbh = DBI->connect(
-      'DBI:MariaDB:database=test;host=localhost;mariadb_server_prepare=1',
-      'user',
-      'password',
-      { RaiseError => 1, PrintError => 0 },
-  );
-
-or:
-
-  my $dbh = DBI->connect(
-      'DBI:MariaDB:database=test;host=localhost',
-      'user',
-      'password',
-      { RaiseError => 1, PrintError => 0, mariadb_server_prepare => 1 },
-  );
-
-There are many benefits to using server side prepare statements, mostly if you
-are using SQL statements with placeholders or performing many inserts because of
-that fact that a single statement is prepared to accept multiple insert values.
-
-Please note that MariaDB or MySQL server cannot prepare or execute some prepared
-statements. In this case DBD::MariaDB fallbacks to normal non-prepared statement
-and tries again.
-
-=item mariadb_server_prepare_disable_fallback
-
-This option disable fallback to normal non-prepared statement when MariaDB or
-MySQL server does not support execution of current statement as prepared.
-
-Useful when you want to be sure that the statement is going to be executed as
-server side prepared. Error message and code in case of failure is propagated
-back to DBI.
-
-This default behavior may change in the future.
 
 =item mariadb_embedded_options
 
@@ -681,6 +639,28 @@ You can also set or unset the I<mariadb_use_result> setting on your statement
 handle, when creating the statement handle or after it has been created. See
 L</STATEMENT HANDLES>.
 
+Library functions C<mysql_use_result()> and C<mysql_store_result()> are not
+used for server side prepared statements, therefore this I<mariadb_use_result>
+attribute has no effect when server side prepared statements are enabled.
+
+Note that library function C<mysql_use_result()> does not provide number of rows
+in result set. Therefore if this I<mariadb_use_result> attribute is enabled then
+DBI variable L<C<$DBI::rows>|DBI/$DBI::rows> and statement methods
+L<execute|DBI/execute> and L<rows|DBI/rows> returns C<-1> (which means that the
+number of rows is not known). However, statement method L<rows|DBI/rows> returns
+correct number of rows after all rows were already fetched and additional fetch
+call was issued (for this special case driver knows that it processed all rows
+and hence it knows what is the total number of rows).
+
+Enabling I<mariadb_use_result> attribute on one statement handle disallow usage
+of all other statement and database handles until all data rows from active
+statement handle are fetched. Trying to use other statement or database handles
+when there is active I<mariadb_use_result> attribute on some statement handle
+cause unpredictable errors.
+
+In most cases there is no benefit in usage of this I<mariadb_use_result>
+attribute, it should stay disabled.
+
 =item mariadb_bind_type_guessing
 
 This attribute causes the driver (emulated prepare statements) to attempt to
@@ -767,6 +747,58 @@ intermediate string and any bind parameter. Default value depends on client
 MariaDB/MySQL library and should be 1GB.
 
   $dbh->{mariadb_max_allowed_packet} = 32*1024*1024; # limit max size to 32MB
+
+=item mariadb_multi_statements
+
+Support for multiple statements separated by a semicolon (C<;>) may be enabled
+by using this option. Enabling this option may cause problems if server-side
+prepared statements are also enabled.
+
+=item mariadb_server_prepare
+
+This option is used to enable server side prepared statements. By default
+prepared statements are not used and placeholder replacement is done by
+DBD::MariaDB prior to sending SQL statement to MariaDB or MySQL server.
+
+This default behavior may change in the future.
+
+To use server side prepared statements, all you need to do is set the variable
+I<mariadb_server_prepare> in the connect:
+
+  my $dbh = DBI->connect(
+      'DBI:MariaDB:database=test;host=localhost;mariadb_server_prepare=1',
+      'user',
+      'password',
+      { RaiseError => 1, PrintError => 0 },
+  );
+
+or:
+
+  my $dbh = DBI->connect(
+      'DBI:MariaDB:database=test;host=localhost',
+      'user',
+      'password',
+      { RaiseError => 1, PrintError => 0, mariadb_server_prepare => 1 },
+  );
+
+There are many benefits to using server side prepare statements, mostly if you
+are using SQL statements with placeholders or performing many inserts because of
+that fact that a single statement is prepared to accept multiple insert values.
+
+Please note that MariaDB or MySQL server cannot prepare or execute some prepared
+statements. In this case DBD::MariaDB fallbacks to normal non-prepared statement
+and tries again.
+
+=item mariadb_server_prepare_disable_fallback
+
+This option disable fallback to normal non-prepared statement when MariaDB or
+MySQL server does not support execution of current statement as prepared.
+
+Useful when you want to be sure that the statement is going to be executed as
+server side prepared. Error message and code in case of failure is propagated
+back to DBI.
+
+This default behavior may change in the future.
 
 =back
 
@@ -1306,6 +1338,24 @@ Here's an example of how to use the asynchronous query interface:
   }
   my $rows = $dbh->mariadb_async_result();
 
+And another example:
+
+  my $fd = $dbh->mariadb_sockfd();
+
+  my $sth = $dbh->prepare('SELECT 1, SLEEP(10), t.id FROM t', { mariadb_async => 1 });
+  $sth->execute();
+
+  my $bits = '';
+  vec($bits, $fd, 1) = 1;
+  select($bits, undef, $bits, undef);
+
+  my $num_rows = $sth->mariadb_async_result();
+  print "num rows: $num_rows\n";
+  while (my @array = $sth->fetchrow_array()) {
+      print "row:\n";
+      print "\tvalue: $_\n" foreach @array;
+  }
+
 =head1 INSTALLATION
 
 See L<DBD::MariaDB::INSTALL>.
@@ -1333,15 +1383,16 @@ Since 2004 DBD::mysql has been maintained by Patrick Galbraith
 developers who keep sending patches to help continue improving DBD::mysql.
 
 In 2018 unreleased version 4.042_01 of DBD::mysql was forked and DBD::MariaDB
-was created to fix long standing Unicode bugs and MariaDB support. Currently it
-is developed in GoodData and maintained by Pali (I<pali@cpan.org>).
+was created to fix long standing Unicode bugs and MariaDB support. Development
+at that time was supported by GoodData. Currently it is hosted on Github as
+part of the big perl5-dbi project and maintained by Pali (I<pali@cpan.org>).
 
 =head1 CONTRIBUTIONS
 
 Anyone who desires to contribute to this project is encouraged to do so.
 Currently, the source code for this project can be found at Github:
 
-L<https://github.com/gooddata/DBD-MariaDB>
+L<https://github.com/perl5-dbi/DBD-MariaDB>
 
 Either fork this repository and produce a branch with your changeset that the
 maintainer can merge to his tree, or create a diff with git. The maintainer is
@@ -1360,7 +1411,7 @@ Large Portions Copyright (c) 2018 GoodData Corporation
 
 =item *
 
-Large Portions Copyright (c) 2015-2017 Pali Rohár
+Large Portions Copyright (c) 2015-2022 Pali Rohár
 
 =item *
 
@@ -1430,7 +1481,7 @@ Information on DBD::MariaDB specifically can be gained by typing:
 Please report bugs, including all the information needed such as DBD::MariaDB
 version, MariaDB/MySQL version, OS type/version, etc to this link:
 
-L<https://github.com/gooddata/DBD-MariaDB/issues>
+L<https://github.com/perl5-dbi/DBD-MariaDB/issues>
 
 In past for DBD::mysql, MySQL/Sun/Oracle responded to bugs and assisted in
 fixing bugs which many thanks should be given for their help! This driver is

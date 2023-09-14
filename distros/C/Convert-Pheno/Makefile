@@ -17,9 +17,9 @@
 #     CONFIGURE_REQUIRES => { ExtUtils::MakeMaker=>q[7.70], File::ShareDir::Install=>q[0.14] }
 #     EXE_FILES => [q[bin/convert-pheno]]
 #     LICENSE => q[perl]
-#     META_MERGE => { dynamic_config=>q[0], meta-spec=>{ version=>q[0] }, no_index=>{ directory=>[q[docs], q[t], q[share/api]] }, prereqs=>{ runtime=>{ requires=>{ perl=>q[5.0261] } } }, resources=>{ bugtracker=>{ web=>q[https://github.com/CNAG-Biomedical-Informatics/convert-pheno/issues] }, homepage=>q[https://github.com/CNAG-Biomedical-Informatics/convert-pheno], license=>[q[http://www.opensource.org/licenses/artistic-license-2.0]], repository=>{ type=>q[git], url=>q[https://github.com/CNAG-Biomedical-Informatics/convert-pheno.git], web=>q[https://github.com/CNAG-Biomedical-Informatics/convert-pheno] } }, x_contributors=>[] }
+#     META_MERGE => { dynamic_config=>q[0], meta-spec=>{ version=>q[0] }, no_index=>{ directory=>[q[docs], q[t], q[share/api]] }, prereqs=>{ runtime=>{ requires=>{ perl=>q[5.026000] } } }, resources=>{ bugtracker=>{ web=>q[https://github.com/CNAG-Biomedical-Informatics/convert-pheno/issues] }, homepage=>q[https://github.com/CNAG-Biomedical-Informatics/convert-pheno], license=>[q[http://www.opensource.org/licenses/artistic-license-2.0]], repository=>{ type=>q[git], url=>q[https://github.com/CNAG-Biomedical-Informatics/convert-pheno.git], web=>q[https://github.com/CNAG-Biomedical-Informatics/convert-pheno] } }, x_contributors=>[] }
 #     NAME => q[Convert::Pheno]
-#     PREREQ_PM => { DBD::SQLite=>q[1.72], DBI=>q[1.643], File::ShareDir::ProjectDistDir=>q[1.000009], JSON::Validator=>q[5.14], JSON::XS=>q[4.03], Mojolicious=>q[9.33], Moo=>q[2.005005], Path::Tiny=>q[0.144], PerlIO::gzip=>q[0.20], Sort::Naturally=>q[1.03], Term::ANSIColor=>q[5.01], Test::Deep=>q[1.204], Test::Exception=>q[0.43], Test::More=>q[1.30], Test::Warn=>q[0.37], Text::CSV_XS=>q[1.50], Text::Similarity=>q[0.13], Types::Standard=>q[2.004000], XML::Fast=>q[0.17], YAML::XS=>q[0.88] }
+#     PREREQ_PM => { DBD::SQLite=>q[1.72], DBI=>q[1.643], Data::Leaf::Walker=>q[0.21], File::ShareDir::ProjectDistDir=>q[1.000009], JSON::Validator=>q[5.14], JSON::XS=>q[4.03], Mojolicious=>q[9.33], Moo=>q[2.005005], Path::Tiny=>q[0.144], Sort::Naturally=>q[1.03], Term::ANSIColor=>q[5.01], Test::Deep=>q[1.204], Test::Exception=>q[0.43], Test::More=>q[1.30], Test::Warn=>q[0.37], Text::CSV_XS=>q[1.50], Text::Similarity=>q[0.13], Types::Standard=>q[2.004000], XML::Fast=>q[0.17], YAML::XS=>q[0.88] }
 #     TEST_REQUIRES => { Test::More=>q[1.30] }
 #     VERSION_FROM => q[lib/Convert/Pheno.pm]
 #     test => { TESTS=>q[t/*.t] }
@@ -61,11 +61,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Convert::Pheno
 NAME_SYM = Convert_Pheno
-VERSION = 0.12
+VERSION = 0.13
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_12
+VERSION_SYM = 0_13
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.12
+XS_VERSION = 0.13
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -273,7 +273,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Convert-Pheno
-DISTVNAME = Convert-Pheno-0.12
+DISTVNAME = Convert-Pheno-0.13
 
 
 # --- MakeMaker macro section:
@@ -543,13 +543,13 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) 'requires:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  DBD::SQLite: '\''1.72'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  DBI: '\''1.643'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Data::Leaf::Walker: '\''0.21'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  File::ShareDir::ProjectDistDir: '\''1.000009'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  JSON::Validator: '\''5.14'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  JSON::XS: '\''4.03'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Mojolicious: '\''9.33'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Moo: '\''2.005005'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Path::Tiny: '\''0.144'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) '  PerlIO::gzip: '\''0.20'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Sort::Naturally: '\''1.03'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Term::ANSIColor: '\''5.01'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Test::Deep: '\''1.204'\''' >> META_new.yml
@@ -560,13 +560,13 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  Types::Standard: '\''2.004000'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XML::Fast: '\''0.17'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  YAML::XS: '\''0.88'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) '  perl: '\''5.0261'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  perl: '\''5.026000'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'resources:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  bugtracker: https://github.com/CNAG-Biomedical-Informatics/convert-pheno/issues' >> META_new.yml
 	$(NOECHO) $(ECHO) '  homepage: https://github.com/CNAG-Biomedical-Informatics/convert-pheno' >> META_new.yml
 	$(NOECHO) $(ECHO) '  license: http://www.opensource.org/licenses/artistic-license-2.0' >> META_new.yml
 	$(NOECHO) $(ECHO) '  repository: https://github.com/CNAG-Biomedical-Informatics/convert-pheno.git' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: '\''0.12'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: '\''0.13'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_contributors: []' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.018'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
@@ -611,13 +611,13 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '            "DBD::SQLite" : "1.72",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "DBI" : "1.643",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Data::Leaf::Walker" : "0.21",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "File::ShareDir::ProjectDistDir" : "1.000009",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "JSON::Validator" : "5.14",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "JSON::XS" : "4.03",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Mojolicious" : "9.33",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Moo" : "2.005005",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Path::Tiny" : "0.144",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "PerlIO::gzip" : "0.20",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Sort::Naturally" : "1.03",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Term::ANSIColor" : "5.01",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Test::Deep" : "1.204",' >> META_new.json
@@ -628,7 +628,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '            "Types::Standard" : "2.004000",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "XML::Fast" : "0.17",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "YAML::XS" : "0.88",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "perl" : "5.0261"' >> META_new.json
+	$(NOECHO) $(ECHO) '            "perl" : "5.026000"' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
 	$(NOECHO) $(ECHO) '      "test" : {' >> META_new.json
@@ -652,7 +652,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '         "web" : "https://github.com/CNAG-Biomedical-Informatics/convert-pheno"' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "0.12",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "0.13",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "x_contributors" : [],' >> META_new.json
 	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.06"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
@@ -939,19 +939,19 @@ testdb_static :: static pure_all
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Convert-Pheno" VERSION="0.12">' > Convert-Pheno.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Convert-Pheno" VERSION="0.13">' > Convert-Pheno.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>A module to interconvert common data models for phenotypic data</ABSTRACT>' >> Convert-Pheno.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Manuel Rueda &lt;mrueda@cpan.org&gt;</AUTHOR>' >> Convert-Pheno.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> Convert-Pheno.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="DBD::SQLite" VERSION="1.72" />' >> Convert-Pheno.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="DBI::" VERSION="1.643" />' >> Convert-Pheno.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Data::Leaf::Walker" VERSION="0.21" />' >> Convert-Pheno.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="File::ShareDir::ProjectDistDir" VERSION="1.000009" />' >> Convert-Pheno.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="JSON::Validator" VERSION="5.14" />' >> Convert-Pheno.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="JSON::XS" VERSION="4.03" />' >> Convert-Pheno.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Mojolicious::" VERSION="9.33" />' >> Convert-Pheno.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Moo::" VERSION="2.005005" />' >> Convert-Pheno.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Path::Tiny" VERSION="0.144" />' >> Convert-Pheno.ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="PerlIO::gzip" VERSION="0.20" />' >> Convert-Pheno.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Sort::Naturally" VERSION="1.03" />' >> Convert-Pheno.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Term::ANSIColor" VERSION="5.01" />' >> Convert-Pheno.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Test::Deep" VERSION="1.204" />' >> Convert-Pheno.ppd

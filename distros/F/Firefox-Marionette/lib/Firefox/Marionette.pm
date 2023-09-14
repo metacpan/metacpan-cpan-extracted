@@ -66,7 +66,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -90,7 +90,6 @@ sub _MIN_VERSION_FOR_HOSTPORT_PROXY { return 57 }
 sub _MIN_VERSION_FOR_XVFB           { return 12 }
 sub _MIN_VERSION_FOR_WEBDRIVER_IDS  { return 63 }
 sub _MIN_VERSION_FOR_LINUX_SANDBOX  { return 90 }
-sub _DEFAULT_SOCKS_VERSION          { return 5 }
 sub _MILLISECONDS_IN_ONE_SECOND     { return 1_000 }
 sub _DEFAULT_PAGE_LOAD_TIMEOUT      { return 300_000 }
 sub _DEFAULT_SCRIPT_TIMEOUT         { return 30_000 }
@@ -118,6 +117,7 @@ sub _ACTIVE_UPDATE_XML_FILE_NAME    { return 'active-update.xml' }
 sub _NUMBER_OF_CHARS_IN_TEMPLATE    { return 11 }
 sub _DEFAULT_ADB_PORT               { return 5555 }
 sub _SHORT_GUID_BYTES               { return 9 }
+sub _DEFAULT_DOWNLOAD_TIMEOUT       { return 300 }
 
 # sub _MAGIC_NUMBER_MOZL4Z            { return "mozLz40\0" }
 
@@ -364,11 +364,54 @@ sub mime_types {
 }
 
 sub download {
-    my ( $self, $path ) = @_;
-    Carp::carp( '**** DEPRECATED - The download(' . q[$]
-          . 'path) method HAS BEEN REPLACED BY downloaded(' . q[$]
-          . 'path) ****' );
-    return $self->downloaded($path);
+    my ( $self, $url, $default_timeout ) = @_;
+    my $download_directory        = $self->_download_directory();
+    my $quoted_download_directory = quotemeta $download_directory;
+    if ( $url =~ /^$quoted_download_directory/smx ) {
+        my $path = $url;
+        Carp::carp( '**** DEPRECATED - The download(' . q[$]
+              . 'path) method HAS BEEN REPLACED BY downloaded(' . q[$]
+              . 'path) ****' );
+        return $self->downloaded($path);
+    }
+    else {
+        $default_timeout ||= _DEFAULT_DOWNLOAD_TIMEOUT();
+        $default_timeout *= _MILLISECONDS_IN_ONE_SECOND();
+        my $uri = URI->new($url);
+        my $download_name =
+          File::Temp::mktemp('firefox_marionette_download_XXXXXXXXXXX');
+        my $download_path =
+          File::Spec->catfile( $download_directory, $download_name );
+        my $timeouts = $self->timeouts();
+        $self->chrome()->timeouts(
+            Firefox::Marionette::Timeouts->new(
+                script    => $default_timeout,
+                implicit  => $timeouts->implicit(),
+                page_load => $timeouts->page_load()
+            )
+        );
+        my $original_script = $timeouts->script();
+        my $result          = $self->script(
+            $self->_compress_script(
+                <<'_SCRIPT_'), args => [ $uri->as_string(), $download_path ] );
+let Downloads = ChromeUtils.import("resource://gre/modules/Downloads.jsm").Downloads;
+return Downloads.fetch({ url: arguments[0] }, { path: arguments[1] });
+_SCRIPT_
+        $self->timeouts($timeouts);
+        $self->content();
+        my $handle;
+
+        while ( !$handle ) {
+            foreach
+              my $downloaded_path ( $self->downloads($download_directory) )
+            {
+                if ( $downloaded_path eq $download_path ) {
+                    $handle = $self->downloaded($downloaded_path);
+                }
+            }
+        }
+        return $handle;
+    }
 }
 
 sub downloaded {
@@ -463,8 +506,9 @@ sub downloading {
 }
 
 sub downloads {
-    my ($self) = @_;
-    return $self->_directory_listing( {}, $self->_download_directory() );
+    my ( $self, $download_directory ) = @_;
+    $download_directory ||= $self->_download_directory();
+    return $self->_directory_listing( {}, $download_directory );
 }
 
 sub _setup_adb {
@@ -3294,15 +3338,27 @@ sub _read_certificates_from_disk {
 
 sub _setup_shortcut_proxy {
     my ( $self, $proxy_parameter, $capabilities ) = @_;
-    my $proxy_uri = URI::URL->new($proxy_parameter);
     my $firefox_proxy;
-    if ( $proxy_uri->scheme() eq 'https' ) {
+    if ( ref $proxy_parameter eq 'ARRAY' ) {
         $firefox_proxy =
-          Firefox::Marionette::Proxy->new( tls => $proxy_uri->host_port() );
+          Firefox::Marionette::Proxy->new( pac =>
+              Firefox::Marionette::Proxy->get_inline_pac( @{$proxy_parameter} )
+          );
+    }
+    elsif ( $proxy_parameter->isa('Firefox::Marionette::Proxy') ) {
+        $firefox_proxy = $proxy_parameter;
     }
     else {
-        $firefox_proxy =
-          Firefox::Marionette::Proxy->new( host => $proxy_uri->host_port() );
+        my $proxy_uri = URI->new($proxy_parameter);
+        if ( $proxy_uri->scheme() eq 'https' ) {
+            $firefox_proxy =
+              Firefox::Marionette::Proxy->new( tls => $proxy_uri->host_port() );
+        }
+        else {
+            $firefox_proxy =
+              Firefox::Marionette::Proxy->new(
+                host => $proxy_uri->host_port() );
+        }
     }
     $capabilities->{proxy} = $firefox_proxy;
     return $capabilities;
@@ -3323,8 +3379,10 @@ sub _launch_and_connect {
         $self->_launch(@arguments);
         my $socket = $self->_setup_local_connection_to_firefox(@arguments);
         if ( my $proxy_parameter = delete $parameters{proxy} ) {
-            $parameters{capabilities} ||=
-              Firefox::Marionette::Capabilities->new();
+            if ( !$parameters{capabilities} ) {
+                $parameters{capabilities} =
+                  Firefox::Marionette::Capabilities->new();
+            }
             $parameters{capabilities} =
               $self->_setup_shortcut_proxy( $proxy_parameter,
                 $parameters{capabilities} );
@@ -4048,8 +4106,9 @@ sub execute {
               IPC::Open3::open3( $writer, $reader, $error, $binary,
                 @arguments );
         } or do {
+            chomp $EVAL_ERROR;
             Firefox::Marionette::Exception->throw(
-                "Failed to execute '$binary':$EXTENDED_OS_ERROR");
+                "Failed to execute '$binary':$EVAL_ERROR");
         };
         my ( $result, $output );
         while ( $result = read $reader,
@@ -4494,7 +4553,7 @@ sub _get_version {
     my $binary = $self->_binary();
     $self->{binary} = $binary;
     my $version_string;
-    my $version_regex = qr/(\d+)[.](\d+(?:\w\d+)?)(?:[.](\d+))*/smx;
+    my $version_regex = qr/(\d+)[.](\d+(?:\w\d+|\-\d+)?)(?:[.](\d+))*/smx;
     if ( $self->_adb() ) {
         my $package_name = $self->_initialise_adb();
         my $dumpsys =
@@ -4524,6 +4583,7 @@ sub _get_version {
         my $waterfox_regex = qr/Waterfox(?:Limited)?[ ]Waterfox[ ]/smx;
         my $browser_regex  = join q[|],
           qr/Mozilla[ ]Firefox[ ]/smx,
+          qr/LibreWolf[ ]Firefox[ ]/smx,
           $waterfox_regex,
           qr/Moonchild[ ]Productions[ ]Basilisk[ ]/smx,
           qr/Moonchild[ ]Productions[ ]Pale[ ]Moon[ ]/smx;
@@ -6357,7 +6417,7 @@ sub _ssh_address {
 
 sub _ssh_arguments {
     my ( $self, %parameters ) = @_;
-    my @arguments = qw(-2 -a);
+    my @arguments = qw(-2 -a -T);
     if ( ( $parameters{graphical} ) || ( $parameters{master} ) ) {
         if ( ( defined $self->_visible() ) && ( $self->_visible() eq 'local' ) )
         {
@@ -6887,6 +6947,7 @@ sub _get_local_handle_for_generic_command_output {
             chomp $EVAL_ERROR;
             warn "$EVAL_ERROR\n";
         };
+        exit 1;
     }
     else {
         Firefox::Marionette::Exception->throw(
@@ -7403,7 +7464,7 @@ sub _request_proxy {
     elsif ( $proxy->socks() ) {
         $build->{proxyType} ||= 'manual';
         $build->{socksProxyVersion} = $build->{socksVersion} =
-          _DEFAULT_SOCKS_VERSION();
+          Firefox::Marionette::Proxy::DEFAULT_SOCKS_VERSION();
     }
     return $self->_convert_proxy_before_request($build);
 }
@@ -7452,7 +7513,14 @@ sub _proxy_from_env {
             if ( $key eq 'https' ) {
                 $build_key = 'ssl';
             }
-            $build->{ $build_key . 'Proxy' } = $uri->host_port();
+            if ( ( $key eq 'all' ) && ( $uri->scheme() eq 'https' ) ) {
+                $build->{proxyType} = 'pac';
+                $build->{proxyAutoconfigUrl} =
+                  Firefox::Marionette::Proxy->get_inline_pac($uri);
+            }
+            else {
+                $build->{ $build_key . 'Proxy' } = $uri->host_port();
+            }
         }
     }
     return $self->_convert_proxy_before_request($build);
@@ -11121,7 +11189,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.43
+Version 1.44
 
 =head1 SYNOPSIS
 
@@ -11279,6 +11347,8 @@ or a L<Firefox::Marionette::Login|Firefox::Marionette::Login> object as the firs
 
     $firefox->add_login(host => 'https://github.com', user => 'me2@example.org', password => 'uiop[]', user_field => 'login', password_field => 'password');
 
+Note for HTTP Authentication, the L<realm|https://datatracker.ietf.org/doc/html/rfc2617#section-2> must perfectly match the correct L<realm|https://datatracker.ietf.org/doc/html/rfc2617#section-2> supplied by the server.
+
 This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 add_site_header
@@ -11360,6 +11430,21 @@ accept a boolean and return the current value of the debug setting.  This allows
 =head2 default_binary_name
 
 just returns the string 'firefox'.  Only of interest when sub-classing.
+
+=head2 download
+
+accepts a L<URI|URI> and an optional timeout in seconds (the default is 5 minutes) as parameters and downloads the L<URI|URI> in the background and returns a handle to the downloaded file.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new();
+
+    my $handle = $firefox->download('https://raw.githubusercontent.com/david-dick/firefox-marionette/master/t/data/keepassxs.csv');
+
+    foreach my $line (<$handle>) {
+      print $line;
+    }
 
 =head2 bookmarks
 
@@ -12038,7 +12123,7 @@ To make the L<go|/go> method return quicker, you need to set the L<page load str
     my $firefox = Firefox::Marionette->new( capabilities => Firefox::Marionette::Capabilities->new( page_load_strategy => 'eager' ));
     $firefox->go('https://metacpan.org/'); # will return once the main document has been loaded and parsed, but BEFORE sub-resources (images/stylesheets/frames) have been loaded.
 
-When going directly to a URL that needs to be downloaded, please see L<BUGS AND LIMITATIONS|/DOWNLOADING-USING-GO-METHOD> for a necessary workaround.
+When going directly to a URL that needs to be downloaded, please see L<BUGS AND LIMITATIONS|/DOWNLOADING-USING-GO-METHOD> for a necessary workaround and the L<download|/download> method for an alternative.
 
 This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
@@ -12577,7 +12662,7 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * profile_name - pick a specific existing profile to automate, rather than creating a new profile.  L<Firefox|https://firefox.com> refuses to allow more than one instance of a profile to run at the same time.  Profile names can be obtained by using the L<Firefox::Marionette::Profile::names()|Firefox::Marionette::Profile#names> method.  NOTE: firefox ignores any changes made to the profile on the disk while it is running, instead, use the L<set_pref|/set_pref> and L<clear_pref|/clear_pref> methods to make changes while firefox is running.
 
-=item * proxy - this is a shortcut method for setting a L<proxy|Firefox::Marionette::Proxy> using the L<capabilities|Firefox::Marionette::Capabilities> parameter above.  It accepts a proxy URL.
+=item * proxy - this is a shortcut method for setting a L<proxy|Firefox::Marionette::Proxy> using the L<capabilities|Firefox::Marionette::Capabilities> parameter above.  It accepts a proxy URL, with the following allowable schemes, 'http' and 'https'.  It also allows a reference to a list of proxy URLs which will function as list of proxies that Firefox will try in L<left to right order|https://developer.mozilla.org/en-US/docs/Web/HTTP/Proxy_servers_and_tunneling/Proxy_Auto-Configuration_PAC_file#description> until a working proxy is found.  See L<REMOTE AUTOMATION OF FIREFOX VIA SSH|/REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH>, L<NETWORK ARCHITECTURE|/NETWORK-ARCHITECTURE> and L<SETTING UP SOCKS SERVERS USING SSH|Firefox::Marionette::Proxy#SETTING-UP-SOCKS-SERVERS-USING-SSH>.
 
 =item * reconnect - an experimental parameter to allow a reconnection to firefox that a connection has been discontinued.  See the survive parameter.
 
@@ -13259,7 +13344,34 @@ produces the following effect, with an ascii box representing a separate network
      | Site   |          | Server |
      ----------          ----------
 
+In addition, the proxy parameter can be used to specify multiple proxies using a reference
+to a list.
+
+  my $firefox = Firefox::Marionette->new(
+                  host  => 'Firefox.runs.here'
+                  trust => '/path/to/ca-for-squid-proxy-server.crt',
+                  proxy => [ 'https://Squid1.Proxy.Server:3128', 'https://Squid2.Proxy.Server:3128' ]
+                     )->go('https://Target.Web.Site');
+
+When firefox gets a list of proxies, it will use the first one that works.  In addition, it will perform a basic form of proxy failover, which may involve a failed network request before it fails over to the next proxy.  In the diagram below, Squid1.Proxy.Server is the first proxy in the list and will be used exclusively, unless it is unavailable, in which case Squid2.Proxy.Server will be used.
+
+                                          ----------
+                                     TLS  | Squid1 |
+                                   ------>| Proxy  |-----
+                                   |      | Server |    |
+     ---------      -----------    |      ----------    |       -----------
+     | Perl  | SSH  | Firefox |    |                    | HTTPS | Target  |
+     | runs  |----->| runs    |----|                    ------->| Web     |
+     | here  |      | here    |    |                    |       | Site    |
+     ---------      -----------    |      ----------    |       -----------
+                                   | TLS  | Squid2 |    |
+                                   ------>| Proxy  |-----
+                                          | Server |
+                                          ----------
+
 See the L<REMOTE AUTOMATION OF FIREFOX VIA SSH|/REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH> section for more options.
+
+See L<SETTING UP SOCKS SERVERS USING SSH|Firefox::Marionette::Proxy#SETTING-UP-SOCKS-SERVERS-USING-SSH> for easy proxying via L<ssh|https://man.openbsd.org/ssh>
 
 =head1 AUTOMATING THE FIREFOX PASSWORD MANAGER
 
@@ -13626,6 +13738,8 @@ When using the L<go|/go> method to go directly to a URL containing a downloadabl
         warn "$path has been downloaded";
     }
     $firefox->quit();
+
+Also, check out the L<download|/download> method for an alternative.
 
 =head2 MISSING METHODS
 

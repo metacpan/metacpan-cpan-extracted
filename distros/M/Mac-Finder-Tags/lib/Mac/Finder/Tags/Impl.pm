@@ -3,7 +3,7 @@ use warnings;
 
 package Mac::Finder::Tags::Impl;
 # ABSTRACT: Role for providers of the get_tags operation
-$Mac::Finder::Tags::Impl::VERSION = '0.01';
+$Mac::Finder::Tags::Impl::VERSION = '0.02';
 
 use Object::Pad 0.44;
 

@@ -68,16 +68,6 @@ sub any {
   return $found ? true : false;
 }
 
-sub assertion {
-  my ($self) = @_;
-
-  my $assert = $self->SUPER::assertion;
-
-  $assert->clear->expression('hashref');
-
-  return $assert;
-}
-
 sub call {
   my ($self, $mapper, $method, @args) = @_;
 
@@ -476,7 +466,7 @@ This package provides the following methods:
 
 =head2 all
 
-  all(CodeRef $code) (Bool)
+  all(coderef $code) (boolean)
 
 The all method returns true if the callback returns true for all of the
 elements.
@@ -517,7 +507,7 @@ I<Since C<0.01>>
 
 =head2 any
 
-  any(CodeRef $code) (Bool)
+  any(coderef $code) (boolean)
 
 The any method returns true if the callback returns true for any of the
 elements.
@@ -558,7 +548,7 @@ I<Since C<0.01>>
 
 =head2 call
 
-  call(Str $iterable, Str $method) (Any)
+  call(string $iterable, string $method) (any)
 
 The call method executes the given method (named using the first argument)
 which performs an iteration (i.e. takes a callback) and calls the method (named
@@ -599,7 +589,7 @@ I<Since C<1.02>>
 
 =head2 cast
 
-  cast(Str $kind) (Object | Undef)
+  cast(string $kind) (object | undef)
 
 The cast method converts L<"value"|Venus::Kind::Value> objects between
 different I<"value"> object types, based on the name of the type provided. This
@@ -771,7 +761,7 @@ I<Since C<0.08>>
 
 =head2 count
 
-  count() (Int)
+  count() (number)
 
 The count method returns the total number of keys defined.
 
@@ -793,7 +783,7 @@ I<Since C<0.01>>
 
 =head2 default
 
-  default() (HashRef)
+  default() (hashref)
 
 The default method returns the default value, i.e. C<{}>.
 
@@ -815,7 +805,7 @@ I<Since C<0.01>>
 
 =head2 delete
 
-  delete(Str $key) (Any)
+  delete(string $key) (any)
 
 The delete method returns the value matching the key specified in the argument
 and returns the value.
@@ -838,7 +828,7 @@ I<Since C<0.01>>
 
 =head2 each
 
-  each(CodeRef $code) (ArrayRef)
+  each(coderef $code) (arrayref)
 
 The each method executes callback for each element in the hash passing the
 routine the key and value at the current position in the loop. This method can
@@ -880,7 +870,7 @@ I<Since C<0.01>>
 
 =head2 empty
 
-  empty() (HashRef)
+  empty() (hashref)
 
 The empty method drops all elements from the hash.
 
@@ -902,7 +892,7 @@ I<Since C<0.01>>
 
 =head2 eq
 
-  eq(Any $arg) (Bool)
+  eq(any $arg) (boolean)
 
 The eq method performs an I<"equals"> operation using the argument provided.
 
@@ -1073,7 +1063,7 @@ I<Since C<0.08>>
 
 =head2 exists
 
-  exists(Str $key) (Bool)
+  exists(string $key) (boolean)
 
 The exists method returns true if the value matching the key specified in the
 argument exists, otherwise returns false.
@@ -1108,7 +1098,7 @@ I<Since C<0.01>>
 
 =head2 find
 
-  find(Str @data) (Any)
+  find(string @data) (any)
 
 The find method traverses the data structure using the keys and indices
 provided, returning the value found or undef. In list-context, this method
@@ -1185,7 +1175,7 @@ I<Since C<0.01>>
 
 =head2 ge
 
-  ge(Any $arg) (Bool)
+  ge(any $arg) (boolean)
 
 The ge method performs a I<"greater-than-or-equal-to"> operation using the
 argument provided.
@@ -1357,7 +1347,7 @@ I<Since C<0.08>>
 
 =head2 gele
 
-  gele(Any $arg1, Any $arg2) (Bool)
+  gele(any $arg1, any $arg2) (boolean)
 
 The gele method performs a I<"greater-than-or-equal-to"> operation on the 1st
 argument, and I<"lesser-than-or-equal-to"> operation on the 2nd argument.
@@ -1529,7 +1519,7 @@ I<Since C<0.08>>
 
 =head2 grep
 
-  grep(CodeRef $code) (ArrayRef)
+  grep(coderef $code) (arrayref)
 
 The grep method executes callback for each key/value pair in the hash passing
 the routine the key and value at the current position in the loop and returning
@@ -1572,7 +1562,7 @@ I<Since C<0.01>>
 
 =head2 gt
 
-  gt(Any $arg) (Bool)
+  gt(any $arg) (boolean)
 
 The gt method performs a I<"greater-than"> operation using the argument provided.
 
@@ -1743,7 +1733,7 @@ I<Since C<0.08>>
 
 =head2 gtlt
 
-  gtlt(Any $arg1, Any $arg2) (Bool)
+  gtlt(any $arg1, any $arg2) (boolean)
 
 The gtlt method performs a I<"greater-than"> operation on the 1st argument, and
 I<"lesser-than"> operation on the 2nd argument.
@@ -1915,7 +1905,7 @@ I<Since C<0.08>>
 
 =head2 iterator
 
-  iterator() (CodeRef)
+  iterator() (coderef)
 
 The iterator method returns a code reference which can be used to iterate over
 the hash. Each time the iterator is executed it will return the values of the
@@ -1961,7 +1951,7 @@ I<Since C<0.01>>
 
 =head2 keys
 
-  keys() (ArrayRef)
+  keys() (arrayref)
 
 The keys method returns an array reference consisting of all the keys in the
 hash.
@@ -1984,7 +1974,7 @@ I<Since C<0.01>>
 
 =head2 le
 
-  le(Any $arg) (Bool)
+  le(any $arg) (boolean)
 
 The le method performs a I<"lesser-than-or-equal-to"> operation using the
 argument provided.
@@ -2156,7 +2146,7 @@ I<Since C<0.08>>
 
 =head2 length
 
-  length() (Int)
+  length() (number)
 
 The length method returns the total number of keys defined, and is an alias for
 the L</count> method.
@@ -2179,7 +2169,7 @@ I<Since C<0.08>>
 
 =head2 list
 
-  list() (Any)
+  list() (any)
 
 The list method returns a shallow copy of the underlying hash reference as an
 array reference.
@@ -2214,7 +2204,7 @@ I<Since C<0.01>>
 
 =head2 lt
 
-  lt(Any $arg) (Bool)
+  lt(any $arg) (boolean)
 
 The lt method performs a I<"lesser-than"> operation using the argument provided.
 
@@ -2385,7 +2375,7 @@ I<Since C<0.08>>
 
 =head2 map
 
-  map(CodeRef $code) (ArrayRef)
+  map(coderef $code) (arrayref)
 
 The map method executes callback for each key/value in the hash passing the
 routine the value at the current position in the loop and returning a new hash
@@ -2428,7 +2418,7 @@ I<Since C<0.01>>
 
 =head2 merge
 
-  merge(HashRef @data) (HashRef)
+  merge(hashref @data) (hashref)
 
 The merge method returns a hash reference where the elements in the hash and
 the elements in the argument(s) are merged. This operation performs a deep
@@ -2464,7 +2454,7 @@ I<Since C<0.01>>
 
 =head2 ne
 
-  ne(Any $arg) (Bool)
+  ne(any $arg) (boolean)
 
 The ne method performs a I<"not-equal-to"> operation using the argument provided.
 
@@ -2635,7 +2625,7 @@ I<Since C<0.08>>
 
 =head2 none
 
-  none(CodeRef $code) (Bool)
+  none(coderef $code) (boolean)
 
 The none method returns true if none of the elements in the array meet the
 criteria set by the operand and rvalue.
@@ -2676,7 +2666,7 @@ I<Since C<0.01>>
 
 =head2 one
 
-  one(CodeRef $code) (Bool)
+  one(coderef $code) (boolean)
 
 The one method returns true if only one of the elements in the array meet the
 criteria set by the operand and rvalue.
@@ -2717,7 +2707,7 @@ I<Since C<0.01>>
 
 =head2 pairs
 
-  pairs() (ArrayRef)
+  pairs() (arrayref)
 
 The pairs method is an alias to the pairs_array method. This method can return
 a list of values in list-context.
@@ -2740,7 +2730,7 @@ I<Since C<0.01>>
 
 =head2 path
 
-  path(Str $expr) (Any)
+  path(string $expr) (any)
 
 The path method traverses the data structure using the path expr provided,
 returning the value found or undef. In list-context, this method returns a
@@ -2817,7 +2807,7 @@ I<Since C<0.01>>
 
 =head2 puts
 
-  puts(Any @args) (ArrayRef)
+  puts(any @args) (arrayref)
 
 The puts method select values from within the underlying data structure using
 L<Venus::Hash/path>, optionally assigning the value to the preceeding scalar
@@ -2931,7 +2921,7 @@ I<Since C<3.20>>
 
 =head2 random
 
-  random() (Any)
+  random() (any)
 
 The random method returns a random element from the array.
 
@@ -2957,7 +2947,7 @@ I<Since C<0.01>>
 
 =head2 reset
 
-  reset() (ArrayRef)
+  reset() (arrayref)
 
 The reset method returns nullifies the value of each element in the hash.
 
@@ -2979,7 +2969,7 @@ I<Since C<0.01>>
 
 =head2 reverse
 
-  reverse() (HashRef)
+  reverse() (hashref)
 
 The reverse method returns a hash reference consisting of the hash's keys and
 values inverted. Note, keys with undefined values will be dropped.
@@ -3002,7 +2992,7 @@ I<Since C<0.01>>
 
 =head2 slice
 
-  slice(Str @keys) (ArrayRef)
+  slice(string @keys) (arrayref)
 
 The slice method returns an array reference of the values that correspond to
 the key(s) specified in the arguments.
@@ -3025,7 +3015,7 @@ I<Since C<0.01>>
 
 =head2 tv
 
-  tv(Any $arg) (Bool)
+  tv(any $arg) (boolean)
 
 The tv method performs a I<"type-and-value-equal-to"> operation using argument
 provided.
@@ -3203,7 +3193,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

@@ -17,8 +17,8 @@ no warnings "experimental::lexical_subs";
 
 package  Data::Dumper::Interp;
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '6.005'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-08-25'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '6.006'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-09-02'; # DATE from Dist::Zilla::Plugin::OurDate
 
 package
   # newline so Dist::Zilla::Plugin::PkgVersion won't add $VERSION
@@ -42,7 +42,7 @@ use Data::Dumper ();
 use Carp;
 use POSIX qw(INT_MAX);
 use Scalar::Util qw(blessed reftype refaddr looks_like_number weaken);
-use List::Util 1.33 qw(min max first none all any sum0 uniqstr);
+use List::Util 1.45 qw(min max first none all any sum0);
 use Data::Structure::Util qw/circular_off/;
 use Regexp::Common qw/RE_balanced/;
 use Term::ReadKey ();
@@ -355,7 +355,7 @@ sub addrvisl(_) {
 }
 sub addrvis_digits(;$) {
   return $addrvis_ndigits if ! defined $_[0];  # "get" request
-  if ($_[0] <= $addrvis_ndigits) { 
+  if ($_[0] <= $addrvis_ndigits) {
     return $addrvis_ndigits; # can not decrease
   }
   $addrvis_ndigits   = $_[0];
@@ -818,7 +818,7 @@ sub _prefix_refaddr($;$) {
   # However don't do this if $item already has an addrvis() substituted,
   # which happens if an object does not stringify or provide another overload
   # replacement -- see _object_subst().
-  return $item 
+  return $item
     unless $opt_refaddr && (!$listform || $my_visit_depth > 0);
   my $pfx = addrvis(refaddr($original//$item));
   my $ix = index($item,$pfx);
@@ -884,7 +884,7 @@ sub visit_ref {
 sub visit_hash_entries {
   my ($self, $hash) = @_;
   # Visit in sorted order
-  return map { $self->visit_hash_entry( $_, $hash->{$_}, $hash ) } 
+  return map { $self->visit_hash_entry( $_, $hash->{$_}, $hash ) }
              (ref($sortkeys) ? @{ $sortkeys->($hash) } : (sort keys %$hash));
 }
 
@@ -1159,7 +1159,7 @@ sub __unmagic_atom() {  # edits $_
 ##  s/(['"])([^'"]*?)
 ##    (?:\Q${\_MAGIC_NOQUOTES_PFX}\E)
 ##    (.*?)(\1)/$2$3/xgs;
-  
+
   s/(['"])
     (?:\Q${\_MAGIC_NOQUOTES_PFX}\E) (.*?)
     (\1)/do{ local $_ = $2;
@@ -1731,11 +1731,16 @@ sub _Interpolate {
     }
     if (!defined(pos) || pos() < length($_)) {
       my $leftover = substr($_,pos()//0);
+      my $e;
       # Try to recognize user syntax errors
-      croak "Invalid expression syntax starting at '$leftover' in $funcname arg"
-        if $leftover =~ /^[\$\@\%][\s\%\@]/;
-      # Otherwise we may have a parser bug
-      confess "Invalid expression (or ".__PACKAGE__." bug):\n«$leftover»";
+      if ($leftover =~ /^[\$\@\%][\s\%\@]/) {
+        $e = "Invalid expression syntax starting at '$leftover' in $funcname arg"
+      } else {
+        # Otherwise we may have a parser bug
+        $e = "Invalid expression (or ".__PACKAGE__." bug):\n«$leftover»";
+      }
+      carp "$e\n";
+      push @pieces, ['p',"<INVALID EXPRESSION>".$leftover];
     }
     foreach (@pieces) {
       my ($meth, $str) = @$_;
@@ -1822,8 +1827,14 @@ sub DB_Vis_Eval($$) {
     local @Data::Dumper::Interp::result;
     local $Data::Dumper::Interp::string_to_eval =
       "package $pkg; "
-     .' &Data::Dumper::Interp::_RestorePunct_NoPop;'      # saved in _Interpolate
-                  # N.B. eval first clears $@ but this restores $@ inside the eval
+       # N.B. eval first clears $@ so we must restore $@ inside the eval
+     .' &Data::Dumper::Interp::_RestorePunct_NoPop;'  # saved in _Interpolate
+       # In case something carps or croaks (e.g. because of ${\(somefunc())}
+       # or a tie handler), force a full backtrace so the user's call location
+       # is visible.  Unfortunately there is no way to make carp() show only
+       # the location of the user's call because we must force the eval'd
+       # string into in e.g. package main so user functions can be found.
+     .' local $Carp::Verbose = 1;'
      .' @Data::Dumper::Interp::result = '.$evalarg.';'
      .' $Data::Dumper::Interp::save_stack[-1]->[0] = $@;' # possibly changed by a tie handler
      ;
@@ -1834,7 +1845,8 @@ sub DB_Vis_Eval($$) {
 
   if ($errmsg) {
     $errmsg = Data::Dumper::Interp::__chop_loc($errmsg);
-    Carp::croak("${label_for_errmsg}: Error interpolating '$evalarg':\n$errmsg\n");
+    Carp::carp("${label_for_errmsg}: Error interpolating '$evalarg':\n$errmsg\n");
+    @result = ( (defined($result[0]) ? $result[0] : "")."<invalid/error>" );
   }
 
   wantarray ? @result : (do{die "bug" if @result>1}, $result[0])
@@ -2126,8 +2138,8 @@ prints messages as these events occur.
 This function returns a string showing an address in both decimal and
 hexadecimal, but abbreviated to only the last few digits.
 
-The number of digits starts at 3 and increases over time if necessary 
-to keep new results unambiguous. 
+The number of digits starts at 3 and increases over time if necessary
+to keep new results unambiguous.
 
 For REFs, the result is like I<< "HASHE<lt>457:1c9E<gt>" >>
 or, for blessed objects, I<< "Package::NameE<lt>457:1c9E<gt>" >>.
@@ -2135,10 +2147,10 @@ or, for blessed objects, I<< "Package::NameE<lt>457:1c9E<gt>" >>.
 If the argument is a plain number, just the abbreviated decimal:hex address
 is returned, e.g. I<< "E<lt>457:1c9E<gt>" >>.
 
-I<"undef"> is returned if the argument is undefined.  
+I<"undef"> is returned if the argument is undefined.
 Croaks if the argument is defined but not a ref.
 
-C<addrvis_digits(NUMBER)> forces a minimum width 
+C<addrvis_digits(NUMBER)> forces a minimum width
 and C<addrvis_forget()> discards past values and resets to 3 digits.
 
 =head2 addrvisl REF_or_NUMBER

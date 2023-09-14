@@ -1,33 +1,34 @@
 Revision history for JIP-DataPath
 
-0.043        2023-02-26
-        Added default_value method.
-        Added is_default_value method.
-        Added Perl 5.36 into ".travis.yml".
-        Small changes in distro.
+0.044    2023-09-02
+  - Small changes in distro.
 
-0.042        2020-06-08
-        Exporting without inheriting from Exporter.
-        More documentation.
-        Added Perl 5.30 into ".travis.yml".
-        Small changes in distro.
-        Small minor improvements.
+0.043    2023-02-26
+  - Added default_value method.
+  - Added is_default_value method.
+  - Added Perl 5.36 into ".travis.yml".
+  - Small changes in distro.
 
-0.041        2019-11-04
-        Removed dependency from JIP::ClassField.
+0.042    2020-06-08
+  - Exporting without inheriting from Exporter.
+  - More documentation.
+  - Added Perl 5.30 into ".travis.yml".
+  - Small changes in distro.
+  - Small minor improvements.
 
-0.04         2018-11-04
-        Added get_new method.
-        Added Perl 5.28 into ".travis.yml".
+0.041    2019-11-04
+  - Removed dependency from JIP::ClassField.
 
-0.03         2018-06-03
-        Added default_value parameter to JIP::DataPath::get.
+0.04    2018-11-04
+  - Added get_new method.
+  - Added Perl 5.28 into ".travis.yml".
 
+0.03    2018-06-03
+  - Added default_value parameter to JIP::DataPath::get.
 
-0.02         2018-05-01
-        Increased Perl version requirement to 5.10.1.
-        Improved documentation.
+0.02    2018-05-01
+  - Increased Perl version requirement to 5.10.1.
+  - Improved documentation.
 
-
-0.01         2018-04-29
-        First version, released on an unsuspecting world.
+0.01    2018-04-29
+  - First version, released on an unsuspecting world.

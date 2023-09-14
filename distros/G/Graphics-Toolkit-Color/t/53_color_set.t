@@ -24,20 +24,20 @@ is( $g[1]->name,                                     'gray20',  'grey20 is betwe
 is( $g[2]->name,                                     'gray40',  'grey40 is between black and white');
 @g = $black->gradient_to( $white, 3, 0 );
 is( int @g,                                                3,   'gradient has right length = 3');
-is( $g[1]->name,                                     'gray50',  'grey25 is between black and white in none linear gradient');
+is( $g[1]->name,                                     'gray',    'gray aka grey50  is between black and white in none linear gradient');
 @g = $black->gradient_to( $white, 3, -1.4 );
 is( $g[1]->name,                                     'gray75',  'grey75 is between black and white in none linear gradient');
 @g = $red->gradient( to=>'#0000FF', steps => 3, in => 'RGB' );
 is( $g[1]->name,                                    'purple',   'purple is between red and blue in RGB');
 
 
-@g = $black->complementary();
+@g = $black->complement();
 is( int @g,                                                 1,   "default is one complementary color");
 is( $black->complementary()->name,                    'black',   "black has no complementary color");
 is( $white->complementary()->name,                    'white',   "white has no complementary color");
 is( $red->complementary()->name,                       'aqua',   "aqua is complementary to red");
 
-@g = $red->complementary(3);
+@g = $red->complement(3);
 is( int @g,                                                 3,   "requested amount of complementary colors");
 is( $g[0]->saturation,                      $g[1]->saturation,   "saturation is equal on complementary circle");
 is( $g[1]->saturation,                      $g[2]->saturation,   "saturation is equal on complementary circle 2");
@@ -47,13 +47,13 @@ is( $g[0]->name,                                        'red',   "complementary 
 is( $g[1]->name,                                       'lime',   "complementary gos on to green");
 is( $g[2]->name,                                       'blue',   "complementary circle ends with blue");
 
-@g = Graphics::Toolkit::Color->new(15,12,13)->complementary(3);
-is( $g[0]->saturation,                       $g[1]->saturation-1,  "saturation is equal on complementary circle of random color");
+@g = Graphics::Toolkit::Color->new(15,12,13)->complement(3);
+is( $g[0]->saturation,                       $g[1]->saturation,  "saturation is equal on complementary circle of random color");
 is( $g[1]->saturation,                       $g[2]->saturation,  "saturation is equal on complementary circle 2");
 is( $g[0]->lightness,                        $g[1]->lightness,   "lightness is equal on complementary circle of random color");
 is( $g[1]->lightness,                        $g[2]->lightness,   "lightness is equal on complementary circle 2");
 
-@g = Graphics::Toolkit::Color->new(15,12,13)->complementary(4, 12, 20);
+@g = Graphics::Toolkit::Color->new(15,12,13)->complement(4, 12, 20);
 is( int @g,                                                 4,   "requested amount of complementary colors");
 is( $g[1]->saturation,                       $g[3]->saturation,  "saturation is equal on opposing sides of skewed circle");
 is( $g[1]->lightness,                        $g[3]->lightness,   "lightness is equal on opposing sides of skewed circle");
@@ -62,11 +62,11 @@ is( $g[1]->saturation+6,                     $g[2]->saturation,  "saturation mov
 is( $g[1]->lightness-10,                     $g[0]->lightness,   "lightness moves on skewed circle as predicted fore");
 is( $g[1]->lightness+10,                     $g[2]->lightness,   "lightness moves on skewed circle as predicted back");
 
-@g = Graphics::Toolkit::Color->new(15,12,13)->complementary(4, 512, 520);
+@g = Graphics::Toolkit::Color->new(15,12,13)->complement(4, 512, 520);
 is( abs($g[0]->saturation-$g[2]->saturation) < 100,         1,   "cut too large saturnation skews");
 is( abs($g[0]->lightness-$g[2]->lightness) < 100,           1,   "cut too large lightness skews");
 
-@g = Graphics::Toolkit::Color->new(15,12,13)->complementary(5, 10, 20);
+@g = Graphics::Toolkit::Color->new(15,12,13)->complement(5, 10, 20);
 is( $g[1]->saturation,                      $g[4]->saturation,   "saturation is equal on opposing sides of odd and skewed circle 1");
 is( $g[2]->saturation,                      $g[3]->saturation,   "saturation is equal on opposing sides of odd and skewed circle 2");
 is( $g[1]->lightness,                       $g[4]->lightness,    "lightness is equal on opposing sides of odd and skewed circle 1");

@@ -306,7 +306,7 @@ This package provides the following methods:
 
 =head2 default
 
-  default() (ArrayRef)
+  default() (arrayref)
 
 The default method returns the default value, i.e. C<[@ARGV]>.
 
@@ -328,7 +328,7 @@ I<Since C<0.01>>
 
 =head2 exists
 
-  exists(Str $key) (Bool)
+  exists(string $key) (boolean)
 
 The exists method takes a name or index and returns truthy if an associated
 value exists.
@@ -375,7 +375,7 @@ I<Since C<0.01>>
 
 =head2 get
 
-  get(Str $key) (Any)
+  get(string $key) (any)
 
 The get method takes a name or index and returns the associated value.
 
@@ -421,7 +421,7 @@ I<Since C<0.01>>
 
 =head2 name
 
-  name(Str $key) (Str | Undef)
+  name(string $key) (string | undef)
 
 The name method takes a name or index and returns index if the the associated
 value exists.
@@ -468,7 +468,7 @@ I<Since C<0.01>>
 
 =head2 parse
 
-  parse(ArrayRef $args) (Opts)
+  parse(arrayref $args) (Venus::Opts)
 
 The parse method optionally takes additional L<Getopt::Long> parser
 configuration options and retuns the options found based on the object C<args>
@@ -504,7 +504,7 @@ I<Since C<0.01>>
 
 =head2 reparse
 
-  reparse(ArrayRef $specs, ArrayRef $args) (Opts)
+  reparse(arrayref $specs, arrayref $args) (Venus::Opts)
 
 The reparse method resets the parser, calls the L</parse> method and returns
 the result.
@@ -539,7 +539,7 @@ I<Since C<2.55>>
 
 =head2 set
 
-  set(Str $key, Any $data) (Any)
+  set(string $key, any $data) (any)
 
 The set method takes a name or index and sets the value provided if the
 associated argument exists.
@@ -586,7 +586,7 @@ I<Since C<0.01>>
 
 =head2 unnamed
 
-  unnamed() (ArrayRef)
+  unnamed() (arrayref)
 
 The unnamed method returns an arrayref of values which have not been named
 using the C<named> attribute.
@@ -615,7 +615,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

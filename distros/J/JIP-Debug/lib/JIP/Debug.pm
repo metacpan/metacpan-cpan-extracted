@@ -12,7 +12,7 @@ use Data::Dumper qw(Dumper);
 use Fcntl qw(LOCK_EX LOCK_UN);
 use English qw(-no_match_vars);
 
-our $VERSION = '0.031';
+our $VERSION = '0.032';
 
 our @EXPORT_OK = qw(
     to_debug

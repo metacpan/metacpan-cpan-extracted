@@ -1,3 +1,11 @@
+0.018   2023-09-03  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] In --detail mode, show the 'status' field as the first column to
+          make it easier to see which categories are no longer active.
+
+        - [ux] Rename non-RBA scripts to *-lama or *-old.
+
+
 0.017   2023-02-13  Released-By: PERLANCAR; Urgency: medium
 
         - First release, split from App-BPOMUtils-Table because that

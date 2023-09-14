@@ -7,7 +7,7 @@ use Carp qw(croak);
 use Exporter qw(import);
 use English qw(-no_match_vars);
 
-our $VERSION = '0.043';
+our $VERSION = '0.044';
 
 our @EXPORT_OK = qw(path);
 

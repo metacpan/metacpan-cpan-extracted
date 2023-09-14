@@ -4,7 +4,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 # VERSION
 
-Version 1.43
+Version 1.44
 
 # SYNOPSIS
 
@@ -146,6 +146,8 @@ or a [Firefox::Marionette::Login](https://metacpan.org/pod/Firefox::Marionette::
 
     $firefox->add_login(host => 'https://github.com', user => 'me2@example.org', password => 'uiop[]', user_field => 'login', password_field => 'password');
 
+Note for HTTP Authentication, the [realm](https://datatracker.ietf.org/doc/html/rfc2617#section-2) must perfectly match the correct [realm](https://datatracker.ietf.org/doc/html/rfc2617#section-2) supplied by the server.
+
 This method returns [itself](https://metacpan.org/pod/Firefox::Marionette) to aid in chaining methods.
 
 ## add\_site\_header
@@ -227,6 +229,21 @@ accept a boolean and return the current value of the debug setting.  This allows
 ## default\_binary\_name
 
 just returns the string 'firefox'.  Only of interest when sub-classing.
+
+## download
+
+accepts a [URI](https://metacpan.org/pod/URI) and an optional timeout in seconds (the default is 5 minutes) as parameters and downloads the [URI](https://metacpan.org/pod/URI) in the background and returns a handle to the downloaded file.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new();
+
+    my $handle = $firefox->download('https://raw.githubusercontent.com/david-dick/firefox-marionette/master/t/data/keepassxs.csv');
+
+    foreach my $line (<$handle>) {
+      print $line;
+    }
 
 ## bookmarks
 
@@ -900,7 +917,7 @@ To make the [go](#go) method return quicker, you need to set the [page load stra
     my $firefox = Firefox::Marionette->new( capabilities => Firefox::Marionette::Capabilities->new( page_load_strategy => 'eager' ));
     $firefox->go('https://metacpan.org/'); # will return once the main document has been loaded and parsed, but BEFORE sub-resources (images/stylesheets/frames) have been loaded.
 
-When going directly to a URL that needs to be downloaded, please see [BUGS AND LIMITATIONS](#downloading-using-go-method) for a necessary workaround.
+When going directly to a URL that needs to be downloaded, please see [BUGS AND LIMITATIONS](#downloading-using-go-method) for a necessary workaround and the [download](#download) method for an alternative.
 
 This method returns [itself](https://metacpan.org/pod/Firefox::Marionette) to aid in chaining methods.
 
@@ -1379,7 +1396,7 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 - page\_load - a shortcut to allow directly providing the [page\_load](https://metacpan.org/pod/Firefox::Marionette::Timeouts#page_load) timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
 - profile - create a new profile based on the supplied [profile](https://metacpan.org/pod/Firefox::Marionette::Profile).  NOTE: firefox ignores any changes made to the profile on the disk while it is running, instead, use the [set\_pref](#set_pref) and [clear\_pref](#clear_pref) methods to make changes while firefox is running.
 - profile\_name - pick a specific existing profile to automate, rather than creating a new profile.  [Firefox](https://firefox.com) refuses to allow more than one instance of a profile to run at the same time.  Profile names can be obtained by using the [Firefox::Marionette::Profile::names()](https://metacpan.org/pod/Firefox::Marionette::Profile#names) method.  NOTE: firefox ignores any changes made to the profile on the disk while it is running, instead, use the [set\_pref](#set_pref) and [clear\_pref](#clear_pref) methods to make changes while firefox is running.
-- proxy - this is a shortcut method for setting a [proxy](https://metacpan.org/pod/Firefox::Marionette::Proxy) using the [capabilities](https://metacpan.org/pod/Firefox::Marionette::Capabilities) parameter above.  It accepts a proxy URL.
+- proxy - this is a shortcut method for setting a [proxy](https://metacpan.org/pod/Firefox::Marionette::Proxy) using the [capabilities](https://metacpan.org/pod/Firefox::Marionette::Capabilities) parameter above.  It accepts a proxy URL, with the following allowable schemes, 'http' and 'https'.  It also allows a reference to a list of proxy URLs which will function as list of proxies that Firefox will try in [left to right order](https://developer.mozilla.org/en-US/docs/Web/HTTP/Proxy_servers_and_tunneling/Proxy_Auto-Configuration_PAC_file#description) until a working proxy is found.  See [REMOTE AUTOMATION OF FIREFOX VIA SSH](#remote-automation-of-firefox-via-ssh), [NETWORK ARCHITECTURE](#network-architecture) and [SETTING UP SOCKS SERVERS USING SSH](https://metacpan.org/pod/Firefox::Marionette::Proxy#SETTING-UP-SOCKS-SERVERS-USING-SSH).
 - reconnect - an experimental parameter to allow a reconnection to firefox that a connection has been discontinued.  See the survive parameter.
 - scp - force the scp protocol when transferring files to remote hosts via ssh. See [REMOTE AUTOMATION OF FIREFOX VIA SSH](#remote-automation-of-firefox-via-ssh) and the --scp-only option in the [ssh-auth-cmd-marionette](https://metacpan.org/pod/ssh-auth-cmd-marionette) script in this distribution.
 - script - a shortcut to allow directly providing the [script](https://metacpan.org/pod/Firefox::Marionette::Timeout#script) timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
@@ -1992,7 +2009,34 @@ produces the following effect, with an ascii box representing a separate network
      | Site   |          | Server |
      ----------          ----------
 
+In addition, the proxy parameter can be used to specify multiple proxies using a reference
+to a list.
+
+    my $firefox = Firefox::Marionette->new(
+                    host  => 'Firefox.runs.here'
+                    trust => '/path/to/ca-for-squid-proxy-server.crt',
+                    proxy => [ 'https://Squid1.Proxy.Server:3128', 'https://Squid2.Proxy.Server:3128' ]
+                       )->go('https://Target.Web.Site');
+
+When firefox gets a list of proxies, it will use the first one that works.  In addition, it will perform a basic form of proxy failover, which may involve a failed network request before it fails over to the next proxy.  In the diagram below, Squid1.Proxy.Server is the first proxy in the list and will be used exclusively, unless it is unavailable, in which case Squid2.Proxy.Server will be used.
+
+                                          ----------
+                                     TLS  | Squid1 |
+                                   ------>| Proxy  |-----
+                                   |      | Server |    |
+     ---------      -----------    |      ----------    |       -----------
+     | Perl  | SSH  | Firefox |    |                    | HTTPS | Target  |
+     | runs  |----->| runs    |----|                    ------->| Web     |
+     | here  |      | here    |    |                    |       | Site    |
+     ---------      -----------    |      ----------    |       -----------
+                                   | TLS  | Squid2 |    |
+                                   ------>| Proxy  |-----
+                                          | Server |
+                                          ----------
+
 See the [REMOTE AUTOMATION OF FIREFOX VIA SSH](#remote-automation-of-firefox-via-ssh) section for more options.
+
+See [SETTING UP SOCKS SERVERS USING SSH](https://metacpan.org/pod/Firefox::Marionette::Proxy#SETTING-UP-SOCKS-SERVERS-USING-SSH) for easy proxying via [ssh](https://man.openbsd.org/ssh)
 
 # AUTOMATING THE FIREFOX PASSWORD MANAGER
 
@@ -2328,6 +2372,8 @@ When using the [go](#go) method to go directly to a URL containing a downloadabl
         warn "$path has been downloaded";
     }
     $firefox->quit();
+
+Also, check out the [download](#download) method for an alternative.
 
 ## MISSING METHODS
 

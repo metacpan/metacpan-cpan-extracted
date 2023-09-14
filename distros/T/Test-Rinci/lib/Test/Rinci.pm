@@ -2,20 +2,19 @@
 
 package Test::Rinci;
 
-our $DATE = '2020-09-23'; # DATE
-our $VERSION = '0.155'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
-use experimental 'smartmatch';
-#use Log::Any '$log';
-
-use File::Spec;
-use Perinci::Access::Perl 0.87;
-#use SHARYANTO::Array::Util qw(match_array_or_regex); # we'll just use ~~
 use Test::Builder;
 use Test::More ();
+
+use File::Spec;
+use Perinci::Access::Perl 0.895;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-07-09'; # DATE
+our $DIST = 'Test-Rinci'; # DIST
+our $VERSION = '0.156'; # VERSION
 
 my $Test = Test::Builder->new;
 # XXX is cache_size=0 really necessary?
@@ -192,7 +191,7 @@ sub metadata_in_module_ok {
             my $uri = "pl:/$module/"; $uri =~ s!::!/!g;
 
             if ($opts{test_package_metadata} &&
-                    !($module ~~ $opts{exclude_packages})) {
+                    !(grep { $_ eq $module } @{ $opts{exclude_packages} })) {
                 $res = $Pa->request(meta => $uri);
                 if ($res->[0] != 200) {
                     $Test->ok(0, "load package metadata") or $ok = 0;
@@ -222,7 +221,7 @@ sub metadata_in_module_ok {
                 my $fen = "$en (in package $module)";
                 if ($e->{type} eq 'function') {
                     if ($opts{test_function_metadata} &&
-                            !($en ~~ $opts{exclude_functions})) {
+                            !(grep { $_ eq $en } @{ $opts{exclude_functions} })) {
                         $has_tests++;
                         $Test->subtest(
                             "function metadata $fen", sub {
@@ -234,7 +233,7 @@ sub metadata_in_module_ok {
                     }
                 } elsif ($e->{type} eq 'variable') {
                     if ($opts{test_variable_metadata} &&
-                            !($en ~~ $opts{exclude_variables})) {
+                            !(grep { $_ eq $en } @{ $opts{exclude_variables} })) {
                         $has_tests++;
                         $Test->subtest(
                             "variable metadata $fen", sub {
@@ -386,7 +385,7 @@ Test::Rinci - Test Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.155 of Test::Rinci (from Perl distribution Test-Rinci), released on 2020-09-23.
+This document describes version 0.156 of Test::Rinci (from Perl distribution Test-Rinci), released on 2023-07-09.
 
 =head1 SYNOPSIS
 
@@ -491,14 +490,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Test-Rinci
 
 Source repository is at L<https://github.com/perlancar/perl-Test-Rinci>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Rinci>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<test-rinci>, a command-line interface for C<metadata_in_all_modules_ok()>.
@@ -516,11 +507,43 @@ L<Dist::Zilla::Plugin::Test::Rinci>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2020, 2019, 2018, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Rinci>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

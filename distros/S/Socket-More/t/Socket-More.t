@@ -10,7 +10,7 @@ use feature "say";
 
 
 BEGIN { use_ok('Socket::More') };
-use Socket::More ":all";
+  use Socket::More;
 
 {
 	#Test socket wrapper

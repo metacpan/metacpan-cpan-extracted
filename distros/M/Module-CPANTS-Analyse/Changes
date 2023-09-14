@@ -1,5 +1,17 @@
 Revision history for Module-CPANTS-Analyse
 
+1.02 2023-09-10
+  - Treat use v5.36 as use_warnings
+  - Skip some of the manifest test if symlink is not available
+  - Improve prereq sorting
+  - Improve pod detection
+  - Improve script detection
+  - Use Parse::Distname to get a little more information from a distribution name
+  - Dedupe possible licences
+  - Add Object::Pad as use strict equivalent (Wesley Schwengle)
+  - Fix has_license_in_source_file for distributions that contain only a
+    script under bin or scripts (Sven Kirmess)
+
 1.01 2019-08-08
   - Fixed not to set an error message when extracted nicely
     (spotted by Martin Becker++)

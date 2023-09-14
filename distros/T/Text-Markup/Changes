@@ -1,5 +1,38 @@
 Revision history for Perl extension Text-Markup.
 
+0.31  2023-09-10T23:24:43Z
+    - Fixed the passing of parameters to `parse()`.
+    - Documented the parameters passable to `parse()` for each parser.
+
+0.30  2023-09-10T16:42:18Z
+    - Removed very old custom paths to `docutils` (reST) and `asciidoc`
+      binaries on Windows. Users must ensure that the proper commands are
+      in the PATH, instead.
+    - Added Text::Markdown::Asciidoctor, which uses the `asciidoctor` command,
+      as a updated alternative to Text::Markdown::Asciidoc, which uses the
+      legacy `asciidoc` command. Text::Markdown will not use this formatter by
+      default, but when explicitly loaded will be used instead of
+      Text::Markup::Asciidoc.
+    - Added Text::Markdown::CommonMark, which uses the cmark library, via the
+      CommonMark module. Text::Markdown will not use this formatter by
+      default, but when explicitly loaded will be used instead of
+      Text::Markup::Markdown.
+    - De-duped the utilities for managing external commands from the Rest and
+      Asciidoc modules into Text::Markdown::Cmd.
+
+0.25  2023-09-04T22:20:13Z
+    - Fixed the importation of Pod::Simple::XHTML, Text::Trac, Text::Textile,
+      and Text::MediawikiFormat to use the correct syntax for requiring a
+      minimum version. Thanks to Graham Knop for the PR (#27)!
+    - Fixed a reStructuredText test failure on newer versions of `docutils`.
+    - Moved development test dependencies from recommended prereqs to
+      development prereqs.
+    - Increased the minimum required Module::Build version to 0.4209.
+    - Added GitHub Workflows for testing and releasing and removed Travis
+      testing. Test on Perl 5.8 - 5.38 on Linux, macOS, an Windows.
+    - Fixed bugs executing Rest and Asciidoc on Windows.
+    - Updated Asciidoc ot find `asciidoc.bat` and `asciidoc.exe` on Windows.
+
 0.24  2019-12-12T00:53:25Z
      - Added missing `<head>` tag to all output. Thanks to Axel Beckert for
        the pull request (#16, #18)!
@@ -8,16 +41,16 @@ Revision history for Perl extension Text-Markup.
      - Added `use warnings;` to all modules, thanks to a patch from John SJ
        Anderson (#22).
      - Added support for a `--raw` option to the markup modules for which it
-       makes sense. This option allows markup to be output without wrapping it
-       in a minimal HTML skeleton. Thanks to John SJ Anderson for the patch
-       (#2, #24)!
+       makes sense. This option allows markup to be output without wrapping
+       it in a minimal HTML skeleton. Thanks to John SJ Anderson for the
+       patch (#2, #24)!
      - Ported reST to Python 3. Thanks to gregor herrmann for the PR (#26).
 
 0.23  2015-05-21T06:23:35Z
      - Added BBcode and Creole to the module description.
      - Fixed a failing test for the Mediawiki format due to a change in CGI
-       v4.14. This reverses the workaround required by CGI 4.11, introduced in
-       v0.20. Not that you care. It's just a test change.
+       v4.14. This reverses the workaround required by CGI 4.11, introduced
+       in v0.20. Not that you care. It's just a test change.
      - Updated the Pod parser to determine the indentation of verbatim blocks
        by the line with the shortest leading whitespace, rather than the
        whitespace of just the first line. Inspired by an equivalent approach
@@ -53,8 +86,8 @@ Revision history for Perl extension Text-Markup.
 0.16  2012-02-13T17:23:00Z
      - Rest support now uses its own implementation of `rst2html` so that it
        can render specialized reST documents, such as Sphinx files, in a more
-       forgiving way: it preserves the content of unknown directives while not
-       emulating specialized rendering. Written by Daniele Varrazzo.
+       forgiving way: it preserves the content of unknown directives while
+        not emulating specialized rendering. Written by Daniele Varrazzo.
      - Improved handling of Sphinx directives in Rest output. Most directives
        are stripped out, although `function` directives now turn out much
        nicer. Props to Daniele Varrazzo for the work on the Rest parser.
@@ -77,8 +110,8 @@ Revision history for Perl extension Text-Markup.
 0.12  2011-04-04T23:16:12
       - Documented that the `file` parameter to `parse()` is required.
       - Added MultiMarkdown support.
-      - Fixed test failure in `t/formats.t` when no supported markup parser is
-        installed.
+      - Fixed test failure in `t/formats.t` when no supported markup parser
+        is installed.
 
 0.11  2011-02-22T22:41:15
       - Added list of supported markups to the README.

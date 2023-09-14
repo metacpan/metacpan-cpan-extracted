@@ -7,9 +7,9 @@ use warnings;
 use Role::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-14'; # DATE
+our $DATE = '2023-08-31'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 with 'TableDataRole::Spec::Basic';
 
@@ -112,7 +112,7 @@ TableDataRole::Source::AOH - Get table data from an array of hashes
 
 =head1 VERSION
 
-This document describes version 0.016 of TableDataRole::Source::AOH (from Perl distribution TableDataRoles-Standard), released on 2023-06-14.
+This document describes version 0.017 of TableDataRole::Source::AOH (from Perl distribution TableDataRoles-Standard), released on 2023-08-31.
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Tickit::Test;
 
@@ -212,9 +212,9 @@ is_termlog( [ GOTO(7,17), ],
 
    $subwin->focus( 0, 0 );
 
-   is_deeply( \@events,
-              [ [ win => "in", $subwin ], [ sub => "in" ] ],
-              'Parent and child window both informed of focus in with focus_child_notify' );
+   is( \@events,
+       [ [ win => "in", $subwin ], [ sub => "in" ] ],
+       'Parent and child window both informed of focus in with focus_child_notify' );
 
    my $otherwin = $rootwin->make_sub( 0, 0, 1, 1 );
    flush_tickit;
@@ -223,9 +223,9 @@ is_termlog( [ GOTO(7,17), ],
 
    $otherwin->focus( 0, 0 );
 
-   is_deeply( \@events,
-              [ [ sub => "out" ], [ win => "out", $subwin ] ],
-              'Child and parent window both informed of focus out with focus_child_notify' );
+   is( \@events,
+       [ [ sub => "out" ], [ win => "out", $subwin ] ],
+       'Child and parent window both informed of focus out with focus_child_notify' );
 
    $subwin->close;
    $otherwin->close;

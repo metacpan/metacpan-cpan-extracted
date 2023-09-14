@@ -8,3 +8,5 @@ typemap
 t/Crypt-OpenSSL-AES.t
 lib/Crypt/OpenSSL/AES.pm
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

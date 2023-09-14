@@ -1,0 +1,48 @@
+---
+abstract: 'framework for easy creation of Enterprise Application Integration tasks'
+author:
+  - 'Roland Kapl'
+build_requires:
+  Archive::Zip: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::File: '0'
+  Test::More: '0'
+  Test::Timer: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: EAI-Wrap
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Text::CSV_XS: '0'
+  Win32::Console::ANSI: '0'
+requires:
+  Archive::Extract: '0'
+  DBD::ODBC: '0'
+  DBI: '0'
+  Data::XLSX::Parser: '0'
+  Excel::Writer::XLSX: '0'
+  HTML::HTML5::Entities: '0'
+  Log::Dispatch::Email::MIMELite: '0'
+  Log::Log4perl: '0'
+  MIME::Lite: '0'
+  Module::Refresh: '0'
+  Net::FTP: '0'
+  Net::SFTP::Foreign: '0'
+  Spreadsheet::ParseExcel: '0'
+  Spreadsheet::WriteExcel: '0'
+  Text::CSV: '0'
+  XML::LibXML: '0'
+  XML::LibXML::Debugging: '0'
+resources:
+  repository: https://github.com/rkapl123/EAI-Wrap.git
+version: '0.3'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,21 @@
+1.001 - 13 Sep 2023
+=====
+
+ - re-work std::string handling to use the typemap
+
+ - fix "decoder" -> "decode" in the SYNOPSIS
+
+ - support all Imager image layouts
+
+ - require a recent enough ExtUtils::CppGuess and set the required C++
+   standard
+
+ - allow the zxing-cpp package name for pkg-config, which seems to be what
+   packagers used before upstream decided on "zxing.pc".
+   https://github.com/tonycoz/imager-zxing/issues/1
+
+
+1.000 - 28 Aug 2023
+=====
+
+Initial release

@@ -16,6 +16,8 @@ my %WriteMakefileArgs = (
   "EXE_FILES" => [
     "bin/configuration",
     "bin/lsjobs",
+    "bin/make_image_from_bioconda",
+    "bin/make_package",
     "bin/runjob",
     "bin/session",
     "bin/shelf",
@@ -35,7 +37,7 @@ my %WriteMakefileArgs = (
     "Storable" => 0,
     "Text::ASCIITable" => "0.22"
   },
-  "VERSION" => "0.5.0",
+  "VERSION" => "0.6.1",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -1,11 +1,11 @@
-0.002     2023-03-03 07:47:47+00:00 UTC
-
-0.003     2023-03-03 12:28:18+00:00 UTC
-  this release make is mandatory to send jsonrpc version as 2.0 as required by latest geth upgrade
-
+0.003     2023-09-12 17:08:09+00:00 UTC
+    [Improvements]
+    - RPC call "getbalances" added as get_balances for Bitcoin
+    - RPC call "omni_getwalletbalances" added as get_omni_wallet_balances for Omnicore
+    [Breaking changes]
+    - Omni get_transaction is now get_omni_transaction
+    - Omni get_transaction now returns same as Bitcoin "gettransaction" RPC call
 0.002     2023-03-03 12:28:18+00:00 UTC
- test release
- 
+    this release make is mandatory to send `jsonrpc` version as `2.0` as required by latest geth upgrade
 0.001     2022-11-24 12:28:18+00:00 UTC
-  Initial release
-
+    Initial release

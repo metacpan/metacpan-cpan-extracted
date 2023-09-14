@@ -11,6 +11,11 @@
 
 #include "object_pad.h"
 
+#define HAVE_PERL_VERSION(R, V, S) \
+    (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
+
+#include "optree-additions.c.inc"
+
 struct Data {
   SV *fieldname;
   SV *checkname;
@@ -31,7 +36,8 @@ static int magic_set(pTHX_ SV *sv, MAGIC *mg)
 
     EXTEND(SP, 2);
     PUSHMARK(SP);
-    PUSHs(sv_mortalcopy(data->checkobj));
+    if(data->checkobj)
+      PUSHs(sv_mortalcopy(data->checkobj));
     PUSHs(sv); /* Yes we're pushing the SV itself */
     PUTBACK;
 
@@ -58,6 +64,52 @@ static const MGVTBL vtbl = {
   .svt_set = &magic_set,
 };
 
+#ifdef G_USEHINTS
+#  define compilerun_sv_with_hints(sv, flags)  eval_sv(sv, flags|G_USEHINTS|G_RETHROW)
+#else
+#  define compilerun_sv_with_hints(sv, flags)  S_compilerun_sv_with_hints(aTHX_ sv, flags)
+static void S_compilerun_sv_with_hints(pTHX_ SV *sv, U32 flags)
+{
+  /* We can't call eval_sv() because it doesn't preserve the caller's hints
+   * or features. We'll have to emulate it and do different things
+   *   https://github.com/Perl/perl5/issues/21415
+   */
+  OP *o = newUNOP(OP_ENTEREVAL, G_SCALAR,
+    newSVOP(OP_CONST, 0, SvREFCNT_inc(sv)));
+  OP *start = LINKLIST(o);
+  o->op_next = NULL;
+#ifdef OPpEVAL_EVALSV
+  o->op_private |= OPpEVAL_EVALSV;
+#endif
+
+  SAVEFREEOP(o);
+
+  // Now just execute the ops in the list until the end
+  SAVEVPTR(PL_op);
+  PL_op = start;
+
+#ifndef OPpEVAL_EVALSV
+  /* Without OPpEVAL_EVALSV we can only detect compiler errors by
+   * pp_entereval() returning NULL. We'll have to manually run the optree
+   * until we see that to know
+   */
+  while(PL_op && PL_op->op_type != OP_ENTEREVAL)
+    PL_op = (*PL_op->op_ppaddr)(aTHX);
+  if(PL_op)
+    PL_op = (*PL_op->op_ppaddr)(aTHX); // run the OP_ENTEREVAL
+  if(!PL_op)
+    croak_sv(ERRSV);
+#endif
+  CALLRUNOPS(aTHX);
+
+#ifdef OPpEVAL_EVALSV
+  dSP;
+  if(!TOPs)
+    croak_sv(ERRSV);
+#endif
+}
+#endif
+
 static bool checked_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_ptr, void *_funcdata)
 {
   SV *checker;
@@ -71,11 +123,13 @@ static bool checked_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_p
     ENTER;
     SAVETMPS;
 
-    /* We can't call eval_sv() because it doesn't preserve the caller's hints
-     * or features. We'll have to emulate it and do different things
-     *   https://github.com/Perl/perl5/issues/21415
-     *
-     * Additionally, it also forgets what package we're actually running in
+    /* We'll turn off strict 'subs' during this code for now, to
+     * support bareword package names as checker expressions
+     */
+    SAVEI32(PL_hints);
+    PL_hints &= ~HINT_STRICT_SUBS;
+
+    /* eval_sv() et.al. will forgets what package we're actually running in
      * because during compiletime, CopSTASH(PL_curcop == &PL_compiling) isn't
      * accurate. We need to help it along
      */
@@ -83,46 +137,9 @@ static bool checked_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_p
     SAVECOPSTASH_FREE(PL_curcop);
     CopSTASH_set(PL_curcop, PL_curstash);
 
-    /* We'll turn off strict 'subs' during this code for now, to
-     * support bareword package names as checker expressions
-     */
-    SAVEI32(PL_hints);
-    PL_hints &= ~HINT_STRICT_SUBS;
-
-    OP *o = newUNOP(OP_ENTEREVAL, G_SCALAR,
-      newSVOP(OP_CONST, 0, SvREFCNT_inc(value)));
-    OP *start = LINKLIST(o);
-    o->op_next = NULL;
-#ifdef OPpEVAL_EVALSV
-    o->op_private |= OPpEVAL_EVALSV;
-#endif
-
-    SAVEFREEOP(o);
-
-    // Now just execute the ops in the list until the end
-    SAVEVPTR(PL_op);
-    PL_op = start;
-
-#ifndef OPpEVAL_EVALSV
-    /* Without OPpEVAL_EVALSV we can only detect compiler errors by
-     * pp_entereval() returning NULL. We'll have to manually run the optree
-     * until we see that to know
-     */
-    while(PL_op && PL_op->op_type != OP_ENTEREVAL)
-      PL_op = (*PL_op->op_ppaddr)(aTHX);
-    if(PL_op)
-      PL_op = (*PL_op->op_ppaddr)(aTHX); // run the OP_ENTEREVAL
-    if(!PL_op)
-      croak_sv(ERRSV);
-#endif
-    CALLRUNOPS(aTHX);
+    compilerun_sv_with_hints(value, G_SCALAR);
 
     SPAGAIN;
-
-#ifdef OPpEVAL_EVALSV
-    if(!TOPs)
-      croak_sv(ERRSV);
-#endif
 
     checker = SvREFCNT_inc(POPs);
 
@@ -130,20 +147,30 @@ static bool checked_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_p
     LEAVE;
   }
 
-  HV *stash;
+  HV *stash = NULL;
+  CV *checkcv = NULL;
+
   if(SvROK(checker) && SvOBJECT(SvRV(checker)))
     stash = SvSTASH(SvRV(checker));
   else if(SvPOK(checker) && (stash = gv_stashsv(checker, GV_NOADD_NOINIT)))
     ; /* checker is package name */
+  else if(SvROK(checker) && !SvOBJECT(SvRV(checker)) && SvTYPE(SvRV(checker)) == SVt_PVCV) {
+    checkcv = (CV *)SvREFCNT_inc(SvRV(checker));
+    SvREFCNT_dec(checker);
+    checker = NULL;
+  }
   else
-    croak("Expected the checker expression to yield an object reference or package name; got %" SVf " instead",
+    croak("Expected the checker expression to yield an object or code reference or package name; got %" SVf " instead",
       SVfARG(checker));
 
-  GV *methgv;
-  if(!(methgv = gv_fetchmeth_pv(stash, "check", -1, 0)))
-    croak("Expected that the checker expression can ->check");
-  if(!GvCV(methgv))
-    croak("Expected that methgv has a GvCV");
+  if(!checkcv) {
+    GV *methgv;
+    if(!(methgv = gv_fetchmeth_pv(stash, "check", -1, 0)))
+      croak("Expected that the checker expression can ->check");
+    if(!GvCV(methgv))
+      croak("Expected that methgv has a GvCV");
+    checkcv = (CV *)SvREFCNT_inc(GvCV(methgv));
+  }
 
   struct Data *data;
   Newx(data, 1, struct Data);
@@ -151,36 +178,37 @@ static bool checked_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_p
   data->fieldname = SvREFCNT_inc(mop_field_get_name(fieldmeta));
   data->checkname = SvREFCNT_inc(value);
   data->checkobj  = checker;
-  data->checkcv   = (CV *)SvREFCNT_inc((SV *)GvCV(methgv));
+  data->checkcv   = checkcv;
 
   *attrdata_ptr = (SV *)data;
 
   return TRUE;
 }
 
-#define newSLUGOP(idx)  S_newSLUGOP(aTHX_ idx)
-static OP *S_newSLUGOP(pTHX_ int idx)
+#define make_assertop(fieldmeta, data, argop)  S_make_assertop(aTHX_ fieldmeta, data, argop)
+static OP *S_make_assertop(pTHX_ FieldMeta *fieldmeta, struct Data *data, OP *argop)
 {
-  OP *op = newGVOP(OP_AELEMFAST, 0, PL_defgv);
-  op->op_private = idx;
-  return op;
-}
+  OP *checkop = data->checkobj
+    ? /* checkcv($checker, ARGOP) ... */
+      newLISTOPn(OP_ENTERSUB, OPf_WANT_SCALAR|OPf_STACKED,
+        newSVOP(OP_CONST, 0, SvREFCNT_inc(data->checkobj)),
+        argop,
+        newSVOP(OP_CONST, 0, SvREFCNT_inc(data->checkcv)),
+        NULL)
+    : /* checkcv(ARGOP) ... */
+      newLISTOPn(OP_ENTERSUB, OPf_WANT_SCALAR|OPf_STACKED,
+        argop,
+        newSVOP(OP_CONST, 0, SvREFCNT_inc(data->checkcv)),
+        NULL);
 
-#define newLISTOPn(type, flags, ...)  S_newLISTOPn(aTHX_ type, flags, __VA_ARGS__, NULL)
-static OP *S_newLISTOPn(pTHX_ OPCODE type, U32 flags, ...)
-{
-  va_list args;
-  va_start(args, flags);
-
-  OP *o = newLISTOP(OP_LIST, 0, NULL, NULL);
-
-  OP *kid;
-  while((kid = va_arg(args, OP *)))
-    o = op_append_elem(OP_LIST, o, kid);
-
-  va_end(args);
-
-  return op_convert_list(type, flags, o);
+  return newLOGOP(OP_OR, 0,
+    checkop,
+    /* ... or die MESSAGE */
+    newLISTOPn(OP_DIE, 0,
+      newSVOP(OP_CONST, 0,
+        newSVpvf("Field %" SVf " requires a value satisfying :Checked(%" SVf ")",
+          SVfARG(mop_field_get_name(fieldmeta)), SVfARG(data->checkname))),
+      NULL));
 }
 
 static void checked_gen_accessor_ops(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata,
@@ -193,29 +221,22 @@ static void checked_gen_accessor_ops(pTHX_ FieldMeta *fieldmeta, SV *attrdata, v
       return;
 
     case ACCESSOR_WRITER:
-    {
-      OP *checkop = newLOGOP(OP_OR, 0,
-        /* checkgv($checker, $_[0]) ... */
-        newLISTOPn(OP_ENTERSUB, OPf_WANT_SCALAR|OPf_STACKED,
-          newSVOP(OP_CONST, 0, SvREFCNT_inc(data->checkobj)),
-          newSLUGOP(0),
-          newSVOP(OP_CONST, 0, SvREFCNT_inc(data->checkcv))),
-        /* ... or die MESSAGE */
-        newLISTOPn(OP_DIE, 0,
-          newSVOP(OP_CONST, 0,
-            newSVpvf("Field %" SVf " requires a value satisfying :Checked(%" SVf ")",
-              SVfARG(mop_field_get_name(fieldmeta)), SVfARG(data->checkname))))
-      );
-
-      ctx->bodyop = op_append_elem(OP_LINESEQ, checkop, ctx->bodyop);
+      ctx->bodyop = op_append_elem(OP_LINESEQ,
+        make_assertop(fieldmeta, data, newSLUGOP(0)),
+        ctx->bodyop);
       return;
-    }
 
     case ACCESSOR_LVALUE_MUTATOR:
       croak("Cannot currently combine :mutator and :Checked");
 
     case ACCESSOR_COMBINED:
-      croak("Cannot currently combine :accessor and :Checked");
+      ctx->bodyop = op_append_elem(OP_LINESEQ,
+        newLOGOP(OP_AND, 0,
+          /* scalar @_ */
+          op_contextualize(newUNOP(OP_RV2AV, 0, newGVOP(OP_GV, 0, PL_defgv)), G_SCALAR),
+          make_assertop(fieldmeta, data, newSLUGOP(0))),
+        ctx->bodyop);
+      return;
 
     default:
       croak("TODO: Unsure what to do with accessor type %d and :Checked", type);

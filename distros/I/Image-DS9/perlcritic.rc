@@ -1,0 +1,48 @@
+severity = brutal
+verbose = 9
+
+exclude = Freenode
+
+[-BuiltinFunctions::RequireBlockGrep]
+[-BuiltinFunctions::RequireBlockMap]
+[-BuiltinFunctions::ProhibitUselessTopic]
+[-CodeLayout::ProhibitParensWithBuiltins]
+[-ControlStructures::ProhibitPostfixControls]
+[-ControlStructures::ProhibitUnlessBlocks]
+[-Documentation::PodSpelling]
+[-Documentation::RequirePodAtEnd]
+[-Documentation::RequirePodSections]
+[-ErrorHandling::RequireCarping]
+[-InputOutput::RequireBriefOpen]
+[-NamingConventions::Capitalization]
+[-CodeLayout::ProhibitQuotedWordLists]
+[-ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]
+[-References::ProhibitDoubleSigils]
+[-RegularExpressions::ProhibitFixedStringMatches]
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-CodeLayout::RequireTrailingCommaAtNewline]
+[-Subroutines::ProhibitExplicitReturnUndef]
+[-Subroutines::ProhibitSubroutinePrototypes]
+[-Subroutines::ProhibitUnusedPrivateSubroutines]
+[-Subroutines::RequireArgUnpacking]
+[-Subroutines::RequireFinalReturn]
+[-TestingAndDebugging::RequireUseStrict]
+[-TestingAndDebugging::RequireUseWarnings]
+[-TryTiny::RequireUse]
+[-ValuesAndExpressions::ProhibitAccessOfPrivateData]
+[-ValuesAndExpressions::ProhibitConstantPragma]
+[-ValuesAndExpressions::ProhibitFiletest_f]
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+[-ValuesAndExpressions::ProhibitMixedBooleanOperators]
+[-ValuesAndExpressions::ProhibitVersionStrings]
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+[-ValuesAndExpressions::RequireNumericVersion]
+[-Variables::ProhibitPunctuationVars]
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = perltidy.rc
+
+[Community::StrictWarnings]
+extra_importers = Moo Moo::Role strictures Test2::V0

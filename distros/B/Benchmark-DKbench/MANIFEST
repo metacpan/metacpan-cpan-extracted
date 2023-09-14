@@ -60,7 +60,7 @@ data/t/recipes/meta_table_metaclasstrait.t
 data/t/recipes/roles_applicationtoinstance.t
 data/t/recipes/roles_comparable_codereuse.t
 data/t/recipes/roles_restartable_advancedcomposition.t
-data/M31.jpg
+data/M31.bmp
 data/wiki0.html
 data/wiki1.html
 data/wiki2.html
@@ -73,6 +73,7 @@ README
 setup_dkbench
 t/00-load.t
 t/cover.t
+t/cpu.t
 t/simple.t
 xt/author/manifest.t
 xt/author/pod.t

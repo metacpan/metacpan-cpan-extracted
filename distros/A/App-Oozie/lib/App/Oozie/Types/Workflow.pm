@@ -1,9 +1,10 @@
 package App::Oozie::Types::Workflow;
-$App::Oozie::Types::Workflow::VERSION = '0.002';
+$App::Oozie::Types::Workflow::VERSION = '0.006';
 use 5.010;
 use strict;
 use warnings;
 
+use App::Oozie::Constants qw( RE_LINEAGE_DATA_ITEM );
 use Email::Valid;
 use Sub::Quote qw( quote_sub );
 use Type::Library -base;
@@ -13,18 +14,6 @@ use Type::Utils -all;
 BEGIN {
     extends 'Types::Standard';
 }
-
-use constant {
-    RE_LINEAGE_DATA_ITEM => qr{
-        \A
-            hive     # Data source type
-            [/]      # Separator
-            [\w^.]+  # Database name
-            [.]      # Separator
-            [\w^.]+  # Table name
-        \z
-    }xms,
-};
 
 my $Email = declare Email => as Str,
     constraint => quote_sub q{
@@ -115,7 +104,7 @@ App::Oozie::Types::Workflow
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 

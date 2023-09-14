@@ -2,8 +2,11 @@
 #
 # Ultima Ratio Coquorum
 
-package Food::Ratio 0.03;
-use Object::Pad 0.52;
+package Food::Ratio 0.04;
+use strict;
+use warnings;
+use Object::Pad 0.802;
+
 class Food::Ratio :strict(params);
 use Carp 'croak';
 use List::UtilsBy 'nsort_by';
@@ -16,33 +19,36 @@ use constant {
     ORDER  => 3,
     RATIO  => 4,
 };
-has $things :reader;        # individual ingredients (aref of aref)
-has $groups :reader;        # groups of ingredients (href of aref)
-has $total  :reader;        # (aref)
+field $things :reader;    # individual ingredients (aref of aref)
+field $groups :reader;    # groups of ingredients (href of aref)
+field $total :reader;     # (aref)
 
-has $key :reader;           # ratio key ingredient, group, or total
+field $key :reader;       # ratio key ingredient, group, or total
 
-has $index_group = 0;       # to keep the output in input addition order
+field $index_group = 0;   # to keep the output in input addition order
 
 ADJUST {
     $groups = {};
     $things = [];
-    $total = [];
+    $total  = [];
 }
 
-method add($mass, $name, @rest) {
+method add ( $mass, $name, @rest ) {
     croak "mass must be positive"
       unless defined $mass
       and looks_like_number($mass)
       and $mass > 0;
-    croak "things must be something" unless defined $name and length $name;
+    croak "things must be something"
+      unless defined $name and length $name;
     for my $grname (@rest) {
-        croak "groups must be something" unless defined $grname and length $grname;
+        croak "groups must be something"
+          unless defined $grname and length $grname;
     }
     # hopefully after here nothing blows up that might leave the object
     # in an inconsistent state
     my @meta;
-    @meta[ MASS, NAME, GROUPS, RATIO ] = ( $mass, $name, @rest ? \@rest : [], 0 );
+    @meta[ MASS, NAME, GROUPS, RATIO ] =
+      ( $mass, $name, @rest ? \@rest : [], 0 );
     push @$things, \@meta;
     for my $grname (@rest) {
         my $gmeta = $groups->{$grname} //= [];
@@ -58,23 +64,23 @@ method details() {
     croak "ratio has not been called" unless defined $key;
     my %details;
     for my $ref (@$things) {
-        push $details{ingredients}->@*, {
-            groups => [ $ref->[GROUPS]->@* ],
-            mass => $ref->[MASS],
-            name => $ref->[NAME],
-            ratio => $ref->[RATIO],
-        }
+        push $details{ingredients}->@*,
+          { groups => [ $ref->[GROUPS]->@* ],
+            mass   => $ref->[MASS],
+            name   => $ref->[NAME],
+            ratio  => $ref->[RATIO],
+          };
     }
-    for my $ref (nsort_by { $_->[ORDER] } values %$groups) {
-        push $details{groups}->@*, {
-            mass => $ref->[MASS],
-            name => $ref->[NAME],
+    for my $ref ( nsort_by { $_->[ORDER] } values %$groups ) {
+        push $details{groups}->@*,
+          { mass  => $ref->[MASS],
+            name  => $ref->[NAME],
             order => $ref->[ORDER],
             ratio => $ref->[RATIO],
-        }
+          };
     }
     $details{total} = {
-        mass => $total->[MASS],
+        mass  => $total->[MASS],
         ratio => $total->[RATIO],
     };
     return \%details;
@@ -83,7 +89,7 @@ method details() {
 # the ratio could be based on the total amount, or for cooking there is
 # more likely some key ingredient--flour--or a group of ingredients,
 # such as a variety of flours that together form the total for the ratio
-method ratio(%param) {
+method ratio (%param) {
     my $amount;
     if ( exists $param{id} ) {
         croak "id must be something"
@@ -102,11 +108,12 @@ method ratio(%param) {
     } elsif ( exists $param{group} ) {
         croak "group must be something"
           unless defined $param{group} and length $param{group};
-        croak "no such group '$param{group}'" unless exists $groups->{ $param{group} };
+        croak "no such group '$param{group}'"
+          unless exists $groups->{ $param{group} };
         $key    = $groups->{ $param{group} };
         $amount = $key->[MASS];
     } else {
-        $key = $total;
+        $key    = $total;
         $amount = $total->[MASS];
     }
     for my $ref ( @$things, values %$groups, $total ) {
@@ -120,15 +127,16 @@ method string() {
     my $s = '';
     for my $ref (@$things) {
         $s .= join( "\t",
-            sprintf( "%.4g\t%.4g%%", $ref->@[MASS, RATIO] ),
+            sprintf( "%.4g\t%.4g%%", $ref->@[ MASS, RATIO ] ),
             $ref->[NAME], $ref->[GROUPS]->@* )
           . "\n";
     }
     if ( keys %$groups ) {
         $s .= "--\n";
         for my $ref ( nsort_by { $_->[ORDER] } values %$groups ) {
-            $s .=
-              join( "\t", sprintf( "%.4g\t%.4g%%", $ref->@[MASS, RATIO] ), $ref->[NAME] )
+            $s .= join( "\t",
+                sprintf( "%.4g\t%.4g%%", $ref->@[ MASS, RATIO ] ),
+                $ref->[NAME] )
               . "\n";
         }
     }
@@ -138,7 +146,7 @@ method string() {
     return $s;
 }
 
-method weigh($mass, %param) {
+method weigh ( $mass, %param ) {
     croak "ratio has not been called" unless defined $key;
     croak "mass must be positive"
       unless defined $mass
@@ -154,7 +162,7 @@ method weigh($mass, %param) {
         for my $ref (@$things) {
             if ( $ref->[NAME] eq $param{id} ) {
                 $ratio = $mass / $ref->[MASS];
-                $okay = 1;
+                $okay  = 1;
                 last;
             }
         }
@@ -162,7 +170,8 @@ method weigh($mass, %param) {
     } elsif ( exists $param{group} ) {
         croak "group must be something"
           unless defined $param{group} and length $param{group};
-        croak "no such group '$param{group}'" unless exists $groups->{ $param{group} };
+        croak "no such group '$param{group}'"
+          unless exists $groups->{ $param{group} };
         $ratio = $mass / $groups->{ $param{group} }->[MASS];
     } else {
         $ratio = $mass / $total->[MASS];

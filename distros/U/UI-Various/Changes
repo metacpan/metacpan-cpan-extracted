@@ -1,6 +1,10 @@
 Revision history for Perl extension UI-Various
 
-0.41 2023-08-31T11:41:30Z
+0.42 2023-09-01T08:44:23Z
+
+0.42 2023-09-01T08:43:51Z
+
+    - t/11-main.t: reduced one test case as it's to big for one smoker's screen
 
 0.41 2023-08-31T11:39:43Z
 

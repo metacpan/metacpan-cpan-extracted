@@ -404,7 +404,7 @@ This package provides the following methods:
 
 =head2 any
 
-  any() (Try)
+  any() (Venus::Try)
 
 The any method registers a default C<catch> condition that returns whatever
 value was encoutered on error and returns it as a result.
@@ -455,7 +455,7 @@ I<Since C<2.32>>
 
 =head2 call
 
-  call(Str | CodeRef $method) (Try)
+  call(string | coderef $method) (Venus::Try)
 
 The call method takes a method name or coderef, registers it as the tryable
 routine, and returns the object. When invoked, the callback will received an
@@ -492,7 +492,7 @@ I<Since C<0.01>>
 
 =head2 callback
 
-  callback(Str | CodeRef $method) (CodeRef)
+  callback(string | coderef $method) (coderef)
 
 The callback method takes a method name or coderef, and returns a coderef for
 registration. If a coderef is provided this method is mostly a passthrough.
@@ -569,7 +569,7 @@ I<Since C<0.01>>
 
 =head2 catch
 
-  catch(Str $isa, Str | CodeRef $method) (Try)
+  catch(string $isa, string | coderef $method) (Venus::Try)
 
 The catch method takes a package or ref name, and when triggered checks whether
 the captured exception is of the type specified and if so executes the given
@@ -654,7 +654,7 @@ I<Since C<0.01>>
 
 =head2 default
 
-  default(Str | CodeRef $method) (Try)
+  default(string | coderef $method) (Venus::Try)
 
 The default method takes a method name or coderef and is triggered if no
 C<catch> conditions match the exception thrown.
@@ -691,7 +691,7 @@ I<Since C<0.01>>
 
 =head2 error
 
-  error(Ref $variable) (Try)
+  error(Ref $variable) (Venus::Try)
 
 The error method takes a scalar reference and assigns any uncaught exceptions
 to it during execution. If no variable is provided a L</catch> operation will
@@ -747,7 +747,7 @@ I<Since C<0.01>>
 
 =head2 execute
 
-  execute(CodeRef $code, Any @args) (Any)
+  execute(coderef $code, any @args) (any)
 
 The execute method takes a coderef and executes it with any given arguments.
 When invoked, the callback will received an C<invocant> if one was provided to
@@ -790,7 +790,7 @@ I<Since C<0.01>>
 
 =head2 finally
 
-  finally(Str | CodeRef $method) (Try)
+  finally(string | coderef $method) (Venus::Try)
 
 The finally method takes a package or ref name and always executes the callback
 after a try/catch operation. The return value is ignored. When invoked, the
@@ -839,7 +839,7 @@ I<Since C<0.01>>
 
 =head2 maybe
 
-  maybe() (Try)
+  maybe() (Venus::Try)
 
 The maybe method registers a default C<catch> condition that returns falsy,
 i.e. an undefined value, if an exception is encountered.
@@ -872,7 +872,7 @@ I<Since C<0.01>>
 
 =head2 no_catch
 
-  no_catch() (Try)
+  no_catch() (Venus::Try)
 
 The no_catch method removes any configured catch conditions and returns the
 object.
@@ -912,7 +912,7 @@ I<Since C<0.01>>
 
 =head2 no_default
 
-  no_default() (Try)
+  no_default() (Venus::Try)
 
 The no_default method removes any configured default condition and returns the
 object.
@@ -951,7 +951,7 @@ I<Since C<0.01>>
 
 =head2 no_finally
 
-  no_finally() (Try)
+  no_finally() (Venus::Try)
 
 The no_finally method removes any configured finally condition and returns the
 object.
@@ -999,7 +999,7 @@ I<Since C<0.01>>
 
 =head2 no_try
 
-  no_try() (Try)
+  no_try() (Venus::Try)
 
 The no_try method removes any configured C<try> operation and returns the
 object.
@@ -1032,7 +1032,7 @@ I<Since C<0.01>>
 
 =head2 result
 
-  result(Any @args) (Any)
+  result(any @args) (any)
 
 The result method executes the try/catch/default/finally logic and returns
 either 1) the return value from the successfully tried operation 2) the return
@@ -1151,7 +1151,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

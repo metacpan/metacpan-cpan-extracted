@@ -13,9 +13,9 @@ use List::Util qw(first);
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-29'; # DATE
+our $DATE = '2023-07-08'; # DATE
 our $DIST = 'Bencher-Backend'; # DIST
-our $VERSION = '1.062'; # VERSION
+our $VERSION = '1.063'; # VERSION
 
 our @EXPORT_OK = qw(
                        bencher
@@ -468,8 +468,6 @@ sub _get_scenario {
 }
 
 sub _parse_scenario {
-    use experimental 'smartmatch';
-
     my %args = @_;
 
     my $unparsed = $args{scenario};
@@ -549,47 +547,55 @@ sub _parse_scenario {
         if ($apply_filters) {
             if ($pargs->{include_modules} && @{ $pargs->{include_modules} }) {
                 $parsed->{participants} = [grep {
-                    (defined($_->{module}) && $_->{module} ~~ @{ $pargs->{include_modules} }) ||
-                        (defined($_->{modules}) && (first { $_ ~~ @{ $pargs->{include_modules} } } @{ $_->{modules} }))
+                    my $p = $_;
+                    (defined($p->{module}) && grep { $_ eq $p->{module} } @{ $pargs->{include_modules} }) ||
+                        (defined($p->{modules}) && (first { my $m = $_; grep { $_ eq $m } @{ $pargs->{include_modules} } } @{ $p->{modules} }))
                     } @{ $parsed->{participants} }];
             }
             if ($pargs->{exclude_modules} && @{ $pargs->{exclude_modules} }) {
                 $parsed->{participants} = [grep {
-                    !(defined($_->{module}) && $_->{module} ~~ @{ $pargs->{exclude_modules} }) &&
-                    !(defined($_->{modules}) && (first { $_ ~~ @{ $pargs->{exclude_modules} } } @{ $_->{modules} }))
+                    my $p = $_;
+                    !(defined($p->{module}) && grep { $_ eq $p->{module} } @{ $pargs->{exclude_modules} }) &&
+                    !(defined($p->{modules}) && (first { my $m = $_; grep { $_ eq $m } @{ $pargs->{exclude_modules} } } @{ $p->{modules} }))
                 } @{ $parsed->{participants} }];
             }
             if ($pargs->{include_module_pattern}) {
                 $parsed->{participants} = [grep {
-                    (defined($_->{module}) && $_->{module} =~ qr/$pargs->{include_module_pattern}/i) ||
-                    (defined($_->{modules}) && (first { /$pargs->{include_module_pattern}/i } @{ $_->{modules} }))
+                    my $p = $_;
+                    (defined($p->{module}) && $p->{module} =~ qr/$pargs->{include_module_pattern}/i) ||
+                    (defined($p->{modules}) && (first { /$pargs->{include_module_pattern}/i } @{ $p->{modules} }))
                 } @{ $parsed->{participants} }];
             }
             if ($pargs->{exclude_module_pattern}) {
                 $parsed->{participants} = [grep {
-                    !(defined($_->{module}) && $_->{module} =~ qr/$pargs->{exclude_module_pattern}/i) &&
-                    !(defined($_->{modules}) && (first { /$pargs->{exclude_module_pattern}/i } @{ $_->{modules} }))
+                    my $p = $_;
+                    !(defined($p->{module}) && $p->{module} =~ qr/$pargs->{exclude_module_pattern}/i) &&
+                    !(defined($p->{modules}) && (first { /$pargs->{exclude_module_pattern}/i } @{ $p->{modules} }))
                 } @{ $parsed->{participants} }];
             }
 
             if ($pargs->{include_functions} && @{ $pargs->{include_functions} }) {
                 $parsed->{participants} = [grep {
-                    defined($_->{function}) && $_->{function} ~~ @{ $pargs->{include_functions} }
+                    my $p = $_;
+                    defined($p->{function}) && grep { $_ eq $p->{function} } @{ $pargs->{include_functions} }
                 } @{ $parsed->{participants} }];
             }
             if ($pargs->{exclude_functions} && @{ $pargs->{exclude_functions} }) {
+                my $p = $_;
                 $parsed->{participants} = [grep {
-                    !defined($_->{function}) || !($_->{function} ~~ @{ $pargs->{exclude_functions} })
+                    !defined($p->{function}) || !(grep {$_ eq $p->{function} } @{ $pargs->{exclude_functions} })
                 } @{ $parsed->{participants} }];
             }
             if ($pargs->{include_function_pattern}) {
                 $parsed->{participants} = [grep {
-                    defined($_->{function}) && $_->{function} =~ qr/$pargs->{include_function_pattern}/i
+                    my $p = $_;
+                    defined($p->{function}) && $p->{function} =~ qr/$pargs->{include_function_pattern}/i
                 } @{ $parsed->{participants} }];
             }
             if ($pargs->{exclude_function_pattern}) {
                 $parsed->{participants} = [grep {
-                    !defined($_->{function}) || $_->{function} !~ qr/$pargs->{exclude_function_pattern}/i
+                    my $p = $_;
+                    !defined($p->{function}) || $p->{function} !~ qr/$pargs->{exclude_function_pattern}/i
                 } @{ $parsed->{participants} }];
             }
 
@@ -704,17 +710,15 @@ sub _parse_scenario {
 }
 
 sub _get_participant_modules {
-    use experimental 'smartmatch';
-
     my $parsed = shift;
 
     my @modules;
     for my $p (@{ $parsed->{participants} }) {
         if (defined $p->{module}) {
-            push @modules, $p->{module} unless $p->{module} ~~ @modules;
+            push @modules, $p->{module} unless grep { $_ eq $p->{module} } @modules;
         } elsif (defined $p->{modules}) {
-            for (@{ $p->{modules} }) {
-                push @modules, $_ unless $_ ~~ @modules;
+            for my $m (@{ $p->{modules} }) {
+                push @modules, $m unless grep { $_ eq $m } @modules;
             }
         }
     }
@@ -723,15 +727,13 @@ sub _get_participant_modules {
 }
 
 sub _get_participant_helper_modules {
-    use experimental 'smartmatch';
-
     my $parsed = shift;
 
     my @modules;
     for my $p (@{ $parsed->{participants} }) {
         if (defined $p->{helper_modules}) {
-            for (@{ $p->{helper_modules} }) {
-                push @modules, $_ unless $_ ~~ @modules;
+            for my $m (@{ $p->{helper_modules} }) {
+                push @modules, $m unless grep { $_ eq $m } @modules;
             }
         }
     }
@@ -740,14 +742,12 @@ sub _get_participant_helper_modules {
 }
 
 sub _get_participant_functions {
-    use experimental 'smartmatch';
-
     my $parsed = shift;
 
     my @functions;
     for my $p (@{ $parsed->{participants} }) {
         next unless defined $p->{function};
-        push @functions, $p->{function} unless $p->{function} ~~ @functions;
+        push @functions, $p->{function} unless grep { $_ eq $p->{function} } @functions;
     }
 
     @functions;
@@ -2083,17 +2083,18 @@ $SPEC{format_result} = {
             req => 1,
             pos => 1,
         },
-        exclude_formatters => {
-            'x.name.is_plural' => 1,
-            'x.name.singular' => 'exclude_formatter',
-            summary => 'Exclude Formatters specification',
-            schema => ['array*', of=>'str*'],
-        },
         options => {
             'x.name.is_plural' => 1,
             'x.name.singular' => 'option',
             schema => 'hash*',
             pos => 2,
+        },
+        exclude_formatters => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'exclude_formatter',
+            summary => 'Exclude Formatters specification',
+            schema => ['array*', of=>'str*'],
+            pos => 3,
         },
     },
     args_as => 'array',
@@ -4377,7 +4378,7 @@ Bencher::Backend - Backend for Bencher
 
 =head1 VERSION
 
-This document describes version 1.062 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2022-11-29.
+This document describes version 1.063 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2023-07-08.
 
 =head1 FUNCTIONS
 
@@ -4930,7 +4931,7 @@ Return value:  (any)
 
 Usage:
 
- format_result( [ \%optional_named_args ] , $envres, $formatters, $options) -> [$status_code, $reason, $payload, \%result_meta]
+ format_result($envres, $formatters, $options, $exclude_formatters) -> [$status_code, $reason, $payload, \%result_meta]
 
 Format bencher result.
 
@@ -4944,7 +4945,7 @@ Arguments ('*' denotes required arguments):
 
 Enveloped result from bencher.
 
-=item * B<exclude_formatters> => I<array[str]>
+=item * B<$exclude_formatters> => I<array[str]>
 
 Exclude Formatters specification.
 
@@ -5097,7 +5098,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

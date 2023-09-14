@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -21,7 +21,7 @@ await $chip->mount(
    $adapter->expect_readwrite( "\xC1\x00" )
       ->returns( "\x00\x00" ); # STAT default value
 
-   is_deeply( { await $chip->read_status },
+   is( { await $chip->read_status },
       {
          RDY   => '',
          MSTAT => '',
@@ -43,7 +43,7 @@ await $chip->mount(
    $adapter->expect_readwrite( "\xC7\x00" )
       ->returns( "\x00\x1e" ); # CTRL3 default value
 
-   is_deeply( await $chip->read_config,
+   is( await $chip->read_config,
       {
          SCYCLE => 1,
          FORMAT => 'TWOS_COMP',
@@ -151,7 +151,7 @@ await $chip->mount(
    $adapter->expect_readwrite( "\xC5\x00" )
       ->returns( "\x00\x39" );
 
-   is_deeply(
+   is(
       [ await Future->needs_all( $chip->read_adc, $chip->read_gpios ) ],
       [ 0x123456, 0x09 ],
       'concurrent ->read_adc + ->read_gpios' );
@@ -161,7 +161,7 @@ await $chip->mount(
 {
    my $gpioproto = await $chip->as_gpio_adapter->make_protocol( "GPIO" );
 
-   is_deeply( [ $gpioproto->list_gpios ], [qw( GPIO1 GPIO2 GPIO3 GPIO4 )],
+   is( [ $gpioproto->list_gpios ], [qw( GPIO1 GPIO2 GPIO3 GPIO4 )],
       '$gpioproto->list_gpios' );
 
    $adapter->expect_write( "\xC4\x11" );
@@ -181,7 +181,7 @@ await $chip->mount(
    $adapter->expect_readwrite( "\xC5\x00" )
       ->returns( "\x00\x33" );
 
-   is_deeply( await $gpioproto->read_gpios( [ 'GPIO3' ] ),
+   is( await $gpioproto->read_gpios( [ 'GPIO3' ] ),
       { GPIO3 => 0 },
       'result of $gpioproto->read_gpios' );
 

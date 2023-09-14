@@ -13,7 +13,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
-license: perl
+license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -29,10 +29,10 @@ no_index:
 provides:
   Config::Structured:
     file: lib/Config/Structured.pm
-    version: '2.003'
+    version: '2.004'
   Config::Structured::Deserializer:
     file: lib/Config/Structured/Deserializer.pm
-    version: '2.003'
+    version: '2.004'
 requires:
   Carp: '0'
   Data::DPath: '0'
@@ -44,8 +44,8 @@ requires:
   Mojo::DynamicMethods: '0'
   Moose: '0'
   Moose::Util::TypeConstraints: '0'
+  Perl6::Junction: '0'
   Readonly: '0'
-  Syntax::Keyword::Junction: '0'
   Syntax::Keyword::Try: '0'
   Text::Glob: '0'
   YAML::XS: '0'
@@ -55,7 +55,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://bitbucket.org/concertpharmaceuticals/config-structured.git
-version: '2.003'
+version: '2.004'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -74,7 +74,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::PodWeaver:
           finder:
             - ':InstallModules'
-            - ':ExecFiles'
+            - ':PerlExecFiles'
           plugins:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
@@ -141,7 +141,7 @@ x_Dist_Zilla:
               name: '@Default/Legal'
               version: '4.018'
       name: PodWeaver
-      version: '4.009'
+      version: '4.010'
     -
       class: Dist::Zilla::Plugin::Repository
       name: Repository
@@ -329,4 +329,4 @@ x_Dist_Zilla:
     version: '6.025'
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
-x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_spdx_expression: MIT

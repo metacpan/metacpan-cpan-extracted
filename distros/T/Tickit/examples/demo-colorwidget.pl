@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 
-package ColourWidget;
-use base 'Tickit::Widget';
-
 use v5.14;
 use warnings;
+
+package ColourWidget;
+use base 'Tickit::Widget';
 
 use Tickit;
 

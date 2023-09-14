@@ -69,11 +69,11 @@ _run_in_fork
     ('max_app initialisation with normal values',
      3,
      sub{
-	 my $main = UI::Various::Main->new({height => 15,
+	 my $main = UI::Various::Main->new({height => 12,
 					    width => 40});
 	 _ok($main, 'UI::Various::Main->new({...}) returned singleton');
-	 _ok(15 == $main->height(),
-	     'maximum application height set to 15: ' . $main->height());
+	 _ok(12 == $main->height(),
+	     'maximum application height set to 12: ' . $main->height());
 	 _ok(40 == $main->width(),
 	     'maximum application width set to 40: ' . $main->width());
      });

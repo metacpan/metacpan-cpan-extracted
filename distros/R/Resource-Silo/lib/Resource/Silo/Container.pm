@@ -2,7 +2,7 @@ package Resource::Silo::Container;
 
 use strict;
 use warnings;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 NAME
 
@@ -141,9 +141,8 @@ sub _instantiate_resource {
             and !$spec->{derived}
             and !$self->{-override}{$name};
 
-    croak "Attempting to fetch unexpected dependency '$name'"
+    self->_unexpected_dependency($name)
         if ($self->{-allow} && !$self->{-allow}{$name});
-    local $self->{-allow} = $spec->{allowdeps};
 
     # Detect circular dependencies
     my $key = $name . (length $arg ? "\@$arg" : '');
@@ -151,14 +150,20 @@ sub _instantiate_resource {
         my $loop = join ', ', sort keys %{ $self->{-pending} };
         croak "Circular dependency detected for resource $key: {$loop}";
     };
-    local $self->{-pending}{$key} = 1;
 
+    # Try loading modules
     foreach my $mod (@{ $spec->{require} }) {
         eval { load $mod; 1 }
             or croak "resource '$name': failed to load '$mod': $@";
     };
+
+    # Finally set the temporary flags
+    local $self->{-onbehalf} = $name; # should we use a stack instead?
+    local $self->{-pending}{$key} = 1;
+    local $self->{-allow} = $spec->{allowdeps};
+
     ($self->{-override}{$name} // $spec->{init})->($self, $name, $arg)
-        // croak "Fetching resource '$key' failed for no apparent reason";
+        // croak "Instantiating resource '$key' failed for no apparent reason";
 };
 
 # use instead of delete $self->{-cache}{$name}
@@ -211,7 +216,8 @@ sub _make_resource_accessor {
             $self->{-pid} = $$;
         };
 
-        croak "Attempting to fetch unexpected dependency '$name'"
+        # We must check dependencies even before going to the cache
+        $self->_unexpected_dependency($name)
             if ($self->{-allow} && !$self->{-allow}{$name});
 
         # Stringify $arg ASAP, we'll validate it inside _instantiate_resource().
@@ -253,6 +259,17 @@ sub _override_resources {
             delete $self->{-override}{$name};
         };
     };
+}
+
+sub _unexpected_dependency {
+    my ($self, $name) = @_;
+    my $spec = $self->{-spec}{resource}{$name};
+
+    my $explain = $spec->{autodeps}
+        ? ". Use explicit 'dependencies' or the 'loose_deps' flag"
+        : " but is not listed in its dependencies";
+    croak "Resource '$name' was unexpectedly required by"
+        ." '$self->{-onbehalf}'$explain";
 }
 
 =head1 CONTROL INTERFACE

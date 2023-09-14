@@ -309,7 +309,7 @@ This package provides the following methods:
 
 =head2 captures
 
-  captures() (ArrayRef)
+  captures() (arrayref)
 
 The captures method returns the capture groups from the result object which
 contains information about the results of the regular expression operation.
@@ -333,7 +333,7 @@ I<Since C<0.01>>
 
 =head2 count
 
-  count() (Num)
+  count() (number)
 
 The count method returns the number of matches found in the result object which
 contains information about the results of the regular expression operation.
@@ -356,7 +356,7 @@ I<Since C<0.01>>
 
 =head2 evaluate
 
-  evaluate() (ArrayRef)
+  evaluate() (arrayref)
 
 The evaluate method performs the regular expression operation and returns an
 arrayref representation of the results.
@@ -398,7 +398,7 @@ I<Since C<0.01>>
 
 =head2 explain
 
-  explain() (Str)
+  explain() (string)
 
 The explain method returns the subject of the regular expression operation and
 is used in stringification operations.
@@ -421,7 +421,7 @@ I<Since C<0.01>>
 
 =head2 get
 
-  get() (Str)
+  get() (string)
 
 The get method returns the subject of the regular expression operation.
 
@@ -443,7 +443,7 @@ I<Since C<0.01>>
 
 =head2 initial
 
-  initial() (Str)
+  initial() (string)
 
 The initial method returns the unaltered string from the result object which
 contains information about the results of the regular expression operation.
@@ -466,7 +466,7 @@ I<Since C<0.01>>
 
 =head2 last_match_end
 
-  last_match_end() (Maybe[ArrayRef[Int]])
+  last_match_end() (maybe[within[arrayref, number]])
 
 The last_match_end method returns an array of offset positions into the string
 where the capture(s) stopped matching from the result object which contains
@@ -490,7 +490,7 @@ I<Since C<0.01>>
 
 =head2 last_match_start
 
-  last_match_start() (Maybe[ArrayRef[Int]])
+  last_match_start() (maybe[within[arrayref, number]])
 
 The last_match_start method returns an array of offset positions into the
 string where the capture(s) matched from the result object which contains
@@ -514,7 +514,7 @@ I<Since C<0.01>>
 
 =head2 matched
 
-  matched() (Maybe[Str])
+  matched() (maybe[string])
 
 The matched method returns the portion of the string that matched from the
 result object which contains information about the results of the regular
@@ -538,7 +538,7 @@ I<Since C<0.01>>
 
 =head2 named_captures
 
-  named_captures() (HashRef)
+  named_captures() (hashref)
 
 The named_captures method returns a hash containing the requested named regular
 expressions and captured string pairs from the result object which contains
@@ -581,7 +581,7 @@ I<Since C<0.01>>
 
 =head2 postmatched
 
-  postmatched() (Maybe[Str])
+  postmatched() (maybe[string])
 
 The postmatched method returns the portion of the string after the regular
 expression matched from the result object which contains information about the
@@ -605,7 +605,7 @@ I<Since C<0.01>>
 
 =head2 prematched
 
-  prematched() (Maybe[Str])
+  prematched() (maybe[string])
 
 The prematched method returns the portion of the string before the regular
 expression matched from the result object which contains information about the
@@ -629,7 +629,7 @@ I<Since C<0.01>>
 
 =head2 set
 
-  set(Str $string) (Str)
+  set(string $string) (string)
 
 The set method sets the subject of the regular expression operation.
 
@@ -687,6 +687,30 @@ B<example 1>
 This package overloads the following operators:
 
 =cut
+
+=over 4
+
+=item operation: C<("")>
+
+This package overloads the C<""> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = "$search";
+
+  # "hello world"
+
+B<example 2>
+
+  # given: synopsis;
+
+  my $result = "$search, $search";
+
+  # "hello world, hello world"
+
+=back
 
 =over 4
 
@@ -754,30 +778,6 @@ B<example 1>
 
 =over 4
 
-=item operation: C<("")>
-
-This package overloads the C<""> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = "$search";
-
-  # "hello world"
-
-B<example 2>
-
-  # given: synopsis;
-
-  my $result = "$search, $search";
-
-  # "hello world, hello world"
-
-=back
-
-=over 4
-
 =item operation: C<(~~)>
 
 This package overloads the C<~~> operator.
@@ -800,7 +800,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

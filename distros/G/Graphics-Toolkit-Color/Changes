@@ -1,3 +1,17 @@
+1.61     2023-09-12    lichtkind
+-------
+    * = fix tests
+    * + renamed complementary method => complement
+    * - deprecated complementary, will be removed at 2.0
+
+1.60     2023-09-11    lichtkind
+-------
+    * = API development
+    * * added color spaces HSB HSW YIQ
+    * + output format array: ['rgb',1,2,3]
+    * + input and output format string: 'rgb: 1,2,3'
+    * + input and output format css_string: 'rgb(1,2,3)'
+    * - deprecated getter method string
 
 1.54     2023-08-21    lichtkind
 -------
@@ -32,7 +46,7 @@
     * + new modifier method: set, blend
     * ~ enhanced and strictened modifier method: add
     * \ deprecate all other numeric getter: rgb, red, green, blue, rgb_hex,
-                         rgb_hash, hsl, hue, saturation, lightnss, hsl_hash
+                         rgb_hash, hsl, hue, saturation, lightnss, hsl_hash, string
     * \ till 2.0 will be also deprecated: rgb_gradient_to, hsl_gradient_to,
                                           gradient_to, distance_to, blend_with
     * & new getter API

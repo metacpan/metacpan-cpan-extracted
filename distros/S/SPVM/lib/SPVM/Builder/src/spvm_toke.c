@@ -252,7 +252,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           return SPECIAL_ASSIGN;
         }
         else {
-          yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_DO_NOTHING);;
+          yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_DO_NOTHING);
           return '-';
         }
         break;
@@ -2541,7 +2541,7 @@ int32_t SPVM_TOKE_load_class_file(SPVM_COMPILER* compiler) {
           
           compiler->current_class_rel_file = class_file->rel_file;
           
-          compiler->current_class_name = class_file->class_name;
+          compiler->current_outer_class_name = class_file->class_name;
           
           // If we get current class file path, set it, otherwise set module relative file path
           if (class_file->file) {

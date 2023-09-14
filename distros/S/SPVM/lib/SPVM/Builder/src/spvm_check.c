@@ -189,6 +189,22 @@ void SPVM_CHECK_check_basic_types_relation(SPVM_COMPILER* compiler) {
     
     SPVM_LIST_free(basic_type_merge_stack);
   }
+  
+  // Outer class
+  for (int32_t basic_type_id = compiler->basic_types_base_id; basic_type_id < compiler->basic_types->length; basic_type_id++) {
+    SPVM_BASIC_TYPE* basic_type = SPVM_LIST_get(compiler->basic_types, basic_type_id);
+    if (basic_type->is_anon) {
+      
+      char* found_ptr = strstr(basic_type->name, "::anon::");
+      assert(found_ptr);
+      int32_t outer_basic_type_name_length = (int32_t)(found_ptr - basic_type->name);
+      
+      SPVM_BASIC_TYPE* outer_basic_type = SPVM_HASH_get(compiler->basic_type_symtable, basic_type->name, outer_basic_type_name_length);
+      assert(outer_basic_type);
+      
+      basic_type->outer = outer_basic_type;
+    }
+  }
 }
 
 void SPVM_CHECK_check_basic_types_class_var(SPVM_COMPILER* compiler) {
@@ -517,8 +533,8 @@ void SPVM_CHECK_check_basic_types_method(SPVM_COMPILER* compiler) {
       }
       
       // Copy has_precomile_attribute from anon method defined basic type
-      if (method->anon_method_defined_basic_type_name) {
-        SPVM_BASIC_TYPE* anon_method_defined_basic_type = SPVM_HASH_get(compiler->basic_type_symtable, method->anon_method_defined_basic_type_name, strlen(method->anon_method_defined_basic_type_name));
+      if (method->outer_basic_type_name) {
+        SPVM_BASIC_TYPE* anon_method_defined_basic_type = SPVM_HASH_get(compiler->basic_type_symtable, method->outer_basic_type_name, strlen(method->outer_basic_type_name));
         basic_type->is_precompile = anon_method_defined_basic_type->is_precompile;
       }
     }
@@ -1075,7 +1091,15 @@ void SPVM_CHECK_check_ast_check_op_types(SPVM_COMPILER* compiler, SPVM_BASIC_TYP
             if (op_type->uv.type->resolved_in_ast) {
               const char* unresolved_basic_type_name_maybe_alias = op_type->uv.type->unresolved_basic_type_name;
               
-              const char* unresolved_basic_type_name = SPVM_HASH_get(basic_type->alias_symtable, unresolved_basic_type_name_maybe_alias, strlen(unresolved_basic_type_name_maybe_alias));
+              SPVM_HASH* alias_symtable = NULL;
+              if (basic_type->is_anon) {
+                alias_symtable = basic_type->outer->alias_symtable;
+              }
+              else {
+                alias_symtable = basic_type->alias_symtable;
+              }
+              
+              const char* unresolved_basic_type_name = SPVM_HASH_get(alias_symtable, unresolved_basic_type_name_maybe_alias, strlen(unresolved_basic_type_name_maybe_alias));
               if (unresolved_basic_type_name) {
                 op_type->uv.type->unresolved_basic_type_name = unresolved_basic_type_name;
                 op_type->uv.type->basic_type = SPVM_LIST_get(compiler->basic_types, 0);
@@ -3681,6 +3705,10 @@ SPVM_FIELD* SPVM_CHECK_search_unmerged_field(SPVM_COMPILER* compiler, SPVM_BASIC
 int32_t SPVM_CHECK_can_access(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_type_from, SPVM_BASIC_TYPE* basic_type_to, int32_t access_controll_flag_to) {
   
   int32_t can_access = 0;
+  
+  if (basic_type_from->is_anon) {
+    basic_type_from = basic_type_from->outer;
+  }
   
   if (access_controll_flag_to == SPVM_ATTRIBUTE_C_ID_PRIVATE) {
     if (strcmp(basic_type_from->name, basic_type_to->name) == 0) {

@@ -17,6 +17,16 @@ while [ -n "$1" ] ; do
 	    # shifting not necessary...
 	    exit $RC
 	    ;;
+	--echo)
+	    echo "$2"
+	    shift
+	    shift
+	    ;;
+	--cat)
+	    cat "$2"
+	    shift
+	    shift
+	    ;;
 	--echo-to-stderr)
 	    echo "$2" >&2
 	    shift

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Pod::CYOA::XHTML 0.003;
+package Pod::CYOA::XHTML 0.004;
 use Pod::Simple::XHTML 3.13;
 use base 'Pod::Simple::XHTML';
 # ABSTRACT: private Pod::Simple::XHTML subclass for CYOA
@@ -39,7 +39,7 @@ Pod::CYOA::XHTML - private Pod::Simple::XHTML subclass for CYOA
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 OVERVIEW
 
@@ -65,11 +65,11 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

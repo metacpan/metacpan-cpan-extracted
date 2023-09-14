@@ -1,7 +1,7 @@
 package Mail::DKIM::ARC::Seal;
 use strict;
 use warnings;
-our $VERSION = '1.20230630'; # VERSION
+our $VERSION = '1.20230911'; # VERSION
 # ABSTRACT: represents a ARC-Seal header
 
 # Copyright 2017 FastMail Pty Ltd. All Rights Reserved.
@@ -29,6 +29,7 @@ sub new {
     $self->timestamp(
         defined $prms{'Timestamp'} ? $prms{'Timestamp'} : time() );
     $self->expiration( $prms{'Expiration'} ) if defined $prms{'Expiration'};
+    $self->tags( $prms{'Tags'} ) if defined $prms{'Tags'};
     $self->key( $prms{'Key'} )               if defined $prms{'Key'};
 
     return $self;
@@ -76,7 +77,7 @@ Mail::DKIM::ARC::Seal - represents a ARC-Seal header
 
 =head1 VERSION
 
-version 1.20230630
+version 1.20230911
 
 =head1 CONSTRUCTORS
 

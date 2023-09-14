@@ -3,8 +3,8 @@ NAME
     (e.g. 100,2,3,4,5,101 -> 100,"2..5",101)
 
 VERSION
-    This document describes version 0.003 of Number::Util::Range (from Perl
-    distribution Number-Util-Range), released on 2023-01-04.
+    This document describes version 0.006 of Number::Util::Range (from Perl
+    distribution Number-Util-Range), released on 2023-09-08.
 
 FUNCTIONS
   convert_number_sequence_to_range
@@ -33,13 +33,33 @@ FUNCTIONS
 
          [100, "2..6", 101, 102, "-5..-2", 103]
 
-    *   option: threshold:
+    *   option: min_range_len (1):
 
-         convert_number_sequence_to_range(array => [100, 2 .. 5, 101], threshold => 5); # -> [100, 2 .. 5, 101]
+         convert_number_sequence_to_range(array => [100, 2 .. 5, 101], min_range_len => 5); # -> [100, 2 .. 5, 101]
+
+    *   option: min_range_len (2):
+
+         convert_number_sequence_to_range(array => [100, 2, 3, 4, 101, "foo"], min_range_len => 3);
+
+        Result:
+
+         [100, "2..4", 101, "foo"]
 
     *   option: ignore_duplicates:
 
          convert_number_sequence_to_range(array => [1 .. 4, 2, 9, 9, 9], ignore_duplicates => 1); # -> ["1..4", 9]
+
+    *   option: max_range_len (1):
+
+         convert_number_sequence_to_range(array => [98, 100 .. 110, 5, 101], max_range_len => 4);
+
+        Result:
+
+         [98, "100..103", "104..107", 108, 109, 110, 5, 101]
+
+    This routine accepts an array, finds sequences of numbers in it (e.g. 1,
+    2, 3), and converts each sequence into a range ("1..3"). So basically it
+    "compresses" the sequence (many elements) into a single element.
 
     This function is not exported by default, but exportable.
 
@@ -53,11 +73,19 @@ FUNCTIONS
 
         (No description)
 
+    *   max_range_len => *posint*
+
+        Maximum number of items in a sequence to convert to a range.
+        Sequence that has more than this number of items might be split into
+        two or more ranges.
+
+    *   min_range_len => *posint* (default: 4)
+
+        Minimum number of items in a sequence to convert to a range.
+        Sequence that has less than this number of items will not be
+        converted.
+
     *   separator => *str* (default: "..")
-
-        (No description)
-
-    *   threshold => *posint* (default: 4)
 
         (No description)
 
@@ -75,10 +103,14 @@ SEE ALSO
     Data::Dump also does something similar when dumping arrays of numbers,
     e.g. if you say "dd [1,2,3,4];" it will dump the array as "[1..4]".
 
-    String::Util::Range
+    String::Util::Range also convert sequences of letters to range (e.g.
+    "a","b","c","d" -> "a..d").
 
 AUTHOR
     perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    Philippe Bruhat (BooK) <book@cpan.org>
 
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull

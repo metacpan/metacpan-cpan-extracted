@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;

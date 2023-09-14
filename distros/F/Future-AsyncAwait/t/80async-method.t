@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test2::V0 0.000148; # is_oneref
+use Test2::V0 0.000148; # is_refcount
 
 BEGIN {
    plan skip_all => "Future >= 0.49 is not available"
@@ -12,9 +12,9 @@ BEGIN {
    plan skip_all => "Future::AsyncAwait >= 0.45 is not available"
       unless eval { require Future::AsyncAwait;
                     Future::AsyncAwait->VERSION( '0.45' ) };
-   plan skip_all => "Object::Pad >= 0.73 is not available"
+   plan skip_all => "Object::Pad >= 0.800 is not available"
       unless eval { require Object::Pad;
-                    Object::Pad->VERSION( '0.73' ) };
+                    Object::Pad->VERSION( '0.800' ) };
 
    # If Future::XS is installed, then check it's at least 0.08; earlier
    # versions will crash
@@ -24,7 +24,7 @@ BEGIN {
    }
 
    Future::AsyncAwait->import;
-   Object::Pad->import( ':experimental(init_expr)' );
+   Object::Pad->import;
 
    diag( "Future::AsyncAwait $Future::AsyncAwait::VERSION, " .
          "Object::Pad $Object::Pad::VERSION" );

@@ -1,5 +1,15 @@
 Revision history for Future-AsyncAwait
 
+0.66    2023-09-08
+        [CHANGES]
+         * Add a unit test to check that `async method` works on core perl
+           class syntax
+         * Remember to implement `sub unimport` so that `no Future::AsyncAwait`
+           works
+
+        [BUGFIXES]
+         * Provide a permit_hintkey to keep XPS happy
+
 0.65    2023-03-17
         [CHANGES]
          * More specific unit-testing of the croak location when testing

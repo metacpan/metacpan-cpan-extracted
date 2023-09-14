@@ -13,7 +13,7 @@ use Astro::Coord::ECI::Utils 0.112 qw{
 
 use parent qw{ Astro::App::Satpass2::ParseTime };
 
-our $VERSION = '0.050';
+our $VERSION = '0.051';
 
 my $package = __PACKAGE__;
 
@@ -92,8 +92,11 @@ sub delegate {
 	    --$date[1];
 	}
 	$offset += pop @date;
-	if ( $zone ) {
-	    return greg_time_gm( reverse @date ) + $offset;
+	if ( defined $zone ) {
+	    'UTC' eq $zone
+		and return greg_time_gm( reverse @date ) + $offset;
+	    local $ENV{TZ} = $zone;	# The best we can do.
+	    return greg_time_local( reverse @date ) + $offset;
 	} else {
 	    return greg_time_local( reverse @date ) + $offset;
 	}
@@ -193,8 +196,11 @@ sub _interpret_zone {
 	return ( UTC => $offset );
     } else {
 	HAVE_DATETIME
-	    and DateTime::TimeZone->is_valid_name( $zone )
+	    or return ( $zone => 0 );	# On the user's head be it.
+
+	DateTime::TimeZone->is_valid_name( $zone )
 	    and return ( $zone => 0 );
+
 	$fatal
 	    and $self->wail( "Invalid time zone '$zone'" );
 	return;
@@ -246,8 +252,8 @@ dates C<'yesterday'>, C<'today'>, and C<'tomorrow'>.
 This class understands ISO-8601 time zone specifications of the form
 'Z', 'UT', 'GMT' and C<[+-]\d{1,2}:?\d{,2}>, but it knows nothing about
 shifts for summer time. So C<2009/7/1 12:00:00 -5> is 5:00 PM GMT, not
-4:00 PM. An attempt to set any other time zone will result in a warning,
-and the system default zone being used.
+4:00 PM. Other zones will be accepted, but may not do what you want. See
+below.
 
 As an extension to the ISO-8601 standard, years can be followed by an
 era specification, which is one of C<'AD'>, C<'BC'>, C<'BCE'>, or
@@ -260,9 +266,15 @@ added, and years at least equal to C<70> but less than C<100> will have
 C<1900> added.
 
 If L<DateTime|DateTime> can be loaded, it will be used to get an epoch
-from the parsed date. Otherwise L<Time::Local|Time::Local> will be used.
+from the parsed date, including zone.
+
+If L<DateTime|DateTime> can B<not> be loaded, L<Time::Local|Time::Local>
+will be used to get an epoch from the parsed date.
 L<Time::Local|Time::Local> has its own quirks when it sees a year in the
-distant past. See its documentation for more information.
+distant past. Zones other than C<UTC>, C<GMT>, C<Z>, and numeric offsets
+will be handled by setting C<$ENV{TZ}> to the specified zone before
+converting from local time to epoch.  If this works for you, fine. If
+not, tough.  B<You have been warned!>
 
 =head1 METHODS
 
@@ -283,7 +295,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2022 by Thomas R. Wyant, III
+Copyright (C) 2009-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

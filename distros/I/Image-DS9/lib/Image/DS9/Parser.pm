@@ -2,369 +2,353 @@ package Image::DS9::Parser;
 
 # ABSTRACT: Parser driver
 
+use v5.10;
+
 use strict;
 use warnings;
 
-our $VERSION = '0.188';
+our $VERSION = 'v1.0.0';
 
-use Carp;
-use Data::Dumper;
+our @CARP_NOT = qw( Image::DS9::Command );
 
 use Image::DS9::PConsts;
+use Ref::Util qw( is_arrayref is_coderef is_hashref is_ref is_regexpref );
+use Log::Any '$log';
 
 use namespace::clean;
 
-sub parse_spec
+## no critic (Modules::ProhibitMultiplePackages)
+
 {
-  my $command = shift;
-  my $specs = shift;
+    package    #
+      Image::DS9::Parser::Value;
 
-  # keep the rest of the args in @_, so don't copy data
+    sub new {
+        my ( $class, $token, $valref, $extra ) = @_;
 
-  my %match;
-
-  my $max_match = 0;
-  my $nmatch = 0;
-
- SPEC:
-  for my $spec ( @$specs )
-  {
-    $max_match = $nmatch if $max_match < $nmatch;
-
-    my $iarg = 0;
-
-    $nmatch = 0;
-
-    $match{cmds} = [];
-
-    next if @_ < @{$spec->[0]};
-
-    foreach my $icmd ( 0 .. @{$spec->[0]}-1 )
-    {
-      # input arguments must have at least the number of
-      # sub command slots.
-
-      if ( my ( $tag, $valref, $extra ) =
-           match( $_[$iarg++], $spec->[0][$icmd] ) )
-      {
-        push @{$match{cmds}}, [ $tag, $valref, $extra ];
-        $nmatch++;
-      }
-      else  {
-        next SPEC ;
-      }
-
+        return bless {
+            token  => $token,
+            valref => $valref,
+            extra  => $extra,
+        }, $class;
     }
 
-    $match{spec} = $spec;
+    sub token     { $_[0]{token} }
+    sub valref    { $_[0]{valref} }
+    sub extra     { $_[0]{extra} }
+    sub has_extra { defined $_[0]{extra} }
 
 
-    # if we've come this far, we CANNOT match any further specs.  why?
-    # well, because the person setting up the spec list is supposed to
-    # ensure that!
-    $max_match = $nmatch if $max_match < $nmatch;
+    sub is_ephemeral { $_[0]->token->is_ephemeral }
+    sub is_rewrite   { $_[0]->token->is_rewrite }
 
-    my $s_nmatch = $nmatch;
-    my $s_iarg = $iarg;
+    sub cvt_from_get {
+        my $self = shift;
+        die if @_;
+        return $self->token->cvt_from_get( $self->valref );
+    }
 
-  ARGLIST:
-    for my $argl ( @{$spec}[ 1 .. @{$spec}-1] )
-    {
+    sub cvt_for_set {
+        my $self = shift;
+        die if @_;
+        return $self->token->cvt_for_set( $self->valref );
+    }
 
-      # this may get adjusted if there's an attribute hash, and will
-      # need to be reinitialized if this arglist doesn't match
-      # and we do another ARGLIST goround
-      my $nargs = @_ - @{$spec->[0]};
+}
 
-      # have to reset pointer into passed arguments for each attempt
-      # at matching another argument list
-      $iarg = $s_iarg;
+sub _croak {
+    require Carp;
+    my $fmt = shift;
+    @_ = sprintf( $fmt, @_ );
+    goto \&Carp::croak;
+}
 
-      $max_match = $nmatch if $max_match < $nmatch;
-      $nmatch = $s_nmatch;
+sub parse_spec {    ## no critic (Subroutines::ProhibitExcessComplexity)
+    my $command = shift;
+    my $specs   = shift;
 
-      # default is to query, no args.
-      $argl->{query} = QYES unless exists $argl->{query};
+    # $log->debug( "parsing: ", { cmd => $command, args => \@_ } );
 
-      # make sure there's an array there, even if empty
-      $argl->{args} ||= [];
+    # keep the rest of the args in @_, so don't copy data
 
-      # number of return values in case of a query; the grammar
-      # need only specify it if it's not the same as the number
-      # of arguments
-      $argl->{rvals} = $argl->{args}
-        unless defined $argl->{rvals};
+    my %match;
 
-      # adjust things if attributes are ok and we found one at the
-      # end of the argument list
-      my $found_attrs = 0;
-      if ( exists $argl->{attrs} && 'HASH' eq ref $_[-1] )
-      {
-        $found_attrs = 1;
-        # so we don't stumble across 'em
-        $nargs--;
-      }
+    my $max_match = 0;
+    my $nmatch    = 0;
 
-      # if we have no passed arguments, and the spec is query only or
-      # query possible, we have a match!
+  SPEC:
+    for my $spec ( @$specs ) {
+        $max_match = $nmatch if $max_match < $nmatch;
 
-      if ( ! $nargs && $argl->{query} && !( $argl->{query} & QARGS ))
-      {
-        $match{argl} = $argl;
+        my $iarg = 0;
 
-        # the number of returned values. set to number of possible
-        # arguments if not explicitly specified.
-        $match{query} = @{$argl->{rvals}} || @{$argl->{args}} || 1;
-      }
+        $nmatch = 0;
 
-      # correct number of arguments.
-      elsif ( $nargs == @{$argl->{args}} )
-      {
-        $match{args} = [];
+        $match{cmds} = [];
 
-        foreach my $arg ( @{$argl->{args}} )
-        {
-          # $extra is not yet supported for args
-          if ( my ( $tag, $valref, $extra ) =
-               match( $_[$iarg++], $arg ) )
-          {
-            push @{$match{args}}, [ $tag, $valref, $extra ];
+        # input arguments must have at least the number of
+        # sub command slots.
+        next if @_ < @{ $spec->[0] };
+
+        # compare against the sub-command slots.
+        foreach my $icmd ( 0 .. @{ $spec->[0] } - 1 ) {
+            my $value = match( $_[ $iarg++ ], $spec->[0][$icmd] );
+            next SPEC unless defined $value;
+
+            # $log->debug( "matched: ", { spec => $spec->[0][$icmd] } );
+            push @{ $match{cmds} }, $value;
             $nmatch++;
-          }
-          else {
-            next ARGLIST ;
-          }
-
         }
 
-        $match{argl} = $argl;
+        $match{spec} = $spec;
 
-        # the number of returned values. set to number of possible
-        # arguments if not explicitly specified.
-        $match{query} = $argl->{query} & QARGS ?
-          @{$argl->{rvals}} || @{$argl->{args}} || 1 : 0;
-      }
+        # if we've come this far, we CANNOT match any further specs.  why?
+        # well, because the person setting up the spec list is supposed to
+        # ensure that!
+        $max_match = $nmatch if $max_match < $nmatch;
 
-      else
-      {
-        next ARGLIST;
-      }
+        my $s_nmatch = $nmatch;
+        my $s_iarg   = $iarg;
 
-      if ( $found_attrs )
-      {
-        # we need to make a copy,
-        $match{attrs} = parse_attr( $command, $_[-1], $argl->{attrs} );
+      ARGLIST:
+        for my $argl ( @{$spec}[ 1 .. @{$spec} - 1 ] ) {
 
-        croak( __PACKAGE__,
-               ": $command: cannot specify attributes with this query" )
-          if $match{query} && ! ($argl->{query} & QATTR);
+            # $log->debug( 'matching', $argl );
 
-      }
+            # this may get adjusted if there's an attribute hash, and will
+            # need to be reinitialized if this arglist doesn't match
+            # and we do another ARGLIST goround
+            my $nargs = @_ - @{ $spec->[0] };
 
-      # we found it, $match{argl} will have been set.
-      last SPEC;
-    }
+            # have to reset pointer into passed arguments for each attempt
+            # at matching another argument list
+            $iarg = $s_iarg;
 
-    last SPEC;
-  }
+            $max_match = $nmatch if $max_match < $nmatch;
+            $nmatch    = $s_nmatch;
 
-  $max_match += $nmatch + 1;
+            # default is to query, no args.
+            $argl->{query} = QYES unless exists $argl->{query};
 
-  croak( __PACKAGE__,
-         ": $command: missing, unexpected, or illegal value for argument #$max_match" )
-    unless defined $match{argl};
+            # make sure there's an array there, even if empty
+            $argl->{args} ||= [];
 
-#  print Dumper \%match;
+            # number of return values in case of a query; the grammar
+            # need only specify it if it's not the same as the number
+            # of arguments
+            $argl->{rvals} = $argl->{args}
+              unless defined $argl->{rvals};
 
-  \%match;
-}
+            # adjust things if attributes are ok and we found one at the
+            # end of the argument list
+            my $found_attrs = 0;
+            if ( exists $argl->{attrs} && is_hashref( $_[-1] ) ) {
+                $found_attrs = 1;
+                # so we don't stumble across 'em
+                $nargs--;
+            }
 
-sub parse_attr
-{
-  my ( $command, $uattr, $specs ) = @_;
+            # if we have no passed arguments, and the spec is query only or
+            # query possible, we have a match!
+            if ( !$nargs && $argl->{query} & ( QONLY | QYES ) ) {
+                $match{argl} = $argl;
 
-  my %attr;
+                # the number of returned values. set to number of possible
+                # arguments if not explicitly specified.
+                $match{query} = @{ $argl->{rvals} } || @{ $argl->{args} } || 1;
+            }
 
-  # need to make a local copy of the specs array, as _parse_attr
-  # destroys the array
-  my @specs = @$specs;
+            # correct number of arguments.
+            elsif ( $nargs == @{ $argl->{args} } ) {
+                $match{args} = [];
 
-  _parse_attr( $command, \%attr, $uattr, \@specs );
+                foreach my $arg ( @{ $argl->{args} } ) {
+                    # $extra is not yet supported for args
+                    my $value = match( $_[ $iarg++ ], $arg );
+                    next ARGLIST unless defined $value;
 
-  my @unknown = grep { ! exists $attr{$_} } keys %$uattr;
+                    push @{ $match{args} }, $value;
+                    $nmatch++;
+                }
 
-  croak( __PACKAGE__, ": $command: unknown attribute(s): ",
-         join( ', ', @unknown ) ) if @unknown;
+                $match{argl} = $argl;
 
-  \%attr;
-}
+                # the number of returned values. set to number of possible
+                # arguments if not explicitly specified.
+                $match{query} = $argl->{query} & QARGS ? @{ $argl->{rvals} } || @{ $argl->{args} } || 1 : 0;
+            }
 
-sub _parse_attr
-{
-  my ( $command, $attr, $uattr, $specs ) = @_;
+            else {
+                next ARGLIST;
+            }
 
-  my $nmatch;
-  my @res;
+            if ( $found_attrs ) {
+                # we need to make a copy,
+                $match{attrs} = parse_attr( $command, $_[-1], $argl->{attrs} );
 
-  while ( my $spec = shift @$specs )
-  {
-    if ( $spec =~ /^-(o|a)/ )
-    {
-      my $op = $1;
+                _croak( '%s: cannot specify attributes with this query', $command )
+                  if $match{query} && !( $argl->{query} & QATTR );
 
-      my ($sres, $smatch) = _parse_attr( $command, $attr, $uattr, shift @$specs );
+            }
 
-      if ( 'a' eq $op )
-      {
-
-        # no matches? record and continue
-        unless ( $smatch )
-        {
-          push @res, { what => $sres, match => 0 };
-          next;
+            # we found it, $match{argl} will have been set.
+            last SPEC;
         }
 
-        # number of matches should equal number of attrs
-        unless ( $smatch == @$sres )
-        {
-          croak( __PACKAGE__, ": $command: missing attributes: ",
-                dump_attr_chk( [ { what => $sres, match => 1, op => $op }] ) );
-        }
-
-        push @res, { what => $sres, match => 1, op => $op };
-        $nmatch++;
-      }
-
-      elsif ( 'o' eq $op )
-      {
-
-        # no matches? record and continue
-        unless ( $smatch )
-        {
-          push @res, { what => $sres, match => 0 };
-          next;
-        }
-
-        # only should have one match
-        unless ( $smatch == 1 )
-        {
-          croak( __PACKAGE__, ": $command: too many attributes: ",
-                dump_attr_chk( [ { what => $sres, match => 1, op => $op }] ) );
-        }
-
-        push @res, { what => $sres, match => 1, op => $op };
-        $nmatch++;
-      }
-
+        last SPEC;
     }
-    else
-    {
-      my $match = chk_attr( $command, $spec, shift(@$specs), $attr, $uattr );
-      $nmatch++ if $match;
 
-      push @res, { what => $spec,
-                   match => $match };
-    }
-  }
-  \@res, $nmatch;
+    $max_match += $nmatch + 1;
+
+    _croak( '%s: missing, unexpected, or illegal value for argument #%d', $command, $max_match )
+      unless defined $match{argl};
+    # $log->debug( "matched:", $match{argl} );
+
+    \%match;
 }
 
-sub dump_attr_chk
-{
-  my ( $chks, $sep ) = @_;
+sub parse_attr {
+    my ( $command, $uattr, $specs ) = @_;
 
-  $sep ||= ' , ';
+    my %attr;
 
-  my $msg;
+    _parse_attr( $command, \%attr, $uattr, $specs );
 
-  for my $res ( @$chks )
-  {
+    my @unknown = grep { !exists $attr{$_} } keys %$uattr;
 
-    if    ( 'ARRAY' eq ref($res->{what}) )
-    {
-      my $msep =
-        'a' eq $res->{op} ? ' & ' :
-        'o' eq $res->{op} ? ' | ' :
-          croak( __PACKAGE__, "::dump_attr_chk: internal error" );
+    _croak( '%s: unknown attribute(s): %s', $command, join( ', ', @unknown ) ) if @unknown;
 
-      my $nmsg = dump_attr_chk( $res->{what}, $msep );
-      $msg .= "($nmsg)$sep";
-    }
-    else
-    {
-      $msg .= $res->{what} . ($res->{match} ? '' : '?' ) . $sep;
-    }
-  }
-
-  $sep =~ s/(\W)/\\$1/g;
-  $msg =~ s/$sep$//;
-
-  $msg;
+    \%attr;
 }
 
-sub chk_attr
-{
-  my ( $command, $key, $type, $attr, $uattr ) = @_;
+sub _parse_attr {
+    my ( $command, $attr, $uattr, $specs_ref ) = @_;
 
-  if ( exists $uattr->{$key} )
-  {
-    # $extra is not yet supported for attrs
-    if ( my ( $tag, $valref, $extra )
-         = match( $uattr->{$key}, $type ) )
-    {
-      $attr->{$key} = { tag => $tag, valref => $valref, extra => $extra };
+    my $nmatch;
+    my @res;
+
+    my @specs = @$specs_ref;
+
+    while ( my $spec = shift @specs ) {
+        if ( $spec =~ /^-([oa])/ ) {
+            my $op = $1;
+
+            my ( $sres, $smatch ) = _parse_attr( $command, $attr, $uattr, shift @specs );
+
+            if ( 'a' eq $op ) {
+
+                # no matches? record and continue
+                unless ( $smatch ) {
+                    push @res, { what => $sres, match => 0 };
+                    next;
+                }
+
+                # number of matches should equal number of attrs
+                unless ( $smatch == @$sres ) {
+                    _croak(
+                        '%s: missing attributes: %s',
+                        $command, dump_attr_chk( [ { what => $sres, match => 1, op => $op } ] ),
+                    );
+                }
+
+                push @res, { what => $sres, match => 1, op => $op };
+                $nmatch++;
+            }
+
+            elsif ( 'o' eq $op ) {
+
+                # no matches? record and continue
+                unless ( $smatch ) {
+                    push @res, { what => $sres, match => 0 };
+                    next;
+                }
+
+                # only should have one match
+                unless ( $smatch == 1 ) {
+                    _croak(
+                        '%s: too many attributes: %s',
+                        $command, dump_attr_chk( [ { what => $sres, match => 1, op => $op } ] ),
+                    );
+                }
+
+                push @res, { what => $sres, match => 1, op => $op };
+                $nmatch++;
+            }
+
+        }
+        else {
+            my $match = chk_attr( $command, $spec, shift( @specs ), $attr, $uattr );
+            $nmatch++ if $match;
+
+            push @res,
+              {
+                what  => $spec,
+                match => $match,
+              };
+        }
     }
-    else
-    {
-      croak( __PACKAGE__, ": $command: attribute `$key': illegal value. perhaps the wrong type or array length?" );
-    }
-
-    return 1;
-  }
-
-  0;
+    return \@res, $nmatch;
 }
 
-# ( $tag, $valref, $extra ) = match( $value, $type )
-#
-sub match
-{
-# don't do this! we need to pass by reference to avoid copying tons
-# of data
-#  my ( $value, $type ) = @_;
+sub dump_attr_chk {
+    my ( $chks, $sep ) = @_;
 
-  my $type = $_[1];
-  my $tag = T_OTHER;
-  my $extra;
+    $sep ||= ' , ';
 
-  my $valref = ref($_[0]) ? $_[0] : \( $_[0] );
+    my $msg;
 
-  # if the type is an array, the first element is a tag for the
-  # type, the second is what to match, the third is just plain extra
-  if ( 'ARRAY' eq ref $type )
-  {
-    $tag   = $type->[0];
-    $extra = $type->[2] if exists $type->[2];
-    $type  = $type->[1];
-  }
+    for my $res ( @$chks ) {
 
-  if ( 'Regexp' eq ref($type) )
-  {
-    return $_[0] =~ /^($type)$/ ? ( $tag, \( my $x = $1 ), $extra ) : ();
-  }
+        if ( is_arrayref( $res->{what} ) ) {
+            my $msep
+              = 'a' eq $res->{op} ? ' & '
+              : 'o' eq $res->{op} ? ' | '
+              :                     _croak( '%s::dump_attr_chk: internal error', __PACKAGE__ );
 
-  elsif ( 'CODE' eq ref($type) )
-  {
-    return $type->($_[0], $valref) ?
-      ( $tag, $valref, $extra) : ();
-  }
+            my $nmsg = dump_attr_chk( $res->{what}, $msep );
+            $msg .= "($nmsg)$sep";
+        }
+        else {
+            $msg .= $res->{what} . ( $res->{match} ? q{} : q{?} ) . $sep;
+        }
+    }
 
-  else
-  {
-    return $type eq $_[0] ? ( $tag, $valref, $extra ) : ();
-  }
+    $sep =~ s/(\W)/\\$1/g;
+    $msg =~ s/$sep$//;
 
-  ();
+    $msg;
+}
+
+sub chk_attr {
+    my ( $command, $key, $type, $attr, $uattr ) = @_;
+
+    if ( exists $uattr->{$key} ) {
+        # $extra is not yet supported for attrs
+        my $value = match( $uattr->{$key}, $type );
+        _croak( q{%s: attribute `%s': illegal value. perhaps the wrong type or array length?},
+            $command, $key )
+          if !defined $value;
+
+        $attr->{$key} = $value;
+
+        return 1;
+    }
+
+    return 0;
+}
+
+sub match {
+    # don't do this! we need to pass by reference to avoid copying tons
+    # of data
+    #  my ( $value, $type ) = @_;
+
+    my $type = $_[1];
+
+    if ( defined( my $match = $type->check( $_[0] ) ) ) {
+        return Image::DS9::Parser::Value->new( $type, $match, $type->extra );
+    }
+
+    return undef;
 }
 
 #
@@ -379,7 +363,12 @@ sub match
 
 1;
 
+__END__
+
 =pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory QARGS QATTR QNONE QONLY
+QYES Subcommand XPASet attrs buf bufarg cvt retref
 
 =head1 NAME
 
@@ -387,7 +376,13 @@ Image::DS9::Parser - Parser driver
 
 =head1 VERSION
 
-version 0.188
+version v1.0.0
+
+=for Pod::Coverate chk_attr
+dump_attr_chk
+match
+parse_attr
+parse_spec
 
 =head2 Command specification structure.
 
@@ -454,6 +449,10 @@ This sub-command may only be queried.  No arguments may be specified.
 This sub-command may be queried.  No arguments may be specified for the query.
 This is the default if B<query> isn't specified.
 
+=item QATTR
+
+Query may have attributes.
+
 =back
 
 =item bufarg
@@ -509,10 +508,21 @@ Note that all clauses are evaluated, to catch possibly typos by the user.
 
 =back
 
-=head1 BUGS AND LIMITATIONS
+=head1 SUPPORT
 
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9>.
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-image-ds9@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/image-ds9
+
+and may be cloned from
+
+  https://gitlab.com/djerius/image-ds9.git
 
 =head1 SEE ALSO
 
@@ -539,128 +549,3 @@ This is free software, licensed under:
   The GNU General Public License, Version 3, June 2007
 
 =cut
-
-__END__
-
-
-#pod =pod
-#pod
-#pod =head2 Command specification structure.
-#pod
-#pod Commands may have "sub-commands" and arguments.  A given sub-command
-#pod is allowed to have alternate argument lists.  Sub-commands may be
-#pod queries as well as directives, and thus will return information.
-#pod
-#pod Commands are specified as arrays.  Each element in the array is a
-#pod separate sub-command.  Sub-commands are specified via arrays,
-#pod the first element of which defines the sub-command tokens, the rest
-#pod the alternate argument lists.
-#pod
-#pod Sub-command tokens are presented as an array of strings or regular
-#pod expressions.  If there is more than one, the input list of tokens
-#pod must match exactly in order.
-#pod
-#pod An argument list is a hash which describes the order and type of
-#pod arguments and whether and how the sub-command can be queried with
-#pod the specified argument list.
-#pod
-#pod In detail, here's what a sub-command specification looks like:
-#pod
-#pod =over 8
-#pod
-#pod =item Subcommand
-#pod
-#pod This is an arrayref which contains strings or RE's to match.  all must
-#pod match, in the specified order. It may be empty.
-#pod
-#pod =item Argument list
-#pod
-#pod A hashref with the following possible keys:
-#pod
-#pod =over 8
-#pod
-#pod =item args
-#pod
-#pod An array of argument types.  The types may be strings, regular
-#pod expressions (generated with the B<qr> operator), or subroutine refs.
-#pod The arguments must match the types, in the specified order.
-#pod
-#pod =item query
-#pod
-#pod This determines how and if the sub-command with the specified
-#pod arguments may be queried.  It may have the following values:
-#pod
-#pod =over 8
-#pod
-#pod =item QNONE
-#pod
-#pod This sub-command with the specified argument list may not be queried.
-#pod
-#pod =item QARGS
-#pod
-#pod This sub-command with the specified argument list may only be
-#pod queried. All of the arguments must specified.
-#pod
-#pod =item QONLY
-#pod
-#pod This sub-command may only be queried.  No arguments may be specified.
-#pod
-#pod =item QYES
-#pod
-#pod This sub-command may be queried.  No arguments may be specified for the query.
-#pod This is the default if B<query> isn't specified.
-#pod
-#pod =back
-#pod
-#pod =item bufarg
-#pod
-#pod The last argument passed to the command should be sent via the XPASet buf
-#pod argument.
-#pod
-#pod =item cvt
-#pod
-#pod If true (the default) returned results are converted if their type has
-#pod a conversion routine available.  The list of arguments is used
-#pod to determine the return types.
-#pod
-#pod =item retref
-#pod
-#pod If true, a reference to the queried value is returned if
-#pod the user queries the command in a scalar context.
-#pod
-#pod =item attrs
-#pod
-#pod If this is present and the last element in the argument list is a
-#pod hashref, it will be scanned for attributes which will modify the query
-#pod or directive.  Attributes are command specific, typed, and may be
-#pod specified in combination or exclusion.  Attributes are specified in
-#pod an array as keyword/type pairs.  Attributes which must appear together
-#pod should be in their own array, preceded by the token C<-a>.
-#pod Attributes which must not appear together should be in their own
-#pod array, preceded by the token C<-o>.  Such clauses may be nested.
-#pod
-#pod For example:
-#pod
-#pod =over 8
-#pod
-#pod =item C<ydim> and C<xdim> must both be specified:
-#pod
-#pod  -a => [ xdim => FLOAT, ydim => FLOAT ]
-#pod
-#pod =item C<night> and C<day> must not both be specified:
-#pod
-#pod  -o => [ night => BOOL, day => BOOL ]
-#pod
-#pod =item C<ydim> and C<xdim> must both be specified, but cannot
-#pod be specified with C<dim>:
-#pod
-#pod  -o => [ ( -a => [ xdim => FLOAT, ydim => FLOAT ] ),
-#pod          ( dim => FLOAT ) ]
-#pod
-#pod =back
-#pod
-#pod Note that all clauses are evaluated, to catch possibly typos by the user.
-#pod
-#pod =back
-#pod
-#pod =back

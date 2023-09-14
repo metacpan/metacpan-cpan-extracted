@@ -346,10 +346,6 @@ call_m( parse => '09/1 Z',
     greg_time_gm( 0, 0, 0, 1, 0, 2009 ),
     q{Parse ISO-8601 '09/1 Z'} );
 
-call_m( parse => '12/1/1 fubar',
-    undef,
-    q{Parse ISO-8601 '12/1/1 fubar' should fail} );
-
 SKIP: {
 
     my $tests = 12;

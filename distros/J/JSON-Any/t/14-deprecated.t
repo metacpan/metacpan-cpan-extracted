@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More 0.88;
 use Test::Warnings 0.009 qw(:no_end_test :all);
 
 require JSON::Any;
 
-use Test::Requires 'JSON::Syck';
+use Test::Needs 'JSON::Syck';
 
 use Test::Without::Module qw(Cpanel::JSON::XS JSON::XS JSON::DWIW JSON JSON::PP);
 

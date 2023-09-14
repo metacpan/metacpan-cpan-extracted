@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.009';
+our $VERSION = '1.011';
 
 use base 'Mutex';
 use Fcntl ':flock';
@@ -24,9 +24,15 @@ sub CLONE {
     $tid = threads->tid() if $INC{'threads.pm'};
 }
 
+sub Mutex::Flock::_guard::DESTROY {
+    my ($pid, $obj) = @{ $_[0] };
+    CORE::flock ($obj->{_fh}, LOCK_UN), $obj->{ $pid } = 0 if $obj->{ $pid };
+
+    return;
+}
+
 sub DESTROY {
     my ($pid, $obj) = ($tid ? $$ .'.'. $tid : $$, @_);
-
     $obj->unlock(), close(delete $obj->{_fh}) if $obj->{ $pid };
     unlink $obj->{path} if ($obj->{_init} && $obj->{_init} eq $pid);
 
@@ -123,6 +129,11 @@ sub lock {
     return;
 }
 
+sub guard_lock {
+    &lock(@_);
+    bless([ $tid ? $$ .'.'. $tid : $$, $_[0] ], Mutex::Flock::_guard::);
+}
+
 *lock_exclusive = \&lock;
 
 sub lock_shared {
@@ -153,14 +164,13 @@ sub synchronize {
     $obj->_open() unless exists $obj->{ $pid };
 
     # lock, run, unlock - inlined for performance
-    CORE::flock ($obj->{_fh}, LOCK_EX), $obj->{ $pid } = 1
-        unless $obj->{ $pid };
-
+    my $guard = bless([ $pid, $obj ], Mutex::Flock::_guard::);
+    unless ($obj->{ $pid }) {
+        CORE::flock ($obj->{_fh}, LOCK_EX), $obj->{ $pid } = 1;
+    }
     (defined wantarray)
       ? @ret = wantarray ? $code->(@_) : scalar $code->(@_)
       : $code->(@_);
-
-    CORE::flock ($obj->{_fh}, LOCK_UN), $obj->{ $pid } = 0;
 
     return wantarray ? @ret : $ret[-1];
 }
@@ -201,7 +211,7 @@ Mutex::Flock - Mutex locking via Fcntl
 
 =head1 VERSION
 
-This document describes Mutex::Flock version 1.009
+This document describes Mutex::Flock version 1.011
 
 =head1 DESCRIPTION
 
@@ -218,6 +228,8 @@ The API is described in L<Mutex>.
 =item lock_exclusive
 
 =item lock_shared
+
+=item guard_lock
 
 =item unlock
 

@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait;
@@ -54,10 +54,10 @@ my %CLK0_CONFIG = (
    $adapter->expect_write_then_read( "\x03", 1 )
       ->returns( "\x00" );
 
-   is_deeply( await $chip->read_multisynth_config( 0 ), \%MS0_CONFIG,
+   is( await $chip->read_multisynth_config( 0 ), \%MS0_CONFIG,
       '->read_multisynth_config yields initial config' );
 
-   is_deeply( await $chip->read_clk_config( 0 ), \%CLK0_CONFIG,
+   is( await $chip->read_clk_config( 0 ), \%CLK0_CONFIG,
       '->read_clk_config yields initial config' );
 
    $adapter->check_and_clear( 'Initial setup' );
@@ -69,10 +69,10 @@ my %CLK0_CONFIG = (
 
    await $chip->change_multisynth_config( 0, SRC => ($MS0_CONFIG{SRC} = "PLLB") );
 
-   is_deeply( await $chip->read_multisynth_config( 0 ), \%MS0_CONFIG,
+   is( await $chip->read_multisynth_config( 0 ), \%MS0_CONFIG,
       '->read_multisynth_config yields new config' );
 
-   is_deeply( await $chip->read_clk_config( 0 ), \%CLK0_CONFIG,
+   is( await $chip->read_clk_config( 0 ), \%CLK0_CONFIG,
       '->read_clk_config yields unchanged config' );
 
    $adapter->check_and_clear( '->change_multisynth_config' );
@@ -82,10 +82,10 @@ my %CLK0_CONFIG = (
 
    await $chip->change_clk_config( 0, IDRV => ($CLK0_CONFIG{IDRV} = "4mA") );
 
-   is_deeply( await $chip->read_multisynth_config( 0 ), \%MS0_CONFIG,
+   is( await $chip->read_multisynth_config( 0 ), \%MS0_CONFIG,
       '->read_multisynth_config yields unchanged config' );
 
-   is_deeply( await $chip->read_clk_config( 0 ), \%CLK0_CONFIG,
+   is( await $chip->read_clk_config( 0 ), \%CLK0_CONFIG,
       '->read_clk_config yields new config' );
 
    $adapter->check_and_clear( '->change_clk_config' );
@@ -102,10 +102,10 @@ my %CLK0_CONFIG = (
    $MS0_CONFIG{ratio_a} = 1234;
    $MS0_CONFIG{ratio}   = 1234;
 
-   is_deeply( await $chip->read_multisynth_config( 0 ), \%MS0_CONFIG,
+   is( await $chip->read_multisynth_config( 0 ), \%MS0_CONFIG,
       '->read_multisynth_config yields new config' );
 
-   is_deeply( await $chip->read_clk_config( 0 ), \%CLK0_CONFIG,
+   is( await $chip->read_clk_config( 0 ), \%CLK0_CONFIG,
       '->read_clk_config yields unchanged config' );
 
    $adapter->check_and_clear( '->change_multisynth_config' );
@@ -115,10 +115,10 @@ my %CLK0_CONFIG = (
 
    await $chip->change_clk_config( 0, DIV => ($CLK0_CONFIG{DIV} = 8) );
 
-   is_deeply( await $chip->read_multisynth_config( 0 ), \%MS0_CONFIG,
+   is( await $chip->read_multisynth_config( 0 ), \%MS0_CONFIG,
       '->read_multisynth_config yields unchanged config' );
 
-   is_deeply( await $chip->read_clk_config( 0 ), \%CLK0_CONFIG,
+   is( await $chip->read_clk_config( 0 ), \%CLK0_CONFIG,
       '->read_clk_config yields new config' );
 
    $adapter->check_and_clear( '->change_clk_config' );

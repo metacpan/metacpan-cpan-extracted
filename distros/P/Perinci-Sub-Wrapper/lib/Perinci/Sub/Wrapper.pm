@@ -1,12 +1,8 @@
 package Perinci::Sub::Wrapper;
 
-our $DATE = '2021-08-01'; # DATE
-our $VERSION = '0.852'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
-use experimental 'smartmatch';
 use Log::ger;
 
 use Data::Dmp qw(dmp);
@@ -15,6 +11,12 @@ use Perinci::Sub::Normalize qw(normalize_function_metadata);
 use Perinci::Sub::Util qw(err);
 
 use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-07-09'; # DATE
+our $DIST = 'Perinci-Sub-Wrapper'; # DIST
+our $VERSION = '0.853'; # VERSION
+
 our @EXPORT_OK = qw(wrap_sub);
 
 our $Log_Wrapper_Code = $ENV{LOG_PERINCI_WRAPPER_CODE} // 0;
@@ -73,7 +75,7 @@ sub _check_module {
 
 sub _add_module {
     my ($self, $mod) = @_;
-    unless ($mod ~~ $self->{_modules}) {
+    unless (grep { $_ eq $mod } @{ $self->{_modules} }) {
         local $self->{_cur_section};
         $self->select_section('before_sub_require_modules');
         if ($mod =~ /\A(use|no) (\S+)/) {
@@ -579,15 +581,14 @@ sub _handle_args {
     my $argsterm = $args{argsterm} // '%args';
 
     if ($opt_va) {
-        $self->_add_module("use experimental 'smartmatch'");
         $self->select_section('before_call_arg_validation');
         $self->push_lines('', '# check args') if $prefix eq '';
-        $self->push_lines("for (sort keys $argsterm) {");
+        $self->push_lines("for my \$_w_arg (sort keys $argsterm) {");
         $self->indent;
-        $self->_errif(400, q["Invalid argument name (please use letters/numbers/underscores only)'].$prefix.q[$_'"],
-                      '!/\A(-?)\w+(\.\w+)*\z/o');
-        $self->_errif(400, q["Unknown argument '].$prefix.q[$_'"],
-                      '!($1 || $_ ~~ '.dmp([sort keys %$v]).')');
+        $self->_errif(400, q["Invalid argument name (please use letters/numbers/underscores only)'].$prefix.q[$_w_arg'"],
+                      '$_w_arg !~ /\A(-?)\w+(\.\w+)*\z/o');
+        $self->_errif(400, q["Unknown argument '].$prefix.q[$_w_arg'"],
+                      '!($1 || grep { $_ eq $_w_arg } @{ '.dmp([sort keys %$v]).' })');
         $self->unindent;
         $self->push_lines('}');
     }
@@ -822,7 +823,7 @@ sub handle_result {
                            x
                        )\z/x;
         # try a property module first
-        require "Perinci/Sub/Property/result/$k.pm";
+        require "Perinci/Sub/Property/result/$k.pm"; ## no critic: Modules::RequireBarewordIncludes
         my $meth = "handlemeta_result__$k";
         unless ($self->can($meth)) {
             die "No handler for property result/$k0 ($meth)";
@@ -1102,8 +1103,7 @@ sub wrap {
     # the wrapper-generated code (e.g. printing error messages)
     if (!$sub_name || $sub) {
         my $n = $comppkg . "::sub".Scalar::Util::refaddr($sub);
-        no strict 'refs'; no warnings; ${$n} = $sub;
-        use experimental 'smartmatch';
+        no strict 'refs'; no warnings; ${$n} = $sub; ## no critic: TestingAndDebugging::ProhibitNoStrict
         if (!$sub_name) {
             $args{sub_name} = $sub_name = '$' . $n;
         }
@@ -1113,8 +1113,7 @@ sub wrap {
     # the wrapper-generated code (e.g. deps clause).
     if (!$meta_name) {
         my $n = $comppkg . "::meta".Scalar::Util::refaddr($meta);
-        no strict 'refs'; no warnings; ${$n} = $meta;
-        use experimental 'smartmatch';
+        no strict 'refs'; no warnings; ${$n} = $meta; ## no critic: TestingAndDebugging::ProhibitNoStrict
         $args{meta_name} = $meta_name = '$' . $n;
     }
 
@@ -1173,7 +1172,7 @@ sub wrap {
         $k =~ s/\..+//;
         next if $k =~ /\A_/;
         next if $handler_args{$k};
-        #if ($k ~~ $self->{_args}{skip}) {
+        #if (grep { $_ eq $k } @{ $self->{_args}{skip} }) {
         #    $log->tracef("Skipped property %s (mentioned in skip)", $k);
         #    next;
         #}
@@ -1181,7 +1180,7 @@ sub wrap {
         my $meth = "handlemeta_$k";
         unless ($self->can($meth)) {
             # try a property module first
-            require "Perinci/Sub/Property/$k.pm";
+            require "Perinci/Sub/Property/$k.pm"; ## no critic: Modules::RequireBarewordIncludes
             unless ($self->can($meth)) {
                 return [500, "No handler for property $k0 ($meth)"];
             }
@@ -1305,7 +1304,7 @@ sub wrap {
         }
         $result->{source} = $source;
         if ($args{compile}) {
-            my $wrapped = eval $source;
+            my $wrapped = eval $source; ## no critic: BuiltinFunctions::ProhibitStringyEval
             die "BUG: Wrapper code can't be compiled: $@" if $@ || !$wrapped;
             $result->{sub}  = $wrapped;
         }
@@ -1478,7 +1477,7 @@ Perinci::Sub::Wrapper - A multi-purpose subroutine wrapping framework
 
 =head1 VERSION
 
-This document describes version 0.852 of Perinci::Sub::Wrapper (from Perl distribution Perinci-Sub-Wrapper), released on 2021-08-01.
+This document describes version 0.853 of Perinci::Sub::Wrapper (from Perl distribution Perinci-Sub-Wrapper), released on 2023-07-09.
 
 =head1 SYNOPSIS
 
@@ -1859,14 +1858,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Su
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-Wrapper>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Wrapper>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Perinci>, L<Rinci>
@@ -1893,15 +1884,41 @@ s1 <s1@backpacker.localdomain>
 
 =item *
 
-Steven Haryanto <sharyanto@cpan.org>
+Steven Haryanto <stevenharyanto@gmail.com>
 
 =back
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Wrapper>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

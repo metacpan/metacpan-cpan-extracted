@@ -1,6 +1,6 @@
 package Mail::BIMI::Options;
 # ABSTRACT: Shared options
-our $VERSION = '3.20230607'; # VERSION
+our $VERSION = '3.20230913'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -32,6 +32,10 @@ has require_dkim => ( is => 'rw', lazy => 0, default => sub {return $ENV{MAIL_BI
   documentation => 'Require DKIM authentication' );
 has require_vmc => ( is => 'rw', lazy => 1, default => sub {return $ENV{MAIL_BIMI_REQUIRE_VMC}},
   documentation => 'Require VMC validation' );
+has no_experimental_vmc => ( is => 'rw', lazy => 1, default => sub {return $ENV{MAIL_BIMI_NO_EXPERIMENTAL_VMC}//0},
+  documentation => 'Disallow VMCs marked as experimental' );
+has allowed_mark_types => ( is => 'rw', lazy => 1, default => sub {return $ENV{MAIL_BIMI_ALLOWED_MARK_TYPES}//'*'},
+  documentation => 'Optional comma separated list of allowed Certificate Mark Types' );
 has ssl_root_cert => ( is => 'rw', lazy => 1, default => sub {return $ENV{MAIL_BIMI_SSL_ROOT_CERT}//undef},
   documentation => 'Location of SSL Root Cert Bundle - Defaults to Mozilla::CA bundle plus Known BIMI Root Certs' );
 has strict_spf => ( is => 'rw', lazy => 1, default => sub {return $ENV{MAIL_BIMI_STRICT_SPF}},
@@ -67,7 +71,7 @@ Mail::BIMI::Options - Shared options
 
 =head1 VERSION
 
-version 3.20230607
+version 3.20230913
 
 =head1 DESCRIPTION
 
@@ -76,6 +80,12 @@ Class for capturing caller options, which may be passed to the constructor, or s
 =head1 ATTRIBUTES
 
 These values are derived from lookups and verifications made based upon the input values, it is however possible to override these with other values should you wish to, for example, validate a record before it is published in DNS, or validate an Indicator which is only available locally
+
+=head2 allowed_mark_types
+
+is=rw
+
+Optional comma separated list of allowed Certificate Mark Types
 
 =head2 cache_backend
 
@@ -124,6 +134,12 @@ Maximum redirects to follow for HTTP
 is=rw
 
 Timeout value for HTTP
+
+=head2 no_experimental_vmc
+
+is=rw
+
+Disallow VMCs marked as experimental
 
 =head2 no_location_with_vmc
 

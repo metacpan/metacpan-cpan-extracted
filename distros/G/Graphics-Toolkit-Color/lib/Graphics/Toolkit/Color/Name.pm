@@ -3,32 +3,32 @@ use v5.12;
 # named colors from X11, HTML (SVG) standard and Pantone report
 
 package Graphics::Toolkit::Color::Name;
-
+use Graphics::Toolkit::Color::Values;
 use Carp;
-use Graphics::Toolkit::Color::Value ':all';
-use Graphics::Toolkit::Color::Name::Constant;
 
+my $RGB = Graphics::Toolkit::Color::Space::Hub::get_space('RGB');
+my $HSL = Graphics::Toolkit::Color::Space::Hub::get_space('HSL');
+my $constants = require Graphics::Toolkit::Color::Name::Constant;
+our (@name_from_rgb, @name_from_hsl); # search caches
+_add_color_to_reverse_search( $_, @{$constants->{$_}} ) for all();
 
-our (@name_from_rgb, @name_from_hsl); # fill them through:
-_add_color_to_reverse_search( $_, @{$Graphics::Toolkit::Color::Name::Constant::rgbhsl_from_name{$_}} ) for all();
-
-sub all   { sort keys %Graphics::Toolkit::Color::Name::Constant::rgbhsl_from_name }
-sub taken { exists  $Graphics::Toolkit::Color::Name::Constant::rgbhsl_from_name{ _clean($_[0]) }}
+sub all   { sort keys %$constants }
+sub taken { exists  $constants->{ _clean($_[0]) } }
 
 sub rgb_from_name {
     my $name = _clean(shift);
-    @{$Graphics::Toolkit::Color::Name::Constant::rgbhsl_from_name{$name}}[0..2] if taken( $name );
+    @{$constants->{$name}}[0..2] if taken( $name );
 }
 
 sub hsl_from_name {
     my $name = _clean(shift);
-    @{$Graphics::Toolkit::Color::Name::Constant::rgbhsl_from_name{$name}}[3..5] if taken( $name );
+    @{$constants->{$name}}[3..5] if taken( $name );
 }
 
 sub name_from_rgb {
     my (@rgb) = @_;
     @rgb  = @{$rgb[0]} if (ref $rgb[0] eq 'ARRAY');
-    Graphics::Toolkit::Color::Value::RGB::check( @rgb ) and return; # return if sub did carp
+    $RGB->check( [@rgb] ) and return; # return if sub did carp
     my @names = _names_from_rgb( @rgb );
     wantarray ? @names : $names[0];
 }
@@ -36,7 +36,7 @@ sub name_from_rgb {
 sub name_from_hsl {
     my (@hsl) = @_;
     @hsl  = @{$hsl[0]} if (ref $hsl[0] eq 'ARRAY');
-    Graphics::Toolkit::Color::Value::HSL::check( @hsl ) and return;
+    $HSL->check( [ @hsl ] ) and return;
     my @names = _names_from_hsl( @hsl );
     wantarray ? @names : $names[0];
 }
@@ -46,26 +46,21 @@ sub names_in_hsl_range { # @center, (@d | $d) --> @names
                '2. radius (real number) or array with tolerances in h s l direction';
     return carp  $help if @_ != 2;
     my ($hsl_center, $radius) = @_;
-    return carp 'first argument has to be an array ref with thre number ([$h, $s, $l])'
-        if ref $hsl_center ne 'ARRAY' or @$hsl_center != 3;
-    return carp 'second argument has to be a integer < 180 or array ref with 3 integer'
-        unless (ref $radius eq 'ARRAY' and @$radius == 3) or (defined $radius and not ref $radius);
-    Graphics::Toolkit::Color::Value::HSL::check( @$hsl_center ) and return;
+    $HSL->check( $hsl_center ) and return;
+    my $hsl_delta = (ref $radius eq 'ARRAY') ? $radius : [$radius, $radius, $radius];
+    $HSL->check( $hsl_delta ) and return;
 
-    my @hsl_delta = ref $radius ? @$radius : ($radius, $radius, $radius);
-    $hsl_delta[$_] = int abs $hsl_delta[$_] for 0 ..2;
-    $hsl_delta[0] = 180 if $hsl_delta[0] > 180;        # enough to search complete HSL space (prevent double results)
-
+    $hsl_delta->[0] = 180 if $hsl_delta->[0] > 180;        # enough to search complete HSL space (prevent double results)
     my (@min, @max, @names, $minhrange, $maxhrange);
-    $min[$_] = $hsl_center->[$_] - $hsl_delta[$_]  for 0..2;
-    $max[$_] = $hsl_center->[$_] + $hsl_delta[$_]  for 0..2;
+    $min[$_] = $hsl_center->[$_] - $hsl_delta->[$_]  for 0..2;
+    $max[$_] = $hsl_center->[$_] + $hsl_delta->[$_]  for 0..2;
     $min[1] =   0 if $min[1] <   0;
     $min[2] =   0 if $min[2] <   0;
     $max[1] = 100 if $max[1] > 100;
     $max[2] = 100 if $max[2] > 100;
-    my @hrange = ($min[0] <   0 ?   0 : $min[0]) .. ($max[0] > 359 ? 359 : $max[0]);
-    push @hrange, (360 + $min[0]) .. 359 if $min[0] <   0;
-    push @hrange,  0 .. ($max[0] - 360) if $max[0] > 359;
+    my @hrange = ($min[0] <   0) ? ( 0 .. $max[0]    , $min[0]+360 .. 359)
+               : ($max[0] > 360) ? ( 0 .. $max[0]-360, $min[0]     .. 359)
+                                 :                    ($min[0]     .. $max[0]);
     for my $h (@hrange){
         next unless defined $name_from_hsl[ $h ];
         for my $s ($min[1] .. $max[1]){
@@ -77,7 +72,8 @@ sub names_in_hsl_range { # @center, (@d | $d) --> @names
              }
         }
     }
-    @names = grep {Graphics::Toolkit::Color::Value::distance( $hsl_center ,[hsl_from_name($_)], 'HSL' ) <= $radius} @names if not ref $radius;
+    @names = grep {Graphics::Toolkit::Color::Values->new(['HSL',@$hsl_center])->distance(
+                   Graphics::Toolkit::Color::Values->new(['HSL',hsl_from_name($_)])     ) <= $radius} @names if not ref $radius;
     @names;
 }
 
@@ -85,16 +81,18 @@ sub add_rgb {
     my ($name, @rgb) = @_;
     @rgb  = @{$rgb[0]} if (ref $rgb[0] eq 'ARRAY');
     return carp "missing first argument: color name" unless defined $name and $name;
-    Graphics::Toolkit::Color::Value::RGB::check( @rgb ) and return;
-    _add_color( $name, @rgb, Graphics::Toolkit::Color::Value::HSL::from_rgb( @rgb ) );
+    $RGB->check( [@rgb] ) and return;
+    my @hsl = $HSL->deconvert( [$RGB->normalize( \@rgb )], 'RGB');
+    _add_color( $name, @rgb, $HSL->denormalize(\@hsl) );
 }
 
 sub add_hsl {
     my ($name, @hsl) = @_;
     @hsl  = @{$hsl[0]} if (ref $hsl[0] eq 'ARRAY');
     return carp "missing first argument: color name" unless defined $name and $name;
-    Graphics::Toolkit::Color::Value::HSL::check( @hsl ) and return;
-    _add_color( $name, Graphics::Toolkit::Color::Value::HSL::to_rgb( @hsl ), @hsl );
+    $HSL->check( \@hsl ) and return;
+    my @rgb = $HSL->convert( [$HSL->normalize( \@hsl )], 'RGB');
+    _add_color( $name, $RGB->denormalize( \@rgb ), @hsl );
 }
 
 sub _add_color {
@@ -102,7 +100,7 @@ sub _add_color {
     $name = _clean( $name );
     return carp "there is already a color named '$name' in store of ".__PACKAGE__ if taken( $name );
     _add_color_to_reverse_search( $name, @rgb, @hsl);
-    my $ret = $Graphics::Toolkit::Color::Name::Constant::rgbhsl_from_name{$name} = [@rgb, @hsl]; # add to foreward search
+    my $ret = $constants->{$name} = [@rgb, @hsl]; # add to foreward search
     (ref $ret) ? [@$ret] : '';                         # make returned ref not transparent
 }
 
@@ -161,11 +159,11 @@ __END__
 
 =head1 NAME
 
-Graphics::Toolkit::Color::Constant - access values of color constants
+Graphics::Toolkit::Color::Name - access values of color constants
 
 =head1 SYNOPSIS
 
-    use Graphics::Toolkit::Color::Constant qw/:all/;
+    use Graphics::Toolkit::Color::Name qw/:all/;
     my @names = Graphics::Toolkit::Color::Name::all();
     my @rgb  = rgb_from_name('darkblue');
     my @hsl  = hsl_from_name('darkblue');
@@ -185,7 +183,7 @@ No symbol is imported by default. The sub symbols: C<rgb_from_name>,
 C<hsl_from_name>, C<name_from_rgb>, C<name_from_hsl> may be imported
 individually or by:
 
-    use Graphics::Toolkit::Color::Constant qw/:all/;
+    use Graphics::Toolkit::Color::Name qw/:all/;
 
 
 =head1 ROUTINES
@@ -195,9 +193,9 @@ individually or by:
 Red, Green and Blue value of the named color.
 These values are integer in 0 .. 255.
 
-    my @rgb = Graphics::Toolkit::Color::Constant::rgb_from_name('darkblue');
-    @rgb = Graphics::Toolkit::Color::Constant::rgb_from_name('dark_blue'); # same result
-    @rgb = Graphics::Toolkit::Color::Constant::rgb_from_name('DarkBlue');  # still same
+    my @rgb = Graphics::Toolkit::Color::Name::rgb_from_name('darkblue');
+    @rgb = Graphics::Toolkit::Color::Name::rgb_from_name('dark_blue'); # same result
+    @rgb = Graphics::Toolkit::Color::Name::rgb_from_name('DarkBlue');  # still same
 
 =head2 hsl_from_name
 
@@ -206,7 +204,7 @@ These are integer between 0 .. 359 (hue) or 100 (sat. & light.).
 A hue of 360 and 0 (degree in a cylindrical coordinate system) is
 considered to be the same, this modul deals only with the ladder.
 
-    my @hsl = Graphics::Toolkit::Color::Constant::hsl_from_name('darkblue');
+    my @hsl = Graphics::Toolkit::Color::Name::hsl_from_name('darkblue');
 
 =head2 name_from_rgb
 
@@ -215,8 +213,8 @@ Returns empty string if color is not stored. When several names define
 given color, the shortest name will be selected in scalar context.
 In array context all names are given.
 
-    say Graphics::Toolkit::Color::Constant::name_from_rgb( 15, 10, 121 );  # 'darkblue'
-    say Graphics::Toolkit::Color::Constant::name_from_rgb([15, 10, 121]);  # works too
+    say Graphics::Toolkit::Color::Name::name_from_rgb( 15, 10, 121 );  # 'darkblue'
+    say Graphics::Toolkit::Color::Name::name_from_rgb([15, 10, 121]);  # works too
 
 =head2 name_from_hsl
 
@@ -225,9 +223,9 @@ Returns empty string if color is not stored. When several names define
 given color, the shortest name will be selected in scalar context.
 In array context all names are given.
 
-    say scalar Graphics::Toolkit::Color::Constant::name_from_hsl( 0, 100, 50 );  # 'red'
-    scalar Graphics::Toolkit::Color::Constant::name_from_hsl([0, 100, 50]);  # works too
-    say for Graphics::Toolkit::Color::Constant::name_from_hsl( 0, 100, 50 ); # 'red', 'red1'
+    say scalar Graphics::Toolkit::Color::Name::name_from_hsl( 0, 100, 50 );  # 'red'
+    scalar Graphics::Toolkit::Color::Name::name_from_hsl([0, 100, 50]);  # works too
+    say for Graphics::Toolkit::Color::Name::name_from_hsl( 0, 100, 50 ); # 'red', 'red1'
 
 =head2  names_in_hsl_range
 
@@ -251,9 +249,9 @@ in a search of in the range 75 .. 100.
 The results contains only one name per color (the shortest).
 
     # all bright red'ish clors
-    my @names = Graphics::Toolkit::Color::Constant::names_in_hsl_range([0, 90, 50], 5);
+    my @names = Graphics::Toolkit::Color::Name::names_in_hsl_range([0, 90, 50], 5);
     # approximates to :
-    my @names = Graphics::Toolkit::Color::Constant::names_in_hsl_range([0, 90, 50],[ 3, 3, 3]);
+    my @names = Graphics::Toolkit::Color::Name::names_in_hsl_range([0, 90, 50],[ 3, 3, 3]);
 
 
 =head2 all
@@ -270,16 +268,16 @@ argument) is already in use.
 Adding a color to the store under an not taken (not already used) name.
 Arguments are name, red, green and blue value (integer < 256, see rgb).
 
-    Graphics::Toolkit::Color::Constant::add_rgb('nightblue',  15, 10, 121 );
-    Graphics::Toolkit::Color::Constant::add_rgb('nightblue', [15, 10, 121]);
+    Graphics::Toolkit::Color::Name::add_rgb('nightblue',  15, 10, 121 );
+    Graphics::Toolkit::Color::Name::add_rgb('nightblue', [15, 10, 121]);
 
 =head2 add_hsl
 
 Adding a color to the store under an not taken (not already used) name.
 Arguments are name, hue, saturation and lightness value (see hsl).
 
-    Graphics::Toolkit::Color::Constant::add_rgb('lucky',  0, 100, 50 );
-    Graphics::Toolkit::Color::Constant::add_rgb('lucky', [0, 100, 50]);
+    Graphics::Toolkit::Color::Name::add_rgb('lucky',  0, 100, 50 );
+    Graphics::Toolkit::Color::Name::add_rgb('lucky', [0, 100, 50]);
 
 =head1 SEE ALSO
 

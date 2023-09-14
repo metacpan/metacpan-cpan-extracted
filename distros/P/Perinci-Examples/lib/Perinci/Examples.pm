@@ -3,9 +3,9 @@
 package Perinci::Examples;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-04-15'; # DATE
+our $DATE = '2023-07-09'; # DATE
 our $DIST = 'Perinci-Examples'; # DIST
-our $VERSION = '0.823'; # VERSION
+our $VERSION = '0.824'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1178,7 +1178,7 @@ Perinci::Examples - Various examples of Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.823 of Perinci::Examples (from Perl distribution Perinci-Examples), released on 2022-04-15.
+This document describes version 0.824 of Perinci::Examples (from Perl distribution Perinci-Examples), released on 2023-07-09.
 
 =head1 DESCRIPTION
 
@@ -1283,9 +1283,15 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$a0> => I<str>
 
+(No description)
+
 =item * B<$a1> => I<str>
 
+(No description)
+
 =item * B<$a2> => I<str>
+
+(No description)
 
 
 =back
@@ -1320,9 +1326,15 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$a0> => I<str>
 
+(No description)
+
 =item * B<$a1> => I<str>
 
+(No description)
+
 =item * B<$a2> => I<str>
+
+(No description)
 
 
 =back
@@ -1357,7 +1369,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<a0> => I<str>
 
+(No description)
+
 =item * B<a1> => I<str>
+
+(No description)
 
 
 =back
@@ -1420,6 +1436,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<data> => I<buf> (default: "\0\0\0")
+
+(No description)
 
 
 =back
@@ -1537,6 +1555,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<fruit>* => I<str>
 
+(No description)
+
 
 =back
 
@@ -1569,33 +1589,63 @@ Arguments ('*' denotes required arguments):
 
 =item * B<action> => I<str>
 
+(No description)
+
 =item * B<cmd> => I<str>
+
+(No description)
 
 =item * B<debug> => I<bool>
 
+(No description)
+
 =item * B<format> => I<str>
+
+(No description)
 
 =item * B<format_options> => I<str>
 
+(No description)
+
 =item * B<help> => I<bool>
+
+(No description)
 
 =item * B<json> => I<bool>
 
+(No description)
+
 =item * B<log_level> => I<str>
+
+(No description)
 
 =item * B<perl> => I<bool>
 
+(No description)
+
 =item * B<quiet> => I<bool>
+
+(No description)
 
 =item * B<subcommands> => I<str>
 
+(No description)
+
 =item * B<trace> => I<bool>
+
+(No description)
 
 =item * B<verbose> => I<bool>
 
+(No description)
+
 =item * B<version> => I<str>
 
+(No description)
+
 =item * B<yaml> => I<bool>
+
+(No description)
 
 
 =back
@@ -1661,6 +1711,7 @@ See also C<s3>.
 
 Argument without any schema.
 
+
 =item * B<f0> => I<float>
 
 Float with just "float" schema defined.
@@ -1684,6 +1735,7 @@ Hash with "element_completion" as well as "index_completion" properties.
 =item * B<i0> => I<int>
 
 Integer with just "int" schema defined.
+
 
 =item * B<i1> => I<int>
 
@@ -2022,6 +2074,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<len> => I<int> (default: 1024)
 
+(No description)
+
 
 =back
 
@@ -2155,6 +2209,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<n> => I<any> (default: 5)
+
+(No description)
 
 
 =back
@@ -2336,7 +2392,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<a0> => I<str>
 
+(No description)
+
 =item * B<a1> => I<str>
+
+(No description)
 
 
 =back
@@ -2469,11 +2529,19 @@ Arguments ('*' denotes required arguments):
 
 =item * B<arg1> => I<any>
 
+(No description)
+
 =item * B<arg2> => I<any>
+
+(No description)
 
 =item * B<arg3> => I<any>
 
+(No description)
+
 =item * B<arg4> => I<any>
+
+(No description)
 
 
 =back
@@ -2507,9 +2575,15 @@ Arguments ('*' denotes required arguments):
 
 =item * B<a> => I<int>
 
+(No description)
+
 =item * B<b> => I<str>
 
+(No description)
+
 =item * B<h1> => I<hash>
+
+(No description)
 
 
 =back
@@ -2562,13 +2636,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -9,7 +9,7 @@ use parent qw{ Astro::App::Satpass2::ParseTime };
 
 use Astro::App::Satpass2::Utils qw{ CODE_REF HASH_REF @CARP_NOT };
 
-our $VERSION = '0.050';
+our $VERSION = '0.051';
 
 use constant DUMMY	=> 'DUMMY';
 
@@ -229,7 +229,7 @@ Tom Wyant (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016-2022 by Thomas R. Wyant, III
+Copyright (C) 2016-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

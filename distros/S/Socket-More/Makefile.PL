@@ -7,8 +7,10 @@ WriteMakefile(
 	PREREQ_PM         => {
 		'Data::Combination'=>0,
 		'Data::Cmp'=>0,
-		'Sort::Key'=>0,
-		'Net::IP::Lite'=>0
+    #'Sort::Key'=>0,
+		'Net::IP::Lite'=>0,
+    "Export::These"=>0
+
 	}, # e.g., Module::Name => 1.1
 	MIN_PERL_VERSION=>"v5.36.0",
 	TEST_REQUIRES	=>{

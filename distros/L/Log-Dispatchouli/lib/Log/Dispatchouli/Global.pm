@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Log::Dispatchouli::Global 3.006;
+package Log::Dispatchouli::Global 3.007;
 # ABSTRACT: a system for sharing a global, dynamically-scoped logger
 
 use Carp ();
@@ -280,7 +280,7 @@ Log::Dispatchouli::Global - a system for sharing a global, dynamically-scoped lo
 
 =head1 VERSION
 
-version 3.006
+version 3.007
 
 =head1 DESCRIPTION
 

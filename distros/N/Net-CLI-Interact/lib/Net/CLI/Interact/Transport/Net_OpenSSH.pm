@@ -1,6 +1,5 @@
 package Net::CLI::Interact::Transport::Net_OpenSSH;
-{ $Net::CLI::Interact::Transport::Net_OpenSSH::VERSION = '2.400000' }
-
+$Net::CLI::Interact::Transport::Net_OpenSSH::VERSION = '2.400002';
 use Moo;
 use Sub::Quote;
 use MooX::Types::MooseLike::Base qw(InstanceOf ArrayRef Str);
@@ -71,6 +70,8 @@ sub runtime_options {
 1;
 
 =pod
+
+=for Pod::Coverage runtime_options
 
 =encoding UTF-8
 

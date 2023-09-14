@@ -1,0 +1,9 @@
+1.000 - API changes:
+         ODF::MailMerge::Engine->new positional args eliminated; now use
+            proto_elt => $table   # specify the object directly
+            context => $context, proto_tag => "tagstring"  # search for it
+         Modifier :die ("Delete If Empty") replaces :delempty
+0.003 - Corrected :rep_first/middle/last to apply only when $N > 1
+        (i.e. only if the row is being replicated).  Preened docs.
+0.002 - Improved example; added function to get path to example dir
+0.001 - Initial release

@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 examples/pcf8563.pl

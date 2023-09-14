@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future::AsyncAwait;
 
@@ -29,7 +29,7 @@ local *Device::Chip::SSD1306::send_data = async sub {
 
    undef @output;
    await $chip->send_display( "\x55" x (128*64/8) );
-   is_deeply( \@output,
+   is( \@output,
       [
          map {
             my $page = $_;
@@ -57,7 +57,7 @@ local *Device::Chip::SSD1306::send_data = async sub {
 
    undef @output;
    await $chip->send_display( "\x55" x (128*32/8) );
-   is_deeply( \@output,
+   is( \@output,
       [
          map {
             my $page = $_;
@@ -81,7 +81,7 @@ local *Device::Chip::SSD1306::send_data = async sub {
 
    undef @output;
    await $chip->send_display( "\x55" x (64*32/8) );
-   is_deeply( \@output,
+   is( \@output,
       [
          map {
             my $page = $_;
@@ -105,7 +105,7 @@ local *Device::Chip::SSD1306::send_data = async sub {
 
    undef @output;
    await $chip->send_display( "\x55" x (128*64/8) );
-   is_deeply( \@output,
+   is( \@output,
       [
          map {
             my $page = $_;

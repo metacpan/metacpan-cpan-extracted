@@ -82,27 +82,27 @@
    "provides" : {
       "Net::Proxmox::VE" : {
          "file" : "lib/Net/Proxmox/VE.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Net::Proxmox::VE::Access" : {
          "file" : "lib/Net/Proxmox/VE/Access.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Net::Proxmox::VE::Cluster" : {
          "file" : "lib/Net/Proxmox/VE/Cluster.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Net::Proxmox::VE::Nodes" : {
          "file" : "lib/Net/Proxmox/VE/Nodes.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Net::Proxmox::VE::Pools" : {
          "file" : "lib/Net/Proxmox/VE/Pools.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       },
       "Net::Proxmox::VE::Storage" : {
          "file" : "lib/Net/Proxmox/VE/Storage.pm",
-         "version" : "0.37"
+         "version" : "0.38"
       }
    },
    "release_status" : "stable",
@@ -117,7 +117,7 @@
          "web" : "https://github.com/mrproper/proxmox-ve-api-perl"
       }
    },
-   "version" : "0.37",
+   "version" : "0.38",
    "x_author_pledge" : {
       "version" : 1
    },
@@ -128,12 +128,14 @@
       "Eric Bollengier <ebollengier@gmail.com>",
       "Jack Sauriol <sauriol@csh.rit.edu>",
       "japp-0xlabs <japp@0xlabs.com>",
+      "MartijnLievaart <github@rtij.nl>",
       "Martijn Lievaart <m@rtij.nl>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "mrproper <psynode@gmail.com>",
       "p5i <petr.v.ilin@gmail.com>",
       "Peter Valdemar M\u00f8rch <peter@morch.com>",
-      "PIQUET Damien <piqudam@gmail.com>"
+      "PIQUET Damien <piqudam@gmail.com>",
+      "poptix <poptix@poptix.net>"
    ],
    "x_generated_by_perl" : "v5.36.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",

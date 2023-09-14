@@ -1,5 +1,11 @@
 Revision history for Device-AVR-UPDI
 
+0.14    2023-09-13
+        [CHANGES]
+         * Updates for Object::Pad v0.800
+         * Swap unit tests to `Test2::V0`
+         * Use Perl v5.26, use signatures
+
 0.13    2023-08-24
         [CHANGES]
          * Rebuild with latest ATtiny ATDF files

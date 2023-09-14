@@ -1,3 +1,4 @@
+Changes
 lib/Imager/zxing.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -7,6 +8,8 @@ t/00-use.t
 t/10-formats.t
 t/30-decode.t
 t/90-pod.t
+t/code39-FA158826-1bit.png
+t/code39-FA158826-8bit.png
 t/simple.ppm
 typemap
 zxing.xs

@@ -4,94 +4,90 @@ author:
   - 'Mikko Koivunalho <mikko.koivunalho@iki.fi>'
 build_requires:
   Data::Dumper: '0'
-  ExtUtils::MakeMaker: '0'
   File::Copy: '0'
   File::Remove: '0'
-  File::Spec: '0'
+  FindBin: '1.51'
   Log::Any::Test: '0'
   Test::Exception: '0'
   Test::More: '0'
   lib: '0'
-  perl: 5.010_000
+  perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: 5.010_000
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - messaging
+  - web_service
+  - message_queue
+  - service
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: IO-Iron
-no_index:
-  directory:
-    - eg
-    - examples
-    - inc
-    - share
-    - t
-    - xt
 provides:
   IO::Iron:
     file: lib/IO/Iron.pm
-    version: '0.13'
+    version: '0.14'
   IO::Iron::ClientBase:
     file: lib/IO/Iron/ClientBase.pm
-    version: '0.13'
+    version: '0.14'
   IO::Iron::Common:
     file: lib/IO/Iron/Common.pm
-    version: '0.13'
+    version: '0.14'
   IO::Iron::Connection:
     file: lib/IO/Iron/Connection.pm
-    version: '0.13'
+    version: '0.14'
   IO::Iron::Connector:
     file: lib/IO/Iron/Connector.pm
-    version: '0.13'
+    version: '0.14'
   IO::Iron::ConnectorBase:
     file: lib/IO/Iron/ConnectorBase.pm
-    version: '0.13'
+    version: '0.14'
   IO::Iron::IronCache::Api:
     file: lib/IO/Iron/IronCache/Api.pm
-    version: '0.13'
+    version: '0.14'
   IO::Iron::IronCache::Cache:
     file: lib/IO/Iron/IronCache/Cache.pm
-    version: '0.13'
+    version: '0.14'
   IO::Iron::IronCache::Client:
     file: lib/IO/Iron/IronCache/Client.pm
-    version: '0.13'
+    version: '0.14'
   IO::Iron::IronCache::Item:
     file: lib/IO/Iron/IronCache/Item.pm
-    version: '0.13'
+    version: '0.14'
   IO::Iron::IronCache::Policy:
     file: lib/IO/Iron/IronCache/Policy.pm
-    version: '0.13'
+    version: '0.14'
   IO::Iron::IronMQ::Api:
     file: lib/IO/Iron/IronMQ/Api.pm
-    version: '0.13'
+    version: '0.14'
   IO::Iron::IronMQ::Client:
     file: lib/IO/Iron/IronMQ/Client.pm
-    version: '0.13'
+    version: '0.14'
   IO::Iron::IronMQ::Message:
     file: lib/IO/Iron/IronMQ/Message.pm
-    version: '0.13'
+    version: '0.14'
   IO::Iron::IronMQ::Queue:
     file: lib/IO/Iron/IronMQ/Queue.pm
-    version: '0.13'
+    version: '0.14'
   IO::Iron::IronWorker::Api:
     file: lib/IO/Iron/IronWorker/Api.pm
-    version: '0.13'
+    version: '0.14'
   IO::Iron::IronWorker::Client:
     file: lib/IO/Iron/IronWorker/Client.pm
-    version: '0.13'
+    version: '0.14'
   IO::Iron::IronWorker::Task:
     file: lib/IO/Iron/IronWorker/Task.pm
-    version: '0.13'
+    version: '0.14'
   IO::Iron::PolicyBase:
     file: lib/IO/Iron/PolicyBase.pm
-    version: '0.13'
+    version: '0.14'
   IO::Iron::PolicyBase::CharacterGroup:
     file: lib/IO/Iron/PolicyBase/CharacterGroup.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   Carp: '0'
   Carp::Assert: '0'
@@ -113,505 +109,17 @@ requires:
   Try::Tiny: '0'
   URI::Escape: '0'
   parent: '0'
-  perl: 5.010_000
+  perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=IO-Iron
   homepage: https://metacpan.org/release/IO-Iron
   repository: https://github.com/mikkoi/io-iron.git
-version: '0.13'
-x_Dist_Zilla:
-  perl:
-    version: '5.014002'
-  plugins:
-    -
-      class: Dist::Zilla::Plugin::MetaResources
-      name: MetaResources
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::GatherDir
-      config:
-        Dist::Zilla::Plugin::GatherDir:
-          exclude_filename: []
-          exclude_match: []
-          follow_symlinks: 0
-          include_dotfiles: 0
-          prefix: ''
-          prune_directory: []
-          root: .
-      name: '@Starter/GatherDir'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::PruneCruft
-      name: '@Starter/PruneCruft'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::ManifestSkip
-      name: '@Starter/ManifestSkip'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::MetaConfig
-      name: '@Starter/MetaConfig'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::MetaProvides::Package
-      config:
-        Dist::Zilla::Plugin::MetaProvides::Package:
-          finder_objects:
-            -
-              class: Dist::Zilla::Plugin::FinderCode
-              name: '@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.009'
-          include_underscores: 0
-        Dist::Zilla::Role::MetaProvider::Provider:
-          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
-          inherit_missing: '1'
-          inherit_version: '1'
-          meta_noindex: '1'
-        Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
-          version: '0.004'
-      name: '@Starter/MetaProvides::Package'
-      version: '2.004003'
-    -
-      class: Dist::Zilla::Plugin::MetaNoIndex
-      name: '@Starter/MetaNoIndex'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::MetaYAML
-      name: '@Starter/MetaYAML'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::MetaJSON
-      name: '@Starter/MetaJSON'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
-      config:
-        Dist::Zilla::Role::FileWatcher:
-          version: '0.006'
-      name: '@Starter/ReadmeAnyFromPod'
-      version: '0.163250'
-    -
-      class: Dist::Zilla::Plugin::ExecDir
-      name: '@Starter/ExecDir'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::ShareDir
-      name: '@Starter/ShareDir'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::PodSyntaxTests
-      name: '@Starter/PodSyntaxTests'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::Test::ReportPrereqs
-      name: '@Starter/Test::ReportPrereqs'
-      version: '0.025'
-    -
-      class: Dist::Zilla::Plugin::Test::Compile
-      config:
-        Dist::Zilla::Plugin::Test::Compile:
-          bail_out_on_fail: '0'
-          fail_on_warning: author
-          fake_home: 0
-          filename: xt/author/00-compile.t
-          module_finder:
-            - ':InstallModules'
-          needs_display: 0
-          phase: develop
-          script_finder:
-            - ':PerlExecFiles'
-          skips: []
-          switch: []
-      name: '@Starter/Test::Compile'
-      version: '2.056'
-    -
-      class: Dist::Zilla::Plugin::MakeMaker
-      config:
-        Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
-      name: '@Starter/MakeMaker'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::Manifest
-      name: '@Starter/Manifest'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::TestRelease
-      name: '@Starter/TestRelease'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::RunExtraTests
-      config:
-        Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
-      name: '@Starter/RunExtraTests'
-      version: '0.029'
-    -
-      class: Dist::Zilla::Plugin::ConfirmRelease
-      name: '@Starter/ConfirmRelease'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::UploadToCPAN
-      name: '@Starter/UploadToCPAN'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::PodWeaver
-      config:
-        Dist::Zilla::Plugin::PodWeaver:
-          finder:
-            - ':InstallModules'
-            - ':ExecFiles'
-          plugins:
-            -
-              class: Pod::Weaver::Plugin::Transformer
-              name: -Transformer
-              version: '4.015'
-            -
-              class: Pod::Weaver::Plugin::EnsurePod5
-              name: '@CorePrep/EnsurePod5'
-              version: '4.015'
-            -
-              class: Pod::Weaver::Plugin::H1Nester
-              name: '@CorePrep/H1Nester'
-              version: '4.015'
-            -
-              class: Pod::Weaver::Plugin::SingleEncoding
-              name: -SingleEncoding
-              version: '4.015'
-            -
-              class: Pod::Weaver::Section::Name
-              name: Name
-              version: '4.015'
-            -
-              class: Pod::Weaver::Section::Version
-              name: Version
-              version: '4.015'
-            -
-              class: Pod::Weaver::Section::Region
-              name: prelude
-              version: '4.015'
-            -
-              class: Pod::Weaver::Section::Generic
-              name: SYNOPSIS
-              version: '4.015'
-            -
-              class: Pod::Weaver::Section::Generic
-              name: DESCRIPTION
-              version: '4.015'
-            -
-              class: Pod::Weaver::Section::Generic
-              name: OVERVIEW
-              version: '4.015'
-            -
-              class: Pod::Weaver::Section::Collect
-              name: ATTRIBUTES
-              version: '4.015'
-            -
-              class: Pod::Weaver::Section::Collect
-              name: METHODS
-              version: '4.015'
-            -
-              class: Pod::Weaver::Section::Collect
-              name: FUNCTIONS
-              version: '4.015'
-            -
-              class: Pod::Weaver::Section::Leftovers
-              name: Leftovers
-              version: '4.015'
-            -
-              class: Pod::Weaver::Section::Region
-              name: postlude
-              version: '4.015'
-            -
-              class: Pod::Weaver::Section::Authors
-              name: Authors
-              version: '4.015'
-            -
-              class: Pod::Weaver::Section::BugsRT
-              name: BugsRT
-              version: '0.52'
-            -
-              class: Pod::Weaver::Section::Legal
-              name: Legal
-              version: '4.015'
-      name: PodWeaver
-      version: '4.008'
-    -
-      class: Dist::Zilla::Plugin::NextRelease
-      name: NextRelease
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::CheckChangesHasContent
-      name: CheckChangesHasContent
-      version: '0.010'
-    -
-      class: Dist::Zilla::Plugin::Git::Check
-      config:
-        Dist::Zilla::Plugin::Git::Check:
-          untracked_files: die
-        Dist::Zilla::Role::Git::DirtyFiles:
-          allow_dirty:
-            - Changes
-            - dist.ini
-          allow_dirty_match: []
-          changelog: Changes
-        Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
-          repo_root: .
-      name: '@Git/Check'
-      version: '2.042'
-    -
-      class: Dist::Zilla::Plugin::Git::Commit
-      config:
-        Dist::Zilla::Plugin::Git::Commit:
-          add_files_in: []
-          commit_msg: v%v%n%n%c
-        Dist::Zilla::Role::Git::DirtyFiles:
-          allow_dirty:
-            - Changes
-            - dist.ini
-          allow_dirty_match: []
-          changelog: Changes
-        Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
-          repo_root: .
-        Dist::Zilla::Role::Git::StringFormatter:
-          time_zone: local
-      name: '@Git/Commit'
-      version: '2.042'
-    -
-      class: Dist::Zilla::Plugin::Git::Tag
-      config:
-        Dist::Zilla::Plugin::Git::Tag:
-          branch: ~
-          changelog: Changes
-          signed: 0
-          tag: v0.13
-          tag_format: v%v
-          tag_message: v%v
-        Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
-          repo_root: .
-        Dist::Zilla::Role::Git::StringFormatter:
-          time_zone: local
-      name: '@Git/Tag'
-      version: '2.042'
-    -
-      class: Dist::Zilla::Plugin::Git::Push
-      config:
-        Dist::Zilla::Plugin::Git::Push:
-          push_to:
-            - origin
-          remotes_must_exist: 1
-        Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
-          repo_root: .
-      name: '@Git/Push'
-      version: '2.042'
-    -
-      class: Dist::Zilla::Plugin::Git::Contributors
-      config:
-        Dist::Zilla::Plugin::Git::Contributors:
-          'git --version': 2.17.1
-          include_authors: 0
-          include_releaser: 1
-          order_by: name
-          paths: []
-          remove: ...
-      name: Git::Contributors
-      version: '0.029'
-    -
-      class: Dist::Zilla::Plugin::PruneFiles
-      name: PruneFiles
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::MinimumPerl
-      name: MinimumPerl
-      version: '1.006'
-    -
-      class: Dist::Zilla::Plugin::AutoPrereqs
-      name: AutoPrereqs
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: test
-          type: requires
-      name: PluginName
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::Test::PodSpelling
-      config:
-        Dist::Zilla::Plugin::Test::PodSpelling:
-          directories:
-            - bin
-            - lib
-          spell_cmd: ''
-          stopwords:
-            - ABCDEFGHIJKLMNOPQRSTUVWXYZ
-            - AWS
-            - AnnoCPAN
-            - CLI
-            - CPAN
-            - Cas
-            - CharacterGroupNotDefinedIronPolicyException
-            - Github
-            - HTTPS
-            - IronCaches
-            - IronHTTPCallException
-            - IronIO
-            - IronPolicyException
-            - Ironcache
-            - JSON
-            - MERCHANTABILITY
-            - NoIronPolicyException
-            - OAuth
-            - POSIX
-            - Params
-            - RESTful
-            - Rackspace
-            - SaaS
-            - Storable
-            - Subdirectory
-            - TODO
-            - Timestamp
-            - YAML
-            - abcdefghijklmnopqrstuvwxyz
-            - alnum
-            - ascii
-            - aws
-            - cas
-            - dir
-            - filename
-            - http
-            - https
-            - io
-            - ironcache
-            - ironmq
-            - ironworker
-            - json
-            - licensable
-            - lv
-            - msg
-            - multi
-            - params
-            - runtime
-            - scalability
-            - semafores
-            - startup
-            - subitem
-            - subparam
-            - succcessful
-            - successfull
-            - timestamp
-            - tradename
-            - unreserves
-            - url
-            - webhooks
-            - webservices
-            - wildcard
-            - wildcards
-          wordlist: Pod::Wordlist
-      name: Test::PodSpelling
-      version: '2.007004'
-    -
-      class: Dist::Zilla::Plugin::MetaTests
-      name: MetaTests
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::PodCoverageTests
-      name: PodCoverageTests
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::Test::Portability
-      config:
-        Dist::Zilla::Plugin::Test::Portability:
-          options: ''
-      name: Test::Portability
-      version: '2.001000'
-    -
-      class: Dist::Zilla::Plugin::Test::Version
-      name: Test::Version
-      version: '1.09'
-    -
-      class: Dist::Zilla::Plugin::Test::Kwalitee
-      config:
-        Dist::Zilla::Plugin::Test::Kwalitee:
-          filename: xt/release/kwalitee.t
-          skiptest: []
-      name: Test::Kwalitee
-      version: '2.12'
-    -
-      class: Dist::Zilla::Plugin::Test::EOL
-      config:
-        Dist::Zilla::Plugin::Test::EOL:
-          filename: xt/author/eol.t
-          finder:
-            - ':ExecFiles'
-            - ':InstallModules'
-            - ':TestFiles'
-          trailing_whitespace: 1
-      name: Test::EOL
-      version: '0.19'
-    -
-      class: Dist::Zilla::Plugin::CheckExtraTests
-      name: CheckExtraTests
-      version: '0.029'
-    -
-      class: Dist::Zilla::Plugin::OurPkgVersion
-      name: OurPkgVersion
-      version: '0.10'
-    -
-      class: Dist::Zilla::Plugin::FinderCode
-      name: ':InstallModules'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::FinderCode
-      name: ':IncModules'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::FinderCode
-      name: ':TestFiles'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::FinderCode
-      name: ':ExtraTestFiles'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::FinderCode
-      name: ':ExecFiles'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::FinderCode
-      name: ':PerlExecFiles'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::FinderCode
-      name: ':ShareFiles'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::FinderCode
-      name: ':MainModule'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::FinderCode
-      name: ':AllFiles'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::FinderCode
-      name: ':NoFiles'
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::FinderCode
-      name: '@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.009'
-  zilla:
-    class: Dist::Zilla::Dist::Builder
-    config:
-      is_trial: '0'
-    version: '6.009'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.14'
+x_contributors:
+  - 'Graham Knop <haarg@haarg.org>'
+  - 'Mikko Koivunalho <mikkoi@cpan.org>'
+x_generated_by_perl: v5.39.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

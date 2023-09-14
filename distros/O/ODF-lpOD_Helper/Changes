@@ -1,18 +1,31 @@
+6.003 - Added bin/dumpodf script to dump the body tree of an ODF document.
+        Renamed *_COND constants *_FILTER for consistency with ODF::lpOD
+6.002 - Simplify callback protocol: Remove optRESULTS callback return support.
+        (Users can pass such info out of a callback via closures/curried refs)
+6.001 - Work around https://github.com/Perl/perl5/issues/18606
+      - Fix Hnormalize() bug which inserted an extra space
+      - Hclean_for_cloning() to remove 'rsid' styles from LibreOffice
+        which interfere with cloning.
+      - Hself_or_parent & Hparent added with with optional $stop_cond
+        to prevent ascending above a specified object type.
+        Removed self_or_parent (without the 'H').
+      - Hor_cond(cond1, cond2, ...) to combine XML::Twig search conditions
+
 6.000 - A major overhaul with incompatible API changes.
 
         "Character mode" is now the default and the old ':chars' import tag
-        is deprectated.  Now you only need to 
-          use ODF::lpOD; 
+        is deprectated.  Now you only need to
+          use ODF::lpOD;
           use ODF::lpOD_Helper;
         A new import tag ':bytes' preserves the old ODF::lpOD
         behavior where method args and results must be encoded binary.
 
-        Introduced methods Hget_text, Hoffset_into_vtext, Hinsert_element, 
+        Introduced methods Hget_text, Hoffset_into_vtext, Hinsert_element,
         Hsplit_element_at, Hdescendants, Hnext_elt, Hnormalize
 
-        A new concept is a "prune condition" when searching or collecting 
-        virtual text, to treat specified tags as opaque (i.e. their children 
-        are not visited).  This can be used to skip over nested paragraphs 
+        A new concept is a "prune condition" when searching or collecting
+        virtual text, to treat specified tags as opaque (i.e. their children
+        are not visited).  This can be used to skip over nested paragraphs
         such as may exist inside Frames or Tables.
 
         Results from multi-segment substitutions are now comprehensively
@@ -23,7 +36,7 @@
         to avoid creating nested spans (existing spans are cloned and
         partitioned if necessary around hoisted new spans).
         NOTE: Please let me know if you *do* want nested spans -- it should
-        be easy to make hoisting an option. 
+        be easy to make hoisting an option.
 
 3.000 - Hsearch reworked with API change; many bug fixes; test improvements
 

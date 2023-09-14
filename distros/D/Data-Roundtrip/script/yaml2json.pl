@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
@@ -69,7 +69,7 @@ yaml2json.pl : convert YAML to JSON with formatting options
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =head1 SYNOPSIS
 

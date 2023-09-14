@@ -3,12 +3,12 @@ use warnings;
 
 package Mac::Finder::Tags::Tag;
 # ABSTRACT: Representation of a single tag
-$Mac::Finder::Tags::Tag::VERSION = '0.01';
+$Mac::Finder::Tags::Tag::VERSION = '0.02';
 
 use Carp 'carp';
 our @CARP_NOT = qw( Mac::Finder::Tags );
 use Mac::PropertyList 'parse_plist';
-use Object::Pad 0.43;
+use Object::Pad 0.60;
 use Path::Tiny;
 
 
@@ -43,15 +43,19 @@ my @EMOJI  = (
 
 class Mac::Finder::Tags::Tag :strict(params) {
 	
-	has $name  :reader :param;
-	has $color :reader :param = undef;
-	has $flags :reader;
+	field $name  :reader :param;
+	field $color :reader :param = undef;
+	field $flags :reader;
 	
-	has $legacy_label  :reader :param = !!0;
-	has $color_guessed :reader :param = !!0;
+	field $legacy_label  :reader :param = !!0;
+	field $color_guessed :reader :param = !!0;
 	
 	
 	ADJUST {
+		$self->_adjust_color_flags();
+	}
+	
+	method _adjust_color_flags () {
 		if ($legacy_label) {
 			$name = $LABELS[$color];
 		}

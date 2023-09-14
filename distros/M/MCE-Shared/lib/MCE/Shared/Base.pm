@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric );
 
 package MCE::Shared::Base;
 
-our $VERSION = '1.885';
+our $VERSION = '1.886';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -247,50 +247,6 @@ sub _croak {
    }
 }
 
-###############################################################################
-## ----------------------------------------------------------------------------
-## Common API for MCE::Shared::{ Array, Cache, Hash, Minidb, Ordhash }.
-##
-###############################################################################
-
-package MCE::Shared::Base::Common;
-
-# pipeline ( [ func1, @args ], [ func2, @args ], ... )
-
-sub pipeline {
-   my $self = shift;
-   my $tmp; $tmp = pop if ( defined wantarray );
-
-   while ( @_ ) {
-      my $cmd = shift; next unless ( ref $cmd eq 'ARRAY' );
-      if ( my $code = $self->can(shift @{ $cmd }) ) {
-         $code->($self, @{ $cmd });
-      }
-   }
-
-   if ( defined $tmp ) {
-      my $code;
-      return ( ref $tmp eq 'ARRAY' && ( $code = $self->can(shift @{ $tmp }) ) )
-         ? $code->($self, @{ $tmp })
-         : undef;
-   }
-
-   return;
-}
-
-# pipeline_ex ( [ func1, @args ], [ func2, @args ], ... )
-
-sub pipeline_ex {
-   my $self = shift;
-   my $code;
-
-   map {
-      ( ref $_ eq 'ARRAY' && ( $code = $self->can(shift @{ $_ }) ) )
-         ? $code->($self, @{ $_ })
-         : undef;
-   } @_;
-}
-
 1;
 
 __END__
@@ -307,7 +263,7 @@ MCE::Shared::Base - Base package for helper classes
 
 =head1 VERSION
 
-This document describes MCE::Shared::Base version 1.885
+This document describes MCE::Shared::Base version 1.886
 
 =head1 DESCRIPTION
 

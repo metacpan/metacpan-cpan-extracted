@@ -13,6 +13,7 @@ my %opt = (
     skip_bio   => 1,
     time       => 1,
     quick      => 1,
+    ver        => 2.1,
     exclude    => 'Math'
 );
 my (%stats1, %stats2);
@@ -22,6 +23,7 @@ warn $std[0];
 
 if ($threads && $threads > 1) {
     $opt{include} = 'Astro';
+    $opt{ver}     = 1;
     @std = capture {%stats2 = suite_run({%opt, threads=>2})};
     warn $std[0];
 } else {

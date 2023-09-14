@@ -319,7 +319,7 @@ This package provides the following methods:
 
 =head2 clear
 
-  clear() (Match)
+  clear() (Venus::Match)
 
 The clear method resets all match conditions and returns the invocant.
 
@@ -343,7 +343,7 @@ I<Since C<1.23>>
 
 =head2 data
 
-  data(HashRef $data) (Match)
+  data(hashref $data) (Venus::Match)
 
 The data method takes a hashref (i.e. lookup table) and creates match
 conditions and actions based on the keys and values found.
@@ -400,7 +400,7 @@ I<Since C<0.07>>
 
 =head2 expr
 
-  expr(Str | RegexpRef $expr) (Match)
+  expr(string | regexp $expr) (Venus::Match)
 
 The expr method registers a L</when> condition that check if the match value is
 an exact string match of the C<$topic> if the topic is a string, or that it
@@ -448,7 +448,7 @@ I<Since C<0.07>>
 
 =head2 just
 
-  just(Str $topic) (Match)
+  just(string $topic) (Venus::Match)
 
 The just method registers a L</when> condition that check if the match value is
 an exact string match of the C<$topic> provided.
@@ -583,7 +583,7 @@ I<Since C<0.03>>
 
 =head2 none
 
-  none(Any | CodeRef $code) (Match)
+  none(any | coderef $code) (Venus::Match)
 
 The none method registers a special condition that returns a result only when
 no other conditions have been matched.
@@ -638,7 +638,7 @@ I<Since C<0.03>>
 
 =head2 only
 
-  only(CodeRef $code) (Match)
+  only(coderef $code) (Venus::Match)
 
 The only method registers a special condition that only allows matching on the
 match value only if the code provided returns truthy.
@@ -691,7 +691,7 @@ I<Since C<0.03>>
 
 =head2 result
 
-  result(Any $data) (Any)
+  result(any $data) (any)
 
 The result method evaluates the registered conditions and returns the result of
 the action (i.e. the L</then> code) or the special L</none> condition if there
@@ -808,7 +808,7 @@ I<Since C<0.03>>
 
 =head2 then
 
-  then(Any | CodeRef $code) (Match)
+  then(any | coderef $code) (Venus::Match)
 
 The then method registers an action to be executed if the corresponding match
 condition returns truthy.
@@ -864,7 +864,7 @@ I<Since C<0.03>>
 
 =head2 when
 
-  when(Str | CodeRef $code, Any @args) (Match)
+  when(string | coderef $code, any @args) (Venus::Match)
 
 The when method registers a match condition that will be passed the match value
 during evaluation. If the match condition returns truthy the corresponding
@@ -949,7 +949,7 @@ I<Since C<0.03>>
 
 =head2 where
 
-  where() (Match)
+  where() (Venus::Match)
 
 The where method registers an action as a sub-match operation, to be executed
 if the corresponding match condition returns truthy. This method returns the
@@ -1051,7 +1051,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

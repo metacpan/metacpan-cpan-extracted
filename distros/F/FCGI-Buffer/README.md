@@ -1,15 +1,10 @@
-[![Linux Build Status](https://travis-ci.org/nigelhorne/FCGI-Buffer.svg?branch=master)](https://travis-ci.org/nigelhorne/FCGI-Buffer)
-[![Windows build status](https://ci.appveyor.com/api/projects/status/vd5loxl1k3dq7ad3?svg=true)](https://ci.appveyor.com/project/nigelhorne/fcgi-buffer)
-[![Dependency Status](https://dependencyci.com/github/nigelhorne/FCGI-Buffer/badge)](https://dependencyci.com/github/nigelhorne/FCGI-Buffer)
-[![Coverage Status](https://coveralls.io/repos/github/nigelhorne/FCGI-Buffer/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/FCGI-Buffer?branch=master)
-
 # NAME
 
 FCGI::Buffer - Verify, Cache and Optimise FCGI Output
 
 # VERSION
 
-Version 0.18
+Version 0.19
 
 # SYNOPSIS
 

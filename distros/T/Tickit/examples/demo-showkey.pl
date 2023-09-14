@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 
-package ShowKeyWidget;
-use base 'Tickit::Widget';
-
 use v5.14;
 use warnings;
+
+package ShowKeyWidget;
+use base 'Tickit::Widget';
 
 use Tickit;
 

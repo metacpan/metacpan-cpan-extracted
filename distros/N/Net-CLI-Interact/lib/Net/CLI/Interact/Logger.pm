@@ -1,6 +1,5 @@
 package Net::CLI::Interact::Logger;
-{ $Net::CLI::Interact::Logger::VERSION = '2.400000' }
-
+$Net::CLI::Interact::Logger::VERSION = '2.400002';
 use Moo;
 use Sub::Quote;
 use MooX::Types::MooseLike::Base qw(HashRef Bool ArrayRef Any);
@@ -54,8 +53,10 @@ sub _build__logger {
 
     my $anon_logger = genpkg();
     {
+        ## no critic (ProhibitNoStrict)
         no strict 'refs';
         @{"$anon_logger\::ISA"} = 'Log::Dispatch::Config';
+        ## use critic
     }
 
     my $config = Log::Dispatch::Configurator::Any->new($self->log_config);
@@ -134,6 +135,11 @@ sub log {
 1;
 
 =pod
+
+=for Pod::Coverage BUILDARGS
+
+=for test_synopsis
+  my ($logger, $category, $level, @message);
 
 =head1 NAME
 

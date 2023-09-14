@@ -1,0 +1,10 @@
+0.002   2023-09-05  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [ux][doc] Add example, mention App::sort_by_spec.
+
+
+0.001   2023-09-05  Released-By: PERLANCAR
+
+        - First release.

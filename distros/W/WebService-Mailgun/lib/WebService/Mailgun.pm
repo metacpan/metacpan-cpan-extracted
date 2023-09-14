@@ -14,7 +14,7 @@ use HTTP::Request::Common;
 use File::Temp;
 
 
-our $VERSION = "0.15";
+our $VERSION = "0.16";
 our $API_BASE = 'api.mailgun.net/v3';
 our $API_BASE_EU = 'api.eu.mailgun.net/v3';
 
@@ -410,8 +410,8 @@ The C<message> parameter should contain either a string or a reference to a stri
     # send MIME message via a string:
 	use MIME::Entity; 
 	my $str = MIME::Entity->build(
-		From    => 'justin@dadamailproject.com',
-        To      => 'justin@dadamailproject.com',
+		From    => 'foo@example.com',
+        To      => 'bar@example.com',
         Subject => "Subject",
         Data    => 'Messag4')->as_string;
 	

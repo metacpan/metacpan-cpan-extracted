@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.66;
+use warnings;
+use Object::Pad 0.800;
 
-package Device::Chip::MCP23x17::Adapter 0.06;
+package Device::Chip::MCP23x17::Adapter 0.07;
 class Device::Chip::MCP23x17::Adapter;
 # can't 'extends Device::Chip::Adapter' because that doesn't provide a SUPER::new
 use base qw( Device::Chip::Adapter );
@@ -97,5 +98,11 @@ async method read_gpios ( $gpios )
 
    return \%ret;
 }
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
 
 0x55AA;

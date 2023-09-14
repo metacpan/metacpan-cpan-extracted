@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 1.43
+    Version 1.44
 
 SYNOPSIS
 
@@ -195,6 +195,10 @@ SUBROUTINES/METHODS
     
         $firefox->add_login(host => 'https://github.com', user => 'me2@example.org', password => 'uiop[]', user_field => 'login', password_field => 'password');
 
+    Note for HTTP Authentication, the realm
+    <https://datatracker.ietf.org/doc/html/rfc2617#section-2> must
+    perfectly match the correct realm supplied by the server.
+
     This method returns itself to aid in chaining methods.
 
  add_site_header
@@ -303,6 +307,23 @@ SUBROUTINES/METHODS
  default_binary_name
 
     just returns the string 'firefox'. Only of interest when sub-classing.
+
+ download
+
+    accepts a URI and an optional timeout in seconds (the default is 5
+    minutes) as parameters and downloads the URI in the background and
+    returns a handle to the downloaded file.
+
+        use Firefox::Marionette();
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new();
+    
+        my $handle = $firefox->download('https://raw.githubusercontent.com/david-dick/firefox-marionette/master/t/data/keepassxs.csv');
+    
+        foreach my $line (<$handle>) {
+          print $line;
+        }
 
  bookmarks
 
@@ -1112,7 +1133,8 @@ SUBROUTINES/METHODS
         $firefox->go('https://metacpan.org/'); # will return once the main document has been loaded and parsed, but BEFORE sub-resources (images/stylesheets/frames) have been loaded.
 
     When going directly to a URL that needs to be downloaded, please see
-    BUGS AND LIMITATIONS for a necessary workaround.
+    BUGS AND LIMITATIONS for a necessary workaround and the download method
+    for an alternative.
 
     This method returns itself to aid in chaining methods.
 
@@ -1818,7 +1840,13 @@ SUBROUTINES/METHODS
       while firefox is running.
 
       * proxy - this is a shortcut method for setting a proxy using the
-      capabilities parameter above. It accepts a proxy URL.
+      capabilities parameter above. It accepts a proxy URL, with the
+      following allowable schemes, 'http' and 'https'. It also allows a
+      reference to a list of proxy URLs which will function as list of
+      proxies that Firefox will try in left to right order
+      <https://developer.mozilla.org/en-US/docs/Web/HTTP/Proxy_servers_and_tunneling/Proxy_Auto-Configuration_PAC_file#description>
+      until a working proxy is found. See REMOTE AUTOMATION OF FIREFOX VIA
+      SSH, NETWORK ARCHITECTURE and SETTING UP SOCKS SERVERS USING SSH.
 
       * reconnect - an experimental parameter to allow a reconnection to
       firefox that a connection has been discontinued. See the survive
@@ -2716,7 +2744,40 @@ NETWORK ARCHITECTURE
          | Site   |          | Server |
          ----------          ----------
 
+    In addition, the proxy parameter can be used to specify multiple
+    proxies using a reference to a list.
+
+      my $firefox = Firefox::Marionette->new(
+                      host  => 'Firefox.runs.here'
+                      trust => '/path/to/ca-for-squid-proxy-server.crt',
+                      proxy => [ 'https://Squid1.Proxy.Server:3128', 'https://Squid2.Proxy.Server:3128' ]
+                         )->go('https://Target.Web.Site');
+
+    When firefox gets a list of proxies, it will use the first one that
+    works. In addition, it will perform a basic form of proxy failover,
+    which may involve a failed network request before it fails over to the
+    next proxy. In the diagram below, Squid1.Proxy.Server is the first
+    proxy in the list and will be used exclusively, unless it is
+    unavailable, in which case Squid2.Proxy.Server will be used.
+
+                                              ----------
+                                         TLS  | Squid1 |
+                                       ------>| Proxy  |-----
+                                       |      | Server |    |
+         ---------      -----------    |      ----------    |       -----------
+         | Perl  | SSH  | Firefox |    |                    | HTTPS | Target  |
+         | runs  |----->| runs    |----|                    ------->| Web     |
+         | here  |      | here    |    |                    |       | Site    |
+         ---------      -----------    |      ----------    |       -----------
+                                       | TLS  | Squid2 |    |
+                                       ------>| Proxy  |-----
+                                              | Server |
+                                              ----------
+
     See the REMOTE AUTOMATION OF FIREFOX VIA SSH section for more options.
+
+    See SETTING UP SOCKS SERVERS USING SSH for easy proxying via ssh
+    <https://man.openbsd.org/ssh>
 
 AUTOMATING THE FIREFOX PASSWORD MANAGER
 
@@ -3206,6 +3267,8 @@ BUGS AND LIMITATIONS
             warn "$path has been downloaded";
         }
         $firefox->quit();
+
+    Also, check out the download method for an alternative.
 
  MISSING METHODS
 

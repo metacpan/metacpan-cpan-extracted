@@ -2,20 +2,24 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.057
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Image/DS9.pm',
     'Image/DS9/Command.pm',
     'Image/DS9/Constants.pm',
+    'Image/DS9/Constants/V0.pm',
+    'Image/DS9/Constants/V1.pm',
+    'Image/DS9/Daemon.pm',
     'Image/DS9/Grammar.pm',
-    'Image/DS9/OldConstants.pm',
+    'Image/DS9/Grammar/V8_5.pm',
     'Image/DS9/PConsts.pm',
-    'Image/DS9/Parser.pm'
+    'Image/DS9/Parser.pm',
+    'Image/DS9/Util.pm'
 );
 
 

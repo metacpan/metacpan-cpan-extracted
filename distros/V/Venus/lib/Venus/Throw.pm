@@ -57,11 +57,13 @@ sub as {
 sub assertion {
   my ($self) = @_;
 
-  my $assert = $self->SUPER::assertion;
+  my $assertion = $self->SUPER::assertion;
 
-  $assert->clear->expression('string');
+  $assertion->match('string')->format(sub{
+    (ref $self || $self)->new($_)
+  });
 
-  return $assert;
+  return $assertion;
 }
 
 sub capture {
@@ -253,7 +255,7 @@ This package provides the following methods:
 
 =head2 as
 
-  as(Str $name) (Throw)
+  as(string $name) (Venus::Throw)
 
 The as method sets a L</name> for the error and returns the invocant.
 
@@ -277,7 +279,7 @@ I<Since C<2.55>>
 
 =head2 error
 
-  error(HashRef $data) (Error)
+  error(hashref $data) (Venus::Error)
 
 The error method throws the prepared error object.
 
@@ -440,7 +442,7 @@ I<Since C<0.01>>
 
 =head2 on
 
-  on(Str $name) (Throw)
+  on(string $name) (Venus::Throw)
 
 The on method sets a L</name> for the error in the form of
 C<"on.$subroutine.$name"> or C<"on.$name"> (if outside of a subroutine) and
@@ -536,7 +538,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

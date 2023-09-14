@@ -1,8 +1,9 @@
 use strict;
 use warnings;
+
 package Open::This;
 
-our $VERSION = '0.000032';
+our $VERSION = '0.000033';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -121,7 +122,8 @@ sub maybe_get_url_from_parsed_text {
     my $clone = $url->clone;
     my @parts = $clone->path_segments;
     push(
-        @parts, 'blob', Git::Helpers::current_branch_name(),
+        @parts,
+        'blob', Git::Helpers::current_branch_name(),
         $parsed->{file_name}
     );
     $clone->path( join '/', @parts );
@@ -144,12 +146,29 @@ sub editor_args_from_parsed_text {
     my @args;
 
     # kate --line 11 --column 2 filename
-    if ( $ENV{EDITOR} eq 'kate' ) {
+    # idea.sh --line 11 --column 2 filename
+    if (   $ENV{EDITOR} eq 'kate'
+        || $ENV{EDITOR}
+        =~ /^(idea|rubymine|pycharm|phpstorm|webstorm|goland|rider|clion|fleet|aqua|data(grip|spell)|appcode)/i
+    ) {
         push @args, '--line', $parsed->{line_number}
             if $parsed->{line_number};
 
         push @args, '--column', $parsed->{column_number}
             if $parsed->{column_number};
+    }
+
+    # code --goto filename:11:2
+    # codium --goto filename:11:2
+    elsif ( $ENV{EDITOR} =~ /^cod(e|ium)/i ) {
+        my $result = $parsed->{file_name};
+        if ( $parsed->{line_number} ) {
+            $result .= ":" . $parsed->{line_number};
+            if ( $parsed->{column_number} ) {
+                $result .= ":" . $parsed->{column_number};
+            }
+        }
+        return ( '--goto', $result );
     }
 
     # See https://vi.stackexchange.com/questions/18499/can-i-open-a-file-at-an-arbitrary-line-and-column-via-the-command-line
@@ -380,7 +399,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000032
+version 0.000033
 
 =head1 DESCRIPTION
 

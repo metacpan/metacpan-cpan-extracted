@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use v5.20;
+use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Future::IO;
 
 use lib 't/lib';
@@ -36,7 +36,7 @@ $updi->_set_nvm_version( 0 );
       ->will_done( "\x55\xE5" . "tinyAVR P:0D:0 3" );
    $mockfio->expect_sleep( 0.1 );
 
-   is_deeply( $updi->read_sib->get,
+   is( $updi->read_sib->get,
       {
          family       => "tinyAVR",
          nvm_version  => "P:0",

@@ -451,11 +451,11 @@ sub new
 			#TRY TO FETCH STREAM LINK:
 			if ($html =~ m#\<iframe\s+(.+?)\<\/iframe\>#s) {
 				my $iframedata = $1;
-print STDERR "--IFRAME=$iframedata=\n";
+				print STDERR "--IFRAME=$iframedata=\n"  if ($DEBUG);
 				if ($iframedata =~ m#src\=[\'\"]([^\'\"]+)#) {
 					$url2 = $1;
 					$url2 = 'https:' . $url2  if ($url2 =~ m#^\/\/#);
-print STDERR "----fetch URL2=$url2=\n";
+					print STDERR "----fetch URL2=$url2=\n"  if ($DEBUG);
 					$self->{'id'} = $1  if ($url2 =~ m#\/partnerplayer\/([\-0-9a-f]+)#);
 				}
 			}
@@ -482,7 +482,6 @@ print STDERR "----fetch URL2=$url2=\n";
 				$html =~ s#\}.*$##s;
 				while ($html =~ s#\"(https?\:[^\"]+)##) {
 					my $one = $1;
-print "--STREAM=$one=\n";
 					$self->{'id'} ||= $1  if ($one =~ m#\/([\-0-9a-f]+)\/#);
 					push @streams, $one  unless ($self->{'secure'} && $one !~ /^https/o);
 					$self->{'cnt'}++;
@@ -492,7 +491,7 @@ print "--STREAM=$one=\n";
 				}
 				foreach my $enc (qw(mp4 mpd webm m4a hls)) {
 					for (my $i=0;$i<=$#encodings;$i++) {
-print "--ADDING ($enc) STREAM=$streams[$i]...\n"  if ($DEBUG);
+						print "--ADDING ($enc) STREAM=$streams[$i]...\n"  if ($DEBUG);
 						push (@{$self->{'streams'}}, $streams[$i])  if ($encodings[$i] =~ /$enc/);
 					}
 				}
@@ -505,14 +504,14 @@ print "--ADDING ($enc) STREAM=$streams[$i]...\n"  if ($DEBUG);
 	$self->{'Url'} = ($self->{'cnt'} > 0) ? $self->{'streams'}->[0] : '';
 	if ($DEBUG) {
 		foreach my $x (sort keys %{$self}) {
-		print "--SELF($x)=".$self->{$x}."=\n";
+			print "--SELF($x)=".$self->{$x}."=\n";
 		}
+		print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
+				if ($self->{'cnt'} > 0);
+		print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."= ARTIST=".$self->{'artist'}."=\n--CNT="
+				.$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--1ST=".$self->{'Url'}
+				."=\n--streams=".join('|',@{$self->{'streams'}})."=\n";
 	}
-	print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
-			if ($DEBUG && $self->{'cnt'} > 0);
-	print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."= ARTIST=".$self->{'artist'}."=\n--CNT="
-			.$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--1ST=".$self->{'Url'}
-			."=\n--streams=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
 	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!

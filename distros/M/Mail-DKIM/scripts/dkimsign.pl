@@ -100,12 +100,11 @@ sub signer_policy
 			defined($opt->identity) ? (Identity => $opt->identity) : (),
 		);
 	$sig->protocol($opt->key_protocol) if defined $opt->key_protocol;
-        if ($opt->extra_tag) {
-	        foreach my $extra ($opt->extra_tag->@*)
-	        {
-		        my ($n, $v) = split /=/, $extra, 2;
-	        	$sig->set_tag($n, $v);
-                }
+  if ($opt->extra_tag) {
+    foreach my $extra ($opt->extra_tag->@*) {
+      my ($n, $v) = split /=/, $extra, 2;
+     	$sig->set_tag($n, $v);
+    }
 	}
 	$dkim->add_signature($sig);
 	return;

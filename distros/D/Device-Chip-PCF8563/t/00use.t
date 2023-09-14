@@ -3,8 +3,9 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'Device::Chip::PCF8563' );
+require Device::Chip::PCF8563;
 
+pass( 'Modules loaded' );
 done_testing;

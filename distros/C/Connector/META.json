@@ -30,7 +30,6 @@
          "requires" : {
             "Config::Merge" : "0",
             "Config::Std" : "0",
-            "Config::Versioned" : "0",
             "DBD::SQLite" : "0",
             "DBI" : "0",
             "ExtUtils::MakeMaker" : "6.59",
@@ -39,6 +38,7 @@
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
             "Proc::SafeExec" : "0",
+            "Syntax::Keyword::Try" : "0",
             "Template" : "0",
             "Test::More" : "0",
             "YAML" : "0"
@@ -61,7 +61,6 @@
       "runtime" : {
          "recommends" : {
             "Config::Std" : "0",
-            "Config::Versioned" : "0.5",
             "DBI" : "0",
             "IO::Socket::SSL" : "0",
             "JSON" : "0",
@@ -83,7 +82,7 @@
    "provides" : {
       "Connector" : {
          "file" : "lib/Connector.pm",
-         "version" : "1.47"
+         "version" : "1.51"
       },
       "Connector::Builtin" : {
          "file" : "lib/Connector/Builtin.pm"
@@ -108,6 +107,9 @@
       },
       "Connector::Builtin::File::Simple" : {
          "file" : "lib/Connector/Builtin/File/Simple.pm"
+      },
+      "Connector::Builtin::Inline" : {
+         "file" : "lib/Connector/Builtin/Inline.pm"
       },
       "Connector::Builtin::Memory" : {
          "file" : "lib/Connector/Builtin/Memory.pm"
@@ -139,9 +141,6 @@
       "Connector::Proxy::Config::Std" : {
          "file" : "lib/Connector/Proxy/Config/Std.pm"
       },
-      "Connector::Proxy::Config::Versioned" : {
-         "file" : "lib/Connector/Proxy/Config/Versioned.pm"
-      },
       "Connector::Proxy::DBI" : {
          "file" : "lib/Connector/Proxy/DBI.pm"
       },
@@ -165,6 +164,9 @@
       },
       "Connector::Proxy::Net::LDAP::Single" : {
          "file" : "lib/Connector/Proxy/Net/LDAP/Single.pm"
+      },
+      "Connector::Proxy::Net::SFTP" : {
+         "file" : "lib/Connector/Proxy/Net/SFTP.pm"
       },
       "Connector::Proxy::Proc::SafeExec" : {
          "file" : "lib/Connector/Proxy/Proc/SafeExec.pm"
@@ -205,7 +207,7 @@
          "web" : "https://github.com/whiterabbitsecurity/connector"
       }
    },
-   "version" : "1.47",
+   "version" : "1.51",
    "x_contributors" : [
       "Martin Bartosch <m.bartosch@cynops.de>",
       "Martin Bartosch <mbartosch@whiterabbitsecurity.com>",

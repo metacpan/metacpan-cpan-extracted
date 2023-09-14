@@ -137,6 +137,9 @@ sub _check_user_password {
         }
     }
 
+    # restore the connection using the orginal credentials
+    $self->rebind();
+
     if(!defined $userdn) {
       $self->log()->warn('Authentication failed');
       return 0;

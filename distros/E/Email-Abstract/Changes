@@ -1,5 +1,8 @@
 Revision history for Email-Abstract.
 
+3.010     2023-09-02 20:22:12-04:00 America/New_York
+        - update packaging metadata
+
 3.009     2021-06-20 16:54:40-04:00 America/New_York
         - MIME::Entity 5.508 is required for operation
         - update author information

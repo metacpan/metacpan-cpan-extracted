@@ -10,7 +10,7 @@ method, which, when given a key, returns the associated value from the
 connector's data source.
 
 Typically, a connector acts as a proxy to a simple data source like
-YAML, Config::Std, Config::Versioned, or to a more complex data source
+YAML, Config::Std, or to a more complex data source
 like an LDAP server or Proc::SafeExec. The standard calling convention
 via get(KEY) makes the connectors interchangeable.
 
@@ -106,7 +106,7 @@ values of all keys (including undef elements if they are explicitly given).
 
 If the node does not exist, an empty list is returned.
 
-## get\_reference
+## get\_reference \[deprecated\]
 
 Rarely used, returns the value of a reference node. Currently used by
 Connector::Multi in combination with Connector::Proxy::Config::Versioned

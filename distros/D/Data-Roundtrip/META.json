@@ -47,6 +47,9 @@
             "Benchmark" : "0",
             "Data::Random::Structure" : "0",
             "Data::Random::Structure::UTF8" : "0.06",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Test2::Plugin::UTF8" : "0",
             "Test::More" : "0",
             "Test::Pod" : "1.51",
             "Test::Script" : "1.28"
@@ -56,15 +59,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/hadjiprocopis/app-appupdater/issues"
+         "web" : "https://github.com/hadjiprocopis/data-roundtrip/issues"
       },
-      "homepage" : "https://metacpan.org/module/App::Appupdater",
+      "homepage" : "https://metacpan.org/module/Data::Roundtrip",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/hadjiprocopis/app-appupdater",
-         "web" : "https://github.com/hadjiprocopis/app-appupdater"
+         "url" : "https://github.com/hadjiprocopis/data-roundtrip",
+         "web" : "https://github.com/hadjiprocopis/data-roundtrip"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

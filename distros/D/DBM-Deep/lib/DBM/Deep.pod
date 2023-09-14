@@ -2,10 +2,6 @@
 
 DBM::Deep - A pure perl multi-level hash/array DBM that supports transactions
 
-=head1 VERSION
-
-2.0016
-
 =head1 SYNOPSIS
 
   use DBM::Deep;
@@ -1275,17 +1271,15 @@ L<Devel::Cover> report on this distribution's test suite.
 
 =head1 MORE INFORMATION
 
-Check out the DBM::Deep Google Group at L<http://groups.google.com/group/DBM-Deep>
-or send email to L<DBM-Deep@googlegroups.com|mailto:DBM-Deep@googlegroups.com>.
-You can also visit #dbm-deep on irc.perl.org
-
-The source code repository is at L<http://github.com/robkinyon/dbm-deep>
+The source code repository is at L<http://github.com/DrHyde/perl-modules-DBM-Deep>
 
 =head1 MAINTAINERS
 
-Rob Kinyon, L<rkinyon@cpan.org|mailto:rkinyon@cpan.org>
+Currently maintained by David Cantrell L<dcantrell@cpan.org|mailto:dcantrell@cpan.org>.
 
 Originally written by Joseph Huckaby, L<jhuckaby@cpan.org|mailto:jhuckaby@cpan.org>
+with significant additions by Rob Kinyon, L<rkinyon@cpan.org|mailto:rkinyon@cpan.org>
+
 
 =head1 SPONSORS
 
@@ -1323,7 +1317,7 @@ L<nfs(5)>
 
 =head1 LICENSE
 
-Copyright (c) 2007-14 Rob Kinyon. All Rights Reserved.
+Copyright (c) 2007-23 Rob Kinyon and others. All Rights Reserved.
 This is free software, you may use it and distribute it under the same terms
 as Perl itself.
 

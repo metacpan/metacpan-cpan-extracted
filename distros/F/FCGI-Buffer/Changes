@@ -1,5 +1,10 @@
 Revision history for FCGI-Buffer
  
+0.19	Fri Sep  1 21:28:40 EDT 2023
+	Fix uninitialisd variable
+	Ensure 403 statuses are printed
+	IO::Compress::Brotli doesn't work on OpenBSD
+
 0.18	Sun Feb 26 17:06:17 EST 2023
 	Make debugging more readable
 	Log correctly when data isn't retrieved from the cache

@@ -1,10 +1,10 @@
 {
-   "abstract" : "CLI for Data::Gimei",
+   "abstract" : "a CLI for Data::Gimei",
    "author" : [
       "NAKAJIMA Yusaku <youpong@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.19",
+   "generated_by" : "Minilla/v3.1.22",
    "license" : [
       "mit"
    ],
@@ -28,12 +28,12 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.039"
+            "Module::Build::Tiny" : "0.046"
          }
       },
       "develop" : {
          "requires" : {
-            "Perl::Tidy" : "20220217",
+            "Perl::Tidy" : "20230701",
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
             "Test::PAUSE::Permissions" : "0.07",
@@ -45,8 +45,8 @@
          "requires" : {
             "Class::Tiny" : "1.008",
             "Data::Gimei" : ">= v0.4.0, < v0.5.0",
-            "Getopt::Long" : "2.52",
-            "Pod::Find" : "1.65",
+            "Getopt::Long" : "2.54",
+            "Pod::Find" : "1.66",
             "Pod::Usage" : "2.03",
             "perl" : "5.022001"
          }
@@ -54,14 +54,14 @@
       "test" : {
          "requires" : {
             "Capture::Tiny" : "0.48",
-            "Test::More" : "0.98"
+            "Test::More" : "1.302195"
          }
       }
    },
    "provides" : {
       "App::Gimei" : {
          "file" : "lib/App/Gimei.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.2.1"
       },
       "App::Gimei::Runner" : {
          "file" : "lib/App/Gimei/Runner.pm"
@@ -79,12 +79,12 @@
          "web" : "https://github.com/youpong/App-Gimei"
       }
    },
-   "version" : "v0.2.0",
+   "version" : "v0.2.1",
    "x_authority" : "cpan:YOUPONG",
    "x_contributors" : [
       "NAKAJIMA Yusaku <yupong7@gmail.com>",
       "youpong <43817652+youpong@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

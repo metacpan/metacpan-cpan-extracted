@@ -1,32 +1,26 @@
 #! perl
 
+use v5.10;
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test2::V0;
 use Image::DS9;
+use Image::DS9::Constants::V1 'MINMAX_MODES';
 
-require './t/common.pl';
+use Test::Lib;
+use My::Util;
 
-my $ds9 = start_up();
-$ds9->file( 'data/m31.fits.gz' );
+my $ds9 = start_up( image => 1 );
 
-my @tests = (
-    mode     => 'scan',
-    mode     => 'datamin',
-    mode     => 'irafmin',
-    []       => 'scan',
-    []       => 'datamin',
-    []       => 'irafmin',
+test_stuff(
+    $ds9,
     (
-        $ds9->version < 7.4
-        ? (
-            mode => 'sample',
-            []   => 'sample',
-          )
-        : ()
+        minmax => [
+            ( map { ( mode => $_ ) } MINMAX_MODES ), ( map { ( [] => $_ ) } MINMAX_MODES ), rescan => {},
+        ],
     ),
 );
 
-test_stuff( $ds9, minmax => \@tests );
 
+done_testing;

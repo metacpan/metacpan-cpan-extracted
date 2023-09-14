@@ -262,7 +262,7 @@ This package provides the following methods:
 
 =head2 call
 
-  call(Str $name, Str @args) (Any)
+  call(string $name, string @args) (any)
 
 The call method attempts to find the path to the program specified via
 L</which> and dispatches to L<Venus::Path/mkcall> and returns the result. Any
@@ -348,7 +348,7 @@ I<Since C<2.80>>
 
 =head2 find
 
-  find(Str $name, Str @paths) (ArrayRef)
+  find(string $name, string @paths) (arrayref)
 
 The find method searches the paths provided for a file matching the name
 provided and returns all the files found as an arrayref. Returns a list in list
@@ -402,7 +402,7 @@ I<Since C<2.80>>
 
 =head2 is_bsd
 
-  is_bsd() (Bool)
+  is_bsd() (boolean)
 
 The is_bsd method returns true if the OS is either C<"freebsd"> or
 C<"openbsd">, and otherwise returns false.
@@ -461,7 +461,7 @@ I<Since C<2.80>>
 
 =head2 is_cyg
 
-  is_cyg() (Bool)
+  is_cyg() (boolean)
 
 The is_cyg method returns true if the OS is either C<"cygwin"> or C<"msys">,
 and otherwise returns false.
@@ -520,7 +520,7 @@ I<Since C<2.80>>
 
 =head2 is_dos
 
-  is_dos() (Bool)
+  is_dos() (boolean)
 
 The is_dos method returns true if the OS is either C<"mswin32"> or C<"dos"> or
 C<"os2">, and otherwise returns false.
@@ -595,7 +595,7 @@ I<Since C<2.80>>
 
 =head2 is_lin
 
-  is_lin() (Bool)
+  is_lin() (boolean)
 
 The is_lin method returns true if the OS is C<"linux">, and otherwise returns
 false.
@@ -654,7 +654,7 @@ I<Since C<2.80>>
 
 =head2 is_mac
 
-  is_mac() (Bool)
+  is_mac() (boolean)
 
 The is_mac method returns true if the OS is either C<"macos"> or C<"darwin">,
 and otherwise returns false.
@@ -713,7 +713,7 @@ I<Since C<2.80>>
 
 =head2 is_non
 
-  is_non() (Bool)
+  is_non() (boolean)
 
 The is_non method returns true if the OS is not recognized, and if recognized
 returns false.
@@ -756,7 +756,7 @@ I<Since C<2.80>>
 
 =head2 is_sun
 
-  is_sun() (Bool)
+  is_sun() (boolean)
 
 The is_sun method returns true if the OS is either C<"solaris"> or C<"sunos">,
 and otherwise returns false.
@@ -815,7 +815,7 @@ I<Since C<2.80>>
 
 =head2 is_vms
 
-  is_vms() (Bool)
+  is_vms() (boolean)
 
 The is_vms method returns true if the OS is C<"vms">, and otherwise returns
 false.
@@ -858,7 +858,7 @@ I<Since C<2.80>>
 
 =head2 is_win
 
-  is_win() (Bool)
+  is_win() (boolean)
 
 The is_win method returns true if the OS is either C<"mswin32"> or C<"dos"> or
 C<"os2">, and otherwise returns false.
@@ -933,7 +933,7 @@ I<Since C<2.80>>
 
 =head2 name
 
-  name() (Str)
+  name() (string)
 
 The name method returns the OS name.
 
@@ -961,7 +961,7 @@ I<Since C<2.80>>
 
 =head2 paths
 
-  paths() (ArrayRef)
+  paths() (arrayref)
 
 The paths method returns the paths specified by the C<"PATH"> environment
 variable as an arrayref of unique paths. Returns a list in list context.
@@ -992,7 +992,7 @@ I<Since C<2.80>>
 
 =head2 quote
 
-  quote(Str $data) (Str)
+  quote(string $data) (string)
 
 The quote method accepts a string and returns the OS-specific quoted version of
 the string.
@@ -1067,7 +1067,7 @@ I<Since C<2.91>>
 
 =head2 type
 
-  type() (Str)
+  type() (string)
 
 The type method returns a string representing the "test" method, which
 identifies the OS, that would return true if called, based on the name of the
@@ -1207,7 +1207,7 @@ I<Since C<2.80>>
 
 =head2 where
 
-  where(Str $file) (ArrayRef)
+  where(string $file) (arrayref)
 
 The where method searches the paths defined by the C<PATH> environment variable
 for a file matching the name provided and returns all the files found as an
@@ -1325,7 +1325,7 @@ I<Since C<2.80>>
 
 =head2 which
 
-  which(Str $file) (Str)
+  which(string $file) (string)
 
 The which method returns the first match from the result of calling the
 L</where> method with the arguments provided.
@@ -1426,7 +1426,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.
