@@ -1,8 +1,5 @@
 package Dist::Zilla::Plugin::Acme::CPANModules::Blacklist;
 
-our $DATE = '2018-01-09'; # DATE
-our $VERSION = '0.001'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -16,7 +13,14 @@ with (
     'Dist::Zilla::Role::AfterBuild',
 );
 
+#has author => (is=>'rw'); # not yet
 has module => (is=>'rw');
+has ignore_on_error => (is=>'rw', default=>sub {1});
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-07-09'; # DATE
+our $DIST = 'Dist-Zilla-Plugin-Acme-CPANModules-Blacklist'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 sub mvp_multivalue_args { qw(module) }
 
@@ -59,8 +63,7 @@ sub _prereq_none {
 }
 
 sub after_build {
-    use experimental 'smartmatch';
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my $self = shift;
 
@@ -97,7 +100,7 @@ sub after_build {
         for my $rel (grep {!/x_/} keys %{ $prereqs_hash->{$phase} }) {
             for my $mod (keys %{ $prereqs_hash->{$phase}{$rel} }) {
                 push @all_prereqs, $mod
-                    unless $mod ~~ @all_prereqs;
+                    unless grep { $_ eq $mod } @all_prereqs;
             }
         }
     }
@@ -105,7 +108,7 @@ sub after_build {
     if (keys %blacklisted) {
         $self->log_debug(["Checking against blacklisted modules ..."]);
         for my $mod (@all_prereqs) {
-            if ($blacklisted{$mod} && !($mod ~~ @whitelisted)) {
+            if ($blacklisted{$mod} && !(grep { $_ eq $mod } @whitelisted)) {
                 $self->log_fatal(["Module '%s' is blacklisted (acmemod=%s, summary=%s)",
                                   $mod,
                                   $blacklisted{$mod}{acmemod},
@@ -131,7 +134,7 @@ Dist::Zilla::Plugin::Acme::CPANModules::Blacklist - Blacklist prereqs using an A
 
 =head1 VERSION
 
-This document describes version 0.001 of Dist::Zilla::Plugin::Acme::CPANModules::Blacklist (from Perl distribution Dist-Zilla-Plugin-Acme-CPANModules-Blacklist), released on 2018-01-09.
+This document describes version 0.002 of Dist::Zilla::Plugin::Acme::CPANModules::Blacklist (from Perl distribution Dist-Zilla-Plugin-Acme-CPANModules-Blacklist), released on 2023-07-09.
 
 =head1 SYNOPSIS
 
@@ -171,6 +174,12 @@ To whitelist more modules, add more C<module=> lines.
 
 =for Pod::Coverage .+
 
+=head1 CONFIGURATION
+
+=head2 module
+
+Str. Can be specified more than once. Module name to blacklist.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla-Plugin-Acme-CPANModules-Blacklist>.
@@ -178,14 +187,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-Acme-CPANModules-Blacklist>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Acme-CPANModules-Blacklist>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -203,11 +204,37 @@ L<Dist::Zilla::Plugin::CPANAuthors::Whitelist>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Acme-CPANModules-Blacklist>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

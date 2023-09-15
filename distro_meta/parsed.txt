@@ -86770,3 +86770,5 @@ W/WA/WATERKIP/YA-CLI-0.004.tar.gz
 Z/ZN/ZNMSTR/Zonemaster-Backend-11.0.2.tar.gz
 Z/ZN/ZNMSTR/Zonemaster-CLI-v6.0.3.tar.gz
 Z/ZN/ZNMSTR/Zonemaster-Engine-v4.7.3.tar.gz
+P/PE/PERLANCAR/Dist-Zilla-Plugin-Acme-CPANModules-Blacklist-0.002.tar.gz
+B/BE/BENNIE/VMware-vCloud-2.404.tar.gz

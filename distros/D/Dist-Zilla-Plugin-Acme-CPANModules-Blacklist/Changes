@@ -1,3 +1,10 @@
-0.001   2018-01-09 (PERLANCAR)
+0.002   2023-07-09  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - Remove the usage of smartmatch.
+
+
+0.001   2018-01-09  Released-By: PERLANCAR
 
         - First release.
