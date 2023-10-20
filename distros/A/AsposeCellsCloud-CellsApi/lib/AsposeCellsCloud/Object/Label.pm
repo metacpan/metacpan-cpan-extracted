@@ -256,7 +256,7 @@ __PACKAGE__->method_documentation({
      'text' => {
      	datatype => 'string',
      	base_name => 'Text',
-     	description => '',
+     	description => 'Gets or sets the text of display unit label.',
      	format => '',
      	read_only => '',
      		},

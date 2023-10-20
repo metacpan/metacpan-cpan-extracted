@@ -1,0 +1,21 @@
+Music::Factory - some factory class for your music factory class
+
+this module can be installed using cpanm:
+
+  cpanm Music::Factory
+
+
+run perldoc(1) on Music::Factory for documentation
+
+
+to author a new release:
+
+  perl Build.PL
+  ./Build testcover
+  RELEASE_TESTING=1 ./Build test
+  ./Build disttest
+  ./Build dist
+  git tag v...
+  cpan-upload ...
+  git push ...
+  ./Build realclean

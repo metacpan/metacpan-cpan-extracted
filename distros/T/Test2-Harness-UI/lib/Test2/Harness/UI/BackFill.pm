@@ -2,7 +2,7 @@ package Test2::Harness::UI::BackFill;
 use strict;
 use warnings;
 
-our $VERSION = '0.000138';
+our $VERSION = '0.000144';
 
 use Data::Dumper;
 use Test2::Harness::UI::UUID qw/gen_uuid/;

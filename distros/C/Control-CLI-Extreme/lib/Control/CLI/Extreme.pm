@@ -7,7 +7,7 @@ use Carp;
 use Control::CLI qw( :all );
 
 my $Package = __PACKAGE__;
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 our @ISA = qw(Control::CLI);
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
@@ -216,7 +216,7 @@ my %Prompt = ( # Prompt pattern templates; SWITCHNAME gets replaced with actual 
 	$Prm{wing}		=>	'SWITCHNAME(?:\((.+?)\))?\*?[>#]$',
 	$Prm{slx}		=>	'SWITCHNAME(?:\((.+?)\))?# $',
 	$Prm{hive}		=>	'SWITCHNAME#$',
-	$Prm{ipanema}		=>	'(?:\[SWITCHNAME(?:\.rt\d)?\]\$|bash-[\d\.]+\$|SWITCHNAME\.?(?:rt\d)?:[~\/\w]+#) $',
+	$Prm{ipanema}		=>	'(?:\[SWITCHNAME(?:\.rt\d)?\]\$|bash-[\d\.]+\$|SWITCHNAME\.?(?:rt\d)?:[~\/\w\.-]+#) $',
 	$Prm{generic}		=>	'[^\n\x0d\x0a]*' . $GenericPromptRegex,
 );
 
@@ -374,7 +374,7 @@ our %ErrorPatterns = ( # Patterns which indicated the last command sent generate
 					. '|: incorrect password'
 				. ')',
 );
-our $CmdConfirmPrompt = '[\(\[] *(?:[yY](?:es)? *(?:[\\\/]|or) *[nN]o?|[nN]o? *(?:[\\\/]|or) *[yY](?:es)?|y - .+?, n - .+?, <cr> - .+?) *[\)\]](?: *[?:] *| )$'; # Y/N prompt
+our $CmdConfirmPrompt = '[\(\[] *(?:[yY](?:es)? *(?:[\\\/]|or) *[nN]o?|[nN]o? *(?:[\\\/]|or) *[yY](?:es)?|y - .+?, n - .+?, <cr> - .+?) *[\)\]](?: *(?:[?:]|\? ?:) *| )$'; # Y/N prompt
 our $CmdInitiatedPrompt = '[?:=]\h*(?:\(.+?\)\h*)?$'; # Prompt for additional user info
 our $WakeConsole = "\n"; # Sequence to send when connecting to console to wake device
 

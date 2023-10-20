@@ -334,10 +334,7 @@ package Sidef::Types::String::String {
     sub ascii2bits {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
-                                        [map { $_ ? Sidef::Types::Number::Number::ONE : Sidef::Types::Number::Number::ZERO }
-                                           CORE::split(//, scalar CORE::unpack("B*", $$self))
-                                        ]
-                                       );
+                      [map { $_ ? Sidef::Types::Number::Number::ONE : Sidef::Types::Number::Number::ZERO } CORE::split(//, scalar CORE::unpack("B*", $$self))]);
     }
 
     sub decode_base64 {
@@ -766,8 +763,8 @@ package Sidef::Types::String::String {
 
     sub unique {
         my ($self) = @_;
-        my %seen;
-        $self->new(CORE::join('', grep { !$seen{$_}++ } CORE::split(//, $$self)));
+        require List::Util;
+        $self->new(CORE::join('', List::Util::uniq(CORE::split(//, $$self))));
     }
 
     *uniq     = \&unique;
@@ -827,8 +824,7 @@ package Sidef::Types::String::String {
 
     sub digits {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(
-                             [map { Sidef::Types::Number::Number::_set_int($_) } grep { /^[0-9]\z/ } CORE::split(//, $$self)]);
+        Sidef::Types::Array::Array->new([map { Sidef::Types::Number::Number::_set_int($_) } grep { /^[0-9]\z/ } CORE::split(//, $$self)]);
     }
 
     sub each_number {
@@ -848,10 +844,7 @@ package Sidef::Types::String::String {
         my $string = $$self;
         require bytes;
         Sidef::Types::Array::Array->new(
-                                      [map { Sidef::Types::Number::Number::_set_int(CORE::ord(bytes::substr($string, $_, 1))) }
-                                         0 .. bytes::length($string) - 1
-                                      ]
-        );
+                                    [map { Sidef::Types::Number::Number::_set_int(CORE::ord(bytes::substr($string, $_, 1))) } 0 .. bytes::length($string) - 1]);
     }
 
     sub each_byte {

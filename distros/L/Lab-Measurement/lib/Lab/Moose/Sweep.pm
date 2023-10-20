@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep;
-$Lab::Moose::Sweep::VERSION = '3.881';
+$Lab::Moose::Sweep::VERSION = '3.901';
 #ABSTRACT: Base class for high level sweeps
 
 use v5.20;
@@ -516,7 +516,7 @@ Lab::Moose::Sweep - Base class for high level sweeps
 
 =head1 VERSION
 
-version 3.881
+version 3.901
 
 =head1 DESCRIPTION
 
@@ -528,7 +528,6 @@ This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
             2018       Andreas K. Huettel, Simon Reinhardt
-            2020       Andreas K. Huettel
             2021       Fabian Weinelt
 
 

@@ -1,5 +1,18 @@
 # Revision history for Perl extension Net::Z3950::FOLIO.
 
+## [3.3.5](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v3.3.5) (IN PROGRESS)
+
+* `Dockerfile` specifies versions of Debian and Perl.
+
+## [3.3.4](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v3.3.4) (Tue Sep 19 13:37:37 BST 2023)
+
+* Make `Dockerfile` more resilient, due to problems building v3.3.3.
+
+## [3.3.3](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v3.3.3) (Tue Sep 19 12:42:27 BST 2023)
+
+* Post-processing is applied to all circulations within an OPAC XML holdings record, not just the first. Fixes ZF-86.
+* When substituting into a MARC subfield from other subfields of the same field, use the values from the same instance of that field. Values from other fields and subfields are still included from the first available instance, which is what you expect. Fixes ZF-87.
+
 ## [3.3.2](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v3.3.2) (Tue Feb 28 11:28:31 GMT 2023)
 
 * Add `1.0` to the list of options for required version of `search` interface, since it's apparently had a major release for some reason. Fixes ZF-85.

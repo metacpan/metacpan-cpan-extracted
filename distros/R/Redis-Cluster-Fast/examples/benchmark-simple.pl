@@ -1,6 +1,6 @@
 use strict;
 use warnings FATAL => 'all';
-use lib './t/lib';
+use lib './xt/lib';
 use Benchmark;
 use Redis::Cluster::Fast;
 use Redis::ClusterRider;

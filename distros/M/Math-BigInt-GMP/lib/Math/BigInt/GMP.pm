@@ -8,7 +8,7 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '1.6012';
+our $VERSION = '1.6013';
 
 use XSLoader;
 XSLoader::load "Math::BigInt::GMP", $VERSION;
@@ -117,10 +117,6 @@ L<https://metacpan.org/release/Math-BigInt-GMP>
 =item CPAN Testers Matrix
 
 L<http://matrix.cpantesters.org/?dist=Math-BigInt-GMP>
-
-=item CPAN Ratings
-
-L<https://cpanratings.perl.org/dist/Math-BigInt-GMP>
 
 =back
 

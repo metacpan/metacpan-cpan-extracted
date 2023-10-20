@@ -47,11 +47,24 @@
 
 =head1 FUNCTIONS
 
-  No functions are provided, except for new() and the subroutines that are
-  responsible for overloading the  '+', '-', '*', '/', '**', '++', '--',
-  '>=', '<=', '==', '!=', '>', '<', '<=>', '""', '+=', '-=', '*=', '/=',
-  '**=', '<<', '>>', '&', '|', '^', '~', '<<=', '>>=', '&=', '|=', '^='
-  (and perhaps other) operations.
+  ($count_in, $count_out) = coverage($iv_bits, $nv_prec, $max_prec);
+    With an NV that has 113 bits of precision, every positive integer in
+    the range 1..10384593717069655257060992658440191 can be represented.
+    If you've ever wondered how many of those values are also
+    representable when the IV is 64-bit and the precision of the NV is
+    53 bits, then running coverage(64, 53, 113) will tell you.
+    $count_in will be set to the number of representable values, and
+    $count_out will be set to the number of unrepresentable values.
+    Hence, $count_in + $count_out == 10384593717069655257060992658440191.
+    You might also like to try arguments of (64, 64, 113) or (32, 53, 64).
+    Take a look at t/coverage.t for other permutations, too.
+    (Just another silly exercise ;-)
+
+  No other public functions are provided, except for new() and the
+  subroutines that are responsible for overloading the  '+', '-', '*',
+  '/', '%', '**', '++', '--', '>=', '<=', '==', '!=', '>', '<', '<=>',
+  '""', '+=', '-=', '*=', '/=', '/%=', '**=', '<<', '>>', '&', '|', '^',
+  '~', '<<=', '>>=', '&=', '|=', '^=' (and perhaps other) operations.
 
 head1 LICENSE
 

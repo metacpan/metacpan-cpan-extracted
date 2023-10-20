@@ -1,0 +1,348 @@
+#!/usr/bin/env perl
+#
+#   An utility from Pheno-Ranker to convert a CSV to:
+#
+#   1 - Input file (JSON array of objects)
+#   2 - Configuration file (needed for Pheno-Ranker)
+#
+#   Last Modified: Jul/30/2023
+#
+#   Version 0.00
+#
+#   Copyright (C) 2023 Manuel Rueda - CNAG (manuel.rueda@cnag.crg.eu)
+#
+#   License: Artistic License 2.0
+#
+#   If this program helps you in your research, please cite.
+use strict;
+use warnings;
+use Getopt::Long qw(:config no_ignore_case);
+use Pod::Usage;
+
+### Main #####
+process_csv();
+##############
+exit;
+
+sub process_csv {
+
+    my $VERSION = '0.00';
+
+    # Reading arguments
+    GetOptions(
+        'input|i=s'       => \my $input,                                    # string
+        'primary-key=s'   => \my $primary_key,                              # string
+        'set-primary-key' => \my $set_primary_key,                          # flag
+        'separator|sep=s' => \my $sep,                                      # str
+        'help|?'          => \my $help,                                     # flag
+        'man'             => \my $man,                                      # flag
+        'debug=i'         => \my $debug,                                    # integer
+        'verbose|'        => \my $verbose,                                  # flag
+        'version|V'       => sub { print "$0 Version $VERSION\n"; exit; }
+    ) or pod2usage(2);
+    pod2usage(1)                              if $help;
+    pod2usage( -verbose => 2, -exitval => 0 ) if $man;
+    pod2usage(
+        -message => "Please specify a valid input with --i <file.csv>\n",
+        -exitval => 1
+    ) unless ( $input && $input =~ m/\.csv/ && -f $input );
+    pod2usage(
+        -message => "Please specify a --primary-key <my_string>\n",
+        -exitval => 1
+    ) if ( $set_primary_key && !$primary_key );
+
+    # Create object
+    my $csv = CSV2PhenoRanker->new(
+        {
+            input           => $input,
+            primary_key     => $primary_key,
+            set_primary_key => $set_primary_key,
+            sep             => $sep,
+            debug           => $debug,
+            verbose         => $verbose
+        }
+    );
+
+    # Run method
+    $csv->run;
+}
+
+package CSV2PhenoRanker;
+
+use strict;
+use warnings;
+use autodie;
+use feature qw(say);
+use Data::Dumper;
+use Path::Tiny;
+use File::Basename;
+use Scalar::Util qw(looks_like_number);
+use YAML::XS     qw(LoadFile DumpFile);
+use JSON::XS;
+use Text::CSV_XS;
+
+sub new {
+    my ( $class, $self ) = @_;
+    bless $self, $class;
+    return $self;
+}
+
+sub run {
+
+    my $self = shift;
+
+    # Read the input file
+    my ( $data, $arrays, $non_arrays ) = read_csv($self);
+
+    # Write data as JSON
+    my ( $name, $path, $suffix ) = fileparse( $self->{input}, qr/\.[^.]*/ );
+    my $json_file = qq/$path$name.json/;
+    say "Writting <$json_file> " if $self->{verbose};
+    write_json( { filepath => $json_file, data => $data } );
+
+    # Load the configuration file data
+    my $config = create_config( $arrays, $non_arrays, $self );
+
+    # Write the configuration file as YAML
+    my $yaml_file = qq/$path${name}_config.yaml/;
+    say "Writting <$yaml_file> " if $self->{verbose};
+    write_yaml( { filepath => $yaml_file, data => $config } );
+
+}
+
+sub write_json {
+
+    my $arg       = shift;
+    my $file      = $arg->{filepath};
+    my $json_data = $arg->{data};
+
+    # Note that canonical DOES not match the order of nsort from Sort:.Naturally
+    my $json = JSON::XS->new->utf8->canonical->pretty->encode($json_data);
+    path($file)->spew_utf8($json);
+    return 1;
+}
+
+sub write_yaml {
+
+    my $arg       = shift;
+    my $file      = $arg->{filepath};
+    my $json_data = $arg->{data};
+    local $YAML::XS::Boolean = 'JSON::PP';
+    DumpFile( $file, $json_data );
+    return 1;
+}
+
+sub read_csv {
+
+    my $self            = shift;
+    my $input           = $self->{input};
+    my $primary_key     = $self->{primary_key};       # has to be non-array
+    my $set_primary_key = $self->{set_primary_key};
+    my $sep             = $self->{sep};
+
+    # Create a Text::CSV object with semicolon as the separator
+    my $csv =
+      Text::CSV_XS->new(
+        { binary => 1, sep_char => $sep // ',', auto_diag => 1 } );
+
+    # Open filehandle
+    open my $fh, '<', $input;
+
+    # Parse the CSV data
+    my $headers = $csv->getline($fh);
+
+    # Get rid of problematic characters on headers
+    $_ =~ tr/()//d for @$headers;
+
+    # Add $primary_key to headers if $set_primary_key
+    push @$headers, $primary_key if $set_primary_key;
+
+    #####################
+    # START READING CSV #
+    #####################
+
+    my ( @rows, %array, %non_array, %numeric );
+    my $count = 1;
+    say "Start reading <$input>" if $self->{verbose};
+    while ( my $row = $csv->getline($fh) ) {
+
+        # Print if verbose
+        say "Reading row $count..."
+          if ( $self->{verbose} && $count % 1_000 == 0 );
+
+        # Add id if $set_primary_key
+        push @$row, 'PR_' . sprintf( "%08d", $count ) if $set_primary_key;
+
+        # Load data
+        my %data;
+        @data{@$headers} = @$row;
+
+        # *** IMPORTANT ***
+        # In some cases we can have arrays and in others nope
+        # To solve it:
+        # a) A posteriori we re-format all array fields to be arrays for each row
+        # b) If the first row was not an array then we don't split by array <==== USED
+
+        # Check fields ONCE!!!!
+        if ( $count == 1 ) {
+            for my $key ( keys %data ) {
+
+                # Check numeric (0/1) 073123 -- NON-USED
+                $numeric{$key} = looks_like_number( $data{$key} ) ? 1 : 0;
+
+                # Check array/non-array
+                if ( $data{$key} =~ /,/ ) {
+                    $array{$key} = 1;
+                }
+                else {
+                    $non_array{$key} = 1;
+                }
+            }
+        }
+
+        # Split array fields (comma-separated values) into an array_ref
+        for my $key ( keys %array ) {
+            $data{$key} = [ split /,/, $data{$key} ];
+        }
+
+        push @rows, \%data;
+        $count++;
+    }
+    close $fh;
+    say "Reading <$input> completed!" if $self->{verbose};
+
+    ###################
+    # END READING CSV #
+    ###################
+
+    return ( \@rows, \%array, \%non_array );
+}
+
+sub create_config {
+
+    my ( $array, $non_array, $self ) = @_;
+    my $primary_key = $self->{primary_key};
+
+    my @arrays     = sort keys %$array;
+    my @non_arrays = sort keys %$non_array;
+
+    # Set primary key.
+    if ( defined $primary_key ) {
+        die "<$primary_key> not found\n"
+          unless ( exists $array->{$primary_key}
+            || exists $non_array->{$primary_key} );
+    }
+
+    else {
+        $primary_key = exists $non_array->{id} ? 'id' : $non_arrays[0];
+    }
+
+    # Default for non-arrays
+    my $config = {
+        format        => 'CSV',
+        primary_key   => $primary_key,
+        allowed_terms => [@non_arrays]
+    };
+
+    # Update for arrays
+    if ( scalar @arrays ) {
+
+        # NB: Can't use $array more than once in the hash ref below. Need to deref
+        $config->{array_terms}       = [@arrays];
+
+        # @non_arrays, @arrays are sorted, but if we merge them we need to re-sort
+        $config->{allowed_terms}     = [ sort @non_arrays, @arrays ];
+        $config->{id_correspondence} = {
+            CSV => [
+                map {
+                    my $val = { $_ => $_ };
+                    $val
+                } @arrays
+            ]
+        };
+
+    }
+    return $config;
+}
+
+1;
+
+=head1 NAME
+
+csv2pheno-ranker: A script to convert a CSV to an input suitable for Pheno-Ranker
+
+=head1 SYNOPSIS
+
+csv2pheno-ranker -i <input.csv> [-options]
+
+     Options:
+       -i|input                       CSV file
+       -primary-key                   Name of the field that you want to use as identifier (MUST BE NON-ARRAY)
+       -sep|separator                 Delimiter character for CSV files [;] e.g., --sep $'\t'
+       -set-primary-key               To force inserting a primary key (in case your CSV does not have one). The name will be set with --primary-key
+
+     Generic Options;
+       -debug                         Print debugging (from 1 to 5, being 5 max)
+       -h|help                        Brief help message
+       -man                           Full documentation
+       -v|verbose                     Verbosity on
+       -V|version                     Print version
+
+
+=head1 DESCRIPTION
+
+There are hundreds of online tools available for converting CSV to JSON, and we saw no need to reinvent the wheel. Our primary focus was on efficiently getting the job done, enabling seamless compatibility between CSV and Pheno-Ranker.
+
+This script is designed to handle both simple CSV files without nested fields in columns, as well as more complex ones with nested fields, as long as they are comma-separated.
+
+The script will create both a JSON file and the configuration file for C<Pheno-Ranker>. You can run C<Pheno-Ranker> as:
+
+ $ pheno-ranker -r my_csv.json --config --my_csv_config.yaml
+
+Note that we load all data in memory before dumping the JSON file. If you have a huge CSV (e.g.,>5M rows) please use a computer that has enough RAM.
+
+=head1 SUMMARY
+
+A script to convert a CSV to an input suitable for Pheno-Ranker
+
+=head1 INSTALLATION
+
+(only needed if you did not install C<Pheno-Ranker>)
+
+ $ cpanm --sudo --installdeps .
+
+=head3 System requirements
+
+  * Ideally a Debian-based distribution (Ubuntu or Mint), but any other (e.g., CentOs, OpenSuse) should do as well.
+  * Perl 5 (>= 5.10 core; installed by default in most Linux distributions). Check the version with "perl -v"
+  * 1GB of RAM.
+  * 1 core (it only uses one core per job).
+  * At least 1GB HDD.
+
+=head1 HOW TO RUN CSV2PHENO-RANKER
+
+The software needs a csv as input file and assumes defaults. If you want to change some parameters please take a look to the synopsis.
+
+B<Examples:>
+
+ $ ./csv2pheno-ranker -i example.csv
+ 
+ $ ./csv2pheno-ranker -i example.csv --set-primary-key --primary-key ID
+
+=head2 COMMON ERRORS AND SOLUTIONS
+
+ * Error message: Foo
+   Solution: Bar
+
+ * Error message: Foo
+   Solution: Bar
+
+=head1 AUTHOR 
+
+Written by Manuel Rueda, PhD. Info about CNAG can be found at L<https://www.cnag.crg.eu>.
+
+=head1 COPYRIGHT AND LICENSE
+
+This PERL file is copyrighted. See the LICENSE file included in this distribution.
+
+=cut

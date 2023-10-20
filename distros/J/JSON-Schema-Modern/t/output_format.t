@@ -195,7 +195,7 @@ cmp_deeply(
       {
         instanceLocation => '',
         keywordLocation => '/required',
-        error => 'missing property: bar',
+        error => 'object is missing property: bar',
       },
     ],
   },
@@ -309,7 +309,7 @@ cmp_deeply(
       {
         instanceLocation => '',
         keywordLocation => '/required',
-        error => 'missing property: bar',
+        error => 'object is missing property: bar',
       },
     ],
   },
@@ -332,7 +332,7 @@ $js = JSON::Schema::Modern->new(validate_formats => 1);
         {
           instanceLocation => '',
           keywordLocation => '/format',
-          error => re(qr{^EXCEPTION: cannot validate format "date-time": Can't locate Time/Moment\.pm}),
+          error => re(qr{^EXCEPTION: cannot validate with format "date-time": Can't locate Time/Moment\.pm}),
         },
       ],
     },

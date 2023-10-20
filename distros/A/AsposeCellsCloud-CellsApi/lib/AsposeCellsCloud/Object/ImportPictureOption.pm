@@ -164,7 +164,7 @@ __PACKAGE__->method_documentation({
      'data' => {
      	datatype => 'string',
      	base_name => 'Data',
-     	description => '',
+     	description => 'base64',
      	format => '',
      	read_only => '',
      		},

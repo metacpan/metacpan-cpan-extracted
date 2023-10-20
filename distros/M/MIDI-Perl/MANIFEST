@@ -7,8 +7,10 @@ lib/MIDI/Score.pm
 lib/MIDI/Simple.pm
 lib/MIDI/Track.pm
 Makefile.PL
-MANIFEST
-MANIFEST.SKIP
+MANIFEST			This list of files
+META.yml
+MYMETA.json
+MYMETA.yml
 README
 t/00_about_verbose.t
 t/10_packw.t
@@ -21,9 +23,11 @@ t/70_j07003.t
 t/80_nl.t
 t/90_paradox.t
 t/91_quant.t
+t/92_skyline.t
 t/cage.mid
 t/dr_m.mid
 t/hb.mid
 t/j07003.mid
+t/skyline.mid
 t/t.mid
-META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

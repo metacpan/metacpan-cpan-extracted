@@ -5,7 +5,7 @@ package Net::CVE;
 use 5.014002;
 use warnings;
 
-our $VERSION = "0.006"; # 20230606
+our $VERSION = "0.007"; # 20230606
 
 use Carp;
 use HTTP::Tiny;
@@ -324,7 +324,7 @@ or
  $reporter->get ("CVE-2022-26928");
  my $info = $reporter->data;
 
-or even, whithout an object
+or even, without an object
 
  my $info = Net::CVE->data ("CVE-2022-26928");
 
@@ -349,7 +349,7 @@ or
  $reporter->get ("CVE-2022-26928");
  my $info = $reporter->summary;
 
-or even, whithout an object
+or even, without an object
 
  my $info = Net::CVE->summary ("CVE-2022-26928");
 
@@ -421,7 +421,7 @@ C<, > in list context the (sorted) list itself.
  $reporter->diag;
  my $diag = $reporter->diag;
 
-If an error occured, returns information about the error. In void context
+If an error occurred, returns information about the error. In void context
 prints the diagnostics using C<warn>. The diagnostics - if any - will be
 returned in a hashref with the following fields:
 
@@ -437,7 +437,7 @@ Failure reason
 
 =item action
 
-Tag of where the failure occured
+Tag of where the failure occurred
 
 =item source
 

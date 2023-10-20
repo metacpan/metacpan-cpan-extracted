@@ -3,7 +3,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION='0.18';
+our $VERSION='0.24';
 
 use Test::More;
 

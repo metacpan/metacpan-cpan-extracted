@@ -8,7 +8,7 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 
 use Bit::Vector;
 
@@ -661,10 +661,6 @@ L<https://metacpan.org/release/Math-BigInt-BitVect>
 =item CPAN Testers Matrix
 
 L<http://matrix.cpantesters.org/?dist=Math-BigInt-BitVect>
-
-=item CPAN Ratings
-
-L<https://cpanratings.perl.org/dist/Math-BigInt-BitVect>
 
 =back
 

@@ -1,10 +1,10 @@
 {
    "abstract" : "Installs all modules I (BURAK) like",
    "author" : [
-      "Burak Gursoy <burak@cpan.org>"
+      "Burak Gursoy"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "task",
       "belike"
@@ -34,6 +34,7 @@
       "runtime" : {
          "requires" : {
             "Acme::CPANAuthors::Turkish" : "0.20",
+            "App::HTTPThis" : "0",
             "App::Sys::Info" : "0.13",
             "CGI::Auth::Basic" : "1.21",
             "Capture::Tiny" : "0.22",
@@ -63,11 +64,9 @@
             "MP3::M3U::Parser" : "2.30",
             "Mojolicious" : "0",
             "Net::GitHub" : "0",
-            "Parse::HTTP::UserAgent" : "0.20",
             "Perl::Tidy" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Elemental::Transformer::List" : "0",
-            "Scalar::Util::Reftype" : "0.40",
             "Software::License" : "0",
             "Task::CPAN::Reporter" : "0",
             "Task::Lingua::Any::Numbers" : "0.17",
@@ -96,7 +95,6 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0",
-            "blib" : "1.01",
             "perl" : "5.012"
          }
       }
@@ -112,10 +110,12 @@
          "web" : "https://github.com/burak/CPAN-Task-BeLike-BURAK"
       }
    },
-   "version" : "0.24",
+   "version" : "0.26",
    "x_contributors" : [
-      "Burak Gursoy <burak@cpan.org>"
+      "Burak Gursoy"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -20,7 +20,6 @@ use Test::More;
 use IPC::Run qw( run );
 use IPC::Run::Timer qw( :all );
 
-plan skip_all => 'Skipping on Win32' if $ENV{GITHUB_WINDOWS_TESTING};
 plan tests => 77;
 
 
@@ -165,7 +164,7 @@ ok( !$t->is_reset );
 my $got;
 eval {
     $got = "timeout fired";
-    run [ $^X, '-e', 'sleep 3' ], timeout 1;
+    run [ $^X, '-e', 'sleep 180' ], timeout 1;
     $got = "timeout didn't fire";
 };
 is $got, "timeout fired", "timer firing in run()";

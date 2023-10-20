@@ -1,6 +1,6 @@
 package SPVM::Digest::MD5;
 
-our $VERSION = "1.001002";
+our $VERSION = "1.001003";
 
 1;
 
@@ -33,7 +33,7 @@ Object-Oriented Programming:
 
 =head2 md5
 
-  static method md5 : string ($data : string);
+C<static method md5 : string ($data : string);>
 
 Calculates the MD5 digest
 of the $data, and returns it in binary form.  The returned string
@@ -41,11 +41,11 @@ will be 16 bytes long.
 
 Exceptions:
 
-The $data must be defined. Otherwise an exception is thrown.
+$data must be defined. Otherwise an exception is thrown.
 
 =head2 md5_hex
 
-  static method md5_hex : string ($data : string);
+C<static method md5_hex : string ($data : string);>
 
 Same as L</"md5">, but will return the digest in hexadecimal form. The
 length of the returned string will be 32 and it will only contain
@@ -57,7 +57,7 @@ Exceptions of L</"md5"> can be thrown.
 
 =head2 new
 
-  static method new : Digest::MD5 ();
+C<static method new : L<Digest::MD5|SPVM::Digest::MD5> ();>
 
 Returns a new L<Digest::MD5|SPVM::Digest::MD5> object which encapsulate
 the state of the MD5 message-digest algorithm.
@@ -66,14 +66,14 @@ the state of the MD5 message-digest algorithm.
 
 =head2 add
 
-  method add : Digest::MD5 ($data : string);
+C<method add : void ($data : string);>
 
-The $data provided as argument are appended to the message we
+$data provided as argument are appended to the message we
 calculate the digest for. The return value is the L<Digest::MD5|SPVM::Digest::MD5> object itself.
 
 Exceptions:
 
-The $data must be defined. Otherwise an exception is thrown.
+$data must be defined. Otherwise an exception is thrown.
 
 Examples:
 
@@ -82,14 +82,14 @@ Examples:
 
 =head2 digest
 
-  method digest : string ();
+C<method digest : string ();>
 
 Returns the binary digest for the message.  The returned string will be
 16 bytes long.
 
 =head2 hexdigest
 
-  method hexdigest : string ();
+C<method hexdigest : string ();>
 
 Same as L</"digest">, but will return the digest in hexadecimal
 form. The length of the returned string will be 32 and it will only

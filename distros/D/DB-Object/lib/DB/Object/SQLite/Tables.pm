@@ -21,10 +21,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object::SQLite DB::Object::Tables );
-    use vars qw( $VERSION $VERBOSE $DEBUG $TYPE_TO_CONSTANT );
-    $VERSION    = 'v0.300.0';
-    $VERBOSE    = 0;
-    $DEBUG      = 0;
+    use vars qw( $VERSION $DEBUG $TYPE_TO_CONSTANT );
     # <https://metacpan.org/pod/DBD::SQLite::Constants>
     # <https://www.sqlite.org/datatype3.html>
     # <https://metacpan.org/pod/DBD::SQLite::Constants#datatypes-(fundamental_datatypes)>
@@ -37,6 +34,8 @@ qr/^(CHARACTER\(\d+\)|VARCHAR\(\d+\)|VARYING\s+CHARACTER\(\d+\)|NCHAR\(\d+\)|NAT
     qr/^(REAL|DOUBLE\s+DOUBLE\s+PRECISION|FLOAT)/           => { constant => '', name => 'SQLITE_FLOAT', type => 'float' },
     qr/^(NUMERIC|DECIMAL\(\d+,\d+\)|BOOLEAN|DATETIME|DATE)/ => { constant => '', name => 'SQLITE_NULL', type => 'bool' },
     };
+    our $DEBUG = 0;
+    our $VERSION = 'v0.300.0';
 };
 
 use strict;
@@ -127,13 +126,14 @@ sub create
         }
         $query .= join( ' ', $def, $tdef, $select );
         my $new = $self->prepare( $query ) ||
-        return( $self->error( "Error while preparing query to create table '$table':\n$query", $self->errstr() ) );
+            return( $self->error( "Error while preparing query to create table '$table':\n$query", $self->errstr() ) );
         # Trick so other method may follow, such as as_string(), fetchrow(), rows()
         if( !defined( wantarray() ) )
         {
-            $new->execute() ||
-            return( $self->error( "Error while executing query to create table '$table':\n$query", $new->errstr() ) );
+            $new->execute ||
+                return( $self->error( "Error while executing query to create table '$table':\n$query", $new->errstr() ) );
         }
+        $self->reset_structure;
         return( $new );
     }
     else
@@ -146,7 +146,7 @@ sub create_info
 {
     my $self    = shift( @_ );
     my $table   = $self->{table};
-    $self->structure();
+    $self->structure || return( $self->pass_error );
     my $struct  = $self->{structure};
     my $fields  = $self->{fields};
     my $default = $self->{default};
@@ -160,7 +160,7 @@ sub create_info
     my $info = $self->stat( $table );
     my @opt  = ();
     push( @opt, "TYPE = $info->{type}" ) if( $info->{type} );
-    my $addons = $info->{ 'create_options' };
+    my $addons = $info->{create_options};
     if( $addons )
     {
         $addons =~ s/(\A|\s+)([\w\_]+)\s*=\s*/$1\U$2\E=/g;
@@ -173,10 +173,10 @@ sub create_info
     return( @output ? $str : undef() );
 }
 
-# Inherited from DB::Object::Tables
+# NOTE: sub default is inherited from DB::Object::Tables
 # sub default
 
-# Inherited from DB::Object::Tables
+# NOTE: sub drop is inherited from DB::Object::Tables
 # sub drop
 
 sub exists
@@ -186,13 +186,13 @@ sub exists
 
 sub lock { return( shift->error( "There is no table locking in SQLite." ) ); }
 
-# Inherited from DB::Object::Tables
+# NOTE: sub name is inherited from DB::Object::Tables
 # sub name
 
-# Inherited from DB::Object::Tables
+# NOTE: sub null is inherited from DB::Object::Tables
 # sub null
 
-# Inherited from DB::Object::Tables
+# NOTE: sub primary is inherited from DB::Object::Tables
 # sub primary
 
 sub on_conflict
@@ -216,44 +216,41 @@ sub rename
 {
     my $self  = shift( @_ );
     my $table = $self->{table} ||
-    return( $self->error( 'No table was provided to rename' ) );
+        return( $self->error( 'No table was provided to rename' ) );
     my $new   = shift( @_ ) ||
-    return( $self->error( "No new table name was provided to rename table '$table'." ) );
+        return( $self->error( "No new table name was provided to rename table '$table'." ) );
     if( $new !~ /^[a-zA-Z][\w\_]+$/ )
     {
         return( $self->error( "Bad new table name '$new'." ) );
     }
     my $query = "ALTER TABLE $table RENAME TO $new";
     my $sth   = $self->prepare( $query ) ||
-    return( $self->error( "Error while preparing query to rename table '$table' into '$new':\n$query", $self->errstr() ) );
+        return( $self->error( "Error while preparing query to rename table '$table' into '$new':\n$query", $self->errstr() ) );
     if( !defined( wantarray() ) )
     {
-        $sth->execute() ||
-        return( $self->error( "Error while executing query to rename table '$table' into '$new':\n$query", $sth->errstr() ) );
+        $sth->execute ||
+            return( $self->error( "Error while executing query to rename table '$table' into '$new':\n$query", $sth->errstr() ) );
     }
+    $self->reset_structure;
     return( $sth );
 }
 
-# https://www.sqlite.org/pragma.html#pragma_table_info
+# TODO: Must implement a cache mechanism for DB::Object::SQLite::structure()
+# <https://www.sqlite.org/pragma.html#pragma_table_info>
 sub structure
 {
     my $self  = shift( @_ );
-    my $table = shift( @_ ) || $self->{table} ||
-    do
-    {
-        $self->error( "No table provided to get its structure." );
-        return( wantarray() ? () : undef() );
-    };
+    return( $self->_clone( $self->{_cache_structure} ) ) if( $self->{_cache_structure} && !CORE::length( $self->{_reset_structure} // '' ) );
+    my $table = $self->{table} ||
+        return( $self->error( "No table provided to get its structure." ) );
     my $sth1 = $self->prepare_cached( "SELECT * FROM sqlite_master WHERE name = ?" ) ||
-    return( $self->error( "An error occured while preparing the sql query to get the details of table \"$table\": ", $self->errstr() ) );
-    $sth1->execute( $table ) || return( $self->error( "An error occured while executing the sql query to get the details of table \"$table\": ", $sth1->errstr() ) );
+        return( $self->error( "An error occured while preparing the sql query to get the details of table \"$table\": ", $self->errstr() ) );
+    $sth1->execute( $table ) ||
+        return( $self->error( "An error occured while executing the sql query to get the details of table \"$table\": ", $sth1->errstr ) );
     my $def = $sth1->fetchrow_hashref;
     $sth1->finish;
     # table or view
     $self->{type} = $def->{type};
-    # $self->_reset_query();
-    # delete( $self->{ 'query_reset' } );
-    # my $struct  = $self->{ '_structure_real' } || $self->{ 'struct' }->{ $table };
     my $struct  = $self->{structure};
     my $fields  = $self->{fields};
     my $default = $self->{default};
@@ -266,12 +263,12 @@ sub structure
         my $query = <<EOT;
 PRAGMA table_info(${table})
 EOT
-        # http://www.postgresql.org/docs/9.3/interactive/infoschema-columns.html
+        # <http://www.postgresql.org/docs/9.3/interactive/infoschema-columns.html>
         # select * from information_schema.columns where table_name = 'address'
         my $sth = $self->prepare_cached( $query ) ||
-        return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $self->errstr() ) );
+            return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $self->errstr() ) );
         $sth->execute ||
-        return( $self->error( "Error while executing query to get table '$table' columns specification: ", $sth->errstr() ) );
+            return( $self->error( "Error while executing query to get table '$table' columns specification: ", $sth->errstr() ) );
         my @primary = ();
         my $ref = '';
         my $c   = 0;
@@ -316,10 +313,9 @@ EOT
             push( @primary, $data{field} ) if( $data{key} );
             $struct->{ $data{field} } = CORE::join( ' ', @define );
         }
-        $sth->finish();
+        $sth->finish;
         if( @primary )
         {
-            # $struct->{ '_primary' } = \@primary;
             $self->{primary} = \@primary;
         }
         # $self->{ '_structure_real' } = $struct;
@@ -329,13 +325,15 @@ EOT
         $self->{structure} = $struct;
         $self->{types}     = $types;
     }
-    return( wantarray() ? () : undef() ) if( !scalar( keys( %$struct ) ) );
-    return( wantarray() ? %$struct : \%$struct );
+    # return( wantarray() ? () : undef() ) if( !scalar( keys( %$struct ) ) );
+    # return( wantarray() ? %$struct : \%$struct );
+    $self->{_cache_structure} = $struct;
+    return( $self->_clone( $struct ) );
 }
 
 sub unlock { return( shift->error( "Locking and unlocking of tables is unsupportde in SQLite." ) ); }
 
-# Inherited from DB::Object
+# NOTE: sub _simple_exist is inherited from DB::Object
 # sub _simple_exist
 
 DESTROY

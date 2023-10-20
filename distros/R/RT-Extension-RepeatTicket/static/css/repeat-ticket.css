@@ -19,3 +19,7 @@
 .repeat .bootstrap-select > .dropdown-toggle {
   width: auto;
 }
+
+.z-index-auto {
+  z-index: auto;
+}

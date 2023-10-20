@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 use Term::ReadLine;
 
@@ -97,8 +97,20 @@ sub _init($)
     {
 	($rows, $columns) = (24, 80);
 	$_ = '' . `stty -a 2>/dev/null`;	# -a is POSIX, --all is not
-	m/;\s*rows\s+(\d+);\s*columns\s+(\d+);/  and
-	    ($rows, $columns) = ($1, $2);
+	if (m/(?:;\s*rows\s+(\d+);|;\s*(\d+)\s+rows;)/)
+	{
+	    # uncoverable branch true
+	    # uncoverable branch false count:1
+	    # uncoverable branch false count:2
+	    $rows = $1 ? $1 : $2 ? $2 : 24;
+	}
+	if (m/(?:;\s*columns\s+(\d+);|;\s*(\d+)\s+columns;)/)
+	{
+	    # uncoverable branch true
+	    # uncoverable branch false count:1
+	    # uncoverable branch false count:2
+	    $columns = $1 ? $1 : $2 ? $2 : 80;
+	}
     }
     # can't use accessors as we're not yet correctly blessed:
     $self->{max_height} = $rows;

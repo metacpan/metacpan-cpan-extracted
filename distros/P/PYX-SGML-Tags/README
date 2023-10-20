@@ -8,7 +8,7 @@ SYNOPSIS
      my $obj = PYX::SGML::Tags->new(%parameters);
      $obj->parse($pyx, $out);
      $obj->parse_file($input_file, $out);
-     $obj->parse_handle($input_file_handler, $out);
+     $obj->parse_handler($input_file_handler, $out);
      $obj->finalize;
 
 METHODS
@@ -16,8 +16,6 @@ METHODS
      my $obj = PYX::SGML::Tags->new(%parameters);
 
     Constructor.
-
-    Returns instance of class.
 
     *       "input_encoding"
 
@@ -44,6 +42,8 @@ METHODS
             value is "Tags::Output::Raw-"new('output_handler' => \*STDOUT)>.
             It's required.
 
+    Returns instance of class.
+
   "parse"
      $obj->parse($pyx, $out);
 
@@ -62,7 +62,7 @@ METHODS
     Returns undef.
 
   "parse_handler"
-     $obj->parse_handle($input_file_handler, $out);
+     $obj->parse_handler($input_file_handler, $out);
 
     Parse PYX handler. $input_file_handler handler is decoded by
     'input_encoding'. Output is serialization to SGML. If $out not present,
@@ -202,10 +202,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2011-2021 Michal Josef Špaček
+    © 2011-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.08
+    0.10
 

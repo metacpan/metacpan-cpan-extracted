@@ -1,26 +1,12 @@
 use v5.26;
 use Object::Pad ':experimental(init_expr)';
+# ABSTRACT: ABI utility for decoding ethereum contract arguments
 
-package Blockchain::Ethereum::ABI::Decoder 0.012;
+package Blockchain::Ethereum::ABI::Decoder;
 class Blockchain::Ethereum::ABI::Decoder;
 
-=encoding utf8
-
-=head1 NAME
-
-Blockchain::Ethereum::ABI::Decoder - Contract ABI response decoder
-
-=head1 SYNOPSIS
-
-Allows you to decode contract ABI response
-
-    my $decoder = Blockchain::Ethereum::ABI::Decoder->new();
-    $decoder
-        ->append('uint256')
-        ->append('bytes[]')
-        ->decode('0x...');
-
-=cut
+our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
+our $VERSION   = '0.013';          # VERSION
 
 use Carp;
 
@@ -29,45 +15,11 @@ use Blockchain::Ethereum::ABI::Type::Tuple;
 
 field $_instances :reader(_instances) :writer(set_instances) = [];
 
-=head2 append
-
-Appends type signature to the decoder.
-
-Usage:
-
-    append(signature) -> L<Blockchain::Ethereum::ABI::Encoder>
-
-=over 4
-
-=item * C<$param> type signature e.g. uint256
-
-=back
-
-Returns C<$self>
-
-=cut
-
 method append ($param) {
 
     push $self->_instances->@*, Blockchain::Ethereum::ABI::Type->new(signature => $param);
     return $self;
 }
-
-=head2 decode
-
-Decodes appended signatures
-
-Usage:
-
-    decode() -> []
-
-=over 4
-
-=back
-
-Returns an array reference containing all decoded values
-
-=cut
 
 method decode ($hex_data) {
 
@@ -95,20 +47,70 @@ method _clean {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Blockchain::Ethereum::ABI::Decoder - ABI utility for decoding ethereum contract arguments
+
+=head1 VERSION
+
+version 0.013
+
+=head1 SYNOPSIS
+
+Allows you to decode contract ABI response
+
+    my $decoder = Blockchain::Ethereum::ABI::Decoder->new();
+    $decoder
+        ->append('uint256')
+        ->append('bytes[]')
+        ->decode('0x...');
+
+=head1 METHODS
+
+=head2 append
+
+Appends type signature to the decoder.
+
+Usage:
+
+    append(signature) -> L<Blockchain::Ethereum::ABI::Encoder>
+
+=over 4
+
+=item * C<$param> type signature e.g. uint256
+
+=back
+
+Returns C<$self>
+
+=head2 decode
+
+Decodes appended signatures
+
+Usage:
+
+    decode() -> []
+
+=over 4
+
+=back
+
+Returns an array reference containing all decoded values
+
 =head1 AUTHOR
 
-Reginaldo Costa, C<< <refeco at cpan.org> >>
+Reginaldo Costa <refeco@cpan.org>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to L<https://github.com/refeco/perl-ABI>
-
-=head1 LICENSE AND COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2022 by REFECO.
 
 This is free software, licensed under:
 
-  The MIT License
+  The MIT (X11) License
 
 =cut

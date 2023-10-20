@@ -31,6 +31,11 @@ lines into a single block.  If you don't like this, override it by
     Set frame width.  You have to put this option before **--frame**
     option.  See **set** function in ["FUNCTION"](#function) section.
 
+- **--frame-pages**
+
+    Output results in multi-column, paginated format to fit the width of the 
+    terminal.
+
 <div>
     <p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-frame/main/images/terminal-3.png">
 </div>
@@ -69,7 +74,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2022 Kazumasa Utashiro.
+Copyright 2022-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -85,7 +85,6 @@ sub __on_table {
     );
     my @pre = ( $hidden, undef );
     my @choices = ( $print_table, $select, $aggregate, $distinct, $where, $group_by, $having, $order_by, $limit, $export );
-    $sf->{d}{stmt_types} = [ 'Select' ];
     my $old_idx = 1;
 
     CUSTOMIZE: while ( 1 ) {

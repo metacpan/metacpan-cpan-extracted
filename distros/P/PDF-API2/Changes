@@ -1,3 +1,17 @@
+2.045     2023-09-25
+
+    - Fixed documentation error in synopsis for QR codes.
+
+    - Fixed date validation when timezone offset minute contains a trailing
+      apostrophe, which is required by the Adobe PDF specifications and
+      prohibited by the ISO PDF specifications.  PDF::API2 now accepts either
+      version as valid (report by Johan Vromans).
+
+    - Fixed passing a GD object to $pdf->image() (reported by Hakon Hagland).
+
+    - Fixed a crash when object numbers contain leading zeroes.
+
+
 2.044     2022-11-16
 
     - Added support for QR codes.

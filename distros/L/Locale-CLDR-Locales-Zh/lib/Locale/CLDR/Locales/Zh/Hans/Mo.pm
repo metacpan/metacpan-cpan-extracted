@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Zh::Hans::Mo - Package for language Chinese
 
 =cut
 
 package Locale::CLDR::Locales::Zh::Hans::Mo;
-# This file auto generated from Data/common/main/zh_Hans_MO.xml
-#	on Mon 11 Apr  5:42:18 pm GMT
+# This file auto generated from Data\common\main\zh_Hans_MO.xml
+#	on Fri 13 Oct  9:50:55 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

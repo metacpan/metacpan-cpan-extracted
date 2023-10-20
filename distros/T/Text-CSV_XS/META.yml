@@ -16,7 +16,7 @@ name: Text-CSV_XS
 provides: 
   Text::CSV_XS: 
     file: CSV_XS.pm
-    version: '1.51'
+    version: '1.52'
 recommends: 
   Encode: '3.19'
 requires: 
@@ -31,4 +31,4 @@ resources:
   homepage: https://metacpan.org/pod/Text::CSV_XS
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Text-CSV_XS
-version: '1.51'
+version: '1.52'

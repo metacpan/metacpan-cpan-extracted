@@ -1,6 +1,591 @@
-SEE ALSO
+NAME
+    App::ListSoftwareLicenses - List all Software::License's
 
+VERSION
+    This document describes version 0.080 of App::ListSoftwareLicenses (from
+    Perl distribution App-ListSoftwareLicenses), released on 2023-07-11.
+
+FUNCTIONS
+  list_software_licenses
+    Usage:
+
+     list_software_licenses(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    List all Software::License's.
+
+    Examples:
+
+    *   String search:
+
+         list_software_licenses(queries => ["perl"]);
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             "Software::License::Artistic_1_0",
+             "Software::License::Artistic_1_0_Perl",
+             "Software::License::Artistic_2_0",
+             "Software::License::LGPL_2_1",
+             "Software::License::LGPL_3_0",
+             "Software::License::Mozilla_1_0",
+             "Software::License::Mozilla_1_1",
+             "Software::License::Perl_5",
+             "Software::License::Sun",
+           ],
+           { "table.fields" => ["module"] },
+         ]
+
+    REPLACE ME
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool* (default: 0)
+
+        Return array of full records instead of just ID fields.
+
+        By default, only the key (ID) field is returned per result entry.
+
+    *   exclude_fields => *array[str]*
+
+        Select fields to return.
+
+    *   fields => *array[str]*
+
+        Select fields to return.
+
+    *   meta2_name => *str*
+
+        Only return records where the 'meta2_name' field equals specified
+        value.
+
+    *   meta2_name.contains => *str*
+
+        Only return records where the 'meta2_name' field contains specified
+        text.
+
+    *   meta2_name.in => *array[str]*
+
+        Only return records where the 'meta2_name' field is in the specified
+        values.
+
+    *   meta2_name.is => *str*
+
+        Only return records where the 'meta2_name' field equals specified
+        value.
+
+    *   meta2_name.isnt => *str*
+
+        Only return records where the 'meta2_name' field does not equal
+        specified value.
+
+    *   meta2_name.max => *str*
+
+        Only return records where the 'meta2_name' field is less than or
+        equal to specified value.
+
+    *   meta2_name.min => *str*
+
+        Only return records where the 'meta2_name' field is greater than or
+        equal to specified value.
+
+    *   meta2_name.not_contains => *str*
+
+        Only return records where the 'meta2_name' field does not contain
+        specified text.
+
+    *   meta2_name.not_in => *array[str]*
+
+        Only return records where the 'meta2_name' field is not in the
+        specified values.
+
+    *   meta2_name.xmax => *str*
+
+        Only return records where the 'meta2_name' field is less than
+        specified value.
+
+    *   meta2_name.xmin => *str*
+
+        Only return records where the 'meta2_name' field is greater than
+        specified value.
+
+    *   meta_name => *str*
+
+        Only return records where the 'meta_name' field equals specified
+        value.
+
+    *   meta_name.contains => *str*
+
+        Only return records where the 'meta_name' field contains specified
+        text.
+
+    *   meta_name.in => *array[str]*
+
+        Only return records where the 'meta_name' field is in the specified
+        values.
+
+    *   meta_name.is => *str*
+
+        Only return records where the 'meta_name' field equals specified
+        value.
+
+    *   meta_name.isnt => *str*
+
+        Only return records where the 'meta_name' field does not equal
+        specified value.
+
+    *   meta_name.max => *str*
+
+        Only return records where the 'meta_name' field is less than or
+        equal to specified value.
+
+    *   meta_name.min => *str*
+
+        Only return records where the 'meta_name' field is greater than or
+        equal to specified value.
+
+    *   meta_name.not_contains => *str*
+
+        Only return records where the 'meta_name' field does not contain
+        specified text.
+
+    *   meta_name.not_in => *array[str]*
+
+        Only return records where the 'meta_name' field is not in the
+        specified values.
+
+    *   meta_name.xmax => *str*
+
+        Only return records where the 'meta_name' field is less than
+        specified value.
+
+    *   meta_name.xmin => *str*
+
+        Only return records where the 'meta_name' field is greater than
+        specified value.
+
+    *   module => *str*
+
+        Only return records where the 'module' field equals specified value.
+
+    *   module.contains => *str*
+
+        Only return records where the 'module' field contains specified
+        text.
+
+    *   module.in => *array[str]*
+
+        Only return records where the 'module' field is in the specified
+        values.
+
+    *   module.is => *str*
+
+        Only return records where the 'module' field equals specified value.
+
+    *   module.isnt => *str*
+
+        Only return records where the 'module' field does not equal
+        specified value.
+
+    *   module.max => *str*
+
+        Only return records where the 'module' field is less than or equal
+        to specified value.
+
+    *   module.min => *str*
+
+        Only return records where the 'module' field is greater than or
+        equal to specified value.
+
+    *   module.not_contains => *str*
+
+        Only return records where the 'module' field does not contain
+        specified text.
+
+    *   module.not_in => *array[str]*
+
+        Only return records where the 'module' field is not in the specified
+        values.
+
+    *   module.xmax => *str*
+
+        Only return records where the 'module' field is less than specified
+        value.
+
+    *   module.xmin => *str*
+
+        Only return records where the 'module' field is greater than
+        specified value.
+
+    *   name => *str*
+
+        Only return records where the 'name' field equals specified value.
+
+    *   name.contains => *str*
+
+        Only return records where the 'name' field contains specified text.
+
+    *   name.in => *array[str]*
+
+        Only return records where the 'name' field is in the specified
+        values.
+
+    *   name.is => *str*
+
+        Only return records where the 'name' field equals specified value.
+
+    *   name.isnt => *str*
+
+        Only return records where the 'name' field does not equal specified
+        value.
+
+    *   name.max => *str*
+
+        Only return records where the 'name' field is less than or equal to
+        specified value.
+
+    *   name.min => *str*
+
+        Only return records where the 'name' field is greater than or equal
+        to specified value.
+
+    *   name.not_contains => *str*
+
+        Only return records where the 'name' field does not contain
+        specified text.
+
+    *   name.not_in => *array[str]*
+
+        Only return records where the 'name' field is not in the specified
+        values.
+
+    *   name.xmax => *str*
+
+        Only return records where the 'name' field is less than specified
+        value.
+
+    *   name.xmin => *str*
+
+        Only return records where the 'name' field is greater than specified
+        value.
+
+    *   notice => *str*
+
+        Only return records where the 'notice' field equals specified value.
+
+    *   notice.contains => *str*
+
+        Only return records where the 'notice' field contains specified
+        text.
+
+    *   notice.in => *array[str]*
+
+        Only return records where the 'notice' field is in the specified
+        values.
+
+    *   notice.is => *str*
+
+        Only return records where the 'notice' field equals specified value.
+
+    *   notice.isnt => *str*
+
+        Only return records where the 'notice' field does not equal
+        specified value.
+
+    *   notice.max => *str*
+
+        Only return records where the 'notice' field is less than or equal
+        to specified value.
+
+    *   notice.min => *str*
+
+        Only return records where the 'notice' field is greater than or
+        equal to specified value.
+
+    *   notice.not_contains => *str*
+
+        Only return records where the 'notice' field does not contain
+        specified text.
+
+    *   notice.not_in => *array[str]*
+
+        Only return records where the 'notice' field is not in the specified
+        values.
+
+    *   notice.xmax => *str*
+
+        Only return records where the 'notice' field is less than specified
+        value.
+
+    *   notice.xmin => *str*
+
+        Only return records where the 'notice' field is greater than
+        specified value.
+
+    *   queries => *array[str]*
+
+        Search.
+
+        This will search all searchable fields with one or more specified
+        queries. Each query can be in the form of "-FOO" (dash prefix
+        notation) to require that the fields do not contain specified
+        string, or "/FOO/" to use regular expression. All queries must match
+        if the "query_boolean" option is set to "and"; only one query should
+        match if the "query_boolean" option is set to "or".
+
+    *   query_boolean => *str* (default: "and")
+
+        Whether records must match all search queries ('and') or just one
+        ('or').
+
+        If set to "and", all queries must match; if set to "or", only one
+        query should match. See the "queries" option for more details on
+        searching.
+
+    *   sort => *array[str]*
+
+        Order records according to certain field(s).
+
+        A list of field names separated by comma. Each field can be prefixed
+        with '-' to specify descending order instead of the default
+        ascending.
+
+    *   text => *str*
+
+        Only return records where the 'text' field equals specified value.
+
+    *   text.contains => *str*
+
+        Only return records where the 'text' field contains specified text.
+
+    *   text.in => *array[str]*
+
+        Only return records where the 'text' field is in the specified
+        values.
+
+    *   text.is => *str*
+
+        Only return records where the 'text' field equals specified value.
+
+    *   text.isnt => *str*
+
+        Only return records where the 'text' field does not equal specified
+        value.
+
+    *   text.max => *str*
+
+        Only return records where the 'text' field is less than or equal to
+        specified value.
+
+    *   text.min => *str*
+
+        Only return records where the 'text' field is greater than or equal
+        to specified value.
+
+    *   text.not_contains => *str*
+
+        Only return records where the 'text' field does not contain
+        specified text.
+
+    *   text.not_in => *array[str]*
+
+        Only return records where the 'text' field is not in the specified
+        values.
+
+    *   text.xmax => *str*
+
+        Only return records where the 'text' field is less than specified
+        value.
+
+    *   text.xmin => *str*
+
+        Only return records where the 'text' field is greater than specified
+        value.
+
+    *   url => *str*
+
+        Only return records where the 'url' field equals specified value.
+
+    *   url.contains => *str*
+
+        Only return records where the 'url' field contains specified text.
+
+    *   url.in => *array[str]*
+
+        Only return records where the 'url' field is in the specified
+        values.
+
+    *   url.is => *str*
+
+        Only return records where the 'url' field equals specified value.
+
+    *   url.isnt => *str*
+
+        Only return records where the 'url' field does not equal specified
+        value.
+
+    *   url.max => *str*
+
+        Only return records where the 'url' field is less than or equal to
+        specified value.
+
+    *   url.min => *str*
+
+        Only return records where the 'url' field is greater than or equal
+        to specified value.
+
+    *   url.not_contains => *str*
+
+        Only return records where the 'url' field does not contain specified
+        text.
+
+    *   url.not_in => *array[str]*
+
+        Only return records where the 'url' field is not in the specified
+        values.
+
+    *   url.xmax => *str*
+
+        Only return records where the 'url' field is less than specified
+        value.
+
+    *   url.xmin => *str*
+
+        Only return records where the 'url' field is greater than specified
+        value.
+
+    *   version => *str*
+
+        Only return records where the 'version' field equals specified
+        value.
+
+    *   version.contains => *str*
+
+        Only return records where the 'version' field contains specified
+        text.
+
+    *   version.in => *array[str]*
+
+        Only return records where the 'version' field is in the specified
+        values.
+
+    *   version.is => *str*
+
+        Only return records where the 'version' field equals specified
+        value.
+
+    *   version.isnt => *str*
+
+        Only return records where the 'version' field does not equal
+        specified value.
+
+    *   version.max => *str*
+
+        Only return records where the 'version' field is less than or equal
+        to specified value.
+
+    *   version.min => *str*
+
+        Only return records where the 'version' field is greater than or
+        equal to specified value.
+
+    *   version.not_contains => *str*
+
+        Only return records where the 'version' field does not contain
+        specified text.
+
+    *   version.not_in => *array[str]*
+
+        Only return records where the 'version' field is not in the
+        specified values.
+
+    *   version.xmax => *str*
+
+        Only return records where the 'version' field is less than specified
+        value.
+
+    *   version.xmin => *str*
+
+        Only return records where the 'version' field is greater than
+        specified value.
+
+    *   with.text => *bool* (default: 0)
+
+        Show field 'with'.
+
+    *   with_field_names => *bool*
+
+        Return field names in each record (as hash/associative array).
+
+        When enabled, function will return each record as hash/associative
+        array (field name => value pairs). Otherwise, function will return
+        each record as list/array (field value, field value, ...).
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ListSoftwareLicenses>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ListSoftwareLicenses>.
+
+SEE ALSO
     Software::License
 
     App::Software::License to print out license text
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023, 2015, 2014 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListSoftwareLicen
+    ses>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

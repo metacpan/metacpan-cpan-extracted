@@ -1,5 +1,46 @@
 Revision history for Perl module Module::Generic
 
+v0.32.5 2023-10-11T20:31:59+0900
+    - Corrected malformed signature for distribution release
+
+v0.32.4 2023-09-26T20:39:17+0900
+    - Updated method _is_empty in Module::Generic
+    - Improved method colour_parse() in Module::Generic
+    - Corrected messagef_colour
+    - Improved as_hash
+    - Reverted debug, verbose from being private properties prepended with '_', because some modules make direct access to those object properties.
+    - Improved method _set_get_number() in Module::Generic when dealing with undefined value.
+
+v0.32.3 2023-09-25T23:37:41+0900
+    - Minor issue in unit test 14.core.t corrected
+
+v0.32.2 2023-09-20T15:08:44+0900
+    - Updated method _is_empty in Module::Generic to include array and hash
+    - Improved method _is_class_loaded() in Module::Generic
+    - Corrected the error() method in Module::Generic::Array that was not working as intended
+    - Added the method reduce() in Module::Generic::Array as an implementation of the JavaScript equivalent.
+    - Added in Module::Generic the methods _has_symbol, _get_symbol and _list_symbols
+
+v0.32.1 2023-09-19T20:15:02+0900
+    - Corrected a negative side affect of allowing, by default, the use of reference as hash keys when some key names are stringifyable objects. They would not stringify because they are object. Now allowing reference as hash keys is disabled by default and is an option.
+
+v0.32.0 2023-09-05T16:11:30+0900
+    - Cleaned up code and improved speed substantially
+    - $_ in method foreach() of Module::Generic::Array refers to the current value of the array and can be altered directly
+    - Added the default option 'allow_tags' to the method new_json() in Module::Generic
+    - Improved module Module::Generic::TieHash
+    - Enabled use of reference as keys in Module::Generic::TieHash
+    - tying recursively hash reference in Module::Generic::TieHash
+    - Updated POD documentation for Module::Generic::TieHash
+    - Updated method as_hash() in Module::Generic::Array
+    - Updated method as_string() in Module::Generic::Exception to stringify the value of message() when it contains an overloaded value.
+    - Changed private object variable to be prefixed with '_'
+    - Method as_hash() in Module::Generic::Hash no longer returns a regular hash, but instead the current object, since this is already an hash
+    - Corrected callback in method _set_get_scalar_as_object() in Module::Generic
+
+v0.31.2 2023-08-31T11:37:06+0900
+    - Updated methods _set_get_file() and _set_get_glob() to allow for undef() value to essentially remove existing value.
+
 v0.31.1 2023-07-31T08:50:04+0900
     - Improved methods _set_get_hash, _set_get_array and _set_get_boolean in Module::Generic
     - Improved method load_json in Module::Generic::File

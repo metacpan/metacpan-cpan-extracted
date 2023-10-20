@@ -39,7 +39,7 @@ not_in_file_ok(Changes =>
 sub module_boilerplate_ok {
     my ($module) = @_;
     not_in_file_ok($module =>
-        #'the great new $MODULENAME'   => qr/ - The great new /,
+        'the great new $MODULENAME'   => qr/ - The great new /,
         #'boilerplate description'     => qr/Quick summary of what the module/,
         #'stub function definition'    => qr/function[12]/,
     );

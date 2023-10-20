@@ -8,19 +8,17 @@
 # This utility script ships with ODF::lpOD_Helper
 
 use strict; use warnings; use feature qw/say/;
-our $VERSION = '6.004'; # VERSION
+our $VERSION = '6.007'; # VERSION
 
 my $progname = basename($0);
 my $usage = <<EOF;
 
-USAGE: $progname <path>
+USAGE: $progname OPTIONS <path>
 
-Dumps the internals of an ODF document to stdout in a peculiar Perlish
-format intended to make human inspection easier.  Instead of xml
-<tag> ... </tag>, hierarchy is represended using nested {blocks},
-wrapped intelligently to your terminal width.
-
-A node hierarchy looks like this:
+Dumps the internals of an ODF document to stdout in a peculiar Perlish format
+intended to make human inspection easier.  Instead of xml <tag> ... </tag>,
+hierarchy is represended using nested {blocks}, wrapped intelligently to
+your terminal width.  Output looks like this:
 
   Tag {
     att={AtrributeName => VALUE, ...}
@@ -30,6 +28,10 @@ A node hierarchy looks like this:
     ...
   }
 
+OPTIONS:
+  -o showoff=BOOL     # Show Virtual Text character offsets into body
+  -o showlevel=BOOL   # Append nesting levels numbers after { and }
+  -w width            # Wrap to indicated width instead of using terminal width
 EOF
 
 use open IO => ':locale';
@@ -40,7 +42,7 @@ use ODF::lpOD;
 use ODF::lpOD_Helper qw/fmt_tree/;
 
 my $width;
-my %fmt_options = (showaddr => 0, showoff => 0, showisa => 0, showlevel => 0);
+my %fmt_options = (showaddr => 0, showoff => 1, showisa => 0, showlevel => 0);
 Getopt::Long::Configure('gnu_compat');
 GetOptions(
   'o|option=s' => \%fmt_options,

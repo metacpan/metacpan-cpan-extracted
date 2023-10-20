@@ -1,0 +1,26 @@
+{
+   "abstract" : "like system(), but with access to STDOUT and STDERR.",
+   "author" : [
+      "Brian Reichert <reichert@numachi.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "gen-cpan-meta version 0.011",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "System2",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {}
+      },
+      "test" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.85"
+}

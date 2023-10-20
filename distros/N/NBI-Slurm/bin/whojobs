@@ -94,6 +94,11 @@ sub unix_users {
     return \@users;    
 }
 sub slurm_users {
+    if (not NBI::Slurm::has_squeue()) {
+        say STDERR RED, "[WARNING]", RESET, " `squeue` not found, are you in the cluster?";
+        say STDERR "Will just print some logged users...";
+        return {};
+    }
     my $cmd = "squeue --format='%u'";
     my @users  = `$cmd`;
     chomp @users;
@@ -162,7 +167,7 @@ whojobs - List the users with active jobs, and the number of jobs in the cluster
 
 =head1 VERSION
 
-version 0.6.1
+version 0.8.1
 
 =head1 SYNOPSIS
 

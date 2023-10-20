@@ -1,15 +1,15 @@
 package App::tracepm;
 
-our $DATE = '2020-04-08'; # DATE
-our $VERSION = '0.230'; # VERSION
-
 use 5.010001;
 use strict;
+use version;
 use warnings;
-use experimental 'smartmatch';
 use Log::ger;
 
-use version;
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-07-11'; # DATE
+our $DIST = 'App-tracepm'; # DIST
+our $VERSION = '0.231'; # VERSION
 
 our %SPEC;
 
@@ -373,12 +373,12 @@ sub tracepm {
                         log_info "Skipped recursing to %s: path not found", $mod;
                         last;
                     }
-                    if ($mod ~~ @recurse_blacklist) {
+                    if (grep { $_ eq $mod } @recurse_blacklist) {
                         log_info "Skipped recursing to %s: excluded by hard-coded blacklist", $mod;
                         last;
                     }
                     if ($args{recurse_exclude}) {
-                        if ($mod ~~ @{ $args{recurse_exclude} }) {
+                        if (grep { $_ eq $mod } @{ $args{recurse_exclude} }) {
                             log_info "Skipped recursing to %s: excluded by list", $mod;
                             last;
                         }
@@ -464,7 +464,7 @@ App::tracepm - Trace dependencies of your Perl script
 
 =head1 VERSION
 
-This document describes version 0.230 of App::tracepm (from Perl distribution App-tracepm), released on 2020-04-08.
+This document describes version 0.231 of App::tracepm (from Perl distribution App-tracepm), released on 2023-07-11.
 
 =head1 SYNOPSIS
 
@@ -479,7 +479,7 @@ This distribution provides command-line utility called L<tracepm>.
 
 Usage:
 
- tracepm(%args) -> [status, msg, payload, meta]
+ tracepm(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Trace dependencies of your Perl script.
 
@@ -613,12 +613,12 @@ Filter only modules that are XS modules.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -630,6 +630,41 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-tracep
 
 Source repository is at L<https://github.com/perlancar/perl-App-tracepm>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2020, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-tracepm>
@@ -637,16 +672,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

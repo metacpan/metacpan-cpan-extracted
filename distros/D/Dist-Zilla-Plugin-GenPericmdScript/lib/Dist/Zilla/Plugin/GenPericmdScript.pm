@@ -20,9 +20,9 @@ use Perinci::CmdLine::Gen qw(gen_pericmd_script);
 use Module::Load;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-22'; # DATE
+our $DATE = '2023-07-11'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-GenPericmdScript'; # DIST
-our $VERSION = '0.424'; # VERSION
+our $VERSION = '0.425'; # VERSION
 
 has allow_prereq => (is=>'rw');
 has allow_unknown_opts => (is=>'rw');
@@ -76,8 +76,6 @@ sub gather_files {
 
 # XXX extract list_own_modules, is_own_module to its own role/dist
 sub is_own_module {
-    use experimental 'smartmatch';
-
     my ($self, $mod) = @_;
 
     state $own_modules = do {
@@ -92,7 +90,7 @@ sub is_own_module {
         \@list;
     };
 
-    $mod ~~ @$own_modules ? 1:0;
+    (grep { $_ eq $mod } @$own_modules) ? 1:0;
 }
 
 sub munge_files {
@@ -278,7 +276,7 @@ Dist::Zilla::Plugin::GenPericmdScript - Generate Perinci::CmdLine script
 
 =head1 VERSION
 
-This document describes version 0.424 of Dist::Zilla::Plugin::GenPericmdScript (from Perl distribution Dist-Zilla-Plugin-GenPericmdScript), released on 2022-01-22.
+This document describes version 0.425 of Dist::Zilla::Plugin::GenPericmdScript (from Perl distribution Dist-Zilla-Plugin-GenPericmdScript), released on 2023-07-11.
 
 =head1 SYNOPSIS
 
@@ -553,13 +551,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::Builder::Tester;
-use Test::More;
+use Test2::V0;
 
 use Future::AsyncAwait 0.47;
 
@@ -26,6 +26,24 @@ ok( defined $uart, 'defined $uart' );
    $adapter->check_and_clear( '->write' );
 
    test_test( '->write' );
+}
+
+# uart read buffering
+{
+   test_out( "ok 1 - ->read future yields data" );
+   test_out( qr/\s*# Subtest: ->read\n/ );
+   test_out( "    ok 1 - No calls made" );
+   test_out( "    1..1" );
+   test_out( "ok 2 - ->read" );
+
+   $adapter->use_read_buffer;
+
+   my $f = $uart->read( 16 );
+   $adapter->write_read_buffer( "here is the data" );
+   is( await $f, "here is the data", '->read future yields data' );
+   $adapter->check_and_clear( '->read' );
+
+   test_test( '->read from buffer' );
 }
 
 done_testing;

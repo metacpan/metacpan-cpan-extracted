@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/DateTime.pm
-## Version v0.4.3
+## Version v0.5.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/11/06
+## Modified 2023/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -21,7 +21,7 @@ BEGIN
     use DateTime 1.57;
     use DateTime::Format::Strptime 1.79;
     use DateTime::TimeZone 2.51;
-    use Nice::Try dont_want => 1;
+    # use Nice::Try dont_want => 1;
     use Regexp::Common;
     use Scalar::Util ();
     use overload (
@@ -58,7 +58,7 @@ BEGIN
         )?
     )?
     /x;
-    our $VERSION = 'v0.4.3';
+    our $VERSION = 'v0.5.0';
 };
 
 BEGIN
@@ -240,7 +240,9 @@ sub new
     }
     else
     {
-        try
+        # try-catch
+        local $@;
+        eval
         {
             if( !exists( $opts->{formatter} ) )
             {
@@ -250,25 +252,31 @@ sub new
                 );
             }
             $dt = DateTime->now( %$opts );
-        }
-        catch( $e where { /Cannot[[:blank:]\h]+determine[[:blank:]\h]+local[[:blank:]\h]+time[[:blank:]\h]+zone/i } )
+        };
+        if( $@ )
         {
-            warn( "Warning: Your system is missing key timezone components. Module::Generic::DateTime is reverting to UTC instead of local time zone." );
-            $opts->{time_zone} = 'UTC';
-            $today = DateTime->new( %$opts );
-            my $dt_fmt = DateTime::Format::Strptime->new(
-                pattern => '%FT%T%z',
-                locale => 'en_GB',
-            );
-            $today->set_formatter( $dt_fmt );
-        }
-        catch( $e )
-        {
-            return( $this->error( "Error while creating a DateTime object: $e" ) );
+            if( $@ =~ /Cannot[[:blank:]\h]+determine[[:blank:]\h]+local[[:blank:]\h]+time[[:blank:]\h]+zone/i )
+            {
+                warn( "Warning: Your system is missing key timezone components. Module::Generic::DateTime is reverting to UTC instead of local time zone." );
+                $opts->{time_zone} = 'UTC';
+                $dt = DateTime->new( %$opts );
+                my $dt_fmt = DateTime::Format::Strptime->new(
+                    pattern => '%FT%T%z',
+                    locale => 'en_GB',
+                );
+                $dt->set_formatter( $dt_fmt );
+            }
+            else
+            {
+                return( $this->error( "Error while creating a DateTime object: $@" ) );
+            }
         }
     }
     return( bless( { dt => $dt->clone } => ( ref( $this ) || $this ) )->init( @_ ) );
 }
+
+# This class does not convert to an HASH, but the TO_JSON method will convert to a string
+sub as_hash { return( $_[0] ); }
 
 sub as_string { return( shift->stringify( @_ ) ); }
 
@@ -277,29 +285,35 @@ sub datetime { return( shift->_set_get_object_without_init( 'dt' => 'DateTime' )
 sub from_epoch
 {
     my $this = shift( @_ );
-    try
+    my $dt;
+    # try-catch
+    local $@;
+    eval
     {
-        my $dt = DateTime->from_epoch( @_ );
-        return( $this->new( $dt ) );
-    }
-    catch( $e )
+        $dt = DateTime->from_epoch( @_ );
+    };
+    if( $@ )
     {
-        return( $this->error( "Error trying to create a new DateTime object using new_from_epoch(): $e" ) );
+        return( $this->error( "Error trying to create a new DateTime object using new_from_epoch(): $@" ) );
     }
+    return( $this->new( $dt ) );
 }
 
 sub now
 {
     my $this = shift( @_ );
-    try
+    my $dt;
+    # try-catch
+    local $@;
+    eval
     {
-        my $dt = DateTime->now( @_ );
-        return( $this->new( $dt ) );
-    }
-    catch( $e )
+        $dt = DateTime->now( @_ );
+    };
+    if( $@ )
     {
-        return( $this->error( "Error trying to create a new DateTime object: $e" ) );
+        return( $this->error( "Error trying to create a new DateTime object: $@" ) );
     }
+    return( $this->new( $dt ) );
 }
 
 sub op
@@ -328,12 +342,14 @@ sub op
     {
         if( !defined( $HAS_LOCAL_TZ ) )
         {
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'local' );
                 $HAS_LOCAL_TZ = 1;
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
                 warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" );
                 $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'UTC' );
@@ -342,11 +358,13 @@ sub op
         }
         else
         {
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 $dt2 = DateTime->from_epoch( epoch => $other, time_zone => ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
                 warn( "Error trying to set a DateTime object using ", ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ), " time zone\n" );
                 $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'UTC' );
@@ -373,20 +391,23 @@ sub op
             $re->{tz_offset} = $re->{tz_sign} . $re->{tz_offset1} . $re->{tz_offset2};
         }
         
-        try
+        # try-catch
+        local $@;
+        eval
         {
             $dt2 = DateTime->new( %$hash );
             $dt2->set_time_zone( $re->{tz_offset} ) if( length( $re->{tz_offset} ) );
             my $dt3 = $dt2->clone;
             $dt3->set_time_zone( 'UTC' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            warn( "Unable to create DateTime object from parsing '$other': $e\n" );
+            warn( "Unable to create DateTime object from parsing '$other': $@\n" );
         }
     }
     use overloading;
     my $eval = $swap ? "\$dt2 $op \$dt1" : "\$dt1 $op \$dt2";
+    # I do not want to localise $@ so it can be checked by the caller
     my $res = eval( $eval );
     return( $res );
 }
@@ -444,43 +465,60 @@ sub op_minus_plus
     my $v;
     $v = "$other" if( !ref( $other ) || ( ref( $other ) && overload::Method( $other => '""' ) ) );
     die( "\$other (", overload::StrVal( $other // '' ), ") is not a number, a DateTime, or a DateTime::Duration object!\n" ) if( !defined( $v ) || $v !~ /^(?:$RE{num}{real}|$RE{num}{int})$/ );
-    try
+    my $new_dt;
+    if( $op eq '-' )
     {
-        my $new_dt;
-        if( $op eq '-' )
+        if( $swap )
         {
-            if( $swap )
+            # try-catch
+            local $@;
+            my( $clone, $ts );
+            eval
             {
-                my $clone = $dt1->clone;
-                my $ts = $clone->epoch;
-                if( !defined( $HAS_LOCAL_TZ ) )
+                $clone = $dt1->clone;
+                $ts = $clone->epoch;
+            };
+            if( $@ )
+            {
+                die( "Error cloning and getting epoch value for DateTime object: $@" );
+            }
+            
+            if( !defined( $HAS_LOCAL_TZ ) )
+            {
+                # try-catch
+                local $@;
+                eval
                 {
-                    try
-                    {
-                        $clone->set_time_zone( 'local' );
-                        $HAS_LOCAL_TZ = 1;
-                    }
-                    catch( $e )
-                    {
-                        $clone->set_time_zone( 'UTC' );
-                        $HAS_LOCAL_TZ = 0;
-                        warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" ) if( warnings::enabled() );
-                    }
-                }
-                else
+                    $clone->set_time_zone( 'local' );
+                    $HAS_LOCAL_TZ = 1;
+                };
+                if( $@ )
                 {
-                    try
-                    {
-                        $clone->set_time_zone( $HAS_LOCAL_TZ ? 'local' : 'UTC' );
-                    }
-                    catch( $e )
-                    {
-                        warn( "Error trying to set the DateTime object time zone using ", ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ), "\n" );
-                        $clone->set_time_zone( 'UTC' );
-                    }
+                    $clone->set_time_zone( 'UTC' );
+                    $HAS_LOCAL_TZ = 0;
+                    warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" ) if( warnings::enabled() );
                 }
-                
-                my $new_ts = $v - $ts;
+            }
+            else
+            {
+                # try-catch
+                local $@;
+                eval
+                {
+                    $clone->set_time_zone( $HAS_LOCAL_TZ ? 'local' : 'UTC' );
+                };
+                if( $@ )
+                {
+                    warn( "Error trying to set the DateTime object time zone using ", ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ), "\n" );
+                    $clone->set_time_zone( 'UTC' );
+                }
+            }
+            
+            # try-catch
+            local $@;
+            my $new_ts = $v - $ts;
+            eval
+            {
                 $new_dt = DateTime->from_epoch( epoch => $new_ts, time_zone => $dt1->time_zone );
                 my $strp = DateTime::Format::Strptime->new(
                     pattern => '%s',
@@ -488,43 +526,53 @@ sub op_minus_plus
                     time_zone => $new_dt->time_zone,
                 );
                 $new_dt->set_formatter( $strp );
+            };
+            if( $@ )
+            {
+                die( "Error instantiating a new DateTime object with epoch timestamp $new_ts and time zone ", $dt1->time_zone );
             }
-            else
+        }
+        else
+        {
+            # try-catch
+            local $@;
+            eval
             {
                 my $clone = !defined( $swap ) ? $dt1 : $dt1->clone;
                 $new_dt = $clone->subtract( seconds => $v );
-                ## If $swap is undefined, this is an assignment operation such as -=
-                return( $self ) if( !defined( $swap ) );
+            };
+            if( $@ )
+            {
+                die( "Failed to subtract ", ( $swap ? $self : $v ), " from ", ( $swap ? $v : $self ), ": $@" );
             }
+            # If $swap is undefined, this is an assignment operation such as -=
+            return( $self ) if( !defined( $swap ) );
         }
-        ## +
+    }
+    # +
+    else
+    {
+        if( $swap )
+        {
+            $new_dt = $dt1->add( seconds => $v );
+        }
         else
         {
-            if( $swap )
-            {
-                $new_dt = $dt1->add( seconds => $v );
-            }
-            else
+            # try-catch
+            local $@;
+            eval
             {
                 my $clone = !defined( $swap ) ? $dt1 : $dt1->clone;
                 $new_dt = $clone->add( seconds => $v );
-                return( $self ) if( !defined( $swap ) );
+            };
+            if( $@ )
+            {
+                die( "Failed to add ", ( $swap ? $self : $v ), " to ", ( $swap ? $v : $self ), ": $@" );
             }
-        }
-        return( $self->_make_my_own( $new_dt ) );
-    }
-    catch( $e )
-    {
-        use overloading;
-        if( $op eq '-' )
-        {
-            die( "Failed to subtract ", ( $swap ? $self : $v ), " from ", ( $swap ? $v : $self ), ": $e\n" );
-        }
-        else
-        {
-            die( "Failed to add ", ( $swap ? $self : $v ), " to ", ( $swap ? $v : $self ), ": $e\n" );
+            return( $self ) if( !defined( $swap ) );
         }
     }
+    return( $self->_make_my_own( $new_dt ) );
 }
 
 sub _get_other
@@ -644,20 +692,24 @@ AUTOLOAD
     die( "DateTime object is gone !\n" ) if( !ref( $self->{dt} ) );
     no overloading;
     my $dt = $self->{dt};
-    try
+    if( $dt->can( $method ) )
     {
-        if( $dt->can( $method ) )
+        my $rv;
+        # try-catch
+        local $@;
+        eval
         {
-            return( $dt->$method( @_ ) );
-        }
-        else
+            $rv = $dt->$method( @_ );
+        };
+        if( $@ )
         {
-            return( $self->error( "No method \"$method\" available in DateTime" ) );
+            return( $self->error( "Error trying to call DateTime::$method with arguments: '", join( "', '", @_ ), "': $@" ) );
         }
+        return( $rv );
     }
-    catch( $e )
+    else
     {
-        return( $self->error( "Error trying to call DateTime::$method with arguments: '", join( "', '", @_ ), "': $e" ) );
+        return( $self->error( "No method \"$method\" available in DateTime" ) );
     }
 };
 
@@ -679,7 +731,7 @@ BEGIN
         fallback => 1,
     );
     use DateTime;
-    use Nice::Try;
+    # use Nice::Try;
     use Scalar::Util ();
     use Want;
 };
@@ -690,6 +742,9 @@ sub new
     my $dur  = shift( @_ ) || return;
     return( bless( { interval => $dur->clone } => ( ref( $this ) || $this ) )->init( @_ ) );
 }
+
+# This class does not convert to an HASH
+sub as_hash { return( $_[0] ); }
 
 sub as_string
 {
@@ -1010,20 +1065,24 @@ AUTOLOAD
     die( "DateTime::Duration object is gone !\n" ) if( !ref( $self->{interval} ) );
     no overloading;
     my $dur = $self->{interval};
-    try
+    if( $dur->can( $method ) )
     {
-        if( $dur->can( $method ) )
+        my $rv;
+        # try-catch
+        local $@;
+        eval
         {
-            return( $dur->$method( @_ ) );
-        }
-        else
+            $rv = $dur->$method( @_ );
+        };
+        if( $@ )
         {
-            return( $self->error( "No method \"$method\" available in DateTime::Duration" ) );
+            return( $self->error( "Error trying to call DateTime::Duration::$method with arguments: '", join( "', '", @_ ), "': $@" ) );
         }
+        return( $rv );
     }
-    catch( $e )
+    else
     {
-        return( $self->error( "Error trying to call DateTime::Duration::$method with arguments: '", join( "', '", @_ ), "': $e" ) );
+        return( $self->error( "No method \"$method\" available in DateTime::Duration" ) );
     }
 };
 
@@ -1096,7 +1155,7 @@ Module::Generic::DateTime - A DateTime wrapper for enhanced features
 
 =head1 VERSION
 
-    v0.4.3
+    v0.5.0
 
 =head1 DESCRIPTION
 

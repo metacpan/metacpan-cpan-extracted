@@ -8,7 +8,7 @@ use DateTime;
 use DateTime::Format::Natural;
 use DateTime::HiRes;
 use DateTime::TimeZone;
-use Test::More tests => 18;
+use Test::More tests => 19;
 
 eval { DateTime::Format::Natural->new(lang => 'en') };
 ok(!$@, 'lang');
@@ -48,7 +48,10 @@ eval { DateTime::Format::Natural->new(time_zone => DateTime::TimeZone->new(name 
 ok(!$@, 'time_zone object');
 
 eval { DateTime::Format::Natural->new(daytime => {}) };
-ok(!$@, 'daytime');
+ok(!$@, 'daytime empty');
+
+eval { DateTime::Format::Natural->new(daytime => { morning => 8, afternoon => 14, evening => 20 }) };
+ok(!$@, 'daytime hours');
 
 eval { DateTime::Format::Natural->new(datetime => DateTime->now) };
 ok(!$@, 'datetime with DateTime object');

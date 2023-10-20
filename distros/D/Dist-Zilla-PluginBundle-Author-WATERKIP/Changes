@@ -3,6 +3,12 @@ Revision history for Dist::Zilla::PluginBundle::Author::WATERKIP
 TODO:
 * Get dual license to work with dzil
 
+3.3       2023-09-15 16:19:02Z
+
+    * Add 'use Data::Dumper' to skip for prereqs
+    * Include authors to contributors file
+
+
 3.2       2022-07-08 12:22:50Z
 
     * Fix typo in Dockerfile

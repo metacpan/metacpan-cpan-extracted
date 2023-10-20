@@ -1,6 +1,6 @@
 #---------------------------------
 # @author Bodo (Hugo) Barwich
-# @version 2023-08-25
+# @version 2023-10-07
 # @package SubProcess Management
 # @subpackage Process/SubProcess.pm
 
@@ -44,7 +44,7 @@ use IO::Select;
 use IPC::Open3;
 use Symbol qw(gensym);
 
-our $VERSION = '2.1.5';
+our $VERSION = '2.1.9';
 
 =head1 DESCRIPTION
 
@@ -243,6 +243,10 @@ If the process is expected to run longer it is useful to set it to avoid excessi
 It is also important for multiple process execusions, because other processes will not
 be checked before the read has not timed out.
 
+C<debug> - show internal processing information
+
+C<quiet> - do not print any warnings or errors
+
 See L<Method C<setName()>|/"setName ( NAME )">
 
 See L<Method C<setCommand()>|/"setCommand ( COMMAND )">
@@ -374,11 +378,15 @@ sub setCommand {
 =item setReadTimeout ( TIMEOUT )
 
 This method sets the C<READTIMEOUT> property as numeric value that represents
-the Time in seconds to wait for the process output.
+the time in seconds to wait for the command output.
 If the process is expected to run longer it is useful to set it to avoid excessive checks.
 It is also important for multiple process execusions, because other processes will not
 be checked before the read has not timed out.
 It can only be set when the Sub Process is not running.
+
+B<Parameters:>
+
+C<TIMEOUT> - is an integer that specifies how long the manager will be waiting for output.
 
 See L<Method C<Launch()>|/"Launch ()">
 
@@ -451,6 +459,27 @@ sub setTimeout {
         $self->{'_execution_timeout'} = -1;
     }           #if(scalar(@_) > 1)
 }
+
+=pod
+
+=over 4
+
+=item setProfiling ( PROFILING )
+
+This method activated the B<Execution Time> measuring.
+
+It can only be set when the Sub Process is not running.
+
+B<Parameters:>
+
+C<PROFILING> - whole number to enable or disable the profiling. Negative numbers or C< 0 >
+will disable it. Positive numbers or C< 1 > will enable it.
+
+See L<Method C<Launch()>|/"Launch ()">
+
+=back
+
+=cut
 
 sub setProfiling {
     my $self = $_[0];
@@ -1204,6 +1233,12 @@ And then checks the process with the C<Check()> method.
 It is used by the B<EXECUTIONTIMEOUT> functionality to ensure that the process does not
 run longer than required.
 
+This will include an Error Message "I<Process terminating ...>"
+and set the Process C<ERROR CODE> to C< 4 >.
+
+Enabling the C<DEBUG> option will additionally include an B<Activity Information> from
+which method C<Terminate()> was called.
+
 See L<Method C<Check()>|/"Check ()">
 
 See L<Method C<setTimeout()>|/"setTimeout ()">
@@ -1237,6 +1272,33 @@ sub Terminate {
           "Sub Process ${sprcnm}: Process is not running.\n";
     }       #if($self->isRunning)
 }
+
+=pod
+
+=over 4
+
+=item Kill ()
+
+This method sends a C<KILL> signal to the process if it is running.
+
+It is used by the B<EXECUTIONTIMEOUT> functionality to ensure that the process does not
+run longer than required.
+
+Any not yet read output will get lost.
+
+This will include an Error Message "I<Process killing ...>"
+and set the Process C<ERROR CODE> to C< 4 > and the C<EXIT CODE> to C< 9 >.
+
+Enabling the C<DEBUG> option will additionally include an B<Error Message> from
+which method C<Kill()> was called.
+
+See L<Method C<Check()>|/"Check ()">
+
+See L<Method C<setTimeout()>|/"setTimeout ()">
+
+=back
+
+=cut
 
 sub Kill {
     my $self   = shift;
@@ -1396,6 +1458,85 @@ sub getErrorCode {
 sub getProcessStatus {
     return $_[0]->{'_process_status'};
 }
+
+=pod
+
+=over 4
+
+=item getStartTime ()
+
+This method returns the B<Start Time>. The B<Start Time> is measured at the moment
+of the launch of the Sub Process.
+
+This feature has to be enabled with the C<setProfiling()> method.
+
+It has only a value after the Sub Process is launched.
+
+B<Returns:> It returns floating point number representing the time when the Sub Process
+was launched.
+
+See L<Method C<Launch()>|/"Launch ()">
+
+See L<Method C<setProfiling()>|/"setProfiling ( PROFILING )">
+
+=back
+
+=cut
+
+sub getStartTime {
+    return $_[0]->{'_start_time'};
+}
+
+=pod
+
+=over 4
+
+=item getEndTime ()
+
+This method returns the B<End Time>. The B<End Time> is measured at the moment
+when the Sub Process is detected as terminated.
+
+This feature has to be enabled with the C<setProfiling()> method.
+
+It has only a value after the Sub Process is terminated.
+
+B<Returns:> It returns floating point number representing the time when the Sub Process
+was terminated and reaped.
+
+See L<Method C<Launch()>|/"Launch ()">
+
+See L<Method C<setProfiling()>|/"setProfiling ( PROFILING )">
+
+=back
+
+=cut
+
+sub getEndTime {
+    return $_[0]->{'_end_time'};
+}
+
+=pod
+
+=over 4
+
+=item getExecutionTime ()
+
+This method returns the B<Execution Time>. The B<Execution Time> is the micro second
+precision time span between the launch of the Sub Process until its termination.
+
+This feature has to be enabled with the C<setProfiling()> method.
+
+It has only a value after the Sub Process is terminated.
+
+B<Returns:> It returns floating point number representing the B<Execution Time>.
+
+See L<Method C<Launch()>|/"Launch ()">
+
+See L<Method C<setProfiling()>|/"setProfiling ( PROFILING )">
+
+=back
+
+=cut
 
 sub getExecutionTime {
     return $_[0]->{'_execution_time'};

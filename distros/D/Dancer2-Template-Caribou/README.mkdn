@@ -4,7 +4,7 @@ Dancer2::Template::Caribou - Template::Caribou wrapper for Dancer2
 
 # VERSION
 
-version 1.0.0
+version 1.0.1
 
 # SYNOPSIS
 
@@ -28,7 +28,7 @@ get '/' => sub {
 
 # DESCRIPTION
 
-`Dancer2::Template::Caribou` is an interface for the [Template::Caribou](https://metacpan.org/pod/Template::Caribou)
+`Dancer2::Template::Caribou` is an interface for the [Template::Caribou](https://metacpan.org/pod/Template%3A%3ACaribou)
 template system. Be forewarned, both this module and `Template::Caribou`
 itself are alpha-quality software and are still subject to any changes. <Caveat
 Maxima Emptor>.
@@ -166,7 +166,7 @@ h1 { 'hullo ' . $self->name . '!' };
 # CONVENIENCE ATTRIBUTES AND METHODS
 
 Auto-generated templates have the
-[Dancer2::Template::Caribou::DancerVariables](https://metacpan.org/pod/Dancer2::Template::Caribou::DancerVariables) role automatically applied to
+[Dancer2::Template::Caribou::DancerVariables](https://metacpan.org/pod/Dancer2%3A%3ATemplate%3A%3ACaribou%3A%3ADancerVariables) role automatically applied to
 them, which give them helper methods like `uri_for()` and `context()` to
 interact with the Dancer environment. If you roll out your own template
 classes, you simply have to apply the role to have access to the same niftiness.
@@ -189,7 +189,7 @@ template page => sub {
 
 - context()
 
-    The [Dancer2::Core::Context](https://metacpan.org/pod/Dancer2::Core::Context) object associated with the current request.
+    The [Dancer2::Core::Context](https://metacpan.org/pod/Dancer2%3A%3ACore%3A%3AContext) object associated with the current request.
 
 # AUTHOR
 
@@ -197,7 +197,7 @@ Yanick Champoux <yanick@babyl.dyndns.org> [![endorse](http://api.coderwall.com/y
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Yanick Champoux.
+This software is copyright (c) 2023 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

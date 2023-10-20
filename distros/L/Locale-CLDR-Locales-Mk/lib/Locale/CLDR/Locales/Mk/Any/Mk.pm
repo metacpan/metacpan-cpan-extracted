@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Mk::Any::Mk - Package for language Macedonian
 
 =cut
 
 package Locale::CLDR::Locales::Mk::Any::Mk;
-# This file auto generated from Data/common/main/mk_MK.xml
-#	on Mon 11 Apr  5:33:18 pm GMT
+# This file auto generated from Data\common\main\mk_MK.xml
+#	on Fri 13 Oct  9:27:03 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

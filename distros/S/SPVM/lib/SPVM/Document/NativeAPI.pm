@@ -10,12 +10,6 @@ These APIs are used in L<native classes|SPVM::Document::NativeClass>.
 
 =head1 Native APIs
 
-=head2 compiler
-
-  void* compiler;
-
-The compiler object that builds the L</"runtime">.
-
 =head2 runtime
 
   void* runtime;
@@ -98,11 +92,17 @@ L<SPVM::Document::NativeAPI::Argument>
 
 L<SPVM::Document::NativeAPI::Type>
 
-=head2 allocator
+=head3 Internal Native API
 
-  void* allocator;
+  env->api->internal;
 
-The memory allocator for this environment.
+L<SPVM::Document::NativeAPI::Internal>
+
+=head3 Mutex Native API
+
+  env->api->mutex;
+
+L<SPVM::Document::NativeAPI::Mutex>
 
 =head2 new_env
 
@@ -298,9 +298,9 @@ The argument C<class_var> must be a valid L<class variable|SPVM::Document::Nativ
 
 The same as L</"get_class_var_object">.
 
-=head2 get_class_var_object_address
+=head2 get_class_var_object_ref
 
-  void** (*get_class_var_object_address)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var);
+  void** (*get_class_var_object_ref)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var);
 
 Gets the address of the value of a class variable of the object type.
 
@@ -1358,28 +1358,6 @@ Gets a exception message which type is byte[].
 
 Sets a exception message which type is byte[].
 
-=head2 get_ref_count
-
-  int32_t (*get_ref_count)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
-
-Gets the refernce count of the object.
-
-=head2 inc_ref_count
-
-  void (*inc_ref_count)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
-
-Specifying an object increments the reference count of the object.
-
-Use this method only if you have a specific reason to use it. Normally, the reference count is managed automatically.
-
-=head2 dec_ref_count
-
-  void (*dec_ref_count)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
-
-Specifying an object decrements the object's reference count by 1. When the reference count reaches 0, the object is released.
-
-Use this method only if you have a specific reason to use it. Normally, the reference count is managed automatically.
-
 =head2 enter_scope
 
   int32_t (*enter_scope)(SPVM_ENV* env, SPVM_VALUE* stack);
@@ -1401,12 +1379,6 @@ If this method don't alloc memory for new mortal information, return 1.
   void (*leave_scope)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t scope_id);
 
 Specifies a scope ID to exit that scope and decrement the object's reference count stored in the mortal stack. Objects with a reference count of 0 are released. The scope ID must be the ID obtained by the enter_scope function.
-
-=head2 remove_mortal
-
-  int32_t (*remove_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t scope_id, void* remove_object);
-
-Given a scope ID and an object, delete the specified object from the mortal stack.
 
 =head2 isa
 
@@ -1440,35 +1412,21 @@ If the object is C<NULL>, returns 0.
 
 =head2 weaken
 
-  int32_t (*weaken)(SPVM_ENV* env, SPVM_VALUE* stack, void** object_address);
+  int32_t (*weaken)(SPVM_ENV* env, SPVM_VALUE* stack, void** ref);
 
-Creates weak reference to the object which is specified by object address.
-
-The reference count of the object is decrimented by 1 and weaken flag is added to the object address.
-
-If the reference count is 1, "dec_ref_count" is called to the object.
-
-If object_address is NULL, this method do nothing.
-
-If the object is already weaken, this method do nothing.
-
-This method allocate memory internally to add the back reference from the object to the object address.
-
-This method success return 0.
-
-If failing memory allocation of back reference, return 1.
+Weakens the reference C<ref>.
 
 =head2 isweak 
 
-  int32_t (*isweak()SPVM_ENV* env, void** object);
+  int32_t (*isweak()SPVM_ENV* env, void** ref);
 
-Given the address of an object, returns non-zero if the object is a weak reference, 0 otherwise.
+Checks if the reference C<ref> is weakend. If so, returns 1, otherwise, returns 0.
 
 =head2 unweaken
 
-  void (*unweaken)(SPVM_ENV* env, SPVM_VALUE* stack, void** object_address);
+  void (*unweaken)(SPVM_ENV* env, SPVM_VALUE* stack, void** ref);
 
-Specifying the address of the object releases the weak reference to the object.
+Unweakens the reference C<ref>.
 
 =head2 get_type_name_no_mortal
 
@@ -1673,17 +1631,13 @@ The charaters of the after the given length are filled with C<\0>.
 
   void (*print)(SPVM_ENV* env, SPVM_VALUE* stack, void* string);
 
-Prints the characters of the string to stdout.
-
-If the string is C<NULL>, nothing is printed.
+Prints a string to stdout. This is the same operator as the print operator.
 
 =head2 print_stderr
 
   void (*print_stderr)(SPVM_ENV* env, SPVM_VALUE* stack, void* string);
 
-Prints the characters of the string to stderr.
-
-If the string is C<NULL>, nothing is printed.
+Prints a string to stderr. This is the same operator as the print operator except for the destination of the output.
 
 =head2 new_stack
 
@@ -1693,35 +1647,23 @@ If the string is C<NULL>, nothing is printed.
 
   void (*free_stack)(SPVM_ENV* env, SPVM_VALUE* stack);
 
-=head2 new_memory_env
-
-  void* (*new_memory_env)(SPVM_ENV* env, size_t size);
-
-Creates a new memory block that is managed by the environment with the byte size and return the address. If it fails, return C<NULL>.
-
-The count of the memory block that is managed by the environment is incremented by 1.
-
-=head2 free_memory_env
-
-  void (*free_memory_env)(SPVM_ENV* env, void* block);
-
-Frees the memory block that is managed by the environment.
-
-The count of the memory block that is managed by the environment is decremented by 1.
-
-=head2 get_memory_blocks_count_env
-
-  int32_t (*get_memory_blocks_count_env)(SPVM_ENV* env);
-
-Returns the count of the memory blocks on the environment.
-
-This is the same as L</"get_memory_blocks_count">. This is more understandable name that memories are managed by the environment.
-
 =head2 new_memory_stack
+
+(Deprecated)
 
   void* (*new_memory_stack)(SPVM_ENV* env, SPVM_VALUE* stack, size_t size);
 
-Creates a new memory block that is managed by the stack of the environment with the byte size and return the address. If it fails, return C<NULL>.
+Creates a new memory block that is managed by the call stack with the byte size and return the address. If it fails, return C<NULL>.
+
+The count of the memory block that is managed by the stack is incremented by 1.
+
+The count of the memory block that is managed by the environment is incremented by 1.
+
+=head2 new_memory_block
+
+  void* (*new_memory_block)(SPVM_ENV* env, SPVM_VALUE* stack, size_t size);
+
+Creates a new memory block that is managed by the call stack with the byte size and return the address. If it fails, return C<NULL>.
 
 The count of the memory block that is managed by the stack is incremented by 1.
 
@@ -1729,9 +1671,21 @@ The count of the memory block that is managed by the environment is incremented 
 
 =head2 free_memory_stack
 
+(Deprecated)
+
   void (*free_memory_stack)(SPVM_ENV* env, SPVM_VALUE* stack, void* block);
 
-Frees the memory block that is managed by the environment.
+Frees the memory block that is managed by the call stack.
+
+The count of the memory block that is managed by the stack is decremented by 1.
+
+The count of the memory block that is managed by the environment is decremented by 1.
+
+=head2 free_memory_block
+
+  void (*free_memory_block)(SPVM_ENV* env, SPVM_VALUE* stack, void* block);
+
+Frees the memory block that is managed by the call stack.
 
 The count of the memory block that is managed by the stack is decremented by 1.
 
@@ -1739,7 +1693,15 @@ The count of the memory block that is managed by the environment is decremented 
 
 =head2 get_memory_blocks_count_stack
 
+(Deprecated)
+
   int32_t (*get_memory_blocks_count_stack)(SPVM_ENV* env, SPVM_VALUE* stack);
+
+Returns the count of the memory blocks on the stack.
+
+=head2 get_memory_blocks_count
+
+  int32_t (*get_memory_blocks_count)(SPVM_ENV* env, SPVM_VALUE* stack);
 
 Returns the count of the memory blocks on the stack.
 
@@ -1755,9 +1717,13 @@ If the length is 0, the length is set to 64.
 
   void* (*new_string_array)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
 
-Creates a new string array. This is alias for the following code using L</"new_object_array">.
+Calls the L</"new_string_array_no_mortal"> native API and calls the L</"push_mortal/"> native API given the return value.
 
-  void* obj_string_array = env->new_object_array(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_STRING, length);
+=head2 new_string_array_no_mortal
+
+    void* (*new_string_array_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
+
+Creates a new string array.
 
 =head2 dumpc
 
@@ -1765,7 +1731,7 @@ Creates a new string array. This is alias for the following code using L</"new_o
 
 The alias for the following code using L</"dump">.
 
-  const char* ret = env->get_chars(env, stack, SPVM_API_dump(env, stack, object));
+  const char* ret = env->get_chars(env, stack, env->dump(env, stack, object));
 
 =head2 new_pointer_object_no_mortal
 
@@ -1965,17 +1931,17 @@ The same as L</"new_stack_trace_raw_by_name">, and push the created object to th
 
   void* (*get_field_object_defined_and_has_pointer_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* field_name, int32_t* error_id, const char* func_name, const char* file_name, int32_t line);
 
-=head2 get_field_object_address
+=head2 get_field_object_ref
 
-  void** (*get_field_object_address)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field);
+  void** (*get_field_object_ref)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field);
 
 Gets the address of the value of a field of the object type.
 
 The argument C<field> must be a valid L<field|SPVM::Document::NativeAPI::Field> object.
 
-=head2 get_field_object_address_by_name
+=head2 get_field_object_ref_by_name
 
-  void** (*get_field_object_address_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* field_name, int32_t* error_id, const char* func_name, const char* file, int32_t line);
+  void** (*get_field_object_ref_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* field_name, int32_t* error_id, const char* func_name, const char* file, int32_t line);
 
 Gets the address of the value of a field of the object type by its basic type name of the object and field name.
 
@@ -1987,11 +1953,29 @@ If an excetpion is thrown because the field does not exist or other errors occur
 
 If the env of the stack is equal to the env, returns 1. Otherwise returns 0.
 
+=head2 assign_object
+
+C<void (*assign_object)(SPVM_ENV* env, SPVM_VALUE* stack, void** ref, void* object);>
+
+Assigns an object C<object> to the place referred by the reference C<ref>.
+
+=head2 say
+
+  void (*say)(SPVM_ENV* env, SPVM_VALUE* stack, void* string);
+
+Prints a string and C<\n> to stdout. This is the same operator as the say operator.
+
+=head2 warn
+
+  void (*warn)(SPVM_ENV* env, SPVM_VALUE* stack, void* string, const char* class_dir, const char* class_rel_file, int32_t line);
+
+Operates the warn operator.
+
 =head1 Native API IDs
 
 Native APIs have its IDs. These IDs are permanently same for the binary compatibility after the future release C<v1.0>.
 
-  0 compiler
+  0 reserved0
   1 runtime
   2 api
   3 new_env
@@ -2028,7 +2012,7 @@ Native APIs have its IDs. These IDs are permanently same for the binary compatib
   34 set_class_var_double
   35 set_class_var_object
   36 set_class_var_string
-  37 get_class_var_object_address
+  37 get_class_var_object_ref
   38 get_class_var_byte_by_name
   39 get_class_var_short_by_name
   40 get_class_var_int_by_name
@@ -2179,7 +2163,7 @@ Native APIs have its IDs. These IDs are permanently same for the binary compatib
   185 enter_scope
   186 leave_scope
   187 push_mortal
-  188 remove_mortal
+  188 reserved188
   189 weaken
   190 isweak
   191 unweaken
@@ -2187,19 +2171,26 @@ Native APIs have its IDs. These IDs are permanently same for the binary compatib
   193 strerror_string_nolen
   194 strerror
   195 strerror_nolen
-  196 allocator
-  197 new_memory_env
-  198 free_memory_env
-  199 get_memory_blocks_count_env
+  196 reserved196
+  197 reserved197
+  198 reserved198
+  199 reserved199
   200 new_memory_stack
   201 free_memory_stack
   202 get_memory_blocks_count_stack
   203 new_stack
   204 free_stack
-  205 get_ref_count
-  206 inc_ref_count
-  207 dec_ref_count
+  205 reserved205
+  206 reserved206
+  207 reserved207
   208 get_field_object_defined_and_has_pointer_by_name
+  209 get_field_object_ref
+  210 get_field_object_ref_by_name
+  211 check_stack_env,
+  212 reserved212
+  213 reserved213
+  214 assign_object
+  215 new_string_array_no_mortal
   
 =head1 Constant Values
 
@@ -2376,7 +2367,7 @@ The basic type category for the any object type.
 
 The type flags.
 
-=head1 Version
+=head1 Macro Functions
 
 =head2 SPVM_NATIVE_VERSION_NUMBER
 
@@ -2385,8 +2376,6 @@ The version number of the SPVM language.
 =head2 SPVM_NATIVE_VERSION_STRING
 
 The version string of the SPVM language.
-
-=head1 Utility Functions
 
 =head2 spvm_warn
 
@@ -2398,6 +2387,18 @@ Examples:
 
   spvm_warn("Hello");
   spvm_warn("Hello %s%d", "Foo", 3);
+
+=head2 SPVM_NATIVE_GET_POINTER
+
+C<#define SPVM_NATIVE_GET_POINTER(object)>
+
+Gets the pointer saved in the object.
+
+=head2 SPVM_NATIVE_SET_POINTER
+
+C<#define SPVM_NATIVE_SET_POINTER(object, pointer)>
+
+Sets the pointer in the object.
 
 =head1 Examples
 

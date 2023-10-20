@@ -43,6 +43,7 @@ t/config.t
 t/downgrade.t
 t/inf_nan.t
 t/isa.t
+t/Math/BigFloat/BareSubclass.pm
 t/Math/BigFloat/Subclass.pm
 t/Math/BigInt/BareCalc.pm
 t/Math/BigInt/Lib/Minimal.pm
@@ -105,6 +106,8 @@ xt/author/backermann-mbi.t
 xt/author/batan-mbf.t
 xt/author/batan-mbi.t
 xt/author/batan2-mbf.t
+xt/author/bblsft.t
+xt/author/bbrsft.t
 xt/author/bdec-mbf.t
 xt/author/bdec-mbi.t
 xt/author/bdigitsum-mbi.t
@@ -149,6 +152,8 @@ xt/author/bpi-mbf.t
 xt/author/bpi-mbi.t
 xt/author/bpow-mbf.t
 xt/author/bpow-mbi.t
+xt/author/bsgn-mbf.t
+xt/author/bsgn-mbi.t
 xt/author/bsstr-mbf.t
 xt/author/bsstr-mbi.t
 xt/author/btmod-btdiv-mbi.t

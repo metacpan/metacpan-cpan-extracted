@@ -4,8 +4,8 @@
 
 use AI::Genetic::Pro;
 use List::MoreUtils qw(uniq);
-use lib $ENV{HOME} . '/sandbox/MIDI-Util/lib';
-use MIDI::Util;
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
+use MIDI::Util qw(setup_score);
 use lib $ENV{HOME} . '/sandbox/Music-Interval-Barycentric/lib';
 use Music::Interval::Barycentric;
 
@@ -19,7 +19,7 @@ my $base = 59; # Base of middle C MIDI values
 
 my $notes = [ ([0 .. 11]) x 3 ]; # vectors of chromatc scales
 
-my $score = MIDI::Util::setup_score(bpm => $bpm, patch => $patch);
+my $score = setup_score(bpm => $bpm, patch => $patch);
 
 my $ga = AI::Genetic::Pro->new(        
     -fitness         => \&fitness,     # fitness function

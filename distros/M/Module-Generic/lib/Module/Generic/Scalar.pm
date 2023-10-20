@@ -53,6 +53,7 @@ BEGIN
             my( $self, $other, $swap ) = @_;
             no warnings 'uninitialized';
             my $expr = $swap ? "\"$other" x \"$$self\"" : "\"$$self\" x \"$other\"";
+            local $@;
             my $res  = eval( $expr );
             if( $@ )
             {
@@ -324,11 +325,13 @@ sub error
         {
             my $pl = "use $ex_class;";
             local $SIG{__DIE__} = sub{};
+            local $@;
             eval( $pl );
             # We have to die, because we have an error within another error
             die( "${class}\::error() is unable to load exception class \"$ex_class\": $@" ) if( $@ );
         }
         $o = $ERRORS->{ $addr } = $ERROR = $ex_class->new( $args );
+        local $@;
         my $enc_str = eval
         {
             Encode::encode( 'UTF-8', "$o", Encode::FB_CROAK );
@@ -718,6 +721,7 @@ sub tr ###
     my $self = CORE::shift( @_ );
     my( $search, $replace, $opts ) = @_;
     $opts //= '';
+    local $@;
     eval( "\$\$self =~ CORE::tr/$search/$replace/$opts" );
     return( $self );
 }

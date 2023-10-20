@@ -3,7 +3,7 @@ use Test::More 0.98;
 
 use_ok $_ for qw(
     UID2::Client
-    UID2::Client::Decryption
+    UID2::Client::Encryption
     UID2::Client::Key
     UID2::Client::KeyContainer
     UID2::Client::DecryptionStatus

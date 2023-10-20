@@ -2,7 +2,9 @@
 # magnitude and physical dimenstions data as downloaded from
 # http://www.prismnet.com/~mmccants/tles/mcnames.zip on March 7 2014 at
 # 4:25 GMT. The Last-Modified header on this data was Mon, 06 Jan 2014
-# 10:21:29 GMT
+# 10:21:29 GMT.
+# As of September 24 2023 these data appear not to be on
+# https://www.mmccants.org/
 
 20580 HST             13.3  4.3  0.0  3.0 v   29
 25544 ISS             30.0 20.0  0.0 -0.5 v  297

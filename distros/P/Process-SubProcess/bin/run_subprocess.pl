@@ -30,7 +30,7 @@ use Process::SubProcess;
 
 =head1 NAME
 
-run_subprocess.pl - Script to run sub processes in a easy post-processable way
+run_subprocess.pl - Script to run sub processes in an easy post-processable way
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# Create SQLite3 from http://download.geonames.org/export/dump/alternatenames/GB.zip
+# Create SQLite3 from http://download.geonames.org/export/dump/GB.zip
 
 use strict;
 use warnings;
@@ -18,7 +18,8 @@ sub doit($$);
 BEGIN {
 	$SIG{__WARN__} = sub {
 		my $warning = shift;
-		if($warning =~ /^Use of uninitialized value/) {
+		if(($warning =~ /^Use of uninitialized value/) ||
+		   ($warning =~ /isn't numeric in numeric eq /i)) {
 			die $warning;
 		}
 	}
@@ -85,6 +86,7 @@ sub doit($$) {
 		chomp $line;
 
 		my ($code1, $code2, $type, $data, $ispreferredname, $isshortname) = split(/\t/, $line);
+		die "Can't parse the line '$line'" unless(defined($type));
 		next if($type eq 'link');
 		next if($type eq 'wkdt');
 
@@ -106,7 +108,7 @@ sub doit($$) {
 	return \%queue;
 }
 
-sub flush($)
+sub flush($$)
 {
 	my ($dbh, $queue) = @_;
 
@@ -119,7 +121,9 @@ sub flush($)
 			$query .= ',(';
 		}
 
-		$query .= $value->{'code1'} . ',' . $value->{'code2'} . ',';
+		$value->{'code1'} =~ s/'/''/g;
+		$value->{'code2'} =~ s/'/''/g;
+		$query .= $value->{'code1'} . ",'" . $value->{'code2'} . "',";
 
 		if($value->{'type'} && ($value->{'type'} ne '')) {
 			$query .= "'" . $value->{'type'} . "',";
@@ -152,6 +156,7 @@ sub flush($)
 	} catch {
 		my @call_details = caller(0);
 		die "Error in insert ($query) called from line ",
+		# die "Error in insert called from line ",
 			$call_details[2], ': ', $dbh->errstr();
 	};
 }

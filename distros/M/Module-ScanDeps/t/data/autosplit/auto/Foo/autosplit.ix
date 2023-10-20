@@ -1,0 +1,6 @@
+# Index created by AutoSplit for Foo.pm
+#    (file acts as timestamp)
+package Foo;
+sub fred  ;
+sub barnie  ;
+1;

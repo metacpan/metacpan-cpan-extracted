@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +21,7 @@ no_index:
     - inc
 requires:
   Devel::Confess: '0.009004'
-  Module::Generic: v0.17.3
+  Module::Generic: v0.32.4
   Want: '0.29'
   overload: '1.22'
   overloading: '0.02'
@@ -30,8 +30,8 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://git.deguest.jp/jack/CSS-Object/issues
+  bugtracker: https://gitlab.com/jackdeguest/CSS-Object/issues
   license: http://dev.perl.org/licenses/
-  repository: https://git.deguest.jp/jack/CSS-Object
-version: v0.1.5
+  repository: https://gitlab.com/jackdeguest/CSS-Object
+version: v0.1.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

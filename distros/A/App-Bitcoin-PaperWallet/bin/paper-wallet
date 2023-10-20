@@ -178,10 +178,10 @@ Show this help message.
 =head1 DESCRIPTION
 
 This script will generate a file in your current working directory that
-contains Bitcoin wallet details ready to be printed or stored on a flash drive.
-This file must not exist already or the script will fail (to ensure that you
-don't override your previously generated wallet that you might have already
-used).
+contains Bitcoin wallet details ready to be printed, written down or stored on
+a flash drive. This file must not exist already or the script will fail (to
+ensure that you don't override your previously generated wallet that you might
+have already used).
 
 This is intended to be used as cold storage (Bitcoin wallet which does not have
 active connection to the Internet). The generation should best take place while
@@ -196,5 +196,68 @@ enter, but it is not recommended to do so. Remember that there is no way to
 restore your password, so make sure you won't lose it.
 
 After printing, you can cut off the top section (mnemonic seed) and store it
-apart from the addresses for safety.
+apart from the addresses for safety. You can also write the mnemonic seed down
+by hand and only print the addresses part.
+
+=head2 Security
+
+With Bitcoin, information is money. You should be wary (or even paranoid) of
+possible dangers during generation of your wallet.
+
+If you want maximum safety, just buy a hardware wallet instead. Using a custom
+solution like this one requires you to have enough expertise to be a hardware
+wallet yourself. It can be a cool experience, but can also cost you money.
+
+You should not depend on your passphrase and take securing your keys seriously.
+Keep your passphrase rather simple, as its only purpose is to buy you time in
+case of a leak. The danger of forgetting your passphrase is very real and with
+a long passphrase, it can be very hard to recover.
+
+For increased security, follow these guidelines:
+
+=over
+
+=item * Make sure your environment is as safe as possible
+
+Scan your machine for malware. Check if you have any suspicious processes
+running. Best, use security-focused system like OpenBSD.
+
+=item * Disable Internet connection during generation
+
+If your seed is going to leak, it will do so through the Web. As long as you
+have the seed on your computer, avoid being online.
+
+=item * Only store the seed physically
+
+Paper or metal are unhackable. If they are stolen, you can move the funds
+elsewhere before they crack your password - as long as you keep the second copy
+in a different location.
+
+=item * Don't print the seed, write it down
+
+It is especially true if you have a printer which is connected to your local
+network. Regular USB-only printers should be fine, but you never know if they
+keep copies of what they printed somewhere. Never ever use printers you have at
+work.
+
+=item * Remove the seed from your computer when you're done
+
+=back
+
+=head3 Common pitfalls
+
+Even if you safely generated the seed, you might still put it at risk without even
+knowing:
+
+=over
+
+=item * If you opened a file with a program, it might have saved a draft copy somewhere
+
+=item * Even if you deleted the file, it may still stick around in Trash
+
+=item * Some systems may synchronize contents of a directory with the cloud
+
+=item * If you forget your password, there's no way to recover it
+
+=back
 

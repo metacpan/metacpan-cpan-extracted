@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2023-08-05'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use App::orgadb::Common;
 
@@ -127,7 +127,7 @@ App::orgadb::Select::Shell::Commands - orgadb-sel shell commands
 
 =head1 VERSION
 
-This document describes version 0.016 of App::orgadb::Select::Shell::Commands (from Perl distribution App-orgadb), released on 2023-01-19.
+This document describes version 0.017 of App::orgadb::Select::Shell::Commands (from Perl distribution App-orgadb), released on 2023-08-05.
 
 =for Pod::Coverage .+
 

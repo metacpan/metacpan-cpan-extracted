@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -6,6 +7,8 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Test::ExpectAndCheck',
    requires => {
+      'perl' => '5.014',
+
       'List::Util' => 0,
       'Test::Builder' => '1.302', # subtest indentation format
       'Test::Deep' => 0,
@@ -16,7 +19,7 @@ my $build = Module::Build->new(
    },
    test_requires => {
       'Test::Builder::Tester' => 0,
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    license => 'perl',
    create_license => 1,

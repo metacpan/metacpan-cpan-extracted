@@ -18,10 +18,9 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object::SQLite DB::Object::Statement );
-    use vars qw( $VERSION $VERBOSE $DEBUG );
-    $VERSION    = 'v0.300.1';
-    $VERBOSE    = 0;
-    $DEBUG      = 0;
+    use vars qw( $VERSION $DEBUG );
+    our $DEBUG = 0;
+    our $VERSION = 'v0.300.1';
 };
 
 use strict;

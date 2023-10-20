@@ -1,6 +1,6 @@
 #!perl -T
 
-use JSON::PP;
+use JSON;
 use Test::More;
 
 require_ok('URI::PackageURL');
@@ -11,7 +11,7 @@ while (<DATA>) {
     $test_suite_data_json .= $_;
 }
 
-my $test_suite_data = JSON::PP::decode_json($test_suite_data_json);
+my $test_suite_data = JSON::decode_json($test_suite_data_json);
 
 foreach my $test (@{$test_suite_data}) {
 

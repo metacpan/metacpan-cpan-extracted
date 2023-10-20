@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -8,17 +9,17 @@ my $build = Module::Build->new(
    requires => {
       'perl' => '5.026', # signatures in Object::Pad
       'Future::AsyncAwait' => '0.47', # toplevel await
-      'Object::Pad' => '0.70',
+      'Object::Pad' => '0.800',
+      'Object::Pad::ClassAttr::Struct' => '0.05',
 
       'Future' => '0.26',
+      'Future::Buffer' => 0,
       'List::Util' => '1.33',
-      'Struct::Dumb' => 0,
       'Test::Builder' => 0,
       'Test::ExpectAndCheck::Future' => '0.04',
    },
    test_requires => {
-      'Test::Fatal' => 0,
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
       'Test::Builder::Tester' => 0,
    },
    configure_requires => {

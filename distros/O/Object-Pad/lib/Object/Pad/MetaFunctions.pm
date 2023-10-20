@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MetaFunctions 0.802;
+package Object::Pad::MetaFunctions 0.804;
 
 use v5.14;
 use warnings;
@@ -70,7 +70,7 @@ interface encapsulation, is really the best technique to achieve your goal.
 
 =head2 metaclass
 
-   $metaclass = metaclass( $obj )
+   $metaclass = metaclass( $obj );
 
 I<Since version 0.67.>
 
@@ -79,7 +79,7 @@ that the object is an instance of.
 
 =head2 deconstruct_object
 
-   ( $classname, @repr ) = deconstruct_object( $obj )
+   ( $classname, @repr ) = deconstruct_object( $obj );
 
 I<Since version 0.67.>
 
@@ -113,7 +113,7 @@ form, or serialising to some stable storage.
 
 =head2 ref_field
 
-   $fieldref = ref_field( $fieldname, $obj )
+   $fieldref = ref_field( $fieldname, $obj );
 
 I<Since version 0.67.>
 
@@ -134,9 +134,9 @@ only read access is required, use L</get_field> instead.
 
 =head2 get_field
 
-   $scalar = get_field( $fieldname, $obj )
-   @array  = get_field( $fieldname, $obj )
-   %hash   = get_field( $fieldname, $obj )
+   $scalar = get_field( $fieldname, $obj );
+   @array  = get_field( $fieldname, $obj );
+   %hash   = get_field( $fieldname, $obj );
 
 I<Since version 0.67.>
 

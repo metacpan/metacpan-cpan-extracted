@@ -1,5 +1,26 @@
 Revision history for Perl module HTTP::Promise
 
+v0.3.3 2023-10-10T08:15:14+0900
+    - Corrected malformed signature for distribution release
+
+v0.3.2 2023-10-07T12:04:00+0900
+    - Corrected malformed signature for distribution release
+
+v0.3.1 2023-09-22T09:41:30+0900
+    - Correcting a bug in method is_binary() in HTTP::Promise::Entity affecting the content of the data being tested.
+    - Checking in method _read_body_chunked() in HTTP::Promise that the length of data written to body file matches the expected amount or returns an error.
+
+v0.3.0 2023-09-08T18:57:43+0900
+    - Code cleanup
+    - Minor improvement in method value() of HTTP::Promise::Field::QualityValue
+    - Corrected a bug where the default headers set with default_headers() were not used.
+
+v0.2.5 2023-08-29T10:18:48+0900
+    - Added option accept_encoding to enable/disable receiving compressed data
+    - Added the possibility of setting a query string for POST/PUT queries
+    - Updated _make_request_data() to only set default Content-Type and Content-Length only when there is some data provided
+    - Updated _make_request_query() to accept special header name 'Content' or 'Query' to set the query string.
+
 v0.2.4 2023-08-15T15:35:14+0900
     - Added method as_form_data in module HTTP::Promise::Message
     - Added method url_encode to HTTP::Promise::Request

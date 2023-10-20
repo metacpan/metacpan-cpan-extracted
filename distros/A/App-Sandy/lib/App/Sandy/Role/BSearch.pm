@@ -3,7 +3,7 @@ package App::Sandy::Role::BSearch;
 
 use App::Sandy::Base 'role';
 
-our $VERSION = '0.24'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 sub with_bsearch {
 	my ($self, $key, $base, $nmemb, $func) = @_;
@@ -45,7 +45,7 @@ App::Sandy::Role::BSearch - Binary search role
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 AUTHORS
 

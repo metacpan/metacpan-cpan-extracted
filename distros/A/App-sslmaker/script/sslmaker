@@ -12,17 +12,24 @@ use File::Spec::Functions qw(catdir);
 use Path::Tiny;
 
 my @options = (
+  'ext=s@    # Add extensions such as "subjectAltName=DNS:example.com" (default)',
+  'subject=s # /C=US/ST=Texas/L=Dallas/O=Company/OU=Department/CN=example.com/emailAddress=user@domain',
   'bits=s    # SSL key bit size',
   'days=s    # Number of days the cert should be valid',
   'home=s    # sslmaker working directory',
   'root=s    # Path to root key.pem. Required for making intermediate key+cert',
-  'subject=s # /C=US/ST=Texas/L=Dallas/O=Company/OU=Department/CN=example.com/emailAddress=user@domain',
   'silent    # Only output data on failure',
+  'h|help    # Show this help text',
 );
 
 my $wrapper = sub {
   my ($sslmaker, $method, @args) = @_;
-  return $ENV{OPENSSL_CONF} ? $sslmaker->$method(@args) : $sslmaker->with_config($method, @args);
+
+  eval { return $ENV{OPENSSL_CONF} ? $sslmaker->$method(@args) : $sslmaker->with_config($method, @args); } or do {
+    $@ =~ s/\s+at\s+\S+\s+line.*/\n/s unless $ENV{TRACE};
+    print STDERR $@;
+    exit($? || $!);
+  };
 };
 
 sub getopt_subcommands {
@@ -62,6 +69,8 @@ sub root {
 
 sub subcommand_revoke {
   my ($self, $cert) = @_;
+  die "Usage: sslmaker revoke /path/to/file.cert\n" unless $cert;
+
   my $sslmaker   = App::sslmaker->new;
   my $passphrase = $self->home->child(qw(private passphrase));
 
@@ -107,12 +116,13 @@ sub subcommand_dhparam {
 
 sub subcommand_generate {
   my ($self, $cn) = @_;
-  die "Usage: $0 generate <CN>\n" unless $cn;
+  die "Usage: sslmaker generate <CN>\n" unless $cn;
 
   my $args = {
     bits    => $self->{bits},
     csr     => "$cn.csr.pem",
     days    => $self->{days},
+    ext     => $self->{ext} || ["subjectAltName=DNS:$cn"],
     home    => $self->home,
     key     => "$cn.key.pem",
     subject => "/CN=$cn",
@@ -174,7 +184,7 @@ sub subcommand_intermediate {
 
 sub subcommand_nginx {
   my ($self, $domain) = @_;
-  die "Usage: $0 nginx <domain>\n" unless $domain;
+  die "Usage: sslmaker nginx <domain>\n" unless $domain;
 
   print +App::sslmaker->_render_template(
     'nginx.config',
@@ -192,7 +202,7 @@ sub subcommand_nginx {
 sub subcommand_sign {
   my ($self, $csr, $cert) = @_;
   my $home = $self->home;
-  die "Usage: $0 sign <csr> [cert]\n" unless $csr;
+  die "Usage: sslmaker sign <csr> [cert]\n" unless $csr;
 
   $cert ||= do { local $_ = $csr; s!(\.csr)?\.pem$!\.cert.pem!; $_ };
   my $sslmaker = App::sslmaker->new;
@@ -231,6 +241,7 @@ run(
   @options,
   sub {
     my ($self, $action, @args) = @_;
+    return print extract_usage if $self->{h};
     return print extract_usage unless $action;
   },
 );

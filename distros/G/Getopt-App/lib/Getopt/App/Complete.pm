@@ -3,27 +3,30 @@ use feature qw(:5.16);
 use strict;
 use warnings;
 use utf8;
-use Cwd qw(abs_path);
+use Cwd            qw(abs_path);
 use File::Basename qw(basename);
-use Exporter qw(import);
+use Exporter       qw(import);
 
 our @EXPORT_OK = qw(complete_reply generate_completion_script);
 
 require Getopt::App;
 our $call_maybe = do { no warnings qw(once); $Getopt::App::call_maybe };
-our $argv_index = 0;
 
 sub complete_reply {
-  my $app         = shift;
-  my $subcommands = $app->$call_maybe('getopt_subcommands') || [];
+  my $app = shift;
   my ($script, @argv) = split /\s+/, $ENV{COMP_LINE};
 
   # Recurse into subcommand
-  if ($argv[$argv_index] and $argv[$argv_index] =~ m!^\w! and @$subcommands) {
+  no warnings qw(once);
+  my $depth       = $Getopt::App::DEPTH;
+  my $subcommands = $app->$call_maybe('getopt_subcommands') || [];
+  if ($argv[$depth] and $argv[$depth] =~ m!^\w! and @$subcommands) {
+    my $argv = [@argv[$depth, $#argv]];
     for my $subcommand (@$subcommands) {
-      next unless $argv[$argv_index] eq $subcommand->[0];
-      local $argv_index = $argv_index + 1;
-      return Getopt::App::_subcommand_run($app, $subcommand, [@argv[$argv_index - 1, $#argv]]);
+      next unless $argv[$depth] eq $subcommand->[0];
+      my $cb = $Getopt::App::APPS{$subcommand->[1]} ||= $app->$call_maybe(getopt_load_subcommand => $subcommand, $argv);
+      local $Getopt::App::SUBCOMMAND = $subcommand;
+      return $cb->([@$argv[1 .. $#$argv]]);
     }
   }
 

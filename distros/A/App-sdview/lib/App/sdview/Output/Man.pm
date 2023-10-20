@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.800;
 
-package App::sdview::Output::Man 0.12;
+package App::sdview::Output::Man 0.13;
 class App::sdview::Output::Man
    :does(App::sdview::Output)
    :strict(params);
@@ -77,15 +77,15 @@ method _convert_str ( $s )
          $ret .= "\\fP", pop @fontstack
             while @fontstack and !$tags{ $fontstack[-1] };
 
-         $tags{C} and (
-            any { $_ eq "C" } @fontstack or
-               $ret .= "\\f(CW", push @fontstack, "C" );
-         $tags{B} and (
-            any { $_ eq "B" } @fontstack or
-               $ret .= "\\fB", push @fontstack, "B" );
-         $tags{I} and (
-            any { $_ eq "I" } @fontstack or
-               $ret .= "\\fI", push @fontstack, "I" );
+         $tags{monospace} and (
+            any { $_ eq "monospace" } @fontstack or
+               $ret .= "\\f(CW", push @fontstack, "monospace" );
+         $tags{bold} and (
+            any { $_ eq "bold" } @fontstack or
+               $ret .= "\\fB", push @fontstack, "bold" );
+         $tags{italic} and (
+            any { $_ eq "italic" } @fontstack or
+               $ret .= "\\fI", push @fontstack, "italic" );
 
          my $man = $substr =~ s/([\\-])/\\$1/gr;
 

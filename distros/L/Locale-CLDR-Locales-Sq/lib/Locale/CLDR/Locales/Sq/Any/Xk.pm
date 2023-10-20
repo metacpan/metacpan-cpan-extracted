@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Sq::Any::Xk - Package for language Albanian
 
 =cut
 
 package Locale::CLDR::Locales::Sq::Any::Xk;
-# This file auto generated from Data/common/main/sq_XK.xml
-#	on Mon 11 Apr  5:38:20 pm GMT
+# This file auto generated from Data\common\main\sq_XK.xml
+#	on Fri 13 Oct  9:40:30 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

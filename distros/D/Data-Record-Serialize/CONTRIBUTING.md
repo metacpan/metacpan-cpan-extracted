@@ -14,7 +14,7 @@ repository.  Patches against the distributed code are welcome, but
 patches or pull requests against the code in the repository are even
 more welcome.
 
-The public repository for this code is managed with  and is hosted at GitLab.
+The public repository for this code is managed with git and is hosted at GitLab.
 It is available via the web at:
 
   https://gitlab.com/djerius/data-record-serialize
@@ -54,7 +54,7 @@ to clean up the PERL5LIB environment variable when you are done!
 Working without Dist::Zilla
 ---------------------------
 
-This directory contains a working Makefile.PL that will allow you to
+This directory contains a working Build.PL that will allow you to
 work without `Dist::Zilla`.
 
 If you have installed dependencies into a local directory, make sure that
@@ -62,9 +62,9 @@ is in your `PERL5LIB` path.
 
 Then, as usual,
 
-  $ perl Makefile.PL
-  $ make
-  $ make test
+  $ perl Build.PL
+  $ ./Build
+  $ ./Build test
 
 Working with Dist::Zilla
 ------------------------

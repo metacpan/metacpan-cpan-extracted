@@ -1,6 +1,9 @@
 Changes
 =======
 
+0.07 - 2022 Sep 27
+    - do not use SSE instructions for ARM architecture
+
 0.06 - 2021 Dec 02
     - fixes in MANIFEST files
 

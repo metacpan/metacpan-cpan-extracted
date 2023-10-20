@@ -1,20 +1,19 @@
 package App::cal::idn;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-03'; # DATE
-our $DIST = 'App-cal-idn'; # DIST
-our $VERSION = '0.136'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
-use experimental 'smartmatch';
 
 use Calendar::Indonesia::Holiday qw(list_idn_holidays);
 use DateTime;
 use List::Util qw(max);
 use Term::ANSIColor;
 use Text::ANSI::Util qw(ta_length);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-07-11'; # DATE
+our $DIST = 'App-cal-idn'; # DIST
+our $VERSION = '0.137'; # VERSION
 
 my $month_names = [qw(Januari Februari Maret April Mei Juni Juli Agustus September Oktober November Desember)];
 my $short_month_names = [qw(Jan Feb Mar Apr Mei Jun Jul Agt Sep Okt Nov Des)];
@@ -214,7 +213,7 @@ sub gen_calendar {
         $dt->add(months => 1);
     }
     my @hol = map {@{ $_->[1] }} @moncals;
-    my $l = max(map {~~@$_} map {$_->[0]} @moncals);
+    my $l = max(map {scalar @$_} map {$_->[0]} @moncals);
     my $i = 0;
     my $j = @moncals;
     while (1) {
@@ -255,7 +254,7 @@ App::cal::idn - Display Indonesian calendar on the command-line
 
 =head1 VERSION
 
-This document describes version 0.136 of App::cal::idn (from Perl distribution App-cal-idn), released on 2021-05-03.
+This document describes version 0.137 of App::cal::idn (from Perl distribution App-cal-idn), released on 2023-07-11.
 
 =head1 SYNOPSIS
 
@@ -273,7 +272,7 @@ the command-line.
 
 Usage:
 
- gen_calendar(%args) -> [status, msg, payload, meta]
+ gen_calendar(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Generate one or more monthly calendars in 3-column format.
 
@@ -285,6 +284,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<highlight_today> => I<bool> (default: 1)
 
+(No description)
+
 =item * B<month> => I<int>
 
 The first month.
@@ -293,25 +294,35 @@ Not required if months=12 (generate whole year from month 1 to 12).
 
 =item * B<months> => I<int> (default: 1)
 
+(No description)
+
 =item * B<show_holiday_list> => I<bool> (default: 1)
+
+(No description)
 
 =item * B<show_joint_leave> => I<bool> (default: 0)
 
+(No description)
+
 =item * B<time_zone> => I<str>
 
+(No description)
+
 =item * B<year>* => I<int>
+
+(No description)
 
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -335,21 +346,39 @@ Arguments ('*' denotes required arguments):
 
 =item * B<highlight_today> => I<bool> (default: 1)
 
+(No description)
+
 =item * B<month>* => I<int>
+
+(No description)
 
 =item * B<show_holiday_list> => I<bool> (default: 1)
 
+(No description)
+
 =item * B<show_joint_leave> => I<bool> (default: 0)
+
+(No description)
 
 =item * B<show_next_month_days> => I<bool> (default: 1)
 
+(No description)
+
 =item * B<show_prev_month_days> => I<bool> (default: 1)
+
+(No description)
 
 =item * B<show_year_in_title> => I<bool> (default: 1)
 
+(No description)
+
 =item * B<time_zone> => I<str>
 
+(No description)
+
 =item * B<year>* => I<int>
+
+(No description)
 
 
 =back
@@ -364,23 +393,47 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-cal-id
 
 Source repository is at L<https://github.com/perlancar/perl-App-cal-idn>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-cal-idn/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2019, 2017, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2021, 2019, 2017, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-cal-idn>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

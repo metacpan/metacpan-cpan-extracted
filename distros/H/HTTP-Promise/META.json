@@ -48,14 +48,13 @@
             "IO::File" : "0",
             "JSON" : "4.10",
             "JSON::XS" : "4.03",
-            "Module::Generic" : "v0.31.1",
-            "Nice::Try" : "v1.3.4",
+            "Module::Generic" : "v0.32.4",
             "Promise::Me" : "v0.4.7",
             "Regexp::Common" : "2017060201",
             "Scalar::Util" : "1.63",
             "Socket" : "2.037",
             "Symbol" : "0",
-            "Time::HiRes" : "1.9770",
+            "Time::HiRes" : "1.9764",
             "URI" : "5.21",
             "URI::Encode::XS" : "0.11",
             "URI::Escape::XS" : "0.14",
@@ -89,6 +88,6 @@
          "web" : "https://gitlab.com/jackdeguest/HTTP-Promise"
       }
    },
-   "version" : "v0.2.4",
+   "version" : "v0.3.3",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

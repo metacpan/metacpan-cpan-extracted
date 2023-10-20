@@ -1,9 +1,23 @@
 Revision history for Pg-SQL-PrettyPrinter
 
-0.7     2022-11-20
-        - Fix missing ORDER BY clause in aggregates
-        - Fix missing "WITH ORDINALITY" clause in functions in FROM
-        - Make sure that "bugs" test try also to test as_text() calls
+0.11    2023-10-05
+        - Update to work with JSON produced by pg_query 4.2.3
+        - Handle DISTINCT clause in aggregates
+
+0.10    2023-09-24
+        - Bring back zeroed file, thanks to report by Slaven Rezić
+        https://gitlab.com/depesz/pg-sql-prettyprinter/-/issues/3
+
+0.9     2023-09-19
+        - Update copyright
+        - Fix missing NOT in NOT IN, or NOT LIKE clauses.
+
+0.8     2022-12-01
+        - Fix missing comma before * in queries like:
+          SELECT (unnest(...)).*
+          per report by 'easteregg' on Slack
+        - Fix bad formatting of queries like:
+          SELECT (unnest(...)).column_name
 
 0.6     2022-11-08
         - Fix bug with display of filtered aggregates that are part of CASE

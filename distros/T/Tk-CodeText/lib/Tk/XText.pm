@@ -7,7 +7,7 @@ Tk::XText - Extended Text widget
 =cut
 
 use vars qw($VERSION);
-$VERSION = '0.40';
+$VERSION = '0.45';
 use strict;
 use warnings;
 use Carp;
@@ -47,14 +47,6 @@ within the L<Tk::CodeText> context. Otherwise see there.
 
 .
 
-=item Name: B<disableMenu>
-
-=item Class: B<DisableMenu>
-
-=item Switch: B<-disablemenu>
-
-.
-
 =item Switch: B<-findandreplacecall>
 
 .
@@ -76,6 +68,10 @@ within the L<Tk::CodeText> context. Otherwise see there.
 =item Class: B<Match>
 
 =item Switch: B<-match>
+
+.
+
+=item Switch: B<-menuitems>
 
 .
 
@@ -146,12 +142,12 @@ sub Populate {
 	
 	$self->ConfigSpecs(
 		-autoindent => ['PASSIVE', 'autoIndent', 'AutoIndent', 0],
-		-disablemenu => ['PASSIVE', 'disableMenu', 'Disablemenu', 0],
 		-findandreplacecall => ['PASSIVE'],
 		-indentstyle => ['PASSIVE', 'indentStyle', 'IndentStyle', "tab"],
 		-logcall => ['CALLBACK', undef, undef, sub {}],
 		-match => ['PASSIVE', 'match', 'Match', '[]{}()'],
 		-matchoptions	=> ['METHOD', undef, undef, [-background => 'blue', -foreground => 'yellow']],
+		-menuitems => ['PASSIVE'],
 		-mlcommentend => ['PASSIVE'],
 		-mlcommentstart => ['PASSIVE'],
 		-modifycall => ['CALLBACK', undef, undef, sub {}],
@@ -159,7 +155,7 @@ sub Populate {
 		DEFAULT => [ 'SELF' ],
 	);
 	$self->eventAdd('<<Find>>', '<F8>');
-	$self->eventAdd('<<Replace>>', '<F9>');
+	$self->eventAdd('<<Replace>>', '<Shift-F8>');
 	$self->eventAdd('<<Indent>>', '<Control-j>');
 	$self->eventAdd('<<UnIndent>>', '<Control-J>');
 	$self->eventAdd('<<Comment>>', '<Control-g>');
@@ -342,6 +338,7 @@ sub delete {
 	my $self = shift;
 	my $begin = $_[0];
 	$begin = 'insert' unless defined $begin;
+	$begin = $self->index($begin);
 	my $string = $self->get(@_);
 	$self->RecordUndo('delete', $self->editModified, $begin, $string);
 	$self->SUPER::delete(@_);
@@ -503,6 +500,7 @@ sub getFontInfo {
 sub goTo {
 	my ($self, $pos) = @_;
 	$self->markSet('insert', $pos);
+	$self->see($pos);
 }
 
 =item B<indent>
@@ -709,8 +707,15 @@ sub matchoptions {
 
 
 sub PostPopupMenu {
-	my $self = shift;
-	$self->SUPER::PostPopupMenu(@_) unless $self->cget('-disablemenu');
+	my ($self, $x, $y) = @_;
+	my $items = $self->cget('-menuitems');
+	return unless defined $items;
+	my $menu = $self->Menu(
+		-tearoff => 0,
+		-menuitems => $items,
+	);
+	$menu->bind('<Leave>', [$menu, 'unpost']);
+	$menu->post($x, $y);
 }
 
 sub PullUndo {
@@ -826,9 +831,11 @@ sub RecordUndo {
 
 sub redo {
 	my $self = shift;
+	$self->Flush;
 	if ($self->canRedo) {
 		my $o = $self->PullRedo;
 		$self->PushUndo($o);
+		my $mod = $self->editModified;
 
 		my $mode = $o->{'mode'};
 		if ($mode eq 'insert') {
@@ -861,6 +868,8 @@ sub redo {
 # 			$self->editModified($self->UndoEmptyModified);
 # 		} else {
 		$self->editModified($o->{'redo_modified'});
+		$self->BufferModified($o->{'redo_modified'});
+		$o->{'modified'} = $mod;
 # 		}
 		if (my $sel = $o->{'selection'}) {
 			$self->unselectAll;
@@ -928,6 +937,20 @@ sub ResetUndo {
 
 sub save {
 	my ($self, $file) = @_;
+	if ($self->saveExport($file)) {
+		$self->clearModified;
+		$self->log("Saved $file");
+		return 1
+	}
+	return 0
+}
+
+=item B<saveExport>I<($file)>
+
+=cut
+
+sub saveExport {
+	my ($self, $file) = @_;
 
 	unless (open OUTFILE, '>', $file) { 
 		warn "cannot open $file";
@@ -941,8 +964,6 @@ sub save {
 		$index = $end;
 	}
 	close OUTFILE;
-	$self->clearModified;
-	$self->log("Saved $file");
 	return 1
 }
 
@@ -1086,6 +1107,7 @@ sub undo {
 # 			$self->editModified($self->RedoEmptyModified);
 # 		} else {
 		$self->editModified($o->{'modified'});
+		$self->BufferModified($o->{'modified'});
 		$o->{'redo_modified'} = $mod;
 # 		}
 		if (my $sel = $o->{'selection'}) {
@@ -1184,3 +1206,11 @@ Unknown. If you find any, please contact the author.
 1;
 
 __END__
+
+
+
+
+
+
+
+

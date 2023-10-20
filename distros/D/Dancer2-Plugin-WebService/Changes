@@ -1,3 +1,11 @@
+4.4.6  2023-09-26
+
+  - Using YAML::Syck for YAML replies. The YAML::XS::Dump have serious problem with UTF-8 strings
+
+4.4.5  2023-08-30
+
+  - Corrections at UTF-8 while decoding json
+
 4.4.3  2023-01-01
 
   - Corrections at Dancer2::Core::Hook before

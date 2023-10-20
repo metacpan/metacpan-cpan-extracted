@@ -1,5 +1,9 @@
 Revision history for Test-Warnings
 
+0.032     2023-09-30 23:36:50Z
+          - new config variable, $ENV{PERL_TEST_WARNINGS_ONLY_REPORT_WARNINGS},
+          for temporarily turning failures into reports
+
 0.031     2021-07-13 22:13:48Z
           - remove unneeded develop prereqs that caused metacpan to unduly
             raise the river position of some dependent modules

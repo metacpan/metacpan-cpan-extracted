@@ -1,5 +1,11 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.020     2023-09-16 23:54:44Z
+        - properly skip over remote resources that reference the wrong spec
+          version
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/47958f82d0ca44b82f3fb32744a0fb5aead191a6...ab3924a663d2f9e6de844f464d185a70d881b9ed
+
 1.019     2023-04-01 17:50:45Z
         - updated test suite:
           https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/d21ed578aeb13b55dfe3604db53adb4750e1abc3...47958f82d0ca44b82f3fb32744a0fb5aead191a6

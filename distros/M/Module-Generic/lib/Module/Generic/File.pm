@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.6.1
+## Version v0.7.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2023/07/31
+## Modified 2023/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -31,7 +31,7 @@ BEGIN
     use Module::Generic::Finfo;
     # constants are already exported with the use Fcntl
     use Module::Generic::File::IO ();
-    use Nice::Try;
+    # use Nice::Try;
     use Scalar::Util ();
     use URI ();
     use URI::file ();
@@ -127,7 +127,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.6.1';
+    our $VERSION = 'v0.7.0';
 };
 
 use strict;
@@ -253,41 +253,46 @@ sub append
         my $opened = $self->opened;
         my $io;
         my $pos;
-        try
+        # try-catch
+        local $@;
+        if( $opened )
         {
-            if( $opened )
+            return( $self->error( "I do not have the permissions to append to this opened file \"${file}\"." ) ) if( !$self->can_append );
+            $io = $opened;
+            # It's not that I cannot get the position in file I am writing to, but rather
+            # that later, I need to seek, and thus read from the file
+            if( $self->can_read )
             {
-                return( $self->error( "I do not have the permissions to append to this opened file \"${file}\"." ) ) if( !$self->can_append );
-                $io = $opened;
-                # It's not that I cannot get the position in file I am writing to, but rather
-                # that later, I need to seek, and thus read from the file
-                if( $self->can_read )
-                {
-                    $pos = $io->tell;
-                    $io->seek(0, 2);
-                }
-            }
-            else
-            {
-                $io = $self->open( $opts->{mode}, @_ ) || return( $self->pass_error );
-            }
-            $io->print( ref( $data ) ? $$data : $data ) ||
-                return( $self->error( "Unable to write ", CORE::length( ref( $data ) ? $$data : $data ), " bytes of data to file \"${file}\": $!" ) );
-            if( $opened )
-            {
-                if( defined( $pos ) )
-                {
-                    $io->seek( $pos, 0 );
-                }
-            }
-            else
-            {
-                $io->close;
+                $pos = $io->tell;
+                $io->seek(0, 2);
             }
         }
-        catch( $e )
+        else
         {
-            return( $self->error( "An unexpected error occured while trying to append ", CORE::length( ref( $data ) ? $$data : $data ), " bytes of data to file \"${file}\": $e" ) );
+            $io = $self->open( $opts->{mode}, @_ ) || return( $self->pass_error );
+        }
+        
+        my $rv;
+        eval
+        {
+            $rv = $io->print( ref( $data ) ? $$data : $data );
+        };
+        if( $@ )
+        {
+            return( $self->error( "An unexpected error occured while trying to append ", CORE::length( ref( $data ) ? $$data : $data ), " bytes of data to file \"${file}\": $@" ) );
+        }
+        return( $self->error( "Unable to write ", CORE::length( ref( $data ) ? $$data : $data ), " bytes of data to file \"${file}\": $!" ) ) if( !$rv );
+        
+        if( $opened )
+        {
+            if( defined( $pos ) )
+            {
+                $io->seek( $pos, 0 );
+            }
+        }
+        else
+        {
+            $io->close;
         }
     }
     return( $self );
@@ -315,6 +320,9 @@ sub as
     my $path = $self->_spec_catpath( $opts->{volume}, $new_dirs, $file, $os );
     return( $self->new( $path, os => $os, debug => $self->debug ) );
 }
+
+# This class does not convert to an HASH, but the TO_JSON method will convert to a string
+sub as_hash { return( $_[0] ); }
 
 sub atime { return( shift->finfo->atime ); }
 
@@ -425,23 +433,26 @@ sub can_append
     my $self = shift( @_ );
     my $file = $self->filepath;
     my $io = $self->opened;
-    try
+    if( $self->is_dir )
     {
-        if( $self->is_dir )
-        {
-            return( -e( $file ) && -w( $file ) );
-        }
-        else
-        {
-            # File is not opened so we do not know if the file handle is writable
-            return(0) if( !$io );
-            my $flags = $io->fcntl( F_GETFL, 0 );
-            return( $flags & ( O_APPEND | O_RDWR ) );
-        }
+        return( -e( $file ) && -w( $file ) );
     }
-    catch( $e )
+    else
     {
-        return( $self->error( "An error occurred while trying to check if we can append to ", ( $self->is_dir ? 'directory' : 'file handle for ' ), " \"${file}\": $e" ) );
+        # File is not opened so we do not know if the file handle is writable
+        return(0) if( !$io );
+        my $flags;
+        # try-catch
+        local $@;
+        eval
+        {
+            $flags = $io->fcntl( F_GETFL, 0 );
+        };
+        if( $@ )
+        {
+            return( $self->error( "An error occurred while trying to check if we can append to ", ( $self->is_dir ? 'directory' : 'file handle for ' ), " \"${file}\": $@" ) );
+        }
+        return( $flags & ( O_APPEND | O_RDWR ) );
     }
 }
 
@@ -451,35 +462,39 @@ sub can_read
 {
     my $self = shift( @_ );
     my $file = $self->filepath;
-    try
+    if( $self->is_dir )
     {
-        if( $self->is_dir )
+        return( $self->finfo->can_read );
+    }
+    else
+    {
+        my $opened = $self->opened // '';
+        my $io;
+        if( $opened )
         {
-            return( $self->finfo->can_read );
+            $io = $opened;
         }
         else
         {
-            my $opened = $self->opened // '';
-            my $io;
-            if( $opened )
-            {
-                $io = $opened;
-            }
-            else
-            {
-                $io = $self->open( @_ ) || return(0);
-            }
-            # $rv = $io->read( my $buff, 1024 );
-            my $flags = $io->fcntl( F_GETFL, 0 );
-            my $v = ( ( $flags == O_RDONLY ) || ( $flags & ( O_RDONLY | O_RDWR ) ) );
-            $v++ unless( $flags & O_ACCMODE );
-            $io->close unless( $opened );
-            return( $v );
+            $io = $self->open( @_ ) || return(0);
         }
-    }
-    catch( $e )
-    {
-        return( $self->error( "An error occurred while trying to check if we can read from ", ( $self->is_dir ? 'directory' : 'file handle for ' ), " \"${file}\": $e" ) );
+        # $rv = $io->read( my $buff, 1024 );
+        # try-catch
+        local $@;
+        my $flags;
+        eval
+        {
+            $flags = $io->fcntl( F_GETFL, 0 );
+        };
+        if( $@ )
+        {
+            return( $self->error( "An error occurred while trying to check if we can read from ", ( $self->is_dir ? 'directory' : 'file handle for ' ), " \"${file}\": $@" ) );
+        }
+        
+        my $v = ( ( $flags == O_RDONLY ) || ( $flags & ( O_RDONLY | O_RDWR ) ) );
+        $v++ unless( $flags & O_ACCMODE );
+        $io->close unless( $opened );
+        return( $v );
     }
 }
 
@@ -488,33 +503,36 @@ sub can_write
     my $self = shift( @_ );
     my $file = $self->filepath;
     my $io = $self->opened;
-    try
+    if( $self->is_dir )
     {
-        if( $self->is_dir )
-        {
-            return( -e( $file ) && -w( $file ) );
-        }
-        else
-        {
-            if( $io )
-            {
-                my $flags = $io->fcntl( F_GETFL, 0 );
-                warn( "Error getting the file handle flags: ", $io->error ) if( !defined( $flags ) );
-                return( $self->pass_error( $io->error ) ) if( !defined( $flags ) );
-                my $bits = ( O_APPEND | O_WRONLY | O_CREAT | O_RDWR );
-                return( $flags & ( O_APPEND | O_WRONLY | O_CREAT | O_RDWR ) );
-            }
-            elsif( $self->finfo->can_write )
-            {
-                return(1);
-            }
-            # File is not opened so we do not know if the file handle is writable
-            return(0);
-        }
+        return( -e( $file ) && -w( $file ) );
     }
-    catch( $e )
+    else
     {
-        return( $self->error( "An error occurred while trying to check if we can write to ", ( $self->is_dir ? 'directory' : 'file handle for ' ), " \"${file}\": $e" ) );
+        if( $io )
+        {
+            # try-catch
+            local $@;
+            my $flags;
+            eval
+            {
+                $flags = $io->fcntl( F_GETFL, 0 );
+            };
+            if( $@ )
+            {
+                return( $self->error( "An error occurred while trying to check if we can write to ", ( $self->is_dir ? 'directory' : 'file handle for ' ), " \"${file}\": $@" ) );
+            }
+            warn( "Error getting the file handle flags: ", $io->error ) if( !defined( $flags ) );
+            return( $self->pass_error( $io->error ) ) if( !defined( $flags ) );
+            my $bits = ( O_APPEND | O_WRONLY | O_CREAT | O_RDWR );
+            return( $flags & ( O_APPEND | O_WRONLY | O_CREAT | O_RDWR ) );
+        }
+        elsif( $self->finfo->can_write )
+        {
+            return(1);
+        }
+        # File is not opened so we do not know if the file handle is writable
+        return(0);
     }
 }
 
@@ -657,14 +675,18 @@ sub chown
     my( $uid, $gid ) = @_;
     my $f = $self->filename;
     my $what = $self->is_dir ? 'directory' : 'file';
-    try
+    # try-catch
+    local $@;
+    my $rv;
+    eval
     {
-        return( CORE::chown( $uid, $gid, "$f" ) );
-    }
-    catch( $e )
+        $rv = CORE::chown( $uid, $gid, "$f" );
+    };
+    if( $@ )
     {
-        return( $self->error( "Unable to chown ${what} $f: $e" ) );
+        return( $self->error( "Unable to chown ${what} $f: $@" ) );
     }
+    return( $rv );
 }
 
 sub cleanup { return( shift->_set_get_boolean( 'auto_remove', @_ ) ); }
@@ -849,53 +871,71 @@ sub content
     my $file = $self->filepath;
     my $opened = $self->opened;
     my $io;
-    try
+    my $pos;
+    if( $self->is_dir )
     {
-        my $pos;
-        if( $self->is_dir )
+        if( $opened )
         {
-            if( $opened )
-            {
-                $io = $opened;
-                $pos = $io->tell;
-                $io->rewind || return( $self->error( "Unable to position ourself at the top of the directory \"${file}\": $!" ) );
-            }
-            else
-            {
-                # $io = $self->open( $opts ) || return( $self->pass_error );
-                $io = $self->open( $opts ) || do
-                {
-                    return( $self->pass_error );
-                };
-            }
-            my $vol = $self->volume;
-            $a = $self->new_array( [ map( $self->_spec_catpath( $vol, $file, $_ ), grep{ !/^\.{1,2}$/ } $io->read ) ] );
-            # Put it back where it was
-            $io->seek( $pos ) if( defined( $pos ) );
+            $io = $opened;
+            $pos = $io->tell;
+            $io->rewind || return( $self->error( "Unable to position ourself at the top of the directory \"${file}\": $!" ) );
         }
         else
         {
-            if( $opened )
+            # $io = $self->open( $opts ) || return( $self->pass_error );
+            $io = $self->open( $opts ) || do
             {
-                $io = $opened;
-                # Prevent error of reading on a non-readable file handle
-                return( $a ) if( !$self->can_read );
-                $pos = $io->tell;
-                $io->seek(0,0) || return( $self->error( "Unable to position ourself at the top of the file \"${file}\": $!" ) );
-            }
-            else
-            {
-                $io = $self->open( '<', $opts ) || return( $self->pass_error );
-            }
-            $a = $self->new_array( [ $io->getlines ] );
-            $io->seek( $pos, Fcntl::SEEK_SET ) if( defined( $pos ) );
+                return( $self->pass_error );
+            };
         }
-        $io->close unless( $opened );
+        my $vol = $self->volume;
+        $a = $self->new_array( [ map( $self->_spec_catpath( $vol, $file, $_ ), grep{ !/^\.{1,2}$/ } $io->read ) ] );
+        # Put it back where it was
+        eval
+        {
+            $io->seek( $pos ) if( defined( $pos ) );
+        };
+        if( $@ )
+        {
+            return( $self->error( "An unexpected error has occurred while trying to get the content for \"${file}\": $@" ) );
+        }
     }
-    catch( $e )
+    else
     {
-        return( $self->error( "An unexpected error has occurred while trying to get the content for \"${file}\": $e" ) );
+        if( $opened )
+        {
+            $io = $opened;
+            # Prevent error of reading on a non-readable file handle
+            return( $a ) if( !$self->can_read );
+            $pos = $io->tell;
+            my $rv;
+            # try-catch
+            local $@;
+            eval
+            {
+                $rv = $io->seek(0,0);
+            };
+            if( $@ )
+            {
+                return( $self->error( "An unexpected error has occurred while trying to get the content for \"${file}\": $@" ) );
+            }
+            return( $self->error( "Unable to position ourself at the top of the file \"${file}\": $!" ) ) if( !$rv );
+        }
+        else
+        {
+            $io = $self->open( '<', $opts ) || return( $self->pass_error );
+        }
+        $a = $self->new_array( [ $io->getlines ] );
+        eval
+        {
+            $io->seek( $pos, Fcntl::SEEK_SET ) if( defined( $pos ) );
+        };
+        if( $@ )
+        {
+            return( $self->error( "An unexpected error has occurred while trying to get the content for \"${file}\": $@" ) );
+        }
     }
+    $io->close unless( $opened );
     return( $a );
 }
 
@@ -941,24 +981,38 @@ sub delete
 {
     my $self = shift( @_ );
     my $file = $self->filepath;
-    try
+    my $rv;
+    if( $self->is_dir )
     {
-        if( $self->is_dir )
+        # try-catch
+        local $@;
+        eval
         {
-            CORE::rmdir( $file ) || return( $self->error( "Unable to remove directory \"${file}\": $!" ) );
-        }
-        else
+            $rv = CORE::rmdir( $file );
+        };
+        if( $@ )
         {
-            CORE::unlink( $file ) || return( $self->error( "Unable to remove file \"${file}\": $!" ) );
+            return( $self->error( "An unexpected error has occurred while trying to remove ", ( $self->is_dir ? 'directory' : 'file' ), " \"${file}\": $@" ) );
         }
-        $self->code( 410 ); # Gone
-        $self->finfo->reset;
-        return( $self );
+        return( $self->error( "Unable to remove directory \"${file}\": $!" ) ) if( !$rv );
     }
-    catch( $e )
+    else
     {
-        return( $self->error( "An unexpected error has occurred while trying to remove ", ( $self->is_dir ? 'directory' : 'file' ), " \"${file}\": $e" ) );
+        # try-catch
+        local $@;
+        eval
+        {
+            $rv = CORE::unlink( $file );
+        };
+        if( $@ )
+        {
+            return( $self->error( "An unexpected error has occurred while trying to remove ", ( $self->is_dir ? 'directory' : 'file' ), " \"${file}\": $@" ) );
+        }
+        return( $self->error( "Unable to remove file \"${file}\": $!" ) ) if( !$rv );
     }
+    $self->code(410); # Gone
+    $self->finfo->reset;
+    return( $self );
 }
 
 sub device { return( shift->finfo->device ); }
@@ -987,35 +1041,57 @@ sub digest
     my $fh = $self->handle || return( $self->pass_error );
     $fh->seek(0,0);
     # $fh->binmode;
-    try
+    my $d = Digest->new( $opts->{algo} ) ||
+        return( $self->error( "Unable to instantiate an Digest object: $!" ) );
+    $d->addfile( $fh );
+    my $rv;
+    if( $opts->{format} eq 'binary' )
     {
-        my $d = Digest->new( $opts->{algo} ) ||
-            return( $self->error( "Unable to instantiate an Digest object: $!" ) );
-        $d->addfile( $fh );
-        if( $opts->{format} eq 'binary' )
+        # try-catch
+        local $@;
+        eval
         {
-            return( $d->digest );
-        }
-        elsif( $opts->{format} eq 'hex' || $opts->{format} eq 'hexdigest' )
+            $rv = $d->digest;
+        };
+        if( $@ )
         {
-            return( $d->hexdigest );
-        }
-        elsif( $opts->{format} eq 'base64' || 
-               $opts->{format} eq 'b64' || 
-               $opts->{format} eq 'base64digest' ||
-               $opts->{format} eq 'b64digest' )
-        {
-            return( $d->base64digest );
-        }
-        else
-        {
-            return( $self->error( "Unknown format \"$opts->{format}\" provided to get the digest (cryptographic hash) of \"${file}\"." ) );
+            return( $self->error( "An unexpected error occurred while trying to get the digest with algorithm \"$opts->{algo}\" for file \"${file}\": $@" ) );
         }
     }
-    catch( $e )
+    elsif( $opts->{format} eq 'hex' || $opts->{format} eq 'hexdigest' )
     {
-        return( $self->error( "An unexpected error occurred while trying to get the digest with algorithm \"$opts->{algo}\" for file \"${file}\": $e" ) );
+        # try-catch
+        local $@;
+        eval
+        {
+            $rv = $d->hexdigest;
+        };
+        if( $@ )
+        {
+            return( $self->error( "An unexpected error occurred while trying to get the digest with algorithm \"$opts->{algo}\" for file \"${file}\": $@" ) );
+        }
     }
+    elsif( $opts->{format} eq 'base64' || 
+           $opts->{format} eq 'b64' || 
+           $opts->{format} eq 'base64digest' ||
+           $opts->{format} eq 'b64digest' )
+    {
+        # try-catch
+        local $@;
+        eval
+        {
+            $rv = $d->base64digest;
+        };
+        if( $@ )
+        {
+            return( $self->error( "An unexpected error occurred while trying to get the digest with algorithm \"$opts->{algo}\" for file \"${file}\": $@" ) );
+        }
+    }
+    else
+    {
+        return( $self->error( "Unknown format \"$opts->{format}\" provided to get the digest (cryptographic hash) of \"${file}\"." ) );
+    }
+    return( $rv );
 }
 
 sub dirname { return( shift->parent ); }
@@ -1037,15 +1113,17 @@ sub empty
             return( $self->error( "Unable to read from opened file \"${file}\"." ) ) if( !$self->can_read );
             return( $self->error( "Unable to write to opened file \"${file}\"." ) ) if( !$self->can_write );
             # Because of system portability issues with truncate, we use try-catch
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 $io = $opened;
                 $io->seek(0,0);
                 $io->truncate( $io->tell );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                return( $self->error( "Unable to seek and truncate file \"${file}\": $e" ) );
+                return( $self->error( "Unable to seek and truncate file \"${file}\": $@" ) );
             }
         }
         else
@@ -1292,7 +1370,9 @@ sub find
         return( @files );
     };
     
-    try
+    # try-catch
+    local $@;
+    eval
     {
         if( $opts->{method} eq 'finddepth' )
         {
@@ -1302,10 +1382,10 @@ sub find
         {
             File::Find::find( $p, $dir );
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An unexpected error has occurred in File::Find::$opts->{method}(): $e" ) );
+        return( $self->error( "An unexpected error has occurred in File::Find::$opts->{method}(): $@" ) );
     }
     return( $self );
 }
@@ -1350,17 +1430,20 @@ sub flags
     my $file = $self->filepath;
     my $io = $self->opened;
     return(0) if( $self->is_dir || !$io || lc( $^O ) eq 'win32' || lc( $^O ) eq 'mswin32' );
-    try
+    my $flags;
+    # try-catch
+    local $@;
+    eval
     {
         # force numeric context
-        my $flags = ( 0 + $io->fcntl( F_GETFL, 0 ) );
-        return( $flags );
-    }
-    catch( $e )
+        $flags = ( 0 + $io->fcntl( F_GETFL, 0 ) );
+    };
+    if( $@ )
     {
-        warnings::warn( "An error occurred while trying to get flags for opened file \"${file}\": $e\n" ) if( warnings::enabled() );
+        warnings::warn( "An error occurred while trying to get flags for opened file \"${file}\": $@\n" ) if( warnings::enabled() );
         return(0);
     }
+    return( $flags );
 }
 
 sub flatten
@@ -1618,26 +1701,29 @@ sub iterator
         {
             next if( $elem eq '.' || $elem eq '..' );
             my $e = $self->new( $self->_spec_catpath( $vol, "$dir", $elem ), { os => $self->{os} } ) || next;
-            try
+            if( $e->is_link && $opts->{follow_link} )
             {
-                if( $e->is_link && $opts->{follow_link} )
+                # Links are resolved and resulting file path made absolute
+                # try-catch
+                local $@;
+                my $rv;
+                eval
                 {
-                    # Links are resolved and resulting file path made absolute
-                    my $rv = $e->readlink;
-                    # Already been there
-                    next if( ++$seen->{ "$rv" } > 1 );
-                    $e = $rv if( $rv );
-                }
-                $cb->( $e );
-            
-                if( $e->is_dir && $opts->{recurse} )
+                    $rv = $e->readlink;
+                };
+                if( $@ )
                 {
-                    $crawl->( $e );
+                    return( $self->error( "An unexpected error occurred while crawling \"$dir\": $@" ) );
                 }
+                # Already been there
+                next if( ++$seen->{ "$rv" } > 1 );
+                $e = $rv if( $rv );
             }
-            catch( $e )
+            $cb->( $e );
+        
+            if( $e->is_dir && $opts->{recurse} )
             {
-                return( $self->error( "An unexpected error occurred while crawling \"$dir\": $e" ) );
+                $crawl->( $e );
             }
         }
         $io->close;
@@ -1724,7 +1810,9 @@ sub lines
         $pos = $io->tell;
     }
     
-    try
+    # try-catch
+    local $@;
+    eval
     {
         # Make sure we are at the top of the file
         $io->seek(0,0);
@@ -1737,10 +1825,10 @@ sub lines
         {
             $io->close;
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Unable to read file \"${file}\": $e" ) );
+        return( $self->error( "Unable to read file \"${file}\": $@" ) );
     }
     
     $a = $self->new_array( \@lines );
@@ -1801,52 +1889,92 @@ sub load
     $opts->{want_object} //= 0;
     my $binmode = $opts->{binmode};
     $binmode =~ s/^\://g;
-    try
+    my $fh = $self->opened;
+    unless( $fh )
     {
-        my $fh = $self->opened;
-        unless( $fh )
+        # try-catch
+        local $@;
+        eval
         {
-            $fh = IO::File->new( "<$file" ) ||
-            return( $self->error( "Unable to open file \"$file\" in read mode: $!" ) );
-        }
+            $fh = IO::File->new( "<$file" );
+        };
+        if( $@ )
+        {
+            return( $self->error( "An error occured while trying to open and read file \"$file\": $@" ) );
+        }        
+        return( $self->error( "Unable to open file \"$file\" in read mode: $!" ) ) if( !$fh );
+    }
+    
+    # try-catch
+    local $@;
+    eval
+    {
         $fh->binmode( ":${binmode}" ) if( CORE::length( $binmode ) );
-        my $pos;
-        if( $self->can_read )
+    };
+    if( $@ )
+    {
+        return( $self->error( "An error occured while trying to open and read file \"$file\": $@" ) );
+    }
+    
+    my $pos;
+    if( $self->can_read )
+    {
+        # try-catch
+        local $@;
+        eval
         {
             $pos = $fh->tell;
             # Move at the beginning of the file
             $fh->seek(0, 0);
-        }
-        my $size;
-        my $buf;
-        if( $binmode eq ':unix' && ( $size = -s( $fh ) ) )
+        };
+        if( $@ )
         {
-            $fh->read( $buf, $size );
-            return( $buf );
-        }
-        else
-        {
-            local $/;
-            $buf = scalar( <$fh> );
-        }
-        if( defined( $pos ) )
-        {
-            # Restore cursor position in file
-            $fh->seek( $pos, 0 );
-        }
-        
-        if( $opts->{want_object} || want( 'OBJECT' ) )
-        {
-            return( $self->new_scalar( \$buf ) );
-        }
-        else
-        {
-            return( $buf );
+            return( $self->error( "An error occured while trying to open and read file \"$file\": $@" ) );
         }
     }
-    catch( $e )
+    my $size;
+    my $buf;
+    if( $binmode eq ':unix' && ( $size = -s( $fh ) ) )
     {
-        return( $self->error( "An error occured while trying to open and read file \"$file\": $e" ) );
+        # try-catch
+        local $@;
+        eval
+        {
+            $fh->read( $buf, $size );
+        };
+        if( $@ )
+        {
+            return( $self->error( "An error occured while trying to open and read file \"$file\": $@" ) );
+        }
+        return( $buf );
+    }
+    else
+    {
+        local $/;
+        $buf = scalar( <$fh> );
+    }
+    if( defined( $pos ) )
+    {
+        # try-catch
+        local $@;
+        # Restore cursor position in file
+        eval
+        {
+            $fh->seek( $pos, 0 );
+        };
+        if( $@ )
+        {
+            return( $self->error( "An error occured while trying to open and read file \"$file\": $@" ) );
+        }
+    }
+    
+    if( $opts->{want_object} || want( 'OBJECT' ) )
+    {
+        return( $self->new_scalar( \$buf ) );
+    }
+    else
+    {
+        return( $buf );
     }
 }
 
@@ -1882,44 +2010,52 @@ sub load_json
     my $json = $self->load_utf8;
     return( $self->pass_error ) if( !CORE::defined( $json ) );
     return( '' ) if( !CORE::length( $json ) );
-    try
+    if( want( 'OBJECT' ) )
     {
-        if( want( 'OBJECT' ) )
-        {
-            my $buf = $j->decode( $json );
-            return( $self->new_scalar( \$buf ) );
-        }
-        else
-        {
-            return( $j->decode( $json ) );
-        }
+        my $buf = $j->decode( $json );
+        return( $self->new_scalar( \$buf ) );
     }
-    catch( $e )
+    else
     {
-        return( $self->error( "Error while decoding ", CORE::length( $json ), " bytes of json data: $e" ) );
+        # try-catch
+        local $@;
+        my $rv;
+        eval
+        {
+            $rv = $j->decode( $json );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error while decoding ", CORE::length( $json ), " bytes of json data: $@" ) );
+        }
+        return( $rv );
     }
 }
 
 sub load_perl
 {
     my $self = shift( @_ );
-    try
+    # try-catch
+    local $@;
+    my $v;
+    eval
     {
-        my $v = do( $self->filepath );
-        if( !defined( $v ) && $@ )
-        {
-            return( $self->error( "Error while loading ", $self->length, " bytes of perl data: $@" ) );
-        }
-        elsif( !defined( $v ) && $! )
-        {
-            return( $self->error( "Error while loading ", $self->length, " bytes of perl data: $1" ) );
-        }
-        return( $v );
-    }
-    catch( $e )
+        $v = do( $self->filepath );
+    };
+    if( $@ )
     {
-        return( $self->error( "Error while loading ", $self->length, " bytes of perl data: $e" ) );
+        return( $self->error( "Error while loading ", $self->length, " bytes of perl data: $@" ) );
     }
+    
+    if( !defined( $v ) && $@ )
+    {
+        return( $self->error( "Error while loading ", $self->length, " bytes of perl data: $@" ) );
+    }
+    elsif( !defined( $v ) && $! )
+    {
+        return( $self->error( "Error while loading ", $self->length, " bytes of perl data: $1" ) );
+    }
+    return( $v );
 }
 
 sub load_utf8
@@ -1973,25 +2109,22 @@ sub lock
     $opts->{timeout} = 0 if( !defined( $opts->{timeout} ) || $opts->{timeout} !~ /^\d+$/ );
     # If the lock is different, release it first
     $self->unlock if( $self->locked );
-    try
+    local $SIG{ALRM} = sub{ die( "timeout" ); };
+    alarm( $opts->{timeout} );
+    # try-catch
+    local $@;
+    my $rc;
+    eval
     {
-        local $SIG{ALRM} = sub{ die( "timeout" ); };
-        alarm( $opts->{timeout} );
-        my $rc = $io->flock( $flags ) || return( $self->error( "Unable to set a lock on file \"$file\": $!" ) );
-        alarm( 0 );
-        if( $rc )
-        {
-            $self->locked( $flags );
-        }
-        else
-        {
-            return( $self->error( "Failed to set a lock on file \"$file\": $!" ) );
-        }
-    }
-    catch( $e )
+        $rc = $io->flock( $flags );
+    };
+    if( $@ )
     {
-        return( $self->error( "Unable to set a lock on file \"${file}\": $e" ) );
+        return( $self->error( "Unable to set a lock on file \"${file}\": $@" ) );
     }
+    return( $self->error( "Unable to set a lock on file \"$file\": $!" ) ) if( !$rc );
+    alarm(0);
+    $self->locked( $flags );
     return( $self );
 }
 
@@ -2064,36 +2197,42 @@ sub mkpath
                     return( $self->error( "Unable to create directory \"$current_path\" ", ( CORE::length( "$parent_path" ) ? "under $parent_path" : "at filesystem root" ), ": $!" ) ) unless( $! =~ /\bFile exists\b/i );
                 };
                 local $_ = $current_path;
-                try
+                my $rv;
+                # try-catch
+                local $@;
+                eval
                 {
-                    $cb->({
+                    $rv = $cb->({
                         dir    => $dir,
                         path   => $current_path,
                         parent => $parent_path,
                         volume => $vol,
-                    }) || return;
-                }
-                catch( $e )
+                    });
+                };
+                if( $@ )
                 {
-                    return( $self->error( "Callback raised an exception on fragment \"$dir\" for path \"current_path\": $e" ) );
+                    return( $self->error( "Callback raised an exception on fragment \"$dir\" for path \"current_path\": $@" ) );
                 }
+                return if( !$rv );
             }
             # See readlink in perlport
             elsif( $^O !~ /^(mswin32|win32|vms|riscos)$/i && -l( $current_path ) )
             {
-                try
+                my $actual = CORE::readlink( $current_path ) || return( $self->error( "Unable to read the symbolic link \"$current_path\": $!" ) );
+                # my $before = URI::file->new( $current_path )->file( $^O );
+                my $before = $self->_uri_file_new( $current_path );
+                # my $after  = URI::file->new( $actual )->abs( $before )->file( $^O );
+                my $after  = $self->_uri_file_abs( $actual, $before );
+                $params->{recurse}++;
+                # try-catch
+                local $@;
+                eval
                 {
-                    my $actual = CORE::readlink( $current_path ) || return( $self->error( "Unable to read the symbolic link \"$current_path\": $!" ) );
-                    # my $before = URI::file->new( $current_path )->file( $^O );
-                    my $before = $self->_uri_file_new( $current_path );
-                    # my $after  = URI::file->new( $actual )->abs( $before )->file( $^O );
-                    my $after  = $self->_uri_file_abs( $actual, $before );
-                    $params->{recurse}++;
                     $process->( $after, $params );
-                }
-                catch( $e )
+                };
+                if( $@ )
                 {
-                    return( $self->error( "An unexpected error occurred while trying to resolve the symbolic link \"$current_path\": $e" ) );
+                    return( $self->error( "An unexpected error occurred while trying to resolve the symbolic link \"$current_path\": $@" ) );
                 }
             }
             elsif( !-d( $current_path ) )
@@ -2272,15 +2411,17 @@ sub mmap
             return( $self->error( "You perl version ($]) does not support PerlIO mmap, or you have set the property \"use_file_map\" to true and you do not have File::Map installed. Install File::Map at least if you want to use this method." ) );
         }
         
-        try
+        # try-catch
+        local $@;
+        eval
         {
             File::Map::map_file( $_[0], $file, $mode, 0, $size );
-            return( $self );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "An error occurred while using mmap with File::Map: $e" ) );
+            return( $self->error( "An error occurred while using mmap with File::Map: $@" ) );
         }
+        return( $self );
     }
 }
 
@@ -2303,110 +2444,128 @@ sub open
     my $file = $self->filename;
     return( $self->error( ( $self->is_dir ? 'Directory' : 'File' ), " \"${file}\" is already opened. You need to close it first to re-open it." ) ) if( $self->opened );
     # return( $self->error( ( $self->is_dir ? 'Directory' : 'File' ), " \"${file}\" does not exist." ) ) if( !$self->exists && !CORE::length( $_[0] ) );
-    try
+    my $io;
+    if( $self->is_dir )
     {
-        my $io;
-        if( $self->is_dir )
+        $io = IO::Dir->new( $file ) || return( $self->error( "Unable to open directory \"${file}\": $!" ) );
+        $self->opened( $io );
+    }
+    else
+    {
+        my $existed = $self->exists;
+        my $mode = shift( @_ ) || '<';
+        if( CORE::exists( $opts->{create} ) && $opts->{create} )
         {
-            $io = IO::Dir->new( $file ) || return( $self->error( "Unable to open directory \"${file}\": $!" ) );
-            $self->opened( $io );
+            $mode = '>';
         }
-        else
+        elsif( CORE::exists( $opts->{append} ) && $opts->{append} )
         {
-            my $existed = $self->exists;
-            my $mode = shift( @_ ) || '<';
-            if( CORE::exists( $opts->{create} ) && $opts->{create} )
+            $mode = '>>';
+        }
+        my $map = 
+        {
+        '<+' => '+<',
+        };
+        $mode = $map->{ $mode } if( CORE::exists( $map->{ $mode } ) );
+        # try-catch
+        local $@;
+        eval
+        {
+            $io = Module::Generic::File::IO->new( "$file", "$mode", @_ );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Unable to open file \"${file}\" with mode '${mode}': $@" ) );
+        }
+        return( $self->error( "Unable to open file \"$file\": ", Module::Generic::File::IO->error ) ) if( !$io );
+        
+        if( CORE::exists( $opts->{binmode} ) )
+        {
+            if( !defined( $opts->{binmode} ) || !CORE::length( $opts->{binmode} ) )
             {
-                $mode = '>';
-            }
-            elsif( CORE::exists( $opts->{append} ) && $opts->{append} )
-            {
-                $mode = '>>';
-            }
-            my $map = 
-            {
-            '<+' => '+<',
-            };
-            $mode = $map->{ $mode } if( CORE::exists( $map->{ $mode } ) );
-            try
-            {
-                $io = Module::Generic::File::IO->new( "$file", "$mode", @_ ) || return( $self->error( "Unable to open file \"$file\": ", Module::Generic::File::IO->error ) );
-            }
-            catch( $err )
-            {
-                return( $self->error( "Unable to open file \"${file}\" with mode '${mode}': ${err}" ) );
-            }
-            
-            if( CORE::exists( $opts->{binmode} ) )
-            {
-                if( !defined( $opts->{binmode} ) || !CORE::length( $opts->{binmode} ) )
+                # try-catch
+                local $@;
+                my $rv;
+                eval
                 {
-                    $io->binmode || return( $self->error( "Unable to set binmode to binary for file \"$file\": $!" ) );
-                }
-                else
+                    $rv = $io->binmode;
+                };
+                if( $@ )
                 {
-                    $opts->{binmode} = 'encoding(utf-8)' if( lc( $opts->{binmode} ) eq 'utf-8' );
-                    $opts->{binmode} =~ s/^\://g;
-                    $io->binmode( ":$opts->{binmode}" ) || return( $self->error( "Unable to set binmode to \"$opts->{binmode}\" for file \"$file\": $!" ) );
+                    return( $self->error( "An unexpected error has occured while trying to open file \"${file}\": $@" ) );
                 }
+                return( $self->error( "Unable to set binmode to binary for file \"$file\": $!" ) ) if( !$rv );
             }
-            $io->autoflush( $opts->{autoflush} ) if( CORE::exists( $opts->{autoflush} ) && CORE::length( $opts->{autoflush} ) );
-            $self->opened( $io );
-            if( !$existed && $self->can_write )
+            else
             {
-                $self->code( 201 ); # created
+                $opts->{binmode} = 'encoding(utf-8)' if( lc( $opts->{binmode} ) eq 'utf-8' );
+                $opts->{binmode} =~ s/^\://g;
+                # try-catch
+                local $@;
+                my $rv;
+                eval
+                {
+                    $rv = $io->binmode( ":$opts->{binmode}" );
+                };
+                if( $@ )
+                {
+                    return( $self->error( "An unexpected error has occured while trying to open file \"${file}\": $@" ) );
+                }
+                return( $self->error( "Unable to set binmode to \"$opts->{binmode}\" for file \"$file\": $!" ) ) if( !$rv );
             }
-            
-            if( $opts->{lock} )
+        }
+        $io->autoflush( $opts->{autoflush} ) if( CORE::exists( $opts->{autoflush} ) && CORE::length( $opts->{autoflush} ) );
+        $self->opened( $io );
+        if( !$existed && $self->can_write )
+        {
+            $self->code( 201 ); # created
+        }
+        
+        if( $opts->{lock} )
+        {
+            # 4 possibilities:
+            # 1) regular open mode >, +>, >>, <, +<; or
+            # 2) fopen style: "r", "r+", "w", "w+", "a", and "a+"; or
+            # 3) Fcntl bitwise permissions to be used for sysopen, such as:
+            #    O_APPEND, O_ASYNC, O_CREAT, O_DEFER, O_EXCL, O_NDELAY, O_NONBLOCK, O_SYNC, O_TRUNC
+            #    O_RDONLY, O_WRONLY, O_RDWR
+            #    For example: O_WRONLY|O_APPEND
+            if( $mode eq '>' || $mode eq '+>' || 
+                $mode eq '>>' || $mode eq '+<' || 
+                $mode eq 'w' || $mode eq 'w+' || 
+                $mode eq 'r+' || $mode eq 'a' || 
+                $mode eq 'a+' )
             {
-                # 4 possibilities:
-                # 1) regular open mode >, +>, >>, <, +<; or
-                # 2) fopen style: "r", "r+", "w", "w+", "a", and "a+"; or
-                # 3) Fcntl bitwise permissions to be used for sysopen, such as:
-                #    O_APPEND, O_ASYNC, O_CREAT, O_DEFER, O_EXCL, O_NDELAY, O_NONBLOCK, O_SYNC, O_TRUNC
-                #    O_RDONLY, O_WRONLY, O_RDWR
-                #    For example: O_WRONLY|O_APPEND
-                if( $mode eq '>' || $mode eq '+>' || 
-                    $mode eq '>>' || $mode eq '+<' || 
-                    $mode eq 'w' || $mode eq 'w+' || 
-                    $mode eq 'r+' || $mode eq 'a' || 
-                    $mode eq 'a+' )
+                $opts->{exclusive}++;
+            }
+            elsif( $mode eq '<' || $mode eq 'r' )
+            {
+                $opts->{shared}++;
+            }
+            elsif( $mode =~ /^\d+$/ )
+            {
+                if( $mode & O_CREAT || $mode & O_APPEND || 
+                    $mode & O_EXCL || $mode & O_WRONLY )
                 {
                     $opts->{exclusive}++;
                 }
-                elsif( $mode eq '<' || $mode eq 'r' )
+                else
                 {
                     $opts->{shared}++;
                 }
-                elsif( $mode =~ /^\d+$/ )
-                {
-                    if( $mode & O_CREAT || $mode & O_APPEND || 
-                        $mode & O_EXCL || $mode & O_WRONLY )
-                    {
-                        $opts->{exclusive}++;
-                    }
-                    else
-                    {
-                        $opts->{shared}++;
-                    }
-                }
             }
-            
-            if( $opts->{shared} || $opts->{exclusive} || $opts->{non_blocking} || $opts->{nb} )
-            {
-                $self->lock( $opts ) || return( $self->pass_error );
-            }
-            $io->truncate(0) if( $opts->{truncate} );
         }
-        # Opening the file in read mode does not change its file information, so we only 
-        # reset finfo if it was opened in write mode.
-        $self->finfo->reset if( $self->can_write );
-        return( $io );
+        
+        if( $opts->{shared} || $opts->{exclusive} || $opts->{non_blocking} || $opts->{nb} )
+        {
+            $self->lock( $opts ) || return( $self->pass_error );
+        }
+        $io->truncate(0) if( $opts->{truncate} );
     }
-    catch( $e )
-    {
-        return( $self->error( "An unexpected error has occured while trying to open file \"${file}\": $e" ) );
-    }
+    # Opening the file in read mode does not change its file information, so we only 
+    # reset finfo if it was opened in write mode.
+    $self->finfo->reset if( $self->can_write );
+    return( $io );
 }
 
 sub open_bin
@@ -2496,49 +2655,62 @@ sub read
     my $file = $self->filepath;
     my $io = $self->opened;
     return( $self->error( ( $self->is_dir ? 'Directory' : 'File' ), " \"${file}\" is not opened." ) ) if( !$io );
-    try
+    if( $self->is_dir )
     {
-        if( $self->is_dir )
+        my $opts = $self->_get_args_as_hash( @_[1..$#_] );
+        $opts->{as_object} //= 0;
+        $opts->{exclude_invisible} //= 0;
+        if( want( 'LIST' ) )
         {
-            my $opts = $self->_get_args_as_hash( @_[1..$#_] );
-            $opts->{as_object} //= 0;
-            $opts->{exclude_invisible} //= 0;
-            if( want( 'LIST' ) )
+            # try-catch
+            local $@;
+            my @all;
+            eval
             {
-                my @all = $io->read;
-                return if( !scalar( @all ) );
-                return( grep( !/^\./, @all ) ) if( $opts->{exclude_invisible} );
-                return( @all );
-            }
-            else
+                @all = $io->read;
+            };
+            if( $@ )
             {
-                my $f = $io->read;
-                return( $f ) if( !defined( $f ) );
-                if( substr( $f, 0, 1 ) eq '.' && $opts->{exclude_invisible} )
-                {
-                    return( $self->read( $opts ) );
-                }
-            
-                if( $opts->{as_object} )
-                {
-                    $f = $self->new( $f, base_dir => $self->filename ) || return( $self->pass_error );
-                }
-                return( $f );
+                return( $self->error( "An unexpected error has occurred while trying to read from ", ( $self->is_dir ? 'directory' : 'file' ), " \"${file}\": $@" ) );
             }
+            return if( !scalar( @all ) );
+            return( grep( !/^\./, @all ) ) if( $opts->{exclude_invisible} );
+            return( @all );
         }
         else
         {
-            # $io->read( $buff, $size, $offset );
-            return( $io->read( $_[1], $_[2], $_[3] ) ) if( scalar( @_ ) >= 4 );
-            # $io->read( $buff, $size );
-            return( $io->read( $_[1], $_[2] ) )        if( scalar( @_ ) >= 3 );
-            # $io->read( $buff );
-            return( $io->read( $_[1] ) )               if( scalar( @_ ) >= 2 );
+            # try-catch
+            local $@;
+            my $f;
+            eval
+            {
+                $f = $io->read;
+            };
+            if( $@ )
+            {
+                return( $self->error( "An unexpected error has occurred while trying to read from ", ( $self->is_dir ? 'directory' : 'file' ), " \"${file}\": $@" ) );
+            }
+            return( $f ) if( !defined( $f ) );
+            if( substr( $f, 0, 1 ) eq '.' && $opts->{exclude_invisible} )
+            {
+                return( $self->read( $opts ) );
+            }
+        
+            if( $opts->{as_object} )
+            {
+                $f = $self->new( $f, base_dir => $self->filename ) || return( $self->pass_error );
+            }
+            return( $f );
         }
     }
-    catch( $e )
+    else
     {
-        return( $self->error( "An unexpected error has occurred while trying to read from ", ( $self->is_dir ? 'directory' : 'file' ), " \"${file}\": $e" ) );
+        # $io->read( $buff, $size, $offset );
+        return( $io->read( $_[1], $_[2], $_[3] ) ) if( scalar( @_ ) >= 4 );
+        # $io->read( $buff, $size );
+        return( $io->read( $_[1], $_[2] ) )        if( scalar( @_ ) >= 3 );
+        # $io->read( $buff );
+        return( $io->read( $_[1] ) )               if( scalar( @_ ) >= 2 );
     }
 }
 
@@ -2611,7 +2783,9 @@ sub resolve
         }
         elsif( $os !~ /^(mswin32|win32|vms|riscos)$/i && -l( $current_path ) )
         {
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 my $actual = CORE::readlink( $current_path );
                 my $before = URI::file->new( $current_path, ( $self->{os} || $^O ) );
@@ -2624,12 +2798,12 @@ sub resolve
                 }
                 my @new = $self->_spec_splitdir( $after );
                 $curr = $self->new_array( \@new );
-                next;
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                return( $self->error( "An unexpected error occurred while trying to resolve the symbolic link \"$current_path\": $e" ) );
+                return( $self->error( "An unexpected error occurred while trying to resolve the symbolic link \"$current_path\": $@" ) );
             }
+            next;
         }
         $curr->push( $dir );
     }
@@ -2652,16 +2826,19 @@ sub rmdir
     my $self = shift( @_ );
     return( $self ) if( !$self->is_dir );
     my $dir = $self->filename;
-    try
+    my $rv;
+    # try-catch
+    local $@;
+    eval
     {
-        CORE::rmdir( $dir ) ||
-            return( $self->error( "Unable to remove directory \"$dir\": $!. Is it empty?" ) );
-        return( $self );
-    }
-    catch( $e )
+        $rv = CORE::rmdir( $dir );
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to remove the directory \"$dir\": $e" ) );
+        return( $self->error( "An error occurred while trying to remove the directory \"$dir\": $@" ) );
     }
+    return( $self->error( "Unable to remove directory \"$dir\": $!. Is it empty?" ) ) if( !$rv );
+    return( $self );
 }
 
 # $obj->rmtree( $some_dir_path );
@@ -2692,13 +2869,15 @@ sub rmtree
         $files->push( $File::Find::name );
     };
     
-    try
+    # try-catch
+    local $@;
+    eval
     {
         File::Find::find( $p, $dir );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An unexpected error has occurred while trying to scan directory \"$dir\": $e" ) );
+        return( $self->error( "An unexpected error has occurred while trying to scan directory \"$dir\": $@" ) );
     }
     
     my $total = $files->length;
@@ -2735,17 +2914,19 @@ sub rmtree
         }
         else
         {
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 CORE::unlink( $f ) || do
                 {
                     $error_files->push( $f );
                 };
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
                 $error_files->push( $f );
-                warnings::warn( "An error occurred while trying to remove file \"$f\": $e\n" ) if( warnings::enabled() );
+                warnings::warn( "An error occurred while trying to remove file \"$f\": $@\n" ) if( warnings::enabled() );
             }
         }
         return(1);
@@ -2770,13 +2951,15 @@ sub rmtree
         my $go_there = sub
         {
             my $where = shift( @_ );
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 CORE::chdir; # Switch to HOME, or LOGDIR. See chdir in perlfunc
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                warnings::warn( "Unable to chdir to ", ( defined( $where ) ? "\"${where}\"" : 'default system location (if any)' ), ": $e\n" ) if( warnings::enabled() );
+                warnings::warn( "Unable to chdir to ", ( defined( $where ) ? "\"${where}\"" : 'default system location (if any)' ), ": $@\n" ) if( warnings::enabled() );
             }
         };
         
@@ -2805,17 +2988,19 @@ sub rmtree
         }
         else
         {
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 CORE::rmdir( $d ) || do
                 {
                     $error_files->push( $d );
                 };
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
                 $error_files->push( $d );
-                warnings::warn( "An error occurred while trying to remove directory \"$d\": $e\n" ) if( warnings::enabled() );
+                warnings::warn( "An error occurred while trying to remove directory \"$d\": $@\n" ) if( warnings::enabled() );
             }
         }
         # Return true
@@ -2871,13 +3056,15 @@ sub size
             $total += -s( $File::Find::name ) if( -f( $File::Find::name ) );
         };
         
-        try
+        # try-catch
+        local $@;
+        eval
         {
             File::Find::find( $p, $file );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "An unexpected error has occurred while calling File::Find::find() to compte recursively all files size in directory \"${file}\": $e" ) );
+            return( $self->error( "An unexpected error has occurred while calling File::Find::find() to compte recursively all files size in directory \"${file}\": $@" ) );
         }
         return( $self->new_number( $total ) );
     }
@@ -2944,15 +3131,19 @@ sub symlink
     return( $self->error( "There is already a file at \"${this}\"." ) ) if( $this->exists );
     my $file = $self->filepath;
     my $dest = $this->filepath;
-    try
+    my $rv;
+    # try-catch
+    local $@;
+    eval
     {
-        CORE::symlink( $file, $dest ) || return( $self->error( "Unable to create link from \"${file}\" to \"${dest}\": $!" ) );
-        return( $self );
-    }
-    catch( $e )
+        $rv = CORE::symlink( $file, $dest );
+    };
+    if( $@ )
     {
-        return( $self->error( "An unexpected error has occurred while trying to create a symbolic link from \"${file}\" to \"${dest}\": $e" ) );
+        return( $self->error( "An unexpected error has occurred while trying to create a symbolic link from \"${file}\" to \"${dest}\": $@" ) );
     }
+    return( $self->error( "Unable to create link from \"${file}\" to \"${dest}\": $!" ) ) if( !$rv );
+    return( $self );
 }
 
 sub sync { return( shift->_filehandle_method( 'sync', 'file', @_ ) ); }
@@ -3217,32 +3408,38 @@ sub unload_json
         sort => 'canonical',
     };
     
-    try
+    foreach my $opt ( keys( %$opts ) )
     {
-        foreach my $opt ( keys( %$opts ) )
+        # We already save the data using the binmode utf8, so we do not want JSON to also encode it into utf8
+        next if( $opt eq 'utf8' );
+        my $ref;
+        $ref = $j->can( exists( $equi->{ $opt } ) ? $equi->{ $opt } : $opt ) || do
         {
-            # We already save the data using the binmode utf8, so we do not want JSON to also encode it into utf8
-            next if( $opt eq 'utf8' );
-            my $ref;
-            $ref = $j->can( exists( $equi->{ $opt } ) ? $equi->{ $opt } : $opt ) || do
-            {
-                warn( "Unknown JSON option '${opt}'\n" ) if( $self->_warnings_is_enabled );
-                next;
-            };
+            warn( "Unknown JSON option '${opt}'\n" ) if( $self->_warnings_is_enabled );
+            next;
+        };
+        
+        # try-catch
+        local $@;
+        eval
+        {
             $ref->( $j, $opts->{ $opt } );
+        };
+        if( $@ )
+        {
+            if( $@ =~ /perl[[:blank:]\h]+structure[[:blank:]\h]+exceeds[[:blank:]\h]+maximum[[:blank:]\h]+nesting[[:blank:]\h]+level/i )
+            {
+                my $max = $j->get_max_depth;
+                return( $self->error( "Unable to encode perl data to json: $@ (max_depth value is ${max})" ) );
+            }
+            else
+            {
+                return( $self->error( "Unable to encode perl data to json: $@" ) );
+            }
         }
-        my $json = $j->encode( $data );
-        $self->unload_utf8( $json ) || return( $self->pass_error );
     }
-    catch( $e where { /perl[[:blank:]\h]+structure[[:blank:]\h]+exceeds[[:blank:]\h]+maximum[[:blank:]\h]+nesting[[:blank:]\h]+level/i } )
-    {
-        my $max = $j->get_max_depth;
-        return( $self->error( "Unable to encode perl data to json: $e (max_depth value is ${max})" ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Unable to encode perl data to json: $e" ) );
-    }
+    my $json = $j->encode( $data );
+    $self->unload_utf8( $json ) || return( $self->pass_error );
 }
 
 sub unload_perl
@@ -3250,27 +3447,33 @@ sub unload_perl
     my $self = shift( @_ );
     my $data = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
-    try
+    my $callback;
+    if( $opts->{callback} && ref( $opts->{callback} ) eq 'CODE' )
     {
-        my $callback;
-        if( $opts->{callback} && ref( $opts->{callback} ) eq 'CODE' )
-        {
-            $callback = $opts->{callback};
-        }
-        else
-        {
-            require Data::Dump;
-            local $Data::Dump::INDENT = $opts->{indent} if( exists( $opts->{indent} ) );
-            local $Data::Dump::TRY_BASE64 = $opts->{max_binary_size} if( exists( $opts->{max_binary_size} ) );
-            local $Data::Dump::LINEWIDTH = $opts->{max_width} if( exists( $opts->{max_width} ) );
-            $callback = sub{ return( Data::Dump::dump( @_ ) ); };
-        }
-        $self->unload_utf8( $callback->( $data ) ) || return( $self->pass_error );
+        $callback = $opts->{callback};
     }
-    catch( $e )
+    else
     {
-        return( $self->error( "Unable to dump perl data to file: $e" ) );
+        require Data::Dump;
+        local $Data::Dump::INDENT = $opts->{indent} if( exists( $opts->{indent} ) );
+        local $Data::Dump::TRY_BASE64 = $opts->{max_binary_size} if( exists( $opts->{max_binary_size} ) );
+        local $Data::Dump::LINEWIDTH = $opts->{max_width} if( exists( $opts->{max_width} ) );
+        $callback = sub{ return( Data::Dump::dump( @_ ) ); };
     }
+
+    my $rv;
+    # try-catch
+    local $@;
+    eval
+    {
+        $rv = $self->unload_utf8( $callback->( $data ) );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Unable to dump perl data to file: $@" ) );
+    }
+    return( $self->pass_error ) if( !$rv );
+    return( $rv );
 }
 
 sub unload_utf8
@@ -3292,23 +3495,27 @@ sub unlock
     # my $flags = $self->locked | LOCK_UN;
     # $flags ^= LOCK_NB if( $flags & LOCK_NB );
     my $flags = LOCK_UN;
-    try
+    my $rc;
+    # try-catch
+    local $@;
+    eval
     {
-        my $rc = $io->flock( $flags ) || return( $self->error( "Unable to remove the lock from file \"${file}\" using flags '$flags': $!" ) );
-        if( $rc )
-        {
-            $self->locked(0);
-        }
-        else
-        {
-            return( $self->error( "Failed to remove the lock from file \"${file}\": $!" ) );
-        }
-        return( $self );
-    }
-    catch( $e )
+        $rc = $io->flock( $flags );
+    };
+    if( $@ )
     {
-        return( $self->error( "An unexpected error has occurred while trying to unlock file \"${file}\": $e" ) );
+        return( $self->error( "An unexpected error has occurred while trying to unlock file \"${file}\": $@" ) );
     }
+
+    if( $rc )
+    {
+        $self->locked(0);
+    }
+    else
+    {
+        return( $self->error( "Unable to remove the lock from file \"${file}\" using flags '$flags': $!" ) );
+    }
+    return( $self );
 }
 
 sub unmap
@@ -3316,19 +3523,21 @@ sub unmap
     my $self = shift( @_ );
     return( $self->error( "No variable provided to unmap" ) ) if( !scalar( @_ ) );
     return( $self->error( "Variable provided is undefined" ) ) if( !defined( $_[0] ) );
-    try
+    if( !$self->_load_class( 'File::Map' ) )
     {
-        if( !$self->_load_class( 'File::Map' ) )
-        {
-            return( $self->error( "Unable to unmap. File::Map is not installed on your system" ) );
-        }
+        return( $self->error( "Unable to unmap. File::Map is not installed on your system" ) );
+    }
+    # try-catch
+    local $@;
+    eval
+    {
         File::Map::unmap( $_[0] );
-        return( $self );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error calling File::Map::unmap on the variable provided: $e" ) );
+        return( $self->error( "Error calling File::Map::unmap on the variable provided: $@" ) );
     }
+    return( $self );
 }
 
 sub uri
@@ -3373,18 +3582,23 @@ sub write
     return( $self ) if( $self->is_dir );
     my $io = $self->opened;
     return( $self->error( "File \"${file}\" is not opened." ) ) if( !$io );
-    try
+    return( $self->error( "File \"${file}\" is not opened with write permission." ) ) if( !$self->can_write );
+    # Nothing to write was provided
+    return( $self ) if( !scalar( @_ ) );
+    
+    my $rv;
+    # try-catch
+    local $@;
+    eval
     {
-        return( $self->error( "File \"${file}\" is not opened with write permission." ) ) if( !$self->can_write );
-        # Nothing to write was provided
-        return( $self ) if( !scalar( @_ ) );
-        $io->print( @_ ) || return( $self->error( "Unable to print data to file \"${file}\": $!" ) );
-        return( $self );
-    }
-    catch( $e )
+        $rv = $io->print( @_ );
+    };
+    if( $@ )
     {
-        return( $self->error( "An unexpected error has occurred while trying to write to file \"${file}\": $e" ) );
+        return( $self->error( "An unexpected error has occurred while trying to write to file \"${file}\": $@" ) );
     }
+    return( $self->error( "Unable to print data to file \"${file}\": $!" ) ) if( !$rv );
+    return( $self );
 }
 
 sub _filehandle_method
@@ -3396,14 +3610,16 @@ sub _filehandle_method
     my $for  = shift( @_ );
     my $file = $self->filepath;
     my $type = $self->is_dir ? 'directory' : 'file';
-    try
+    my $ok = [CORE::split( /\|/, $for )];
+    return( $self->error( "You cannot call \"${what}\" on a ${type}. You can only call this on ${for}" ) ) if( !scalar( CORE::grep( $_ eq $type, @$ok ) ) );
+    my $opened = $self->opened || 
+        return( $self->error( ucfirst( $type ), " \"${file}\" is not opened yet." ) );
+    # return( $opened->$what( @_ ) );
+    my @rv = ();
+    # try-catch
+    local $@;
+    eval
     {
-        my $ok = [CORE::split( /\|/, $for )];
-        return( $self->error( "You cannot call \"${what}\" on a ${type}. You can only call this on ${for}" ) ) if( !scalar( CORE::grep( $_ eq $type, @$ok ) ) );
-        my $opened = $self->opened || 
-            return( $self->error( ucfirst( $type ), " \"${file}\" is not opened yet." ) );
-        # return( $opened->$what( @_ ) );
-        my @rv = ();
         if( wantarray() )
         {
             @rv = $opened->$what( @_ );
@@ -3412,14 +3628,14 @@ sub _filehandle_method
         {
             $rv[0] = $opened->$what( @_ );
         }
-        return( $self->error({ skip_frames => 1, message => "Error with $what on file \"$file\": $!" }) ) if( ( !scalar( @rv ) || !CORE::defined( $rv[0] ) ) && $what ne 'getline' );
-        return( wantarray() ? @rv : $rv[0] );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        warn( "An unexpected error occurred while trying to call ${what} on ${type} \"${file}\": $e\n" );
-        return( $self->error( "An unexpected error occurred while trying to call ${what} on ${type} \"${file}\": $e" ) );
+        warn( "An unexpected error occurred while trying to call ${what} on ${type} \"${file}\": $@\n" );
+        return( $self->error( "An unexpected error occurred while trying to call ${what} on ${type} \"${file}\": $@" ) );
     }
+    return( $self->error({ skip_frames => 1, message => "Error with $what on file \"$file\": $!" }) ) if( ( !scalar( @rv ) || !CORE::defined( $rv[0] ) ) && $what ne 'getline' );
+    return( wantarray() ? @rv : $rv[0] );
 }
 
 # my $self = &_function2method( \@_ );
@@ -3537,124 +3753,127 @@ sub _move_or_copy
     return( $self->error( "No clue what action \"$what\" is. I was expecting 'move' or 'copy'." ) ) if( $what ne 'move' && $what ne 'copy' );
     $opts->{overwrite} //= 0;
     my $file = $self->filename;
-    try
+    my $new_path;
+    # Check if file exists. If it does, move/copy it, otherwise, just change its filepath
+    # in which case the move/copy will be virtual, like manipulating a file path
+    if( $self->exists )
     {
-        my $new_path;
-        # Check if file exists. If it does, move/copy it, otherwise, just change its filepath
-        # in which case the move/copy will be virtual, like manipulating a file path
-        if( $self->exists )
+        # If the source is a directory;
+        # 1) the target is an existing directory, then we move/copy the source inside the target
+        #    just like unix systems would do
+        # 2) the target does not exist, then File::Copy will simply rename/create it; fine.
+        # 3) the target exists and is a file. That's obviously not ok,
+        if( $self->is_dir )
         {
-            # If the source is a directory;
-            # 1) the target is an existing directory, then we move/copy the source inside the target
-            #    just like unix systems would do
-            # 2) the target does not exist, then File::Copy will simply rename/create it; fine.
-            # 3) the target exists and is a file. That's obviously not ok,
-            if( $self->is_dir )
+            my $base = $self->basename;
+            # We move/copy the source inside the target directory.
+            # For that we provide File::Copy with dest/target otherwise File::Copy
+            # would do a rename of the directory, even removing the previous one!
+            # Yes, -d over a IO::Dir directory handle works...
+            if( -e( $dest ) && -d( $dest ) )
             {
-                my $base = $self->basename;
-                # We move/copy the source inside the target directory.
-                # For that we provide File::Copy with dest/target otherwise File::Copy
-                # would do a rename of the directory, even removing the previous one!
-                # Yes, -d over a IO::Dir directory handle works...
-                if( -e( $dest ) && -d( $dest ) )
+                # If $dest is a IO::Dir file handle, we get the underlying filepath 
+                # because File::Copy does not move or copy to non file handle.
+                if( $self->_is_object( $dest ) && $dest->isa( 'IO::Dir' ) )
                 {
-                    # If $dest is a IO::Dir file handle, we get the underlying filepath 
-                    # because File::Copy does not move or copy to non file handle.
-                    if( $self->_is_object( $dest ) && $dest->isa( 'IO::Dir' ) )
-                    {
-                        # Would not it be nice if IO:Dir had a public method to get the 
-                        # directory name that was opened?
-                        $dest = ${*$dest}{io_dir_path} if( ${*$dest}{io_dir_path} );
-                    }
-                    # If $dest is a reference or an object, File::Copy will trigger its 
-                    # own error which we will catch
-                
-                    my( $vol, $path, $name ) = $self->_spec_splitpath( "$dest" );
-                    $new_path = $dest = $self->_spec_catpath( $vol, $self->_spec_catdir( [ $path, $name ] ), $base );
-                    return( $self->error( "There already exists a ", ( -d( $dest ) ? 'directory' : 'file' ), " \"${dest}\"." ) ) if( -e( $dest ) && ( !$opts->{overwrite} || !-d( $dest ) ) );
+                    # Would not it be nice if IO:Dir had a public method to get the 
+                    # directory name that was opened?
+                    $dest = ${*$dest}{io_dir_path} if( ${*$dest}{io_dir_path} );
                 }
-                elsif( -e( $dest ) && !-d( $dest ) )
-                {
-                    return( $self->error( "There is already a file at \"${dest}\". Cannot overwrite a file with a directory." ) );
-                }
-                # other cases are ok.
+                # If $dest is a reference or an object, File::Copy will trigger its 
+                # own error which we will catch
+            
+                my( $vol, $path, $name ) = $self->_spec_splitpath( "$dest" );
+                $new_path = $dest = $self->_spec_catpath( $vol, $self->_spec_catdir( [ $path, $name ] ), $base );
+                return( $self->error( "There already exists a ", ( -d( $dest ) ? 'directory' : 'file' ), " \"${dest}\"." ) ) if( -e( $dest ) && ( !$opts->{overwrite} || !-d( $dest ) ) );
             }
-            # We are a file
-            else
+            elsif( -e( $dest ) && !-d( $dest ) )
             {
-                # And the destination exists and is a file too
-                if( -e( $dest ) && !-d( $dest ) && !$opts->{overwrite} )
-                {
-                    return( $self->error( "Unable to copy file \"${file}\" to \"${dest}\". A file with the same name exists and the option \"overwrite\" is not enabled." ) );
-                }
+                return( $self->error( "There is already a file at \"${dest}\". Cannot overwrite a file with a directory." ) );
             }
-        
-            my $code = File::Copy->can( $what ) ||
-            return( $self->error( "Super weird. Could not find method '$what' in File::Copy!" ) );
-        
-            $code->( $file, $dest ) || 
-                return( $self->error( "Unable to $what file \"${file}\" to \"${dest}\": $!" ) );
+            # other cases are ok.
         }
+        # We are a file
+        else
+        {
+            # And the destination exists and is a file too
+            if( -e( $dest ) && !-d( $dest ) && !$opts->{overwrite} )
+            {
+                return( $self->error( "Unable to copy file \"${file}\" to \"${dest}\". A file with the same name exists and the option \"overwrite\" is not enabled." ) );
+            }
+        }
+
+        my $code;
+        # try-catch
+        local $@;
+        eval
+        {
+            $code = File::Copy->can( $what );
+        };
+        if( $@ )
+        {
+            return( $self->error( "An unexpected error occurred while trying to $what file \"${file}\" to \"${dest}\": $@" ) );
+        }
+        $code or return( $self->error( "Super weird. Could not find method '$what' in File::Copy!" ) );
     
-        # If the destination was a directory, we formulate the new file path.
-        # It would have been nice if File::Copy::move returned the new file path
-        # Note that we do so even if the destination directory does not exist.
-        # It would then be only virtual
-        if( -d( "$dest" ) || ( $dest->isa( 'Module::Generic::File' ) && $dest->is_dir ) )
-        {
-            # No need to recompute it
-            if( defined( $new_path ) )
-            {
-                $dest = $new_path;
-            }
-            else
-            {
-                my $base;
-                if( $self->_is_object( $dest ) && $self->_is_a( $dest => 'Module::Generic::File' ) )
-                {
-                    # NOTE: Maybe use child() method instead?
-                    $base = $self->basename;
-                    my( $vol, $path, $fname ) = $self->_spec_splitpath( $dest->filepath );
-                    $dest = $self->_spec_catpath( $vol, $self->_spec_catdir( [ $path, $fname ] ), $base );
-                }
-                # A regular string or an overloaded object
-                elsif( !ref( $dest ) || overload::Method( $dest, '""' ) )
-                {
-                    # We get the directory portion of the path.
-                    $base = $self->basename;
-                    my( $vol, $path, $fname ) = $self->_spec_splitpath( "$dest" );
-                    $dest = $self->_spec_catpath( $vol, $self->_spec_catdir( [ $path, $fname ] ), $base );
-                }
-                # No clue what to do with this
-                else
-                {
-                    return( $self->error( "For the dstination, I was expecting a string or a directory handle, but instead I got '$dest'." ) );
-                }
-            }
-        }
-        # Destination provided was a glob, since we cannot get the file path out of the glob
-        # we return it as is, unless we can such as in File::Temp who has the 'filename' method
-        # If the destination provided was a IO::Dir directory handle, it will have been turned 
-        # into a directory path earlier on.
-        elsif( ( Scalar::Util::reftype( $dest ) // '' ) eq 'GLOB' )
-        {
-            if( $self->_is_object( $dest ) && $dest->can( 'filename' ) )
-            {
-                $dest = $dest->filename;
-            }
-            # There is nothing we can do with it, so we just return it as is
-            else
-            {
-                return( $dest );
-            }
-        }
-        # Make a new file object and return it
-        return( $self->new( $dest, base_file => $self, debug => $self->debug ) );
+        $code->( $file, $dest ) || 
+            return( $self->error( "Unable to $what file \"${file}\" to \"${dest}\": $!" ) );
     }
-    catch( $e )
+
+    # If the destination was a directory, we formulate the new file path.
+    # It would have been nice if File::Copy::move returned the new file path
+    # Note that we do so even if the destination directory does not exist.
+    # It would then be only virtual
+    if( -d( "$dest" ) || ( $dest->isa( 'Module::Generic::File' ) && $dest->is_dir ) )
     {
-        return( $self->error( "An unexpected error occurred while trying to $what file \"${file}\" to \"${dest}\": $!" ) );
+        # No need to recompute it
+        if( defined( $new_path ) )
+        {
+            $dest = $new_path;
+        }
+        else
+        {
+            my $base;
+            if( $self->_is_object( $dest ) && $self->_is_a( $dest => 'Module::Generic::File' ) )
+            {
+                # NOTE: Maybe use child() method instead?
+                $base = $self->basename;
+                my( $vol, $path, $fname ) = $self->_spec_splitpath( $dest->filepath );
+                $dest = $self->_spec_catpath( $vol, $self->_spec_catdir( [ $path, $fname ] ), $base );
+            }
+            # A regular string or an overloaded object
+            elsif( !ref( $dest ) || overload::Method( $dest, '""' ) )
+            {
+                # We get the directory portion of the path.
+                $base = $self->basename;
+                my( $vol, $path, $fname ) = $self->_spec_splitpath( "$dest" );
+                $dest = $self->_spec_catpath( $vol, $self->_spec_catdir( [ $path, $fname ] ), $base );
+            }
+            # No clue what to do with this
+            else
+            {
+                return( $self->error( "For the dstination, I was expecting a string or a directory handle, but instead I got '$dest'." ) );
+            }
+        }
     }
+    # Destination provided was a glob, since we cannot get the file path out of the glob
+    # we return it as is, unless we can such as in File::Temp who has the 'filename' method
+    # If the destination provided was a IO::Dir directory handle, it will have been turned 
+    # into a directory path earlier on.
+    elsif( ( Scalar::Util::reftype( $dest ) // '' ) eq 'GLOB' )
+    {
+        if( $self->_is_object( $dest ) && $dest->can( 'filename' ) )
+        {
+            $dest = $dest->filename;
+        }
+        # There is nothing we can do with it, so we just return it as is
+        else
+        {
+            return( $dest );
+        }
+    }
+    # Make a new file object and return it
+    return( $self->new( $dest, base_file => $self, debug => $self->debug ) );
 }
 
 sub _os2sep
@@ -4295,7 +4514,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.6.1
+    v0.7.0
 
 =head1 DESCRIPTION
 

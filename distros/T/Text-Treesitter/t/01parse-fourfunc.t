@@ -56,6 +56,11 @@ ok( !$root->has_error, '$root has no errors' );
 is( [ $root->start_point ], [ 0, 0 ], '$root->start_point' );
 is( [ $root->end_point   ], [ 1, 0 ], '$root->end_point' );
 
+is( $root->start_row,    0, '$root->start_row' );
+is( $root->start_column, 0, '$root->start_column' );
+is( $root->end_row,      1, '$root->end_row' );
+is( $root->end_column,   0, '$root->end_column' );
+
 is( $root->child_count, 1, '$root->child_count' );
 
 is( $root->parent, undef, '$root->parent' );

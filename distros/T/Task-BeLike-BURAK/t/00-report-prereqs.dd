@@ -15,6 +15,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Acme::CPANAuthors::Turkish' => '0.20',
+                                      'App::HTTPThis' => '0',
                                       'App::Sys::Info' => '0.13',
                                       'CGI::Auth::Basic' => '1.21',
                                       'Capture::Tiny' => '0.22',
@@ -44,11 +45,9 @@ do { my $x = {
                                       'MP3::M3U::Parser' => '2.30',
                                       'Mojolicious' => '0',
                                       'Net::GitHub' => '0',
-                                      'Parse::HTTP::UserAgent' => '0.20',
                                       'Perl::Tidy' => '0',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Pod::Elemental::Transformer::List' => '0',
-                                      'Scalar::Util::Reftype' => '0.40',
                                       'Software::License' => '0',
                                       'Task::CPAN::Reporter' => '0',
                                       'Task::Lingua::Any::Numbers' => '0.17',
@@ -77,7 +76,6 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::More' => '0',
-                                   'blib' => '1.01',
                                    'perl' => '5.012'
                                  }
                  }

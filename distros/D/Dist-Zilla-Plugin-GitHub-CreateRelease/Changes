@@ -1,5 +1,22 @@
 Revision history for Dist-Zilla-Plugin-GitHub-CreateRelease
 
+0.0005 -- Sun Oct 08 11:37:09 ADT 2023
+
+0.0004 -- Wed Oct 04 16:29:46 ADT 2023
+
+    [Significant Changes from 0.0002]
+
+    Previous version only looked for the "origin" remote url.  This
+    version allows you to specify in the dist.ini and gives you a
+    chance to select the correct remote name in case you did not have
+    it added to your dist.ini properly.
+
+    [Detailed Change Log]
+
+    - f429e27 Update version and fix spelling issue
+    - 995edd0 Fixes #2: allow repo_name to be provided in dist.ini
+    - 51b39b3 v0.0003
+
 0.0003 -- Mon Aug 28 21:18:37 ADT 2023
 
     [Significant Changes from 0.0002]

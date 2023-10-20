@@ -441,7 +441,7 @@ AI::TensorFlow::Libtensorflow::Manual::Notebook::InferenceUsingTFHubMobileNetV2M
 
 =head1 SYNOPSIS
 
-The following tutorial is based on the L<Image Classification with TensorFlow Hub notebook|https://github.com/tensorflow/hub/blob/master/examples/colab/image_classification.ipynb>. It uses a pre-trained model based on the I<MobileNet V2> architecture trained on the I<Imagenet> dataset. Running the code requires an Internet connection to download the model (from Google servers) and testing data (from Wikimedia servers).
+The following tutorial is based on the L<Image Classification with TensorFlow Hub notebook|https://github.com/tensorflow/docs/blob/master/site/en/hub/tutorials/image_classification.ipynb>. It uses a pre-trained model based on the I<MobileNet V2> architecture trained on the I<Imagenet> dataset. Running the code requires an Internet connection to download the model (from Google servers) and testing data (from Wikimedia servers).
 
 Please look at the L<SECURITY note|https://github.com/tensorflow/tensorflow/blob/master/SECURITY.md> regarding running models as models are programs. You can also used C<saved_model_cli scan> to check for L<security-sensitive "denylisted ops"|https://github.com/tensorflow/tensorflow/pull/17529> which by default are operations that do I/O.
 

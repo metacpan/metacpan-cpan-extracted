@@ -1,6 +1,6 @@
 package PerlPowerTools;
 
-our $VERSION = '1.038';
+our $VERSION = '1.040';
 
 1;
 
@@ -195,6 +195,8 @@ setting C<INSTALL_BASE> when you run F<Makefile.PL>.
 =item rot13 - rotate text 13 ASCII characters
 
 =item shar - create a shell archive of files
+
+=item seq - output a sequence of numbers
 
 =item sleep - suspend execution for a number of seconds
 

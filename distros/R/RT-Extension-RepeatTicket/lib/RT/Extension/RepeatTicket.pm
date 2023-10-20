@@ -3,7 +3,7 @@ use strict;
 
 package RT::Extension::RepeatTicket;
 
-our $VERSION = "2.00";
+our $VERSION = "2.02";
 
 use RT::Interface::Web;
 use DateTime;
@@ -163,6 +163,16 @@ sub Run {
     return @ids;
 }
 
+my $repeat_ticket_preview = 0;
+sub RepeatTicketPreview {
+    my $val = shift;
+
+    $repeat_ticket_preview = $val
+        if defined $val;
+
+    return $repeat_ticket_preview;
+}
+
 sub Repeat {
     my $attr      = shift;
     my @checkdays = @_;
@@ -174,13 +184,21 @@ sub Repeat {
     my $repeat_ticket = $attr->Object;
 
     my $tickets_needed = TicketsToMeetCoexistentNumber($attr);
-    return unless $tickets_needed;
+
+    return unless $tickets_needed
+        || $content->{'repeat-create-on-recurring-date'}
+        || RepeatTicketPreview;
 
     for my $checkday (@checkdays) {
         # Adjust by lead time
         my $original_date = $checkday->clone();
-        $checkday = $checkday->add( days => $content->{'repeat-lead-time'} )
-          if defined $content->{'repeat-lead-time'};
+        if (
+            defined $content->{'repeat-lead-time'}
+            &&
+            ! $content->{'repeat-create-on-recurring-date'}
+        ) {
+            $checkday = $checkday->add( days => $content->{'repeat-lead-time'} );
+        }
         $RT::Logger->debug( 'Checking date ' . $original_date ->ymd .
                             ' with adjusted lead time date ' . $checkday->ymd );
 
@@ -238,7 +256,16 @@ sub Repeat {
             time_zone => RT->Config->Get('Timezone'),
         );
         $last_created->truncate( to => 'day' );
-        next unless $last_created->ymd lt $checkday->ymd;
+
+        # if we are in simple mode we do not care about the last ticket
+        # due date or create date
+        if ( $content->{'repeat-create-on-recurring-date'} ) {
+            # set last due to checkday so all sets start with the checkday
+            $last_due = $checkday;
+        }
+        else {
+            next unless $last_created->ymd lt $checkday->ymd;
+        }
 
         my $set;
         if ( $content->{'repeat-type'} eq 'daily' ) {
@@ -421,33 +448,48 @@ sub Repeat {
         if ($set) {
             $due = RT::Date->new( RT->SystemUser );
             $due->Set( Format => 'unknown', Value => $checkday );
+
+            if (
+                defined $content->{'repeat-lead-time'}
+                &&
+                $content->{'repeat-create-on-recurring-date'}
+            ) {
+                $due->AddDays( $content->{'repeat-lead-time'} );
+            }
         }
 
-        my ( $id, $txn, $msg ) = _RepeatTicket(
-            $repeat_ticket,
-            Starts => $starts->ISO,
-            $due
-            ? ( Due => $due->ISO )
-            : (),
-        );
-
-        if ($id) {
-            $RT::Logger->info(
-                "Repeated ticket " . $repeat_ticket->id . ": $id" );
-            $content->{'repeat-occurrences'}++;
-            $content->{'last-ticket'} = $id;
-            push @{ $content->{'tickets'} }, $id;
-            push @ids, $id;
+        if ( RepeatTicketPreview ) {
+            # return the ticket starts and due date
+            push @ids, [ $starts->Date, $due ? $due->Date : () ];
         }
         else {
-            $RT::Logger->error( "Failed to repeat ticket for "
-                  . $repeat_ticket->id
-                  . ": $msg" );
-            next;
+            my ( $id, $txn, $msg ) = _RepeatTicket(
+                $repeat_ticket,
+                Starts => $starts->ISO,
+                $due
+                ? ( Due => $due->ISO )
+                : (),
+            );
+
+            if ($id) {
+                $RT::Logger->info(
+                    "Repeated ticket " . $repeat_ticket->id . ": $id" );
+                $content->{'repeat-occurrences'}++;
+                $content->{'last-ticket'} = $id;
+                push @{ $content->{'tickets'} }, $id;
+                push @ids, $id;
+            }
+            else {
+                $RT::Logger->error( "Failed to repeat ticket for "
+                    . $repeat_ticket->id
+                    . ": $msg" );
+                next;
+            }
         }
     }
 
-    $attr->SetContent($content);
+    $attr->SetContent($content)
+        unless RepeatTicketPreview;
     return @ids;
 }
 
@@ -455,7 +497,10 @@ sub TicketsToMeetCoexistentNumber {
     my $attr    = shift;
     my $content = $attr->Content;
 
-    my $co_number = $content->{'repeat-coexistent-number'};
+    my $co_number
+        = $content->{'repeat-create-on-recurring-date'}
+            ? 0
+            : $content->{'repeat-coexistent-number'};
     $co_number = RT->Config->Get('RepeatTicketCoexistentNumber')
       unless defined $co_number && length $co_number;  # respect 0 but ''
     return unless $co_number;
@@ -627,96 +672,12 @@ sub MaybeRepeatMore {
     $last_created->truncate( to => 'day' );
 
     $content->{tickets} = GetActiveTickets($content);
-    $attr->SetContent($content);
+    $attr->SetContent($content)
+        unless RepeatTicketPreview;
 
     my @ids;
     if ( $tickets_needed ) {
-        my $set;
-        if ( $content->{'repeat-type'} eq 'daily' ) {
-            if ( $content->{'repeat-details-daily'} eq 'day' ) {
-                $set = DateTime::Event::ICal->recur(
-                    dtstart  => $last_due || $last_created,
-                    freq     => 'daily',
-                    interval => $content->{'repeat-details-daily-day'} || 1,
-                );
-            }
-            elsif ( $content->{'repeat-details-daily'} eq 'weekday' ) {
-                $set = DateTime::Event::ICal->recur(
-                    dtstart  => $last_due || $last_created,
-                    freq    => 'daily',
-                    byday   => [ 'mo', 'tu', 'we', 'th', 'fr' ],
-                );
-            }
-        }
-        elsif ( $content->{'repeat-type'} eq 'weekly' ) {
-            if ( $content->{'repeat-details-weekly'} eq 'week' ) {
-                my $weeks = $content->{'repeat-details-weekly-weeks'};
-                if ( defined $weeks ) {
-                    $set = DateTime::Event::ICal->recur(
-                        dtstart  => $last_due || $last_created,
-                        freq     => 'weekly',
-                        interval => $content->{'repeat-details-weekly-week'}
-                          || 1,
-                        byday => ref $weeks ? $weeks : [$weeks],
-                    );
-                }
-                else {
-                    $RT::Logger->error('No weeks defined');
-                }
-            }
-        }
-        elsif ( $content->{'repeat-type'} eq 'monthly' ) {
-            if ( $content->{'repeat-details-monthly'} eq 'day' ) {
-                $set = DateTime::Event::ICal->recur(
-                    dtstart  => $last_due || $last_created,
-                    freq     => 'monthly',
-                    interval => $content->{'repeat-details-monthly-day-month'}
-                      || 1,
-                    bymonthday => $content->{'repeat-details-monthly-day-day'}
-                      || 1,
-                );
-            }
-            elsif ( $content->{'repeat-details-monthly'} eq 'week' ) {
-                my $number = $content->{'repeat-details-monthly-week-number'}
-                  || 1;
-                my $day = $content->{'repeat-details-monthly-week-week'}
-                  || 'mo';
-
-                $set = DateTime::Event::ICal->recur(
-                    dtstart  => $last_due || $last_created,
-                    freq     => 'monthly',
-                    interval => $content->{'repeat-details-monthly-week-month'}
-                      || 1,
-                    byday => $number . $day,
-                );
-            }
-        }
-        elsif ( $content->{'repeat-type'} eq 'yearly' ) {
-            if ( $content->{'repeat-details-yearly'} eq 'day' ) {
-                $set = DateTime::Event::ICal->recur(
-                    dtstart  => $last_due || $last_created,
-                    freq    => 'yearly',
-                    bymonth => $content->{'repeat-details-yearly-day-month'}
-                      || 1,
-                    bymonthday => $content->{'repeat-details-yearly-day-day'}
-                      || 1,
-                );
-            }
-            elsif ( $content->{'repeat-details-yearly'} eq 'week' ) {
-                my $number = $content->{'repeat-details-yearly-week-number'}
-                  || 1;
-                my $day = $content->{'repeat-details-yearly-week-week'} || 'mo';
-
-                $set = DateTime::Event::ICal->recur(
-                    dtstart  => $last_due || $last_created,
-                    freq    => 'yearly',
-                    bymonth => $content->{'repeat-details-yearly-week-month'}
-                      || 1,
-                    byday => $number . $day,
-                );
-            }
-        }
-
+        my $set = BuildSet( $content, $last_due, $last_created );
         if ($set) {
             my @dates;
             my $iter = $set->iterator;
@@ -733,6 +694,98 @@ sub MaybeRepeatMore {
         }
     }
     return @ids;
+}
+
+sub BuildSet {
+    my ( $content, $last_due, $last_created ) = @_;
+
+    my $set;
+    if ( $content->{'repeat-type'} eq 'daily' ) {
+        if ( $content->{'repeat-details-daily'} eq 'day' ) {
+            $set = DateTime::Event::ICal->recur(
+                dtstart  => $last_due || $last_created,
+                freq     => 'daily',
+                interval => $content->{'repeat-details-daily-day'} || 1,
+            );
+        }
+        elsif ( $content->{'repeat-details-daily'} eq 'weekday' ) {
+            $set = DateTime::Event::ICal->recur(
+                dtstart  => $last_due || $last_created,
+                freq    => 'daily',
+                byday   => [ 'mo', 'tu', 'we', 'th', 'fr' ],
+            );
+        }
+    }
+    elsif ( $content->{'repeat-type'} eq 'weekly' ) {
+        if ( $content->{'repeat-details-weekly'} eq 'week' ) {
+            my $weeks = $content->{'repeat-details-weekly-weeks'};
+            if ( defined $weeks ) {
+                $set = DateTime::Event::ICal->recur(
+                    dtstart  => $last_due || $last_created,
+                    freq     => 'weekly',
+                    interval => $content->{'repeat-details-weekly-week'}
+                        || 1,
+                    byday => ref $weeks ? $weeks : [$weeks],
+                );
+            }
+            else {
+                $RT::Logger->error('No weeks defined');
+            }
+        }
+    }
+    elsif ( $content->{'repeat-type'} eq 'monthly' ) {
+        if ( $content->{'repeat-details-monthly'} eq 'day' ) {
+            $set = DateTime::Event::ICal->recur(
+                dtstart  => $last_due || $last_created,
+                freq     => 'monthly',
+                interval => $content->{'repeat-details-monthly-day-month'}
+                    || 1,
+                bymonthday => $content->{'repeat-details-monthly-day-day'}
+                    || 1,
+            );
+        }
+        elsif ( $content->{'repeat-details-monthly'} eq 'week' ) {
+            my $number = $content->{'repeat-details-monthly-week-number'}
+                || 1;
+            my $day = $content->{'repeat-details-monthly-week-week'}
+                || 'mo';
+
+            $set = DateTime::Event::ICal->recur(
+                dtstart  => $last_due || $last_created,
+                freq     => 'monthly',
+                interval => $content->{'repeat-details-monthly-week-month'}
+                    || 1,
+                byday => $number . $day,
+            );
+        }
+    }
+    elsif ( $content->{'repeat-type'} eq 'yearly' ) {
+        if ( $content->{'repeat-details-yearly'} eq 'day' ) {
+            $set = DateTime::Event::ICal->recur(
+                dtstart  => $last_due || $last_created,
+                freq    => 'yearly',
+                bymonth => $content->{'repeat-details-yearly-day-month'}
+                    || 1,
+                bymonthday => $content->{'repeat-details-yearly-day-day'}
+                    || 1,
+            );
+        }
+        elsif ( $content->{'repeat-details-yearly'} eq 'week' ) {
+            my $number = $content->{'repeat-details-yearly-week-number'}
+                || 1;
+            my $day = $content->{'repeat-details-yearly-week-week'} || 'mo';
+
+            $set = DateTime::Event::ICal->recur(
+                dtstart  => $last_due || $last_created,
+                freq    => 'yearly',
+                bymonth => $content->{'repeat-details-yearly-week-month'}
+                    || 1,
+                byday => $number . $day,
+            );
+        }
+    }
+
+    return $set;
 }
 
 sub CheckCompleteStatus {
@@ -834,9 +887,41 @@ Add this line:
 
 =back
 
+=head1 MODES
+
+=head2 Simple Mode VS Concurrent Tickets Mode
+
+This extension supports two different modes for the repeat ticket
+configurations. The extension originally only supported Concurrent
+Tickets Mode but many users found the logic counter intuitive.
+
+Any existing repeat ticket configurations from previous versions will be
+in Concurrent Tickets Mode unless the definition is changed.
+
+The default for new repeat ticket configurations is Simple Mode.
+
+=head3 Simple Mode
+
+In this mode tickets are created and start on the recurring date. If the
+lead time field is filled out the ticket will be due that many days
+after the recurring date. There is no check for existing active tickets
+and if the rt-repeat-ticket script is run multiple times for the same
+day it will create a new ticket for each run.
+
+=head3 Concurrent Tickets Mode
+
+In this mode the tickets are created with the due date as the recurring
+date. The tickets start on the due date minus the lead time. You can
+specify the max number of concurrent active tickets. If the
+rt-repeat-ticket script is run multiple times for the same day it will
+only create new tickets if there are fewer active tickets than the max
+number of concurrent active tickets.
+
 =head1 CONFIGURATION
 
 =head2 C<$RepeatTicketCoexistentNumber>
+
+Only used in Concurrent Tickets Mode.
 
 The C<$RepeatTicketCoexistentNumber>
 determines how many tickets can be in an active status for a
@@ -848,14 +933,24 @@ The extension default is 1 ticket.
 
 =head2 C<$RepeatTicketLeadTime>
 
-The C<$RepeatTicketLeadTime> becomes the ticket Starts value and sets how far
-in advance of a ticket's Due date you want the ticket to be created. This
-essentially is how long you want to give people to work on the ticket.
+When in Simple Mode the C<$RepeatTicketLeadTime> is the number of days
+to add to the recurring date for the Due date of the ticket.
+
+When in Concurrent Tickets Mode the C<$RepeatTicketLeadTime> becomes the
+ticket Starts value and sets how far in advance of a ticket's Due date
+you want the ticket to be created. This essentially is how long you want
+to give people to work on the ticket.
 
 For example, if you create a weekly recurrence scheduled on Mondays
 and set the lead time to 7 days, each Monday a ticket will be created
 with the Starts date set to that Monday and a Due date of the following
 Monday.
+
+When in Concurrent Tickets Mode, with a number of concurrent active
+tickets greater than 1, if you set the lead time to be larger than the
+interval between recurring tickets it can result in strange behavior. It
+is recommended that the ticket lead time be smaller or equal to the
+interval between tickets.
 
 The value you set in RT_SiteConfig.pm becomes the system default, but you can
 set this value on each ticket as well. The extension default is 14 days.
@@ -882,6 +977,16 @@ a new RT ColumnMap. You can see the available formats by looking at
 the columns available in the Display Columns portlet on the RT ticket
 search page.
 
+=head2 C<$RepeatTicketPreviewNumber>
+
+By default, the Recurrence Preview will show the next 5 tickets that will be
+created. You can modify the number of tickets to show by setting the
+C<$RepeatTicketPreviewNumber> option:
+
+    Set($RepeatTicketPreviewNumber, 10);
+
+Set the C<$RepeatTicketPreviewNumber> option to 0 to hide the Recurrence Preview.
+
 =head2 rt-repeat-ticket
 
 The rt-repeat-ticket utility evaluates all of your repeating tickets and creates
@@ -895,6 +1000,11 @@ This can be handy if your cron job doesn't run for some reason and you want to m
 sure no repeating tickets have been missed. Just go back and run the script for
 the days you missed. You can also pass dates in the future which might be handy if
 you want to experiment with recurrences in a test environment.
+
+=head3 WARNING
+
+If you run the script multiple times for the same day then it is possible multiple
+tickets will be created for the same repeat ticket configuration.
 
 =head1 USAGE
 
@@ -957,13 +1067,15 @@ Do you have rt-repeat-tickets scheduled in cron? Is it running?
 
 =item *
 
-Do you have previous tickets still in an active state? Resolve those tickets
-or increase the concurrent active tickets value.
+If the repeat configuration is in Concurrent Tickets Mode do you have
+previous tickets still in an active state? Resolve those tickets or
+increase the concurrent active tickets value.
 
 =item *
 
-Is it the right day? Remember to subtract the lead time value to determine
-the day new tickets should be created.
+Is it the right day? If the repeat configuration is in Concurrent
+Tickets Mode remember to subtract the lead time value to determine the
+day new tickets should be created.
 
 =item *
 
@@ -985,6 +1097,16 @@ Make sure those users have "SeeCustomField" and "ModifyCusotmField" rights
 granted for "Original Ticket" custom field.
 
 =back
+
+=head1 SEARCHING
+
+To search for tickets that have recurrence enabled use the following in a Ticket
+Search:
+
+    HasAttribute = 'RepeatTicketSettings'
+
+This will need to be added on the Advanced tab so build the rest of your search
+as desired and then add the clause on the Advanced tab.
 
 =head1 METHODS
 

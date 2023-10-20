@@ -3,11 +3,16 @@ package builtins;
 use 5.036;
 use warnings;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 
 sub import {
     warnings->unimport('experimental::builtin');
-    builtin->import( grep { $_ ne 'import' } keys %builtin:: );
+    builtin->import( grep { not /^(?:un)?import$/ } keys %builtin:: );
+}
+
+sub unimport {
+    warnings->import('experimental::builtin');
+    builtin->unimport( grep { not /^(?:un)?import$/ } keys %builtin:: );
 }
 
 
@@ -40,6 +45,8 @@ This document describes C<builtins> version 0.000001
         }
     }
 
+    no builtins;  # And now they're all gone!
+
 
 
 =head1 DESCRIPTION
@@ -71,6 +78,8 @@ None.
 You simply use the module and it takes care of installing every available
 C<builtin> built-in into the current lexical scope (just like a S<C<use builtin qw(...)>> would).
 It also turns off the "experimental" warnings about each built-in it installs.
+
+Or you write C<no builtins> and they are all removed.
 
 =head1 DIAGNOSTICS
 

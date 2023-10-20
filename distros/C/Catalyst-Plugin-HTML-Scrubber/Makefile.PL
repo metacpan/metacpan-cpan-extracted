@@ -20,21 +20,22 @@ my %WriteMakefileArgs = (
     "HTML::Scrubber" => 0,
     "MRO::Compat" => 0,
     "Moose" => 0,
-    "namespace::autoclean" => 0
+    "namespace::autoclean" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Catalyst" => 0,
     "Catalyst::Controller" => 0,
+    "Catalyst::Controller::REST" => 0,
     "Catalyst::Test" => 0,
     "FindBin" => 0,
     "HTTP::Request::Common" => 0,
     "HTTP::Status" => 0,
     "Test::More" => 0,
     "lib" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "strict" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,6 +46,7 @@ my %FallbackPrereqs = (
   "Catalyst" => 0,
   "Catalyst::ClassData" => 0,
   "Catalyst::Controller" => 0,
+  "Catalyst::Controller::REST" => 0,
   "Catalyst::Test" => 0,
   "FindBin" => 0,
   "HTML::Scrubber" => 0,

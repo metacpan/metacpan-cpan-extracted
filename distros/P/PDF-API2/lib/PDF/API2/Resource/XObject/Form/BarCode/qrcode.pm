@@ -5,7 +5,7 @@ use base 'PDF::API2::Resource::XObject::Form::BarCode';
 use strict;
 use warnings;
 
-our $VERSION = '2.044'; # VERSION
+our $VERSION = '2.045'; # VERSION
 
 use Carp;
 
@@ -84,7 +84,7 @@ PDF::API2::Resource::XObject::Form::BarCode::qrcode - Generate QR codes
     my $page = $pdf->page();
 
     # Create a QR Code object
-    my $barcode = $pdf->barcode('qr', code => 'This is a test');
+    my $barcode = $pdf->barcode('qr', 'This is a test');
 
     # Calculate the scale needed for a desired size (72pt / inch)
     my $desired_inches = 2;

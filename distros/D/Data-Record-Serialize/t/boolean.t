@@ -21,19 +21,19 @@ subtest 'no encoder support' => sub {
     ) or note $@;
 
     for my $test (
-        [ '',    0, '""'    ],
-        [ '0',   0, '"0"'   ],
-        [ 0,     0, '0'     ],
+        [ '',    0, '""' ],
+        [ '0',   0, '"0"' ],
+        [ 0,     0, '0' ],
         [ undef, 0, 'undef' ],
-        [ '1',   1, '"1"'   ],
-        [ 1,     1, '1'     ],
+        [ '1',   1, '"1"' ],
+        [ 1,     1, '1' ],
       )
     {
         my ( $send, $expect, $label ) = @$test;
 
         $drs->fh->seek( 0, 0 );
         $drs->send( { bool => $send } );
-        my $got = eval $output; ## no critic(ProhibitStringyEval)
+        my $got = eval $output;    ## no critic(ProhibitStringyEval)
         is( $got, { bool => $expect }, "bool = $label" );
     }
 };
@@ -64,19 +64,19 @@ subtest 'encoder support' => sub {
     ) or note $@;
 
     for my $test (
-        [ '',    'false', '""'    ],
-        [ '0',   'false', '"0"'   ],
-        [ 0,     'false', '0'     ],
+        [ '',    'false', '""' ],
+        [ '0',   'false', '"0"' ],
+        [ 0,     'false', '0' ],
         [ undef, 'false', 'undef' ],
-        [ '1',   'true',  '"1"'   ],
-        [ 1,     'true',  '1'     ],
+        [ '1',   'true',  '"1"' ],
+        [ 1,     'true',  '1' ],
       )
     {
         my ( $send, $expect, $label ) = @$test;
 
         $drs->fh->seek( 0, 0 );
         $drs->send( { bool => $send } );
-        my $got = eval $output; ## no critic(ProhibitStringyEval)
+        my $got = eval $output;    ## no critic(ProhibitStringyEval)
         is( $got, { bool => $expect }, "bool = $label" );
     }
 };

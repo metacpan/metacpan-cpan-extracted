@@ -61,13 +61,13 @@
  *    applications, to the detriment of everybody else who just wants
  *    an event loop. but, umm, ok, if that's all, it could be worse.
  *    (from what I gather from the author Jens Axboe, it simply didn't
- *    occur to him, and he made good on it by adding an unlimited nuber
+ *    occur to him, and he made good on it by adding an unlimited number
  *    of timeouts later :).
  * h) initially there was a hardcoded limit of 4096 outstanding events.
  *    later versions not only bump this to 32k, but also can handle
  *    an unlimited amount of events, so this only affects the batch size.
  * i) unlike linux aio, you *can* register more then the limit
- *    of fd events. while early verisons of io_uring signalled an overflow
+ *    of fd events. while early versions of io_uring signalled an overflow
  *    and you ended up getting wet. 5.5+ does not do this anymore.
  * j) but, oh my! it had exactly the same bugs as the linux aio backend,
  *    where some undocumented poll combinations just fail. fortunately,
@@ -120,10 +120,12 @@ struct io_uring_sqe
     __u32 cancel_flags;
     __u32 open_flags;
     __u32 statx_flags;
+    __u32 fadvise_advice;
   };
   __u64 user_data;
   union {
     __u16 buf_index;
+    __u16 personality;
     __u64 __pad2[3];
   };
 };
@@ -172,12 +174,39 @@ struct io_uring_params
   struct io_cqring_offsets cq_off;
 };
 
+#define IORING_FEAT_SINGLE_MMAP   0x00000001
+#define IORING_FEAT_NODROP        0x00000002
+#define IORING_FEAT_SUBMIT_STABLE 0x00000004
+
 #define IORING_SETUP_CQSIZE 0x00000008
+#define IORING_SETUP_CLAMP  0x00000010
 
 #define IORING_OP_POLL_ADD        6
 #define IORING_OP_POLL_REMOVE     7
 #define IORING_OP_TIMEOUT        11
 #define IORING_OP_TIMEOUT_REMOVE 12
+
+#define IORING_REGISTER_EVENTFD       4
+#define IORING_REGISTER_EVENTFD_ASYNC 7
+#define IORING_REGISTER_PROBE         8
+
+#define IO_URING_OP_SUPPORTED 1
+
+struct io_uring_probe_op {
+  __u8  op;
+  __u8  resv;
+  __u16 flags;
+  __u32 resv2;
+};
+
+struct io_uring_probe
+{
+  __u8  last_op;
+  __u8  ops_len;
+  __u16 resv;
+  __u32 resv2[3];
+  struct io_uring_probe_op ops[0];
+};
 
 /* relative or absolute, reference clock is CLOCK_MONOTONIC */
 struct iouring_kernel_timespec
@@ -191,7 +220,6 @@ struct iouring_kernel_timespec
 #define IORING_ENTER_GETEVENTS 0x01
 
 #define IORING_OFF_SQ_RING 0x00000000ULL
-#define IORING_OFF_CQ_RING 0x08000000ULL
 #define IORING_OFF_SQES	   0x10000000ULL
 
 #define IORING_FEAT_SINGLE_MMAP   0x00000001
@@ -212,19 +240,26 @@ evsys_io_uring_enter (int fd, unsigned to_submit, unsigned min_complete, unsigne
   return ev_syscall6 (SYS_io_uring_enter, fd, to_submit, min_complete, flags, sig, sigsz);
 }
 
+inline_size
+int
+evsys_io_uring_register (unsigned int fd, unsigned int opcode, void *arg, unsigned int nr_args)
+{
+  return ev_syscall4 (SYS_io_uring_register, fd, opcode, arg, nr_args);
+}
+
 /*****************************************************************************/
-/* actual backed implementation */
+/* actual backend implementation */
 
 /* we hope that volatile will make the compiler access this variables only once */
-#define EV_SQ_VAR(name) *(volatile unsigned *)((char *)iouring_sq_ring + iouring_sq_ ## name)
-#define EV_CQ_VAR(name) *(volatile unsigned *)((char *)iouring_cq_ring + iouring_cq_ ## name)
+#define EV_SQ_VAR(name) *(volatile unsigned *)((char *)iouring_ring + iouring_sq_ ## name)
+#define EV_CQ_VAR(name) *(volatile unsigned *)((char *)iouring_ring + iouring_cq_ ## name)
 
 /* the index array */
-#define EV_SQ_ARRAY     ((unsigned *)((char *)iouring_sq_ring + iouring_sq_array))
+#define EV_SQ_ARRAY     ((unsigned *)((char *)iouring_ring + iouring_sq_array))
 
 /* the submit/completion queue entries */
 #define EV_SQES         ((struct io_uring_sqe *)         iouring_sqes)
-#define EV_CQES         ((struct io_uring_cqe *)((char *)iouring_cq_ring + iouring_cq_cqes))
+#define EV_CQES         ((struct io_uring_cqe *)((char *)iouring_ring + iouring_cq_cqes))
 
 inline_speed
 int
@@ -287,7 +322,7 @@ iouring_sqe_get (EV_P)
 }
 
 inline_size
-struct io_uring_sqe *
+void
 iouring_sqe_submit (EV_P_ struct io_uring_sqe *sqe)
 {
   unsigned idx = sqe - EV_SQES;
@@ -313,15 +348,14 @@ iouring_tfd_cb (EV_P_ struct ev_io *w, int revents)
 
 /* called for full and partial cleanup */
 ecb_cold
-static int
+static void
 iouring_internal_destroy (EV_P)
 {
   close (iouring_tfd);
   close (iouring_fd);
 
-  if (iouring_sq_ring != MAP_FAILED) munmap (iouring_sq_ring, iouring_sq_ring_size);
-  if (iouring_cq_ring != MAP_FAILED) munmap (iouring_cq_ring, iouring_cq_ring_size);
-  if (iouring_sqes    != MAP_FAILED) munmap (iouring_sqes   , iouring_sqes_size   );
+  if (iouring_ring != MAP_FAILED) munmap (iouring_ring, iouring_ring_size);
+  if (iouring_sqes != MAP_FAILED) munmap (iouring_sqes, iouring_sqes_size);
 
   if (ev_is_active (&iouring_tfd_w))
     {
@@ -335,57 +369,41 @@ static int
 iouring_internal_init (EV_P)
 {
   struct io_uring_params params = { 0 };
+  uint32_t sq_size, cq_size;
+
+  params.flags = IORING_SETUP_CLAMP;
 
   iouring_to_submit = 0;
 
-  iouring_tfd     = -1;
-  iouring_sq_ring = MAP_FAILED;
-  iouring_cq_ring = MAP_FAILED;
-  iouring_sqes    = MAP_FAILED;
+  iouring_tfd  = -1;
+  iouring_ring = MAP_FAILED;
+  iouring_sqes = MAP_FAILED;
 
   if (!have_monotonic) /* cannot really happen, but what if11 */
     return -1;
 
-  for (;;)
-    {
-      iouring_fd = evsys_io_uring_setup (iouring_entries, &params);
+  iouring_fd = evsys_io_uring_setup (iouring_entries, &params);
 
-      if (iouring_fd >= 0)
-        break; /* yippie */
+  if (iouring_fd < 0)
+    return -1;
 
-      if (errno != EINVAL)
-        return -1; /* we failed */
+  if ((~params.features) & (IORING_FEAT_NODROP | IORING_FEAT_SINGLE_MMAP | IORING_FEAT_SUBMIT_STABLE))
+    return -1; /* we require the above features */
 
-#if TODO
-      if ((~params.features) & (IORING_FEAT_NODROP | IORING_FEATURE_SINGLE_MMAP | IORING_FEAT_SUBMIT_STABLE))
-        return -1; /* we require the above features */
-#endif
+  /* TODO: remember somehow whether our queue size has been clamped */
 
-      /* EINVAL: lots of possible reasons, but maybe
-       * it is because we hit the unqueryable hardcoded size limit
-       */
+  sq_size = params.sq_off.array + params.sq_entries * sizeof (unsigned);
+  cq_size = params.cq_off.cqes  + params.cq_entries * sizeof (struct io_uring_cqe);
 
-      /* we hit the limit already, give up */
-      if (iouring_max_entries)
-        return -1;
+  iouring_ring_size = sq_size > cq_size ? sq_size : cq_size;
+  iouring_sqes_size = params.sq_entries * sizeof (struct io_uring_sqe);
 
-      /* first time we hit EINVAL? assume we hit the limit, so go back and retry */
-      iouring_entries >>= 1;
-      iouring_max_entries = iouring_entries;
-    }
+  iouring_ring = mmap (0, iouring_ring_size, PROT_READ | PROT_WRITE,
+                       MAP_SHARED | MAP_POPULATE, iouring_fd, IORING_OFF_SQ_RING);
+  iouring_sqes = mmap (0, iouring_sqes_size, PROT_READ | PROT_WRITE,
+                       MAP_SHARED | MAP_POPULATE, iouring_fd, IORING_OFF_SQES);
 
-  iouring_sq_ring_size = params.sq_off.array + params.sq_entries * sizeof (unsigned);
-  iouring_cq_ring_size = params.cq_off.cqes  + params.cq_entries * sizeof (struct io_uring_cqe);
-  iouring_sqes_size    =                       params.sq_entries * sizeof (struct io_uring_sqe);
-
-  iouring_sq_ring = mmap (0, iouring_sq_ring_size, PROT_READ | PROT_WRITE,
-                          MAP_SHARED | MAP_POPULATE, iouring_fd, IORING_OFF_SQ_RING);
-  iouring_cq_ring = mmap (0, iouring_cq_ring_size, PROT_READ | PROT_WRITE,
-                          MAP_SHARED | MAP_POPULATE, iouring_fd, IORING_OFF_CQ_RING);
-  iouring_sqes    = mmap (0, iouring_sqes_size, PROT_READ | PROT_WRITE,
-                          MAP_SHARED | MAP_POPULATE, iouring_fd, IORING_OFF_SQES);
-
-  if (iouring_sq_ring == MAP_FAILED || iouring_cq_ring == MAP_FAILED || iouring_sqes == MAP_FAILED)
+  if (iouring_ring == MAP_FAILED || iouring_sqes == MAP_FAILED)
     return -1;
 
   iouring_sq_head         = params.sq_off.head;
@@ -403,12 +421,12 @@ iouring_internal_init (EV_P)
   iouring_cq_overflow     = params.cq_off.overflow;
   iouring_cq_cqes         = params.cq_off.cqes;
 
+  iouring_tfd_to = EV_TSTAMP_HUGE;
+
   iouring_tfd = timerfd_create (CLOCK_MONOTONIC, TFD_CLOEXEC);
 
   if (iouring_tfd < 0)
-    return iouring_tfd;
-
-  iouring_tfd_to = EV_TSTAMP_HUGE;
+    return -1;
 
   return 0;
 }

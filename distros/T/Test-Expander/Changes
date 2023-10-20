@@ -1,5 +1,10 @@
 Changelog for Test-Expander
 
+2.2.0 2023-10-08
+    - Stringify directory containing test file before replacement of slash with double colon avoiding blessed value
+      in $CLASS in case there is no one double colon.
+    - Implement support of subtest selection.
+
 2.1.5 2023-08-02
     - Skip assignment and export of $TEST_FILE variable if the command line option '-e' is used.
 

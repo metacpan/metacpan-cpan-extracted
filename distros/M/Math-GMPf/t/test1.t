@@ -184,7 +184,12 @@ Rmpf_abs($t, $s);
 if(!Rmpf_cmp($t, $r)) {print "ok 23\n"}
 else {print "not ok 23\n"}
 
-if(Rmpf_get_str($t, 16, 0) eq Rmpf_get_str($r, 16, 0)) {print "ok 24\n"}
+my $str1 = Rmpf_get_str($t, 16, 0);
+my $str2 = Rmpf_get_str($r, 16, 0);
+
+#print "\nIN test1.t: $str1 $str2\n";
+
+if($str1 eq $str2) {print "ok 24\n"}
 else {print "not ok 24\n"}
 
 Rmpf_reldiff($q, $s, $r);
@@ -337,3 +342,5 @@ else {print "not ok 48\n"}
 @vals = Rmpf_get_d_2exp(Math::GMPf->new(0.125));
 if($vals[0] == 0.5 && $vals[1] == -2) {print "ok 49\n"}
 else {print "not ok 49 @vals\n"}
+
+

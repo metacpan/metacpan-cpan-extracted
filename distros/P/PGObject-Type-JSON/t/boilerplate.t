@@ -3,7 +3,8 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test2::V0; 
+plan 3;
 
 sub not_in_file_ok {
     my ($filename, %regex) = @_;

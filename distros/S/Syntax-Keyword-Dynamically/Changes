@@ -1,5 +1,14 @@
 Revision history for Syntax-Keyword-Dynamically
 
+0.13    2023-09-21
+        [CHANGES]
+         * Remember to implement `no Syntax::Keyword::Dynamically`
+         * Avoid multiple accesses to `PL_modglobal` at once when in
+           `-DMULTIPLICITY`
+
+        [BUGFIXES]
+         * Need to set `-DNO_XLOCKS=1` to keep MSWin32 happy (RT149716)
+
 0.12    2023-03-04
         [CHANGES]
          * Swap all unit tests from `Test::More` to `Test2::V0`

@@ -6,7 +6,7 @@ use FindBin;
 
 package App::GUI::Harmonograph;
 our $NAME = __PACKAGE__;
-our $VERSION = '0.60';
+our $VERSION = '0.66';
 
 use base qw/Wx::App/;
 use App::GUI::Harmonograph::Frame;
@@ -226,12 +226,16 @@ the sum of the checked.
 
 =head2 Mod Matrix
 
+=for HTML <p>
+<img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/GUI3.png"    alt=""  width="630" height="410">
+</p>
+
 The third tab allows the deepest alterations to the drawing, which leave
 the original concept of a Harmonograph. For instance the X - Pendulum
 is basically a little more than the a cosine function to the time variable.
 Here you can change that to sine, tangent or other trigonometric functions.
 Same goes for Y and Z. R is a function of an rotation matrix. Here you
-can change every of its four elements (with next version).
+can change every of its four elements.
 
 =head2 Line
 
@@ -322,13 +326,15 @@ The third menu has some dialogs with documentation and additional information.
 
 =head1 SEE ALSO
 
-L<App::GUI::Chaosgraph>
-
 L<App::GUI::Cellgraph>
+
+L<App::GUI::Chaosgraph>
 
 L<App::GUI::Dynagraph>
 
-L<App::GUI::Sierpingaph>
+L<App::GUI::Sierpingraph>
+
+L<App::GUI::Tangraph>
 
 =head1 AUTHOR
 

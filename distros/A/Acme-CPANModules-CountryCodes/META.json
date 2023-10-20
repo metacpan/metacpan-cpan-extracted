@@ -46,39 +46,43 @@
       },
       "x_lists" : {
          "x_lists" : {
+            "App::ListCountries" : "0",
+            "App::LocaleCodesUtils" : "0",
             "Locale::Codes::Country" : "0",
             "Locale::Codes::Country::FR" : "0",
             "Locale::Codes::Country_Codes" : "0",
             "Locale::Country" : "0",
             "Locale::Country::Multilingual" : "0",
             "Locale::SubCountry" : "0",
-            "Locale::Util::Country" : "0",
             "MooseX::Types::Locale::Country" : "0",
             "MooseX::Types::Locale::Country::Fast" : "0",
             "Sah::Schema::country::code" : "0",
-            "Sah::Schema::country::code::alpha2" : "0"
+            "Sah::Schema::country::code::alpha2" : "0",
+            "Sah::Schema::country::code::alpha3" : "0"
          }
       },
       "x_mentions" : {
          "x_mentions" : {
+            "App::ListCountries" : "0",
+            "App::LocaleCodesUtils" : "0",
             "Locale::Codes::Country" : "0",
             "Locale::Codes::Country::FR" : "0",
             "Locale::Codes::Country_Codes" : "0",
             "Locale::Country" : "0",
             "Locale::Country::Multilingual" : "0",
             "Locale::SubCountry" : "0",
-            "Locale::Util::Country" : "0",
             "MooseX::Types::Locale::Country" : "0",
             "MooseX::Types::Locale::Country::Fast" : "0",
             "Sah::Schema::country::code" : "0",
-            "Sah::Schema::country::code::alpha2" : "0"
+            "Sah::Schema::country::code::alpha2" : "0",
+            "Sah::Schema::country::code::alpha3" : "0"
          }
       }
    },
    "provides" : {
       "Acme::CPANModules::CountryCodes" : {
          "file" : "lib/Acme/CPANModules/CountryCodes.pm",
-         "version" : "0.001"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -93,7 +97,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-CountryCodes"
       }
    },
-   "version" : "0.001",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"

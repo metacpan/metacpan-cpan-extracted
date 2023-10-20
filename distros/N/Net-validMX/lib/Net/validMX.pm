@@ -146,7 +146,7 @@ BEGIN {
     require Exporter;
 
     @ISA     = qw(Exporter DynaLoader);
-    $VERSION = '2.5.1';
+    $VERSION = '2.5.2';
     $DEBUG   = 0;
     $ALLOW_IP_ADDRESS_AS_MX = 1;
     $FLAG_INTRANETS = 1;
@@ -703,14 +703,16 @@ sub check_email_validity {
       return 0;
     }
   
-    # PURGE ANYTHING EXITED BY BACKSLASH
-    $local =~ s/\\.//g;
+    # PURGE BACKSLASHES
+    $local =~ s/\\//g;
   
     # per RFC 3696 section 3 the local part of the email can be quoted, which allows any character to appear if inside quotes
     # PURGE BEGINNING AND END QUOTE IF IT CONTAINS QUOTES
     if ($local =~ /"/) {
-      $local =~ s/^"//g;
-      $local =~ s/"$//g;
+      if($local =~ /^".*"$/) {
+        $local =~ s/^"//g;
+        $local =~ s/"$//g;
+      }
   
       # IF IT STILL CONTAINS A QUOTE, IT IS INVALID, OTHERWISE THE LOCAL PART IS VALID
       if ($local =~ /"/) {
@@ -1013,6 +1015,8 @@ kevin.mcgrail-netvalidmx@mcgrail.com
 
 =item v2.5.1 Released April 4, 2023. Documentation bug fixes and ipv6 improvements.
 
+=item v2.5.2 Released September 25, 2023. check_email_validity fixes.
+
 =back
 
 =head1 HOMEPAGE
@@ -1037,5 +1041,9 @@ MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 Based on an idea from Les Miksell and much input from Jan Pieter Cornet.  Additional thanks to David F. Skoll, Matthew van Eerde, and Mark Damrose for testing and suggestions, plus Bill Cole & Karsten Bräckelmann for code contributions.  And sincere apologies in advance if I missed anyone!
 
 =back
+
+=head1 REPOSITORY
+
+L<https://github.com/The-McGrail-Foundation/Net-validMX>
 
 =cut

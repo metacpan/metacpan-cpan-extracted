@@ -3,25 +3,45 @@ package Acme::CPANModules::CryptingPassword;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-15'; # DATE
+our $DATE = '2023-07-21'; # DATE
 our $DIST = 'Acme-CPANModules-CryptingPassword'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $LIST = {
     summary => 'List of modules/tools to crypt/hash a password',
     description => <<'_',
 
-The Perl's builtin `crypt()` is all you need, but there are some wrappers and
-other utilities available on CPAN for added convenience.
+Bascally, the Perl's builtin `crypt()` is all you need. It supports all the
+hashing algorithms supported by your system's C library. You just need to supply
+the salt in the right format to select the hashing algorithm. See the function's
+documentation for more details.
+
+There are some wrappers and other utilities available on CPAN for added
+convenience.
 
 _
     entries => [
         {
             module => 'Crypt::Password::Util',
+            description => <<'_',
+
+This module offers a one-argument `crypt()` which generates an appropriate
+("reasonably secure") salt for you. There are also utility functions to check
+whether a string looks like a crypted password and to find out the type of the
+crypted password.
+
+_
         },
 
         {
             module => 'App::bcrypt',
+            script => 'bcrypt',
+            description => <<'_',
+
+The distribution provides a `bcrypt` CLI utility to crypt every input line with
+bcrypt. It can also compare a password with its crypt.
+
+_
         },
     ],
 };
@@ -41,12 +61,17 @@ Acme::CPANModules::CryptingPassword - List of modules/tools to crypt/hash a pass
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::CryptingPassword (from Perl distribution Acme-CPANModules-CryptingPassword), released on 2023-06-15.
+This document describes version 0.002 of Acme::CPANModules::CryptingPassword (from Perl distribution Acme-CPANModules-CryptingPassword), released on 2023-07-21.
 
 =head1 DESCRIPTION
 
-The Perl's builtin C<crypt()> is all you need, but there are some wrappers and
-other utilities available on CPAN for added convenience.
+Bascally, the Perl's builtin C<crypt()> is all you need. It supports all the
+hashing algorithms supported by your system's C library. You just need to supply
+the salt in the right format to select the hashing algorithm. See the function's
+documentation for more details.
+
+There are some wrappers and other utilities available on CPAN for added
+convenience.
 
 =head1 ACME::CPANMODULES ENTRIES
 
@@ -56,7 +81,21 @@ other utilities available on CPAN for added convenience.
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
+This module offers a one-argument C<crypt()> which generates an appropriate
+("reasonably secure") salt for you. There are also utility functions to check
+whether a string looks like a crypted password and to find out the type of the
+crypted password.
+
+
 =item L<App::bcrypt>
+
+Author: L<BDFOY|https://metacpan.org/author/BDFOY>
+
+The distribution provides a C<bcrypt> CLI utility to crypt every input line with
+bcrypt. It can also compare a password with its crypt.
+
+
+Script: L<bcrypt>
 
 =back
 

@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,43 +19,43 @@ name: Selenium-Client
 provides:
   Selenium::Capabilities:
     file: lib/Selenium/Client.pm
-    version: '1.05'
+    version: '1.06'
   Selenium::Client:
     file: lib/Selenium/Client.pm
-    version: '1.05'
+    version: '1.06'
   Selenium::Driver::Auto:
     file: lib/Selenium/Driver/Auto.pm
-    version: '1.05'
+    version: '1.06'
   Selenium::Driver::Chrome:
     file: lib/Selenium/Driver/Chrome.pm
-    version: '1.05'
+    version: '1.06'
   Selenium::Driver::Edge:
     file: lib/Selenium/Driver/Edge.pm
-    version: '1.05'
+    version: '1.06'
   Selenium::Driver::Gecko:
     file: lib/Selenium/Driver/Gecko.pm
-    version: '1.05'
+    version: '1.06'
   Selenium::Driver::Safari:
     file: lib/Selenium/Driver/Safari.pm
-    version: '1.05'
+    version: '1.06'
   Selenium::Driver::SeleniumHQ::Jar:
     file: lib/Selenium/Driver/SeleniumHQ/Jar.pm
-    version: '1.05'
+    version: '1.06'
   Selenium::Driver::WinApp:
     file: lib/Selenium/Driver/WinApp.pm
-    version: '1.05'
+    version: '1.06'
   Selenium::Element:
     file: lib/Selenium/Client.pm
-    version: '1.05'
+    version: '1.06'
   Selenium::Session:
     file: lib/Selenium/Client.pm
-    version: '1.05'
+    version: '1.06'
   Selenium::Specification:
     file: lib/Selenium/Specification.pm
-    version: '1.05'
+    version: '1.06'
   Selenium::Subclass:
     file: lib/Selenium/Subclass.pm
-    version: '1.05'
+    version: '1.06'
 requires:
   Capture::Tiny: '0'
   Carp: '0'
@@ -87,10 +87,10 @@ resources:
   bugtracker: https://github.com/troglodyne-internet-widgets/selenium-client-perl/issues
   homepage: https://github.com/troglodyne-internet-widgets/selenium-client-perl
   repository: https://github.com/troglodyne-internet-widgets/selenium-client-perl.git
-version: '1.05'
+version: '1.06'
 x_contributors:
   - 'Chris Faylor <cgf@realedsolutions.com>'
   - 'Manni Heumann <heumann@strato.de>'
-x_generated_by_perl: v5.32.1
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT

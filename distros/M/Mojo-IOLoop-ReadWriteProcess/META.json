@@ -4,7 +4,7 @@
       "Ettore Di Giacinto <edigiacinto@suse.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.20",
+   "generated_by" : "Minilla/v3.1.22",
    "license" : [
       "perl_5"
    ],
@@ -47,7 +47,7 @@
       "runtime" : {
          "requires" : {
             "IPC::SharedMem" : "0",
-            "Mojolicious" : "0"
+            "Mojolicious" : "9.34"
          }
       },
       "test" : {
@@ -60,7 +60,7 @@
    "provides" : {
       "Mojo::IOLoop::ReadWriteProcess" : {
          "file" : "lib/Mojo/IOLoop/ReadWriteProcess.pm",
-         "version" : "0.33"
+         "version" : "0.34"
       },
       "Mojo::IOLoop::ReadWriteProcess::CGroup" : {
          "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup.pm"
@@ -153,7 +153,7 @@
          "web" : "https://github.com/openSUSE/Mojo-IOLoop-ReadWriteProcess"
       }
    },
-   "version" : "0.33",
+   "version" : "0.34",
    "x_contributors" : [
       "Adam Williamson <awilliam@redhat.com>",
       "Clemens Famulla-Conrad <cfamullaconrad@suse.de>",
@@ -169,9 +169,10 @@
       "Santiago Zarate <santiago@zarate.co>",
       "Sebastian Riedel <s@kraih.com>",
       "Sebastian Riedel <sri@cpan.org>",
+      "Tina Müller <cpan2@tinita.de>",
       "cfconrad <40127946+cfconrad@users.noreply.github.com>",
       "gregor herrmann <gregoa@debian.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.12",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 0
 }

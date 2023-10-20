@@ -68,6 +68,10 @@ sub table_write_access {
         $stmt_type =~ s/^-\ //;
         $sf->{d}{stmt_types} = [ $stmt_type ];
         $ax->reset_sql( $sql );
+        ##
+        my $table_key = $sf->{d}{table_key};
+        $sql->{table} = $ax->quote_table( $sf->{d}{tables_info}{$table_key} ); # table name without alias
+        ##
         if ( $stmt_type eq 'Insert' ) {
             my $ok = $sf->__build_insert_stmt( $sql );
             if ( $ok ) {
@@ -98,7 +102,6 @@ sub table_write_access {
             if ( ! defined $idx || ! defined $menu->[$idx] ) {
                 next STMT_TYPE;
             }
-            my $custom = $menu->[$idx];
             if ( $sf->{o}{G}{menu_memory} ) {
                 if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
                     $old_idx = 0;
@@ -107,6 +110,7 @@ sub table_write_access {
                 $old_idx = $idx;
             }
             my $backup_sql = $ax->backup_href( $sql );
+            my $custom = $menu->[$idx];
             if ( $custom eq $cu{'set'} ) {
                 my $ok = $sb->set( $sql );
                 if ( ! $ok ) {

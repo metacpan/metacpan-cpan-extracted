@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use RT::Extension::RepeatTicket::Test tests => 26;
+use RT::Extension::RepeatTicket::Test tests => 31;
 
 use_ok('RT::Extension::RepeatTicket');
 require_ok('bin/rt-repeat-ticket');
@@ -19,15 +19,16 @@ diag "Create a ticket with a recurrence in the General queue.";
 $m->submit_form_ok(
     {   form_name => 'TicketCreate',
         fields    => {
-            'Subject'                     => 'Set up recurring aperture maintenance',
-            'Content'                     => 'Perform work on portals on Tuesday and Thursday',
-            'repeat-lead-time'            => 7,
-            'repeat-coexistent-number'    => 2,
-            'repeat-enabled'              => 1,
-            'repeat-type'                 => 'weekly',
-            'repeat-details-weekly'       => 'week',
-            'repeat-details-weekly-week'  => 1,
-            'repeat-details-weekly-weeks' => 'th',
+            'Subject'                         => 'Set up recurring aperture maintenance',
+            'Content'                         => 'Perform work on portals on Tuesday and Thursday',
+            'repeat-lead-time'                => 7,
+            'repeat-coexistent-number'        => 2,
+            'repeat-enabled'                  => 1,
+            'repeat-type'                     => 'weekly',
+            'repeat-details-weekly'           => 'week',
+            'repeat-details-weekly-week'      => 1,
+            'repeat-details-weekly-weeks'     => 'th',
+            'repeat-create-on-recurring-date' => 0,
         },
         button => 'SubmitTicket',
     },
@@ -74,6 +75,18 @@ ok(!(RT::Repeat::Ticket::Run->run('-date=' . $thurs->ymd)), 'Ran recurrence scri
 my $ticket4 = RT::Ticket->new(RT->SystemUser);
 ok(!($ticket4->Load($third + 1)), 'No fourth ticket created.');
 
+diag "Run after changing create-on-recurring-date to 1";
+# change to create on recurring date and then a 4th ticket should be created
+ok( $m->goto_ticket($weekly_id), "Found ticket $weekly_id.");
+$m->follow_link_ok( {text => 'Recurrence'}, 'Loaded recurrence edit' );
+
+$m->form_name("ModifyRecurrence");
+$m->field('repeat-create-on-recurring-date' => 1);
+$m->click_button(name => 'SubmitTicket');
+$m->text_like( qr/Recurrence updated/);
+
+ok(!(RT::Repeat::Ticket::Run->run('-date=' . $thurs->ymd)), 'Ran recurrence script for next Thursday again.');
+ok($ticket4->Load($third + 1), 'Fourth ticket created after changing create-on-recurring-date to 1.');
 
 # Didn't want to add DateTime::Format::Natural as a dependency.
 sub GetThursday {

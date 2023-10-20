@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2023-08-05'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use Perinci::CmdLine::Any;
 
@@ -35,7 +35,7 @@ orgadb-sel - Select entries and fields from Org addressbook
 
 =head1 VERSION
 
-This document describes version 0.016 of orgadb-sel (from Perl distribution App-orgadb), released on 2023-01-19.
+This document describes version 0.017 of orgadb-sel (from Perl distribution App-orgadb), released on 2023-08-05.
 
 =head1 SYNOPSIS
 
@@ -861,15 +861,15 @@ Shortcut for --num-fields=1.
 
 See C<--num-fields>.
 
-=item B<-Y>
-
-Shortcut for --clipboard=only.
-
-See C<--clipboard>.
-
 =item B<-y>
 
 Shortcut for --clipboard=tee.
+
+See C<--clipboard>.
+
+=item B<-Y>
+
+Shortcut for --clipboard=only.
 
 See C<--clipboard>.
 

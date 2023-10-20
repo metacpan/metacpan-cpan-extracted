@@ -2,9 +2,10 @@ package Data::Record::Serialize::Encode::null;
 
 # ABSTRACT: infinite bitbucket
 
+use v5.12;
 use Moo::Role;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use namespace::clean;
 
@@ -18,10 +19,10 @@ use namespace::clean;
 
 
 sub encode { }
-sub send {  }
-sub print { }
-sub say { }
-sub close { }
+sub send   { }
+sub print  { }
+sub say    { }
+sub close  { }
 
 with 'Data::Record::Serialize::Role::Encode';
 with 'Data::Record::Serialize::Role::Sink';
@@ -50,7 +51,7 @@ Data::Record::Serialize::Encode::null - infinite bitbucket
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 
@@ -68,6 +69,8 @@ All records sent using it will disappear.
 It performs both the L<Data::Record::Serialize::Role::Encode> and
 L<Data::Record::Serialize::Role::Sink> roles.
 
+=head1 INTERNALS
+
 =for Pod::Coverage encode
  send
  print
@@ -83,7 +86,7 @@ L<< Data::Record::Serialize::new|Data::Record::Serialize/new >>.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>
 
 =head2 Source
 

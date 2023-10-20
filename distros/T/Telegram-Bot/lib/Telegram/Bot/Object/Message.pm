@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Message;
-$Telegram::Bot::Object::Message::VERSION = '0.023';
+$Telegram::Bot::Object::Message::VERSION = '0.024';
 # ABSTRACT: The base class for the Telegram type "Message".
 
 
@@ -150,7 +150,7 @@ Telegram::Bot::Object::Message - The base class for the Telegram type "Message".
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 DESCRIPTION
 

@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Pa::Guru - Package for language Punjabi
 
 =cut
 
 package Locale::CLDR::Locales::Pa::Guru;
-# This file auto generated from Data/common/main/pa_Guru.xml
-#	on Mon 11 Apr  5:36:12 pm GMT
+# This file auto generated from Data\common\main\pa_Guru.xml
+#	on Fri 13 Oct  9:33:10 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

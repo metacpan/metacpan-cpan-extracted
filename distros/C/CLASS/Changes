@@ -1,0 +1,48 @@
+Revision history for Perl module Class
+
+v1.1.8 2023-09-23T19:16:58+0900
+    - Correcting an issue with the signature file of this release. Bug #1
+
+v1.1.6 2022-03-06T19:27:08+0900
+    - Correcting module name
+
+v1.1.5 2022-03-06T12:12:37+0900
+    - Amending distribution to revert to CLASS
+
+v1.1.4 2022-03-05T18:29:07+0900
+    - Improed nheritance and adjusted unit tests
+
+v1.1.3 2022-03-05T14:55:20+0900
+    - Added missing inheritance of @EXPORT, @EXPORT_OK and %EXPORT_TAGS
+    - Made Class::* modules independent from Module::Generic
+
+v1.1.2 2022-02-28T07:14:12+0900
+    - Resubmission due to error on CPAN
+
+v1.1.1 2022-02-27T17:18:25+0900
+    - Transfer of Class to Jacques Deguest
+    - Adding Class::Array and Class::Scalar after transfer from Dan Kogai
+    - Added modules Class::Array, Class::Boolean, Class::Exception, Class::File, Class::Finfo, Class::Assoc, Class::Null, Class::Class::Number, Class::Scalar
+
+1.00 2006-10-09T18:10:58-0700
+    - Add a LICENSE notice
+    - This is 1.00, why not
+    - Remove the really, really old Test::More bundled with this and just depend on it instead.
+
+0.91 2003-05-20T01:23:08-0700
+    - CLASS is now a real constant (thanks Juerd)
+
+0.90 2002-11-29T14:26:09-0700
+    - Colm figured out a way to add $CLASS
+    - Cut out using any other modules so load time is now negligible.
+    - This pretty much makes the module Feature Complete so jacking up to 0.90 as a beta release.
+
+0.03 2001-08-28T01:32:07-0400
+    - Eliminated nearly ALL the code!
+    - Explicitly tested all the way back to 5.004
+
+0.02 2001-08-24T23:34:51-0400
+    - Added CLASS keyword
+
+0.01 2001-06-28T13:14:31-0400
+    - First working version.

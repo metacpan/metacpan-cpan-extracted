@@ -1,5 +1,5 @@
 package Thread::GoChannel;
-$Thread::GoChannel::VERSION = '0.003';
+$Thread::GoChannel::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Thread::GoChannel - Fast thread queues with go-like semantics
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

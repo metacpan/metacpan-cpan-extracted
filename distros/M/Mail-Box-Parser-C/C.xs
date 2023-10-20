@@ -478,7 +478,7 @@ static int scan_stripped_lines(Mailbox *box,
     while(1)
     {   char      *line;
         Separator *sep;
-	int        length;
+        int        length;
 
         if(*nr_lines == expect_lines && is_good_end(box, -1))
             break;

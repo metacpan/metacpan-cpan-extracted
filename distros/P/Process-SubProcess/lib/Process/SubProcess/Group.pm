@@ -1,6 +1,6 @@
 #---------------------------------
 # @author Bodo (Hugo) Barwich
-# @version 2023-08-25
+# @version 2023-10-07
 # @package SubProcess Management
 # @subpackage Process/SubProcess/Group.pm
 
@@ -57,6 +57,39 @@ in an object oriented manner.
 
 #----------------------------------------------------------------------------
 #Constructors
+
+=head1 CONSTRUCTOR
+
+=over 4
+
+=item new ( [ CONFIGURATIONS ] )
+
+This is the constructor for a new SubProcess.
+
+B<Parameters:>
+
+C<CONFIGURATIONS> are passed in a hash like fashion, using key and value pairs.
+
+B<Recognized Configurations:>
+
+C<check> - Time in seconds when to check a process for new output.
+This is calculated based on the count of processes to manage.
+
+C<read | readtimeout> - Time in seconds to wait for the process output.
+If the process is expected to run longer it is useful to set it to avoid excessive checks.
+It is also important for multiple process execusions, because other processes will not
+be checked before the read has not timed out.
+
+C<timeout> - Time in seconds to wait for the process to finish. After this time the process will
+be terminated
+
+C<debug> - show internal processing information
+
+C<quiet> - do not print any warnings or errors
+
+=back
+
+=cut
 
 sub new {
 
@@ -117,6 +150,28 @@ sub DESTROY {
 
 #----------------------------------------------------------------------------
 #Administration Methods
+
+=head1 Administration Methods
+
+=over 4
+
+=item add ( [ OBJECT | CLASS ] )
+
+This method adds a B<Process> object to the list of managed processes.
+
+B<Parameters:>
+
+C<OBJECT | CLASS> - is a C<Process::SubProcess> object or a compatible class name.
+If a class name or no parameter is given a new object will be created.
+
+B<Returns:> It returns the object that was addded to list.
+If an object was given the same will be returned.
+
+See L<Method C<Process::SubProcess::setArrProcess()>|Process::SubProcess/"setReadTimeout ( TIMEOUT )">
+
+=back
+
+=cut
 
 sub add {
     my $self = shift;
@@ -214,6 +269,35 @@ sub add {
     return $rsprc;
 }
 
+=pod
+
+=over 4
+
+=item setCheckInterval ( INTERVAL )
+
+This method calculates the C<READTIMEOUT> for each C<Process::SubProcess> object according to
+the amount of existing objects. The value of the C<READTIMEOUT> for each Process will be rounded
+to a whole number.
+
+B<Example:>
+
+The B<Process Group> manages 3 B<Processes>. Processes "I<A>", "I<B>" and "I<C>".
+Process "I<A>" should be checked every B<6 seconds>. So, setting C<setCheckInterval(6)> will
+set the C<READTIMEOUT> of Processes "I<A>", "I<B>" and "I<C>" to B<2 seconds>.
+This way after cycling over the processes the Process "I<A>" will be checked again
+after 6 seconds.
+
+B<Parameters:>
+
+C<INTERVAL> - is an integer that specifies the interval in which each process should
+be checked.
+
+See L<Method C<Process::SubProcess::setArrProcess()>|Process::SubProcess/"setReadTimeout ( TIMEOUT )">
+
+=back
+
+=cut
+
 sub setCheckInterval {
     my $self = shift;
 
@@ -244,6 +328,25 @@ sub setCheckInterval {
         $self->setReadTimeout($irdtmout);
     } #if($self->{"_check_interval"} > 0 && scalar(@{$self->{"_array_processes"}}) > 0)
 }
+
+=pod
+
+=over 4
+
+=item setReadTimeout ( TIMEOUT )
+
+This method set the C<READTIMEOUT> for each C<Process::SubProcess> object.
+
+B<Parameters:>
+
+C<TIMEOUT> - is an integer that specifies the time in seconds to wait for output
+from the command.
+
+See L<Method C<Process::SubProcess::setArrProcess()>|Process::SubProcess/"setReadTimeout ( TIMEOUT )">
+
+=back
+
+=cut
 
 sub setReadTimeout {
     my $self = shift;
@@ -480,6 +583,17 @@ sub Check {
                 $self->{"_report"} .= "Sub Process ${sprcnm}: checking ...\n"
                   if ( $self->{"_debug"} > 0 );
 
+                if ( $self->{'_execution_timeout'} > -1 ) {
+
+                    #Synchronise with the Sub Processes
+                    $self->{'_start_time'} = $sbprc->getStartTime
+                      if ( $self->{'_start_time'} < 0 );
+
+                    $self->{'_start_time'} = $sbprc->getStartTime
+                      if ( $sbprc->getStartTime < $self->{'_start_time'} );
+
+                }
+
                 if ( $sbprc->isRunning ) {
                     if ( $sbprc->Check ) {
 
@@ -606,6 +720,13 @@ sub Wait {
             if (   $self->{"_check_interval"} > -1
                 || $self->{"_execution_timeout"} > -1 )
             {
+                if ( $self->{'_start_time'} < $itmchkstrt ) {
+
+                    # Re-synchronise with updated Start Time
+                    $itmchkstrt = $self->{'_start_time'};
+                    $itmrngstrt = $self->{'_start_time'};
+                }
+
                 $itmchkend = time;
                 $itmrngend = $itmchkend;
 

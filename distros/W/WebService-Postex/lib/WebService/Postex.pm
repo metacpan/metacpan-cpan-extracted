@@ -1,68 +1,43 @@
-use utf8;
-
 package WebService::Postex;
-our $VERSION = '0.003';
-use Moose;
-use namespace::autoclean;
+use v5.26;
+use Object::Pad;
 
-use LWP::UserAgent;
-use HTTP::Request::Common;
-use MooseX::Types::URI qw(Uri);
-use Carp qw(croak);
-use JSON::XS;
+our $VERSION = '0.004';
 
 # ABSTRACT: A Postex WebService implemenation in Perl
 
-has base_uri => (
-    is       => 'ro',
-    isa      => Uri,
-    coerce   => 1,
-    required => 1,
-);
+class WebService::Postex;
+use Carp qw(croak);
+use HTTP::Request::Common;
+use JSON::XS;
+use LWP::UserAgent;
+use URI;
 
-has generator_id => (
-    is       => 'ro',
-    isa      => 'Str',
-    required => 1,
-);
+field $base_uri :param;
+field $generator_id :param;
+field $secret :param;
 
-has secret => (
-    is       => 'ro',
-    isa      => 'Str',
-    required => 1,
-);
+field $ua :param = undef;
 
-has ua => (
-    is      => 'ro',
-    isa     => 'LWP::UserAgent',
-    lazy    => 1,
-    builder => '_build_ua',
-    trigger => \&_set_ua_defaults,
-);
-
-
-sub _set_ua_defaults {
-    my ($self, $ua) = @_;
+method _set_ua_defaults() {
     $ua->default_header(Accept        => 'application/json');
-    $ua->default_header(Authorization => "Bearer " . $self->secret);
-    return $ua;
-
+    $ua->default_header(Authorization => "Bearer $secret");
 }
 
-sub _build_ua {
-    my $self = shift;
-    my $ua   = LWP::UserAgent->new(
+ADJUSTPARAMS {
+    my $args = shift;
+
+    $ua //= LWP::UserAgent->new(
         agent   => sprintf('%s/%s', __PACKAGE__, $VERSION),
         timeout => 30,
     );
-    return $self->_set_ua_defaults($ua);
+    $self->_set_ua_defaults;
+
+    $base_uri = URI->new($base_uri) unless ref $base_uri;
 }
 
-sub _call {
-    my ($self, $req) = @_;
-
-    my $res = $self->ua->request($req);
-
+method _call($req) {
+    my $res = $ua->request($req);
     unless ($res->is_success) {
         my $uri = $req->uri . "";
         die "Unsuccesful request to $uri: " . $res->status_line, $/;
@@ -73,68 +48,53 @@ sub _call {
         die "Error occurred calling Postex", $/;
     }
     return $json;
-
 }
 
-sub generation_rest_upload {
-    my ($self, %payload) = @_;
+method generation_rest_upload(%payload) {
 
-    my $uri = $self->_build_uri(qw(generation raw), $self->generator_id);
+    my $uri = $self->_build_uri(qw(generation raw), $generator_id);
     my $req = $self->_prepare_post($uri, %payload);
     return $self->_call($req);
 }
 
-sub generation_rest_upload_check {
-    my ($self, %payload) = @_;
-
-    my $uri = $self->_build_uri(qw(generation raw), $self->generator_id);
+method generation_rest_upload_check(%payload) {
+    my $uri = $self->_build_uri(qw(generation raw), $generator_id);
     my $req = $self->_prepare_get($uri, %payload);
     return $self->_call($req);
 }
 
-sub generation_file_upload {
-    my ($self, %payload) = @_;
-
-    my $uri = $self->_build_uri(qw(generation upload), $self->generator_id);
+method generation_file_upload(%payload) {
+    my $uri = $self->_build_uri(qw(generation upload), $generator_id);
     my $req = $self->_prepare_post($uri, %payload);
     return $self->_call($req);
 }
 
-sub generation_file_upload_check {
-    my ($self, %payload) = @_;
-
-    my $uri = $self->_build_uri(qw(generation upload), $self->generator_id);
+method generation_file_upload_check(%payload) {
+    my $uri = $self->_build_uri(qw(generation upload), $generator_id);
     my $req = $self->_prepare_get($uri, %payload);
     return $self->_call($req);
 }
 
-sub generation_session_status {
-    my ($self, $session_id) = @_;
+method generation_session_status($session_id) {
     my $uri = $self->_build_uri(qw(generation session), $session_id);
     my $req = $self->_prepare_get($uri);
     return $self->_call($req);
 }
 
-sub profile_file_upload {
-    my ($self, $recipient_id, %payload) = @_;
-
+method profile_file_upload($recipient_id, %payload) {
     my $uri = $self->_build_uri(qw(recipients upload), $recipient_id);
     my $req = $self->_prepare_post($uri, %payload);
     return $self->_call($req);
 }
 
-sub _build_uri {
-    my ($self, $type, $call, $id) = @_;
-
-    my $uri = $self->base_uri->clone;
+method _build_uri($type, $call, $id) {
+    my $uri = $base_uri->clone;
     my @segments = $uri->path_segments;
     $uri->path_segments(@segments, qw(rest data v1), $type, $call, $id);
     return $uri;
 }
 
-sub _prepare_request {
-    my ($self, $uri, %payload) = @_;
-
+method _prepare_request($uri, %payload) {
     if (my $file = delete $payload{file}) {
         $payload{file} = [$file, delete $payload{filename}];
         return (
@@ -156,18 +116,15 @@ sub _prepare_request {
 
 }
 
-sub _prepare_post {
-    my ($self, $uri, %payload) = @_;
+method _prepare_post($uri, %payload) {
     return POST($self->_prepare_request($uri, %payload));
 }
 
-sub _prepare_get {
-    my ($self, $uri, %payload) = @_;
+method _prepare_get($uri, %payload) {
     return GET($self->_prepare_request($uri, %payload));
 }
 
-
-__PACKAGE__->meta->make_immutable;
+1;
 
 __END__
 
@@ -181,7 +138,7 @@ WebService::Postex - A Postex WebService implemenation in Perl
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Und_fonipa::Und_fonxsamp;
-# This file auto generated from Data/common/transforms/IPA-XSampa.xml
-#	on Mon 11 Apr  5:22:56 pm GMT
+# This file auto generated from Data\common\transforms\IPA-XSampa.xml
+#	on Fri 13 Oct  9:03:45 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

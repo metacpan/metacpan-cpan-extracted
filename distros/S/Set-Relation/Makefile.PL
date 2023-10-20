@@ -13,8 +13,8 @@ sub OPTIONAL {
 
 WriteMakefile(
    NAME => 'Set::Relation',
-   VERSION => '0.13.2',
-   ABSTRACT => 'Relation data type for Perl',
+   VERSION => '0.13.4',
+   ABSTRACT => 'A relation data type',
    AUTHOR => 'Darren Duncan <darren@DarrenDuncan.net>',
    PREREQ_PM => {
       # This list is a copy of "META_ADD:[configure_|build_|]requires"
@@ -22,7 +22,6 @@ WriteMakefile(
       # itself, which in general wouldn't see the info in the other lists,
       # as the other lists are primarily used when generating the META.yml/json.
       'Carp' => '1.01',
-      'Carp::Always' => '0.01',
       'ExtUtils::MakeMaker' => '6.03',
       'List::Util' => '1.4602',
       'Scalar::Util' => '1.13',
@@ -48,7 +47,6 @@ WriteMakefile(
             # These are bundled with newer versions of Perl only.
             'Test::More' => '0.92', # bundled with Perl 5.10.1, min 0.88 needed
             # These are not bundled with any version of Perl.
-            'Carp::Always' => '0.01', # first released version
             'Test::Deep' => '0.106', # tests req 0.106+ w Perl 5.10.1+
          },
          requires => {
@@ -61,8 +59,7 @@ WriteMakefile(
          resources => {
             homepage => 'https://muldis.com',
             license => 'https://www.perlfoundation.org/artistic-license-20.html',
-            MailingList => 'http://mm.darrenduncan.net/mailman/listinfo',
-            repository => 'https://github.com/muldis/Set-Relation',
+            repository => 'https://github.com/muldis/Set_Relation_Perl',
          },
       },
    ),

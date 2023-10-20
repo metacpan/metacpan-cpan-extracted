@@ -251,7 +251,7 @@ when it sees them instead of telling you that the comparison failed.
 
 =cut
 
-our $VERSION = "0.70"; # or "0.001_001" for a dev release
+our $VERSION = "0.71"; # or "0.001_001" for a dev release
 $VERSION = eval $VERSION;
 
 use Exporter;
@@ -499,6 +499,20 @@ would mean that Test::Differences would need to emulate every popular test
 module out there, which would require far more coding and maintenance that I'm
 willing to do.  Use the eval and my_ok deployment shown above if you want some
 level of automation.
+
+=head2 Booleans
+
+Historically, true and false (whether resulting from logical-not C<!> or from
+equality checks like C<==>) were represented in perl as numeric C<1> for true
+and the empty string C<''> for false. In perl 5.36.0 they became real Boolean
+values which for backward compatibility also have their old numeric/string
+values. In 5.38 (and in dev releases from 5.37.2 onwards) L<Data::Dumper>
+belatedly learned about this, and so Test::Differences (which uses Data::Dumper
+under the bonnet) can also tell the difference.
+
+This means that `eq_or_diff(1, !!1)` will behave differently depending on
+whether you are using perl 5.38 or later (in which case it will say they are
+different) or 5.36 or earlier (which will say they are the same).
 
 =head2 Unicode
 

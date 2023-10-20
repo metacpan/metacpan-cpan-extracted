@@ -1,5 +1,30 @@
 Revision history for CXC-Form-Tiny-Plugin-OptArgs2
 
+0.11      2023-09-19 22:53:08-04:00 America/New_York
+
+  [BUILD FIX]
+
+    * Types::Path::Tiny was missing from test depedencies  
+
+0.10      2023-09-16 23:43:21-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * character which joins nested fields to create OptArgs2 option
+      name may now be specified via the optargs_args keyword.
+
+    * Type::Tiny types with names 'Path', 'Dir', and 'File' are
+      converted to 'Str' OptArgs2 types.
+
+0.09      2023-09-16 15:27:20-04:00 America/New_York
+
+  [BUGFIX]
+
+    * OptArgs2 may modify the passed options specification. The
+      optspec returned by a command's Form::Tiny form is cached, but
+      not immutable, so this may result in incorrect behavior if the
+      form is reused.  Now, pass a clone of the optspec to OptArgs2.
+
 0.08      2023-08-22 09:52:55-04:00 America/New_York
 
   [ENHANCMENT]

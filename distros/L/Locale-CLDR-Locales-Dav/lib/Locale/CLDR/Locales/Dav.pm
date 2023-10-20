@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Dav - Package for language Taita
 
 =cut
 
 package Locale::CLDR::Locales::Dav;
-# This file auto generated from Data/common/main/dav.xml
-#	on Mon 11 Apr  5:26:14 pm GMT
+# This file auto generated from Data\common\main\dav.xml
+#	on Fri 13 Oct  9:11:27 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

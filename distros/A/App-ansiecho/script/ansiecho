@@ -62,7 +62,7 @@ Example:
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =head1 DESCRIPTION
 
@@ -127,6 +127,23 @@ and given to another format.
 
 Formatting is done by Perl C<sprintf> function.  See
 L<perlfunc/sprintf> for detail.
+
+=head2 REORDERED ARGUMENTS
+
+Position specifiers may also be used in the format string.
+Next command produces C<34 12>.
+
+    ansiecho -f '%2$d %1$d' 12 34
+
+Oddly enough
+
+    ansiecho -f '%2$d %d %d' 12 34
+
+prints C<34 12 34>, but don't be surprised.  When using position
+specifiers, it is safe to use them for all arguments.
+
+If you are using perl v5.24 or later, you can also use reordered 
+precision arguments.
 
 =head2 ANSI SEQUENCE
 

@@ -22,7 +22,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/adler32.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/adler32.c */
 
 
 /* #include "lib_common.h" */
@@ -73,8 +73,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -90,10 +90,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -137,10 +143,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -227,6 +238,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -858,11 +880,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -1003,8 +1029,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -1020,10 +1046,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -1067,10 +1099,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -1157,6 +1194,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -1788,11 +1836,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -2424,8 +2476,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -2441,10 +2493,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -2488,10 +2546,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -2578,6 +2641,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -3209,11 +3283,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -3358,6 +3436,13 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 			  defined(_MSC_VER)))
 #  define HAVE_BMI2_INTRIN	1
 #else
+#  define HAVE_BMI2_INTRIN	0
+#endif
+
+#if defined(_MSC_VER) && _MSC_VER < 1930 
+#  undef HAVE_BMI2_NATIVE
+#  undef HAVE_BMI2_INTRIN
+#  define HAVE_BMI2_NATIVE	0
 #  define HAVE_BMI2_INTRIN	0
 #endif
 
@@ -3734,7 +3819,7 @@ libdeflate_adler32(u32 adler, const void *buffer, size_t len)
 		return 1;
 	return adler32_impl(adler, buffer, len);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/crc32.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/crc32.c */
 
 
 
@@ -3787,8 +3872,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -3804,10 +3889,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -3851,10 +3942,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -3941,6 +4037,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -4572,11 +4679,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -5632,8 +5743,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -5649,10 +5760,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -5696,10 +5813,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -5786,6 +5908,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -6417,11 +6550,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -7380,8 +7517,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -7397,10 +7534,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -7444,10 +7587,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -7534,6 +7682,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -8165,11 +8324,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -8314,6 +8477,13 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 			  defined(_MSC_VER)))
 #  define HAVE_BMI2_INTRIN	1
 #else
+#  define HAVE_BMI2_INTRIN	0
+#endif
+
+#if defined(_MSC_VER) && _MSC_VER < 1930 
+#  undef HAVE_BMI2_NATIVE
+#  undef HAVE_BMI2_INTRIN
+#  define HAVE_BMI2_NATIVE	0
 #  define HAVE_BMI2_INTRIN	0
 #endif
 
@@ -8874,7 +9044,7 @@ libdeflate_crc32(u32 crc, const void *p, size_t len)
 		return 0;
 	return ~crc32_impl(~crc, p, len);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/deflate_compress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/deflate_compress.c */
 
 
 /* #include "deflate_compress.h" */
@@ -8929,8 +9099,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -8946,10 +9116,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -8993,10 +9169,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -9083,6 +9264,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -9714,11 +9906,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -9923,8 +10119,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -9940,10 +10136,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -9987,10 +10189,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -10077,6 +10284,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -10708,11 +10926,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -10852,8 +11074,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -10869,10 +11091,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -10916,10 +11144,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -11006,6 +11239,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -11637,11 +11881,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -11972,8 +12220,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -11989,10 +12237,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -12036,10 +12290,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -12126,6 +12385,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -12757,11 +13027,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -12906,6 +13180,13 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 			  defined(_MSC_VER)))
 #  define HAVE_BMI2_INTRIN	1
 #else
+#  define HAVE_BMI2_INTRIN	0
+#endif
+
+#if defined(_MSC_VER) && _MSC_VER < 1930 
+#  undef HAVE_BMI2_NATIVE
+#  undef HAVE_BMI2_INTRIN
+#  define HAVE_BMI2_NATIVE	0
 #  define HAVE_BMI2_INTRIN	0
 #endif
 
@@ -13399,8 +13680,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -13416,10 +13697,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -13463,10 +13750,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -13553,6 +13845,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -14184,11 +14487,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -14328,8 +14635,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -14345,10 +14652,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -14392,10 +14705,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -14482,6 +14800,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -15113,11 +15442,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -15448,8 +15781,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -15465,10 +15798,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -15512,10 +15851,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -15602,6 +15946,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -16233,11 +16588,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -16382,6 +16741,13 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 			  defined(_MSC_VER)))
 #  define HAVE_BMI2_INTRIN	1
 #else
+#  define HAVE_BMI2_INTRIN	0
+#endif
+
+#if defined(_MSC_VER) && _MSC_VER < 1930 
+#  undef HAVE_BMI2_NATIVE
+#  undef HAVE_BMI2_INTRIN
+#  define HAVE_BMI2_NATIVE	0
 #  define HAVE_BMI2_INTRIN	0
 #endif
 
@@ -16824,8 +17190,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -16841,10 +17207,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -16888,10 +17260,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -16978,6 +17355,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -17609,11 +17997,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -17753,8 +18145,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -17770,10 +18162,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -17817,10 +18215,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -17907,6 +18310,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -18538,11 +18952,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -18873,8 +19291,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -18890,10 +19308,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -18937,10 +19361,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -19027,6 +19456,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -19658,11 +20098,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -19807,6 +20251,13 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 			  defined(_MSC_VER)))
 #  define HAVE_BMI2_INTRIN	1
 #else
+#  define HAVE_BMI2_INTRIN	0
+#endif
+
+#if defined(_MSC_VER) && _MSC_VER < 1930 
+#  undef HAVE_BMI2_NATIVE
+#  undef HAVE_BMI2_INTRIN
+#  define HAVE_BMI2_NATIVE	0
 #  define HAVE_BMI2_INTRIN	0
 #endif
 
@@ -20341,39 +20792,23 @@ static const u8 deflate_length_slot[DEFLATE_MAX_MATCH_LEN + 1] = {
 };
 
 
-static const u8 deflate_offset_slot[512] = {
-	0, 0, 1, 2, 3, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 7,
-	7, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9,
-	9, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
-	10, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-	11, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12,
+static const u8 deflate_offset_slot[256] = {
+	0, 1, 2, 3, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7,
+	8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9,
+	10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
+	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
 	12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12,
-	12, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13,
+	12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12,
 	13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13,
-	13, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
+	13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13,
 	14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
 	14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
 	14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
-	14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+	14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
 	15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
 	15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
 	15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-	15, 0, 16, 17, 18, 18, 19, 19, 20, 20, 20, 20, 21, 21, 21, 21,
-	22, 22, 22, 22, 22, 22, 22, 22, 23, 23, 23, 23, 23, 23, 23, 23,
-	24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24,
-	25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25,
-	26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26,
-	26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26,
-	27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27,
-	27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27,
-	28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
-	28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
-	28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
-	28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
-	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
-	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
-	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
-	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
+	15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
 };
 
 
@@ -20477,6 +20912,9 @@ struct libdeflate_compressor {
 		     size_t in_nbytes, struct deflate_output_bitstream *os);
 
 	
+	free_func_t free_func;
+
+	
 	unsigned compression_level;
 
 	
@@ -20562,7 +21000,8 @@ struct libdeflate_compressor {
 			
 			struct deflate_costs costs;
 
-			struct deflate_costs costs_producing_best_true_cost;
+			
+			struct deflate_costs costs_saved;
 
 			
 			u8 offset_slot_full[DEFLATE_MAX_MATCH_OFFSET + 1];
@@ -20583,6 +21022,9 @@ struct libdeflate_compressor {
 
 			
 			unsigned min_bits_to_use_nonfinal_path;
+
+			
+			unsigned max_len_to_optimize_static_block;
 
 		} n; 
 	#endif 
@@ -20613,10 +21055,10 @@ struct deflate_output_bitstream {
 
 	
 	u8 *end;
+
+	
+	bool overflow;
 };
-
-
-#define OUTPUT_END_PADDING	8
 
 
 #define ADD_BITS(bits, n)			\
@@ -20629,18 +21071,17 @@ do {						\
 
 #define FLUSH_BITS()							\
 do {									\
-	if (UNALIGNED_ACCESS_IS_FAST) {					\
+	if (UNALIGNED_ACCESS_IS_FAST && likely(out_next < out_fast_end)) { \
 				\
 		put_unaligned_leword(bitbuf, out_next);			\
 		bitbuf >>= bitcount & ~7;				\
-		out_next += MIN(out_end - out_next, bitcount >> 3);	\
+		out_next += bitcount >> 3;				\
 		bitcount &= 7;						\
 	} else {							\
 						\
 		while (bitcount >= 8) {					\
-			*out_next = bitbuf;				\
-			if (out_next != out_end)			\
-				out_next++;				\
+			ASSERT(out_next < os->end);			\
+			*out_next++ = bitbuf;				\
 			bitcount -= 8;					\
 			bitbuf >>= 8;					\
 		}							\
@@ -20936,20 +21377,11 @@ deflate_make_huffman_code(unsigned num_syms, unsigned max_codeword_len,
 
 	
 	num_used_syms = sort_symbols(num_syms, freqs, lens, A);
-
 	
 
 	
-
-	if (unlikely(num_used_syms == 0)) {
-		
-		return;
-	}
-
-	if (unlikely(num_used_syms == 1)) {
-		
-
-		unsigned sym = A[0] & SYMBOL_MASK;
+	if (unlikely(num_used_syms < 2)) {
+		unsigned sym = num_used_syms ? (A[0] & SYMBOL_MASK) : 0;
 		unsigned nonzero_idx = sym ? sym : 1;
 
 		codewords[0] = 0;
@@ -21021,20 +21453,12 @@ deflate_init_static_codes(struct libdeflate_compressor *c)
 
 
 static forceinline unsigned
-deflate_get_offset_slot(unsigned offset)
+deflate_get_offset_slot(u32 offset)
 {
-#if 1
-	if (offset <= 256)
-		return deflate_offset_slot[offset];
-	else
-		return deflate_offset_slot[256 + ((offset - 1) >> 7)];
-#else 
-	u32 i1 = offset;
-	u32 i2 = 256 + ((offset - 1) >> 7);
-	u32 is_small = (s32)(offset - 257) >> 31;
+	
+	unsigned n = (256 - offset) >> 29;
 
-	return deflate_offset_slot[(i1 & is_small) ^ (i2 & ~is_small)];
-#endif
+	return deflate_offset_slot[(offset - 1) >> n] + (n << 1);
 }
 
 static unsigned
@@ -21246,20 +21670,23 @@ deflate_flush_block(struct libdeflate_compressor *c,
 	bitbuf_t bitbuf = os->bitbuf;
 	unsigned bitcount = os->bitcount;
 	u8 *out_next = os->next;
-	u8 * const out_end = os->end;
+	u8 * const out_fast_end =
+		os->end - MIN(WORDBYTES - 1, os->end - out_next);
 	
-	u32 dynamic_cost = 0;
-	u32 static_cost = 0;
-	u32 uncompressed_cost = 0;
+	u32 dynamic_cost = 3;
+	u32 static_cost = 3;
+	u32 uncompressed_cost = 3;
 	u32 best_cost;
 	struct deflate_codes *codes;
 	unsigned sym;
 
-	ASSERT(block_length >= MIN_BLOCK_LENGTH || is_final_block);
+	ASSERT(block_length >= MIN_BLOCK_LENGTH ||
+	       (is_final_block && block_length > 0));
 	ASSERT(block_length <= MAX_BLOCK_LENGTH);
 	ASSERT(bitcount <= 7);
 	ASSERT((bitbuf & ~(((bitbuf_t)1 << bitcount) - 1)) == 0);
-	ASSERT(out_next <= out_end);
+	ASSERT(out_next <= os->end);
+	ASSERT(!os->overflow);
 
 	
 	deflate_precompute_huffman_header(c);
@@ -21318,8 +21745,56 @@ deflate_flush_block(struct libdeflate_compressor *c,
 			     (8 * block_length);
 
 	
-	best_cost = MIN(static_cost, uncompressed_cost);
-	if (dynamic_cost < best_cost) {
+
+	best_cost = MIN(dynamic_cost, MIN(static_cost, uncompressed_cost));
+
+	
+	if (DIV_ROUND_UP(bitcount + best_cost, 8) > os->end - out_next) {
+		os->overflow = true;
+		return;
+	}
+	
+
+	if (best_cost == uncompressed_cost) {
+		
+		do {
+			u8 bfinal = 0;
+			size_t len = UINT16_MAX;
+
+			if (in_end - in_next <= UINT16_MAX) {
+				bfinal = is_final_block;
+				len = in_end - in_next;
+			}
+			
+			ASSERT(os->end - out_next >=
+			       DIV_ROUND_UP(bitcount + 3, 8) + 4 + len);
+			
+			STATIC_ASSERT(DEFLATE_BLOCKTYPE_UNCOMPRESSED == 0);
+			*out_next++ = (bfinal << bitcount) | bitbuf;
+			if (bitcount > 5)
+				*out_next++ = 0;
+			bitbuf = 0;
+			bitcount = 0;
+			
+			put_unaligned_le16(len, out_next);
+			out_next += 2;
+			put_unaligned_le16(~len, out_next);
+			out_next += 2;
+			memcpy(out_next, in_next, len);
+			out_next += len;
+			in_next += len;
+		} while (in_next != in_end);
+		
+		goto out;
+	}
+
+	if (best_cost == static_cost) {
+		
+		codes = &c->static_codes;
+		ADD_BITS(is_final_block, 1);
+		ADD_BITS(DEFLATE_BLOCKTYPE_STATIC_HUFFMAN, 2);
+		FLUSH_BITS();
+	} else {
 		const unsigned num_explicit_lens = c->o.precode.num_explicit_lens;
 		const unsigned num_precode_items = c->o.precode.num_items;
 		unsigned precode_sym, precode_item;
@@ -21327,7 +21802,6 @@ deflate_flush_block(struct libdeflate_compressor *c,
 
 		
 
-		best_cost = dynamic_cost;
 		codes = &c->codes;
 		STATIC_ASSERT(CAN_BUFFER(1 + 2 + 5 + 5 + 4 + 3));
 		ADD_BITS(is_final_block, 1);
@@ -21372,46 +21846,6 @@ deflate_flush_block(struct libdeflate_compressor *c,
 				 deflate_extra_precode_bits[precode_sym]);
 			FLUSH_BITS();
 		} while (++i < num_precode_items);
-	} else if (static_cost < uncompressed_cost) {
-		
-		codes = &c->static_codes;
-		ADD_BITS(is_final_block, 1);
-		ADD_BITS(DEFLATE_BLOCKTYPE_STATIC_HUFFMAN, 2);
-		FLUSH_BITS();
-	} else {
-		
-		do {
-			u8 bfinal = 0;
-			size_t len = UINT16_MAX;
-
-			if (in_end - in_next <= UINT16_MAX) {
-				bfinal = is_final_block;
-				len = in_end - in_next;
-			}
-			if (out_end - out_next <
-			    (bitcount + 3 + 7) / 8 + 4 + len) {
-				
-				out_next = out_end;
-				goto out;
-			}
-			
-			STATIC_ASSERT(DEFLATE_BLOCKTYPE_UNCOMPRESSED == 0);
-			*out_next++ = (bfinal << bitcount) | bitbuf;
-			if (bitcount > 5)
-				*out_next++ = 0;
-			bitbuf = 0;
-			bitcount = 0;
-			
-			put_unaligned_le16(len, out_next);
-			out_next += 2;
-			put_unaligned_le16(~len, out_next);
-			out_next += 2;
-			memcpy(out_next, in_next, len);
-			out_next += len;
-			in_next += len;
-		} while (in_next != in_end);
-		
-		goto out;
 	}
 
 	
@@ -21515,9 +21949,7 @@ deflate_flush_block(struct libdeflate_compressor *c,
 out:
 	ASSERT(bitcount <= 7);
 	
-	ASSERT(8 * (out_next - os->next) + bitcount - os->bitcount ==
-	       3 + best_cost || out_next == out_end);
-
+	ASSERT(8 * (out_next - os->next) + bitcount - os->bitcount == best_cost);
 	os->bitbuf = bitbuf;
 	os->bitcount = bitcount;
 	os->next = out_next;
@@ -21742,6 +22174,10 @@ calculate_min_match_len(const u8 *data, size_t data_len,
 	size_t i;
 
 	
+	if (data_len < 512)
+		return DEFLATE_MIN_MATCH_LEN;
+
+	
 	data_len = MIN(data_len, 4096);
 	for (i = 0; i < data_len; i++)
 		used[data[i]] = 1;
@@ -21900,7 +22336,7 @@ deflate_compress_fastest(struct libdeflate_compressor * restrict c,
 		deflate_finish_block(c, os, in_block_begin,
 				     in_next - in_block_begin,
 				     c->p.f.sequences, in_next == in_end);
-	} while (in_next != in_end);
+	} while (in_next != in_end && !os->overflow);
 }
 
 
@@ -21977,7 +22413,7 @@ deflate_compress_greedy(struct libdeflate_compressor * restrict c,
 		deflate_finish_block(c, os, in_block_begin,
 				     in_next - in_block_begin,
 				     c->p.g.sequences, in_next == in_end);
-	} while (in_next != in_end);
+	} while (in_next != in_end && !os->overflow);
 }
 
 static forceinline void
@@ -22149,7 +22585,7 @@ have_cur_match:
 		deflate_finish_block(c, os, in_block_begin,
 				     in_next - in_block_begin,
 				     c->p.g.sequences, in_next == in_end);
-	} while (in_next != in_end);
+	} while (in_next != in_end && !os->overflow);
 }
 
 
@@ -22661,6 +23097,7 @@ deflate_optimize_and_flush_block(struct libdeflate_compressor *c,
 	u32 best_true_cost = UINT32_MAX;
 	u32 true_cost;
 	u32 only_lits_cost;
+	u32 static_cost = UINT32_MAX;
 	struct deflate_sequence seq_;
 	struct deflate_sequence *seq = NULL;
 	u32 i;
@@ -22674,6 +23111,20 @@ deflate_optimize_and_flush_block(struct libdeflate_compressor *c,
 	     i <= MIN(block_length - 1 + DEFLATE_MAX_MATCH_LEN,
 		      ARRAY_LEN(c->p.n.optimum_nodes) - 1); i++)
 		c->p.n.optimum_nodes[i].cost_to_end = 0x80000000;
+
+	
+	if (block_length <= c->p.n.max_len_to_optimize_static_block) {
+		
+		c->p.n.costs_saved = c->p.n.costs;
+
+		deflate_set_costs_from_codes(c, &c->static_codes.lens);
+		deflate_find_min_cost_path(c, block_length, cache_ptr);
+		static_cost = c->p.n.optimum_nodes[0].cost_to_end / BIT_COST;
+		static_cost += 7; 
+
+		
+		c->p.n.costs = c->p.n.costs_saved;
+	}
 
 	
 	deflate_set_initial_costs(c, block_begin, block_length, is_first_block);
@@ -22691,7 +23142,9 @@ deflate_optimize_and_flush_block(struct libdeflate_compressor *c,
 			break;
 
 		best_true_cost = true_cost;
-		c->p.n.costs_producing_best_true_cost = c->p.n.costs;
+
+		
+		c->p.n.costs_saved = c->p.n.costs;
 
 		
 		deflate_set_costs_from_codes(c, &c->codes.lens);
@@ -22699,17 +23152,23 @@ deflate_optimize_and_flush_block(struct libdeflate_compressor *c,
 	} while (--num_passes_remaining);
 
 	*used_only_literals = false;
-	if (only_lits_cost < best_true_cost) {
-		
-		deflate_choose_all_literals(c, block_begin, block_length);
-		deflate_set_costs_from_codes(c, &c->codes.lens);
-		seq_.litrunlen_and_length = block_length;
-		seq = &seq_;
-		*used_only_literals = true;
+	if (MIN(only_lits_cost, static_cost) < best_true_cost) {
+		if (only_lits_cost < static_cost) {
+			
+			deflate_choose_all_literals(c, block_begin, block_length);
+			deflate_set_costs_from_codes(c, &c->codes.lens);
+			seq_.litrunlen_and_length = block_length;
+			seq = &seq_;
+			*used_only_literals = true;
+		} else {
+			
+			deflate_set_costs_from_codes(c, &c->static_codes.lens);
+			deflate_find_min_cost_path(c, block_length, cache_ptr);
+		}
 	} else if (true_cost >=
 		   best_true_cost + c->p.n.min_bits_to_use_nonfinal_path) {
 		
-		c->p.n.costs = c->p.n.costs_producing_best_true_cost;
+		c->p.n.costs = c->p.n.costs_saved;
 		deflate_find_min_cost_path(c, block_length, cache_ptr);
 		deflate_set_costs_from_codes(c, &c->codes.lens);
 	}
@@ -22950,7 +23409,7 @@ deflate_compress_near_optimal(struct libdeflate_compressor * restrict c,
 			deflate_near_optimal_init_stats(c);
 			in_block_begin = in_next;
 		}
-	} while (in_next != in_end);
+	} while (in_next != in_end && !os->overflow);
 }
 
 
@@ -22975,12 +23434,17 @@ deflate_init_offset_slot_full(struct libdeflate_compressor *c)
 #endif 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
-libdeflate_alloc_compressor(int compression_level)
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options)
 {
 	struct libdeflate_compressor *c;
 	size_t size = offsetof(struct libdeflate_compressor, p);
 
 	check_buildtime_parameters();
+
+	
+	if (options->sizeof_options != sizeof(*options))
+		return NULL;
 
 	if (compression_level < 0 || compression_level > 12)
 		return NULL;
@@ -22997,9 +23461,14 @@ libdeflate_alloc_compressor(int compression_level)
 			size += sizeof(c->p.f);
 	}
 
-	c = libdeflate_aligned_malloc(MATCHFINDER_MEM_ALIGNMENT, size);
+	c = libdeflate_aligned_malloc(options->malloc_func ?
+				      options->malloc_func :
+				      libdeflate_default_malloc_func,
+				      MATCHFINDER_MEM_ALIGNMENT, size);
 	if (!c)
 		return NULL;
+	c->free_func = options->free_func ?
+		       options->free_func : libdeflate_default_free_func;
 
 	c->compression_level = compression_level;
 
@@ -23067,6 +23536,7 @@ libdeflate_alloc_compressor(int compression_level)
 		c->p.n.max_optim_passes = 2;
 		c->p.n.min_improvement_to_continue = 32;
 		c->p.n.min_bits_to_use_nonfinal_path = 32;
+		c->p.n.max_len_to_optimize_static_block = 0;
 		deflate_init_offset_slot_full(c);
 		break;
 	case 11:
@@ -23076,6 +23546,7 @@ libdeflate_alloc_compressor(int compression_level)
 		c->p.n.max_optim_passes = 4;
 		c->p.n.min_improvement_to_continue = 16;
 		c->p.n.min_bits_to_use_nonfinal_path = 16;
+		c->p.n.max_len_to_optimize_static_block = 1000;
 		deflate_init_offset_slot_full(c);
 		break;
 	case 12:
@@ -23086,6 +23557,7 @@ libdeflate_alloc_compressor(int compression_level)
 		c->p.n.max_optim_passes = 10;
 		c->p.n.min_improvement_to_continue = 1;
 		c->p.n.min_bits_to_use_nonfinal_path = 1;
+		c->p.n.max_len_to_optimize_static_block = 10000;
 		deflate_init_offset_slot_full(c);
 		break;
 #endif 
@@ -23094,6 +23566,16 @@ libdeflate_alloc_compressor(int compression_level)
 	deflate_init_static_codes(c);
 
 	return c;
+}
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor(int compression_level)
+{
+	static const struct libdeflate_options defaults = {
+		.sizeof_options = sizeof(defaults),
+	};
+	return libdeflate_alloc_compressor_ex(compression_level, &defaults);
 }
 
 LIBDEFLATEAPI size_t
@@ -23109,26 +23591,35 @@ libdeflate_deflate_compress(struct libdeflate_compressor *c,
 					     out, out_nbytes_avail);
 
 	
-	if (unlikely(out_nbytes_avail <= OUTPUT_END_PADDING))
-		return 0;
 	os.bitbuf = 0;
 	os.bitcount = 0;
 	os.next = out;
-	os.end = os.next + out_nbytes_avail - OUTPUT_END_PADDING;
-	(*c->impl)(c, in, in_nbytes, &os);
+	os.end = os.next + out_nbytes_avail;
+	os.overflow = false;
+
 	
-	if (os.next >= os.end)
+	(*c->impl)(c, in, in_nbytes, &os);
+
+	
+	if (os.overflow)
 		return 0;
+
+	
 	ASSERT(os.bitcount <= 7);
-	if (os.bitcount)
+	if (os.bitcount) {
+		ASSERT(os.next < os.end);
 		*os.next++ = os.bitbuf;
+	}
+
+	
 	return os.next - (u8 *)out;
 }
 
 LIBDEFLATEAPI void
 libdeflate_free_compressor(struct libdeflate_compressor *c)
 {
-	libdeflate_aligned_free(c);
+	if (c)
+		libdeflate_aligned_free(c->free_func, c);
 }
 
 unsigned int
@@ -23141,7 +23632,6 @@ LIBDEFLATEAPI size_t
 libdeflate_deflate_compress_bound(struct libdeflate_compressor *c,
 				  size_t in_nbytes)
 {
-	size_t bound = 0;
 	size_t max_blocks;
 
 	
@@ -23151,17 +23641,9 @@ libdeflate_deflate_compress_bound(struct libdeflate_compressor *c,
 	max_blocks = MAX(DIV_ROUND_UP(in_nbytes, MIN_BLOCK_LENGTH), 1);
 
 	
-	bound += 5 * max_blocks;
-
-	
-	bound += in_nbytes;
-
-	
-	bound += 1 + OUTPUT_END_PADDING;
-
-	return bound;
+	return (5 * max_blocks) + in_nbytes;
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/deflate_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/deflate_decompress.c */
 
 
 /* #include "lib_common.h" */
@@ -23212,8 +23694,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -23229,10 +23711,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -23276,10 +23764,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -23366,6 +23859,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -23997,11 +24501,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -24371,6 +24879,9 @@ struct libdeflate_decompressor {
 
 	bool static_codes_loaded;
 	unsigned litlen_tablebits;
+
+	
+	free_func_t free_func;
 };
 
 
@@ -24444,20 +24955,16 @@ build_decode_table(u32 decode_table[],
 		u32 entry;
 		unsigned i;
 
+		
 		if (codespace_used == 0) {
-			
-
-			
-			entry = make_decode_table_entry(decode_results, 0, 1);
+			sym = 0; 
 		} else {
-			
 			if (codespace_used != (1U << (max_codeword_len - 1)) ||
 			    len_counts[1] != 1)
 				return false;
-			entry = make_decode_table_entry(decode_results,
-							*sorted_syms, 1);
+			sym = sorted_syms[0];
 		}
-		
+		entry = make_decode_table_entry(decode_results, sym, 1);
 		for (i = 0; i < (1U << table_bits); i++)
 			decode_table[i] = entry;
 		return true;
@@ -25299,8 +25806,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -25316,10 +25823,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -25363,10 +25876,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -25453,6 +25971,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -26084,11 +26613,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -26233,6 +26766,13 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 			  defined(_MSC_VER)))
 #  define HAVE_BMI2_INTRIN	1
 #else
+#  define HAVE_BMI2_INTRIN	0
+#endif
+
+#if defined(_MSC_VER) && _MSC_VER < 1930 
+#  undef HAVE_BMI2_NATIVE
+#  undef HAVE_BMI2_INTRIN
+#  define HAVE_BMI2_NATIVE	0
 #  define HAVE_BMI2_INTRIN	0
 #endif
 
@@ -26939,23 +27479,41 @@ libdeflate_deflate_decompress(struct libdeflate_decompressor *d,
 }
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
-libdeflate_alloc_decompressor(void)
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options)
 {
-	
-	struct libdeflate_decompressor *d = libdeflate_malloc(sizeof(*d));
+	struct libdeflate_decompressor *d;
 
+	
+	if (options->sizeof_options != sizeof(*options))
+		return NULL;
+
+	d = (options->malloc_func ? options->malloc_func :
+	     libdeflate_default_malloc_func)(sizeof(*d));
 	if (d == NULL)
 		return NULL;
+	
 	memset(d, 0, sizeof(*d));
+	d->free_func = options->free_func ?
+		       options->free_func : libdeflate_default_free_func;
 	return d;
+}
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor(void)
+{
+	static const struct libdeflate_options defaults = {
+		.sizeof_options = sizeof(defaults),
+	};
+	return libdeflate_alloc_decompressor_ex(&defaults);
 }
 
 LIBDEFLATEAPI void
 libdeflate_free_decompressor(struct libdeflate_decompressor *d)
 {
-	libdeflate_free(d);
+	if (d)
+		d->free_func(d);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/gzip_compress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/gzip_compress.c */
 
 
 /* #include "deflate_compress.h" */
@@ -27010,8 +27568,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -27027,10 +27585,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -27074,10 +27638,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -27164,6 +27733,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -27795,11 +28375,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -27950,7 +28534,7 @@ libdeflate_gzip_compress_bound(struct libdeflate_compressor *c,
 	return GZIP_MIN_OVERHEAD +
 	       libdeflate_deflate_compress_bound(c, in_nbytes);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/gzip_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/gzip_decompress.c */
 
 
 /* #include "lib_common.h" */
@@ -28001,8 +28585,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -28018,10 +28602,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -28065,10 +28655,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -28155,6 +28750,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -28786,11 +29392,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -28986,7 +29596,7 @@ libdeflate_gzip_decompress(struct libdeflate_decompressor *d,
 					     out, out_nbytes_avail,
 					     NULL, actual_out_nbytes_ret);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/utils.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/utils.c */
 
 
 /* #include "lib_common.h" */
@@ -29037,8 +29647,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -29054,10 +29664,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -29101,10 +29717,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -29191,6 +29812,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -29822,11 +30454,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -29870,27 +30506,18 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #  include <stdlib.h>
 #endif
 
-static void *(*libdeflate_malloc_func)(size_t) = malloc;
-static void (*libdeflate_free_func)(void *) = free;
+malloc_func_t libdeflate_default_malloc_func = malloc;
+free_func_t libdeflate_default_free_func = free;
 
 void *
-libdeflate_malloc(size_t size)
+libdeflate_aligned_malloc(malloc_func_t malloc_func,
+			  size_t alignment, size_t size)
 {
-	return (*libdeflate_malloc_func)(size);
-}
+	void *ptr = (*malloc_func)(sizeof(void *) + alignment - 1 + size);
 
-void
-libdeflate_free(void *ptr)
-{
-	(*libdeflate_free_func)(ptr);
-}
-
-void *
-libdeflate_aligned_malloc(size_t alignment, size_t size)
-{
-	void *ptr = libdeflate_malloc(sizeof(void *) + alignment - 1 + size);
 	if (ptr) {
 		void *orig_ptr = ptr;
+
 		ptr = (void *)ALIGN((uintptr_t)ptr + sizeof(void *), alignment);
 		((void **)ptr)[-1] = orig_ptr;
 	}
@@ -29898,18 +30525,17 @@ libdeflate_aligned_malloc(size_t alignment, size_t size)
 }
 
 void
-libdeflate_aligned_free(void *ptr)
+libdeflate_aligned_free(free_func_t free_func, void *ptr)
 {
-	if (ptr)
-		libdeflate_free(((void **)ptr)[-1]);
+	(*free_func)(((void **)ptr)[-1]);
 }
 
 LIBDEFLATEAPI void
-libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
-				void (*free_func)(void *))
+libdeflate_set_memory_allocator(malloc_func_t malloc_func,
+				free_func_t free_func)
 {
-	libdeflate_malloc_func = malloc_func;
-	libdeflate_free_func = free_func;
+	libdeflate_default_malloc_func = malloc_func;
+	libdeflate_default_free_func = free_func;
 }
 
 
@@ -29981,7 +30607,7 @@ libdeflate_assertion_failed(const char *expr, const char *file, int line)
 	abort();
 }
 #endif 
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/zlib_compress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/zlib_compress.c */
 
 
 /* #include "deflate_compress.h" */
@@ -30036,8 +30662,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -30053,10 +30679,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -30100,10 +30732,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -30190,6 +30827,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -30821,11 +31469,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -30944,7 +31596,7 @@ libdeflate_zlib_compress_bound(struct libdeflate_compressor *c,
 	return ZLIB_MIN_OVERHEAD +
 	       libdeflate_deflate_compress_bound(c, in_nbytes);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/zlib_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/zlib_decompress.c */
 
 
 /* #include "lib_common.h" */
@@ -30995,8 +31647,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -31012,10 +31664,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -31059,10 +31717,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -31149,6 +31812,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -31780,11 +32454,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -31916,7 +32594,7 @@ libdeflate_zlib_decompress(struct libdeflate_decompressor *d,
 					     out, out_nbytes_avail,
 					     NULL, actual_out_nbytes_ret);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/arm/cpu_features.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/arm/cpu_features.c */
 
 
 
@@ -31993,8 +32671,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -32010,10 +32688,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -32057,10 +32741,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -32147,6 +32836,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -32778,11 +33478,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -32923,8 +33627,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -32940,10 +33644,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -32987,10 +33697,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -33077,6 +33792,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -33708,11 +34434,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -34098,7 +34828,7 @@ void libdeflate_init_arm_cpu_features(void)
 }
 
 #endif 
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.18/lib/x86/cpu_features.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/x86/cpu_features.c */
 
 
 /* #include "cpu_features_common.h" - no include guard */ 
@@ -34156,8 +34886,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	18
-#define LIBDEFLATE_VERSION_STRING	"1.18"
+#define LIBDEFLATE_VERSION_MINOR	19
+#define LIBDEFLATE_VERSION_STRING	"1.19"
 
 
 #ifndef LIBDEFLATEAPI
@@ -34173,10 +34903,16 @@ extern "C" {
 
 
 struct libdeflate_compressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_compressor *
 libdeflate_alloc_compressor(int compression_level);
+
+
+LIBDEFLATEAPI struct libdeflate_compressor *
+libdeflate_alloc_compressor_ex(int compression_level,
+			       const struct libdeflate_options *options);
 
 
 LIBDEFLATEAPI size_t
@@ -34220,10 +34956,15 @@ libdeflate_free_compressor(struct libdeflate_compressor *compressor);
 
 
 struct libdeflate_decompressor;
+struct libdeflate_options;
 
 
 LIBDEFLATEAPI struct libdeflate_decompressor *
 libdeflate_alloc_decompressor(void);
+
+
+LIBDEFLATEAPI struct libdeflate_decompressor *
+libdeflate_alloc_decompressor_ex(const struct libdeflate_options *options);
 
 
 enum libdeflate_result {
@@ -34310,6 +35051,17 @@ libdeflate_crc32(uint32_t crc, const void *buffer, size_t len);
 LIBDEFLATEAPI void
 libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 				void (*free_func)(void *));
+
+
+struct libdeflate_options {
+
+	
+	size_t sizeof_options;
+
+	
+	void *(*malloc_func)(size_t);
+	void (*free_func)(void *);
+};
 
 #ifdef __cplusplus
 }
@@ -34941,11 +35693,15 @@ rbit32(u32 v)
 #endif 
 
 
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
 
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
+extern malloc_func_t libdeflate_default_malloc_func;
+extern free_func_t libdeflate_default_free_func;
+
+void *libdeflate_aligned_malloc(malloc_func_t malloc_func,
+				size_t alignment, size_t size);
+void libdeflate_aligned_free(free_func_t free_func, void *ptr);
 
 #ifdef FREESTANDING
 
@@ -35093,6 +35849,13 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_BMI2_INTRIN	0
 #endif
 
+#if defined(_MSC_VER) && _MSC_VER < 1930 
+#  undef HAVE_BMI2_NATIVE
+#  undef HAVE_BMI2_INTRIN
+#  define HAVE_BMI2_NATIVE	0
+#  define HAVE_BMI2_INTRIN	0
+#endif
+
 #endif 
 
 #endif 
@@ -35120,11 +35883,11 @@ cpuid(u32 leaf, u32 subleaf, u32 *a, u32 *b, u32 *c, u32 *d)
 	*c = result[2];
 	*d = result[3];
 #else
-	__asm__(".ifnc %%ebx, %1; mov  %%ebx, %1; .endif\n"
-		"cpuid                                  \n"
-		".ifnc %%ebx, %1; xchg %%ebx, %1; .endif\n"
-		: "=a" (*a), EBX_CONSTRAINT (*b), "=c" (*c), "=d" (*d)
-		: "a" (leaf), "c" (subleaf));
+	__asm__ volatile(".ifnc %%ebx, %1; mov  %%ebx, %1; .endif\n"
+			 "cpuid                                  \n"
+			 ".ifnc %%ebx, %1; xchg %%ebx, %1; .endif\n"
+			 : "=a" (*a), EBX_CONSTRAINT (*b), "=c" (*c), "=d" (*d)
+			 : "a" (leaf), "c" (subleaf));
 #endif
 }
 
@@ -35135,23 +35898,15 @@ read_xcr(u32 index)
 #ifdef _MSC_VER
 	return _xgetbv(index);
 #else
-	u32 edx, eax;
+	u32 d, a;
 
 	
-	__asm__ (".byte 0x0f, 0x01, 0xd0" : "=d" (edx), "=a" (eax) : "c" (index));
+	__asm__ volatile(".byte 0x0f, 0x01, 0xd0" :
+			 "=d" (d), "=a" (a) : "c" (index));
 
-	return ((u64)edx << 32) | eax;
+	return ((u64)d << 32) | a;
 #endif
 }
-
-#undef BIT
-#define BIT(nr)			(1UL << (nr))
-
-#define XCR0_BIT_SSE		BIT(1)
-#define XCR0_BIT_AVX		BIT(2)
-
-#define IS_SET(reg, nr)		((reg) & BIT(nr))
-#define IS_ALL_SET(reg, mask)	(((reg) & (mask)) == (mask))
 
 static const struct cpu_feature x86_cpu_feature_table[] = {
 	{X86_CPU_FEATURE_SSE2,		"sse2"},
@@ -35166,47 +35921,34 @@ volatile u32 libdeflate_x86_cpu_features = 0;
 
 void libdeflate_init_x86_cpu_features(void)
 {
+	u32 max_leaf, a, b, c, d;
+	u64 xcr0 = 0;
 	u32 features = 0;
-	u32 dummy1, dummy2, dummy3, dummy4;
-	u32 max_function;
-	u32 features_1, features_2, features_3, features_4;
-	bool os_avx_support = false;
 
 	
-	cpuid(0, 0, &max_function, &dummy2, &dummy3, &dummy4);
-	if (max_function < 1)
+	cpuid(0, 0, &max_leaf, &b, &c, &d);
+	if (max_leaf < 1)
 		goto out;
 
 	
-	cpuid(1, 0, &dummy1, &dummy2, &features_2, &features_1);
-
-	if (IS_SET(features_1, 26))
+	cpuid(1, 0, &a, &b, &c, &d);
+	if (d & (1 << 26))
 		features |= X86_CPU_FEATURE_SSE2;
-
-	if (IS_SET(features_2, 1))
+	if (c & (1 << 1))
 		features |= X86_CPU_FEATURE_PCLMUL;
-
-	if (IS_SET(features_2, 27)) { 
-		u64 xcr0 = read_xcr(0);
-
-		os_avx_support = IS_ALL_SET(xcr0,
-					    XCR0_BIT_SSE |
-					    XCR0_BIT_AVX);
-	}
-
-	if (os_avx_support && IS_SET(features_2, 28))
+	if (c & (1 << 27))
+		xcr0 = read_xcr(0);
+	if ((c & (1 << 28)) && ((xcr0 & 0x6) == 0x6))
 		features |= X86_CPU_FEATURE_AVX;
 
-	if (max_function < 7)
+	if (max_leaf < 7)
 		goto out;
 
 	
-	cpuid(7, 0, &dummy1, &features_3, &features_4, &dummy4);
-
-	if (os_avx_support && IS_SET(features_3, 5))
+	cpuid(7, 0, &a, &b, &c, &d);
+	if ((b & (1 << 5)) && ((xcr0 & 0x6) == 0x6))
 		features |= X86_CPU_FEATURE_AVX2;
-
-	if (IS_SET(features_3, 8))
+	if (b & (1 << 8))
 		features |= X86_CPU_FEATURE_BMI2;
 
 out:

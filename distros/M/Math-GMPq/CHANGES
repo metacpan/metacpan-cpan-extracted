@@ -1,5 +1,10 @@
 Revision history for Perl module Math::GMPq
 
+0.56
+ - Skip Math::MPFR checks in t/overload_cross_class.t and t/overload_op_eq.t if
+   $Math::MPFR::VERSION < 4.19
+ - Avoid monitoring PL_markstack_ptr in GMPq.xs
+
 0.55
  - Fix bugs in t/overload_op_eq.t
 

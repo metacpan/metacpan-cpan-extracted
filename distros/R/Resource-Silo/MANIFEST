@@ -34,6 +34,7 @@ t/406-self_check.t
 t/407-return-undef.t
 t/408-no-forward.t
 t/501-compat-moo.t
+t/502-compat-moose.t
 t/README.md
 t/tlib/My/Class.pm
 xt/pod-coverage.t

@@ -1,11 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Business/ID/POM/parse_pom_reg_code
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
-
-our $DATE = '2019-11-21'; # DATE
-our $DIST = 'App-IndonesianNumberUtils'; # DIST
-our $VERSION = '0.031'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -13,6 +9,11 @@ use warnings;
 use Log::ger;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-10-04'; # DATE
+our $DIST = 'App-IndonesianNumberUtils'; # DIST
+our $VERSION = '0.032'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Business/ID/POM/parse_pom_reg_code",
@@ -39,93 +40,24 @@ parse-pom-reg-code - Parse food/drug registration code published by the Indonesi
 
 =head1 VERSION
 
-This document describes version 0.031 of parse-pom-reg-code (from Perl distribution App-IndonesianNumberUtils), released on 2019-11-21.
+This document describes version 0.032 of parse-pom-reg-code (from Perl distribution App-IndonesianNumberUtils), released on 2023-10-04.
 
 =head1 SYNOPSIS
 
-Usage:
+B<parse-pom-reg-code> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
- % parse-pom-reg-code [options] <code>
+B<parse-pom-reg-code> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-Examples:
+B<parse-pom-reg-code> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<code|/"--code=s*">>E<gt>
 
- % parse-pom-reg-code 'MD 224510107115'
- +---------------------------+-------------------------------+
- | key                       | value                         |
- +---------------------------+-------------------------------+
- | category_code             | MD                            |
- | category_id               | Makanan (M), dalam negeri (D) |
- | food_company_code         | 107                           |
- | food_company_product_code | 115                           |
- | food_packaging_code       | 2                             |
- | food_province_code        | 10                            |
- | food_type_code            | 245                           |
- | number                    | 224510107115                  |
- +---------------------------+-------------------------------+
 
- % parse-pom-reg-code DBL9624502804A1
- +---------------------------+---------------------------------------------+
- | key                       | value                                       |
- +---------------------------+---------------------------------------------+
- | category_code             | DBL                                         |
- | category_id               | Obat merek dagang (D), bebas (B), lokal (L) |
- | drug_category_code        | B                                           |
- | drug_company_code         | 245                                         |
- | drug_company_product_code | 028                                         |
- | drug_dosage_form_code     | 04                                          |
- | drug_dosage_form_id       | kaplet (04)                                 |
- | drug_origin_code          | L                                           |
- | drug_packaging_serial     | 1                                           |
- | drug_strength_serial      | A                                           |
- | drug_year                 | 1996                                        |
- | number                    | 9624502804A1                                |
- +---------------------------+---------------------------------------------+
 
- % parse-pom-reg-code NC14191300159
- +----------------------------+-------------------------+
- | key                        | value                   |
- +----------------------------+-------------------------+
- | category_code              | NC                      |
- | category_id                | Kosmetik (N), Eropa (C) |
- | cosmetic_category_code     | C                       |
- | cosmetic_country_code      | 14                      |
- | cosmetic_group_code        | 13                      |
- | cosmetic_notification_code | 00159                   |
- | cosmetic_year              | 2019                    |
- | number                     | 14191300159             |
- +----------------------------+-------------------------+
-
- % parse-pom-reg-code TR092699241
- +-----------------------------+----------------------------------------+
- | key                         | value                                  |
- +-----------------------------+----------------------------------------+
- | category_code               | TR                                     |
- | category_id                 | Obat traditional (T), dalam negeri (R) |
- | number                      | 092699241                              |
- | trad_company_product_serial | 9924                                   |
- | trad_company_type_code      | 2                                      |
- | trad_company_type_id        | pabrik jamu                            |
- | trad_origin                 | R                                      |
- | trad_packaging_code         | 6                                      |
- | trad_packaging_id           | cairan                                 |
- | trad_packaging_volume       | 15ml                                   |
- | trad_packaging_volume_code  | 1                                      |
- | trad_year                   | 2009                                   |
- +-----------------------------+----------------------------------------+
-
- % parse-pom-reg-code FF182600791
- +---------------+----------------+
- | key           | value          |
- +---------------+----------------+
- | category_code | FF             |
- | category_id   | Fitofarma (FF) |
- | number        | 182600791      |
- +---------------+----------------+
+See examples in the L</EXAMPLES> section.
 
 =head1 DESCRIPTION
 
-This routine does not check whether the code actually exists. Use
-https://cekbpom.pom.go.id/ for that.
+This routine does not check whether the specified code is actually registered.
+Use L<https://cekbpom.pom.go.id/> for that.
 
 =head1 OPTIONS
 
@@ -138,6 +70,8 @@ C<*> marks required options.
 =item B<--code>=I<s>*
 
 Input POM code to be parsed.
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -152,6 +86,17 @@ Shortcut for --log-level=debug.
 =item B<--log-level>=I<s>
 
 Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
 
 =item B<--quiet>
 
@@ -179,6 +124,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -193,15 +144,32 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
 
 
 =back
@@ -254,6 +222,144 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
+=head1 EXAMPLES
+
+=head2 Example #1
+
+ % parse-pom-reg-code MD240935001200027
+ +---------------------------+-------------------------------+
+ | key                       | value                         |
+ +---------------------------+-------------------------------+
+ | category_code             | MD                            |
+ | category_id               | Makanan (M), dalam negeri (D) |
+ | food_company_code         | 00027                         |
+ | food_company_product_code | 0012                          |
+ | food_is_rba               | 1                             |
+ | food_packaging_type_code  | 4                             |
+ | food_province_code        | 09                            |
+ | food_risk_code            | 2                             |
+ | food_risk_id              | T - Tinggi                    |
+ | food_type_code            | 35                            |
+ | number                    | 240935001200027               |
+ +---------------------------+-------------------------------+
+
+=head2 Example #2
+
+ % parse-pom-reg-code 'MD 224510107115'
+ +---------------------------+-------------------------------+
+ | key                       | value                         |
+ +---------------------------+-------------------------------+
+ | category_code             | MD                            |
+ | category_id               | Makanan (M), dalam negeri (D) |
+ | food_company_code         | 107                           |
+ | food_company_product_code | 115                           |
+ | food_is_rba               | 0                             |
+ | food_packaging_type_code  | 2                             |
+ | food_province_code        | 10                            |
+ | food_type_code            | 245                           |
+ | number                    | 224510107115                  |
+ +---------------------------+-------------------------------+
+
+=head2 Example #3
+
+ % parse-pom-reg-code DBL9624502804A1
+ +---------------------------+---------------------------------------------+
+ | key                       | value                                       |
+ +---------------------------+---------------------------------------------+
+ | category_code             | DBL                                         |
+ | category_id               | Obat merek dagang (D), bebas (B), lokal (L) |
+ | drug_category_code        | B                                           |
+ | drug_company_code         | 245                                         |
+ | drug_company_product_code | 028                                         |
+ | drug_dosage_form_code     | 04                                          |
+ | drug_dosage_form_id       | kaplet (04)                                 |
+ | drug_origin_code          | L                                           |
+ | drug_packaging_serial     | 1                                           |
+ | drug_strength_serial      | A                                           |
+ | drug_year                 | 1996                                        |
+ | number                    | 9624502804A1                                |
+ +---------------------------+---------------------------------------------+
+
+=head2 Example #4
+
+ % parse-pom-reg-code NC14191300159
+ +----------------------------+-------------------------+
+ | key                        | value                   |
+ +----------------------------+-------------------------+
+ | category_code              | NC                      |
+ | category_id                | Kosmetik (N), Eropa (C) |
+ | cosmetic_category_code     | C                       |
+ | cosmetic_country_code      | 14                      |
+ | cosmetic_group_code        | 13                      |
+ | cosmetic_notification_code | 00159                   |
+ | cosmetic_year              | 2019                    |
+ | number                     | 14191300159             |
+ +----------------------------+-------------------------+
+
+=head2 Example #5
+
+ % parse-pom-reg-code 'POM TR092699241'
+ +-----------------------------+----------------------------------------+
+ | key                         | value                                  |
+ +-----------------------------+----------------------------------------+
+ | category_code               | TR                                     |
+ | category_id                 | Obat traditional (T), dalam negeri (R) |
+ | number                      | 092699241                              |
+ | trad_company_product_serial | 9924                                   |
+ | trad_company_type_code      | 2                                      |
+ | trad_company_type_id        | pabrik jamu                            |
+ | trad_origin                 | R                                      |
+ | trad_packaging_code         | 6                                      |
+ | trad_packaging_id           | cairan                                 |
+ | trad_packaging_volume       | 15ml                                   |
+ | trad_packaging_volume_code  | 1                                      |
+ | trad_year                   | 2009                                   |
+ +-----------------------------+----------------------------------------+
+
+=head2 Example #6
+
+ % parse-pom-reg-code FF182600791
+ +---------------+----------------+
+ | key           | value          |
+ +---------------+----------------+
+ | category_code | FF             |
+ | category_id   | Fitofarma (FF) |
+ | number        | 182600791      |
+ +---------------+----------------+
+
+=head2 Example #7
+
+ % parse-pom-reg-code SD181353251
+ +---------------+------------------------------------------+
+ | key           | value                                    |
+ +---------------+------------------------------------------+
+ | category_code | SD                                       |
+ | category_id   | Suplemen kesehatan (S), dalam negeri (D) |
+ | number        | 181353251                                |
+ +---------------+------------------------------------------+
+
+=head2 Example #8
+
+ % parse-pom-reg-code SI184509731
+ +---------------+-----------------------------------+
+ | key           | value                             |
+ +---------------+-----------------------------------+
+ | category_code | SI                                |
+ | category_id   | Suplemen kesehatan (S), impor (I) |
+ | number        | 184509731                         |
+ +---------------+-----------------------------------+
+
+=head2 Example #9
+
+ % parse-pom-reg-code SL091300431
+ +---------------+-------------------------------------+
+ | key           | value                               |
+ +---------------+-------------------------------------+
+ | category_code | SL                                  |
+ | category_id   | Suplemen kesehatan (S), lisensi (L) |
+ | number        | 091300431                           |
+ +---------------+-------------------------------------+
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-IndonesianNumberUtils>.
@@ -262,6 +368,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Indone
 
 Source repository is at L<https://github.com/perlancar/perl-App-IndonesianNumberUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2019, 2018, 2016, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-IndonesianNumberUtils>
@@ -269,16 +404,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2019, 2018, 2016, 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

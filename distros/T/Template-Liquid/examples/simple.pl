@@ -9,9 +9,9 @@ my $template = Template::Liquid->parse(<<'END');
     Test. {{i}}
 {%endfor%}
 END
-warn $template->render({condition => 1, array => [qw[one two three four]]});
+warn $template->render(condition => 1, array => [qw[one two three four]]);
 print Template::Liquid->parse(
-      <<'INPUT')->render({hash => {key => 'value'}, list => [qw[key value]]});
+        <<'INPUT')->render(hash => {key => 'value'}, list => [qw[key value]]);
 {% if hash == list %}Yep.{% endif %}
 INPUT
 warn Template::Liquid->parse(<<'END')->render();

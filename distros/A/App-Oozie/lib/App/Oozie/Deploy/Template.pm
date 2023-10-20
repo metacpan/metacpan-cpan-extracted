@@ -1,11 +1,12 @@
 package App::Oozie::Deploy::Template;
-$App::Oozie::Deploy::Template::VERSION = '0.006';
-use 5.010;
+$App::Oozie::Deploy::Template::VERSION = '0.010';
+use 5.014;
 use strict;
 use warnings;
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
 use App::Oozie::Types::Common qw( IsDir );
+use App::Oozie::Util::Misc qw( resolve_tmp_dir );
 use App::Oozie::Constants qw( TEMPLATE_DEFINE_VAR );
 
 use Config::Properties;
@@ -16,7 +17,7 @@ use File::Path qw(
     remove_tree
 );
 use File::Spec;
-use File::Temp qw( tempfile );
+use File::Temp ();
 use Hash::Flatten ();
 use IPC::Cmd ();
 use Moo;
@@ -182,7 +183,6 @@ sub compile {
     # Possible improvement: use libraries instead of this command
     #     if feasible
     my @command = (
-        'ttree',
         '-f'     => $tt_conf_file,
         '-a',
         '--src'  => $workflow,
@@ -227,11 +227,7 @@ sub compile {
         }
     }
 
-    my( $ok, $err, $full_buf, $stdout_buff, $stderr_buff ) = IPC::Cmd::run(
-        command => \@command,
-        verbose => $self->verbose,
-        timeout => $self->timeout,
-    );
+    my($ok, $err, $full_buf, $stdout_buff, $stderr_buff) = $self->_ttree_cli( @command );
 
     # ttree doesn't return an error status when it encounters an error, so just
     # look at the output
@@ -281,6 +277,55 @@ sub compile {
             $total_errors      // 0,
             $dest,
     ;
+}
+
+sub _ttree_obj {
+    my $self = shift;
+    my @command = @_;
+    require App::Oozie::Deploy::Template::ttree;
+
+    my( $ok, $err, $full_buf, $stdout_buff, $stderr_buff );
+
+    $stdout_buff = [];
+    $stderr_buff = [];
+
+    my $logger = sub {
+        my %log = @_;
+        if ( $log{level} eq 'info' ) {
+            push @{ $stdout_buff }, $log{msg};
+        }
+        else {
+            push @{ $stderr_buff }, $log{msg};
+        }
+    };
+
+    eval {
+        my $ttree = App::Oozie::Deploy::Template::ttree->new( $logger );
+        $ttree->run( @command );
+        $ok = 1;
+        1;
+    } or do {
+        my $eval_error = $@ || 'Zombie error';
+        push @{ $stderr_buff }, $eval_error;
+    };
+
+    $full_buf = [ @{ $stdout_buff }, @{ $stderr_buff } ];
+
+    return ( $ok, $err, $full_buf, $stdout_buff, $stderr_buff );
+}
+
+sub _ttree_cli {
+    my $self = shift;
+    my @command = @_;
+
+    unshift @command, 'ttree';
+
+    my( $ok, $err, $full_buf, $stdout_buff, $stderr_buff ) = IPC::Cmd::run(
+        command => \@command,
+        verbose => $self->verbose,
+        timeout => $self->timeout,
+    );
+    return $ok, $err, $full_buf, $stdout_buff, $stderr_buff;
 }
 
 sub _probe_readme {
@@ -464,7 +509,7 @@ sub _pre_process_ttconfig_into_tempfile {
     my $opt    = shift || {};
     my $logger = $self->logger;
 
-    my($fh_tmp_cfg, $tmp_cfg_file) = tempfile();
+    my($fh_tmp_cfg, $tmp_cfg_file) = File::Temp::tempfile( undef, DIR => resolve_tmp_dir() );
 
     my $file = File::Spec->catfile( $self->ttlib_base_dir, 'ttree.cfg' );
     open my $FH, '<', $file or die "Failed to read $file: $!";
@@ -510,7 +555,7 @@ App::Oozie::Deploy::Template
 
 =head1 VERSION
 
-version 0.006
+version 0.010
 
 =head1 SYNOPSIS
 

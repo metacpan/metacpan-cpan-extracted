@@ -1,0 +1,22 @@
+Revision history for Image-Square
+
+1.0     16th September 2023
+	- First public release
+	- Gave up on using hashes to check images as each build of libgd seems to use a different value from copyResampled. 
+	- Instead we now generate the images on the fly meaning no big payloads to download.
+	- The checks are for initial size, upscaling and downscaling.
+	- Makefile.PL contains META_MERGE section
+
+0.01_4  13th September 2023
+	- Tests still fail on different builds of GD.  Now using PNG as input image and native GD format for output.
+
+0.01_3  12th September 2023
+	- The previous tests failed due to the GD->jpeg method not being consistent across Perl versions.  Now we are using PNG images instead as these should be more consistent!
+	- Added 'Error Handling' section to POD and reference to the GitHub repository.
+
+0.01_2  7th September 2023
+	- Added tests to check generated images against hashes of visually tested images.
+
+0.01_1  6th September 2023
+        - First version, released on an unsuspecting world.
+

@@ -9,7 +9,7 @@ use Carp;
 use Catmandu::Error;
 use URI;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 with 'Catmandu::Importer';
 
@@ -34,6 +34,7 @@ has oai                    => (is => 'ro', lazy => 1, builder => 1);
 has dry                    => (is => 'ro');
 has handler                => (is => 'rw', lazy => 1 , builder => 1, coerce => \&_coerce_handler );
 has xslt                   => (is => 'ro', coerce => \&_coerce_xslt );
+has sleep                  => ( is => 'ro', default => sub { 0 } );
 has max_retries            => ( is => 'ro', default => sub { 0 } );
 has _retried               => ( is => 'rw', default => sub { 0; } );
 has _xml_handlers          => ( is => 'ro', default => sub { +{} } );
@@ -371,6 +372,10 @@ sub _list_records {
             unless (defined $resumptionToken && length $resumptionToken) {
                 $done = 1;
             }
+
+            if ($self->sleep) {
+                sleep $self->sleep;
+            }
         }
 
         if (my $rec = shift @$stack) {
@@ -696,6 +701,10 @@ the importer stops can differ:
     wait [ 0..2^3 [ seconds
 
  ..
+
+=item sleep 
+
+Sleep a number of seconds between OAI-PMH calls to the endpoint (default 0).
 
 =item realm
 

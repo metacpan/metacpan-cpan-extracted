@@ -7,7 +7,6 @@ use 5.008000;
 use utf8;
 use strict;
 use warnings;
-use Carp::Always 0.01;
 
 use Test::More 0.92;
 use Test::Deep 0.106;

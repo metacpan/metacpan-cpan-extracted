@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Query.pm
-## Version v0.5.2
+## Version v0.5.3
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/06/13
+## Modified 2023/07/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,11 +17,14 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object );
-    use vars qw( $VERSION $DEBUG $VERBOSE );
+    use vars qw( $VERSION $DEBUG );
+    use DB::Object::Query::Clause;
+    use DB::Object::Query::Elements;
+    use DB::Object::Query::Element;
     use Devel::Confess;
-    $VERSION = 'v0.5.2';
-    $DEBUG = 0;
-    $VERBOSE = 0;
+    use Want;
+    our $DEBUG = 0;
+    our $VERSION = 'v0.5.3';
 };
 
 use strict;
@@ -39,16 +42,19 @@ sub init
     $self->{binded_types}   = [] unless( CORE::exists( $self->{binded_types} ) );
     $self->{binded_values}  = [] unless( CORE::exists( $self->{binded_values} ) );
     $self->{binded_where}   = [] unless( CORE::exists( $self->{binded_where} ) );
+    $self->{elements}       = undef unless( CORE::exists( $self->{elements} ) );
     $self->{enhance}        = 0 unless( CORE::exists( $self->{enhance} ) );
     $self->{from_table}     = [] unless( CORE::exists( $self->{from_table} ) );
     $self->{from_unixtime}  = [] unless( CORE::exists( $self->{from_unixtime} ) );
     $self->{group_by}       = '' unless( CORE::exists( $self->{group_by} ) );
+    $self->{having}         = '' unless( CORE::exists( $self->{having} ) );
     $self->{join_fields}    = '' unless( CORE::exists( $self->{join_fields} ) );
     $self->{left_join}      = {} unless( CORE::exists( $self->{left_join} ) );
-    $self->{limit}          = [] unless( CORE::exists( $self->{limit} ) );
+    $self->{limit}          = '' unless( CORE::exists( $self->{limit} ) );
     $self->{local}          = {} unless( CORE::exists( $self->{local} ) );
     $self->{order_by}       = '' unless( CORE::exists( $self->{order_by} ) );
     $self->{prepare_options}= {} unless( CORE::exists( $self->{prepare_options} ) );
+    $self->{query_values}   = undef unless( CORE::exists( $self->{query_values} ) );
     $self->{reverse}        = '' unless( CORE::exists( $self->{reverse} ) );
     $self->{sorted}         = [] unless( CORE::exists( $self->{sorted} ) );
     $self->{table_alias}    = '' unless( CORE::exists( $self->{table_alias} ) );
@@ -64,6 +70,10 @@ sub init
     $self->{selected_fields} = '';
     $self->{table_object}   = '';
     $self->{tie_order}      = [];
+    unless( $self->{elements} )
+    {
+        $self->{elements} = $self->new_elements;
+    }
     return( $self );
 }
 
@@ -75,18 +85,50 @@ sub avoid { return( shift->_set_get_array_as_object( 'avoid', @_ ) ); }
 
 sub binded { return( shift->_set_get_array_as_object( 'binded', @_ ) ); }
 
-sub binded_group { return( shift->group->bind->values ); }
+sub binded_group { return( shift->group->values ); }
 
-sub binded_limit { return( shift->limit->bind->values ); }
+sub binded_limit { return( shift->limit->values ); }
 
-sub binded_order { return( shift->order->bind->values ); }
+sub binded_order { return( shift->order->values ); }
 
+# NOTE: sub binded_types is not used anymore as of 2023-07-19 (v0.11.7)
 sub binded_types { return( shift->_set_get_array_as_object( 'binded_types', @_ ) ); }
+# sub binded_types
+# {
+#     my $self = shift( @_ );
+#     my $arr = $self->new_array;
+#     my $e = $self->elements;
+#     $e->keys->sort->foreach(sub
+#     {
+#         my $k = shift( @_ );
+#         $arr->push( $e->{ $k }->type );
+#     });
+#     return( $arr );
+# }
 
+# sub binded_types_as_param
+# {
+#     my $self = shift( @_ );
+#     return( $self->error( "The driver has not implemented the method binded_types_as_param." ) );
+# }
 sub binded_types_as_param
 {
     my $self = shift( @_ );
-    return( $self->error( "The driver has not implemented th emethod binded_types_as_param." ) );
+    my $params = $self->new_array;
+    $self->elements->foreach(sub
+    {
+        my $elem = shift( @_ );
+        my $type;
+        if( $elem && defined( $type = $elem->type ) )
+        {
+            $params->push( $type );
+        }
+        else
+        {
+            $params->push( '' );
+        }
+    });
+    return( $params );
 }
 
 sub binded_values { return( shift->_set_get_array_as_object( 'binded_values', @_ ) ); }
@@ -111,7 +153,8 @@ sub constant
     return( $self->{constant} );
 }
 
-sub database_object { return( shift->table_object->database_object ) }
+# sub database_object { return( shift->table_object->database_object ) }
+sub database_object { return( shift->_set_get_object_without_init( 'database_object', 'DB::Object', @_ ) ); }
 
 sub delete
 {
@@ -143,7 +186,7 @@ sub delete
     return( $self->error( "Refusing to do a bulk delete. Enable the allow_bulk_delete database object property if you want to do so. Original query was: $query" ) ) if( !$self->where && !$self->database_object->allow_bulk_delete );
     $self->_save_bind();
     my $sth = $tbl_o->_cache_this( $self ) ||
-    return( $self->error( "Error while preparing query to delete from table '$table':\n$query" ) );
+        return( $self->error( "Error while preparing query to delete from table '$table':\n$query" ) );
     # Routines such as as_string() expect an array on pupose so we do not have to commit the action
     # but rather get the statement string. At the end, we write:
     # $obj->delete() to really delete
@@ -152,14 +195,17 @@ sub delete
     if( !defined( wantarray() ) )
     {
         $sth->execute() ||
-        return( $self->error( "Error while executing query to delete from table '$table':\n$query" ) );
-        ## Will be destroyed anyway and permits the end user to manipulate the object if needed
-        ## $sth->finish();
+            return( $self->error( "Error while executing query to delete from table '$table':\n$query" ) );
+        # Will be destroyed anyway and permits the end user to manipulate the object if needed
+        # $sth->finish();
     }
     # wantarray returns false but not undef() otherwise, i.e.
     # $obj->delete->as_string();
     return( $sth );
 }
+
+# sub elements { return( shift->_set_get_hash_as_mix_object( 'elements', @_ ) ); }
+sub elements { return( shift->_set_get_object_without_init( 'elements', 'DB::Object::Query::Elements', @_ ) ); }
 
 sub enhance { return( shift->_set_get_boolean( 'enhance', @_ ) ); }
 
@@ -178,7 +224,7 @@ sub format_to_epoch
     warn( "This method \"format_to_epoch\" was not superseded.\n" );
 }
 
-# For select or insert queries
+# NOTE: For select or insert queries
 sub format_statement
 {
     my $self = shift( @_ );
@@ -208,13 +254,13 @@ sub format_statement
     map{ $unixtime->{ $_ }++ } @$tmp_ref;
     my @format_fields = ();
     my @format_values = ();
-    my $binded   = $self->{binded_values} = [];
+    # my $binded   = $self->{binded_values} = [];
     my $multi_db = $tbl_o->prefix_database;
     my $db       = $tbl_o->database;
-    my $fields_ref = $tbl_o->fields();
+    my $fields_ref = $tbl_o->fields;
     my $ok_list  = CORE::join( '|', keys( %$fields_ref ) );
     my $tables   = CORE::join( '|', @{$tbl_o->database_object->tables} );
-    my $struct   = $tbl_o->structure();
+    my $struct   = $tbl_o->structure || return( $self->pass_error( $tbl_o->error ) );
     my $query_type = $self->{query_type};
     my @sorted   = ();
     if( @$args && !( @$args % 2 ) )
@@ -229,59 +275,76 @@ sub format_statement
     # Used for insert or update so that execute can take a hash of key => value pair and we would bind the values in the right order
     # But or that we need to know the order of the fields.
     $self->{sorted} = \@sorted;
+    my $placeholder_re = $tbl_o->database_object->_placeholder_regexp;
+    my $elems = $self->new_elements;
     
     foreach( @sorted )
     {
-        # next if( $struct->{ $_ } =~ /\b(AUTO_INCREMENT|SERIAL)\b/i );
+        my $elem = $self->new_element;
         if( exists( $data->{ $_ } ) )
         {
             my $value = $data->{ $_ };
             if( $self->_is_a( $value => "${base_class}::Statement" ) )
             {
-                push( @format_values, '(' . $value->as_string . ')' );
-                $self->binded_types->push( $value->query_object->binded_types_as_param );
+                $elem->value( '(' . $value->as_string . ')' );
+                # push( @format_values, '(' . $value->as_string . ')' );
+                # $self->binded_types->push( $value->query_object->binded_types_as_param );
+                # $elems->merge( $value->query_object->elements );
+                $elem->elements( $value->query_object->elements );
             }
             # This is for insert or update statement types
             elsif( exists( $from_unix->{ $_ } ) )
             {
                 if( $bind )
                 {
-                    push( @$binded, $value );
-                    push( @format_values, $self->format_from_epoch({ value => $value, bind => 1 }) );
+                    # push( @$binded, $value );
+                    # push( @format_values, $self->format_from_epoch({ value => $value, bind => 1 }) );
+                    $elem->value( $value );
+                    $elem->format( $self->format_from_epoch({ value => $value, bind => 1 }) );
                 }
                 else
                 {
-                    push( @format_values, $self->format_from_epoch({ value => $value, bind => 0 }) );
+                    # push( @format_values, $self->format_from_epoch({ value => $value, bind => 0 }) );
+                    $elem->format( $self->format_from_epoch({ value => $value, bind => 0 }) );
                 }
-                $self->binded_types->push( '' );
+                # $self->binded_types->push( '' );
             }
             elsif( exists( $unixtime->{ $_ } ) )
             {
                 if( $bind )
                 {
-                    push( @$binded, $value );
-                    push( @format_values, $self->format_to_epoch({ value => $value, bind => 1 }) );
+                    # push( @$binded, $value );
+                    # push( @format_values, $self->format_to_epoch({ value => $value, bind => 1 }) );
+                    $elem->value( $value );
+                    $elem->format( $self->format_to_epoch({ value => $value, bind => 1 }) );
                 }
                 else
                 {
-                    push( @format_values, $self->format_to_epoch({ value => $value, bind => 0 }) );
+                    # push( @format_values, $self->format_to_epoch({ value => $value, bind => 0 }) );
+                    $elem->format( $self->format_to_epoch({ value => $value, bind => 0 }) );
                 }
-                $self->binded_types->push( '' );
+                # $self->binded_types->push( '' );
             }
             elsif( ref( $value ) eq 'SCALAR' )
             {
-                push( @format_values, $$value );
+                # push( @format_values, $$value );
+                $elem->format( $$value );
             }
-            elsif( $value eq '?' )
+            elsif( $value =~ /^($placeholder_re)$/ )
             {
-                push( @format_values, '?' );
-                $self->binded_types->push( '' );
+                # push( @format_values, $1 );
+                # $self->binded_types->push( '' );
+                $elem->placeholder( $1 );
+                $elem->format( $1 );
             }
             elsif( $struct->{ $_ } =~ /^\s*\bBLOB\b/i )
             {
-                push( @format_values, '?' );
-                push( @$binded, $value );
-                $self->binded_types->push( '' );
+                # push( @format_values, '?' );
+                # push( @$binded, $value );
+                # $self->binded_types->push( '' );
+                $elem->placeholder( '?' );
+                $elem->format( '?' );
+                $elem->value( $value );
             }
             # If the value itself looks like a field name or like a SQL function
             # or simply if bind option is inactive
@@ -295,30 +358,37 @@ sub format_statement
 #             }
             elsif( !$bind )
             {
-                push( @format_values, sprintf( "%s", $tbl_o->database_object->quote( $value ) ) );
+                # push( @format_values, sprintf( "%s", $tbl_o->database_object->quote( $value ) ) );
+                $elem->format( sprintf( "%s", $tbl_o->database_object->quote( $value ) ) );
             }
             # We do this before testing for param binding because DBI puts quotes around SET number :-(
             elsif( $value =~ /^\d+$/ && $struct->{ $_ } =~ /\bSET\(/i )
             {
-                push( @format_values, $value );
+                # push( @format_values, $value );
+                $elem->format( $value );
             }
             elsif( $value =~ /^\d+$/ && 
                    $struct->{ $_ } =~ /\bENUM\(/i && 
                       ( $query_type eq 'insert' || $query_type eq 'update' ) )
             {
-                push( @format_values, "'$value'" );
+                # push( @format_values, "'$value'" );
+                $elem->format( "'$value'" );
             }
             # Otherwise, bind option is enabled, we bind parameter
             elsif( $bind )
             {
-                push( @format_values, '?' );
-                push( @$binded, $value );
-                $self->binded_types->push( '' );
+                # push( @format_values, '?' );
+                # push( @$binded, $value );
+                # $self->binded_types->push( '' );
+                $elem->placeholder( '?' );
+                $elem->format( '?' );
+                $elem->value( $value );
             }
             # In last resort, we handle the formatting ourself
             else
             {
-                push( @format_values, $tbl_o->database_object->quote( $value ) );
+                # push( @format_values, $tbl_o->database_object->quote( $value ) );
+                $elem->format( $tbl_o->database_object->quote( $value ) );
             }
         }
     
@@ -343,20 +413,42 @@ sub format_statement
                 }
             }gex;
             s/(?<!\.)($tables)(?:\.)/$db\.$1\./g if( $multi_db );
-            push( @format_fields, $_ );
+            # push( @format_fields, $_ );
         }
-        else
-        {
-            push( @format_fields, $_ );
-        }
+#         else
+#         {
+#             push( @format_fields, $_ );
+#         }
+        $elem->field( $_ );
+        $elems->push( $elem );
     }
     if( !wantarray() && scalar( @{$self->{_extra}} ) )
     {
-        push( @format_fields, @{$self->{_extra}} );
+        # push( @format_fields, @{$self->{_extra}} );
+        foreach my $this ( @{$self->{_extra}} )
+        {
+            $elems->push({
+                field => $this,
+                debug => $self->debug,
+            });
+        }
     }
-    $values = CORE::join( ', ', @format_values );
-    $fields = CORE::join( ', ', @format_fields );
-    wantarray ? return( $fields, $values ) : return( $fields );
+    
+#     $values = CORE::join( ', ', @format_values );
+#     $fields = CORE::join( ', ', @format_fields );
+#     wantarray ? return( $fields, $values ) : return( $fields );
+
+#     $fields = $elems->fields->join( ', ' );
+#     if( wantarray )
+#     {
+#         $values = $elems->formats->join( ', ' );
+#         return( $fields, $values );
+#     }
+#     else
+#     {
+#         return( $fields );
+#     }
+    return( $elems );
 }
 
 sub format_update($;%)
@@ -399,9 +491,9 @@ sub format_update($;%)
     }
     my $bind   = $tbl_o->database_object->use_bind;
     my $def    = $arg{default} || $self->{_default};
-    my $fields_ref = $tbl_o->fields();
+    my $fields_ref = $tbl_o->fields;
     my $fields_list = CORE::join( '|', keys( %$fields_ref ) );
-    my $struct = $tbl_o->structure();
+    my $struct = $tbl_o->structure || return( $self->pass_error( $tbl_o->error ) );
     my $types  = $tbl_o->types;
     my $from_unix = $self->from_unixtime();
     my $from_unixtime = { map{ $_ => 1 } @$from_unix };
@@ -410,25 +502,20 @@ sub format_update($;%)
     my @types  = ();
     # Get the constant has definition for each table fields
     my $types_const = $tbl_o->types_const;
+    my $placeholder_re = $tbl_o->database_object->_placeholder_regexp;
     # Before we used to call getdefault supplying it our new values and the
     # format_statement() that would take the default supplied values
     # Now, this works differently since we use update() method and supply 
     # directly our value to update to it
     # In this context, getting the default values is dangerous, since resetting
     # the values to their default ones is not was we want, is it?
-    #foreach my $field ( keys( %$def ) )
-    #{
-    #    if( exists( $info->{ $field } ) )
-    #{
-    #    $def->{ $field } = $info->{ $field };
-    #}
-    #}
-    my( $field, $value );
+    my $elems = $self->new_elements;
     while( @$info )
     {
-        my( $field, $value ) = ( shift( @$info ), shift( @$info ) );
+        my( $field, $value ) = splice( @$info, 0, 2 );
         # Do not update a field that does not belong in this table
         next if( !exists( $fields_ref->{ $field } ) );
+        my $elem = $self->new_element( field => $field );
         # Make it a FROM_UNIXTIME field if this is what we need.
         # $value = "FROM_UNIXTIME($value)" if( exists( $from_unixtime->{ $field } ) );
         # $value = \"TO_TIMESTAMP($value)" if( exists( $from_unixtime->{ $field } ) );
@@ -437,80 +524,98 @@ sub format_update($;%)
         {
             if( $bind )
             {
-                push( @binded, $value );
-                push( @fields, "$field=" . $self->format_from_epoch({ value => $value, bind => 1 }) );
-                CORE::push( @types, '' );
+                # push( @binded, $value );
+                # push( @fields, "$field=" . $self->format_from_epoch({ value => $value, bind => 1 }) );
+                # CORE::push( @types, '' );
+                $elem->value( $value );
+                $elem->format( "$field=" . $self->format_from_epoch({ value => $value, bind => 1 }) );
             }
             else
             {
-                push( @fields, "$field=" . $self->format_from_epoch({ value => $value, bind => 0 }) );
-                CORE::push( @types, '' ) if( $value eq '?' );
+                # push( @fields, "$field=" . $self->format_from_epoch({ value => $value, bind => 0 }) );
+                # # CORE::push( @types, '' ) if( $value eq '?' );
+                # CORE::push( @types, '' ) if( $value =~ /^$placeholder_re$/ );
+                $elem->format( "$field=" . $self->format_from_epoch({ value => $value, bind => 0 }) );
             }
         }
         elsif( ref( $value ) eq 'SCALAR' )
         {
-            push( @fields, "$field=$$value" );
+            # push( @fields, "$field=$$value" );
+            $elem->format( "$field=$$value" );
         }
         # Maybe $bind is not enabled, but the user may have manually provided a placeholder, i.e. '?'
         elsif( !$bind )
         {
-            # push( @fields, sprintf( "$field='%s'", quotemeta( $value ) ) );
             my $const;
-            if( $value eq '?' )
+            # if( $value eq '?' )
+            if( $value =~ /^($placeholder_re)$/ )
             {
-                push( @fields, "$field = ?" );
+                # push( @fields, "$field = $1" );
+                $elem->placeholder( $1 );
+                $elem->format( "$field = $1" );
                 if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
                 {
-                    CORE::push( @types, $const );
+                    # CORE::push( @types, $const );
+                    $elem->type( $const );
                 }
                 elsif( CORE::exists( $types_const->{ $field } ) )
                 {
-                    CORE::push( @types, $types_const->{ $field }->{constant} );
+                    # CORE::push( @types, $types_const->{ $field }->{constant} );
+                    $elem->type( $types_const->{ $field }->{constant} );
                 }
                 else
                 {
-                    CORE::push( @types, '' );
+                    # CORE::push( @types, '' );
                 }
             }
             elsif( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
             {
                 # push( @fields, sprintf( "$field=%s", $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ) ) );
-                push( @fields, sprintf( "$field=%s", $tbl_o->database_object->quote( $value, $const ) ) );
+                # push( @fields, sprintf( "$field=%s", $tbl_o->database_object->quote( $value, $const ) ) );
+                $elem->format( sprintf( "$field=%s", $tbl_o->database_object->quote( $value, $const ) ) );
             }
             elsif( $self->_is_hash( $value ) && 
                    ( lc( $types->{ $field } ) eq 'jsonb' || lc( $types->{ $field } ) eq 'json' ) )
             {
                 my $this_json = $self->_encode_json( $value );
-                push( @fields, sprintf( "$field=%s", $tbl_o->database_object->quote( $this_json, ( lc( $types->{ $field } ) eq 'jsonb' ? $self->database_object->get_sql_type( 'jsonb' ) : $self->database_object->get_sql_type( 'json' ) ) ) ) );
+                # push( @fields, sprintf( "$field=%s", $tbl_o->database_object->quote( $this_json, ( lc( $types->{ $field } ) eq 'jsonb' ? $self->database_object->get_sql_type( 'jsonb' ) : $self->database_object->get_sql_type( 'json' ) ) ) ) );
+                $elem->format( sprintf( "$field=%s", $tbl_o->database_object->quote( $this_json, ( lc( $types->{ $field } ) eq 'jsonb' ? $self->database_object->get_sql_type( 'jsonb' ) : $self->database_object->get_sql_type( 'json' ) ) ) ) );
             }
             else
             {
-                push( @fields, sprintf( "$field=%s", $tbl_o->database_object->quote( $value ) ) );
+                # push( @fields, sprintf( "$field=%s", $tbl_o->database_object->quote( $value ) ) );
+                $elem->format( sprintf( "$field=%s", $tbl_o->database_object->quote( $value ) ) );
             }
         }
         # if this is a SET field type and value is a number, treat it as a number and not as a string
         # We do this before testing for param binding because DBI puts quotes around SET number :-(
         elsif( $value =~ /^\d+$/ && $struct->{ $field } =~ /\bSET\(/i )
         {
-            push( @fields, "$field=$value" );
+            # push( @fields, "$field=$value" );
+            $elem->format( "$field=$value" );
         }
         elsif( $bind )
         {
-            push( @fields, "$field=?" );
-            push( @binded, $value );
+            # push( @fields, "$field=?" );
+            # push( @binded, $value );
+            $elem->placeholder( '?' );
+            $elem->format( "$field=?" );
+            $elem->value( $value );
             my $const;
             if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
             {
                 # CORE::push( @types, DBD::Pg::PG_BYTEA );
-                CORE::push( @types, $const );
+                # CORE::push( @types, $const );
+                $elem->type( $const );
             }
             elsif( CORE::exists( $types_const->{ $field } ) )
             {
-                CORE::push( @types, $types_const->{ $field }->{constant} );
+                # CORE::push( @types, $types_const->{ $field }->{constant} );
+                $elem->type( $types_const->{ $field }->{constant} );
             }
             else
             {
-                CORE::push( @types, '' );
+                # CORE::push( @types, '' );
             }
         }
         else
@@ -519,17 +624,21 @@ sub format_update($;%)
             if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
             {
                 # push( @fields, "$field=" . $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ) );
-                push( @fields, "$field=" . $tbl_o->database_object->quote( $value, $const ) );
+                # push( @fields, "$field=" . $tbl_o->database_object->quote( $value, $const ) );
+                $elem->format( "$field=" . $tbl_o->database_object->quote( $value, $const ) );
             }
             else
             {
-                push( @fields, "$field=" . $tbl_o->database_object->quote( $value ) );
+                # push( @fields, "$field=" . $tbl_o->database_object->quote( $value ) );
+                $elem->format( "$field=" . $tbl_o->database_object->quote( $value ) );
             }
         }
+        $elems->push( $elem );
     }
-    $self->{binded_values} = [ @binded ];
-    $self->binded_types->push( @types ) if( scalar( @types ) );
-    return( CORE::join( ', ', @fields ) );
+    # $self->{binded_values} = [ @binded ];
+    # $self->binded_types->push( @types ) if( scalar( @types ) );
+    # return( CORE::join( ', ', @fields ) );
+    return( $elems );
 }
 
 sub from_table { return( shift->_set_get_array_as_object( 'from_table', @_ ) ); }
@@ -551,9 +660,9 @@ sub getdefault
         return( $self->error( "arg parameter provided is not a key => value pair. Its number of elements should be an even number." ) ) if( scalar( @$arg ) && ( @$arg % 2 ) );
     }
     my %arg       = ();
-    my %default   = ();
-    my %fields    = ();
-    my %structure = ();
+    my $default   = {};
+    my $fields    = {};
+    my $structure = {};
     my $base_class = $self->base_class;
     # Contains some extra parameters for SELECT queries only
     # Right now a concatenation of 'last_name' and 'first_name' fields into field named 'name'
@@ -567,7 +676,7 @@ sub getdefault
     my $query_type  = $opts->{query_type};
     if( !$query_type )
     {
-        my( $pkg, $file, $line, $sub ) = caller( 1 );
+        my( $pkg, $file, $line, $sub ) = caller(1);
         $sub =~ s/(.*):://;
         $query_type = $sub;
     }
@@ -582,34 +691,29 @@ sub getdefault
     my $from_unix   = $opts->{from_unixtime} || $self->from_unixtime();
 
     my $enhance     = $tbl_o->enhance;
-    ## my $table_name  = $table;
-    ## Need to do hard copy of hashes
-    %default   = $tbl_o->default();
-    %fields    = $tbl_o->fields();
-    %structure = $tbl_o->structure();
+    # Need to do hard copy of hashes
+    $default   = $tbl_o->default || return( $self->pass_error( $tbl_o->error ) );
+    $fields    = $tbl_o->fields || return( $self->pass_error( $tbl_o->error ) );
+    $structure = $tbl_o->structure || return( $self->pass_error( $tbl_o->error ) );
     
-    if( !%default || !%fields )
+    if( !%$default || !%$fields )
     {
         return( $self->error( "No proper configuration file found for table \"$table\"." ) );
     }
     
     if( $query_type eq 'select' && $enhance )
     {
-        my @sorted = sort{ $fields{ $a } <=> $fields{ $b } } keys( %fields );
-        ## foreach my $field ( keys( %structure ) )
+        my @sorted = sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields );
         foreach my $field ( @sorted )
         {
-            if( $structure{ $field } =~ /^\s*(?:DATE(?:TIME)?|TIMESTAMP)\s*/i )
+            if( $structure->{ $field } =~ /^\s*(?:DATE(?:TIME)?|TIMESTAMP)\s*/i )
             {
-                ## $fields{ "UNIX_TIMESTAMP( $field ) AS ${field}_unixtime" } = scalar( keys( %fields ) ) + 1;
-                ## $fields{ "${field}::ABSTIME::INTEGER AS ${field}_unixtime" } = scalar( keys( %fields ) ) + 1;
                 my $f = $self->format_to_epoch({
                     value => ( $prefix ? "${prefix}.${field}" : $field ),
                     bind => 0,
                     quote => 0,
                 });
-                ## $fields{ "EXTRACT( EPOCH FROM $f ) AS ${field}_unixtime" } = scalar( keys( %fields ) ) + 1;
-                $fields{ "$f AS ${field}_unixtime" } = scalar( keys( %fields ) ) + 1;
+                $fields->{ "$f AS ${field}_unixtime" } = scalar( keys( %$fields ) ) + 1;
             }
         }
     }
@@ -628,16 +732,15 @@ sub getdefault
     {
         foreach my $field ( keys( %to_unixtime ) )
         {
-            if( exists( $fields{ $field } ) )
+            if( exists( $fields->{ $field } ) )
             {
-                ## $fields{ 'UNIX_TIMESTAMP(' . $field . ') AS ' . $field } = $fields{ $field };
                 my $func = $self->format_to_epoch({
                     value => ( $prefix ? "${prefix}.${field}" : $field ),
                     bind => 0,
                     quote => 0,
                 });
-                $fields{ $func . ' AS ' . $field } = $fields{ $field };
-                delete( $fields{ $field } );
+                $fields->{ $func . ' AS ' . $field } = $fields->{ $field };
+                delete( $fields->{ $field } );
             }
         }
     }
@@ -656,10 +759,10 @@ sub getdefault
     {
         foreach my $field ( keys( %avoid ) )
         {
-            if( exists( $fields{ $field } ) )
+            if( exists( $fields->{ $field } ) )
             {
-                delete( $fields{ $field } );
-                delete( $default{ $field } );
+                delete( $fields->{ $field } );
+                delete( $default->{ $field } );
             }
         }
     }
@@ -670,23 +773,25 @@ sub getdefault
         %as = %$alias;
         foreach my $field ( keys( %as ) )
         {
-            if( exists( $fields{ $field } ) )
+            if( exists( $fields->{ $field } ) )
             {
                 my $f = $prefix 
                         ? "${prefix}.${field}" 
                         : $field;
-                $fields{ "$f AS \"$as{ $field }\"" } = $fields{ $field };
+                $fields->{ "$f AS \"$as{ $field }\"" } = $fields->{ $field };
                 # delete( $fields{ $field } );
             }
             else
             {
-                $fields{ "$field AS \"$as{ $field }\"" } = scalar( keys( %fields ) ) + 1;
+                $fields->{ "$field AS \"$as{ $field }\"" } = scalar( keys( %$fields ) ) + 1;
             }
         }
     }
-    if( exists( $fields{ 'last_name' } ) && 
-        exists( $fields{ 'first_name' } ) && 
-        !exists( $fields{ 'name' } ) )
+    if( $query_type eq 'select' && 
+        $enhance &&
+        exists( $fields->{last_name} ) && 
+        exists( $fields->{first_name} ) && 
+        !exists( $fields->{name} ) )
     {
     
         my $f = $prefix 
@@ -695,25 +800,25 @@ sub getdefault
         push( @extra, "$f AS name" );
     }
     
-    if( ( exists( $default{ 'auth' } ) && !defined( $arg{ 'auth' } ) ) || 
-        defined( $arg{ 'auth' } ) )
+    if( ( exists( $default->{auth} ) && !defined( $arg{auth} ) ) || 
+        defined( $arg{auth} ) )
     {
-        $default{ 'auth' } = defined( $arg{ 'auth' } ) 
-            ? $arg{ 'auth' }
+        $default->{auth} = defined( $arg{auth} ) 
+            ? $arg{auth}
             : 0;
     }
-    if( ( exists( $default{ 'status' } ) && !defined( $default{ 'status' } ) ) || 
-        defined( $arg{ 'status' } ) )
+    if( ( exists( $default->{status} ) && !defined( $default->{status} ) ) || 
+        defined( $arg{status} ) )
     {
-        $default{ 'status' } = defined( $arg{ 'status' } ) 
-            ? $arg{ 'status' }
+        $default->{status} = defined( $arg{status} ) 
+            ? $arg{status}
             : 1;
     }
     foreach my $data ( keys( %arg ) )
     {
-        if( exists( $default{ $data } ) )
+        if( exists( $default->{ $data } ) )
         {
-            $default{ $data } = $arg{ $data };
+            $default->{ $data } = $arg{ $data };
         }
     }
     my %from_unixtime = ();
@@ -728,10 +833,10 @@ sub getdefault
     
     $self->{_args} = $arg;
     # $self->{ '_args' } = $opts->{arg};
-    $self->{_default} = \%default;
-    $self->{_fields} = \%fields;
+    $self->{_default} = $default;
+    $self->{_fields} = $fields;
     $self->{_extra} = \@extra;
-    $self->{_structure} = \%structure;
+    $self->{_structure} = $structure;
     $self->{_from_unix} = \%from_unixtime;
     $self->{_to_unix} = \%to_unixtime;
     $self->{query_type} = $query_type;
@@ -767,14 +872,15 @@ sub insert
     }
     %arg = @arg if( @arg );
     my $tbl_o = $self->table_object || return( $self->error( "No table object is set." ) );
-    my $table   = $tbl_o->name ||
-    return( $self->error( "No table was provided to insert data." ) );
+    my $table = $tbl_o->name ||
+        return( $self->error( "No table was provided to insert data." ) );
     # We do not decide of the value of AUTO_INCREMENT fields, so we do not use them in
     # our INSERT statement.
-    my $structure = $tbl_o->structure();
+    my $structure = $tbl_o->structure || return( $self->pass_error( $tbl_o->error ) );
     my $null      = $tbl_o->null();
     my @avoid     = ();
-    my( $fields, $values ) = ( '', '' );
+    my( $fields, $values, $elems );
+    my $el = $self->elements;
     unless( $select )
     {
         foreach my $field ( keys( %$structure ) )
@@ -784,17 +890,23 @@ sub insert
             # Especially since a test on a NULL field may be made specifically.
             push( @avoid, $field ) if( scalar( @arg ) && !exists( $arg{ $field } ) && $null->{ $field } );
         }
-        $self->getdefault({
+        $self->getdefault(
             table => $table,
             arg => \@arg,
             avoid => \@avoid,
-        }) || return;
-        ( $fields, $values ) = $self->format_statement();
+        ) || return( $self->pass_error );
+        # ( $fields, $values ) = $self->format_statement();
+        $elems = $self->format_statement;
+        $fields = $elems->fields->join( ', ' );
+        # $values = $elems->values->join( ', ' );
+        $values = $elems->formats->join( ', ' );
+        $el->merge( $elems );
     }
     
-    if( $data && $self->_is_hash( $data ) && $self->binded_types->length )
+    # if( $data && $self->_is_hash( $data ) && $self->binded_types->length )
+    if( $data && $self->_is_hash( $data ) && $el->types->length )
     {
-        warn( "You have passed arguments to this insert as hash reference, and you are using placeholders. Using placeholders requires fixed order of arguments which an hash reference cannot guarantee. This will potentially lead to error when executing the query. I recommend you switch to an array of arguments instead, i.e. from { field1 => value1, field2 => value2 } to ( field1 => value1, field2 => value2 )\n" );
+        warn( "You have passed arguments to this insert as hash reference, and you are using placeholders. Using placeholders requires fixed order of arguments which an hash reference cannot guarantee. This will potentially lead to error when executing the query. I recommend you switch to an array of arguments instead, i.e. from { field1 => value1, field2 => value2 } to ( field1 => value1, field2 => value2 ), or to use numbered placeholders like \$1, \$2, etc...\n" );
     }
     my $clauses = $self->_query_components( 'insert' );
     my @query = ( $select ? "INSERT INTO $table $select" : "INSERT INTO $table ($fields) VALUES($values)" );
@@ -811,6 +923,7 @@ sub insert
     {
         return( $self->error( "Error '", $tbl_o->error, "' while preparing query to insert data into table '$table':\n$query" ) );
     }
+    # Called in void context
     if( !defined( wantarray() ) )
     {
         $sth->execute() ||
@@ -830,30 +943,27 @@ sub left_join { return( shift->_set_get_hash( 'left_join', @_ ) ); }
 sub limit
 {
     my $self  = shift( @_ );
-    my $limit = $self->_process_limit( @_ );
-    if( CORE::length( $limit->metadata->limit ) )
+    my $limit = $self->{limit};
+    if( @_ )
     {
-        $limit->generic( CORE::length( $limit->metadata->offset ) ? 'LIMIT ?, ?' : 'LIMIT ?' );
-        # User is managing the binding of value
-        if( (
-                $limit->metadata->offset eq '?' &&
-                $limit->metadata->limit eq '?'
-            ) || $limit->metadata->limit eq '?' )
+        # Returns a DB::Object::Query::Clause
+        $limit = $self->_process_limit( @_ ) ||
+            return( $self->pass_error );
+        if( CORE::length( $limit->metadata->limit // '' ) )
         {
+            $limit->generic( CORE::length( $limit->metadata->offset // '' ) ? 'LIMIT ?, ?' : 'LIMIT ?' );
+            # %s works for integer, and also for numbered placeholders like $1 or ?1, or regular placeholder like ?
             $limit->value(
-                CORE::length( $limit->metadata->offset )
-                ?  'LIMIT ?, ?'
-                : 'LIMIT ?'
+                CORE::length( $limit->metadata->offset // '' )
+                    ?  sprintf( "LIMIT %s, %s", $limit->metadata->offset, $limit->metadata->limit )
+                    : sprintf( "LIMIT %s", $limit->metadata->limit )
             );
         }
-        else
-        { 
-            $limit->value(
-                CORE::length( $limit->metadata->offset )
-                ? CORE::sprintf( 'LIMIT %d, %d', $limit->metadata->offset, $limit->metadata->limit )
-                : CORE::sprintf( 'LIMIT %d', $limit->metadata->limit )
-            );
-        }
+    }
+    
+    if( !$limit && want( 'OBJECT' ) )
+    {
+        return( $self->new_null( type => 'object' ) );
     }
     return( $limit );
 }
@@ -876,7 +986,7 @@ sub local
     return( wantarray() ? () : undef() ) if( !$local || !%$local );
     return( %$local ) if( wantarray() );
     my $str = join( ', ', map{ "\@${_} = '" . $local->{ $_ } . "'" } keys( %$local ) );
-    ## return( "SET $str" );
+    # return( "SET $str" );
     return( $str );
 }
 
@@ -884,12 +994,33 @@ sub new_clause
 {
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
-    $opts->{debug} = $self->debug;
-    my $o = DB::Object::Query::Clause->new( $opts );
-    defined( $o ) || return( $self->error( "Unable to create a DB::Object::Query::Clause object: ", DB::Object::Query::Clause->error ) );
-    $o->query_object( $self ) || return( $self->error( "Error: ", $o->error ) );
-    # $o->debug( $self->debug );
+    $opts->{debug} = $self->debug if( !exists( $opts->{debug} ) );
+    $opts->{query_object} = $self;
+    my $o = DB::Object::Query::Clause->new( %$opts ) ||
+        return( $self->error( "Unable to create a DB::Object::Query::Clause object: ", DB::Object::Query::Clause->error ) );
     return( $o );
+}
+
+sub new_element
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{debug} = $self->debug if( !exists( $opts->{debug} ) );
+    $opts->{query_object} = $self;
+    my $elem = DB::Object::Query::Element->new( %$opts ) ||
+        return( $self->pass_error( DB::Object::Query::Element->error ) );
+    return( $elem );
+}
+
+sub new_elements
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{debug} = $self->debug if( !exists( $opts->{debug} ) );
+    $opts->{query_object} = $self;
+    my $e = DB::Object::Query::Elements->new( %$opts ) ||
+        return( $self->pass_error( DB::Object::Query::Elements->error ) );
+    return( $e );
 }
 
 sub order { return( shift->_group_order( 'order', 'order_by', @_ ) ); }
@@ -906,7 +1037,7 @@ sub query_reset_keys { return( shift->_set_get_array_as_object( 'query_reset_key
 
 sub query_type { return( shift->_set_get_scalar( 'query_type', @_ ) ); }
 
-sub query_values { return( shift->_set_get( 'query_values', @_ ) ); }
+sub query_values { return( shift->_set_get_scalar_as_object( 'query_values', @_ ) ); }
 
 sub replace { return( shift->error( "The replace sql query is not supported by this driver." ) ); }
 
@@ -1073,7 +1204,8 @@ sub select
     else
     {
         $self->getdefault({ table => $table });
-        $fields = $self->format_statement();
+        my $elems = $self->format_statement();
+        $fields = $elems->fields->join( ', ' );
     }
     
     my $tie   = $self->tie();
@@ -1089,7 +1221,7 @@ sub select
         $table_alias = " AS $table_alias";
     }
     my @query = ( "SELECT $fields FROM ${table}${table_alias}" );
-    my $prev_fields = $self->{selected_fields};
+    my $prev_fields = $self->selected_fields;
     my $last_sth    = '';
     my $queries = $self->_cache_queries;
     # A simple check to avoid to do this test on each query, but rather only on those who deserve it.
@@ -1097,10 +1229,10 @@ sub select
     {
         my @last_query = grep
         {
-            $_->{selected_fields} ||= '';
-            $_->{selected_fields} eq $fields 
+            $_->selected_fields ||= '';
+            $_->selected_fields eq $fields 
         } @$queries;
-        $last_sth   = $last_query[ 0 ] || {};
+        $last_sth = $last_query[ 0 ] || {};
     }
     # If the selected fields in the last query performed were the same than those ones and
     # that the last query object has the flag 'as_string' set to true, this would mean that
@@ -1110,11 +1242,11 @@ sub select
     # to get the clause conditions
     #if( $fields eq $$prev_fields && $last_sth->{ 'as_string' } )
     #{
-        ## unshift( @query, "${vars};" ) if( $vars );
+        # unshift( @query, "${vars};" ) if( $vars );
         push( @query, @$clauses ) if( @$clauses );
     #}
     # used by join()
-    $self->{selected_fields} = $fields;
+    $self->selected_fields( $fields );
     my $query = $self->{query} = CORE::join( ' ', @query );
     my @tie_order = ();
     if( $tie && %$tie )
@@ -1140,7 +1272,7 @@ sub select
     # Query string should lie within the object
     # _cache_this sends back an object no matter what or undef() if an error occurs
     my $sth = $tbl_o->_cache_this( $self );
-    ## STOP! No need to go further
+    # STOP! No need to go further
     if( !defined( $sth ) )
     {
         return( $self->error( "Error while preparing query to select on table '$self->{ 'table' }':\n$query", $self->errstr() ) );
@@ -1154,8 +1286,8 @@ sub select
     # Straight forward declaration: $obj->select(); or $obj->select->execute() || die( $obj->error() );
     if( !defined( wantarray() ) )
     {
-        $sth->execute() ||
-        return( $self->error( "Error while executing query to select:\n", $self->as_string(), $sth->errstr() ) );
+        $sth->execute ||
+            return( $self->error( "Error while executing query to select:\n", $self->as_string(), $sth->errstr() ) );
     }
     return( $sth );
 }
@@ -1194,17 +1326,6 @@ sub tie
     return( wantarray() ? %{$self->{tie}} : $self->{tie} );
 }
 
-# sub unix_timestamp
-# {
-#     my $self = shift( @_ );
-#     if( @_ )
-#     {
-#         my $ref = ( @_ == 1 && $self->_is_array( $_[0] ) ) ? shift( @_ ) : [ @_ ];
-#         $self->{ 'unix_timestamp' } ||= [];
-#         push( @{$self->{unix_timestamp}}, ref( $ref ) ? @$ref : $ref );
-#     }
-#     return( wantarray() ? @{ $self->{ 'unix_timestamp' } } : $self->{ 'unix_timestamp' } );
-# }
 sub unix_timestamp { return( shift->_set_get_array_as_object( 'unix_timestamp', @_ ) ); }
 
 sub update
@@ -1235,18 +1356,20 @@ sub update
     {
         return( $self->error( "No data to update was provided." ) );
     }
-    my $values = $self->format_update( \@arg ) ||
-    return( $self->error( "No data to update was provided." ) );
+    my $elems = $self->format_update( \@arg ) || return( $self->pass_error );
+    my $values = $elems->formats->join( ', ' );
     my $clauses = $self->_query_components( 'update' );
     my @query  = ( "UPDATE $table SET $values" );
     push( @query, @$clauses ) if( scalar( @$clauses ) );
     my $query = $self->{query} = CORE::join( ' ', @query );
-    my( $p, $f, $l ) = caller();
-    my $call_sub = ( caller( 1 ) )[3];
-    return( $self->error( "Refusing to do a bulk update. Called from package $p in file $f at line $l from sub $call_sub. Enable the allow_bulk_update database object property if you want to do so. Original query was: $query" ) ) if( !$self->where && !$self->database_object->allow_bulk_update );
-    $self->{query_values} = \$values;
+    if( !$self->where && !$self->database_object->allow_bulk_update )
+    {
+        my( $p, $f, $l ) = caller();
+        my $call_sub = ( caller(1) )[3];
+        return( $self->error( "Refusing to do a bulk update. Called from package $p in file $f at line $l from sub $call_sub. Enable the allow_bulk_update database object property if you want to do so. Original query was: $query" ) );
+    }
+    $self->query_values( $values );
     $self->_save_bind();
-    # my $sth = $self->prepare( $self->{ 'query' } ) ||
     my $sth = $tbl_o->_cache_this( $self ) ||
     return( $self->error( "Error while preparing query to update table '$table':\n$query" ) );
     # $obj->update() to really delete
@@ -1257,7 +1380,7 @@ sub update
     {
         $sth->execute() ||
         return( $self->error( "Error while executing query to update table '$table':\n$query" ) );
-        ## $sth->finish();
+        # $sth->finish();
     }
     # wantarray returns false but not undefined when $obj->update->as_string();
     return( $sth );
@@ -1275,11 +1398,11 @@ sub _group_order
     my $tbl_o = $self->table_object || return( $self->error( "No table object is set." ) );
     my $bind  = $tbl_o->use_bind;
     my $table = $tbl_o->name;
-    $self->{ $prop } = $self->new_clause if( !CORE::length( $self->{ $prop } ) && !ref( $self->{ $prop } ) );
+    # $self->{ $prop } = $self->new_clause if( !CORE::length( $self->{ $prop } ) && !ref( $self->{ $prop } ) );
+    my $placeholder_re = $tbl_o->database_object->_placeholder_regexp;
     my $clause;
     if( @_ )
     {
-        my $clause = '';
         my $fields_ref = $tbl_o->fields();
         my $data   = ( @_ == 1 && ( !$self->_is_object( $_[0] ) || $self->_is_array( $_[0] ) ) && !exists( $fields_ref->{ "$_[0]" } ) )
             ? shift( @_ )
@@ -1296,20 +1419,49 @@ sub _group_order
             my $types      = Module::Generic::Array->new;
             my $fobjects   = Module::Generic::Array->new;
             my $generic    = Module::Generic::Array->new;
+            $clause = $self->new_clause(
+                type    => $type,
+                debug   => $self->debug,
+            );
             
             foreach my $field ( @$data )
             {
                 # Some garbage reached us
                 next if( !CORE::length( $field ) );
-                ## Transform a simple 'field' into a field object
+                
+                # Special treatment if we are being provided multiple clause to merge with ours
+                if( $self->_is_a( $field => 'DB::Object::Query::Clause' ) )
+                {
+                    if( !$self->{ $prop } )
+                    {
+                        $self->{ $prop } = $clause;
+                    }
+                    else
+                    {
+                        $clause = $self->{ $prop };
+                    }
+                    $clause->merge( $field );
+                    next;
+                }
+                
+                # Transform a simple 'field' into a field object
                 $field = $tbl_o->fo->$field if( CORE::exists( $fields_ref->{ $field } ) );
+                # my $elem = $self->new_element( field => $field );
+                my $elem;
                 if( $self->_is_a( $field => 'DB::Object::Fields::Field' ) )
                 {
-                    $components->push( '%s' );
-                    $fobjects->push( $field );
-                    $generic->push( '?' );
-                    $types->push( '' );
-                    $values->push( $field );
+#                     $components->push( '%s' );
+#                     $fobjects->push( $field );
+#                     $generic->push( '?' );
+#                     $types->push( '' );
+#                     $values->push( $field );
+                    $elem = $self->new_element(
+                        field => $field,
+                        # Not necessary; this is already the default value
+                        # generic => '?',
+                        type => '',
+                        value => $field,
+                    );
                 }
                 elsif( $self->_is_a( $field => 'DB::Object::Fields::Unknown' ) )
                 {
@@ -1318,11 +1470,26 @@ sub _group_order
                 # i.e. GROUP BY width => GROUP BY table.width
                 elsif( ref( $field ) eq 'SCALAR' )
                 {
-                    $components->push( $$field );
+                    # $components->push( $$field );
+                    $elem = $self->new_element(
+                        field => $field,
+                        type => '',
+                        value => $$field,
+                    );
+                }
+                elsif( $field =~ /^($placeholder_re)$/ )
+                {
+                    # $elem->placeholder( $1 );
+                    # $components->push( $field );
+                    $elem = $self->new_element(
+                        field => $field,
+                        placeholder => $1,
+                        type => '',
+                        value => $field,
+                    );
                 }
                 elsif( $field =~ /\b(?:$fields)\b/ ||
                        $field =~ /\w\([^\)]*\)/ ||
-                       $field eq '?' || 
                        !$bind )
                 {
                     $field =~ s{
@@ -1333,24 +1500,50 @@ sub _group_order
                         "${prefix}.${ok}${spc}";
                     }gex if( $prefix );
                     $field =~ s/(?<!\.)($tables)(?:\.)/$db\.$1\./g if( $multi_db );
-                    $components->push( $field );
+                    # $components->push( $field );
+                    $elem = $self->new_element(
+                        field => $field,
+                        type => '',
+                        value => $field,
+                    );
                 }
                 else
                 {
-                    $components->push( $field );
-                    $values->push( $field );
-                    $types->push( '' );
-                    $generic->push( '?' );
+#                     $components->push( $field );
+#                     $values->push( $field );
+#                     $types->push( '' );
+#                     $generic->push( '?' );
+                    $elem = $self->new_element(
+                        field => $field,
+                        # Not necessary; this is already the default value
+                        # generic => '?',
+                        type => '',
+                        value => $field,
+                    );
                 }
+                $clause->push( $elem );
             }
-            $clause = $self->new_clause({
-                value => $components->join( ', ' ),
-                type => $type,
-                fields => $fobjects,
-                generic => $generic->join( ', ' ),
-            });
-            $clause->bind->values( @$values ) if( $bind );
-            $clause->bind->types( @$types ) if( $bind );
+#             $clause = $self->new_clause({
+#                 value => $components->join( ', ' ),
+#                 type => $type,
+#                 fields => $fobjects,
+#                 generic => $generic->join( ', ' ),
+#             });
+#             $clause->bind->values( @$values ) if( $bind );
+#             $clause->bind->types( @$types ) if( $bind );
+            
+            # $clause->value( $components->join( ', ' ) );
+            # $clause->generic( $generic->join( ', ' ) );
+            $clause->value( $clause->values->join( ', ' ) );
+            $clause->generic( $clause->generics->join( ', ' ) );
+        }
+        # Merging our clause with a new one
+        elsif( $self->_is_a( $data => 'DB::Object::Query::Clause' ) )
+        {
+            $clause = $self->{ $prop }
+                ? $self->{ $prop }
+                : $self->new_clause( type => $type );
+            $clause->merge( $data );
         }
         else
         {
@@ -1358,12 +1551,14 @@ sub _group_order
                 value => $data,
                 type => $type,
             });
-            my $ref = [];
+            # my $ref = [];
             if( $bind )
             {
-                $self->_value2bind( \$data, $ref );
-                $clause->bind->values( $ref );
-                $clause->bind->types( ( '' ) x scalar( @$ref ) );
+                # $self->_value2bind( \$data, $ref );
+                my $elems = $self->_value2bind( \$data );
+                # $clause->bind->values( $ref );
+                # $clause->bind->types( ( '' ) x scalar( @$ref ) );
+                $clause->push( $elems->elements->list ) if( $elems->elements->length );
             }
         }
         $self->{ $prop } = $clause;
@@ -1371,6 +1566,11 @@ sub _group_order
     else
     {
         $clause = $self->{ $prop };
+    }
+    
+    if( !$clause && want( 'OBJECT' ) )
+    {
+        return( $self->new_null( type => 'object' ) );
     }
     return( $clause );
 }
@@ -1384,7 +1584,7 @@ sub _having
     my $bind  = $tbl_o->use_bind;
     my $table = $tbl_o->name;
     my $prefix = $tbl_o->prefix;
-    $self->{having} ||= '';
+    my $placeholder_re = $tbl_o->database_object->_placeholder_regexp;
     my $clause;
     if( @_ )
     {
@@ -1403,17 +1603,46 @@ sub _having
             {
                 # In case we received some garbage
                 next if( !CORE::length( $field ) );
+                
+                # Special treatment if we are being provided multiple clause to merge with ours
+                if( $self->_is_a( $field => 'DB::Object::Query::Clause' ) )
+                {
+                    if( !$self->{having} )
+                    {
+                        $self->{having} = $self->new_clause( type => 'having' );
+                    }
+                    else
+                    {
+                        $clause = $self->{having};
+                    }
+                    $clause->merge( $field );
+                    next;
+                }
+
                 # i.e. HAVING width => HAVING table.width
                 if( ref( $field ) eq 'SCALAR' )
                 {
                     push( @clause, $self->new_clause({
-                        value => $$field,
-                        type => 'having',
+                        value   => $$field,
+                        type    => 'having',
                     }) );
+                }
+                elsif( $field =~ /^($placeholder_re)$/ )
+                {
+                    my $plh = $1;
+                    my $cl = $self->new_clause(
+                        value   => $field,
+                        type    => 'having',
+                    );
+                    
+                    my $elem = $self->new_element(
+                        placeholder => $plh,
+                    );
+                    $cl->push( $elem );
+                    CORE::push( @clause, $cl );
                 }
                 elsif( $field =~ /\b(?:$fields)\b/ ||
                        $field =~ /\w\([^\)]*\)/ ||
-                       $field eq '?' || 
                        !$bind )
                 {
                     $field =~ s{
@@ -1425,22 +1654,22 @@ sub _having
                     }gex if( $prefix );
                     $field =~ s/(?<!\.)($tables)(?:\.)/$db\.$1\./g if( $multi_db );
                     push( @clause, $self->new_clause({
-                        value => $field,
-                        type => 'having',
+                        value   => $field,
+                        type    => 'having',
                     }) );
                 }
                 elsif( $bind )
                 {
-                    CORE::push( @clause, $self->new_clause(
-                    {
-                        value => '?',
-                        type => 'having',
-                        bind => 
-                        {
-                            values => $field,
-                            types => [ '' ],
-                        }
-                    }) );
+                    my $elem = $self->new_element(
+                        placeholder => '?',
+                        value       => $field,
+                    );
+                    my $cl = $self->new_clause(
+                        value   => '?',
+                        type    => 'having',
+                    );
+                    $cl->push( $elem );
+                    CORE::push( @clause, $cl );
                 }
                 else
                 {
@@ -1450,29 +1679,36 @@ sub _having
                     }) );
                 }
             }
-            $clause = $self->new_clause->merge( $self->database_object->AND( @clause ) );
-            $clause->bind->values( @values ) if( $bind );
-            $clause->bind->types( @types ) if( $bind );
+            $clause = $self->new_clause( type => 'having' )->merge( $self->database_object->AND( @clause ) );
+            # $clause->bind->values( @values ) if( $bind );
+            # $clause->bind->types( @types ) if( $bind );
         }
         else
         {
-            $clause = $self->new_clause({
+#             my $ref = [];
+#             if( $bind )
+#             {
+#                 $self->_value2bind( \$clause, $ref );
+#                 $clause->bind->values( @$ref ) if( $bind && scalar( @$ref ) );
+#                 $clause->bind->types( ( '' ) x scalar( @$ref ) ) if( $bind );
+#             }
+            my $elems = $self->_value2bind( \$data );
+            $clause = $self->new_clause(
                 value => $data,
                 type => 'having',
-            });
-            my $ref = [];
-            if( $bind )
-            {
-                $self->_value2bind( \$clause, $ref );
-                $clause->bind->values( @$ref ) if( $bind && scalar( @$ref ) );
-                $clause->bind->types( ( '' ) x scalar( @$ref ) ) if( $bind );
-            }
+            );
+            $clause->push( $elems->elements->list ) if( $elems->elements->length );
         }
         $self->{having} = $clause;
     }
     else
     {
         $clause = $self->{having};
+    }
+    
+    if( !$clause && want( 'OBJECT' ) )
+    {
+        return( $self->new_null( type => 'object' ) );
     }
     return( $clause );
 }
@@ -1490,79 +1726,115 @@ sub _process_limit
     my $self  = shift( @_ );
     my $tbl_o = $self->table_object || return( $self->error( "No table object is set." ) );
     my $bind  = $tbl_o->use_bind;
+    my $placeholder_re = $tbl_o->database_object->_placeholder_regexp;
     my $limit;
-    if( !$self->{limit} || !$self->_is_object( $self->{limit} ) )
-    {
-        $limit = $self->{limit} = $self->new_clause({ type => 'limit' });
-    }
-    else
-    {
-        $limit = $self->{limit};
-    }
+    
+    # $self->limit can be used to set the offset and limit, but can also be used to 
+    # pass limit clause object to be merged, so here we check it, and if found, we do not go further.
     if( @_ )
     {
-        my( $start, $end ) = ( '', '' );
+        # First check if what we are being provided is not clause objects
+        my @clauses = ();
+        for( my $i = 0; $i < scalar( @_ ); $i++ )
+        {
+            # Special treatment if we are being provided multiple clause to merge with ours
+            if( $self->_is_a( $_[$i] => 'DB::Object::Query::Clause' ) )
+            {
+                push( @clauses, $_[$i] );
+                splice( @_, $i, 1 );
+                $i--;
+            }
+        }
+        
+        if( scalar( @clauses ) )
+        {
+            if( !$self->{limit} )
+            {
+                $self->{limit} = $limit = $self->new_clause( type => 'limit' );
+            }
+            else
+            {
+                $limit = $self->{limit};
+            }
+            $limit->merge( @clauses );
+            return( $limit );
+        }
+        
+        my( $start, $end );
         if( @_ == 1 )
         {
-            ( $start, $end ) = ( undef(), shift( @_ ) );
+            $end = shift( @_ );
         }
         else
         {
-            ( $start, $end ) = ( shift( @_ ), shift( @_ ) );
+            ( $start, $end ) = splice( @_, 0, 2 );
         }
         my @binded = ();
         my @list   = ();
         my @types  = ();
         my @generic = ();
+        $limit = $self->new_clause( type => 'limit' );
         foreach my $value ( $start, $end )
         {
-            next if( !CORE::length( $value ) );
-            ## This is a raw parameter - being a ref to a SCALAR means we must not modify it
+            next if( !CORE::length( $value // '' ) );
+            my $elem = $self->new_element;
+            # This is a raw parameter - being a ref to a SCALAR means we must not modify it
             if( ref( $value ) eq 'SCALAR' )
             {
                 push( @list, $$value );
             }
-            ## A value to be a place holder - forward it
-            elsif( $value eq '?' )
+            # A value to be a place holder - forward it
+            # elsif( $value eq '?' )
+            elsif( $value =~ /^($placeholder_re)$/ )
             {
-                # push( @list, $value );
-                push( @list, '?' );
-                push( @generic, '?' );
-                push( @binded, $value );
-                push( @types, '' );
+                # Maybe ? or $1, or ?1
+                push( @list, $1 );
+                push( @generic, $1 );
+                $elem->placeholder( $1 );
+                # push( @binded, $value );
+                # push( @types, '' );
+                $elem->value( $value );
             }
-            ## Normal processing
-            ## elsif( $bind )
+            # Normal processing
             else
             {
                 push( @list, $value );
                 push( @generic, '?' );
-                push( @binded, $value );
-                push( @types, '' );
+                # push( @binded, $value );
+                # push( @types, '' );
+                $elem->placeholder( '?' );
+                $elem->value( $value );
             }
+            $limit->push( $elem );
         }
-        ## $limit = $self->{limit} = [ @list ];
+        # $limit = $self->{limit} = [ @list ];
         $limit->value( CORE::join( ', ', @list ) ) if( scalar( @list ) );
         $limit->generic( CORE::join( ', ', @generic ) ) if( scalar( @generic ) );
-        $limit->bind->values( \@binded );
-        $limit->bind->types( \@types );
+        # $limit->bind->values( \@binded );
+        # $limit->bind->types( \@types );
         if( scalar( @list ) )
         {
             if( scalar( @list ) > 1 )
             {
-                $limit->metadata->offset( $list[0] ) if( CORE::length( $list[0] ) );
-                $limit->metadata->limit( $list[1] ) if( CORE::length( $list[1] ) );
+                $limit->metadata->offset( $list[0] ) if( CORE::length( $list[0] // '' ) );
+                $limit->metadata->limit( $list[1] ) if( CORE::length( $list[1] // '' ) );
             }
             else
             {
                 $limit->metadata->offset( '' );
-                $limit->metadata->limit( $list[0] ) if( CORE::length( $list[0] ) );
+                $limit->metadata->limit( $list[0] ) if( CORE::length( $list[0] // '' ) );
             }
         }
+        $self->{limit} = $limit;
     }
     else
     {
         $limit = $self->{limit};
+    }
+    
+    if( !$limit && want( 'OBJECT' ) )
+    {
+        return( $self->new_null( type => 'object' ) );
     }
     return( $limit );
 }
@@ -1572,14 +1844,14 @@ sub _query_components
     my $self = shift( @_ );
     my $type = lc( shift( @_ ) ) || $self->_query_type() || return( $self->error( "You must specify a query type: select, insert, update or delete" ) );
     my( $where, $group, $sort, $order, $limit );
-    $where  = $self->where();
-    if( $type eq "select" )
+    $where = $self->where;
+    if( $type eq 'select' )
     {
-        $group  = $self->group();
-        $sort  = $self->reverse() ? 'DESC' : $self->sort() ? 'ASC' : '';
-        $order  = $self->order();
+        $group = $self->group;
+        $sort  = $self->reverse ? 'DESC' : $self->sort ? 'ASC' : '';
+        $order = $self->order;
     }
-    $limit  = $self->limit();
+    $limit = $self->limit;
     my @query = ();
     push( @query, "WHERE $where" ) if( $where && $type ne 'insert' );
     push( @query, "GROUP BY $group" ) if( $group && $type eq 'select' );
@@ -1611,32 +1883,39 @@ sub _save_bind
     }
     my $tbl_o = $self->table_object || return( $self->error( "No table object is set." ) );
     my $bind  = $tbl_o->use_bind;
-    my $where = $self->where();
-    my $group = $self->group();
-    my $order = $self->order();
-    my $limit = $self->limit();
-    ## This is used so upon execute, the saved binded parameters get sent to the DBI::execute method
+    my $where = $self->where;
+    my $group = $self->group;
+    my $order = $self->order;
+    my $limit = $self->limit;
+    # This is used so upon execute, the saved binded parameters get sent to the DBI::execute method
     if( $bind )
     {
-        my $binded = $self->binded;
-        ## For update or insert
-        my $binded_values = $self->binded_values;
-        my $binded_where  = $self->where->bind->values;
-        my $binded_group  = $self->group->bind->values;
-        my $binded_order  = $self->order->bind->values;
-        my $binded_limit  = $self->limit->bind->values;
-        ## The order is important
-        $binded->push( @$binded_values ) if( $type !~ /^(?:select|delete)$/ && $binded_values->length );
-        $binded->push( @$binded_where ) if( $where->length && $binded_where->length );
-        $binded->push( @$binded_group ) if( $group->length && $binded_group->length );
-        $binded->push( @$binded_order ) if( $order->length && $binded_order->length );
-        $binded->push( @$binded_limit ) if( $limit->length && $binded_limit->length );
+        # Replace binded()
+        my $elems = $self->elements;
+        $elems->push( $where->elements ) if( $where->length && !$where->elements->is_empty );
+        $elems->push( $group->elements ) if( $group->length && !$group->elements->is_empty );
+        $elems->push( $order->elements ) if( $order->length && !$order->elements->is_empty );
+        $elems->push( $limit->elements ) if( $limit->length && !$limit->elements->is_empty );
         
-        my $binded_types = $self->binded_types;
-        $binded_types->push( @{$where->bind->types} ) if( $where->bind->types->length );
-        $binded_types->push( @{$group->bind->types} ) if( $group->bind->types->length );
-        $binded_types->push( @{$order->bind->types} ) if( $order->bind->types->length );
-        $binded_types->push( @{$limit->bind->types} ) if( $limit->bind->types->length );
+#         # my $binded = $self->binded;
+#         # For update or insert
+#         my $binded_values = $self->binded_values;
+#         my $binded_where  = $self->where->bind->values;
+#         my $binded_group  = $self->group->bind->values;
+#         my $binded_order  = $self->order->bind->values;
+#         my $binded_limit  = $self->limit->bind->values;
+#         # The order is important
+#         $binded->push( @$binded_values ) if( $type !~ /^(?:select|delete)$/ && $binded_values->length );
+#         $binded->push( @$binded_where ) if( $where->length && $binded_where->length );
+#         $binded->push( @$binded_group ) if( $group->length && $binded_group->length );
+#         $binded->push( @$binded_order ) if( $order->length && $binded_order->length );
+#         $binded->push( @$binded_limit ) if( $limit->length && $binded_limit->length );
+#         
+#         my $binded_types = $self->binded_types;
+#         $binded_types->push( @{$where->bind->types} ) if( $where->bind->types->length );
+#         $binded_types->push( @{$group->bind->types} ) if( $group->bind->types->length );
+#         $binded_types->push( @{$order->bind->types} ) if( $order->bind->types->length );
+#         $binded_types->push( @{$limit->bind->types} ) if( $limit->bind->types->length );
     }
     return( $self );
 }
@@ -1644,8 +1923,8 @@ sub _save_bind
 sub _value2bind
 {
     my $self   = shift( @_ );
-    ## If we are not suppose to bind any values, there is no point to go on.
-    ## return( 1 ) if( !$self->{ 'bind' } );
+    # If we are not suppose to bind any values, there is no point to go on.
+    # return(1) if( !$self->{ 'bind' } );
     my $str    = shift( @_ );
     my $ref    = shift( @_ );
     my $tbl_o  = $self->{table_object} || return( $self->error( "No table object is set." ) );
@@ -1658,6 +1937,8 @@ sub _value2bind
     my $tables = CORE::join( '|', @{$tbl_o->database_object->tables} );
     my $multi_db = $tbl_o->param( 'multi_db' );
     my @binded = ();
+    my $placeholder_re = $tbl_o->database_object->_placeholder_regexp;
+    my $elems = $self->new_elements;
     $$str =~ s
     {
         (([\w\_]+)(?:\.))?\b([a-zA-Z\_]+)\b\s*(=|\!=|LIKE)\s*['"]([^'"]+)['"]
@@ -1666,27 +1947,38 @@ sub _value2bind
         do
         {
             my( $this_table, $field, $equity, $value ) = ( $2, $3, $4, $5 );
-            ## Add to the list of value to bind on execute() only if this is not already a place holder
-            ## push( @binded, $value ) if( $bind && $value ne '?' );
+            # Add to the list of value to bind on execute() only if this is not already a place holder
+            # push( @binded, $value ) if( $bind && $value ne '?' );
             $this_table ||= $table;
             $this_table .= '.';
-            ## $bind ? "${this_table}${field}=?" : "${this_table}${field}='$value'";
+            # $bind ? "${this_table}${field}=?" : "${this_table}${field}='$value'";
+            my $elem = $self->new_element( field => "${this_table}${field}" );
+            my $result;
             if( $value !~ /[\r\n]+/ &&
                 ( $value =~ /\b(?:$fields)\b/ ||
                   $value =~ /\w\([^\)]*\)/ ||
-                  $value eq '?' ) )
+                  $value =~ /^$placeholder_re$/ ) )
             {
-                "${this_table}${field} $equity $value";
+                if( $value =~ /^($placeholder_re)$/ )
+                {
+                    $elem->placeholder( $1 );
+                }
+                $result = "${this_table}${field} $equity $value";
+                $elems->push( $elem );
             }
             elsif( $bind )
             {
-                push( @binded, $value );
-                "${this_table}${field} $equity ?";
+                # push( @binded, $value );
+                $result = "${this_table}${field} $equity ?";
+                $elem->placeholder( '?' );
+                $elem->value( $value );
+                $elems->push( $elem );
             }
             else
             {
-                "${this_table}${field} $equity '$value'";
+                $result = "${this_table}${field} $equity '$value'";
             }
+            $result;
         };
     }geix;
     $$str =~ s
@@ -1698,8 +1990,9 @@ sub _value2bind
         "$prefix.$ok$spc";
     }gex if( $prefix );
     $$str =~ s/(?<!\.)($tables)(?:\.)/$db\.$1\./g if( $multi_db );
-    push( @$ref, @binded ) if( @binded );
-    return( 1 );
+    # push( @$ref, @binded ) if( @binded );
+    # return(1);
+    return( $elems );
 }
 
 sub _where_having
@@ -1712,8 +2005,10 @@ sub _where_having
     my $tbl_o = $self->table_object || return( $self->error( "No table object is set." ) );
     my $base_class = $tbl_o->base_class;
     my $bind = $tbl_o->use_bind;
-    $self->{ $prop } = $self->new_clause() if( !CORE::length( $self->{ $prop } ) || !$self->_is_object( $self->{ $prop } ) );
-    my $where = $self->{ $prop };
+    # $self->{ $prop } = $self->new_clause if( !CORE::length( $self->{ $prop } ) || !$self->_is_object( $self->{ $prop } ) );
+    # my $where = $self->{ $prop };
+    my $where;
+    my $placeholder_re = $tbl_o->database_object->_placeholder_regexp;
     if( @_ )
     {
         my @params = @_;
@@ -1739,7 +2034,6 @@ sub _where_having
                 return( $self->error( "I was expecting an operator object, but got \"", $_[0], "\" instead." ) ) if( !$_[0]->isa( 'DB::Object::Operator' ) );
                 $agg_op = $_[0]->operator || return( $self->error( "Unknown operator for \"", $_[0], "\"." ) );
                 # We filter out any unknown field
-                my @and_values = $_[0]->value;
                 ( @arg ) = grep( !$self->_is_a( $_ => 'DB::Object::Fields::Unknown' ), $_[0]->value );
             }
             else
@@ -1781,7 +2075,7 @@ sub _where_having
                         push( @list, shift( @arg ) );
                         next;
                     }
-                    elsif( $self->_is_object( $arg[0] ) && $arg[0]->isa( 'DB::Object::Fields::Field::Overloaded' ) )
+                    elsif( $self->_is_object( $arg[0] ) && $arg[0]->isa( 'DB::Object::Fields::Overloaded' ) )
                     {
                         my $f = shift( @arg );
                         my $cl = $self->new_clause(
@@ -1789,17 +2083,27 @@ sub _where_having
                             type => 'where',
                         );
                         # $cl->bind->types->push( '' ) if( $f->binded );
-                        if( $f->binded )
+                        if( $f->placeholder )
                         {
                             my $const = $f->field->constant->constant;
-                            if( $const )
-                            {
-                                $cl->bind->types->push( $const );
-                            }
-                            else
-                            {
-                                $cl->bind->types->push( '' );
-                            }
+                            my $offset = $f->index;
+#                             $cl->push({
+#                                 field   => $f->field,
+#                                 # Use the offset expressly provided (e.g. $1 (PostgreSQL) or ?1 (SQLite), or the last position in the array
+#                                 ( defined( $offset ) ? ( index => $offset ) : () ),
+#                                 ( $const ? ( type => $const ) : () ),
+#                             }) || return( $self->pass_error( $cl->error ) );
+                            # Even better than instantiating a new DB::Object::Element object, we just use as-is the DB::Object::Fields::Overloaded object, which inherits from DB::Object::Element :)
+                            $cl->push( $f );
+                            
+#                             if( $const )
+#                             {
+#                                 $cl->bind->types->push( $const );
+#                             }
+#                             else
+#                             {
+#                                 $cl->bind->types->push( '' );
+#                             }
                         }
                         push( @list, $cl );
                         
@@ -1820,13 +2124,13 @@ sub _where_having
                     # Case where there is a litteral query component, e.g. "LENGTH(lang) = 2" and the number of arguments is odd which means there is no second argument such as: ->where( "LENGTH(lang) = 2", $tbl->fo->user_id => "something );
                     elsif( ( scalar( @arg ) % 2 ) && !ref( $arg[0] ) )
                     {
-                        push( @list, $self->new_clause({ value => shift( @arg ), type => 'where' }) );
+                        push( @list, $self->new_clause( value => shift( @arg ), type => 'where' ) );
                         next;
                     }
                     elsif( ( scalar( @arg ) % 2 ) && ref( $arg[0] ) eq 'SCALAR' )
                     {
                         my $scalar = shift( @arg );
-                        push( @list, $self->new_clause({ value => $$scalar, type => 'where' }) );
+                        push( @list, $self->new_clause( value => $$scalar, type => 'where' ) );
                         next;
                     }
                     # Catching some typical typo errors for the benefit of the coder (from experience)
@@ -1836,10 +2140,10 @@ sub _where_having
                         warn( "Warning only: found a field object '$arg[0]' (never mind the surrounding quotes) (", overload::StrVal( $arg[0] ), ") followed by no other argument. Did you forget to assign a value such as \$tbl->fo->$arg[0] == 'something' ?\n" );
                     }
                     
-                    my( $field, $value ) = ( shift( @arg ), shift( @arg ) );
+                    my( $field, $value ) = splice( @arg, 0, 2 );
                     # Catching some typical typo errors for the benefit of the coder (from experience)
                     if( $self->_is_a( $field, 'DB::Object::Fields::Field' ) && 
-                        $self->_is_a( $value, 'DB::Object::Fields::Field::Overloaded' ) )
+                        $self->_is_a( $value, 'DB::Object::Fields::Overloaded' ) )
                     {
                         warn( "Warning only: found a field object '$field' (never mind the surrounding quotes) (", overload::StrVal( $field ), ") followed by an another (proper) field value assignment ($value). Did you forget to assign a value such as \$tbl->fo->$field == 'something' ?\n" );
                     }
@@ -1907,9 +2211,10 @@ sub _where_having
                             generic => $i_am_negative ? "$f != ?" : "$f = ?",
                             type => 'where',
                         });
-                        $cl->bind->values( $res );
-                        $cl->bind->types( '' );
-                        $cl->fields( $field ) if( $self->_is_a( $field => 'DB::Object::Fields::Field' ) );
+                        # $cl->bind->values( $res );
+                        # $cl->bind->types( '' );
+                        # $cl->fields( $field ) if( $self->_is_a( $field => 'DB::Object::Fields::Field' ) );
+                        $cl->push( $value->query_object->elements );
                         push( @list, $cl );
                     }
                     elsif( ref( $value ) eq 'Regexp' )
@@ -1937,57 +2242,86 @@ sub _where_having
                                 type => 'where',
                             });
                         }
-                        $cl->bind->values( $value );
-                        $cl->bind->types( '' );
-                        $cl->fields( $field ) if( $self->_is_a( $field => 'DB::Object::Fields::Field' ) );
+                        # $cl->bind->values( $value );
+                        # $cl->bind->types( '' );
+                        $cl->push({
+                            ( $self->_is_a( $field => 'DB::Object::Fields::Field' ) ? ( field => $field ) : () ),
+                            value => $value,
+                        });
+                        # $cl->fields( $field ) if( $self->_is_a( $field => 'DB::Object::Fields::Field' ) );
+                        push( @list, $cl );
+                    }
+                    elsif( $value =~ /^($placeholder_re)$/ )
+                    {
+                        my $plh = $1;
+                        my $cl = $self->new_clause(
+                            value => $i_am_negative ? "$f != $value" : "$f = $value",
+                            type => 'where',
+                        );
+                        my $el = $self->new_element(
+                            field       => $field, 
+                            placeholder => $plh,
+                        );
+                        $cl->push( $el );
                         push( @list, $cl );
                     }
                     elsif( $value =~ /[\s\(\)\.\'\"]+(?:$fields)[\s\(\)\.\'\"]+/ ||
-                           $value =~ /\w\([^\)]*\)/ ||
-                           $value eq '?' )
+                           $value =~ /\w\([^\)]*\)/ )
                     {
                         # Nothing fancy, as is. Even with binding option on, it will still return the clause without placeholder, because we don't know what $value is
-                        my $cl = $self->new_clause({
+                        my $cl = $self->new_clause(
                             value => $i_am_negative ? "$f != $value" : "$f = $value",
                             type => 'where',
-                        });
-                        $cl->bind->types( '' ) if( $value eq '?' );
-                        $cl->fields( $field ) if( $self->_is_a( $field => 'DB::Object::Fields::Field' ) );
+                        );
+                        # $cl->bind->types( '' ) if( $value =~ /^$placeholder_re$/ );
+                        # $cl->fields( $field ) if( $self->_is_a( $field => 'DB::Object::Fields::Field' ) );
+                        if( $self->_is_a( $field => 'DB::Object::Fields::Field' ) )
+                        {
+                            my $el = $self->new_element(
+                                field => $field, 
+                            );
+                            $cl->push( $el );
+                        }
                         push( @list, $cl );
                     }
                     else
                     {
-                        my $cl;
-                        my $const;
+                        my( $cl, $const, $el );
                         if( lc( $fields_type->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
                         {
-                            $cl = $self->new_clause({
-                                # value => "$f" . ( $i_am_negative ? '!=' : '=' ) . $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ),
+                            $cl = $self->new_clause(
                                 value => "$f" . ( $i_am_negative ? '!=' : '=' ) . $tbl_o->database_object->quote( $value, $const ),
                                 type => 'where',
-                            });
+                            );
+                            $el = $self->new_element;
                         }
                         else
                         {
-                            $cl = $self->new_clause({
+                            $cl = $self->new_clause(
                                 value => "$f" . ( $i_am_negative ? '!=' : '=' ) . $tbl_o->database_object->quote( $value ),
                                 generic => $i_am_negative ? "$f != ?" : "$f = ?",
                                 type => 'where',
+                            );
+                            # $cl->bind->values( $value );
+                            $cl->push({
+                                value => $value,
                             });
-                            $cl->bind->values( $value );
+                            $el = $self->new_element( value => $value );
                         }
-                        $cl->fields( $field ) if( $self->_is_a( $field => 'DB::Object::Fields::Field' ) );
+                        
+                        # $cl->fields( $field ) if( $self->_is_a( $field => 'DB::Object::Fields::Field' ) );
+                        $el->field( $field ) if( $self->_is_a( $field => 'DB::Object::Fields::Field' ) );
                         if( lc( $fields_type->{ $field } ) eq 'bytea' && 
                             ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
                         {
-                            # TODO Really need to fix this !!
-                            # $cl->bind->types( DBD::Pg::PG_BYTEA );
-                            $cl->bind->types( $const );
+                            # $cl->bind->types( $const );
+                            $el->type( $const );
                         }
-                        else
-                        {
-                            $cl->bind->types( '' ) if( $value eq '?' );
-                        }
+                        # else
+                        # {
+                        #     $cl->bind->types( '' ) if( $value =~ /^$placeholder_re$/ );
+                        # }
+                        $cl->push( $el ) if( defined( $el ) );
                         CORE::push( @list, $cl );
                     }
                 }
@@ -1996,17 +2330,24 @@ sub _where_having
             }
             elsif( $data )
             {
-                $self->_value2bind( \$data, \@binded ) if( $bind );
-                $str = $data;
-                @types = ( '' ) x scalar( @binded );
-                $clause = $self->new_clause({
-                    value => $str,
-                    bind =>
-                    {
-                        values => \@binded,
-                        types => \@types,
-                    }
-                });
+#                 $self->_value2bind( \$data, \@binded ) if( $bind );
+#                 $str = $data;
+#                 @types = ( '' ) x scalar( @binded );
+#                 $clause = $self->new_clause({
+#                     value => $str,
+#                     bind =>
+#                     {
+#                         values => \@binded,
+#                         types => \@types,
+#                     }
+#                 });
+                
+                my $elems = $self->_value2bind( \$data );
+                $clause = $self->new_clause(
+                    value => $data,
+                    type  => 'where',
+                );
+                $clause->push( $elems ) if( $elems->elements->length );
             }
             return( $clause );
         };
@@ -2017,154 +2358,13 @@ sub _where_having
     {
         $where = $self->{ $prop };
     }
+    
+    if( !$where && want( 'OBJECT' ) )
+    {
+        return( $self->new_null( type => 'object' ) );
+    }
     return( $where );
 }
-
-# NOTE: package DB::Object::Query::Clause
-package DB::Object::Query::Clause;
-BEGIN
-{
-    use strict;
-    use common::sense;
-    use parent qw( Module::Generic );
-    use Devel::Confess;
-    use overload (
-        '""'     => 'as_string',
-        fallback => 1,
-    );
-    our( $VERSION ) = '0.1';
-};
-
-sub init
-{
-    my $self = shift( @_ );
-    my @copy = @_;
-    $self->{value} = '';
-    $self->{generic} = '';
-    $self->{_init_strict_use_sub} = 1;
-    $self->{fields} = [];
-    defined( $self->SUPER::init( @copy ) ) || return( $self->pass_error );
-    # return( $self->error( "No sql clause was provided." ) ) if( !$self->{value} );
-    return( $self );
-}
-
-sub as_string
-{
-    # no overloading;
-    my $self = shift( @_ );
-    my $fields = $self->fields;
-    if( $self->generic->length && $self->query_object->table_object->use_bind )
-    {
-        return( $self->generic ) if( !$fields->length );
-        return( Module::Generic::Scalar->new( CORE::sprintf( $self->generic, @$fields ) ) );
-    }
-    my $str  = $self->value;
-    return( $str ) if( !$fields->length );
-    # Stringification of the fields will automatically format them properly, ie with a table prefix, schema prefix, database prefix as necessary
-    return( Module::Generic::Scalar->new( CORE::sprintf( $str, @$fields ) ) );
-    # return( CORE::sprintf( $str, @$fields ) );
-}
-
-sub bind
-{
-    return( shift->_set_get_class( 'bind', 
-    {
-        # The sql types of the value bound to the placeholders
-        types => { type => 'array_as_object' },
-        # The values bound to the placeholders in the sql clause
-        values => { type => 'array_as_object' },
-    }, @_ ) );
-}
-
-sub fields { return( shift->_set_get_array_as_object( 'fields', @_ ) ); }
-
-sub generic { return( shift->_set_get_scalar_as_object( 'generic', @_ ) ); }
-
-sub length { return( shift->value->length ); }
-
-sub metadata { return( shift->_set_get_hash_as_object( 'metadata', @_ ) ); }
-
-sub merge
-{
-    my $self = shift( @_ );
-    if( @_ )
-    {
-        # By default
-        my $op = 'AND';
-        my @params = ();
-        # $clause->merge( $dbh->OR( $clause1, $clause2, $clause3 ) );
-        # or just
-        # $clause->merge( $clause1, $clause2, $clause3 );
-        if( $self->_is_object( $_[0] ) && $_[0]->isa( 'DB::Object::Operator' ) )
-        {
-            my $op_obj = shift( @_ );
-            return( $self->error( "Database Object operator provided is invalid. It should be either an AND or OR." ) ) if( $op_obj->operator ne 'AND' and $op_obj->operator ne 'OR' and $op_obj->operator ne 'NOT' );
-            $op = $op_obj->operator;
-            @params = grep( !$self->_is_a( 'DB::Object::Fields::Unknown' ), $op_obj->value );
-        }
-        else
-        {
-            @params = @_;
-        }
-        
-        my @clause = ();
-        @clause = ( $self->value ) if( $self->value->length > 0 );
-        my @generic = ();
-        @generic = ( $self->generic ) if( $self->generic->length > 0 );
-        foreach my $this ( @params )
-        {
-            # Safeguard against garbage
-            # Special treatment for DB::Object::Fields::Field::Overloaded who are already formatted
-            if( $self->_is_a( $this => [qw( DB::Object::Fields::Field::Overloaded DB::Object::Expression )] ) )
-            {
-                push( @clause, $this );
-                next;
-            }
-            
-            next if( !$self->_is_a( $this => 'DB::Object::Query::Clause' ) );
-            # First check we even have a clause, otherwise skip
-            if( !$this->value->length )
-            {
-                CORE::next;
-            }
-            if( $self->type->length && $this->type->length && $this->type ne $self->type )
-            {
-                return( $self->error( "This clause provided for merge is not of the same type \"", $this->type, "\" as ours \"", $self->type, "\"." ) );
-            }
-            # Possibly our type is empty and if so, we initiate it by using the type of the first object we find
-            # This makes it convenient to merge without having to set the type beforehand like so:
-            # $clause->type( 'where' );
-            # $clause->merge( $w1, $w2, $e3 );
-            # We can do instead
-            # $clause->merge( $w1, $w2, $e3 );
-            # And it will take the type from $w1
-            $self->type( $this->type ) if( !$self->type->length );
-            CORE::push( @clause, $this->value );
-            CORE::push( @generic, $this->generic ) if( $this->generic->length );
-            $self->fields->push( @{$this->fields} ) if( $this->fields->length );
-            $self->bind->types->push( @{$this->bind->types} ) if( $this->bind->types->length );
-            $self->bind->values->push( @{$this->bind->values} ) if( $this->bind->values->length );
-            my $ref = $this->metadata;
-            my $hash = $self->metadata;
-            foreach my $k ( keys( %$ref ) )
-            {
-                $hash->{ $k } = $ref->{ $k } if( !CORE::exists( $hash->{ $k } ) );
-            }
-            $self->metadata( $hash );
-        }
-        $self->value( CORE::join( " $op ", @clause ) );
-        $self->generic( CORE::join( " $op ", @generic ) );
-    }
-    return( $self );
-}
-
-sub query_object { return( shift->_set_get_object( 'query_object', 'DB::Object::Query', @_ ) ); }
-
-# The clause type e.g. where, order, group, having, limit, etc
-sub type { return( shift->_set_get_scalar_as_object( 'type', @_ ) ); }
-
-# The string value of the clause
-sub value { return( shift->_set_get_scalar_as_object( 'value', @_ ) ); }
 
 1;
 
@@ -2183,7 +2383,7 @@ DB::Object::Query - Query Object
 
 =head1 VERSION
 
-    v0.5.2
+    v0.5.3
 
 =head1 DESCRIPTION
 
@@ -2254,6 +2454,10 @@ It will refuse to prepare the query if no C<where> clause has been defined, as t
 If this method is called in void, this will execute the query.
 
 It returns the newly created statement handler as a L<DB::Object::Statement>
+
+=head2 elements
+
+Sets or gets an L<DB::Object::Query::Elements> object. This object serves to contain all the elements used in creating SQL queries, keeping track of their order, value, dta types, placeholders used, etc.
 
 =head2 enhance
 
@@ -2544,6 +2748,14 @@ It returns the formated declaration as a string.
 
 This returns a new L<DB::Object::Query::Clause> object.
 
+=head2 new_element
+
+Instantiate a new L<DB::Object::Query::Element> object, passing it whatever arguments were provided and sharing wit it the value of the L</debug> flag.
+
+=head2 new_elements
+
+Instantiate a new L<DB::Object::Query::Elements> object, passing it whatever arguments were provided and sharing wit it the value of the L</debug> flag.
+
 =head2 order
 
 Provided with a list of parameter and this will format the C<order> clause by calling L</_group_order>
@@ -2583,6 +2795,8 @@ Sets or gets the query type, such as C<delete>, C<insert>, C<select>, C<update>,
 =head2 query_values
 
 Sets or gets the query values.
+
+Returns a L<scalar object|Module::Generic::Scalar>
 
 =head2 replace
 
@@ -2628,6 +2842,8 @@ It returns the statement object (DB::Object::Statement).
 
 Sets or gets the string representing the list of columns used in previous C<select> statement.
 
+Returns a regular string.
+
 =head2 sort
 
 Set the query to use normal sorting order.
@@ -2639,6 +2855,10 @@ Sets or gets the list of sorted columns used in statements. This returns a L<Mod
 =head2 table_alias
 
 Sets an optional alias for this table to be used in statement.
+
+This method should be called by L<DB::Object::Tables/as>. If you change this directly, you risk facing some discrepancies between the actual table alias and the one set here.
+
+Returns the current value.
 
 =head2 table_object
 
@@ -2774,7 +2994,7 @@ If the parameter is a L<DB::Object::Query::Clause> object, it will be added to t
 
 If the parameter is a L<DB::Object::Expression> object, it will be added to the stack of elements.
 
-If the parameter is a L<DB::Object::Fields::Field::Overloaded> object, it will be added as a new L<DB::Object::Query::Clause> to the stack.
+If the parameter is a L<DB::Object::Fields::Overloaded> object, it will be added as a new L<DB::Object::Query::Clause> to the stack.
 
 If the parameter is a litteral represented as a string or a scalar reference, then it will be added to the list as-is. For example:
 

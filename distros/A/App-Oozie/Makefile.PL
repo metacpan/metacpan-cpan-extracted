@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -17,9 +17,10 @@ my %WriteMakefileArgs = (
     "bin/oozie-tool"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "App::Oozie",
   "PREREQ_PM" => {
+    "AppConfig" => 0,
     "Archive::Zip" => 0,
     "Carp" => 0,
     "Carp::Always" => 0,
@@ -37,6 +38,7 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "Fcntl" => 0,
     "File::Basename" => 0,
+    "File::Copy" => 0,
     "File::Find" => 0,
     "File::Find::Rule" => 0,
     "File::Path" => 0,
@@ -55,7 +57,7 @@ my %WriteMakefileArgs = (
     "Log::Log4perl" => 0,
     "Moo" => 0,
     "Moo::Role" => 0,
-    "MooX::Options" => 0,
+    "MooX::Options" => "4.103",
     "Net::Hadoop::Oozie" => 0,
     "Net::Hadoop::WebHDFS::LWP" => "0.011",
     "Net::Hadoop::YARN::NameNode::JMX" => 0,
@@ -65,7 +67,9 @@ my %WriteMakefileArgs = (
     "Sub::Quote" => 0,
     "Sys::Hostname" => 0,
     "Template" => 0,
+    "Template::Base" => 0,
     "Text::Glob" => 0,
+    "Text::ParseWords" => 0,
     "Text::Trim" => 0,
     "Time::Duration" => 0,
     "Time::HiRes" => 0,
@@ -79,6 +83,7 @@ my %WriteMakefileArgs = (
     "XML::LibXML::Simple" => 0,
     "XML::Twig" => 0,
     "YAML::XS" => 0,
+    "base" => 0,
     "constant" => 0,
     "namespace::autoclean" => 0,
     "overload" => 0,
@@ -93,7 +98,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -101,6 +106,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "AppConfig" => 0,
   "Archive::Zip" => 0,
   "Carp" => 0,
   "Carp::Always" => 0,
@@ -119,6 +125,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "Fcntl" => 0,
   "File::Basename" => 0,
+  "File::Copy" => 0,
   "File::Find" => 0,
   "File::Find::Rule" => 0,
   "File::Path" => 0,
@@ -139,7 +146,7 @@ my %FallbackPrereqs = (
   "Log::Log4perl" => 0,
   "Moo" => 0,
   "Moo::Role" => 0,
-  "MooX::Options" => 0,
+  "MooX::Options" => "4.103",
   "Net::Hadoop::Oozie" => 0,
   "Net::Hadoop::WebHDFS::LWP" => "0.011",
   "Net::Hadoop::YARN::NameNode::JMX" => 0,
@@ -149,8 +156,10 @@ my %FallbackPrereqs = (
   "Sub::Quote" => 0,
   "Sys::Hostname" => 0,
   "Template" => 0,
+  "Template::Base" => 0,
   "Test::More" => 0,
   "Text::Glob" => 0,
+  "Text::ParseWords" => 0,
   "Text::Trim" => 0,
   "Time::Duration" => 0,
   "Time::HiRes" => 0,
@@ -164,6 +173,7 @@ my %FallbackPrereqs = (
   "XML::LibXML::Simple" => 0,
   "XML::Twig" => 0,
   "YAML::XS" => 0,
+  "base" => 0,
   "constant" => 0,
   "namespace::autoclean" => 0,
   "overload" => 0,

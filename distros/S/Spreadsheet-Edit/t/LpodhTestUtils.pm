@@ -9,8 +9,8 @@ use t_TestCommon qw/bug $debug/;
 use ODF::lpOD;
 use ODF::lpOD_Helper;
 BEGIN {
-  *TEXTLEAF_COND   = *ODF::lpOD_Helper::TEXTLEAF_COND;
-  *PARA_COND       = *ODF::lpOD_Helper::PARA_COND;
+  *TEXTLEAF_FILTER   = *ODF::lpOD_Helper::TEXTLEAF_FILTER;
+  *PARA_FILTER       = *ODF::lpOD_Helper::PARA_FILTER;
 }
 
 use Exporter 'import';
@@ -43,8 +43,8 @@ sub append_para($$) {
 
 sub verif_normalized($) {
   my $elt = shift;
-  oops if ref(TEXTLEAF_COND); # not a qr/regex/
-  my $cond = TEXTLEAF_COND."|text:span";
+  oops if ref(TEXTLEAF_FILTER); # not a qr/regex/
+  my $cond = TEXTLEAF_FILTER."|text:span";
   foreach my $e ($elt->descendants_or_self($cond)) {
     my $err;
     my $tag = $e->tag;
@@ -96,7 +96,7 @@ sub verif_normalized($) {
     elsif ($tag eq 'text:line-break') { }
     else { oops $e }
     if ($err) {
-      my $para = $e->self_or_parent(PARA_COND);
+      my $para = $e->self_or_parent(PARA_FILTER);
       @_ = ("verif_normalized", "$err\nContaining para:\n".fmt_tree($para));
       goto &fail
     }

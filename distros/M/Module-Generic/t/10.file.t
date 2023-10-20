@@ -12,7 +12,7 @@ BEGIN
     use Digest::SHA;
     use Encode ();
     use File::Spec ();
-    use Nice::Try;
+    # use Nice::Try;
     use POSIX ();
     use Storable ();
     # Or using Sereal
@@ -281,7 +281,7 @@ if( $f5 )
 {
     SKIP:
     {
-        try
+        eval
         {
             require Digest::SHA;
             # $data = Encode::decode_utf8( $data ) if( !Encode::is_utf8( $data ) );
@@ -304,17 +304,17 @@ if( $f5 )
                 diag( "digest() returned an error: ", $f5->error ) if( $DEBUG );
             }
             $f5->close;
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            diag( "The following error occurred: $e" ) if( $DEBUG );
+            diag( "The following error occurred: $@" ) if( $DEBUG );
             skip( "Digest::SHA not available on your system" );
         }
     }
 
     SKIP:
     {
-        try
+        eval
         {
             require Digest::SHA2;
             # $data = Encode::decode_utf8( $data ) if( !Encode::is_utf8( $data ) );
@@ -332,17 +332,17 @@ if( $f5 )
             my $digest = $f5->digest( 'sha512' );
             is( $digest, $digest_sha512, 'digest sha512' );
             $f5->close;
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            diag( "The following error occurred: $e" ) if( $DEBUG );
+            diag( "The following error occurred: $@" ) if( $DEBUG );
             skip( "Digest::SHA2 not available on your system" );
         }
     }
 
     SKIP:
     {
-        try
+        eval
         {
             require Digest::MD5;
             # $data = Encode::decode_utf8( $data ) if( !Encode::is_utf8( $data ) );
@@ -358,10 +358,10 @@ if( $f5 )
             my $digest = $f5->digest( 'md5' );
             is( $digest, $digest_md5, 'digest md5' );
             $f5->close;
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            diag( "The following error occurred: $e" ) if( $DEBUG );
+            diag( "The following error occurred: $@" ) if( $DEBUG );
             skip( "Digest::MD5 not available on your system" );
         }
     }

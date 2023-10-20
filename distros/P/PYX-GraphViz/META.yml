@@ -34,4 +34,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/PYX-GraphViz
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/PYX-GraphViz
-version: '0.05'
+version: '0.06'

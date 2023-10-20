@@ -1,26 +1,3 @@
-// Copyright (c) 2021 The Trade Desk, Inc
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-//
-// 1. Redistributions of source code must retain the above copyright notice,
-//    this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright notice,
-//    this list of conditions and the following disclaimer in the documentation
-//    and/or other materials provided with the distribution.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-// POSSIBILITY OF SUCH DAMAGE.
-
 #pragma once
 
 #include <uid2/timestamp.h>
@@ -29,177 +6,234 @@
 #include <string>
 #include <vector>
 
-namespace uid2
-{
-	struct Key;
+namespace uid2 {
+struct Key;
 
-    enum class IdentityScope
+enum class IdentityScope {
+    UID2 = 0,
+    EUID = 1,
+};
+
+enum class IdentityType {
+    EMAIL = 0,
+    PHONE = 1,
+};
+
+enum class AdvertisingTokenVersion {
+    // showing as "AHA..." in the Base64 Encoding (Base64 'H' is 000111 and 112 is 01110000)
+    V3 = 112,
+    // showing as "AIA..." in the Base64URL Encoding ('H' is followed by 'I' hence
+    // this choice for the next token version) (Base64 'I' is 001000 and 128 is 10000000)
+    V4 = 128,
+};
+
+enum class DecryptionStatus {
+    SUCCESS,
+    NOT_AUTHORIZED_FOR_KEY,
+    NOT_INITIALIZED,
+    INVALID_PAYLOAD,
+    EXPIRED_TOKEN,
+    KEYS_NOT_SYNCED,
+    VERSION_NOT_SUPPORTED,
+    INVALID_PAYLOAD_TYPE,
+    INVALID_IDENTITY_SCOPE,
+};
+
+enum class EncryptionStatus {
+    SUCCESS,
+    NOT_AUTHORIZED_FOR_KEY,
+    NOT_AUTHORIZED_FOR_MASTER_KEY,
+    NOT_INITIALIZED,
+    KEYS_NOT_SYNCED,
+    TOKEN_DECRYPT_FAILURE,
+    KEY_INACTIVE,
+    ENCRYPTION_FAILURE,
+};
+
+class RefreshResult {
+public:
+    static RefreshResult MakeSuccess() { return {true, std::string()}; }
+
+    static RefreshResult MakeError(std::string&& reason) { return {false, std::move(reason)}; }
+
+    bool IsSuccess() const { return success_; }
+
+    const std::string& GetReason() const { return reason_; }
+
+private:
+    RefreshResult(bool success, std::string&& reason) : success_(success), reason_(reason) {}
+
+    bool success_;
+    std::string reason_;
+};
+
+class DecryptionResult {
+public:
+    static DecryptionResult MakeSuccess(std::string&& identity, Timestamp established, int siteId, int siteKeySiteId)
     {
-        UID2 = 0,
-        EUID = 1,
-    };
+        return {DecryptionStatus::SUCCESS, std::move(identity), established, siteId, siteKeySiteId};
+    }
 
-    enum class IdentityType
+    static DecryptionResult MakeError(DecryptionStatus status) { return {status, std::string(), Timestamp(), -1, -1}; }
+
+    static DecryptionResult MakeError(DecryptionStatus status, Timestamp established, int siteId, int siteKeySiteId)
     {
-        Email = 0,
-        Phone = 1,
-    };
+        return {status, std::string(), established, siteId, siteKeySiteId};
+    }
 
-	enum class DecryptionStatus
-	{
-		SUCCESS,
-		NOT_AUTHORIZED_FOR_KEY,
-		NOT_INITIALIZED,
-		INVALID_PAYLOAD,
-		EXPIRED_TOKEN,
-		KEYS_NOT_SYNCED,
-		VERSION_NOT_SUPPORTED,
-		INVALID_PAYLOAD_TYPE,
-        INVALID_IDENTITY_SCOPE,
-	};
+    bool IsSuccess() const { return status_ == DecryptionStatus::SUCCESS; }
 
-	enum class EncryptionStatus
-	{
-		SUCCESS,
-		NOT_AUTHORIZED_FOR_KEY,
-		NOT_INITIALIZED,
-		KEYS_NOT_SYNCED,
-		TOKEN_DECRYPT_FAILURE,
-		KEY_INACTIVE,
-		ENCRYPTION_FAILURE,
-	};
+    DecryptionStatus GetStatus() const { return status_; }
 
-	class RefreshResult
-	{
-	public:
-		static RefreshResult MakeSuccess() { return RefreshResult(true, std::string()); }
-		static RefreshResult MakeError(std::string&& reason) { return RefreshResult(false, std::move(reason)); }
+    const std::string& GetUid() const { return identity_; }
 
-		bool IsSuccess() const { return Success; }
-		const std::string& GetReason() const { return Reason; }
+    Timestamp GetEstablished() const { return established_; }
 
-	private:
-		RefreshResult(bool success, std::string&& reason)
-			: Success(success), Reason(reason) {}
+    int GetSiteId() const { return siteId_; }
 
-		bool Success;
-		std::string Reason;
-	};
+    int GetSiteKeySiteId() const { return siteKeySiteId_; }
 
-	class DecryptionResult
-	{
-	public:
-		static DecryptionResult MakeSuccess(std::string&& identity, Timestamp established, int siteId, int siteKeySiteId)
-		{
-			return DecryptionResult(DecryptionStatus::SUCCESS, std::move(identity), established, siteId, siteKeySiteId);
-		}
-		static DecryptionResult MakeError(DecryptionStatus status)
-		{
-			return DecryptionResult(status, std::string(), Timestamp(), -1, -1);
-		}
-        static DecryptionResult MakeError(DecryptionStatus status, Timestamp established, int siteId, int siteKeySiteId)
-        {
-            return DecryptionResult(status, std::string(), established, siteId, siteKeySiteId);
-        }
+private:
+    DecryptionResult(DecryptionStatus status, std::string&& identity, Timestamp established, int siteId, int siteKeySiteId)
+        : status_(status), identity_(std::move(identity)), established_(established), siteId_(siteId), siteKeySiteId_(siteKeySiteId)
+    {
+    }
 
-		bool IsSuccess() const { return Status == DecryptionStatus::SUCCESS; }
-		DecryptionStatus GetStatus() const { return Status; }
-		const std::string& GetUid() const { return Identity; }
-		Timestamp GetEstablished() const { return Established; }
-		int GetSiteId() const { return SiteId; }
-        int GetSiteKeySiteId() const { return SiteKeySiteId; }
+    DecryptionStatus status_;
+    std::string identity_;
+    Timestamp established_;
+    int siteId_;
+    int siteKeySiteId_;
+};
 
-	private:
-		DecryptionResult(DecryptionStatus status, std::string&& identity, Timestamp established, int siteId, int siteKeySiteId)
-			: Status(status), Identity(std::move(identity)), Established(established), SiteId(siteId), SiteKeySiteId(siteKeySiteId) {}
+class EncryptionResult {
+public:
+    static EncryptionResult MakeSuccess(std::string&& encryptedData) { return {EncryptionStatus::SUCCESS, std::move(encryptedData)}; }
 
-		DecryptionStatus Status;
-		std::string Identity;
-		Timestamp Established;
-		int SiteId;
-        int SiteKeySiteId;
-	};
+    static EncryptionResult MakeError(EncryptionStatus status) { return {status, std::string()}; }
 
-	class EncryptionDataRequest
-	{
-	public:
-		EncryptionDataRequest() = default;
-		EncryptionDataRequest(const std::uint8_t* data, std::size_t size) : Data(data), DataSize(size) {}
+    bool IsSuccess() const { return status_ == EncryptionStatus::SUCCESS; }
 
-		EncryptionDataRequest& WithSiteId(int siteId) { SiteId = siteId; return *this; }
-		EncryptionDataRequest& WithKey(const Key& key) { ExplicitKey = &key; return *this; }
-		template<typename T>
-		EncryptionDataRequest& WithAdvertisingToken(T&& token) { AdvertisingToken = std::forward<T>(token); return *this; }
-		EncryptionDataRequest& WithInitializationVector(const std::uint8_t* iv, std::size_t size) { InitializationVector = iv; InitializationVectorSize = size; return *this; }
-		EncryptionDataRequest& WithNow(Timestamp now) { Now = now; return *this; }
+    EncryptionStatus GetStatus() const { return status_; }
 
-		const std::uint8_t* GetData() const { return Data; }
-		std::size_t GetDataSize() const { return DataSize; }
-		int GetSiteId() const { return SiteId; }
-		const Key* GetKey() const { return ExplicitKey; }
-		const std::string& GetAdvertisingToken() const { return AdvertisingToken; }
-		const std::uint8_t* GetInitializationVector() const { return InitializationVector; }
-		std::size_t GetInitializationVectorSize() const { return InitializationVectorSize; }
-		Timestamp GetNow() const { return Now.IsZero() ? Timestamp::Now() : Now; }
+    std::string GetEncryptedData() const { return encryptedData_; }
 
-	private:
-		const std::uint8_t* Data = nullptr;
-		std::size_t DataSize = 0;
-		int SiteId = 0;
-		const Key* ExplicitKey = nullptr;
-		std::string AdvertisingToken;
-		const std::uint8_t* InitializationVector = nullptr;
-		std::size_t InitializationVectorSize = 0;
-		Timestamp Now;
-	};
+private:
+    EncryptionResult(EncryptionStatus status, std::string&& encryptedData) : status_(status), encryptedData_(std::move(encryptedData)) {}
 
-	class EncryptionDataResult
-	{
-	public:
-		static EncryptionDataResult MakeSuccess(std::string&& encryptedData)
-		{
-			return EncryptionDataResult(EncryptionStatus::SUCCESS, std::move(encryptedData));
-		}
-		static EncryptionDataResult MakeError(EncryptionStatus status)
-		{
-			return EncryptionDataResult(status, std::string());
-		}
+    EncryptionStatus status_;
+    std::string encryptedData_;
+};
 
-		bool IsSuccess() const { return Status == EncryptionStatus::SUCCESS; }
-		EncryptionStatus GetStatus() const { return Status; }
-		const std::string& GetEncryptedData() const { return EncryptedData; }
+class EncryptionDataRequest {
+public:
+    EncryptionDataRequest() = default;
 
-	private:
-		EncryptionDataResult(EncryptionStatus status, std::string&& encryptedData)
-			: Status(status), EncryptedData(std::move(encryptedData)) {}
+    EncryptionDataRequest(const std::uint8_t* data, std::size_t size) : data_(data), dataSize_(size) {}
 
-		EncryptionStatus Status;
-		std::string EncryptedData;
-	};
+    EncryptionDataRequest& WithSiteId(int siteId)
+    {
+        siteId_ = siteId;
+        return *this;
+    }
 
-	class DecryptionDataResult
-	{
-	public:
-		static DecryptionDataResult MakeSuccess(std::vector<std::uint8_t>&& decryptedData, Timestamp encryptedAt)
-		{
-			return DecryptionDataResult(DecryptionStatus::SUCCESS, std::move(decryptedData), encryptedAt);
-		}
-		static DecryptionDataResult MakeError(DecryptionStatus status)
-		{
-			return DecryptionDataResult(status, {}, Timestamp());
-		}
+    EncryptionDataRequest& WithKey(const Key& key)
+    {
+        explicitKey_ = &key;
+        return *this;
+    }
 
-		bool IsSuccess() const { return Status == DecryptionStatus::SUCCESS; }
-		DecryptionStatus GetStatus() const { return Status; }
-		const std::vector<std::uint8_t> GetDecryptedData() const { return DecryptedData; }
-		Timestamp GetEncryptedAt() const { return EncryptedAt; }
+    template <typename T>
+    EncryptionDataRequest& WithAdvertisingToken(T&& token)
+    {
+        advertisingToken_ = std::forward<T>(token);
+        return *this;
+    }
 
-	private:
-		DecryptionDataResult(DecryptionStatus status, std::vector<std::uint8_t>&& data, Timestamp encryptedAt)
-			: Status(status), DecryptedData(std::move(data)), EncryptedAt(encryptedAt) {}
+    EncryptionDataRequest& WithInitializationVector(const std::uint8_t* iv, std::size_t size)
+    {
+        initializationVector_ = iv;
+        initializationVectorSize_ = size;
+        return *this;
+    }
 
-		DecryptionStatus Status;
-		std::vector<std::uint8_t> DecryptedData;
-		Timestamp EncryptedAt;
-	};
-}
+    EncryptionDataRequest& WithNow(Timestamp now)
+    {
+        now_ = now;
+        return *this;
+    }
+
+    const std::uint8_t* GetData() const { return data_; }
+
+    std::size_t GetDataSize() const { return dataSize_; }
+
+    int GetSiteId() const { return siteId_; }
+
+    const Key* GetKey() const { return explicitKey_; }
+
+    const std::string& GetAdvertisingToken() const { return advertisingToken_; }
+
+    const std::uint8_t* GetInitializationVector() const { return initializationVector_; }
+
+    std::size_t GetInitializationVectorSize() const { return initializationVectorSize_; }
+
+    Timestamp GetNow() const { return now_.IsZero() ? Timestamp::Now() : now_; }
+
+private:
+    const std::uint8_t* data_ = nullptr;
+    std::size_t dataSize_ = 0;
+    int siteId_ = 0;
+    const Key* explicitKey_ = nullptr;
+    std::string advertisingToken_;
+    const std::uint8_t* initializationVector_ = nullptr;
+    std::size_t initializationVectorSize_ = 0;
+    Timestamp now_;
+};
+
+class EncryptionDataResult {
+public:
+    static EncryptionDataResult MakeSuccess(std::string&& encryptedData) { return {EncryptionStatus::SUCCESS, std::move(encryptedData)}; }
+
+    static EncryptionDataResult MakeError(EncryptionStatus status) { return {status, std::string()}; }
+
+    bool IsSuccess() const { return status_ == EncryptionStatus::SUCCESS; }
+
+    EncryptionStatus GetStatus() const { return status_; }
+
+    const std::string& GetEncryptedData() const { return encryptedData_; }
+
+private:
+    EncryptionDataResult(EncryptionStatus status, std::string&& encryptedData) : status_(status), encryptedData_(std::move(encryptedData)) {}
+
+    EncryptionStatus status_;
+    std::string encryptedData_;
+};
+
+class DecryptionDataResult {
+public:
+    static DecryptionDataResult MakeSuccess(std::vector<std::uint8_t>&& decryptedData, Timestamp encryptedAt)
+    {
+        return {DecryptionStatus::SUCCESS, std::move(decryptedData), encryptedAt};
+    }
+
+    static DecryptionDataResult MakeError(DecryptionStatus status) { return {status, {}, Timestamp()}; }
+
+    bool IsSuccess() const { return status_ == DecryptionStatus::SUCCESS; }
+
+    DecryptionStatus GetStatus() const { return status_; }
+
+    const std::vector<std::uint8_t>& GetDecryptedData() const { return decryptedData_; }
+
+    Timestamp GetEncryptedAt() const { return encryptedAt_; }
+
+private:
+    DecryptionDataResult(DecryptionStatus status, std::vector<std::uint8_t>&& data, Timestamp encryptedAt)
+        : status_(status), decryptedData_(std::move(data)), encryptedAt_(encryptedAt)
+    {
+    }
+
+    DecryptionStatus status_;
+    std::vector<std::uint8_t> decryptedData_;
+    Timestamp encryptedAt_;
+};
+}  // namespace uid2

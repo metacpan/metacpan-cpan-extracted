@@ -40,13 +40,21 @@ if (@subtests == 0) {
   die unless @subtests >= 4;  # update this as we add more of them
 }
 
-plan tests => ($debug||$verbose) ? scalar(@subtests)+1 : scalar(@subtests) * 2;
+my $silent_skip_msg;
+$silent_skip_msg = "Skipping --silent tests because \$debug or \$verbose is true" if $debug || $verbose;
+
+my $debug_skip_msg;
+$debug_skip_msg = "Skipping verbose logging checks (AUTHOR_TESTING only)"
+  if !$ENV{AUTHOR_TESTING} && !$debug && !$verbose;
+
+plan tests => ($silent_skip_msg ? 1 : scalar(@subtests)) +
+              ($debug_skip_msg  ? 1 : scalar(@subtests));
 
 # Note: --silent --verbose etc. arguments are parsed in t_TestCommon.pm
 
 ##### Run with --silent #####
 SKIP: {
-  skip "Skipping --silent tests because \$debug or \$verbose is true" if $debug || $verbose;
+  skip $silent_skip_msg if $silent_skip_msg;
   for my $st (@subtests) {
     subtest_buffered with_silent => sub {
       my ($soutput, $swstat) = tee_merged { run_subtest($st, '--silent') };
@@ -69,22 +77,27 @@ SKIP: {
   }
 }
 
-##### Run with --verbose #####
-# *not* with --debug so we don't see internal calls to convert_spreadsheet
-my @vdopts = ('--verbose'); # without --debug
-for my $st (@subtests) {
-  subtest_buffered with_debug => sub {
-    my @cmd = ($st, @vdopts);
-    my ($doutput, $dwstat) = capture_merged { run_subtest(@cmd) };
-    is($dwstat, 0, "zero subtest exit stat","output:\n$doutput");
-    if (! eval { verif_no_internals_mentioned($doutput) }) {
-      die "\n==================\n$doutput\n",
-          $@,"\nInternals inappropriately mentioned in output from @cmd\n ";
-    }
-    print basename($st)." @vdopts produced ".length($doutput)." characters\n";
-    print basename($st)." @vdopts : no inappropriate output detected\n";
-    done_testing();
-  };
+SKIP: {
+  skip $debug_skip_msg if $debug_skip_msg;
+
+  # Run with --verbose (*not* --debug) and check that no internals are mentioned
+  my @vdopts = ('--verbose'); # without --debug
+  for my $st (@subtests) {
+    subtest_buffered with_debug => sub {
+      my @cmd = ($st, @vdopts);
+      my ($doutput, $dwstat) = capture_merged { run_subtest(@cmd) };
+      is($dwstat, 0, "zero subtest exit stat","output:\n$doutput");
+      if (! eval { verif_no_internals_mentioned($doutput) }) {
+        die "\n==================\n$doutput\n",
+            $@,"\nInternals inappropriately mentioned in output from @cmd\n ";
+      }
+      print basename($st)." @vdopts produced ".length($doutput)." characters\n";
+      print basename($st)." @vdopts : no inappropriate output detected\n";
+      done_testing();
+    };
+  }
 }
+
+done_testing();
 
 exit 0;

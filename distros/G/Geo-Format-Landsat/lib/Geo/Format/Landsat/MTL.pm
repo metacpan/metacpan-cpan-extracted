@@ -1,15 +1,19 @@
-# Copyrights 2009 by Mark Overmeer.
+# Copyrights 2009-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 1.06.
-use warnings;
-use strict;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution Geo-Format-Landsat.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Geo::Format::Landsat::MTL;
 use vars '$VERSION';
-$VERSION = '0.03';
+$VERSION = '0.90';
 
 use base 'Exporter';
+
+use warnings;
+use strict;
 
 our @EXPORT = qw/
   landsat_mtl_from_file
@@ -136,6 +140,8 @@ sub _cleanup_metadata_file_info($)
     if($d->{DATEHOUR_CONTACT_PERIOD} =~ m/^(\d\d)(\d\d\d)(\d\d)$/ )
     {   my ($year, $yday, $hour) = ($1, $2, $3);
         $year += $year < 70 ? 2000 : 1900;
+        # (Date::Calc::Add_Delta_Days($_[0],1,1,$_[1]-1))[1,2]; 
+
         my @monthdays = (undef, 31,28,31,30,31,30,31,31,30,31,30,31);
         $monthdays[2] = 29 if $year%400==0 || ($year%4==0 && $year%100!=0);
         my ($month, $day) = (1, $yday);

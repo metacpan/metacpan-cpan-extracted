@@ -2,6 +2,62 @@
                                   Changes
 ---------------------------------------------------------------------------
 
+2023-09-26
+
+    * Set::Relation version 0.13.4 for Perl is released on CPAN as
+    Set-Relation-0.13.4.tar.gz.
+
+    * Eliminate the test-only external dependency on the CPAN module
+    Carp::Always as it is not actually needed for testing at all.
+    As a result, running Set::Relation's tests no longer requires having
+    these 5 non-core direct or non-direct dependencies to be installed:
+    Carp::Always, Test::Base, Spiffy, Algorithm::Diff, Text::Diff.
+    After this change, Test::Deep is the only test-only external dependency
+    remaining that isn't a Perl core module.
+
+2023-09-25
+
+    * Set::Relation version 0.13.3 for Perl is released on CPAN as
+    Set-Relation-0.13.3.tar.gz.
+
+    * The main purpose of this release is to make major updates to
+    Set::Relation's documentation.  A lot of archaic and superfluous and
+    obsolete documentation was purged.  A small amount of outdated
+    documentation was corrected.  There were absolutely zero code changes
+    made, so the actual Set::Relation functionality is fully unchanged.
+
+    * The 2 files "INSTALL" and "TODO" were entirely removed.  The vast
+    majority of the file "README" was removed; some "README" fixes were made.
+
+    * Remove all references to a Raku version of Set::Relation developed in
+    parallel with the Perl version; we only talk about the Perl version here.
+
+    * Remove all references to official Mailman mailing lists for support
+    and discussion as these no longer exist.
+
+    * Update the main module description text to better reflect the current
+    and intended maintenance plans for the project.
+
+    * Make the distro pass the Perl Kwalitee "has_abstract_in_pod" test:
+    For every pod file, tweak its NAME section so the abstract
+    is on the same line as the package name rather than the next line.
+
+    * Update main module name/abstract text to "A relation data type"
+    from "Relation data type for Perl".
+
+    * Update all references to GitHub to use the updated project url
+    "https://github.com/muldis/Set_Relation_Perl".
+
+    * Replaced any references to the non-existent CPAN distribution/package
+    name Muldis::D::RefEng with the title "Muldis Data Engine Reference"
+    so that these don't constitute broken external links.
+    Replaced any references to the non-existent CPAN distribution/package
+    name Muldis::D with the title "Muldis Data Language" so that these
+    don't constitute broken external links.  Likewise replace any
+    references to the "Muldis D" language with the same.
+
+    * Incremented all copyright year range-ends to 2023.
+
 2019-10-20
 
     * Set::Relation version 0.13.2 for Perl is released on CPAN as
@@ -40,7 +96,7 @@
     plus the 1 dual-life CPAN module Scalar::Util version 1.13+.
 
     * Increased the explicit dependency on the Perl core module List::Util
-    to 1.4602 (was 0.45), which is the version bundled with Perl 5.26.0;
+    to 1.4602 (was 1.45), which is the version bundled with Perl 5.26.0;
     1.45 is the actual minimum dependency, but 1.4602 was chosen so it
     matched the version with the first stable Perl release to have any
     suitable version.  Similarly for Scalar::Util, 1.09 is the actual

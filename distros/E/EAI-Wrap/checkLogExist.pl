@@ -7,24 +7,21 @@ my $curhyphenDate = get_curdate_gen("Y-M-D");
 my $curdotDate = get_curdate_dot();
 my $curTime = get_curtime();
 
-EAI::Common::getOptions();
-EAI::Common::setupConfigMerge();
-EAI::Common::setupLogging(\%common);
-EAI::Common::checkHash(\%config,"config");
-EAI::Common::checkHash(\%common,"common");
+setupConfigMerge();
 
 my $logger = get_logger();
 $logger->info(">>>>>>> starting logcheck, curDate: $curDate, curDateDash: $curDateDash, curhyphenDate: $curhyphenDate, curdotDate: $curdotDate, curTime: $curTime, weekday(curDate):".weekday($curDate).",is_last_day_of_month(curDate):".is_last_day_of_month($curDate));
 
 LOGCHECK:
 foreach my $job (keys %{$config{checkLookup}}) {
-	next LOGCHECK if $job eq "checkLogExist";
+	next LOGCHECK if $job eq "checkLogExist.pl"; # don't check our own logfile, configuration only for own error emailing (e.g from setupConfigMerge)
 	my $freqToCheck = $config{checkLookup}{$job}{freqToCheck}; # frequency to check log file (business-daily, daily, monthly, etc.), default (if not given): every business day
 	$freqToCheck = "B" if !$freqToCheck;
 	my $timeToCheck = $config{checkLookup}{$job}{timeToCheck}; # earliest time to check log start entry
 	my $logFileToCheck = $config{checkLookup}{$job}{logFileToCheck}; # Logfile to be searched
+	# either take specific logpath set up in checkLookup or the default one from EAI::Wrap
+	my $logFolder = ($config{checkLookup}{$job}{logRootPath} ? $config{checkLookup}{$job}{logRootPath}.($execute{envraw} ? "/".$execute{envraw} : "") : $execute{logRootPath})."/"; # don't need additional environment for default logRootPath as this is already set by setupLogging (done in INIT of $execute{logRootPath} of EAI::Wrap)
 	my $logcheck = $config{checkLookup}{$job}{logcheck}; # Logcheck (regex)
-	my $logFolder = ($config{checkLookup}{$job}{logRootPath} ? $config{checkLookup}{$job}{logRootPath} : $config{process}{logRootPath}).($execute{envraw} ? "/".$execute{envraw} : "")."/";
 	
 	$logger->info("preparing logcheck for $job, freqToCheck:$freqToCheck, timeToCheck:$timeToCheck, logFileToCheck:$logFolder$logFileToCheck, logcheck regex:/$logcheck/");
 	if ($freqToCheck eq "B" and (is_weekend($curDate) || is_holiday($config{logCheckHoliday},$curDate))) {
@@ -70,18 +67,8 @@ foreach my $job (keys %{$config{checkLookup}}) {
 		while (<LOGFILE>){
 			my $wholeLine = $_;
 			my @logline = split "\t";
-			# found, if log check pattern matches and date today
-			if ($logline[0] =~ /$curDateDash/ and $wholeLine =~ /$logcheck/) {
-				$logger->info("logcheck '".$logcheck."' successful, row:".$wholeLine);
-				close LOGFILE; next LOGCHECK;
-			}
-			# for "german" logs compare dates using dots and dd.mm.yyyy
-			if ($logline[0] =~ /$curdotDate/ and $wholeLine =~ /$logcheck/) {
-				$logger->info("logcheck '".$logcheck."' successful, row:".$wholeLine);
-				close LOGFILE; next LOGCHECK;
-			}
-			# for log4j logs compare date using dash
-			if ($logline[0] =~ /$curhyphenDate/ and $wholeLine =~ /$logcheck/) {
+			# found, if log check pattern matches and date today, either YYYY/MM/DD or "german" logs using dd.mm.yyyy or log4j using YYYY-MM-DD
+			if (($logline[0] =~ /$curDateDash/ or $logline[0] =~ /$curdotDate/ or $logline[0] =~ /$curhyphenDate/) and $wholeLine =~ /$logcheck/) {
 				$logger->info("logcheck '".$logcheck."' successful, row:".$wholeLine);
 				close LOGFILE; next LOGCHECK;
 			}
@@ -104,8 +91,6 @@ foreach my $job (keys %{$config{checkLookup}}) {
 __END__
 =head1 NAME
 
-=encoding CP1252
-
 checkLogExist.pl - checks Log-entries at given times
 
 =head1 SYNOPSIS
@@ -125,7 +110,8 @@ Configuration is done in sub-hash C<$config{checkLookup}>, being the same place 
      timeToCheck => "0800",
      freqToCheck => "B",
      logFileToCheck => "test.log",
-     logcheck => "started.*"
+     logcheck => "started.*",
+     logRootPath => "optional alternate logfile path"
    },
   <...> => {
      
@@ -154,11 +140,15 @@ ignore log check except on: ML..Monthend, D..every day, B..Business days, M1..Mo
 
 =item logFileToCheck
 
-Where (which logfile) should the job have written into ?
+Where (which logfile) should the job have written into ? this logfile is expected either in the logRootPath configured in site.config or in logRootPath configured for this locgceck entry (see below).
 
 =item logcheck
 
 "regex keyword/expression" to compare the rows, if this is missing in the logfile after the current date/timeToCheck then an alarm is sent to the configured errmailaddress
+
+=item logRootPath
+
+instead of using the logRootPath configured in site.config, a special logRootPath can be optionally configured here for each log check.
 
 =back
 

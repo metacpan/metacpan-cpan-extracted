@@ -79,6 +79,7 @@ if ($opt_refresh or not -e $cache_file) {
 			my @files = <$location$stage/bin/*>;
 			for my $file (@files) {
 				my $pack = basename($file);
+				say STDERR "[add-legacy] $pack" if ($opt_verbose);
 				$cache->{$pack} = $file;
 				#if ($search eq $pack) {
 				#	print GREEN, BOLD, $pack, RESET, "\tsource package $file\n" ;
@@ -92,7 +93,7 @@ if ($opt_refresh or not -e $cache_file) {
 	}
 
 	for my $location (@locations) {
-		say STDERR BLUE, "\t modern: $location", RESET if ($opt_verbose);
+		say STDERR BLUE, "\t modern: ", RESET, " $location" if ($opt_verbose);
 		#last if ($opt_legacy);	
 		#if (defined $opt_inst) {
 		#	next unless $location =~/$opt_inst/i;
@@ -103,7 +104,9 @@ if ($opt_refresh or not -e $cache_file) {
 			
 			if (-e "$container/Singularity.manifest") {
 				my $data = getinfo("$container/Singularity.manifest");
-					
+				if (not defined $data) {
+					next;
+				}
 					if ($data->{UUID} eq $search) {
 						#say  CYAN, "From $container/Singularity.manifest", RESET;
 						#print_details($data);
@@ -180,18 +183,40 @@ sub print_details {
 	print "\nsource package $data->{UUID}\n";
 	
 } 
-
 sub getinfo {
-	my $json_file = shift @_;
-	my $json;
-	{
-	  local $/; #Enable 'slurp' mode
-	  open my $fh, "<", $json_file;
-	  $json = <$fh>;
-	  close $fh;
+    my ($json_file) = @_;
+	if ($opt_verbose) {
+		say STDERR BLUE, " - Reading $json_file", RESET;
 	}
-	return decode_json($json);
-	
+
+    # Open the JSON file with error handling
+    open my $fh, "<", $json_file or die "Failed to open '$json_file': $!";
+    
+    # Slurp the JSON content
+    local $/;
+    my $json = <$fh>;
+    
+    # Close the file
+    close $fh or die "Failed to close '$json_file': $!";
+
+    # Attempt to decode the JSON, handling potential errors
+    my $decoded_json;
+    eval {
+        $decoded_json = decode_json($json);
+    };
+    
+    if ($@) {
+		if (not $opt_refresh) {
+			my $json_file_beginning = substr($json, 0, 100);
+    	    die "*** Error decoding JSON in '$json_file':\n$json_file_beginning\n\nERROR: $@\n";
+		} else {
+			# We will ignore the error if we are refreshing the cache
+			return undef;
+		}
+		
+    }
+
+    return $decoded_json;
 }
 
 __END__
@@ -206,7 +231,7 @@ shelf - Search for HPC packages in the cluster
 
 =head1 VERSION
 
-version 0.6.1
+version 0.8.1
 
 =head1 SYNOPSIS
 
@@ -251,7 +276,7 @@ When searching for a query string, the script will print the name and how to act
 
 Will produce:
 
-  MetaPhlAn                source package 9020df39-c4ad-402b-b299-896159114bd7 
+  MetaPhlAn               source package 9020df39-c4ad-402b-b299-896159114bd7 
   metaphlan2-2.7.5        source package /nbi/software/testing/bin/metaphlan2-2.7.5 
   metaphlan-3.0           source package /ei/software/testing/bin/metaphlan-3.0 
   metaphlan-2f1b17a1f4e9  source package /ei/software/testing/bin/metaphlan-2f1b17a1f4e9 

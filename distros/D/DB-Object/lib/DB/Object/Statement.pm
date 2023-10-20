@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Statement.pm
-## Version v0.4.2
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.4.3
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/03/24
+## Modified 2023/07/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -21,12 +21,11 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object );
-    use vars qw( $VERSION $VERBOSE $DEBUG );
+    use vars qw( $VERSION $DEBUG );
     use Class::Struct qw( struct );
     use Want;
-    $VERSION    = 'v0.4.2';
-    $VERBOSE    = 0;
-    $DEBUG      = 0;
+    our $DEBUG = 0;
+    our $VERSION = 'v0.4.3';
     use Devel::Confess;
 };
 
@@ -58,8 +57,7 @@ sub bind_param
     $self->{file} = $file;
     $self->{line} = $line;
     $self->{sub}  = $sub;
-    my $rc = 
-    eval
+    my $rc = eval
     {
         $self->{sth}->bind_param( @_ );
     };
@@ -196,19 +194,20 @@ sub exec { return( shift->execute( @_ ) ); }
 sub execute
 {
     my $self = shift( @_ );
+    my @args = @_;
     my( $pack, $file, $line ) = caller();
     my $sub = ( caller(1) )[3];
     # What we want is to get the point from where we were originatly called
-    if( $pack =~ /^DB::Object/ )
+    my $class = 'DB::Object';
+    if( substr( $pack, 0, length( $class ) ) eq $class )
     {
         for( my $i = 1; $i < 5; $i++ )
         {
             ( $pack, $file, $line ) = caller( $i );
             $sub = ( caller( $i + 1 ) )[3];
-            last if( $pack !~ /^DB::Object/ );
+            last if( substr( $pack, 0, length( $class ) ) ne $class );
         }
     }
-    # my $sub = ( caller( 1 ) )[ 3 ];
     $self->{pack} = $pack;
     $self->{file} = $file;
     $self->{line} = $line;
@@ -218,20 +217,18 @@ sub execute
     $q->final(1) if( $q );
     my @binded = ();
     my @binded_types = ();
-    if( $q && $q->binded_types->length )
+    # As a rule, if the first placeholder is a numbered one, then all are, because we cannot mix numbered placeholder and non-numbered ones.
+    my $use_numbered_placeholders = ( ( $q && $q->elements->first->is_numbered ) ? 1 : 0 );
+    # if( $q && $q->binded_types->length )
+    if( $q && $q->elements->types->length )
     {
         my $types = $q->binded_types_as_param;
         @binded_types = @$types;
     }
     
-#     if( $q && ( $self->{bind} || 
-#         ( 
-#             ( $q->_query_type eq 'insert' || $q->_query_type eq 'update' ) && 
-#             $q->binded_types->length ) 
-#         ) )
+    # Get the values to bind
     if( $q && $self->{bind} )
     {
-        # if( @_ && ( $self->_is_hash( $_[0] ) ) )
         if( @_ && 
             (
                 # hash reference
@@ -272,16 +269,19 @@ sub execute
         }
         else
         {
-            my $binded_values = $q->binded;
+            # my $binded_values = $q->binded;
+            my $binded_values = $q->elements->values;
             push( @binded, @$binded_values ) if( scalar( @$binded_values ) );
         }
     }
     
-    @binded = @_ if( ( !@binded && @_ ) || @_ );
+#    @binded = @_ if( ( !@binded && @_ ) || @_ );
+    @binded = @_ if( !@binded && @_ );
     @binded = () if( !@binded );
     if( $q && $q->is_upsert )
     {
-        if( scalar( @binded_types ) > scalar( @binded ) )
+        if( !$use_numbered_placeholders && 
+            scalar( @binded_types ) > scalar( @binded ) )
         {
             CORE::push( @binded, @binded );
         }
@@ -290,7 +290,7 @@ sub execute
     if( scalar( @_ ) )
     {
         my $temp = {};
-        for( my $i = 0; $i < scalar( @_ ); $i++ )
+        for( my $i = 0; $i < scalar( @args ); $i++ )
         {
             # { $some_value => 'varchar' }
             if( ref( $_[$i] ) eq 'HASH' && 
@@ -302,38 +302,28 @@ sub execute
                 $temp->{$i} = { type => $constant->(), value => [keys( %{$_[$i]} )]->[0] };
             }
         }
-    
+
         # The user has chosen to override any datatype computed and be explicit.
         if( scalar( keys( %$temp ) ) == scalar( @_ ) )
         {
-            @binded = @_;
+            # @binded = @_;
+            @binded_types = ();
+            @binded = ();
+            foreach my $i ( sort( keys( %$temp ) ) )
+            {
+                push( @binded_types, $temp->{ $i }->{type} );
+                push( @binded, $temp->{ $i }->{value} );
+            }
         }
         elsif( scalar( keys( %$temp ) ) )
         {
             foreach my $i ( sort( keys( %$temp ) ) )
             {
-                CORE::splice( @binded_types, $i, 0, $temp->{ $i }->{type} );
+                CORE::splice( @binded_types, $i, 1, $temp->{ $i }->{type} );
                 $binded[$i] = $temp->{ $i }->{value};
             }
         }
     }
-    
-    # $sth->exec({ $my_value => DBI::SQL_VARCHAR });
-#     for( my $i = 0; $i < scalar( @binded ); $i++ )
-#     {
-#         # { $some_value => 'varchar' }
-#         if( ref( $binded[$i] ) eq 'HASH' && 
-#             scalar( keys( %{$binded[$i]} ) ) == 1 &&
-#             # e.g. DBI::SQL_VARCHAR or DBI::SQL_INTEGER
-#             DBI->can( "SQL_" . uc( [values( %{$binded[$i]} )]->[0] ) ) )
-#         {
-#             my $constant = DBI->can( "SQL_" . uc( [values( %{$binded[$i]} )]->[0] ) );
-#             # Get the DBI SQL contant value and add it as a type
-#             CORE::splice( @binded_types, $i, 0, $constant->() );
-#             # Replace our current value with the actual value
-#             $binded[$i] = [keys( %{$binded[$i]} )]->[0];
-#         }
-#     }
     
     if( $q && scalar( @binded ) != scalar( @binded_types ) )
     {
@@ -371,11 +361,8 @@ sub execute
     my $rv = 
     eval
     {
-        #local( $SIG{__DIE__} )  = sub{ };
-        #local( $SIG{__WARN__} ) = sub{ };
-        local( $SIG{ALRM} )     = sub{ die( "Timeout while processing query $self->{sth}->{Statement}\n" ) };
+        local( $SIG{ALRM} ) = sub{ die( "Timeout while processing query $self->{sth}->{Statement}\n" ) };
         # print( STDERR ref( $self ) . "::execute(): binding parameters '", join( ', ', @$binded ), "' to query:\n$self->{ 'query' }\n" );
-        # $self->{ 'sth' }->execute( @binded );
         for( my $i = 0; $i < scalar( @binded ); $i++ )
         {
             # Stringify the binded value if it is a stringifyable object.
@@ -705,7 +692,7 @@ sub join
     my $q = $self->query_object || return( $self->error( "No query formatter object was set" ) );
     my $tbl_o = $q->table_object || return( $self->error( "No table object is set in query object." ) );
     my $query = $q->query ||
-    return( $self->error( "No query prepared for join with another table." ) );
+        return( $self->error( "No query prepared for join with another table." ) );
     if( $query !~ /^[[:blank:]]*SELECT[[:blank:]]+/i )
     {
         return( $self->error( "You may not perform a join on a query other than select." ) );
@@ -717,21 +704,22 @@ sub join
         return( $self );
     }
     my $table      = $tbl_o->table;
-    my $db         = $tbl_o->database();
+    my $db         = $tbl_o->database;
     my $multi_db   = $tbl_o->prefix_database;
     my $alias      = $tbl_o->as;
     my $new_fields = '';
     my $new_table  = '';
     my $new_db     = '';
     my $class      = ref( $self );
-    my $q2 = $q->clone;
-    my $q1;
-    $q2->join_tables( $tbl_o ) if( !$q2->join_tables->length );
+    my $q_source   = $q->clone;
+    my $q_target;
+    # On the duplicated table object, add the current table in the join
+    $q_source->join_tables( $tbl_o ) if( !$q_source->join_tables->length );
     # $data is a DB::Object::Postgres::Statement object - we get all its parameter and merge them with ours
     # if( ref( $data ) && ref( $data ) eq $class )
     if( ref( $data ) && $self->_is_a( $data, $class ) )
     {
-        $q1 = $data->query_object;
+        $q_target = $data->query_object;
     }
     # $data is the table name
     else
@@ -739,6 +727,7 @@ sub join
         my $join_tbl;
         if( $self->_is_object( $data ) && $data->isa( 'DB::Object::Tables' ) )
         {
+            $self->messagec( 4, "Object table {green}", $data->name, "{/} object ", overload::StrVal( $data ), " is provided." );
             $join_tbl = $data;
         }
         elsif( $self->_is_object( $data ) )
@@ -747,14 +736,16 @@ sub join
         }
         else
         {
+            $self->messagec( 4, "Table name provided for join '{green}${data}{/}' (", overload::StrVal( $data ), ")." );
             return( $self->error( "No such table \"$data\" exists in database \"$db\"." ) ) if( !$self->database_object->table_exists( $data ) );
             $join_tbl = $self->database_object->table( $data );
             return( $self->error( "Could not get a table object from \"$data\"." ) ) if( !$join_tbl );
         }
         $join_tbl->prefixed( $db ne $join_tbl->database_object->database ? 3 : 1 );
         my $sth_tmp = $join_tbl->select || return( $self->pass_error( $join_tbl->error ) );
-        $q1 = $sth_tmp->query_object || return( $self->error( "Could not get a query object out of the dummy select query I made from table \"$data\"." ) );
-        $new_fields = $q1->selected_fields;
+        $q_target = $sth_tmp->query_object || 
+            return( $self->error( "Could not get a query object out of the dummy select query I made from table \"$data\"." ) );
+        $new_fields = $q_target->selected_fields;
         # NOTE: 2021-08-22: If we reset it here, we lose the table aliasing
         # $join_tbl->reset;
         
@@ -768,39 +759,46 @@ sub join
         $new_fields = '';
     }
     # TODO: check this or remove it
-    # $q1->table_object->prefixed( $db ne $q1->database_object->database ? 3 : 1 );
-    $new_fields = $q1->selected_fields;
-    $new_table  = $q1->table_object->name;
-    # $new_table  = $q1->table_object->prefix;
-    $new_db     = $q1->database_object->database;
-    $q2->join_tables->push( $q1->table_object );
-    if( CORE::length( $q->where ) )
+    # $q_target->table_object->prefixed( $db ne $q_target->database_object->database ? 3 : 1 );
+    $new_fields = $q_target->selected_fields;
+    $new_table  = $q_target->table_object->name;
+    # $new_table  = $q_target->table_object->prefix;
+    $new_db     = $q_target->database_object->database;
+    $q_source->join_tables->push( $q_target->table_object );
+    if( $q->where && $q_target->where )
     {
-        $q2->where( $self->AND( ( $q->where ), $q1->new_clause({ value => '( ' . ( $q1->where ) . ' )' }) ) ) if( CORE::length( $q1->where ) );
+        $self->messagec( 5, "Merging the where clause of target table {green}", $q_target->table_object->name, "{/} with source table {green}", $q_source->table_object->name, "{/}" );
+        $q_source->where(
+            $self->AND(
+                ( $q->where ),
+                $q_target->new_clause({ value => '( ' . ( $q_target->where ) . ' )' })
+            )
+        );
     }
-    elsif( CORE::length( $q1->where ) )
+    elsif( $q_target->where )
     {
-        $q2->where( $q1->where );
+        $self->messagec( 5, "Souce table has no where clause. Setting the where clause of target table {green}", $q_target->table_object->name, "{/} to that of the source table {green}", $q_source->table_object->name, "{/}" );
+        $q_source->where( $q_target->where );
     }
-    $q2->group( $q->group, $q1->group ) if( $q1->group->value->length );
-    $q2->order( $q->order, $q1->order ) if( $q1->order->value->length );
-    $q2->binded_where->push( @{$q1->binded_where} );
-    $q2->binded_group->push( @{$q1->binded_group} );
-    $q2->binded_order->push( @{$q1->binded_order} );
-    $q2->binded( @{$q1->binded} );
-    if( ( !$q->limit || !$q->_limit->length ) && $q2->_limit->length )
+    if( my $group_target = $q_target->group )
     {
-        $q2->_limit( $q1->_limit );
-        $q2->binded_limit( $q1->binded_limit );
+        $self->messagec( 5, "Adding group clause clause of the target table {green}", $q_target->table_object->name, "{/} to the source table {green}", $q_source->table_object->name, "{/} -> ", ( $group_target->value->length ? 'yes' : 'no, nothing to set' ) );
+        $q_source->group( $group_target ) if( $group_target->value->length );
     }
+    if( my $order_target = $q_target->order )
+    {
+        $self->messagec( 5, "Adding order clause clause of the target table {green}", $q_target->table_object->name, "{/} to the source table {green}", $q_source->table_object->name, "{/} -> ", ( $order_target->value->length ? 'yes' : 'no, nothing to set' ) );
+        $q_source->order( $order_target ) if( $order_target->value->length );
+    }
+    
+    if( ( !$q_source->limit || ( $q_source->limit && !$q_source->limit->length ) ) && 
+        $q_source->limit && $q_source->limit->length )
+    {
+        $q_source->limit( $q_target->limit );
+    }
+    
     my $prev_fields = length( $q->join_fields ) ? $q->join_fields : $q->selected_fields;
     # Regular express to prepend previous fields by their table name if that's not the case already
-    # my $prev_prefix = $new_db ? "$db.$table" : $table;
-    # my $prev_prefix = $tbl_o->query_object->table_alias ? $tbl_o->query_object->table_alias : $tbl_o->prefixed( $db ne $new_db ? 3 : 1 )->prefix;
-#     unless( $tbl_o->query_object->table_alias )
-#     {
-#         $tbl_o->prefixed( $db ne $new_db ? 3 : 1 )
-#     }
     $tbl_o->prefixed( $db ne $new_db ? 3 : 1 );
     # Prefix for previous fields list
     my $prev_prefix = $tbl_o->prefix;
@@ -809,16 +807,12 @@ sub join
     my $re = qr/(?<![\.\"])\b($prev_fields_list)\b/;
     $prev_fields =~ s/(?<![\.\"])\b($prev_fields_list)\b/${prev_prefix}.$1/gs;
     my $fields = $new_fields ? CORE::join( ', ', $prev_fields, $new_fields ) : $prev_fields;
-    $q2->join_fields( $fields );
-    #my $from_table = $q2->from_table;
-    #$from_table = $multi_db ? [ "$db.$table" ] : [ $table ] if( !scalar( @$from_table ) );
-    # $q2->from_table( $multi_db ? "$db.$table" : $table ) if( !$q2->from_table->length );
-    $q2->from_table->push(
-        $q2->table_alias
-            ? sprintf( '%s AS %s', $q2->table_object->name, $q2->table_alias )
-            : ( $q2->table_object->prefixed ? $q2->table_object->prefix : $q2->table_object->name )
-    ) if( !$q2->from_table->length );
-    # $q2->left_join( {} ) if( !$q2->left_join );
+    $q_source->join_fields( $fields );
+    $q_source->from_table->push(
+        $q_source->table_alias
+            ? sprintf( '%s AS %s', $q_source->table_object->name, $q_source->table_alias )
+            : ( $q_source->table_object->prefixed ? $q_source->table_object->prefix : $q_source->table_object->name )
+    ) if( !$q_source->from_table->length );
     my $left_join = '';
     my $condition = '';
     my $format_condition;
@@ -836,6 +830,7 @@ sub join
                 my $sub_obj = shift( @$vals );
                 my $sub_op = $sub_obj->operator;
                 my( @sub_vals ) = $sub_obj->value;
+                $self->messagec( 5, "format_condition(): Value '", overload::StrVal( $vals->[0] ), "' is a DB::Object::Operator object with operator name {green}${sub_obj}{/} and values -> ", sub{ $self->Module::Generic::dump( \@sub_vals ) } );
                 my $this_ref = $format_condition->( \@sub_vals, $sub_op );
                 CORE::push( @res, $this_ref->{clause} ) if( length( $this_ref->{clause} ) );
                 my $tmp = $this_ref->{fields_tables};
@@ -844,8 +839,9 @@ sub join
             }
             else
             {
-                if( $self->_is_object( $vals->[0] ) && $vals->[0]->isa( 'DB::Object::Fields::Field::Overloaded' ) )
+                if( $self->_is_object( $vals->[0] ) && $vals->[0]->isa( 'DB::Object::Fields::Overloaded' ) )
                 {
+                    $self->messagec( 5, "format_condition(): Value '", overload::StrVal( $vals->[0] ), "' is an overloaded field object DB::Object::Fields::Overloaded" );
                     my $f1 = shift( @$vals );
                     $f1->field->prefixed( $multi_db ? 3 : 1 );
                     CORE::push( @res, "$f1" );
@@ -864,6 +860,7 @@ sub join
                 my( $field1, $field2 );
                 if( $self->_is_object( $f1 ) && $f1->isa( 'DB::Object::Fields::Field' ) )
                 {
+                    $self->messagec( 5, "format_condition(): \$f1 is a field object ({green}", $f1->name, "{/}). Adding its related table {green}", $f1->table, "{/} as known." );
                     $f1->prefixed( $multi_db ? 3 : 1 );
                     $field1 = $f1->name;
                     $fields_tables->{ $f1->table }++ if( !$fields_tables->{ $f1->table } );
@@ -874,6 +871,7 @@ sub join
                 }
                 if( $self->_is_object( $f2 ) && $f2->isa( 'DB::Object::Fields::Field' ) )
                 {
+                    $self->messagec( 5, "format_condition(): \$f2 is a field object ({green}", $f2->name, "{/}). Adding its related table {green}", $f2->table, "{/} as known." );
                     $f2->prefixed( $multi_db ? 3 : 1 );
                     $field2 = $f2->name;
                     $fields_tables->{ $f2->table }++ if( !$fields_tables->{ $f2->table } );
@@ -899,26 +897,27 @@ sub join
             my $op = $on->operator;
             my( @vals ) = $on->value;
             my $ret = $format_condition->( \@vals, $op );
-            my $as = $q1->table_alias ? sprintf( ' AS %s', $q1->table_alias ) : '';
+            my $as = $q_target->table_alias ? sprintf( ' AS %s', $q_target->table_alias ) : '';
             $left_join = "LEFT JOIN ${new_table}${as} ON $ret->{clause}";
         }
-        elsif( $self->_is_object( $on ) && $on->isa( 'DB::Object::Fields::Field::Overloaded' ) )
+        elsif( $self->_is_object( $on ) && $on->isa( 'DB::Object::Fields::Overloaded' ) )
         {
-            my $as = $q1->table_alias ? sprintf( ' AS %s', $q1->table_alias ) : '';
+            my $as = $q_target->table_alias ? sprintf( ' AS %s', $q_target->table_alias ) : '';
             $left_join = "LEFT JOIN ${new_table}${as} ON ${on}";
         }
         elsif( $self->_is_array( $on ) )
         {
             my $ret = $format_condition->( $on, 'AND' );
-            my $as = $q1->table_alias ? sprintf( ' AS %s', $q1->table_alias ) : '';
+            my $as = $q_target->table_alias ? sprintf( ' AS %s', $q_target->table_alias ) : '';
             $left_join = "LEFT JOIN ${new_table}${as} ON $ret->{clause}";
         }
         # There is a second parameter - if so this is the condition of the 'LEFT JOIN'
-        elsif( $self->_is_hash( $on ) )
+        # elsif( $self->_is_hash( $on ) )
+        elsif( ref( $on ) eq 'HASH' )
         {
             # Previous join
-            my $join_ref = $q2->left_join;
-            my $def = { on => $on, table_object => $q1->table_object, query_object => $q1 };
+            my $join_ref = $q_source->left_join;
+            my $def = { on => $on, table_object => $q_target->table_object, query_object => $q_target };
             ## Add the current one
             if( $multi_db )
             {
@@ -953,30 +952,21 @@ sub join
     # Otherwise, this is a straight JOIN
     else
     {
-        # $q2->from_table->push( $multi_db ? "$new_db.$new_table" : $new_table );
-        $q2->from_table->push(
-            $q1->table_alias
-                ? sprintf( '%s AS %s', $q1->table_object->name, $q1->table_alias )
-                : ( $q1->table_object->prefixed ? $q1->table_object->prefix : $q1->table_object->name )
+        # $q_source->from_table->push( $multi_db ? "$new_db.$new_table" : $new_table );
+        $q_source->from_table->push(
+            $q_target->table_alias
+                ? sprintf( '%s AS %s', $q_target->table_object->name, $q_target->table_alias )
+                : ( $q_target->table_object->prefixed ? $q_target->table_object->prefix : $q_target->table_object->name )
         );
     }
-    my $from = $q2->from_table->join( ', ' );
-    # $q2->from_table( $from_table );
-    my $clause = $q2->_query_components( 'select', { no_bind_copy => 1 } );
-    # You may not sort if there is no order clause
-#     my $table_alias = '';
-#     if( length( $table_alias = $q2->table_alias ) )
-#     {
-#         $table_alias = " AS ${table_alias}";
-#     }
-    # my @query = ( "SELECT ${fields} FROM ${from}${table_alias} ${left_join}" );
+    my $from = $q_source->from_table->join( ', ' );
+    my $clause = $q_source->_query_components( 'select', { no_bind_copy => 1 } );
     my @query = ( "SELECT ${fields} FROM ${from} ${left_join}" );
     push( @query, @$clause ) if( @$clause );
     my $statement = CORE::join( ' ', @query );
-    $q2->query( $statement );
-    # my $sth = $self->prepare( $self->{ 'query' } ) ||
-    my $sth = $tbl_o->_cache_this( $q2 ) ||
-    return( $self->error( "Error while preparing query to select:\n", $q2->as_string(), $tbl_o->error ) );
+    $q_source->query( $statement );
+    my $sth = $tbl_o->_cache_this( $q_source ) ||
+        return( $self->error( "Error while preparing query to select:\n", $q_source->as_string(), $tbl_o->error ) );
     # Routines such as as_string() expect an array on pupose so we do not have to commit the action
     # but rather get the statement string. At the end, we write:
     # $obj->select() to really select
@@ -986,7 +976,7 @@ sub join
     if( !defined( wantarray() ) )
     {
         $sth->execute() ||
-        return( $self->error( "Error while executing query to select:\n", $q2->as_string(), "\nError: ", $sth->error() ) );
+            return( $self->error( "Error while executing query to select:\n", $q_source->as_string(), "\nError: ", $sth->error() ) );
     }
     return( $sth );
 }
@@ -1165,7 +1155,7 @@ DB::Object::Statement - Statement Object
 
 =head1 VERSION
 
-v0.4.2
+v0.4.3
 
 =head1 DESCRIPTION
 
@@ -1311,11 +1301,11 @@ The target mentioned above can be either a L<DB::Object::Statement> object, or a
 
 The condition mentioned above can be a L<DB::Object::Operator> (C<AND>, C<OR> or C<NOT>), in which case the actual condition will be taken from that operator embedded value.
 
-The condition can also be a L<DB::Object::Fields::Field::Overloaded> object, which implies a table field with some operator and some value.
+The condition can also be a L<DB::Object::Fields::Overloaded> object, which implies a table field with some operator and some value.
 
     $tbl->select->join( $other_tbl, $other_tbl->fo->id == 2 );
 
-Here C<$other_tbl->fo->id == 2> will become a L<DB::Object::Fields::Field::Overloaded> object.
+Here C<$other_tbl->fo->id == 2> will become a L<DB::Object::Fields::Overloaded> object.
 
 The condition can also be an array reference or array object of conditions and implicitly the array entry will be joined with C<AND>:
 

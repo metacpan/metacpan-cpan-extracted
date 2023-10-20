@@ -64,7 +64,7 @@
    "provides" : {
       "App::TrashUtils" : {
          "file" : "lib/App/TrashUtils.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/perlancar/perl-App-TrashUtils"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"

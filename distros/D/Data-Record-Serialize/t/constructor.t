@@ -22,16 +22,17 @@ subtest 'empty args' => sub {
 
 subtest 'bad types' => sub {
 
-    for my $type ( [ scalar =>   1 ],
-                   [ 'hash; illegal type', { foo => 'Q' }, ],
-                   [ 'array; illegal type', [ foo => 'N', bar => 'Q' ] ],
-                 ) {
+    for my $type (
+        [ scalar => 1 ],
+        [ 'hash; illegal type',  { foo => 'Q' }, ],
+        [ 'array; illegal type', [ foo => 'N', bar => 'Q' ] ],
+      )
+    {
 
         my ( $label, $type ) = @$type;
         subtest $label => sub {
 
-            my $error
-              = dies { Data::Record::Serialize->new( encode => 'null', types => $type ) };
+            my $error = dies { Data::Record::Serialize->new( encode => 'null', types => $type ) };
             isa_ok( $error, ['Error::TypeTiny::Assertion'], 'error class' );
 
             is( $error->attribute_name, 'types', "attribute name" );
@@ -51,7 +52,7 @@ subtest "encode includes sink ; don't specify sink" => sub {
                 Data::Record::Serialize->new(
                     encode => '+My::Test::Encode::both',
                     sink   => 'stream'
-                  )
+                )
             }
         ),
         ['Data::Record::Serialize::Error::attribute::value'],

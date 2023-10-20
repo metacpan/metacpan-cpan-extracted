@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Ckb::Any::Ir - Package for language Central Kurdish
 
 =cut
 
 package Locale::CLDR::Locales::Ckb::Any::Ir;
-# This file auto generated from Data/common/main/ckb_IR.xml
-#	on Mon 11 Apr  5:25:41 pm GMT
+# This file auto generated from Data\common\main\ckb_IR.xml
+#	on Fri 13 Oct  9:10:13 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

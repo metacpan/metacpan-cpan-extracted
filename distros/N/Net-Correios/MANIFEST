@@ -1,0 +1,24 @@
+Changes
+lib/Net/Correios.pm
+lib/Net/Correios/Agencias.pm
+lib/Net/Correios/CEP.pm
+lib/Net/Correios/Empresas.pm
+lib/Net/Correios/Faturas.pm
+lib/Net/Correios/Prazo.pm
+lib/Net/Correios/Preco.pm
+lib/Net/Correios/Prepostagens.pm
+lib/Net/Correios/SRO.pm
+lib/Net/Correios/Token.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/01-endpoint.t
+t/02-token.t
+t/03-preco.t
+t/04-prazo.t
+t/06-cep.t
+t/07-sro.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

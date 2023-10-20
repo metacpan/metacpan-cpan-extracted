@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,7 +38,7 @@ requires:
   JSON: '4.03'
   List::Util: '1.56'
   MIME::Base64: '3.16'
-  Module::Generic: v0.16.4
+  Module::Generic: v0.32.4
   Nice::Try: v1.1.2
   POSIX: 1.53_01
   Regexp::IPv6: '0'
@@ -57,5 +57,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/WebSocket/issues
   repository: https://gitlab.com/jackdeguest/WebSocket
-version: v0.1.6
+version: v0.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

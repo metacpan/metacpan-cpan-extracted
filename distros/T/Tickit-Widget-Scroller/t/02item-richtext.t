@@ -25,10 +25,10 @@ isa_ok( $item, [ "Tickit::Widget::Scroller::Item::Text" ], '$item' );
 
 is( [ $item->chunks ],
    # Stringify the pens so Test2 will compare the stringified versions
-    [ [ "My ",     3, pen => "".Tickit::Pen->new() ],
-      [ "message", 7, pen => "".Tickit::Pen->new( b => 1 ) ],
-      [ " ",       1, pen => "".Tickit::Pen->new() ],
-      [ "here",    4, pen => "".Tickit::Pen->new( u => 1 ) ] ],
+    [ [ "My ",     3, pen => "".Tickit::Pen::Immutable->new() ],
+      [ "message", 7, pen => "".Tickit::Pen::Immutable->new( b => 1 ) ],
+      [ " ",       1, pen => "".Tickit::Pen::Immutable->new() ],
+      [ "here",    4, pen => "".Tickit::Pen::Immutable->new( u => 1 ) ] ],
     '$item->chunks' );
 
 is( $item->height_for_width( 80 ), 1, 'height_for_width 80' );
@@ -65,10 +65,10 @@ is_display( [ [TEXT("My "), TEXT("message",b=>1), BLANK(1), TEXT("here",u=>1)] ]
    my $item = Tickit::Widget::Scroller::Item::RichText->new( $str );
 
    is( [ $item->chunks ],
-       [ [ "Another ",    8, pen => "".Tickit::Pen->new() ],
-         [ "message",     7, pen => "".Tickit::Pen->new( b => 1 ), linebreak => 1 ],
-         [ "with",        4, pen => "".Tickit::Pen->new( b => 1 ) ], 
-         [ " linefeeds", 10, pen => "".Tickit::Pen->new() ] ],
+       [ [ "Another ",    8, pen => "".Tickit::Pen::Immutable->new() ],
+         [ "message",     7, pen => "".Tickit::Pen::Immutable->new( b => 1 ), linebreak => 1 ],
+         [ "with",        4, pen => "".Tickit::Pen::Immutable->new( b => 1 ) ], 
+         [ " linefeeds", 10, pen => "".Tickit::Pen::Immutable->new() ] ],
        '$item->chunks with linefeeds' );
 }
 

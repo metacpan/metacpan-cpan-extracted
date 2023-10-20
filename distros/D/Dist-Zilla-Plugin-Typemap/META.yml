@@ -7,12 +7,12 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
-  perl: '5.006'
+  perl: '5.013002'
   strict: '0'
   warnings: '0'
 configure_requires:
   Module::Build::Tiny: '0.034'
-  perl: '5.004'
+  perl: '5.013002'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -23,7 +23,7 @@ name: Dist-Zilla-Plugin-Typemap
 provides:
   Dist::Zilla::Plugin::Typemap:
     file: lib/Dist/Zilla/Plugin/Typemap.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Carp: '0'
   Dist::Zilla::File::InMemory: '0'
@@ -36,11 +36,11 @@ requires:
   Moose: '0'
   MooseX::Types::Moose: '0'
   MooseX::Types::Perl: '0'
-  perl: '5.006'
+  perl: '5.013002'
 resources:
   bugtracker: https://github.com/Leont/dist-zilla-plugin-typemap/issues
   repository: git://github.com/Leont/dist-zilla-plugin-typemap.git
-version: '0.004'
+version: '0.005'
 x_generated_by_perl: v5.38.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

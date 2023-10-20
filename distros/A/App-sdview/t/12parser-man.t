@@ -34,7 +34,7 @@ EOMAN
 
    is( $p[3]->type, "plain", 'p[3] type' );
    is( $p[3]->text, "The content with bold and code in it.", 'p[3] text' );
-   is( [ sort $p[3]->text->tagnames ], [qw( B C )], 'p[3] tags' );
+   is( [ sort $p[3]->text->tagnames ], [qw( bold monospace )], 'p[3] tags' );
 };
 
 subtest "Formatting" => sub {
@@ -52,13 +52,13 @@ EOMAN
    is( scalar @p, 3, 'Received 3 paragraphs' );
 
    is( $p[0]->text, "bold bold", 'bold text' );
-   ok( $p[0]->text->get_tag_at( 0, "B" ), 'bold tag' );
+   ok( $p[0]->text->get_tag_at( 0, "bold" ), 'bold tag' );
 
    is( $p[1]->text, "italic italic", 'italic text' );
-   ok( $p[1]->text->get_tag_at( 0, "I" ), 'italic tag' );
+   ok( $p[1]->text->get_tag_at( 0, "italic" ), 'italic tag' );
 
    is( $p[2]->text, "code->with->arrows", 'code text' );
-   ok( $p[2]->text->get_tag_at( 0, "C" ), 'code tag' );
+   ok( $p[2]->text->get_tag_at( 0, "monospace" ), 'code tag' );
 };
 
 subtest "Verbatim trimming" => sub {

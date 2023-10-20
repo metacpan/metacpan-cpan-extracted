@@ -57,6 +57,7 @@ do { my $x = {
                                       'if' => '0',
                                       'namespace::clean' => '0',
                                       'perl' => '5.020',
+                                      'stable' => '0.031',
                                       'strict' => '0',
                                       'strictures' => '2',
                                       'warnings' => '0'

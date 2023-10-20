@@ -42,10 +42,6 @@ eval {
 
 like($@, qr/Cannot set Object \(Custom\) property \(two\) it is only readable/);
 
-#use Data::Dumper;
-#warn Dumper $k;
-
-
 #is($k->{three}(10), 12);
 
 

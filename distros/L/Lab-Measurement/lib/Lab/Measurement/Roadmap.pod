@@ -14,38 +14,26 @@ Lab::Measurement::Roadmap - Some notes and speculations on future L::M developme
 
 =head1 VERSION
 
-version 3.881
-
-=head1 3.700: feature completeness Moose vs. old code
-
-=over
-
-=item *
-
-Old instrument or xpress code prints an informative message about the new Moose
-framework.
-
-=item *
-
-Remaining features that are still missing in the Moose code are ported from old
-drivers or implemented.
-
-=back
+version 3.901
 
 =head1 3.800: legacy code deprecation
 
-Old instrument or xpress code prints a deprecation warning.
+Old instrument or xpress code prints a deprecation warning. (done, 2022-03)
 
 =head1 3.900: legacy code removal
 
-The old code is completely removed. Old scripts stop working.
+The old code is completely removed. Old scripts stop working. (done, 2022-10)
 
-=head1 3.990: move Lab::Moose and friends to Lab::Measurement
+=head1 3.920: legacy code blocker
 
-Lab::Moose -> Lab::Measurement, Lab::Moose::Instrument -> Lab::Instrument,
-...
+A temporary Lab::Measurement module is installed to inform people of the need to
+install Lab::Measurement::Legacy for old scripts, for users of CPAN and 
+similar managers that do not remove old module versions.
 
-More directory cleanup is possible, e.g. introducing a Lab::Role:: subdir...
+=head1 3.990: copy Lab::Moose to Lab::Measurement
+
+Replace the temporary Lab::Measurement module with an alias for Lab::Moose
+(or vice versa).
 
 =head1 4.000: party!
 
@@ -55,6 +43,7 @@ This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Andreas K. Huettel
             2021       Andreas K. Huettel
+            2023       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -303,7 +303,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         + 'mmButton';
                     this.addOwnedQxObject(mmButton, mmBtnId);
                 }
-                var action = function () {
+                let action = function () {
                     var that = this;
                     if (!button.isEnabled()) {
                         return;
@@ -460,7 +460,9 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         default:
                             this.debug('Invalid execute action:' + btCfg.action);
                     }
-                }; // var action = function() { ... };
+                }; // action_code
+                // wrap action such that it executes only after the event loop is free again
+                //var action = () => setTimeout(action_code.bind(this),0);
 
                 if (btCfg.defaultAction) {
                     this._defaultAction = action;

@@ -45,7 +45,7 @@ Redis::Cluster::Fast - A fast perl binding for Redis Cluster
 
 Redis::Cluster::Fast is like [Redis::Fast](https://github.com/shogo82148/Redis-Fast) but support Redis Cluster by [hiredis-cluster](https://github.com/Nordix/hiredis-cluster).
 
-To build this module you need at least autoconf, automake, libtool, pkg-config are installed on your system.
+To build and use this module you need libevent-dev >= 2.x is installed on your system.
 
 Recommend Redis 6 or higher.
 

@@ -1,6 +1,12 @@
 
 Revision history for Perl extension Mojo-IOLoop-ReadWriteProcess
 
+0.34 2023-09-18T15:47:18Z
+ - Adapt to deprecation of spurt in upstream Mojolicious
+ - Make git work in github workflow
+ - Turn warnings "Sleeping inside locked section" into notes
+ - Avoid warnings about using undefined value as file handle
+
 0.33 2022-12-12T12:22:13Z
  - Apply perltidy v20221112
  - remove hard-coding of OABI syscall entry point

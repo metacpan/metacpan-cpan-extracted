@@ -9,7 +9,7 @@ use App::Sandy;
 # PODNAME: Sandy
 # ABSTRACT: A straightforward and complete next-generation sequencing read simulator
 
-our $VERSION = '0.24'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 my $app = App::Sandy->new;
 $app->run;
@@ -26,7 +26,7 @@ Sandy - A straightforward and complete next-generation sequencing read simulator
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 AUTHORS
 

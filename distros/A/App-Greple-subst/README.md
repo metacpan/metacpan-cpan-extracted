@@ -5,7 +5,7 @@ subst - Greple module for text search and substitution
 
 # VERSION
 
-Version 2.3104
+Version 2.3301
 
 # SYNOPSIS
 
@@ -341,7 +341,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2017-2022 Kazumasa Utashiro.
+Copyright 2017-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

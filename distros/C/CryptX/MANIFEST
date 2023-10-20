@@ -156,7 +156,9 @@ META.yml
 ppport.h
 README.md
 src/ltc/ciphers/aes/aes.c
+src/ltc/ciphers/aes/aes_desc.c
 src/ltc/ciphers/aes/aes_tab.c
+src/ltc/ciphers/aes/aesni.c
 src/ltc/ciphers/anubis.c
 src/ltc/ciphers/blowfish.c
 src/ltc/ciphers/camellia.c
@@ -491,6 +493,7 @@ src/ltc/pk/dsa/dsa_shared_secret.c
 src/ltc/pk/dsa/dsa_sign_hash.c
 src/ltc/pk/dsa/dsa_verify_hash.c
 src/ltc/pk/dsa/dsa_verify_key.c
+src/ltc/pk/ec25519/ec25519_crypto_ctx.c
 src/ltc/pk/ec25519/ec25519_export.c
 src/ltc/pk/ec25519/ec25519_import_pkcs8.c
 src/ltc/pk/ec25519/tweetnacl.c
@@ -1057,8 +1060,9 @@ t/mbi_ltm_bigintpm.t
 t/mbi_ltm_biglog.t
 t/mbi_ltm_bigroot.t
 t/mbi_ltm_bugs.t
-t/mbi_ltm_latest.t
 t/mbi_ltm_mbi-from-big-scalar.t
+t/mbi_ltm_since_1.999837.t
+t/mbi_ltm_since_1.999842.t
 t/mbi_ltm_storable.t
 t/mode_cbc.t
 t/mode_cfb.t

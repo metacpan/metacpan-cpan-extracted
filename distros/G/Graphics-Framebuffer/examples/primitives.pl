@@ -14,6 +14,10 @@ use Getopt::Long;
 
 # use Data::Dumper;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
 
+BEGIN {
+	our $VERSION = '5.00';
+};
+
 our $F;
 
 my $new_x;
@@ -24,6 +28,8 @@ my $noaccel  = FALSE;
 my $nosplash = FALSE;
 my $delay    = 3;
 my $ignore_x = FALSE;
+my $small    = FALSE;
+my $show_func;
 
 GetOptions(
     'x=i'              => \$new_x,
@@ -33,10 +39,16 @@ GetOptions(
     'noaccel'          => \$noaccel,
     'nosplash'         => \$nosplash,
     'delay=i'          => \$delay,
+	'func=s'           => \$show_func,
 	'ignore-x-windows' => \$ignore_x,
+	'small'            => \$small,
 );
 
 $noaccel = ($noaccel) ? 1 : 0;    # Only 1 or 0 please
+if ($small) {
+	$new_x = 320;
+	$new_y = 200;
+}
 
 my $images_path = (-e 'images/4KTest_Pattern.png') ? 'images' : 'examples/images';
 
@@ -190,79 +202,85 @@ my %func = (
     'Animated'                          => sub { animated(shift); },
 );
 
-my @order = (
-    'Color Mapping',
-    'Plotting',
-    'Lines',
-    'Angle Lines',
-    'Polygons',
-    'Antialiased Lines',
-    'Antialiased Angle Lines',
-    'Antialiased Polygons',
-    'Boxes',
-    'Rounded Boxes',
-    'Circles',
-    'Ellipses',
-    'Arcs',
-    'Poly Arcs',
-    'Beziers',
-    'Filled Boxes',
-    'Filled Rounded Boxes',
-    'Filled Circles',
-    'Filled Ellipses',
-    'Filled Pies',
-    'Filled Polygons',
-    'Hatch Filled Boxes',
-    'Hatch Filled Rounded Boxes',
-    'Hatch Filled Circles',
-    'Hatch Filled Ellipses',
-    'Hatch Filled Pies',
-    'Hatch Filled Polygons',
-    'Vertical Gradient Boxes',
-    'Vertical Gradient Rounded Boxes',
-    'Vertical Gradient Circles',
-    'Vertical Gradient Ellipses',
-    'Vertical Gradient Pies',
-    'Vertical Gradient Polygons',
-    'Horizontal Gradient Boxes',
-    'Horizontal Gradient Rounded Boxes',
-    'Horizontal Gradient Circles',
-    'Horizontal Gradient Ellipses',
-    'Horizontal Gradient Pies',
-    'Horizontal Gradient Polygons',
-    'Texture Filled Boxes',
-    'Texture Filled Rounded Boxes',
-    'Texture Filled Circles',
-    'Texture Filled Ellipses',
-    'Texture Filled Pies',
-    'Texture Filled Polygons',
-    'Flood Fill',
-    'TrueType Fonts',
-    'TrueType Printing',
-    'Rotate TrueType Fonts',
-    'Color Replace None-Clipped',
-    'Color Replace Clipped',
-    'Blitting',
-    'Blit Move',
-    'Rotate',
-    'Flipping',
-    'Monochrome',
-    'XOR Mode Drawing',
-    'OR Mode Drawing',
-    'AND Mode Drawing',
-    'MASK Mode Drawing',
-    'UNMASK Mode Drawing',
-    'ALPHA Mode Drawing',
-    'ADD Mode Drawing',
-    'SUBTRACT Mode Drawing',
-#    'MULTIPLY Mode Drawing',
-#    'DIVIDE Mode Drawing',
-    'Animated',
-);
+my @order;
+if (defined($show_func)) {
+	@order = split(/,/,$show_func);
+} else {
+	@order = (
+		'Color Mapping',
+		'Plotting',
+		'Lines',
+		'Angle Lines',
+		'Polygons',
+		'Antialiased Lines',
+		'Antialiased Angle Lines',
+		'Antialiased Polygons',
+		'Boxes',
+		'Rounded Boxes',
+		'Circles',
+		'Ellipses',
+		'Arcs',
+		'Poly Arcs',
+		'Beziers',
+		'Filled Boxes',
+		'Filled Rounded Boxes',
+		'Filled Circles',
+		'Filled Ellipses',
+		'Filled Pies',
+		'Filled Polygons',
+		'Hatch Filled Boxes',
+		'Hatch Filled Rounded Boxes',
+		'Hatch Filled Circles',
+		'Hatch Filled Ellipses',
+		'Hatch Filled Pies',
+		'Hatch Filled Polygons',
+		'Vertical Gradient Boxes',
+		'Vertical Gradient Rounded Boxes',
+		'Vertical Gradient Circles',
+		'Vertical Gradient Ellipses',
+		'Vertical Gradient Pies',
+		'Vertical Gradient Polygons',
+		'Horizontal Gradient Boxes',
+		'Horizontal Gradient Rounded Boxes',
+		'Horizontal Gradient Circles',
+		'Horizontal Gradient Ellipses',
+		'Horizontal Gradient Pies',
+		'Horizontal Gradient Polygons',
+		'Texture Filled Boxes',
+		'Texture Filled Rounded Boxes',
+		'Texture Filled Circles',
+		'Texture Filled Ellipses',
+		'Texture Filled Pies',
+		'Texture Filled Polygons',
+		'Flood Fill',
+		'TrueType Fonts',
+		'TrueType Printing',
+		'Rotate TrueType Fonts',
+		'Color Replace None-Clipped',
+		'Color Replace Clipped',
+		'Blitting',
+		'Blit Move',
+		'Rotate',
+		'Flipping',
+		'Monochrome',
+		'XOR Mode Drawing',
+		'OR Mode Drawing',
+		'AND Mode Drawing',
+		'MASK Mode Drawing',
+		'UNMASK Mode Drawing',
+		'ALPHA Mode Drawing',
+		'ADD Mode Drawing',
+		'SUBTRACT Mode Drawing',
+#       'MULTIPLY Mode Drawing',
+#       'DIVIDE Mode Drawing',
+		'Animated',
+	);
+}
 
-# @order = ('Color Replace None-Clipped');
 foreach my $name (@order) {
-    $func{$name}->($name);
+	if (exists($func{$name})) {
+		$func{$name}->($name);
+	}
 }
 
 ##################################
@@ -275,15 +293,15 @@ $F->cls('ON');
 foreach my $name (@order) {
     next if ($name =~ /Mode/);
     if ($name =~ /Image Load|Flood/i) {
-        print STDOUT "$name = $benchmark->{$name} seconds\n";
+        print STDOUT sprintf('%-33s = %.02f seconds', $name, $benchmark->{$name}), "\n";
     } elsif ($name eq 'Animated') {
-        print STDOUT "$name Native = " . ($benchmark->{"$name Native"} / $delay) . " frames per second\n";
-        print STDOUT "$name Fullscreen = " . ($benchmark->{"$name Native"} / $delay) . " frames per second\n";
+        print STDOUT sprintf('%-33s = %.02f frames per second', "$name Native", ($benchmark->{"$name Native"} / $delay)), "\n";
+        print STDOUT sprintf('%-33s = %.02f frames per second', "$name Fullscreen", ($benchmark->{"$name Fullscreen"} / $delay)), "\n";
     } elsif ($name eq 'Rotate') {
-        print STDOUT "Clockwise $name" . ($benchmark->{"Clockwise $name"} / $delay) . " per second\n";
-        print STDOUT "Counter Clockwise $name" . ($benchmark->{"Counter Clockwise $name"} / $delay) . " per second\n";
+        print STDOUT sprintf('%-33s = %.02f per second', "Clockwise $name", ($benchmark->{"Clockwise $name"} / $delay)), "\n";
+        print STDOUT sprintf('%-33s = %.02f per second', "Counter Clockwise $name", ($benchmark->{"Counter Clockwise $name"} / $delay)), "\n";
     } else {
-        print STDOUT "$name = " .  ($benchmark->{$name} / $delay) . " per second\n";
+        print STDOUT sprintf('%-33s = %.02f per second', $name, ($benchmark->{$name} / $delay)), "\n";
     }
 }
 
@@ -1753,9 +1771,13 @@ Examples:
 
 =over 4
 
+ perl primitives.pl
+
  perl primitives.pl --dev=1 --x=640 --y=480
 
  perl primitives.pl --x=1280 --y=720 --pixel=2
+
+ perl primitives.pl --small
 
 =back
 
@@ -1779,6 +1801,10 @@ This tells the script to tell the Graphics::Framebuffer module to simulate a dev
 
  "--y=480" would set the height to 480 pixels.
 
+=item B<--small>
+
+This is a shortcut (and diagnostic tool) to set "x" and "y" to 320x200 respectively.  Use this if you are getting bus errors.  See the "TROUBLESHOOTING" file for using this setting to determine if GFB is incorrectly detecting screen parameters.
+
 =item B<--pixel>=C<pixel size>
 
 This tells the module to draw with larger pixels (larger means slower)
@@ -1801,7 +1827,7 @@ Richard Kelsch <rich@rk-internet.com>
 
 =head1 COPYRIGHT
 
-Copyright 2003-2019 Richard Kelsch
+Copyright 2003-2023 Richard Kelsch
 All Rights Reserved
 
 =head1 LICENSE

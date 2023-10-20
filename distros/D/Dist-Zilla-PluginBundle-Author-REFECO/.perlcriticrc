@@ -1,0 +1,13 @@
+force = 1
+only = 1
+severity = 1
+verbose = 5
+color-severity-highest = bold red underline
+color-severity-high = bold magenta
+color-severity-medium = bold yellow
+include = BuiltinFunctions::ProhibitShiftRef CodeLayout::ProhibitTrailingWhitespace CodeLayout::RequireTidyCode ErrorHandling::RequireCarping Modules::ProhibitMultiplePackages Modules::RequireEndWithOne Subroutines::ProtectPrivateSubs TestingAndDebugging::ProhibitNoStrict TestingAndDebugging::ProhibitNoWarnings TestingAndDebugging::RequireUseStrict TestingAndDebugging::RequireUseWarnings ValuesAndExpressions::ProhibitMixedBooleanOperators
+# these are mostly for Object::Pad
+# - Object::Pad sets by default strcit and warnings;
+# - Package and class should be defined in the same file;
+# - class keywords are not yet defined on PPI, so the ending true checks doesn't work correctly
+exclude = Subroutines::ProhibitExplicitReturnUndef TestingAndDebugging::RequireUseWarnings Modules::ProhibitMultiplePackages TestingAndDebugging::RequireUseStrict Modules::RequireEndWithOne

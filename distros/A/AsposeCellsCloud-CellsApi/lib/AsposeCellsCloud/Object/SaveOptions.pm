@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents all save options',
                                   class => 'SaveOptions',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'save_format' => {
      	datatype => 'string',
      	base_name => 'SaveFormat',
-     	description => '',
+     	description => 'Save format name',
      	format => '',
      	read_only => '',
      		},
@@ -156,21 +156,21 @@ __PACKAGE__->method_documentation({
      'enable_http_compression' => {
      	datatype => 'boolean',
      	base_name => 'EnableHTTPCompression',
-     	description => '',
+     	description => 'whether http compression is to be used.',
      	format => '',
      	read_only => '',
      		},
      'refresh_chart_cache' => {
      	datatype => 'boolean',
      	base_name => 'RefreshChartCache',
-     	description => '',
+     	description => 'Indicates whether refreshing chart cache data',
      	format => '',
      	read_only => '',
      		},
      'sort_names' => {
      	datatype => 'boolean',
      	base_name => 'SortNames',
-     	description => '',
+     	description => 'Indicates whether sorting defined names before saving file.',
      	format => '',
      	read_only => '',
      		},

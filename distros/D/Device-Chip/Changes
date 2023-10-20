@@ -1,6 +1,18 @@
 Revision history for Device-Chip
 
+0.26    2023-10-18
+        [CHANGES]
+         * Optional read buffer in `Test::Device::Chip::Adapter` to assist
+           UART-based unit tests
+         * The `->returns()` back-compatibility wrapper now prints a
+           deprecation warning
+         * Updates for Object::Pad v0.800:
+            + use field initialiser expressions
+         * Module style updates
+            + Swap unit tests from `Test::More` to `Test2::V0`
+
 0.25    2022-10-30
+        [CHANGES]
          * Updates for Object::Pad v0.70:
             + `ADJUST :params`
 

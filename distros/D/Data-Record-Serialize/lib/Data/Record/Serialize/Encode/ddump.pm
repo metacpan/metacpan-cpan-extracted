@@ -2,9 +2,10 @@ package Data::Record::Serialize::Encode::ddump;
 
 # ABSTRACT:  encoded a record using Data::Dumper
 
+use v5.12;
 use Moo::Role;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use Scalar::Util;
 use Data::Dumper;
@@ -56,25 +57,25 @@ has dd_config => (
 
 sub encode {
     my $self = shift;
-    $self->ddump->Values( \@_ )->Dump . ",";
+    $self->ddump->Values( \@_ )->Dump . q{,};
 }
 
 around BUILD => sub {
-    my ( $orig, $self) = ( shift, shift );
+    my ( $orig, $self ) = ( shift, shift );
 
-    $orig->( $self, @_);
+    $orig->( $self, @_ );
 
     my $ddump  = $self->ddump;
     my %config = (
         %{ $self->dd_config },
         Terse         => 1,
-        Trailingcomma => 1
+        Trailingcomma => 1,
     );
 
-    for my $mth ( keys  %config ) {
+    for my $mth ( keys %config ) {
         my $code = $ddump->can( $mth )
           or error( '::parameter', "$mth is not a Data::Dumper configuration variable" );
-        $code->( $ddump, $config{$mth});
+        $code->( $ddump, $config{$mth} );
     }
     return;
 };
@@ -112,7 +113,7 @@ Data::Record::Serialize::Encode::ddump - encoded a record using Data::Dumper
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 
@@ -131,14 +132,7 @@ L<Data::Dumper>.  The resultant encoding may be decoded via
 
 It performs the L<Data::Record::Serialize::Role::Encode> role.
 
-=head1 CLASS METHODS
-
-=head2 new
-
-This role adds two named arguments to the constructor, L</ddump> and
-L</config>, which mirror the added object attributes.
-
-=head1 ATTRIBUTES
+=head1 OBJECT ATTRIBUTES
 
 =head2 ddump
 
@@ -147,13 +141,22 @@ the constructor.
 
 =head2 dd_config
 
-Configuration data for the L</ddump> L<Data::Dumper> object.  Hash
-keys are the names of L<Data::Dumper> configuration variables, without
-the preceding C<Data::Dumper::> prefix.  Be careful to ensure that the
-resultant output is a (comma separated) list of structures which can be
-C<eval>'ed.
+Configuration data for the L<Data::Dumper> object stored in L</ddump>.
+Hash keys are the names of L<Data::Dumper> configuration variables,
+without the preceding C<Data::Dumper::> prefix.  Be careful to ensure
+that the resultant output is a (comma separated) list of structures
+which can be C<eval>'ed.
 
 B<Terse> and B<Trailingcomma> are always set.
+
+=head1 CLASS METHODS
+
+=head2 new
+
+This role adds two named arguments to the constructor, L</ddump> and
+L</config>, which mirror the added object attributes.
+
+=head1 INTERNALS
 
 =for Pod::Coverage encode
 
@@ -161,7 +164,7 @@ B<Terse> and B<Trailingcomma> are always set.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>
 
 =head2 Source
 

@@ -7,7 +7,7 @@ use 5.012000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "color palette creation helper",
+  "ABSTRACT" => "color palette constructor",
   "AUTHOR" => "Herbert Breunung <lichtkind\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "1.61",
+  "VERSION" => "1.71",
   "test" => {
     "TESTS" => "t/*.t"
   }

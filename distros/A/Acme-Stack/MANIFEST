@@ -1,0 +1,12 @@
+MANIFEST
+Changes
+Makefile.PL
+Stack.pm
+Stack.pod
+Stack.xs
+t/test1.t
+t/test1_alt.t
+t/test2.t
+t/test2_alt.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

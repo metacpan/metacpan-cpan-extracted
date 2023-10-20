@@ -5,8 +5,8 @@ SPECIFICATION VERSION
     2
 
 VERSION
-    This document describes version 2.1.3 of ColorTheme (from Perl
-    distribution ColorTheme), released on 2023-07-02.
+    This document describes version 2.1.4 of ColorTheme (from Perl
+    distribution ColorTheme), released on 2023-07-14.
 
 DESCRIPTION
     This document specifies a way to create and use color themes.
@@ -211,6 +211,9 @@ SOURCE
 
 SEE ALSO
     DefHash
+
+    Somewhat related: BorderStyle specification, because they are often used
+    together in an application.
 
 HISTORY
     Color::Theme is an older specification, superseded by this document.

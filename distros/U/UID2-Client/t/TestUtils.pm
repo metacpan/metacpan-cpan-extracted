@@ -7,14 +7,15 @@ use Carp;
 use JSON;
 use Crypt::Mode::CBC;
 use Crypt::AuthEnc::GCM;
-use Crypt::Misc qw(encode_b64 decode_b64);
+use Crypt::Misc qw(encode_b64 decode_b64 encode_b64u);
 use Crypt::PRNG qw(random_bytes irand);
 
-use UID2::Client::Decryption;
+use UID2::Client::Encryption;
+use UID2::Client::AdvertisingTokenVersion;
 use UID2::Client::IdentityType;
 use UID2::Client::Timestamp;
 
-sub encrypt_token_v2 {
+sub generate_token_v2 {
     my %args = @_;
     my $privacy_bits = irand();
     my $established = UID2::Client::Timestamp->now->add_seconds(-60 * 60);
@@ -33,7 +34,15 @@ sub encrypt_token_v2 {
     encode_b64($token);
 }
 
-sub encrypt_token_v3 {
+sub generate_token_v3 {
+    _generate_token(@_, token_version => UID2::Client::AdvertisingTokenVersion::V3);
+}
+
+sub generate_token_v4 {
+    _generate_token(@_, token_version => UID2::Client::AdvertisingTokenVersion::V4);
+}
+
+sub _generate_token {
     my %args = @_;
 
     # publisher data
@@ -66,11 +75,14 @@ sub encrypt_token_v3 {
     my $master_iv = random_bytes(12);
     my $master_payload_encrypted = _encrypt_gcm($master_payload, $args{master_key}, $master_iv);
 
-    my $identity_type = $args{identity_type} // UID2::Client::IdentityType::EMAIL;
-    my $identity_scope_and_type = ($args{identity_scope} << 4) | ($identity_type << 2);
-    my $version = 112;
+    my $first_char = substr $args{id_str}, 0, 1;
+    my $identity_type = ($first_char eq 'F' || $first_char eq 'B') ? UID2::Client::IdentityType::PHONE : UID2::Client::IdentityType::EMAIL;
+    my $identity_scope_and_type = (($args{identity_scope} << 4) | ($identity_type << 2)) | 3;
+
+    my $version = $args{token_version};
     my $token = pack 'C C a*', $identity_scope_and_type, $version, $master_payload_encrypted;
-    encode_b64($token);
+    my $encode = $version == UID2::Client::AdvertisingTokenVersion::V4 ? \&encode_b64u : \&encode_b64;
+    $encode->($token);
 }
 
 sub encrypt_data_v2 {
@@ -88,7 +100,7 @@ sub encrypt_data_v2 {
             croak 'only one of site_id and advertising_token can be specified';
         }
         if ($advertising_token) {
-            my $token = UID2::Client::Decryption::decrypt($advertising_token, $keys);
+            my $token = UID2::Client::Encryption::decrypt($advertising_token, $keys);
             $site_id = $token->{site_id};
         }
         $key = $keys->get_active_site_key($site_id);
@@ -135,11 +147,11 @@ sub mock_http {
         # fake server
         my ($version, $payload) = unpack 'a a*', decode_b64($params->{content});
         die 'invalid version' if ord($version) != 1;
-        my $decrypted = UID2::Client::Decryption::decrypt_gcm($payload, $secret_key_bytes);
+        my $decrypted = UID2::Client::Encryption::decrypt_gcm($payload, $secret_key_bytes);
         my ($nonce) = unpack 'x8 a8', $decrypted;
         my $now = UID2::Client::Timestamp->now;
         my $envelope = pack 'q> a8 a*', $now->get_epoch_milli, $nonce, $json;
-        my $envelope_encrypted = UID2::Client::Decryption::encrypt_gcm($envelope, $secret_key_bytes);
+        my $envelope_encrypted = UID2::Client::Encryption::encrypt_gcm($envelope, $secret_key_bytes);
         my $content = encode_b64($envelope_encrypted);
         +{
             success => 1,

@@ -4,7 +4,7 @@ package Crypt::Cipher::SAFERP;
 
 use strict;
 use warnings;
-our $VERSION = '0.078';
+our $VERSION = '0.080';
 
 use base qw(Crypt::Cipher);
 

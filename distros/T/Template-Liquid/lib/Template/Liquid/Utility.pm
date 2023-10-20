@@ -2,7 +2,7 @@ package Template::Liquid::Utility;
 use experimental 'signatures';
 use strict;
 use warnings;
-our $VERSION         = '1.0.22';
+our $VERSION         = '1.0.23';
 our $FilterSeparator = qr[\s*\|\s*]o;
 my $ArgumentSeparator = qr[,]o;
 our $FilterArgumentSeparator    = qr[\s*:\s*]o;

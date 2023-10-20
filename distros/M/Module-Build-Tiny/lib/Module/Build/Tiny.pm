@@ -1,5 +1,5 @@
 package Module::Build::Tiny;
-$Module::Build::Tiny::VERSION = '0.046';
+$Module::Build::Tiny::VERSION = '0.047';
 use strict;
 use warnings;
 use Exporter 5.57 'import';
@@ -99,10 +99,10 @@ my %actions = (
 		}
 		my %modules = map { $_ => catfile('blib', $_) } find(qr/\.pm$/, 'lib');
 		my %docs    = map { $_ => catfile('blib', $_) } find(qr/\.pod$/, 'lib');
-		my %scripts = map { $_ => catfile('blib', $_) } find(qr//, 'script');
+		my %scripts = map { $_ => catfile('blib', $_) } find(qr/(?:)/, 'script');
 		my %sdocs   = map { $_ => delete $scripts{$_} } grep { /.pod$/ } keys %scripts;
-		my %dist_shared  = map { $_ => catfile(qw/blib lib auto share dist/, $opt{meta}->name, abs2rel($_, 'share')) } find(qr//, 'share');
-		my %module_shared  = map { $_ => catfile(qw/blib lib auto share module/, abs2rel($_, 'module-share')) } find(qr//, 'module-share');
+		my %dist_shared    = map { $_ => catfile(qw/blib lib auto share dist/, $opt{meta}->name, abs2rel($_, 'share')) } find(qr/(?:)/, 'share');
+		my %module_shared  = map { $_ => catfile(qw/blib lib auto share module/, abs2rel($_, 'module-share')) } find(qr/(?:)/, 'module-share');
 		pm_to_blib({ %modules, %docs, %scripts, %dist_shared, %module_shared }, catdir(qw/blib lib auto/));
 		make_executable($_) for values %scripts;
 		mkpath(catdir(qw/blib arch/), $opt{verbose});
@@ -202,7 +202,7 @@ Module::Build::Tiny - A tiny replacement for Module::Build
 
 =head1 VERSION
 
-version 0.046
+version 0.047
 
 =head1 SYNOPSIS
 

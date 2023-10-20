@@ -13,9 +13,9 @@ my ( $s, $buf );
 ok(
     lives {
         $s = Data::Record::Serialize->new(
-            encode => 'ddump',
-            output => \$buf,
-            nullify => [ 'c' ],
+            encode  => 'ddump',
+            output  => \$buf,
+            nullify => ['c'],
           ),
           ;
     },

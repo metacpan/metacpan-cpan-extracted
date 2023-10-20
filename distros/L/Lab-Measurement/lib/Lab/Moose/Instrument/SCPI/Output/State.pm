@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Output::State;
-$Lab::Moose::Instrument::SCPI::Output::State::VERSION = '3.881';
+$Lab::Moose::Instrument::SCPI::Output::State::VERSION = '3.901';
 #ABSTRACT: Role for the SCPI OUTPut:STATe subsystem
 
 use v5.20;
@@ -45,7 +45,7 @@ Lab::Moose::Instrument::SCPI::Output::State - Role for the SCPI OUTPut:STATe sub
 
 =head1 VERSION
 
-version 3.881
+version 3.901
 
 =head1 METHODS
 
@@ -63,7 +63,6 @@ Query/Set whether output is on or off. Allowed values: C<ON, OFF>.
 This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
-            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

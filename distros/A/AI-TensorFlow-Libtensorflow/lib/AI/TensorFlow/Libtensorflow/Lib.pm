@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Lib;
 # ABSTRACT: Private class for AI::TensorFlow::Libtensorflow
-$AI::TensorFlow::Libtensorflow::Lib::VERSION = '0.0.6';
+$AI::TensorFlow::Libtensorflow::Lib::VERSION = '0.0.7';
 use strict;
 use warnings;
 

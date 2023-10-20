@@ -1,16 +1,13 @@
 package PYX::Stack;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use PYX::Parser;
 
-# Version.
-our $VERSION = 0.04;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -125,59 +122,72 @@ PYX::Stack - Processing PYX data or file and process element stack.
 =head1 SYNOPSIS
 
  use PYX::Stack;
+
  my $obj = PYX::Stack->new(%parameters);
  $obj->parse($pyx, $out);
  $obj->parse_file($input_file, $out);
- $obj->parse_handle($input_file_handler, $out);
+ $obj->parse_handler($input_file_handler, $out);
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%parameters)>
+ my $obj = PYX::Stack->new(%parameters);
 
- Constructor.
+Constructor.
 
 =over 8
 
 =item * C<bad_end>
 
- Check bad end of element.
- If set, print error on unopened end of element.
- Default value is 0.
+Check bad end of element.
+If set, print error on unopened end of element.
+
+Default value is 0.
 
 =item * C<output_handler>
 
- Output handler.
- Default value is \*STDOUT.
+Output handler.
+
+Default value is \*STDOUT.
 
 =item * C<verbose>
 
- Verbose flag.
- If set, each start element prints information to 'output_handler'.
- Default value is 0.
+Verbose flag.
+If set, each start element prints information to 'output_handler'.
+
+Default value is 0.
 
 =back
 
-=item C<parse($pyx[, $out])>
+Returns instance of object.
 
- Parse PYX text or array of PYX text.
- If $out not present, use 'output_handler'.
- Returns undef.
+=head2 C<parse>
 
-=item C<parse_file($input_file[, $out])>
+ $obj->parse($pyx, $out);
 
- Parse file with PYX data.
- If $out not present, use 'output_handler'.
- Returns undef.
+Parse PYX text or array of PYX text.
+If C<$out> not present, use 'output_handler'.
 
-=item C<parse_handler($input_file_handler[, $out])>
+Returns undef.
 
- Parse PYX handler.
- If $out not present, use 'output_handler'.
- Returns undef.
+=head2 C<parse_file>
 
-=back
+ $obj->parse_file($input_file, $out);
+
+Parse file with PYX data.
+If C<$out> not present, use 'output_handler'.
+
+Returns undef.
+
+=head2 C<parse_handler>
+
+ $obj->parse_handler($input_file_handler, $out);
+
+Parse PYX defined by handler.
+If C<$out> not present, use 'output_handler'.
+
+Returns undef.
 
 =head1 ERRORS
 
@@ -202,11 +212,11 @@ PYX::Stack - Processing PYX data or file and process element stack.
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=print_stack.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use PYX::Stack;
 
  # Example data.
@@ -237,11 +247,11 @@ PYX::Stack - Processing PYX data or file and process element stack.
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=error1.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure;
  use PYX::Stack;
 
@@ -269,11 +279,11 @@ PYX::Stack - Processing PYX data or file and process element stack.
 
 =head1 EXAMPLE3
 
- # Pragmas.
+=for comment filename=error2.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure;
  use PYX::Stack;
 
@@ -320,21 +330,22 @@ Install the PYX modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/PYX-Stack>
+L<https://github.com/michal-josef-spacek/PYX-Stack>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2015 Michal Špaček
- BSD 2-Clause License
+© 2011-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.06
 
 =cut

@@ -1,6 +1,6 @@
 package Dancer2::Core::Request;
 # ABSTRACT: Interface for accessing incoming requests
-$Dancer2::Core::Request::VERSION = '0.400001';
+$Dancer2::Core::Request::VERSION = '1.0.0';
 use strict;
 use warnings;
 use parent 'Plack::Request';
@@ -181,6 +181,15 @@ sub data { $_[0]->{'data'} ||= $_[0]->deserialize() }
 sub deserialize {
     my $self = shift;
 
+    # don't attempt to deserialize if the form is 'multipart/form-data'
+    if (
+        $self->content_type 
+        && $self->content_type =~ /^multipart\/form-data/i 
+        ) {
+        return;
+    }
+
+
     my $serializer = $self->serializer
         or return;
 
@@ -285,8 +294,7 @@ sub uri_base {
 }
 
 sub dispatch_path {
-    warn q{DEPRECATED: request->dispatch_path. Please use request->path instead};
-    return shift->path;
+    Carp::croak q{DEPRECATED: request->dispatch_path. Please use request->path instead};
 }
 
 sub uri_for {
@@ -640,7 +648,7 @@ Dancer2::Core::Request - Interface for accessing incoming requests
 
 =head1 VERSION
 
-version 0.400001
+version 1.0.0
 
 =head1 SYNOPSIS
 
@@ -738,7 +746,7 @@ Alias to C<input_handle> method below.
 
 =head2 input_handle
 
-Alias to the PSGI input handle (C<< <request->env->{psgi.input}> >>)
+Alias to the PSGI input handle (C<< request->env->{'psgi.input'} >>)
 
 =head2 is_ajax
 

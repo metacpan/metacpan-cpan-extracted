@@ -15,7 +15,6 @@ BEGIN
     use warnings;
     use parent qw( WebSocket::HeaderValue );
     use vars qw( $VERSION );
-    use Nice::Try;
     our $VERSION = 'v0.1.0';
 };
 

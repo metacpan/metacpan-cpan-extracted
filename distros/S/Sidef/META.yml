@@ -1,7 +1,7 @@
 ---
 abstract: 'The Sidef Programming Language'
 author:
-  - 'Daniel Șuteu   (<trizen@cpan.org>)'
+  - 'Daniel Șuteu (<trizen@cpan.org>)'
   - 'Ioana Fălcușan (<ioanaflavia@gmail.com>)'
 build_requires:
   Test::More: '0'
@@ -17,7 +17,7 @@ name: Sidef
 provides:
   Sidef:
     file: lib/Sidef.pm
-    version: '23.08'
+    version: '23.10'
   Sidef::Deparse::Perl:
     file: lib/Sidef/Deparse/Perl.pm
   Sidef::Deparse::Sidef:
@@ -135,6 +135,7 @@ recommends:
   Term::ReadLine::Gnu: '0'
   Text::Balanced: '0'
   Text::ParseWords: '0'
+  forks: '0'
 requires:
   Algorithm::Combinatorics: '0'
   Algorithm::Loops: '0'
@@ -148,7 +149,7 @@ requires:
   File::Path: '0'
   File::Spec: '0'
   Getopt::Std: '0'
-  List::Util: '1.33'
+  List::Util: '1.45'
   Math::GMPq: '0.45'
   Math::GMPz: '0.48'
   Math::MPC: '0'
@@ -168,5 +169,5 @@ resources:
   homepage: https://github.com/trizen/sidef
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/sidef
-version: '23.08'
+version: '23.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

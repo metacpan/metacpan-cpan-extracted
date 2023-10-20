@@ -21,7 +21,6 @@ BEGIN
     use parent qw( Module::Generic::File::IO );
     use vars qw( $DEBUG $VERSION $ERROR @EXPORT );
     use Devel::StackTrace;
-    use Nice::Try;
     no warnings 'once';
     our @EXPORT = @Module::Generic::File::IO;
     our $ERROR = '';
@@ -36,13 +35,15 @@ sub new
     my $this = shift( @_ );
     my $class = ( ref( $this ) || $this );
     my $self;
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $self = $class->IO::File::new;
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error trying to get a file handle: $e" ) );
+        return( $self->error( "Error trying to get a file handle: $@" ) );
     }
     *$self = {};
     if( Want::want( 'OBJECT' ) )

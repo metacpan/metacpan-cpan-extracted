@@ -3,12 +3,13 @@ package Benchmark::DKbench;
 use strict;
 use warnings;
 
+use Config;
 use Digest;
 use Digest::MD5 qw(md5_hex);
 use Encode;
 use File::Spec::Functions;
 use List::Util qw(min max sum);
-use Time::HiRes;
+use Time::HiRes qw(CLOCK_MONOTONIC);
 use Time::Piece;
 
 use Astro::Coord::Constellations 'constellation_for_eq';
@@ -29,15 +30,17 @@ use Math::MatrixReal;
 use MCE::Loop;
 use SQL::Abstract::Classic;
 use SQL::Inserter;
+use System::CPU;
 use System::Info;
 use Text::Levenshtein::Damerau::XS;
 use Text::Levenshtein::XS;
 
 use Exporter 'import';
-our @EXPORT = qw(system_identity suite_run calc_scalability);
-our $datadir = dist_dir("Benchmark-DKbench");
+our @EXPORT    = qw(system_identity suite_run calc_scalability);
+our $datadir   = dist_dir("Benchmark-DKbench");
+my $mono_clock = $^O !~ /win/i || $Time::HiRes::VERSION >= 1.9764;
 
-our $VERSION = '2.1';
+our $VERSION = '2.4';
 
 =head1 NAME
 
@@ -69,25 +72,57 @@ scenario.
 
 =head1 INSTALLATION
 
+See the L</"setup_dkbench"> script below for more on the installation of a couple
+of optional benchmarks and standardizing your benchmarking environment, otherwise
+here are some general guidelines for verious systems.
+
+=head2 Linux / WSL etc
+
 The only non-CPAN software required to install/run the suite is a build environment
 for the C/XS modules (C compiler, make etc.) and Perl. On the most popular Linux
 package managers you can easily set up such an environment (as root or with sudo):
 
  # Debian/Ubuntu etc
  apt-get update
- apt-get -y install build-essential perl cpanminus
+ apt-get install build-essential perl cpanminus
 
  # CentOS/Red Hat
  yum update
- yum -y install gcc make patch perl perl-App-cpanminus
+ yum install gcc make patch perl perl-App-cpanminus
 
 After that, you can use L<App::cpanminus> to install the benchmark suite (as
 root/sudo is the easiest, will install for all users):
 
  cpanm -n Benchmark::DKbench
 
-See the C<setup_dkbench> script below for more on the installation of a couple of
-optional benchmarks and standardizing your benchmarking environment.
+=head2 Solaris
+
+You will need to install the Oracle Solaris Studio development package to have a
+compiler environment, and to add its C<bin> directory to your PATH, before installing
+the benchmark suite.
+
+=head2 Strawberry Perl
+
+If you are on Windows, you should be using the Windows Subsystem for Linux (WSL)
+for running Perl or, if you can't (e.g. old Windows verions), cygwin instead.
+The suite should still work on Strawberry Perl, as long as you don't try to run
+tests when installing (some dependencies will not pass them). The simplest way is
+with L<App::cpanminus> (most Strawberry Perl verions have it installed):
+
+ cpanm -n Benchmark::DKbench
+
+otherwise with the base CPAN shell:
+
+ perl -MCPAN -e shell
+
+ > notest install Benchmark::DKbench
+
+and then note that the scripts get the batch extension appended, so C<dkbench.bat>
+runs the suite (and C<setup_dkbench.bat> can assist with module versions, optional
+benchmarks etc.).
+
+Be aware that Strawberry Perl is slower, on my test system I get almost 50% slower
+performance than WSL and 30% slower than cygwin.
 
 =head1 SCRIPTS
 
@@ -108,19 +143,22 @@ options to control number of threads, iterations, which benchmarks to run etc:
  --multi,       -m     : Multi-threaded using all your CPU cores/threads.
  --max_threads <i>     : Override the cpu detection to specify max cpu threads.
  --iter <i>,    -i <i> : Number of suite iterations (with min/max/avg at the end).
+ --stdev               : Show relative standard deviation (for iter > 1).
  --include <regex>     : Run only benchmarks that match regex.
  --exclude <regex>     : Do not run benchmarks that match regex.
  --time,        -t     : Report time (sec) instead of score.
  --quick,       -q     : Quick benchmark run (implies -t).
  --no_mce              : Do not run under MCE::Loop (implies -j 1).
+ --scale <i>,   -s <i> : Scale the bench workload by x times (incompatible with -q).
  --skip_bio            : Skip BioPerl benchmarks.
- --skip_timep          : Skip Time::Piece benchmark (see benchmark details).
  --skip_prove          : Skip Moose prove benchmark.
+ --time_piece          : Run optional Time::Piece benchmark (see benchmark details).
  --bio_codons          : Run optional BioPerl Codons benchmark (does not scale well).
  --sleep <i>           : Sleep for <i> secs after each benchmark.
  --setup               : Download the Genbank data to enable the BioPerl tests.
  --datapath <path>     : Override the path where the expected benchmark data is found.
  --ver <num>           : Skip benchmarks added after the specified version.
+ --help         -h     : Show basic help and exit.
 
 The default run (no options) will run all the benchmarks both single-threaded and
 multi-threaded (using all detected CPU cores/hyperthreads) and show you scores and
@@ -128,25 +166,34 @@ multi vs single threaded scalability.
 
 The scores are calibrated such that a reference CPU (Intel Xeon Platinum 8481C -
 Sapphire Rapids) would achieve a score of 1000 in a single-core benchmark run using
-the default software configuration (Linux/Perl 5.36.0 with reference CPAN modules).
+the default software configuration (Linux/Perl 5.36.0 built with multiplicity and
+threads, with reference CPAN module versions). Perl built without thread support and
+multi(plicity) will be a bit faster (usually in the order of ~3-4%), while older Perl
+versions will most likely be slower. Different CPAN module versions will also impact
+scores, using C<setup_dkbench> is a way to ensure a reference environment for more
+meaningful hardware comparisons.
 
-The multi-thread scalability should approach 100% if each thread runs on a full core
-(i.e. no SMT), and the core can maintain the clock speed it had on the single-thread
-runs. Note that the overall scalability is an average of the benchmarks that drops
-non-scaling outliers (over 2*stdev less than the mean).
+The multi-thread scalability calculated by the suite should approach 100% if each
+thread runs on a full core (i.e. no SMT), and the core can maintain the clock speed
+it had on the single-thread runs. Note that the overall scalability is an average
+of the benchmarks that drops non-scaling outliers (over 2*stdev less than the mean).
+
+If you want to reduce the effects of thermal throttling, which will lower the speed
+of (mainly multi-threaded) benchmarks as the CPU temperature increases, the C<sleep>
+option can help by adding cooldown time between each benchmark.
 
 The suite will report a Pass/Fail per benchmark. A failure may be caused if you have
 different CPAN module version installed - this is normal, and you will be warned.
 
-The suite uses L<MCE::Loop> to run on the desired number of parallel threads, although
-there is an option to disable it, which forces a single-thread run.
+L<MCE::Loop> is used to run on the desired number of parallel threads, with minimal
+overhead., There is an option to disable it, which forces a single-thread run.
 
 =head2 C<setup_dkbench>
 
 Simple installer to check/get the reference versions of CPAN modules and download
 the Genbank data file required for the BioPerl benchmarks of the DKbench suite.
 
-It assumes that you have some software already installed (see INSTALLATION above),
+It assumes that you have some software already installed (see L</"INSTALLATION"> above),
 try C<setup_dkbench --help> will give you more details.
 
  setup_dkbench [--force --sudo --test --data=s --help]
@@ -169,14 +216,14 @@ between systems and also for the benchmark Pass/Fail results to be reliable.
 
 =head1 BENCHMARKS
 
-The suite consists of 21 benchmarks, 20 will run by default. However, the
+The suite consists of 21 benchmarks, 19 will run by default. However, the
 C<BioPerl Monomers> requires the optional L<BioPerl> to be installed and Genbank
 data to be downloaded (C<dkbench --setup> can do the latter), so you will only
-see 19 benchmarks running just after a standard install. Because the overall score
-is an average, it is generally unaffected by skipping a benchmark or two.
+see 18 benchmarks running just after a standard install. Because the overall score
+is an average, it is generally unaffected by adding or skipping a benchmark or two.
 
-On MacOS only, the C<Time::Piece> benchmark will be skipped, unless you use C<--no_mce>
-(making it single-thread only - see why below).
+The optional benchmarks are enabled with the C<--time_piece> and C<--bio_codons>
+options.
 
 =over 4
 
@@ -244,9 +291,10 @@ changed (old Perl versions are faster but less strict in general).
 to 2500) are calculated using L<Text::Levenshtein::XS> and L<Text::Levenshtein::Damerau::XS>.
 
 =item * C<Time::Piece> : Creates and manipulates/converts Time::Piece objects. It
-is disabled by default on MacOS (unless C<--no_mce> is specified), as it runs
-extremely slow when forked on this platform. In general you may want to skip this
-benchmark (C<--skip_timep>) if you are comparing different OS platforms.
+is disabled by default because it uses the OS time libraries, so it might skew results
+if you are trying to compare CPUs on different OS platforms. It can be enabled with
+the C<--time_piece> option. For MacOS specifically, it can only be enabled if C<--no_mce>
+is specified, as it runs extremely slow when forked.
 
 =back
 
@@ -267,6 +315,9 @@ Prints out software/hardware configuration and returns then number of cores dete
 
 Runs the benchmark suite given the C<%options> and prints results. Returns a hash
 with run stats.
+
+The options accepted are the same as the C<dkbench> script (in their long form),
+except C<help>, C<setup> and C<max_threads> which are command-line only.
 
 =head2 C<calc_scalability>
 
@@ -293,16 +344,17 @@ actual workload.
 =head2 SCORES
 
 Some sample DKbench score results from various systems for comparison (all on
-reference setup with Perl 5.36.0):
+reference setup with Perl 5.36.0 thread-multi):
 
  CPU                                     Cores/HT   Single   Multi   Scalability
  Intel i7-4750HQ @ 2.0 (MacOS)                4/8     612     2332      46.9%
- AMD Ryzen 5 PRO 4650U @ 2.1 (WSL)           6/12     906     4166      38.2% 
+ AMD Ryzen 5 PRO 4650U @ 2.1 (WSL)           6/12     905     4444      40.6%
  Apple M1 Pro @ 3.2 (MacOS)                 10/10    1283    10026      78.8%
  Apple M2 Pro @ 3.5 (MacOS)                 12/12    1415    12394      73.1%
  Ampere Altra @ 3.0 (Linux)                 48/48     708    32718      97.7%
  Intel Xeon Platinum 8481C @ 2.7 (Linux)   88/176    1000    86055      48.9%
  AMD EPYC Milan 7B13 @ 2.45 (Linux)       112/224     956   104536      49.3%
+ AMD EPYC Genoa 9B14 @ 2.7 (Linux)        180/360    1197   221622      51.4%
 
 =head1 AUTHOR
 
@@ -355,23 +407,18 @@ sub benchmark_list {
 }
 
 sub system_identity {
-    my ($physical, $cores, $ncpu) =
-        $^O =~ /bsd|darwin|dragonfly/ ? bsd_cpu() : linux_cpu();
-    $ncpu ||= MCE::Util::get_ncpu() || 1;
+    my ($physical, $cores, $ncpu) = System::CPU::get_cpu;
+    $ncpu ||= 1;
     local $^O = 'linux' if $^O =~ /android/;
     my $info  = System::Info->sysinfo_hash;
     my $osn   = $info->{distro} || $info->{os} || $^O;
-    my $model = $info->{cpu};
-    my $arch  = $info->{cpu_type} || '';
+    my $model = System::CPU::get_name || '';
+    my $arch  = System::CPU::get_arch || '';
     $arch = " ($arch)" if $arch;
-    if ($^O =~ /darwin/ && $model =~ /^Mac|nknown/) {
-        my $brand = `sysctl -a |grep brand`;
-        $model = $1 if $brand =~ /brand_string: (.*)/;
-    }
-    $model =~ s/\s+/ /g;
-    $model =~ s/\(R\)//g;
     print "--------------- Software ---------------\nDKbench v$VERSION\n";
-    print "Perl $^V\n";
+    printf "Perl $^V (%sthreads, %smulti)\n",
+        $Config{usethreads}      ? '' : 'no ',
+        $Config{usemultiplicity} ? '' : 'no ',;
     print "OS: $osn\n--------------- Hardware ---------------\n";
     print "CPU type: $model$arch\n";
     print "CPUs: $ncpu";
@@ -385,39 +432,11 @@ sub system_identity {
     return $ncpu;
 };
 
-sub bsd_cpu {
-    chomp( my $cpus = `sysctl -n hw.ncpu 2>/dev/null` );
-    return unless $cpus;
-    chomp( my $cores = `sysctl -n hw.physicalcpu 2>/dev/null` );
-    $cores ||= $cpus;
-    return (undef, $cores, $cpus);
-}
-
-sub linux_cpu {
-    my (@physical, @cores, $phys, $cpus);
-    if ( -f '/proc/cpuinfo' && open my $fh, '<', '/proc/cpuinfo' ) {
-        while (<$fh>) {
-            $cpus++ if /^processor\s*:/;
-            push @physical, $1 if /^physical id\s*:\s*(\d+)/;
-            push @cores, $1 if /^cpu cores\s*:\s*(\d+)/;
-        }
-        return undef, $cores[0], $cpus if !@physical && @cores;
-        @cores = (0) unless @cores;
-        my %hash;
-        $hash{$physical[$_]} = $_ < scalar(@cores) ? $cores[$_] : $cores[0]
-            for 0 .. $#physical;
-        my $phys  = keys %hash || undef;
-        my $cores = sum(values %hash) || $cpus;
-        return $phys, $cores, $cpus;
-    }
-    return;
-}
-
 sub suite_run {
     my $opt = shift;
     $datadir = $opt->{datapath} if $opt->{datapath};
     $opt->{threads} //= 1;
-    $opt->{repeat} //= 1;
+    $opt->{scale} //= 1;
     $opt->{f} = $opt->{time} ? '%.3f' : '%5.0f';
     my %stats = (threads => $opt->{threads});
 
@@ -458,7 +477,14 @@ sub calc_scalability {
     print (("-"x40)."\n");
     my $avg1 = min_max_avg($stats1->{total}->{$display});
     my $avg2 = min_max_avg($stats2->{total}->{$display});
-    print "DKbench summary ($cnt benchmarks, $stats2->{threads} threads):\n";
+    print "DKbench summary ($cnt benchmark";
+    print "s" if $cnt > 1;
+    print " x$opt->{scale} scale" if $opt->{scale} && $opt->{scale} > 1;
+    print ", $opt->{iter} iterations" if $opt->{iter} && $opt->{iter} > 1;
+    print ", $stats2->{threads} thread";
+    print "s" if $stats2->{threads} > 1;
+    print "):\n";
+    $opt->{f} .= "s" if $opt->{time};
     print pad_to("Single:").sprintf($opt->{f}, $avg1)."\n";
     print pad_to("Multi:").sprintf($opt->{f}, $avg2)."\n";
     my @newperf = Benchmark::DKbench::drop_outliers(\@perf, -1);
@@ -481,7 +507,7 @@ sub run_iteration {
         next if $opt->{skip_bio} && $bench =~ /Monomers/;
         next if $opt->{skip_prove} && $bench =~ /prove/;
         next if !$opt->{bio_codons} && $bench =~ /Codons/;
-        next if $opt->{skip_timep} && $bench =~ /Time::Piece/;
+        next if !$opt->{time_piece} && $bench =~ /Time::Piece/;
         next if $opt->{ver} && $benchmarks->{$bench}->[5] && $opt->{ver} < $benchmarks->{$bench}->[5];
         next if $opt->{exclude} && $bench =~ /$opt->{exclude}/;
         next if $opt->{include} && $bench !~ /$opt->{include}/;
@@ -523,7 +549,7 @@ sub mce_bench_run {
             MCE->gather([$time, $res]);
         }
     }
-    (1 .. $opt->{threads} * $opt->{repeat});
+    (1 .. $opt->{threads} * $opt->{scale});
 
     my ($res, $time) = ('Pass', 0);
     foreach (@stats) {
@@ -531,16 +557,16 @@ sub mce_bench_run {
         $res = $_->[1] if $_->[1] ne 'Pass';
     }
 
-    return $time/($opt->{threads}*$opt->{repeat} || 1), $res;
+    return $time/($opt->{threads}*$opt->{scale} || 1), $res;
 }
 
 sub bench_run {
     my ($benchmark, $srand) = @_;
     $srand //= 1;
     srand($srand); # For repeatability
-    my $t0   = Time::HiRes::time();
+    my $t0   = _get_time();
     my $out  = $benchmark->[2]->($benchmark->[3]);
-    my $time = sprintf("%.3f", Time::HiRes::time()-$t0);
+    my $time = sprintf("%.3f", _get_time()-$t0);
     my $r    = $out eq $benchmark->[0] ? 'Pass' : "Fail ($out)";
     return $time, $r;
 }
@@ -1026,7 +1052,8 @@ sub total_stats {
     my $benchmarks = benchmark_list();
     my $display = $opt->{time} ? 'times' : 'scores';
     my $title   = $opt->{time} ? 'Time (sec)' : 'Score';
-    print "Aggregates:\n".pad_to("Benchmark",24).pad_to("Avg $title").pad_to("Min $title").pad_to("Max $title");
+    print "Aggregates ($opt->{iter} iterations):\n".pad_to("Benchmark",24).pad_to("Avg $title").pad_to("Min $title").pad_to("Max $title");
+    print pad_to("stdev %") if $opt->{stdev};
     print pad_to("Pass %") unless $opt->{time};
     print "\n";
     foreach my $bench (sort keys %$benchmarks) {
@@ -1047,7 +1074,13 @@ sub calc_stats {
     my $arr = shift;
     my $pad = shift;
     my ($min, $max, $avg) = min_max_avg($arr);
-    return $avg, join '', map {pad_to(sprintf($opt->{f}, $_), $pad)} ($avg,$min,$max);
+    my $str = join '', map {pad_to(sprintf($opt->{f}, $_), $pad)} ($avg,$min,$max);
+    if ($opt->{stdev} && $avg) {
+        my $stdev = avg_stdev($arr);
+        $stdev *= 100/$avg;
+        $str .= pad_to(sprintf("%0.2f%%", $stdev), $pad);
+    }
+    return $avg, $str;
 }
 
 sub min_max_avg {
@@ -1247,6 +1280,10 @@ sub _decode_jwt2 {
     }
     return ($header, $payload) if $args{decode_header};
     return $payload;
+}
+
+sub _get_time {
+    return $mono_clock ? Time::HiRes::clock_gettime(CLOCK_MONOTONIC) : Time::HiRes::time();
 }
 
 # Helper package for Moose benchmark

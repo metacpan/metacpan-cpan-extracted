@@ -3,11 +3,10 @@ package MyApp;
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test2::V0; plan 2;
 
 use Dancer2;
-use Dancer2::Test;
-
+use Test::WWW::Mechanize::PSGI;
 
 { 
     package Dancer2::View::MyView;
@@ -25,4 +24,8 @@ setting template => 'Caribou';
 get '/' => sub { template 'MyView' };
 
 
-response_content_is '/' => 'hello world';
+my $mech = Test::WWW::Mechanize::PSGI->new(
+    app => MyApp->to_app 
+);
+$mech->get_ok('/');
+$mech->content_contains('hello world');

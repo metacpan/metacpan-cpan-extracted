@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HP83732A;
-$Lab::Moose::Instrument::HP83732A::VERSION = '3.881';
+$Lab::Moose::Instrument::HP83732A::VERSION = '3.901';
 #ABSTRACT: HP 83732A Series Synthesized Signal Generator
 
 use v5.20;
@@ -123,7 +123,7 @@ Lab::Moose::Instrument::HP83732A - HP 83732A Series Synthesized Signal Generator
 
 =head1 VERSION
 
-version 3.881
+version 3.901
 
 =head1 SYNOPSIS
 

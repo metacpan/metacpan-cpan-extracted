@@ -8,9 +8,9 @@ use Log::ger;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-21'; # DATE
+our $DATE = '2023-10-03'; # DATE
 our $DIST = 'Business-ID-POM'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our @EXPORT_OK = qw(parse_pom_reg_code);
 
@@ -39,6 +39,7 @@ _
         },
     },
     examples => [
+        {args=>{code=>'MD240935001200027'}},
         {args=>{code=>'MD 224510107115'}},
         {args=>{code=>'DBL9624502804A1'}},
         {args=>{code=>'NC14191300159'}},
@@ -69,15 +70,32 @@ sub parse_pom_reg_code {
     if ($res->{category_code} =~ /\AM[DL]\z/) {
 
         $res->{category_id} = $res->{category_code} eq 'MD' ? 'Makanan (M), dalam negeri (D)' : 'Makanan (M), impor (L)';
-        $res->{number} =~ /\A([0-9])([0-9]{3})([0-9]{2})([0-9]{3})([0-9]{3})\z/
-            or return [400, "MD/ML number needs to be 12-digit number"];
+        if (length $res->{number} == 12) {
+            $res->{number} =~ /\A([0-9])([0-9]{3})([0-9]{2})([0-9]{3})([0-9]{3})\z/
+                or return [400, "MD/ML number needs to be 12-digit number"];
 
-        $res->{food_packaging_code} = $1;
-        $res->{food_type_code} = $2;
-        $res->{food_province_code} = $3;
-        $res->{food_company_code} = $4;
-        $res->{food_company_product_code} = $5;
+            $res->{food_is_rba} = 0;
+            $res->{food_packaging_type_code} = $1;
+            $res->{food_type_code} = $2;
+            $res->{food_province_code} = $3;
+            $res->{food_company_code} = $4;
+            $res->{food_company_product_code} = $5;
+        } elsif (length $res->{number} == 15) {
+            $res->{number} =~ /\A([0-9]{1})([0-9]{1})([0-9]{2})([0-9]{2})([0-9]{4})([0-9]{5})\z/
+                or return [400, "MD/ML number needs to be 15-digit number"];
 
+            # this is based on my analysis, can't find official documentation.
+            $res->{food_is_rba} = 1;
+            $res->{food_risk_code} = $1;
+            $res->{food_risk_id} = $1 == 0 ? "MR - Menengah Rendah" : $1 == 1 ? "MT - Menengah Tinggi" : "T - Tinggi";
+            $res->{food_packaging_type_code} = $2;
+            $res->{food_province_code} = $3;
+            $res->{food_type_code} = $4;
+            $res->{food_company_product_code} = $5;
+            $res->{food_company_code} = $6;
+        } else {
+            return [400, "MD/ML number needs to be 12- or 15-digit number"];
+        }
     } elsif ($res->{category_code} =~ /\A[DG](.?)(.?)\z/) {
 
         $res->{drug_category_code} = $1;
@@ -252,7 +270,7 @@ Business::ID::POM - Parse food/drug registration code published by the Indonesia
 
 =head1 VERSION
 
-This document describes version 0.004 of Business::ID::POM (from Perl distribution Business-ID-POM), released on 2021-10-21.
+This document describes version 0.005 of Business::ID::POM (from Perl distribution Business-ID-POM), released on 2023-10-03.
 
 =head1 DESCRIPTION
 
@@ -293,6 +311,31 @@ Examples:
 
 =item * Example #1:
 
+ parse_pom_reg_code(code => "MD240935001200027");
+
+Result:
+
+ [
+   200,
+   "OK",
+   {
+     category_code             => "MD",
+     category_id               => "Makanan (M), dalam negeri (D)",
+     food_company_code         => "00027",
+     food_company_product_code => "0012",
+     food_is_rba               => 1,
+     food_packaging_type_code  => 4,
+     food_province_code        => "09",
+     food_risk_code            => 2,
+     food_risk_id              => "T - Tinggi",
+     food_type_code            => 35,
+     number                    => 240935001200027,
+   },
+   {},
+ ]
+
+=item * Example #2:
+
  parse_pom_reg_code(code => "MD 224510107115");
 
 Result:
@@ -305,7 +348,8 @@ Result:
      category_id               => "Makanan (M), dalam negeri (D)",
      food_company_code         => 107,
      food_company_product_code => 115,
-     food_packaging_code       => 2,
+     food_is_rba               => 0,
+     food_packaging_type_code  => 2,
      food_province_code        => 10,
      food_type_code            => 245,
      number                    => 224510107115,
@@ -313,7 +357,7 @@ Result:
    {},
  ]
 
-=item * Example #2:
+=item * Example #3:
 
  parse_pom_reg_code(code => "DBL9624502804A1");
 
@@ -339,7 +383,7 @@ Result:
    {},
  ]
 
-=item * Example #3:
+=item * Example #4:
 
  parse_pom_reg_code(code => "NC14191300159");
 
@@ -361,7 +405,7 @@ Result:
    {},
  ]
 
-=item * Example #4:
+=item * Example #5:
 
  parse_pom_reg_code(code => "POM TR092699241");
 
@@ -387,7 +431,7 @@ Result:
    {},
  ]
 
-=item * Example #5:
+=item * Example #6:
 
  parse_pom_reg_code(code => "FF182600791");
 
@@ -404,7 +448,7 @@ Result:
    {},
  ]
 
-=item * Example #6:
+=item * Example #7:
 
  parse_pom_reg_code(code => "SD181353251");
 
@@ -421,7 +465,7 @@ Result:
    {},
  ]
 
-=item * Example #7:
+=item * Example #8:
 
  parse_pom_reg_code(code => "SI184509731");
 
@@ -438,7 +482,7 @@ Result:
    {},
  ]
 
-=item * Example #8:
+=item * Example #9:
 
  parse_pom_reg_code(code => "SL091300431");
 
@@ -513,13 +557,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

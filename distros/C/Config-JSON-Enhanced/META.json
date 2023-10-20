@@ -39,6 +39,7 @@
       "test" : {
          "requires" : {
             "Cwd" : "0",
+            "File::Spec" : "0",
             "File::Temp" : "0",
             "FindBin" : "0",
             "Test2::Plugin::UTF8" : "0",
@@ -47,6 +48,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hadjiprocopis/Config-JSON-Enhanced/issues"
+      },
+      "homepage" : "https://metacpan.org/module/Config::JSON::Enhanced",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hadjiprocopis/Config-JSON-Enhanced",
+         "web" : "https://github.com/hadjiprocopis/Config-JSON-Enhanced"
+      }
+   },
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

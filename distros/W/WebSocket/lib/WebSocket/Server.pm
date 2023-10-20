@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## WebSocket Client & Server - ~/lib/WebSocket/Server.pm
-## Version v0.1.1
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.0
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/09/13
-## Modified 2023/04/18
+## Modified 2023/04/29
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -25,7 +25,7 @@ BEGIN
     use Want;
     use WebSocket::Connection;
     use WebSocket::Version;
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.2.0';
     $SIG{PIPE} = 'IGNORE';
 };
 
@@ -33,22 +33,26 @@ sub init
 {
     my $self = shift( @_ );
     my $class = ref( $self ) || $self;
+    # We are careful not to override object default value set by child class inheriting from our class
+    $self->{connection_class} = 'WebSocket::Connection' unless( defined( $self->{connection_class} ) );
     # If true, connections will return a list, otherwise it will return an array object
-    $self->{legacy}         = 0;
-    $self->{listen}         = undef();
-    $self->{on_connect}     = sub{},
-    $self->{on_shutdown}    = sub{},
-    $self->{on_tick}        = sub{},
-    $self->{port}           = 8080,
-    $self->{silence_max}    = 20,
-    $self->{subprotocol}    = [];
-    $self->{tick_period}    = 0,
+    $self->{legacy}         = 0 unless( defined( $self->{legacy} ) );
+    $self->{listen}         = undef() unless( defined( $self->{listen} ) );
+    $self->{on_accept}      = sub{} unless( defined( $self->{on_accept} ) );
+    $self->{on_connect}     = sub{} unless( defined( $self->{on_connect} ) );
+    $self->{on_shutdown}    = sub{} unless( defined( $self->{on_shutdown} ) );
+    $self->{on_tick}        = sub{} unless( defined( $self->{on_tick} ) );
+    $self->{port}           = 8080 unless( defined( $self->{port} ) );
+    $self->{silence_max}    = 20 unless( defined( $self->{silence_max} ) );
+    $self->{subprotocol}    = [] unless( defined( $self->{subprotocol} ) );
+    $self->{tick_period}    = 0 unless( defined( $self->{tick_period} ) );
     # Used by WebSocket::Connection when comparing the version of the client handshake with the one we support here
-    $self->{version}        = WebSocket::Version->new( WEBSOCKET_DRAFT_VERSION_DEFAULT );
-    $self->{watch_readable} = {},
-    $self->{watch_writable} = {},
+    $self->{version}        = WebSocket::Version->new( WEBSOCKET_DRAFT_VERSION_DEFAULT ) unless( defined( $self->{version} ) );
+    $self->{watch_readable} = {};
+    $self->{watch_writable} = {};
     $self->{select_readable}= undef();
     $self->{select_writable}= undef();
+    $self->{_exception_class}     = 'WebSocket::Exception' unless( defined( $self->{_exception_class} ) );
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     $self->{silence_checkinterval} = $self->{silence_max} / 2;
@@ -70,6 +74,8 @@ sub init
     return( $self );
 }
 
+sub connection_class { return( shift->_set_get_scalar( 'connection_class', @_ ) ); }
+
 sub connections
 {
     my $self = shift( @_ );
@@ -85,6 +91,13 @@ sub disconnect
 {
     my( $self, $fh ) = @_;
     $self->{select_readable}->remove( $fh );
+    # We should shutdown to tell the other side of the TCP that we are done, 
+    # then remove the filehandle
+    # <https://www.perlmonks.org/?node_id=108244>
+    $fh->shutdown(SHUT_RDWR) || do
+    {
+        warn( "Error shutting down the client socket: $!" ) if( $self->_warnings_is_enabled() );
+    };
     $fh->close();
     CORE::delete( $self->{conns}->{ $fh } );
 }
@@ -112,6 +125,8 @@ sub on
     return( $self );
 }
 
+sub on_accept { return( shift->_set_get_code( 'on_accept', @_ ) ); }
+
 sub on_connect { return( shift->_set_get_code( 'on_connect', @_ ) ); }
 
 sub on_shutdown { return( shift->_set_get_code( 'on_shutdown', @_ ) ); }
@@ -131,7 +146,7 @@ sub shutdown
     }
     catch( $e )
     {
-        warnings::warn( "Error calling the shutdown callback: $e" ) if( warnings::enabled() );
+        warn( "Error calling the shutdown callback: $e" ) if( $self->_warnings_is_enabled() );
         return( $self->error({ code => WS_INTERNAL_SERVER_ERROR, message => "Internal error" }) );
     }
     
@@ -191,7 +206,10 @@ sub start
     $self->{conns} = {};
     my $silence_nextcheck = $self->silence_max ? ( time() + $self->silence_checkinterval ) : 0;
     my $tick_next = $self->tick_period ? ( time() + $self->tick_period ) : 0;
+    my $conn_class = $self->connection_class || 'WebSocket::Connection';
+    $self->_load_class( $conn_class ) || return( $self->pass_error );
 
+    my $accept_cb  = $self->on_accept || sub{};
     my $connect_cb = $self->on_connect || sub{};
     my $tick_cb    = $self->on_tick || sub{};
     while( $sock->opened )
@@ -211,25 +229,60 @@ sub start
             if( $fh == $sock )
             {
                 my $client = $sock->accept;
-                next unless $client;
+                unless( $client )
+                {
+                    warn( "Error accepting connection from client: $!" ) if( $self->_warnings_is_enabled() );
+                    next;
+                }
                 # NOTE: Connection
-                my $conn = WebSocket::Connection->new(
-                    socket      => $client,
-                    server      => $self,
-                    subprotocol => $self->subprotocol,
-                    debug       => $self->debug,
-                );
+                
+                my $conn;
+                if( defined( $accept_cb ) && ref( $accept_cb ) eq 'CODE' )
+                {
+                    try
+                    {
+                        $conn = $accept_cb->({
+                            socket      => $client,
+                            server      => $self,
+                            subprotocol => $self->subprotocol,
+                        });
+                    }
+                    catch( $e )
+                    {
+                        return( $self->error( "Error calling the accept callback: $e" ) );
+                    }
+                }
+                
+                unless( $self->_is_object( $conn ) && $self->_can( $conn => [qw( error is_ready new recv send )] ) )
+                {
+                    $conn = $conn_class->new(
+                        socket      => $client,
+                        server      => $self,
+                        subprotocol => $self->subprotocol,
+                        debug       => $self->debug,
+                    );
+                }
                 $self->{conns}->{ $client } = { conn => $conn, lastrecv => time() };
                 $self->{select_readable}->add( $client );
                 
                 try
                 {
-                    $connect_cb->( $self, $conn );
+                    my $rv = $connect_cb->( $self, $conn );
+                    # The callback returned a defined, but false value, so we terminate the connection
+                    if( defined( $rv ) && !$rv )
+                    {
+                        $self->{select_readable}->remove( $fh );
+                        CORE::delete( $self->{conns}->{ $client } );
+                        $client->shutdown(SHUT_RDWR) || do
+                        {
+                            warn( "Error closing client socket after being refused by connect callback: $!" ) if( $self->_warnings_is_enabled() );
+                        };
+                        close( $fh );
+                    }
                 }
                 catch( $e )
                 {
-                    warnings::warn( "Error calling the connect callback: $e" ) if( warnings::enabled() );
-                    return( $self->error({ code => WS_INTERNAL_SERVER_ERROR, message => "Internal error" }) );
+                    return( $self->error( "Error calling the connect callback: $e" ) );
                 }
             }
             elsif( $self->{watch_readable}->{ $fh } )
@@ -244,11 +297,17 @@ sub start
                 if( !defined( $rv ) )
                 {
                     $self->{select_readable}->remove( $fh );
+                    CORE::delete( $self->{conns}->{ $fh } );
+                    $fh->shutdown(SHUT_RDWR) || do
+                    {
+                        warn( "Error closing client socket after being refused by connect callback: $!" ) if( $self->_warnings_is_enabled() );
+                    };
+                    close( $fh );
                 }
             }
             else
             {
-                warning::warn( "Filehandle $fh became readable, but no handler took responsibility for it; removing it\n" ) if( warnings::enabled() );
+                warn( "Filehandle $fh became readable, but no handler took responsibility for it; removing it\n" ) if( $self->_warnings_is_enabled() );
                 $self->{select_readable}->remove( $fh );
             }
         }
@@ -261,7 +320,7 @@ sub start
             }
             else
             {
-                warnings::warn( "Filehandle $fh became writable, but no handler took responsibility for it; removing it\n" ) if( warnings::enabled() );
+                warn( "Filehandle $fh became writable, but no handler took responsibility for it; removing it\n" ) if( $self->_warnings_is_enabled() );
                 $self->{select_writable}->remove( $fh );
             }
         }
@@ -285,8 +344,7 @@ sub start
             }
             catch( $e )
             {
-                warnings::warn( "Error calling the tick callback: $e" ) if( warnings::enabled() );
-                return( $self->error({ code => WS_INTERNAL_SERVER_ERROR, message => "Internal error" }) );
+                return( $self->error( "Error calling the tick callback: $e" ) );
             }
             
             $tick_next += $self->tick_period;
@@ -294,6 +352,8 @@ sub start
     }
     return( $self );
 }
+
+sub stop { return( shift->shutdown( @_ ) ); }
 
 sub subprotocol
 {
@@ -411,7 +471,7 @@ sub _watch
         return( $self->error( "watch_${type} expects the second value of each pair to be a code reference, but element $i was not" ) ) if( ref( $cb ) ne 'CODE' );
         if( $self->{ "watch_${type}" }->{ $fh } )
         {
-            warnings::warn( "watch_${type} was given a filehandle at index $i which is already being watched; ignoring!" ) if( warnings::enabled() );
+            warn( "watch_${type} was given a filehandle at index $i which is already being watched; ignoring!" ) if( $self->_warnings_is_enabled() );
             next;
         }
         $self->{ "select_${type}" }->add( $fh );
@@ -439,6 +499,7 @@ WebSocket::Server - WebSocket Server
     my $j = JSON->new->relaxed->convert_blessed;
     my $ws = WebSocket::Server->new(
         debug => 3,
+        connection_class => 'My::Connection',
         port => 8080,
         on_connect => sub
         {
@@ -489,7 +550,7 @@ WebSocket::Server - WebSocket Server
 
 =head1 VERSION
 
-    v0.1.1
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -513,6 +574,12 @@ See L<rfc6455 section 9.1|https://datatracker.ietf.org/doc/html/rfc6455#section-
 
 Seel also L</compression_threshold>.
 
+=item C<connection_class>
+
+This is optional and defaults to C<WebSocket::Connection>. You can use this to set an alternative class to be used to handle incoming connections.
+
+See L</connection_class> for more details.
+
 =item C<listen>
 
 Optional. A L<IO::Socket> object, or one of its inheriting packages. This enables you to instantiate your own L<IO::Socket> object and pass it here to be used. For example:
@@ -531,7 +598,7 @@ Optional. A L<IO::Socket> object, or one of its inheriting packages. This enable
 
 A code reference that will be triggered upon connection from client.
 
-It will be passed the the server object and the connection object (L<WebSocket::Connection>).
+It will be passed the the server object and the connection object (by default L<WebSocket::Connection>, but this can be configured with C<connection_class>).
 
 See L</on_connect> for more information.
 
@@ -589,6 +656,34 @@ Inherited from L<WebSocket>
 
 Set or get the threshold in bytes above which the ut8 or binary messages will be compressed if the client and the server support compression and it is activated as an extension.
 
+=head2 connection_class
+
+Sets or gets a class name to be used to handle incoming connections. This defaults to C<WebSocket::Connection>
+
+This class name will be loaded in L</start> and if any error occurs upon loading, L</start> will set an L<error|Module::Generic/error> and return C<undef>
+
+The class specified will be instantiated with the following parameters:
+
+=over 4
+
+=item * C<debug>
+
+An integer representing the debug level enabled for this object.
+
+=item * C<server>
+
+The current server object.
+
+=item * C<socket>
+
+The client socket accepted. This is an L<IO::Socket> object.
+
+=item * C<subprotocol>
+
+An array of protocols as set with L</subprotocol>
+
+=back
+
 =head2 connections
 
 Returns the client connections currently active.
@@ -644,7 +739,7 @@ This value is set automatically upon calling L</start>, or it can also be provid
 
 Provided with an hash or hash reference of event name and code reference pairs and this will set those event handlers.
 
-Possible event names are: C<connect>, C<shutdown>, C<tick>.
+Possible event names are: C<accept>, C<connect>, C<shutdown>, C<tick>.
 
 See below their corresponding method for more details.
 
@@ -652,30 +747,96 @@ See also L<WebSocket::Connection> for event handlers that can be set when a conn
 
 It returns the current object.
 
+=head2 on_accept
+
+Set or get the code reference for the event handler that is triggered afer a new client connection has been accepted. 
+
+The handler will be passed an hash reference containing the following properties:
+
+=over 4
+
+=item * C<server>
+
+The current server object.
+
+=item * C<socket>
+
+The client socket accepted. This is an L<IO::Socket> object.
+
+=item * C<subprotocol>
+
+An array of protocols as set with L</subprotocol>
+
+=back
+
+It expects a class object in returns that supports the same methods as in L<WebSocket::Connection>, and at the very least C<error>, C<is_ready>, C<new>, C<recv> and C<send>. If the object returned does not, then you should expect some errors occurring.
+
+If nothing is returned, it will use the class specified with L</connection_class> instead.
+
 =head2 on_connect
 
 Set or get the code reference for the event handler that is triggered when there is a new client connection, and after the connection has been established.
 
+At this stage, no handshake has happened yet. This is just the server receiving a connection,
+
 The handler is passed the server object and the connection object.
 
+    use curry;
     $server->on_connect(sub
     {
         my( $s, $conn ) = @_;
         print( "Connection received from ip '", $conn->ip, "'\n" );
+        $conn->do_pong( \&pong );
+        $conn->max_recv_size(65536);
+        $conn->max_send_size(65536);
+        $conn->nodelay(1);
         # set handler for each event
         # See WebSocket::Connection for details on the arguments provided
         # You can also check out the example given in the symopsis
         $conn->on(
             handshake   => $self->curry::onconnect,
             ready       => $self->curry::onready,
+            origin      => $self->curry::onorigin,
             utf8        => $self->curry::onmessage,
             binary      => $self->curry::onbinary,
+            ping        => $self->curry::onping,
             pong        => $self->curry::onpong,
             disconnect  => $self->curry::onclose,
         );
     });
 
-Any fatal error occurring in the callback are caught using try-catch with (L<Nice::Try>), and if an error occurs, this method will raise a warning if warnings are enabled.
+If the connect handler returns a defined, but false value, such as an empty string or C<0>, this will have L<WebSocket::Server> close the client connection that was just L<accepted|IO::Socket/accept>
+
+The same could also be achieved by the handler like so:
+
+    use Net::IP;
+    my $banned = [qw( 192.168.2.0/24 )];
+    $server->on_connect(sub
+    {
+        my( $s, $conn ) = @_;
+        my $ip = Net::IP->new( $conn->ip );
+        my $is_banned = grep( $ip->overlaps( Net::IP->new( $_ ) ) == $Net::IP::IP_A_IN_B_OVERLAP, @$banned );
+        return(0) if( $is_banned );
+        # or, alternatively:
+        # if( $is_banned )
+        # {
+        #     # This will shutdown the TCP connection and close the filehandle of the socket
+        #     $conn->disconnect;
+        #     return;
+        # }
+        # Then, set the handlers
+        $conn->on(
+            handshake   => $self->curry::onconnect,
+            ready       => $self->curry::onready,
+            origin      => $self->curry::onorigin,
+            utf8        => $self->curry::onmessage,
+            binary      => $self->curry::onbinary,
+            ping        => $self->curry::onping,
+            disconnect  => $self->curry::onclose,
+        );
+    });
+
+Any fatal error occurring in the callback are caught using try-catch with (L<Nice::Try>), and if an error occurs, this method will raise a warning if warnings are enabled, and this will set an L<error|Module::Generic/error> and returns C<undef> or an empty list depending on the context.
 
 =head2 on_shutdown
 
@@ -719,9 +880,41 @@ Starts the server.
 
 If a socket object has already been initiated and provided with the L</new> option I<listen>, then it will be used, otherwise, it will instantiate a new L<IO::Socket::INET> connection. If a I<port> option was provided in L</new>, it will be used, otherwise it will be auto allocated and the port assigned can then be retrieved using the L</port> method.
 
-For every client connection received, it will instantiate a new L<WebSocket::Connection> object and call the L</on_connect> event handler, passing it the server object and the connection object.
+For every client connection received, it will call the accept callback, if specified, providing it the C<server>, C<socket>, C<subprotocol> values and expect an object back.
+
+If the accept callback dies, this will be caught and this method C<start> will set an L<error|Module::Generic/error> accordingly and return C<undef>
+
+If no connection object has been provided by the accept callback, it will instantiate a new connection object, using a class name specified with L</connection_class> or by default L<WebSocket::Connection> and call the L</on_connect> event handler, passing it the server object and the connection object.
+
+This connection class name will be loaded and if any error occurs upon loading, this will set an L<error|Module::Generic/error> and return C<undef>
+
+The class specified will be instantiated with the following parameters:
+
+=over 4
+
+=item * C<debug>
+
+An integer representing the debug level enabled for this object.
+
+=item * C<server>
+
+The current server object.
+
+=item * C<socket>
+
+The client socket accepted. This is an L<IO::Socket> object.
+
+=item * C<subprotocol>
+
+An array of protocols as set with L</subprotocol>
+
+=back
 
 If I<tick_period> option in L</new> has been set, this will trigger the L</on_tick> event handler at the I<tick_period> interval.
+
+=head2 stop
+
+This just an alias for L</shutdown>
 
 =head2 subprotocol
 

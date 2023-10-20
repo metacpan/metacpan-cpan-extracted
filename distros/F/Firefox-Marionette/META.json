@@ -60,7 +60,7 @@
             "FileHandle" : "0",
             "IPC::Open3" : "1.03",
             "JSON" : "0",
-            "MIME::Base64" : "0",
+            "MIME::Base64" : "3.11",
             "POSIX" : "0",
             "Pod::Simple::Text" : "0",
             "Scalar::Util" : "0",
@@ -91,6 +91,6 @@
          "web" : "https://github.com/david-dick/firefox-marionette"
       }
    },
-   "version" : "1.44",
+   "version" : "1.46",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

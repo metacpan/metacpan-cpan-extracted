@@ -73,7 +73,6 @@ README
 setup_dkbench
 t/00-load.t
 t/cover.t
-t/cpu.t
 t/simple.t
 xt/author/manifest.t
 xt/author/pod.t

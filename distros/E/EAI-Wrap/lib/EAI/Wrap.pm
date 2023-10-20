@@ -1,13 +1,9 @@
-package EAI::Wrap 0.3;
+package EAI::Wrap 1.4;
 
-use strict;
-use Time::Local; use Time::localtime; use MIME::Lite; use Data::Dumper; use Module::Refresh; use Exporter; use File::Copy; use Cwd; use Archive::Extract;
-# we make $EAI::Common::common/config/execute/loads an alias for $EAI::Wrap::common/config/execute/loads so that the user can set it without knowing anything about the Common package!
-our %common;
-our %config;
-our %execute;
-our @loads;
-our @optload; our %opt;
+use strict; use feature 'unicode_strings'; use warnings;
+use Exporter qw(import); use Data::Dumper qw(Dumper); use File::Copy qw(copy move); use Cwd qw(chdir); use Archive::Extract ();
+# we make $EAI::Common::common/config/execute/loads/optload/opt an alias for $EAI::Wrap::common/config/execute/loads/optload/opt so that the user can set it without knowing anything about the Common package!
+our %common;our %config;our @loads;our %execute;our @optload;our %opt;
 
 BEGIN {
 	*EAI::Common::common = \%common;
@@ -19,51 +15,53 @@ BEGIN {
 };
 use EAI::Common; use EAI::DateUtil; use EAI::DB; use EAI::File; use EAI::FTP;
 
-our @ISA = qw(Exporter);
 our @EXPORT = qw(%common %config %execute @loads @optload %opt removeFilesinFolderOlderX openDBConn openFTPConn redoFiles getLocalFiles getFilesFromFTP getFiles checkFiles extractArchives getAdditionalDBData readFileData dumpDataIntoDB markProcessed writeFileFromDB putFileInLocalDir markForHistoryDelete uploadFileToFTP uploadFileCMD uploadFile processingEnd processingPause moveFilesToHistory deleteFiles
-%months %monate get_curdate get_curdatetime get_curdate_dot formatDate formatDateFromYYYYMMDD get_curdate_dash get_curdate_gen get_curdate_dash_plus_X_years get_curtime get_curtime_HHMM get_lastdateYYYYMMDD get_lastdateDDMMYYYY is_first_day_of_month is_last_day_of_month get_last_day_of_month weekday is_weekend is_holiday first_week first_weekYYYYMMDD last_week last_weekYYYYMMDD convertDate convertDateFromMMM convertDateToMMM convertToDDMMYYYY addDays addDaysHol addMonths subtractDays subtractDaysHol convertcomma convertToThousendDecimal get_dateseries parseFromDDMMYYYY parseFromYYYYMMDD convertEpochToYYYYMMDD
+monthsToInt intToMonths addLocaleMonths get_curdate get_curdatetime get_curdate_dot formatDate formatDateFromYYYYMMDD get_curdate_dash get_curdate_gen get_curdate_dash_plus_X_years get_curtime get_curtime_HHMM get_lastdateYYYYMMDD get_lastdateDDMMYYYY is_first_day_of_month is_last_day_of_month get_last_day_of_month weekday is_weekend is_holiday is_easter addCalendar first_week first_weekYYYYMMDD last_week last_weekYYYYMMDD convertDate convertDateFromMMM convertDateToMMM convertToDDMMYYYY addDays addDaysHol addMonths subtractDays subtractDaysHol convertcomma convertToThousendDecimal get_dateseries parseFromDDMMYYYY parseFromYYYYMMDD convertEpochToYYYYMMDD
 newDBH beginWork commit rollback readFromDB readFromDBHash doInDB storeInDB deleteFromDB updateInDB getConn setConn
 readText readExcel readXML writeText writeExcel
 removeFilesOlderX fetchFiles putFile moveTempFile archiveFiles removeFiles login getHandle setHandle
-readConfigFile getSensInfo setupConfigMerge getOptions setupEAIWrap extractConfigs checkHash checkParam setupLogging checkStartingCond sendGeneralMail
+readConfigFile getSensInfo setupConfigMerge getOptions setupEAIWrap dumpFlat extractConfigs checkHash checkParam setupLogging checkStartingCond sendGeneralMail
 get_logger Dumper);
 
 # initialize module, reading all config files and setting basic execution variables
 sub INIT {
 	# read site config, additional configs and sensitive config in alphabetical order (allowing precedence)
 	STDOUT->autoflush(1);
-	$EAI_WRAP_CONFIG_PATH = $ENV{EAI_WRAP_CONFIG_PATH};
-	$EAI_WRAP_SENS_CONFIG_PATH = $ENV{EAI_WRAP_SENS_CONFIG_PATH};
+	$EAI_WRAP_CONFIG_PATH = ($ENV{EAI_WRAP_CONFIG_PATH} ? $ENV{EAI_WRAP_CONFIG_PATH} : "");
+	$EAI_WRAP_SENS_CONFIG_PATH = ($ENV{EAI_WRAP_SENS_CONFIG_PATH} ? $ENV{EAI_WRAP_SENS_CONFIG_PATH} : "");
 	$EAI_WRAP_CONFIG_PATH =~ s/\\/\//g;
 	$EAI_WRAP_SENS_CONFIG_PATH =~ s/\\/\//g;
 	print STDOUT "EAI_WRAP_CONFIG_PATH: ".($EAI_WRAP_CONFIG_PATH ? $EAI_WRAP_CONFIG_PATH : "not set").", EAI_WRAP_SENS_CONFIG_PATH: ".($EAI_WRAP_SENS_CONFIG_PATH ? $EAI_WRAP_SENS_CONFIG_PATH : "not set")."\n";
-	EAI::Common::readConfigFile($EAI_WRAP_CONFIG_PATH."/site.config");
+	EAI::Common::readConfigFile($EAI_WRAP_CONFIG_PATH."/site.config") if -e $EAI_WRAP_CONFIG_PATH."/site.config";
 	EAI::Common::readConfigFile($_) for sort glob($EAI_WRAP_CONFIG_PATH."/additional/*.config");
 	EAI::Common::readConfigFile($_) for sort glob($EAI_WRAP_SENS_CONFIG_PATH."/*.config");
 	
 	$execute{homedir} = File::Basename::dirname(File::Spec->rel2abs((caller(0))[1])); # folder, where the main script is being executed.
 	$execute{scriptname} = File::Basename::fileparse((caller(0))[1]);
 	my ($homedirnode) = ($execute{homedir} =~ /^.*[\\\/](.*?)$/);
+	print STDOUT "\$execute{homedir}: $execute{homedir}, \$execute{scriptname}: $execute{scriptname}, \$homedirnode: $homedirnode\n";
 	$execute{envraw} = $config{folderEnvironmentMapping}{$homedirnode};
 	if ($execute{envraw}) {
 		$execute{env} = $execute{envraw};
 	} else {
-		# if not configured, used default mapping (usually ''=>"Prod" for productionn)
+		# if not configured, use default mapping (usually ''=>"Prod" for production)
 		$execute{env} = $config{folderEnvironmentMapping}{''};
 	}
-	if ($execute{envraw}) { # for non-production environment read separate configs, if existing
+	if ($execute{envraw}) { # for folderEnvironmentMapping configured environments read separate configs, if existing
 		EAI::Common::readConfigFile($EAI_WRAP_CONFIG_PATH."/".$execute{envraw}."/site.config") if -e $EAI_WRAP_CONFIG_PATH."/".$execute{envraw}."/site.config";
 		EAI::Common::readConfigFile($_) for sort glob($EAI_WRAP_CONFIG_PATH."/".$execute{envraw}."/additional/*.config");
 		EAI::Common::readConfigFile($_) for sort glob($EAI_WRAP_SENS_CONFIG_PATH."/".$execute{envraw}."/*.config");
 	}
 	EAI::Common::getOptions(); # getOptions before logging setup as centralLogHandling depends on interactive options passed
-	my $return = 1;
-	$return = eval $config{executeOnInit} if $config{executeOnInit};
-	unless ($return) {
-		die("Error parsing config{executeOnInit}: $@") if $@;
-		die("Error executing config{executeOnInit}: $!") unless defined $return;
-		die("Error executing config{executeOnInit}") unless $return;
+	if ($config{executeOnInit}) {
+		if (ref($config{executeOnInit}) eq "CODE") {
+			eval {$config{executeOnInit}->()};
+		} else {
+			eval $config{executeOnInit};
+		}
+		die("Error parsing config{executeOnInit} ".(ref($config{executeOnInit}) eq "CODE" ? "defined sub" : "'".$config{executeOnInit}."'").": $@") if $@;
 	}
+	$execute{failcount}=0;
 	EAI::Common::setupLogging();
 }
 
@@ -89,8 +87,15 @@ sub openDBConn ($) {
 		$logger->error("specified DSN ('".$DB->{DSN}."') contains \$DB->{user}, which is neither set in \$DB->{user} nor in \$config{sensitive}{".$DB->{prefix}."}{user} !");
 		return 0;
 	};
-	EAI::DB::newDBH($DB,\%execute) or do {
-		$logger->error("couldn't open database connection for ".$DB->{DSN});
+	my ($DSNeval, $newDSN);
+	$DSNeval = $DB->{DSN};
+	$newDSN = eval qq{"$DSNeval"};
+	if (!$newDSN) {
+		$logger->error("error parsing \$DB->{DSN}(".$DB->{DSN}.") (couldn't interpolate all values):".$DSNeval);
+		return 0;
+	}
+	EAI::DB::newDBH($DB,$newDSN) or do {
+		$logger->error("couldn't open database connection for $newDSN");
 		return 0; # false means error in connection and signal to die...
 	};
 	return 1;
@@ -112,8 +117,9 @@ sub openFTPConn ($) {
 		$logger->error("ftp user neither set in \$FTP->{user} nor in \$config{sensitive}{".$FTP->{prefix}."}{user} !");
 		return 0;
 	};
-	EAI::FTP::login($FTP,\%execute) or do {
-		$logger->error("couldn't open ftp connection for ".$FTP->{remoteHost}{$execute{env}});
+	EAI::FTP::login($FTP,$FTP->{remoteHost}{$execute{env}}) or do {
+		no warnings 'uninitialized';
+		$logger->error("couldn't open ftp connection for \$FTP{remoteHost}{$execute{env}} (".$FTP->{remoteHost}{$execute{env}}.")");
 		return 0; # false means error in connection and signal to die...
 	};
 	return 1; 
@@ -173,7 +179,7 @@ sub redoFiles ($) {
 	return 1;
 }
 
-# get local file(s) from source into homedir and extract archives if needed
+# get local file(s) from source into homedir
 sub getLocalFiles ($) {
 	my $arg = shift;
 	my $logger = get_logger();
@@ -219,7 +225,7 @@ sub getLocalFiles ($) {
 	return 1;
 }
 
-# get file/s (can also be a glob for multiple files) from FTP into homedir and extract archives if needed
+# get file/s (can also be a glob for multiple files) from FTP into homedir
 sub getFilesFromFTP ($) {
 	my $arg = shift;
 	my $logger = get_logger();
@@ -231,10 +237,7 @@ sub getFilesFromFTP ($) {
 			return redoFiles($arg);
 		} else {
 			if ($File->{filename}) {
-				if (!EAI::FTP::fetchFiles ($FTP,\%execute,{fileToRetrieve=>$File->{filename},fileToRetrieveOptional=>$File->{optional}})) {
-					$logger->error("error in fetching file from FTP") if !$execute{retryBecauseOfError};
-					return 0;
-				}
+				return EAI::FTP::fetchFiles($FTP,{firstRunSuccess=>$execute{firstRunSuccess},homedir=>$execute{homedir},fileToRetrieve=>$File->{filename},fileToRetrieveOptional=>$File->{optional},retrievedFiles=>$execute{retrievedFiles}});
 			} else {
 				$logger->error("no \$File->{filename} given, can't get it from FTP");
 				return 0;
@@ -260,13 +263,13 @@ sub getFiles ($) {
 	}
 }
 
-# check files for continuation of processing
+# check files for continuation of processing and extract archives if needed
 sub checkFiles ($) {
 	my $arg = shift;
 	my $logger = get_logger();
 	my ($File,$process) = EAI::Common::extractConfigs("checking for existence of files",$arg,"File","process");
 	return 1 if $execute{retryBecauseOfError} and !$process->{hadErrors};
-	my $redoDir = $execute{redoDir}."/" if $common{task}{redoFile};
+	my $redoDir = ($common{task}{redoFile} ? $execute{redoDir}."/" : "");
 	my $fileDoesntExist;
 	if ($execute{retrievedFiles} and @{$execute{retrievedFiles}} >= 1) {
 		for my $singleFilename (@{$execute{retrievedFiles}}) {
@@ -320,7 +323,7 @@ sub extractArchives ($) {
 	my $logger = get_logger();
 	my ($process) = EAI::Common::extractConfigs("extracting archives",$arg,"process");
 	return 1 if $execute{retryBecauseOfError} and !$process->{hadErrors};
-	my $redoDir = $execute{redoDir}."/" if $common{task}{redoFile};
+	my $redoDir = ($common{task}{redoFile} ? $execute{redoDir}."/" : "");
 	if ($execute{retrievedFiles}) { 
 		for my $filename (@{$execute{retrievedFiles}}) {
 			if (! -e $redoDir.$filename) {
@@ -378,19 +381,13 @@ sub readFileData ($) {
 	return 1 if $execute{retryBecauseOfError} and !$process->{hadErrors};
 	my $readSuccess;
 	if ($File->{format_xlformat}) {
-		$readSuccess = EAI::File::readExcel($File, $process, $process->{filenames}, $redoDir);
+		$readSuccess = EAI::File::readExcel($File, \@{$process->{data}}, $process->{filenames}, $redoDir);
 	} elsif ($File->{format_XML}) {
-		$readSuccess = EAI::File::readXML($File, $process, $process->{filenames}, $redoDir);
+		$readSuccess = EAI::File::readXML($File, \@{$process->{data}}, $process->{filenames}, $redoDir);
 	} else {
-		$readSuccess = EAI::File::readText($File, $process, $process->{filenames}, $redoDir);
+		$readSuccess = EAI::File::readText($File, \@{$process->{data}}, $process->{filenames}, $redoDir);
 	}
-	# error when reading files with readFile/readExcel/readXML
-	if (!$readSuccess) {
-		my @filesdone = @{$process->{filenames}} if $process->{filenames};
-		$logger->error("error reading one of file(s) @filesdone") if (!$File->{optional});
-		$logger->warn("error reading one of file(s) @filesdone, but ignored as \$File{emptyOK} = 1!") if ($File->{emptyOK});
-	}
-	return $readSuccess;
+	return $readSuccess; # return error when reading files with readFile/readExcel/readXML
 }
 
 # store data into Database
@@ -400,7 +397,7 @@ sub dumpDataIntoDB ($) {
 	my ($DB,$File,$process) = EAI::Common::extractConfigs("storing data to DB",$arg,"DB","File","process");
 	return 1 if $execute{retryBecauseOfError} and !$process->{hadErrors};
 	our $hadDBErrors = 0;
-	if ($process->{data}) { # data supplied?
+	if ($process->{data} and @{$process->{data}}) { # data supplied?
 		if ($DB->{noDumpIntoDB}) {
 			$logger->info("skip dumping of ".$File->{filename}." into DB");
 		} else {
@@ -424,22 +421,21 @@ sub dumpDataIntoDB ($) {
 			}
 			# post processing (Perl code) for config, where postDumpProcessing is defined
 			if ($DB->{postDumpProcessing}) {
-				$logger->info("starting postDumpProcessing");
-				$logger->debug($DB->{postDumpProcessing});
-				eval $DB->{postDumpProcessing};
-				if ($@) {
-					$logger->error("error in eval postDumpProcessing: ".$DB->{postDumpProcessing}.": $@");
-					$hadDBErrors = 1;
-				}
+				evalCustomCode($DB->{postDumpProcessing},"postDumpProcessing",\$hadDBErrors);
 			}
 			# post processing (execute in DB!) for all configs, where postDumpExecs conditions and referred execs (DB scripts, that should be executed) are defined
 			if (!$hadDBErrors && $DB->{postDumpExecs}) {
 				$logger->info("starting postDumpExecs ... ");
 				for my $postDumpExec (@{$DB->{postDumpExecs}}) {
 					$logger->info("checking postDumpExec condition: ".$postDumpExec->{condition});
-					my $dopostdumpexec = eval $postDumpExec->{condition};
+					my $dopostdumpexec;
+					if (ref($config{executeOnInit}) eq "CODE") {
+						eval {$dopostdumpexec = eval $postDumpExec->{condition}->();};
+					} else {
+						$dopostdumpexec = eval $postDumpExec->{condition};
+					}
 					if ($@) {
-						$logger->error("error parsing postDumpExec condition: ".$postDumpExec->{condition}.": $@");
+						$logger->error("error parsing postDumpExec condition: ".(ref($postDumpExec->{condition}) eq "CODE" ? "defined sub" : "'".$postDumpExec->{condition}."'").": $@");
 						$hadDBErrors = 1;
 						last;
 					}
@@ -480,9 +476,9 @@ sub dumpDataIntoDB ($) {
 				$process->{hadErrors} = 1;
 			}
 		}
-	} else {# if ($process->{data}) .. in case there is no data and an empty file is OK no error will be thrown in readFile/readExcel, but any Import should not be done...
+	} else {
 		if ($File->{emptyOK}) {
-			$logger->warn("received empty file, will be ignored as \$File{emptyOK}=1");
+			$logger->warn("received empty data, will be ignored as \$File{emptyOK}=1");
 		} else {
 			my @filesdone = @{$process->{filenames}} if $process->{filenames};
 			$logger->error("error as none of the following files didn't contain data: @filesdone !");
@@ -490,6 +486,22 @@ sub dumpDataIntoDB ($) {
 		}
 	}
 }
+
+# evaluate custom code contained either in string or ref to sub
+sub evalCustomCode ($$;$) {
+	my ($customCode,$processingName,$hadDBErrorsRef) = @_;
+	my $logger = get_logger();
+	$logger->info("starting $processingName");
+	if (ref($customCode) eq "CODE") {
+		eval {$customCode->()};
+	} else {
+		my $hadDBErrors;
+		eval $customCode;
+		$$hadDBErrorsRef = $hadDBErrors;
+	}
+	$logger->error("eval of $processingName ".(ref($customCode) eq "CODE" ? "defined sub" : "'".$customCode."'")." returned error:$@") if $@;
+}
+
 
 # mark files as being processed depending on whether there were errors, also decide on removal/archiving of downloaded files
 sub markProcessed ($) {
@@ -525,7 +537,7 @@ sub writeFileFromDB ($) {
 	# get data from database, including column names (passed by ref)
 	@{$DB->{columnnames}} = (); # reset columnnames to pass data back as reference
 	@{$process->{data}} = (); # reset data to pass data back as reference
-	EAI::DB::readFromDB($DB, \@{$process->{data}}) or do {
+	EAI::DB::readFromDB($DB,\@{$process->{data}}) or do {
 		$logger->error("couldn' read from DB");
 		return 0;
 	};
@@ -534,10 +546,9 @@ sub writeFileFromDB ($) {
 	$logger->warn("no data retrieved from database for file ".$File->{filename}.", query: ".$DB->{query}) if ($process->{data} and @{$process->{data}} == 0);
 	# prepare for all configs, where postReadProcessing is defined
 	if ($DB->{postReadProcessing}) {
-		eval $DB->{postReadProcessing};
-		$logger->error("error doing postReadProcessing: ".$DB->{postReadProcessing}.": ".$@) if ($@);
+		evalCustomCode($DB->{postReadProcessing},"postReadProcessing");
 	}
-	EAI::File::writeText($File,$process) or do {
+	EAI::File::writeText($File,\@{$process->{data}}) or do {
 		$logger->error("error creating/writing file");
 		return 0;
 	};
@@ -734,23 +745,25 @@ sub processingEnd {
 		$retrySeconds = $common{task}{retrySecondsErr} if !$retrySeconds;
 		$retrySeconds = 60 if !$retrySeconds; # sanity fallback if retrySecondsErr not set
 		my $failcountFinish;
-		if ($execute{failcount} > $common{task}{retrySecondsXfails}) {
+		my $retrySecondsXfails = (defined($common{task}{retrySecondsXfails}) ? $common{task}{retrySecondsXfails} : 0);
+		if ($execute{failcount} > $retrySecondsXfails) {
 			$logger->info("fail count reached $common{task}{retrySecondsXfails}, so now retrySeconds are switched to $common{task}{retrySecondsErrAfterXfails}") if $common{task}{retrySecondsErrAfterXfails};
 			$failcountFinish = 1 if !$common{task}{retrySecondsErrAfterXfails};
 			$retrySeconds = $common{task}{retrySecondsErrAfterXfails};
 		}
 		my $nextStartTime = calcNextStartTime($retrySeconds);
-		my $currentTime = EAI::DateUtil::get_curtime_HHMM();
+		my $currentTime = EAI::DateUtil::get_curtime("%02d%02d%02d");
 		my $endTime = $common{task}{plannedUntil};
-		$endTime = "2400" if !$endTime and $processFailed;
-		$endTime = "0000->not set" if !$endTime; # if neither planned nor process failed then endtime is undefined and needs to be lower than any currentTime for next decision
-		if ($failcountFinish or $currentTime >= $endTime or ($nextStartTime =~ /24../)) {
-			$logger->info("finished processing due ".($failcountFinish ? "to reaching set error count \$common{task}{retrySecondsXfails} $common{task}{retrySecondsXfails} and \$common{task}{retrySecondsErrAfterXfails} is false" : "to time out: current time(".$currentTime.") >= endTime(".$endTime.") or nextStartTime(".$nextStartTime.") =~ /24../!"));
+		$endTime .= "59" if length($endTime) == 4;
+		$endTime = "240000" if !$endTime and $processFailed;
+		$endTime = "000000->not set" if !$endTime; # if neither planned nor process failed then endtime is undefined and needs to be lower than any currentTime for next decision
+		if ($failcountFinish or $nextStartTime >= $endTime or ($nextStartTime =~ /24..../)) {
+			$logger->info("finished processing due ".($failcountFinish ? "to reaching set error count \$common{task}{retrySecondsXfails} $common{task}{retrySecondsXfails} and \$common{task}{retrySecondsErrAfterXfails} is false" : "to time out: next start time(".$nextStartTime.") >= endTime(".$endTime.") or after midnight"));
 			moveFilesToHistory($common{task}{customHistoryTimestamp});
 			deleteFiles($execute{filesToDelete}) if $execute{filesToDelete};
 			$execute{processEnd}=1;
 		} else {
-			$logger->debug("execute:\n".Dumper(\%execute));
+			$logger->debug("execute:\n".EAI::Common::dumpFlat(\%execute,1));
 			$logger->info("Retrying in ".$retrySeconds." seconds because of ".($execute{retryBecauseOfError} ? "occurred error" : "planned retry")." until ".$endTime.", next run: ".$nextStartTime);
 			sleep $retrySeconds;
 		}
@@ -760,12 +773,7 @@ sub processingEnd {
 # helps to calculate next start time
 sub calcNextStartTime ($) {
 	my $seconds = shift;
-	my $hrs = substr(EAI::DateUtil::get_curtime_HHMM(),0,2);
-	my $min = substr(EAI::DateUtil::get_curtime_HHMM(),2,2);
-	# Add time (60 module): 
-	# hour part: including carry of minutes after adding additional minutes ($seconds/60); * 100 for shifting 2 digits left
-	# minute part: integer rest from 60 of (original + additional)
-	return sprintf("%04d",($hrs + int(($min+($seconds/60))/60))*100 + (($min + ($seconds/60))%60));
+	return EAI::DateUtil::get_curtime("%02d%02d%02d",$seconds);
 }
 
 # generally available procedure for pausing processing
@@ -782,7 +790,7 @@ sub moveFilesToHistory (;$) {
 	my ($archiveTimestamp) = @_;
 	my $logger = get_logger();
 	$archiveTimestamp = EAI::DateUtil::get_curdatetime() if !$archiveTimestamp;
-	my $redoDir = $execute{redoDir}."/" if $common{task}{redoFile};
+	my $redoDir = ($common{task}{redoFile} ? $execute{redoDir}."/" : "");
 	EAI::Common::setErrSubject("local archiving");
 	for my $histFolder ("historyFolder", "historyFolderUpload") {
 		my @filenames = @{$execute{filesToMoveinHistory}} if $execute{filesToMoveinHistory};
@@ -810,7 +818,7 @@ sub moveFilesToHistory (;$) {
 sub deleteFiles ($) {
 	my ($filenames) = @_;
 	my $logger = get_logger();
-	my $redoDir = $execute{redoDir}."/" if $common{task}{redoFile};
+	my $redoDir = ($common{task}{redoFile} ? $execute{redoDir}."/" : "");
 	EAI::Common::setErrSubject("local cleanup"); #
 	for (@$filenames) {
 		if (!$execute{alreadyMovedOrDeleted}{$_}) {
@@ -852,7 +860,7 @@ EAI::Wrap - framework for easy creation of Enterprise Application Integration ta
     	DB => {
     		server => {Prod => "ProdServer", Test => "TestServer"},
     		cutoffYr2000 => 60,
-    		DSN => 'driver={SQL Server};Server=$DB->{server}{$execute->{env}};database=$DB->{database};TrustedConnection=Yes;',
+    		DSN => 'driver={SQL Server};Server=$DB->{server}{$execute{env}};database=$DB->{database};TrustedConnection=Yes;',
     		schemaName => "dbo",
     	},
     	FTP => {
@@ -956,7 +964,7 @@ list of hashes defining specific load processes within the task script. Each has
 
 In the above mentioned hashes can be five categories (sub-hashes): L<DB|/DB>, L<File|/File>, L<FTP|/FTP>, L<process|/process> and L<task|/task>. These allow further parameters to be set for the respective parts of EAI::Wrap (L<EAI::DB>, L<EAI::File> and L<EAI::FTP>), process parameters and task parameters. The parameters are described in detail in section L<CONFIGURATION REFERENCE|/CONFIGURATION REFERENCE>.
 
-The L<process|/process> category is on the one hand used to pass information within each process (data, additionalLookupData, filenames, hadErrors or commandline parameters starting with interactive), on the other hand for additional configurations not suitable for L<DB|/DB>, L<File|/File> or L<FTP|/FTP> (e.g. L<uploadCMD|/uploadCMD>). The L<task|/task> category contains parameters used on the task script level and is therefore only allowed in C<%config> and C<%common>. It contains parameters for skipping, retrying and redoing the whole task script.
+The L<process|/process> category is on the one hand used to pass information within each process (data, additionalLookupData, filenames, hadErrors or custom commandline parameters starting with interactive), on the other hand for additional configurations not suitable for L<DB|/DB>, L<File|/File> or L<FTP|/FTP> (e.g. L<uploadCMD|/uploadCMD>). The L<task|/task> category contains parameters used on the task script level and is therefore only allowed in C<%config> and C<%common>. It contains parameters for skipping, retrying and redoing the whole task script.
 
 The settings in DB, File, FTP and task are "merge" inherited in a cascading manner (i.e. missing parameters are merged, parameters already set below are not overwritten):
 
@@ -985,7 +993,7 @@ The merge inheritance for L<DB|/DB>, L<FTP|/FTP>, L<File|/File> and L<task|/task
 
 =item %execute
 
-hash of parameters for current task execution which is not set by the user but can be used to set other parameters and control the flow. Most important here are C<$execute{env}> giving the current used environment (Prod, Test, Dev, whatever), C<$execute{envraw}> (Production is empty here), the several files lists (being procesed, for deletion, moving, etc.), flags for ending/interrupting processing, directory locations as home and history, etc.
+hash of parameters for current task execution which is not set by the user but can be used to set other parameters and control the flow. Most important here are C<$execute{env}>, giving the current used environment (Prod, Test, Dev, whatever), C<$execute{envraw}> (Production is empty here), the several file lists (files being procesed, files for deletion/moving, etc.), flags for ending/interrupting processing and directory locations as home and history
 
 Detailed information about the several parameters used can be found in section L<execute|/execute> of the configuration parameter reference, there are parameters for files (L<filesProcessed|/filesProcessed>, L<filesToArchive|/filesToArchive>, L<filesToDelete|/filesToDelete>, L<filesToMoveinHistory|/filesToMoveinHistory>, L<filesToMoveinHistoryUpload|/filesToMoveinHistoryUpload>, L<filesToRemove|/filesToRemove> and L<retrievedFiles|/retrievedFiles>), directories (L<homedir|/homedir>, L<historyFolder|/historyFolder>, L<historyFolderUpload|/historyFolderUpload> and L<redoDir|/redoDir>), process controlling parameters (L<failcount|/failcount>, L<firstRunSuccess|/firstRunSuccess>, L<retryBecauseOfError|/retryBecauseOfError>, L<retrySeconds|/retrySeconds> and L<processEnd|/processEnd>).
 
@@ -995,83 +1003,121 @@ L<getLocalFiles|/getLocalFiles>, L<getFilesFromFTP|/getFilesFromFTP>, L<getFiles
 
 After the first successful run of the task, C<$execute{firstRunSuccess}> is set to prevent any error messages resulting of files having been moved/removed while rerunning the task until the defined planned time (C<task =E<gt> {plannedUntil =E<gt> "HHMM"}>) has been reached.
 
-=item INIT ()
+=item INIT
 
 The INIT procedure is executed at the EAI::Wrap module initialization (when EAI::Wrap is used in the task script) and loads the site configuration, starts logging and reads commandline options. This means that everything passed to the script via command line may be used in the definitions, especially the C<task{interactive.*}> parameters, here the name and the type of the parameter are not checked by the consistency checks (all other parameters not allowed or having the wrong type would throw an error).
 
 =item removeFilesinFolderOlderX
 
-remove files on FTP server being older than a time back (given in day/mon/year in C<remove =E<gt> {removeFolders =E<gt> ["",""], day=E<gt>, mon=E<gt>, year=E<gt>1}>), see L<EAI::FTP::removeFilesOlderX>
+remove files on FTP server being older than a time back (given in day/mon/year in C<remove =E<gt> {removeFolders =E<gt> ["",""], day=E<gt>, mon=E<gt>, year=E<gt>1}>), see L<EAI::FTP::removeFilesOlderX|EAI::FTP/removeFilesOlderX>
 
-=item openDBConn
+=item openDBConn ($)
 
-open a DB connection with the information provided in C<$DB-E<gt>{user}>, C<$DB-E<gt>{pwd}> (these can be provided by the sensitive information looked up using C<$DB-E<gt>{prefix}>), C<$DB-E<gt>{DSN}> and C<$execute{env}>, see L<EAI::DB::newDBH>
+argument $arg (ref to current load or common)
 
-=item openFTPConn
+open a DB connection with the information provided in C<$DB-E<gt>{user}>, C<$DB-E<gt>{pwd}> (these can be provided by the sensitive information looked up using C<$DB-E<gt>{prefix}>) and C<$DB-E<gt>{DSN}> which can be dynamically configured using information from C<$DB> itself, using C<$execute{env}> inside C<$DB-E<gt>{server}{*}>: C<'driver={SQL Server};Server=$DB-E<gt>{server}{$execute{env}};database=$DB-E<gt>{database};TrustedConnection=Yes;'>, also see L<EAI::DB::newDBH|EAI::DB/newDBH>
 
-open a FTP connection with the information provided in C<$FTP-E<gt>{remoteHost}>, C<$FTP-E<gt>{user}>, C<$FTP-E<gt>{pwd}>, C<$FTP-E<gt>{hostkey}>, C<$FTP-E<gt>{privKey}> (these four can be provided by the sensitive information looked up using C<$FTP-E<gt>{prefix}>) and C<$execute{env}>, see L<EAI::FTP::login>
+=item openFTPConn ($)
 
-=item redoFiles
+argument $arg (ref to current load or common)
+
+open a FTP connection with the information provided in C<$FTP-E<gt>{remoteHost}>, C<$FTP-E<gt>{user}>, C<$FTP-E<gt>{pwd}>, C<$FTP-E<gt>{hostkey}>, C<$FTP-E<gt>{privKey}> (these four can be provided by the sensitive information looked up using C<$FTP-E<gt>{prefix}>) and C<$execute{env}>, also see L<EAI::FTP::login|EAI::FTP/login>
+
+=item redoFiles ($)
+
+argument $arg (ref to current load or common)
 
 redo file from redo directory if specified (C<$common{task}{redoFile}> is being set), this is also being called by getLocalFiles and getFilesFromFTP. Arguments are fetched from common or loads[i], using File parameter.
 
-=item getLocalFiles
+=item getLocalFiles ($)
 
-get local file(s) from source into homedir and extract archives if needed, uses C<$File-E<gt>{filename}>, C<$File-E<gt>{extension}> and C<$File-E<gt>{avoidRenameForRedo}>. Arguments are fetched from common or loads[i], using File parameter.
+argument $arg (ref to current load or common)
 
-=item getFilesFromFTP
+get local file(s) from source into homedir, uses C<$File-E<gt>{filename}>, C<$File-E<gt>{extension}> and C<$File-E<gt>{avoidRenameForRedo}>. Arguments are fetched from common or loads[i], using File parameter.
+
+=item getFilesFromFTP ($)
+
+argument $arg (ref to current load or common)
 
 get file/s (can also be a glob for multiple files) from FTP into homedir and extract archives if needed. Arguments are fetched from common or loads[i], using File and FTP parameters.
 
-=item getFiles
+=item getFiles ($)
 
-combines above two procedures in a general procedure to get files from FTP or locally. Arguments are fetched from common or loads[i], using File and FTP parameters.
+argument $arg (ref to current load or common)
 
-=item checkFiles
+combines above two procedures in a general procedure to get files from FTP or locally. Arguments are fetched from common or loads[i], using File and FTP parameters. 
 
-check files for continuation of processing. Arguments are fetched from common or loads[i], using File parameter. The processed files are put into process->{filenames}
+All get<*Files*> functions also parse the file into the datastructure process{data}. Custom "hooks" can be defined with L<fieldCode|/fieldCode> and L<lineCode|/lineCode> to modify and enhance the standard mapping defined in format_header. To access the final line data the hash %EAI::File::line can be used (specific fields with $EAI::File::line{<target header column>}). if a field is being replaced using a different name from targetheader, the data with the original header name is placed in %EAI::File::templine. You can also access data from the previous line with %EAI::File::previousline and the previous temp line with %EAI::File::previoustempline.
 
-=item extractArchives
+=item checkFiles ($)
+
+argument $arg (ref to current load or common)
+
+check files for continuation of processing and extract archives if needed. Arguments are fetched from common or loads[i], using File parameter. The processed files are put into process->{filenames}
+
+=item extractArchives ($)
+
+argument $arg (ref to current load or common)
 
 extract files from archive. Arguments are fetched from common or loads[i], using only the process->{filenames} parameter that was filled by checkFiles. 
 
-=item getAdditionalDBData
+=item getAdditionalDBData ($;$)
+
+arguments $arg (ref to current load or common) and optional $refToDataHash
 
 get additional data from DB. Arguments are fetched from common or loads[i], using DB and process parameters. You can also pass an optional ref to a data hash parameter to store the retrieved data there instead of C<$process->{additionalLookupData}>
 
-=item readFileData
+=item readFileData ($)
+
+argument $arg (ref to current load or common)
 
 read data from a file. Arguments are fetched from common or loads[i], using File parameter.
 
-=item dumpDataIntoDB
+=item dumpDataIntoDB ($)
+
+argument $arg (ref to current load or common)
 
 store data into Database. Arguments are fetched from common or loads[i], using DB and File (for emptyOK) parameters.
 
-=item markProcessed
+=item markProcessed ($)
+
+argument $arg (ref to current load or common)
 
 mark files as being processed depending on whether there were errors, also decide on removal/archiving of downloaded files. Arguments are fetched from common or loads[i], using File parameter.
 
-=item writeFileFromDB
+=item writeFileFromDB ($)
+
+argument $arg (ref to current load or common)
 
 create Data-files from Database. Arguments are fetched from common or loads[i], using DB and File parameters.
 
-=item putFileInLocalDir
+=item putFileInLocalDir ($)
+
+argument $arg (ref to current load or common)
 
 put files into local folder if required. Arguments are fetched from common or loads[i], using File parameter.
 
-=item markForHistoryDelete
+=item markForHistoryDelete ($)
+
+argument $arg (ref to current load or common)
 
 mark to be removed or be moved to history after upload. Arguments are fetched from common or loads[i], using File parameter.
 
-=item uploadFileToFTP
+=item uploadFileToFTP ($)
+
+argument $arg (ref to current load or common)
 
 upload files to FTP. Arguments are fetched from common or loads[i], using FTP and File parameters.
 
-=item uploadFileCMD
+=item uploadFileCMD ($)
+
+argument $arg (ref to current load or common)
 
 upload files using an upload command program. Arguments are fetched from common or loads[i], using File and process parameters.
 
-=item uploadFile
+=item uploadFile ($)
+
+argument $arg (ref to current load or common)
 
 combines above two procedures in a general procedure to upload files via FTP or CMD or to put into local dir. Arguments are fetched from common or loads[i], using File and process parameters
 
@@ -1079,17 +1125,21 @@ combines above two procedures in a general procedure to upload files via FTP or 
 
 final processing steps for processEnd (cleanup, FTP removal/archiving) or retry after pausing. No context argument as this always depends on all loads and/or the common definition
 
-=item processingPause
+=item processingPause ($)
 
 generally available procedure for pausing processing, argument $pauseSeconds gives the delay
 
 =item moveFilesToHistory (;$)
 
+optional argument $archiveTimestamp
+
 move transferred files marked for moving (filesToMoveinHistory/filesToMoveinHistoryUpload) into history and/or historyUpload folder. Optionally a custom timestamp can be passed.
  
 =item deleteFiles ($)
 
-delete transferred files. The filenames are passed in a ref to array
+argument $filenames, ref to array
+
+delete transferred files given in $filenames
 
 =back
 
@@ -1107,7 +1157,7 @@ parameter category for site global settings, defined in site.config and other as
 
 =item checkLookup
 
-used for logchecker, each entry of the hash defines a log to be checked, defining errmailaddress to receive error mails, errmailsubject, timeToCheck as earliest time to check for existence in log, freqToCheck as frequency of checks (daily/monthly/etc), logFileToCheck as the name of the logfile to check, logcheck as the regex to check in the logfile and logRootPath as the folder where the logfile is found. lookup key: $execute{scriptname} + $execute{addToScriptName}
+ref to datastructure {"scriptname.pl + optional addToScriptName" => {errmailaddress => "",errmailsubject => "",timeToCheck =>"", freqToCheck => "", logFileToCheck => "", logcheck => "",logRootPath =>""},...} used for logchecker, each entry of the hash lookup table defines a log to be checked, defining errmailaddress to receive error mails, errmailsubject, timeToCheck as earliest time to check for existence in log, freqToCheck as frequency of checks (daily/monthly/etc), logFileToCheck as the name of the logfile to check, logcheck as the regex to check in the logfile and logRootPath as the folder where the logfile is found. lookup key: $execute{scriptname} + $execute{addToScriptName}
 
 =item errmailaddress
 
@@ -1123,7 +1173,7 @@ code to be executed during INIT of EAI::Wrap to allow for assignment of config/e
 
 =item folderEnvironmentMapping
 
-Mapping for $execute{envraw} to $execute{env}
+ref to hash {Test => "Test", Dev => "Dev", "" => "Prod"}, mapping for $execute{envraw} to $execute{env}
 
 =item fromaddress
 
@@ -1131,15 +1181,15 @@ from address for central logcheck/errmail sending, also used as default sender a
 
 =item historyFolder
 
-folders where downloaded files are historized, lookup key as checkLookup, default in "" =>
+ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, folders where downloaded files are historized, lookup key as in checkLookup, default in "" => "defaultfolder"
 
 =item historyFolderUpload
 
-folders where uploaded files are historized, lookup key as checkLookup, default in "" =>
+ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, folders where uploaded files are historized, lookup key as in checkLookup, default in "" => "defaultfolder"
 
 =item logCheckHoliday
 
-calendar for business days in central logcheck/errmail sending
+calendar for business days in central logcheck/errmail sending. builtin calendars are AT (Austria), TG (Target), UK (United Kingdom) and WE (for only weekends). Calendars can be added with EAI::DateUtil::addCalendar
 
 =item logs_to_be_ignored_in_nonprod
 
@@ -1147,15 +1197,15 @@ logs to be ignored in central logcheck/errmail sending
 
 =item logRootPath
 
-paths to log file root folders (environment is added to that if non production), lookup key as checkLookup, default in "" =>
+ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, paths to log file root folders (environment is added to that if non production), lookup key as checkLookup, default in "" => "defaultfolder"
 
 =item redoDir
 
-folders where files for redo are contained, lookup key as checkLookup, default in "" =>
+ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, folders where files for redo are contained, lookup key as checkLookup, default in "" => "defaultfolder"
 
 =item sensitive
 
-hash lookup for sensitive access information in DB and FTP (lookup keys are set with DB{prefix} or FTP{prefix}), may also be placed outside of site.config; all sensitive keys can also be environment lookups, e.g. hostkey=>{Test => "", Prod => ""} to allow for environment specific setting
+hash lookup table ({"prefix" => {user=>"",pwd =>"",hostkey=>"",privkey =>""},...}) for sensitive access information in DB and FTP (lookup keys are set with DB{prefix} or FTP{prefix}), may also be placed outside of site.config; all sensitive keys can also be environment lookups, e.g. hostkey=>{Test => "", Prod => ""} to allow for environment specific setting
 
 =item smtpServer
 
@@ -1367,15 +1417,15 @@ if files from this load should not be dumped to the database
 
 =item postDumpExecs
 
-done in dumpDataIntoDB after postDumpProcessing and before commit/rollback. doInDB everything in execs if condition is fulfilled 
+array for execs done in dumpDataIntoDB after postDumpProcessing and before commit/rollback: [{execs => ['',''], condition => ''}]. doInDB all execs if condition (evaluated string or anonymous sub: condition => sub {...}) is fulfilled
 
 =item postDumpProcessing
 
-done in dumpDataIntoDB after storeInDB, execute perl code in postDumpProcessing
+done in dumpDataIntoDB after storeInDB, execute perl code in postDumpProcessing (evaluated string or anonymous sub: postDumpProcessing => sub {...})
 
 =item postReadProcessing
 
-done in writeFileFromDB after readFromDB, execute perl code in postReadProcessing
+done in writeFileFromDB after readFromDB, execute perl code in postReadProcessing (evaluated string or anonymous sub: postReadProcessing => sub {...})
 
 =item prefix
 
@@ -1399,7 +1449,7 @@ schemaName used in dumpDataIntoDB/storeInDB, if tableName contains dot the extra
 
 =item server
 
-DB Server in environment hash
+DB Server in environment hash lookup: {Prod => "", Test => ""}
 
 =item tablename
 
@@ -1445,10 +1495,6 @@ if up- or downloaded file should not be moved into historyFolder but be kept in 
 
 flag to specify whether empty files should not invoke an error message. Also needed to mark an empty file as processed in EAI::Wrap::markProcessed
 
-=item encoding
-
-text encoding of the file in question (e.g. :encoding(utf8))
-
 =item extract
 
 flag to specify whether to extract files from archive package (zip)
@@ -1459,7 +1505,7 @@ the extension of the file to be read (optional, used for redoFile)
 
 =item fieldCode
 
-additional field based processing code: fieldCode => {field1 => 'perl code', ..}, invoked if key equals either header (as in format_header) or targetheader (as in format_targetheader) or invoked for all fields if key is empty {"" => 'perl code'}. set $skipLineAssignment to true (1) if current line should be skipped from data.
+additional field based processing code: fieldCode => {field1 => 'perl code', ..}, invoked if key equals either header (as in format_header) or targetheader (as in format_targetheader) or invoked for all fields if key is empty {"" => 'perl code'}. set $EAI::File::skipLineAssignment to true (1) if current line should be skipped from data. perl code can be an evaluated string or an anonymous sub: field1 => sub {...}
 
 =item filename
 
@@ -1484,6 +1530,14 @@ numeric array of columns that contain date values (special parsing) in excel fil
 =item format_decimalsep
 
 decimal separator used in numbers of sourcefile (defaults to . if not given)
+
+=item format_defaultsep
+
+default separator when format_sep not given (usually in site.config), if not given, "\t" is used as default.
+
+=item format_encoding
+
+text encoding of the file in question (e.g. :encoding(utf8))
 
 =item format_headerColumns
 
@@ -1575,7 +1629,7 @@ specify xml parsing
 
 =item lineCode
 
-additional line based processing code, invoked after whole line has been read
+additional line based processing code, invoked after whole line has been read (evaluated string or anonymous sub: lineCode => sub {...})
 
 =item localFilesystemPath
 
@@ -1671,7 +1725,7 @@ queue_size for Net::SFTP::Foreign, if > 1 this causes often connection issues
 
 =item remove
 
-for for removing (archived) files with removeFilesOlderX, all files in removeFolders are deleted being older than day=> days, mon=> months and year=> years
+ref to hash {removeFolders=>[], day=>, mon=>, year=>1} for for removing (archived) files with removeFilesOlderX, all files in removeFolders are deleted being older than day days, mon months and year years
 
 =item remoteDir
 
@@ -1775,7 +1829,7 @@ ignore the notest file in the process-script folder, usually preventing all runs
 
 =item plannedUntil
 
-latest time that planned repitition should last
+latest time that planned repetition should start, this can be given either as HHMM (HourMinute) or HHMMSS (HourMinuteSecond), in case of HHMM the "Second" part is attached as 59
 
 =item redoFile
 

@@ -1,7 +1,7 @@
 package Template::Caribou;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: class-based HTML-centric templating system
-$Template::Caribou::VERSION = '1.2.1';
+$Template::Caribou::VERSION = '1.2.2';
 use Carp;
 
 use Moose::Exporter;
@@ -58,7 +58,7 @@ Template::Caribou - class-based HTML-centric templating system
 
 =head1 VERSION
 
-version 1.2.1
+version 1.2.2
 
 =head1 SYNOPSIS
 
@@ -118,7 +118,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Yanick Champoux.
+This software is copyright (c) 2023 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

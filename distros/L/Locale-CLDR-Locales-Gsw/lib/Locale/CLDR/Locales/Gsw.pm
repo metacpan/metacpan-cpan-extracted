@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Gsw - Package for language Swiss German
 
 =cut
 
 package Locale::CLDR::Locales::Gsw;
-# This file auto generated from Data/common/main/gsw.xml
-#	on Mon 11 Apr  5:29:17 pm GMT
+# This file auto generated from Data\common\main\gsw.xml
+#	on Fri 13 Oct  9:18:28 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

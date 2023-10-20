@@ -1,5 +1,3 @@
-## no critic (ProtectPrivateSubs)
-
 use strict;
 use warnings
   FATAL    => qw( all ),

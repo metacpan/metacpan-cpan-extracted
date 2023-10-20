@@ -1,7 +1,12 @@
 #!/usr/bin/env perl
 
 use strict;
-# use warnings; # Use just for development, otherwise leave warnings off
+# use warnings; # Use just for development, otherwise leave warnings off.
+#               # Seriously, leave warnings off for live code.
+
+BEGIN {
+	our $VERSION = '0.01'; # Increment this as you develop the code.
+};
 
 use Graphics::Framebuffer; # There are things to import, if you want, but they
                            # are usually not needed.
@@ -10,8 +15,8 @@ use Graphics::Framebuffer; # There are things to import, if you want, but they
 # $FB is your framebuffer object.  See the documentation, if you want to pass
 # any parameters when initializing the module, but no parameters should be
 # just fine to get started.
-our $FB = Graphics::Framebuffer->new();
-
+our $FB = Graphics::Framebuffer->new('SPLASH' => 0); # The splash screen is
+                                                     # mainly for testing.
 
 ##############################################################################
 

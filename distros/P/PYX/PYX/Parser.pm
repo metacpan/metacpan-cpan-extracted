@@ -11,7 +11,7 @@ use Readonly;
 # Constants.
 Readonly::Scalar my $EMPTY_STR => q{};
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Constructor.
 sub new {
@@ -233,7 +233,7 @@ PYX::Parser - PYX parser with callbacks.
  my $line = $obj->line;
  $obj->parse($pyx, $out);
  $obj->parse_file($input_file, $out);
- $obj->parse_handle($input_file_handler, $out);
+ $obj->parse_handler($input_file_handler, $out);
 
 =head1 METHODS
 
@@ -360,7 +360,7 @@ Returns undef.
 
 =head2 C<parse_handler>
 
- $obj->parse_handle($input_file_handler, $out);
+ $obj->parse_handler($input_file_handler, $out);
 
 Parse PYX handler.
 C<$input_file_handler> handler is decoded by 'input_encoding'.
@@ -468,6 +468,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

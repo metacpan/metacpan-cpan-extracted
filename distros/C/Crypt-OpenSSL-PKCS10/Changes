@@ -1,5 +1,28 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS10.
 
+0.25 -- Sun Oct 15 20:41:15 ADT 2023
+
+        [Significant updates since 0.24]
+        - Maybe really fix issue on old OpenSSL versions
+
+        [Change Log]
+        - 200762b Release - get release notes from SignReleaseNotes file
+        - 467f2ff Fix really old openssl version issue
+        - 85fa71a v0.24
+
+0.24 -- Sat Oct 07 16:11:58 ADT 2023
+
+        [Significant updates since 0.23]
+        - Move the git repo to the perl-openssl organization
+        - Minor build fixes for strawberry perl
+
+        [Change Log]
+        - 019e8ca Update version number for release
+        - 8b45c3e Moving repository to the perl-openssl organization
+        - 217aad6 Fix build issue on old strawvberry perls
+        - 45d9721 Add support for GitHub::CreateRelease
+        - cfe776f v0.23
+
 0.23 -- Sun Aug 13 14:39:03 ADT 2023
 
         [Significant updates since 0.20]

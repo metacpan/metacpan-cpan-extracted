@@ -3,8 +3,7 @@
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-Mail-Box-Parser-C>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/Mail-Box-Parser-C/>
-    and <https://metacpan.org/release/Mail-Box-Parser-C>
+  * Indexed from CPAN: <https://metacpan.org/release/Mail-Box-Parser-C>
 
 This module is a companion for the MailBox suite.  It provides an XS version
 of the mbox parser.  When installed, it will be detected automatically.  It

@@ -4,41 +4,33 @@ use 5.008;
 use strict;
 use warnings FATAL => 'all';
 use Config;
-use Inline::MakeMaker;
+# These should be in Perl's installation already
+use Inline::MakeMaker; # Layers on top of ExtUtils::MakeMaker
+use Term::ReadKey;
 use Term::ANSIColor;
 
-chomp(my $TERM = `/usr/bin/stty size`);
-my ($ROWS,$COLS) = split(/ /,$TERM);
-
+my ($COLS,$ROWS,$w,$h) = GetTerminalSize(*STDOUT);
+my $pmt = 'Y';
 if ($^O =~ /MSWin/i) { # Some people will still try
-	if ($COLS <= 80) {
-		print "\n\n",
-		  colored(['bold white on_red'],' This module absolutely, positively, without a doubt (but without malice) does '),"\n",
-		  colored(['bold white on_red'],' NOT work on Microsoft Windows!  MS Windows does not map a file to the         '),"\n",
-		  colored(['bold white on_red'],' Framebuffer.  GAME OVER ... END OF LINE ...                                   '),"\n\n";
-	} else {
-		print "\n\n",
-		  colored(['bold white on_red'],' This module absolutely, positively, without a doubt (but without malice) does NOT work on Microsoft Windows!  MS Windows does not map a file to the Framebuffer.  GAME OVER ... END OF LINE ... '),"\n\n";
-	}
-	exit(1); # Exit with an error
+	print colored(['white on_red'],"\n\n This module does not work natively on MS Windows.  It will only function in emulation mode, and you will not be able to see the output.  Please read the documentation on emulation mode. \n\n");
+	$pmt = ExtUtils::MakeMaker::prompt('Do you really wish to install anyway?  ','N');
 } elsif (defined($ENV{'DISPLAY'})) {
-	if ($COLS <= 80) {
-		print "\n\n",
-		  colored(['white on_red'],' ' x $COLS),"\n",
-		  colored(['white on_red'],' Graphics::Framebuffer should not be installed from within X-Windows!  You     '),"\n",
-		  colored(['white on_red'],' should install it from the console itself, and not a console window.          '),"\n",
-		  colored(['white on_red'],' ' x $COLS),"\n",
-		  colored(['black on_yellow'],' If you insist on installing from within X-Windows, please keep in mind that   '),"\n",
-		  colored(['black on_yellow'],' the tests will show nothing, as they will be unable to draw to the screen,    '),"\n",
-		  colored(['black on_yellow'],' since X-Windows is using it.  Thus the tests will run in emulation mode only. '),"\n\n";
-	} else {
-		print "\n\n",
-		  colored(['white on_red']," Graphics::Framebuffer should not be installed from within X-Windows!  You should install it from the console itself, and not a console window. "), "\n",
-		  colored(['black on_yellow'],' If you insist on installing from within X-Windows, please keep in mind that the tests will show nothing, as they will be unable to draw to the screen, since X-Windows is using it.  Thus the tests will run in emulation mode only. '),"\n\n";
-	}
-	sleep 3;
+	print "\n\n",
+	  colored(['white on_red'],' ' x 79),"\n",
+	  colored(['white on_red'],' Graphics::Framebuffer should not be installed from within X-Windows!  You     '),"\n",
+	  colored(['white on_red'],' should install it from the console itself, and not a console window.          '),"\n",
+	  colored(['white on_red'],' ' x 79),"\n",
+	  colored(['black on_yellow'],' ' x 79),"\n",
+	  colored(['black on_yellow'],' If you insist on installing from within X-Windows, please keep in mind that   '),"\n",
+	  colored(['black on_yellow'],' the tests will show nothing, as they will be unable to draw to the screen,    '),"\n",
+	  colored(['black on_yellow'],' since X-Windows is using it.  Thus the tests will run in emulation mode only. '),"\n",
+	  colored(['black on_yellow'],' ' x 79), "\n\n";
+	$pmt = ExtUtils::MakeMaker::prompt('Do you wish to install anyway?  ','Y');
 }
-
+unless($pmt =~ /^Y/i) {
+	print "\n\nInstall Aborted.\n\n";
+	exit(1);
+}
 # This portion of the code actually merges the C and Perl portions in the "src"
 # directory and writes the "lib/Graphics/Framebuffer.pm" file.  The one that is
 # there before this operation is merely a placeholder for CPAN, and was created
@@ -52,39 +44,41 @@ my $t = '  ';
 my $top  = '  ' . colored(['bright_green'],'/                       /');
 my $mid  = ' ' . colored(['bright_green'],'/ ') . colored(['bright_yellow'],'Graphics::Framebuffer') . colored(['bright_green'],' /');
 my $btm  = colored(['bright_green'],'/                       /');
-my $logo = colored(['on_red'],'   ') . colored(['on_green'],'   ') . colored(['on_blue'],'   ') . "$top\n";
-$logo   .= colored(['bold white on_red'],' G ') . colored(['bold white on_green'],' F ') . colored(['bold white on_blue'],' B ') . "$mid\n";
-$logo   .= colored(['on_red'],'   ') . colored(['on_green'],'   ') . colored(['on_blue'],'   ') . "$btm\n";
+my $logo = colored(['bold white on_red'],' G ') . colored(['bold white on_green'],' F ') . colored(['bold white on_blue'],' B ') . "$mid\n";
 my $line = '-' x $COLS;
 print $logo,colored(['cyan on_cyan'],$line),"\n";
 
 # Process the src files
-my $ccode = slurp_file('src/Framebuffer.c');
+my $ccode    = slurp_file('src/Framebuffer.c');
 my $template = slurp_file('src/Framebuffer.pm.template');
 my $Eml;
 
-print colored(['bright_yellow'],'Adding C to Module') . ' ...';
+print colored(['bright_yellow'],' Adding C to Framebuffer.pm') . ' ...';
 $template =~ s/\#\# C CODE \#\#/$ccode/s;
+print colored(['green']," Added\n");
 
 if ($template =~ /^\# (.*?)\n/s) {
-    print colored(['bright_yellow'],'Inserting versions'), ' ... ';
+    print colored(['bright_yellow'],'         Inserting versions'), ' ... ';
     my ($version, $date, $email) = split(/\:/, $1 );
 	my ($month, $day, $year) = split(/ |, /,$date);
     $template =~ s/^.*?\n//s;
     $template =~ s/\#\# VERSION \#\#/$version/sg;
     $template =~ s/\#\# VERSION DATE \#\#/$date/sg;
     $template =~ s/\#\# YEAR \#\#/$year/sg;
-    $template =~ s/\#\# TEMP COPYRIGHT \#\#.*?\#\# TEMPCOPYRIGHT \#\#//sg;
-	$template =~ s/\#\# EMAIL \#\#/$email/sg;
     print colored(['bright_green'],"Version: $version, $date"),"\n";
+	print colored(['bright_yellow'],'  Finalizing Copyright Year'), ' ... ';
+    $template =~ s/\#\# TEMP COPYRIGHT \#\#.*?\#\# TEMPCOPYRIGHT \#\#//sg;
+	print colored(['bright_green'],"Copyright 2017-$year Richard Kelsch"),"\n";
+	$template =~ s/\#\# EMAIL \#\#/$email/sg;
 	$Eml = $email;
-	print colored(['bright_yellow'],"Author"), ":  $email\n";
+	print colored(['bright_yellow'],'                     Author') . ' ... ', colored(['bright_green'],"$email") . "\n";
 }
+
+print colored(['cyan'],'Framebuffer.pm Modification'), ' ... ';
 open(my $FILE,'>','lib/Graphics/Framebuffer.pm');
 print $FILE $template;
 close($FILE);
-
-print colored(['bright_green'],' Added'),"\n";
+print colored(['bright_green'],'Complete'),"\n";
 
 WriteMakefile(
     NAME               => 'Graphics::Framebuffer',
@@ -95,8 +89,9 @@ WriteMakefile(
     MIN_PERL_VERSION   => 5.008, # 5.6 (5.006) is considered slow and unstable.  Upgrade
     CONFIGURE_REQUIRES => {
         'Inline::MakeMaker'   => '0.45',
-        'ExtUtils::MakeMaker' => '4.52',
+        'ExtUtils::MakeMaker' => '6.52',
 		'Term::ANSIColor'     => '0',
+        'Term::ReadKey'       => '0',
     },
     BUILD_REQUIRES => {
         'Test::More' => '1.00',
@@ -115,14 +110,15 @@ WriteMakefile(
         'Inline::C'      => '0.53',
     },
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
-    clean => {FILES    => 'Graphics-Framebuffer* _Inline* examples/_Inline* *log lib/Graphics/Framebuffer.pm'},
+    clean => {FILES    => 'Graphics-Framebuffer* _Inline* examples/_Inline* *log lib/Graphics/Framebuffer.pm *bak'},
 );
 print colored(['cyan on_cyan'],$line),"\n";
 
 my $message;
 if ($COLS <= 80) {
-	print "The ",'"', colored(['bold green'],'examples'), qq{" directory has some handy scripts to help get you started, and\nshow you how to use the module.  Just "} . colored(['bold green'],'perldoc') . qq{" on each to see how to use\nthem:\n};
+	print "The ",'"', colored(['bold green'],'examples'), qq{" directory has some handy scripts to help get you started, and\nshow you how to use the module.  Just "} . colored(['bold green'],'perldoc') . qq{" on each to see how to use\nthem:};
 	$message = qq{
+------------------------------------------------------------------------------
 primitives.pl          - This script will pretty much demonstrate all of
                          the capabilities of this module.
 slideshow.pl           - This script shows all of the images in a specific
@@ -136,21 +132,23 @@ text_mode.pl           - A rescue script to force the tty into text mode.
 template.pl            - A skeleton single-tasking script shell for you to use
                          as as template.  Do not edit this, but instead copy
                          it.
-============================= MULTIPROCESSING ================================
+----------------------------- MULTIPROCESSING --------------------------------
 threaded_primitives.pl - A threaded version of the above.  It can make a mess
                          of the screen.  Requires Sys::CPU.
 threaded_slideshow.pl  - This script shows all of the images in a specific
                          path.  It divides your screen by how many threads,
                          and dedicates each to show an image.  Requires
                          Sys::CPU.
-threaded_template.pl   - Like the above, but for threading.  Requires Sys::CPU
-get-mce-demos          - Go and grab MCE multiprocessing demos
+threaded_template.pl   - Like the above, but for threading.  Requires
+                         Sys::CPU
+get-mce-demos          - Go and grab MCE multiprocessing demos (an alternate
+	                     threading method using only one instance of GFB)
 };
 } else {
 	my $pad = int(($COLS - 21)/2);
-	my $mult = ' ' x $pad . '-- MULTIPROCESSING --' . ' ' x $pad;
+	my $mult = '-' x $pad . '-- MULTIPROCESSING --' . '-' x $pad;
 	print "The ",'"', colored(['bold green'],'examples'), qq{" directory has some handy scripts to help get you started, and show you how to use the module.  Just "} . colored(['bold green'],'perldoc') . qq{" on each to see how to use them:\n};
-	$message = qq{
+	$message = '-' x $COLS . qq{
 primitives.pl          - This script will pretty much demonstrate all of the capabilities of this module.
 slideshow.pl           - This script shows all of the images in a specific path (full screen, if asked).
 viewpic.pl             - This script shows one specific image (or animation).
@@ -161,8 +159,8 @@ template.pl            - A skeleton single-tasking script shell for you to use a
 $mult
 threaded_primitives.pl - A threaded version of the above.  It can make a mess of the screen.  Requires "Sys::CPU".
 threaded_slideshow.pl  - This script shows all of the images in a specific path.  It divides your screen by how many threads, and dedicates each to show an image.  Requires "Sys::CPU".
-threaded_template.pl   - Like the above, but for threading.  Requires Sys::CPU
-get-mce-demos          - Go and grab MCE multiprocessing demos
+threaded_template.pl   - Like the above, but for threading.  Requires "Sys::CPU"
+get-mce-demos          - Go and grab MCE multiprocessing demos (an alternate threading method using only one instance of a GFB object)
 };
 }
 
@@ -171,8 +169,8 @@ foreach my $l (split(/\n/,$message)) {
         my $old = $1;
         my $new = colored(['bold green'],$old);
         $l =~ s/$old/$new/;
-    } elsif ($l =~ /^.*?MULTIPROCESSING.*/) {
-        $l = colored(['bold black on_cyan'],$l);
+    } elsif ($l =~ /^-------/) {
+        $l = colored(['bold cyan'],$l);
     }
     print "$l\n";
 }
@@ -189,3 +187,12 @@ sub slurp_file {
     my $file = shift;
     return( do { local (@ARGV, $/) = $file; <> } );
 }
+
+__END__
+  
+=pod
+
+Copyright (C) 2013-2023 Richard Kelsch
+All Rights Reserved
+
+=cut

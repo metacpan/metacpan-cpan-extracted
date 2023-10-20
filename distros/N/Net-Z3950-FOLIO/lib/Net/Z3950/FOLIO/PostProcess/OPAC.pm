@@ -42,7 +42,9 @@ sub processListOfFields {
 	my $field = $list->[$i];
 	my($name, $value) = @$field;
 	if (!$isItem && $name eq 'circulations') {
-	    processListOfFields($cfg, $value->[0], 1) if @$value > 0;
+	    foreach (my $j = 0; $j < @$value; $j++) {
+		processListOfFields($cfg, $value->[$j], 1);
+	    }
 	} else {
 	    my $rule = $thisCfg->{$name};
 	    if ($rule) {

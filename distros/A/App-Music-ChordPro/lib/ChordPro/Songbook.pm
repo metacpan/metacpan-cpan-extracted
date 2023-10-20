@@ -64,10 +64,21 @@ sub parse_file {
     my $songs = 0;
     while ( @$lines ) {
 	my $song = ChordPro::Song
-	  ->new( $opts->{_filesource} )
+	  # WxChordPro uses temp file _filesource. Add real filename as well.
+	  ->new( $opts->{filesource} || $opts->{_filesource} )
 	  ->parse_song( $lines, \$linecnt, {%$meta}, {%$defs} );
 	$song->{meta}->{songindex} = 1 + @{ $self->{songs} };
 	push( @{ $self->{songs} }, $song );
+
+	# Copy persistent assets to the songbook.
+	if ( $song->{assets} ) {
+	    $self->{assets} //= {};
+	    while ( my ($k,$v) = each %{$song->{assets}} ) {
+		next unless $v->{persist};
+		$self->{assets}->{$k} = $v;
+	    }
+	}
+
 	$songs++ if $song->{body};
     }
 

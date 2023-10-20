@@ -8,7 +8,7 @@ use warnings;
 
 use experimental ( 'postderef', 'signatures' );
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Exporter 'import';
 
@@ -402,7 +402,7 @@ Iterator::Flex::Common - Iterator Generators and Adapters
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 

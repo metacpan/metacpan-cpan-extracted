@@ -2,6 +2,7 @@
 abstract: 'Net::Pcap wrapper with AnyEvent'
 author:
   - 'Takeshi Miki <miki@cpan.org>'
+  - 'Sergei Zhmylev <zhmylove@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: 6.42
 configure_requires:
@@ -27,4 +28,4 @@ requires:
   NetPacket::TCP: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.00004
+version: 0.00005

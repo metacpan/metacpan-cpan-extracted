@@ -40932,7 +40932,7 @@ sub post_lock{
 # Protect MS Excel and OpenDocument Spreadsheet by making them password protected.
 # 
 # @File  string (required)  File to upload  
-# @protectWorkbookRequst  ProtectWorkbookRequst (required)    
+# @protectWorkbookRequest  ProtectWorkbookRequest (required)    
 # @password  string      
 #
 {
@@ -41783,6 +41783,87 @@ sub post_worksheet_list_object_sort_table{
     my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
+
+#
+# PostWorksheetListObjectRemoveDuplicatesRequest
+#
+# Remove duplicates on list object.
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @listObjectIndex  int (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetListObjectRemoveDuplicatesRequest',
+            description => 'PostWorksheetListObjectRemoveDuplicates Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_list_object_remove_duplicates' } = { 
+    	summary => 'Remove duplicates on list object.',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_list_object_remove_duplicates{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# PostWorksheetListObjectInsertSlicerRequest
+#
+# Insert slicer for list object.
+# 
+# @name  string (required)    
+# @sheetName  string (required)    
+# @listObjectIndex  int (required)    
+# @columnIndex  int (required)    
+# @destCellName  string (required)    
+# @folder  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetListObjectInsertSlicerRequest',
+            description => 'PostWorksheetListObjectInsertSlicer Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_list_object_insert_slicer' } = { 
+    	summary => 'Insert slicer for list object.',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_list_object_insert_slicer{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
 
 #
 # PostWorksheetListColumnRequest
@@ -44340,6 +44421,46 @@ sub post_worksheet_cells_range_move_to{
     my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
+
+#
+# PostWorksheetCellsRangeSortRequest
+#
+# Sets outline border around a range of cells.
+# 
+# @name  string (required)  The workbook name.  
+# @sheetName  string (required)  The worksheet name.  
+# @rangeOperate  RangeSortRequest (required)  Range Set OutlineBorder Request   
+# @folder  string   Original workbook folder.  
+# @storageName  string   Storage name.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorksheetCellsRangeSortRequest',
+            description => 'PostWorksheetCellsRangeSort Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_sort' } = { 
+    	summary => 'Sets outline border around a range of cells.',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub post_worksheet_cells_range_sort{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
 
 #
 # PostWorksheetCellsRangeOutlineBorderRequest

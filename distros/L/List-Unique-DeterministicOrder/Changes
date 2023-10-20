@@ -1,5 +1,8 @@
 Revision history for List-Unique-DeterministicOrder
 
+0.004    2023-10-05
+    - Micro-optimise the deletion methods
+
 0.003    2022-09-24
     - Fix class returned from clone 
 

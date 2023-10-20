@@ -3,6 +3,7 @@
 **Test::Expander** - Expansion of test functionalities that appear to be frequently used while testing.
 
 # SYNOPSIS
+
 ```perl
     # Tries to automatically determine, which class / module and method / subroutine are to be tested,
     # creates neither a temporary directory, nor a temporary file:
@@ -48,6 +49,7 @@
       -builtins => { close => sub { $close_success ? CORE::close( shift ) : 0 } },
       -target   => 'My::Class';
 ```
+
 # DESCRIPTION
 
 The primary objective of **Test::Expander** is to provide additional convenience while testing based on
@@ -66,13 +68,17 @@ This, of course, can be stored in additional variables declared somewhere at the
     a single change of path and / or base name of the corresponding test file.
 
     An additional benefit of suggested approach is a better readability of tests, where chunks like
+
     ```perl
         Foo::Bar->baz( $arg0, $arg1 )
     ```
+
     now look like
+
     ```perl
         $CLASS->$METHOD( $arg0, $arg1 )
     ```
+
     and hence clearly manifest that this chunk is about the testee.
 
 - The frequent necessity of introduction of temporary directory and / or temporary file usually leads to the usage of
@@ -81,20 +87,141 @@ providing the methods / funtions **tempdir** and **tempfile**.
 
     This, however, can significantly be simplified (and the size of test file can be reduced) requesting such introduction
     via the options supported by **Test::Expander**:
+
     ```perl
         use Test::Expander -tempdir => {}, -tempfile => {};
     ```
+
 - Another fuctionality frequently used in tests relates to the work with files and directories:
 reading, writing, creation, etc. Because almost all features required in such cases are provided by
 [Path::Tiny](https://metacpan.org/pod/Path::Tiny), some functions of this module is also exported from
 **Test::Expander**.
-- Last but not least. To provide a really environment-independent testing, we might need a possibility to run our tests in
+- To provide a really environment-independent testing, we might need a possibility to run our tests in
 a clean environment, where only explicitly mentioned environment variables are set and environment variables from the
 "outside world" cannot affect the execution of tests.
 This can also be achieved manually by manipulation of **%ENV** hash at the very beginning of tests.
 However, even ignoring the test code inflation, this might be (in fact - is) necessary in many tests belonging to one
 and the same module, so that a possibility to outsource the definition of test environment provided by **Test::Expander**
 makes tests smaller, more maintainable, and much more reliable.
+- Last but not least. I stole the idea of subtest selection from
+[Test::Builder::SubtestSelection](https://metacpan.org/pod/Test::Builder::SubtestSelection).
+That's why the subtest selection supported by **Test::Expander** is partially compatible with the implementation provided
+by [Test::Builder::SubtestSelection](https://metacpan.org/pod/Test::Builder::SubtestSelection).
+The term "partially" means that the option `--subtest` can only be applied to selection by name not by number.
+
+    In general the subtest selection allows the execution of required subtests identified by their names and / or by their numbers before test running.
+    At the command-line [prove](https://metacpan.org/pod/prove) runs your test script and the subtest selection is based
+    on the values given to the options `--subtest_name` (alias `--subtest` - in the
+    [Test::Builder::SubtestSelection](https://metacpan.org/pod/Test::Builder::SubtestSelection) style) and
+    `--subtest_number`. Both options can be applied repeatedly and mixed together so that some tests can be selected
+    by names and other ones by numbers.
+
+    In both cases the options have to be supplied as arguments to the test script.
+    To do so separate the arguments from prove's own arguments with the arisdottle (`::`).
+
+    - Selection by name
+
+        The selection by name means that the value supplied along with `--subtest_name` option is compared with all subtest
+        names in your test and only those, which names match this value in terms of regular expression, will be executed.
+        If this value cannot be treated as a valid regular expression, meta characters therein are properly quoted so that
+        the RegEx match is in any case possible.
+
+        Assuming the test script **t/my\_test.t** contains
+
+        ```perl
+            use strict;
+            use warnings;
+
+            use Test::Expander;
+
+            plan( 3 );
+
+            subtest 'my higher level subtest without RegEx meta characters in name' => sub {
+              # some test function calls
+            };
+
+            subtest 'my next higher level subtest' => sub {
+              subtest 'my embedded subtest' => sub {
+                subtest 'my deepest subtest' => sub {
+                  # some test function calls
+                };
+                # some test function calls
+              };
+              # some test function calls
+            };
+
+            # some test function calls
+
+            subtest 'my subtest with [' => sub {
+              # some test function calls
+            };
+        ```
+
+        Then, if the subtest **my next higher level subtest** with all embedded subtests and the subtest **my subtest with \[**
+        should be executed, the corresponding [prove](https://metacpan.org/pod/prove) call
+        can look like one of the following variants:
+
+        ```sh
+            prove -v -b t/basic.t :: --subtest_name 'next|embedded|deepest' --subtest_name '['
+            prove -v -b t/basic.t :: --subtest_name 'next' --subtest_name 'embedded' --subtest_name 'deepest' --subtest_name '['
+        ```
+
+        This kind of subtest selection is pretty convenient but has a significant restriction:
+        you cannot select an embedded subtest without its higher-level subtests.
+        I.e. if you would try to run the following command
+
+        ```sh
+            prove -v -b t/basic.t :: --subtest_name 'deepest' --subtest_name '['
+        ```
+
+        the subtest **my next higher level subtest** including all embedded subtests will be skipped, so that even the subtest
+        **my deepest subtest** will not be executed although this was your goal.
+
+        This restriction, however, can be avoided using the subset selection by number.
+
+    - Selection by number
+
+        The selection by number means that the value supplied along with `--subtest_number` option is the sequence of numbers
+        representing required subtest in the test file.
+        Let's add to the source code of **t/my\_test.t** some comments illustrating the numbers of each subtest:
+
+        ```perl
+            use strict;
+            use warnings;
+
+            use Test::Expander;
+
+            plan( 3 );
+
+            subtest 'my higher level subtest without RegEx meta characters in name' => sub { # subtest No. 0
+              # some test function calls
+            };
+
+            subtest 'my next higher level subtest' => sub { # subtest No. 1
+              subtest 'my embedded subtest' => sub {        # subtest No. 0 in subtest No. 1
+                subtest 'my deepest subtest' => sub {       # subtest No. 0 in subtest No. 0 in subtest No. 1
+                  # some test function calls
+                };
+                # some test function calls
+              };
+              # some test function calls
+            };
+
+            # some test function calls
+
+            subtest 'my subtest with [' => sub { # subtest No. 2
+              # some test function calls
+            };
+        ```
+
+        Taking this into consideration we can combine subtest numbers starting from the highest level and separate single levels
+        by the slash sign to get the unique number of any subtest we intend to execute.
+        Doing so, if we only want to execute the subtests **my deepest subtest** (its number is **1/0/0**) and
+        **my subtest with \[** (its number is **2**), this can easily be done with the following command:
+
+        ```sh
+            prove -v -b t/basic.t :: --subtest_number '1/0/0' --subtest_number '2'
+        ```
 
 **Test::Expander** combines all advanced possibilities provided by [Test2::V0](https://metacpan.org/pod/Test2::V0)
 with some specific functions only available in the older module [Test::More](https://metacpan.org/pod/Test::More)
@@ -167,9 +294,11 @@ related to this class / module should be **t/**_Foo_**/**_Bar_**/**_Baz_ or **xt
 (the name of the top-level directory in this relative name - **t**, or **xt**, or **my\_test** is not important) -
 otherwise the module name cannot be put into the exported variable **$CLASS** and, if you want to use this variable,
 should be supplied as the value of **-target**:
+
 ```perl
     use Test::Expander -target => 'Foo::Bar::Baz';
 ```
+
 This recognition can explicitly be deactivated if the value of **-target** is **undef**, so that no class / module
 will be loaded and, correspondingly, the variables **$CLASS**, **$METHOD**, and **$METHOD\_REF** will not be exported.
 
@@ -181,9 +310,11 @@ to be tested and its reference, correspondingly, otherwise both variables are ne
 
 Also in this case evaluation and export of the variables **$METHOD** and **$METHOD\_REF** can be prevented
 by passing of **undef** as value of the option **-method**:
+
 ```perl
     use Test::Expander -target => undef;
 ```
+
 Finally, **Test::Expander** supports testing inside of a clean environment containing only some clearly
 specified environment variables required for the particular test.
 Names and values of these environment variables should be configured in files,
@@ -333,10 +464,12 @@ In this case they are logged to STDOUT using [note](https://metacpan.org/pod/Tes
 
     1. When another module is used, which in turn is based on [Test::Builder](https://metacpan.org/pod/Test::Builder) e.g.
     [Test::Output](https://metacpan.org/pod/Test::Output):
-        ```perl
+
+    ```perl
             use Test::Output;
             use Test::Expander;
-        ```
+    ```
+
     2. When some actions performed on the module level (e.g. determination of constants)
     rely upon results of other actions (e.g. mocking of built-ins).
 
@@ -345,6 +478,7 @@ In this case they are logged to STDOUT using [note](https://metacpan.org/pod/Tes
         the option **-builtin** should be used instead!)
         to verify if the testee properly reacts both on its success and failure.
         For this purpose a reasonable implementation might look as follows:
+
         ```perl
             my $close_success;
             BEGIN {
@@ -353,11 +487,14 @@ In this case they are logged to STDOUT using [note](https://metacpan.org/pod/Tes
 
             use Test::Expander;
         ```
+
 - Array elements of the value supplied along with the option **-lib** are evaluated using
 [string eval](https://perldoc.perl.org/functions/eval) so that constant strings would need duplicated quotes e.g.
-    ```perl
+
+```perl
         use Test::Expander -lib => [ q('my_test_lib') ];
-    ```
+```
+
 - If the value to be assigned to an environment variable after evaluation of an **.env** file is undefined,
 such assignment is skipped.
 - If **Test::Expander** is used in one-line mode (with the **-e** option),

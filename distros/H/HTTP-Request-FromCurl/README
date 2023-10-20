@@ -54,6 +54,8 @@ of C<< ->as_curl >> than this module.
 L<https://github.com/NickCarneiro/curlconverter> - a converter for multiple
 target languages
 
+L<The cURL manpage|https://curl.se/docs/manpage.html>
+
 AUTHOR
 
 Max Maischein C<corion@cpan.org>

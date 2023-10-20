@@ -1,6 +1,11 @@
+0.26 2023-09-30  lichtkind
+-------
+    * = bug fix
+    * adopt code to new GTC API
+
 0.25 2023-02-23  lichtkind
 -------
-    * = colors
+    * = major fixes
     * ~ moved config to ~/.config/cellgraph
     * ! switch current state on color panel now moves also HSL values
     * ! grid computation bug

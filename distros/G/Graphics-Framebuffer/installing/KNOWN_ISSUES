@@ -1,10 +1,17 @@
-KNOWN ISSUES
+******************************************************************************
+*                              KNOWN ISSUES                                  *
+*                          Graphics::Framebuffer                             *
+******************************************************************************
 
 ##############################################################################
 
-16 bit processing is a hack, a kludge.  It is a slower than 32 bit color
-operations.  It also may have problems.  The best way to avoid any speed or
-bug issues, is to avoid 16 bit mode all together and use 24 or 32 bit mode.
+Avoid 16 bit mode if at all possible.  16 bit processing is a hack, a kludge.
+It is a slower than 24/32 bit color operations.  It also may have problems.
+The best way to avoid any speed or bug issues, is to avoid 16 bit mode all
+together and use 24 or 32 bit mode.
+
+Note:  The Raspberry Pi typically defaults to 16 bit color mode.  Please
+       change its settings to use 24/32 bit mode.
 
 ##############################################################################
 
@@ -27,11 +34,12 @@ flakey.
 ##############################################################################
 
 Some framebuffer drivers are tearfully slow (not many).  I have noticed that
-the Nouveau framebuffer driver for NVidia is Molasses slow.  It's amazing how
-slow it is.  Other framebuffer drivers are amazingly fast.  It's clear the
-Nouveau framebuffer driver is in dire need of optimization, or at the very
-least hardware accelerated buffer copy, like CPU DMA.  I'll be looking into
-finding ways to overcome this issue.
+the Nouveau framebuffer driver for NVidia is Molasses slow (this is not the
+fault of NVidia, but the Nouvaeu developers).  It's amazing how slow it is.
+Other framebuffer drivers are amazingly fast.  It's clear the Nouveau
+framebuffer driver is in dire need of optimization, or at the very least
+hardware accelerated buffer copy, like CPU DMA.  I'll be looking into finding
+ways to overcome this issue (don't get your hopes up).
 
 After more testing, it seems non-bulk read or write access is simply very
 slow.  Odd really.  Operations in normal mode, like blit_write are very

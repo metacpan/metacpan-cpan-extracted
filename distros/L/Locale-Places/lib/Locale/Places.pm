@@ -1,5 +1,7 @@
 package Locale::Places;
 
+# TODO:  Investigate https://github.com/x88/i18nGeoNamesDB
+
 use strict;
 use warnings;
 
@@ -9,17 +11,19 @@ use File::Spec;
 use Locale::Places::DB::GB;
 use Module::Info;
 
+=encoding utf8
+
 =head1 NAME
 
 Locale::Places - Translate places between different languages using http://download.geonames.org/
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -42,24 +46,27 @@ Any other options are passed to the underlying database driver.
 =cut
 
 sub new {
-	my($proto, %param) = @_;
+	my($proto, %args) = @_;
 	my $class = ref($proto) || $proto;
 
 	if(!defined($class)) {
-		# Using Locale::Places->new, not Locale::Places::new
+		# Locale::Places::new() used rather than Locale::Places->new()
 		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 		# return;
 		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %args }, ref($class);
 	}
 
-	my $directory = delete $param{'directory'} || Module::Info->new_from_loaded(__PACKAGE__)->file();
+	my $directory = delete $args{'directory'} || Module::Info->new_from_loaded(__PACKAGE__)->file();
 	$directory =~ s/\.pm$//;
 
 	Locale::Places::DB::init({
 		directory => File::Spec->catfile($directory, 'databases'),
 		no_entry => 1,
-		cache => $param{cache} || CHI->new(driver => 'Memory', datastore => {}),
-		%param
+		cache => $args{cache} || CHI->new(driver => 'Memory', datastore => {}),
+		%args
 	});
 
 	return bless { }, $class;
@@ -94,9 +101,12 @@ sub translate {
 		%params = %{$_[0]};
 	} elsif(scalar(@_) % 2 == 0) {
 		%params = @_;
-	} else {
+	} elsif(scalar(@_) == 1) {
 		$params{'place'} = shift;
 		$params{'from'} = 'en';
+	} else {
+		Carp::carp(__PACKAGE__, ': usage: translate(place => $place, from => $language1, to => $language2)');
+		return;
 	}
 
 	my $place = $params{'place'};
@@ -131,15 +141,19 @@ sub translate {
 	$self->{'gb'} ||= Locale::Places::DB::GB->new(no_entry => 1);
 
 	# my @places = @{$self->{'gb'}->selectall_hashref({ type => $from, data => $place, ispreferredname => 1 })};
+	# ::diag("$place: $from => $to");
 	my @places = $self->{'gb'}->code2({ type => $from, data => $place, ispreferredname => 1 });
+	# ::diag(__LINE__, ': Number of matches = ', scalar(@places));
 	if(scalar(@places) == 0) {
 		# @places = @{$self->{'gb'}->selectall_hashref({ type => $from, data => $place })};
 		@places = $self->{'gb'}->code2({ type => $from, data => $place });
+		# ::diag(__LINE__, ': Number of matches = ', scalar(@places));
 	}
 
 	if(scalar(@places) == 1) {
 		if(my $data = $self->{'gb'}->data({ type => $to, code2 => $places[0] })) {
 		# if(my $data = $self->{'gb'}->data({ type => $to, code2 => $places[0]->{'code2'} })) {
+			# ::diag(__LINE__, ": $places[0]: $data");
 			return $data;
 		}
 	} elsif(scalar(@places) > 1) {
@@ -234,7 +248,16 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 Only supports towns and cities in GB at the moment.
 
+Canterbury no longer translates to Cantorbéry in French.
+This is a problem with the data, which has this line:
+
+    16324587	2653877	fr	Canterbury	1
+
+which overrides the translation by setting the 'isPreferredName' flag
+
 =head1 SEE ALSO
+
+L<Locale::Country::Multilingual> to translate country names.
 
 =head1 SUPPORT
 
@@ -262,10 +285,6 @@ L<http://cpants.cpanauthors.org/dist/Locale-Places>
 
 L<http://matrix.cpantesters.org/?dist=Locale-Places>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Locale-Places>
-
 =item * CPAN Testers Dependencies
 
 L<http://deps.cpantesters.org/?module=Locale::Places>
@@ -278,7 +297,7 @@ L<https://groups.google.com/g/geonames>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright 2020-2022 Nigel Horne.
+Copyright 2020-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

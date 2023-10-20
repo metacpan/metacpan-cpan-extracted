@@ -544,7 +544,6 @@ static int IMPL_xs_parse_sublike_any_v4(pTHX_ const struct XSParseSublikeHooks *
     { .hooks = hooksA, .data = hookdataA },
     { 0 }
   };
-  struct XSParseSublikeHooks hooks;
 
   if(reg) {
     hd[1].hooks = reg->hooks;
@@ -562,10 +561,10 @@ static int IMPL_xs_parse_sublike_any_v3(pTHX_ const void *hooksA, void *hookdata
 static void IMPL_register_xps_signature_attribute(pTHX_ const char *name, const struct XPSSignatureAttributeFuncs *funcs, void *funcdata)
 {
   if(funcs->ver < 5)
-    croak("Mismatch in signature param attribute ABI version field: module wants %d; we require >= 5\n",
+    croak("Mismatch in signature param attribute ABI version field: module wants %u; we require >= 5\n",
       funcs->ver);
   if(funcs->ver > XSPARSESUBLIKE_ABI_VERSION)
-    croak("Mismatch in signature param attribute ABI version field: module wants %d; we support <= %d\n",
+    croak("Mismatch in signature param attribute ABI version field: module wants %u; we support <= %d\n",
       funcs->ver, XSPARSESUBLIKE_ABI_VERSION);
 
   if(!name || !(name[0] >= 'A' && name[0] <= 'Z'))

@@ -59,7 +59,7 @@ sub new {
 
 
 # Run Operation Request
-# PostClearObjectsRequest.File : File to upload  ,
+# PostClearObjectsRequest.File : chart/comment/picture/shape/listobject/hyperlink/oleobject/pivottable/validation/Background  ,
 # PostClearObjectsRequest.objecttype : chart/comment/picture/shape/listobject/hyperlink/oleobject/pivottable/validation/Background  ,
 # PostClearObjectsRequest.sheetname :   ,
 # PostClearObjectsRequest.outFormat :   ,
@@ -143,7 +143,7 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'File to upload',
+     	description => 'chart/comment/picture/shape/listobject/hyperlink/oleobject/pivottable/validation/Background',
      	format => '',
      	read_only => '',
      		},

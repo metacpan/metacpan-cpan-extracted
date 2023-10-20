@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see L<http://www.gnu.org/licenses/>.
 #
+
 	package SQL::SimpleOps::DBI::MySQL;
 
 	use 5.006001;
@@ -28,7 +29,7 @@
 
 	our @EXPORT = qw(new Open $VERSION);
 
-	our $VERSION = "2023.106.1";
+	our $VERSION = "2023.274.1";
 
 	our @EXPORT_OK = @EXPORT;
 
@@ -41,9 +42,11 @@
 sub new()
 {
 	my $class = shift; $class = ref($class) || $class || 'SQL::SimpleOps::DBI::MySQL';
-	my $self = {};
-
-	$self->{argv} = {@_};
+	my $self = {@_};
+	$self->{sql_simple}->{init}{plugin_id} = "MySQL";
+	$self->{sql_simple}->{init}{schema} = 0;
+	$self->{sql_simple}->{init}{test_server} = 1;
+	$self->{sql_simple}->{init}{alias_with_as} = 0;
 
 	bless($self,$class);
 }
@@ -67,10 +70,10 @@ sub Open()
 
 	## sets the dsnam here
 	my @options;
-	push(@options,"database=".$self->{argv}{sql_simple}->{argv}{db}) if (defined($self->{argv}{sql_simple}->{argv}{db}) && $self->{argv}{sql_simple}->{argv}{db}ne ""); 
-	push(@options,"host=".$self->{argv}{sql_simple}->{argv}{server}) if (defined($self->{argv}{sql_simple}->{argv}{server}) && $self->{argv}{sql_simple}->{argv}{server} ne "");
-	push(@options,$self->{argv}{sql_simple}->{argv}{port}) if (defined($self->{argv}{sql_simple}->{argv}{port}) && $self->{argv}{sql_simple}->{argv}{port} ne "");
-	$self->{argv}{sql_simple}->{argv}{dsname} = "DBI:mysql:".join(';',@options);
+	push(@options,"database=".$self->{sql_simple}->{argv}{db}) if (defined($self->{sql_simple}->{argv}{db}) && $self->{sql_simple}->{argv}{db}ne ""); 
+	push(@options,"host=".$self->{sql_simple}->{argv}{server}) if (defined($self->{sql_simple}->{argv}{server}) && $self->{sql_simple}->{argv}{server} ne "");
+	push(@options,$self->{sql_simple}->{argv}{port}) if (defined($self->{sql_simple}->{argv}{port}) && $self->{sql_simple}->{argv}{port} ne "");
+	$self->{sql_simple}->{argv}{dsname} = "DBI:mysql:".join(';',@options);
 
 	return 0;
 }

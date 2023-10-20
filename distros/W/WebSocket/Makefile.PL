@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
         'JSON'          => '4.03',
         'List::Util'    => '1.56',
         'MIME::Base64'  => '3.16',
-        'Module::Generic'=> 'v0.16.4',
+        'Module::Generic'=> 'v0.32.4',
         'Nice::Try'     => 'v1.1.2',
         'POSIX'         => '1.53_01',
         # Just to ensure URI::_generic does not die when requiring it
@@ -56,7 +56,7 @@ my %WriteMakefileArgs = (
     LICENSE             => 'perl_5',
     MIN_PERL_VERSION    => 'v5.14.0',
     (MM->can('signature_target') ? (SIGN => 1) : ()),
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', PREOP => './dev/cleanup.pl' },
+    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp', PREOP => './dev/cleanup.pl' },
     clean               => { FILES => 'WebSocket-*' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },

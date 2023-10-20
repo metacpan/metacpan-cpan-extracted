@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Dsb - Package for language Lower Sorbian
 
 =cut
 
 package Locale::CLDR::Locales::Dsb;
-# This file auto generated from Data/common/main/dsb.xml
-#	on Mon 11 Apr  5:26:26 pm GMT
+# This file auto generated from Data\common\main\dsb.xml
+#	on Fri 13 Oct  9:11:55 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

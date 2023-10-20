@@ -28,6 +28,9 @@ my @tests = (
                '-u', "apikey:xxx",
                '--header', "Content-Type: audio/flac",
                '--data-binary', '@$tempfile', '$url' ], },
+    { cmd => [ '--verbose', '-g', '-s', '$url', '--json', "{name:'cool_event'}" ],
+      version => '007082000',
+    },
 );
 
 run_curl_tests( @tests );

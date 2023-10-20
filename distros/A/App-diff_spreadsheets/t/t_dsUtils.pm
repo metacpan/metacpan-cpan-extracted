@@ -39,7 +39,7 @@ sub runtest($$$$$$;@) {
   #unshift @extraargs, "--silent" if $silent;
   # Suppress waiting-for-lockfile messages
   unshift @extraargs, "--silent" unless $verbose or $debug;
-confess "unexpected" if $verbose or $debug;
+#confess "unexpected" if $verbose or $debug;
 
   # Translate *nix /path to Windows \path
   $in1 = path($in1)->canonpath;

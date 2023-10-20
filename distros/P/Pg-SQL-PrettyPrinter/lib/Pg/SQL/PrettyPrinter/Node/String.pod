@@ -11,6 +11,12 @@ Not to be used directly.
 Aside from functions listed below, it inherits functions from
 L<Pg::SQL::PrettyPrinter::Node>.
 
+=head2 string
+
+Helper method to return string value regardless of how it's provided in JSON.
+
+This is required because of changes in underlying ruby library.
+
 =head2 as_text
 
 Returns this object as plain text, with next to none formatting.
@@ -34,8 +40,3 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Pg::SQL::PrettyPrinter::Node::String
 
-=head1 COPYRIGHT & LICENSE
-
-Copyright  hubert depesz lubaczewski, all rights reserved.
-
-This program is distributed under the (Revised) BSD License.

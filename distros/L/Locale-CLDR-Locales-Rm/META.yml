@@ -22,16 +22,16 @@ name: Locale-CLDR-Locales-Rm
 provides:
   Locale::CLDR::Locales::Rm:
     file: lib/Locale/CLDR/Locales/Rm.pm
-    version: v0.34.1
+    version: v0.34.2
   Locale::CLDR::Locales::Rm::Any:
     file: lib/Locale/CLDR/Locales/Rm/Any.pm
-    version: v0.34.1
+    version: v0.34.2
   Locale::CLDR::Locales::Rm::Any::Ch:
     file: lib/Locale/CLDR/Locales/Rm/Any/Ch.pm
-    version: v0.34.1
+    version: v0.34.2
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.34.1
+  Locale::CLDR: v0.34.2
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -41,5 +41,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.34.1
+version: v0.34.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

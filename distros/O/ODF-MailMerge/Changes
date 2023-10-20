@@ -1,3 +1,7 @@
+1.003 - Export & document $token_re and parse_token()
+1.002 - Portability tweak for Windows
+1.001 - Provide MM_SUBST constant (instead of using Hr_SUBST)
+        Add :spanr (span to the right) support. Rename :span to :spand
 1.000 - API changes:
          ODF::MailMerge::Engine->new positional args eliminated; now use
             proto_elt => $table   # specify the object directly

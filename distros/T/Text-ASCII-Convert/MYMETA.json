@@ -1,0 +1,56 @@
+{
+   "abstract" : "Perl module to convert non-ASCII characters to their ASCII equivalents",
+   "author" : [
+      "Kent Oyer <kent@mxguardian.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Text-ASCII-Convert",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "perl" : "5.008004",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mxguardian/Text-ASCII-Convert/issues"
+      },
+      "homepage" : "https://github.com/mxguardian/Text-ASCII-Convert",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mxguardian/Text-ASCII-Convert.git",
+         "web" : "https://github.com/mxguardian/Text-ASCII-Convert"
+      }
+   },
+   "version" : "0.21",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

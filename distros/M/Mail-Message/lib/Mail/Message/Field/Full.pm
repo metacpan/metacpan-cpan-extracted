@@ -8,7 +8,7 @@
 
 package Mail::Message::Field::Full;
 use vars '$VERSION';
-$VERSION = '3.013';
+$VERSION = '3.014';
 
 use base 'Mail::Message::Field';
 
@@ -29,8 +29,9 @@ use Mail::Message::Field::Structured;
 use Mail::Message::Field::Unstructured;
 use Mail::Message::Field::URIs;
 
-my $atext = q[a-zA-Z0-9!#\$%&'*+\-\/=?^_`{|}~];  # from RFC
-my $atext_ill = q/\[\]/;     # illegal, but still used (esp spam)
+my $atext      = q[a-zA-Z0-9!#\$%&'*+\-\/=?^_`{|}~];  # from RFC5322
+my $utf8_atext = q[\p{Alnum}!#\$%&'*+\-\/=?^_`{|}~];  # from RFC5335
+my $atext_ill  = q/\[\]/;     # illegal, but still used (esp spam)
 
 
 use overload '""' => sub { shift->decodedBody };
@@ -237,7 +238,9 @@ sub encode($@)
     {   $self->log(WARNING => "Illegal character in charset '$charset'")
             if $charset =~ m/[\x00-\ ()<>@,;:"\/[\]?.=\\]/;
     }
-    else { $charset = 'us-ascii' }
+    else
+    {   $charset = $utf8 =~ /\P{ASCII}/ ? 'utf8' : 'us-ascii';
+    }
 
     if($lang = $args{language})
     {   $self->log(WARNING => "Illegal character in language '$lang'")
@@ -364,7 +367,7 @@ sub consumePhrase($)
     if($string =~ s/^\s*\" ((?:[^"\r\n\\]*|\\.)*) (?:\"|\s*$)//x )
     {   ($phrase = $1) =~ s/\\\"/"/g;
     }
-    elsif($string =~ s/^\s*((?:\=\?.*?\?\=|[${atext}${atext_ill}\ \t.])+)//o )
+    elsif($string =~ s/^\s*((?:\=\?.*?\?\=|[${utf8_atext}${atext_ill}\ \t.])+)//o )
     {   ($phrase = $1) =~ s/\s+$//;
         CORE::length($phrase) or undef $phrase;
     }

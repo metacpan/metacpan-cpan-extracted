@@ -8,7 +8,7 @@ my $build = Module::Build::Using::PkgConfig->new(
    module_name => 'Text::Treesitter',
    requires => {
       'perl' => '5.026',
-      'Object::Pad' => 0,
+      'Object::Pad' => '0.800',
       'Syntax::Keyword::Match' => 0,
 
       'ExtUtils::CppGuess' => 0,

@@ -20,13 +20,12 @@ t/42_Hor_cond.t
 t/45_Hsearch.t
 t/47_Hsplit_element_at.t
 t/50_Hinsert_element.t
-t/55_Hinsert_content.t
+t/51_insert_content.t
+t/55_Hreplace.t
 t/60_encoding.t
 t/LpodhTestUtils.pm
-t/Mydump.pm
 t/author-pod-coverage.t
 t/author-pod-syntax.t
-t/dumpskel.pl
 t/t_Common.pm
 t/t_TestCommon.pm
 tlib/NestedCompact.odt

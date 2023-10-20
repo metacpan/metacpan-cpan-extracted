@@ -806,11 +806,9 @@ void Rmpz_get_d_2exp(pTHX_ mpz_t * n) {
 
      d = mpz_get_d_2exp(&exp, *n);
 
-     /* sp = mark; */ /* not needed */
-     EXTEND(SP, 2);
      ST(0) = sv_2mortal(newSVnv(d));
      ST(1) = sv_2mortal(newSVuv(exp));
-     /* PUTBACK; */ /* not needed */
+     PL_markstack_ptr++;
      XSRETURN(2);
 }
 
@@ -1188,6 +1186,14 @@ int Rmpz_probab_prime_p(pTHX_ mpz_t * cand, SV * reps) {
 
 void Rmpz_nextprime(mpz_t * prime, mpz_t * init) {
      mpz_nextprime(*prime, *init);
+}
+
+unsigned long Rmpz_prevprime(mpz_t * prime, mpz_t * init) {
+#if __GNU_MP_RELEASE >= 60300
+     return mpz_prevprime(*prime, *init);
+#else
+     croak("Rmpz_prevprime not implemented");
+#endif
 }
 
 void Rmpz_gcd(mpz_t * gcd, mpz_t * src1, mpz_t * src2) {
@@ -1635,6 +1641,7 @@ void Rmpz_export_UV(pTHX_ SV * order, SV * size, SV * endian, SV * nails, mpz_t 
     }
 
     Safefree(arr);
+    PL_markstack_ptr++;
     XSRETURN(count);
 }
 
@@ -1754,7 +1761,8 @@ for(i = 0; i < abits; ++i) {
 
 Safefree(addon);
 
-PUTBACK;
+/* PUTBACK; */ /* not needed */
+PL_markstack_ptr++;
 XSRETURN(size);
 
 }
@@ -1968,7 +1976,8 @@ for(i = 0; i < b; ++i) {
 
 Safefree(v);
 
-PUTBACK;
+/* PUTBACK; */ /* not needed */
+PL_markstack_ptr++;
 XSRETURN(size);
 
 }
@@ -2608,23 +2617,27 @@ SV * overload_lshift(pTHX_ mpz_t * a, SV * b, SV * third) {
      mpz_t * mpz_t_obj;
      SV * obj_ref, * obj;
 
-     CHECK_MP_BITCNT_T_OVERFLOW(b)
-
-     New(1, mpz_t_obj, 1, mpz_t);
-     if(mpz_t_obj == NULL) croak("Failed to allocate memory in overload_lshift function");
-     obj_ref = newSV(0);
-     obj = newSVrv(obj_ref, "Math::GMPz");
-     mpz_init(*mpz_t_obj);
-
      if(SV_IS_IOK(b)) {
        if(SvUOK(b)) {
+         CHECK_MP_BITCNT_T_OVERFLOW(b)
+         New(1, mpz_t_obj, 1, mpz_t);
+         if(mpz_t_obj == NULL) croak("Failed to allocate memory in overload_lshift function");
+         obj_ref = newSV(0);
+         obj = newSVrv(obj_ref, "Math::GMPz");
+         mpz_init(*mpz_t_obj);
          mpz_mul_2exp(*mpz_t_obj, *a, (mp_bitcnt_t)SvUV(b));
          sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
          SvREADONLY_on(obj);
          return obj_ref;
        }
 
-       if(SvIV(b) < 0) croak("Invalid argument supplied to Math::GMPz::overload_lshift");
+       if(SvIV(b) < 0) croak("Negative shift not allowed in Math::GMPz::overload_lshift");
+       CHECK_MP_BITCNT_T_OVERFLOW(b)
+       New(1, mpz_t_obj, 1, mpz_t);
+       if(mpz_t_obj == NULL) croak("Failed to allocate memory in overload_lshift function");
+       obj_ref = newSV(0);
+       obj = newSVrv(obj_ref, "Math::GMPz");
+       mpz_init(*mpz_t_obj);
        mpz_mul_2exp(*mpz_t_obj, *a, (mp_bitcnt_t)SvUV(b));
        sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
        SvREADONLY_on(obj);
@@ -2638,23 +2651,27 @@ SV * overload_rshift(pTHX_ mpz_t * a, SV * b, SV * third) {
      mpz_t * mpz_t_obj;
      SV * obj_ref, * obj;
 
-     CHECK_MP_BITCNT_T_OVERFLOW(b)
-
-     New(1, mpz_t_obj, 1, mpz_t);
-     if(mpz_t_obj == NULL) croak("Failed to allocate memory in overload_rshift function");
-     obj_ref = newSV(0);
-     obj = newSVrv(obj_ref, "Math::GMPz");
-     mpz_init(*mpz_t_obj);
-
      if(SV_IS_IOK(b)) {
        if(SvUOK(b)) {
+         CHECK_MP_BITCNT_T_OVERFLOW(b)
+         New(1, mpz_t_obj, 1, mpz_t);
+         if(mpz_t_obj == NULL) croak("Failed to allocate memory in overload_rshift function");
+         obj_ref = newSV(0);
+         obj = newSVrv(obj_ref, "Math::GMPz");
+         mpz_init(*mpz_t_obj);
          mpz_tdiv_q_2exp(*mpz_t_obj, *a, (mp_bitcnt_t)SvUVX(b));
          sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
          SvREADONLY_on(obj);
          return obj_ref;
        }
 
-       if(SvIV(b) < 0) croak("Invalid argument supplied to Math::GMPz::overload_rshift");
+       if(SvIV(b) < 0) croak("Negative shift not allowed in Math::GMPz::overload_rshift");
+       CHECK_MP_BITCNT_T_OVERFLOW(b)
+       New(1, mpz_t_obj, 1, mpz_t);
+       if(mpz_t_obj == NULL) croak("Failed to allocate memory in overload_rshift function");
+       obj_ref = newSV(0);
+       obj = newSVrv(obj_ref, "Math::GMPz");
+       mpz_init(*mpz_t_obj);
        mpz_tdiv_q_2exp(*mpz_t_obj, *a, (mp_bitcnt_t)SvUVX(b));
        sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
        SvREADONLY_on(obj);
@@ -3006,7 +3023,7 @@ SV * overload_xor(pTHX_ mpz_t * a, SV * b, SV * third, ...) {
      croak("Invalid argument supplied to Math::GMPz::overload_xor");
 }
 
-SV * overload_com(pTHX_ mpz_t * p, SV * second, SV * third) {
+SV * overload_com(pTHX_ mpz_t * p, SV * second, SV * third, ...) {
      mpz_t * mpz_t_obj;
      SV * obj_ref, * obj;
 
@@ -3996,20 +4013,17 @@ SV * overload_pow_eq(pTHX_ SV * a, SV * b, SV * third) {
 
 SV * overload_rshift_eq(pTHX_ SV * a, SV * b, SV * third) {
 
-     CHECK_MP_BITCNT_T_OVERFLOW(b)
-
-     SvREFCNT_inc(a);
-
      if(SV_IS_IOK(b)) {
        if(SvUOK(b)) {
+         CHECK_MP_BITCNT_T_OVERFLOW(b)
+         SvREFCNT_inc(a);
          mpz_tdiv_q_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUVX(b));
          return a;
        }
 
-       if(SvIV(b) < 0) {
-         SvREFCNT_dec(a);
-         croak("Invalid argument supplied to Math::GMPz::overload_rshift_eq");
-       }
+       if(SvIV(b) < 0) croak("Negative shift not allowed in Math::GMPz::overload_rshift_eq");
+       CHECK_MP_BITCNT_T_OVERFLOW(b)
+       SvREFCNT_inc(a);
        mpz_tdiv_q_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUVX(b));
        return a;
      }
@@ -4020,20 +4034,17 @@ SV * overload_rshift_eq(pTHX_ SV * a, SV * b, SV * third) {
 
 SV * overload_lshift_eq(pTHX_ SV * a, SV * b, SV * third) {
 
-     CHECK_MP_BITCNT_T_OVERFLOW(b)
-
-     SvREFCNT_inc(a);
-
      if(SV_IS_IOK(b)) {
        if(SvUOK(b)) {
+         CHECK_MP_BITCNT_T_OVERFLOW(b)
+         SvREFCNT_inc(a);
          mpz_mul_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUV(b));
          return a;
        }
 
-       if(SvIV(b) < 0) {
-         SvREFCNT_dec(a);
-         croak("Invalid argument supplied to Math::GMPz::overload_lshift_eq");
-       }
+       if(SvIV(b) < 0) croak("Negative shift not allowed in Math::GMPz::overload_lshift_eq");
+       CHECK_MP_BITCNT_T_OVERFLOW(b)
+       SvREFCNT_inc(a);
        mpz_mul_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUV(b));
        return a;
      }
@@ -5730,52 +5741,25 @@ void
 Rmpz_set_uj (copy, original)
 	mpz_t *	copy
 	UV	original
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_set_uj(copy, original);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_set_sj (copy, original)
 	mpz_t *	copy
 	IV	original
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_set_sj(copy, original);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_set_IV (copy, original)
 	mpz_t *	copy
 	SV *	original
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_set_IV(aTHX_ copy, original);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 SV *
 Rmpz_init_set_IV (p)
@@ -5842,35 +5826,17 @@ void
 _mpf_set_dd (q, p)
 	mpf_t *	q
 	SV *	p
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         _mpf_set_dd(q, p);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_set_NV (copy, original)
 	mpz_t *	copy
 	SV *	original
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_set_NV(aTHX_ copy, original);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 SV *
 Rmpz_init_set_NV (p)
@@ -5912,220 +5878,103 @@ OUTPUT:  RETVAL
 void
 DESTROY (p)
 	mpz_t *	p
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         DESTROY(aTHX_ p);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_clear (p)
 	mpz_t *	p
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_clear(aTHX_ p);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_clear_mpz (p)
 	mpz_t *	p
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_clear_mpz(p);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_clear_ptr (p)
 	mpz_t *	p
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_clear_ptr(aTHX_ p);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_realloc2 (integer, bits)
 	mpz_t *	integer
 	SV *	bits
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_realloc2(aTHX_ integer, bits);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_set (copy, original)
 	mpz_t *	copy
 	mpz_t *	original
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_set(copy, original);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_set_q (copy, original)
 	mpz_t *	copy
 	mpq_t *	original
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_set_q(copy, original);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_set_f (copy, original)
 	mpz_t *	copy
 	mpf_t *	original
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_set_f(copy, original);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_set_si (copy, original)
 	mpz_t *	copy
 	long	original
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_set_si(copy, original);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_set_ui (copy, original)
 	mpz_t *	copy
 	unsigned long	original
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_set_ui(copy, original);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_set_d (copy, d)
 	mpz_t *	copy
 	double	d
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_set_d(copy, d);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_set_str (copy, original, base)
 	mpz_t *	copy
 	SV *	original
 	int	base
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_set_str(aTHX_ copy, original, base);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_swap (a, b)
 	mpz_t *	a
 	mpz_t *	b
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_swap(a, b);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 unsigned long
 Rmpz_get_ui (n)
@@ -6138,17 +5987,8 @@ Rmpz_get_si (n)
 void
 Rmpz_get_d_2exp (n)
 	mpz_t *	n
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_get_d_2exp(aTHX_ n);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
         return; /* assume stack size is correct */
 
 SV *
@@ -6164,322 +6004,160 @@ Rmpz_add (dest, src1, src2)
 	mpz_t *	dest
 	mpz_t *	src1
 	mpz_t *	src2
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_add(dest, src1, src2);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_add_ui (dest, src, num)
 	mpz_t *	dest
 	mpz_t *	src
 	unsigned long	num
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_add_ui(dest, src, num);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_sub (dest, src1, src2)
 	mpz_t *	dest
 	mpz_t *	src1
 	mpz_t *	src2
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_sub(dest, src1, src2);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_sub_ui (dest, src, num)
 	mpz_t *	dest
 	mpz_t *	src
 	unsigned long	num
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_sub_ui(dest, src, num);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_ui_sub (dest, num, src)
 	mpz_t *	dest
 	unsigned long	num
 	mpz_t *	src
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_ui_sub(dest, num, src);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_mul (dest, src1, src2)
 	mpz_t *	dest
 	mpz_t *	src1
 	mpz_t *	src2
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_mul(dest, src1, src2);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_mul_si (dest, src, num)
 	mpz_t *	dest
 	mpz_t *	src
 	long	num
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_mul_si(dest, src, num);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_mul_ui (dest, src, num)
 	mpz_t *	dest
 	mpz_t *	src
 	unsigned long	num
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_mul_ui(dest, src, num);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_addmul (dest, src1, src2)
 	mpz_t *	dest
 	mpz_t *	src1
 	mpz_t *	src2
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_addmul(dest, src1, src2);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_addmul_ui (dest, src, num)
 	mpz_t *	dest
 	mpz_t *	src
 	unsigned long	num
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_addmul_ui(dest, src, num);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_submul (dest, src1, src2)
 	mpz_t *	dest
 	mpz_t *	src1
 	mpz_t *	src2
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_submul(dest, src1, src2);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_submul_ui (dest, src, num)
 	mpz_t *	dest
 	mpz_t *	src
 	unsigned long	num
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_submul_ui(dest, src, num);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_mul_2exp (dest, src1, b)
 	mpz_t *	dest
 	mpz_t *	src1
 	SV *	b
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_mul_2exp(aTHX_ dest, src1, b);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_div_2exp (dest, src1, b)
 	mpz_t *	dest
 	mpz_t *	src1
 	SV *	b
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_div_2exp(aTHX_ dest, src1, b);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_neg (dest, src)
 	mpz_t *	dest
 	mpz_t *	src
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_neg(dest, src);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_abs (dest, src)
 	mpz_t *	dest
 	mpz_t *	src
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_abs(dest, src);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_cdiv_q (q, n, d)
 	mpz_t *	q
 	mpz_t *	n
 	mpz_t *	d
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_cdiv_q(q, n, d);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_cdiv_r (mod, n, d)
 	mpz_t *	mod
 	mpz_t *	n
 	mpz_t *	d
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_cdiv_r(mod, n, d);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_cdiv_qr (q, r, n, d)
@@ -6487,18 +6165,9 @@ Rmpz_cdiv_qr (q, r, n, d)
 	mpz_t *	r
 	mpz_t *	n
 	mpz_t *	d
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_cdiv_qr(q, r, n, d);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 unsigned long
 Rmpz_cdiv_q_ui (q, n, d)
@@ -6529,90 +6198,45 @@ Rmpz_cdiv_q_2exp (q, n, b)
 	mpz_t *	q
 	mpz_t *	n
 	SV *	b
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_cdiv_q_2exp(aTHX_ q, n, b);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_cdiv_r_2exp (r, n, b)
 	mpz_t *	r
 	mpz_t *	n
 	SV *	b
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_cdiv_r_2exp(aTHX_ r, n, b);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_fdiv_q (q, n, d)
 	mpz_t *	q
 	mpz_t *	n
 	mpz_t *	d
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_fdiv_q(q, n, d);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_div (q, n, d)
 	mpz_t *	q
 	mpz_t *	n
 	mpz_t *	d
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_div(q, n, d);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_fdiv_r (mod, n, d)
 	mpz_t *	mod
 	mpz_t *	n
 	mpz_t *	d
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_fdiv_r(mod, n, d);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_fdiv_qr (q, r, n, d)
@@ -6620,18 +6244,9 @@ Rmpz_fdiv_qr (q, r, n, d)
 	mpz_t *	r
 	mpz_t *	n
 	mpz_t *	d
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_fdiv_qr(q, r, n, d);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_divmod (q, r, n, d)
@@ -6639,18 +6254,9 @@ Rmpz_divmod (q, r, n, d)
 	mpz_t *	r
 	mpz_t *	n
 	mpz_t *	d
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_divmod(q, r, n, d);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 unsigned long
 Rmpz_fdiv_q_ui (q, n, d)
@@ -6694,90 +6300,45 @@ Rmpz_fdiv_q_2exp (q, n, b)
 	mpz_t *	q
 	mpz_t *	n
 	SV *	b
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_fdiv_q_2exp(aTHX_ q, n, b);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_fdiv_r_2exp (r, n, b)
 	mpz_t *	r
 	mpz_t *	n
 	SV *	b
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_fdiv_r_2exp(aTHX_ r, n, b);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_mod_2exp (r, n, b)
 	mpz_t *	r
 	mpz_t *	n
 	SV *	b
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_mod_2exp(aTHX_ r, n, b);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_tdiv_q (q, n, d)
 	mpz_t *	q
 	mpz_t *	n
 	mpz_t *	d
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_tdiv_q(q, n, d);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_tdiv_r (mod, n, d)
 	mpz_t *	mod
 	mpz_t *	n
 	mpz_t *	d
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_tdiv_r(mod, n, d);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_tdiv_qr (q, r, n, d)
@@ -6785,18 +6346,9 @@ Rmpz_tdiv_qr (q, r, n, d)
 	mpz_t *	r
 	mpz_t *	n
 	mpz_t *	d
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_tdiv_qr(q, r, n, d);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 unsigned long
 Rmpz_tdiv_q_ui (q, n, d)
@@ -6827,54 +6379,27 @@ Rmpz_tdiv_q_2exp (q, n, b)
 	mpz_t *	q
 	mpz_t *	n
 	SV *	b
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_tdiv_q_2exp(aTHX_ q, n, b);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_tdiv_r_2exp (r, n, b)
 	mpz_t *	r
 	mpz_t *	n
 	SV *	b
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_tdiv_r_2exp(aTHX_ r, n, b);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_mod (r, n, d)
 	mpz_t *	r
 	mpz_t *	n
 	mpz_t *	d
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_mod(r, n, d);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 unsigned long
 Rmpz_mod_ui (r, n, d)
@@ -6887,36 +6412,18 @@ Rmpz_divexact (dest, n, d)
 	mpz_t *	dest
 	mpz_t *	n
 	mpz_t *	d
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_divexact(dest, n, d);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_divexact_ui (dest, n, d)
 	mpz_t *	dest
 	mpz_t *	n
 	unsigned long	d
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_divexact_ui(dest, n, d);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 int
 Rmpz_divisible_p (n, d)
@@ -6963,18 +6470,9 @@ Rmpz_powm (dest, base, exp, mod)
 	mpz_t *	base
 	mpz_t *	exp
 	mpz_t *	mod
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_powm(dest, base, exp, mod);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_powm_ui (dest, base, exp, mod)
@@ -6982,54 +6480,27 @@ Rmpz_powm_ui (dest, base, exp, mod)
 	mpz_t *	base
 	unsigned long	exp
 	mpz_t *	mod
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_powm_ui(dest, base, exp, mod);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_pow_ui (dest, base, exp)
 	mpz_t *	dest
 	mpz_t *	base
 	unsigned long	exp
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_pow_ui(dest, base, exp);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_ui_pow_ui (dest, base, exp)
 	mpz_t *	dest
 	unsigned long	base
 	unsigned long	exp
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_ui_pow_ui(dest, base, exp);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 int
 Rmpz_root (r, n, d)
@@ -7041,36 +6512,18 @@ void
 Rmpz_sqrt (r, n)
 	mpz_t *	r
 	mpz_t *	n
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_sqrt(r, n);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_sqrtrem (root, rem, src)
 	mpz_t *	root
 	mpz_t *	rem
 	mpz_t *	src
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_sqrtrem(root, rem, src);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 int
 Rmpz_perfect_power_p (in)
@@ -7092,36 +6545,23 @@ void
 Rmpz_nextprime (prime, init)
 	mpz_t *	prime
 	mpz_t *	init
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_nextprime(prime, init);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
+
+unsigned long
+Rmpz_prevprime (prime, init)
+	mpz_t *	prime
+	mpz_t *	init
 
 void
 Rmpz_gcd (gcd, src1, src2)
 	mpz_t *	gcd
 	mpz_t *	src1
 	mpz_t *	src2
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_gcd(gcd, src1, src2);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 unsigned long
 Rmpz_gcd_ui (gcd, n, d)
@@ -7136,54 +6576,27 @@ Rmpz_gcdext (g, s, t, a, b)
 	mpz_t *	t
 	mpz_t *	a
 	mpz_t *	b
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_gcdext(g, s, t, a, b);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_lcm (lcm, src1, src2)
 	mpz_t *	lcm
 	mpz_t *	src1
 	mpz_t *	src2
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_lcm(lcm, src1, src2);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_lcm_ui (lcm, src1, src2)
 	mpz_t *	lcm
 	mpz_t *	src1
 	unsigned long	src2
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_lcm_ui(lcm, src1, src2);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 int
 Rmpz_invert (inv, src1, src2)
@@ -7239,194 +6652,95 @@ void
 Rmpz_fac_ui (fac, b)
 	mpz_t *	fac
 	unsigned long	b
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_fac_ui(fac, b);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_2fac_ui (fac, b)
 	mpz_t *	fac
 	unsigned long	b
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_2fac_ui(fac, b);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_mfac_uiui (fac, b, c)
 	mpz_t *	fac
 	unsigned long	b
 	unsigned long	c
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_mfac_uiui(fac, b, c);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_primorial_ui (fac, b)
 	mpz_t *	fac
 	unsigned long	b
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_primorial_ui(fac, b);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_bin_ui (dest, n, d)
 	mpz_t *	dest
 	mpz_t *	n
 	unsigned long	d
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_bin_ui(dest, n, d);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_bin_si (dest, n, d)
 	mpz_t *	dest
 	mpz_t *	n
 	long	d
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_bin_si(dest, n, d);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_bin_uiui (dest, n, d)
 	mpz_t *	dest
 	unsigned long	n
 	unsigned long	d
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_bin_uiui(dest, n, d);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_fib_ui (dest, b)
 	mpz_t *	dest
 	unsigned long	b
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_fib_ui(dest, b);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_fib2_ui (fn, fnsub1, b)
 	mpz_t *	fn
 	mpz_t *	fnsub1
 	unsigned long	b
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_fib2_ui(fn, fnsub1, b);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_lucnum_ui (dest, b)
 	mpz_t *	dest
 	unsigned long	b
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_lucnum_ui(dest, b);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_lucnum2_ui (ln, lnsub1, b)
 	mpz_t *	ln
 	mpz_t *	lnsub1
 	unsigned long	b
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_lucnum2_ui(ln, lnsub1, b);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 int
 Rmpz_cmp (n, d)
@@ -7480,71 +6794,35 @@ Rmpz_and (dest, src1, src2)
 	mpz_t *	dest
 	mpz_t *	src1
 	mpz_t *	src2
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_and(dest, src1, src2);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_ior (dest, src1, src2)
 	mpz_t *	dest
 	mpz_t *	src1
 	mpz_t *	src2
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_ior(dest, src1, src2);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_xor (dest, src1, src2)
 	mpz_t *	dest
 	mpz_t *	src1
 	mpz_t *	src2
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_xor(dest, src1, src2);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_com (dest, src)
 	mpz_t *	dest
 	mpz_t *	src
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_com(dest, src);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 SV *
 Rmpz_popcount (in)
@@ -7581,35 +6859,17 @@ void
 Rmpz_setbit (num, bit_index)
 	mpz_t *	num
 	SV *	bit_index
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_setbit(aTHX_ num, bit_index);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_clrbit (num, bit_index)
 	mpz_t *	num
 	SV *	bit_index
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_clrbit(aTHX_ num, bit_index);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 SV *
 Rmpz_tstbit (num, bit_index)
@@ -7628,18 +6888,9 @@ Rmpz_import (rop, count, order, size, endian, nails, op)
 	SV *	endian
 	SV *	nails
 	SV *	op
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_import(aTHX_ rop, count, order, size, endian, nails, op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 SV *
 Rmpz_export (order, size, endian, nails, op)
@@ -7661,18 +6912,9 @@ Rmpz_import_UV (rop, count, order, size, endian, nails, op)
 	SV *	endian
 	SV *	nails
 	AV *	op
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_import_UV(aTHX_ rop, count, order, size, endian, nails, op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_export_UV (order, size, endian, nails, op)
@@ -7681,17 +6923,8 @@ Rmpz_export_UV (order, size, endian, nails, op)
 	SV *	endian
 	SV *	nails
 	mpz_t *	op
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_export_UV(aTHX_ order, size, endian, nails, op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
         return; /* assume stack size is correct */
 
 int
@@ -7746,17 +6979,8 @@ Rsieve_gmp (x_arg, a, number)
 	int	x_arg
 	int	a
 	mpz_t *	number
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rsieve_gmp(aTHX_ x_arg, a, number);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
         return; /* assume stack size is correct */
 
 SV *
@@ -7871,17 +7095,8 @@ OUTPUT:  RETVAL
 void
 eratosthenes (x_arg)
 	SV *	x_arg
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         eratosthenes(aTHX_ x_arg);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
         return; /* assume stack size is correct */
 
 SV *
@@ -7898,35 +7113,17 @@ Rmpz_rootrem (root, rem, u, d)
 	mpz_t *	rem
 	mpz_t *	u
 	unsigned long	d
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_rootrem(root, rem, u, d);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_combit (num, bitpos)
 	mpz_t *	num
 	SV *	bitpos
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_combit(aTHX_ num, bitpos);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 SV *
 overload_mul (a, b, third)
@@ -8041,51 +7238,36 @@ overload_and (a, b, third, ...)
 	mpz_t *	a
 	SV *	b
 	SV *	third
-        PREINIT:
-        I32* temp;
         CODE:
-        temp = PL_markstack_ptr++;
-        RETVAL = overload_and(aTHX_ a, b, third);
-        PL_markstack_ptr = temp;
-        OUTPUT:
-        RETVAL
+          RETVAL = overload_and(aTHX_ a, b, third);
+        OUTPUT:  RETVAL
 
 SV *
 overload_ior (a, b, third, ...)
 	mpz_t *	a
 	SV *	b
 	SV *	third
-        PREINIT:
-        I32* temp;
         CODE:
-        temp = PL_markstack_ptr++;
-        RETVAL = overload_ior(aTHX_ a, b, third);
-        PL_markstack_ptr = temp;
-        OUTPUT:
-        RETVAL
+          RETVAL = overload_ior(aTHX_ a, b, third);
+        OUTPUT:  RETVAL
 
 SV *
 overload_xor (a, b, third, ...)
 	mpz_t *	a
 	SV *	b
 	SV *	third
-        PREINIT:
-        I32* temp;
         CODE:
-        temp = PL_markstack_ptr++;
-        RETVAL = overload_xor(aTHX_ a, b, third);
-        PL_markstack_ptr = temp;
-        OUTPUT:
-        RETVAL
+          RETVAL = overload_xor(aTHX_ a, b, third);
+        OUTPUT:  RETVAL
 
 SV *
-overload_com (p, second, third)
+overload_com (p, second, third, ...)
 	mpz_t *	p
 	SV *	second
 	SV *	third
-CODE:
-  RETVAL = overload_com (aTHX_ p, second, third);
-OUTPUT:  RETVAL
+        CODE:
+          RETVAL = overload_com(aTHX_ p, second, third);
+        OUTPUT:  RETVAL
 
 int
 my_cmp_z (p, z)
@@ -8169,42 +7351,27 @@ overload_xor_eq (a, b, third, ...)
 	SV *	a
 	SV *	b
 	SV *	third
-        PREINIT:
-        I32* temp;
         CODE:
-        temp = PL_markstack_ptr++;
-        RETVAL = overload_xor_eq(aTHX_ a, b, third);
-        PL_markstack_ptr = temp;
-        OUTPUT:
-        RETVAL
+          RETVAL = overload_xor_eq(aTHX_ a, b, third);
+        OUTPUT:  RETVAL
 
 SV *
 overload_ior_eq (a, b, third, ...)
 	SV *	a
 	SV *	b
 	SV *	third
-        PREINIT:
-        I32* temp;
         CODE:
-        temp = PL_markstack_ptr++;
-        RETVAL = overload_ior_eq(aTHX_ a, b, third);
-        PL_markstack_ptr = temp;
-        OUTPUT:
-        RETVAL
+          RETVAL = overload_ior_eq(aTHX_ a, b, third);
+        OUTPUT:  RETVAL
 
 SV *
 overload_and_eq (a, b, third, ...)
 	SV *	a
 	SV *	b
 	SV *	third
-        PREINIT:
-        I32* temp;
         CODE:
-        temp = PL_markstack_ptr++;
-        RETVAL = overload_and_eq(aTHX_ a, b, third);
-        PL_markstack_ptr = temp;
-        OUTPUT:
-        RETVAL
+          RETVAL = overload_and_eq(aTHX_ a, b, third);
+        OUTPUT:  RETVAL
 
 SV *
 overload_pow_eq (a, b, third)
@@ -8238,36 +7405,18 @@ overload_inc (p, second, third)
 	SV *	p
 	SV *	second
 	SV *	third
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         overload_inc(aTHX_ p, second, third);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 overload_dec (p, second, third)
 	SV *	p
 	SV *	second
 	SV *	third
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         overload_dec(aTHX_ p, second, third);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 SV *
 overload_mod_eq (a, b, third)
@@ -8383,50 +7532,26 @@ OUTPUT:  RETVAL
 void
 Rmpz_urandomb (p, ...)
 	SV *	p
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
+        PL_markstack_ptr++;
         Rmpz_urandomb(aTHX_ p);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_urandomm (x, ...)
 	SV *	x
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
+        PL_markstack_ptr++;
         Rmpz_urandomm(aTHX_ x);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpz_rrandomb (x, ...)
 	SV *	x
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
+        PL_markstack_ptr++;
         Rmpz_rrandomb(aTHX_ x);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 SV *
 rand_init (seed)
@@ -8438,18 +7563,9 @@ OUTPUT:  RETVAL
 void
 rand_clear (p)
 	SV *	p
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         rand_clear(aTHX_ p);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 int
 _has_longlong ()
@@ -8531,18 +7647,9 @@ Rmpz_powm_sec (dest, base, exp, mod)
 	mpz_t *	base
 	mpz_t *	exp
 	mpz_t *	mod
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rmpz_powm_sec(dest, base, exp, mod);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 int
 _using_mpir ()
@@ -8569,18 +7676,9 @@ Rprbg_ms (outref, p, q, seed, bits_required)
 	mpz_t *	q
 	mpz_t *	seed
 	int	bits_required
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rprbg_ms(aTHX_ outref, p, q, seed, bits_required);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rprbg_bbs (outref, p, q, seed, bits_required)
@@ -8589,18 +7687,9 @@ Rprbg_bbs (outref, p, q, seed, bits_required)
 	mpz_t *	q
 	mpz_t *	seed
 	int	bits_required
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         Rprbg_bbs(aTHX_ outref, p, q, seed, bits_required);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 int
 Rmonobit (bitstream)
@@ -8637,17 +7726,8 @@ void
 autocorrelation (bitstream, offset)
 	mpz_t *	bitstream
 	int	offset
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         autocorrelation(aTHX_ bitstream, offset);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
         return; /* assume stack size is correct */
 
 int
@@ -8689,18 +7769,9 @@ OUTPUT:  RETVAL
 void
 _dump_mbi_gmp (b)
 	SV *	b
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
+        CODE:
         _dump_mbi_gmp(aTHX_ b);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 int
 _SvIOK (sv)

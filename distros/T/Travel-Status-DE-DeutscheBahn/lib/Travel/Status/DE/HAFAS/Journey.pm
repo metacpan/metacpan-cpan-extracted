@@ -13,7 +13,7 @@ use DateTime::Format::Strptime;
 use List::Util qw(any);
 use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '4.16';
+our $VERSION = '4.17';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
@@ -53,7 +53,7 @@ sub new {
 	my $train_no = $product->{prodCtx}{num};
 	my $cat      = $product->{prodCtx}{catOut};
 	my $catlong  = $product->{prodCtx}{catOutL};
-	if ( $name and $cat and $name eq $cat ) {
+	if ( $name and $cat and $name eq $cat and $product->{nameS} ) {
 		$name .= ' ' . $product->{nameS};
 	}
 	if ( defined $train_no and not $train_no ) {
@@ -218,7 +218,7 @@ sub new {
 		}
 	}
 	else {
-		$ref->{route_start} = $stops[0]{name};
+		$ref->{route_start} = $stops[0]{loc}{name};
 	}
 
 	bless( $ref, $obj );
@@ -473,7 +473,7 @@ journey received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 4.16
+version 4.17
 
 =head1 DESCRIPTION
 

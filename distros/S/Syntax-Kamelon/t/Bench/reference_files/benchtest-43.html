@@ -171,7 +171,7 @@ font.Warning {
 <div id="9" class="line"><font class="Keyword">var</font><font class="Normal">&nbsp;</font><font class="DataType">Sound</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ShieldHitSound;</font></br></div>
 <div id="10" class="line"><font class="Keyword">var</font><font class="Normal">&nbsp;</font><font class="DataType">String</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ShieldHitForce;</font></br></div>
 <div id="11" class="line"></br></div>
-<div id="12" class="line"><font class="Normal">replication</font></br></div>
+<div id="12" class="line"><font class="Keyword">replication</font></br></div>
 <div id="13" class="line"><font class="Normal">{</font></br></div>
 <div id="14" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="Keyword">reliable</font><font class="Normal">&nbsp;</font><font class="Keyword">if</font><font class="Normal">&nbsp;(Role&nbsp;==&nbsp;ROLE_Authority)</font></br></div>
 <div id="15" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ClientTakeHit;</font></br></div>
@@ -391,14 +391,14 @@ font.Warning {
 <div id="229" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">return</font><font class="Normal">&nbsp;FMin(</font><font class="Float">1</font><font class="Normal">,FireMode[0].HoldTime/ShieldFire(FireMode[0]).FullyChargedTime);</font></br></div>
 <div id="230" class="line"><font class="Normal">}&nbsp;</font></br></div>
 <div id="231" class="line"></br></div>
-<div id="232" class="line"><font class="Normal">defaultproperties</font></br></div>
+<div id="232" class="line"><font class="Keyword">defaultproperties</font></br></div>
 <div id="233" class="line"><font class="Normal">{</font></br></div>
 <div id="234" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;ItemName=</font><font class="String">&quot;Shield&nbsp;Gun&quot;</font></br></div>
 <div id="235" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;IconMaterial=Material</font><font class="String">'InterfaceContent.Hud.SkinA'</font></br></div>
 <div id="236" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;IconCoords=(X1=200,Y1=281,X2=321,Y2=371)</font></br></div>
 <div id="237" class="line"></br></div>
-<div id="238" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;bShowChargingBar=true</font></br></div>
-<div id="239" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;bCanThrow=false</font></br></div>
+<div id="238" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;bShowChargingBar=</font><font class="Keyword">true</font></br></div>
+<div id="239" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;bCanThrow=</font><font class="Keyword">false</font></br></div>
 <div id="240" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;FireModeClass(</font><font class="Float">0</font><font class="Normal">)=ShieldFire</font></br></div>
 <div id="241" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;FireModeClass(</font><font class="Float">1</font><font class="Normal">)=ShieldAltFire</font></br></div>
 <div id="242" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;InventoryGroup=1</font></br></div>
@@ -406,7 +406,7 @@ font.Warning {
 <div id="244" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;BobDamping=2.2</font></br></div>
 <div id="245" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;PickupClass=class</font><font class="String">'ShieldGunPickup'</font></br></div>
 <div id="246" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;EffectOffset=(X=15.0,Y=6.7,Z=1.2)</font></br></div>
-<div id="247" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;bMeleeWeapon=true</font></br></div>
+<div id="247" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;bMeleeWeapon=</font><font class="Keyword">true</font></br></div>
 <div id="248" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;ShieldHitSound=Sound</font><font class="String">'WeaponSounds.ShieldGun.ShieldReflection'</font></br></div>
 <div id="249" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;DrawScale=0.4</font></br></div>
 <div id="250" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;PutDownAnim=PutDown</font></br></div>

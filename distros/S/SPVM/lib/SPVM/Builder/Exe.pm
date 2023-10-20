@@ -505,9 +505,6 @@ sub create_bootstrap_header_source {
 #include <time.h>
 #include <assert.h>
 
-// Only used for _setmode function and _O_BINARY
-#include <fcntl.h>
-
 #include "spvm_native.h"
 
 EOS
@@ -578,18 +575,9 @@ sub create_bootstrap_main_func_source {
   $source .= <<"EOS";
 
 int32_t main(int32_t command_args_length, const char *command_args[]) {
-
-  // Binary mode in all systems
-#ifdef _WIN32
-  _setmode(fileno(stdout), _O_BINARY);
-  _setmode(fileno(stderr), _O_BINARY);
-  _setmode(fileno(stdin), _O_BINARY);
-#endif
   
-  // Create env
-  SPVM_ENV* env_api = SPVM_API_new_env();
+  SPVM_ENV* env_api = SPVM_NATIVE_new_env();
   
-  // Compiler
   void* compiler = env_api->api->compiler->new_instance();
   
   void* runtime = SPVM_BOOTSTRAP_get_runtime(env_api, compiler);
@@ -597,6 +585,8 @@ int32_t main(int32_t command_args_length, const char *command_args[]) {
   SPVM_ENV* env = env_api->new_env();
   
   env->runtime = runtime;
+  
+  FILE* spvm_stderr = env->api->runtime->get_spvm_stderr(env->runtime);
   
   // Set precompile method addresses
   SPVM_BOOTSTRAP_create_bootstrap_set_precompile_method_addresses(env);
@@ -660,7 +650,7 @@ int32_t main(int32_t command_args_length, const char *command_args[]) {
     void* method = env->api->basic_type->get_method_by_name(env->runtime, module_basic_type, "main");
     
     if (!method) {
-      fprintf(stderr, "The class method %s->main is not defined\\n", class_name);
+      fprintf(spvm_stderr, "The class method %s->main is not defined\\n", class_name);
       return -1;
     }
     
@@ -763,12 +753,13 @@ EOS
   
   $source .= qq|  int32_t error_id = env->api->compiler->compile(compiler, \"$start_basic_type_name\");\n|;
   
+  $source .= qq|  void* runtime = env->api->compiler->get_runtime(compiler);\n|;
+  
+  $source .= qq|  FILE* spvm_stderr = env->api->runtime->get_spvm_stderr(runtime);\n|;
   $source .= qq|  if (error_id != 0) {\n|;
-  $source .= qq|    fprintf(stderr, "[Unexpected Compile Error]%s.", env->api->compiler->get_error_message(compiler, 0));\n|;
+  $source .= qq|    fprintf(spvm_stderr, "[Unexpected Compile Error]%s.", env->api->compiler->get_error_message(compiler, 0));\n|;
   $source .= qq|    exit(255);\n|;
   $source .= qq|  }\n|;
-  
-  $source .= qq|  void* runtime = env->api->compiler->get_runtime(compiler);\n|;
   
   $source .= qq|  return runtime;\n|;
   

@@ -4,13 +4,13 @@
       "Andrea Telatin <andrea@telatin.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "FASTX-Reader",
    "prereqs" : {
@@ -32,7 +32,7 @@
             "JSON::PP" : "0",
             "PerlIO::encoding" : "0",
             "Time::HiRes" : "0",
-            "perl" : "5.012"
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -45,19 +45,19 @@
    "provides" : {
       "FASTX::Reader" : {
          "file" : "lib/FASTX/Reader.pm",
-         "version" : "v1.11.0"
+         "version" : "v1.12.0"
       },
       "FASTX::ReaderPaired" : {
          "file" : "lib/FASTX/ReaderPaired.pm",
-         "version" : "v1.11.0"
+         "version" : "v1.12.0"
       },
       "FASTX::ScriptHelper" : {
          "file" : "lib/FASTX/ScriptHelper.pm",
-         "version" : "v1.11.0"
+         "version" : "v1.12.0"
       },
       "FASTX::Seq" : {
          "file" : "lib/FASTX/Seq.pm",
-         "version" : "v1.11.0"
+         "version" : "v1.12.0"
       }
    },
    "release_status" : "stable",
@@ -66,7 +66,9 @@
          "url" : "https://github.com/telatin/FASTX-Reader"
       }
    },
-   "version" : "1.11.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "1.12.0",
+   "x_generated_by_perl" : "v5.30.3",
+   "x_serialization_backend" : "JSON::XS version 4.02",
+   "x_spdx_expression" : "MIT"
 }
 

@@ -18,6 +18,7 @@ BEGIN
     use common::sense;
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
+    use DB::Object::Fields::Overloaded;
     use Devel::Confess;
     use Module::Generic::Array;
     use overload (
@@ -50,7 +51,7 @@ BEGIN
         fallback => 1,
     );
     use Want;
-    our( $VERSION ) = 'v1.0.2';
+    our $VERSION = 'v1.0.2';
 };
 
 use strict;
@@ -88,7 +89,7 @@ sub database_object { return( shift->table_object->database_object ); }
 
 sub default { return( shift->_set_get_scalar( 'default', @_ ) ); }
 
-sub first { return( shift->_find_siblings( 1 ) ); }
+sub first { return( shift->_find_siblings(1) ); }
 
 sub last
 {
@@ -209,7 +210,6 @@ sub _op_overload
         return( $val->_opt_overload( $self, 1, $op ) );
     }
     
-    # print( STDERR ref( $self ), "::_op_overload: Parameters provided are: '", join( "', '", @_ ), "'\n" );
     my $field = $self->name;
     my $map =
     {
@@ -227,20 +227,23 @@ sub _op_overload
     '==' => '=',
     };
     $op = $map->{ $op } if( exists( $map->{ $op } ) );
+    my $dbo = $self->database_object;
+    my $qo = $self->query_object;
+    my $placeholder_re = $dbo->_placeholder_regexp;
     # $op = 'IS' if( $op eq '=' and $val eq 'NULL' );
     # If the value specified in the operation is a placeholder, or a field object or a statement object, we do not want to quote process it
-    unless( $val eq '?' || 
+    unless( $val =~ /^$placeholder_re$/ || 
             ( $self->_is_object( $val ) && 
               (
                 $val->isa( 'DB::Object::Fields::Field' ) ||
                 $val->isa( 'DB::Object::Statement' )
               )
             ) || 
-            $self->database_object->placeholder->has( \$val ) ||
+            $dbo->placeholder->has( \$val ) ||
             $self->_is_scalar( $val ) ||
             uc( $val ) eq 'NULL' )
     {
-        $val = $self->database_object->quote( $val, $self->constant->constant ) if( $self->database_object );
+        $val = $dbo->quote( $val, $self->constant->constant ) if( $dbo );
     }
     
     my $types;
@@ -249,12 +252,12 @@ sub _op_overload
     {
         $val = '(' . $val->as_string . ')';
     }
-    elsif( $self->database_object->placeholder->has( $self->_is_scalar( $val ) ? $val : \$val ) )
+    elsif( $dbo->placeholder->has( $self->_is_scalar( $val ) ? $val : \$val ) )
     {
-        $types = $self->database_object->placeholder->replace( \$val );
+        $types = $dbo->placeholder->replace( \$val );
     }
     # A placeholder, but don't know the type
-    elsif( $val eq '?' )
+    elsif( $val =~ /^$placeholder_re$/ )
     {
         $types = Module::Generic::Array->new( [''] );
     }
@@ -262,7 +265,25 @@ sub _op_overload
     {
         $val = $$val;
     }
-    return( DB::Object::Fields::Field::Overloaded->new(
+#     return( DB::Object::Fields::Overloaded->new(
+#         expression => 
+#             (
+#                 $swap
+#                     ? "${val} ${op} ${field}" 
+#                     : "${field} ${op} ${val}"
+#             ),
+#         field => $self,
+#         # binded => ( $val =~ /^$placeholder_re$/ || $types ) ? 1 : 0,
+#         ( $val =~ /^$placeholder_re$/ ? ( placeholder => $val ) : () ),
+#         type => $self->type,
+#         # query_object => $self->query_object,
+#         debug => $self->debug,
+#         ( $val !~ /^$placeholder_re$/ ? ( value => $val ) : () ),
+#         # binded_offset => ( $val =~ /^$placeholder_re$/ && defined( $+{offset} ) ) ? ( $+{offset} - 1 ) : undef,
+#         # types => $types,
+#     ) );
+    my $const = $self->constant->constant;
+    my $over = DB::Object::Fields::Overloaded->new(
         expression => 
             (
                 $swap
@@ -270,41 +291,18 @@ sub _op_overload
                     : "${field} ${op} ${val}"
             ),
         field => $self,
-        binded => ( $val eq '?' || $types ) ? 1 : 0,
+        # binded => ( $val =~ /^$placeholder_re$/ || $types ) ? 1 : 0,
+        ( $val =~ /^$placeholder_re$/ ? ( placeholder => $val ) : () ),
+        # Actually type() will return us the actual data type, not the driver constant
+        # type => $self->type,
+        ( defined( $const ) ? ( type => $const ) : () ),
+        query_object => $qo,
+        debug => $self->debug,
+        ( $val !~ /^$placeholder_re$/ ? ( value => $val ) : () ),
+        # binded_offset => ( $val =~ /^$placeholder_re$/ && defined( $+{offset} ) ) ? ( $+{offset} - 1 ) : undef,
         # types => $types,
-    ) );
-}
-
-{
-    # NOTE: package DB::Object::Fields::Field::Overloaded
-    # The purpose of this package is to tag overloaded operation so we can handle them properly later
-    # such as in a where clause
-    package
-        DB::Object::Fields::Field::Overloaded;
-    use strict;
-    use common::sense;
-    use overload (
-        '""'    => sub{ return( $_[0]->{expression} ) },
-        fallback => 1,
     );
-    our $VERSION = 'v0.1.0';
-
-    sub new
-    {
-        my $this = shift( @_ );
-        # This contains the result of the sql field with its operator and value during overloading
-        # expression, field, binded, types
-        my $opts = { @_ };
-        # So it can be called in chaining whether it contains data or not
-        $opts->{types} //= Module::Generic::Array->new;
-        return( bless( $opts => ref( $this ) || $this ) );
-    }
-    
-    sub binded { return( shift->{binded} ); }
-    
-    sub field { return( shift->{field} ); }
-
-    sub types { return( shift->{types} ); }
+    return( $over );
 }
 
 1;

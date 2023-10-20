@@ -1,0 +1,196 @@
+#DistZilla: +PodWeaver
+#PODNAME: Lab::Measurement::Legacy::Developer::Write-A-Source-Driver
+#ABSTRACT: Implementing a current/voltage source driver
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Measurement::Legacy::Developer::Write-A-Source-Driver - Implementing a current/voltage source driver (deprecated)
+
+=head1 VERSION
+
+version 3.899
+
+=head1 Implementing a current/voltage source driver
+
+This document is ment as a guideline to and a help with the implementation of drivers for current and voltage sources.
+Since the complexity of the C<Lab::Instrument> and C<Lab::Instrument::Source> classes increases, it becomes more and more cumbersome to carefully read
+the (sometimes outdated) class documentation to keep track of correct interfaces, i.e., required methods and return values, to provide 
+source device drivers.
+
+NOTE: This document is outdated and refers to an old version of the legacy code interface.
+
+=head2 The config hash
+
+Let us start with what comes first, the config hash. It is used to provide default values for parameters that control the higher level functionality,
+namely C<gate_protect> and to define the device parameters that should be stored internally (e.g. the range or the current output mode).
+At the moment when this documentation is written, an example for a correct config hash can be found in the class definition of the YokogawaGS200:
+
+  our %fields = (
+	supported_connections => [ 'VISA_GPIB', 'GPIB', 'VISA', 'DEBUG' ],
+
+	# default settings for the supported connections
+	connection_settings => {
+		gpib_board => 0,
+		gpib_address => 22,
+	},
+
+
+	device_settings => {
+	
+		gate_protect            => 1,
+		gp_equal_level          => 1e-5,
+		gp_max_units_per_second  => 0.05,
+		gp_max_units_per_step    => 0.005,
+		gp_max_step_per_second  => 10,
+		
+		stepsize		=> 0.01,  # default stepsize for sweep without gate protect
+	
+	 
+		max_sweep_time=>3600,
+		min_sweep_time=>0.1,
+	},
+	
+	# If class does not provide set_$var for those, AUTOLOAD will take care.
+	device_cache => {
+		function			=> "VOLT", # 'VOLT' - voltage, 'CURR' - current
+		range			=> undef,
+		level			=> undef,
+		output					=> undef,
+	},
+	
+	device_cache_order => ['function','range'],
+  );
+
+Let me introduce the objects in this hash. C<connection_settings> is more or less self-explanatory and should be overwritten by the user anyway.
+
+=head2 The device_settings hash
+
+The C<device_settings> hash contains, in the case of a source driver, all the settings that are important to use the gate_protect feature of
+the C<Lab::Instrument::Source> class. The values given are a careful choice, the user who wants to use gate protect will redefine them anyway.
+For a new driver, the hash can just be copy/pasted.
+
+=head2 The C<device_cache> hash
+
+The C<device_cache> hash contains all device parameters, i.e., parameters that can be set and read to and from the device, which should be stored 
+on the software side. It is your decision what variables you add to the list, but make sure you 
+
+=over 8
+
+=item 1. 
+implement getter and setter for all these variables except the Current/Voltage level.
+
+=item 2. 
+use C<undef> as default if it is likely that this parameter is given on init. If it is not given, it will be read from the device.
+
+=back
+
+=head3 The C<device_cache_order> array
+
+If the order of initializing parameters on the device is important, you should specify the order in this array.
+
+=head3 The getter methods
+
+The default for the getter should be to return the cached variable, i.e. the variable which is stored on the computer.
+If the option 
+
+  from_device => 1
+
+is given, the variable should be read from the device.
+
+=head3 The setter methods
+
+should always set both on device and in the software cache.
+You can also use a 
+
+  error_check=>1
+
+in the C<$self->write> command, then a possible error which appears on the device will automatically be set.
+Read also the section on error checking.
+
+=head3 Default values
+
+Best is to use C<undef>.
+
+=head2 Methods that MUST be provided by the device class
+
+Please make sure you implement the following:
+
+=over 8
+
+=item 1. 
+B<get/set> for each variable in the device_cache with one exception: C<set_level>. The setter should return the set value.
+
+=item 2. 
+The sub C<_set_level($target)> which will be called from C<Lab::Instrument::Source> to use gate protect. Implement instead of C<set_level()>.
+
+=item 3. 
+A function C<get_status()>.
+
+=back
+
+=head3 The status sub
+
+The sub C<get_status> should read out the status byte of the device and create a hash with a descriptive flag and the state of the corresponding bit.
+The error bit should have the key B<"ERROR">.
+
+=head2 Methods that should be implemented
+
+It is convenient to implement the follwoing functions if possible:
+
+=over
+
+=item 1.
+A sub C<_sweep_to_level($target,$time)>.
+
+=item 2.
+A sub C<get_error()>.
+
+=back
+
+=head3 The sweep function
+
+C<_sweep_to_level($target,$time)> is given a target level C<$target> and a sweep time C<$time>. 
+If the device supports this functionality, it should be implemented here.
+It should return C<$target>.
+
+=head3 C<get_error()>
+
+should read out the device's error stack. It should return ONE error at once in a single array with 
+
+  [$errorcode,$errormessage]
+
+=head2 The error checking framework
+
+It is possible to wrap every C<write($cmd)> call by an error checking routine. This can be invoked by providing the option C<error_check>.
+For example:
+
+  $self->write($cmd,'error_check' => 1)
+
+After sending the command in C<$cmd> to the device, the framework will use C<get_status()> to read out the B<ERROR> status bit. If it is set, 
+C<get_error()> will be used to fetch the error from the device.
+
+=head2 General remarks on device driver developement
+
+=head3 Allow pass-through of commands in set & get
+
+The advanced user should be given the possibility to do dirty workarounds when using the driver. To do this, he can provide options in the C<write()> call,
+that are interpreted on connection level. This should in general also be possible when using C<set_level> or any command that involves a C<write()> call.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
+
+  Copyright 2012       Alois Dirnaichner
+            2017-2018  Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

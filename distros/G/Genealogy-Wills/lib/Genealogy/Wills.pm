@@ -14,11 +14,11 @@ Genealogy::Wills - Lookup in a database of wills
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -33,13 +33,16 @@ our $VERSION = '0.02';
 
 Creates a Genealogy::Wills object.
 
-Takes an optional argument, directory, that is the directory containing wills.sql.
+Takes two optionals arguments:
+	directory: that is the directory containing obituaries.sql
+	logger: an object to send log messages to
 
 =cut
 
 sub new {
-	my($proto, %args) = @_;
-	my $class = ref($proto) || $proto;
+	my $class = $_[0];
+	shift;
+	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	if(!defined($class)) {
 		# Using Genealogy::Wills->new(), not Genealogy::Wills::new()
@@ -55,6 +58,9 @@ sub new {
 
 	my $directory = $args{'directory'} || Module::Info->new_from_loaded(__PACKAGE__)->file();
 	$directory =~ s/\.pm$//;
+
+	# The database is updated daily
+	$args{'cache_duration'} ||= '1 day';
 
 	Genealogy::Wills::DB::init(directory => File::Spec->catfile($directory, 'database'), %args);
 	return bless { }, $class;
@@ -126,10 +132,6 @@ L<https://metacpan.org/release/Genealogy-Wills>
 =item * RT: CPAN's request tracker
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Genealogy-Wills>
-
-=item * CPANTS
-
-L<http://cpants.cpanauthors.org/dist/Genealogy-Wills>
 
 =item * CPAN Testers' Matrix
 

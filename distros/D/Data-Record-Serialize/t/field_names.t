@@ -164,11 +164,7 @@ subtest "rename" => sub {
 
     ok( lives { $VAR1 = eval $buf }, 'deserialize record' ) or diag $@;
 
-    is(
-        $VAR1,
-        { short_a => 1, long_b => 2 },
-        'field name long_a renamed to short_a'
-    );
+    is( $VAR1, { short_a => 1, long_b => 2 }, 'field name long_a renamed to short_a' );
 
 };
 

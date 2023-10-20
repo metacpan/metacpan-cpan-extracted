@@ -96,14 +96,14 @@ sub postamble {
 	'',
 	'doc docs:		doc/Net-CVE.md doc/Net-CVE.html doc/Net-CVE.man',
 	'	-@rm -f pod2html.tmp',
-	'doc/Net-CVE.md:		lib/Net/CVE.pm',
+	'doc/Net-CVE.md:	lib/Net/CVE.pm',
 	'	pod2markdown  < $? > $@',
-	'doc/Net-CVE.html:		lib/Net/CVE.pm',
+	'doc/Net-CVE.html:	lib/Net/CVE.pm',
 	'	pod2html      < $? 2>&1 | grep -v "^Cannot find" > $@',
 	'doc/Net-CVE.3:		lib/Net/CVE.pm',
 	'	pod2man       < $? > $@',
 	'doc/Net-CVE.man:	doc/Net-CVE.3',
-	'	nroff -mandoc < $? > $@',
+	'	nroff2man     < $? > $@',
 	@pc,
 	'';
     } # postamble

@@ -56,7 +56,7 @@ use Params::Util    qw{_INSTANCE _CLASS _CODELIKE _NUMBER};
 use PPI::Element    ();
 use PPI::Singletons '%_PARENT';
 
-our $VERSION = '1.276';
+our $VERSION = '1.277';
 
 our @ISA = "PPI::Element";
 
@@ -517,7 +517,7 @@ sub remove_child {
 
 	# Splice it out, and remove the child's parent entry
 	splice( @{$self->{children}}, $p, 1 );
-	delete $_PARENT{refaddr $child};
+	delete $_PARENT{$key};
 
 	$child;
 }

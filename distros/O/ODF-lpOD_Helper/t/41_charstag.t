@@ -6,7 +6,7 @@ use t_TestCommon ':silent',
                  qw/bug tmpcopy_if_writeable $debug/;
 
 use ODF::lpOD;
-use ODF::lpOD_Helper;
+use ODF::lpOD_Helper qw/:DEFAULT/;
 
 my $master_copy_path = "$Bin/../tlib/Skel.odt";
 my $input_path = tmpcopy_if_writeable($master_copy_path);
@@ -15,9 +15,9 @@ my $body = $doc->get_body;
 
 {
   my $m = $body->search("☺");
-  ok($m->{segment}, "The :chars import tag implies Huse_character_strings");
+  ok($m->{segment}, "Character mode is now the default");
 
   like(fmt_node($m->{segment}), qr/☺Unicode/, 
-       ":DEFAULT still imports others")
+       ":DEFAULT imports fmt_node")
 }
 done_testing();

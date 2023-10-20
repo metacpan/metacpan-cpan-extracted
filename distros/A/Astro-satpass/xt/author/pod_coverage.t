@@ -3,15 +3,8 @@ package main;
 use strict;
 use warnings;
 
+use Test::More 0.88;	# Because of done_testing()
 BEGIN {
-    eval {
-	require Test::More;
-	Test::More->import();
-	1;
-    } or do {
-	print "1..0 # skip Test::More required to test pod coverage.\n";
-	exit;
-    };
     eval {
 	require Test::Pod::Coverage;
 	Test::Pod::Coverage->VERSION(1.00);

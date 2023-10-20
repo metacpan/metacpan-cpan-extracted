@@ -32,7 +32,6 @@ Util
 array
 bitbucket
 d'etre
-dbi
 ddump
 djerius
 fh

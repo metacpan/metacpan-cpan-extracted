@@ -5,9 +5,9 @@
 
 use v5.26; # signatures
 use warnings;
-use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
+use Object::Pad 0.800 ':experimental(adjust_params)';
 
-package Tickit::Widget::Scroller 0.31;
+package Tickit::Widget::Scroller 0.32;
 class Tickit::Widget::Scroller
    :strict(params)
    :isa(Tickit::Widget);
@@ -188,15 +188,31 @@ ADJUST :params (
 method cols  () { 1 }
 method lines () { 1 }
 
-method _item ( $idx )
+method _itemidx_for ( $item_or_idx )
 {
-   return $_items[$idx];
+   if( ref $item_or_idx ) {
+      my $idx;
+      $_items[$_] == $item_or_idx and ( $idx = $_ ), last for 0 .. $#_items;
+      croak '$item_or_idx is not an item in the Scroller' if !defined $idx;
+      return $idx;
+   }
+
+   if( $item_or_idx < 0 ) {
+      $item_or_idx += @_items;
+
+      croak '$item_or_idx out of bounds' if $item_or_idx < 0;
+   }
+   else {
+      croak '$item_or_idx out of bounds' if $item_or_idx >= @_items;
+   }
+
+   return $item_or_idx;
 }
 
 method _itemheight ( $idx )
 {
    return $_itemheights[$idx] if defined $_itemheights[$idx];
-   return $_itemheights[$idx] = $self->_item( $idx )->height_for_width( $self->window->cols );
+   return $_itemheights[$idx] = $_items[$idx]->height_for_width( $self->window->cols );
 }
 
 method reshape ()
@@ -255,14 +271,14 @@ method window_gained ( $win )
 
 =head2 set_on_scrolled
 
-   $on_scrolled = $scroller->on_scrolled
+   $on_scrolled = $scroller->on_scrolled;
 
-   $scroller->set_on_scrolled( $on_scrolled )
+   $scroller->set_on_scrolled( $on_scrolled );
 
 Return or set the CODE reference to be called when the scroll position is
 adjusted.
 
-   $on_scrolled->( $scroller, $delta )
+   $on_scrolled->( $scroller, $delta );
 
 This is invoked by the C<scroll> method, including the C<scroll_to>,
 C<scroll_to_top> and C<scroll_to_bottom>. In normal cases it will be given the
@@ -275,7 +291,7 @@ clipped if this would scroll past the beginning or end of the display.
 
 =head2 items
 
-   $count = scalar $scroller->items;
+   $count = $scroller->items;
 
 I<Since version 0.31.>
 
@@ -289,7 +305,7 @@ method items { return scalar @_items; }
 
 =head2 push
 
-   $scroller->push( @items )
+   $scroller->push( @items );
 
 Append the given items to the end of the list.
 
@@ -344,7 +360,7 @@ method push ( @more )
 
 =head2 unshift
 
-   $scroller->unshift( @items )
+   $scroller->unshift( @items );
 
 Prepend the given items to the beginning of the list.
 
@@ -409,7 +425,7 @@ method unshift ( @more )
 
 =head2 shift
 
-   @items = $scroller->shift( $count )
+   @items = $scroller->shift( $count );
 
 Remove the given number of items from the start of the list and returns them.
 
@@ -450,7 +466,7 @@ method shift ( $count = 1 )
 
 =head2 pop
 
-   @items = $scroller->pop( $count )
+   @items = $scroller->pop( $count );
 
 Remove the given number of items from the end of the list and returns them.
 
@@ -488,7 +504,7 @@ method pop ( $count = 1 )
 
 =head2 scroll
 
-   $scroller->scroll( $delta )
+   $scroller->scroll( $delta );
 
 Move the display up or down by the given C<$delta> amount; with positive
 moving down. This will be a physical count of displayed lines; if some items
@@ -582,15 +598,16 @@ REDO:
 
 =head2 scroll_to
 
-   $scroller->scroll_to( $line, $itemidx, $itemline )
+   $scroller->scroll_to( $line, $item_or_idx, $itemline );
 
 Moves the display up or down so that display line C<$line> contains line
-C<$itemline> of item C<$itemidx>. Any of these counts may be negative to count
-backwards from the display lines, items, or lines within the item.
+C<$itemline> of the item; which may be given by object reference or index
+number. Any of these counts may be negative to count backwards from the
+display lines, items, or lines within the item.
 
 =cut
 
-method scroll_to ( $line, $itemidx, $itemline )
+method scroll_to ( $line, $item_or_idx, $itemline )
 {
    my $window = $self->window or return;
 
@@ -605,14 +622,7 @@ method scroll_to ( $line, $itemidx, $itemline )
       croak '$line out of bounds' if $line >= $_window_lines;
    }
 
-   if( $itemidx < 0 ) {
-      $itemidx += @_items;
-
-      croak '$itemidx out of bounds' if $itemidx < 0;
-   }
-   else {
-      croak '$itemidx out of bounds' if $itemidx >= @_items;
-   }
+   my $itemidx = $self->_itemidx_for( $item_or_idx );
 
    my $itemheight = $self->_itemheight( $itemidx );
 
@@ -663,41 +673,41 @@ method scroll_to ( $line, $itemidx, $itemline )
 
 =head2 scroll_to_top
 
-   $scroller->scroll_to_top( $itemidx, $itemline )
+   $scroller->scroll_to_top( $item_or_idx, $itemline );
 
 Shortcut for C<scroll_to> to set the top line of display; where C<$line> is 0.
-If C<$itemline> is undefined, it will be passed as 0. If C<$itemidx> is also
-undefined, it will be passed as 0. Calling this method with no arguments,
+If C<$itemline> is undefined, it will be passed as 0. If C<$item_or_idx> is
+also undefined, it will be passed as 0. Calling this method with no arguments,
 therefore scrolls to the very top of the display.
 
 =cut
 
-method scroll_to_top ( $itemidx = 0, $itemline = 0 )
+method scroll_to_top ( $item_or_idx = 0, $itemline = 0 )
 {
-   $self->scroll_to( 0, $itemidx, $itemline );
+   $self->scroll_to( 0, $item_or_idx, $itemline );
 }
 
 =head2 scroll_to_bottom
 
-   $scroller->scroll_to_bottom( $itemidx, $itemline )
+   $scroller->scroll_to_bottom( $item_or_idx, $itemline );
 
 Shortcut for C<scroll_to> to set the bottom line of display; where C<$line> is
--1. If C<$itemline> is undefined, it will be passed as -1. If C<$itemidx> is
-also undefined, it will be passed as -1. Calling this method with no
+-1. If C<$itemline> is undefined, it will be passed as -1. If C<$item_or_idx>
+is also undefined, it will be passed as -1. Calling this method with no
 arguments, therefore scrolls to the very bottom of the display.
 
 =cut
 
-method scroll_to_bottom ( $itemidx = -1, $itemline = -1 )
+method scroll_to_bottom ( $item_or_idx = -1, $itemline = -1 )
 {
-   $self->scroll_to( -1, $itemidx, $itemline );
+   $self->scroll_to( -1, $item_or_idx, $itemline );
 }
 
 =head2 line2item
 
-   $itemidx = $scroller->line2item( $line )
+   $itemidx = $scroller->line2item( $line );
 
-   ( $itemidx, $itemline ) = $scroller->line2item( $line )
+   ( $itemidx, $itemline ) = $scroller->line2item( $line );
 
 Returns the item index currently on display at the given line of the window.
 In list context, also returns the line number within item. If no window has
@@ -739,14 +749,14 @@ method line2item ( $line )
 
 =head2 item2line
 
-   $line = $scroller->item2line( $itemidx, $itemline )
+   $line = $scroller->item2line( $item_or_idx, $itemline );
 
-   ( $line, $offscreen ) = $scroller->item2line( $itemidx, $itemline, $count_offscreen )
+   ( $line, $offscreen ) = $scroller->item2line( $item_or_idx, $itemline, $count_offscreen );
 
 Returns the display line in the window of the given line of the item at the
-given index. C<$itemidx> may be given negative, to count backwards from the
-last item. C<$itemline> may be negative to count backward from the last line
-of the item.
+given index. C<$item_or_idx> may be an item directly, a non-negative integer
+to give its index, or a negative to count backwards from the last item.
+C<$itemline> may be negative to count backward from the last line of the item.
 
 In list context, also returns a value describing the offscreen nature of the
 item. For items fully on display, this value is C<undef>. If the given line of
@@ -759,20 +769,13 @@ lines in the scroller's window for items C<"below">.
 
 =cut
 
-method item2line ( $want_itemidx, $want_itemline = 0, $count_offscreen = 0 )
+method item2line ( $want_item_or_idx, $want_itemline = 0, $count_offscreen = 0 )
 {
    my $window = $self->window or return;
 
    @_items or return;
 
-   if( $want_itemidx < 0 ) {
-      $want_itemidx += @_items;
-
-      croak '$itemidx out of bounds' if $want_itemidx < 0;
-   }
-   else {
-      croak '$itemidx out of bounds' if $want_itemidx >= @_items;
-   }
+   my $want_itemidx = $self->_itemidx_for( $want_item_or_idx );
 
    my $itemheight = $self->_itemheight( $want_itemidx );
 
@@ -827,7 +830,7 @@ method item2line ( $want_itemidx, $want_itemline = 0, $count_offscreen = 0 )
 
 =head2 lines_above
 
-   $count = $scroller->lines_above
+   $count = $scroller->lines_above;
 
 Returns the number of lines of content above the scrolled display.
 
@@ -842,7 +845,7 @@ method lines_above ()
 
 =head2 lines_below
 
-   $count = $scroller->lines_below
+   $count = $scroller->lines_below;
 
 Returns the number of lines of content below the scrolled display.
 
@@ -882,7 +885,7 @@ method render_to_rb ( $rb, $rect )
    my $endline   = $rect->bottom;
 
    while( $line < $endline and $itemidx < @_items ) {
-      my $item       = $self->_item( $itemidx );
+      my $item       = $_items[$itemidx];
       my $itemheight = $self->_itemheight( $itemidx );
 
       my $top = $line;
@@ -948,9 +951,9 @@ method on_mouse ( $ev )
 
 =head2 set_gen_bottom_indicator
 
-   $scroller->set_gen_top_indicator( $method )
+   $scroller->set_gen_top_indicator( $method );
 
-   $scroller->set_gen_bottom_indicator( $method )
+   $scroller->set_gen_bottom_indicator( $method );
 
 Accessors for the generators for the top and bottom indicator text. If set,
 each should be a CODE reference or method name on the scroller which will be
@@ -960,7 +963,7 @@ if defined and non-empty, will be displayed in an indicator window. This will
 be a small one-line window displayed at the top right or bottom right corner
 of the Scroller's window.
 
-   $text = $scroller->$method()
+   $text = $scroller->$method();
 
 The ability to pass method names allows subclasses to easily implement custom
 logic as methods without having to capture a closure.
@@ -983,7 +986,7 @@ method set_gen_bottom_indicator
 
 =head2 update_indicators
 
-   $scroller->update_indicators
+   $scroller->update_indicators;
 
 Calls any defined generators for indicator text, and updates the indicator
 windows with the returned text. This may be useful if the functions would

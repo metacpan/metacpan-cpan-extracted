@@ -8,7 +8,7 @@ use Error::Pure qw(err);
 use GraphViz;
 use PYX::Parser;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -178,7 +178,7 @@ PYX::GraphViz - GraphViz output for PYX handling.
  my $obj = PYX::GraphViz->new(%parameters);
  $obj->parse($pyx, $out);
  $obj->parse_file($input_file, $out);
- $obj->parse_handle($input_file_handler, $out);
+ $obj->parse_handler($input_file_handler, $out);
 
 =head1 METHODS
 
@@ -301,8 +301,8 @@ Constructor
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/michal-josef-spacek/PYX-GraphViz/master/images/ex1.png">
-  <img src="https://raw.githubusercontent.com/michal-josef-spacek/PYX-GraphViz/master/images/ex1.png" alt="Output of example" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/PYX-GraphViz/master/images/simple_html_to_png.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/PYX-GraphViz/master/images/simple_html_to_png.png" alt="Output of example" width="300px" height="300px" />
 </a>
 
 =end html
@@ -342,6 +342,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

@@ -1,18 +1,18 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.66 ':experimental(init_expr)';
+use warnings;
+use Object::Pad 0.800 ':experimental(mop adjust_params)';
 
-package Device::Chip::Sensor 0.25;
+package Device::Chip::Sensor 0.26;
 
 use strict;
 use warnings;
 
 use experimental 'signatures';
-use Object::Pad ':experimental(mop adjust_params)';
 
 use Carp;
 
@@ -148,6 +148,11 @@ sub import ( @opts )
    declare_into( $caller ) if grep { $_ eq "-declare" } @opts;
 }
 
+sub unimport ( @opts )
+{
+   croak "This module cannot be unimported";
+}
+
 sub declare_into ( $caller )
 {
    my $classmeta = Object::Pad::MOP::Class->for_class( $caller );
@@ -208,17 +213,17 @@ my %TYPES = (
    counter => 1,
 );
 
-field $_type      :reader :param { "gauge" };
+field $_type      :reader :param = "gauge";
 field $_name      :reader :param;
-field $_units     :reader :param { undef };
-field $_precision :reader :param { 0 };
+field $_units     :reader :param = undef;
+field $_precision :reader :param = 0;
 
 field $_lbound;
 field $_ubound;
 
-field $_method :param { undef };
+field $_method :param = undef;
 
-field $_chip :reader :param { undef };
+field $_chip :reader :param = undef;
 
 ADJUST
 {

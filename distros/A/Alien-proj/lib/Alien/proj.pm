@@ -8,7 +8,7 @@ use Capture::Tiny qw /:all/;
 use File::Which qw /which/;
 use List::Util qw /uniq/;
 
-our $VERSION = '1.25';
+our $VERSION = '1.26';
 
 #  adding to global {DY}LD_LIBRARY_PATH vars is icky but seems
 #  to be needed for utilities and downstream FFI
@@ -40,6 +40,9 @@ if (eval 'require Alien::curl' && 'Alien::curl'->install_type eq 'share') {
 #elsif (not $^O =~ /mswin/i) {
 #    @LD_LIBRARY_PATH = grep {defined} uniq (@LD_LIBRARY_PATH, @ld_lib_dirs)
 #}
+if ($^O =~ /MSWin32/) {
+    unshift @PATH, __PACKAGE__->bin_dirs;
+}
 
 
 sub bin_dirs {

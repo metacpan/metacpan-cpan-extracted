@@ -4,7 +4,7 @@
       "Jiro Nishiguchi <jiro@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.19",
+   "generated_by" : "Minilla/v3.1.22",
    "license" : [
       "bsd"
    ],
@@ -64,7 +64,10 @@
    "provides" : {
       "UID2::Client::XS" : {
          "file" : "lib/UID2/Client/XS.pm",
-         "version" : "0.01"
+         "version" : "0.02"
+      },
+      "UID2::Client::XS::AdvertisingTokenVersion" : {
+         "file" : "lib/UID2/Client/XS/AdvertisingTokenVersion.pm"
       },
       "UID2::Client::XS::DecryptionStatus" : {
          "file" : "lib/UID2/Client/XS/DecryptionStatus.pm"
@@ -94,7 +97,10 @@
          "web" : "https://github.com/spiritloose/uid2-client-perlxs"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.10",
+   "version" : "0.02",
+   "x_contributors" : [
+      "Jiro Nishiguchi <spiritloose@users.noreply.github.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 0
 }

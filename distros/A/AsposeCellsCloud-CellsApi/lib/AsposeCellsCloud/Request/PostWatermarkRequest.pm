@@ -59,7 +59,7 @@ sub new {
 
 
 # Run Operation Request
-# PostWatermarkRequest.File : File to upload  ,
+# PostWatermarkRequest.File : e.g. #1032ff  ,
 # PostWatermarkRequest.text :   ,
 # PostWatermarkRequest.color : e.g. #1032ff  ,
 # PostWatermarkRequest.password :   ,
@@ -138,7 +138,7 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'File to upload',
+     	description => 'e.g. #1032ff',
      	format => '',
      	read_only => '',
      		},

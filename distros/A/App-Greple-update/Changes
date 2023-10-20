@@ -1,5 +1,13 @@
 Revision history for Perl extension App-Greple-update
 
+1.01 2023-10-03T09:28:41Z
+
+    - introduce --update::discard, --discard option
+
+1.00 2023-10-03T02:48:13Z
+
+    - use --no-new-line option to dump file content
+
 0.03 2022-09-14T10:16:38Z
 
     - correct typo

@@ -1,6 +1,6 @@
 package App::Oozie::Types::Common;
-$App::Oozie::Types::Common::VERSION = '0.006';
-use 5.010;
+$App::Oozie::Types::Common::VERSION = '0.010';
+use 5.014;
 use strict;
 use warnings;
 
@@ -113,7 +113,7 @@ App::Oozie::Types::Common
 
 =head1 VERSION
 
-version 0.006
+version 0.010
 
 =head1 SYNOPSIS
 

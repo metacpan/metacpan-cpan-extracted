@@ -2,9 +2,9 @@ package My::Test::Encode::store;
 
 use Moo::Role;
 
-has output => ( is => 'ro',
-                default => sub { [] }
-              );
+has output => (
+    is      => 'ro',
+    default => sub { [] } );
 
 sub send {
     my $self = shift;

@@ -1,21 +1,22 @@
-# Copyrights 2002-2018 by [Mark Overmeer].
+# Copyrights 2002-2023 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution Mail-Box-Parser-C.  Meta-POD processed
 # with OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Mail::Box::Parser::C;
 use vars '$VERSION';
-$VERSION = '3.009';
+$VERSION = '3.011';
 
 use base qw/Mail::Box::Parser Exporter DynaLoader/;
 
-our $VERSION = 3.009;
+our $VERSION = '3.011';
 
 use strict;
 use warnings;
+
 use Carp;
 
 

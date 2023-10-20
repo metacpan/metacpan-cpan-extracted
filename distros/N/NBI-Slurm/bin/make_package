@@ -8,27 +8,39 @@ use Getopt::Long;
 use File::Basename;
 use File::Path qw(make_path);
 use File::Spec;
+use Pod::Usage;
+use NBI::Slurm;
 
+my $config    = NBI::Slurm::load_config("$USER/.nbislurm.config");
 my $image     = undef;
 my $package   = undef;
 my $force     = 0;
-my $packages_dir     = '/nbi/software/testing/bin/';
-my $packages_basepath = '/nbi/software/testing/';
+my $packages_dir      = $config->{'packages_dir'} // '/nbi/software/testing/bin/';
+my $packages_basepath = $config->{'packages_basepath'} // '/nbi/software/testing/';
 my $permissions = 0755;
-
+my $opt_help;
 
 # Parse command line options
 GetOptions(
     'i|image=s'   => \$image,
     'p|package=s' => \$package,
     'f|force'     => \$force,
+    'h|help'      => \$opt_help,
 );
 
 my $errors = startup($packages_dir, $packages_basepath, $image, \@ARGV);
-exit 1 if $errors;
+
+if ($opt_help) {
+  # Long manual with pod
+  pod2usage({-exitval => 0, -verbose => 2});
+} elsif ($errors > 0) {
+  usage();
+  exit 1;
+}
 
 # Determine the package name
 $package = get_package_name($image, $package);
+say STDERR "Package name: $package";
 
 # Create the package
 my $package_bin   = File::Spec->catfile($packages_dir, $package);
@@ -57,6 +69,7 @@ print $exec "#!/bin/bash\n";
 print $exec "# Launcher for $package made by Core Bioinformatics\n";
 print $exec "singularity exec \"$abs_img\" " . '$(basename "$0") "$@"' . "\n";
 close $exec;
+say STDERR "Launcher created: $source_file";
 
 if (chmod($permissions, $source_file)) {
     print "Permissions of '$source_file' changed to 755.\n";
@@ -65,7 +78,23 @@ if (chmod($permissions, $source_file)) {
 }
 
 # Create symbolic links for the provided commands
-for my $command (@ARGV) {
+my @COMMANDS = `singularity exec \"$image\" cat /etc/binaries.txt`;
+if ($? != 0) {
+    say STDERR "ERROR: Failed to read /etc/binaries.txt from image.";
+    say STDERR "  -> Are you sure this is a valid Singularity image?";
+    exit 1;
+} elsif (scalar @COMMANDS == 0) {
+    say STDERR "ERROR: No commands supplied (or no /etc/binaries.txt found).";
+} else {
+   for my $i (0 .. $#COMMANDS) {
+       chomp $COMMANDS[$i];
+       $COMMANDS[$i] =~ s/^\s+|\s+$//g;
+   }
+   say STDERR "Commands: ", join(", ", @COMMANDS);
+}
+push(@COMMANDS, @ARGV) if @ARGV;
+
+for my $command (@COMMANDS) {
     say " - $command";
     my $symlink_name = File::Spec->catfile($package_path, $command);
     if (-e $symlink_name and $force) {
@@ -80,8 +109,9 @@ for my $command (@ARGV) {
 
 sub usage {
     say STDERR <<END;
-source_it.pl -i SINGULARITY_IMAGE [-p PACKAGE] COMMANDS...
+make_package -i SINGULARITY_IMAGE [-p PACKAGE] COMMANDS...
 
+Type --help for more information.
 END
 }
 
@@ -100,18 +130,27 @@ sub startup {
     $errors++;
   }
 
-  if (! -e "$image" ) {
+  if (defined $image and ! -e "$image" ) {
     say STDERR "ERROR: Image file not found";
     say STDERR "  -> File $image does not exist\n";
     $errors++;
+  } elsif (defined $image ) {
+    # Check if image has  list of binaries
+
+    my $cmd = "singularity exec \"$image\" cat /etc/binaries.txt";
+    my @output = `$cmd`;
+    # Check lenght of commands list, if zero print usage
+    if (scalar @ARGV == 0 and scalar @output == 0) {
+          usage();
+          say STDERR "ERROR: No commands supplied (or no /etc/binaries.txt found).\n";
+          $errors++;
+    }
+  } else {
+    say STDERR "ERROR: Image file not specified";
+    $errors++;
   }
 
-  # Check lenght of commands list, if zero print usage
-    if (scalar @ARGV == 0) {
-        usage();
-        say STDERR "ERROR: No commands supplied.\n";
-        $errors++;
-    }
+
   return $errors;
 }
 
@@ -139,11 +178,11 @@ make_package - Install a "package" in the NBI HPC using a singularity image
 
 =head1 VERSION
 
-version 0.6.1
+version 0.8.1
 
 =head1 SYNOPSIS
 
-  source_it.pl -i SINGULARITY_IMAGE [-p PACKAGE] COMMANDS...
+  make_package -i SINGULARITY_IMAGE [-p PACKAGE] COMMANDS...
 
 =head1 DESCRIPTION
 
@@ -151,7 +190,7 @@ This script creates a package for running Singularity containers with specified 
 
 =head1 NAME
 
-source_it.pl - Create package for installing Singularity containers as HPC packages
+make_package - Create package for installing Singularity containers as HPC packages
 
 =head1 OPTIONS
 
@@ -174,13 +213,21 @@ Force overwriting existing binary or package path if they already exist.
 List of binaries shipping with the package, they will all be linked to the same launcher script. 
 At least a "command" is required.
 
+Note that images created from C<make_image_from_bioconda> will have a list of binaries in C</etc/binaries.txt>, automatically
+used to create the links.
+
 =back
 
 =head1 EXAMPLE
 
+To install a package from a Singularity image called C<seqfu__1.20.0.simg> 
+with the binaries C<seqfu>, C<fu-orf>, C<fu-msa>, C<fu-rename> and C<fu-tabcheck>:
+
   make_package -i seqfu__1.20.0.simg seqfu fu-orf fu-msa fu-rename fu-tabcheck 
 
-Will generate links to seqfu, fu-orf, fu-msa, fu-rename and fu-tabcheck in the package C<seqfu>, using the specified image (seqfu__1.20.0.simg).
+If the image was generated, you can simply:
+
+  make_package -i seqfu__1.20.0.simg
 
 =cut
 

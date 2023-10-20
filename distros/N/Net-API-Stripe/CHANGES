@@ -1,5 +1,12 @@
 Revision history for Perl module Net::API::Stripe
 
+v2.0.4 2023-10-11T20:35:52+0900
+    - Corrected malformed signature for distribution release
+
+v2.0.3 2023-01-10T19:53:21+0900
+    - Corrected method payment_method_list_customer_payment_methods() in Net::API::Stripe
+    - Improved the Exception module Net::API::Stripe::Exception
+
 v2.0.2 2022-12-19T14:31:54+0900
     - Improved method to better deal with overloaded objects
     - Updated method _get_args to be more specific and less error prone

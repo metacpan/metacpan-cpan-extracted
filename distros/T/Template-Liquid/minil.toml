@@ -4,8 +4,22 @@ module_maker="ModuleBuildTiny"
 static_install = "auto"
 license="artistic_2"
 authority="cpan:SANKO"
+markdown_maker = "Pod::Markdown::Github"
 
 [release]
 hook=[
     'tidyall -a'
 ]
+
+[no_index]
+directory=[
+    "t",
+    "xt",
+    "inc",
+    "eg",
+    "examples",
+    "author",
+]
+
+[Metadata]
+X_No_Archive = 'Yes'

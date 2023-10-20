@@ -18,6 +18,13 @@ new(self)
 MODULE = X11::XCB PACKAGE = X11_XCB_ICCCM_WMHintsPtr
 
 void
+set_flags(self, flags)
+    X11_XCB_ICCCM_WMHints * self
+    I32 flags
+  CODE:
+    self->flags = flags;
+
+void
 set_urgency(self)
     X11_XCB_ICCCM_WMHints * self
   CODE:

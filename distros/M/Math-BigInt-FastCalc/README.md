@@ -89,10 +89,6 @@ You can also look for information at:
 
     [http://matrix.cpantesters.org/?dist=Math-BigInt-FastCalc](http://matrix.cpantesters.org/?dist=Math-BigInt-FastCalc)
 
-- CPAN Ratings
-
-    [https://cpanratings.perl.org/dist/Math-BigInt-FastCalc](https://cpanratings.perl.org/dist/Math-BigInt-FastCalc)
-
 # LICENSE
 
 This program is free software; you may redistribute it and/or modify it under

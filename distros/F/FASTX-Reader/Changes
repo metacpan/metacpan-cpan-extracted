@@ -2,6 +2,11 @@ This is the changelog for FASTX::Reader. Version prior to v 0.1 are preliminary 
 Some APIs *can change* with the release of the first stable release (v 1.0).
 Version 0.61 has been available via BioConda
 
+1.12.0 2023-09-24
+
+  * 5.16 minimum Perl version required
+  * minor updates to POD, tests
+
 1.11.0 2023-08-22
 
   * added `translate()` method to FASTX::Seq

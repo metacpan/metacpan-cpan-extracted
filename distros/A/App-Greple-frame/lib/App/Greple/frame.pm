@@ -1,6 +1,6 @@
 package App::Greple::frame;
 
-our $VERSION = "0.07";
+our $VERSION = "1.00";
 
 =encoding utf-8
 
@@ -48,6 +48,11 @@ option.  See B<set> function in L</FUNCTION> section.
 Set frame without folding.
 
 =end comment
+
+=item B<--frame-pages>
+
+Output results in multi-column, paginated format to fit the width of the 
+terminal.
 
 =back
 
@@ -107,7 +112,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2022 Kazumasa Utashiro.
+Copyright 2022-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

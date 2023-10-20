@@ -21,7 +21,6 @@ BEGIN
     use Config;
     use Encode ();
     use Scalar::Util qw( readonly );
-    use Nice::Try;
     use constant MAX_RAND_INT       => 2**32;
     use constant MATH_RANDOM_SECURE => eval( "require Math::Random::Secure;" );
     use constant SUPPORT_64BITS     => ( ( $Config{use64bitint} // '' ) eq 'define' || !( $Config{ivsize} <= 4 || $Config{longsize} < 8 || $] < 5.010 ) );
@@ -57,16 +56,17 @@ sub init
     {
         $buffer = shift( @_ );
     }
-    $self->{buffer}                 = $buffer;
+    $self->{buffer}                 = $buffer unless( defined( $self->{buffer} ) );
     # fin value must be undef
-    $self->{fin}                    = undef;
-    $self->{fragments}              = [];
+    $self->{fin}                    = undef unless( defined( $self->{fin} ) );
+    $self->{fragments}              = [] unless( defined( $self->{fragments} ) );
     $self->{max_fragments_amount}   = $MAX_FRAGMENTS_AMOUNT unless( length( $self->{max_fragments_amount} ) );
     $self->{max_payload_size}       = $MAX_PAYLOAD_SIZE unless( length( $self->{max_payload_size} ) );
-    $self->{opcode}                 = undef;
-    $self->{rsv}                    = [];
-    $self->{type}                   = '';
-    $self->{version}                = '';
+    $self->{opcode}                 = undef unless( defined( $self->{opcode} ) );
+    $self->{rsv}                    = [] unless( defined( $self->{rsv} ) );
+    $self->{type}                   = '' unless( length( $self->{type} // '' ) );
+    $self->{version}                = '' unless( length( $self->{version} // '' ) );
+    $self->{_exception_class}       = 'WebSocket::Exception' unless( defined( $self->{_exception_class} ) );
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     $self->version( WEBSOCKET_DRAFT_VERSION_DEFAULT ) unless( $self->version );

@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API.pm
-## Version v0.1.1
+## Version v0.1.3
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2023/06/11
+## Modified 2023/10/11
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -39,7 +40,7 @@ BEGIN
     use Nice::Try dont_want => 1;
     use Scalar::Util ();
     $DEBUG   = 0;
-    $VERSION = 'v0.1.1';
+    $VERSION = 'v0.1.3';
 };
 
 use strict;
@@ -645,7 +646,7 @@ sub reply
     }
     
     # Our print() will possibly change the HTTP headers, so we do not flush now just yet.
-    my $json = $self->json->utf8->relaxed(0)->encode( $ref );
+    my $json = $self->json->utf8->relaxed(0)->allow_blessed->convert_blessed->encode( $ref );
     # Before we use this, we have to make sure all Apache module that deal with content encoding are de-activated because they would interfere
     $self->print( $json ) || do
     {
@@ -822,7 +823,7 @@ Apache2::API - Apache2 API Framework
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.3
 
 =head1 DESCRIPTION
 
@@ -858,7 +859,7 @@ Optional. If set with a positive integer, this will activate debugging message
 
 =head2 apache_request
 
-Returns the L<Apache2::RequestRec> object, assuming the C<GlobalRequest> option is enabled in Apache configuration.
+Returns the L<Apache2::RequestRec> object that was provided upon object instantiation.
 
 =head2 bailout
 

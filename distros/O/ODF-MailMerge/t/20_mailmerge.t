@@ -3,7 +3,7 @@ use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp
 use t_TestCommon ':silent', # Test2::V0 etc.
-                 qw/:DEFAULT verif_no_internals_mentioned
+                 qw/:DEFAULT verif_eval_err verif_no_internals_mentioned
                     $debug $savepath/;
 
 #diag "WARNING: :silent temp disabled";
@@ -59,7 +59,8 @@ my $input_path = tmpcopy_if_writeable($master_copy_path);
 ## NULL mail merge
 ###############################
 {
-  my $doc = odf_get_document($input_path, read_only => 1);
+  #my $doc = odf_get_document($input_path, read_only => 1);
+  my $doc = odf_new_document_from_template($input_path);
   my $body = $doc->get_body;
 
 # maximal addrvis() ndigits
@@ -105,7 +106,8 @@ if ($debug) {
 ## SINGLE RECORD mail merge
 ###############################
 {
-  my $doc = odf_get_document($input_path, read_only => 1);
+  #my $doc = odf_get_document($input_path, read_only => 1);
+  my $doc = odf_new_document_from_template($input_path);
   my $body = $doc->get_body;
 
   my $before_text = $body->Hget_text();
@@ -127,7 +129,7 @@ if ($debug) {
   my $exp = $before_text;
   $exp =~ s/\{PROTO-TAG\}// or oops;
   $exp =~ s/\{LAST NAME.*?\}/Brown/ or oops;
-  $exp =~ s/\{FIRST NAME.*?\}/John/ or oops;
+  $exp =~ s/\{FIRST_NAME.*?\}/John/ or oops;
   $exp =~ s/\{Address1.*?\}/115 John Brown Road/ or oops;
   $exp =~ s/(?<=John Brown Road)\{Address2.*?\}//s or oops vis $exp;
   $exp =~ s/\{CITY.*?\}/Lake\N{U+A0}Placid/ or oops;
@@ -180,7 +182,7 @@ if ($debug) {
 ## and unhandled {token} diagnosis
 ############################################
 {
-  my $doc = odf_get_document($input_path, read_only => 1);
+  my $doc = odf_new_document_from_template($input_path);
   my $body = $doc->get_body;
 
   my $engine = ODF::MailMerge::Engine->new(
@@ -195,7 +197,7 @@ if ($debug) {
       if (int(rand(2)) == 0) {
         @retvals = (0); # do nothing
       } else {
-        @retvals = (Hr_SUBST, ["bogon"]);
+        @retvals = (MM_SUBST, ["bogon"]);
       }
       say dvis '"*" callback: $tokname $token $custom_mods @retvals' if $debug;
       $wildcard_got{$tokname}++;
@@ -206,7 +208,7 @@ if ($debug) {
 
   is (\%wildcard_got,
       hash {
-        field 'FIRST NAME' => match qr/^[1-9]\d*$/;
+        field 'FIRST_NAME' => match qr/^[1-9]\d*$/;
         field 'LAST NAME'  => match qr/^[1-9]\d*$/;;
         field Address1     => match qr/^[1-9]\d*$/;;
         field Address2     => match qr/^[1-9]\d*$/;;
@@ -222,12 +224,15 @@ if ($debug) {
   $engine->add_record(\%hash1, debug => $debug);
 
   my %hash2 = (
-    'FIRST NAME' => "John",
+    'FIRST_NAME' => "John",
     'LAST NAME' => "Brown",
   );
   eval { $engine->add_record(\%hash2, debug => $debug) };
   verif_no_internals_mentioned($@);
   like($@, qr/nhandled token/, "Diagnose unhandled {token}");
+
+  eval {my $engine2 = ODF::MailMerge::Engine->new(context => $body, proto_tag => '{Non Existent}')}; verif_eval_err(qr/Non Existent/);
+  pass("Diagnose non-existent proto_tag");
 }
 
 done_testing();

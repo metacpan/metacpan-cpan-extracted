@@ -34,8 +34,8 @@
 #include "spvm_api_type.h"
 #include "spvm_runtime_basic_type.h"
 #include "spvm_api_basic_type.h"
-
-
+#include "spvm_mutex.h"
+#include "spvm_compiler.h"
 
 
 
@@ -105,6 +105,11 @@ SPVM_API_RUNTIME* SPVM_API_RUNTIME_new_api() {
     SPVM_API_RUNTIME_get_basic_types_length,
     SPVM_API_RUNTIME_build_precompile_module_source,
     SPVM_API_RUNTIME_build_precompile_method_source,
+    SPVM_API_RUNTIME_get_compiler,
+    SPVM_API_RUNTIME_set_compiler,
+    SPVM_API_RUNTIME_get_spvm_stdin,
+    SPVM_API_RUNTIME_get_spvm_stdout,
+    SPVM_API_RUNTIME_get_spvm_stderr,
   };
   SPVM_API_RUNTIME* env_runtime = calloc(1, sizeof(env_runtime_init));
   memcpy(env_runtime, env_runtime_init, sizeof(env_runtime_init));
@@ -116,15 +121,16 @@ void SPVM_API_RUNTIME_free_api(SPVM_API_RUNTIME* api) {
   free(api);
 }
 
-int32_t SPVM_API_RUNTIME_get_object_data_offset(SPVM_RUNTIME* runtime) {
-  // Adjust alignment SPVM_VALUE
-  int32_t object_header_size = sizeof(SPVM_OBJECT);
-  if (object_header_size % sizeof(SPVM_VALUE) != 0) {
-    object_header_size += (sizeof(SPVM_VALUE) - object_header_size % sizeof(SPVM_VALUE));
-  }
-  assert(object_header_size % sizeof(SPVM_VALUE) == 0);
+int32_t SPVM_API_RUNTIME_get_object_mutex_offset(SPVM_RUNTIME* runtime) {
+  int32_t object_mutex_offset = sizeof(SPVM_OBJECT);
   
-  return object_header_size;
+  return object_mutex_offset;
+}
+
+int32_t SPVM_API_RUNTIME_get_object_data_offset(SPVM_RUNTIME* runtime) {
+  int32_t object_data_offset = sizeof(SPVM_OBJECT) + SPVM_MUTEX_size();
+  
+  return object_data_offset;
 }
 
 int32_t SPVM_API_RUNTIME_get_object_ref_count_offset(SPVM_RUNTIME* runtime) {
@@ -244,5 +250,30 @@ void SPVM_API_RUNTIME_build_precompile_method_source(SPVM_RUNTIME* runtime, SPVM
   SPVM_PRECOMPILE_set_runtime(precompile, runtime);
   SPVM_PRECOMPILE_build_method_source(precompile, string_buffer, method->current_basic_type, method);
   SPVM_PRECOMPILE_free(precompile);
+}
+
+SPVM_COMPILER* SPVM_API_RUNTIME_get_compiler(SPVM_RUNTIME* runtime) {
+  
+  return runtime->compiler;
+}
+
+void SPVM_API_RUNTIME_set_compiler(SPVM_RUNTIME* runtime, SPVM_COMPILER* compiler) {
+  
+  runtime->compiler = compiler;
+}
+
+FILE* SPVM_API_RUNTIME_get_spvm_stdin(SPVM_RUNTIME* runtime) {
+  
+  return runtime->spvm_stdin;
+}
+
+FILE* SPVM_API_RUNTIME_get_spvm_stdout(SPVM_RUNTIME* runtime) {
+  
+  return runtime->spvm_stdout;
+}
+
+FILE* SPVM_API_RUNTIME_get_spvm_stderr(SPVM_RUNTIME* runtime) {
+  
+  return runtime->spvm_stderr;
 }
 

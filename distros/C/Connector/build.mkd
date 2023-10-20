@@ -38,7 +38,8 @@ minil test
 ```
 perl -i -pe "s{our \\\$VERSION = .+}{our \\\$VERSION = '$connver';};" \
   lib/Connector.pm
-git add lib/Connector.pm
+minil dist
+git add lib/Connector.pm META.json
 git commit -m "bump version to $connver"
 ```
 

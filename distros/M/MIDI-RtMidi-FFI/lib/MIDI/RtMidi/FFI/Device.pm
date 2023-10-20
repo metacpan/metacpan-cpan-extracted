@@ -9,7 +9,7 @@ use MIDI::RtMidi::FFI ':all';
 use MIDI::Event;
 use Carp;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my $rtmidi_api_names = {
     unspecified => [ "Unknown",            RTMIDI_API_UNSPECIFIED ],
@@ -322,7 +322,7 @@ MIDI::RtMidi::FFI::Device - OO interface for MIDI::RtMidi::FFI
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -637,7 +637,7 @@ John Barrett <john@jbrt.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by John Barrett.
+This software is copyright (c) 2023 by John Barrett.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

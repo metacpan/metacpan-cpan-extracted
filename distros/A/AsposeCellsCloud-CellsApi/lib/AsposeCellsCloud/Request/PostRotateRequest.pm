@@ -59,7 +59,7 @@ sub new {
 
 
 # Run Operation Request
-# PostRotateRequest.File : File to upload  ,
+# PostRotateRequest.File : 270/90/row/col/row2col  ,
 # PostRotateRequest.rotateType : 270/90/row/col/row2col  ,
 # PostRotateRequest.format : CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers  ,
 # PostRotateRequest.password :   ,
@@ -138,7 +138,7 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'File to upload',
+     	description => '270/90/row/col/row2col',
      	format => '',
      	read_only => '',
      		},

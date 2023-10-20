@@ -20,7 +20,6 @@ BEGIN {
 use Test::More;
 use IPC::Run qw( harness timeout );
 
-plan skip_all => 'Skipping on Win32' if $ENV{GITHUB_WINDOWS_TESTING};
 plan tests => 26;
 
 my $h;
@@ -88,7 +87,7 @@ SCOPE: {
 }
 
 {
-    $h = harness( [ $^X, '-e', 'sleep 1' ], timeout(10), debug => 0 );
+    $h = harness( [ $^X, '-e', 'sleep 1' ], timeout(180), debug => 0 );
     my $started_at = time;
     $h->start;
     $h->finish;

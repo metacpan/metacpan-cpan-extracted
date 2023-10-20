@@ -185,6 +185,7 @@ UPDATE HISTORY
     so that testing passes in the future.  
     v2.5 Released May 8, 2020. Numerous bug fixes and moved to The McGrail  
     Foundation.  
+    v2.5.1 Released April 4, 2023. Documentation bug fixes and improved ipv6 support.  
     This product is in active use in production system.  
 
 HOMEPAGE

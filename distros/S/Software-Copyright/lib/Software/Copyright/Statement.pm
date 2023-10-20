@@ -8,7 +8,7 @@
 #   The GNU General Public License, Version 3, June 2007
 #
 package Software::Copyright::Statement;
-$Software::Copyright::Statement::VERSION = '0.010';
+$Software::Copyright::Statement::VERSION = '0.012';
 use 5.20.0;
 use warnings;
 
@@ -61,9 +61,12 @@ sub __clean_copyright ($c) {
     $c =~ s/(\\n)*all\s+rights?\s+reserved\.?(\\n)*\s*//gi; # yes there are literal \n
     $c = '' if $c =~ /^\*No copyright/i;
     $c =~ s/\(r\)//g;
-    $c =~ s!^[\s,/*]|[\s,#/*-]+$!!g;
+    # remove spurious characters at beginning or end of string
+    $c =~ s!^[\s,/*]+|[\s,#/*-]+$!!g;
     $c =~ s/--/-/g;
     $c =~ s!\s+\*/\s+! !;
+    # remove copyright word surrounded by non alpha char (like "@copyright{}");
+    $c =~ s/[^a-z0-9\s,.'"]+copyright[^a-z0-9\s,.'"]+//i;
     # libuv1 has copyright like "2000, -present"
     $c =~ s![,\s]*-present!'-'.(localtime->year() + 1900)!e;
     # cleanup markdown copyright
@@ -177,7 +180,7 @@ Software::Copyright::Statement - a copyright statement for one owner
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 SYNOPSIS
 

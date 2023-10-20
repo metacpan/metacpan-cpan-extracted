@@ -137,11 +137,11 @@ sub no_err(&);
                               {}])}    qr/^src: each entry must be a defined scalar/;
 
   note("Accessor args");
-  err_like {$obj->inc(1)}               qr/^Unexpected argument\(s\)/;
-  err_like {$obj->noinc(1)}             qr/^Unexpected argument\(s\)/;
-  err_like {$obj->prespec(1)}           qr/^Unexpected argument\(s\)/;
-  err_like {$obj->elems(1)}             qr/^Unexpected argument\(s\)/;
-  err_like {$obj->elem_ids(1)}          qr/^Unexpected argument\(s\)/;
+  err_like {$obj->inc(1, 2)}            qr/^Unexpected argument\(s\)/;
+  err_like {$obj->noinc(1, 2)}          qr/^Unexpected argument\(s\)/;
+  err_like {$obj->prespec(1, 2)}        qr/^Unexpected argument\(s\)/;
+  err_like {$obj->elems(1, 2)}          qr/^Unexpected argument\(s\)/;
+  err_like {$obj->elem_ids(1, 2)}       qr/^Unexpected argument\(s\)/;
 
   note("matrix() and matrix_named()");
   err_like {$obj->matrix(1, 2, 3)}      qr/^Odd number of arguments/;

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::FieldAttr 0.802;
+package Object::Pad::MOP::FieldAttr 0.804;
 
 use v5.14;
 use warnings;
@@ -38,7 +38,7 @@ effect. They can be silenced with
 
 =head2 register
 
-   Object::Pad::MOP::FieldAttr->register( $name, %args )
+   Object::Pad::MOP::FieldAttr->register( $name, %args );
 
 I<Since version 0.60.>
 

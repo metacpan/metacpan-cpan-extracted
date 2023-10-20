@@ -14,7 +14,7 @@ our @EXPORT = ('strtotime');
 ###############################################################################
 
 # https://pause.perl.org/pause/query?ACTION=pause_operating_model#3_5_factors_considering_in_the_indexing_phase
-our $VERSION = 0.4;
+our $VERSION = 0.5;
 
 # https://timezonedb.com/download
 my $TZ_OFFSET = {
@@ -105,12 +105,21 @@ order. In all cases, the day of the week is ignored in the input string.
 
 B<Note:> Strings without a year are assumed to be in the current year. Example: C<May 15th, 10:15am>
 
-B<Note:> Strings with only a date are assumed to occur at the midnight. Example: C<2023-01-15>
+B<Note:> Strings with only a date are assumed to occur at midnight. Example: C<2023-01-15>
 
 B<Note:> Strings with only time are assumed to be the current day. Example: C<10:15am>
 
 B<Note:> In strings with numeric B<and> textual time zone offsets, the numeric is used. Example:
 C<14 Nov 1994 11:34:32 -0500 (EST)>
+
+=head1 Will you support XYZ format?
+
+Everyone has their B<favorite> date/time format, and we'd like to support as many
+as possible. We have tried to support as much of
+L<ISO 8601|https://en.wikipedia.org/wiki/ISO_8601> as possible, but we
+cannot support everything. Every new format we support runs the risk of slowing
+down things for existing formats. You can submit a feature request on Github
+for new formats but we may reject them if adding support would slow down others.
 
 =head1 Bugs/Features
 
@@ -180,13 +189,13 @@ sub strtotime {
 	###########################################################################
 
 	state $rule_2 = qr/
-		(\d{1,2})?       # Maybe some digits before month
+		(\d{1,2})?            # Maybe some digits before month
 		\s*
-		($MONTH_REGEXP)  # A textual month
+		($MONTH_REGEXP)       # A textual month
 		\s+
-		(\d{1,4})        # Digits
-		[\s\$]           # Whitespace OR end of line
-		((\d{4}) )?      # If there are digits ater the space it's 'Jan 13 2000'
+		(\d{1,4})             # Digits
+		[\s\$]                # Whitespace OR end of line
+		((\d{2}|\d{4})[ \$])? # If there are two or four digits ater it's a year
 	/x;
 
 	# Next we look for alpha months followed by a digit if we didn't find a numeric month above
@@ -205,8 +214,11 @@ sub strtotime {
 		} else {
 			$day = int($3);
 
-			# *IF* there is a $5 it's a year
-			$year ||= int($5 || 0);
+			# *IF* we still don't have a year
+			if (!$year) {
+				my $part = $5 || 0;
+				$year    = int($part)
+			}
 		}
 	}
 
@@ -222,11 +234,10 @@ sub strtotime {
 
 		# Month starts string: dec/21/93 or feb/14/1999
 		if ($before eq "") {
-			$after =~ m/(\d{2})$sep(\d{2,4})/;
-
-			$day  = $1;
-			$year = $2;
-
+			if ($after =~ m/(\d{2})$sep(\d{2,4})/) {
+				$day  = $1;
+				$year = $2;
+			}
 		# Month in the middle: 21/dec/93
 		} elsif ($before && $after) {
 			$before =~ m/(\d+)\D/; # Just the digits
@@ -256,8 +267,7 @@ sub strtotime {
 		$hour = int($2);
 		$min  = int($3);
 		$sec  = $4 || 0; # Not int() cuz it might be float for milliseconds
-
-		$sec =~ s/Z$//;
+		$sec  =~ s/Z$//; # Remove and Z at the end
 
 		# The string of AM or PM
 		my $ampm = lc($6 || "");
@@ -295,16 +305,20 @@ sub strtotime {
 	###########################################################################
 	###########################################################################
 
-	# Sanity check some basic boundaries
-	# I don't think we need this any more since we eval() and timegm_modern() will barf and return undef
-	#if ($month > 12 || $day > 31 || $hour > 23 || $min > 60 || $sec > 61) {
-	#    return undef;
-	#}
+	# If there is no month, we assume the current month
+	if (!$month) {
+		$month = (localtime())[4] + 1;
+	}
 
-	$month ||= (localtime())[4] + 1; # If there is no month, we assume the current month
-	$day   ||= (localtime())[3];     # If there is no day, we assume the current day
+	# If there is no day, we assume the current day
+	if (!$day) {
+		$day = (localtime())[3];
+	}
+
 	# If we STILL don't have a year it may be a time only string so we assume it's the current year
-	$year  ||= (localtime())[5] + 1900;
+	if (!$year) {
+		$year = (localtime())[5] + 1900;
+	}
 
 	# Convert any two digit years to four digits
 	if ($year < 100) {
@@ -318,11 +332,14 @@ sub strtotime {
 
 	# If we have all the requisite pieces we build a unixtime
 	my $ret;
-	my $err = $@ || 'Error' unless eval {
+	my $ok = eval {
 		$ret = Time::Local::timegm_modern($sec, $min, $hour, $day, $month - 1, $year);
 
 		return 1;
 	};
+	# This has to be *immediately* after the eval or something else might
+	# tromp on the error message
+	my $err = $@;
 
 	if ($err && $err =~ /Undefined subroutine/) {
 		print STDERR $err;
@@ -349,6 +366,7 @@ sub strtotime {
 		)
 	/x;
 
+	# If we have a string with a timezone piece
 	if ($ret && $str =~ $tz_rule) {
 		my $str_offset = 0;
 
@@ -373,7 +391,7 @@ sub strtotime {
 				$str_offset *= -1;
 			}
 
-			$tz_str = "$2$3$4";
+			$tz_str = "$3$4$5";
 		}
 
 		$tz_offset_seconds = $str_offset;
@@ -389,8 +407,8 @@ sub strtotime {
 	$ret -= $tz_offset_seconds;
 
 	if ($debug) {
-		my $color = "\e[38;5;45m";
-		my $reset = "\e[0m";
+		my $color  = "\e[38;5;45m";
+		my $reset  = "\e[0m";
 		my $header = sprintf("%*s = YYYY-MM-DD HH:II:SS (timezone offset)", length($str) + 2, "Input string");
 		my $output = sprintf("'%s' = %02d-%02d-%02d %02d:%02d:%02d (%s = %d seconds)", $str, $year || -1, $month || -1, $day || -1, $hour, $min, $sec, $tz_str, $tz_offset_seconds);
 
@@ -406,17 +424,17 @@ sub strtotime {
 sub get_local_offset {
 	my $unixtime = $_[0];
 
+	# If we have a forced LOCAL_TZ_OFFSET we use that (unit tests)
+	if (defined($LOCAL_TZ_OFFSET)) {
+		return $LOCAL_TZ_OFFSET;
+	}
+
 	# Since timezones only change on the half-hour (at most), we
 	# round down the nearest half hour "bucket" and then cache
 	# that result. We probably could get away with a full hour
 	# here but we don't gain much performance/memory by doing that
 	my $bucket_size = 1800;
 	my $cache_key   = $unixtime - ($unixtime % $bucket_size);
-
-	# If we have a forced LOCAL_TZ_OFFSET we use that (unit tests)
-	if (defined($LOCAL_TZ_OFFSET)) {
-		return $LOCAL_TZ_OFFSET;
-	}
 
 	# Simple memoizing (improves repeated performance a LOT)
 	# Note: this is even faster than `use Memoize`

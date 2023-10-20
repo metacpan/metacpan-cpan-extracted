@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'password' => {
      	datatype => 'string',
      	base_name => 'Password',
-     	description => '',
+     	description => 'Password.',
      	format => '',
      	read_only => '',
      		},    

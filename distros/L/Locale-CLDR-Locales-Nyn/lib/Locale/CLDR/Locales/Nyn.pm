@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Nyn - Package for language Nyankole
 
 =cut
 
 package Locale::CLDR::Locales::Nyn;
-# This file auto generated from Data/common/main/nyn.xml
-#	on Mon 11 Apr  5:35:55 pm GMT
+# This file auto generated from Data\common\main\nyn.xml
+#	on Fri 13 Oct  9:32:28 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

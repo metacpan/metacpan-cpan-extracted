@@ -6,6 +6,25 @@
 #   07 March 2023: 2.020s (with MPU)
 #   07 March 2023: 2.418s (without MPU)
 
+assert_eq(8 >> 32, 0)
+assert_eq(112 >> 32, 0)
+assert_eq(208 >> 64, 0)
+assert_eq(496 >> 32, 0)
+assert_eq(640 >> 32, 0)
+
+assert(all_prime(5))
+assert([2].all_prime)
+assert([5].all_prime)
+assert([2,3,5,7,11].all_prime)
+
+assert_eq(10.by{.is_safe_prime}, %n[5, 7, 11, 23, 47, 59, 83, 107, 167, 179])
+
+assert_eq(8 >> 8, 0)
+assert_eq(0 >> 0, 0)
+assert_eq(1234 >> 8, 4)
+
+assert_eq(13.smooth_count(1e16), 511985)
+
 assert_eq(squarefree_sum(1e6), 303961062910)
 assert_eq(squarefree_sum(1e7), 30396557311887)
 
@@ -462,9 +481,20 @@ do {
         assert(n.is_super_psp)
         assert(n.is_euler_psp)
         assert(!n.is_pell_psp)
+        assert(!n.is_bfw_psp)
+        assert(!n.is_bpsw_prp)
         assert(!n.is_fib_psp)
         assert(!n.is_carmichael)
+        assert(!n.is_chebyshev_psp)
+        assert(!n.is_strong_fib_psp)
         assert(!n.is_lucas_psp)
+        assert(!n.is_lucasU_psp(1, -1))
+        assert(!n.is_lucasV_psp(1, -1))
+        assert(!n.is_lucasU_psp)
+        assert(!n.is_lucasV_psp)
+        assert(!n.is_strong_lucas_psp)
+        assert(!n.is_stronger_lucas_psp)
+        assert(!n.is_strongish_lucas_psp)
         assert(!n.is_lucas_carmichael)
         assert(!n.is_imprimitive_carmichael)
     }
@@ -826,6 +856,11 @@ assert_eq(next_perfect_power(4171), do {
 assert_eq(prev_perfect_power(4171), do {
     var n = 4171; while (!n.is_perfect_power) { --n }; n
 })
+
+assert_eq(
+    next_perfect_power(1<<3320).prev_perfect_power.prev_perfect_power.next_perfect_power,
+    1 << 3320,
+)
 
 assert_eq(
     10.by { .is_squarefree_almost_prime(2) },
@@ -1308,6 +1343,16 @@ assert_eq(
         n.is_composite && (divmod(powmod(10, n-1, n)-1, 9, n) == 0)
     },
     %n[91 259 451 481 703 1729 2821 2981 3367 4141],
+)
+
+assert_eq(
+    (-8 .. 8 -> map { .is_power }),
+    [true, false, false, false, false, false, false, true, true, true, false, false, true, false, false, false, true]
+)
+
+assert_eq(
+    ((-8 .. 8) ~X (-8 .. 8) -> map_2d {|n,k| is_power(n,k) }),
+    [false, false, false, false, false, false, false, false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, true, false, false, false, false, false]
 )
 
 say "** Tests passed!"

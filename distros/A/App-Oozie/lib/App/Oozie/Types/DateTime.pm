@@ -1,6 +1,6 @@
 package App::Oozie::Types::DateTime;
-$App::Oozie::Types::DateTime::VERSION = '0.006';
-use 5.010;
+$App::Oozie::Types::DateTime::VERSION = '0.010';
+use 5.014;
 use strict;
 use warnings;
 
@@ -86,7 +86,7 @@ App::Oozie::Types::DateTime
 
 =head1 VERSION
 
-version 0.006
+version 0.010
 
 =head1 SYNOPSIS
 

@@ -6,11 +6,18 @@
 
 #include "spvm_typedecl.h"
 
-struct spvm_mutex;
-typedef struct spvm_mutex SPVM_MUTEX;
+void SPVM_MUTEX_init(void* mutex);
 
-struct spvm_mutex {
-   void* mutex;
-};
+void SPVM_MUTEX_destroy(void* mutex);
+
+void SPVM_MUTEX_lock (void* mutex);
+
+void SPVM_MUTEX_unlock (void* mutex);
+
+void SPVM_MUTEX_reader_lock (void* mutex);
+
+void SPVM_MUTEX_reader_unlock (void* mutex);
+
+int32_t SPVM_MUTEX_size ();
 
 #endif  // SPVM_MUTEX_H

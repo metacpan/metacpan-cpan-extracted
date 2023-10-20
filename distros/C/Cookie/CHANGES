@@ -1,5 +1,11 @@
 Revision history for Perl module Cookie
 
+v0.3.3 2023-10-11T00:01:31+0900
+    - Corrected malformed signature for distribution release
+
+v0.3.2 2023-09-19T12:39:43+0900
+    - Improved code for speed
+
 v0.3.1 2023-06-02T11:35:52+0900
     - Corrected a minor bug in test unit in method is() in CookieTest.pm
     - Updated dependencies.

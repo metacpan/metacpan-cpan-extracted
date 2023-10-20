@@ -1,0 +1,9 @@
+# No specific version needed
+
+requires 'JSON::XS';
+requires 'Path::Tiny';
+requires 'Data::Fake';
+requires 'JSON::Validator';
+
+# Specific version needed
+requires 'Scalar::Util', '>= 1.50'; 

@@ -1,5 +1,5 @@
 
-# Time-stamp: "2010-12-23 09:19:57 conklin"
+# Time-stamp: "2023-10-17 09:28:16 conklin"
 require 5;
 package MIDI::Simple;
 use MIDI;
@@ -14,7 +14,7 @@ use subs qw(&make_opus($\@) &write_score($$\@)
            );
 require Exporter;
 @ISA = qw(Exporter);
-$VERSION = '0.83';
+$VERSION = '0.84';
 $Debug = 0;
 
 @EXPORT = qw(
@@ -57,6 +57,7 @@ MIDI::Simple - procedural/OOP interface for MIDI composition
 
 =head1 SYNOPSIS
 
+ use strict;
  use MIDI::Simple;
  new_score;
  text_event 'http://www.ely.anglican.org/parishes/camgsm/bells/chimes.html';
@@ -67,12 +68,12 @@ MIDI::Simple - procedural/OOP interface for MIDI composition
 
  noop c1, f, o5;  # Setup
  # Now play
- n qn, Cs;    n F;   n Ds;  n hn, Gs_d1;
- n qn, Cs;    n Ds;  n F;   n hn, Cs;
- n qn, F;     n Cs;  n Ds;  n hn, Gs_d1;
- n qn, Gs_d1; n Ds;  n F;   n hn, Cs;
+ n 'qn', 'Cs';    n 'F';   n 'Ds';  n 'hn', 'Gs_d1';
+ n 'qn', 'Cs';    n 'Ds';  n 'F';   n 'hn', 'Cs';
+ n 'qn', 'F';     n 'Cs';  n 'Ds';  n 'hn', 'Gs_d1';
+ n 'qn', 'Gs_d1'; n 'Ds';  n 'F';   n 'hn', 'Cs';
 
- write_score 'westmister_chimes.mid';
+ write_score 'westminster_chimes.mid';
 
 =head1 DESCRIPTION
 
@@ -369,7 +370,7 @@ positive integer in the range 0 (completely inaudible?) to 127 (AS
 LOUD AS POSSIBLE).  Example: "V90" sets Volume to 90.
 
 * An alphanumeric B<volume> parameter.  This is a key from the hash
-%MIDI::Simple::Volume.  Current legal values are "ppp", "pp", "p",
+C<%MIDI::Simple::Volume>.  Current legal values are "ppp", "pp", "p",
 "mp", "mezzo" (or "m"), "mf", "f", "ff", and "fff".  Example: "ff"
 sets Volume to 112.  (Note that "m" isn't a good bareword, so use
 "mezzo" instead, or just always remember to use quotes around "m".)
@@ -382,7 +383,7 @@ a positive (presumably nonzero) integer.  Example: "d48", to set
 Duration to 48.
 
 * An alphabetic (or in theory, possibly alphanumeric) B<duration>
-parameter.  This is a key from the hash %MIDI::Simple::Length.
+parameter.  This is a key from the hash C<%MIDI::Simple::Length>.
 Current legal values start with "wn", "hn", "qn", "en", "sn" for
 whole, half, quarter, eighth, or sixteenth notes.  Add "d" to the
 beginning of any of these to get "dotted..." (e.g., "dqn" for a dotted
@@ -391,7 +392,7 @@ get "double-dotted..."  (e.g., "ddqn" for a double-dotted quarter
 note).  Add "t" to the beginning of any of that first list to get
 "triplet..."  (e.g., "tsn" for a triplet sixteenth note -- i.e. a note
 such that 3 of them add up to something as long as one eighth note).
-You may add to the contents of %MIDI::Simple::Length to support
+You may add to the contents of C<%MIDI::Simple::Length> to support
 whatever abbreviations you want, as long as the parser can't mistake
 them for any other kind of n/r/noop parameter.
 
@@ -431,7 +432,7 @@ at the end of this section.)
 
 So this:
 
-  n mf, n40, n47, n50;
+  n 'mf', 'n40', 'n47', 'n50';
 
 sets Volume to 80, and Notes to (40, 47, 50).  And it sets Octave,
 first to 3 (since n40 is in octave 3), then to 3 again (since n47 =
@@ -439,7 +440,7 @@ B3), and then finally to 4 (since n50 = D4).
 
 Note that this is the same as:
 
-  n n40, n47, n50, mf;
+  n 'n40', 'n47', 'n50', 'mf';
 
 The relative orders of parameters is B<usually> irrelevant; but see
 the section "Order of Parameters in a Call to n/r/noop", below.
@@ -447,7 +448,7 @@ the section "Order of Parameters in a Call to n/r/noop", below.
 * An alphanumeric, absolute B<note> specification. 
 
 These have the form: a string denoting a note within the octave (as
-determined by %MIDI::Simple::Note -- see below, in the description of
+determined by C<%MIDI::Simple::Note> -- see below, in the description of
 alphanumeric, relative note specifications), and then a number
 denoting the octave number (in the range 0-10).  Examples: "C3",
 "As4" or "Asharp4", "Bf9" or "Bflat9".
@@ -458,16 +459,16 @@ Octave to 3, "As4" sets Octave to 4, and "Bflat9" sets Octave to 9.
 
 This:
 
-  n E3, B3, D4, mf;
+  n 'E3', 'B3', 'D4', 'mf';
 
 does the same as this example of ours from before:
 
-  n n40, n47, n50, mf;
+  n 'n40', 'n47', 'n50', 'mf';
 
 * An alphanumeric, relative B<note> specification. 
 
 These have the form: a string denoting a note within the octave (as
-determined by %MIDI::Simple::Note), and then an optional parameter
+determined by C<%MIDI::Simple::Note>), and then an optional parameter
 "_u[number]" meaning "so many octaves up from the current octave" or
 "_d[parameter]" meaning "so many octaves down from the current
 octave".
@@ -479,7 +480,7 @@ In resolving what actual notes these kinds of specifications denote,
 the current value of Octave is used.
 
 What's a legal for the first bit (before any optional octave up/down
-specification) comes from the keys to the hash %MIDI::Simple::Note.
+specification) comes from the keys to the hash C<%MIDI::Simple::Note>.
 The current acceptable values are:
 
  C                                 (maps to the value 0)
@@ -496,8 +497,8 @@ The current acceptable values are:
  B                                 (maps to the value 11)
 
 (Note that these are based on the English names for these notes.  If
-you prefer to add values to accomodate other strings denoting notes in
-the octave, you may do so by adding to the hash %MIDI::Simple::Note
+you prefer to add values to accommodate other strings denoting notes in
+the octave, you may do so by adding to the hash C<%MIDI::Simple::Note>
 like so:
 
   use MIDI::Simple;
@@ -511,24 +512,24 @@ like so:
 But the values you add must not contain any characters outside the
 range [A-Za-z\x80-\xFF]; and your new values must not look like
 anything that could be any other kind of specification.  E.g., don't
-add "mf" or "o3" to %MIDI::Simple::Note.)
+add "mf" or "o3" to C<%MIDI::Simple::Note>.)
 
 Consider that these bits of code all do the same thing:
 
-  n E3, B3, D4, mf;       # way 1
+  n 'E3', 'B3', 'D4', 'mf';       # way 1
   
-  n E3, B,  D_u1, mf;     # way 2
+  n 'E3', 'B', 'D_u1', 'mf';      # way 2
   
-  n o3, E, B,  D_u1, mf;  # way 3
+  n 'o3', 'E', 'B', 'D_u1', 'mf'; # way 3
   
-  noop o3, mf;            # way 4
-  n     E, B,  D_u1;
+  noop 'o3', 'mf';                # way 4
+  n    'E', 'B', 'D_u1';
 
 or even
 
-  n o3, E, B, o4, D, mf;       # way 5!
+  n 'o3', 'E', 'B', 'o4', 'D', 'mf';    # way 5!
   
-  n o6, E_d3, B_d3, D_d2, mf;  # way 6!
+  n 'o6', 'E_d3', 'B_d3', 'D_d2', 'mf'; # way 6!
 
 If a "_d[number]" would refer to a note in an octave below 0, it is
 forced into octave 0.  If a "_u[number]" would refer to a note in an
@@ -542,18 +543,18 @@ Parameters to n/r/noop", below.)
 Notes to empty-list.  That way you can make a call to C<n> actually
 make a rest:
 
-  n qn, G;    # makes a G quarter-note
-  n hn, rest; # half-rest -- alters Notes, making it ()
-  n C,G;      # half-note chord: simultaneous C and G
-  r;          # half-rest -- DOESN'T alter Notes.
-  n qn;       # quarter-note chord: simultaneous C and G
-  n rest;     # quarter-rest
-  n;          # another quarter-rest
+  n 'qn', 'G';    # makes a G quarter-note
+  n 'hn', 'rest'; # half-rest -- alters Notes, making it ()
+  n 'C', 'G';     # half-note chord: simultaneous C and G
+  r;              # half-rest -- DOESN'T alter Notes.
+  n 'qn';         # quarter-note chord: simultaneous C and G
+  n 'rest';       # quarter-rest
+  n;              # another quarter-rest
 
 (If you can follow the above code, then you understand.)
 
 A "C<rest>" that occurs in a parameter list with other note specs
-(e.g., "n qn, A, rest, G") has B<no effect>, so don't do that.
+(e.g., "n 'qn', 'A', 'rest', 'G'") has B<no effect>, so don't do that.
 
 =head2 Order of Parameters in a Call to n/r/noop
 
@@ -561,31 +562,31 @@ The order of parameters in calls to n/r/noop is not important except
 insofar as the parameters change the Octave parameter, which may change
 how some relative note specifications are resolved.  For example:
 
-  noop o4, mf;
-  n G, B, A3, C;
+  noop 'o4', 'mf';
+  n 'G', 'B', 'A3', 'C';
 
-is the same as "n mf, G4, B4, A3, C3".  But just move that "C" to the
+is the same as "n 'mf', 'G4', 'B4', 'A3', 'C3'".  But just move that "C" to the
 start of the list:
 
-  noop o4, mf;
-  n C, G, B, A3;
+  noop 'o4', 'mf';
+  n 'C', 'G', 'B', 'A3';
 
-and you something different, equivalent to "n mf, C4, G4, B4, A3".
+and you something different, equivalent to "n 'mf', 'C4', 'G4', 'B4', 'A3'".
 
 But note that you can put the "mf" anywhere without changing anything.
 
 But B<stylistically>, I strongly advise putting note parameters at the
 B<end> of the parameter list:
 
-  n mf, c10, C, B;  # 1. good
-  n C, B, mf, c10;  # 2. bad
-  n C, mf, c10, B;  # 3. so bad!
+  n 'mf', 'c10', 'C', 'B';  # 1. good
+  n 'C', 'B', 'mf', 'c10';  # 2. bad
+  n 'C', 'mf', 'c10', 'B';  # 3. so bad!
 
 3 is particularly bad because an uninformed/inattentive reader may get
 the impression that the C may be at a different volume and on a
 different channel than the B.
 
-(Incidentally, "n C5,G5" and "n G5,C5" are the same for most purposes,
+(Incidentally, "n 'C5', 'G5'" and "n 'G5', 'C5'" are the same for most purposes,
 since the C and the G are played at the same time, and with the same
 parameters (channel and volume); but actually they differ in which
 note gets put in the Score first, and therefore which gets encoded
@@ -1185,7 +1186,7 @@ As to the Tempo/Duration parameter, leave it alone and just assume
 that 96 ticks-per-quarter-note is a universal constant, and you'll be
 happy.
 
-(You may wonder: Why 96?  As far as I've worked out, all purmutations
+(You may wonder: Why 96?  As far as I've worked out, all permutations
 of the normal note lengths (whole, half, quarter, eighth, sixteenth,
 and even thirty-second notes) and tripletting, dotting, or
 double-dotting, times 96, all produce integers.  For example, if a
@@ -1387,22 +1388,22 @@ of synch:
 
         my $measure = 0;
         my @phrases =(
-          [ Cs, F,  Ds, Gs_d1 ], [Cs,    Ds, F, Cs],
-          [ F,  Cs, Ds, Gs_d1 ], [Gs_d1, Ds, F, Cs]
+          [ 'Cs', 'F',  'Ds', 'Gs_d1' ], ['Cs',    'Ds', 'F', 'Cs'],
+          [ 'F',  'Cs', 'Ds', 'Gs_d1' ], ['Gs_d1', 'Ds', 'F', 'Cs']
         );
         
         for(1 .. 20) { synch(\&count, \&lalala); }
         
         sub count {
           my $it = $_[0];
-          $it->r(wn); # whole rest
-          # not just "r(wn)" -- we want a method, not a procedure!
+          $it->r('wn'); # whole rest
+          # not just "r('wn')" -- we want a method, not a procedure!
           ++$measure;
         }
         
         sub lalala {
           my $it = $_[0];
-          $it->noop(c1,mf,o3,qn); # setup
+          $it->noop('c1','mf','o3','qn'); # setup
           my $phrase_number = ($measure + -1) % 4;
           my @phrase = @{$phrases[$phrase_number]};
           foreach my $note (@phrase) { $it->n($note); }
@@ -1482,7 +1483,7 @@ handle for it).  Currently this is in this somewhat uninspiring format:
   ['note', 0, 96, 1, 25, 96],
   ['note', 96, 96, 1, 29, 96],
 
-as it is (currently) just a call to &MIDI::Score::dump_score; but in
+as it is (currently) just a call to C<&MIDI::Score::dump_score>; but in
 the future I may (should?) make it output in C<n>/C<r> notation.  In
 the meantime I assume you'll use this, if at all, only for debugging
 purposes.
@@ -1516,7 +1517,7 @@ specifications (whether relative or absolute), and returns a list
 consisting of the given note specifications transposed by that many
 half-steps.  E.g.,
 
-  @majors = interval [0,4,7], C, Bflat3;
+  @majors = interval [0,4,7], 'C', 'Bflat3';
 
 which returns the list C<(C,E,G,Bf3,D4,F4)>.
 
@@ -1642,7 +1643,7 @@ unconditional transposition, whereas C<note_map> lets you do anything
 at all.  For example:
 
        @note_specs = note_map { $funky_lookup_table{$_} }
-                              C, Gf;
+                              'C', 'Gf';
 
 or
 
@@ -1698,7 +1699,7 @@ sub note_map (&@) { # map a function to a list of notes
 This returns the absolute note specification (in the form "C5") that
 the MIDI note number in NUMBER represents.
 
-This is like looking up the note number in %MIDI::number2note -- not
+This is like looking up the note number in C<%MIDI::number2note> -- not
 exactly the same, but effectively the same.  See the source for more
 details.
 
@@ -1716,7 +1717,7 @@ This returns the relative note specification that NUMBER represents.
 The idea of a numerical representation for C<relative> note
 specifications was necessitated by C<interval> and C<note_map> --
 since without this, you couldn't meaningfully say, for example,
-interval [0,2] 'F'.  This should illustrate the concept:
+C<interval [0,2] 'F'>.  This should illustrate the concept:
 
           number_to_relative(-10)   =>   "D_d1"
           number_to_relative( -3)   =>   "A_d1"
@@ -1812,7 +1813,7 @@ input is a number, and undef/emptylist (C<return;>) if not -- then,
 the user could test:
 
       # Hypothetical --
-      # This fuction doesn't actually work this way:
+      # This function doesn't actually work this way:
       if(defined(my $note_val = is_relative_note_spec($string))) {
          ...do things with $note_val...
       } else {

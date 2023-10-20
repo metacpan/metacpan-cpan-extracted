@@ -11,11 +11,11 @@ Shell::Var::Reader - Runs a sh or bash script and returns the variables that hav
 
 =head1 VERSION
 
-Version 0.4.0
+Version 0.5.2
 
 =cut
 
-our $VERSION = '0.4.0';
+our $VERSION = '0.5.2';
 
 =head1 SYNOPSIS
 
@@ -137,9 +137,6 @@ Please report any bugs or feature requests to C<bug-shell-var-reader at rt.cpan.
 the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Shell-Var-Reader>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-
-
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
@@ -155,10 +152,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Shell-Var-Reader>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Shell-Var-Reader>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Shell-Var-Reader>
@@ -171,7 +164,7 @@ L<https://metacpan.org/release/Shell-Var-Reader>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by Zane C. Bowers-Hadley.
+This software is Copyright (c) 2023 by Zane C. Bowers-Hadley.
 
 This is free software, licensed under:
 

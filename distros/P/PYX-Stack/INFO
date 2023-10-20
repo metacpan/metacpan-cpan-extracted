@@ -2,4 +2,4 @@ INFO
 ====
 Information
 -----------
-Similar command `xml el __INPUT_FILE__` from xmlstar package.
+Similar command `xmlstarlet el __INPUT_FILE__` from xmlstarlet package.

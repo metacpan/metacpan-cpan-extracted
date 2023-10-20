@@ -5,6 +5,6 @@ use warnings
 
 use Test::Expander -target => undef;
 
-ok( !exists( $main::{ CLASS } ), 'no class determined' );
+plan( 1 );
 
-done_testing();
+ok( !exists( $main::{ CLASS } ), 'no class determined' );

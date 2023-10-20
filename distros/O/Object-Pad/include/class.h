@@ -17,6 +17,7 @@ struct ClassMeta {
   unsigned int strict_params : 1;
   unsigned int has_adjust : 1; /* has at least one ADJUST(PARAMS) block */
   unsigned int has_superclass : 1;
+  unsigned int has_buildargs : 1;
 
   FIELDOFFSET start_fieldix; /* first field index of this partial within its instance */
   FIELDOFFSET next_fieldix;  /* 1 + final field index of this partial within its instance; includes fields in roles */
@@ -144,9 +145,36 @@ OP *ObjectPad__newop_croak_from_constructor(pTHX_ SV *message);
 #define check_colliding_param(classmeta, paramname)  ObjectPad__check_colliding_param(aTHX_ classmeta, paramname)
 void ObjectPad__check_colliding_param(pTHX_ ClassMeta *classmeta, SV *paramname);
 
+#define get_embedding_from_pad()  ObjectPad__get_embedding_from_pad(aTHX)
+RoleEmbedding *ObjectPad__get_embedding_from_pad(pTHX);
+
 void ObjectPad__boot_classes(pTHX);
 
 /* Empty role embedding that is applied to all invokable role methods */
 extern struct RoleEmbedding ObjectPad__embedding_standalone;
+
+#ifdef HAVE_UNOP_AUX
+#  define METHSTART_CONTAINS_FIELD_BINDINGS
+
+/* We'll reserve the top two bits of a UV for storing the `type` value for a
+ * fieldpad operation; the remainder stores the fieldix itself */
+#  define UVBITS (UVSIZE*8)
+#  define FIELDIX_TYPE_SHIFT  (UVBITS-2)
+#  define FIELDIX_MASK        ((1LL<<FIELDIX_TYPE_SHIFT)-1)
+#endif
+
+#if HAVE_PERL_VERSION(5, 38, 0)
+#  define HAVE_SVt_PVOBJ
+
+#  define fieldstore_fields(fs)   \
+      ((SvTYPE(fs) == SVt_PVOBJ) ? ObjectFIELDS(fs) : AvARRAY(fs))
+#  define fieldstore_maxfield(fs) \
+      ((SvTYPE(fs) == SVt_PVOBJ) ? ObjectMAXFIELD(fs) : AvFILLp(fs))
+#else
+#  define fieldstore_fields(fs)   \
+      AvARRAY(fs)
+#  define fieldstore_maxfield(fs) \
+      AvFILLp(fs)
+#endif
 
 #endif

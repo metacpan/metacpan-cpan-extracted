@@ -6,13 +6,15 @@ use v5.20;
 
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.11';
 
+use Clone        ();
 use Scalar::Util qw( blessed );
 use Ref::Util    qw( is_plain_hashref is_arrayref is_regexpref is_ref );
 use Form::Tiny::Utils 'get_package_form_meta';
-use Types::Standard qw( ArrayRef Bool CodeRef Dict Enum Int Optional RegexpRef Tuple Undef Value );
-use Type::Params    qw( signature_for );
+use Types::Standard
+  qw( ArrayRef Bool CodeRef Dict Enum Int Optional RegexpRef Str Tuple Undef Value );
+use Type::Params          qw( signature_for );
 use Types::Common::String qw ( NonEmptySimpleStr NonEmptyStr );
 
 use Moo::Role;
@@ -86,15 +88,33 @@ has inherit_optargs_match => (
 
 
 
+has nested_path_sep => (
+    is      => 'rwp',
+    builder => sub { '_' },
+);
 
 
 
-has optargs => (
+
+
+
+
+
+
+
+
+
+has _optargs => (
     is       => 'rwp',
     lazy     => 1,
     init_arg => undef,
-    builder  => sub ( $self ) { $self->_build_opt_args->optargs },
+    ## no critic (Subroutines::ProtectPrivateSubs )
+    builder => sub ( $self ) { $self->_build_opt_args->_optargs },
 );
+
+sub optargs ( $self ) {
+    return Clone::clone( $self->_optargs );
+}
 
 has rename => (
     is       => 'rwp',
@@ -167,7 +187,7 @@ sub _build_opt_args ( $self ) {
         push @optargs, $name, \%spec;
     }
 
-    $self->_set_optargs( \@optargs );
+    $self->_set__optargs( \@optargs );
     $self->_set_rename( \%rename );
     return $self;
 }
@@ -285,7 +305,7 @@ sub _create_options (
             # generate the fully qualified option name using the
             # specified field name.  the field may specify an
             # alternate option name, so use that if specified.
-            my $fq_option_name = $optargs->{name} // join( '_', $opt_path->@*, $field_name );
+            my $fq_option_name = $optargs->{name} // join( $self->nested_path_sep, $opt_path->@*, $field_name );
 
             # store the mapping between option name and fully
             # qualified normalized field name.
@@ -316,8 +336,8 @@ sub _create_options (
                 croak( "$a->[0] and $b->[0] have the same argument order" )
                   if $order == 0;
                 $order;
-              }
-              grep { defined $_->[1]{order} } @optargs
+            }
+            grep { defined $_->[1]{order} } @optargs
         ) ];
 }
 
@@ -358,7 +378,7 @@ sub _resolve_type ( $field, $type_set ) {
     # if we add Any to OptionTypeMap and ArgumentTypeMap
 
     return $type_set->{Str}
-      if $type->name eq 'Any';
+      if index( '|Any|Path|File|Dir|', q{|} . $type->name . q{|} ) != -1;
 
     while ( defined $type ) {
         return $type_set->{ $type->name } if exists $type_set->{ $type->name };
@@ -461,6 +481,7 @@ signature_for _dsl_optargs_opts => (
         inherit_required      => Optional [Bool],
         inherit_optargs       => Optional [Bool],
         inherit_optargs_match => Optional [ArrayRef],
+        nested_path_sep       => Optional [Str],
     ],
 );
 sub _dsl_optargs_opts ( $self, $context, $args ) {
@@ -481,6 +502,9 @@ sub _dsl_optargs_opts ( $self, $context, $args ) {
         my $matches = parse_inherit_matches( INCLUDE, $match );
         $self->_set_inherit_optargs_match( $matches );
     }
+
+    $self->_set_nested_path_sep( $args->nested_path_sep )
+      if $args->has_nested_path_sep;
 
 
 }
@@ -509,7 +533,7 @@ CXC::Form::Tiny::Plugin::OptArgs2::Meta - Form metaclass role for OptArgs2
 
 =head1 VERSION
 
-version 0.08
+version 0.11
 
 =head1 DESCRIPTION
 
@@ -534,6 +558,12 @@ If true, the output optargs will include those from forms which are superclasses
 A regular expression which matches the class names of superclass forms
 to exclude from inheritance.  It defaults to C<undef> which is
 equivalent to matching everything.
+
+=head2 nested_path_sep
+
+The string used to separate paths in a nested field when creating the option name.
+It defaults to C<_>.  (Note that a name explicitly passed to the 'option' clause will
+override the generated name).
 
 =head1 METHODS
 

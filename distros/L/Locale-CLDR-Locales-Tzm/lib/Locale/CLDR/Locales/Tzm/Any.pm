@@ -1,11 +1,11 @@
 package Locale::CLDR::Locales::Tzm::Any;
 
 # This file auto generated
-#	on Sun  3 Feb  2:24:17 pm GMT
+#	on Fri 13 Oct  9:46:31 am GMT
 
 use version;
 
-our $VERSION = version->declare('v0.34.0');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

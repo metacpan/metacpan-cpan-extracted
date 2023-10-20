@@ -36,6 +36,9 @@ WriteMakefile(
 	AUTHOR    => 'Haelwenn (lanodan) Monnier <contact+cve-client@hacktivis.me>',
 	LICENSE   => 'agpl_3',
 	EXE_FILES => ['cve-client'],
+	MAN1PODS  => {
+		'cve-client' => 'blib/man1/cve-client.1',
+	},
 
 	VERSION_FROM  => 'cve-client',
 	PREREQ_PM     => \%depend,

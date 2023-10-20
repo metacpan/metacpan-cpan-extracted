@@ -1,10 +1,23 @@
 Revision history for Benchmark-DKbench
 
+2.4     2023-09-29
+        - Added --scale and --stdev options.
+
+2.3     2023-09-25
+        - Show Perl threads/multi config.
+        - Minimum module version for passing benchmarks.
+        - Improvements for Strawberry Perl (prefer the much faster WSL though - or at least cygwin).
+
+2.2     2023-09-21
+        - Time::Piece test is optional for all platforms.
+        - Switched to monotonic clock instead of wall.
+        - dkbench -h option.
+
 2.1     2023-09-09
         - Added Text::Levenshtein and DBI/SQL benchmarks.
-        - Added -ver command line option for dkbench to filter benchmarks.
+        - Added -ver command line option.
         - Made tests locale-independent.
-        - Switched to System::Info from Sys::Info
+        - Switched to System::Info from Sys::Info.
         - Removed libjpeg dependency.
         - More documentation.
 
@@ -14,4 +27,3 @@ Revision history for Benchmark-DKbench
 
 1.0     2021-12-21
         - First version.
-

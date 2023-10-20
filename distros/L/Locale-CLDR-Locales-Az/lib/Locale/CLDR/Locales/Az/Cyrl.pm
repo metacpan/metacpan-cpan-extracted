@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Az::Cyrl - Package for language Azerbaijani
 
 =cut
 
 package Locale::CLDR::Locales::Az::Cyrl;
-# This file auto generated from Data/common/main/az_Cyrl.xml
-#	on Mon 11 Apr  5:24:05 pm GMT
+# This file auto generated from Data\common\main\az_Cyrl.xml
+#	on Fri 13 Oct  9:06:33 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

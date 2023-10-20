@@ -78,7 +78,7 @@ SYNOPSIS
     documented in their respective module.
 
 VERSION
-        v2.0.2
+        v2.0.3
 
 DESCRIPTION
     This is a comprehensive Stripe API. It provides an object oriented
@@ -3865,20 +3865,56 @@ ERROR HANDLING
     retrieved with the "error" method, such as:
 
         my $prod = $stripe->products( retrieve => $prod_id ) || die( $stripe->error, "\n" );
+        # or
+        my $pm = $stripe->payment_methods( retrieve => $id );
+        say "Payment method returned is: ", ( $pm // 'undefined' );
+        if( !defined( $pm ) )
+        {
+            my $ex = $stripe->error;
+            say "Error: ", $ex;
+            say "HTTP code: ", $ex->http_code;
+            say "HTTP response headers: ", $ex->http_headers->as_string;
+            say "Stripe code: ", $ex->code;
+            say "Message: ", $ex->message;
+            say "Request log URL: ", $ex->request_log_url;
+            say "Type: ", $ex->type;
+        }
+        else
+        {
+            say "Ok, payment method is '", $pm->id, "'";
+        }
 
-    The error method returns the Module::Generic::Exception set. Please
-    refer to the manual page of "error" in Module::Generic for more
-    information, but essentially, the following methods are available with
-    the error objects:
+    The error method returns the Net::API::Stripe::Exception object, which
+    inherits from Module::Generic::Exception. Please refer to the manual
+    page of Net::API::Stripe::Exception for more information, but
+    essentially, the following methods are available with the error objects:
 
   as_string
     This is triggered when the error object is stringified
 
+  charge
+    String. For card errors, sets or gets the ID of the failed charge.
+
   code
     The error code returned by Stripe
 
+  decline_code
+    A short string for card errors resulting from a card issuer decline.
+    This is a short string indicating the card issuer’s reason for the
+    decline if they provide one.
+
+  doc_url
+    The url of the Stripe documentation detailing that error code. For
+    example: <https://stripe.com/docs/error-codes/resource-missing>
+
   file
     The file containing the error
+
+  http_code
+    The HTTP status code returned by Stripe. For example 200 or 400, etc.
+
+  http_headers
+    The HTTP headers object from the Stripe HTTP response.
 
   line
     The line number of the error
@@ -3889,8 +3925,33 @@ ERROR HANDLING
   package
     The package name where the error occurred.
 
+  param
+    The error param. For example: "payment_method"
+
+  payment_intent
+    The PaymentIntent object for errors returned on a request involving a
+    PaymentIntent.
+
+  payment_method
+    The PaymentMethod object for errors returned on a request involving a
+    PaymentMethod.
+
+  payment_method_type
+    The payment method type that had a problem. This field is only populated
+    for invoice-related errors.
+
+  request_log_url
+    The uri in the dashboard to get details about the error that occurred.
+
   rethrow
     Used to re-trigger the error
+
+  setup_intent
+    The SetupIntent object for errors returned on a request involving a
+    SetupIntent.
+
+  source
+    The source object for errors returned on a request involving a source.
 
   subroutine
     The subroutine name where the error originates
@@ -3899,7 +3960,8 @@ ERROR HANDLING
     The full stack trace object. This is a Devel::StackTrace
 
   type
-    The error type, if any
+    The error type, if any. This can be any of "api_error", "card_error",
+    "idempotency_error", "invalid_request_error"
 
 EVENT
     You can list or retrieve event

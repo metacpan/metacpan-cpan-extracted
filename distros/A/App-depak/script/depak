@@ -9,9 +9,9 @@ use warnings;
 use Perinci::CmdLine::depak;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-14'; # DATE
+our $DATE = '2023-07-11'; # DATE
 our $DIST = 'App-depak'; # DIST
-our $VERSION = '0.585'; # VERSION
+our $VERSION = '0.586'; # VERSION
 
 Perinci::CmdLine::depak->new(
     log => 1,
@@ -33,7 +33,7 @@ depak - Pack dependencies onto your script file
 
 =head1 VERSION
 
-This document describes version 0.585 of depak (from Perl distribution App-depak), released on 2021-11-14.
+This document describes version 0.586 of depak (from Perl distribution App-depak), released on 2023-07-11.
 
 =head1 SYNOPSIS
 
@@ -87,8 +87,8 @@ C<*> marks required options.
 
 Prefer modules from other sources (filesystem) first.
 
-Normally, the `fatpack` or `datapack` require hook will be put at the front of
-`@INC`. If this option is set to true, the require hook will be put at the end.
+Normally, the C<fatpack> or C<datapack> require hook will be put at the front of
+C<@INC>. If this option is set to true, the require hook will be put at the end.
 This means Perl will search modules from the regular sources (filesystem) first.
 This is useful for example if you want your application to use the possibly
 newer version of modules on the filesystem before using the packed version as
@@ -105,13 +105,37 @@ the fallback when some modules are not installed.
 
 Set path to configuration file.
 
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
 =item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
+
 =item B<--no-config>, B<-C>
 
 Do not use any configuration file.
+
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
 
 =back
 
@@ -133,6 +157,10 @@ Keep temporary directory for debugging.
 
 Do not read environment for default options.
 
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
+
 =back
 
 =head2 Input options
@@ -147,7 +175,7 @@ Default value:
 
  "-"
 
-`-` (or if unspecified) means to take from standard input (internally, a
+C<-> (or if unspecified) means to take from standard input (internally, a
 temporary file will be created to handle this).
 
 
@@ -166,6 +194,17 @@ Shortcut for --log-level=debug.
 =item B<--log-level>=I<s>
 
 Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
 
 =item B<--quiet>
 
@@ -205,9 +244,9 @@ See C<--exclude-dist>.
 
 Exclude all modules of dist.
 
-Just like the `exclude` option, but will exclude module as well as other modules
+Just like the C<exclude> option, but will exclude module as well as other modules
 from the same distribution. Module name must be the main module of the
-distribution. Will determine other modules from the `.packlist` file.
+distribution. Will determine other modules from the C<.packlist> file.
 
 
 Can be specified multiple times.
@@ -263,7 +302,7 @@ This option can be used to express dependency to an XS module, since XS modules
 cannot be packed.
 
 To query dependencies, a local CPAN index is used for querying speed. Thus, this
-option requires that `lcpan` is installed and a fairly recent lcpan index is
+option requires that C<lcpan> is installed and a fairly recent lcpan index is
 available.
 
 
@@ -295,9 +334,9 @@ See C<--include-dist>.
 
 Include all modules of dist.
 
-Just like the `include` option, but will include module as well as other modules
+Just like the C<include> option, but will include module as well as other modules
 from the same distribution. Module name must be the main module of the
-distribution. Will determine other modules from the `.packlist` file.
+distribution. Will determine other modules from the C<.packlist> file.
 
 
 Can be specified multiple times.
@@ -334,9 +373,9 @@ This option can be used to include a module, as well as other modules in the
 same distribution as that module, as well as the distribution's recursive
 dependencies, for packing. Dependencies will be searched using a local CPAN
 index. This is a convenient alternative to tracing a module. So you might want
-to use this option together with setting `trace_method` to `none`.
+to use this option together with setting C<trace_method> to C<none>.
 
-This option requires that `lcpan` is installed and a fairly recent lcpan index
+This option requires that C<lcpan> is installed and a fairly recent lcpan index
 is available.
 
 
@@ -347,7 +386,7 @@ Can be specified multiple times.
 Perl version to target, defaults to current running version.
 
 This is for determining which modules are considered core and should be skipped
-by default (when `exclude_core` option is enabled). Different perl versions have
+by default (when C<exclude_core> option is enabled). Different perl versions have
 different sets of core modules as well as different versions of the modules.
 
 
@@ -355,11 +394,11 @@ different sets of core modules as well as different versions of the modules.
 
 Instead of dying, skip when module to add is not found.
 
-This option is useful when you use `include_prereq`, because modules without its
+This option is useful when you use C<include_prereq>, because modules without its
 own .pm files will also be included (CPAN indexes packages, including those that
 do not have their own .pm files).
 
-By default, this option is turned off unless when you use `include_prereq` where
+By default, this option is turned off unless when you use C<include_prereq> where
 this option is by default turned on. You can of course override the default by
 explicitly specify this option.
 
@@ -386,13 +425,13 @@ Valid values:
 
  ["fatpacker","require","prereqscanner","prereqscanner_lite","prereqscanner_recurse","prereqscanner_lite_recurse","none"]
 
-The default is `fatpacker`, which is the same as what `fatpack trace` does.
+The default is C<fatpacker>, which is the same as what C<fatpack trace> does.
 Different tracing methods have different pro's and con's, one method might
 detect required modules that another method does not, and vice versa. There are
-several methods available, please see `App::tracepm` for more details.
+several methods available, please see C<App::tracepm> for more details.
 
-A special value of `none` is also provided. If this is selected, then depak will
-not perform any tracing. Usually used in conjunction with `--include-from`.
+A special value of C<none> is also provided. If this is selected, then depak will
+not perform any tracing. Usually used in conjunction with C<--include-from>.
 
 
 =item B<--use-json>=I<s>
@@ -405,8 +444,8 @@ See C<--use>.
 
 Additional module to "use".
 
-Will be passed to the tracer. Will currently only affect the `fatpacker` and
-`require` methods (because those methods actually run your script).
+Will be passed to the tracer. Will currently only affect the C<fatpacker> and
+C<require> methods (because those methods actually run your script).
 
 
 Can be specified multiple times.
@@ -429,6 +468,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -443,15 +488,15 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--output-file>=I<s>, B<-o>
@@ -462,7 +507,7 @@ Default value:
 
  "-"
 
-`-` (or if unspecified) means to output to stdout.
+C<-> (or if unspecified) means to output to stdout.
 
 
 Can also be specified as the 2nd command-line argument.
@@ -475,6 +520,10 @@ Overwrite output if previously exists.
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--shebang>=I<s>
 
 Set shebang line/path.
@@ -486,6 +535,11 @@ Default value:
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -505,13 +559,13 @@ Valid values:
 
  ["fatpack","datapack"]
 
-Either `fatpack` (the default) or `datapack`. Fatpack puts packed modules inside
+Either C<fatpack> (the default) or C<datapack>. Fatpack puts packed modules inside
 Perl variables and load them via require hook. Datapack puts packed modules in
-__DATA__ section. For more details about each method, please consult
-`Module::FatPack` and `Module::DataPack`.
+B<DATA> section. For more details about each method, please consult
+C<Module::FatPack> and C<Module::DataPack>.
 
 One thing to remember is, with datapack, your script cannot load modules during
-compile-time (`use`): all modules must be loaded during run-time (`require`)
+compile-time (C<use>): all modules must be loaded during run-time (C<require>)
 when data section is already available. Also, your script currently cannot
 contain data section of its own.
 
@@ -565,7 +619,7 @@ Set maintain_linum=1 in Perl::Stripper.
 Test the resulting output.
 
 Testing is done by running the resulting packed script with perl. To test, at
-least one test case is required (see `--test-case-json`). Test cases specify
+least one test case is required (see C<--test-case-json>). Test cases specify
 what arguments to give to program, what exit code we expect, and what the output
 should contain.
 
@@ -578,7 +632,7 @@ See C<--test-cases>.
 
 Example case:
 
-    {"args":["--help"], "exit_code":0, "perl_args":["-Mlib::core::only"], "output_like":"Usage:"}
+ {"args":["--help"], "exit_code":0, "perl_args":["-Mlib::core::only"], "output_like":"Usage:"}
 
 
 =back
@@ -591,15 +645,15 @@ Example case:
 
 Script argument.
 
-Will be used when running your script, e.g. when `trace_method` is `fatpacker`
-or `require`. For example, if your script requires three arguments: `--foo`,
-`2`, `"bar baz"` then you can either use:
+Will be used when running your script, e.g. when C<trace_method> is C<fatpacker>
+or C<require>. For example, if your script requires three arguments: C<--foo>,
+C<2>, C<"bar baz"> then you can either use:
 
-    % depak script output --args --foo --args 2 --args "bar baz"
+ % depak script output --args --foo --args 2 --args "bar baz"
 
 or:
 
-    % depak script output --args-json '["--foo",2,"bar baz"]'
+ % depak script output --args-json '["--foo",2,"bar baz"]'
 
 
 Can be specified multiple times.
@@ -632,13 +686,13 @@ Valid values:
 
  ["fatpacker","require","prereqscanner","prereqscanner_lite","prereqscanner_recurse","prereqscanner_lite_recurse","none"]
 
-The default is `fatpacker`, which is the same as what `fatpack trace` does.
+The default is C<fatpacker>, which is the same as what C<fatpack trace> does.
 Different tracing methods have different pro's and con's, one method might
 detect required modules that another method does not, and vice versa. There are
-several methods available, please see `App::tracepm` for more details.
+several methods available, please see C<App::tracepm> for more details.
 
-A special value of `none` is also provided. If this is selected, then depak will
-not perform any tracing. Usually used in conjunction with `--include-from`.
+A special value of C<none> is also provided. If this is selected, then depak will
+not perform any tracing. Usually used in conjunction with C<--include-from>.
 
 
 =back
@@ -695,7 +749,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/depak.conf>, F<~/depak.conf>, or F</etc/depak.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/depak.conf>, F</home/u1/depak.conf>, or F</etc/depak.conf>.
 
 All found files will be read and merged.
 
@@ -781,9 +835,9 @@ C<parse-id-phone>.
 
 =head1 ENVIRONMENT
 
-=head2 DEPAK_OPT => str
+=head2 DEPAK_OPT
 
-Specify additional command-line options.
+String. Specify additional command-line options.
 
 =head2 DEBUG_KEEP_TEMPDIR => bool
 
@@ -791,11 +845,11 @@ Set default for C<debug_keep_tempdir> option.
 
 =head1 FILES
 
-F<~/.config/depak.conf>
+=head2 /home/u1/.config/depak.conf
 
-F<~/depak.conf>
+=head2 /home/u1/depak.conf
 
-F</etc/depak.conf>
+=head2 /etc/depak.conf
 
 =head1 HOMEPAGE
 
@@ -834,13 +888,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

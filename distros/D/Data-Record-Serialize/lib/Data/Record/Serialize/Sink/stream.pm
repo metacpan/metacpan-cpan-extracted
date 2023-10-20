@@ -2,9 +2,10 @@ package Data::Record::Serialize::Sink::stream;
 
 # ABSTRACT: output encoded data to a stream.
 
+use v5.10;
 use Moo::Role;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use namespace::clean;
 
@@ -44,7 +45,7 @@ Data::Record::Serialize::Sink::stream - output encoded data to a stream.
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 
@@ -60,6 +61,8 @@ B<Data::Record::Serialize::Sink::stream> outputs encoded data to a
 file handle.
 
 It performs the L<Data::Record::Serialize::Role::Sink> role.
+
+=head1 INTERNALS
 
 =for Pod::Coverage print
  say
@@ -89,7 +92,7 @@ stream.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>
 
 =head2 Source
 

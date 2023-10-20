@@ -3,7 +3,7 @@ package Dancer2::Plugin::OAuth2::Server;
 use strict;
 use warnings;
 use 5.008_005;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 use Dancer2::Plugin;
 use URI;
 use URI::QueryParam;
@@ -51,7 +51,7 @@ register 'oauth_scopes' => sub {
         my @res = _verify_access_token_and_scope( $dsl, $settings, $server,0, @$scopes );
         if( not $res[0] ) {
             $dsl->status( 400 );
-            return $dsl->to_json( { error => $res[1] } );
+            return $dsl->send_as( JSON => { error => $res[1] } );
         } else {
             $dsl->app->request->var( oauth_access_token => $res[0] );
             goto $code_ref;
@@ -75,8 +75,8 @@ sub _authorization_request {
             or $type ne 'code'
     ) {
         $dsl->status( 400 );
-        return $dsl->to_json(
-            {
+        return $dsl->send_as(
+            JSON => {
                 error             => 'invalid_request',
                 error_description => 'the request was missing one of: client_id, '
                 . 'response_type;'
@@ -93,8 +93,8 @@ sub _authorization_request {
             and ! length $state
     ) {
         $dsl->status( 400 );
-        return $dsl->to_json(
-            {
+        return $dsl->send_as(
+            JSON => {
                 error             => 'invalid_request',
                 error_description => 'the request was missing : state ',
                 error_uri         => '',
@@ -163,8 +163,8 @@ sub _access_token_request {
             or ( $grant_type eq 'authorization_code' and ! defined( $url ) )
     ) {
         $dsl->status( 400 );
-        return $dsl->to_json(
-            {
+        return $dsl->send_as(
+            JSON => {
                 error             => 'invalid_request',
                 error_description => 'the request was missing one of: grant_type, '
                 . 'client_id, client_secret, code, redirect_uri;'
@@ -223,11 +223,11 @@ sub _access_token_request {
         };
     }
 
-    $dsl->header( 'Cache-Control' => 'no-store' );
-    $dsl->header( 'Pragma'        => 'no-cache' );
+    $dsl->response_header( 'Cache-Control' => 'no-store' );
+    $dsl->response_header( 'Pragma'        => 'no-cache' );
 
     $dsl->status( $status );
-    return $dsl->to_json( $json_response );
+    return $dsl->send_as( JSON => $json_response );
 }
 
 sub _verify_access_token_and_scope {
@@ -267,7 +267,7 @@ __END__
 
 Dancer2::Plugin::OAuth2::Server - Easier implementation of an OAuth2 Authorization
 Server / Resource Server with Dancer2
-Port of Mojolicious implementation : https://github.com/G3S/mojolicious-plugin-oauth2-server
+Port of Mojolicious implementation : https://github.com/Humanstate/mojolicious-plugin-oauth2-server
 
 =head1 SYNOPSIS
 
@@ -471,6 +471,16 @@ message (almost certainly 'invalid_grant' in this case)
 =head1 AUTHOR
 
 Pierre Vigier E<lt>pierre.vigier@gmail.comE<gt>
+
+=head1 CONTRIBUTORS
+
+Orignal plugin for mojolicious:
+
+Lee Johnson - C<leejo@cpan.org>
+
+With contributions from:
+
+Peter Mottram C<peter@sysnix.com>
 
 =head1 COPYRIGHT
 

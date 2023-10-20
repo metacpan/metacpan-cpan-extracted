@@ -17,7 +17,7 @@ my $x;
 SKIP: {
     eval { $x = X11::XCB::Connection->new; };
 
-    skip "Could not setup X11 connection", 2 if $@;
+    skip "Could not setup X11 connection", 2 if $@ or $x->has_error();
 
     my $root = $x->root;
 

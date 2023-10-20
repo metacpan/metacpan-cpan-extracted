@@ -1,0 +1,49 @@
+NAME
+    Task::FASTQTools
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+    Facilities to process FASTQ files as returned from sequencing
+    instruments. Convert from FASTQ to FASTA or tabular formats.
+
+DESCRIPTION
+    A collection of tools to convert, filter and analyze FASTQ files.
+
+NAME
+    Task::FASTQTools- manipulate FASTQ files from perl
+
+SUBROUTINES
+  fastq2a ($input_file, $output_file)
+    Converts a FASTQ file to the equivalent FASTA file
+
+  fq2tab ($input_file, $output_file)
+    Convert a FASTQ file to tab delimited file
+
+  fa2tab ($input_file, $output_file)
+    Convert a FASTA file to tab delimited file
+
+SEE ALSO
+    BioPerl FASTQ <https://metacpan.org/pod/Bio::SeqIO::fastq>
+        BioPerl facilities for parsing FASTQ files using the SeqIO OO
+        interface
+
+AUTHOR
+    Christos Argyropoulos <chrisarg@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by Christos Argyropoulos.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+AUTHOR
+    Christos Argyropoulos <chrisarg@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by Christos Argyropoulos.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

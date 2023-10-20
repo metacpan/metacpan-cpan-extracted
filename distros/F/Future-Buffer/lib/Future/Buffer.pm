@@ -1,15 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2023 -- leonerd@leonerd.org.uk
 
-package Future::Buffer;
+package Future::Buffer 0.04;
 
-use 5.010; # //
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.03';
 
 use Future;
 
@@ -40,7 +37,7 @@ C<Future::Buffer> - a string buffer that uses Futures
       }
    }
 
-   print_lines()->get;
+   await print_lines();
 
 =head1 DESCRIPTION
 
@@ -62,6 +59,11 @@ the order they were created when more data is eventually available. Thus, any
 call to the C<write> method to provide more data can potentially result in
 multiple futures becoming ready.
 
+I<Since version 0.04> the buffer supports an end-of-file condition. The
+L</close> method or a C<fill> callback future yielding an empty result will
+mark that the buffer is now closed. Once it has exhausted the remaining stored
+data any further read futures will yield empty.
+
 =cut
 
 =head1 CONSTRUCTOR
@@ -70,7 +72,7 @@ multiple futures becoming ready.
 
 =head2 new
 
-   $buffer = Future::Buffer->new( %args )
+   $buffer = Future::Buffer->new( %args );
 
 Returns a new L<Future::Buffer> instance.
 
@@ -80,14 +82,15 @@ Takes the following named arguments:
 
 =item fill => CODE
 
-   $f = $fill->()
-
-      $data = $f->get
+   $data = await $fill->();
 
 Optional callback which the buffer will invoke when it needs more data.
 
 Any read futures which are waiting on the fill future are constructed by using
 the fill future as a prototype, ensuring they have the correct type.
+
+If the result is an empty list this will be treated as an end-of-file
+notification and the buffer is closed.
 
 =back
 
@@ -119,11 +122,17 @@ sub _fill
       # Arm the fill loop
       $fill->() # TODO: give it a size hint?
          ->on_done( sub {
-            my ( $data ) = @_;
             $weakself or return;
 
-            $weakself->{data} .= $data;
             undef $self->{fill_f};
+
+            if( @_ ) {
+               my ( $data ) = @_;
+               $weakself->{data} .= $data;
+            }
+            else {
+               $weakself->{at_eof} = 1;
+            }
 
             $weakself->_invoke_pending;
 
@@ -184,11 +193,18 @@ sub _invoke_pending
       shift @$pending;
       $p->[1]->done( $ret );
    }
+   while( @$pending and $self->{at_eof} ) {
+      my $p = $pending->[0];
+      shift @$pending and next if $p->[1]->is_cancelled;
+
+      shift @$pending;
+      $p->[1]->done();
+   }
 }
 
 =head2 length
 
-   $len = $buffer->length
+   $len = $buffer->length;
 
 Returns the length of the currently-stored data; that is, data that has been
 provided by C<write> calls or the C<fill> callback but not yet consumed by a
@@ -200,7 +216,7 @@ sub length :method { length $_[0]->{data} }
 
 =head2 is_empty
 
-   $empty = $buffer->is_empty
+   $empty = $buffer->is_empty;
 
 Returns true if the stored length is zero.
 
@@ -210,7 +226,7 @@ sub is_empty { shift->length == 0 }
 
 =head2 write
 
-   $f = $buffer->write( $data )
+   $f = $buffer->write( $data );
 
 Appends to the stored data, invoking any pending C<read> futures that are
 outstanding and can now complete.
@@ -232,16 +248,36 @@ sub write
    return Future->done;
 }
 
+=head2 close
+
+   $buffer->close;
+
+Marks that the buffer is now at EOF condition. Once any remaining buffered
+content is consumed, any further read futures will all yield EOF condition.
+
+=cut
+
+sub close
+{
+   my $self = shift;
+   $self->{at_eof} = 1;
+
+   $self->_invoke_pending if @{ $self->{pending} };
+
+   return Future->done;
+}
+
 =head2 read_atmost
 
-   $f = $buffer->read_atmost( $len )
-
-      $data = $f->get
+   $data = await $buffer->read_atmost( $len );
 
 Returns a future which will complete when there is some data available in the
 buffer and will yield I<up too> the given length. Note that, analogous to
 calling the C<read> IO method on a filehandle, this can still complete and
 yield a shorter length if less is currently available.
+
+If the stream is closed and there is no remaining data, the returned future
+will yield empty.
 
 =cut
 
@@ -262,12 +298,13 @@ sub read_atmost
 
 =head2 read_exactly
 
-   $f = $buffer->read_exactly( $len )
-
-      $data = $f->get
+   $data = await $buffer->read_exactly( $len );
 
 Returns a future which will complete when there is enough data available in
 the buffer to yield exactly the length given.
+
+If the stream is closed and there is no remaining data, the returned future
+will yield empty.
 
 =cut
 
@@ -288,14 +325,15 @@ sub read_exactly
 
 =head2 read_until
 
-   $f = $buffer->read_until( $pattern )
-
-      $data = $f->get
+   $data = await $buffer->read_until( $pattern );
 
 Returns a future which will complete when the buffer contains a match for the
 given pattern (which may either be a plain string or a compiled C<Regexp>).
 The future will yield the contents of the buffer up to and including this
 match.
+
+If the stream is closed and there is no remaining data, the returned future
+will yield empty.
 
 For example, a C<readline>-like operation can be performed by
 
@@ -322,15 +360,16 @@ sub read_until
 
 =head2 read_unpacked
 
-   $f = $buffer->read_unpacked( $pack_format )
-
-      @fields = $f->get
+   $data = await $buffer->read_unpacked( $pack_format );
 
 I<Since version 0.03.>
 
 Returns a future which will complete when the buffer contains enough data to
 unpack all of the requested fields using the given C<pack()> format. The
 future will yield a list of all the fields extracted by the format.
+
+If the stream is closed and there is no remaining data, the returned future
+will yield empty.
 
 Note that because the implementation is shamelessly stolen from
 L<IO::Handle::Packable> the same limitations on what pack formats are
@@ -398,7 +437,7 @@ sub read_unpacked
 
 =head2 unread
 
-   $buffer->unread( $data )
+   $buffer->unread( $data );
 
 I<Since version 0.03.>
 
@@ -452,12 +491,6 @@ unbounded C<read_until> though.
 Consider extensions of the L</read_unpacked> method to handle more situations.
 This may require building a shared CPAN module for doing streaming-unpack
 along with C<IO::Handle::Packable> and other situations.
-
-=item *
-
-Consider what happens at EOF. Add a C<close> method for producers to call.
-Understand what C<fill> would do there. Have all the pending C<read> futures
-yield an empty list maybe?
 
 =back
 

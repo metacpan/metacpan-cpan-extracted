@@ -1,3 +1,8 @@
+1.001003 2023-10-02
+  [Exception Message Changes]
+    * Improve English of exception messages.
+  [Document Changes]
+    * Improve the formats of documents.
 1.001002 2023-05-29
   [Prerequirement Changes]
     * SPVM 0.986+ is required.

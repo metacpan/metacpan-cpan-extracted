@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($PYX::Format::VERSION, 0.09, 'Version.');
+is($PYX::Format::VERSION, 0.1, 'Version.');

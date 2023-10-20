@@ -3,12 +3,12 @@ package SignalWire::ML;
 use strict;
 use warnings;
 use JSON;
-use YAML qw(Dump Bless);;
+use YAML::PP qw( Dump );
 use Data::Dumper;
 
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $AUTOLOAD);
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 our $AUTOLOAD;
 
 sub new {
@@ -274,3 +274,14 @@ sub render_yaml {
 }
 
 1;
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+SignalWire::ML - Light and fast SWML generator
+
+=head1 SYNOPSIS
+
+TODO

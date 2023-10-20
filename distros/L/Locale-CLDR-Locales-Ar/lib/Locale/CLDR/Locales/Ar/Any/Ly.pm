@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Ar::Any::Ly - Package for language Arabic
 
 =cut
 
 package Locale::CLDR::Locales::Ar::Any::Ly;
-# This file auto generated from Data/common/main/ar_LY.xml
-#	on Mon 11 Apr  5:23:38 pm GMT
+# This file auto generated from Data\common\main\ar_LY.xml
+#	on Fri 13 Oct  9:05:29 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

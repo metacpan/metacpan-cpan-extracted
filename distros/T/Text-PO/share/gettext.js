@@ -1,11 +1,11 @@
 /*
 * ----------------------------------------------------------------------------
 * PO Files Manipulation - Text-PO/share/gettext.js
-* Version v0.2.3
+* Version v0.2.5
 * Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
 * Author: Jacques Deguest <jack@deguest.jp>
 * Created 2021/06/29
-* Modified 2023/04/14
+* Modified 2023/10/14
 * All rights reserved
 * 
 * This program is free software; you can redistribute  it  and/or  modify  it
@@ -438,7 +438,7 @@
     var TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
     var TEXT_REGEXP  = /^[\u000b\u0020-\u007e\u0080-\u00ff]+$/;
     
-    var LOCALE_REGEXP = /^([a-z]{2}(?:[_-][A-Z]{2})(?:\.[\w-]+)?)?$/;
+    var LOCALE_REGEXP = /^[a-z]{2}((?:[_-][A-Z]{2})(?:\.[\w-]+)?)?$/;
     
     var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
 
@@ -837,6 +837,16 @@
     };
 
     GettextString.prototype.getLocale = function()
+    {
+        return(this.locale);
+    };
+    
+    GettextString.prototype.setLang = function(locale)
+    {
+        this.locale = locale;
+    };
+
+    GettextString.prototype.getLang = function()
     {
         return(this.locale);
     };
@@ -1259,7 +1269,9 @@
             Object.keys(hash).sort().forEach(function(k, index)
             {
                 var locWeb = k.replace( '_', '-' );
-                var text = self.dngettext( self.domain, key, plural, count, { locale: k })
+                self.log( "Fetching localised text for singular '" + key + "', plural '" + plural + "' with count '" + count + "' and locale '" + k + "'" );
+                var text = self.dngettext( self.domain, key, plural, count, { locale: k });
+                self.log( "Text found is '" + text + "'" );
                 // Clone
                 var params = args.slice();
                 params.unshift( text );
@@ -1267,6 +1279,7 @@
                 {
                     params.push( count );
                 }
+                self.log( "Params to sprintf are: " + JSON.stringify( params, null, 4 ) );
                 spans.push( '<span lang="' + locWeb + '">' + sprintf.apply( null, params ) + '</span>' );
             });
             return( spans );
@@ -1899,7 +1912,7 @@
             params.lang = params.lang.replace( '-', '_' );
             //return( sprintf( getText( thisKey, params.lang ), ...args ) );
             var thisText = self.getText( thisKey, params.lang );
-            var strLang = thisText.getLang();
+            var strLang = thisText.getLocale();
             args.unshift( thisText );
             // return( sprintf.apply( null, args ) );
             return( new GettextString( sprintf.apply( null, args ), strLang ) );
@@ -2877,7 +2890,7 @@ Gettext - A GNU Gettext JavaScript implementation
 
 =head1 VERSION
 
-    v0.2.2
+    v0.2.5
 
 =head1 DESCRIPTION
 
@@ -2939,9 +2952,11 @@ From version v0.2.0, this method returns a C<GettextString> object, which inheri
     let localStr = po.gettext( "Hello" );
     // Assuming the language sought is ja-JP and it succeed:
     localStr.getLang(); // returns ja-JP
+    localStr.getLocale(); // same; returns ja-JP
     localStr.lang; // also returns ja-JP
     // If no localised string were found:
     localStr.getLang(); // returns undefined
+    localStr.getLocale(); // same; returns undefined
     localStr.lang; // also returns undefined
 
 =head2 dgettext
@@ -2976,7 +2991,7 @@ From version v0.2.0, the string returned is a C<GettextString> object, which inh
 
 =head1 EXTENDED METHODS
 
-=head2 gettext
+=head2 gettextf
 
 This is the same as L</gettext>, except it will format the localised string using sprintf and the supplied arguments.
 

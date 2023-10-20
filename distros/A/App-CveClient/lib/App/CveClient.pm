@@ -2,7 +2,7 @@
 # Copyright © 2021-2023 CVE-Client Authors <https://hacktivis.me/git/cve-client/>
 # SPDX-License-Identifier: AGPL-3.0-only
 package App::CveClient;
-our $VERSION = '1.0.4';
+our $VERSION = 'v1.0.5';
 
 use warnings;
 use strict;

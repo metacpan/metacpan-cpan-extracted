@@ -54,7 +54,7 @@
    "provides" : {
       "DateTime::Format::Natural" : {
          "file" : "lib/DateTime/Format/Natural.pm",
-         "version" : "1.17"
+         "version" : "1.18"
       },
       "DateTime::Format::Natural::Calc" : {
          "file" : "lib/DateTime/Format/Natural/Calc.pm",
@@ -102,7 +102,7 @@
       },
       "DateTime::Format::Natural::Test" : {
          "file" : "lib/DateTime/Format/Natural/Test.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "DateTime::Format::Natural::Utils" : {
          "file" : "lib/DateTime/Format/Natural/Utils.pm",
@@ -122,6 +122,6 @@
          "url" : "https://github.com/stsc/DateTime-Format-Natural"
       }
    },
-   "version" : "1.17",
+   "version" : "1.18",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

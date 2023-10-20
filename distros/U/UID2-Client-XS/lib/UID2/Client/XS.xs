@@ -58,8 +58,8 @@ BOOT:
     newCONSTSUB(stash, "EUID", newSViv(static_cast<int>(uid2::IdentityScope::EUID)));
 
     stash = gv_stashpv("UID2::Client::XS::IdentityType", 1);
-    newCONSTSUB(stash, "EMAIL", newSViv(static_cast<int>(uid2::IdentityType::Email)));
-    newCONSTSUB(stash, "PHONE", newSViv(static_cast<int>(uid2::IdentityType::Phone)));
+    newCONSTSUB(stash, "EMAIL", newSViv(static_cast<int>(uid2::IdentityType::EMAIL)));
+    newCONSTSUB(stash, "PHONE", newSViv(static_cast<int>(uid2::IdentityType::PHONE)));
 
     stash = gv_stashpv("UID2::Client::XS::DecryptionStatus", 1);
     newCONSTSUB(stash, "SUCCESS", newSViv(static_cast<int>(uid2::DecryptionStatus::SUCCESS)));
@@ -80,6 +80,10 @@ BOOT:
     newCONSTSUB(stash, "TOKEN_DECRYPT_FAILURE", newSViv(static_cast<int>(uid2::EncryptionStatus::TOKEN_DECRYPT_FAILURE)));
     newCONSTSUB(stash, "KEY_INACTIVE", newSViv(static_cast<int>(uid2::EncryptionStatus::KEY_INACTIVE)));
     newCONSTSUB(stash, "ENCRYPTION_FAILURE", newSViv(static_cast<int>(uid2::EncryptionStatus::ENCRYPTION_FAILURE)));
+
+    stash = gv_stashpv("UID2::Client::XS::AdvertisingTokenVersion", 1);
+    newCONSTSUB(stash, "V3", newSViv(static_cast<int>(uid2::AdvertisingTokenVersion::V3)));
+    newCONSTSUB(stash, "V4", newSViv(static_cast<int>(uid2::AdvertisingTokenVersion::V4)));
 }
 
 PROTOTYPES: DISABLE

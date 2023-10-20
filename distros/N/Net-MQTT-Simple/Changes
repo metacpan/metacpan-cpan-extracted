@@ -3,6 +3,9 @@ Revision history for Perl extension Net::MQTT::Simple.
 Incompatible changes are marked with "!!". Incompatibility with and changes in
 "undocumented features" are not always specifically mentioned here.
 
+1.29  2023-10-13 13:37
+        - Clarify license terms.
+
 1.28  2022-12-28 02:37
         - Fix: Don't hang when receiving signal during select() (Contributed by
           Peter Sobisch via RT 134165)

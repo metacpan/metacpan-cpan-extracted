@@ -21,85 +21,124 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object );
-    use vars qw( $VERSION $VERBOSE $DEBUG );
+    use vars qw( $VERSION $DEBUG );
     use DB::Object::Fields;
-    $VERSION    = 'v0.6.0';
-    $VERBOSE    = 0;
-    $DEBUG      = 0;
     use Devel::Confess;
     use Want;
+    our $DEBUG = 0;
+    our $VERSION = 'v0.6.0';
 };
 
 use strict;
 use warnings;
 
+sub new { return( shift->Module::Generic::new( @_ ) ); }
+
 sub init
 {
-    my $self  = shift( @_ );
-    my $table = '';
-    $table    = shift( @_ ) if( @_ && @_ % 2 );
-    my %arg   = ( @_ );
-    # Prioritise this, so we get debugging messages
-    $self->{debug} = CORE::delete( $arg{delete} );
-    return( $self->error( "You must provide a table name to create a table object." ) ) if( !$table && !$arg{table} );
-    $table ||= CORE::delete( $arg{table} );
-    $self->{avoid}          = [];
-    $self->{alias}          = {};
-#     $self->{bind}           = '';
-#     $self->{cache}          = '';
-    $self->{dbo}            = '';
+    my $self = shift( @_ );
+    my $table;
+    my @test_args;
+    if( @_ &&
+        (
+            # $self->init( $table_name )
+            (
+                @_ == 1 && 
+                defined( $_[0] ) &&
+                (
+                    !ref( $_[0] ) || 
+                    $self->_can_overload( $_[0] => '""' )
+                )
+            ) ||
+            # $self->init( $table_name, $opts_hash_ref );
+            (
+                @_ == 2 &&
+                defined( $_[0] ) &&
+                defined( $_[1] ) &&
+                (
+                    !ref( $_[0] ) || 
+                    $self->_can_overload( $_[0] => '""' )
+                ) &&
+                ref( $_[1] ) eq 'HASH'
+            ) ||
+            # $self->init( $table_name, opt11 => val1, opt2 => val2 );
+            (
+                @_ > 2 && 
+                defined( $_[0] ) &&
+                (
+                    !ref( $_[0] ) || $self->_can_overload( $_[0] => '""' )
+                ) &&
+                ( @test_args = @_[1..$#_] ) &&
+                !( @test_args % 2 )
+            )
+        ) )
+    {
+        $table = shift( @_ );
+    }
+    my $opts = $self->_get_args_as_hash( @_ );
+    unless( defined( $table ) )
+    {
+        if( !CORE::exists( $opts->{table} ) || !CORE::length( $opts->{table} // '' ) )
+        {
+            return( $self->error( "You must provide a table name to create a table object." ) );
+        }
+        else
+        {
+            $table = CORE::delete( $opts->{table} );
+        }
+    }
+    $self->{dbo}            = undef;
     $self->{default}        = {};
-    $self->{enhance}        = '';
     $self->{fields}         = {};
     # DB::Object::Fields
-    $self->{fields_object}  = '';
+    $self->{fields_object}  = undef;
     $self->{null}           = {};
     $self->{prefixed}       = 0;
     $self->{primary}        = [];
-    $self->{query_object}   = '';
+    $self->{query_object}   = undef;
     $self->{query_reset}    = 0;
     $self->{reverse}        = 0;
     # The schema name, if any
-    $self->{schema}         = '';
+    $self->{schema}         = undef;
     $self->{structure}      = {};
-    $self->{table}          = $table if( $table );
+    $self->{table_alias}    = undef;
     $self->{types}          = {};
     # An hash to contain table field to an hash of constant value and constant name:
     # field => { constant => 12, name => PG_JSONB, type => 'jsonb' };
     $self->{types_const}    = {};
     # The table type. It could be table or view
-    $self->{type}           = '';
-    my $keys = [keys( %arg )];
-    @$self{ @$keys } = @arg{ @$keys };
-#     foreach my $k ( keys( %arg ) )
-#     {
-#         $self->{ $k } = $arg{ $k };
-#     }
+    $self->{type}           = undef;
+    $self->{_init_params_order} = [qw( dbo query_object )];
+    $self->{_init_strict_use_sub} = 1;
+    $self->Module::Generic::init( %$opts ) || return( $self->pass_error );
+    $self->dbo( $opts->{dbo} );
+    $self->{table} = $table;
+    $self->{_cache_structure} = '';
     # Load table default, fields, structure informations
-    # my $db = $self->database();
-    my $ref = $self->structure();
-    return( $self->error( "There is no table by the name of $table" ) ) if( !defined( $ref ) || !%$ref );
+    my $ref = $self->structure || return( $self->pass_error );
+    # return( $self->error( "There is no table by the name of $table" ) ) if( !defined( $ref ) || !%$ref );
     return( $self );
 }
 
 # Get/set alias
-sub alias
-{
-    my $self = shift( @_ );
-    my $q = $self->_reset_query;
-    return( $q->alias( @_ ) );
-}
+sub alias { return( shift->_method_to_query( 'alias', @_ ) ); }
 
 sub alter
 {
     my $self  = shift( @_ );
     # Expecting a reference to an array
-    my $spec  = '';
-    $spec     = shift( @_ ) if( @_ == 1 && ref( $_[ 0 ] ) );
-    $spec     = [ @_ ] if( @_ && !$spec );
+    my $spec;
+    if( @_ == 1 && $self->_is_array( $_[0] ) )
+    {
+        $spec = shift( @_ );
+    }
+    elsif( @_ )
+    {
+        $spec = [@_];
+    }
     my $table = $self->{table} ||
     return( $self->error( "No table was provided." ) );
-    return( $self->error( "No proper ALTER specification was provided." ) ) if( !$spec || !ref( $spec ) || !@$spec );
+    return( $self->error( "No proper ALTER specification was provided." ) ) if( !defined( $spec ) || !@$spec );
     my $query = "ALTER TABLE $table " . CORE::join( ', ', @$spec );
     my $sth   = $self->prepare( $query ) ||
     return( $self->error( "Error while preparing ALTER query to modify table '$table':\n", $self->errstr() ) );
@@ -117,18 +156,14 @@ sub as
     my $q = $self->_reset_query;
     if( @_ )
     {
-        # my( $p, $f, $l ) = caller;
+        $self->{table_alias} = $_[0];
         $self->prefixed( length( $_[0] ) > 0 ? 1 : 0 );
+        $q->table_alias( $self->{table_alias} );
     }
-    return( $q->table_alias( @_ ) );
+    return( $self->{table_alias} );
 }
 
-sub avoid
-{
-    my $self  = shift( @_ );
-    my $q = $self->_reset_query;
-    return( $q->avoid( @_ ) );
-}
+sub avoid { return( shift->_method_to_query( 'avoid', @_ ) ); }
 
 sub columns
 {
@@ -187,17 +222,20 @@ sub create_info
 
 sub database { return( shift->database_object->database ); }
 
-sub database_object { return( shift->{dbo} ); }
+sub database_object { return( shift->_set_get_object_without_init( 'dbo', 'DB::Object', @_ ) ); }
 
 sub dbh { return( shift->_set_get( 'dbh', @_ ) ); }
+
+sub dbo { return( shift->_set_get_object_without_init( 'dbo', 'DB::Object', @_ ) ); }
 
 sub default
 {
     my $self = shift( @_ );
-    $self->structure();
+    $self->structure || return( $self->pass_error );
     my $default = $self->{default};
-    return( wantarray() ? () : undef() ) if( !%$default );
-    return( wantarray() ? %$default : \%$default );
+    # return( wantarray() ? () : undef() ) if( !%$default );
+    # return( wantarray() ? %$default : \%$default );
+    return( $self->_clone( $default ) );
 }
 
 sub delete
@@ -235,17 +273,19 @@ sub drop
 {
     my $self  = shift( @_ );
     my $table = $self->{table} || 
-    return( $self->error( "No table was provided to drop." ) );
+        return( $self->error( "No table was provided to drop." ) );
     my $query = "DROP TABLE $table";
     my $sth = $self->prepare( $query ) ||
-    return( $self->error( "Error while preparing query to drop table '$table':\n$query", $self->errstr() ) );
+        return( $self->error( "Error while preparing query to drop table '$table':\n$query", $self->errstr() ) );
     if( !defined( wantarray() ) )
     {
-        $sth->execute() ||
-        return( $self->error( "Error while executing query to drop table '$table':\n$query", $sth->errstr() ) );
+        $sth->execute ||
+            return( $self->error( "Error while executing query to drop table '$table':\n$query", $sth->errstr() ) );
     }
     return( $sth );
 }
+
+sub enhance { return( shift->_method_to_query( 'enhance', @_ ) ); }
 
 sub exists
 {
@@ -257,10 +297,9 @@ sub exists
 sub fields
 {
     my $self = shift( @_ );
-    $self->structure();
+    $self->structure || return( $self->pass_error );
     my $fields = $self->{fields};
-    return( wantarray() ? () : undef() ) if( !%$fields );
-    return( wantarray() ? %$fields : \%$fields );
+    return( $self->_clone( $fields ) );
 }
 
 sub fields_object
@@ -269,10 +308,13 @@ sub fields_object
     my $o = $self->{fields_object};
     # This will make sure we have a query object which DB::Object::Fields and DB::Object::Field need
     $self->_reset_query;
+    my $qo = $self->query_object;
+    $qo->table_object( $self );
+    $self->messagec( 5, "Called for table {green}", $self->name, "{/} aliased to {green}", ( $self->as // 'undef' ), "{/}" );
     if( $o && $self->_is_object( $o ) )
     {
         $o->prefixed( $self->{prefixed} );
-        $o->query_object( $self->query_object );
+        $o->query_object( $qo );
         return( $o );
     }
     my $db_name = $self->database_object->database;
@@ -298,55 +340,38 @@ BEGIN
 1;
 
 EOT
-        # print( STDERR __PACKAGE__, "::_set_get_hash_as_object(): Evaluating\n$perl\n" );
         my $rc = eval( $perl );
-        # print( STDERR __PACKAGE__, "::_set_get_hash_as_object(): Returned $rc\n" );
         die( "Unable to dynamically create module $class: $@" ) if( $@ );
     }
     else
     {
+        # Class already exists
     }
     $o = $class->new(
         prefixed        => $self->{prefixed},
         # For table alias
-        query_object    => $self->query_object,
+        # query_object    => $self->query_object,
+        # query_object    => $qo,
         table_object    => $self,
         debug           => $self->debug,
     );
     $o->prefixed( $self->{prefixed} );
+    $self->messagec( 5, "Saving fields object whose table object has name {green}", $o->table_object->name, "{/} and alias {green}", $o->table_object->as, "{/}. Fields object has debug value '", $o->debug, "'" );
     $self->{fields_object} = $o;
     return( $o );
 }
 
 sub fo { return( shift->fields_object( @_ ) ); }
 
-sub format_statement($;\%\%@)
-{
-    my $self = shift( @_ );
-    my $q = $self->_reset_query;
-    return( $q->format_statement( @_ ) );
-}
+sub format_statement($;\%\%@) { return( shift->_method_to_query( 'format_statement', @_ ) ); }
 
-sub format_update($;%)
-{
-    my $self = shift( @_ );
-    my $q = $self->_reset_query;
-    return( $q->format_update( @_ ) );
-}
+sub format_update($;%) { return( shift->_method_to_query( 'format_update', @_ ) ); }
 
-sub from_unixtime
-{
-    my $self = shift( @_ );
-    my $q = $self->_reset_query;
-    return( $q->from_unixtime( @_ ) );
-}
+sub from_unixtime { return( shift->_method_to_query( 'from_unixtime', @_ ) ); }
 
-sub group
-{
-    my $self = shift( @_ );
-    my $q = $self->_reset_query;
-    return( $q->group( @_ ) );
-}
+sub get_query_object { return( shift->_reset_query ); }
+
+sub group { return( shift->_method_to_query( 'group', @_ ) ); }
 
 sub insert
 {
@@ -378,19 +403,9 @@ sub insert
     }
 }
 
-sub limit
-{
-    my $self  = shift( @_ );
-    my $q = $self->_reset_query;
-    return( $q->limit( @_ ) );
-}
+sub limit { return( shift->_method_to_query( 'limit', @_ ) ); }
 
-sub local
-{
-    my $self = shift( @_ );
-    my $q = $self->_reset_query;
-    return( $q->local( @_ ) );
-}
+sub local { return( shift->_method_to_query( 'local', @_ ) ); }
 
 sub lock
 {
@@ -405,13 +420,57 @@ sub name
     return( shift->{table} );
 }
 
+sub no_bind { return( shift->_set_get_boolean( { field => 'no_bind', callbacks =>
+{
+    set => sub
+    {
+        my $self = shift( @_ );
+        my $val = shift( @_ );
+        return if( !$val );
+        my $q = $self->_reset_query;
+        my $where = $q->where();
+        my $group = $q->group();
+        my $order = $q->order();
+        my $limit = $q->limit();
+        my $binded_where = $q->binded_where;
+        my $binded_group = $q->binded_group;
+        my $binded_order = $q->binded_order;
+        my $binded_limit = $q->binded_limit;
+        # Replace the placeholders by their corresponding value
+        # and have them re-processed by their corresponding method
+        if( $where && @$binded_where )
+        {
+            $where =~ s/(=\s*\?)/"='" . quotemeta( $binded_where->[ $#+ ] ) . "'"/ge;
+            $self->where( $where );
+        }
+        if( $group && @$binded_group )
+        {
+            $group =~ s/(=\s*\?)/"='" . quotemeta( $binded_group->[ $#+ ] ) . "'"/ge;
+            $self->group( $group );
+        }
+        if( $order && @$binded_order )
+        {
+            $order =~ s/(=\s*\?)/"='" . quotemeta( $binded_order->[ $#+ ] ) . "'"/ge;
+            $self->order( $order );
+        }
+        if( $limit && @$binded_limit )
+        {
+            # $limit =~ s/(=\s*\?)/"='" . quotemeta( $binded_limit[ $#+ ] ) . "'"/ge;
+            $self->limit( @$binded_limit );
+        }
+        $q->reset_bind;
+        return( $self );
+    },
+} }, @_ ) ); }
+
 sub null
 {
     my $self = shift( @_ );
-    $self->structure();
+    $self->structure || return( $self->pass_error );
     my $null = $self->{null};
-    return( wantarray() ? () : undef() ) if( !%$null );
-    return( wantarray() ? %$null : $null );
+    # return( wantarray() ? () : undef() ) if( !%$null );
+    # return( wantarray() ? %$null : $null );
+    return( $self->_clone( $null ) );
 }
 
 sub on_conflict { return( shift->error( "The on conflict clause is not supported by this driver." ) ); }
@@ -423,20 +482,13 @@ sub optimize
     return( $self->error( "optimize() is not implemented by $class." ) );
 }
 
-sub order
-{
-    my $self = shift( @_ );
-    my $q = $self->_reset_query;
-    return( $q->order( @_ ) );
-}
+sub order { return( shift->_method_to_query( 'order', @_ ) ); }
 
 sub prefix
 {
     my $self = shift( @_ );
     my @val = ();
     my $alias = $self->query_object->table_alias;
-    #my $q = $self->query_object || die( "No query object could be created or gotten: ", $self->error );
-    #my $alias = $q->table_alias;
     return( $alias ) if( $alias && $self->{prefixed} > 0 );
     CORE::push( @val, $self->database_object->database ) if( $self->{prefixed} > 2 );
     CORE::push( @val, $self->schema ) if( $self->{prefixed} > 1 && $self->schema );
@@ -472,10 +524,11 @@ sub prefixed
 sub primary
 {
     my $self = shift( @_ );
-    $self->structure();
+    $self->structure || return( $self->pass_error );
     my $primary = $self->{primary};
-    return( wantarray() ? () : undef() ) if( !$primary || !@$primary );
-    return( wantarray() ? @$primary : \@$primary );
+    # return( wantarray() ? () : undef() ) if( !$primary || !@$primary );
+    # return( wantarray() ? @$primary : \@$primary );
+    return( $self->_clone( $primary ) );
 }
 
 # In PostgreSQL, Oracle, SQL server this would be schema_name.table_name
@@ -534,18 +587,23 @@ sub reset
     CORE::delete( $self->{query_reset} );
     $self->_reset_query( @_ ) || return( $self->pass_error );
     CORE::delete( $self->{fields_object} );
-    ## To allow chaining of commands
+    # To allow chaining of commands
+    return( $self );
+}
+
+sub reset_structure
+{
+    my $self = shift( @_ );
+    if( !CORE::length( $self->{_reset_structure} // '' ) && scalar( @_ ) )
+    {
+        $self->{_reset_structure} = scalar( @_ );
+    }
     return( $self );
 }
 
 # Modelled after PostgreSQL and available since 3.35.0 released 2021-03-12
 # <https://www.sqlite.org/lang_returning.html>
-sub returning
-{
-    my $self  = shift( @_ );
-    my $q = $self->_reset_query;
-    return( $q->returning( @_ ) );
-}
+sub returning { return( shift->_method_to_query( 'returning', @_ ) ); }
 
 sub reverse
 {
@@ -585,8 +643,11 @@ sub select
     }
     else
     {
+        $self->messagec( 5, "Calling select() on query object for table {green}", $self->name, "{/} with alias {green}", $self->as, "{/}" );
         my $val = $q->select( @_ ) || return( $self->pass_error( $q->error ) );
+        $self->messagec( 5, "select() on query object for table {green}", $self->name, "{/} with alias {green}", $self->as, "{/} returned {green}", $val, "{/}" );
         $self->reset;
+        $self->messagec( 5, "Table {green}", $self->name, "{/} is {green}", $self->as, "{/}" );
         return( $val );
     }
 }
@@ -632,19 +693,21 @@ sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
 sub types
 {
     my $self = shift( @_ );
-    $self->structure();
+    $self->structure || return( $self->pass_error );
     my $types = $self->{types};
-    return( wantarray() ? () : undef() ) if( !%$types );
-    return( wantarray() ? %$types : $types );
+    # return( wantarray() ? () : undef() ) if( !%$types );
+    # return( wantarray() ? %$types : $types );
+    return( $self->_clone( $types ) );
 }
 
 sub types_const
 {
     my $self = shift( @_ );
-    $self->structure();
+    $self->structure || return( $self->pass_error );
     my $types = $self->{types_const};
-    return( wantarray() ? () : undef() ) if( !%$types );
-    return( wantarray() ? %$types : $types );
+    # return( wantarray() ? () : undef() ) if( !%$types );
+    # return( wantarray() ? %$types : $types );
+    return( $self->_clone( $types ) );
 }
 
 sub unlock
@@ -654,12 +717,7 @@ sub unlock
     return( $self->error( "unlock() is not implemented by $class." ) );
 }
 
-sub unix_timestamp
-{
-    my $self = shift( @_ );
-    my $q = $self->_reset_query;
-    return( $q->unix_timestamp( @_ ) );
-}
+sub unix_timestamp { return( shift->_method_to_query( 'unix_timestamp', @_ ) ); }
 
 sub update
 {
@@ -692,14 +750,18 @@ sub update
     }
 }
 
-sub where
+sub where { return( shift->_method_to_query( 'where', @_ ) ); }
+
+sub _method_to_query
 {
     my $self = shift( @_ );
+    my $meth = shift( @_ );
     my $q = $self->_reset_query;
-    return( $q->where( @_ ) );
+    my $code = $q->can( $meth ) || return( $self->error( "Query class '", ref( $q ), "' has no method '$meth'." ) );
+    return( $code->( $q, @_ ) );
 }
 
-AUTOLOAD
+sub AUTOLOAD
 {
     my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
     no overloading;
@@ -718,7 +780,7 @@ AUTOLOAD
     }
 };
 
-DESTROY
+sub DESTROY
 {
     # Do nothing
     # DB::Object::Tables are never destroyed.
@@ -831,6 +893,10 @@ Returns the database object (L<DB::Object>)
 
 Returns the database handler (L<DBI>)
 
+=head2 dbo
+
+Sets or get the L<database object|DB::Object>, which can be one of L<DB::Object::Mysql>, L<DB::Object::Postgres> or L<DB::Object::SQLite>
+
 =head2 default
 
 This calls L</structure> which may return cached data.
@@ -859,6 +925,10 @@ In void context, this will execute the resulting statement handler.
 
 It returns the resulting statement handler
 
+=head2 enhance
+
+Sets or gets the boolean value. When true, this will instruct the query object to make certain enhancements to the SQL query.
+
 =head2 exists
 
 This must be implemented by the driver package, so check L<DB::Object::Mysql::Tables/exists>, L<DB::Object::Postgres::Tables/exists> or L<DB::Object::SQLite::Tables/exists>
@@ -878,7 +948,7 @@ If nothing is found, it returns an empty list in list context and L<perlfunc/und
     my $name = $tbl->fields_object->name
     # Do something with it
     my $expr = $name == 'joe';
-    # Resulting in an DB::Object::Fields::Field::Overloaded object
+    # Resulting in an DB::Object::Fields::Overloaded object
 
 This returns the cached object if there is one.
 
@@ -945,6 +1015,10 @@ L</format_update> returns a string representing the comma-separated list of fiel
 Provided with an array or array reference of table columns and this will set the list of fields that are to be treated as unix time and converted accordingly after the sql query is executed.
 
 It returns the list of fields in list context or a reference to an array in scalar context.
+
+=head2 get_query_object
+
+Get the L<DB::Object::Query> object. If none is set yet, it will instantiate one automatically.
 
 =head2 group
 
@@ -1058,6 +1132,10 @@ This is used to reset a prepared query to its default values. If a field is a da
 
 It execute an update with the reseted value and return the number of affected rows.
 
+=head2 reset_structure
+
+Resets the cache for the L</structure> method
+
 =head2 returning
 
 The SQL C<RETURNING> clause needs to be implemented by the driver and is currently supported only by and L<DB::Object::Postgres> (see L<DB::Object::Postgres::Query/returning>) and L<DB::Object::SQLite> (see L<DB::Object::SQLite::Query/returning>).
@@ -1093,6 +1171,8 @@ This must be implemented by the driver package, so check L<DB::Object::Mysql::Ta
 The implementation is driver specific.
 
 This must be implemented by the driver package, so check L<DB::Object::Mysql::Tables/structure>, L<DB::Object::Postgres::Tables/structure> or L<DB::Object::SQLite::Tables/structure>
+
+This returns a cached data for speed. See L</reset_structure> to reset that cache.
 
 =head2 table
 

@@ -56,10 +56,9 @@ $App::LXC::Container::Data::common::_system_default =
 
 #########################################################################
 # local helper functions:
-sub fail_in_sub_perl($$$;$$)
+sub fail_in_sub_perl($$$;$)
 {
-    my ($home_dir, $conf_dir, $input, $call_new, $debug) = @_;
-    defined $debug  or  $debug = 0;
+    my ($home_dir, $conf_dir, $input, $call_new) = @_;
     return _sub_perl('
 		BEGIN {
 		    $ENV{HOME} = "' . $home_dir . '";
@@ -69,7 +68,6 @@ sub fail_in_sub_perl($$$;$$)
 		do("' . T_PATH . '/functions/call_with_stdin.pl");
 		my $dummy_obj = { MAIN_UI => UI::Various::Main->new() };
 		$dummy_obj = bless $dummy_obj, "App::LXC::Container::Setup";
-		UI::Various::logging("DEBUG_3") if ' . $debug . ';
 		my @input = qw(' . $input . ');
 		_call_with_stdin
 		(\@input,
@@ -136,31 +134,17 @@ $_ = fail_in_sub_perl(HOME_PATH, FAIL_PATH, '2 2 2 2', 1);
 like($_,
      qr{^aborting after the following error\(s\):\nPermission denied at }m,
      'bad configuration directory should fail');
-# FIXME: additional diagnostic to try to find reason for deep recursion:
-my $debug_ui = 0;
-if (m/Deep recursion/)
-{
-    diag('HOME_PATH is ', HOME_PATH);
-    diag('HOME_PATH really is ', Cwd::abs_path(HOME_PATH));
-    diag('FAIL_PATH is ', FAIL_PATH);
-    diag('FAIL_PATH really is ', Cwd::abs_path(FAIL_PATH));
-    diag('activating UI::Various debugging');
-    $debug_ui = 1;
-}
-$_ = fail_in_sub_perl(HOME_PATH, FAIL_PATH, '2 1 2 2', 0, $debug_ui);
-diag("DEEP RECURSION:\n", $_)  if  $debug_ui  and  m/deep recursion/i;
+$_ = fail_in_sub_perl(HOME_PATH, FAIL_PATH, '2 1 2 2', 0);
 like($_,
      qr{$re_dialog_main$re_dialog_buttons}ms,
      'aborting initialisation 1 looks correct');
 ok(! -d HOME_PATH . '/conf', 'conf does not yet exist');
-$_ = fail_in_sub_perl(HOME_PATH, FAIL_PATH, '2 2 2 1', 0, $debug_ui);
-diag("DEEP RECURSION:\n", $_)  if  $debug_ui  and  m/deep recursion/i;
+$_ = fail_in_sub_perl(HOME_PATH, FAIL_PATH, '2 2 2 1', 0);
 like($_,
      qr{$re_dialog_main$re_dialog_buttons}ms,
      'aborting initialisation 2 looks correct');
 ok(! -d HOME_PATH . '/conf', 'conf still does not yet exist');
-$_ = fail_in_sub_perl(FAIL_PATH, HOME_PATH, '2 2 2 2', 0, $debug_ui);
-diag("DEEP RECURSION:\n", $_)  if  $debug_ui  and  m/deep recursion/i;
+$_ = fail_in_sub_perl(FAIL_PATH, HOME_PATH, '2 2 2 2', 0);
 like($_,
      qr{^can't link '.*/t/tmp/fail/.lxc-configuration' to '.*/t/tmp/home': Permission denied at }m,
      'unwritable home directory should fail');
@@ -275,8 +259,7 @@ stdout_like
     qr{$re_dialog}ms,
     're-run with same directory did not fail';
 
-$_ = fail_in_sub_perl(HOME_PATH, TMP_PATH, '1 3 home 0 2 2 2 2', 0, $debug_ui);
-diag("DEEP RECURSION:\n", $_)  if  $debug_ui  and  m/deep recursion/i;
+$_ = fail_in_sub_perl(HOME_PATH, TMP_PATH, '1 3 home 0 2 2 2 2', 0);
 like($_,
      qr{^can't link '.*/t/tmp/home/.lxc-configuration' to '.*/t/tmp/home': File exists at }m,
      'existing link should fail');

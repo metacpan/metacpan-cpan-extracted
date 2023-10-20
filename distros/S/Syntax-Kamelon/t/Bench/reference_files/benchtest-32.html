@@ -215,7 +215,7 @@ font.Warning {
 <div id="53" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">btfss</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;STATUS,C</font></br></div>
 <div id="54" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">goto</font><font class="Normal">&nbsp;in</font></br></div>
 <div id="55" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">goto</font><font class="Normal">&nbsp;outp&nbsp;</font><font class="Comment">;&nbsp;C=1&nbsp;=&gt;&nbsp;resutat&nbsp;&gt;=&nbsp;0&nbsp;=&gt;&nbsp;var&nbsp;&gt;=&nbsp;min</font></br></div>
-<div id="56" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;endm</font></br></div>
+<div id="56" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Others">endm</font></br></div>
 <div id="57" class="line"><font class="Comment">;</font></br></div>
 <div id="58" class="line"><font class="Comment">;&nbsp;Attend&nbsp;que&nbsp;le&nbsp;bit&nbsp;&quot;bit&quot;&nbsp;du&nbsp;registre&nbsp;&quot;reg&quot;&nbsp;soit&nbsp;a&nbsp;1</font></br></div>
 <div id="59" class="line"><font class="Comment">;</font></br></div>
@@ -223,7 +223,7 @@ font.Warning {
 <div id="61" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Others">local</font><font class="Normal">&nbsp;&nbsp;&nbsp;Wait1</font></br></div>
 <div id="62" class="line"><font class="Normal">Wait1&nbsp;&nbsp;&nbsp;</font><font class="Keyword">btfss</font><font class="Normal">&nbsp;&nbsp;&nbsp;reg,bit</font></br></div>
 <div id="63" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">goto</font><font class="Normal">&nbsp;Wait1</font></br></div>
-<div id="64" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;endm</font></br></div>
+<div id="64" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Others">endm</font></br></div>
 <div id="65" class="line"><font class="Comment">;</font></br></div>
 <div id="66" class="line"><font class="Comment">;&nbsp;Attend&nbsp;que&nbsp;le&nbsp;bit&nbsp;&quot;bit&quot;&nbsp;du&nbsp;registre&nbsp;&quot;reg&quot;&nbsp;soit&nbsp;a&nbsp;0</font></br></div>
 <div id="67" class="line"><font class="Comment">;</font></br></div>
@@ -231,22 +231,22 @@ font.Warning {
 <div id="69" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Others">local</font><font class="Normal">&nbsp;Wait0</font></br></div>
 <div id="70" class="line"><font class="Normal">Wait0&nbsp;&nbsp;&nbsp;</font><font class="Keyword">btfsc</font><font class="Normal">&nbsp;&nbsp;&nbsp;reg,bit</font></br></div>
 <div id="71" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">goto</font><font class="Normal">&nbsp;Wait0</font></br></div>
-<div id="72" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;endm</font></br></div>
+<div id="72" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Others">endm</font></br></div>
 <div id="73" class="line"><font class="Comment">;</font></br></div>
 <div id="74" class="line"><font class="Comment">;&nbsp;Branche&nbsp;en&nbsp;&quot;label&quot;&nbsp;si&nbsp;(reg)&nbsp;==&nbsp;num,&nbsp;sinon&nbsp;continue</font></br></div>
 <div id="75" class="line"><font class="Comment">;</font></br></div>
 <div id="76" class="line"><font class="Normal">Beq&nbsp;&nbsp;&nbsp;</font><font class="Others">macro</font><font class="Normal">&nbsp;label,reg,num</font></br></div>
 <div id="77" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">movlw</font><font class="Normal">&nbsp;&nbsp;&nbsp;num</font></br></div>
-<div id="78" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">subwf</font><font class="Normal">&nbsp;&nbsp;&nbsp;reg,W</font></br></div>
+<div id="78" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">subwf</font><font class="Normal">&nbsp;&nbsp;&nbsp;reg,</font><font class="Operator">W</font></br></div>
 <div id="79" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">btfsc</font><font class="Normal">&nbsp;&nbsp;&nbsp;STATUS,Z&nbsp;</font></br></div>
 <div id="80" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">goto</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;label</font></br></div>
-<div id="81" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;endm</font></br></div>
+<div id="81" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Others">endm</font></br></div>
 <div id="82" class="line"><font class="Comment">;</font></br></div>
 <div id="83" class="line"><font class="Comment">;&nbsp;Branche&nbsp;en&nbsp;&quot;label&quot;&nbsp;si&nbsp;(reg)&nbsp;!=&nbsp;num,&nbsp;sinon&nbsp;continue</font></br></div>
 <div id="84" class="line"><font class="Comment">;</font></br></div>
 <div id="85" class="line"><font class="Normal">Bne&nbsp;&nbsp;&nbsp;</font><font class="Others">macro</font><font class="Normal">&nbsp;label,reg,num</font></br></div>
 <div id="86" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">movlw</font><font class="Normal">&nbsp;&nbsp;&nbsp;num</font></br></div>
-<div id="87" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">subwf</font><font class="Normal">&nbsp;&nbsp;&nbsp;reg,W</font></br></div>
+<div id="87" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">subwf</font><font class="Normal">&nbsp;&nbsp;&nbsp;reg,</font><font class="Operator">W</font></br></div>
 <div id="88" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">btfss</font><font class="Normal">&nbsp;&nbsp;&nbsp;STATUS,Z&nbsp;</font></br></div>
 <div id="89" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">goto</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;label</font></br></div>
 <div id="90" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Others">endm</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></br></div>
@@ -259,7 +259,7 @@ font.Warning {
 <div id="97" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">subwf</font><font class="Normal">&nbsp;&nbsp;&nbsp;reg,</font><font class="Operator">W</font><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;reg&nbsp;-&nbsp;W</font></br></div>
 <div id="98" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">btfss</font><font class="Normal">&nbsp;&nbsp;&nbsp;STATUS,C&nbsp;</font></br></div>
 <div id="99" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">goto</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;label&nbsp;</font><font class="Comment">;&nbsp;C=0&nbsp;=&gt;&nbsp;&nbsp;reg&nbsp;-&nbsp;W&nbsp;&lt;&nbsp;0</font></br></div>
-<div id="100" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;endm</font></br></div>
+<div id="100" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Others">endm</font></br></div>
 <div id="101" class="line"></br></div>
 <div id="102" class="line"><font class="Comment">;</font></br></div>
 <div id="103" class="line"><font class="Comment">;&nbsp;Branche&nbsp;en&nbsp;&quot;label&quot;&nbsp;si&nbsp;(reg)&nbsp;&gt;=&nbsp;num,&nbsp;sinon&nbsp;continue</font></br></div>
@@ -269,7 +269,7 @@ font.Warning {
 <div id="107" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">subwf</font><font class="Normal">&nbsp;&nbsp;&nbsp;reg,</font><font class="Operator">W</font><font class="Normal">&nbsp;</font><font class="Comment">;&nbsp;reg&nbsp;-&nbsp;W</font></br></div>
 <div id="108" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">btfsc</font><font class="Normal">&nbsp;&nbsp;&nbsp;STATUS,C&nbsp;</font></br></div>
 <div id="109" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">goto</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;label&nbsp;</font><font class="Comment">;&nbsp;C=1&nbsp;=&gt;&nbsp;&nbsp;reg&nbsp;-&nbsp;W&nbsp;&gt;=&nbsp;0</font></br></div>
-<div id="110" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;endm</font></br></div>
+<div id="110" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Others">endm</font></br></div>
 <div id="111" class="line"><font class="Comment">;&nbsp;========================================================</font></br></div>
 <div id="112" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;CONFIG&nbsp;word&nbsp;&nbsp;(&nbsp;en&nbsp;FFF&nbsp;)</font></br></div>
 <div id="113" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;bits&nbsp;11:5&nbsp;&nbsp;&nbsp;don't&nbsp;care</font></br></div>
@@ -290,16 +290,16 @@ font.Warning {
 <div id="128" class="line"><font class="Comment">;&nbsp;et&nbsp;on&nbsp;attend&nbsp;le&nbsp;repassage&nbsp;a&nbsp;1&nbsp;</font></br></div>
 <div id="129" class="line"><font class="Comment">;&nbsp;Cette&nbsp;routine&nbsp;DOIT&nbsp;etre&nbsp;appelee&nbsp;tout&nbsp;les&nbsp;2/100&nbsp;s&nbsp;ou&nbsp;plus&nbsp;souvent</font></br></div>
 <div id="130" class="line"><font class="Normal">tickcount</font></br></div>
-<div id="131" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;clrwdt</font></br></div>
-<div id="132" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">movf</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;TMR0,W</font></br></div>
+<div id="131" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">clrwdt</font></br></div>
+<div id="132" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">movf</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;TMR0,</font><font class="Operator">W</font></br></div>
 <div id="133" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">btfss</font><font class="Normal">&nbsp;&nbsp;&nbsp;STATUS,Z</font></br></div>
 <div id="134" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">retlw</font><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="DecVal">0</font></br></div>
 <div id="135" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
-<div id="136" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">incf</font><font class="Normal">&nbsp;&nbsp;&nbsp;TICKS,F</font></br></div>
+<div id="136" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">incf</font><font class="Normal">&nbsp;&nbsp;&nbsp;TICKS,</font><font class="Operator">F</font></br></div>
 <div id="137" class="line"><font class="Comment">;&nbsp;&nbsp;&nbsp;attendre&nbsp;que&nbsp;le&nbsp;timer&nbsp;ait&nbsp;depasse&nbsp;0</font></br></div>
 <div id="138" class="line"><font class="Normal">waitnoZ</font></br></div>
-<div id="139" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;clrwdt</font></br></div>
-<div id="140" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">movf</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;TMR0,W</font></br></div>
+<div id="139" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">clrwdt</font></br></div>
+<div id="140" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">movf</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;TMR0,</font><font class="Operator">W</font></br></div>
 <div id="141" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">btfsc</font><font class="Normal">&nbsp;&nbsp;&nbsp;STATUS,Z</font></br></div>
 <div id="142" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">goto</font><font class="Normal">&nbsp;&nbsp;&nbsp;waitnoZ</font></br></div>
 <div id="143" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">retlw</font><font class="Normal">&nbsp;</font><font class="DecVal">0</font></br></div>
@@ -320,8 +320,8 @@ font.Warning {
 <div id="158" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">retlw</font><font class="Normal">&nbsp;</font><font class="DecVal">0</font></br></div>
 <div id="159" class="line"><font class="Comment">;&nbsp;remet&nbsp;a&nbsp;zero&nbsp;le&nbsp;compteur&nbsp;de&nbsp;ticks&nbsp;et&nbsp;le&nbsp;timer&nbsp;et&nbsp;le&nbsp;watchdog</font></br></div>
 <div id="160" class="line"><font class="Normal">clearticks</font></br></div>
-<div id="161" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;clrwdt</font></br></div>
-<div id="162" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;clrw</font></br></div>
+<div id="161" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">clrwdt</font></br></div>
+<div id="162" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">clrw</font></br></div>
 <div id="163" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">movwf</font><font class="Normal">&nbsp;&nbsp;&nbsp;TICKS</font></br></div>
 <div id="164" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">movwf</font><font class="Normal">&nbsp;&nbsp;&nbsp;TMR0</font></br></div>
 <div id="165" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;pour&nbsp;eviter&nbsp;un&nbsp;timeout&nbsp;immediat,&nbsp;le&nbsp;timer&nbsp;est&nbsp;charge&nbsp;</font></br></div>
@@ -340,7 +340,7 @@ font.Warning {
 <div id="178" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">btfsc</font><font class="Normal">&nbsp;&nbsp;&nbsp;STATUS,TO</font></br></div>
 <div id="179" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">goto</font><font class="Normal">&nbsp;notimeout</font></br></div>
 <div id="180" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;TO&nbsp;==&nbsp;0&nbsp;:&nbsp;OUI</font></br></div>
-<div id="181" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;clrwdt</font></br></div>
+<div id="181" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">clrwdt</font></br></div>
 <div id="182" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">goto</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BaseN">0x1FF</font><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;recalibrage,&nbsp;&nbsp;0x3FF&nbsp;sur&nbsp;12C509</font></br></div>
 <div id="183" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
 <div id="184" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;TO&nbsp;==&nbsp;1&nbsp;:&nbsp;NON</font></br></div>
@@ -422,7 +422,7 @@ font.Warning {
 <div id="260" class="line"></br></div>
 <div id="261" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">goto</font><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;attendre_trame</font></br></div>
 <div id="262" class="line"><font class="Normal">nextslot</font></br></div>
-<div id="263" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">incf</font><font class="Normal">&nbsp;&nbsp;&nbsp;SLOT,F</font></br></div>
+<div id="263" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">incf</font><font class="Normal">&nbsp;&nbsp;&nbsp;SLOT,</font><font class="Operator">F</font></br></div>
 <div id="264" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font></br></div>
 <div id="265" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;si&nbsp;le&nbsp;signal&nbsp;est&nbsp;a&nbsp;1,&nbsp;on&nbsp;en&nbsp;profite&nbsp;pour&nbsp;se&nbsp;resynchroniser</font></br></div>
 <div id="266" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Comment">;&nbsp;sur&nbsp;son&nbsp;front&nbsp;descendant,&nbsp;au&nbsp;cas&nbsp;ou&nbsp;l'emetteur&nbsp;ne&nbsp;soit&nbsp;pas</font></br></div>
@@ -442,7 +442,7 @@ font.Warning {
 <div id="280" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">call</font><font class="Normal">&nbsp;tickcount</font></br></div>
 <div id="281" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;Lminmax&nbsp;&nbsp;&nbsp;TICKS,</font><font class="BaseN">D'100'</font><font class="Normal">,</font><font class="BaseN">D'101'</font><font class="Normal">,again100,sample,again100</font></br></div>
 <div id="282" class="line"></br></div>
-<div id="283" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;end</font></br></div>
+<div id="283" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Others">end</font></br></div>
 <div id="284" class="line"></br></div>
 <div id="285" class="line"></br></div>
 </div>

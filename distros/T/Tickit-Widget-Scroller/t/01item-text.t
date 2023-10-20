@@ -2,6 +2,7 @@
 
 use v5.26;
 use warnings;
+use utf8;
 
 use Test2::V0;
 
@@ -174,8 +175,6 @@ drain_termlog;
 
 # Odd Unicode
 {
-   use utf8;
-
    $term->clear;
    drain_termlog;
 
@@ -201,6 +200,37 @@ drain_termlog;
 
    is_display( [ [TEXT("(ノಠ益ಠ)ノ彡┻━┻")] ],
                'Display for render with Unicode' );
+}
+
+# Non-breaking spaces
+{
+   $term->clear;
+   drain_termlog;
+
+   my $item = Tickit::Widget::Scroller::Item::Text->new( "abcdef 12\x{A0}34" );
+
+   is( $item->height_for_width( 11 ), 2, 'height_for_width 2 with NBSP' );
+
+   $item->render( $rb, top => 0, firstline => 0, lastline => 1, width => 11, height => 2 );
+   $rb->flush_to_term( $term );
+
+   flush_tickit;
+
+   is_termlog( [ GOTO(0,0),
+                 SETPEN,
+                 PRINT("abcdef "),
+                 SETPEN,
+                 ERASECH(4),
+                 GOTO(1,0),
+                 SETPEN,
+                 PRINT("12 34"),
+                 SETPEN,
+                 ERASECH(6) ],
+               'Termlog for render with NBSP' );
+
+   is_display( [ [TEXT("abcdef")],
+                 [TEXT("12 34")] ],
+               'Display for render with NBSP' );
 }
 
 # Empty

@@ -1,5 +1,5 @@
 package Selenium::Driver::WinApp;
-$Selenium::Driver::WinApp::VERSION = '1.05';
+$Selenium::Driver::WinApp::VERSION = '1.06';
 use strict;
 use warnings;
 
@@ -49,7 +49,7 @@ Selenium::Driver::WinApp - Tell Selenium::Client how to spawn the Windows Applic
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 Mode of Operation
 
@@ -73,7 +73,7 @@ George S. Baugh <george@troglodyne.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by George S. Baugh.
+This software is Copyright (c) 2023 by George S. Baugh.
 
 This is free software, licensed under:
 

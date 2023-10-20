@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::Builder::Tester;
-use Test::More;
+use Test2::V0;
 
 use Future::AsyncAwait 0.47;
 
@@ -34,8 +34,8 @@ my $gpio = await $adapter->make_protocol( 'GPIO' );
    test_out( "ok 2 - ->read_gpios" );
 
    $adapter->expect_read_gpios( [ 'A', 'B' ] )
-      ->returns( { A => 1, B => 0 } );
-   is_deeply( await $gpio->read_gpios( [ 'A', 'B' ] ), { A => 1, B => 0 },
+      ->will_done( { A => 1, B => 0 } );
+   is( await $gpio->read_gpios( [ 'A', 'B' ] ), { A => 1, B => 0 },
       '->read_gpios returns values' );
    $adapter->check_and_clear( '->read_gpios' );
 

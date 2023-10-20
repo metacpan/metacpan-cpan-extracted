@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::ApiDefMap;
 # ABSTRACT: Maps Operation to API description
-$AI::TensorFlow::Libtensorflow::ApiDefMap::VERSION = '0.0.6';
+$AI::TensorFlow::Libtensorflow::ApiDefMap::VERSION = '0.0.7';
 use strict;
 use warnings;
 use namespace::autoclean;

@@ -1,0 +1,6 @@
+
+2020-10-30 Now available on GitHub at: https://github.com/philiprbrenan/MathVectors2
+           Please create a pull request from a cloned copy.
+           
+2023-10-01 intersection() intersection point of two line segments
+2023-10-02 triangulate() triangulate a shape whose boundary is represented by an array of vectors actign as points.           

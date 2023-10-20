@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Exporter qw(import);
 
-our $VERSION = '2.00';
+our $VERSION = '2.02';
 our @EXPORT  = qw(purl_to_urls);
 
 sub purl_to_urls {
@@ -193,11 +193,16 @@ sub _cpan_urls {
 
     my $purl = shift;
 
-    my $name       = $purl->name;
-    my $version    = $purl->version;
-    my $qualifiers = $purl->qualifiers;
-    my $author     = $purl->namespace ? uc($purl->namespace) : undef;
-    my $file_ext   = $qualifiers->{ext} || 'tar.gz';
+    my $name           = $purl->name;
+    my $version        = $purl->version;
+    my $qualifiers     = $purl->qualifiers;
+    my $author         = $purl->namespace ? uc($purl->namespace) : undef;
+    my $file_ext       = $qualifiers->{ext}            || 'tar.gz';
+    my $repository_url = $qualifiers->{repository_url} || 'https://www.cpan.org';
+
+    if ($repository_url !~ /^(http|https|file|ftp):\/\//) {
+        $repository_url = 'https://' . $repository_url;
+    }
 
     $name =~ s/\:\:/-/g;    # TODO
 
@@ -209,7 +214,7 @@ sub _cpan_urls {
         my $author_2 = substr($author, 0, 2);
 
         $urls->{repository} = "https://metacpan.org/release/$author/$name-$version";
-        $urls->{download}   = "http://www.cpan.org/authors/id/$author_1/$author_2/$author/$name-$version.$file_ext";
+        $urls->{download}   = "$repository_url/authors/id/$author_1/$author_2/$author/$name-$version.$file_ext";
 
     }
 
@@ -287,7 +292,7 @@ URI::PackageURL::Util - Utility for URI::PackageURL
 
   use URI::PackageURL::Util qw(purl_to_urls);
 
-  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.00');
+  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.01');
 
   $filename = basename($urls->{download});
   $ua->mirror($urls->{download}, "/tmp/$filename");
@@ -324,13 +329,13 @@ C<gem>, C<github>, C<gitlab>, C<maven>, C<npm>, C<nuget>, C<pypi>).
 
 (*) Only with B<version> component
 
-  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.00');
+  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.01');
 
   print Dumper($urls);
 
   # $VAR1 = {
-  #           'repository' => 'https://metacpan.org/release/GDT/URI-PackageURL-2.00',
-  #           'download' => 'http://www.cpan.org/authors/id/G/GD/GDT/URI-PackageURL-2.00.tar.gz'
+  #           'repository' => 'https://metacpan.org/release/GDT/URI-PackageURL-2.01',
+  #           'download' => 'http://www.cpan.org/authors/id/G/GD/GDT/URI-PackageURL-2.01.tar.gz'
   #         };
 
 =back

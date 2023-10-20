@@ -1,0 +1,54 @@
+---
+abstract: unknown
+author:
+  - 'Manuel Rueda <mrueda@cpan.org>'
+build_requires:
+  Data::Fake: '0.006'
+  ExtUtils::MakeMaker: '0'
+  JSON::XS: '4.03'
+  Path::Tiny: '0.144'
+  Test::Exception: '0.43'
+  Test::More: '1.30'
+  Text::CSV_XS: '1.50'
+  YAML::XS: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '7.70'
+  File::ShareDir::Install: '0.14'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pheno-Ranker
+no_index:
+  directory:
+    - t
+    - inc
+    - docs
+    - t
+requires:
+  Data::Fake: '0.006'
+  File::ShareDir::ProjectDistDir: '1.000009'
+  Hash::Fold: '0'
+  JSON::Validator: '5.14'
+  JSON::XS: '4.03'
+  Math::CDF: '0'
+  Moo: '2.005005'
+  Path::Tiny: '0.144'
+  Scalar::Util: '1.50'
+  Sort::Naturally: '1.03'
+  Statistics::Descriptive: '0'
+  Term::ANSIColor: '5.01'
+  Text::CSV_XS: '1.50'
+  Types::Standard: '2.004000'
+  YAML::XS: '0.88'
+  perl: '5.026000'
+resources:
+  bugtracker: https://github.com/CNAG-Biomedical-Informatics/pheno-ranker/issues
+  homepage: https://github.com/CNAG-Biomedical-Informatics/pheno-ranker
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/CNAG-Biomedical-Informatics/pheno-ranker.git
+version: '0.02'
+x_contributors: []
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

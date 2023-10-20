@@ -12,7 +12,7 @@ Genealogy::ObituaryDailyTimes - Lookup an entry in the Obituary Daily Times
 
 # VERSION
 
-Version 0.09
+Version 0.10
 
 # SYNOPSIS
 
@@ -26,7 +26,9 @@ Version 0.09
 
 Creates a Genealogy::ObituaryDailyTimes object.
 
-Takes an optional argument, directory, that is the directory containing obituaries.sql.
+Takes two optional arguments:
+	directory: that is the directory containing obituaries.sql
+	logger: an object to send log messages to
 
 ## search
 

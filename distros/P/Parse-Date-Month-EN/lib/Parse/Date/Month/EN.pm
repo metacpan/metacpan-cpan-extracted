@@ -7,9 +7,9 @@ use warnings;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-16'; # DATE
+our $DATE = '2023-07-25'; # DATE
 our $DIST = 'Parse-Date-Month-EN'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our @EXPORT_OK = qw(parse_date_month_en $Pat);
 
@@ -112,7 +112,7 @@ Parse::Date::Month::EN - Parse month name from English text
 
 =head1 VERSION
 
-This document describes version 0.001 of Parse::Date::Month::EN (from Perl distribution Parse-Date-Month-EN), released on 2023-06-16.
+This document describes version 0.002 of Parse::Date::Month::EN (from Perl distribution Parse-Date-Month-EN), released on 2023-07-25.
 
 =head1 SYNOPSIS
 
@@ -172,7 +172,7 @@ Source repository is at L<https://github.com/perlancar/perl-Parse-Date-Month-EN>
 
 =head1 SEE ALSO
 
-Other C<Parse::Month::Name::*> modules.
+Other C<Parse::Month::Name::*> modules, e.g. L<Parse::Date::Month::ID>.
 
 =head1 AUTHOR
 

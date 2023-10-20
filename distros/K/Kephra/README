@@ -10,25 +10,46 @@ DESCRIPTION
     Kephra is an editor from and for programmers, currently at start of
     rewrite. This page gives you a summary how to use it.
 
-  File IO
-    Currently just the basics: ASCII and UTF-8 coding. Open, reload, save
-    and saving under different file name. See the menu for key kombos.
-
-  Editing
-    Basic editing as expected: undo redo, cut copy paste delete. When
-    nothing is selected Ctrl+C copies current line.
-
-    Slightly more advanced is swapping selection and clipboard
-    (Ctrl+Shift+V) and duplicate current line or selection with Ctrl+D.
-    Ctrl+A grows selection from word to expression to line, block, sub until
-    all is selected and shrink selection is just the opposite
-    (Ctrl+Shift+A).
+    The following is a rundown of the main functions sorted by main menu
+    from left to right. Not mentioned there is:
 
     Holding Ctrl allows you no navigate with left and right as expected word
     wise, up and down block wise and page up and page down subroutine wise.
     If the cursor is next to round a brace character you will navigate the
     its partner.
 
+    Bracing characters (including '' and "") are always created in pairs and
+    will embrace the selection.
+
+  File
+    "New" (Ctrl+N), "Open" (Ctrl+O), "Reload" (Ctrl+Shift+O) (reopen same
+    file), "Save" (Ctrl+S), "Save As .." (Ctrl+Shift+S) (save under
+    different file name), "Save Under .." (Alt+Shift+S) (save current
+    document state under (given in dialog) file name, but keep association
+    with old file name), "Quit" (close Kephra) (Ctrl+Q), "No Ask Quit"
+    (disregard unsaved files) (Ctrl+Shift+Q)
+
+  Edit
+    Basic editing as expected: "undo" (Ctrl+Z), redo (Ctrl+Y), if you add
+    *Shift* here, you will go several undo steps at once. *Alt* instead of
+    *Ctrl* moves you to start or end of the undo chain.
+
+    Core functions: "cut" (Ctrl+X) removes the selected text or the current
+    line (if nothing is selected) and copies it into the clipboard. Same is
+    true for "copy" (Ctrl+C), which only copies without removing anything.
+    "Paste" (Ctrl+V) inserts the copied text on the position of the caret
+    (cursor). "Swap" (Ctrl+Shift+V) streamlines the copy and paste process a
+    bit by replacing the selection with the old clipboard content, while
+    copying the selection or current line. "Delete" (Del) only removes the
+    selection or character on the caret position. "Duplicate" (Ctrl+D)
+    copies and paste's the selected text or current line, without affecting
+    the clipboard.
+
+    More advanced is (Ctrl+A), which "grows selection" from word to
+    expression to line, block, sub until all is selected and "shrink
+    selection" is just the opposite (Ctrl+Shift+A).
+
+  Format
     Holding Alt moves the selected or current line up or down. Left and
     right indent and dedents char wise in this mode. Normal indent/dedent
     listens to Tab and Shift+Tab.
@@ -39,9 +60,6 @@ DESCRIPTION
     (called line comments). The first option adds another letter after the
     pound symbol so that such (block) comments stay commented, even after
     come actions with Ctrl+Shift+K.
-
-    Bracing characters (including '' and "") are always created in pairs and
-    will embrace the selection.
 
   Search and Replace
     Kephra provides all the usual search and replace functions you expect.
@@ -60,10 +78,28 @@ DESCRIPTION
     easily navigate the findings of search (up and down) and replace term
     (Alt+up/down) and change it in both directions with (Alt+)Enter.
 
-    Ctrl+E jumps to position of last edit.
+    Ctrl+E jumps to position of last edit. If already there, the second last
+    edit will be destination.
+
+  Document
+    If "Soft Tabs" is activated, the Tab key will insert a number of space
+    cahracters. The "Indention Size" sets how many character this will be or
+    how much visual space a tab character will take (also tab character will
+    become visible when "whitespace" option in the *View* menu is set on).
+    If "Line Ending" defines which character will be inserted by pressing
+    (Enter). Next submenu helps you to set the encoding (currently only
+    ASCII and UTF-8). At last position is the language of the syntax
+    highlighter.
 
   View
-    F11 toggles full screen mode.
+    Here are items which can be turned on (visible) or off (invisible) lie
+    white space character, end of line (EOL) marker, indent guides and the
+    right margin, a vertical line marging the historical 80 character limit.
+    Next are toggle options for the two types of margin on the left border
+    of the editing widget: line number and margin for markers (special text
+    position you can jump to). Further down are options to zoom text or
+    break it on the right border of visibility. (F11) toggles full screen
+    mode.
 
 PLAN
     Development is done is stages which are focused on different feature

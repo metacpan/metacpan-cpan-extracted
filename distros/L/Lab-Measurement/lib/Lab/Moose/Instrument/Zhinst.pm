@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Zhinst;
-$Lab::Moose::Instrument::Zhinst::VERSION = '3.881';
+$Lab::Moose::Instrument::Zhinst::VERSION = '3.901';
 #ABSTRACT: Base class for Zurich Instruments device drivers
 
 use v5.20;
@@ -119,7 +119,7 @@ Lab::Moose::Instrument::Zhinst - Base class for Zurich Instruments device driver
 
 =head1 VERSION
 
-version 3.881
+version 3.901
 
 =head1 METHODS
 
@@ -164,7 +164,6 @@ event.
 This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Andreas K. Huettel, Simon Reinhardt
-            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

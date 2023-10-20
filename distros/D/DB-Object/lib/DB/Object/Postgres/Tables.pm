@@ -21,10 +21,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object::Tables DB::Object::Postgres );
-    use vars qw( $VERSION $VERBOSE $DEBUG $TYPE_TO_CONSTANT );
-    $VERSION    = 'v0.5.1';
-    $VERBOSE    = 0;
-    $DEBUG      = 0;
+    use vars qw( $VERSION $DEBUG $TYPE_TO_CONSTANT );
     use Devel::Confess;
     # the 'constant' property in the dictionary hash is added in structure()
     # <https://www.postgresql.org/docs/13/datatype.html>
@@ -75,6 +72,8 @@ BEGIN
     qr/^uuid/                           => { constant => '', name => 'PG_UUID', type => 'uuid' },
     qr/^xml/                            => { constant => '', name => 'PG_XML', type => 'xml' },
     };
+    our $DEBUG = 0;
+    our $VERSION = 'v0.5.1';
 };
 
 use strict;
@@ -82,7 +81,12 @@ use warnings;
 
 sub init
 {
-    return( shift->DB::Object::Tables::init( @_ ) );
+    # return( shift->DB::Object::Tables::init( @_ ) );
+    my $self = shift( @_ );
+    $self->{_init_params_order} = [qw( dbo query_object )];
+    $self->{_init_strict_use_sub} = 1;
+    $self->DB::Object::Tables::init( @_ ) || return( $self->pass_error );
+    return( $self );
 }
 
 # Inherited from DB::Object::Tables
@@ -91,15 +95,15 @@ sub init
 sub create
 {
     my $self  = shift( @_ );
-    ## $tbl->create( [ 'ROW 1', 'ROW 2'... ], { 'temporary' => 1, 'TYPE' => ISAM }, $obj );
+    # $tbl->create( [ 'ROW 1', 'ROW 2'... ], { 'temporary' => 1, 'TYPE' => ISAM }, $obj );
     my $data  = shift( @_ ) || [];
     my $opt   = shift( @_ ) || {};
     my $sth   = shift( @_ );
     my $table = $self->{table};
-    ## Set temporary in the object, so we can use it to recreate the table creation info as string:
-    ## $table->create( [ ... ], { ... }, $obj )->as_string();
+    # Set temporary in the object, so we can use it to recreate the table creation info as string:
+    # $table->create( [ ... ], { ... }, $obj )->as_string();
     my $temp  = $self->{temporary} = delete( $opt->{temporary} );
-    ## Check possible options
+    # Check possible options
     my $allowed = 
     {
     'inherits'     => qr/^\w+$/i,
@@ -111,7 +115,7 @@ sub create
     };
     my @options = ();
     my @errors  = ();
-    ## Avoid working for nothing, make this condition
+    # Avoid working for nothing, make this condition
     if( %$opt )
     {
         my %lc_opt  = map{ lc( $_ ) => $opt->{ $_ } } keys( %$opt );
@@ -134,7 +138,7 @@ sub create
     {
         warn( "The options '", join( ', ', @errors ), "' were either not recognized or malformed and thus were ignored.\n" );
     }
-    ## Check statement
+    # Check statement
     my $select = '';
     if( $sth && ref( $sth ) && ( $sth->isa( "DB::Object::Postgres::Statement" ) || $sth->can( 'as_string' ) ) )
     {
@@ -147,9 +151,9 @@ sub create
     if( $self->exists() == 0 )
     {
         my $query = 'CREATE ' . ( $temp ? 'TEMPORARY ' : '' ) . "TABLE $table ";
-        ## Structure of table if any - 
-        ## structure may very well be provided using a select statement, such as:
-        ## CREATE TEMPORARY TABLE ploppy TYPE=HEAP COMMENT='this is kewl' MAX_ROWS=10 SELECT * FROM some_table LIMIT 0,0
+        # Structure of table if any - 
+        # structure may very well be provided using a select statement, such as:
+        # CREATE TEMPORARY TABLE ploppy TYPE=HEAP COMMENT='this is kewl' MAX_ROWS=10 SELECT * FROM some_table LIMIT 0,0
         my $def    = "(\n" . CORE::join( ",\n", @$data ) . "\n)" if( $data && ref( $data ) && @$data );
         $def      .= " INHERITS (" . $opt->{ 'inherits' } . ")" if( $opt->{ 'inherits' } );
         my $tdef   = CORE::join( ' ', map{ "\U$_\E = $opt->{ $_ }" } @options );
@@ -160,13 +164,14 @@ sub create
         $query .= join( ' ', $def, $tdef, $select );
         my $new = $self->database_object->prepare( $query ) ||
         return( $self->error( "Error while preparing query to create table '$table':\n$query", $self->database_object->errstr() ) );
-        ## Trick so other method may follow, such as as_string(), fetchrow(), rows()
+        # Trick so other method may follow, such as as_string(), fetchrow(), rows()
         if( !defined( wantarray() ) )
         {
             # print( STDERR "create(): wantarrays in void context.\n" );
             $new->execute() ||
             return( $self->error( "Error while executing query to create table '$table':\n$query", $new->errstr() ) );
         }
+        $self->reset_structure;
         $self->database_object->table_push( $table );
         return( $new );
     }
@@ -180,7 +185,7 @@ sub create_info
 {
     my $self    = shift( @_ );
     my $table   = $self->{table};
-    $self->structure();
+    $self->structure || return( $self->pass_error );
     my $struct  = $self->{structure};
     my $fields  = $self->{fields};
     my $default = $self->{default};
@@ -206,7 +211,7 @@ sub create_info
     return( @output ? $str : undef() );
 }
 
-# Inherited from DB::Object::Tables
+# NOTE: sub default is inherited from DB::Object::Tables
 # sub default
 
 # <https://www.postgresql.org/docs/10/sql-altertable.html>
@@ -266,6 +271,7 @@ sub drop
         $sth->execute() ||
         return( $self->error( "Error while executing query to drop table '$table':\n$query", $sth->errstr() ) );
     }
+    $self->reset_structure;
     return( $sth );
 }
 
@@ -306,7 +312,7 @@ sub exists
     return( shift->table_exists( shift( @_ ) ) );
 }
 
-# Inherited from DB::Object::Tables
+# NOTE: sub fields is inherited from DB::Object::Tables
 # sub fields
 
 sub lock
@@ -331,13 +337,13 @@ sub lock
     return( $sth );
 }
 
-# Inherited from DB::Object::Tables
+# NOTE: sub name is inherited from DB::Object::Tables
 # sub name
 
-# Inherited from DB::Object::Tables
+# NOTE: sub null is inherited from DB::Object::Tables
 # sub null
 
-# Inherited from DB::Object::Tables
+# NOTE: sub primary is inherited from DB::Object::Tables
 # sub primary
 
 sub on_conflict
@@ -374,21 +380,22 @@ sub rename
 {
     my $self  = shift( @_ );
     my $table = $self->{table} ||
-    return( $self->error( 'No table was provided to rename' ) );
+        return( $self->error( 'No table was provided to rename' ) );
     my $new   = shift( @_ ) ||
-    return( $self->error( "No new table name was provided to rename table '$table'." ) );
+        return( $self->error( "No new table name was provided to rename table '$table'." ) );
     if( $new !~ /^[\w\_]+$/ )
     {
         return( $self->error( "Bad new table name '$new'." ) );
     }
     my $query = "ALTER TABLE $table RENAME TO $new";
     my $sth   = $self->database_object->prepare( $query ) ||
-    return( $self->error( "Error while preparing query to rename table '$table' into '$new':\n$query", $self->database_object->errstr() ) );
+        return( $self->error( "Error while preparing query to rename table '$table' into '$new':\n$query", $self->database_object->errstr() ) );
     if( !defined( wantarray() ) )
     {
         $sth->execute() ||
-        return( $self->error( "Error while executing query to rename table '$table' into '$new':\n$query", $sth->errstr() ) );
+            return( $self->error( "Error while executing query to rename table '$table' into '$new':\n$query", $sth->errstr() ) );
     }
+    $self->reset_structure;
     return( $sth );
 }
 
@@ -396,14 +403,13 @@ sub repair { return( shift->error( "repair() is not implemented PostgreSQL." ) )
 
 sub stat { return( shift->error( "stat() is not implemented PostgreSQL." ) ); }
 
+# TODO: Must implement a cache mechanism for DB::Object::Postgres::structure()
 sub structure
 {
     my $self  = shift( @_ );
-    my $table = shift( @_ ) || $self->{table} ||
+    return( $self->_clone( $self->{_cache_structure} ) ) if( $self->{_cache_structure} && !CORE::length( $self->{_reset_structure} // '' ) );
+    my $table = $self->{table} ||
         return( $self->error( "No table provided to get its structure." ) );
-    # $self->_reset_query();
-    # delete( $self->{ 'query_reset' } );
-    # my $struct  = $self->{ '_structure_real' } || $self->{ 'struct' }->{ $table };
     my $struct  = $self->{structure};
     my $fields  = $self->{fields};
     my $default = $self->{default};
@@ -487,10 +493,11 @@ EOT
         }
         # http://www.postgresql.org/docs/9.3/interactive/infoschema-columns.html
         # select * from information_schema.columns where table_name = 'address'
+        $self->messagec( 5, "Executing SQL query to get the table structure for table {green}${table}{/}" );
         my $sth = $self->database_object->prepare_cached( $query ) ||
-        return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $self->database_object->errstr() ) );
+            return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $self->database_object->errstr() ) );
         $sth->execute( $table ) ||
-        return( $self->error( "Error while executing query to get table '$table' columns specification: ", $sth->errstr() ) );
+            return( $self->error( "Error while executing query to get table '$table' columns specification: ", $sth->errstr() ) );
         my @primary = ();
         my $ref = '';
         my $c   = 0;
@@ -539,15 +546,16 @@ EOT
             push( @primary, $data{field} ) if( $data{key} );
             $struct->{ $data{field} } = CORE::join( ' ', @define );
         }
-        $sth->finish();
+        $sth->finish;
         if( @primary )
         {
-            # $struct->{_primary} = \@primary;
             $self->{primary} = \@primary;
         }
     }
-    return( wantarray() ? () : undef() ) if( !scalar( keys( %$struct ) ) );
-    return( wantarray() ? %$struct : \%$struct );
+    # return( wantarray() ? () : undef() ) if( !scalar( keys( %$struct ) ) );
+    # return( wantarray() ? %$struct : \%$struct );
+    $self->{_cache_structure} = $struct;
+    return( $self->_clone( $struct ) );
 }
 
 sub unlock

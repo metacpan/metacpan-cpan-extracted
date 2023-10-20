@@ -66,4 +66,32 @@ is( \@tags,
            ],
            'tags list after third unapply' );
 
+# delete all
+{
+   my $str = String::Tagged->new
+      ->append_tagged( 123, A => 1 )
+      ->append_tagged( 456, B => 1 )
+      ->append_tagged( 789, A => 1 );
+
+   $str->delete_all_tag( "A" );
+
+   is( [ $str->tagnames ], [ "B" ], '->delete_all_tag removes all of a tag' );
+}
+
+# Check we can safely delete tags during iteration
+{
+   my $str = String::Tagged->new
+      ->append_tagged( "A", letter => 1 )
+      ->append_tagged( "B", letter => 1 )
+      ->append_tagged( "C", letter => 1 )
+      ->append_tagged( "D", letter => 1 )
+      ->append_tagged( "E", letter => 1 );
+
+   $str->iter_extents(
+      sub { my ( $e ) = @_; $str->delete_tag( $e, "letter" ) }
+   );
+
+   is( [ $str->tagnames ], [], '->delete_tag at iter_tags position clears all' );
+}
+
 done_testing;

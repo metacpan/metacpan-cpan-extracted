@@ -64,6 +64,7 @@ do { my $x = {
                                    'Test::Object' => '0.07',
                                    'Test::SubCalls' => '1.07',
                                    'lib' => '0',
+                                   'parent' => '0',
                                    'utf8' => '0',
                                    'warnings' => '0'
                                  }

@@ -10,7 +10,7 @@ use utf8;
 use Object::Pad 0.800 ':experimental(adjust_params)';
 use Object::Pad::FieldAttr::Checked;
 
-package App::sdview::Parser 0.12;
+package App::sdview::Parser 0.13;
 role App::sdview::Parser;
 
 use String::Tagged;
@@ -42,10 +42,11 @@ class App::sdview::Para::Plain :strict(params) {
 }
 
 class App::sdview::Para::Verbatim :strict(params) {
-   use Types::Standard qw( InstanceOf Num );
+   use Types::Standard qw( Maybe Str InstanceOf Num );
 
-   field $text   :param :reader :Checked(InstanceOf['String::Tagged']);
-   field $indent :param :reader :Checked(Num) = 0;
+   field $language :param :reader :Checked(Maybe[Str]) = undef;
+   field $text     :param :reader :Checked(InstanceOf['String::Tagged']);
+   field $indent   :param :reader :Checked(Num) = 0;
 
    method type { "verbatim" }
 }

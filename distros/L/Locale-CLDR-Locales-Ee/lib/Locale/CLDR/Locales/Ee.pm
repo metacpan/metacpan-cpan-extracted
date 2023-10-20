@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Ee - Package for language Ewe
 
 =cut
 
 package Locale::CLDR::Locales::Ee;
-# This file auto generated from Data/common/main/ee.xml
-#	on Mon 11 Apr  5:26:33 pm GMT
+# This file auto generated from Data\common\main\ee.xml
+#	on Fri 13 Oct  9:12:12 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';
@@ -36,7 +36,7 @@ has 'algorithmic_number_format_data' => (
 	isa => HashRef,
 	init_arg => undef,
 	default => sub { 
-		use bignum;
+		use bigfloat;
 		return {
 		'after-billions' => {
 			'private' => {

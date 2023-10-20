@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Indicates create pivot table request',
                                   class => 'CreatePivotTableRequest',
                                   required => [], # TODO
 }                                 );
@@ -128,49 +128,49 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'Name',
-     	description => '',
+     	description => 'Pivot table name',
      	format => '',
      	read_only => '',
      		},
      'source_data' => {
      	datatype => 'string',
      	base_name => 'SourceData',
-     	description => '',
+     	description => 'The data for the new PivotTable cache.',
      	format => '',
      	read_only => '',
      		},
      'dest_cell_name' => {
      	datatype => 'string',
      	base_name => 'DestCellName',
-     	description => '',
+     	description => 'The cell in the upper-left corner of the PivotTable report`s destination range.',
      	format => '',
      	read_only => '',
      		},
      'use_same_source' => {
      	datatype => 'boolean',
      	base_name => 'UseSameSource',
-     	description => '',
+     	description => 'Indicates whether using same data source when another existing pivot table has used this data source.If the property is true, it will save memory.',
      	format => '',
      	read_only => '',
      		},
      'pivot_field_rows' => {
      	datatype => 'ARRAY[int?]',
      	base_name => 'PivotFieldRows',
-     	description => '',
+     	description => 'Represents row fields in a PivotTable report.',
      	format => '',
      	read_only => '',
      		},
      'pivot_field_columns' => {
      	datatype => 'ARRAY[int?]',
      	base_name => 'PivotFieldColumns',
-     	description => '',
+     	description => 'Represents column fields in a PivotTable report.',
      	format => '',
      	read_only => '',
      		},
      'pivot_field_data' => {
      	datatype => 'ARRAY[int?]',
      	base_name => 'PivotFieldData',
-     	description => '',
+     	description => 'Represents data fields in a PivotTable report.',
      	format => '',
      	read_only => '',
      		},    

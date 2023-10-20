@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Hash.pm
-## Version v1.3.0
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v1.3.1
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2023/05/06
+## Modified 2023/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,6 +17,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use vars qw( $KEY_OBJECT );
     use Clone ();
     use Data::Dumper;
     use JSON;
@@ -37,10 +38,12 @@ BEGIN
         'gt'    => sub { _obj_comp( @_, 'gt') },
         'le'    => sub { _obj_comp( @_, 'le') },
         'ge'    => sub { _obj_comp( @_, 'ge') },
-        'bool'  => sub{1},
+        'bool'  => sub{$_[0]},
         fallback => 1,
     );
-    our( $VERSION ) = 'v1.3.0';
+    # Do we allow the use of object as hash keys?
+    our $KEY_OBJECT = 0;
+    our( $VERSION ) = 'v1.3.1';
 };
 
 use strict;
@@ -53,36 +56,60 @@ sub new
 {
     my $that = shift( @_ );
     my $class = ref( $that ) || $that;
-    my $data = {};
-    $data = shift( @_ ) if( scalar( @_ ) );
-    return( $that->error( "I was expecting an hash, but instead got '$data'." ) ) if( ( Scalar::Util::reftype( $data ) // '' ) ne 'HASH' );
-    my $tied = tied( %$data );
-    return( $that->error( "Hash provided is already tied to ", ref( $tied ), " and our package $class cannot use it, or it would disrupt the tie." ) ) if( $tied );
+    
     my %hash = ();
     # This enables access to the hash just like a real hash while still the user an call our object methods
     my $obj = tie( %hash, 'Module::Generic::TieHash', {
         disable => ['Module::Generic'],
         debug => 0,
+        enable => 0,
+        # Should we allow objects to be used as key? Default to false
+        key_object => $KEY_OBJECT,
     });
     my $self = bless( \%hash => $class );
     $obj->enable(1);
-    my @keys = CORE::keys( %$data );
-    @hash{ @keys } = @$data{ @keys };
+
+    if( scalar( @_ ) == 1 )
+    {
+        my $data = shift( @_ );
+        return( $that->error( "I was expecting an hash, but instead got '", ( $data // 'undef' ), "'." ) ) if( Scalar::Util::reftype( $data // '' ) ne 'HASH' );
+        my $tied = tied( %$data );
+        return( $that->error( "Hash provided is already tied to ", ref( $tied ), " and our package $class cannot use it, or it would disrupt the tie." ) ) if( $tied );
+        my @keys = CORE::keys( %$data );
+        @hash{ @keys } = @$data{ @keys };
+    }
+    elsif( scalar( @_ ) > 1 &&
+        !( @_ % 2 ) )
+    {
+        while( @_ )
+        {
+            $hash{ shift( @_ ) } = shift( @_ );
+        }
+    }
+    elsif( scalar( @_ ) )
+    {
+        return( $self->error( "Odd number (", scalar( @_ ), ") of hash keys and values provided." ) );
+    }
+
     $obj->enable(0);
     $self->SUPER::init( @_ );
     $obj->enable(1);
     return( $self );
 }
 
-sub as_hash
-{
-    my $self = CORE::shift( @_ );
-    my $hash = {};
-    $self->_tie_object->enable(1);
-    my $keys = $self->keys;
-    @$hash{ @$keys } = @$self{ @$keys };
-    return( $hash );
-}
+# sub as_hash
+# {
+#     my $self = CORE::shift( @_ );
+#     my $hash = {};
+#     $self->_tie_object->enable(1);
+#     my $keys = $self->keys;
+#     @$hash{ @$keys } = @$self{ @$keys };
+#     return( $hash );
+# }
+
+# We are already an hash, so no need to do anything.
+# To convert to a regular hash as needed by JSON, the method TO_JSON can be used.
+sub as_hash { return( $_[0] ); }
 
 sub as_json { return( shift->json(@_)->scalar ); }
 
@@ -216,6 +243,17 @@ sub json
     return( Module::Generic::Scalar->new( $json ) );
 }
 
+# Allow hash keys as object
+sub key_object
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        $self->_tie_object->key_object( shift( @_ ) );
+    }
+    return( $self->_tie_object->key_object );
+}
+
 # $h->keys->sort
 sub keys
 {
@@ -340,21 +378,6 @@ sub values
     }
 }
 
-# sub _dumper
-# {
-#     my $self = shift( @_ );
-#     if( !$self->{_dumper} )
-#     {
-#         my $d = Data::Dumper->new;
-#         $d->Indent( 1 );
-#         $d->Useqq( 1 );
-#         $d->Terse( 1 );
-#         $d->Sortkeys( 1 );
-#         $self->{_dumper} = $d;
-#     }
-#     return( $self->{_dumper}->Dumper( @_ ) );
-# }
-# 
 sub _dumper
 {
     my $self = shift( @_ );

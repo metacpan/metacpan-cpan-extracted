@@ -141,6 +141,24 @@ CONSTRUCTOR
       If only_tags is being used too, then the source names of any tags to
       be converted must also be listed there, or they will not be copied.
 
+    start => INT
+
+      Since version 0.22.
+
+      Start at the given position; defaults to 0.
+
+    end => INT
+
+      Since version 0.22.
+
+      End after the given position; defaults to end of string. This option
+      overrides len.
+
+    len => INT
+
+      End after the given length beyond the start position; defaults to end
+      of string. This option only applies if end is not given.
+
  clone (instance)
 
        $new = $orig->clone( %args )
@@ -279,6 +297,18 @@ METHODS
     Alternatively, an existing String::Tagged::Extent object can be passed
     as the first argument instead of two integers.
 
+ delete_all_tag
+
+       $st->delete_all_tag( $name )
+
+    Since version 0.21.
+
+    Deletes every tag with the given name. This is more efficient than
+    calling iter_extents to list the tags then delete_tag on each one
+    individually in the case of a simple name match.
+
+    This method returns the $st object.
+
  merge_tags
 
        $st->merge_tags( $eqsub )
@@ -333,6 +363,17 @@ METHODS
     except => ARRAY
 
       Select all the tags except those named in the given ARRAY reference.
+
+    Since version 0.21 it is safe to call delete_tag from within the
+    callback function to remove the tag currently being iterated on.
+
+       $str->iter_extents( sub {
+          my ( $e, $n, $v ) = @_;
+          $str->delete_tag( $e, $n ) if $n =~ m/^tmp_/;
+       } );
+
+    Apart from this scenario, the tags in the string should not otherwise
+    be added or removed while the iteration is occurring.
 
  iter_tags
 

@@ -183,6 +183,7 @@ UPDATE HISTORY
     Foundation. This product is in active use in production system.
     v2.5.1 Released April 4, 2023. Documentation bug fixes and ipv6
     improvements.
+    v2.5.2 Released September 25, 2023. check_email_validity fixes.
 
 HOMEPAGE
     Releases can be found at http://www.mcgrail.com/downloads/Net-validMX
@@ -199,4 +200,7 @@ CREDITS
         Mark Damrose for testing and suggestions, plus Bill Cole & Karsten
         Bräckelmann for code contributions. And sincere apologies in advance
         if I missed anyone!
+
+REPOSITORY
+    <https://github.com/The-McGrail-Foundation/Net-validMX>
 

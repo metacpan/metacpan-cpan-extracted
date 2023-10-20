@@ -2,19 +2,17 @@
 use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops btw btwN/; # strict, warnings, Carp
-use t_TestCommon #':silent', # Test2::V0 etc.
+use t_TestCommon ':silent', # Test2::V0 etc.
                  qw/:DEFAULT $debug $savepath/;
-warn ":silent temp disabled";
+#warn ":silent temp disabled";
 
 use LpodhTestUtils qw/append_para verif_normalized/;
 
 use ODF::lpOD;
 use ODF::lpOD_Helper;
-use ODF::MailMerge;
+use ODF::MailMerge qw/:DEFAULT $token_re parse_token/;
 
 use constant FRAME_FILTER => 'draw:frame';
-
-my $token_re = $ODF::MailMerge::token_re;
 
 sub escape($) { local $_ = shift; s/([:\{\}\\])/\\$1/g; $_ }
 
@@ -27,15 +25,18 @@ for my $tokname ("A", "a b", "A_B", "A:B", "A\\B", "A{B:", "AB\\") {
                     .join("", map{ ":".escape($_) } @$modlist)
                     ."}";
         my ($ptokname, $smods, $cmods)
-          = eval{ ODF::MailMerge::_parse_token($token) };
-        fail(dvisq '$token parse error: $@') if $@;
+          = eval{ ODF::MailMerge::parse_token($token) };
+        if ($@) {
+          diag $@;
+          fail(dvisq '$token parse error: $@');
+        }
         unless ($ptokname eq $tokname) {
-          fail(dvis '_parse_token $token : $ptokname ne $tokname');
+          fail(dvis 'parse_token $token : $ptokname ne $tokname');
         }
         unless (@$smods == 0
                 && @$cmods == @$modlist
                 && all { $cmods->[$_] eq $modlist->[$_] } 0..$#$cmods) {
-          is($cmods, $modlist, "_parse_token bug with modifiers",
+          is($cmods, $modlist, "parse_token bug with modifiers",
              dvis '$tokname $modlist $prespace $postspace\n$token\n$ptokname $smods $cmods'
           )
         }
@@ -51,7 +52,7 @@ for my $bad_tokname ("A\tB", "a\nb", "A:\nfoo") {
         my $token = "{".$prespace.escape($bad_tokname).$postspace
                     .join("", map{ ":".escape($_) } @$modlist)
                     ."}";
-        () = eval{ ODF::MailMerge::_parse_token($token) };
+        () = eval{ ODF::MailMerge::parse_token($token) };
         unless ($@ =~ /token/) {
           fail(dvis '$bad_tokname failed to provoke an error ($token)');
         }
@@ -59,7 +60,7 @@ for my $bad_tokname ("A\tB", "a\nb", "A:\nfoo") {
     }
   }
 }
-{ my ($tokname, $std_mods, $custom_mods) = ODF::MailMerge::_parse_token(
+{ my ($tokname, $std_mods, $custom_mods) = ODF::MailMerge::parse_token(
      "{Foo:nb:AA=a1\na2 :BB:unfold:breakmulti:die:delrow:delpara"
     .":del=MY DELTAG"
     .":rep_first:rep_mid:rep_last:rep=MYEXPR:CC:reptag=MYREPTAG}" );
@@ -77,7 +78,8 @@ pass "Finished token-parse tests";
 my $master_copy_path = "$Bin/../tlib/Basic.odt";
 my $input_path = tmpcopy_if_writeable($master_copy_path);
 note "> Reading (copy of) $master_copy_path" if $debug;
-my $doc = odf_get_document($input_path, read_only => 1);
+#my $doc = odf_get_document($input_path, read_only => 1);
+my $doc = odf_new_document_from_template($input_path);
 my $body = $doc->get_body;
 
 #sub xxdebug() {
@@ -147,7 +149,7 @@ my %hash = (
     is($token, '{Date:mymodif}', 'User callback $match arg');
     is($custom_mods, ["mymodif"], 'User callback $mods arg');
     ok($para->Hsearch($token), "  para contains the token");
-    return (Hr_SUBST, ["8/18/2023"]);
+    return (MM_SUBST, ["8/18/2023"]);
   },
 );
 replace_tokens($body, \%hash, debug => $debug) == 1 or fail();
@@ -320,11 +322,12 @@ test_multi(["XXX[{TokA:die} {TokB:die}]",
 );
 
 ###########################
-# :rmbb and :span (not really tested)
+# :rmbb and :spanr,spand (not really tested)
 ###########################
-test_rt( "MyTok", [':span'], 1 );
+test_rt( "MyTok", [':spand'], 1 );
+test_rt( "MyTok", [':spanr'], 1 );
 test_rt( "MyTok", [':rmsb'], 1 );
 
-# TODO FUTURE: TEst :span and eliding borders
+# TODO FUTURE: TEST :spand and eliding borders
 
 done_testing;

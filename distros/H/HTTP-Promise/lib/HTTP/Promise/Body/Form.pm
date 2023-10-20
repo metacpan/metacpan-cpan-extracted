@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Body/Form.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/05/18
-## Modified 2022/05/18
+## Modified 2023/09/08
 ## All rights reserved.
 ## 
 ## 
@@ -19,9 +19,9 @@ BEGIN
     use warnings::register;
     use parent qw( Module::Generic::Hash );
     use vars qw( $VERSION );
-    use Nice::Try;
+    # use Nice::Try;
     use URL::Encode::XS ();
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -129,7 +129,9 @@ sub as_string
         $keys = $self->keys->sort;
     }
     my @pairs = ();
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $self->_tie_object->enable(1);
         foreach my $n ( @$keys )
@@ -157,12 +159,12 @@ sub as_string
                 push( @pairs, join( '=', $n, URL::Encode::XS::url_encode_utf8( "$v" ) ) );
             }
         }
-        return( join( '&', @pairs ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error while Trying to url-encode ", scalar( @$keys ), " form elements: $e" ) );
+        return( $self->error( "Error while Trying to url-encode ", scalar( @$keys ), " form elements: $@" ) );
     }
+    return( join( '&', @pairs ) );
 }
 
 sub decode { return( shift->decode_to_array( @_ ) ); }
@@ -173,15 +175,18 @@ sub decode_string
     my $data = shift( @_ );
     warn( "No data to url-decode was provided.\n" ) if( ( !defined( $data ) || !length( "$data" ) ) && $self->_is_warnings_enabled );
     return( $self->error( "Invalid parameter provided. You can only pass a string or an object that stringifies." ) ) if( ref( $data ) && !overload::Method( $data => '""' ) );
-    try
+    my $decoded;
+    # try-catch
+    local $@;
+    eval
     {
-        my $decoded = URL::Encode::XS::url_decode_utf8( "${data}" );
-        return( $decoded );
-    }
-    catch( $e )
+        $decoded = URL::Encode::XS::url_decode_utf8( "${data}" );
+    };
+    if( $@ )
     {
-        return( $self->error( "Error while Trying to url-decode ", length( $data ), " bytes of data: $e" ) );
+        return( $self->error( "Error while Trying to url-decode ", length( $data ), " bytes of data: $@" ) );
     }
+    return( $decoded );
 }
 
 sub decode_to_array
@@ -191,15 +196,18 @@ sub decode_to_array
     # warn( "No data to url-decode was provided.\n" ) if( ( !defined( $data ) || !length( "$data" ) ) && $self->_is_warnings_enabled );
     warn( "No data to url-decode was provided.\n" ) if( ( !defined( $data ) || !length( "$data" ) ) && $self->_is_warnings_enabled );
     return( $self->error( "Invalid parameter provided. You can only pass a string or an object that stringifies." ) ) if( ref( $data ) && !overload::Method( $data => '""' ) );
-    try
+    my $ref;
+    # try-catch
+    local $@;
+    eval
     {
-        my $ref = URL::Encode::XS::url_params_flat( "${data}" );
-        return( $ref );
-    }
-    catch( $e )
+        $ref = URL::Encode::XS::url_params_flat( "${data}" );
+    };
+    if( $@ )
     {
-        return( $self->error( "Error while Trying to url-decode ", length( $data ), " bytes of data: $e" ) );
+        return( $self->error( "Error while Trying to url-decode ", length( $data ), " bytes of data: $@" ) );
     }
+    return( $ref );
 }
 
 sub decode_to_hash
@@ -232,8 +240,11 @@ sub encode
     # Work on a copy
     my $this = ref( $ref ) eq 'ARRAY' ? [@$ref] : [%$ref];
     return( '' ) if( !scalar( @$this ) );
+    my $rv;
     my @pairs = ();
-    try
+    # try-catch
+    local $@;
+    eval
     {
         while( my( $n, $v ) = splice( @$this, 0, 2 ) )
         {
@@ -259,25 +270,30 @@ sub encode
                 push( @pairs, join( '=', $n, URL::Encode::XS::url_encode_utf8( "$v" ) ) );
             }
         }
-        return( join( '&', @pairs ) );
-    }
-    catch( $e )
+        $rv = join( '&', @pairs );
+    };
+    if( $@ )
     {
-        return( $self->error( "Error while Trying to url-encode ", scalar( @$this ), " elements provided: $e" ) );
+        return( $self->error( "Error while Trying to url-encode ", scalar( @$this ), " elements provided: $@" ) );
     }
+    return( $rv );
 }
 
 sub encode_string
 {
     my $self = shift( @_ );
-    try
+    my $encoded;
+    # try-catch
+    local $@;
+    eval
     {
-        return( URL::Encode::XS::url_encode_utf8( shift( @_ ) ) );
-    }
-    catch( $e )
+        $encoded = URL::Encode::XS::url_encode_utf8( shift( @_ ) );
+    };
+    if( $@ )
     {
-        return( $self->error( "Error while trying to url-encode: $e" ) );
+        return( $self->error( "Error while trying to url-encode: $@" ) );
     }
+    return( $encoded );
 }
 
 sub error
@@ -351,7 +367,7 @@ HTTP::Promise::Body::Form - x-www-form-urlencoded Data Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

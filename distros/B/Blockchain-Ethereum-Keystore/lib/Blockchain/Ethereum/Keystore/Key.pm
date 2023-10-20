@@ -1,26 +1,11 @@
 use v5.26;
 use Object::Pad;
 
-package Blockchain::Ethereum::Keystore::Key 0.005;
+package Blockchain::Ethereum::Keystore::Key;
 class Blockchain::Ethereum::Keystore::Key;
 
-=encoding utf8
-
-=head1 NAME
-
-Blockchain::Ethereum::Keystore::Key - Private key abstraction
-
-=head1 SYNOPSIS
-
-Private key abstraction
-
-If instantiated without a private key, this module uses L<Crypt::PRNG> for the random key generation
-
-    my $key = Blockchain::Ethereum::Key->new;
-    $key->sign_transaction($transaction);
-    ...
-
-=cut
+our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
+our $VERSION   = '0.009';          # VERSION
 
 use Carp;
 use Crypt::PK::ECC;
@@ -48,24 +33,6 @@ ADJUST {
 
 }
 
-=head2 sign_transaction
-
-Sign a L<Blockchain::Ethereum::Transaction> object
-
-Usage:
-
-    sign_transaction($transaction) -> $$transaction
-
-=over 4
-
-=item * C<$transaction> - L<Blockchain::Ethereum::Transaction> subclass
-
-=back
-
-self
-
-=cut
-
 method sign_transaction ($transaction) {
 
     croak "transaction must be a reference from Blockchain::Ethereum::Transaction"
@@ -82,22 +49,6 @@ method sign_transaction ($transaction) {
     return $transaction;
 }
 
-=head2 address
-
-Export the L<Blockchain::Ethereum::Keystore::Address> from the imported/generated private key
-
-Usage:
-
-    address() -> L<Blockchain::Ethereum::Keystore::Address>
-
-=over 4
-
-=back
-
-L<Blockchain::Ethereum::Keystore::Address>
-
-=cut
-
 method address {
 
     my ($x, $y) = Crypt::Perl::ECDSA::Utils::split_G_or_public($self->_ecc_handler->_decompress_public_point);
@@ -109,22 +60,6 @@ method address {
     return Blockchain::Ethereum::Keystore::Address->new(address => "0x$hex_address");
 }
 
-=head2 export
-
-Export the private key bytes
-
-Usage:
-
-    export() -> private key bytes
-
-=over 4
-
-=back
-
-Private key bytes
-
-=cut
-
 method export {
 
     return $self->private_key;
@@ -134,20 +69,80 @@ method export {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Blockchain::Ethereum::Keystore::Key
+
+=head1 VERSION
+
+version 0.009
+
+=head1 SYNOPSIS
+
+Generate a new key:
+
+    my $key = Blockchain::Ethereum::Key->new;
+    $key->sign_transaction($transaction); # Blockchain::Ethereum::Transaction
+
+Import existent key:
+
+    my $key = Blockchain::Ethereum::Key->new(private_key => $private_key); # private key bytes
+    $key->sign_transaction($transaction); # Blockchain::Ethereum::Transaction
+
+=head1 OVERVIEW
+
+This is a private key abstraction
+
+If instantiated without a private key, this module uses L<Crypt::PRNG> for the random key generation
+
+=head1 METHODS
+
+=head2 sign_transaction
+
+Sign a L<Blockchain::Ethereum::Transaction> object
+
+=over 4
+
+=item * C<$transaction> - L<Blockchain::Ethereum::Transaction> subclass
+
+=back
+
+self
+
+=head2 address
+
+Export the L<Blockchain::Ethereum::Keystore::Address> from the imported/generated private key
+
+=over 4
+
+=back
+
+L<Blockchain::Ethereum::Keystore::Address>
+
+=head2 export
+
+Export the source/new private key
+
+=over 4
+
+=back
+
+Private key bytes
+
 =head1 AUTHOR
 
-Reginaldo Costa, C<< <refeco at cpan.org> >>
+Reginaldo Costa <refeco@cpan.org>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to L<https://github.com/refeco/perl-ethereum-keystore>
-
-=head1 LICENSE AND COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2023 by REFECO.
 
 This is free software, licensed under:
 
-  The MIT License
+  The MIT (X11) License
 
 =cut

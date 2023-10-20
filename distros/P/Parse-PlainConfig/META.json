@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Class::EHierarchy" : "2",
-            "Paranoid" : "2.05",
+            "Paranoid" : "2.1",
             "Text::ParseWords" : "0",
             "Text::Tabs" : "0",
             "perl" : "5.008003"
@@ -41,5 +41,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "3.05"
+   "version" : "3.06"
 }

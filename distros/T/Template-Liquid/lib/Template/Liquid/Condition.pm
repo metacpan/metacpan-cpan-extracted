@@ -1,5 +1,5 @@
 package Template::Liquid::Condition;
-our $VERSION = '1.0.22';
+our $VERSION = '1.0.23';
 require Template::Liquid::Error;
 use base 'Template::Liquid::Block';
 use strict;
@@ -24,7 +24,8 @@ sub new {
         if !defined $args->{'parent'};
     my ($lval, $condition, $rval)
         = ((defined $args->{'attrs'} ? $args->{'attrs'} : '')
-           =~ m[("[^"]+"|'[^']+'|(?:[\S]+))]go);
+        =~ m[("[^"]+"|'[^']+'|(?:eq|==|ne|!=|lt|<|gt|>|contains|&&|\|\|)|(?:[\w.]+))]go
+        );
     if (defined $lval) {
         if (!defined $rval && !defined $condition) {
             return
@@ -55,11 +56,13 @@ sub new {
         else {
             ...;
         }
-        raise Template::Liquid::Error {
-             template => $args->{template},
-             type     => 'Context',
-             message  => 'Unknown operator "' . $condition . '" in ' .
-                 $lval . ' ' . $condition . ' ' . (defined $rval ? $rval : '')
+        raise Template::Liquid::Error {template => $args->{template},
+                                       type     => 'Context',
+                                       message  => 'Unknown operator "' .
+                                           $condition . '" in ' .
+                                           $lval . ' ' .
+                                           $condition . ' ' .
+                                           (defined $rval ? $rval : '')
         };
     }
     return
@@ -134,7 +137,7 @@ sub gt {
             : $l > $r
         : 0;
 }
-sub lt { return !$_[0]->gt }
+sub lt { return (!$_[0]->gt && !$_[0]->eq) }
 
 sub contains {
     my ($s) = @_;

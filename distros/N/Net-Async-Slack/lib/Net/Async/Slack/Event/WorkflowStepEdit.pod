@@ -1,0 +1,63 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::Slack::Event::WorkflowStepEdit
+at lib/Net/Async/Slack/Event/WorkflowStepEdit.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::Slack::Event::WorkflowStepEdit - app added as a workflow step
+
+=head1 DESCRIPTION
+
+Example input data:
+
+    {
+        action_ts => "1679230481.238183",
+        callback_id => "some_workflow",
+        enterprise => undef,
+        is_enterprise_install => false,
+        team => {
+            domain => "example",
+            id => "T03823123"
+        },
+        token => "Io2ca8sd8f1n4n12uu123Sf1",
+        trigger_id => "5023918231231.12318832904.823812sc8a8ed8af8a0c908ca8ed8aff",
+        type => "workflow_step_edit",
+        user => {
+            id => "U2Q84EA9E",
+            team_id => "T03832314",
+            username => "test"
+        },
+        workflow_step => {
+            inputs => {},
+            outputs => [],
+            step_id => "55bcc092-5fa8-4515-b75a-58008afdbed7",
+            workflow_id => "472313182471232832"
+        }
+    }
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Net::Async::Slack::EventType>
+
+L<from_json|Net::Async::Slack::EventType/from_json>, L<import|Net::Async::Slack::EventType/import>, L<new|Net::Async::Slack::EventType/new>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2016-2023. Licensed under the same terms as Perl itself.
+

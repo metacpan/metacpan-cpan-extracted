@@ -176,7 +176,7 @@ Module::Generic::Array - An Array Manipulation Object Class
 
 =head1 VERSION
 
-    v2.0.0
+    v2.0.2
 
 =head1 DESCRIPTION
 
@@ -987,6 +987,111 @@ Provided with an array reference, and this add all its entry at the end of the a
     $ar->push_arrayref( [qw( Jack Peter )] );
     print( $ar->join( "," ), "\n" );
     # Now prints: John, Joe, Mary, Jack, Peter
+
+=head2 reduce
+
+    my $final_value = $array->reduce(sub{ $_[0] + $_[1] });
+    # or, with an optional initial value
+    my $final_value = $array->reduce(sub{ $_[0] + $_[1] }, 10);
+
+This is an implementation of the JavaScript C<reduce> equivalent. In that, it is different from the C<reduce> implementation in L<List::Util> that departed from the original JavaScript alter ego.
+
+This method takes a subroutine reference, or an anonymous subroutine as its first parameter, and an optional initial value as its second parameter.
+
+If an initial value was provided, the C<accumulator> value will be set to that initial value and C<reduce> will start iterating from offset C<0>, otherwise, the C<accumulator> value will be set to the first array value, and the iteration will start from offset C<1>.
+
+For each iteration, it will call the callback, in scalar context, with 3 arguments:
+
+=over
+
+=item 1. the current value of the C<accumulator>
+
+=item 2. the value at the current offset
+
+=item 3. the value of the current offset
+
+=back
+
+And C<$_> will be set to the value of the array object at the current position.
+
+The C<accumulator> value gets updated by the return value of each invokation of the callback.
+
+It returns the resulting value of the C<accumulator>
+
+For example:
+
+    my $array = Module::Generic::Array->new(0, 1, 2, 3, 4);
+    my $rv = $array->reduce(sub
+    {
+        my( $accumulator, $current_value, $offset ) = @_;
+        # $current_value is also accessible as $_
+        return( $accumulator + $current_value );
+    });
+
+The return value in the above example would be 10.
+
+Since C<reduce> will B<not> skip array index that have an undefined value, you need to be mindful of the definedness of the current value passed, and also that of the C<accumulator>.
+
+    my $array = Module::Generic::Array->new;
+    $array->[0] = 0;
+    $array->[2] = 1;
+    $array->[4] = 2;
+    $array->[6] = 3;
+    $array->[8] = 4;
+
+As you see, we assigned value in the array object at every other slot, and yet, if we do:
+
+    my $rv = $array->reduce(sub
+    {
+        my( $accumulator, $current_value, $offset ) = @_;
+        return( $accumulator ) if( !defined( $current_value ) );
+        # do something
+        return( $something_else );
+    });
+
+If you decided to mutate the C<accumulator> instead of copying it, remember to still return, in the callback, its modified value, or the next iteration will receive whatever was the last value of your callback, which might be C<undef>.
+
+For example:
+
+    my $rv = $array->reduce(sub
+    {
+        $_[0] += $_[1];
+        return( $_[0] );
+    });
+
+Any change, within the callback, to the array object structure, or array values is not recommended as it would lead to unpredictable results and poor code readability just like it would if you did that while using C<foreach>.
+
+Edge cases:
+
+If the array only has one element (regardless of position) and no initial value is provided, or if the initial value is provided but the array is empty, that solo value will be returned without calling the callback.
+
+If an initial value is provided and the array is not empty, then C<reduce> will always invoke the C<callback> starting at offset C<0>.
+
+If an initial value is not provided then C<reduce> will act differently for arrays with length larger than 1, equal to 1 and 0, as shown in the following example:
+
+    use POSIX;
+    my $getMax = sub
+    {
+        my( $a, $b ) = @_;
+        return( POSIX::fmax( $a, $b ) );
+    };
+
+    # callback is invoked for each element in the array starting at offset 0
+    Module::Generic::Array->new([1, 100])->reduce( $getMax, 50 ); # 100
+    Module::Generic::Array->new([50])->reduce( $getMax, 10 ); # 50
+
+    # callback is invoked once for element at offset 1
+    Module::Generic::Array->new([1, 100])->reduce( $getMax ); # 100
+
+    # callback is not invoked
+    Module::Generic::Array->new([50])->reduce( $getMax ); # 50
+    Module::Generic::Array->new([])->reduce( $getMax, 1 ); # 1
+
+    Module::Generic::Array->new([])->reduce( $getMax ); # Error, returns undef, or an empty list in list context
+
+Any fatal error occurring in the callback will be caught and an L<error object|Module::Generic::Exception> will be set, and C<undef> will be returned in scalar context, or an empty list in list context.
+
+See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce>
 
 =head2 remove
 

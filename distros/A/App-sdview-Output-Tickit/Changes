@@ -1,5 +1,10 @@
 Revision history for App-sdview-Output-Tickit
 
+0.04    2023-10-02
+        [CHANGES]
+         * Better handling of non-breaking spaces and soft hyphens
+         * Added basic search facility by regexp search and highlights
+
 0.03    2023-09-13
         [CHANGES]
          * Type within the outline treeview to filter; Enter to jump to the

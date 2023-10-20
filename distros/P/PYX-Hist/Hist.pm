@@ -8,7 +8,7 @@ use Error::Pure qw(err);
 use List::Util qw(reduce);
 use PYX::Parser;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -122,7 +122,7 @@ PYX::Hist - Processing PYX data or file and print histogram.
  my $obj = PYX::Hist->new(%parameters);
  $obj->parse($pyx, $out);
  $obj->parse_file($input_file, $out);
- $obj->parse_handle($input_file_handler, $out);
+ $obj->parse_handler($input_file_handler, $out);
 
 =head1 METHODS
 
@@ -140,6 +140,8 @@ Constructor.
  Default value is \*STDOUT.
 
 =back
+
+Returns instance of object.
 
 =head2 C<parse>
 
@@ -161,7 +163,7 @@ Returns undef.
 
 =head2 C<parse_handler>
 
- $obj->parse_handle($input_file_handler, $out);
+ $obj->parse_handler($input_file_handler, $out);
 
 Parse PYX handler and print histogram of PYX input.
 If C<$out> not present, use 'output_handler'.
@@ -323,6 +325,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

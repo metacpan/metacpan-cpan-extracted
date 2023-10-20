@@ -1,7 +1,7 @@
 package Template::Caribou::Tags::HTML::Extended;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: custom HTML tags optimized for DWIMery
-$Template::Caribou::Tags::HTML::Extended::VERSION = '1.2.1';
+$Template::Caribou::Tags::HTML::Extended::VERSION = '1.2.2';
 
 use strict;
 use warnings;
@@ -32,9 +32,7 @@ sub doctype($type="html 5") {
 }
 
 
-sub favicon($) {
-    my $url = shift;
-
+sub favicon($url) {
     render_tag( 'link', sub {
             attr rel => 'shortcut icon',
             href => $url
@@ -68,9 +66,7 @@ sub javascript($script) {
 }
 
 
-sub javascript_include($) {
-    my $url = shift;
-
+sub javascript_include($url) {
     render_tag( 'script', sub {
         attr type => 'text/javascript',
              src => $url;
@@ -89,8 +85,7 @@ sub css_include( $url, %args ) {
 }
 
 
-sub css($) {
-    my $css = shift;
+sub css($css) {
     render_tag( 'style', sub {
         attr type => 'text/css';
         $css;
@@ -117,12 +112,12 @@ sub image($src,%attr) {
 }
 
 
-sub markdown($){
+sub markdown($md){
     require Text::MultiMarkdown;
 
-    return unless length $_[0];
+    return unless length $md;
 
-    my $value = Text::MultiMarkdown::markdown(shift);
+    my $value = Text::MultiMarkdown::markdown($md);
 
     print ::RAW $value;
 }
@@ -141,7 +136,7 @@ Template::Caribou::Tags::HTML::Extended - custom HTML tags optimized for DWIMery
 
 =head1 VERSION
 
-version 1.2.1
+version 1.2.2
 
 =head1 SYNOPSIS
 
@@ -265,7 +260,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Yanick Champoux.
+This software is copyright (c) 2023 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

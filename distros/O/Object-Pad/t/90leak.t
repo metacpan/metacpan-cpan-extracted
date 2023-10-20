@@ -52,4 +52,14 @@ use Object::Pad;
       'named constructor param does not leak';
 }
 
+{
+   class WithHashKeys :repr(keys) {
+      field $f = "value";
+      method x { $f = $f; }
+   }
+
+   no_growth { WithHashKeys->new->x }
+      ':repr(keys) does not leak';
+}
+
 done_testing;

@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Mas::Any::Tz - Package for language Masai
 
 =cut
 
 package Locale::CLDR::Locales::Mas::Any::Tz;
-# This file auto generated from Data/common/main/mas_TZ.xml
-#	on Mon 11 Apr  5:33:06 pm GMT
+# This file auto generated from Data\common\main\mas_TZ.xml
+#	on Fri 13 Oct  9:26:37 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

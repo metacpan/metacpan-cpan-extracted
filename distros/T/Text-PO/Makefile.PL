@@ -2,8 +2,17 @@ use ExtUtils::MakeMaker;
 use strict;
 use warnings;
 
-# Call 'perldoc ExtUtils::MakeMaker' for details of how to influence
-# the contents of the Makefile that is written.
+sub MY::distsignature
+{
+    return << 'EOT';
+distsignature : distmeta
+	$(NOECHO) ./dev/cleanup.pl
+	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) }' \
+	  -e '	  or die "Could not add SIGNATURE to MANIFEST: $${'\''@'\''}"' --
+	$(NOECHO) cd $(DISTVNAME) && $(TOUCH) SIGNATURE
+	cd $(DISTVNAME) && cpansign -s
+EOT
+}
 
 my %WriteMakefileArgs = (
     NAME                => 'Text::PO',
@@ -46,7 +55,8 @@ my %WriteMakefileArgs = (
     )],
     LICENSE             => 'perl_5',
     MIN_PERL_VERSION    => 'v5.14.0',
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', PREOP => './dev/cleanup.pl' },
+    (MM->can('signature_target') ? (SIGN => 1) : ()),
+    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp' },
     clean               => { FILES => 'Text-PO-*' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },

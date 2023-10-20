@@ -29,12 +29,12 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'Dancer2' => '0',
-                                   'Dancer2::Test' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Template::Caribou' => 'v1.2.0',
+                                   'Test2::V0' => '0',
                                    'Test::More' => '0',
                                    'Test::WWW::Mechanize::PSGI' => '0',
                                    'perl' => '5.006'

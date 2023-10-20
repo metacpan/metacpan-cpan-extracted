@@ -49,4 +49,35 @@ my $orig = String::Tagged->new
    is( $new->get_tag_at( index( $new, "some" ), "some" ), 2, 'value of sub-converted tag' );
 }
 
+# substr clone
+{
+   my $new = String::Tagged->clone( $orig,
+      start => 16,
+      end   => 33,
+   );
+
+   is( $new->str, "some tags applied", '->str of clone with position' );
+   ok( my $e = $new->get_tag_extent( 0, "some" ), 'clone with position has "some" tag' );
+   is( $e->start, 0, '"some" tag extent start' );
+   is( $e->end, 4, '"some" tag extent end' );
+   ok( !$e->anchor_before, '"some" tag not anchored before' );
+
+   $new = String::Tagged->clone( $orig,
+      start => 16,
+      len   => 17,
+   );
+
+   is( $new->str, "some tags applied", '->str of clone with position' );
+
+   # edge anchoring
+
+   $new = String::Tagged->clone( $orig,
+      start => 16+1,
+      end   => 33-1,
+   );
+
+   ok( $e = $new->get_tag_extent( 0, "some" ), 'clone with position has "some" tag' );
+   ok( $e->anchor_before, '"some" tag anchored before' );
+}
+
 done_testing;

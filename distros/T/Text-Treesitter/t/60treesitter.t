@@ -33,10 +33,16 @@ my $ts = Text::Treesitter->new(
    my $tree = $ts->parse_string_range( "The string is '3 + 4'",
       start_byte => 15,
       end_byte   => 15+5,
+
+      start_row    => 100,
+      start_column => 20,
    );
    my $root = $tree->root_node;
 
    is( $root->text, "3 + 4", '$root of ->parse_string_range captured only included range' );
+
+   is( [ $root->start_point ], [ 100, 20 ], '$root->start_point for included range' );
+   is( [ $root->end_point ],   [ 100, 25 ], '$root->end_point for included range' );
 }
 
 done_testing;

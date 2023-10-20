@@ -20,9 +20,13 @@ name: Pod-AsciiDoctor
 provides:
   Pod::AsciiDoctor:
     file: lib/Pod/AsciiDoctor.pm
-    version: '0.101003'
+    version: '0.102000'
 requires:
+  Carp: '0'
+  Getopt::Long: '0'
+  Path::Tiny: '0'
   Pod::Parser: '1.65'
+  autodie: '0'
   parent: '0'
   perl: '5.014'
   strict: '0'
@@ -31,7 +35,7 @@ resources:
   bugtracker: https://github.com/shlomif/Pod-AsciiDoctor/issues
   homepage: http://metacpan.org/release/Pod-AsciiDoctor
   repository: git://github.com/shlomif/Pod-AsciiDoctor.git
-version: '0.101003'
+version: '0.102000'
 x_Dist_Zilla:
   perl:
     version: '5.036001'
@@ -302,7 +306,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Support
               name: '@SHLOMIF/Support'
-              version: '1.013'
+              version: '1.014'
             -
               class: Pod::Weaver::Section::Authors
               name: '@SHLOMIF/Authors'
@@ -328,6 +332,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Filter/UploadToCPAN'
+      version: '6.030'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: ExecDir
       version: '6.030'
     -
       class: Dist::Zilla::Plugin::Test::Kwalitee

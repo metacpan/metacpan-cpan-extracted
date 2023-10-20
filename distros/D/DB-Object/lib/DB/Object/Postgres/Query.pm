@@ -17,9 +17,10 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object::Query );
-    use vars qw( $VERSION $VERBOSE $DEBUG );
+    use vars qw( $VERSION $DEBUG );
     use Devel::Confess;
-    $VERSION = 'v0.1.8';
+    use Want;
+    our $VERSION = 'v0.1.8';
 };
 
 use strict;
@@ -38,22 +39,42 @@ sub init
 
 sub binded_having { return( shift->_set_get_array_as_object( 'binded_having', @_ ) ); }
 
+# sub binded_types_as_param
+# {
+#     my $self = shift( @_ );
+#     my $types = $self->binded_types;
+#     my $params = $self->new_array;
+#     foreach my $t ( @$types )
+#     {
+#         if( CORE::length( $t ) )
+#         {
+#             $params->push( { pg_type => $t } );
+#         }
+#         else
+#         {
+#             $params->push( '' );
+#         }
+#     }
+#     return( $params );
+# }
+
 sub binded_types_as_param
 {
     my $self = shift( @_ );
-    my $types = $self->binded_types;
     my $params = $self->new_array;
-    foreach my $t ( @$types )
+    $self->elements->foreach(sub
     {
-        if( CORE::length( $t ) )
+        my $elem = shift( @_ );
+        my $type;
+        if( $elem && defined( $type = $elem->type ) )
         {
-            $params->push( { pg_type => $t } );
+            $params->push( { pg_type => $type } );
         }
         else
         {
             $params->push( '' );
         }
-    }
+    });
     return( $params );
 }
 
@@ -84,8 +105,7 @@ sub format_from_epoch
 sub format_to_epoch
 {
     my $self = shift( @_ );
-    my $opts = {};
-    $opts = shift( @_ ) if( scalar( @_ ) == 1 && $self->_is_hash( $_[0] ) );
+    my $opts = $self->_get_args_as_hash( @_ );
     if( $opts->{bind} )
     {
         # 2020-10-11: ABSTIME is deprecated in PostgreSQL 12
@@ -141,10 +161,10 @@ sub format_statement
     my $prefix   = $tbl_o->prefix;
     my $db       = $tbl_o->database;
     my $field_prefix = $tbl_o->query_object->table_alias ? $tbl_o->query_object->table_alias : $prefix;
-    my $fields_ref = $tbl_o->fields();
+    my $fields_ref = $tbl_o->fields;
     my $ok_list  = CORE::join( '|', keys( %$fields_ref ) );
     my $tables   = CORE::join( '|', @{$tbl_o->database_object->tables} );
-    my $struct   = $tbl_o->structure();
+    my $struct   = $tbl_o->structure || return( $self->pass_error( $tbl_o->error ) );
     my $types    = $tbl_o->types;
     my $types_const = $tbl_o->types_const;
     my $query_type = $self->{query_type};
@@ -162,19 +182,24 @@ sub format_statement
     # Used for insert or update so that execute can take a hash of key => value pair and we would bind the values in the right order
     # But or that we need to know the order of the fields.
     $self->{sorted} = \@sorted;
+    my $placeholder_re = $tbl_o->database_object->_placeholder_regexp;
+    my $elems = $self->new_elements( debug => $self->debug );
     
     foreach my $field ( @sorted )
     {
         next if( defined( $struct->{ $field } ) && $struct->{ $field } =~ /\bSERIAL\b/i );
+        my $elem = $self->new_element;
         if( exists( $data->{ $field } ) )
         {
             my $value = $data->{ $field };
             if( $self->_is_a( $value, "${base_class}::Statement" ) )
             {
-                push( @format_values, '(' . $value->as_string . ')' );
-                push( @$binded, $value->query_object->binded_values->list ) if( $value->query_object->binded_values->length );
-                # $self->binded_types->push( $value->query_object->binded_types_as_param );
-                push( @types, $value->query_object->binded_types->list ) if( $value->query_object->binded_types->length );
+                $elem->value( '(' . $value->as_string . ')' );
+                # push( @format_values, '(' . $value->as_string . ')' );
+                # push( @$binded, $value->query_object->binded_values->list ) if( $value->query_object->binded_values->length );
+                # # $self->binded_types->push( $value->query_object->binded_types_as_param );
+                # push( @types, $value->query_object->binded_types->list ) if( $value->query_object->binded_types->length );
+                $elem->elements( $value->query_object->elements );
             }
             # This is for insert or update statement types
             elsif( exists( $from_unix->{ $field } ) )
@@ -182,36 +207,54 @@ sub format_statement
                 # push( @format_values, sprintf( "FROM_UNIXTIME('%s') AS $field", $data->{ $field } ) );
                 if( $bind )
                 {
-                    push( @$binded, $value );
-                    # push( @format_values, "FROM_UNIXTIME( ? )" );
-                    push( @format_values, $self->format_from_epoch({ value => $value, bind => 1 }) );
+                    # push( @$binded, $value );
+                    # push( @format_values, $self->format_from_epoch({ value => $value, bind => 1 }) );
                     if( CORE::exists( $types_const->{ $field } ) )
                     {
                         # CORE::push( @types, $types_const->{ $field }->{constant} );
                         # PG_INT4
-                        CORE::push( @types, $self->database_object->get_sql_type( 'int4' ) );
+                        # CORE::push( @types, $self->database_object->get_sql_type( 'int4' ) );
+                        $elem->type( $self->database_object->get_sql_type( 'int4' ) );
+                    }
+                    # else
+                    # {
+                    #     CORE::push( @types, '' );
+                    # }
+                    if( $value =~ /^($placeholder_re)$/ )
+                    {
+                        $elem->placeholder( $1 );
+                        if( defined( $+{index} ) )
+                        {
+                            $elem->index( $+{index} );
+                        }
                     }
                     else
                     {
-                        CORE::push( @types, '' );
+                        $elem->value( $value );
                     }
+                    $elem->format( $self->format_from_epoch({ value => $value, bind => 1 }) );
                 }
                 else
                 {
-                    # push( @format_values, "FROM_UNIXTIME($value)" );
-                    push( @format_values, $self->format_from_epoch({ value => $value, bind => 0 }) );
-                    if( $value eq '?' )
+                    # push( @format_values, $self->format_from_epoch({ value => $value, bind => 0 }) );
+                    if( $value =~ /^$placeholder_re$/ )
                     {
+                        $elem->format( $self->format_from_epoch({ value => $value, bind => 1 }) );
                         if( CORE::exists( $types_const->{ $field } ) )
                         {
                             # CORE::push( @types, $types_const->{ $field }->{constant} );
                             # PG_INT4
-                            CORE::push( @types, $self->database_object->get_sql_type( 'int4' ) );
+                            # CORE::push( @types, $self->database_object->get_sql_type( 'int4' ) );
+                            $elem->type( $self->database_object->get_sql_type( 'int4' ) );
                         }
-                        else
-                        {
-                            CORE::push( @types, '' );
-                        }
+                        # else
+                        # {
+                        #     CORE::push( @types, '' );
+                        # }
+                    }
+                    else
+                    {
+                        $elem->format( $self->format_from_epoch({ value => $value, bind => 0 }) );
                     }
                 }
             }
@@ -219,33 +262,44 @@ sub format_statement
             {
                 push( @format_values, $$value );
             }
-            elsif( $value eq '?' )
+            elsif( $value =~ /^($placeholder_re)$/ )
             {
-                push( @format_values, '?' );
+                $elem->placeholder( $1 );
+                $elem->format( $1 );
+                if( defined( $+{index} ) )
+                {
+                    $elem->index( $+{index} );
+                }
+                # push( @format_values, $1 );
                 # CORE::push( @types, $types_const->{ $field } ? $types_const->{ $field }->{constant} : '' );
                 if( CORE::exists( $types_const->{ $field } ) )
                 {
-                    CORE::push( @types, $types_const->{ $field }->{constant} );
+                    # CORE::push( @types, $types_const->{ $field }->{constant} );
+                    $elem->type( $types_const->{ $field }->{constant} );
                 }
-                else
-                {
-                    CORE::push( @types, '' );
-                }
+                # else
+                # {
+                #     CORE::push( @types, '' );
+                # }
             }
             elsif( $struct->{ $field } =~ /^\s*\bBLOB\b/i )
             {
-                push( @format_values, '?' );
-                push( @$binded, $value );
+                # push( @format_values, '?' );
+                # push( @$binded, $value );
+                $elem->placeholder( '?' );
+                $elem->format( '?' );
+                $elem->value( $value );
                 my $const;
                 if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
                 {
                     # CORE::push( @types, DBD::Pg::PG_BYTEA );
-                    CORE::push( @types, $const );
+                    # CORE::push( @types, $const );
+                    $elem->type( $const );
                 }
-                else
-                {
-                    CORE::push( @types, '' );
-                }
+                # else
+                # {
+                #     CORE::push( @types, '' );
+                # }
             }
             # If the value itself looks like a field name or like a SQL function
             # or simply if bind option is inactive
@@ -260,49 +314,59 @@ sub format_statement
             elsif( !$bind )
             {
                 my $const;
+                $elem->value( $value );
                 if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
                 {
                     # push( @format_values, $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ) );
-                    push( @format_values, $tbl_o->database_object->quote( $value, { pg_type => $const } ) );
+                    # push( @format_values, $tbl_o->database_object->quote( $value, { pg_type => $const } ) );
+                    $elem->format( $tbl_o->database_object->quote( $value, { pg_type => $const } ) );
                 }
                 # Value is a hash and the data type is json, so we transform this value into a json data
                 elsif( $self->_is_hash( $value ) && ( lc( $types->{ $field } ) eq 'jsonb' || lc( $types->{ $field } ) eq 'json' ) )
                 {
                     my $this_json = $self->_encode_json( $value );
                     # push( @format_values, $tbl_o->database_object->quote( $this_json, ( lc( $types->{ $field } ) eq 'jsonb' ? DBD::Pg::PG_JSONB : DBD::Pg::PG_JSON ) ) );
-                    push( @format_values, $tbl_o->database_object->quote( $this_json, { pg_type => $self->database_object->get_sql_type( $types->{ $field } ) } ) );
+                    # push( @format_values, $tbl_o->database_object->quote( $this_json, { pg_type => $self->database_object->get_sql_type( $types->{ $field } ) } ) );
+                    $elem->format( $tbl_o->database_object->quote( $this_json, { pg_type => $self->database_object->get_sql_type( $types->{ $field } ) } ) );
                 }
                 else
                 {
                     # push( @format_values, sprintf( "'%s'", quotemeta( $value ) ) );
-                    push( @format_values, sprintf( "%s", $tbl_o->database_object->quote( $value ) ) );
+                    # push( @format_values, sprintf( "%s", $tbl_o->database_object->quote( $value ) ) );
+                    $elem->format( sprintf( "%s", $tbl_o->database_object->quote( $value ) ) );
                 }
             }
             # We do this before testing for param binding because DBI puts quotes around SET number :-(
             elsif( $value =~ /^\d+$/ && $struct->{ $field } =~ /\bSET\(/i )
             {
-                push( @format_values, $value );
+                # push( @format_values, $value );
+                $elem->format( $value );
             }
             elsif( $value =~ /^\d+$/ && 
                    $struct->{ $field } =~ /\bENUM\(/i && 
                       ( $query_type eq 'insert' || $query_type eq 'update' ) )
             {
-                push( @format_values, "'$value'" );
+                # push( @format_values, "'$value'" );
+                $elem->format( "'$value'" );
             }
             # Otherwise, bind option is enabled, we bind parameter
             elsif( $bind )
             {
-                push( @format_values, '?' );
-                push( @$binded, $value );
+                # push( @format_values, '?' );
+                # push( @$binded, $value );
+                $elem->placeholder( '?' );
+                $elem->format( '?' );
+                $elem->value( $value );
                 my $const;
                 if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
                 {
-                    CORE::push( @types, $const );
+                    # CORE::push( @types, $const );
+                    $elem->type( $const );
                 }
-                else
-                {
-                    CORE::push( @types, '' );
-                }
+                # else
+                # {
+                #     CORE::push( @types, '' );
+                # }
             }
             # In last resort, we handle the formatting ourself
             else
@@ -312,11 +376,13 @@ sub format_statement
                 if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
                 {
                     # push( @format_values, $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ) );
-                    push( @format_values, $tbl_o->database_object->quote( $value, { pg_type => $const } ) );
+                    # push( @format_values, $tbl_o->database_object->quote( $value, { pg_type => $const } ) );
+                    $elem->format( $tbl_o->database_object->quote( $value, { pg_type => $const } ) );
                 }
                 else
                 {
-                    push( @format_values, $tbl_o->database_object->quote( $value ) );
+                    # push( @format_values, $tbl_o->database_object->quote( $value ) );
+                    $elem->format( $tbl_o->database_object->quote( $value ) );
                 }
             }
         }
@@ -343,21 +409,32 @@ sub format_statement
                 }
             }gex;
             $field =~ s/(?<!\.)($tables)(?:\.)/$db\.$1\./g if( $multi_db );
-            push( @format_fields, $field );
+            # push( @format_fields, $field );
         }
-        else
-        {
-            push( @format_fields, $field );
-        }
+        # else
+        # {
+        #     push( @format_fields, $field );
+        # }
+        $elem->field( $field );
+        $elems->push( $elem );
     }
+    # TODO: Remove the following line as it is obsolete as of 2023-07-23
     $self->binded_types->push( @types ) if( scalar( @types ) );
     if( !wantarray() && scalar( @{$self->{_extra}} ) )
     {
-        push( @format_fields, @{$self->{_extra}} );
+        # push( @format_fields, @{$self->{_extra}} );
+        foreach my $this ( @{$self->{_extra}} )
+        {
+            $elems->push({
+                field => $this,
+                debug => $self->debug,
+            });
+        }
     }
-    $values = CORE::join( ', ', @format_values );
-    $fields = CORE::join( ', ', @format_fields );
-    wantarray ? return( $fields, $values ) : return( $fields );
+    # $values = CORE::join( ', ', @format_values );
+    # $fields = CORE::join( ', ', @format_fields );
+    # wantarray ? return( $fields, $values ) : return( $fields );
+    return( $elems );
 }
 
 # _having is in DB::Object::Query
@@ -368,30 +445,27 @@ sub having { return( shift->_where_having( 'having', 'having', @_ ) ); }
 sub limit
 {
     my $self  = shift( @_ );
-    my $limit = $self->_process_limit( @_ );
-    if( CORE::length( $limit->metadata->limit ) )
+    my $limit = $self->{limit};
+    if( @_ )
     {
-        $limit->generic( CORE::length( $limit->metadata->offset ) ? 'OFFSET ? LIMIT ?' : 'LIMIT ?' );
-        # User is managing the binding of value
-        if( (
-                $limit->metadata->offset eq '?' &&
-                $limit->metadata->limit eq '?'
-            ) || $limit->metadata->limit eq '?' )
+        # Returns a DB::Object::Query::Clause
+        $limit = $self->_process_limit( @_ ) ||
+            return( $self->pass_error );
+        if( CORE::length( $limit->metadata->limit // '' ) )
         {
+            $limit->generic( CORE::length( $limit->metadata->offset // '' ) ? 'OFFSET ? LIMIT ?' : 'LIMIT ?' );
+            # %s works for integer, and also for numbered placeholders like $1 or ?1, or regular placeholder like ?
             $limit->value(
-                CORE::length( $limit->metadata->offset )
-                ?  'OFFSET ? LIMIT ?'
-                : 'LIMIT ?'
+                CORE::length( $limit->metadata->offset // '' )
+                    ?  sprintf( "OFFSET %s LIMIT %s", $limit->metadata->offset, $limit->metadata->limit )
+                    : sprintf( "LIMIT %s", $limit->metadata->limit )
             );
         }
-        else
-        { 
-            $limit->value(
-                CORE::length( $limit->metadata->offset )
-                ? CORE::sprintf( 'OFFSET %d LIMIT %d', $limit->metadata->offset, $limit->metadata->limit )
-                : CORE::sprintf( 'LIMIT %d', $limit->metadata->limit )
-            );
-        }
+    }
+    
+    if( !$limit && want( 'OBJECT' ) )
+    {
+        return( $self->new_null( type => 'object' ) );
     }
     return( $limit );
 }
@@ -470,7 +544,9 @@ sub on_conflict
                         # Need to account for placeholders
                         # Let's check values only
                         $self->is_upsert(1);
-                        my $inherited_fields = $self->format_update( $f_ref );
+                        # my $inherited_fields = $self->format_update( $f_ref );
+                        my $elems = $self->format_update( $f_ref );
+                        my $inherited_fields = $elems->formats->join( ', ' );
                         push( @comp, 'DO UPDATE SET' );
                         push( @comp, $inherited_fields );
                         $hash->{query} = join( ' ', @comp );
@@ -584,10 +660,8 @@ sub returning
         return( $self->error( "Cannot use returning for PostgreSQL version lower than 8.2. This server version is: $pg_version" ) ) if( $pg_version < '8.2' );
         # It could be a field name or a wildcard
         return( $self->error( "A reference was provided (", ref( $_[0] ), "), but I was expecting a string, which could be a field name or even a star (*) indicating all fields." ) ) if( ref( $_[0] ) );
-        $self->{returning} = $self->new_clause({ value => shift( @_ ) });
+        $self->{returning} = $self->new_clause( value => shift( @_ ) );
     }
-    # return( wantarray() ? () : undef() ) if( !$self->{returning} );
-    # return( wantarray() ? ( $self->{returning} ) : "RETURNING $self->{returning}" );
     return( $self->{returning} );
 }
 
@@ -610,27 +684,24 @@ sub _query_components
     # no_bind_copy: because join for example does it already and this would duplicate the binded types, so we use this option to tell this method to set an exception. Kind of a hack that needs clean-up in the future from a design point of view.
     $opts->{no_bind_copy} //= 0;
     my( $where, $group, $having, $sort, $order, $limit, $returning, $on_conflict );
-    if( $self->debug )
-    {
-        my $trace = $self->_get_stack_trace;
-    }
     
-    $where  = $self->where();
-    if( $type eq "select" )
+    $where = $self->where();
+    if( $type eq 'select' )
     {
-        $group  = $self->group();
-        $having = $self->having();
-        $sort  = $self->reverse() ? 'DESC' : $self->sort() ? 'ASC' : '';
-        $order  = $self->order();
+        $group  = $self->group;
+        $having = $self->having;
+        $sort   = $self->reverse ? 'DESC' : $self->sort ? 'ASC' : '';
+        $order  = $self->order;
     }
-    $limit  = $self->limit();
+    $limit = $self->limit;
     $returning = $self->returning;
     $on_conflict = $self->on_conflict;
     my @query = ();
     push( @query, "WHERE $where" ) if( $where && $type ne 'insert' );
-    if( $where->bind->types->length )
+    if( $where && $where->types->length )
     {
-        $self->binded_types->push( $where->bind->types->list ) unless( $opts->{no_bind_copy} );
+        # $self->binded_types->push( $where->bind->types->list ) unless( $opts->{no_bind_copy} );
+        $self->elements->push( $where ) unless( $opts->{no_bind_copy} );
     }
     push( @query, "GROUP BY $group" ) if( $group && $type eq 'select'  );
     push( @query, "HAVING $having" ) if( $having && $type eq 'select'  );
@@ -639,9 +710,11 @@ sub _query_components
     if( $limit && $type eq 'select' )
     {
         push( @query, "$limit" );
-        if( $limit->bind->types->length )
+        # if( $limit->bind->types->length )
+        if( $limit->elements->length )
         {
-            $self->binded_types->push( $limit->bind->types->list ) unless( $opts->{no_bind_copy} );
+            # $self->binded_types->push( $limit->bind->types->list ) unless( $opts->{no_bind_copy} );
+            $self->elements->push( $limit ) unless( $opts->{no_bind_copy} );
         }
     }
     if( $on_conflict )

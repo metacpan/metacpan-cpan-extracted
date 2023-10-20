@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie.pm
-## Version v0.3.1
+## Version v0.3.3
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2023/06/02
+## Modified 2023/10/11
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -19,7 +19,6 @@ BEGIN
     use DateTime;
     use DateTime::Format::Strptime;
     use Module::Generic::DateTime;
-    use Nice::Try;
     use URI::Escape ();
     use overload (
         '""'     => \&as_string,
@@ -29,7 +28,7 @@ BEGIN
         '=='     => \&same_as,
         fallback => 1,
     );
-    our $VERSION = 'v0.3.1';
+    our $VERSION = 'v0.3.3';
     our $SUBS;
     our $COOKIE_DEBUG = 0;
     use constant CRYPTX_VERSION => '0.074';
@@ -98,19 +97,21 @@ sub algo
         my $algo = shift( @_ );
         if( defined( $algo ) && CORE::length( $algo ) )
         {
-            try
+            $self->_load_class( 'Crypt::Mode::CBC', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
+            # try-catch
+            local $@;
+            eval
             {
-                $self->_load_class( 'Crypt::Mode::CBC', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
                 # Crypt::Mode::CBC dies when it is unhappy, but we catch a null return 
                 # value anyway just in case
                 my $o = Crypt::Mode::CBC->new( $algo ) ||
-                    return( $self->error( "Unsupported algorithm \"$algo\"" ) );
+                    die( "Unsupported algorithm \"$algo\"\n" );
                 $self->_set_get_scalar_as_object( 'algo', $algo );
                 $self->reset(1);
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                return( $self->error( "Unsupported algorithm \"$algo\": $e" ) );
+                return( $self->error( "Unsupported algorithm \"$algo\": $@" ) );
             }
         }
         else
@@ -191,28 +192,39 @@ sub as_string
     {
         my $key = $self->key ||
             return( $self->error( "Signature or encryption has been enabled, but no key was provided." ) );
-        try
+        if( $self->sign->is_true )
         {
-            if( $self->sign->is_true )
+            $self->_load_class( 'Crypt::Mac::HMAC', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
+            # try-catch
+            local $@;
+            my $signature = eval
             {
-                $self->_load_class( 'Crypt::Mac::HMAC', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
-                my $signature = Crypt::Mac::HMAC::hmac_b64( "SHA256", "$key", "$value" );
-                $value = "$value.$signature";
-            }
-            elsif( $self->encrypt )
+                Crypt::Mac::HMAC::hmac_b64( "SHA256", "$key", "$value" );
+            };
+            if( $@ )
             {
-                $self->_load_class( 'Crypt::Misc', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
-                my $algo = $self->algo;
-                my $p = $self->_encrypt_objects( $key => $algo ) || return( $self->pass_error );
-                my $crypt = $p->{crypt};
-                # $value = Crypt::Misc::encode_b64( $crypt->encrypt( "$value", $p->{key}, $p->{iv} ) );
-                my $encrypted = $crypt->encrypt( "$value", $p->{key}, $p->{iv} );
-                $value = Crypt::Misc::encode_b64( $encrypted );
+                return( $self->error( "An error occurred while trying to ", ( $self->sign ? 'sign' : 'encrypt' ), " cookie value: $@" ) );
             }
+            $value = "$value.$signature";
         }
-        catch( $e )
+        elsif( $self->encrypt )
         {
-            return( $self->error( "An error occurred while trying to ", ( $self->sign ? 'sign' : 'encrypt' ), " cookie value: $e" ) );
+            $self->_load_class( 'Crypt::Misc', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
+            my $algo = $self->algo;
+            my $p = $self->_encrypt_objects( $key => $algo ) || return( $self->pass_error );
+            my $crypt = $p->{crypt};
+            # $value = Crypt::Misc::encode_b64( $crypt->encrypt( "$value", $p->{key}, $p->{iv} ) );
+            # try-catch
+            local $@;
+            my $encrypted = eval
+            {
+                $crypt->encrypt( "$value", $p->{key}, $p->{iv} );
+            };
+            if( $@ )
+            {
+                return( $self->error( "An error occurred while trying to ", ( $self->sign ? 'sign' : 'encrypt' ), " cookie value: $@" ) );
+            }
+            $value = Crypt::Misc::encode_b64( $encrypted );
         }
     }
     
@@ -278,19 +290,22 @@ sub decrypt
     my $algo = $opts->{algo} || $self->algo;
     return( $self->error( "Cookie encryption was enabled, but no key was set to decrypt it." ) ) if( !defined( $key ) || !CORE::length( "$key" ) );
     return( $self->error( "Cookie encryption was enabled, but no algorithm was set to decrypt it." ) ) if( !defined( $algo ) || !CORE::length( "$algo" ) );
-    try
+    $self->_load_class( 'Crypt::Misc', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
+    # If IV is not provided, _encrypt_objects will generate one and save it for next time
+    my $p = $self->_encrypt_objects( $key => $algo, $opts->{iv} ) || return( $self->pass_error );
+    my $crypt = $p->{crypt};
+    # try-catch
+    local $@;
+    my $rv = eval
     {
-        $self->_load_class( 'Crypt::Misc', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
-        # If IV is not provided, _encrypt_objects will generate one and save it for next time
-        my $p = $self->_encrypt_objects( $key => $algo, $opts->{iv} ) || return( $self->pass_error );
-        my $crypt = $p->{crypt};
         my $bin = Crypt::Misc::decode_b64( "$value" );
         return( $crypt->decrypt( "$bin", $p->{key}, $p->{iv} ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to decrypt cookie value: $e" ) );
+        return( $self->error( "An error occurred while trying to decrypt cookie value: $@" ) );
     }
+    return( $rv );
 }
 
 sub discard { return( shift->_set_get_boolean( 'discard', @_ ) ); }
@@ -321,11 +336,13 @@ sub expires
         my $tz;
         # DateTime::TimeZone::Local will die ungracefully if the local timezone is not set with the error:
         # "Cannot determine local time zone"
-        try
+        # try-catch
+        local $@;
+        $tz = eval
         {
-            $tz = DateTime::TimeZone->new( name => 'local' );
-        }
-        catch( $e )
+            DateTime::TimeZone->new( name => 'local' );
+        };
+        if( $@ )
         {
             $tz = DateTime::TimeZone->new( name => 'UTC' );
         }
@@ -337,7 +354,9 @@ sub expires
         }
         elsif( $exp =~ /^\d{1,10}$/ )
         {
-            try
+            # try-catch
+            local $@;
+            $dt = eval
             {
                 # Unexpectedly, DateTime sets the time zone ONLY after having instantiated the
                 # object and set its time zone to UTC.
@@ -346,11 +365,11 @@ sub expires
                 # to being in Asia/Tokyo time zone!
                 # Issue #126
                 # <https://github.com/houseabsolute/DateTime.pm/issues/126>
-                $dt = DateTime->from_epoch( epoch => $exp, time_zone => $tz );
-            }
-            catch( $e )
+                DateTime->from_epoch( epoch => $exp, time_zone => $tz );
+            };
+            if( $@ )
             {
-                return( $self->error( "An error occurred while setting the cookie expiration date time based on the unix timestamp '$exp'." ) );
+                return( $self->error( "An error occurred while setting the cookie expiration date time based on the unix timestamp '$exp': $@" ) );
             }
         }
         elsif( $self->_is_object( $exp ) && ( $exp->isa( 'DateTime' ) || $exp->isa( 'Module::Generic::Datetime' ) ) )
@@ -384,10 +403,11 @@ sub expires
         {
             $dt = $self->_parse_timestamp( $exp );
             return( $self->pass_error ) if( !defined( $dt ) );
-            return( $self->error( "Provided expires value '$exp' is an invalid expression." ) ) if( !CORE::length( $dt ) );
+            return( $self->error( "Provided expires value '$exp' (", overload::StrVal( $exp // 'undef' ), ") is an invalid expression." ) ) if( !CORE::length( $dt ) );
         }
         else
         {
+            # Don't know what to do with '$exp'.
         }
         
         if( defined( $dt ) )
@@ -468,16 +488,18 @@ sub is_valid
     my $sig = pop( @parts );
     my $orig = join( '.', @parts );
     my $key = $opts->{key};
-    try
+    $self->_load_class( 'Crypt::Mac::HMAC', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
+    # try-catch
+    local $@;
+    my $check = eval
     {
-        $self->_load_class( 'Crypt::Mac::HMAC', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
-        my $check = Crypt::Mac::HMAC::hmac_b64( 'SHA256', "$key", "$orig" );
-        return( "$check" eq "$sig" );
-    }
-    catch( $e )
+        Crypt::Mac::HMAC::hmac_b64( 'SHA256', "$key", "$orig" );
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to check the cookie signature validation: $e" ) );
+        return( $self->error( "An error occurred while trying to check the cookie signature validation: $@" ) );
     }
+    return( "$check" eq "$sig" );
 }
 
 sub iv { return( shift->initialisation_vector( @_ ) ); }
@@ -543,11 +565,13 @@ sub max_age
                 my $tz;
                 # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
                 # "Cannot determine local time zone"
-                try
+                # try-catch
+                local $@;
+                $tz = eval
                 {
-                    $tz = DateTime::TimeZone->new( name => 'local' );
-                }
-                catch( $e )
+                    DateTime::TimeZone->new( name => 'local' );
+                };
+                if( $@ )
                 {
                     $tz = DateTime::TimeZone->new( name => 'UTC' );
                 }
@@ -668,39 +692,48 @@ sub _encrypt_objects
     return( $self->error( "Key provided is empty!" ) ) if( !defined( $key ) || !CORE::length( "$key" ) );
     return( $self->error( "No algorithm was provided to encrypt cookie value. You can choose any <NAME> for which there exists Crypt::Cipher::<NAME>" ) ) if( !defined( $algo ) || !CORE::length( "$algo" ) );
     $iv //= '';
-    try
+
+    $self->_load_class( 'Crypt::Mode::CBC', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
+    $self->_load_class( 'Bytes::Random::Secure' ) || return( $self->pass_error );
+    my $crypt = eval
     {
-        $self->_load_class( 'Crypt::Mode::CBC', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
-        $self->_load_class( 'Bytes::Random::Secure' ) || return( $self->pass_error );
-        my $crypt = Crypt::Mode::CBC->new( "$algo" ) || return( $self->error( "Unable to create a Crypt::Mode::CBC object." ) );
-        my $class = "Crypt::Cipher::${algo}";
-        $self->_load_class( $class ) || return( $self->pass_error );
-        my $key_len = $class->keysize;
-        my $block_len = $class->blocksize;
-        return( $self->error( "The size of the key provided (", CORE::length( $key ), ") does not match the minimum key size required for this algorithm \"$algo\" (${key_len})." ) ) if( CORE::length( $key ) < $key_len );
-        # Generate an "IV", i.e. Initialisation Vector based on the required block size
-        $iv ||= $self->initialisation_vector;
-        if( defined( $iv ) && CORE::length( "$iv" ) )
-        {
-            if( CORE::length( "$iv" ) != $block_len )
-            {
-                return( $self->error( "The Initialisation Vector provided for cookie encryption has a length (", CORE::length( "$iv" ), ") which does not match the algorithm ($algo) size requirement ($block_len). Please refer to the cookie documentation Cookie" ) );
-            }
-        }
-        else
-        {
-            $iv = Bytes::Random::Secure::random_bytes( $block_len );
-            # Save it for decryption
-            $self->initialisation_vector( $iv );
-        }
-        my $key_pack = pack( 'H' x $key_len, $key );
-        my $iv_pack  = pack( 'H' x $block_len, $iv );
-        return({ 'crypt' => $crypt, key => $key_pack, iv => $iv_pack });
-    }
-    catch( $e )
+        Crypt::Mode::CBC->new( "$algo" );
+    };
+    if( $@ )
     {
-        return( $self->error( "Error getting the encryption objects for algorithm \"$algo\": $e" ) );
+        return( $self->error( "Error getting the encryption objects for algorithm \"$algo\": $@" ) );
     }
+    $crypt or return( $self->error( "Unable to create a Crypt::Mode::CBC object." ) );
+    my $class = "Crypt::Cipher::${algo}";
+    $self->_load_class( $class ) || return( $self->pass_error );
+    my $key_len = $class->keysize;
+    my $block_len = $class->blocksize;
+    return( $self->error( "The size of the key provided (", CORE::length( $key ), ") does not match the minimum key size required for this algorithm \"$algo\" (${key_len})." ) ) if( CORE::length( $key ) < $key_len );
+    # Generate an "IV", i.e. Initialisation Vector based on the required block size
+    $iv ||= $self->initialisation_vector;
+    if( defined( $iv ) && CORE::length( "$iv" ) )
+    {
+        if( CORE::length( "$iv" ) != $block_len )
+        {
+            return( $self->error( "The Initialisation Vector provided for cookie encryption has a length (", CORE::length( "$iv" ), ") which does not match the algorithm ($algo) size requirement ($block_len). Please refer to the cookie documentation Cookie" ) );
+        }
+    }
+    else
+    {
+        $iv = eval
+        {
+            Bytes::Random::Secure::random_bytes( $block_len );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error getting $block_len random secure bytes for algorithm \"$algo\": $@" ) );
+        }
+        # Save it for decryption
+        $self->initialisation_vector( $iv );
+    }
+    my $key_pack = pack( 'H' x $key_len, $key );
+    my $iv_pack  = pack( 'H' x $block_len, $iv );
+    return({ 'crypt' => $crypt, key => $key_pack, iv => $iv_pack });
 }
 
 sub _header_datetime
@@ -837,7 +870,7 @@ Cookie - Cookie Object with Encryption or Signature
 
 =head1 VERSION
 
-    v0.3.1
+    v0.3.3
 
 =head1 DESCRIPTION
 

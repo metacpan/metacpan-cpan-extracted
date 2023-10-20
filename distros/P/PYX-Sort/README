@@ -7,31 +7,45 @@ SYNOPSIS
      my $obj = PYX::Sort->new(%parameters);
      $obj->parse($pyx, $out);
      $obj->parse_file($input_file, $out);
-     $obj->parse_handle($input_file_handler, $out);
+     $obj->parse_handler($input_file_handler, $out);
 
 METHODS
-    "new(%parameters)"
-             Constructor.
+  "new"
+     my $obj = PYX::Sort->new(%parameters);
 
-            *       "output_handler"
+    Constructor.
 
-                     Output handler.
-                     Default value is \*STDOUT.
+    *       "output_handler"
 
-    "parse($pyx[, $out])"
-             Parse PYX text or array of PYX text and print sorted list of element attributes in PYX format.
-             If $out not present, use 'output_handler'.
-             Returns undef.
+            Output handler.
 
-    "parse_file($input_file[, $out])"
-             Parse file with PYX data and print sorted list of element attributes in PYX format.
-             If $out not present, use 'output_handler'.
-             Returns undef.
+            Default value is \*STDOUT.
 
-    "parse_handler($input_file[, $out])"
-             Parse PYX handler print sorted list of element attributes in PYX format.
-             If $out not present, use 'output_handler'.
-             Returns undef.
+    Returns instance of object.
+
+  "parse"
+     $obj->parse($pyx, $out);
+
+    Parse PYX text or array of PYX text and print sorted list of element
+    attributes in PYX format. If $out not present, use 'output_handler'.
+
+    Returns undef.
+
+  "parse_file"
+     $obj->parse_file($input_file, $out);
+
+    Parse file with PYX data and print sorted list of element attributes in
+    PYX format. If $out not present, use 'output_handler'.
+
+    Returns undef.
+
+  "parse_handler"
+     $obj->parse_handler($input_file_handler, $out);
+
+    Parse PYX handler print sorted list of element attributes in PYX format.
+    If $out not present, use 'output_handler'.
+
+    Returns undef.
 
 ERRORS
      new():
@@ -89,5 +103,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

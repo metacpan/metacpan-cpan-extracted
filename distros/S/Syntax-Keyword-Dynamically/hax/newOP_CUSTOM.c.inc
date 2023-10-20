@@ -88,7 +88,7 @@ static OP *S_newLOGOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first, OP *
   logop->op_first = first;
   logop->op_flags = (U8)(flags | OPf_KIDS);
   logop->op_other = LINKLIST(other);
-  /* logop->op_private has nothing interesting for OP_CUSTOM */
+  logop->op_private = (U8)(1 | (flags >> 8));
 
   /* Link in postfix order */
   logop->op_next = LINKLIST(first);

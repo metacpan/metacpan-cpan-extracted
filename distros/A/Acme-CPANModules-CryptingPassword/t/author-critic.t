@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Acme/CPANModules/CryptingPassword.pm'];
+my $filenames = ['lib/Acme/CPANModules/CryptingPassword.pm','lib/Acme/CPANModules/HashingPassword.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

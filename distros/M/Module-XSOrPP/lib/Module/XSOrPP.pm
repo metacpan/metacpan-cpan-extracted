@@ -1,17 +1,18 @@
 package Module::XSOrPP;
 
-our $DATE = '2016-01-15'; # DATE
-our $VERSION = '0.11'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
+use Exporter qw(import);
 use Dist::Util qw(packlist_for);
-use Module::Path::More qw(module_path);
+use Module::Installed::Tiny qw(module_source);
 
-require Exporter;
-our @ISA = qw(Exporter);
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-07-09'; # DATE
+our $DIST = 'Module-XSOrPP'; # DIST
+our $VERSION = '0.120'; # VERSION
+
 our @EXPORT_OK = qw(
                        is_xs
                        is_pp
@@ -33,8 +34,6 @@ our @PP_MODULES = qw(
                 );
 
 sub xs_or_pp {
-    use experimental 'smartmatch';
-
     my ($mod, $opts) = @_;
     die "Please specify module\n" unless $mod;
 
@@ -49,17 +48,17 @@ sub xs_or_pp {
     $opts->{debug} //= 0;
     my $debug = $opts->{debug};
 
-    if ($mod ~~ @XS_OR_PP_MODULES) {
+    if (grep { $_ eq $mod } @XS_OR_PP_MODULES) {
         warn "$mod is xs_or_pp (from list)\n" if $debug;
         return "xs_or_pp";
     }
 
-    if ($mod ~~ @XS_MODULES) {
+    if (grep { $_ eq $mod } @XS_MODULES) {
         warn "$mod is xs (from list)\n" if $debug;
         return "xs";
     }
 
-    if ($mod ~~ @PP_MODULES) {
+    if (grep { $_ eq $mod } @PP_MODULES) {
         warn "$mod is pp (from list)\n" if $debug;
         return "pp";
     }
@@ -83,20 +82,17 @@ sub xs_or_pp {
         return "pp";
     }
 
-    $path = module_path(module=>$mod);
     {
-        last unless $path;
-        local $/;
-        my $fh;
-        unless (open $fh, '<', $path) {
-            warn "Can't open module file $path: $!" if $warn;
-            last;
+        my $src;
+        eval { $src = module_source($mod) };
+        if ($@) {
+            warn "Can't check $mod for XS/PP because source can't be retrieved: $@" if $debug;
+            return undef; ## no critic: TestingAndDebugging::ProhibitExplicitReturnUndef
         }
-        while (my $content = <$fh>) {
-            if ($content =~ m!^\s*(use|require) \s+ (DynaLoader|XSLoader)\b!mx) {
-                warn "$mod is XS because the source contains 'use {DynaLoader,XSLoader}' statement\n" if $debug;
-                return "xs";
-            }
+
+        if ($src =~ m!^\s*(use|require) \s+ (DynaLoader|XSLoader)\b!mx) {
+            warn "$mod is XS because the source contains 'use {DynaLoader,XSLoader}' statement\n" if $debug;
+            return "xs";
         }
         warn "$mod is PP because the source code doesn't contain any 'use {DynaLoader,XSLoader}' statement\n" if $debug;
         return "pp";
@@ -122,14 +118,14 @@ sub xs_or_pp {
 sub is_xs {
     my ($mod, $opts) = @_;
     my $res = xs_or_pp($mod, $opts);
-    return undef unless defined($res);
+    return undef unless defined($res); ## no critic: TestingAndDebugging::ProhibitExplicitReturnUndef
     $res eq 'xs' || $res eq 'xs_or_pp';
 }
 
 sub is_pp {
     my ($mod, $opts) = @_;
     my $res = xs_or_pp($mod, $opts);
-    return undef unless defined($res);
+    return undef unless defined($res); ## no critic: TestingAndDebugging::ProhibitExplicitReturnUndef
     $res eq 'pp' || $res eq 'xs_or_pp';
 }
 
@@ -148,7 +144,7 @@ Module::XSOrPP - Determine if an installed module is XS or pure-perl
 
 =head1 VERSION
 
-This document describes version 0.11 of Module::XSOrPP (from Perl distribution Module-XSOrPP), released on 2016-01-15.
+This document describes version 0.120 of Module::XSOrPP (from Perl distribution Module-XSOrPP), released on 2023-07-09.
 
 =head1 SYNOPSIS
 
@@ -231,7 +227,42 @@ Please visit the project's homepage at L<https://metacpan.org/release/Module-XSO
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-SHARYANTO-Module-Util>.
+Source repository is at L<https://github.com/perlancar/perl-Module-XSOrPP>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =head1 BUGS
 
@@ -240,16 +271,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2016 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

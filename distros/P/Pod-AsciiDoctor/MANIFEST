@@ -9,6 +9,7 @@ META.json
 META.yml
 README
 README.adoc
+bin/pod2asciidoctor
 dist.ini
 lib/Pod/AsciiDoctor.pm
 t/00-compile.t

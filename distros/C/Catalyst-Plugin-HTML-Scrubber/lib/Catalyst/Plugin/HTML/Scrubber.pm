@@ -1,5 +1,5 @@
 package Catalyst::Plugin::HTML::Scrubber;
-$Catalyst::Plugin::HTML::Scrubber::VERSION = '0.03';
+$Catalyst::Plugin::HTML::Scrubber::VERSION = '0.07';
 use Moose;
 use namespace::autoclean;
 
@@ -27,7 +27,7 @@ sub setup {
     return $c->maybe::next::method(@_);
 }
 
-sub prepare_parameters {
+sub execute {
     my $c = shift;
 
     $c->maybe::next::method(@_);
@@ -47,33 +47,151 @@ sub prepare_parameters {
 sub html_scrub {
     my ($c, $conf) = @_;
 
-    param:
-    for my $param (keys %{ $c->request->{parameters} }) {
-        #while (my ($param, $value) = each %{ $c->request->{parameters} }) {
-        my $value = \$c->request->{parameters}{$param};
-        if (ref $$value && ref $$value ne 'ARRAY') {
-            next param;
+    # Firstly, if an entry in ignore_urls matches, then we don't want to
+    # scrub anything for this request...
+    return if ($c->_req_path_exempt_from_scrubbing($conf));
+
+    # If there's body_data - for e.g. a POSTed JSON body that was decoded -
+    # then we need to walk through it, scrubbing as appropriate; don't call
+    # body_data unless the content type is one there's a data handler for
+    # though, otherwise we'll trigger an exception (see GH#4)
+    if (exists $c->req->data_handlers->{ $c->req->content_type }) {
+        if (my $body_data = $c->request->body_data) {
+            $c->_scrub_recurse($conf, $c->request->body_data);
         }
-
-        # If we only want to operate on certain params, do that checking
-        # now...
-        if ($conf && $conf->{ignore_params}) {
-            my $ignore_params = $c->config->{scrubber}{ignore_params};
-            if (ref $ignore_params ne 'ARRAY') {
-                $ignore_params = [ $ignore_params ];
-            }
-            for my $ignore_param (@$ignore_params) {
-                if (ref $ignore_param eq 'Regexp') {
-                    next param if $param =~ $ignore_param;
-                } else {
-                    next param if $param eq $ignore_param;
-                }
-            }
-        } 
-
-        # If we're still here, we want to scrub this param's value.
-        $_ = $c->_scrubber->scrub($_) for (ref($$value) ? @{$$value} : $$value);
     }
+
+    # And if Catalyst::Controller::REST is in use so we have $req->data,
+    # then scrub that too
+    if ($c->request->can('data')) {
+        my $data = $c->request->data;
+        if ($data) {
+            $c->_scrub_recurse($conf, $c->request->data);
+        }
+    }
+
+    # Normal query/POST body parameters:
+    $c->_scrub_recurse($conf, $c->request->parameters);
+
+}
+
+# Recursively scrub param values...
+sub _scrub_recurse {
+    my ($c, $conf, $data) = @_;
+
+    # If the thing we've got is a hashref, walk over its keys, checking
+    # whether we should ignore, otherwise, do the needful
+    if (ref $data eq 'HASH') {
+        for my $key (keys %$data) {
+            if (!$c->_should_scrub_param($conf, $key)) {
+                next;
+            }
+
+            # OK, it's fine to fettle with this key - if its value is
+            # a ref, recurse, otherwise, scrub
+            if (my $ref = ref $data->{$key}) {
+                $c->_scrub_recurse($conf, $data->{$key})
+                    if defined $data->{$key};
+            } else {
+                # Alright, non-ref value, so scrub it
+                # FIXME why did we have to have this ref-ref handling fun?
+                #$_ = $c->_scrubber->scrub($_) for (ref($$value) ? @{$$value} : $$value);
+                $data->{$key} = $c->_scrub_value($conf, $data->{$key})
+                    if defined $data->{$key};
+            }
+        }
+    } elsif (ref $data eq 'ARRAY') {
+        for (@$data) {
+            if (ref $_) {
+                $c->_scrub_recurse($conf, $_);
+            } else {
+                $_ = $c->_scrub_value($conf, $_) if defined $_;
+            }
+        }
+    } elsif (ref $data eq 'CODE') {
+        $c->log->debug("Can't scrub a coderef!");
+    } else {
+        # This shouldn't happen, as we should always start with a ref,
+        # and non-ref hash/array values should have been handled above.
+        $c->log->debug("Non-ref to scrub - should this happen?");
+    }
+}
+
+
+# Wrap HTML::Scrubber's scrub() so we can decode HTML entities if needed
+sub _scrub_value {
+    my ($c, $conf, $value) = @_;
+
+    return $value unless defined $value;
+    
+    $value = $c->_scrubber->scrub($value);
+
+    if ($conf->{no_encode_entities}) {
+        $value = HTML::Entities::decode_entities($value);
+    }
+    return $value;
+}
+
+sub _should_scrub_param {
+    my ($c, $conf, $param) = @_;
+    # If we only want to operate on certain params, do that checking
+    # now...
+    if ($conf && $conf->{ignore_params}) {
+        my $ignore_params = $c->config->{scrubber}{ignore_params};
+        if (ref $ignore_params ne 'ARRAY') {
+            $ignore_params = [ $ignore_params ];
+        }
+        for my $ignore_param (@$ignore_params) {
+            if (ref $ignore_param eq 'Regexp') {
+                return if $param =~ $ignore_param;
+            } else {
+                return if $param eq $ignore_param;
+            }
+        }
+    }
+
+    # If we've not bailed above, we didn't match any ignore_params
+    # entries, or didn't have any, so we do want to scrub
+    return 1; 
+}
+
+
+sub _req_path_exempt_from_scrubbing {
+    my ($c, $conf) = @_;
+    return unless exists $conf->{ignore_paths};
+
+    my $req_path = $c->req->path;
+    $req_path = "/$req_path" unless $req_path =~ m{^/};
+    for my $ignore (@{ $conf->{ignore_paths} }) {
+        if (ref $ignore eq 'Regexp') {
+            return 1 if $req_path =~ $ignore;
+        } else {
+            return 1 if $req_path eq $ignore;
+        }
+    }
+}
+
+# Incredibly nasty monkey-patch to rewind filehandle before parsing - see
+# https://github.com/perl-catalyst/catalyst-runtime/pull/186
+# First, get the default handlers hashref:
+my $default_data_handlers = Catalyst->default_data_handlers();
+
+# Wrap the coderef for application/json in one that rewinds the filehandle
+# first:
+my $orig_json_handler = $default_data_handlers->{'application/json'};
+$default_data_handlers->{'application/json'} = sub {
+    $_[0]->seek(0,0); # rewind $fh arg
+    $orig_json_handler->(@_);
+};
+
+
+{
+    # and now replace the original default_data_handlers() with a version that
+    # returns our modified handlers
+    no warnings 'redefine';
+    *Catalyst::default_data_handlers = sub {
+        return $default_data_handlers;
+    };
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -93,7 +211,20 @@ Catalyst::Plugin::HTML::Scrubber - Catalyst plugin for scrubbing/sanitizing inco
     MyApp->config( 
         scrubber => {
             auto => 1,  # automatically run on request
+
+            # Exempt certain parameter names from scrubbing
             ignore_params => [ qr/_html$/, 'article_body' ],
+
+            # Don't scrub at all for certain URL paths:
+            ignore_paths => [
+                '/foo',
+                qr{^/foo/.+},
+            ],
+
+            # HTML::Scrubber will HTML-encode some chars, e.g. angle
+            # brackets.  If you don't want that, enable this setting and
+            # the scrubbed values will be unencoded.
+            no_decode_entities => 0,
             
             # The following are options to HTML::Scrubber
             params => [
@@ -124,9 +255,11 @@ See SYNOPSIS for how to configure the plugin, both with its own configuration
 passing on any options from L<HTML::Scrubber> to control exactly what
 scrubbing happens.
 
-=item prepare_parameters
+=item dispatch
 
-Sanitize HTML tags in all parameters (unless `ignore_params` exempts them).
+Sanitize HTML tags in all parameters (unless `ignore_params` exempts them) -
+this includes normal POST params, and serialised data (e.g. a POSTed JSON body)
+accessed via `$c->req->body_data` or `$c->req->data`.
 
 =back
 

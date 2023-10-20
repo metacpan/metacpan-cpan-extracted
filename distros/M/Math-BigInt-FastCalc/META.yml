@@ -19,10 +19,10 @@ no_index:
     - inc
 requires:
   Carp: '1.22'
-  Math::BigInt: '1.999838'
+  Math::BigInt: '1.99984'
   XSLoader: '0'
   perl: '5.006001'
 resources:
   repository: https://github.com/pjacklam/p5-Math-BigInt-FastCalc.git
-version: '0.5014'
+version: '0.5015'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

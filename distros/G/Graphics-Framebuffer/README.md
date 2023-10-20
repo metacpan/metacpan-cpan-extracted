@@ -1,6 +1,6 @@
 # Graphics-Framebuffer
 
-### Note, this module does NOT work (natively) in Microsoft Windows
+###   Note, this module does NOT work (natively) in Microsoft Windows.  It will only function in "emulation" mode, and you will not see any screen output.  See the documentation on emulation mode for more details.  Use a Virtual Machine like VirtualBox to use on Windows, with a Linux distribution installed.
 
 ## PREREQUISITES
 
@@ -10,7 +10,7 @@ Sometimes you can force a VESA framebuffer console driver to be loaded by adding
 
 ### ATTENTION CPAN TESTERS!  Please make sure the above is noted before testing (and marking a fail)
 
-If you want a more detailed instruction then this document, then read "INSTALL".
+If you want a more detailed instruction than this document, then read "INSTALL".
 
 I highly recommend you install the system (or package) version of the "Imager" library, as it is already pre-compiled with all the needed C libraries for it to work with this module.  In Yum (RedHat) and Aptitude (Debian/Ubuntu) this module is called "libimager-perl" (or "perl-libImager").  However, if you desire to install it yourself, please do it manually, and not via CPAN.  When you do it manually, you can see the missing C libraries it is looking for in the "Makefile.PL" process and stop it there.  You can then install these libraries until it no longer says something is missing.  You see, it just turns off functionality if it can't find a library (when installing from CPAN), instead of stopping.  Libraries usually missing are those for GIF, JPEG, PNG, TrueType and FreeType fonts.  These are necessary not optional, if you wish to be able to work with fonts and images.
 
@@ -46,10 +46,8 @@ To install this module, run the following commands:
 perl Makefile.PL
 make
 make test
-make install
+[sudo] make install
 ```
-
-NOTE:  _The install step may require sudo (root access)._
 
 *Build.PL is not supported by Inline::C, and thus not by this module as well.*
 
@@ -105,11 +103,15 @@ You can also look for information at:
 
 * **Search CPAN** - http://search.cpan.org/dist/Graphics-Framebuffer/
 
-* **YouTube** - https://youtu.be/4Yzs55Wpr7E
+* **YouTube** - https://www.youtube.com/channel/UCxhjUfniyPze02GU4sWBJrw
+
+* **GitHub** - https://github.com/richcsst/Graphics-Framebuffer
+
+* **GitHub Clone** - https://github.com/richcsst/Graphics-Framebuffer.git
 
 ## LICENSE AND COPYRIGHT
 
-Copyright (C) 2013-2023 Richard Kelsch
+Copyright © 2013-2023 Richard Kelsch
 
 This program is free software; you can redistribute it and/or modify it under the terms of either: the GNU General Public License as published by the Free Software Foundation; or the Artistic License.
 

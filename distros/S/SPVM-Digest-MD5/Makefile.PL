@@ -15,7 +15,7 @@ if ($meta) {
 }
 
 my %configure_and_runtime_requires = (
-  'SPVM' => '0.971006',
+  'SPVM' => '0.989047',
 );
 WriteMakefile(
   NAME              => 'SPVM::Digest::MD5',

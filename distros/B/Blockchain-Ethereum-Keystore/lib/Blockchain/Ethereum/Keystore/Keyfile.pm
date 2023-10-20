@@ -1,22 +1,11 @@
 use v5.26;
 use Object::Pad ':experimental(init_expr)';
 
-package Blockchain::Ethereum::Keystore::Keyfile 0.005;
+package Blockchain::Ethereum::Keystore::Keyfile;
 class Blockchain::Ethereum::Keystore::Keyfile;
 
-=encoding utf8
-
-=head1 NAME
-
-Blockchain::Ethereum::Keystore::Keyfile - Ethereum Keyfile abstraction
-
-=head1 SYNOPSIS
-
-Ethereum keyfile abstraction
-
-Currently only supports read and write for keyfile v3
-
-=cut
+our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
+our $VERSION   = '0.009';          # VERSION
 
 use Carp;
 use File::Slurp;
@@ -37,24 +26,6 @@ field $id :reader :writer;
 field $private_key :reader :writer;
 
 field $_json :reader(_json) = JSON::MaybeXS->new(utf8 => 1);
-
-=head2 import_file
-
-Import a v3 keyfile
-
-Usage:
-
-    import_file($file_path) -> $self
-
-=over 4
-
-=item * C<file_path> - string path for the keyfile
-
-=back
-
-self
-
-=cut
 
 method import_file ($file_path, $password) {
 
@@ -101,26 +72,6 @@ method _from_v3 ($object, $password) {
     return $self;
 }
 
-=head2 change_password
-
-Change the imported keyfile password
-
-Usage:
-
-    change_password($old_password, $new_password) -> $self
-
-=over 4
-
-=item * C<old_password> - Current password for the keyfile
-
-=item * C<new_password> - New password to be set
-
-=back
-
-self
-
-=cut
-
 method change_password ($old_password, $new_password) {
 
     return $self->import_key($self->_private_key($old_password), $new_password);
@@ -139,24 +90,6 @@ method _private_key ($password) {
 
     return Blockchain::Ethereum::Keystore::Key->new(private_key => $key);
 }
-
-=head2 import_key
-
-Import a L<Blockchain::Ethereum::keystore::Key>
-
-Usage:
-
-    import_key($keyfile) -> $self
-
-=over 4
-
-=item * C<keyfile> - L<Blockchain::Ethereum::Keystore::Key>
-
-=back
-
-self
-
-=cut
 
 method import_key ($key, $password) {
 
@@ -214,24 +147,6 @@ method _write_to_object {
     return $file;
 }
 
-=head2 write_to_file
-
-Write the imported keyfile/private_key to a keyfile in the file system
-
-Usage:
-
-    write_to_file($file_path) -> $self
-
-=over 4
-
-=item * C<file_path> - file path to save the data
-
-=back
-
-returns 1 upon successfully writing the file or undef if it encountered an error
-
-=cut
-
 method write_to_file ($file_path) {
 
     return write_file($file_path, $self->_json->canonical(1)->pretty->encode($self->_write_to_object));
@@ -241,20 +156,91 @@ method write_to_file ($file_path) {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Blockchain::Ethereum::Keystore::Keyfile
+
+=head1 VERSION
+
+version 0.009
+
+=head1 SYNOPSIS
+
+...
+
+=head1 OVERVIEW
+
+This is an Ethereum keyfile abstraction that provides a way of change/read the
+keyfile information.
+
+Currently only supports version 3 keyfiles.
+
+=head1 METHODS
+
+=head2 import_file
+
+Import a v3 keyfile
+
+=over 4
+
+=item * C<file_path> - string path for the keyfile
+
+=back
+
+self
+
+=head2 change_password
+
+Change the imported keyfile password
+
+=over 4
+
+=item * C<old_password> - Current password for the keyfile
+
+=item * C<new_password> - New password to be set
+
+=back
+
+self
+
+=head2 import_key
+
+Import a L<Blockchain::Ethereum::keystore::Key>
+
+=over 4
+
+=item * C<keyfile> - L<Blockchain::Ethereum::Keystore::Key>
+
+=back
+
+self
+
+=head2 write_to_file
+
+Write the imported keyfile/private_key to a keyfile in the file system
+
+=over 4
+
+=item * C<file_path> - file path to save the data
+
+=back
+
+returns 1 upon successfully writing the file or undef if it encountered an error
+
 =head1 AUTHOR
 
-Reginaldo Costa, C<< <refeco at cpan.org> >>
+Reginaldo Costa <refeco@cpan.org>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to L<https://github.com/refeco/perl-ethereum-keystore>
-
-=head1 LICENSE AND COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2023 by REFECO.
 
 This is free software, licensed under:
 
-  The MIT License
+  The MIT (X11) License
 
 =cut

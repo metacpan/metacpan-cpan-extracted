@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.881
+version 3.901
 
 =head1 OVERVIEW
 
@@ -26,11 +26,6 @@ Currently, the Lab::Measurement API consists of:
 
 L</Lab::Moose>, the recommended, current API, based on B<Modern Perl>
 techniques
-
-=item *
-
-the historical API, consisting of the Lab::Instrument virtual
-instruments and the high-level Lab::XPRESS interface
 
 =back
 

@@ -2,10 +2,11 @@ package Data::Record::Serialize::Error;
 
 # ABSTRACT: Error objects
 
+use v5.12;
 use strict;
 use warnings;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use Exporter::Shiny qw( error );
 
@@ -63,18 +64,18 @@ sub _resolve_class {
     my ( $class, $caller, @prefix ) = @_;
 
     return join(
-        '::', @prefix,
+        q{::}, @prefix,
         do {
             if ( $class =~ /^::(.*)/ ) {
                 $1;
             }
             elsif ( $caller =~ /Data::Record::Serialize::(.*)/ ) {
-                $1 . '::' . $class;
+                $1 . q{::} . $class;
             }
             else {
                 $class;
             }
-          }
+        },
     );
 }
 
@@ -102,7 +103,7 @@ Data::Record::Serialize::Error - Error objects
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 
@@ -172,7 +173,7 @@ For example, in
 C<::foo> will be converted to C<Data::Record::Serialize::Error::foo>
 and C<foo> to C<Data::Record::Serialize::Bar::Error::foo>.
 
-=head1 ATTRIBUTES
+=head1 OBJECT ATTRIBUTES
 
 =head2 msg
 
@@ -193,11 +194,13 @@ name; see L</Error Class Names>.  The remaining parameters are passed
 directly to the L<failures> throw method (see L<failures/Throwing
 failures>).
 
+=head1 INTERNALS
+
 =head1 SUPPORT
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>
 
 =head2 Source
 

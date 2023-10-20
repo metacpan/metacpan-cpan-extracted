@@ -1,0 +1,16 @@
+History for the Lab-Measurement-Legacy Perl distribution
+
+3.904 2023-10-19
+  * Bump module version numbers
+
+3.903 2023-10-19
+  * Add several more modules
+
+3.902 2023-10-17
+  * More fixes in POD files
+
+3.901 2023-10-14
+  * Fix POD documentation
+
+3.900 2023-10-14
+  * First release

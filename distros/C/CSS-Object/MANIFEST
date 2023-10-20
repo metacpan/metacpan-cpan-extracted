@@ -1,4 +1,4 @@
-Changes
+CHANGES
 CONTRIBUTING.md
 lib/CSS/Object.pm
 lib/CSS/Object/Builder.pm
@@ -35,3 +35,4 @@ t/css_simple
 t/css_tiny
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -4,7 +4,7 @@
       "plainbanana <plainbanana@mustardon.tokyo>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.21",
+   "generated_by" : "Minilla/v3.1.22",
    "license" : [
       "perl_5"
    ],
@@ -29,7 +29,6 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Devel::CheckBin" : "0",
             "File::Which" : "0",
             "File::chdir" : "0",
             "Module::Build" : "0.4005",
@@ -65,7 +64,7 @@
    "provides" : {
       "Redis::Cluster::Fast" : {
          "file" : "lib/Redis/Cluster/Fast.pm",
-         "version" : "0.088"
+         "version" : "0.089"
       }
    },
    "release_status" : "stable",
@@ -80,7 +79,10 @@
          "web" : "https://github.com/plainbanana/Redis-Cluster-Fast"
       }
    },
-   "version" : "0.088",
-   "x_serialization_backend" : "JSON::PP version 4.06",
+   "version" : "0.089",
+   "x_contributors" : [
+      "Masahiro Honma <hiratara@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
    "x_static_install" : 0
 }

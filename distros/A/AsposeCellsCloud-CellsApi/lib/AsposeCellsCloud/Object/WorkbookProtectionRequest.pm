@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'protection_type' => {
      	datatype => 'string',
      	base_name => 'ProtectionType',
-     	description => 'Protection type. Can be ALL, CONTENTS, NONE, OBJECTS, SCENARIOS, STRUCTURE, WINDOWS  ',
+     	description => 'Protection type. Can be ALL, CONTENTS, NONE, OBJECTS, SCENARIOS, STRUCTURE, WINDOWS',
      	format => '',
      	read_only => '',
      		},

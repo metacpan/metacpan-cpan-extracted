@@ -1,7 +1,7 @@
 ## no critic (RequireStrictDeclarations ProhibitUselessNoCritic)
 package App::Oozie::Constants;
-$App::Oozie::Constants::VERSION = '0.006';
-use 5.010;
+$App::Oozie::Constants::VERSION = '0.010';
+use 5.014;
 use strict;
 use warnings;
 use parent qw( Exporter );
@@ -105,7 +105,7 @@ App::Oozie::Constants
 
 =head1 VERSION
 
-version 0.006
+version 0.010
 
 =head1 SYNOPSIS
 

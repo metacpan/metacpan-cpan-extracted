@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Getopt::Long with Class - ~/lib/Getopt/Class.pm
-## Version v0.104.0
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.104.2
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/04/25
-## Modified 2023/05/24
+## Modified 2023/10/11
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -27,7 +27,7 @@ BEGIN
     use Module::Generic::Scalar;
     use Nice::Try;
     use Scalar::Util;
-    our $VERSION = 'v0.104.0';
+    our $VERSION = 'v0.104.2';
 };
 
 use strict;
@@ -655,6 +655,8 @@ sub new
     return( $self );
 }
 
+sub debug { return( shift->_set_get_number( 'debug', @_ ) ); }
+
 sub init
 {
     my $self = shift( @_ );
@@ -688,6 +690,8 @@ sub init
     $self->{warnings} = $should_display_warning;
     return( $self );
 }
+
+sub verbose { return( shift->_set_get_number( 'verbose', @_ ) ); }
 
 AUTOLOAD
 {
@@ -999,7 +1003,7 @@ sub STORE
     my $aliases = $self->{aliases};
     my( $pack, $file, $line ) = caller;
     my( $key, $val ) = @_;
-    # $self->message_colour( 3, "Called from line $line in file \"$file\" for property \"<green>$key</>\" with reference (<black on white>", ref( $val ), "</>) and value \"<red>$val</>\">" );
+    $self->message_colour( 3, "Called from line $line in file \"$file\" for property \"<green>$key</>\" with reference (<black on white>", ref( $val ), "</>) and value \"<red>" . ( $val // 'undef' ) . "</>\">" );
     my $dict = $self->{dict};
     my $enabled = $self->{enable};
     my $fallback = sub
@@ -1024,7 +1028,7 @@ sub STORE
             CORE::warn( "No alias property found. This should not happen.\n" ) if( $self->{warnings} );
             return( $fallback->( $key, $val ) );
         };
-        $self->messagef_colour( 3, 'Found alias "{green}' . $alias . '{/}" with %d elements: {green}"%s"{/}', scalar( @$alias ), $alias->join( "', '" ) );
+        # $self->messagef_colour( 3, 'Found alias "{green}' . $alias . '{/}" with %d elements: {green}"%s"{/}', scalar( @$alias ), $alias->join( "', '" ) );
         $self->messagef_colour( 3, "Found alias '<green>$alias</>' with %d elements: <green>'%s'</>", scalar( @$alias ), $alias->join( "', '" ) );
         if( Scalar::Util::reftype( $alias ) ne 'ARRAY' )
         {
@@ -1133,7 +1137,7 @@ Getopt::Class - Extended dictionary version of Getopt::Long
 
 =head1 VERSION
 
-    v0.104.0
+    v0.104.2
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2018-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2018-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.35; # role :compat(invokable)
+use warnings;
+use Object::Pad 0.800;
 
-package Device::Chip::ProtocolBase::SPI 0.25;
+package Device::Chip::ProtocolBase::SPI 0.26;
 role Device::Chip::ProtocolBase::SPI :compat(invokable);
 
 =head1 NAME

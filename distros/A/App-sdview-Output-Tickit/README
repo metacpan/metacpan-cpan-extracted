@@ -36,6 +36,8 @@ DESCRIPTION
 
       * F9 - open the outline view popup. See Below.
 
+      * / - start a regexp search in the document body. See Below.
+
       * q - exit
 
  Outline View
@@ -50,9 +52,18 @@ DESCRIPTION
     headings matching the typed text. Pressing the <Enter> key will jump
     directly to the first highlighted heading, again dismissing the view.
 
+ Regexp Searching
+
+    Typing into the main search box enters text that forms a (perl) regexp
+    pattern to be tested against the body text of the document. Each
+    paragraph is tested individually and all matches are highlighted.
+    Pressing <Enter> will select the first match. Use the <n> and <p> keys
+    to jump between them. Press <Escape> to clear the highlights. Press
+    <Alt-i> to toggle case-insensitivity.
+
 TODO
 
-      * Search behaviours
+      * Line-editing and history in the / search entry box.
 
       * Follow links, possibly internally implementing a history mechanism
       or multiple pages.

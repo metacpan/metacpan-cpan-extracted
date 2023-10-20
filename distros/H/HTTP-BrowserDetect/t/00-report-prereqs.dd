@@ -50,7 +50,6 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'FindBin' => '0',
-                                   'Hash::Merge' => '0',
                                    'JSON::PP' => '4.04',
                                    'List::Util' => '1.49',
                                    'Path::Tiny' => '0',

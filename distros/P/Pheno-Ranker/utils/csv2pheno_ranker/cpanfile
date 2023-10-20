@@ -1,0 +1,7 @@
+# No specific version needed
+
+requires 'JSON::XS';
+requires 'Path::Tiny';
+requires 'File::Basename';
+requires 'YAML::XS';
+requires 'Text::CSV_XS';

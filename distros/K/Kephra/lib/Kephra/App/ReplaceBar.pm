@@ -45,7 +45,7 @@ sub new {
     Wx::Event::EVT_BUTTON( $self, $self->{'rnext'},  sub { $self->revert_next  });
     Wx::Event::EVT_BUTTON( $self, $self->{'close'},  sub { $self->close        });
     # Wx::Event::EVT_TEXT_ENTER( $self, $self->{'text'}, sub {  });
-    
+
     Wx::Event::EVT_KEY_DOWN( $self->{'text'}, sub {
         my ($ed, $event) = @_;
         my $code = $event->GetKeyCode;  # my $mod = $event->GetModifiers();
@@ -64,7 +64,7 @@ sub new {
         elsif( $event->ControlDown and $code == ord('R'))           { $self->editor->SetFocus  }
         else { $event->Skip }
     });
-    
+
     my $attr = &Wx::wxGROW | &Wx::wxTOP|&Wx::wxDOWN;
     my $sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
     $sizer->AddSpacer( 10);
@@ -100,8 +100,9 @@ sub new {
     $self;
 }
 
-sub editor     { $_[0]->GetParent->{'ed'} }
-sub search_bar { $_[0]->GetParent->{'sb'} }
+sub editor     { $_[0]->GetParent->{'editor'} }
+sub search_bar { $_[0]->GetParent->{'searchbar'} }
+sub replace_term { $_[0]->{'text'}->GetValue }
 
 sub show {
     my ($self, $visible) = @_;
@@ -111,7 +112,7 @@ sub show {
 
 sub enter {
     my ($self) = @_;
-    $self->search_bar->show(1); 
+    $self->search_bar->show(1);
     $self->show(1);
     my $sel = $self->editor->GetSelectedText;
     $self->{'text'}->SetValue( $sel ) if $sel;
@@ -132,11 +133,11 @@ sub find_prev {
     my $wrap = $self->search_bar->{'wrap'}->GetValue;
     $ed->SetSelection( $start, $start );
     $ed->SearchAnchor;
-    my $pos = $ed->SearchPrev( 0,  $self->{'text'}->GetValue );
+    my $pos = $ed->SearchPrev( 0,  $self->replace_term );
     if ($pos == -1){
         $ed->SetSelection( $ed->GetLength , $ed->GetLength  );
         $ed->SearchAnchor();
-        $pos = $ed->SearchPrev( 0,  $self->{'text'}->GetValue ) if $wrap;
+        $pos = $ed->SearchPrev( 0,  $self->replace_term ) if $wrap;
         $ed->SetSelection( $start, $end ) if $pos == -1;
     }
     $ed->EnsureCaretVisible;
@@ -148,11 +149,11 @@ sub find_next {
     my $wrap = $self->search_bar->{'wrap'}->GetValue;
     $ed->SetSelection( $end, $end );
     $ed->SearchAnchor;
-    my $pos = $ed->SearchNext( 0,  $self->{'text'}->GetValue );
+    my $pos = $ed->SearchNext( 0,  $self->replace_term );
     if ($pos == -1){
         $ed->SetSelection( 0, 0 );
         $ed->SearchAnchor;
-        $pos = $ed->SearchNext( 0,  $self->{'text'}->GetValue ) if $wrap;
+        $pos = $ed->SearchNext( 0,  $self->replace_term ) if $wrap;
         $ed->SetSelection( $start, $end ) if $pos == -1;
     }
     $ed->EnsureCaretVisible;
@@ -160,12 +161,12 @@ sub find_next {
 
 sub revert_prev {
     my ($self) = @_;
-    $self->editor->ReplaceSelection( $self->search_bar->{'text'}->GetValue );
+    $self->editor->ReplaceSelection( $self->search_bar->search_term );
     $self->find_prev;
 }
 sub revert_next {
     my ($self) = @_;
-    $self->editor->ReplaceSelection( $self->search_bar->{'text'}->GetValue );
+    $self->editor->ReplaceSelection( $self->search_bar->search_term );
     $self->find_next;
 }
 
@@ -184,14 +185,14 @@ sub replace_next {
     $ed->SetSelection( $start, $start ) unless $self->search_bar->_find_next;
 }
 
-sub replace { $_[0]->editor->ReplaceSelection( $_[0]->{'text'}->GetValue ) }
+sub replace { $_[0]->editor->ReplaceSelection( $_[0]->replace_term ) }
 
-sub replace_once { 
+sub replace_once {
     my ($self) = @_;
     my $ed = $self->editor;
     my ($start, $end) = $ed->GetSelection;
     $self->replace;
-    $ed->SetSelection( $start, $start + length $self->{'text'}->GetValue);
+    $ed->SetSelection( $start, $start + length $self->replace_term);
 }
 
 sub replace_all {

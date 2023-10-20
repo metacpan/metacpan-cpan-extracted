@@ -1,0 +1,60 @@
+{
+   "abstract" : "Japan Folklore Object Class",
+   "author" : "MOMOTARO",
+   "authorized" : true,
+   "binary" : false,
+   "date" : "2023-07-29T05:10:12",
+   "deprecated" : false,
+   "description" : "Folklore::Japan is a totally fictious perl 5 module designed to serve as an example for the MetaCPAN API.",
+   "directory" : false,
+   "dist_fav_count" : 1,
+   "distribution" : "Folklore::Japan",
+   "documentation" : "Folklore::Japan",
+   "download_url" : "https://cpan.metacpan.org/authors/id/M/MO/MOMOTARO/Folklore-Japan-v1.2.3.tar.gz",
+   "id" : "l0tsOf1192fuN100",
+   "indexed" : true,
+   "level" : 1,
+   "maturity" : "released",
+   "mime" : "text/x-script.perl-module",
+   "module" : [
+      {
+         "associated_pod" : "MOMOTARO/Folklore-Japan-v1.2.3/lib/Folklore/Japan.pm",
+         "authorized" : true,
+         "indexed" : true,
+         "name" : "Folklore::Japan",
+         "version" : "v1.2.3",
+         "version_numified" : 1.002003
+      }
+   ],
+   "name" : "Japan.pm",
+   "path" : "lib/Folklore/Japan.pm",
+   "pod" : "NAME Folklore::Japan - Japan Folklore Object Class VERSION version v1.2.3 SYNOPSIS use Folklore::Japan; my $fun = Folklore::Japan->new; DESCRIPTION This is an imaginary class object to Japan folklore to only serve as dummy example AUTHOR Momo Taro <momo.taro@example.jp> COPYRIGHT AND LICENSE This software is copyright (c) 2023 by Okayama, Inc.. This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.",
+   "pod_lines" : [
+      [
+         1192,
+         1868
+      ]
+   ],
+   "release" : "Folklore-Japan-v1.2.3",
+   "sloc" : 202,
+   "slop" : 637,
+   "stat" : {
+      "gid" : 12345,
+      "mode" : 33188,
+      "mtime" : 1690618397,
+      "size" : 10240,
+      "uid" : 16790
+   },
+   "status" : "latest",
+   "suggest" : {
+      "weight" : 985,
+      "payload" : {
+         "doc_name" : "Folklore::Japan"
+      },
+      "input" : [
+         "Folklore::Japan"
+      ]
+   },
+   "version" : "v1.2.3",
+   "version_numified" : "1.002003"
+}

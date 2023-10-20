@@ -1,0 +1,163 @@
+% if ( RT::Handle::cmp_version($RT::VERSION, '5.0.0') >= 0 ) {
+% # RT 5 version
+<style>
+tr.in-preview td { background: #ffb }
+div.ticket-list-with-previewinsearch table.ticket-list { table-layout:fixed; }
+</style>
+<script type="text/javascript">
+var ticket_list = jQuery('table.ticket-list');
+
+% if ( RT->Config->Get('SideBySidePreview') ) {
+ticket_list.wrap( "<div class='row m-0'><div class='ticket-list-with-previewinsearch col-6'></div></div>" );
+jQuery('div.ticket-list-with-previewinsearch').after( "<div id='ticket-preview-container' class='col-6'><p>foobar</p></div>" );
+% } else {
+ticket_list.after( "<div class='row m-0'><div id='ticket-preview-container' class='col-12'><p>foobar</p></div></div>" );
+% }
+
+var get_ticket_row = function (from) {
+    var row = jQuery(from).closest('tr');
+    var even_or_odd = row.hasClass('oddline')? 'evenline': 'oddline';
+    row = row.add(
+        row.prevUntil( '.' + even_or_odd, '[class*="line"]' )
+    ).add(
+        row.nextUntil( '.' + even_or_odd, '[class*="line"]' )
+    );
+    return row;
+};
+
+var do_preview = function (row) {
+    var tid = row.find('> td a[href*="Display.html?id="]').first().attr('href').match(/Display\.html\?id=(\d+)/)[1];
+    var url = <% RT->Config->Get('WebPath') |n,j %> +'/Helpers/TicketPreview?id='+tid;
+    row.closest('table').children('tbody').children('tr').removeClass('in-preview');
+    row.addClass('in-preview');
+    jQuery('#ticket-preview-container').text(<% loc('Loading...') |n,j %>).load( url );
+};
+
+jQuery(document).ready(function() {
+    do_preview( get_ticket_row( jQuery('table.ticket-list tbody tr td').first() ) );
+
+    // if RT 5.0.4 or newer need to adjust calculation of max-height of search filter modal
+    if ( jQuery(".search-filter") ) {
+        jQuery(".search-filter").click(function(ev){
+            ev.preventDefault();
+            var modal = jQuery(this).closest('th').find('.modal.search-results-filter');
+            modal.css('top', jQuery(this).offset().top);
+            var left = jQuery(this).offset().left;
+            // 10 is extra space to move modal a bit away from edge
+            if ( left + modal.width() + 10 > jQuery('body').width() ) {
+                left = jQuery('body').width() - modal.width() - 10;
+            }
+            modal.css('left', left);
+            modal.find('div.modal-content').css('max-height', jQuery(window).height() - jQuery(this).offset().top - 160 );
+            modal.modal('show');
+        });
+    }
+});
+
+jQuery(function(){
+    jQuery('table.collection-as-table > tbody > tr > td').on('click', function (e) {
+        if (e.target.tagName != 'TD')
+            return;
+
+        var row = get_ticket_row(e.target);
+        do_preview(row);
+    });
+});
+</script>
+% } elsif ( RT::Handle::cmp_version($RT::VERSION, '5.0.0') < 0 ) {
+% # RT 4 version
+<style>
+tr.in-preview td { background: #ffb }
+% if ( RT->Config->Get('SideBySidePreview') ) {
+table.ticket-list, .ticket-list-with-previewinsearch {
+    position: fixed;
+    width: 42%;
+    top: 10em;
+    bottom: 6em;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 11;
+}
+.refresh-with-previewinsearch {
+    position: fixed;
+    bottom: 0;
+}
+.paging-with-previewinsearch {
+    position: fixed;
+    bottom: 2.5em;
+}
+#ticket-preview-container {
+    position: fixed;
+    top: 10em;
+% if ( $web_style =~ /web2|ballard/ ) {
+    left: 54%;
+% }
+% else {
+    left: 47%;
+% }
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    background: inherit;
+    z-index: 10;
+    display: none;
+}
+% }
+</style>
+<div id="ticket-preview-container" ></div>
+<script type="text/javascript">
+var get_ticket_row = function (from) {
+    var row = jQuery(from).closest('tr');
+    var even_or_odd = row.hasClass('oddline')? 'evenline': 'oddline';
+    row = row.add(row.prevUntil('.'+even_or_odd, '[class*="line"]'))
+        .add(row.nextUntil('.'+even_or_odd, '[class*="line"]'));
+    return row;
+};
+var do_preview = function(row) {
+    var tid = row.find('> td a[href*="Display.html?id="]')
+        .first().attr('href').match(/Display\.html\?id=(\d+)/)[1];
+    var url = <% RT->Config->Get('WebPath') |n,j %> +'/Helpers/TicketPreview?id='+tid;
+    row.closest('table').children('tbody').children('tr').removeClass('in-preview');
+    row.addClass('in-preview');
+    jQuery('#ticket-preview-container').text(<% loc('Loading...') |n,j %>).load( url );
+% if ( RT->Config->Get('SideBySidePreview') ) {
+    var ticket_list = jQuery('table.ticket-list');
+    ticket_list.wrap( "<div class='ticket-list-with-previewinsearch'></div>" );
+    ticket_list.removeClass('ticket-list');
+    jQuery('#ticket-preview-container').show();
+    jQuery('div.refresh').addClass('refresh-with-previewinsearch');
+    jQuery('div.ticket-list-with-previewinsearch').animate({
+        scrollTop: '+='+(jQuery("tr.in-preview").offset().top-jQuery('div.ticket-list-with-previewinsearch').offset().top)
+    }, 1);
+    jQuery('div.paging').addClass('paging-with-previewinsearch');
+% } else {
+    jQuery('html, body').animate({
+        scrollTop: '+='+(jQuery("#ticket-preview-container").offset().top-jQuery(window).scrollTop())
+    }, 1000);
+% }
+};
+
+% if ( RT->Config->Get('SideBySidePreview') ) {
+jQuery(document).ready(function() {
+    do_preview( get_ticket_row( jQuery('table.ticket-list tbody tr td').first() ) );
+});
+% }
+
+jQuery(function(){
+    jQuery('table.collection-as-table > tbody > tr > td').on('click', function (e) {
+        if (e.target.tagName != 'TD')
+            return;
+
+        var row = get_ticket_row(e.target);
+        do_preview(row);
+    });
+});
+</script>
+% }
+<%ARGS>
+</%ARGS>
+<%INIT>
+my $web_style = $session{'CurrentUser'}
+    ? $session{'CurrentUser'}->Stylesheet
+    : RT->Config->Get('WebDefaultStylesheet');
+</%INIT>

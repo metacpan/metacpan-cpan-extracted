@@ -10,6 +10,7 @@ WriteMakefile(
     # VERSION     => '2.0.2',
     MIN_PERL_VERSION => '5.010',
     test             => { TESTS => 't/*.t' },
+    EXE_FILES        => ['bin/run_subprocess.pl'],
     BUILD_REQUIRES   => {
         'ExtUtils::MakeMaker' => '6.46',
     },

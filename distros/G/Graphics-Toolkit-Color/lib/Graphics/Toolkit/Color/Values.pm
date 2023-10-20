@@ -74,34 +74,30 @@ sub blend { # _c1 _c2 -- +factor ~space --> _
 
 ########################################################################
 
-sub distance { # _c1 _c2 -- ~space ~metric @range --> +
-    my ($self, $c2, $space_name, $metric, $range) = @_;
-#say "distance ";
+sub distance { # _c1 _c2 -- ~space ~select @range --> +
+    my ($self, $c2, $space_name, $select, $range) = @_;
     return carp "need value object as second argument" unless ref $c2 eq __PACKAGE__;
     $space_name //= 'HSL';
     Graphics::Toolkit::Color::Space::Hub::check_space_name( $space_name ) and return;
     my $space = Graphics::Toolkit::Color::Space::Hub::get_space( $space_name );
-    $metric = $space->basis->key_shortcut($metric) if $space->basis->is_key( $metric );
+    $select = $space->basis->key_shortcut($select) if $space->basis->is_key( $select );
     my @values1 = $self->get( $space_name, 'list', 'normal' );
     my @values2 = $c2->get( $space_name, 'list', 'normal' );
-#say "values: @values1   @values2 $space_name";
     return unless defined $values1[0] and defined $values2[0];
     my @delta = $space->delta( \@values1, \@values2 );
-#say "normalized:  @delta $metric" if defined $metric;
 
     @delta = $space->denormalize_range( \@delta, $range);
-#say "denormal :  @delta " if defined $metric;
     return unless defined $delta[0] and @delta == $space->dimensions;
 
-    # grep values for individual metric / subspace distance
-    if (defined $metric and $metric){
-        my @components = split( '', $metric );
-        my $pos = $space->basis->key_pos( $metric );
+    # grep values for individual select / subspace distance
+    if (defined $select and $select){
+        my @components = split( '', $select );
+        my $pos = $space->basis->key_pos( $select );
         @components = defined( $pos )
                     ? ($pos)
                     : (map  { $space->basis->shortcut_pos($_) }
                        grep { defined $space->basis->shortcut_pos($_) } @components);
-        return - carp "called 'distance' for metric $metric that does not fit color space $space_name!" unless @components;
+        return - carp "called 'distance' for select $select that does not fit color space $space_name!" unless @components;
         @delta = map { $delta [$_] } @components;
     }
 

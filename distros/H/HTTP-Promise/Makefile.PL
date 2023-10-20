@@ -2,6 +2,18 @@ use ExtUtils::MakeMaker;
 use strict;
 use warnings;
 
+sub MY::distsignature
+{
+    return << 'EOT';
+distsignature : distmeta
+	$(NOECHO) ./dev/cleanup.pl
+	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) }' \
+	  -e '	  or die "Could not add SIGNATURE to MANIFEST: $${'\''@'\''}"' --
+	$(NOECHO) cd $(DISTVNAME) && $(TOUCH) SIGNATURE
+	cd $(DISTVNAME) && cpansign -s
+EOT
+}
+
 my %WriteMakefileArgs = (
     NAME                => 'HTTP::Promise',
     VERSION_FROM        => 'lib/HTTP/Promise.pm',
@@ -30,8 +42,8 @@ my %WriteMakefileArgs = (
         'IO::File'              => 0,
         'JSON'                  => '4.10',
         'JSON::XS'              => '4.03',
-        'Module::Generic'       => 'v0.31.1',
-        'Nice::Try'             => 'v1.3.4',
+        'Module::Generic'       => 'v0.32.4',
+        # 'Nice::Try'             => 'v1.3.4',
         'Promise::Me'           => 'v0.4.7',
         'Regexp::Common'        => '2017060201',
         'Scalar::Util'          => '1.63',
@@ -39,7 +51,7 @@ my %WriteMakefileArgs = (
         # URI::Fast is great, but only supports simple protocols
         # 'URI::Fast'             => '0.55',
         'Symbol'                => 0,
-        'Time::HiRes'           => '1.9770',
+        'Time::HiRes'           => '1.9764',
         'URI'                   => '5.21',
         'URI::Encode::XS'       => '0.11',
         'URI::Escape::XS'       => '0.14',
@@ -61,7 +73,8 @@ my %WriteMakefileArgs = (
     LICENSE             => 'perl_5',
     MIN_PERL_VERSION    => 'v5.26.1',
     (MM->can('signature_target') ? (SIGN => 1) : ()),
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp', PREOP => './dev/cleanup.pl' },
+    # dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp', PREOP => './dev/cleanup.pl' },
+    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp' },
     clean               => { FILES => 'HTTP-Promise-*' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },

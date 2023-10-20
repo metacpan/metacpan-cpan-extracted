@@ -5,10 +5,9 @@ use t_Common qw/oops/; # strict, warnings, Carp, Data::Dumper::Interp, etc.
 use t_TestCommon ':silent',
                  qw/bug tmpcopy_if_writeable $debug/;
 
-#use Mydump qw/mydump/;
-# TO SEE OFFSETS, ETC. run t/dumpskel.pl 1 or 2 or 5
-#   or call  say mydump($body,{kind => 1})
-#   or call  say fmt_tree($body)
+# TO SEE OFFSETS, ETC.
+#    run bin/dumpodf -o showoff=1 tlib/Skel.odt
+# or call  say fmt_tree($body)
 
 use ODF::lpOD;
 use ODF::lpOD_Helper qw/:DEFAULT PARA_FILTER/;
@@ -23,7 +22,7 @@ my $leaf0 = $body->next_elt($body, '#TEXT') // oops;
 
 my $alltext = $body->Hget_text();
 my @all_paras = $body->descendants(qr/^text:[ph]$/);
-my @para_text_lengths = map{ my $t = $_->get_text(); 
+my @para_text_lengths = map{ my $t = $_->get_text();
                              defined($t) ? length($t) : undef } @all_paras;
 my @paras_with_text = @all_paras[ grep{defined $para_text_lengths[$_]}
                                   0..$#all_paras ];
@@ -47,7 +46,7 @@ foreach ([$body,"body"], [$para0,"para0"], [$leaf0,"leaf0"]) {
         field voffset => 0;
         field vend    => 5;
         etc();
-      }, 
+      },
       "${context_desc}->Hsearch($expr_desc) matches start"
     );
   }
@@ -64,7 +63,7 @@ foreach ([$body,"body"], [$para0,"para0"], [$leaf0,"leaf0"]) {
             field offset  => 6; field end  => 11;
             field voffset => 6; field vend => 11;
             etc();
-          }, 
+          },
           "${context_desc}->Hsearch($expr_desc) matches middle"
       );
     } else {
@@ -80,17 +79,17 @@ is( $body->Hsearch(qr/Front Stuff /s),
       field offset  => 0; field end  => 12;
       field voffset => 0; field vend => 12;
       etc();
-    }, 
+    },
     "Hsearch match entire first segment"
 );
-      
+
 is( $body->Hsearch(qr/Front Stuff o/s, debug => 0),
     hash {
       field segments => array{ item 2 => DNE };
       field offset  => 0; field end  => 1;
       field voffset => 0; field vend => 13;
       etc();
-    }, 
+    },
     "Hsearch match first segment + start of second"
 );
 
@@ -100,30 +99,30 @@ is( $body->Hsearch(qr/utside/s),
       field offset  => 1;  field end  => 7;
       field voffset => 13; field vend => 19;
       etc();
-    }, 
+    },
     "Hsearch match middle of second segment"
 );
-      
+
 is( $body->Hsearch(qr/outside the 2-column Section/s),
     hash {
       field segments => array{ item 1 => DNE };
       field offset  => 0;  field end  => 28;
       field voffset => 12; field vend => 40;
       etc();
-    }, 
+    },
     "Hsearch match entire second segment",
 );
-      
+
 is( $body->Hsearch(qr/^outside/s, debug => 0), undef,
     "Hsearch ^anchored match start of second seg fails");
-      
+
 is( $body->Hsearch('o'),
     hash {
       field segments => array{ item 1 => DNE };
       field offset  => 2; field end  => 3;
       field voffset => 2; field vend => 3;
       etc();
-    }, 
+    },
     "Hsearch first 'o' (string)",
 );
 
@@ -133,40 +132,40 @@ is( $body->Hsearch(qr/o/),
       field offset  => 2; field end  => 3;
       field voffset => 2; field vend => 3;
       etc();
-    }, 
+    },
     "Hsearch first 'o' (regex)",
 );
-      
+
 is( $body->Hsearch(qr/o.*o/),
     hash {
       field segments => array{ item 2 => DNE };
       field offset  => 2; field end  => 27;
       field voffset => 2; field vend => 39;
       etc();
-    }, 
+    },
     "Hsearch longest match across mult segs ('o.*o')",
 );
-      
+
 is( $body->Hsearch(qr/^Lorem.*another/s, debug => 0),
     hash {
       field segments => array{ item 11 => DNE };
       field offset  => 0;  field end  => 7;
       field voffset => 76; field vend => 168;
       etc();
-    }, 
+    },
     "Hsearch match past one newline",
 );
-      
+
 is( $body->Hsearch(qr/^Lorem.*laborum\./s),
     hash {
       field segments => array{ item 33 => DNE };
       field offset  => 0;  field end  => 305;
       field voffset => 76; field vend => 708;
       etc();
-    }, 
+    },
     "Hsearch match past multiple newlines",
 );
-      
+
 
 #####################
 
@@ -176,7 +175,7 @@ is( $body->Hsearch(qr/5 consecutive-spaces:/),
       field offset  => 0;  field end  => 19;
       field voffset => 91; field vend => 112;
       etc();
-    }, 
+    },
     "Hsearch until just b4 space b4 multi-space",
 );
 is( $body->Hsearch(qr/5 consecutive-spaces: /),
@@ -185,7 +184,7 @@ is( $body->Hsearch(qr/5 consecutive-spaces: /),
       field offset  => 0;  field end  => 20;
       field voffset => 91; field vend => 113;
       etc();
-    }, 
+    },
     "Hsearch until just b4 multi-space",
 );
 for my $n (1..6) {
@@ -197,7 +196,7 @@ for my $n (1..6) {
           field offset  => 0;  field end  => $n;
           field voffset => 91; field vend => 113+$n;
           etc();
-        }, 
+        },
         "Hsearch including $n of multi-space",
     );
   } else {
@@ -214,11 +213,11 @@ for my $n (1..6) {
       hash {
         field match => "\t"; field offset=>0; field end=>1;
         etc();
-      }, 
+      },
       "Hsearch for tab alone",
   );
   is( $body->Hsearch(qr/tab here:\t/),
-      hash{ 
+      hash{
         field match => "tab here:\t";
         field offset=>0; field end=>1;
         field voffset => $tab_match->{voffset}-9;
@@ -229,7 +228,7 @@ for my $n (1..6) {
   );
 
   is( $body->Hsearch(qr/tab here:\t:there/),
-      hash{ 
+      hash{
         field match => "tab here:\t:there";
         field offset=>0; field end=>6;
         field voffset => $tab_match->{voffset}-9;
@@ -240,7 +239,7 @@ for my $n (1..6) {
   );
 
   is( $body->Hsearch(qr/\t:there/),
-      hash{ 
+      hash{
         field match => "\t:there";
         field offset=>0; field end=>6;
         field voffset => $tab_match->{voffset};
@@ -254,14 +253,14 @@ for my $n (1..6) {
 #####################
 
 is( $body->Hsearch(qr/.*Unicode .*/s),
-    hash{ 
+    hash{
       field offset=>0; field voffset=>758;
       field match => "This «Paragraph» has ☺Unicode and bold\t<tabthere and     multi-space and italic and underlined and larger text.";
       etc;
     },
     "Hsearch match variety para"
 );
-      
+
 #####################
 
 { # Null matches
@@ -329,13 +328,13 @@ is( $body->Hsearch(qr/.*Unicode .*/s),
 is( $body->Hsearch(qr//s),
     hash {
       field offset=>0; field end=>0; field voffset=>0; field vend=>0; etc();
-    }, 
+    },
     "Hsearch with qr//s"
 );
 is( $body->Hsearch(qr//),
     hash {
       field offset=>0; field end=>0; field voffset=>0; field vend=>0; etc();
-    }, 
+    },
     "Hsearch with qr//"
 );
 

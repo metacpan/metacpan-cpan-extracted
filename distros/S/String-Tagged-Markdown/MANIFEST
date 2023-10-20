@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 examples/markdown-to-html.pl

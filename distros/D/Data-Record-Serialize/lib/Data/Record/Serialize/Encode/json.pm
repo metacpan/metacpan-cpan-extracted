@@ -2,14 +2,15 @@ package Data::Record::Serialize::Encode::json;
 
 # ABSTRACT: encoded a record as JSON
 
+use v5.12;
 use strict;
 use warnings;
 
-use Data::Record::Serialize::Error { errors => [ 'json_backend' ] }, -all;
+use Data::Record::Serialize::Error { errors => ['json_backend'] }, -all;
 
 use Moo::Role;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 
 BEGIN {
@@ -23,20 +24,23 @@ BEGIN {
     # the first place.
     require Module::Version;
     if ( Module::Version::get_version( 'Cpanel::JSON::XS' ) >= $Cpanel_JSON_XS_VERSION ) {
-        require  Cpanel::JSON::XS;
+        require Cpanel::JSON::XS;
         *encode_json = \&Cpanel::JSON::XS::encode_json;
     }
     elsif ( eval { require JSON::PP } ) {
         *encode_json = \&JSON::PP::encode_json;
     }
     else {
-        error( 'json_backend', "can't find either Cpanel::JSON::XS (>= $Cpanel_JSON_XS_VERSION) or JSON::PP. Please install one of them." );
+        error(
+            'json_backend',
+            q{can't find either Cpanel::JSON::XS (>= $Cpanel_JSON_XS_VERSION) or JSON::PP. Please install one of them.},
+        );
     }
-};
+}
 
 use namespace::clean;
 
-has '+numify' => ( is => 'ro', default => 1 );
+has '+numify'    => ( is => 'ro', default => 1 );
 has '+stringify' => ( is => 'ro', default => 1 );
 
 sub _needs_eol { 1 }
@@ -84,7 +88,7 @@ Data::Record::Serialize::Encode::json - encoded a record as JSON
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 
@@ -121,6 +125,8 @@ It performs the L<Data::Record::Serialize::Role::Encode> role.
 
 Convert a truthy value to something that the JSON encoders will recognize as a boolean.
 
+=head1 INTERNALS
+
 =for Pod::Coverage encode
 
 =for Pod::Coverage numify
@@ -136,7 +142,7 @@ L<< Data::Record::Serialize::new|Data::Record::Serialize/new >>.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>
 
 =head2 Source
 

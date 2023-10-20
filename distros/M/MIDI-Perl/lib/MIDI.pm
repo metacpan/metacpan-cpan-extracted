@@ -1,5 +1,5 @@
+# Time-stamp: "2023-10-17 09:26:53 conklin"
 
-# Time-stamp: "2010-02-14 21:39:10 conklin"
 require 5;
 package MIDI;
 use strict;
@@ -13,7 +13,7 @@ use MIDI::Score;
 # Doesn't use MIDI::Simple -- but MIDI::Simple uses this
 
 $Debug = 0; # currently doesn't do anything
-$VERSION = '0.83';
+$VERSION = '0.84';
 
 # MIDI.pm doesn't do much other than 1) 'use' all the necessary submodules
 # 2) provide some publicly useful hashes, 3) house a few private routines
@@ -135,7 +135,7 @@ it does provide some hashes you might find useful:
 
 =item C<%MIDI::note2number> and C<%MIDI::number2note>
 
-C<%MIDI::number2note> correponds MIDI note numbers to a more
+C<%MIDI::number2note> corresponds MIDI note numbers to a more
 comprehensible representation (e.g., 68 to 'Gs4', for G-sharp, octave
 4); C<%MIDI::note2number> is the reverse.  Have a look at the source
 to see the contents of the hash.
@@ -168,7 +168,7 @@ to see the contents of the hash.
 
 =item C<%MIDI::patch2number> and C<%MIDI::number2patch>
 
-C<%MIDI::number2patch> correponds General MIDI patch numbers
+C<%MIDI::number2patch> corresponds General MIDI patch numbers
 (0 to 127) to English names (e.g., 79 to 'Ocarina');
 C<%MIDI::patch2number> is the reverse.  Have a look at the source
 to see the contents of the hash.
@@ -211,7 +211,7 @@ to see the contents of the hash.
  "Oboe", "English Horn", "Bassoon", "Clarinet",
 # Pipe
  "Piccolo", "Flute", "Recorder", "Pan Flute",
- "Blown Bottle", "Skakuhachi", "Whistle", "Ocarina",
+ "Blown Bottle", "Shakuhachi", "Whistle", "Ocarina",
 
 #80: Synth Lead
  "Lead 1 (square)", "Lead 2 (sawtooth)", "Lead 3 (calliope)", "Lead 4 (chiff)",
@@ -243,7 +243,7 @@ to see the contents of the hash.
 
 =item C<%MIDI::notenum2percussion> and C<%MIDI::percussion2notenum>
 
-C<%MIDI::notenum2percussion> correponds General MIDI Percussion Keys
+C<%MIDI::notenum2percussion> corresponds General MIDI Percussion Keys
 to English names (e.g., 56 to 'Cowbell') -- but note that only numbers
 35 to 81 (inclusive) are defined; C<%MIDI::percussion2notenum> is the
 reverse.  Have a look at the source to see the contents of the hash.

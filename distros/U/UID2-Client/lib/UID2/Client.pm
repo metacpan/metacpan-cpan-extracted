@@ -2,7 +2,7 @@ package UID2::Client;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Class::Accessor::Lite (
     rw => [qw(endpoint auth_key secret_key identity_scope http keys)],
@@ -14,7 +14,7 @@ use JSON;
 use Crypt::PRNG qw(random_bytes);
 use Crypt::Misc qw(encode_b64 decode_b64);
 
-use UID2::Client::Decryption;
+use UID2::Client::Encryption;
 use UID2::Client::Key;
 use UID2::Client::KeyContainer;
 use UID2::Client::Timestamp;
@@ -97,7 +97,7 @@ sub _make_v2_request {
     my ($self, $nonce, $now) = @_;
     $now //= UID2::Client::Timestamp->now;
     my $data = pack 'q> a*', $now->get_epoch_milli, $nonce;
-    my $payload = UID2::Client::Decryption::encrypt_gcm($data, $self->secret_key),
+    my $payload = UID2::Client::Encryption::encrypt_gcm($data, $self->secret_key),
     my $version = 1;
     my $envelope = pack 'C a*', $version, $payload;
     encode_b64($envelope);
@@ -106,7 +106,7 @@ sub _make_v2_request {
 sub _parse_v2_response {
     my ($self, $envelope, $nonce) = @_;
     my $envelope_bytes = decode_b64($envelope);
-    my $payload = UID2::Client::Decryption::decrypt_gcm($envelope_bytes, $self->secret_key);
+    my $payload = UID2::Client::Encryption::decrypt_gcm($envelope_bytes, $self->secret_key);
     if (length($payload) < 16) {
         croak 'invalid payload';
     }
@@ -130,19 +130,19 @@ sub _parse_json {
 
 sub decrypt {
     my ($self, $token, $now) = @_;
-    UID2::Client::Decryption::decrypt_token($token, $now, $self->keys, $self->identity_scope);
+    UID2::Client::Encryption::decrypt_token($token, $now, $self->keys, $self->identity_scope);
 }
 
 sub encrypt_data {
     my ($self, $data, $request) = @_;
     $request->{identity_scope} = $self->identity_scope;
     $request->{keys} = $self->keys unless $request->{key};
-    UID2::Client::Decryption::encrypt_data($data, $request);
+    UID2::Client::Encryption::encrypt_data($data, $request);
 }
 
 sub decrypt_data {
     my ($self, $data) = @_;
-    UID2::Client::Decryption::decrypt_data($data, $self->keys, $self->identity_scope);
+    UID2::Client::Encryption::decrypt_data($data, $self->keys, $self->identity_scope);
 }
 
 1;

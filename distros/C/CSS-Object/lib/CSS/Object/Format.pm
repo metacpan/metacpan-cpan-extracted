@@ -60,7 +60,6 @@ sub copy_parameters_from
     my $fmt  = shift( @_ ) || return( $self->error( "No formatter object was provided to copy the parameters from." ) );
     return( $self->error( "Formatter object provided is actually not a formatter object." ) ) if( !$self->_is_a( $fmt, 'CSS::Object::Format' ) );
     # my( $p, $f, $l ) = caller();
-    # $self->message( 3, "copy_parameters_from called from package $p at line $l in file $f to set indent from '", $self->indent->scalar, "' to '", $fmt->indent->scalar, "'." );
     my $ok_params = $self->{_params};
     for( @$ok_params )
     {
@@ -78,11 +77,9 @@ sub elements_as_string
 	my $result = Module::Generic::Array->new;
 	my $nl = $self->new_line->scalar;
 	my $prop_sep = $self->property_separator->scalar;
-	# $self->message( 3, "Property separator is set to \"$prop_sep\"." );
 	## $prop_sep .= $self->indent->scalar;
 	$elems->foreach(sub
 	{
-	    # $self->message( 3, "Stringifying element object of class \"" . $_->class . "\"." );
 	    $result->push( $_->format->indent->scalar . $_->as_string . ( $_->isa( 'CSS::Object::Comment' ) ? '' : ';' ) );
 	});
 	return( $result->join( $prop_sep )->scalar );
@@ -96,7 +93,6 @@ sub indent
     {
         my $val = shift( @_ );
 #         my( $p, $f, $l ) = caller();
-#         $self->message( 3, "Format called from package $p at line $l in file $f to set indent to '$val'." );
         return( $self->_set_get_scalar_as_object( 'indent', $val ) );
     }
     return( $self->_set_get_scalar_as_object( 'indent' ) );
@@ -163,12 +159,10 @@ sub rule_as_string
     my( $self, $rule ) = @_;
     # no overloading;
 #     my( $pack, $file, $line ) = caller;
-#     $self->message( 3, "Stringifying rule called from package $pack at line $line in file $file" );
     return( $self->error( "No rule object was provided." ) ) if( !defined( $rule ) );
     return( $self->error( "Rule object provided (", overload::Overloaded( $rule ) ? overload::StrVal( $rule ) : $rule ,") is not an actual rule object." ) ) if( !$self->_is_a( $rule, 'CSS::Object::Rule' ) );
     my $rule_indent = $rule->format->indent->scalar;
     my $nl = $self->new_line->scalar;
-#     $self->message( 3, "Indent string is '$rule_indent'." );
     ## return( $rule->selectors_as_string . ' { ' . $rule->properties_as_string . " }\n" );
     return(
         $rule_indent . $rule->selectors_as_string . 
@@ -192,7 +186,6 @@ sub value_as_string
     my( $self, $val ) = @_;
     return( $self->error( "No value object was provided." ) ) if( !$self->_is_a( $val, 'CSS::Object::Value' ) );
     return( $self->error( "Value object provided is not a CSS::Object::Value object." ) ) if( !$self->_is_a( $val, 'CSS::Object::Value' ) );
-    # $self->messagef( 3, "%d comments before and %d comments after.", $val->comment_before->length, $val->comment_after->length );
     return(
         $val->comment_before->map(sub{ $_->as_string })->join( ' ' )->scalar . ( $val->comment_before->length > 0 ? ' ' : '' ) . 
         $val->value->as_string . 

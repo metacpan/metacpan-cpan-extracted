@@ -111,7 +111,7 @@ SYNOPSIS
         my $c = $jar->extract_one( $cookie_string );
 
 VERSION
-        v0.3.0
+        v0.3.1
 
 DESCRIPTION
     This is a module to handle cookies, according to the latest standard as
@@ -159,7 +159,8 @@ METHODS
   new
     This initiates the package and takes the following parameters:
 
-    "request"
+    *   "request"
+
         This is an optional parameter to provide a Apache2::RequestRec
         object. When provided, it will be used in various methods to get or
         set cookies from or onto http headers.
@@ -192,7 +193,8 @@ METHODS
                 return( Apache2::Const::OK );
             }
 
-    "debug"
+    *   "debug"
+
         Optional. If set with a positive integer, this will activate verbose
         debugging message
 
@@ -519,6 +521,9 @@ METHODS
 
     You should not need to use this method as it is used internally only.
 
+  length
+    Read-only. Returns the size of the Cookie repository as a number object
+
   load
         $jar->load( '/home/joe/cookies.json' ) || die( $jar->error );
 
@@ -538,7 +543,8 @@ METHODS
 
     Supported options are:
 
-    *algo* string
+    *   "algo" string
+
         Algorithm to use to decrypt the cookie file.
 
         It can be any of AES, Anubis, Blowfish, CAST5, Camellia, DES,
@@ -547,16 +553,19 @@ METHODS
         Twofish, XTEA, IDEA, Serpent or simply any <NAME> for which there
         exists Crypt::Cipher::<NAME>
 
-    *decrypt* boolean
+    *   "decrypt" boolean
+
         Must be set to true to enable decryption.
 
-    *iv* string
+    *   "iv" string
+
         Set the Initialisation Vector
         <https://en.wikipedia.org/wiki/Initialization_vector> used for file
         encryption and decryption. This must be the same value used for
         encryption. See "save"
 
-    *key* string
+    *   "key" string
+
         Set the encryption key used to decrypt the cookies file.
 
         The key must be the same one used to encrypt the file. See "save"
@@ -707,14 +716,16 @@ METHODS
 
     This method also takes an hash or hash reference of options:
 
-    *die* boolean
+    *   "die" boolean
+
         If true, the anonymous code passed to the "do" method called, will
         die upon error. Default to false.
 
         By default, if an error occurs, "undef" is returned and the error is
         set.
 
-    *overwrite* boolean
+    *   "overwrite" boolean
+
         If true, when an existing cookie is found it will be overwritten by
         the new one. Default to false.
 
@@ -801,7 +812,8 @@ METHODS
 
     Supported options are:
 
-    *algo* string
+    *   "algo" string
+
         Algorithm to use to encrypt the cookie file.
 
         It can be any of AES, Anubis, Blowfish, CAST5, Camellia, DES,
@@ -810,10 +822,12 @@ METHODS
         Twofish, XTEA, IDEA, Serpent or simply any <NAME> for which there
         exists Crypt::Cipher::<NAME>
 
-    *encrypt* boolean
+    *   "encrypt" boolean
+
         Must be set to true to enable encryption.
 
-    *iv* string
+    *   "iv" string
+
         Set the Initialisation Vector
         <https://en.wikipedia.org/wiki/Initialization_vector> used for file
         encryption. If you do not provide one, it will be automatically
@@ -828,7 +842,8 @@ METHODS
 
         which would yield 16
 
-    *key* string
+    *   "key" string
+
         Set the encryption key used to encrypt the cookies file.
 
         The key must be the same one used to decrypt the file and must have

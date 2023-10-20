@@ -1,17 +1,16 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Future::AsyncAwait;
 
 my $HEIGHT = 1.234;
 
 {
-   use Object::Pad 0.57;
+   use Object::Pad 0.800;
 
    class TestChip
       :isa(Device::Chip);
@@ -71,7 +70,7 @@ is( scalar @sensors, 4, '$chip->list_sensors yields 3 sensors' );
 {
    my $sensor = $sensors[2];
 
-   is_deeply( [ await $sensor->read ], [ 30 ], 'sensor is read as a single scalar' );
+   is( [ await $sensor->read ], [ 30 ], 'sensor is read as a single scalar' );
 }
 
 {
@@ -85,11 +84,11 @@ is( scalar @sensors, 4, '$chip->list_sensors yields 3 sensors' );
    my $sensor = $sensors[0];
 
    $HEIGHT = -1;
-   like( exception { $sensor->read->get }, qr/^Reading -1.00 is out of range/,
+   like( dies { $sensor->read->get }, qr/^Reading -1.00 is out of range/,
       '$sensor->read fails when below lbounds' );
 
    $HEIGHT = 17;
-   like( exception { $sensor->read->get }, qr/^Reading 17.00 is out of range/,
+   like( dies { $sensor->read->get }, qr/^Reading 17.00 is out of range/,
       '$sensor->read fails when above ubounds' );
 }
 

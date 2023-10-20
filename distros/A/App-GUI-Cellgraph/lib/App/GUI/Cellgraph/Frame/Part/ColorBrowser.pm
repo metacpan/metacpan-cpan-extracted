@@ -8,6 +8,9 @@ use App::GUI::Cellgraph::Widget::SliderCombo;
 use App::GUI::Cellgraph::Widget::ColorDisplay;
 use Graphics::Toolkit::Color qw/color/;
 
+my $RGB = Graphics::Toolkit::Color::Space::Hub::get_space('RGB');
+my $HSL = Graphics::Toolkit::Color::Space::Hub::get_space('HSL');
+
 sub new {
     my ( $class, $parent, $type, $init_color ) = @_;
     $init_color = color( $init_color );
@@ -18,25 +21,30 @@ sub new {
     $self->{'init'} = $init_color;
     $self->{'call_back'} = sub {};
 
-    $self->{'red'}   =  App::GUI::Cellgraph::Widget::SliderCombo->new( $self, 290, ' R  ', "red part of $type color",    0, 255,  $init_color->red);
-    $self->{'green'} =  App::GUI::Cellgraph::Widget::SliderCombo->new( $self, 290, ' G  ', "green part of $type color",  0, 255,  $init_color->green);
-    $self->{'blue'}  =  App::GUI::Cellgraph::Widget::SliderCombo->new( $self, 290, ' B  ', "blue part of $type color",   0, 255,  $init_color->blue);
-    $self->{'hue'}   =  App::GUI::Cellgraph::Widget::SliderCombo->new( $self, 290, ' H  ', "hue of $type color",         0, 359,  $init_color->hue);
-    $self->{'sat'}   =  App::GUI::Cellgraph::Widget::SliderCombo->new( $self, 294, ' S   ', "saturation of $type color",  0, 100,  $init_color->saturation);
-    $self->{'light'} =  App::GUI::Cellgraph::Widget::SliderCombo->new( $self, 294, ' L   ', "lightness of $type color",   0, 100,  $init_color->lightness);
+    my @rgb = $init_color->values('RGB');
+    my @hsl = $init_color->values('HSL');
+
+    $self->{'red'}   =  App::GUI::Cellgraph::Widget::SliderCombo->new( $self, 290, ' R  ', "red part of $type color",    0, 255,  $rgb[0]);
+    $self->{'green'} =  App::GUI::Cellgraph::Widget::SliderCombo->new( $self, 290, ' G  ', "green part of $type color",  0, 255,  $rgb[1]);
+    $self->{'blue'}  =  App::GUI::Cellgraph::Widget::SliderCombo->new( $self, 290, ' B  ', "blue part of $type color",   0, 255,  $rgb[2]);
+    $self->{'hue'}   =  App::GUI::Cellgraph::Widget::SliderCombo->new( $self, 290, ' H  ', "hue of $type color",         0, 359,  $hsl[0]);
+    $self->{'sat'}   =  App::GUI::Cellgraph::Widget::SliderCombo->new( $self, 294, ' S   ', "saturation of $type color", 0, 100,  $hsl[1]);
+    $self->{'light'} =  App::GUI::Cellgraph::Widget::SliderCombo->new( $self, 294, ' L   ', "lightness of $type color",  0, 100,  $hsl[2]);
    # $self->{'display'}->SetToolTip("$type color monitor");
 
     my $rgb2hsl = sub {
         my @rgb = ($self->{'red'}->GetValue, $self->{'green'}->GetValue, $self->{'blue'}->GetValue);
-        my @hsl = Graphics::Toolkit::Color::Value::hsl_from_rgb( @rgb );
+        my @hsl = $HSL->deconvert( [$RGB->normalize( \@rgb )], 'RGB');
+        @hsl = $HSL->denormalize( \@hsl );
         $self->{'hue'}->SetValue( $hsl[0], 1 );
         $self->{'sat'}->SetValue( $hsl[1], 1 );
         $self->{'light'}->SetValue( $hsl[2], 1 );
         $self->{'call_back'}->( { red => $rgb[0], green => $rgb[1], blue => $rgb[2] } );
     };
     my $hsl2rgb = sub {
-        my @rgb = Graphics::Toolkit::Color::Value::rgb_from_hsl(
-            $self->{'hue'}->GetValue,  $self->{'sat'}->GetValue, $self->{'light'}->GetValue );
+        my @hsl = ($self->{'hue'}->GetValue, $self->{'sat'}->GetValue, $self->{'light'}->GetValue);
+        my @rgb = $HSL->convert( [$HSL->normalize( \@hsl )], 'RGB');
+        @rgb = $RGB->denormalize( \@rgb );
         $self->{'red'}->SetValue( $rgb[0], 1 );
         $self->{'green'}->SetValue( $rgb[1], 1 );
         $self->{'blue'}->SetValue( $rgb[2], 1 );
@@ -75,10 +83,13 @@ sub set_data {
     my ( $self, $data, $silent ) = @_;
     return unless ref $data eq 'HASH'
         and exists $data->{'red'} and exists $data->{'green'} and exists $data->{'blue'};
+
     $self->{'red'}->SetValue( $data->{'red'}, 1);
     $self->{'green'}->SetValue( $data->{'green'}, 1);
     $self->{'blue'}->SetValue( $data->{'blue'}, 1 );
-    my @hsl = Graphics::Toolkit::Color::Value::hsl_from_rgb( @$data{qw/red green blue/} );
+    my @rgb = @$data{qw/red green blue/};
+    my @hsl = $HSL->deconvert( [$RGB->normalize( \@rgb )], 'RGB');
+    @hsl = $HSL->denormalize( \@hsl );
     $self->{'hue'}->SetValue( $hsl[0], 1 );
     $self->{'sat'}->SetValue( $hsl[1], 1 );
     $self->{'light'}->SetValue( $hsl[2], 1 );
@@ -91,3 +102,4 @@ sub SetCallBack {
 }
 
 1;
+

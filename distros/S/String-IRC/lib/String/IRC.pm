@@ -1,10 +1,11 @@
 package String::IRC;
 
-use warnings;
 use strict;
-use Carp;
+use warnings;
+use 5.008_005;
+use utf8;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use overload (
     q{""}    => 'stringify',
@@ -16,7 +17,7 @@ sub new {
     my $self = {};
     bless $self, $class;
 
-    $self->{string} = shift || "";
+    $self->{string} = defined $_[0] ? shift : "";
 
     return $self;
 }
@@ -76,9 +77,31 @@ sub stringify { $_[0]->{string} . ""; }
 
 __END__
 
+=encoding utf8
+
+=begin html
+
+<a href="https://travis-ci.org/hirose31/String-IRC"><img src="https://travis-ci.org/hirose31/String-IRC.png?branch=master" alt="Build Status" /></a>
+<a href="https://coveralls.io/r/hirose31/String-IRC?branch=master"><img src="https://coveralls.io/repos/hirose31/String-IRC/badge.png?branch=master" alt="Coverage Status" /></a>
+
+=end html
+
 =head1 NAME
 
 String::IRC - add color codes for mIRC compatible client
+
+=begin readme
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+=end readme
 
 =head1 SYNOPSIS
 
@@ -153,28 +176,30 @@ Return string which is added color or decoration code.
 String::IRC calls this method implicitly by context. You may call it
 explicitly.
 
-=head1 BUGS AND LIMITATIONS
+=head1 AUTHOR
 
-No bugs have been reported.
+HIROSE Masaaki E<lt>hirose31@gmail.comE<gt>
 
-Please report any bugs or feature requests to
-C<bug-string-irc@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.
+=head1 REPOSITORY
+
+L<https://github.com/hirose31/String-IRC>
+
+    git clone https://github.com/hirose31/String-IRC.git
+
+patches and collaborators are welcome.
 
 =head1 SEE ALSO
 
 L<http://www.mirc.co.uk/help/color.txt>
 
-=head1 AUTHOR
+=head1 COPYRIGHT
 
-HIROSE Masaaki  C<< <hirose31@gmail.com> >>
+Copyright HIROSE Masaaki
 
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE
 
-Copyright (c) 2007, HIROSE Masaaki C<< <hirose31@gmail.com> >>. All rights reserved.
-
-This module is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself. See L<perlartistic>.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
@@ -182,7 +207,10 @@ modify it under the same terms as Perl itself. See L<perlartistic>.
 # Local Variables:
 # mode: cperl
 # cperl-indent-level: 4
+# cperl-close-paren-offset: -4
+# cperl-indent-parens-as-block: t
 # indent-tabs-mode: nil
+# coding: utf-8
 # End:
 
-# vi: set ts=4 sw=4 sts=0 :
+# vi: set ts=4 sw=4 sts=0 et ft=perl fenc=utf-8 ff=unix :

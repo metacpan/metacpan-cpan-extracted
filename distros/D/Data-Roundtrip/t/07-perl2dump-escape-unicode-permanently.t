@@ -6,16 +6,10 @@ use warnings;
 
 use utf8;
 
-our $VERSION='0.18';
-
-binmode STDERR, ':encoding(UTF-8)';
-binmode STDOUT, ':encoding(UTF-8)';
-binmode STDIN,  ':encoding(UTF-8)';
-# to avoid wide character in TAP output
-# do this before loading Test* modules
-use open ':std', ':encoding(utf8)';
+our $VERSION='0.24';
 
 use Test::More;
+use Test2::Plugin::UTF8;
 #use Test::Deep;
 
 my $num_tests = 0;

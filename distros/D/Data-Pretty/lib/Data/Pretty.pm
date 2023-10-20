@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Data Dump Beautifier - ~/lib/Data/Pretty.pm
-## Version v0.1.6
+## Version v0.1.8
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/08/06
-## Modified 2023/08/30
+## Modified 2023/10/11
 ## All rights reserved
 ## 
 ## 
@@ -28,7 +28,7 @@ BEGIN
     @EXPORT = qw( dd ddx );
     @EXPORT_OK = qw( dump pp dumpf literal quote );
     our $DEBUG = 0;
-    our $VERSION = 'v0.1.6';
+    our $VERSION = 'v0.1.8';
 };
 
 use strict;
@@ -354,7 +354,7 @@ sub _dump
     my($name, $idx, $dont_remember, $pclass, $pidx) = @$opts{qw( name idx dont_remember pclass pidx )};
 
     my($class, $type, $id);
-    my $strval = overload::StrVal($rval);
+    my $strval = overload::StrVal($rval // '');
     # Parse $strval without using regexps, in order not to clobber $1, $2,...
     if ((my $i = rindex($strval, "=")) >= 0) {
         $class = substr($strval, 0, $i);
@@ -365,7 +365,7 @@ sub _dump
         $id = substr($strval, $i + 2, -1);
     }
     else {
-        die "Can't parse " . overload::StrVal($rval);
+        die "Can't parse " . overload::StrVal($rval // '');
     }
     if ($] < 5.008 && $type eq "SCALAR") {
         $type = "REF" if $ref eq "REF";
@@ -422,7 +422,9 @@ sub _dump
     }
 
     unless ($dont_remember) {
-        if (my $s = $seen{$id}) {
+        # We do not use reference alias for scalars because they pose no threat of infinite recursion
+        my $s;
+        if( ( $s = $seen{$id} ) && $type ne 'SCALAR' ) {
             my($sname, $sidx) = @$s;
             $refcnt{$sname}++;
             my $sref = fullname($sname, $sidx,
@@ -628,7 +630,7 @@ sub _dump
             $key = quote($key) if $need_quotes->{ $key };
             $kstat_max = length($key) if length($key) > $kstat_max;
             $kstat_sum += length($key);
-            $kstat_sum2 += length($key)*length($key);
+            $kstat_sum2 += length($key) * length($key);
 
             push(@keys, $key);
             # push(@vals, _dump($$val, $name, [@$idx, "{$key}"], $tied, $pclass, $pidx));
@@ -641,8 +643,8 @@ sub _dump
                 pidx => $pidx,
             );
             my $this_type;
-            if ((my $i = index(overload::StrVal($$val), "(0x")) >= 0) {
-                $this_type = substr(overload::StrVal($$val), 0, $i);
+            if ((my $i = index(overload::StrVal($$val // ''), "(0x")) >= 0) {
+                $this_type = substr(overload::StrVal($$val // ''), 0, $i);
             }
             # Our child element is also an HASH, and if it is not empty, this would become too much of a cluttered structure to print in just one line.
             if( defined( $this_type ) && $this_type eq 'HASH' && scalar( keys( %{$rval->{$orig}} ) ) )
@@ -694,6 +696,7 @@ sub _dump
     elsif ($type eq "VSTRING") {
         $out = sprintf +($ref ? '\v%vd' : 'v%vd'), $$rval;
     }
+    # NOTE: other type unsupported
     else {
         warn "Can't handle $type data";
         $out = "'#$type#'";
@@ -780,7 +783,7 @@ Data::Pretty - Data Dump Beautifier
 
 =head1 VERSION
 
-    v0.1.6
+    v0.1.8
 
 =head1 DESCRIPTION
 

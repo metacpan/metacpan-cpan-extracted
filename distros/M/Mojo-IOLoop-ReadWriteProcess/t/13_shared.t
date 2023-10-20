@@ -178,7 +178,7 @@ subtest 'concurrent memory read/write' => sub {
             # Random sleeps to try to make threads race into lock section
             unless (DEBUG) {
               do {
-                warn "$$: Sleeping inside locked section";
+                note "$$: Sleeping inside locked section";
                 sleep rand(int(2));
                 }
                 for 1 .. 5;
@@ -257,7 +257,7 @@ subtest 'storable' => sub {
           sub {
             unless (DEBUG) {
               do {
-                warn "$$: Sleeping inside locked section";
+                note "$$: Sleeping inside locked section";
                 sleep rand(int(2));
                 }
                 for 1 .. 5;
@@ -330,7 +330,7 @@ subtest 'dying in locked section' => sub {
           sub {
             unless (DEBUG) {
               do {
-                warn "$$: Sleeping inside locked section";
+                note "$$: Sleeping inside locked section";
                 sleep rand(int(2));
                 }
                 for 1 .. 5;

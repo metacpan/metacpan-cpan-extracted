@@ -87,8 +87,10 @@ t/68mop-compose-role.t
 t/69mop-generated.t
 t/70mop-custom-fieldattr.t
 t/75metafunctions.t
+t/77repr-pvobj.t
 t/80async-method.t
 t/80dynamically+Object-Pad.t
+t/80extended+Object-Pad.t
 t/81async-method+dynamically.t
 t/82devel-mat-dumper-helper.t
 t/90leak.t

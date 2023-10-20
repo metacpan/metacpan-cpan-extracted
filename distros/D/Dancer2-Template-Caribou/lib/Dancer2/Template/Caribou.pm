@@ -1,7 +1,7 @@
 package Dancer2::Template::Caribou;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: Template::Caribou wrapper for Dancer2
-$Dancer2::Template::Caribou::VERSION = '1.0.0';
+$Dancer2::Template::Caribou::VERSION = '1.0.1';
 # TODO move away from Dancer2::Test
 
 
@@ -187,7 +187,7 @@ Dancer2::Template::Caribou - Template::Caribou wrapper for Dancer2
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 SYNOPSIS
 
@@ -372,7 +372,7 @@ Yanick Champoux <yanick@babyl.dyndns.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Yanick Champoux.
+This software is copyright (c) 2023 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

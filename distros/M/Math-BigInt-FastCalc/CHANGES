@@ -1,3 +1,9 @@
+0.5015 2023-09-20
+
+ * Sync test files with Math-BigInt.
+
+ * Remove obsolete link to cpanratings.org.
+
 0.5014 2023-04-03
 
  * Sync test files with Math-BigInt.

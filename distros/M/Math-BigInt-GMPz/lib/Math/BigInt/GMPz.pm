@@ -8,7 +8,7 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '0.0011';
+our $VERSION = '0.0013';
 
 use Math::GMPz 0.36 qw< :mpz >;
 
@@ -615,10 +615,6 @@ L<https://metacpan.org/release/Math-BigInt-GMPz>
 =item CPAN Testers Matrix
 
 L<http://matrix.cpantesters.org/?dist=Math-BigInt-GMPz>
-
-=item CPAN Ratings
-
-L<https://cpanratings.perl.org/dist/Math-BigInt-GMPz>
 
 =back
 

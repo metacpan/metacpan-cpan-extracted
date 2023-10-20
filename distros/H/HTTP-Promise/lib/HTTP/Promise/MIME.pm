@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/MIME.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/04/07
-## Modified 2022/04/07
-## All rights reserved
+## Modified 2023/09/08
+## All rights reserved.
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -20,8 +21,8 @@ BEGIN
     # use File::MMagic::XS;
     eval( "use File::MMagic::XS 0.09008" );
     our $HAS_FILE_MMAGIC_XS = $@ ? 0 : 1;                               
-    use Nice::Try;
-    our $VERSION = 'v0.1.0';
+    # use Nice::Try;
+    our $VERSION = 'v0.2.0';
     our $TYPES = {};
 };
 
@@ -84,24 +85,28 @@ sub mime_type
 {
     my $self = shift( @_ );
     my $file = shift( @_ ) || return( $self->error( "No file was provided." ) );
-    try
+    my $mime;
+    # try-catch
+    local $@;
+    eval
     {
         if( $HAS_FILE_MMAGIC_XS )
         {
             my $m = File::MMagic::XS->new;
-            return( $m->get_mime( "$file" ) );
+            $mime = $m->get_mime( "$file" );
         }
         else
         {
             require File::MMagic;
             my $m = File::MMagic->new;
-            return( $m->checktype_filename( "$file" ) );
+            $mime = $m->checktype_filename( "$file" );
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to get the mime type for file \"${file}\": $e" ) );
+        return( $self->error( "An error occurred while trying to get the mime type for file \"${file}\": $@" ) );
     }
+    return( $mime );
 }
 
 sub mime_type_from_suffix
@@ -192,7 +197,7 @@ HTTP::Promise::MIME - MIME Types and File Extension Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents options of saving .json file.',
                                   class => 'JsonSaveOptions',
                                   required => [], # TODO
 }                                 );
@@ -129,28 +129,28 @@ __PACKAGE__->method_documentation({
      'export_area' => {
      	datatype => 'CellArea',
      	base_name => 'ExportArea',
-     	description => '',
+     	description => 'Gets or sets the exporting range.',
      	format => '',
      	read_only => '',
      		},
      'has_header_row' => {
      	datatype => 'boolean',
      	base_name => 'HasHeaderRow',
-     	description => '',
+     	description => 'Indicates whether the range contains header row.',
      	format => '',
      	read_only => '',
      		},
      'export_as_string' => {
      	datatype => 'boolean',
      	base_name => 'ExportAsString',
-     	description => '',
+     	description => 'Exports the string value of the cells to json.',
      	format => '',
      	read_only => '',
      		},
      'indent' => {
      	datatype => 'string',
      	base_name => 'Indent',
-     	description => '',
+     	description => 'Indicates the indent.',
      	format => '',
      	read_only => '',
      		},

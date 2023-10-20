@@ -275,8 +275,6 @@ qx.Class.define("callbackery.ui.form.Auto", {
         this);
 
         var formWgt = new (formRenderer)(form);
-        var fl = formWgt.getLayout();
-
         this._add(formWgt);
     },
 

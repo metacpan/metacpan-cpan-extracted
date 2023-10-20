@@ -1,5 +1,8 @@
 Revision history for App-ModuleBuildTiny
 
+0.043     2023-10-19 20:38:08+0200
+          - Add options to not write build files
+
 0.042     2023-08-13 16:29:30+0200
           - Add version subcommand
           - Allow -j as synonym for --jobs

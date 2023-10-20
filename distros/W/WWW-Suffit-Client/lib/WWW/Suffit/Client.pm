@@ -11,7 +11,7 @@ WWW::Suffit::Client - The Suffit API client library
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -101,7 +101,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use parent qw/ WWW::Suffit::UserAgent /;
 

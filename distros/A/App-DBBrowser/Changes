@@ -1,6 +1,32 @@
 Revision history for App-DBBrowser
 
 
+2.344  2023-10-15
+        - Bugfix: no table alias in update/insert/delete.
+
+2.343  2023-10-05
+        - Split option 'quote identifier' into 'quote table names', 'quote column names' and 'quote aliases'.
+        - New option: enable/disable aliases for non-unique columns in join.
+        - Derived table and Cte are available as extension.
+        - Make a 'Change dir' in the file import menu permanent.
+        - Order by: add aggregate function aliases.
+        - Enter aliases for complex columns in 'group by' and use them in 'select'.
+        - Function 'extract': added support for the field 'quarter'.
+        - Term::Choose::Util minimum version '0.139'.
+        - Refactored Join.pm and Union.pm.
+        - Bugfixes.
+        - Update documentation.
+
+2.342  2023-09-28
+        - Bugfix: don't remove outer parentheses in Subqueries.pm.
+        - Bugfix: wrong format of auto generated aliases in Union.pm.
+        - Bugfix in table alias: undefined variable.
+
+2.341  2023-09-20
+        - Bugfix Update: 'set' was missing a parameter.
+        - Bugfix in Join.pm and Union.pm: uninitialized array references.
+        - Use CTEs instead of subqueries for derived tables.
+
 2.340  2023-08-26
         - Fix in where/having/when: add parentheses only at the top level.
         - Allow window function everywhere in select and order_by.

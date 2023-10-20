@@ -7,7 +7,7 @@ use NBI::Slurm;
 
 # Skip if NBI::Slurm::has_squeue() is false
 if (NBI::Slurm::has_squeue() == 0) {
-    plan skip_all => "Skipping all tests due to a condition";
+    plan skip_all => "Skipping all tests: not in a slurm cluster";
 }
 
 my @queue = NBI::Slurm::queue();

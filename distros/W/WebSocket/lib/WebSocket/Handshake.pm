@@ -15,7 +15,6 @@ BEGIN
     use warnings;
     use parent qw( WebSocket );
     use vars qw( $VERSION );
-    use Nice::Try;
     our $VERSION = 'v0.1.0';
 };
 
@@ -25,7 +24,8 @@ sub init
     $self->{request}    = undef unless( defined( $self->{request} ) );
     $self->{response}   = undef unless( defined( $self->{response} ) );
     $self->{uri}        = undef unless( defined( $self->{uri} ) );
-    $self->{version}    = '' unless( length( $self->{version} ) );
+    $self->{version}    = '' unless( length( $self->{version} // '' ) );
+    $self->{_exception_class} = 'WebSocket::Exception' unless( defined( $self->{_exception_class} ) );
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     return( $self );

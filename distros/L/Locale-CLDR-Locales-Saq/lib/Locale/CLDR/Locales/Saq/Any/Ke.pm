@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Saq::Any::Ke - Package for language Samburu
 
 =cut
 
 package Locale::CLDR::Locales::Saq::Any::Ke;
-# This file auto generated from Data/common/main/saq_KE.xml
-#	on Mon 11 Apr  5:37:25 pm GMT
+# This file auto generated from Data\common\main\saq_KE.xml
+#	on Fri 13 Oct  9:36:12 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

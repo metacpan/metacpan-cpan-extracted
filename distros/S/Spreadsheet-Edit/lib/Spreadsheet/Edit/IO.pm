@@ -11,8 +11,8 @@ package Spreadsheet::Edit::IO;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.006'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-09-06'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.009'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-09-23'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 
@@ -22,7 +22,9 @@ our @EXPORT = qw/convert_spreadsheet OpenAsCsv cx2let let2cx cxrx2sheetaddr
                  sheetname_from_spec filepath_from_spec
                  form_spec_with_sheetname/;
 
-our @EXPORT_OK = qw/@sane_CSV_read_options @sane_CSV_write_options/;
+our @EXPORT_OK = qw/can_cvt_spreadsheets can_extract_allsheets can_extract_named_sheet
+                    openlibreoffice_path
+                    @sane_CSV_read_options @sane_CSV_write_options/;
 
 # TODO: Provide "known_attributes" function ala Text::CSV::known_attributes()
 
@@ -1678,7 +1680,8 @@ sub convert_spreadsheet(@) {
   $result;
 }#convert_spreadsheet
 
-# Open as a CSV, intuiting input encoding, converting spreadsheet if necessary.
+# Open as a CSV, intuiting input encoding, converting from spreadsheet if
+# necessary.
 #
 # :crlf translation is enabled on the resulting file handle, which converts
 # DOS CR,LF to \n while passing *nix bare LF through unmolested.
@@ -1953,15 +1956,15 @@ Not exported by default.
 Composes a combined string in a "preferred" format (currently "PATH!SHEETNAME").
 Not exported by default.
 
-=head1 Testing if LibreOffice etc. is Installed
+=head1 Feature Test Functions
 
 =head2 $bool = can_cvt_spreadsheets();
 
-=head2 $bool = sub can_extract_allsheets();
+=head2 $bool = can_extract_allsheets();
 
 =head2 $bool = can_extract_named_sheet();
 
-These feature-test functions return false if the corresponding operations
+These functions return false if the corresponding operations
 are not possible because LibreOffice (or, someday gnumeric) is not installed
 or is an older version which does not have needed capabilities.
 
@@ -1969,6 +1972,8 @@ or is an older version which does not have needed capabilities.
 
 Returns the detected path of I<soffice> (Apache Open Office or Libre Office)
 or undef if not found.
+
+These are not exported by default.
 
 =head1 SEE ALSO
 

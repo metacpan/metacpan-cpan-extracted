@@ -23,6 +23,9 @@ if (defined $app) {
 		-modifycall => \&tmodified,
 		-tabs => '7m',
 		-font => 'Hack 12',
+		-menuitems => [
+			[command => 'Say something', -command => sub { print "Saying something\n"}],
+		]
 	)->pack(
 		-expand => 1,
 		-fill => 'both',
@@ -777,3 +780,4 @@ push @tests, (
 );
 
 starttesting;
+

@@ -3,6 +3,8 @@
 #include "XSUB.h"
 #include <xcb/xcb.h>
 #include <xcb/xinerama.h>
+#include <xcb/randr.h>
+#include <xcb/xkb.h>
 
 #include "ppport.h"
 
@@ -105,6 +107,8 @@ _new_event_object(xcb_generic_event_t *event)
     char *objname;
     HV* hash = newHV();
 
+    // Some events, for instance from XKB, passing essential data only via pad0 field
+    hv_store(hash, "pad0", strlen("pad0"), newSViv(event->pad0), 0);
     hv_store(hash, "response_type", strlen("response_type"), newSViv(event->response_type), 0);
     hv_store(hash, "sequence", strlen("sequence"), newSViv(event->sequence), 0);
 
@@ -112,6 +116,33 @@ _new_event_object(xcb_generic_event_t *event)
     type = (event->response_type & 0x7F);
 
     switch (type) {
+        case XCB_NONE:
+        {
+            objname = "X11::XCB::Event::GenericError";
+            xcb_generic_error_t *e = (xcb_generic_error_t*)event;
+            hv_store(hash, "error_code", strlen("error_code"), newSViv(e->error_code), 0);
+            hv_store(hash, "sequence", strlen("sequence"), newSViv(e->sequence), 0);
+            hv_store(hash, "resource_id", strlen("resource_id"), newSViv(e->resource_id), 0);
+            hv_store(hash, "minor_code", strlen("minor_code"), newSViv(e->minor_code), 0);
+            hv_store(hash, "major_code", strlen("major_code"), newSViv(e->major_code), 0);
+        }
+        break;
+
+        case XCB_CREATE_NOTIFY:
+        {
+            objname = "X11::XCB::Event::CreateNotify";
+            xcb_create_notify_event_t *e = (xcb_create_notify_event_t*)event;
+            hv_store(hash, "parent", strlen("parent"), newSViv(e->parent), 0);
+            hv_store(hash, "window", strlen("window"), newSViv(e->window), 0);
+            hv_store(hash, "x", strlen("x"), newSViv(e->x), 0);
+            hv_store(hash, "y", strlen("y"), newSViv(e->y), 0);
+            hv_store(hash, "width", strlen("width"), newSViv(e->width), 0);
+            hv_store(hash, "height", strlen("height"), newSViv(e->height), 0);
+            hv_store(hash, "border_width", strlen("border_width"), newSViv(e->border_width), 0);
+            hv_store(hash, "override_redirect", strlen("override_redirect"), newSViv(e->override_redirect), 0);
+        }
+        break;
+
         case XCB_MAP_NOTIFY:
         {
             objname = "X11::XCB::Event::MapNotify";
@@ -119,6 +150,78 @@ _new_event_object(xcb_generic_event_t *event)
             hv_store(hash, "event", strlen("event"), newSViv(e->event), 0);
             hv_store(hash, "window", strlen("window"), newSViv(e->window), 0);
             hv_store(hash, "override_redirect", strlen("override_redirect"), newSViv(e->override_redirect), 0);
+        }
+        break;
+
+        case XCB_MAP_REQUEST:
+        {
+            objname = "X11::XCB::Event::MapRequest";
+            xcb_map_request_event_t *e = (xcb_map_request_event_t*)event;
+            hv_store(hash, "parent", strlen("parent"), newSViv(e->parent), 0);
+            hv_store(hash, "window", strlen("window"), newSViv(e->window), 0);
+        }
+        break;
+
+        case XCB_CONFIGURE_NOTIFY:
+        {
+            objname = "X11::XCB::Event::ConfigureNotify";
+            xcb_configure_notify_event_t *e = (xcb_configure_notify_event_t*)event;
+            hv_store(hash, "event", strlen("event"), newSViv(e->event), 0);
+            hv_store(hash, "window", strlen("window"), newSViv(e->window), 0);
+            hv_store(hash, "above_sibling", strlen("above_sibling"), newSViv(e->above_sibling), 0);
+            hv_store(hash, "x", strlen("x"), newSViv(e->x), 0);
+            hv_store(hash, "y", strlen("y"), newSViv(e->y), 0);
+            hv_store(hash, "width", strlen("width"), newSViv(e->width), 0);
+            hv_store(hash, "height", strlen("height"), newSViv(e->height), 0);
+            hv_store(hash, "border_width", strlen("border_width"), newSViv(e->border_width), 0);
+            hv_store(hash, "override_redirect", strlen("override_redirect"), newSViv(e->override_redirect), 0);
+        }
+        break;
+
+        case XCB_CONFIGURE_REQUEST:
+        {
+            objname = "X11::XCB::Event::ConfigureRequest";
+            xcb_configure_request_event_t *e = (xcb_configure_request_event_t*)event;
+            hv_store(hash, "parent", strlen("parent"), newSViv(e->parent), 0);
+            hv_store(hash, "stack_mode", strlen("stack_mode"), newSViv(e->stack_mode), 0);
+            hv_store(hash, "window", strlen("window"), newSViv(e->window), 0);
+            hv_store(hash, "sibling", strlen("sibling"), newSViv(e->sibling), 0);
+            hv_store(hash, "x", strlen("x"), newSViv(e->x), 0);
+            hv_store(hash, "y", strlen("x"), newSViv(e->y), 0);
+            hv_store(hash, "width", strlen("x"), newSViv(e->width), 0);
+            hv_store(hash, "height", strlen("x"), newSViv(e->height), 0);
+            hv_store(hash, "border_width", strlen("border_width"), newSViv(e->border_width), 0);
+            hv_store(hash, "value_mask", strlen("value_mask"), newSViv(e->value_mask), 0);
+        }
+        break;
+
+        case XCB_UNMAP_NOTIFY:
+        {
+            objname = "X11::XCB::Event::UnmapNotify";
+            xcb_unmap_notify_event_t *e = (xcb_unmap_notify_event_t*)event;
+            hv_store(hash, "event", strlen("event"), newSViv(e->event), 0);
+            hv_store(hash, "window", strlen("window"), newSViv(e->window), 0);
+            hv_store(hash, "from_configure", strlen("from_configure"), newSViv(e->from_configure), 0);
+        }
+        break;
+
+        case XCB_DESTROY_NOTIFY:
+        {
+            objname = "X11::XCB::Event::DestroyNotify";
+            xcb_destroy_notify_event_t *e = (xcb_destroy_notify_event_t*)event;
+            hv_store(hash, "event", strlen("event"), newSViv(e->event), 0);
+            hv_store(hash, "window", strlen("window"), newSViv(e->window), 0);
+        }
+        break;
+
+        case XCB_PROPERTY_NOTIFY:
+        {
+            objname = "X11::XCB::Event::PropertyNotify";
+            xcb_property_notify_event_t *e = (xcb_property_notify_event_t*)event;
+            hv_store(hash, "window", strlen("window"), newSViv(e->window), 0);
+            hv_store(hash, "atom", strlen("atom"), newSViv(e->atom), 0);
+            hv_store(hash, "time", strlen("time"), newSViv(e->time), 0);
+            hv_store(hash, "state", strlen("state"), newSViv(e->state), 0);
         }
         break;
 
@@ -132,13 +235,141 @@ _new_event_object(xcb_generic_event_t *event)
         }
         break;
 
+        case XCB_MOTION_NOTIFY:
+        {
+            objname = "X11::XCB::Event::MotionNotify";
+            xcb_motion_notify_event_t *e = (xcb_motion_notify_event_t*)event;
+            hv_store(hash, "time", strlen("time"), newSViv(e->time), 0);
+            hv_store(hash, "detail", strlen("detail"), newSViv(e->detail), 0);
+            hv_store(hash, "root", strlen("root"), newSViv(e->root), 0);
+            hv_store(hash, "event", strlen("event"), newSViv(e->event), 0);
+            hv_store(hash, "child", strlen("child"), newSViv(e->child), 0);
+            hv_store(hash, "root_x", strlen("root_x"), newSViv(e->root_x), 0);
+            hv_store(hash, "root_y", strlen("root_y"), newSViv(e->root_y), 0);
+            hv_store(hash, "event_x", strlen("event_x"), newSViv(e->event_x), 0);
+            hv_store(hash, "event_y", strlen("event_y"), newSViv(e->event_y), 0);
+            hv_store(hash, "state", strlen("state"), newSViv(e->state), 0);
+            hv_store(hash, "same_screen", strlen("same_screen"), newSViv(e->same_screen), 0);
+        }
+        break;
+
         case XCB_CLIENT_MESSAGE:
         {
             objname = "X11::XCB::Event::ClientMessage";
             xcb_client_message_event_t *e = (xcb_client_message_event_t*)event;
             hv_store(hash, "window", strlen("window"), newSViv(e->window), 0);
             hv_store(hash, "type", strlen("type"), newSViv(e->type), 0);
-            hv_store(hash, "data", strlen("data"), newSVpvn(&(e->data), 20), 0);
+            hv_store(hash, "data", strlen("data"), newSVpvn((const char *)&(e->data), 20), 0);
+        }
+        break;
+
+        case XCB_KEY_PRESS:
+        {
+            objname = "X11::XCB::Event::KeyPress";
+            xcb_key_press_event_t *e = (xcb_key_press_event_t*)event;
+            hv_store(hash, "detail", strlen("detail"), newSViv(e->detail), 0);
+            hv_store(hash, "time", strlen("time"), newSViv(e->time), 0);
+            hv_store(hash, "root", strlen("root"), newSViv(e->root), 0);
+            hv_store(hash, "event", strlen("event"), newSViv(e->event), 0);
+            hv_store(hash, "child", strlen("child"), newSViv(e->child), 0);
+            hv_store(hash, "root_x", strlen("root_x"), newSViv(e->root_x), 0);
+            hv_store(hash, "root_y", strlen("root_y"), newSViv(e->root_y), 0);
+            hv_store(hash, "event_x", strlen("event_x"), newSViv(e->event_x), 0);
+            hv_store(hash, "event_y", strlen("event_y"), newSViv(e->event_y), 0);
+            hv_store(hash, "state", strlen("state"), newSViv(e->state), 0);
+            hv_store(hash, "same_screen", strlen("same_screen"), newSViv(e->same_screen), 0);
+        }
+        break;
+
+        case XCB_KEY_RELEASE:
+        {
+            objname = "X11::XCB::Event::KeyRelease";
+            xcb_key_release_event_t *e = (xcb_key_release_event_t*)event;
+            hv_store(hash, "detail", strlen("detail"), newSViv(e->detail), 0);
+            hv_store(hash, "time", strlen("time"), newSViv(e->time), 0);
+            hv_store(hash, "root", strlen("root"), newSViv(e->root), 0);
+            hv_store(hash, "event", strlen("event"), newSViv(e->event), 0);
+            hv_store(hash, "child", strlen("child"), newSViv(e->child), 0);
+            hv_store(hash, "root_x", strlen("root_x"), newSViv(e->root_x), 0);
+            hv_store(hash, "root_y", strlen("root_y"), newSViv(e->root_y), 0);
+            hv_store(hash, "event_x", strlen("event_x"), newSViv(e->event_x), 0);
+            hv_store(hash, "event_y", strlen("event_y"), newSViv(e->event_y), 0);
+            hv_store(hash, "state", strlen("state"), newSViv(e->state), 0);
+            hv_store(hash, "same_screen", strlen("same_screen"), newSViv(e->same_screen), 0);
+        }
+        break;
+
+        case XCB_BUTTON_PRESS:
+        {
+            objname = "X11::XCB::Event::ButtonPress";
+            xcb_button_press_event_t *e = (xcb_button_press_event_t*)event;
+            hv_store(hash, "detail", strlen("detail"), newSViv(e->detail), 0);
+            hv_store(hash, "time", strlen("time"), newSViv(e->time), 0);
+            hv_store(hash, "root", strlen("root"), newSViv(e->root), 0);
+            hv_store(hash, "event", strlen("event"), newSViv(e->event), 0);
+            hv_store(hash, "child", strlen("child"), newSViv(e->child), 0);
+            hv_store(hash, "root_x", strlen("root_x"), newSViv(e->root_x), 0);
+            hv_store(hash, "root_y", strlen("root_y"), newSViv(e->root_y), 0);
+            hv_store(hash, "event_x", strlen("event_x"), newSViv(e->event_x), 0);
+            hv_store(hash, "event_y", strlen("event_y"), newSViv(e->event_y), 0);
+            hv_store(hash, "state", strlen("state"), newSViv(e->state), 0);
+            hv_store(hash, "same_screen", strlen("same_screen"), newSViv(e->same_screen), 0);
+        }
+        break;
+
+        case XCB_BUTTON_RELEASE:
+        {
+            objname = "X11::XCB::Event::ButtonRelease";
+            xcb_button_press_event_t *e = (xcb_button_press_event_t*)event;
+            hv_store(hash, "detail", strlen("detail"), newSViv(e->detail), 0);
+            hv_store(hash, "time", strlen("time"), newSViv(e->time), 0);
+            hv_store(hash, "root", strlen("root"), newSViv(e->root), 0);
+            hv_store(hash, "event", strlen("event"), newSViv(e->event), 0);
+            hv_store(hash, "child", strlen("child"), newSViv(e->child), 0);
+            hv_store(hash, "root_x", strlen("root_x"), newSViv(e->root_x), 0);
+            hv_store(hash, "root_y", strlen("root_y"), newSViv(e->root_y), 0);
+            hv_store(hash, "event_x", strlen("event_x"), newSViv(e->event_x), 0);
+            hv_store(hash, "event_y", strlen("event_y"), newSViv(e->event_y), 0);
+            hv_store(hash, "state", strlen("state"), newSViv(e->state), 0);
+            hv_store(hash, "same_screen", strlen("same_screen"), newSViv(e->same_screen), 0);
+        }
+        break;
+
+        case XCB_ENTER_NOTIFY:
+        {
+            objname = "X11::XCB::Event::EnterNotify";
+            xcb_enter_notify_event_t *e = (xcb_enter_notify_event_t*)event;
+            hv_store(hash, "detail", strlen("detail"), newSViv(e->detail), 0);
+            hv_store(hash, "time", strlen("time"), newSViv(e->time), 0);
+            hv_store(hash, "root", strlen("root"), newSViv(e->root), 0);
+            hv_store(hash, "event", strlen("event"), newSViv(e->event), 0);
+            hv_store(hash, "child", strlen("child"), newSViv(e->child), 0);
+            hv_store(hash, "root_x", strlen("root_x"), newSViv(e->root_x), 0);
+            hv_store(hash, "root_y", strlen("root_y"), newSViv(e->root_y), 0);
+            hv_store(hash, "event_x", strlen("event_x"), newSViv(e->event_x), 0);
+            hv_store(hash, "event_y", strlen("event_y"), newSViv(e->event_y), 0);
+            hv_store(hash, "state", strlen("state"), newSViv(e->state), 0);
+            hv_store(hash, "mode", strlen("mode"), newSViv(e->mode), 0);
+            hv_store(hash, "same_screen_focus", strlen("same_screen_focus"), newSViv(e->same_screen_focus), 0);
+        }
+        break;
+
+        case XCB_LEAVE_NOTIFY:
+        {
+            objname = "X11::XCB::Event::LeaveNotify";
+            xcb_leave_notify_event_t *e = (xcb_leave_notify_event_t*)event;
+            hv_store(hash, "detail", strlen("detail"), newSViv(e->detail), 0);
+            hv_store(hash, "time", strlen("time"), newSViv(e->time), 0);
+            hv_store(hash, "root", strlen("root"), newSViv(e->root), 0);
+            hv_store(hash, "event", strlen("event"), newSViv(e->event), 0);
+            hv_store(hash, "child", strlen("child"), newSViv(e->child), 0);
+            hv_store(hash, "root_x", strlen("root_x"), newSViv(e->root_x), 0);
+            hv_store(hash, "root_y", strlen("root_y"), newSViv(e->root_y), 0);
+            hv_store(hash, "event_x", strlen("event_x"), newSViv(e->event_x), 0);
+            hv_store(hash, "event_y", strlen("event_y"), newSViv(e->event_y), 0);
+            hv_store(hash, "state", strlen("state"), newSViv(e->state), 0);
+            hv_store(hash, "mode", strlen("mode"), newSViv(e->mode), 0);
+            hv_store(hash, "same_screen_focus", strlen("same_screen_focus"), newSViv(e->same_screen_focus), 0);
         }
         break;
 
@@ -180,7 +411,7 @@ _connect_and_attach_struct(self)
   PREINIT:
     XCBConnection *xcbconnbuf;
   CODE:
-    assert(sv_derivered_from(self, __PACKAGE__));
+    assert(sv_derived_from(self, HvNAME(PL_curstash)));
     SV **disp = hv_fetch((HV*)SvRV(self), "display", strlen("display"), 0);
     if(!disp)
         croak("Attribute 'display' is required");
@@ -195,8 +426,13 @@ _connect_and_attach_struct(self)
 void
 DESTROY(self)
     XCBConnection *self
+  PREINIT:
+    const xcb_setup_t *setup;
   CODE:
-    Safefree(self);
+    // This skips (un)Safefree() on failed connections to avoid SIGABRT on invalid pointer free
+    setup = xcb_get_setup(self);
+    if (setup->status)
+        Safefree(self);
 
 int
 has_error(self)
@@ -259,6 +495,117 @@ poll_for_event(self)
     RETVAL
 
 
+SV *
+get_setup(conn)
+    XCBConnection *conn
+  PREINIT:
+    HV * hash;
+    const xcb_setup_t * setup;
+  CODE:
+    hash = newHV();
+    setup = xcb_get_setup(conn);
+    if (setup) {
+        hv_store(hash, "status", strlen("status"), newSViv(setup->status), 0);
+        hv_store(hash, "protocol_major_version", strlen("protocol_major_version"), newSViv(setup->protocol_major_version), 0);
+        hv_store(hash, "protocol_minor_version", strlen("protocol_minor_version"), newSViv(setup->protocol_minor_version), 0);
+        hv_store(hash, "length", strlen("length"), newSViv(setup->length), 0);
+        hv_store(hash, "release_number", strlen("release_number"), newSViv(setup->release_number), 0);
+        hv_store(hash, "resource_id_base", strlen("resource_id_base"), newSViv(setup->resource_id_base), 0);
+        hv_store(hash, "resource_id_mask", strlen("resource_id_mask"), newSViv(setup->resource_id_mask), 0);
+        hv_store(hash, "motion_buffer_size", strlen("motion_buffer_size"), newSViv(setup->motion_buffer_size), 0);
+        hv_store(hash, "vendor_len", strlen("vendor_len"), newSViv(setup->vendor_len), 0);
+        hv_store(hash, "maximum_request_length", strlen("maximum_request_length"), newSViv(setup->maximum_request_length), 0);
+        hv_store(hash, "roots_len", strlen("roots_len"), newSViv(setup->roots_len), 0);
+        hv_store(hash, "pixmap_formats_len", strlen("pixmap_formats_len"), newSViv(setup->pixmap_formats_len), 0);
+        hv_store(hash, "image_byte_order", strlen("image_byte_order"), newSViv(setup->image_byte_order), 0);
+        hv_store(hash, "bitmap_format_bit_order", strlen("bitmap_format_bit_order"), newSViv(setup->bitmap_format_bit_order), 0);
+        hv_store(hash, "bitmap_format_scanline_unit", strlen("bitmap_format_scanline_unit"), newSViv(setup->bitmap_format_scanline_unit), 0);
+        hv_store(hash, "bitmap_format_scanline_pad", strlen("bitmap_format_scanline_pad"), newSViv(setup->bitmap_format_scanline_pad), 0);
+        hv_store(hash, "min_keycode", strlen("min_keycode"), newSViv(setup->min_keycode), 0);
+        hv_store(hash, "max_keycode", strlen("max_keycode"), newSViv(setup->max_keycode), 0);
+        RETVAL = sv_bless(newRV_noinc((SV*)hash), gv_stashpv("X11::XCB::Setup", 1));
+    } else {
+        RETVAL = &PL_sv_undef;
+    }
+  OUTPUT:
+    RETVAL
+
+SV *
+get_keymap(conn)
+    XCBConnection *conn
+  PREINIT:
+    AV * row;
+    SSize_t idx;
+    const xcb_setup_t * setup;
+    int i;
+    int j;
+    int total_codes;
+    xcb_get_keyboard_mapping_reply_t * kmap;
+    xcb_keysym_t * keysym;
+  INIT:
+    AV * results = (AV *)sv_2mortal((SV *)newAV());
+    av_extend(results, 256);
+  CODE:
+    setup = xcb_get_setup(conn);
+    if (! setup || setup->max_keycode > 255 || setup->min_keycode >= setup->max_keycode)
+      croak("Failed calling xcb_get_setup()");
+
+    kmap = xcb_get_keyboard_mapping_reply(conn, xcb_get_keyboard_mapping(conn, setup->min_keycode, setup->max_keycode - setup->min_keycode + 1), 0);
+    total_codes = kmap->length / kmap->keysyms_per_keycode;
+    keysym = xcb_get_keyboard_mapping_keysyms(kmap);
+
+    if (! keysym)
+      croak("Failed getting X11 keyboard mapping");
+
+    for (int i = 0; i < total_codes; i++) {
+      idx = setup->min_keycode + i;
+      row = (AV *)sv_2mortal((SV *)newAV());
+      av_extend(row, kmap->keysyms_per_keycode);
+
+      for (int j = 0; j < kmap->keysyms_per_keycode; j++) {
+        if (! av_store(row, j, newSViv(keysym[j + i * kmap->keysyms_per_keycode]))) {
+          XSRETURN_UNDEF;
+        }
+      }
+
+      if (! av_store(results, idx, newRV_inc((SV *)row))) {
+        XSRETURN_UNDEF;
+      }
+    }
+
+    RETVAL = newRV_inc((SV *)results);
+  OUTPUT:
+    RETVAL
+
+SV *
+get_query_tree_children(conn, window)
+    XCBConnection *conn
+    uint32_t window
+  PREINIT:
+    xcb_query_tree_cookie_t cookie;
+    xcb_query_tree_reply_t *reply;
+    xcb_window_t *children;
+    int children_len;
+  INIT:
+    AV * results = (AV *)sv_2mortal((SV *)newAV());
+  CODE:
+    cookie = xcb_query_tree(conn, window);
+    reply = xcb_query_tree_reply(conn, cookie, NULL);
+    if (! reply)
+      croak("Failed calling xcb_query_tree()");
+    if (! (children_len = xcb_query_tree_children_length(reply)))
+      XSRETURN_UNDEF;
+    av_extend(results, children_len);
+    children = xcb_query_tree_children(reply);
+    for (int i = 0; i < children_len; i++) {
+      if (! av_store(results, i, newSViv(children[i]))) {
+        XSRETURN_UNDEF;
+      }
+    }
+    RETVAL = newRV_inc((SV *)results);
+  OUTPUT:
+    RETVAL
+
 int
 get_root_window(conn)
     XCBConnection *conn
@@ -266,7 +613,6 @@ get_root_window(conn)
     RETVAL = xcb_setup_roots_iterator(xcb_get_setup(conn)).data->root;
   OUTPUT:
     RETVAL
-
 
 int
 generate_id(conn)
@@ -298,6 +644,52 @@ extension_present(conn, extension_name)
     } else {
       RETVAL = 0;
     }
+  OUTPUT:
+    RETVAL
+
+# XXX There is no _checked sign in xproto.xml, so adding some functions manually
+
+HV *
+request_check(conn, sequence)
+    XCBConnection *conn
+    int sequence
+  PREINIT:
+    HV * hash;
+    xcb_generic_error_t *error;
+    xcb_void_cookie_t cookie;
+  CODE:
+    cookie.sequence = sequence;
+    error = xcb_request_check(conn, cookie);
+    if (! error)
+      XSRETURN_UNDEF;
+    hash = newHV();
+    hv_store(hash, "sequence", strlen("sequence"), newSViv(error->sequence), 0);
+    hv_store(hash, "response_type", strlen("response_type"), newSViv(error->response_type), 0);
+    hv_store(hash, "error_code", strlen("error_code"), newSViv(error->error_code), 0);
+    hv_store(hash, "resource_id", strlen("resource_id"), newSViv(error->resource_id), 0);
+    hv_store(hash, "minor_code", strlen("minor_code"), newSViv(error->minor_code), 0);
+    hv_store(hash, "major_code", strlen("major_code"), newSViv(error->major_code), 0);
+    hv_store(hash, "full_sequence", strlen("full_sequence"), newSViv(error->full_sequence), 0);
+    RETVAL = hash;
+  OUTPUT:
+    RETVAL
+
+HV *
+change_window_attributes_checked(conn, window, value_mask, value_list, ...)
+    XCBConnection *conn
+    uint32_t window
+    uint32_t value_mask
+    intArray * value_list
+  PREINIT:
+    HV * hash;
+    xcb_void_cookie_t cookie;
+  CODE:
+    cookie = xcb_change_window_attributes_checked(conn, window, value_mask, value_list);
+
+    hash = newHV();
+    hv_store(hash, "sequence", strlen("sequence"), newSViv(cookie.sequence), 0);
+    RETVAL = hash;
+    free(value_list);
   OUTPUT:
     RETVAL
 

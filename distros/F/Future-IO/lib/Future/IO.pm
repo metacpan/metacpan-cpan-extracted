@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
 
-package Future::IO 0.14;
+package Future::IO 0.15;
 
 use v5.14;
 use warnings;
@@ -59,6 +59,10 @@ modules to work without needing a better event system.
 If there are both read/write and C<sleep> futures pending, the implementation
 will use C<select()> to wait for either. This may be problematic on MSWin32,
 depending on what type of filehandle is involved.
+
+If C<select()> is not being used then the default implementation will
+temporarily set filehandles into blocking mode (by switching off the
+C<O_NONBLOCK> flag) while performing IO on them.
 
 For cases where multiple filehandles are required, or for doing more involved
 IO operations, a real implementation based on an actual event loop should be
@@ -249,7 +253,7 @@ sub _sysread_into_buffer
 
 =head2 sysread_until_eof
 
-   $f = Future::IO->sysread_until_eof( $fh )
+   $f = Future::IO->sysread_until_eof( $fh );
 
 I<Since version 0.12.>
 
@@ -567,11 +571,21 @@ redo_select:
       $wready = !!@writers;
    }
 
+   my $was_blocking;
+
    if( $rready ) {
-      ( shift @readers )->f->done;
+      my $rd = shift @readers;
+
+      $was_blocking = $rd->fh->blocking(1) if !$do_select;
+      $rd->f->done;
+      $rd->fh->blocking(0) if !$do_select and !$was_blocking;
    }
    if( $wready ) {
-      ( shift @writers )->f->done;
+      my $wr = shift @writers;
+
+      $was_blocking = $wr->fh->blocking(1) if !$do_select;
+      $wr->f->done;
+      $wr->fh->blocking(0) if !$do_select and !$was_blocking;
    }
 
    my $now = time();

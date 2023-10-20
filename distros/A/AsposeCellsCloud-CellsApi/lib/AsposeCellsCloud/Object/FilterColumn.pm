@@ -133,14 +133,14 @@ __PACKAGE__->method_documentation({
      'field_index' => {
      	datatype => 'int',
      	base_name => 'FieldIndex',
-     	description => '',
+     	description => 'Gets and sets the column offset in the range. ',
      	format => '',
      	read_only => '',
      		},
      'filter_type' => {
      	datatype => 'string',
      	base_name => 'FilterType',
-     	description => '',
+     	description => 'Gets and sets the type fo filtering data. ',
      	format => '',
      	read_only => '',
      		},
@@ -189,7 +189,7 @@ __PACKAGE__->method_documentation({
      'visibledropdown' => {
      	datatype => 'string',
      	base_name => 'Visibledropdown',
-     	description => '',
+     	description => 'Indicates whether the AutoFilter button for this column is visible. ',
      	format => '',
      	read_only => '',
      		},    

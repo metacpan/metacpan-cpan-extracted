@@ -16,6 +16,7 @@ Modules to install from cpan
 
   cpanm XML::Hash::XS
   cpanm Cpanel::JSON::XS
+  cpanm YAML::XS
   cpanm YAML::Syck
   cpanm Moo
   cpanm ExtUtils::Config

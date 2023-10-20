@@ -1,5 +1,20 @@
 Revision history for String-Tagged
 
+0.22    2023-10-02
+        [CHANGES]
+         * Add the same start/end/len options to `->clone` as
+           `->iter_extents` takes
+
+        [BUGFIXES]
+         * Ensure that a `->substr` that splits a tag calculates its length
+           correctly on the second half
+
+0.21    2023-09-26
+        [CHANGES]
+         * Added `->delete_all_tag` method
+         * Make it safe to delete the currently-iterating tag during
+           `->iter_extents` and related
+
 0.20    2023-02-15
         [CHANGES]
          * Added `->match_extents` method

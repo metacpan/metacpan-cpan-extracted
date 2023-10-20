@@ -38,7 +38,8 @@ foreach (PACKAGES)
     }
 }
 $_ = '' . `stty -a 2>/dev/null`;
-if (m/;\s*rows\s+([1-9][0-9]*);\s*columns\s+([1-9][0-9]*);/)
+if (m/;\s*rows\s+([1-9][0-9]*);\s*columns\s+([1-9][0-9]*);/  or
+    m/;\s*([1-9][0-9]*)\s+rows;\s*([1-9][0-9]*)\s+columns;/)
 {   diag("terminal size is $1x$2");   }
 else
 {   diag("can't get terminal size: '$_'");   }

@@ -5,7 +5,40 @@ NAME
 RT VERSION
     Works with RT 4.4, 5.0
 
-SYNOPSIS
+    To use the QuickCreate option RT must be newer than 4.4.1
+
+DESCRIPTION
+    This RT extension allows you to add a QuickCalls portlet to your RT
+    dashboards.
+
+    You can configure the portlet to show the same Quick Calls on every
+    dashboard or customize the Quick Calls per dashboard.
+
+    The QuickCalls portlet can also be added to the user summary page:
+
+        Set(@UserSummaryPortlets, (qw/ExtraInfo CreateTicket ActiveTickets
+            InactiveTickets UserAssets QuickCalls/));
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    To use the QuickCreate option apply this patch for RT earlier than 5.0.6
+            patch -d /opt/rt5 -p1 < patches/0001-Support-QuickCreate-to-pass-arguments-to-redirect-UR.patch
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Plugin('RT::Extension::QuickCalls');
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+CONFIGURATION
     You will need to enable the new QuickCalls portlet with a line like this
     in your RT_SiteConfig.pm file:
 
@@ -16,52 +49,81 @@ SYNOPSIS
     can then choose to add the portlet to their homepage in Preferences ->
     RT at a glance
 
+  BASIC CONFIGURATION
     To set up your Quick Calls, you will want to specify a Name and a Queue
     in the config file. The Name will become the Subject of the task unless
     you specify a Subject option. You can add other Ticket options as
     needed, such as Status. Additionally, if the SetOwnerToCurrentUser
     option is set, the ticket will be owned by the current user.
 
-        Set($QuickCalls,[{Name => "Foo", Queue => 'General', Status => 'resolved'},
-                         {Name => "Bar", Queue => 'Queue2',  Status => 'resolved'}]);
+    The following configuration will show the same Quick Calls on all
+    dashboards:
 
-    If a value is an anonymous subref, it will be called when the QuickCall
+        Set(
+            $QuickCalls, [
+                { Name => "Foo", Queue => 'General', Status => 'resolved' },
+                { Name => "Bar", Queue => 'Queue2',  Status => 'resolved' },
+            ]
+        );
+
+  CUSTOM CONFIGURATION PER DASHBOARD
+    If you would like different dashboards to show different Quick Calls you
+    can use a different configuration format:
+
+        Set(
+            $QuickCalls, {
+                Default => {
+                    Actions => [
+                        { Name => "Default Foo", Queue => 'General', Status => 'resolved' },
+                        { Name => "Default Bar", Queue => 'Queue2',  Status => 'resolved' }
+                    ],
+                },
+                1 => { # use the ID of the Dashboard as the hash key
+                    Title => 'Optional Title',
+                    Actions => [
+                        { Name => "Dashboard ID 1 Foo", Queue => 'General', Status => 'resolved' },
+                        { Name => "Dashboard ID 1 Bar", Queue => 'Queue2',  Status => 'resolved' }
+                    ],
+                },
+                ...
+            }
+        );
+
+    The above configuration would show different Quick Calls when the
+    portlet is loaded on the Dashboard with ID 1. If there is not a custom
+    configuration for a Dashboard ID it will use the 'Default' value.
+
+  SUBREF VALUES
+    If a value is an anonymous subref, it will be called when the Quick Call
     is selected, and its return value filled in for the appropriate key:
 
-        Set($QuickCalls,[ {
-           Queue   => 'General',
-           Name    => 'This will have the current time on the server in its content',
-           Content => sub {
-              my $date = localtime;
-              return "When: $date\n\n";
-           },
-        }]);
+        Set(
+            $QuickCalls, [
+                {
+                    Queue   => 'General',
+                    Name    => 'This will have the current time on the server in its content',
+                    Content => sub {
+                        my $date = localtime;
+                        return "When: $date\n\n";
+                    },
+                },
+            ]
+        );
 
-    After you have added QuickCalls to your home page, you will be able to
-    select one, click Create and be brought to the ticket creation page with
-    multiple fields pre-filled.
+  QUICK CREATE
+    After you have added the QuickCalls portlet to your home page, you will
+    be able to select one, click Create and be brought to the ticket
+    creation page with multiple fields pre-filled.
 
-INSTALLATION
-    perl Makefile.PL
-    make
-    make install
-        May need root permissions
+    If you would like the Quick Call to automatically create the ticket and
+    stay on the dashboard you can use the QuickCreate option:
 
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
-        If you are using RT 4.2 or greater, add this line:
-
-            Plugin('RT::Extension::QuickCalls');
-
-        For RT 4.0, add this line:
-
-            Set(@Plugins, qw(RT::Extension::QuickCalls));
-
-        or add RT::Extension::QuickCalls to your existing @Plugins line.
-
-    Clear your mason cache
-            rm -rf /opt/rt4/var/mason_data/obj
-
-    Restart your webserver
+        Set(
+            $QuickCalls, [
+                { Name => "Foo", Queue => 'General', Status => 'resolved', QuickCreate => 1 },
+                { Name => "Bar", Queue => 'Queue2',  Status => 'resolved' },
+            ]
+        );
 
 AUTHOR
     Best Practical Solutions, LLC <modules@bestpractical.com>
@@ -76,7 +138,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-QuickCalls>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2014 by Best Practical Solutions
+    This software is Copyright (c) 2014-2023 by Best Practical Solutions
 
     This is free software, licensed under:
 

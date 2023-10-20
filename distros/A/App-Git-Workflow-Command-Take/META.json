@@ -4,13 +4,13 @@
       "Ivan Wills <ivan.wills@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-Git-Workflow-Command-Take",
    "prereqs" : {
@@ -38,7 +38,7 @@
    "provides" : {
       "App::Git::Workflow::Command::Take" : {
          "file" : "lib/App/Git/Workflow/Command/Take.pm",
-         "version" : "0.7"
+         "version" : "0.8"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "url" : "git://github.com/ivanwills/App-Git-Workflow-Command-Take.git"
       }
    },
-   "version" : "0.7",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.8",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

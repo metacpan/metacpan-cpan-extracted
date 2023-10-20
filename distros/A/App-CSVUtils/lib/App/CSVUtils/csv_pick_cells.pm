@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-25'; # DATE
+our $DATE = '2023-08-06'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.030'; # VERSION
+our $VERSION = '1.031'; # VERSION
 
 use App::CSVUtils qw(
                         gen_csv_util
@@ -113,7 +113,7 @@ App::CSVUtils::csv_pick_cells - Get one or more random cells from CSV
 
 =head1 VERSION
 
-This document describes version 1.030 of App::CSVUtils::csv_pick_cells (from Perl distribution App-CSVUtils), released on 2023-07-25.
+This document describes version 1.031 of App::CSVUtils::csv_pick_cells (from Perl distribution App-CSVUtils), released on 2023-08-06.
 
 =head1 FUNCTIONS
 

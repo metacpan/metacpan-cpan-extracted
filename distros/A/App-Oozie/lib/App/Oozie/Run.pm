@@ -1,6 +1,6 @@
 package App::Oozie::Run;
-$App::Oozie::Run::VERSION = '0.006';
-use 5.010;
+$App::Oozie::Run::VERSION = '0.010';
+use 5.014;
 use strict;
 use warnings;
 use namespace::autoclean -except => [qw/_options_data _options_config/];
@@ -16,13 +16,16 @@ use App::Oozie::Constants qw(
 use App::Oozie::Date;
 use App::Oozie::Types::DateTime qw( IsDate IsHour IsMinute );
 use App::Oozie::Types::Common qw( IsJobType );
-use App::Oozie::Util::Misc qw( remove_newline );
+use App::Oozie::Util::Misc qw(
+    remove_newline
+    resolve_tmp_dir
+);
 
 use Config::Properties;
 use Cwd;
 use File::Basename;
 use File::Spec;
-use File::Temp;
+use File::Temp ();
 use IO::Interactive qw( is_interactive );
 use IPC::Cmd        ();
 use Ref::Util       qw( is_ref is_hashref is_arrayref );
@@ -410,7 +413,10 @@ sub collect_oozie_cmd_args {
 
     $self->logger->info( 'Combining owner info into job.properties' );
 
-    my $override_file = File::Temp->new( SUFFIX => '.properties' );
+    my $override_file = File::Temp->new(
+                            SUFFIX => '.properties',
+                            DIR    => resolve_tmp_dir(),
+                        );
     my $original='';
 
     if ( open my $ORIG_FH, '<', 'job.properties' ) {
@@ -954,7 +960,7 @@ App::Oozie::Run
 
 =head1 VERSION
 
-version 0.006
+version 0.010
 
 =head1 SYNOPSIS
 

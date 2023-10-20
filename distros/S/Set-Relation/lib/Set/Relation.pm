@@ -7,7 +7,7 @@ use warnings;
 ###########################################################################
 
 { package Set::Relation; # role
-    our $VERSION = '0.013002';
+    our $VERSION = '0.013004';
     $VERSION = eval $VERSION;
 } # role Set::Relation
 
@@ -15,7 +15,7 @@ use warnings;
 ###########################################################################
 
 { package Set::Relation::Mutable; # role
-    our $VERSION = '0.013002';
+    our $VERSION = '0.013004';
     $VERSION = eval $VERSION;
     # with Set::Relation
 } # role Set::Relation::Mutable

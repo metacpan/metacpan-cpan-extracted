@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Japanese DateTime Parser/Formatter - ~/lib/DateTime/Format/JP.pm
-## Version v0.1.3
+## Version v0.1.4
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/18
-## Modified 2022/07/07
+## Modified 2023/10/11
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -23,7 +23,7 @@ BEGIN
         $WEEKDAYS_RE $TIME_RE $TIME_ZENKAKU_RE $TIME_KANJI_RE $ERROR
     );
     use Nice::Try;
-    our $VERSION = 'v0.1.3';
+    our $VERSION = 'v0.1.4';
     our $DICT = [];
     our $ZENKAKU_NUMBERS = [];
     our $KANJI_NUMBERS   = [];
@@ -416,6 +416,7 @@ sub new
     my $this = shift( @_ );
     return( $this->error( "Incorrect parameters provided. You need to provide an hash of values." ) ) if( @_ % 2 );
     my $p = { @_ };
+    $p->{debug} //= 0;
     # kanji_number
     # pattern
     # time_zone
@@ -787,6 +788,24 @@ sub format_datetime
         die( "Missing definition for '$token'\n" ) if( !exists( $map->{ $token } ) );
         $map->{ $token }->();
     }gexs;
+
+    $pat =~ s
+    {
+        \%\{(\w+)\}
+    }
+    {
+        my $meth = $1;
+        my $code = $dt->can( $meth );
+        if( $code )
+        {
+            $code->( $dt );
+        }
+        else
+        {
+            warnings::warn( "Unsupported DateTime method \"${meth}\" found in pattern.\n" ) if( warnings::enabled() );
+            '%{' . $meth . '}';
+        }
+    }gexs;
     
     if( index( $pat, '%' ) != -1 )
     {
@@ -943,7 +962,7 @@ sub message
 {
     my $self = shift( @_ );
     my $level = shift( @_ );
-    return(1) if( $self->{debug} < int( $level ) );
+    return(1) if( $self->{debug} < int( $level // 0 ) );
     my $msg  = join( '', map( ( ref( $_ ) eq 'CODE' ) ? $_->() : $_, @_ ) );
     chomp( $msg );
     print( STDERR "# ", join( "\n# ", split( /\n/, $msg ) ), "\n" );
@@ -1319,7 +1338,7 @@ DateTime::Format::JP - Japanese DateTime Parser and Formatter
 
 =head1 VERSION
 
-    v0.1.3
+    v0.1.4
 
 =head1 DESCRIPTION
 

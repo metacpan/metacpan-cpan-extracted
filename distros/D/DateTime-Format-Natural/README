@@ -112,8 +112,8 @@ CONSTRUCTOR
 
     *   "daytime"
 
-        An anonymous hash reference consisting of customized daytime hours,
-        which may be selectively changed.
+        A hash reference consisting of customized daytime hours, which may
+        be selectively changed.
 
 METHODS
   parse_datetime

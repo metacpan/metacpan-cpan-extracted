@@ -10,28 +10,32 @@ use Pod::Usage;
 
 # use Data::Dumper::Simple;$Data::Dumper::Sortkeys = 1;$Data::Dumper::Purity = 1;
 
+BEGIN {
+	our $VERSION = '2.02';
+};
+
 my $default_dir = '.';
 my $errors      = FALSE;
 my $auto        = FALSE;
-my $fullscreen  = FALSE;
+my $fullscreen  = TRUE;
 my $showall     = FALSE;
 my $help        = FALSE;
-my $nosplash    = FALSE;
 my $dev         = FALSE;
 my $noaccel     = FALSE;
 my $diagnostics = FALSE;
 my $showname    = FALSE;
 my $ignore_x    = FALSE;
 my $delay       = 3;
+my $dummy       = FALSE;
 
 GetOptions(
     'auto'             => \$auto,
     'errors'           => \$errors,
-    'full'             => \$fullscreen,
+	'full'             => \$dummy, # The default is fullscreen, but this retains compatibility to avoid errors
+    'nofull'           => \$fullscreen,
     'showall|all'      => \$showall,
     'help'             => \$help,
     'delay|wait=i'     => \$delay,
-    'nosplash'         => \$nosplash,
     'dev=i'            => \$dev,
     'noaccel'          => \$noaccel,
     'diagnostics'      => \$diagnostics,
@@ -48,12 +52,10 @@ if ($help) {
     pod2usage('-exitstatus' => 1, '-verbose' => $help);
 }
 
-my $splash = ($nosplash) ? 0 : 2;
-
 our $FB = Graphics::Framebuffer->new(
     'SHOW_ERRORS'      => $errors,
     'RESET'            => 1,
-    'SPLASH'           => $splash,
+    'SPLASH'           => 0,
     'ACCELERATED'      => !$noaccel,
     'FB_DEVICE'        => "/dev/fb$dev",
     'DIAGNOSTICS'      => $diagnostics,
@@ -70,7 +72,6 @@ ERRORS           = $errors
 FULL             = $fullscreen
 SHOWALL          = $showall
 DELAY            = $delay
-NOSPLASH         = $nosplash
 DEVICE           = /dev/fb$dev
 ACCELERATION     = $FB->{'ACCELERATED'}
 IGNORE-X-WINDOWS = $ignore_x
@@ -235,6 +236,8 @@ Framebuffer Slide Show
 
 This automatically detects all of the framebuffer devices in your system, and shows the images in the images path, in a random order, on the primary framebuffer device (the first it finds).
 
+Note:  It will ignore any subdirectory with a ".nomedia" file in it.
+
 =head1 SYNOPSIS
 
  perl slideshow.pl [options] "/path/to/scan"
@@ -247,15 +250,15 @@ More than one path can be used.  Just separate each path by a space.
 
 =item B<--auto>
 
-Turns on auto color level mode.  Sometimes this yields great results... and sometimes it totally ugly's things up
+Turns on auto color level mode.  Sometimes this yields great results... and sometimes it makes things ugly.
 
 =item B<--errors>
 
 Allows the module to print errors to STDERR
 
-=item B<--full>
+=item B<--nofull>
 
-Scales all images (and animations) to full screen (proportionally).  Images are always scaled down, if they are too big for the screen, regardless of this option.
+Turns off automatic proportional image scaling to full screen, and shows the image in its original resolution (unless it is too big for the screen, else it will be scaled down regardless).
 
 =item B<--delay>=seconds
 
@@ -271,7 +274,7 @@ Ignores any ".nomedia" files in subdirectories, and shows the images in them any
 
 =head1 COPYRIGHT
 
-Copyright 2010 - 2019 Richard Kelsch
+Copyright 2010 - 2023 Richard Kelsch
 All Rights Reserved
 
 =head1 LICENSE

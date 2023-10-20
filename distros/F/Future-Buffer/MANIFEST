@@ -1,7 +1,12 @@
+.editorconfig
 Build.PL
 Changes
 lib/Future/Buffer.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01read_atmost.t
 t/02read_exactly.t
@@ -9,8 +14,5 @@ t/03read_until.t
 t/04read_unpacked.t
 t/10write.t
 t/11fill.t
+t/12eof.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

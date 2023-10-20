@@ -14,11 +14,13 @@ Options:
   --with-backup  make backup files
 
   --diff         produce diff output
-  --U#           specify unified diff context length
+  -U#            specify unified diff context length
+
+  --discard      simply discard the output
 
 =head1 VERSION
 
-Version 0.03
+Version 1.01
 
 =head1 DESCRIPTION
 
@@ -63,6 +65,12 @@ File is not touched as far as its content does not change.
 Backup original file with C<.bak> suffix.  If optional parameter is
 given, it is used as a suffix string.  If the file exists, C<.bak_1>,
 C<.bak_2> ... are used.
+
+=item B<--discard>
+
+=item B<--update::discard>
+
+Simply discard the command output without updating file.
 
 =begin comment
 
@@ -119,7 +127,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2022 Kazumasa Utashiro.
+Copyright 2022-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -130,7 +138,7 @@ package App::Greple::update;
 use v5.14;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '1.01';
 
 use utf8;
 use open IO => ':utf8';
@@ -248,6 +256,7 @@ sub update_file {
     my $newname = '';
 
     recover_stdout() or die;
+    return if $arg{discard};
     $divert_buffer = decode 'utf8', $divert_buffer;
 
     if ($_ eq $divert_buffer) {
@@ -296,13 +305,15 @@ option default \
 	--prologue update_initialize \
 	--begin    update_begin
 
-expand ++dump --all --need 0 -h --color=never --no-newline
-option --update::diff   ++dump --of &update_diff
-option --update::create ++dump --begin update_divert --end update_file() --suffix=.new
-option --update::update ++dump --begin update_divert --end update_file(replace)
+expand ++dump --all --need 0 -h --color=never --no-newline --no-line-number
+option --update::diff    ++dump --of &update_diff
+option --update::create  ++dump --begin update_divert --end update_file() --suffix=.new
+option --update::update  ++dump --begin update_divert --end update_file(replace)
+option --update::discard ++dump --begin update_divert --end update_file(discard)
 
-option --diff   --update::diff
-option --create --update::create
-option --update --update::update
+option --diff    --update::diff
+option --create  --update::create
+option --update  --update::update
+option --discard --update::discard
 
 #  LocalWords:  greple diff sdif cdif

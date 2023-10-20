@@ -9,9 +9,9 @@ with 'Org::ElementRole';
 with 'Org::ElementRole::Block';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-12'; # DATE
+our $DATE = '2023-08-05'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.559'; # VERSION
+our $VERSION = '0.560'; # VERSION
 
 has _dummy => (is => 'rw'); # workaround Moo bug
 
@@ -50,7 +50,7 @@ sub BUILD {
                     push @{ $row->children }, $cell;
                 }
             } else {
-                die "Invalid line in table: $row0";
+                $self->die("Invalid line in table: $row0");
             }
             push @{$self->children}, $row;
         }
@@ -125,7 +125,7 @@ Org::Element::Table - Represent Org table
 
 =head1 VERSION
 
-This document describes version 0.559 of Org::Element::Table (from Perl distribution Org-Parser), released on 2023-07-12.
+This document describes version 0.560 of Org::Element::Table (from Perl distribution Org-Parser), released on 2023-08-05.
 
 =head1 DESCRIPTION
 

@@ -23,7 +23,7 @@ WriteMakefile(
             },
         }
     },
-    test  => { TESTS    => 't/*.t' },
+    test  => {TESTS    => 't/*.t'},
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
     clean => {FILES    => 'Mojolicious-Plugin-HTMX-*'},
 );

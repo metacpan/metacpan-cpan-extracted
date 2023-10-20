@@ -6,18 +6,7 @@ use warnings;
 use Astro::Coord::ECI::TLE;
 use Time::Local;
 
-BEGIN {
-
-    eval {
-	require Test::More;
-	Test::More->VERSION( 0.88 );	# Because of done_testing()
-	Test::More->import();
-	1;
-    } or do {
-	print "1..0 # skip Test::More 0.88 required\n";
-	exit;
-    };
-}
+use Test::More 0.88;	# Because of done_testing()
 
 my ($near, $deep) = Astro::Coord::ECI::TLE->parse(<<eod);
 1 88888U          80275.98708465  .00073094  13844-3  66816-4 0    8

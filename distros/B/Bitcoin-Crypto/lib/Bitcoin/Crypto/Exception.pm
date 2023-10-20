@@ -1,10 +1,15 @@
 package Bitcoin::Crypto::Exception;
-$Bitcoin::Crypto::Exception::VERSION = '1.008';
+$Bitcoin::Crypto::Exception::VERSION = '2.001';
 use v5.10;
 use strict;
 use warnings;
+
 use Moo;
-use Types::Standard qw(Maybe Str ArrayRef);
+use Mooish::AttributeBuilder -standard;
+use Try::Tiny;
+use Scalar::Util qw(blessed);
+
+use Bitcoin::Crypto::Types qw(Str Maybe ArrayRef);
 
 use namespace::clean;
 
@@ -12,32 +17,29 @@ use overload
 	q{""} => "as_string",
 	fallback => 1;
 
-has 'message' => (
-	is => 'ro',
+has param 'message' => (
 	isa => Str,
-	required => 1,
+	writer => -hidden,
 );
 
-has 'caller' => (
-	is => 'ro',
+has field 'caller' => (
 	isa => Maybe [ArrayRef],
 	default => sub {
-		for my $call_level (1 .. 10) {
+		for my $call_level (1 .. 20) {
 			my ($package, $file, $line) = caller $call_level;
-			if (defined $package && $package !~ /^Bitcoin::Crypto/) {
+			if (defined $package && $package !~ /^(Bitcoin::Crypto|Try::Tiny|Type::Coercion)/) {
 				return [$package, $file, $line];
 			}
 		}
 		return undef;
 	},
-	init_arg => undef,
 );
 
 sub raise
 {
 	my ($self, $error) = @_;
 
-	unless (ref $self) {
+	if (defined $error) {
 		$self = $self->new(message => $error);
 	}
 
@@ -51,28 +53,30 @@ sub throw
 
 sub trap_into
 {
-	my ($class, $sub) = @_;
-
-	# make sure we use class name
-	$class = ref $class
-		if ref $class;
+	my ($class, $sub, $prefix) = @_;
 
 	my $ret;
-	my $error = do {
-		local $@;
-		my $failure = not eval {
-			$ret = $sub->();
-			return 1;
-		};
-
-		$@ || $failure;
-	};
-
-	if ($error) {
-
-		# make sure we stringify the error
-		$class->throw("$error");
+	try {
+		$ret = $sub->();
 	}
+	catch {
+		my $ex = $_;
+
+		if (blessed $ex) {
+			if ($ex->isa($class)) {
+				$ex->_set_message("$prefix: " . $ex->message)
+					if $prefix;
+
+				$ex->raise;
+			}
+
+			if ($ex->isa('Bitcoin::Crypto::Exception')) {
+				$class->raise(($prefix ? "$prefix: " : '') . $ex->message);
+			}
+		}
+
+		$class->raise($prefix ? "$prefix: $ex" : "$ex");
+	};
 
 	return $ret;
 }
@@ -82,139 +86,213 @@ sub as_string
 	my ($self) = @_;
 
 	my $raised = $self->message;
-	$raised =~ s/\s$//g;
+	$raised =~ s/\s+\z//;
+
 	my $caller = $self->caller;
 	if (defined $caller) {
 		$raised .= ' (raised at ' . $caller->[1] . ', line ' . $caller->[2] . ')';
 	}
-	return 'An error occured in Bitcoin subroutines: ' . $raised;
+
+	my $class = ref $self;
+	$class =~ s/Bitcoin::Crypto::Exception:://;
+
+	return "An error occured in Bitcoin subroutines: [$class] $raised";
+}
+
+{
+
+	package Bitcoin::Crypto::Exception::Transaction;
+$Bitcoin::Crypto::Exception::Transaction::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
+
+}
+
+{
+
+	package Bitcoin::Crypto::Exception::UTXO;
+$Bitcoin::Crypto::Exception::UTXO::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
+
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Sign;
-$Bitcoin::Crypto::Exception::Sign::VERSION = '1.008';
-use parent -norequire, "Bitcoin::Crypto::Exception";
+$Bitcoin::Crypto::Exception::Sign::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
 
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Verify;
-$Bitcoin::Crypto::Exception::Verify::VERSION = '1.008';
-use parent -norequire, "Bitcoin::Crypto::Exception";
+$Bitcoin::Crypto::Exception::Verify::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::KeyCreate;
-$Bitcoin::Crypto::Exception::KeyCreate::VERSION = '1.008';
-use parent -norequire, "Bitcoin::Crypto::Exception";
+$Bitcoin::Crypto::Exception::KeyCreate::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::KeyDerive;
-$Bitcoin::Crypto::Exception::KeyDerive::VERSION = '1.008';
-use parent -norequire, "Bitcoin::Crypto::Exception";
+$Bitcoin::Crypto::Exception::KeyDerive::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::MnemonicGenerate;
-$Bitcoin::Crypto::Exception::MnemonicGenerate::VERSION = '1.008';
-use parent -norequire, "Bitcoin::Crypto::Exception";
+$Bitcoin::Crypto::Exception::MnemonicGenerate::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::MnemonicCheck;
-$Bitcoin::Crypto::Exception::MnemonicCheck::VERSION = '1.008';
-use parent -norequire, "Bitcoin::Crypto::Exception";
+$Bitcoin::Crypto::Exception::MnemonicCheck::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Base58InputFormat;
-$Bitcoin::Crypto::Exception::Base58InputFormat::VERSION = '1.008';
-use parent -norequire, "Bitcoin::Crypto::Exception";
+$Bitcoin::Crypto::Exception::Base58InputFormat::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Base58InputChecksum;
-$Bitcoin::Crypto::Exception::Base58InputChecksum::VERSION = '1.008';
-use parent -norequire, "Bitcoin::Crypto::Exception";
+$Bitcoin::Crypto::Exception::Base58InputChecksum::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Bech32InputFormat;
-$Bitcoin::Crypto::Exception::Bech32InputFormat::VERSION = '1.008';
-use parent -norequire, "Bitcoin::Crypto::Exception";
+$Bitcoin::Crypto::Exception::Bech32InputFormat::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Bech32InputData;
-$Bitcoin::Crypto::Exception::Bech32InputData::VERSION = '1.008';
-use parent -norequire, "Bitcoin::Crypto::Exception";
-}
-
-{
-
-	package Bitcoin::Crypto::Exception::Bech32Type;
-$Bitcoin::Crypto::Exception::Bech32Type::VERSION = '1.008';
-use parent -norequire, "Bitcoin::Crypto::Exception";
+$Bitcoin::Crypto::Exception::Bech32InputData::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Bech32InputChecksum;
-$Bitcoin::Crypto::Exception::Bech32InputChecksum::VERSION = '1.008';
-use parent -norequire, "Bitcoin::Crypto::Exception";
+$Bitcoin::Crypto::Exception::Bech32InputChecksum::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::SegwitProgram;
-$Bitcoin::Crypto::Exception::SegwitProgram::VERSION = '1.008';
-use parent -norequire, "Bitcoin::Crypto::Exception";
+$Bitcoin::Crypto::Exception::SegwitProgram::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
-	package Bitcoin::Crypto::Exception::ValidationTest;
-$Bitcoin::Crypto::Exception::ValidationTest::VERSION = '1.008';
-use parent -norequire, "Bitcoin::Crypto::Exception";
+	package Bitcoin::Crypto::Exception::ScriptType;
+$Bitcoin::Crypto::Exception::ScriptType::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::ScriptOpcode;
-$Bitcoin::Crypto::Exception::ScriptOpcode::VERSION = '1.008';
-use parent -norequire, "Bitcoin::Crypto::Exception";
+$Bitcoin::Crypto::Exception::ScriptOpcode::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::ScriptPush;
-$Bitcoin::Crypto::Exception::ScriptPush::VERSION = '1.008';
-use parent -norequire, "Bitcoin::Crypto::Exception";
+$Bitcoin::Crypto::Exception::ScriptPush::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
+}
+
+{
+
+	package Bitcoin::Crypto::Exception::ScriptSyntax;
+$Bitcoin::Crypto::Exception::ScriptSyntax::VERSION = '2.001';
+use Moo;
+	use Mooish::AttributeBuilder -standard;
+	use Bitcoin::Crypto::Types qw(PositiveOrZeroInt ArrayRef);
+
+	extends 'Bitcoin::Crypto::Exception';
+
+	has field 'script' => (
+		isa => ArrayRef,
+		writer => 1,
+		predicate => 1,
+	);
+
+	has field 'error_position' => (
+		isa => PositiveOrZeroInt,
+		writer => 1,
+		predicate => 1,
+	);
+
+	sub as_string
+	{
+		my ($self) = @_;
+		my $message = $self->SUPER::as_string;
+
+		if ($self->has_script && $self->has_error_position) {
+			my @script = @{$self->script};
+			$script[$self->error_position] = '> ' . $script[$self->error_position] . ' <-- here';
+			$message .= "\n" . join ' ', @script;
+		}
+
+		return $message;
+	}
+}
+
+{
+
+	package Bitcoin::Crypto::Exception::ScriptRuntime;
+$Bitcoin::Crypto::Exception::ScriptRuntime::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
+}
+
+{
+
+	package Bitcoin::Crypto::Exception::TransactionScript;
+$Bitcoin::Crypto::Exception::TransactionScript::VERSION = '2.001';
+use parent -norequire,
+		'Bitcoin::Crypto::Exception::Transaction',
+		'Bitcoin::Crypto::Exception::ScriptRuntime';
+}
+
+{
+
+	package Bitcoin::Crypto::Exception::NetworkCheck;
+$Bitcoin::Crypto::Exception::NetworkCheck::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::NetworkConfig;
-$Bitcoin::Crypto::Exception::NetworkConfig::VERSION = '1.008';
-use parent -norequire, "Bitcoin::Crypto::Exception";
+$Bitcoin::Crypto::Exception::NetworkConfig::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::AddressGenerate;
-$Bitcoin::Crypto::Exception::AddressGenerate::VERSION = '1.008';
-use parent -norequire, "Bitcoin::Crypto::Exception";
+$Bitcoin::Crypto::Exception::AddressGenerate::VERSION = '2.001';
+use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 1;
@@ -222,84 +300,102 @@ use parent -norequire, "Bitcoin::Crypto::Exception";
 __END__
 =head1 NAME
 
-Bitcoin::Crypto::Exception - Exception class for Bitcoin::Crypto purposes
+Bitcoin::Crypto::Exception - Exception classes for Bitcoin::Crypto
 
 =head1 SYNOPSIS
 
-	use Try::Tiny;
-
 	try {
-		decode_segwit("Not a segwit address");
-	} catch {
-		my $error = $_;
-
+		decode_segwit('Not a segwit address');
+	}
+	catch ($error) {
 		# $error is an instance of Bitcoin::Crypto::Exception and stringifies automatically
 		warn "$error";
 
-		# but also contains some information about the problem to avoid regex matching
-		if ($error->isa("Bitcoin::Crypto::Exception::Bech32InputFormat")) {
+		# it also contains some information about the problem to avoid regex matching
+		if ($error->isa('Bitcoin::Crypto::Exception::Bech32InputFormat')) {
 			log $error->message;
 		}
-	};
+	}
 
 =head1 DESCRIPTION
 
-A wrapper class with automatic stringification and standarized raising.
-Contains many other inline packages that identify parts that went wrong (like Bitcoin::Crypto::Exception::Sign for errors in signature generation).
-See individual Bitcoin::Crypto packages documentation to see the exception classes to check for extra control flow when needed.
+An exception wrapper class with automatic stringification and standarized
+raising.
 
-=head1 FUNCTIONS
+Contains inline packages that identify parts that went wrong (like
+C<Bitcoin::Crypto::Exception::Sign> for errors in signature generation). Search
+individual Bitcoin::Crypto packages documentation for a list the exception
+classes to check for extra control flow when needed.
 
-=head2 message
+=head1 INTERFACE
 
-	$error_string = $object->message()
+=head2 Attributes
 
-Returns the error message (a string).
+=head3 message
 
-=head2 caller
+The wrapped error message (a string). Note: this is the raw message,
+not the serialized form like in L</as_string>.
 
-	$caller_aref = $object->caller()
+=head3 caller
 
-Returns an array ref containing: package name, file name and line number (same as C<[caller()]> perl expression). It will contain the data for the first code from outside Bitcoin::Crypto which called it. May be undefined if it cannot find a calling source.
+B<Not assignable in the constructor>
 
-=head2 as_string
+An array ref containing: package name, file name and line number (same
+as C<[caller()]> perl expression). It will point to the first place from
+outside Bitcoin::Crypto which called it. May be undefined if it cannot find a
+calling source.
+
+=head2 Methods
+
+=head3 new
+
+	$runner = Bitcoin::Crypto::Exception->new(%data)
+
+This is a standard Moo constructor, which can be used to create the object. It
+takes arguments specified in L</Attributes>. For exceptions, it's probably
+better to use L</raise> instead.
+
+Returns class instance.
+
+=head3 as_string
 
 	$error_info = $object->as_string()
 
-Stringifies the error, using the C<message> method, C<caller> method and some extra text for context.
+Stringifies the error, using the L</message> method, L</caller> method and some
+extra text for context.
 
-=head2 raise
+=head3 raise
 
 	$object->raise()
 	$class->raise($message)
 
 Creates a new instance and throws it. If used on an object, throws it right away.
 
-	use Try::Tiny;
-
 	try {
 		# throws, but will be catched
-		Bitcoin::Crypto::Exception->raise("something went wrong");
-	} catch {
-		my $exception = $_;
-
+		Bitcoin::Crypto::Exception->raise('something went wrong');
+	}
+	catch ($exception) {
 		# throws again
 		$exception->raise;
-	};
+	}
 
-=head2 throw
+=head3 throw
 
 An alias to C<raise>.
 
-=head2 trap_into
+=head3 trap_into
 
-	$sub_result = $class->trap_into($sub)
+	$sub_result = $class->trap_into($sub, $prefix)
 
-Executes the subroutine given as the only parameter inside an C<eval>. Any exceptions thrown inside the subroutine C<$sub> will be re-thrown after turning them into objects of the given class. If no exception is thrown, method returns the value returned by C<$sub>.
+Executes the given subroutine in an exception-trapping environment. Any
+exceptions thrown inside the subroutine C<$sub> will be re-thrown after turning
+them into objects of the given C<::Exception> class. If no exception is thrown,
+method returns the value returned by C<$sub>.
 
 	my $result = Bitcoin::Crypto::Exception->trap_into(sub {
-		die "something went wrong";
+		die 'something went wrong';
 	});
 
-=cut
+C<$prefix> can be specified to better format the message.
 

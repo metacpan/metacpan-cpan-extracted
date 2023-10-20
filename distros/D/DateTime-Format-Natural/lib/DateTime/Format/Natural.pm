@@ -24,7 +24,7 @@ use Storable qw(dclone);
 
 use DateTime::Format::Natural::Utils qw(trim);
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 validation_options(
     on_fail => sub
@@ -142,6 +142,28 @@ sub _init_check
         daytime => {
             type => HASHREF,
             optional => true,
+            callbacks => {
+                'valid daytime' => sub
+                {
+                    my $href = shift;
+                    my %daytimes = map { $_ => true } qw(morning afternoon evening);
+                    if (any { !$daytimes{$_} } keys %$href) {
+                        die "spelling of daytime\n";
+                    }
+                    elsif (any { !defined $href->{$_} } keys %$href) {
+                        die "undefined hour\n";
+                    }
+                    elsif (any { $href->{$_} !~ /^\d{1,2}$/ } keys %$href) {
+                        die "not a valid number\n";
+                    }
+                    elsif (any { $href->{$_} < 0 || $href->{$_} > 23 } keys %$href) {
+                        die "hour out of range\n";
+                    }
+                    else {
+                        return true;
+                    }
+                }
+            },
         },
         datetime => {
             type => OBJECT,
@@ -853,7 +875,7 @@ recognized by L<DateTime>. Defaults to 'floating'.
 
 =item * C<daytime>
 
-An anonymous hash reference consisting of customized daytime hours,
+A hash reference consisting of customized daytime hours,
 which may be selectively changed.
 
 =back

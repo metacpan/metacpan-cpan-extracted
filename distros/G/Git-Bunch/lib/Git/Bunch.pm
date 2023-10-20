@@ -1,10 +1,5 @@
 package Git::Bunch;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-31'; # DATE
-our $DIST = 'Git-Bunch'; # DIST
-our $VERSION = '0.629'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -12,6 +7,7 @@ use Log::ger::Format 'MultilevelLog';
 use Log::ger;
 
 use Cwd ();
+use Exporter qw(import);
 use File::chdir;
 use File::Path qw(make_path);
 use IPC::System::Options 'system', 'readpipe', -log=>1, -lang=>'C';
@@ -19,8 +15,11 @@ use List::Util qw(max);
 use POSIX qw(strftime);
 use String::ShellQuote;
 
-use Exporter qw(import);
-our @ISA       = qw(Exporter);
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-07-16'; # DATE
+our $DIST = 'Git-Bunch'; # DIST
+our $VERSION = '0.630'; # VERSION
+
 our @EXPORT_OK = qw(check_bunch sync_bunch exec_bunch);
 
 our %SPEC;
@@ -245,7 +244,7 @@ sub _check_common_args {
         return [400, "Invalid include_repos_pat: must be a string"]
             if ref($irp);
         return [400, "Invalid include_repos_pat: $@"]
-            if !(eval q{qr/$irp/});
+            if !(eval q{qr/$irp/}); ## no critic: TestingAndDebugging::ProhibitNoStrict
     }
     my $er = $args->{exclude_repos};
     return [400, "exclude_repos must be an array"]
@@ -255,7 +254,7 @@ sub _check_common_args {
         return [400, "Invalid exclude_repos_pat: must be a string"]
             if ref($erp);
         return [400, "Invalid exclude_repos_pat: must be a string"]
-            if !(eval q{qr/$erp/});
+            if !(eval q{qr/$erp/}); ## no critic: TestingAndDebugging::ProhibitNoStrict
     }
 
     if ($requires_target) {
@@ -279,8 +278,6 @@ sub _is_repo {
 
 # return true if entry should be skipped
 sub _skip_process_entry {
-    use experimental 'smartmatch';
-
     my ($e, $args, $dir, $skip_non_repo) = @_;
 
     # skip special files
@@ -306,7 +303,7 @@ sub _skip_process_entry {
     }
     if ($is_repo) {
         my $ir = $args->{include_repos};
-        if ($ir && !($e->{name} ~~ @$ir)) {
+        if ($ir && !(grep { $_ eq $e->{name} } @$ir)) {
             log_debug("Skipped $e->{name} (not in include_repos)");
             return 1;
         }
@@ -316,7 +313,7 @@ sub _skip_process_entry {
             return 1;
         }
         my $er = $args->{exclude_repos};
-        if ($er && $e->{name} ~~ @$er) {
+        if ($er && grep { $_ eq $e->{name} } @$er) {
             log_debug("Skipped $e->{name} (in exclude_repos)");
             return 1;
         }
@@ -444,8 +441,6 @@ _
     },
 };
 sub check_bunch {
-    use experimental 'smartmatch';
-
     my %args = @_;
     my $res;
 
@@ -467,7 +462,7 @@ sub check_bunch {
 
     my $i = 0;
     $progress->pos(0) if $progress;
-    $progress->target(~~@entries) if $progress;
+    $progress->target(scalar @entries) if $progress;
   REPO:
     for my $e (@entries) {
         my $repo = $e->{name};
@@ -562,8 +557,6 @@ _
     },
 };
 sub list_bunch_contents {
-    use experimental 'smartmatch';
-
     my %args = @_;
 
     # XXX schema
@@ -609,8 +602,6 @@ sub list_bunch_contents {
 }
 
 sub _sync_repo {
-    use experimental 'smartmatch';
-
     my ($src, $dest, $repo, $opts) = @_;
     my $exit;
 
@@ -700,7 +691,7 @@ sub _sync_repo {
             $output = readpipe(
                 join("",
                      "cd '$dest/$repo'; ",
-                     ($branch ~~ @dest_branches ? "":"git branch '$branch'; "),
+                     ((grep { $_ eq $branch } @dest_branches) ? "":"git branch '$branch'; "),
                      "git checkout '$branch' 2>/dev/null; ",
                      "git pull '$src/$repo' '$branch' 2>&1"
                  ));
@@ -743,7 +734,7 @@ sub _sync_repo {
 
     if ($opts->{delete_branch}) {
         for my $branch (@dest_branches) {
-            next if $branch ~~ @src_branches;
+            next if grep { $_ eq $branch } @src_branches;
             next if $branch eq 'master'; # can't delete master branch
             $changed_branch++;
             log_info("Deleting branch $branch of repo $repo because ".
@@ -891,7 +882,6 @@ _
     },
 };
 sub sync_bunch {
-    use experimental 'smartmatch';
     require Capture::Tiny;
     require UUID::Random;
     require App::reposdb;
@@ -942,7 +932,7 @@ sub sync_bunch {
     my %res;
     my $i = 0;
     $progress->pos(0) if $progress;
-    $progress->target(~~@entries) if $progress;
+    $progress->target(scalar @entries) if $progress;
 
     my @res;
 
@@ -1263,7 +1253,7 @@ Git::Bunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.629 of Git::Bunch (from Perl distribution Git-Bunch), released on 2021-01-31.
+This document describes version 0.630 of Git::Bunch (from Perl distribution Git-Bunch), released on 2023-07-16.
 
 =head1 SYNOPSIS
 
@@ -1308,7 +1298,7 @@ See also L<rsybak>, which I wrote to backup everything else.
 
 Usage:
 
- check_bunch(%args) -> [status, msg, payload, meta]
+ check_bunch(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check status of git repositories inside gitbunch directory.
 
@@ -1387,12 +1377,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1402,7 +1392,7 @@ Return value:  (any)
 
 Usage:
 
- commit_bunch(%args) -> [status, msg, payload, meta]
+ commit_bunch(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Commit all uncommitted repos in the bunch.
 
@@ -1493,12 +1483,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1508,7 +1498,7 @@ Return value:  (any)
 
 Usage:
 
- exec_bunch(%args) -> [status, msg, payload, meta]
+ exec_bunch(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Execute a command for each repo in the bunch.
 
@@ -1593,12 +1583,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1608,7 +1598,7 @@ Return value:  (any)
 
 Usage:
 
- list_bunch_contents(%args) -> [status, msg, payload, meta]
+ list_bunch_contents(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List contents inside gitbunch directory.
 
@@ -1679,12 +1669,12 @@ Directory to check.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1694,7 +1684,7 @@ Return value:  (any)
 
 Usage:
 
- sync_bunch(%args) -> [status, msg, payload, meta]
+ sync_bunch(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Synchronize bunch to another bunch.
 
@@ -1719,6 +1709,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<action> => I<str> (default: "sync")
+
+(No description)
 
 =item * B<backup> => I<bool>
 
@@ -1846,12 +1838,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1862,14 +1854,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Git-Bunch>
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Git-Bunch>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Git-Bunch/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -1897,11 +1881,43 @@ L<File::RsyBak>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Git-Bunch>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

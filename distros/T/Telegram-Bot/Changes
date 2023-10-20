@@ -1,4 +1,13 @@
+0.024     2023-10-10 12:41:52+01:00 Europe/London
+
+    - sending messages now warns on errors, but never fails (kk12l) (GH#5)
+    - add sendDocument method to send file messages
+
 0.023     2023-08-14 13:18:20+03:00 Europe/Helsinki
+
+	- warn rather than crashing, on an unknown update type
+	- add test for this behaviour change
+	- change dist.ini to reflect that it's me releasing
 
 0.021     2019-07-01 10:34:13+09:30 Australia/Adelaide
 

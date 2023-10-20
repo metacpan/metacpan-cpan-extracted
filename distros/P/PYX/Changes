@@ -1,3 +1,7 @@
+0.10 2023-10-19T10:08:27+02:00
+ [PYX::Parser]
+ - Fix doc.
+
 0.09 2023-09-11T23:12:41+02:00
  [Common]
  - Add tests for parse().

@@ -21,20 +21,20 @@ no_index:
 requires:
   Config::Grammar: '1.13'
   Excel::Writer::XLSX: '0'
-  Future::AsyncAwait: '0.54'
-  JSON::Validator: '5.03'
+  Future::AsyncAwait: '0.65'
+  JSON::Validator: '5.14'
   Locale::PO: '0.27'
-  Mojolicious: '9.12'
+  Mojolicious: '9.33'
   Mojolicious::Plugin::Qooxdoo: v1.0.14
-  Syntax::Keyword::Try: '0.25'
+  Syntax::Keyword::Try: '0.29'
   Test::Fatal: '0'
   Text::CSV: '0'
-  XS::Parse::Keyword: '0.21'
-  YAML::XS: '0.83'
+  XS::Parse::Keyword: '0.38'
+  YAML::XS: '0.88'
   perl: '5.022000'
 resources:
   bugtracker: https://github.com/oetiker/callbackery/issues
   license: http://opensource.org/licenses/GPL-3.0
   repository: https://github.com/oetiker/callbackery
-version: v0.47.3
+version: v0.47.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

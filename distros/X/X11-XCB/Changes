@@ -1,0 +1,72 @@
+Revision history for libXcb Perl bindings.
+
+0.21    2023-10-18
+
+    - Add GenericError event
+
+    - Add constant for KEY_RELEASE
+
+    - Add INSTALL.md
+
+    - Fix X11::XCB::DESTROY for failed connections
+
+    - Fix warnings in _GenerateMyXS.pm
+      And resolve #144815.
+
+0.20    2023-09-26
+
+    - Fix type cast for ClientMessage data to avoid warning
+
+    - Add RandR support
+      This commit adds most of RandR extension support. There are several
+      randr types, specifically struct randr_get_provider_property_reply,
+      mode_info_t, transform_t, monitor_info_t which are still not included
+      into a typemap, so these functions are not implemented:
+      randr_create_mode, randr_set_monitor, randr_set_crtc_transform.
+      Read-only RandR support is better than nothing, huh? :)
+
+    - Implement xcb_get_setup
+      It looks like it's missing in xml and _GenerateMyXS.pm does not see it
+      so it was added manually.
+
+    - Implement X11::XCB::Connection::get_keymap in XCB.xs
+      X11 keymap is being received in several steps: at first we should call
+      C<xcb_get_setup()> and then C<xcb_get_keyboard_mapping()>. The latter
+      returns data (like several other XCB functions) via accessors
+      (xcb_get_keyboard_mapping_keysyms in this case). In order to simplify
+      Keymap requests from Perl, a new function in Connection.pm implemented
+      which returns an array with keysyms. POD is updated correspondingly.
+
+    - Implement xcb_request_check and xcb_change_window_attributes_checked
+      There was a TODO to implement *_checked requests as they're missing in
+      xml. One of them is now implemented as well as C<xcb_request_check()>
+      itself.
+
+    - Add events:
+      ButtonPress, ButtonRelease, ConfigureNotify, ConfigureRequest,
+      CreateNotify, DestroyNotify, EnterNotify, KeyPress, KeyRelease,
+      LeaveNotify, MapRequest, MotionNotify, PropertyNotify, and UnmapNotify.
+
+    - Add XKB support
+      Like with RandR, most of X11 XKEYBOARD extension functionality is
+      implemented. An xkb typemap for xcb_xkb_action_t is not
+      implemented yet, so C<xcb_xkb_set_behavior()> and
+      C<xcb_xkb_sym_interpret()> are not implemented as well. The other
+      functionality, especially C<xkb_get_state()> and Xkb events, looks
+      working good.
+
+    - Fix missing pad0 field for all events
+      After adding Xkb support it was revealed that some extensions could pass
+      vital data through pad0 field of the event. So this field was added to
+      be more aligned with X11
+      protocol.
+
+    - Implement set_flags() for X11_XCB_ICCCM_WMHintsPtr
+      It looks like current implementation of X11::XCB::ICCCM::WMHints was
+      created only for read-only purposes, so C<set_flags()> was implemented
+      to allow change the internal state of WMHintsPtr object from Perl.
+
+    - Implement X11::XCB::Connection::get_query_tree_children in XCB.xs
+      As XCB replies on get_query_tree with accessor get_query_tree_children,
+      a simple wrapper was added to make it possible to get an array with
+      children IDs' in a single call from Perl.

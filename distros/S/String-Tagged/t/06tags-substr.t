@@ -120,4 +120,18 @@ is( \@tags,
    };
 }
 
+# ->substr split tag
+{
+   my $str = String::Tagged->new
+      ->append_tagged( "mouse inc", highlight => 1 )
+      ->append       ( "luding" );
+
+   my $sub = $str->substr( 6, 9 );
+   ok( my $e = $sub->get_tag_extent( 0, "highlight" ), 'sub has highlight tag' );
+   if( $e ) {
+      is( $e->start, 0, 'highlight tag starts at 0' );
+      is( $e->length, 3, 'highlight tag is 3 long' );
+   }
+}
+
 done_testing;

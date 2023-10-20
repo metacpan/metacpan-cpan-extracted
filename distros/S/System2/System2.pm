@@ -11,7 +11,7 @@ require AutoLoader;
 
 @ISA = qw(Exporter AutoLoader);
 @EXPORT = qw( &system2 );
-$VERSION = '0.84';
+$VERSION = '0.85';
 
 use vars qw/ $debug /;
 
@@ -307,13 +307,6 @@ Obviously, the returned scalars can be quite large, depending on
 the nature of the program being run.  In the future, I intend to
 introduce options to allow for temporary file handles, but for now,
 be aware of the potential resource usage.
-
-Although I've been using this module for literally years now
-personally, consider it lightly tested, until I get feedback from
-the public at large.  (Treat this as a hint to tell me that you're
-using it. :)
-
-Have at it.
 
 =head1 AUTHOR
 

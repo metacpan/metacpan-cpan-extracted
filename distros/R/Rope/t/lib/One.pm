@@ -1,6 +1,7 @@
 package One;
 
 use Rope;
+use Rope::Autoload;
 
 prototyped (
 	one => sub {

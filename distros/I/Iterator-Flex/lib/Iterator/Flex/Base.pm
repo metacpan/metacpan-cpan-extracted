@@ -9,7 +9,7 @@ use warnings;
 
 use experimental qw( signatures postderef );
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Ref::Util;
 use List::Util;
@@ -409,7 +409,7 @@ Iterator::Flex::Base - Iterator object
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 METHODS
 

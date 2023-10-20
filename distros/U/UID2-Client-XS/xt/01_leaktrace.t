@@ -54,7 +54,7 @@ no_leaks_ok(sub {
         identity_scope => UID2::Client::XS::IdentityScope::UID2,
     });
     $client->refresh_json(t::TestUtils::key_set_to_json($master_key, $site_key));
-    my $advertising_token = t::TestUtils::encrypt_token_v3(
+    my $advertising_token = t::TestUtils::generate_token_v3(
         id_str => $example_uid,
         site_id => $site_id,
         identity_type => UID2::Client::XS::IdentityType::EMAIL,

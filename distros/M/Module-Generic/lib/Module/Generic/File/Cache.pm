@@ -19,7 +19,7 @@ BEGIN
     use vars qw( $CACHE_REPO $CACHE_TO_OBJECT $DEBUG $HAS_B64 );
     use Data::UUID;
     use Module::Generic::File qw( file sys_tmpdir );
-    use Nice::Try;
+    # use Nice::Try;
     use JSON 4.03 qw( -convert_blessed_universally );
     use Scalar::Util ();
     # use Storable 3.25 ();
@@ -66,6 +66,9 @@ sub init
     $self->{removed}    = 0;
     return( $self );
 }
+
+# This class does not convert to an HASH
+sub as_hash { return( $_[0] ); }
 
 sub base64 { return( shift->_set_get_scalar( 'base64', @_ ) ); }
 
@@ -308,7 +311,9 @@ sub read
             substr( $buffer, $len, length( $buffer ), '' );
         }
         
-        try
+        # try-catch
+        local $@;
+        eval
         {
             if( $packing eq 'json' )
             {
@@ -342,11 +347,11 @@ sub read
                     ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
                 );
             }
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "An error occured while decoding data using $packing with base64 set to '", ( $self->{base64} // '' ), "': $e" ) );
-        }
+            return( $self->error( "An error occured while decoding data using $packing with base64 set to '", ( $self->{base64} // '' ), "': $@" ) );
+        };
     }
     else
     {
@@ -501,49 +506,69 @@ sub write
     $size = int( "${size}" ) if( defined( $size ) );
     my $packing = $self->_packing_method;
     my $encoded;
-    try
+    if( $packing eq 'json' )
     {
-        if( $packing eq 'json' )
-        {
-            $encoded = $self->_encode_json( $data );
-        }
-        elsif( $packing eq 'cbor' )
+        $encoded = $self->_encode_json( $data );
+    }
+    elsif( $packing eq 'cbor' )
+    {
+        # try-catch
+        local $@;
+        eval
         {
             $encoded = $self->serialise( $data,
                 serialiser => 'CBOR::XS',
                 allow_sharing => 1,
                 ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
             );
-            return( $self->pass_error ) if( !defined( $encoded ) );
-        }
-        elsif( $packing eq 'sereal' )
+        };
+        if( $@ )
         {
-            $self->_load_class( 'Sereal::Encoder' ) || return( $self->pass_error );
-            my $const;
-            $const = \&{"Sereal\::Encoder::SRL_ZLIB"} if( defined( &{"Sereal\::Encoder::SRL_ZLIB"} ) );
+            return( $self->error( "An error occured encoding data provided using $packing: $@. Data was: '$data'" ) );
+        }
+        return( $self->pass_error ) if( !defined( $encoded ) );
+    }
+    elsif( $packing eq 'sereal' )
+    {
+        $self->_load_class( 'Sereal::Encoder' ) || return( $self->pass_error );
+        my $const;
+        $const = \&{"Sereal\::Encoder::SRL_ZLIB"} if( defined( &{"Sereal\::Encoder::SRL_ZLIB"} ) );
+        # try-catch
+        local $@;
+        eval
+        {
             $encoded = $self->serialise( $data,
                 serialiser => 'Sereal',
                 freeze_callbacks => 1,
                 ( defined( $const ) ? ( compress => $const->() ) : () ),
                 ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
             );
-            return( $self->pass_error ) if( !defined( $encoded ) );
-        }
-        # Default to Storable::Improved
-        else
+        };
+        if( $@ )
         {
-            # local $Storable::forgive_me = 1;
-            # $encoded = Storable::Improved::freeze( $data );
+            return( $self->error( "An error occured encoding data provided using $packing: $@. Data was: '$data'" ) );
+        }
+        return( $self->pass_error ) if( !defined( $encoded ) );
+    }
+    # Default to Storable::Improved
+    else
+    {
+        # local $Storable::forgive_me = 1;
+        # $encoded = Storable::Improved::freeze( $data );
+        # try-catch
+        local $@;
+        eval
+        {
             $encoded = $self->serialise( $data,
                 serialiser => 'Storable::Improved',
                 ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
             );
-            return( $self->pass_error ) if( !defined( $encoded ) );
+        };
+        if( $@ )
+        {
+            return( $self->error( "An error occured encoding data provided using $packing: $@. Data was: '$data'" ) );
         }
-    }
-    catch( $e )
-    {
-        return( $self->error( "An error occured encoding data provided using $packing: $e. Data was: '$data'" ) );
+        return( $self->pass_error ) if( !defined( $encoded ) );
     }
     
     # For some reason, I get warning that $size is uninitialised despite having initialised it and ensured it is defined
@@ -609,16 +634,19 @@ sub _decode_json
         return( $this );
     };
     
-    try
+    my $decoded;
+    # try-catch
+    local $@;
+    eval
     {
-        my $decoded = $j->decode( $data );
-        my $result = $crawl->( $decoded );
-        return( $result );
-    }
-    catch( $e )
+        $decoded = $j->decode( $data );
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to decode JSON data: $e" ) );
+        return( $self->error( "An error occurred while trying to decode JSON data: $@" ) );
     }
+    my $result = $crawl->( $decoded );
+    return( $result );
 }
 
 # Purpose of this method is to recursively check the given data and change scalar reference if they are anything else than 1 or 0, otherwise JSON would complain
@@ -676,15 +704,18 @@ sub _encode_json
     };
     my $ref = $crawl->( $data );
     my $j = JSON->new->utf8->relaxed->allow_nonref->convert_blessed;
-    try
+    my $encoded;
+    # try-catch
+    local $@;
+    eval
     {
-        my $encoded = $j->encode( $ref );
-        return( $encoded );
-    }
-    catch( $e )
+        $encoded = $j->encode( $ref );
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to JSON encode data: $e" ) );
-    }
+        return( $self->error( "An error occurred while trying to JSON encode data: $@" ) );
+    };
+    return( $encoded );
 }
 
 sub _fill

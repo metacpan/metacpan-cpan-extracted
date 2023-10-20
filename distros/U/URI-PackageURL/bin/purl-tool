@@ -40,9 +40,9 @@ purl-tool - PackageURL tool
 
     Examples:
 
-        purl-tool pkg:cpan/GDT/URI-PackageURL@2.00 --json | jq
+        purl-tool pkg:cpan/GDT/URI-PackageURL@2.02 --json | jq
 
-        wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.00 --download-url)
+        wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.02 --download-url)
 
 
 =head1 DESCRIPTION
@@ -53,11 +53,11 @@ C<purl-tool> PackageURL tool
 
 Parse the given PackageURL string and return JSON and send the STDOUT to L<jq>:
 
-B<purl-tool pkg:cpan/GDT/URI-PackageURL@2.00 --json | jq>
+B<purl-tool pkg:cpan/GDT/URI-PackageURL@2.02 --json | jq>
 
 Download the package from the repository using PackageURL string:
 
-B<wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.00 --download-url)>
+B<wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.02 --download-url)>
 
 =head1 AUTHOR
 

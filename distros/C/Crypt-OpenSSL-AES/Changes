@@ -1,5 +1,153 @@
 Revision history for Perl extension Crypt::OpenSSL::AES.
 
+0.17 -- Sun Oct 15 16:17:22 ADT 2023
+
+    [Detailed Change Log]
+    - 4573a62 Increment version for release
+    - 5388652 Fix CTR Tests for old OpenSSL
+    - 175a751 v0.16
+
+    [Fix Change Log for 0.16]
+    Forgot to rebase the git repo
+    - a2c0878 Fix test issue lt versus le for OpenSSL versions
+    - adfe1ee Increment version for release
+    - 654f7f6 Output OpenSSL version during test
+    - fbc824c Fixes RT issues 141491 and 149909
+    - 87e4922 v0.15
+
+0.16 -- Sun Oct 15 11:07:09 ADT 2023
+
+    [Significant updates since 0.15]
+
+    Fixes a couple of vexing build issues on some MacOS environments
+    where the module would be built against OpenSSLv3 but linked to
+    OpenSSLv1.  Fix is a Makefile.PL workaround for what is likely a
+    toolchain issue.
+
+    [Detailed Change Log]
+    - 166d710 Fix test issue lt versus le for OpenSSL versions
+    - b0da334 Increment version for release
+    - 8988e45 Output OpenSSL version during test
+    - 1bb51ed Fixes RT issues 141491 and 149909
+    - 82680e4 v0.15
+
+0.15 -- Sun Oct 08 10:25:18 ADT 2023
+
+    [Significant updates since 0.13]
+    - None - Don't support CTR ciphers on old perls
+
+    [Detailed Change Log]
+    - 4e0e77e Add File::Which and Crypt::OpenSSL::Guess for tests
+    - 01d6c90 Show full OpenSSL version information
+    - 8502136 AES CTR was not supported on 1.0.0 and below
+    - 512f06e v0.14
+
+0.14 -- Sat Oct 07 09:10:31 ADT 2023
+
+    [Significant updates since 0.13]
+    - None - Fix build issue on old strawberry-perl
+
+    [Detailed Change Log]
+    - c1ef642 Fix yet another strawberryperl build issue
+    - c1933ae v0.13
+
+0.13 -- Fri Oct 06 19:23:46 ADT 2023
+
+    [Significant updates since 0.10]
+    - None - Packaging and fix build issue on old strawberry-perl
+
+    [Detailed Change Log]
+    - d5eda5c Update version for a new release
+    - 3fd8e5c Create windows-strawberry-legacy.yml
+    - 683c92c Fix issues on older strawberry-perl installs
+    - 9ecd96b Fix POD formatting issue
+    - 7eef915 v0.12
+
+0.12 -- Wed Oct 04 21:02:53 ADT 2023
+
+    [Significant updates since 0.10]
+
+    - Bugfix from smokers and #149909
+    - Add full LibreSSL support for the new library API functions
+    - Remove dependency for CryptX (rewrite the tests)
+    - new library API functions supported for OpenSSL 0.9.8+
+
+    [Detailed Change Log]
+    - aba2120 Update version for a new release
+    - ecbcc51 Update POD to reflect recent changes
+    - 289803e Get the blocksize from the EVP_CIPHER_CTX
+    - 6f687cd v0.11
+
+0.11 -- Mon Oct 02 22:03:40 ADT 2023
+
+    [Significant updates since 0.10]
+
+    - Bugfix from mokers and #149909
+    - Add full LibreSSL support for the new library API functions
+    - Remove dependency for CryptX (rewrite the tests)
+    - new library API functions supported for OpenSSL 0.9.8+
+
+    [Detailed Change Log]
+    - b328a6c Really remove Crypt::CBC dependency
+    - 16eb4b6 Fix #149909: v0.10 Segfaulting on macOS [rt.cpan.org #149909]
+    - c6bf4be Remove Build/Test dependency on CryptX
+    - cfe9571 The API supports 0.9.8 and above so the skips seem unnecessary
+    - 7fa47df Fix patch undefined
+    - 6fb6b23 Support libressl with modern api calls
+    - 8be70f0 reverse 2782f24 Don't run OpenSSL tests for LibreSSL
+    - 014f71e Increment version for release
+    - 2782f24 Don't run OpenSSL tests for LibreSSL
+    - 24072d3 Attempt to fix Free to wrong pool issue
+    - 49f93e3 Fix get_option_svalue issue
+    - d6cb161 Fix issue with tests - undefined
+    - f7027e3 (tag: 0.10) v0.10
+
+0.10 -- Thu Sep 21 23:10:38 ADT 2023
+
+    [Significant updates since 0.08]
+
+    - Added support for CBC, CFB, CTR and OFB
+    - Allows encryption of data larger than 16-bytes
+    - Uses padding for data that is not a multiple of 16-bytes
+    - Allows support for IV for supported ciphers
+
+    [Detailed Change Log]
+    - d3a7ccb Increment version for release
+    - 24b7deb Add GitHub::CreateRelease and remove META.json from repo
+    - 9ca1b5a Remove C++ style comment
+    - cbcd8e3 SET_CONTEXT for threaded perls
+    - 25e7c01 v0.09
+    - 1cb07ea Testing release
+
+0.09 -- Wed Sep 20 23:04:24 ADT 2023
+
+    [Significant updates since 0.08]
+
+    - Added support for CBC, CFB, CTR and OFB
+    - Allows encryption of data larger than 16-bytes
+    - Uses padding for data that is not a multiple of 16-bytes
+    - Allows support for IV for supported ciphers
+
+    - f84bd04 Update MANIFEST file
+    - c23620a Increment version for next release
+    - fcf7e23 Update dependencies
+    - 4de67f5 Add tests for multiple ciphers
+    - 750f2bb Support additional AES ciphers
+    - a6fd450 Change tabs to spaces - tabs were driving me crazy
+    - d6e7f7d (tag: 0.08) v0.08
+
+0.08 -- Sat Sep 16 00:19:13 ADT 2023
+
+    [Detailed Changes]
+
+    - ff164da Change the push to repo
+    - 98b92f8 Create a test for Crypt::CBC
+    - ad9094f Update pod information
+    - 9230b98 Fix casting and signedness errors
+    - 4434d5c Convert build to Dist::Zilla
+    - 1f9d13b Increment version for a release
+    - 9b539b4 Update Changes for release
+
 0.07 Thu Sep 14 18:41:23 PM 2023
 
     [Significant updates since 0.02]

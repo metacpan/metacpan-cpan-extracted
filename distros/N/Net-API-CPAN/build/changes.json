@@ -1,0 +1,33 @@
+{
+   "author" : "MOMOTARO",
+   "authorized" : true,
+   "binary" : false,
+   "category" : "changelog",
+   "content" : "Revision history for Perl module Folklore::Japan\n\nv1.2.3 2023-07-29T09:12:10+0900\n    - Initial release\n",
+   "date" : "2023-07-29T23:14:52",
+   "deprecated" : false,
+   "directory" : false,
+   "distribution" : "Folklore-Japan",
+   "download_url" : "https://cpan.metacpan.org/authors/id/M/MO/MOMOTARO/Folklore-Japan-v1.2.3.tar.gz",
+   "id" : "Jp_IsS0oC00l_CoM3OveR",
+   "indexed" : false,
+   "level" : 0,
+   "maturity" : "released",
+   "mime" : "",
+   "module" : [],
+   "name" : "CHANGES",
+   "path" : "CHANGES",
+   "pod" : "",
+   "pod_lines" : [],
+   "release" : "Folklore-Japan-v1.2.3",
+   "sloc" : 487,
+   "slop" : 0,
+   "stat" : {
+      "mode" : 33188,
+      "mtime" : 1690618397,
+      "size" : 108
+   },
+   "status" : "latest",
+   "version" : "v1.2.3",
+   "version_numified" : 1.002003
+}

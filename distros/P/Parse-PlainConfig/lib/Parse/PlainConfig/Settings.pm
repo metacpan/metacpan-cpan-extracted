@@ -1,8 +1,8 @@
 # Parse::PlainConfig::Settings -- Settings Class
 #
-# (c) 2015, Arthur Corliss <corliss@digitalmages.com>
+# (c) 2016, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Parse/PlainConfig/Settings.pm, 3.05 2017/02/06 10:36:37 acorliss Exp $
+# $Id: lib/Parse/PlainConfig/Settings.pm, 3.06 2023/09/23 19:24:20 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -23,7 +23,7 @@ use strict;
 use warnings;
 use vars qw($VERSION);
 
-($VERSION) = ( q$Revision: 3.05 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 3.06 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 use Paranoid;
 use Paranoid::Debug;
@@ -47,6 +47,7 @@ use vars qw(@ISA @_properties @_methods);
     [ CEH_PUB | CEH_HASH,   'prototype regexes' ],
     [ CEH_PUB | CEH_HASH,   'prototype registry' ],
     [ CEH_PUB | CEH_SCALAR, 'error' ],
+    [ CEH_PUB | CEH_ARRAY,  '_ppcClasses' ],
     );
 
 #####################################################################
@@ -120,7 +121,7 @@ Parse::PlainConfig::Settings - Settings Class
 
 =head1 VERSION
 
-$Id: lib/Parse/PlainConfig/Settings.pm, 3.05 2017/02/06 10:36:37 acorliss Exp $
+$Id: lib/Parse/PlainConfig/Settings.pm, 3.06 2023/09/23 19:24:20 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -247,5 +248,5 @@ Arthur Corliss (corliss@digitalmages.com)
 This software is licensed under the same terms as Perl, itself. 
 Please see http://dev.perl.org/licenses/ for more information.
 
-(c) 2015, Arthur Corliss (corliss@digitalmages.com)
+(c) 2016, Arthur Corliss (corliss@digitalmages.com)
 

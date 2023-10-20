@@ -236,9 +236,9 @@ font.Warning {
 <div id="74" class="line"></br></div>
 <div id="75" class="line"></br></div>
 <div id="76" class="line"><font class="Comment">#&nbsp;keywords&nbsp;are&nbsp;black,&nbsp;builtins&nbsp;dark&nbsp;purple&nbsp;and&nbsp;common&nbsp;commands&nbsp;lighter&nbsp;purple</font></br></div>
-<div id="77" class="line"><font class="Extension">set</font></br></div>
-<div id="78" class="line"><font class="Extension">exit</font></br></div>
-<div id="79" class="line"><font class="Extension">login</font></br></div>
+<div id="77" class="line"><font class="Keyword">set</font></br></div>
+<div id="78" class="line"><font class="BuiltIn">exit</font></br></div>
+<div id="79" class="line"><font class="Function">login</font></br></div>
 <div id="80" class="line"></br></div>
 <div id="81" class="line"></br></div>
 <div id="82" class="line"><font class="Comment">#&nbsp;Other&nbsp;colorings:</font></br></div>
@@ -270,9 +270,9 @@ font.Warning {
 <div id="108" class="line"></br></div>
 <div id="109" class="line"><font class="Comment">#&nbsp;Any&nbsp;constructions&nbsp;can&nbsp;be&nbsp;nested:</font></br></div>
 <div id="110" class="line"><font class="BuiltIn">echo</font><font class="Normal">&nbsp;</font><font class="String">&quot;A&nbsp;long&nbsp;string&nbsp;with&nbsp;</font><font class="Variable">$(</font></br></div>
-<div id="111" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="BuiltIn">&nbsp;[</font><font class="Normal">&nbsp;</font><font class="Variable">$count</font><font class="Normal">&nbsp;</font><font class="Others">-gt</font><font class="Normal">&nbsp;100</font><font class="BuiltIn">&nbsp;]</font><font class="Normal">&nbsp;;&nbsp;</font><font class="Extension">then</font></br></div>
+<div id="111" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">if</font><font class="BuiltIn">&nbsp;[</font><font class="Normal">&nbsp;</font><font class="Variable">$count</font><font class="Normal">&nbsp;</font><font class="Others">-gt</font><font class="Normal">&nbsp;100</font><font class="BuiltIn">&nbsp;]</font><font class="Normal">&nbsp;;&nbsp;</font><font class="Keyword">then</font></br></div>
 <div id="112" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">echo</font><font class="Normal">&nbsp;</font><font class="String">&quot;much&quot;</font></br></div>
-<div id="113" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Extension">else</font></br></div>
+<div id="113" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">else</font></br></div>
 <div id="114" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="BuiltIn">echo</font><font class="Normal">&nbsp;</font><font class="String">&quot;not&nbsp;much&quot;</font></br></div>
 <div id="115" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Keyword">fi</font><font class="Normal">&nbsp;</font><font class="Variable">)</font><font class="String">&nbsp;substitutions.&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">;</font></br></div>
 <div id="116" class="line"></br></div>
@@ -309,7 +309,7 @@ font.Warning {
 <div id="147" class="line"><font class="BuiltIn">local</font><font class="Normal">&nbsp;</font><font class="Variable">p=</font><font class="Normal">3&nbsp;&nbsp;</font><font class="Variable">x</font><font class="Normal">&nbsp;&nbsp;</font><font class="Variable">y=</font><font class="String">'\'</font></br></div>
 <div id="148" class="line"><font class="BuiltIn">read</font><font class="Normal">&nbsp;</font><font class="Variable">x</font><font class="Normal">&nbsp;</font><font class="Variable">y</font><font class="Normal">&nbsp;</font><font class="Variable">z</font><font class="Normal">&nbsp;</font><font class="Operator">&lt;&lt;&lt;</font><font class="Normal">&nbsp;</font><font class="Variable">$hallo</font></br></div>
 <div id="149" class="line"><font class="BuiltIn">unset</font><font class="Normal">&nbsp;</font><font class="Variable">B</font></br></div>
-<div id="150" class="line"><font class="BuiltIn">declare</font><font class="Normal">&nbsp;-a&nbsp;</font><font class="Variable">VAR1</font><font class="Normal">&nbsp;</font><font class="Variable">VAR2</font><font class="Normal">&nbsp;</font><font class="Keyword">&amp;&amp;</font><font class="Normal">&nbsp;</font><font class="Extension">exit</font></br></div>
+<div id="150" class="line"><font class="BuiltIn">declare</font><font class="Normal">&nbsp;-a&nbsp;</font><font class="Variable">VAR1</font><font class="Normal">&nbsp;</font><font class="Variable">VAR2</font><font class="Normal">&nbsp;</font><font class="Keyword">&amp;&amp;</font><font class="Normal">&nbsp;</font><font class="BuiltIn">exit</font></br></div>
 <div id="151" class="line"><font class="BuiltIn">declare</font><font class="Normal">&nbsp;</font><font class="Variable">less</font><font class="Normal">&nbsp;</font><font class="Variable">a</font><font class="Normal">&nbsp;</font><font class="Keyword">&amp;&amp;</font><font class="Normal">&nbsp;</font><font class="Extension">b</font><font class="Normal">&nbsp;</font></br></div>
 <div id="152" class="line"></br></div>
 <div id="153" class="line"><font class="Comment">#&nbsp;options&nbsp;are&nbsp;recoqnized:</font></br></div>
@@ -320,9 +320,9 @@ font.Warning {
 <div id="158" class="line"></br></div>
 <div id="159" class="line"><font class="Comment">#&nbsp;[[&nbsp;and&nbsp;[&nbsp;correctly&nbsp;need&nbsp;spaces&nbsp;to&nbsp;be&nbsp;regarded&nbsp;as&nbsp;structure,</font></br></div>
 <div id="160" class="line"><font class="Comment">#&nbsp;otherwise&nbsp;they&nbsp;are&nbsp;patterns&nbsp;(currently&nbsp;treated&nbsp;as&nbsp;normal&nbsp;text)</font></br></div>
-<div id="161" class="line"><font class="Keyword">if</font><font class="BuiltIn">&nbsp;[</font><font class="Normal">&nbsp;</font><font class="String">&quot;</font><font class="Variable">$p</font><font class="String">&quot;</font><font class="Normal">&nbsp;</font><font class="Others">==</font><font class="Normal">&nbsp;</font><font class="String">&quot;&quot;</font><font class="BuiltIn">&nbsp;]</font><font class="Normal">&nbsp;;&nbsp;</font><font class="Extension">then</font></br></div>
+<div id="161" class="line"><font class="Keyword">if</font><font class="BuiltIn">&nbsp;[</font><font class="Normal">&nbsp;</font><font class="String">&quot;</font><font class="Variable">$p</font><font class="String">&quot;</font><font class="Normal">&nbsp;</font><font class="Others">==</font><font class="Normal">&nbsp;</font><font class="String">&quot;&quot;</font><font class="BuiltIn">&nbsp;]</font><font class="Normal">&nbsp;;&nbsp;</font><font class="Keyword">then</font></br></div>
 <div id="162" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Function">ls</font><font class="Normal">&nbsp;/usr/bin/[a-z]*</font></br></div>
-<div id="163" class="line"><font class="Keyword">elif&nbsp;[[</font><font class="Normal">&nbsp;</font><font class="Variable">$p</font><font class="Normal">&nbsp;</font><font class="Others">==</font><font class="Normal">&nbsp;0</font><font class="Keyword">&nbsp;]]</font><font class="Normal">&nbsp;;&nbsp;</font><font class="Extension">then</font></br></div>
+<div id="163" class="line"><font class="Keyword">elif&nbsp;[[</font><font class="Normal">&nbsp;</font><font class="Variable">$p</font><font class="Normal">&nbsp;</font><font class="Others">==</font><font class="Normal">&nbsp;0</font><font class="Keyword">&nbsp;]]</font><font class="Normal">&nbsp;;&nbsp;</font><font class="Keyword">then</font></br></div>
 <div id="164" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Function">ls</font><font class="Normal">&nbsp;/usr/share/</font><font class="Variable">$p</font></br></div>
 <div id="165" class="line"><font class="Keyword">fi</font></br></div>
 <div id="166" class="line"></br></div>
@@ -347,12 +347,12 @@ font.Warning {
 <div id="185" class="line"></br></div>
 <div id="186" class="line"></br></div>
 <div id="187" class="line"><font class="Comment">#&nbsp;indented:</font></br></div>
-<div id="188" class="line"><font class="Keyword">if</font><font class="Normal">&nbsp;</font><font class="Extension">true</font></br></div>
-<div id="189" class="line"><font class="Extension">then</font></br></div>
+<div id="188" class="line"><font class="Keyword">if</font><font class="Normal">&nbsp;</font><font class="Function">true</font></br></div>
+<div id="189" class="line"><font class="Keyword">then</font></br></div>
 <div id="190" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Function">cat</font><font class="Normal">&nbsp;</font><font class="Operator">&lt;&lt;-&nbsp;EOF</font></br></div>
 <div id="191" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Indented&nbsp;text&nbsp;with&nbsp;a&nbsp;</font><font class="Variable">$dollar</font><font class="Normal">&nbsp;or&nbsp;</font><font class="DataType">\$</font><font class="Normal">two</font></br></div>
 <div id="192" class="line"><font class="Operator">&nbsp;&nbsp;&nbsp;EOF</font></br></div>
-<div id="193" class="line"><font class="Keyword">elif</font><font class="BuiltIn">&nbsp;[</font><font class="Normal">&nbsp;</font><font class="Others">-d</font><font class="Normal">&nbsp;</font><font class="Variable">$file</font><font class="BuiltIn">&nbsp;]</font><font class="Normal">;&nbsp;</font><font class="Extension">then</font></br></div>
+<div id="193" class="line"><font class="Keyword">elif</font><font class="BuiltIn">&nbsp;[</font><font class="Normal">&nbsp;</font><font class="Others">-d</font><font class="Normal">&nbsp;</font><font class="Variable">$file</font><font class="BuiltIn">&nbsp;]</font><font class="Normal">;&nbsp;</font><font class="Keyword">then</font></br></div>
 <div id="194" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;</font><font class="Function">cat</font><font class="Normal">&nbsp;</font><font class="Operator">&lt;&lt;-&nbsp;&quot;EOF&quot;</font></br></div>
 <div id="195" class="line"><font class="Normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Indented&nbsp;text&nbsp;without&nbsp;a&nbsp;$dollar</font></br></div>
 <div id="196" class="line"><font class="Operator">&nbsp;&nbsp;&nbsp;EOF</font></br></div>

@@ -4,13 +4,13 @@
       "MailboxValidator.com <support@mailboxvalidator.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "lgpl_3_0"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MailboxValidator-SingleValidation",
    "no_index" : {
@@ -32,12 +32,13 @@
       },
       "runtime" : {
          "requires" : {
-            "JSON::Parse" : "0",
+            "JSON::PP" : "0",
             "LWP::Simple" : "0",
             "URI::Escape" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.11"
+   "version" : "2.00",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

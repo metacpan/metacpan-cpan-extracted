@@ -16,9 +16,12 @@ use Test::More;
 our ($VERSION, @EXPORT_OK, %EXPORT_TAGS, %time, $case_strings, $time_entries);
 my @set;
 
-$VERSION = '0.12';
+$VERSION = '0.13';
 
-@set         =  qw(truncated unaltered %time $case_strings $time_entries _run_tests _result_string _result_string_hires _message);
+@set = qw(truncated unaltered %time $case_strings
+          $time_entries _run_tests _result_string
+          _result_string_hires _message);
+
 @EXPORT_OK   = (qw(_find_modules _find_files), @set);
 %EXPORT_TAGS = ('set' => [ @set ]);
 

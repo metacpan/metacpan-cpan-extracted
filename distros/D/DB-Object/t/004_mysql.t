@@ -187,7 +187,9 @@ SQL
 		my $rv = $dbh->do( "DROP DATABASE $test_db" );
 		ok( $rv, "Dropping leftover test database $test_db" );
 	}
-}
+};
+
+done_testing();
 
 END
 {
@@ -197,8 +199,6 @@ END
 		# $dbh->disconnect();
 	}
 };
-
-done_testing();
 
 
 __END__

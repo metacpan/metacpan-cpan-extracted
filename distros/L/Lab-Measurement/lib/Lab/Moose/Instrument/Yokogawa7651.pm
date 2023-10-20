@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Yokogawa7651;
-$Lab::Moose::Instrument::Yokogawa7651::VERSION = '3.881';
+$Lab::Moose::Instrument::Yokogawa7651::VERSION = '3.901';
 #ABSTRACT: Yokogawa7651 voltage/current source.
 
 use v5.20;
@@ -122,7 +122,7 @@ Lab::Moose::Instrument::Yokogawa7651 - Yokogawa7651 voltage/current source.
 
 =head1 VERSION
 
-version 3.881
+version 3.901
 
 =head1 SYNOPSIS
 
@@ -193,7 +193,7 @@ For XPRESS voltage sweep. Equivalent to C<set_voltage>.
 This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
-            2020-2021  Andreas K. Huettel
+            2021       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

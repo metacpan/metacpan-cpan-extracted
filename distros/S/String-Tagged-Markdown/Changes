@@ -1,5 +1,10 @@
 Revision history for String-Tagged-Markdown
 
+0.05    2023-09-25
+        [CHANGES]
+         * Decode HTML entities during parsing
+         * Encode `&amp;` and `&nbsp;` entities when building
+
 0.04    2023-02-13
         [CHANGES]
          * Include a Markdown-to-HTML example script for additional testing

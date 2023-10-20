@@ -1,7 +1,13 @@
 Revision history for Perl module Math::GMPf
 
+0.52
+ - Division-by-zero now croaks, rather than die in silence.
+ - Simplify overloading of '++' and '--'.
+ - Avoid monitoring PL_markstack_ptr in GMPf.xs and Random/Random.xs
+
 0.51
  - Add Random/t/a_v_random.t
+ - Accommodate MS Visual Studio builds of perl
 
 0.49
  - Fix some bugs in t/NOK_and_POK.t that did not cater for the possibility

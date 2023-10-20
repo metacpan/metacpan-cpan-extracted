@@ -2,7 +2,7 @@ package App::Yath::Options::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000152';
+our $VERSION = '1.000155';
 
 use List::Util qw/min/;
 use Test2::Util qw/IS_WIN32/;
@@ -251,7 +251,7 @@ sub fix_job_resources {
         $found{$r}++;
     }
 
-    if ($sconf && !$found{'Test2::Harness::Runner::Resource::SharedJobSlots'}) {
+    if ($sconf && !$found{'Test2::Harness::Runner::Resource::SharedJobSlots'} && !$sconf->disabled) {
         if (delete $found{'Test2::Harness::Runner::Resource::JobCount'}) {
             @{$settings->runner->resources} = grep { $_ ne 'Test2::Harness::Runner::Resource::JobCount' } @{$runner->resources};
         }

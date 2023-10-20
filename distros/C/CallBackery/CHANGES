@@ -1,6 +1,20 @@
+0.47.5 2023-10-19 14:06:22 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - ios compatiblity issue can not easily be fixed outside qx
+   https://github.com/qooxdoo/qooxdoo/pull/10629 is the right way
+   to go about it ... 
+
+0.47.4 2023-10-18 22:53:53 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - it seems on ios there is no changeValue after blur, fix that by
+   resettting and setting the value explicitly after blur ... aargh 
+
+ - explicitly check for empty string in required field even when there
+   is no validator defined
+
 0.47.3 2023-08-29 16:20:30 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
- - make table columns with flex with work on mobile devices
+ - make table columns with "flex" work on mobile devices
 
 0.47.2 2023-08-29 14:14:54 +0200 Tobias Oetiker <tobi@oetiker.ch>
 

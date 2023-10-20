@@ -3,12 +3,16 @@
 # Vector drawing parser
 # Virtual resolution is ALWAYS 3840 x 2160
 # it will be converted to the actual resolution when drawn
-# The commands are a subset of thed actual GFB capabilites
+# The commands are a subset of the actual GFB capabilites
 
 use strict;
 
 use Graphics::Framebuffer;
-# use Data::Dumper;
+# use Data::Dumper::Simple;
+
+BEGIN {
+	our $VERSION = '0.02';
+};
 
 my $F = Graphics::Framebuffer->new('SPLASH' => 0);
 
@@ -439,7 +443,7 @@ The screen will be cleared with the BACKGROUND color.  Also sets the pixel locat
 
 =item B<ATTRIBUTE_RESET>
 
-Sets the FORGROUND color to white, the BACKGROUND color to black, and resets clipping.
+Sets the FOREGROUND color to white, the BACKGROUND color to black, and resets clipping.
 
 =item B<PLOT> x, y [, pixel size]
 

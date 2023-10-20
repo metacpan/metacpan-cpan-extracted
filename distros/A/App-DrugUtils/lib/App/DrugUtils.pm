@@ -1,0 +1,450 @@
+package App::DrugUtils;
+
+use 5.010001;
+use strict;
+use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-10-19'; # DATE
+our $DIST = 'App-DrugUtils'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+our %SPEC;
+
+my $re_dosage = qr/\A(\d+(?:\.\d+)?)\@(\d+(?:\.\d+)?)\z/;
+$SPEC{tabulate_drug_concentration} = {
+    v => 1.1,
+    summary => 'Tabulate drug concentration over time, with one or more dosages of a drug of specified half-life',
+    description => <<'MARKDOWN',
+
+Drug concentration over time is calculated using a simple equation:
+
+    D(t) = D(0) * exp(-t/T)
+
+where T is a constant and can be calculated from half-life where D(t)/D(0) =
+0.5:
+
+    0.5 = 1 * exp(-half_life / T)
+    log(0.5) = -half_life / T
+    T = half_life / log(0.5)
+
+When given multiple dosages, each dosage's concentration will be added up.
+
+By default, hourly concentration will be calculated for 10 half-lives.
+
+MARKDOWN
+    args => {
+        half_life => {
+            summary => 'Drug half life, in hours',
+            schema => 'ufloat*',
+            req => 1,
+            cmdline_aliases => {H=>{}},
+        },
+        dosages => {
+            summary => 'Dosages, each of which in the form of d@t (amount followed by comma and time in hour)',
+            schema => ['array*', of=>['str*', match=>$re_dosage]],
+            cmdline_aliases => {d=>{}},
+        },
+        regular_dosage => {
+            summary => 'Regular dosage, in the form of d@t (amount followed by at sign and period in hour, meaning dosage given every t hours)',
+            schema => ['str*', match=>$re_dosage],
+            cmdline_aliases => {r=>{}},
+        },
+        period => {
+            summary => 'How many hours to tabulate',
+            description => <<'MARKDOWN',
+
+If unspecified, defaults to 10 * half-life.
+
+MARKDOWN
+            schema => 'uint*',
+            cmdline_aliases => {p=>{}},
+        },
+    },
+    args_rels => {
+        choose_one => ['dosages', 'regular_dosage'],
+    },
+    examples => [
+        {
+            summary => 'Tabulate concentration of tadalafil (half-life 17.5h) over 1 week period if we give 2.5mg each day for a week',
+            argv => [qw/-H 17.5 -p 144 -d 2.5@0 -d2.5@24 -d2.5@48 -d2.5@72 -d2.5@96 -d2.5@120 -d 2.5@144/],
+        },
+        {
+            summary => 'Same as previous example, but uses -r',
+            argv => [qw/-H 17.5 -p 144 -r2.5@24/],
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Same as previous example, but plot it (requires xyplot)',
+            src => '[[prog]] -H 17.5 -p 144 -r2.5@24 | xyplot -',
+            src_plang => 'bash',
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'What if we dose 2.5mg every 12 hours?',
+            src => '[[prog]] -H 17.5 -p 144 -r2.5@12 | xyplot -',
+            src_plang => 'bash',
+            'x.doc.show_result' => 0,
+        },
+    ],
+};
+sub tabulate_drug_concentration {
+    my %args = @_;
+
+    my $half_life = $args{half_life};
+
+    my $T = $half_life / log(0.5);
+    my $p = $args{period} // int(10 * $half_life);
+    my @dosages;
+
+    if ($args{dosages}) {
+        for (@{ $args{dosages} }) {
+            $_ =~ /$re_dosage/ or return [400, "Invalid dosage syntax '$_', must be amount\@time"];
+            push @dosages, [$1, $2];
+        }
+    } elsif ($args{regular_dosage}) {
+        $args{regular_dosage} =~ /$re_dosage/ or return [400, "Invalid regular dosage syntax '$_', must be amount\@every"];
+        my ($d, $every) = ($1, $2);
+        my $t = 0;
+        while ($t < $p) {
+            push @dosages, [$d, $t];
+            $t += $every;
+        }
+    }
+
+    my @concentrations;
+    for my $t (0..$p) {
+        my $concentration = 0;
+        for my $dosage (@dosages) {
+            if ($t >= $dosage->[1]) {
+                $concentration += $dosage->[0] * exp(-($dosage->[1] - $t)/$T);
+            }
+        }
+        push @concentrations, {time=>$t, concentration=>sprintf("%.3f", $concentration)};
+    }
+
+    [200, "OK", \@concentrations, {'table.fields' => ['time', 'concentration']}];
+}
+
+1;
+# ABSTRACT: Utilities related to drugs
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+App::DrugUtils - Utilities related to drugs
+
+=head1 VERSION
+
+This document describes version 0.001 of App::DrugUtils (from Perl distribution App-DrugUtils), released on 2023-10-19.
+
+=head1 DESCRIPTION
+
+This distributions provides the following command-line utilities:
+
+=over
+
+=item * L<tabulate-drug-concentration>
+
+=back
+
+=head1 FUNCTIONS
+
+
+=head2 tabulate_drug_concentration
+
+Usage:
+
+ tabulate_drug_concentration(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Tabulate drug concentration over time, with one or more dosages of a drug of specified half-life.
+
+Examples:
+
+=over
+
+=item * Tabulate concentration of tadalafil (half-life 17.5h) over 1 week period if we give 2.5mg each day for a week:
+
+ tabulate_drug_concentration(
+     dosages   => [
+                  "2.5\@0",
+                  "2.5\@24",
+                  "2.5\@48",
+                  "2.5\@72",
+                  "2.5\@96",
+                  "2.5\@120",
+                  "2.5\@144",
+                ],
+   half_life => 17.5,
+   period    => 144
+ );
+
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     { time => 0, concentration => "2.500" },
+     { time => 1, concentration => 2.403 },
+     { time => 2, concentration => "2.310" },
+     { time => 3, concentration => "2.220" },
+     { time => 4, concentration => 2.134 },
+     { time => 5, concentration => 2.051 },
+     { time => 6, concentration => 1.971 },
+     { time => 7, concentration => 1.895 },
+     { time => 8, concentration => 1.821 },
+     { time => 9, concentration => "1.750" },
+     { time => 10, concentration => 1.682 },
+     { time => 11, concentration => 1.617 },
+     { time => 12, concentration => 1.554 },
+     { time => 13, concentration => 1.494 },
+     { time => 14, concentration => 1.436 },
+     { time => 15, concentration => "1.380" },
+     { time => 16, concentration => 1.327 },
+     { time => 17, concentration => 1.275 },
+     { time => 18, concentration => 1.225 },
+     { time => 19, concentration => 1.178 },
+     { time => 20, concentration => 1.132 },
+     { time => 21, concentration => 1.088 },
+     { time => 22, concentration => 1.046 },
+     { time => 23, concentration => 1.005 },
+     { time => 24, concentration => 3.466 },
+     { time => 25, concentration => 3.332 },
+     { time => 26, concentration => 3.202 },
+     { time => 27, concentration => 3.078 },
+     { time => 28, concentration => 2.958 },
+     { time => 29, concentration => 2.844 },
+     { time => 30, concentration => 2.733 },
+     { time => 31, concentration => 2.627 },
+     { time => 32, concentration => 2.525 },
+     { time => 33, concentration => 2.427 },
+     { time => 34, concentration => 2.333 },
+     { time => 35, concentration => 2.242 },
+     { time => 36, concentration => 2.155 },
+     { time => 37, concentration => 2.071 },
+     { time => 38, concentration => 1.991 },
+     { time => 39, concentration => 1.914 },
+     { time => 40, concentration => 1.839 },
+     { time => 41, concentration => 1.768 },
+     { time => 42, concentration => 1.699 },
+     { time => 43, concentration => 1.633 },
+     { time => 44, concentration => "1.570" },
+     { time => 45, concentration => 1.509 },
+     { time => 46, concentration => "1.450" },
+     { time => 47, concentration => 1.394 },
+     { time => 48, concentration => "3.840" },
+     { time => 49, concentration => 3.691 },
+     { time => 50, concentration => 3.547 },
+     { time => 51, concentration => "3.410" },
+     { time => 52, concentration => 3.277 },
+     { time => 53, concentration => "3.150" },
+     { time => 54, concentration => 3.028 },
+     { time => 55, concentration => "2.910" },
+     { time => 56, concentration => 2.797 },
+     { time => 57, concentration => 2.688 },
+     { time => 58, concentration => 2.584 },
+     { time => 59, concentration => 2.484 },
+     { time => 60, concentration => 2.387 },
+     { time => 61, concentration => 2.294 },
+     { time => 62, concentration => 2.205 },
+     { time => 63, concentration => "2.120" },
+     { time => 64, concentration => 2.037 },
+     { time => 65, concentration => 1.958 },
+     { time => 66, concentration => 1.882 },
+     { time => 67, concentration => 1.809 },
+     { time => 68, concentration => 1.739 },
+     { time => 69, concentration => 1.671 },
+     { time => 70, concentration => 1.606 },
+     { time => 71, concentration => 1.544 },
+     { time => 72, concentration => 3.984 },
+     { time => 73, concentration => 3.829 },
+     { time => 74, concentration => 3.681 },
+     { time => 75, concentration => 3.538 },
+     { time => 76, concentration => "3.400" },
+     { time => 77, concentration => 3.268 },
+     { time => 78, concentration => 3.141 },
+     { time => 79, concentration => 3.019 },
+     { time => 80, concentration => 2.902 },
+     { time => 81, concentration => 2.789 },
+     { time => 82, concentration => 2.681 },
+     { time => 83, concentration => 2.577 },
+     { time => 84, concentration => 2.477 },
+     { time => 85, concentration => 2.381 },
+     { time => 86, concentration => 2.288 },
+     { time => 87, concentration => 2.199 },
+     { time => 88, concentration => 2.114 },
+     { time => 89, concentration => 2.032 },
+     { time => 90, concentration => 1.953 },
+     { time => 91, concentration => 1.877 },
+     { time => 92, concentration => 1.804 },
+     { time => 93, concentration => 1.734 },
+     { time => 94, concentration => 1.667 },
+     { time => 95, concentration => 1.602 },
+     { time => 96, concentration => "4.040" },
+     { time => 97, concentration => 3.883 },
+     { time => 98, concentration => 3.732 },
+     { time => 99, concentration => 3.587 },
+     { time => 100, concentration => 3.448 },
+     { time => 101, concentration => 3.314 },
+     { time => 102, concentration => 3.185 },
+     { time => 103, concentration => 3.062 },
+     { time => 104, concentration => 2.943 },
+     { time => 105, concentration => 2.828 },
+     { time => 106, concentration => 2.719 },
+     { time => 107, concentration => 2.613 },
+     { time => 108, concentration => 2.512 },
+     { time => 109, concentration => 2.414 },
+     { time => 110, concentration => "2.320" },
+     { time => 111, concentration => "2.230" },
+     { time => 112, concentration => 2.144 },
+     { time => 113, concentration => "2.060" },
+     { time => 114, concentration => "1.980" },
+     { time => 115, concentration => 1.903 },
+     { time => 116, concentration => "1.830" },
+     { time => 117, concentration => 1.758 },
+     { time => 118, concentration => "1.690" },
+     { time => 119, concentration => 1.625 },
+     { time => 120, concentration => 4.061 },
+     { time => 121, concentration => 3.904 },
+     { time => 122, concentration => 3.752 },
+     { time => 123, concentration => 3.606 },
+     { time => 124, concentration => 3.466 },
+     { time => 125, concentration => 3.332 },
+     { time => 126, concentration => 3.202 },
+     { time => 127, concentration => 3.078 },
+     { time => 128, concentration => 2.958 },
+     { time => 129, concentration => 2.844 },
+     { time => 130, concentration => 2.733 },
+     { time => 131, concentration => 2.627 },
+     { time => 132, concentration => 2.525 },
+     { time => 133, concentration => 2.427 },
+     { time => 134, concentration => 2.333 },
+     { time => 135, concentration => 2.242 },
+     { time => 136, concentration => 2.155 },
+     { time => 137, concentration => 2.071 },
+     { time => 138, concentration => 1.991 },
+     { time => 139, concentration => 1.914 },
+     { time => 140, concentration => 1.839 },
+     { time => 141, concentration => 1.768 },
+     { time => 142, concentration => 1.699 },
+     { time => 143, concentration => 1.633 },
+     { time => 144, concentration => "4.070" },
+   ],
+   { "table.fields" => ["time", "concentration"] },
+ ]
+
+=item * Same as previous example, but uses -r:
+
+ tabulate_drug_concentration(half_life => 17.5, period => 144, regular_dosage => "2.5\@24");
+
+=back
+
+Drug concentration over time is calculated using a simple equation:
+
+ D(t) = D(0) * exp(-t/T)
+
+where T is a constant and can be calculated from half-life where D(t)/D(0) =
+0.5:
+
+ 0.5 = 1 * exp(-half_life / T)
+ log(0.5) = -half_life / T
+ T = half_life / log(0.5)
+
+When given multiple dosages, each dosage's concentration will be added up.
+
+By default, hourly concentration will be calculated for 10 half-lives.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<dosages> => I<array[str]>
+
+Dosages, each of which in the form of d@t (amount followed by comma and time in hour).
+
+=item * B<half_life>* => I<ufloat>
+
+Drug half life, in hours.
+
+=item * B<period> => I<uint>
+
+How many hours to tabulate.
+
+If unspecified, defaults to 10 * half-life.
+
+=item * B<regular_dosage> => I<str>
+
+Regular dosage, in the form of d@t (amount followed by at sign and period in hour, meaning dosage given every t hours).
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-DrugUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-DrugUtils>.
+
+=head1 SEE ALSO
+
+Somewhat related utilities: L<App::VitaminUtils>, L<App::MineralUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-DrugUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

@@ -7,9 +7,9 @@ use warnings;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-16'; # DATE
+our $DATE = '2023-07-25'; # DATE
 our $DIST = 'Parse-Date-Month-ID'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our @EXPORT_OK = qw(parse_date_month_id $Pat);
 
@@ -133,7 +133,7 @@ Parse::Date::Month::ID - Parse month name from Indonesian text
 
 =head1 VERSION
 
-This document describes version 0.002 of Parse::Date::Month::ID (from Perl distribution Parse-Date-Month-ID), released on 2023-06-16.
+This document describes version 0.003 of Parse::Date::Month::ID (from Perl distribution Parse-Date-Month-ID), released on 2023-07-25.
 
 =head1 SYNOPSIS
 
@@ -194,7 +194,7 @@ Source repository is at L<https://github.com/perlancar/perl-Parse-Date-Month-ID>
 
 =head1 SEE ALSO
 
-Other C<Parse::Month:Name::*> modules.
+Other C<Parse::Month:Name::*> modules, e.g. L<Parse::Month:Name::EN>.
 
 A more full-fledged Indonesian date parsing module:
 L<DateTime::Format::Alami::ID>, with more dependencies.

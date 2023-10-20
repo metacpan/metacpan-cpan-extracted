@@ -1,8 +1,7 @@
 package Template::Caribou::Tags;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: generates tags functions for Caribou templates
-$Template::Caribou::Tags::VERSION = '1.2.1';
-
+$Template::Caribou::Tags::VERSION = '1.2.2';
 use strict;
 use warnings;
 
@@ -20,13 +19,13 @@ use XML::Writer;
 our @EXPORT_OK = qw/ render_tag mytag attr /;
 
 
-sub attr(@){
-    return $_{$_[0]} if @_ == 1;
+sub attr(@args){
+    return $_{$args[0]} if @args == 1;
 
-    croak "number of attributes must be even" if @_ % 2;
+    croak "number of attributes must be even" if @args % 2;
 
     no warnings 'uninitialized';
-    while( my ( $k, $v ) = splice @_, 0, 2 ) {
+    while( my ( $k, $v ) = splice @args, 0, 2 ) {
         if ( $k =~ s/^\+// ) {
             $_{$k} = { map { $_ => 1 } split ' ', $_{$k} }
                 unless ref $_{$k};
@@ -166,7 +165,7 @@ Template::Caribou::Tags - generates tags functions for Caribou templates
 
 =head1 VERSION
 
-version 1.2.1
+version 1.2.2
 
 =head1 SYNOPSIS
 
@@ -372,7 +371,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Yanick Champoux.
+This software is copyright (c) 2023 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

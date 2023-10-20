@@ -13,9 +13,9 @@ use File::Slurper qw(write_binary read_binary);
 use version;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-14'; # DATE
+our $DATE = '2023-07-11'; # DATE
 our $DIST = 'App-depak'; # DIST
-our $VERSION = '0.585'; # VERSION
+our $VERSION = '0.586'; # VERSION
 
 my @ALLOW_XS = qw(List::MoreUtils version::vxs);
 
@@ -48,8 +48,6 @@ sub _trace {
 }
 
 sub _build_lib {
-    use experimental 'smartmatch';
-
     require Dist::Util;
     require File::Copy;
     require File::Find;
@@ -183,12 +181,12 @@ sub _build_lib {
             }
         }
 
-        if ($self->{exclude_module} && $mod ~~ @{ $self->{exclude_module} }) {
+        if ($self->{exclude_module} && grep { $_ eq $mod } @{ $self->{exclude_module} }) {
             log_info("Excluding %s: skipped", $mod);
             next MOD_TO_FILTER;
         }
         for (@{ $self->{exclude_pattern} // [] }) {
-            if ($mod ~~ /$_/) {
+            if ($mod =~ /$_/) {
                 log_info("Excluding %s: skipped by pattern %s", $mod, $_);
                 next MOD_TO_FILTER;
             }
@@ -200,7 +198,7 @@ sub _build_lib {
                     push @$excluded_distmods, Dist::Util::list_dist_modules($_);
                 }
             }
-            if ($mod ~~ @$excluded_distmods) {
+            if (grep { $_ eq $mod } @$excluded_distmods) {
                 log_info("Excluding %s (by dist): skipped", $mod);
                 next MOD_TO_FILTER;
             }
@@ -225,7 +223,7 @@ sub _build_lib {
                     push @$excluded_list, $emod;
                 }
             }
-            if ($mod ~~ @$excluded_list) {
+            if (grep { $_ eq $mod } @$excluded_list) {
                 log_info("Excluding %s (by list): skipped", $mod);
             }
         }
@@ -242,8 +240,8 @@ sub _build_lib {
 
         unless ($mpath) {
             if (Module::XSOrPP::is_xs($mod)) {
-                unless (!$self->{allow_xs} || $mod ~~ @{ $self->{allow_xs} } ||
-                            $mod ~~ @ALLOW_XS) {
+                unless (!$self->{allow_xs} || grep { $_ eq $mod } @{ $self->{allow_xs} } ||
+                            grep { $_ eq $mod } @ALLOW_XS) {
                     die "Can't add XS module: $mod\n";
                 }
             }
@@ -375,7 +373,6 @@ sub _pack {
 }
 
 sub _test {
-    use experimental 'smartmatch';
     require Capture::Tiny;
     require IPC::System::Options;
 
@@ -387,7 +384,7 @@ sub _test {
     my $i = 0;
     for my $case (@$cases) {
         $i++;
-        log_debug("  Test case %d/%d: %s ...", $i, ~~@$cases, $case->{args});
+        log_debug("  Test case %d/%d: %s ...", $i, scalar(@$cases), $case->{args});
         my @cmd = ($^X);
         push @cmd, @{ $case->{perl_args} } if $case->{perl_args} && @{ $case->{perl_args} };
         push @cmd, $self->{abs_output_file}, @{ $case->{args} };
@@ -904,7 +901,7 @@ App::depak - Pack dependencies onto your script file
 
 =head1 VERSION
 
-This document describes version 0.585 of App::depak (from Perl distribution App-depak), released on 2021-11-14.
+This document describes version 0.586 of App::depak (from Perl distribution App-depak), released on 2023-07-11.
 
 =head1 SYNOPSIS
 
@@ -930,6 +927,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<allow_xs> => I<array[str]>
+
+(No description)
 
 =item * B<args> => I<array[str]>
 
@@ -1224,13 +1223,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

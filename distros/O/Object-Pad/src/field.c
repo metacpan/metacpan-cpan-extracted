@@ -5,12 +5,6 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include "object_pad.h"
-#include "class.h"
-#include "field.h"
-
-#undef register_field_attribute
-
 #include "perl-backcompat.c.inc"
 #include "perl-additions.c.inc"
 #include "force_list_keeping_pushmark.c.inc"
@@ -18,6 +12,12 @@
 #include "make_argcheck_ops.c.inc"
 #include "newOP_CUSTOM.c.inc"
 #include "OP_HELEMEXISTSOR.c.inc"
+
+#include "object_pad.h"
+#include "class.h"
+#include "field.h"
+
+#undef register_field_attribute
 
 #if HAVE_PERL_VERSION(5,36,0)
 #  define HAVE_OP_WEAKEN
@@ -294,10 +294,84 @@ AV *ObjectPad_mop_field_get_attribute_values(pTHX_ FieldMeta *fieldmeta, const c
   return ret;
 }
 
+SV *ObjectPad_get_obj_fieldsv(pTHX_ SV *self, ClassMeta *classmeta, FieldMeta *fieldmeta)
+{
+  SV *fieldstore;
+  FIELDOFFSET fieldix;
+
+  assert(SvROK(self));
+  assert(SvOBJECT(SvRV(self)));
+
+  if(classmeta->type == METATYPE_ROLE) {
+    HV *objstash = SvSTASH(SvRV(self));
+    const char *key = HvNAME(objstash);
+    STRLEN klen = HvNAMELEN(objstash);
+    if(HvNAMEUTF8(objstash))
+      klen = -klen;
+
+    assert(key);
+    SV **svp = hv_fetch(classmeta->role.applied_classes, key, klen, 0);
+    if(!svp)
+      croak("Cannot fetch role field value from a non-applied instance");
+
+    RoleEmbedding *embedding = (RoleEmbedding *)*svp;
+
+    fieldstore = get_obj_fieldstore(self, embedding->classmeta->repr, true);
+    fieldix = fieldmeta->fieldix + embedding->offset;
+  }
+  else {
+    const char *stashname = HvNAME(classmeta->stash);
+
+    if(!stashname || !sv_derived_from(self, stashname))
+      croak("Cannot fetch field value from a non-derived instance");
+
+    fieldstore = get_obj_fieldstore(self, classmeta->repr, true);
+    fieldix = fieldmeta->fieldix;
+  }
+
+  if(fieldix > fieldstore_maxfield(fieldstore))
+    croak("ARGH: instance does not have a field at index %ld", (long int)fieldix);
+
+  SV *sv = fieldstore_fields(fieldstore)[fieldix];
+
+  return sv;
+}
+
+static OP *pp_fieldsv(pTHX)
+{
+  dSP;
+  FIELDOFFSET fieldix = PL_op->op_targ;
+  if(PL_op->op_flags & OPf_SPECIAL) {
+    RoleEmbedding *embedding = get_embedding_from_pad();
+
+    if(embedding && embedding != &ObjectPad__embedding_standalone) {
+      fieldix += embedding->offset;
+    }
+  }
+
+  SV *fieldstore = PAD_SVl(PADIX_FIELDS);
+
+  SV *fieldsv = fieldstore_fields(fieldstore)[fieldix];
+
+  EXTEND(SP, 1);
+  PUSHs(fieldsv);
+
+  RETURN;
+}
+
+#define newFIELDSVOP(flags, fieldix)  S_newFIELDSVOP(aTHX_ flags, fieldix)
+static OP *S_newFIELDSVOP(pTHX_ U32 flags, FIELDOFFSET fieldix)
+{
+  OP *o = newOP_CUSTOM(&pp_fieldsv, flags);
+  o->op_targ = fieldix;
+  return o;
+}
+
 #define gen_field_init_op(fieldmeta)  S_gen_field_init_op(aTHX_ fieldmeta)
 static OP *S_gen_field_init_op(pTHX_ FieldMeta *fieldmeta)
 {
   ClassMeta *classmeta = fieldmeta->class;
+  U8 opf_special_if_role = (classmeta->type == METATYPE_ROLE) ? OPf_SPECIAL : 0;
 
   char sigil = SvPV_nolen(fieldmeta->name)[0];
   OP *op = NULL;
@@ -340,9 +414,7 @@ static OP *S_gen_field_init_op(pTHX_ FieldMeta *fieldmeta)
         op = newBINOP(OP_SASSIGN, 0,
           valueop,
           /* $fields[$idx] */
-          newAELEMOP(OPf_MOD,
-            newPADxVOP(OP_PADAV, OPf_MOD|OPf_REF, PADIX_SLOTS),
-            fieldmeta->fieldix));
+          newFIELDSVOP(OPf_MOD | opf_special_if_role, fieldmeta->fieldix));
       break;
     }
     case '@':
@@ -358,9 +430,7 @@ static OP *S_gen_field_init_op(pTHX_ FieldMeta *fieldmeta)
       if(valueop) {
         /* $fields[$idx]->@* or ->%* */
         OP *lhs = force_list_keeping_pushmark(newUNOP(coerceop, OPf_MOD|OPf_REF,
-                    newAELEMOP(0,
-                      newPADxVOP(OP_PADAV, OPf_MOD|OPf_REF, PADIX_SLOTS),
-                      fieldmeta->fieldix)));
+                    newFIELDSVOP(opf_special_if_role, fieldmeta->fieldix)));
 
         op = newBINOP(OP_AASSIGN, 0,
             force_list_keeping_pushmark(valueop),
@@ -496,6 +566,7 @@ static void S_generate_field_accessor_method(pTHX_ FieldMeta *fieldmeta, SV *mna
   ENTER;
 
   ClassMeta *classmeta = fieldmeta->class;
+  U8 opf_special_if_role = (classmeta->type == METATYPE_ROLE ? OPf_SPECIAL : 0);
   char sigil = SvPVX(fieldmeta->name)[0];
 
   SV *mname_fq = newSVpvf("%" SVf "::%" SVf, classmeta->name, mname);
@@ -520,9 +591,10 @@ static void S_generate_field_accessor_method(pTHX_ FieldMeta *fieldmeta, SV *mna
 
   OP *ops = op_append_list(OP_LINESEQ, NULL,
     newSTATEOP(0, NULL, NULL));
+  OP *methstartop;
   ops = op_append_list(OP_LINESEQ, ops,
-    newMETHSTARTOP(0 |
-      (classmeta->type == METATYPE_ROLE ? OPf_SPECIAL : 0) |
+    methstartop = newMETHSTARTOP(0 |
+      opf_special_if_role |
       (classmeta->repr << 8)));
 
   int req_args = 0;
@@ -544,16 +616,34 @@ static void S_generate_field_accessor_method(pTHX_ FieldMeta *fieldmeta, SV *mna
   ops = op_append_list(OP_LINESEQ, ops,
     make_argcheck_ops(req_args, opt_args, slurpy_arg, mname_fq));
 
-  U32 flags = 0;
+  FIELDOFFSET fieldix = fieldmeta->fieldix;
+
+  U8 private = 0;
 
   switch(sigil) {
-    case '$': flags = OPpFIELDPAD_SV << 8; break;
-    case '@': flags = OPpFIELDPAD_AV << 8; break;
-    case '%': flags = OPpFIELDPAD_HV << 8; break;
+    case '$': private = OPpFIELDPAD_SV; break;
+    case '@': private = OPpFIELDPAD_AV; break;
+    case '%': private = OPpFIELDPAD_HV; break;
   }
 
-  ops = op_append_list(OP_LINESEQ, ops,
-    newFIELDPADOP(flags, padix, fieldmeta->fieldix));
+#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
+  {
+    UNOP_AUX_item *aux;
+    Newx(aux, 2 + 1*2, UNOP_AUX_item);
+    cUNOP_AUXx(methstartop)->op_aux = aux;
+
+    (aux++)->uv = 1;       /* fieldcount */
+    (aux++)->uv = fieldix; /* max_fieldix */
+
+    (aux++)->uv = padix;
+    (aux++)->uv = ((UV)private << FIELDIX_TYPE_SHIFT) | fieldix;
+  }
+#else
+  {
+    ops = op_append_list(OP_LINESEQ, ops,
+      newFIELDPADOP(private << 8 | opf_special_if_role, padix, fieldix));
+  }
+#endif
 
   /* Generate the basic ops here so the ordering doesn't matter if other
    * attributes want to modify these */

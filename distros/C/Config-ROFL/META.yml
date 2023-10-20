@@ -1,0 +1,43 @@
+---
+author:
+  - 'Nicolas Mendoza <mendoza@pvv.ntnu.no>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  File::Share: 0
+  Test::More: 0
+  Test::Output: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+  Module::Install: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.21'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-ROFL
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  Carp: 0
+  Config::General: 0
+  Config::ZOMG: 0
+  Cpanel::JSON::XS: '4.04'
+  Cwd: 0
+  Data::Rmap: 0
+  File::Share: 0
+  File::Spec: 0
+  List::Util: '1.33'
+  Moo: 0
+  MooX::Singleton: 0
+  Path::Tiny: 0
+  Types::Standard: 0
+  YAML::XS: 0
+  namespace::clean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.07'

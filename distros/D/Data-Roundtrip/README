@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.18
+    Version 0.24
 
 SYNOPSIS
 
@@ -81,6 +81,13 @@ SYNOPSIS
         # have its unicode content escaped:
         my $json_with_unicode_escaped =
               json2json($jsonstr, {'escape-unicode'=>1});
+    
+        # With version 0.18 and up two more exported-on-demand
+        # subs were added to read JSON or YAML directly from a file:
+        # jsonfile2perl() and yamlfile2perl()
+        my $perldata = jsonfile2perl("file.json");
+        my $perldata = yamlfile2perl("file.yaml");
+        die "failed" unless defined $perldata;
     
         # For some of the above functions there exist command-line scripts:
         perl2json.pl -i "perl-data-structure.pl" -o "output.json" --pretty
@@ -248,7 +255,7 @@ SUBROUTINES
       * $ret
 
     Given an input $yamlstring as a string, it will return the equivalent
-    Perl data structure using YAML::Load($yamlstring)
+    Perl data structure using YAML::PP::Load($yamlstring)
 
     Returns the Perl data structure on success or undef on failure.
 
@@ -601,7 +608,7 @@ SCRIPTS
 
 CAVEATS
 
-    A valid Perl variable may kill YAML::Load because of escapes and
+    A valid Perl variable may kill YAML::PP::Load because of escapes and
     quotes. For example this:
 
         my $yamlstr = <<'EOS';
@@ -609,7 +616,7 @@ CAVEATS
         - 682224
         - "\"w": 1
         EOS
-        my $pv = eval { YAML::Load($yamlstr) };
+        my $pv = eval { YAML::PP::Load($yamlstr) };
         if( $@ ){ die "failed(1): ". $@ }
         # it's dead
 
@@ -622,7 +629,7 @@ CAVEATS
         EOS
         # this is OK also:
         # - \"w: 1
-        my $pv = eval { YAML::Load($yamlstr) };
+        my $pv = eval { YAML::PP::Load($yamlstr) };
         if( $@ ){ die "failed(1): ". $@ }
         # it's OK! still alive.
 

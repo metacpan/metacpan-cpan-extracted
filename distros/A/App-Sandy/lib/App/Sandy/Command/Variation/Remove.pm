@@ -5,7 +5,7 @@ use App::Sandy::Base 'class';
 
 extends 'App::Sandy::Command::Variation';
 
-our $VERSION = '0.24'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 override 'opt_spec' => sub {
 	super,
@@ -47,7 +47,7 @@ App::Sandy::Command::Variation::Remove - variation subcommand class. Remove stru
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 SYNOPSIS
 

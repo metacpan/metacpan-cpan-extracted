@@ -32,6 +32,8 @@ sub extract_tcp_packet {
 1;
 __END__
 
+=encoding utf-8
+
 =head1 NAME
 
 AnyEvent::Pcap::Utils - Utilty class for AnyEvent::Pcap.

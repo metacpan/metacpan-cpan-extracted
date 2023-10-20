@@ -17,6 +17,7 @@ test*
 *.inl
 *.yml
 src/Framebuffer.pm
+src/Makefile.pl
 subs.pl
-examples/many*
-examples/mce*
+examples/multiprocessing/many*
+examples/multiprocessing/mce*

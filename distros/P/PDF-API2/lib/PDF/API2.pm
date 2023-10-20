@@ -3,7 +3,7 @@ package PDF::API2;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.044'; # VERSION
+our $VERSION = '2.045'; # VERSION
 
 use Carp;
 use Encode qw(:all);
@@ -552,15 +552,20 @@ sub _is_date {
     # D: prefix and the year, all components are optional but must be present if
     # a later component is present.  No provision is made in the specification
     # for leap seconds, etc.
-    return unless $value =~ /^D:([0-9]{4})        # D:YYYY (required)
-                             (?:([01][0-9])       # Month (01-12)
-                             (?:([0123][0-9])     # Day (01-31)
-                             (?:([012][0-9])      # Hour (00-23)
-                             (?:([012345][0-9])   # Minute (00-59)
-                             (?:([012345][0-9])   # Second (00-59)
-                             (?:([Z+-])           # UT Offset Direction
-                             (?:([012][0-9])      # UT Offset Hours
-                             (?:\'([012345][0-9]) # UT Offset Minutes
+    #
+    # The Adobe PDF specifications (including 1.7) state that the offset minutes
+    # must have a trailing apostrophe.  Beginning with the ISO version of the
+    # 1.7 specification, a trailing apostrophe is not permitted after the offset
+    # minutes.  For compatibility, we accept either version as valid.
+    return unless $value =~ /^D:([0-9]{4})         # D:YYYY (required)
+                             (?:([01][0-9])        # Month (01-12)
+                             (?:([0123][0-9])      # Day (01-31)
+                             (?:([012][0-9])       # Hour (00-23)
+                             (?:([012345][0-9])    # Minute (00-59)
+                             (?:([012345][0-9])    # Second (00-59)
+                             (?:([Z+-])            # UT Offset Direction
+                             (?:([012][0-9])\'?    # UT Offset Hours
+                             (?:([012345][0-9])\'? # UT Offset Minutes
                              )?)?)?)?)?)?)?)?$/x;
     my ($year, $month, $day, $hour, $minute, $second, $od, $oh, $om)
         = ($1, $2, $3, $4, $5, $6, $7, $8, $9);
@@ -590,6 +595,10 @@ sub _is_date {
     }
     if (defined $om) {
         return unless $om <= 59;
+    }
+    if (defined $oh and $om) {
+        # Apostrophe is required between offset hour and minute
+        return unless $value =~ /$oh\'$om\'?/;
     }
 
     return 1;
@@ -1529,7 +1538,7 @@ sub embed_page {
     $s_idx ||= 0;
 
     unless (ref($s_pdf) and $s_pdf->isa('PDF::API2')) {
-        die "Invalid usage: first argument must be PDF::API2 instance, not: " . ref($s_pdf);
+        croak "Invalid usage: first argument must be PDF::API2 instance, not: " . ref($s_pdf);
     }
 
     my ($s_page, $xo);
@@ -1541,6 +1550,7 @@ sub embed_page {
     }
     else {
         $s_page = $s_pdf->open_page($s_idx);
+        croak "Unable to open page $s_idx in source PDF" unless defined $s_page;
     }
 
     $self->{'apiimportcache'} ||= {};
@@ -1972,6 +1982,12 @@ sub font {
     if (PDF::API2::Resource::Font::CoreFont->is_standard($name)) {
         return $self->corefont($name, %options);
     }
+    elsif ($name eq 'Times' and not $options{'format'}) {
+        # Accept Times as an alias for Times-Roman to follow the pattern set by
+        # Courier and Helvetica.
+        carp "Times is not a standard font; substituting Times-Roman";
+        return $self->corefont('Times-Roman', %options);
+    }
 
     my $format = $options{'format'};
     $format //= ($name =~ /\.[ot]tf$/i ? 'truetype' :
@@ -2238,7 +2254,7 @@ sub image {
     my $format = lc($options{'format'} // '');
 
     if (ref($file) eq 'GD::Image') {
-        return image_gd($file, %options);
+        return $self->image_gd($file, %options);
     }
     elsif (ref($file)) {
         $format ||= _detect_image_format($file);
@@ -2404,16 +2420,17 @@ The base height of the barcode in points.
 
 =item * bar_extend
 
-If present, bars for non-printing characters (e.g. start and stop characters)
-will be extended downward by this many points, and printing characters will be
-shown below their respective bars.
+If present and applicable, bars for non-printing characters (e.g. start and stop
+characters) will be extended downward by this many points, and printing
+characters will be shown below their respective bars.
 
 This is enabled by default for EAN-13 barcodes.
 
 =item * caption
 
 If present, this value will be printed, centered, beneath the barcode, and
-should be a human-readable representation of the barcode.
+should be a human-readable representation of the barcode.  This option is
+ignored for QR codes.
 
 =item * font
 
@@ -2435,12 +2452,12 @@ A margin, in points, that will be place before the left and bottom edges of the
 barcode (including the caption, if present).  This is used to help barcode
 scanners tell where the barcode begins and ends.
 
-The default is the width of one encoded character.
+The default is the width of one encoded character, or four squares for QR codes.
 
 =item * bar_overflow
 
 Shrinks the horizontal width of bars by this amount in points to account for ink
-spread when printing.
+spread when printing.  This option is ignored for QR codes.
 
 The default is 0.01 points.
 
@@ -2452,6 +2469,10 @@ L<PDF::API2::Content/"fillcolor">.
 The default is black.
 
 =back
+
+QR codes have
+L<additional options|PDF::API2::Resource::XObject::Form::BarCode::qrcode> for
+customizing the error correction level and other niche settings.
 
 =cut
 

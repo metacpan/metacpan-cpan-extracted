@@ -17,7 +17,7 @@ README
 t/_1aaa_v.t
 t/_1basic.t
 t/_itsa.t
-t/test1.t
+t/div_by_zero.t
 t/get_set_IV.t
 t/get_set_NV.t
 t/init_set_IV_NV.t
@@ -27,14 +27,17 @@ t/NOK_and_POK.t
 t/overload.t
 t/overload_cross_class.t
 t/overload_switch.t
-t/use64bitint.t
 t/new.t
 t/not_zero.t
 t/out_str.t
 t/printf.t
 t/PV_NV_BUG.t
-t/TRmpf_out_str.t
 t/pod.t
+t/random2.t
+t/random3.t
+t/test1.t
+t/TRmpf_out_str.t
+t/use64bitint.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

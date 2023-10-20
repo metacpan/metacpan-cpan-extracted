@@ -1,5 +1,4 @@
 Changes
-INSTALL
 lib/Set/Relation.pm
 lib/Set/Relation.pod
 lib/Set/Relation/V1.pm
@@ -9,11 +8,9 @@ lib/Set/Relation/V2.pod
 LICENSE/artistic-2_0.txt
 Makefile.PL
 MANIFEST
-MANIFEST.SKIP
 README
 t/Set_Relation_00_Compile.t
 t/Set_Relation_50_Synopsis.t
 t/Set_Relation_51_Database_in_Depth_Example.t
-TODO
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

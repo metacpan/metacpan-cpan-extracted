@@ -169,6 +169,8 @@ lib/Net/Async/Slack/Event/ScopeGranted.pm
 lib/Net/Async/Slack/Event/ScopeGranted.pod
 lib/Net/Async/Slack/Event/Shortcut.pm
 lib/Net/Async/Slack/Event/Shortcut.pod
+lib/Net/Async/Slack/Event/SlashCommands.pm
+lib/Net/Async/Slack/Event/SlashCommands.pod
 lib/Net/Async/Slack/Event/StarAdded.pm
 lib/Net/Async/Slack/Event/StarAdded.pod
 lib/Net/Async/Slack/Event/StarRemoved.pm
@@ -217,6 +219,8 @@ lib/Net/Async/Slack/Event/UserTyping.pm
 lib/Net/Async/Slack/Event/UserTyping.pod
 lib/Net/Async/Slack/Event/ViewSubmission.pm
 lib/Net/Async/Slack/Event/ViewSubmission.pod
+lib/Net/Async/Slack/Event/WorkflowStepEdit.pm
+lib/Net/Async/Slack/Event/WorkflowStepEdit.pod
 lib/Net/Async/Slack/EventType.pm
 lib/Net/Async/Slack/Message.pm
 lib/Net/Async/Slack/RTM.pm

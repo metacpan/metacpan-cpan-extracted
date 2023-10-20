@@ -129,7 +129,7 @@ sub __transaction {
         1 }
     ) {
         $ax->print_error_message( $@ );
-        $sth->finish if $sf->{i}{driver} eq 'SQLite';
+        $sth->finish if defined $sth && $sf->{i}{driver} eq 'SQLite';
         $dbh->rollback;
         $rolled_back = 1;
     }

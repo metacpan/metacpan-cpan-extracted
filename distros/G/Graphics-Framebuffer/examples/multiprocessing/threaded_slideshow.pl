@@ -22,6 +22,10 @@ use File::Basename;
 ## I only use this for debugging
 # use Data::Dumper::Simple; $Data::Dumper::Sortkeys = 1; $Data::Dumper::Purity = 1; $Data::Dumper::Deepcopy = 1;
 
+BEGIN {
+	our $VERSION = '2.00';
+};
+
 my $errors           = FALSE;
 my $auto             = FALSE;
 my $showall          = FALSE;
@@ -40,15 +44,12 @@ my $new_y;
 our $GO : shared     = FALSE;
 
 GetOptions(
-    'x=i'          => \$new_x,
-    'y=i'          => \$new_y,
     'auto'         => \$auto,
     'errors'       => \$errors,
     'showall|all'  => \$showall,
     'help'         => \$help,
     'delay|wait=i' => \$delay,
     'heads=i'      => \$heads,
-    'nosplash'     => \$nosplash,
     'noaccel'      => \$noaccel,
     'threads=i'    => \$threads,
     'names'        => \$show_names,
@@ -64,7 +65,7 @@ if ($help) {
     pod2usage('-exitstatus' => 1, '-verbose' => $help);
 }
 
-my $splash = ($nosplash) ? 0 : 3;
+my $splash = ($nosplash) ? 0 : 1;
 
 my @devs;
 
@@ -143,7 +144,7 @@ while (threads->list()) {
     sleep .01;
 }
 
-exit(0);
+exec('reset');
 
 sub finish {
     $RUNNING = 0;
@@ -494,7 +495,7 @@ sub show {
     my $FB = (defined($nx)) ?
       Graphics::Framebuffer->new(
           'SHOW_ERRORS' => $errors,
-          'RESET'       => 1,
+          'RESET'       => 0,
           'SPLASH'      => $splash,
           'FB_DEVICE'   => $dev,
           'SPLASH'      => $display,
@@ -505,7 +506,7 @@ sub show {
       :
       Graphics::Framebuffer->new(
           'SHOW_ERRORS' => $errors,
-          'RESET'       => 1,
+          'RESET'       => 0,
           'SPLASH'      => $splash,
           'FB_DEVICE'   => $dev,
           'SPLASH'      => $display,

@@ -39,15 +39,15 @@
    "provides" : {
       "Sublike::Extended" : {
          "file" : "lib/Sublike/Extended.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       },
       "XS::Parse::Sublike" : {
          "file" : "lib/XS/Parse/Sublike.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       },
       "XS::Parse::Sublike::Builder" : {
          "file" : "lib/XS/Parse/Sublike/Builder.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

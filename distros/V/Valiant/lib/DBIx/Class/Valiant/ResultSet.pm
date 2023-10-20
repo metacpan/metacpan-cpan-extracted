@@ -6,6 +6,31 @@ use Carp;
 use Valiant::Util 'debug';
 use namespace::autoclean -also => ['debug'];
 use DBIx::Class::Valiant::Util::Exception::TooManyRows;
+use Role::Tiny::With;
+
+with 'Valiant::Naming';
+
+# Gotta jump thru these hoops because of the way the Catalyst
+# DBIC model messes with the result namespace but not the schema
+# namespace
+
+sub namespace {
+  my $self = shift;
+  my $class = ref($self) ? ref($self) : $self; 
+  my ($ns) = ($class =~m/^(.+)::.+$/);
+  return $ns;
+}
+
+sub i18n_scope { 'valiant' }
+
+sub i18n_lookup { 
+  my ($class_or_self, $arg) = @_;
+  my $class = ref($class_or_self) ? ref($class_or_self) : $class_or_self;
+  no strict "refs";
+  my @proposed = @{"${class}::ISA"};
+  push @proposed, $class_or_self->i18n_metadata if $class_or_self->can('i18n_metadata');
+  return grep { $_->can('model_name') } ($class, @proposed);
+}
 
 sub skip_validation {
   my ($self, $arg) = @_;

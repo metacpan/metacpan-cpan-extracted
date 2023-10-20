@@ -95,7 +95,7 @@ sub parse_string
             }
         }
         ## We may have found an element, check the first character
-        ## XXX Confirm with rfc for the lawful characters
+        ## NOTE: Confirm with rfc for the lawful characters
         elsif( !$this->{inside_statement} && $c =~ /^[\@\:\[\#\.a-zA-Z0-9]$/ )
         {
             $this->{inside_statement}++;

@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
   "NAME" => "ODF::lpOD_Helper",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Data::Dumper::Interp" => "6.005",
+    "Data::Dumper::Interp" => "6.006",
     "Exporter" => 0,
     "File::Basename" => 0,
     "Getopt::Long" => 0,
@@ -39,9 +39,10 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Archive::Zip" => 0,
+    "Capture::Tiny" => 0,
     "Cwd" => 0,
     "Data::Dumper" => 0,
-    "Data::Dumper::Interp" => "6.005",
+    "Data::Dumper::Interp" => "6.006",
     "Encode" => 0,
     "English" => 0,
     "Env" => 0,
@@ -65,7 +66,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "multidimensional" => 0
   },
-  "VERSION" => "6.004",
+  "VERSION" => "6.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,10 +75,11 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Archive::Zip" => 0,
+  "Capture::Tiny" => 0,
   "Carp" => 0,
   "Cwd" => 0,
   "Data::Dumper" => 0,
-  "Data::Dumper::Interp" => "6.005",
+  "Data::Dumper::Interp" => "6.006",
   "Encode" => 0,
   "English" => 0,
   "Env" => 0,

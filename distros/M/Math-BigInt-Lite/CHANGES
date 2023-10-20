@@ -1,3 +1,11 @@
+0.29 2023-08-24
+
+ * Sync with the Math-BigInt distribution.
+
+0.28 2023-04-03
+
+ * Update documentation. Remove/update obsolete URLs.
+
 0.27 2022-07-03
 
  * Correct band(), bior(), and bxor() cf. CPAN RT #79923. These methods didn't

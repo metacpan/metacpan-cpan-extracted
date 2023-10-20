@@ -10,8 +10,9 @@ use ODF::lpOD_Helper;
 
 #####################################################################
 #
-# Test encoding support (specifically, lack of breakage from :chars) 
-# by creating a document containing "wide" chars, and manually 
+# Test encoding support (specifically, lack of breakage from
+# ODF::lpod_Helper's fooling around with ODF::lpOD encoding settings)
+# by creating a document containing "wide" chars, and manually
 # re-encoding it various ways and having ODF::lpOD read it back.
 #
 #####################################################################
@@ -139,7 +140,7 @@ my $orig_xmltext;
 for my $alt_enc (qw/UTF-8 big5 euc-kr x-sjis-cp932/) {
   note "--- ",visq($alt_enc)," ---";
   my $new_path = "$tmpdir/using_${alt_enc}.odt";
-  { 
+  {
     # Encode content.xml differently
     my $alt_xmloctets = eval { MyXML::encode_xml($orig_xmltext, $alt_enc) };
     if ($@) { diag "$alt_enc does not work"; next }

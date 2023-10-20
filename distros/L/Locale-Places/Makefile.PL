@@ -30,7 +30,7 @@ foreach my $dir(@dirs) {
 }
 
 my %urls = (
-	"http://$site/export/dump/alternatenames/GB.zip" => 'lib/Locale/Places/databases/GB.zip',
+	"https://$site/export/dump/alternatenames/GB.zip" => 'lib/Locale/Places/databases/GB.zip',
 );
 
 # unlink('lib/Geo/Coder/Free/MaxMind/databases/cities.sql');
@@ -88,6 +88,7 @@ foreach my $url(keys %urls) {
 			# Only download if a newer version is available
 			$use_mirror = 1;
 		}
+		unlink $file;	# Don't leave anything stale around
 	}
 
 	if($use_mirror) {
@@ -112,14 +113,35 @@ foreach my $url(keys %urls) {
 
 if(!(-r 'lib/Locale/Places/databases/GB.csv')) {
 	my $zip = 'lib/Locale/Places/databases/GB.zip';
-	system("unzip $zip");
-	rename 'GB.txt', 'lib/Locale/Places/databases/GB.csv';
-	unlink 'readme.txt';
-	# Save disc space, but prevent more than one download
-	if(open(my $fout, '>', $zip)) {
-		close($fout);
+
+	# Try inline as the external program fails on Windows
+	# http://www.cpantesters.org/cpan/report/a03259ca-6c02-1014-bd5e-9b11492b42cd
+	eval 'require IO::Uncompress::Unzip';
+	if($@) {
+		system("unzip $zip") or die "unzip $zip failed";
+
+		rename 'GB.txt', 'lib/Locale/Places/databases/GB.csv' or die "rename: $!";
+		unlink 'readme.txt';
+	} elsif(open(my $fout, '>', 'lib/Locale/Places/databases/GB.csv')) {
+		IO::Uncompress::Unzip->import();
+		my $fin = IO::Uncompress::Unzip->new($zip);
+		do {
+			if($fin->getHeaderInfo->{'Name'} eq 'GB.txt') {
+				while(my $line = $fin->getline()) {
+					print $fout $line;
+				}
+				# last; # Gives syntax error that it's not in a loop :-(
+			}
+		} while($fin->nextStream());
 	}
+	# Save disc space, but prevent more than one download
+	# if(open(my $fout, '>', $zip)) {
+		# close($fout);
+	# }
+	truncate $zip, 0;
 }
+
+die if(!(-r 'lib/Locale/Places/databases/GB.csv'));
 
 # my $pm = {
 	# 'lib/Locale/Places.pm' => 'blib/lib/Locale/Places.pm',

@@ -1,7 +1,7 @@
 package Object::PadX::Log::Log4perl;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use v5.26;
-use Object::Pad;
+use Object::Pad 0.66;
 
 # ABSTRACT: A logger role for Object::Pad based classes based on Log::Log4perl
 
@@ -43,7 +43,7 @@ Object::PadX::Log::Log4perl - A logger role for Object::Pad based classes based 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

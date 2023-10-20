@@ -45,7 +45,7 @@
    "provides" : {
       "Bundle::Locale::CLDR::Westernasia" : {
          "file" : "lib/Bundle/Locale/CLDR/Westernasia.pm",
-         "version" : "v0.34.1"
+         "version" : "v0.34.2"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.34.1",
+   "version" : "v0.34.2",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

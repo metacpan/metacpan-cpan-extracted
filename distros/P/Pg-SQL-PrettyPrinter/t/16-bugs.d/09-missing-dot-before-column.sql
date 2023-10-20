@@ -1,0 +1,1 @@
+select (unnest('{"(ACDT,10:30:00,t)","(ACSST,10:30:00,t)"}'::pg_timezone_abbrevs[])).abbrev

@@ -18,10 +18,10 @@ no_index:
     - t
     - inc
 requires:
-  Math::BigInt: '1.999838'
+  Math::BigInt: '1.99984'
   Math::GMPz: '0.36'
   perl: '5.006002'
 resources:
   repository: https://github.com/pjacklam/p5-Math-BigInt-GMPz.git
-version: '0.0011'
+version: '0.0013'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

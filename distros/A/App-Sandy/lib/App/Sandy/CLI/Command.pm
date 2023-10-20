@@ -5,7 +5,7 @@ use App::Sandy::Base 'class';
 
 extends 'App::Sandy::CLI';
 
-our $VERSION = '0.24'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 override 'opt_spec' => sub {
 	super
@@ -46,7 +46,7 @@ App::Sandy::CLI::Command - App::Sandy::CLI subclass for commands interface
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 SYNOPSIS
 

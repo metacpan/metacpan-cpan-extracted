@@ -8,3 +8,6 @@ static_install = "auto"
 [release]
 branch = "master"
 
+[FileGatherer]
+exclude_match = [ '^images/', '^docs/' ]
+

@@ -1,5 +1,10 @@
 Revision history for Perl extension Text-Conceal
 
+1.02 2023-10-20T01:54:29Z
+
+    - Document 'ordered' parameter.
+    - test VPrintf uses ordered => 0 and surprisingly works
+
 1.01 2022-08-09T03:15:17Z
 
     - Release 1.01

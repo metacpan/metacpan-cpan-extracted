@@ -1,0 +1,26 @@
+Game::WordChainGame
+
+Game::WordChainGame - WordChainGame is a Perl module that lets you play a word chain game with multiple players. In this game, players take turns forming a chain of words, with each word starting with the last letter of the previous word. The game continues until only one player remains or all players choose to quit.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DOCUMENTATION
+
+You can find documentation for this module with the perldoc command:
+
+    perldoc Game::WordChainGame
+
+LICENSE
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+COPYRIGHT
+
+(c) 2023, Rohit Manjrekar

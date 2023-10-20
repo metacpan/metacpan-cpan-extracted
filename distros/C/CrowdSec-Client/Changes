@@ -1,0 +1,12 @@
+Revision history for Perl extension CrowdSec::Client.
+
+0.03  Fri Sep 22 11:11:25 2023
+	- Add testIp()
+	- Update doc
+
+0.02  Fri Sep 22 07:28:35 2023
+	- Fix dependencies
+	- Improve doc
+
+0.01  Thu Sep 21 20:14:57 2023
+	- original version; created by h2xs

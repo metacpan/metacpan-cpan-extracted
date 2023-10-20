@@ -14,6 +14,11 @@
    },
    "name" : "Thread-GoChannel",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::ParseXS" : "3.50"
+         }
+      },
       "configure" : {
          "requires" : {
             "Module::Build::Tiny" : "0.046"
@@ -22,6 +27,7 @@
       "develop" : {
          "requires" : {
             "Devel::PPPort" : "3.23",
+            "ExtUtils::Typemaps::Magic" : "0",
             "Test::More" : "0",
             "Test::Pod" : "1.41"
          }
@@ -43,14 +49,13 @@
    "provides" : {
       "Thread::GoChannel" : {
          "file" : "lib/Thread/GoChannel.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-thread-gochannel at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Thread-GoChannel"
+         "web" : "https://github.com/Leont/thread-gochannel/issues"
       },
       "repository" : {
          "type" : "git",
@@ -58,7 +63,7 @@
          "web" : "https://github.com/Leont/thread-gochannel"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_contributors" : [
       "Ed Sabol <esabol@users.noreply.github.com>"
    ],

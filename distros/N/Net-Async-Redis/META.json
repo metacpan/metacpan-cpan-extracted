@@ -101,47 +101,47 @@
    "provides" : {
       "Net::Async::Redis" : {
          "file" : "lib/Net/Async/Redis.pm",
-         "version" : "4.000"
+         "version" : "4.001"
       },
       "Net::Async::Redis::Cluster" : {
          "file" : "lib/Net/Async/Redis/Cluster.pm",
-         "version" : "4.000"
+         "version" : "4.001"
       },
       "Net::Async::Redis::Cluster::Node" : {
          "file" : "lib/Net/Async/Redis/Cluster/Node.pm",
-         "version" : "4.000"
+         "version" : "4.001"
       },
       "Net::Async::Redis::Commands" : {
          "file" : "lib/Net/Async/Redis/Commands.pm",
-         "version" : "4.000"
+         "version" : "4.001"
       },
       "Net::Async::Redis::Multi" : {
          "file" : "lib/Net/Async/Redis/Multi.pm",
-         "version" : "4.000"
+         "version" : "4.001"
       },
       "Net::Async::Redis::Protocol" : {
          "file" : "lib/Net/Async/Redis/Protocol.pm",
-         "version" : "4.000"
+         "version" : "4.001"
       },
       "Net::Async::Redis::Server" : {
          "file" : "lib/Net/Async/Redis/Server.pm",
-         "version" : "4.000"
+         "version" : "4.001"
       },
       "Net::Async::Redis::Server::Connection" : {
          "file" : "lib/Net/Async/Redis/Server/Connection.pm",
-         "version" : "4.000"
+         "version" : "4.001"
       },
       "Net::Async::Redis::Server::Database" : {
          "file" : "lib/Net/Async/Redis/Server/Database.pm",
-         "version" : "4.000"
+         "version" : "4.001"
       },
       "Net::Async::Redis::Subscription" : {
          "file" : "lib/Net/Async/Redis/Subscription.pm",
-         "version" : "4.000"
+         "version" : "4.001"
       },
       "Net::Async::Redis::Subscription::Message" : {
          "file" : "lib/Net/Async/Redis/Subscription/Message.pm",
-         "version" : "4.000"
+         "version" : "4.001"
       }
    },
    "release_status" : "stable",
@@ -156,7 +156,7 @@
          "web" : "https://github.com/team-at-cpan/Net-Async-Redis"
       }
    },
-   "version" : "4.000",
+   "version" : "4.001",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Eyad Arnabeh <eyadof@gmail.com>",
@@ -167,7 +167,7 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "shaydo-deriv <129739908+shaydo-deriv@users.noreply.github.com>"
    ],
-   "x_generated_by_perl" : "v5.36.0",
+   "x_generated_by_perl" : "v5.38.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

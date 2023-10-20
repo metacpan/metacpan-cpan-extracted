@@ -50,29 +50,29 @@ sub init
     {
         $uri = shift( @_ );
     }
-    $self->{cookie}         = undef;
-    $self->{do_pong}        = \&pong,
-    $self->{ip}             = undef;
-    $self->{max_fragments_amount} = undef;
-    $self->{max_payload_size} = undef;
-    $self->{on_binary}      = sub{};
-    $self->{on_connect}     = sub{};
-    $self->{on_disconnect}  = sub{},
-    $self->{on_error}       = sub{};
-    $self->{on_handshake}   = sub{1},
-    $self->{on_ping}        = sub{};
-    $self->{on_pong}        = sub{};
-    $self->{on_recv}        = sub{};
-    $self->{on_send}        = sub{};
-    $self->{on_utf8}        = sub{};
-    $self->{origin}         = undef;
-    $self->{socket}         = undef;
-    $self->{subprotocol}    = [];
-    $self->{timeout}        = undef;
-    $self->{uri}            = $uri;
+    $self->{cookie}         = undef unless( defined( $self->{cookie} ) );
+    $self->{do_pong}        = \&pong unless( defined( $self->{do_pong} ) );
+    $self->{ip}             = undef unless( defined( $self->{ip} ) );
+    $self->{max_fragments_amount} = undef unless( defined( $self->{max_fragments_amount} ) );
+    $self->{max_payload_size} = undef unless( defined( $self->{max_payload_size} ) );
+    $self->{on_binary}      = sub{} unless( defined( $self->{on_binary} ) );
+    $self->{on_connect}     = sub{} unless( defined( $self->{on_connect} ) );
+    $self->{on_disconnect}  = sub{} unless( defined( $self->{on_disconnect} ) );
+    $self->{on_error}       = sub{} unless( defined( $self->{on_error} ) );
+    $self->{on_handshake}   = sub{1} unless( defined( $self->{on_handshake} ) );
+    $self->{on_ping}        = sub{} unless( defined( $self->{on_ping} ) );
+    $self->{on_pong}        = sub{} unless( defined( $self->{on_pong} ) );
+    $self->{on_recv}        = sub{} unless( defined( $self->{on_recv} ) );
+    $self->{on_send}        = sub{} unless( defined( $self->{on_send} ) );
+    $self->{on_utf8}        = sub{} unless( defined( $self->{on_utf8} ) );
+    $self->{origin}         = undef unless( defined( $self->{origin} ) );
+    $self->{socket}         = undef unless( defined( $self->{socket} ) );
+    $self->{subprotocol}    = [] unless( defined( $self->{subprotocol} ) );
+    $self->{timeout}        = undef unless( defined( $self->{timeout} ) );
+    $self->{uri}            = $uri unless( defined( $self->{uri} ) );
     # e.g. draft-ietf-hybi-17
     # Default to empty string prevent Module::Generic from setting this to the module version
-    $self->{version}        = '';
+    $self->{version}        = '' unless( length( $self->{version} // '' ) );
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     $self->{disconnecting}  = 0;
@@ -192,7 +192,7 @@ sub connect
     }
     catch( $e )
     {
-        warning::warn( "An error occurred while trying to call the send callback: $e" ) if( warnings::enabled() );
+        warn( "An error occurred while trying to call the send callback: $e" ) if( $self->_warnings_is_enabled() );
     }
     
     # Listen for server response and further handshake exchanges
@@ -331,7 +331,7 @@ sub listen
             }
             else
             {
-                warnings::warn( "Filehandle $fh became writable, but no handler took responsibility for it; removing it\n" ) if( warnings::enabled() );
+                warn( "Filehandle $fh became writable, but no handler took responsibility for it; removing it\n" ) if( $self->_warnings_is_enabled() );
                 $self->{select_writable}->remove( $fh );
             }
         }
@@ -355,7 +355,7 @@ sub disconnect
     }
     catch( $e )
     {
-        warnings::warn( "Error calling disconnect callback: $e" ) if( warnings::enabled() );
+        warn( "Error calling disconnect callback: $e" ) if( $self->_warnings_is_enabled() );
     }
 
     my $data = '';
@@ -445,7 +445,7 @@ sub recv
     {
         if( !defined( $len ) )
         {
-            warnings::warn( "Unable to read from socket, disconnecting: $!") if( warnings::enabled() );
+            warn( "Unable to read from socket, disconnecting: $!") if( $self->_warnings_is_enabled() );
             if( $self->handshake )
             {
                 return( $self->error({ code => 500, message => 'Unable to read from socket' }) );
@@ -492,7 +492,7 @@ sub recv
             }
             catch( $e )
             {
-                warnings::warn( "Error calling the error callback: $e" ) if( warnings::enabled() );
+                warn( "Error calling the error callback: $e" ) if( $self->_warnings_is_enabled() );
                 return( $self->error({ code => WS_INTERNAL_SERVER_ERROR, message => "Internal error" }) );
             }
             return( $self );
@@ -540,7 +540,7 @@ sub recv
             }
             catch( $e )
             {
-                warnings::warn( "Error calling the handshake callback: $e" ) if( warnings::enabled() );
+                warn( "Error calling the handshake callback: $e" ) if( $self->_warnings_is_enabled() );
                 return( $self->error({ code => WS_INTERNAL_SERVER_ERROR, message => "Internal error" }) );
             }
             return( $self );
@@ -565,7 +565,7 @@ sub recv
                 }
                 catch( $e )
                 {
-                    warnings::warn( "Error with callback \"on_recv\" to process incoming binary or text data: $e" ) if( warnings::enabled() );
+                    warn( "Error with callback \"on_recv\" to process incoming binary or text data: $e" ) if( $self->_warnings_is_enabled() );
                     return( $self->error({ code => WS_INTERNAL_SERVER_ERROR, message => "Internal error" }) );
                 }
             }
@@ -578,7 +578,7 @@ sub recv
                 }
                 catch( $e )
                 {
-                    warnings::warn( "Error with callback to process binary message: $e" ) if( warnings::enabled() );
+                    warn( "Error with callback to process binary message: $e" ) if( $self->_warnings_is_enabled() );
                     return( $self->error({ code => WS_INTERNAL_SERVER_ERROR, message => "Internal error" }) );
                 }
             }
@@ -590,7 +590,7 @@ sub recv
                 }
                 catch( $e )
                 {
-                    warnings::warn( "Error with callback to process text message: $e" ) if( warnings::enabled() );
+                    warn( "Error with callback to process text message: $e" ) if( $self->_warnings_is_enabled() );
                     return( $self->error({ code => WS_INTERNAL_SERVER_ERROR, message => "Internal error" }) );
                 }
             }
@@ -603,7 +603,7 @@ sub recv
                 }
                 catch( $e )
                 {
-                    warnings::warn( "Error with callback to process ping received from server: $e" ) if( warnings::enabled() );
+                    warn( "Error with callback to process ping received from server: $e" ) if( $self->_warnings_is_enabled() );
                     return( $self->error({ code => WS_INTERNAL_SERVER_ERROR, message => "Internal error" }) );
                 }
 
@@ -616,7 +616,7 @@ sub recv
                     }
                     catch( $e )
                     {
-                        warnings::warn( "Error with callback to execute a pong to server in response to ping received: $e" ) if( warnings::enabled() );
+                        warn( "Error with callback to execute a pong to server in response to ping received: $e" ) if( $self->_warnings_is_enabled() );
                         return( $self->error({ code => WS_INTERNAL_SERVER_ERROR, message => "Internal error" }) );
                     }
                 }
@@ -629,7 +629,7 @@ sub recv
                 }
                 catch( $e )
                 {
-                    warnings::warn( "Error with callback to process pong received from the server: $e" ) if( warnings::enabled() );
+                    warn( "Error with callback to process pong received from the server: $e" ) if( $self->_warnings_is_enabled() );
                 }
             }
             elsif( $frame->is_close )
@@ -681,7 +681,7 @@ sub send
     return( $self->error( "Message of type \"$type\" is unsupported." ) ) if( !WebSocket::Frame->supported_types( $type ) );
     if( !$self->handshake->is_done )
     {
-        warnings::warn( "Tried to send data before finishing handshake\n" ) if( warnings::enabled() );
+        warn( "Tried to send data before finishing handshake\n" ) if( $self->_warnings_is_enabled() );
         return(0);
     }
     
@@ -711,7 +711,7 @@ sub send
     }
     catch( $e )
     {
-        warnings::warn( "Error calling the send callback: $e" ) if( warnings::enabled() );
+        warn( "Error calling the send callback: $e" ) if( $self->_warnings_is_enabled() );
     }
     my $socket = $self->socket;
     return( $self->error( "No socket found to send data to!" ) ) if( !$socket );
@@ -968,7 +968,7 @@ Returns a L<scalar object|Module::Generic::Scalar>
 
 =head2 disconnect
 
-Close the connection with the server, and return the current object.
+Provided with an optional code and an optional reason, and this will close the connection with the server, and return the current object.
 
 =head2 disconnected
 
@@ -1018,6 +1018,12 @@ It returns the current object.
 
 =head2 on_binary
 
+    $ws->on( binary => sub
+    {
+        my( $ws, $msg ) = @_;
+        # Do something
+    });
+
 Event handler triggered when a binary message is received.
 
 The current client object and the binary message are passed as argument to the event handler.
@@ -1025,6 +1031,12 @@ The current client object and the binary message are passed as argument to the e
 Any fatal error occurring in the callback are caught using try-catch with (L<Nice::Try>)
 
 =head2 on_connect
+
+    $ws->on( connect => sub
+    {
+        my( $ws ) = @_;
+        # Do something
+    });
 
 Event handler triggered when the connection with the server has been made and B<before> any handshake has been performed.
 
@@ -1034,13 +1046,26 @@ Any fatal error occurring in the callback are caught using try-catch with (L<Nic
 
 =head2 on_disconnect
 
+    $ws->on( disconnect => sub
+    {
+        my( $ws, $code, $reason ) = @_;
+        # Do something
+    });
+
 Event handler triggered B<before> the connection with the server is closed.
 
-The current client object is passed as argument to the event handler.
+The current client object, the code and optional reason are passed as argument to the event handler.
 
 Any fatal error occurring in the callback are caught using try-catch with (L<Nice::Try>), and if an error occurs, this method will raise a warning if warnings are enabled.
 
 =head2 on_error
+
+    $ws->on( error => sub
+    {
+        my( $ws, $error ) = @_;
+        # Do something
+        print( STDERR "Error received upon handshake: $error\n" );
+    });
 
 Event handler triggered whenever an error occurs upon parsing of the handshake.
 
@@ -1049,6 +1074,12 @@ The current client object and the L<error object|WebSocket::Exception> are passe
 Any fatal error occurring in the callback are caught using try-catch with (L<Nice::Try>), and if an error occurs, this method will raise a warning if warnings are enabled.
 
 =head2 on_handshake
+
+    $ws->on( handshake => sub
+    {
+        my( $ws ) = @_;
+        # Do something
+    });
 
 Event handler triggered just before the handshake sequence is completed, but right after the handshake has been received from the server.
 
@@ -1060,7 +1091,16 @@ Any fatal error occurring in the callback are caught using try-catch with (L<Nic
 
 =head2 on_ping
 
+    $ws->on( ping => sub
+    {
+        my( $ws, $msg ) = @_;
+        # Do something
+        print( STDOUT "Received a ping from the server: $msg\n" );
+    });
+
 A code reference that will be triggered when a C<ping> is received from the WebSocket server and right before a C<pong> is sent back.
+
+The current client object, and the possible message, if any, are passed as arguments to the event handler.
 
 If the callback returns a defined, but false value, no C<pong> will be issued in reply. A defined but false value could be an empty string or C<0>. This is designed in case when you do not waant to reply to the server's ping and thus inform it the client is still there.
 
@@ -1074,9 +1114,16 @@ Any fatal error occurring in the callback are caught using try-catch with (L<Nic
 
 =head2 on_pong
 
+    $ws->on( pong => sub
+    {
+        my( $ws, $msg ) = @_;
+        # Do something
+        print( STDOUT "Received a pong from the server: $msg\n" );
+    });
+
 A code reference that will be triggered when a C<pong> is received from the WebSocket server, most likely as a reply to our initial C<ping>.
 
-The event handler is then passed the current client object.
+The event handler is then passed the current client object, and the optional message received in the original ping, if any.
 
 See L<Mozilla documentation on ping and pong|https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers#Pings_and_Pongs_The_Heartbeat_of_WebSockets>
 
@@ -1092,6 +1139,7 @@ Event handler triggered whenever a binary or text payload is received from the s
 
 The current L<frame|WebSocket::Frame> object and the payload data are passed as arguments to the event handler.
 
+    use JSON;
     $ws->on_recv(sub
     {
         my( $frame, $payload ) = @_;
@@ -1102,12 +1150,20 @@ The current L<frame|WebSocket::Frame> object and the payload data are passed as 
         elsif( $frame->is_text )
         {
             # do something else
+            my $hash = JSON::decode_json( $payload );
         }
     });
 
 Any fatal error occurring in the callback are caught using try-catch with (L<Nice::Try>), and if an error occurs, this method will set an L<error|WebSocket::Exception> and return C<undef> or an empty list depending on the context.
 
 =head2 on_send
+
+    $ws->on( send => sub
+    {
+        my( $ws, $msg ) = @_;
+        # Do something
+        print( STDOUT "Message sent to the server: $msg\n" );
+    });
 
 Event handler triggered whenever a message is sent to the remote server.
 
@@ -1126,6 +1182,13 @@ This callback is triggered on two occasions:
 In either case, fatal error occurring in the callback are caught using try-catch with (L<Nice::Try>), and if an error occurs, this method will raise a warning if warnings are enabled.
 
 =head2 on_utf8
+
+    $ws->on( utf8 => sub
+    {
+        my( $ws, $msg ) = @_;
+        # Do something
+        print( STDOUT "Message received from the server: $msg\n" );
+    });
 
 Event handler triggered whenever a text message is sent to the remote server.
 
@@ -1163,7 +1226,7 @@ Returns the current object.
 
 =head2 send_utf8
 
-Sends data to the server socket after having encoded them using L<Encode/encode>> and returns the current object. This will also trigger associated event handlers.
+Sends data to the server socket after having encoded them using L<Encode/encode> and returns the current object. This will also trigger associated event handlers.
 
 Returns the current object.
 

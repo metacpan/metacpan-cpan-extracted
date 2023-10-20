@@ -1,42 +1,14 @@
 use v5.26;
 use Object::Pad;
 
-package Blockchain::Ethereum::Keystore::Key::PKUtil 0.005;
+package Blockchain::Ethereum::Keystore::Key::PKUtil;
 class Blockchain::Ethereum::Keystore::Key::PKUtil
     :isa(Crypt::Perl::ECDSA::PrivateKey);
 
-=encoding utf8
-
-=head1 SYNOPSIS
-
-This is a child for L<Crypt::Perl::ECDSA::PrivateKey> to overwrite
-the function _sign that on the parent module returns only C<$r> and C<$s>,
-this version returns the C<$y_parity> as well, what simplifies signing
-the transaction.
-
-You don't want to use this directly, use instead L<Blockchain::Ethereum::Keystore::Key>
-
-=cut;
+our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
+our $VERSION   = '0.009';          # VERSION
 
 use Carp;
-
-=head2 _sign
-
-Overwrites L<Crypt::Perl::ECDSA::PrivateKey> adding the y-parity to the response
-
-Usage:
-
-    _sign($rlp_encoded_transaction) -> (Math::BigInt $r, Math::BigInt $s, $v)
-
-=over 4
-
-=item * C<message> - Message to be signed
-
-=back
-
-L<Crypt::Perl::BigInt> r, L<Crypt::Perl::BigInt> s, uint y_parity
-
-=cut
 
 method _sign ($message) {
 
@@ -92,20 +64,51 @@ method _sign ($message) {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Blockchain::Ethereum::Keystore::Key::PKUtil
+
+=head1 VERSION
+
+version 0.009
+
+=head1 OVERVIEW
+
+This is a child for L<Crypt::Perl::ECDSA::PrivateKey> to overwrite
+the function _sign that on the parent module returns only C<$r> and C<$s>,
+this version returns the C<$y_parity> as well, what simplifies signing
+the transaction.
+
+You don't want to use this directly, use instead L<Blockchain::Ethereum::Keystore::Key>
+
+=head1 METHODS
+
+=head2 _sign
+
+Overwrites L<Crypt::Perl::ECDSA::PrivateKey> adding the y-parity to the response
+
+=over 4
+
+=item * C<message> - Message to be signed
+
+=back
+
+L<Crypt::Perl::BigInt> r, L<Crypt::Perl::BigInt> s, uint y_parity
+
 =head1 AUTHOR
 
-Reginaldo Costa, C<< <refeco at cpan.org> >>
+Reginaldo Costa <refeco@cpan.org>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to L<https://github.com/refeco/perl-ethereum-keystore>
-
-=head1 LICENSE AND COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2023 by REFECO.
 
 This is free software, licensed under:
 
-  The MIT License
+  The MIT (X11) License
 
 =cut

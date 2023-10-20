@@ -3,6 +3,8 @@ abstract: 'generate HTML output from L<App::sdview>'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
+  App::sdview::Parser::Markdown: '0.13'
+  App::sdview::Parser::Pod: '0.13'
   Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
@@ -16,12 +18,13 @@ name: App-sdview-Output-HTML
 provides:
   App::sdview::Output::HTML:
     file: lib/App/sdview/Output/HTML.pm
-    version: '0.01'
+    version: '0.02'
 requires:
+  App::sdview::Output: '0.13'
   Object::Pad: '0.800'
   String::Tagged::HTML: '0'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

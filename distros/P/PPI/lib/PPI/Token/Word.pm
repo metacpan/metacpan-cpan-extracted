@@ -39,7 +39,7 @@ use strict;
 use PPI::Token ();
 use PPI::Singletons qw' %OPERATOR %QUOTELIKE %KEYWORDS ';
 
-our $VERSION = '1.276';
+our $VERSION = '1.277';
 
 our @ISA = "PPI::Token";
 
@@ -305,10 +305,12 @@ sub __TOKENIZER__commit {
 				# attribute operator doesn't directly
 				# touch the object name already works.
 				$token_class = 'Word';
-			} else {
+			} elsif ( !($tokens[0] and $tokens[0]->isa('PPI::Token::Operator')) ) {
 				$word .= $1;
 				$t->{line_cursor} += length($1);
 				$token_class = 'Label';
+			} else {
+				$token_class = 'Word';
 			}
 		} elsif ( $word eq '_' ) {
 			$token_class = 'Magic';

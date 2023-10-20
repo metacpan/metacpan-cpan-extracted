@@ -4,14 +4,14 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '2.22';
+our $VERSION = '2.23';
 
 use parent 'Travel::Routing::DE::EFA';
 
 sub new {
 	my ( $class, %opt ) = @_;
 
-	$opt{efa_url} = 'http://efa.vrr.de/vrr/XSLT_TRIP_REQUEST2';
+	$opt{efa_url} = 'https://app.vrr.de/vrrstd/XML_TRIP_REQUEST2';
 
 	return $class->SUPER::new(%opt);
 }
@@ -47,7 +47,7 @@ Travel::Routing::DE::VRR - unofficial interface to the efa.vrr.de German itinera
 
 =head1 VERSION
 
-version 2.22
+version 2.23
 
 =head1 DESCRIPTION
 

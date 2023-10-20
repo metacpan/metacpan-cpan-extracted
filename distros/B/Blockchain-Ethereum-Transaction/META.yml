@@ -3,27 +3,31 @@ abstract: 'Ethereum transaction abstraction'
 author:
   - 'Reginaldo Costa <refeco@cpan.org>'
 build_requires:
-  Blockchain::Ethereum::Keystore: '0.005'
-  ExtUtils::MakeMaker: '0'
+  Blockchain::Ethereum::Keystore: '0.008'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::More: '0.94'
 configure_requires:
-  ExtUtils::MakeMaker: '7.70'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Blockchain-Ethereum-Transaction
-no_index:
-  directory:
-    - t
-    - inc
 requires:
-  Blockchain::Ethereum::RLP: '0.007'
+  Blockchain::Ethereum::RLP: '0.009'
   Crypt::Digest::Keccak256: '0.078'
   Object::Pad: '0.79'
-  perl: '5.026000'
+  perl: v5.26.0
 resources:
-  repository: https://github.com/refeco/perl-ethereum-transaction.git
-version: '0.008'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  homepage: https://github.com/refeco/Blockchain-Ethereum-Transaction
+  repository: https://github.com/refeco/Blockchain-Ethereum-Transaction.git
+version: '0.009'
+x_authority: cpan:REFECO
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: MIT

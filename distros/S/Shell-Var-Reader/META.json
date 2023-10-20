@@ -4,7 +4,7 @@
       "Zane C. Bowers-Hadley <vvelox@vvelox.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -27,7 +27,8 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0"
          }
       },
       "runtime" : {
@@ -42,7 +43,7 @@
             "Rex::CMDB::TOML" : "v0.0.1",
             "String::ShellQuote" : "0",
             "TOML" : "0",
-            "YAML" : "0",
+            "YAML::XS" : "0",
             "perl" : "5.006"
          }
       },
@@ -59,6 +60,6 @@
          "web" : "https://github.com/VVelox/Shell-Var-Reader"
       }
    },
-   "version" : "v0.4.0",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v0.5.2",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

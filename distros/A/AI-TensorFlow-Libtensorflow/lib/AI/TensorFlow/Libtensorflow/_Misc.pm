@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::_Misc;
 # ABSTRACT: Private API
-$AI::TensorFlow::Libtensorflow::_Misc::VERSION = '0.0.6';
+$AI::TensorFlow::Libtensorflow::_Misc::VERSION = '0.0.7';
 use strict;
 use warnings;
 use namespace::autoclean;

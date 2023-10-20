@@ -1,3 +1,14 @@
+0.06 2023-10-19T10:27:25+02:00
+ - Fix typo in doc.
+ - Improve texts in doc.
+ - Rename example files to better names.
+ - Update copyright years.
+
+0.05 2023-10-15T16:55:51+02:00
+ - Fix constructor call in doc.
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Update Module::Install to 1.21 version.
+
 0.04 2021-02-21T02:41:29+01:00
  - Add missing return to code. Add blank line after arguments.
  - Fix output encoding and add tests.

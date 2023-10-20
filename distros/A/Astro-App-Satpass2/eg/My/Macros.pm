@@ -12,7 +12,7 @@ use Astro::Coord::ECI::Utils 0.059 qw{ rad2deg };
 use Attribute::Handlers;
 use Scalar::Util 1.26 qw{ refaddr };
 
-our $VERSION = '0.051';
+our $VERSION = '0.052';
 
 {
     my %operands;

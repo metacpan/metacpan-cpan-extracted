@@ -5,10 +5,12 @@ Template::Liquid - A Simple, Stateless Template System
 
 # Synopsis
 
-    use Template::Liquid;
-    my $template = Template::Liquid->parse(
-        '{% for x in (1..3) reversed %}{{ x }}, {% endfor %}{{ some.text }}');
-    print $template->render(some => {text => 'Contact!'}); # 3, 2, 1, Contact!
+```perl
+use Template::Liquid;
+my $template = Template::Liquid->parse(
+    '{% for x in (1..3) reversed %}{{ x }}, {% endfor %}{{ some.text }}');
+print $template->render(some => {text => 'Contact!'}); # 3, 2, 1, Contact!
+```
 
 # Description
 
@@ -38,30 +40,38 @@ Parse and Render.
 
 If you're in a hurry, you could just...
 
-    use Template::Liquid;
-    print Template::Liquid->parse('Hi, {{name}}!')->render(name => 'Sanko');
+```perl
+use Template::Liquid;
+print Template::Liquid->parse('Hi, {{name}}!')->render(name => 'Sanko');
+```
 
 But because Liquid is stateless, you can split that part. Keep reading.
 
 ## Parse
 
-    use Template::Liquid;
-    my $sol = Template::Liquid->new();    # Create a Template::Liquid object
-    $sol->parse('Hi, {{name}}!');         # Parse and compile the template
+```perl
+use Template::Liquid;
+my $sol = Template::Liquid->new();    # Create a Template::Liquid object
+$sol->parse('Hi, {{name}}!');         # Parse and compile the template
+```
 
 ...or...
 
-    use Template::Liquid;
-    my $sol = Template::Liquid->parse('Hi, {{name}}!'); # Obj is auto-created
+```perl
+use Template::Liquid;
+my $sol = Template::Liquid->parse('Hi, {{name}}!'); # Obj is auto-created
+```
 
 The `parse` step creates a fully compiled template which can be re-used as
 often as you like. You can store it in memory or in a cache for faster
 rendering later. Templates are simple, blessed references so you could do...
 
-    use Template::Liquid;
-    use Data::Dump qw[pp];
-    my $greet = Template::Liquid->parse('Hi, {{name}}!');
-    my $dump = pp($greet);
+```perl
+use Template::Liquid;
+use Data::Dump qw[pp];
+my $greet = Template::Liquid->parse('Hi, {{name}}!');
+my $dump = pp($greet);
+```
 
 ...store `$dump` somewhere (a file, database, etc.) and then eval the
 structure later without doing the 'expensive' parsing step again.
@@ -71,18 +81,22 @@ structure later without doing the 'expensive' parsing step again.
 To complete our `$sol` examples from the previous section, rendering a
 template is as easy as...
 
-    $sol->render(name => 'Sanko');    # Returns 'Hi, Sanko!'
-    $sol->render(name => 'Megatron'); # Returns 'Hi, Megatron!'
+```perl
+$sol->render(name => 'Sanko');    # Returns 'Hi, Sanko!'
+$sol->render(name => 'Megatron'); # Returns 'Hi, Megatron!'
+```
 
 All parameters you want Template::Liquid to work with must be passed to the
 `render` method. Template::Liquid is a closed ecosystem; it does not know
 about your local, instance, global, or environment variables. If your template
 requires any of those, you must pass them along:
 
-    use Template::Liquid;
-    print Template::Liquid->parse(
-                              '@INC: {%for item in inc%}{{item}}, {%endfor%}')
-        ->render(inc => \@INC);
+```perl
+use Template::Liquid;
+print Template::Liquid->parse(
+                          '@INC: {%for item in inc%}{{item}}, {%endfor%}')
+    ->render(inc => \@INC);
+```
 
 # Standard Liquid Tags
 
@@ -95,11 +109,15 @@ Comment tags are simple blocks that do nothing during the [render](#render)
 stage. Use these to temporarily disable blocks of code or to insert
 documentation.
 
-    This is a {% comment %} secret {% endcomment %}line of text.
+```
+This is a {% comment %} secret {% endcomment %}line of text.
+```
 
 ...renders to...
 
-    This is a line of text.
+```
+This is a line of text.
+```
 
 For more, see [Template::Liquid::Tag::Comment](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3AComment).
 
@@ -108,24 +126,30 @@ For more, see [Template::Liquid::Tag::Comment](https://metacpan.org/pod/Template
 Raw temporarily disables tag processing. This is useful for generating content
 (Mustache, Handlebars) which uses conflicting syntax.
 
-    {% raw %}
-        In Handlebars, {{ this }} will be HTML-escaped, but {{{ that }}} will not.
-    {% endraw %}
+```
+{% raw %}
+    In Handlebars, {{ this }} will be HTML-escaped, but {{{ that }}} will not.
+{% endraw %}
+```
 
 ...renders to...
 
-    In Handlebars, {{ this }} will be HTML-escaped, but {{{ that }}} will not.
+```
+In Handlebars, {{ this }} will be HTML-escaped, but {{{ that }}} will not.
+```
 
 For more, see [Template::Liquid::Tag::Raw](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3ARaw).
 
 ## `if` / `elseif` / `else`
 
-    {% if post.body contains search_string %}
-        <div class="post result" id="p-{{post.id}}">
-            <p class="title">{{ post.title }}</p>
-            ...
-        </div>
-    {% endunless %}
+```
+{% if post.body contains search_string %}
+    <div class="post result" id="p-{{post.id}}">
+        <p class="title">{{ post.title }}</p>
+        ...
+    </div>
+{% endunless %}
+```
 
 For more, see [Template::Liquid::Tag::If](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3AIf) and
 [Template::Liquid::Condition](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ACondition). .
@@ -134,14 +158,16 @@ For more, see [Template::Liquid::Tag::If](https://metacpan.org/pod/Template%3A%3
 
 This is sorta the opposite of `if`.
 
-    {% unless some.value == 3 %}
-        Well, the value sure ain't three.
-    {% elseif some.value > 1 %}
-        It's greater than one.
-    {% else %}
-       Well, is greater than one but not equal to three.
-       Psst! It's {{some.value}}.
-    {% endunless %}
+```
+{% unless some.value == 3 %}
+    Well, the value sure ain't three.
+{% elseif some.value > 1 %}
+    It's greater than one.
+{% else %}
+   Well, is greater than one but not equal to three.
+   Psst! It's {{some.value}}.
+{% endunless %}
+```
 
 For more, see [Template::Liquid::Tag::Unless](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3AUnless)
 and [Template::Liquid::Condition](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ACondition).
@@ -150,14 +176,16 @@ and [Template::Liquid::Condition](https://metacpan.org/pod/Template%3A%3ALiquid%
 
 If you need more conditions, you can use the case statement:
 
-    {% case condition %}
-        {% when 1 %}
-            hit 1
-        {% when 2 or 3 %}
-            hit 2 or 3
-        {% else %}
-            ... else ...
-    {% endcase %}
+```
+{% case condition %}
+    {% when 1 %}
+        hit 1
+    {% when 2 or 3 %}
+        hit 2 or 3
+    {% else %}
+        ... else ...
+{% endcase %}
+```
 
 For more, see [Template::Liquid::Tag::Case](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3ACase).
 
@@ -166,17 +194,21 @@ For more, see [Template::Liquid::Tag::Case](https://metacpan.org/pod/Template%3A
 Often you have to alternate between different colors or similar tasks. Liquid
 has built-in support for such operations, using the cycle tag.
 
-    {% cycle 'one', 'two', 'three' %}
-    {% cycle 'one', 'two', 'three' %}
-    {% cycle 'one', 'two', 'three' %}
-    {% cycle 'one', 'two', 'three' %}
+```
+{% cycle 'one', 'two', 'three' %}
+{% cycle 'one', 'two', 'three' %}
+{% cycle 'one', 'two', 'three' %}
+{% cycle 'one', 'two', 'three' %}
+```
 
 ...will result in...
 
-    one
-    two
-    three
-    one
+```
+one
+two
+three
+one
+```
 
 If no name is supplied for the cycle group, then it's assumed that multiple
 calls with the same parameters are one group.
@@ -184,17 +216,21 @@ calls with the same parameters are one group.
 If you want to have total control over cycle groups, you can optionally specify
 the name of the group. This can even be a variable.
 
-    {% cycle 'group 1': 'one', 'two', 'three' %}
-    {% cycle 'group 1': 'one', 'two', 'three' %}
-    {% cycle 'group 2': 'one', 'two', 'three' %}
-    {% cycle 'group 2': 'one', 'two', 'three' %}
+```
+{% cycle 'group 1': 'one', 'two', 'three' %}
+{% cycle 'group 1': 'one', 'two', 'three' %}
+{% cycle 'group 2': 'one', 'two', 'three' %}
+{% cycle 'group 2': 'one', 'two', 'three' %}
+```
 
 ...will result in...
 
-    one
-    two
-    one
-    two
+```
+one
+two
+one
+two
+```
 
 For more, see [Template::Liquid::Tag::Cycle](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3ACycle).
 
@@ -203,30 +239,38 @@ For more, see [Template::Liquid::Tag::Cycle](https://metacpan.org/pod/Template%3
 Creates a new number variable, and increases its value by one every time it is
 called. The initial value is `0`.
 
-    {% increment my_counter %}
-    {% increment my_counter %}
-    {% increment my_counter %}
+```perl
+{% increment my_counter %}
+{% increment my_counter %}
+{% increment my_counter %}
+```
 
 ...would become...
 
-    0
-    1
-    2
+```
+0
+1
+2
+```
 
 ## `decrement`
 
 Creates a new number variable, and decreases its value by one every time it is
 called. The initial value is `-1`.
 
-    {% decrement variable %}
-    {% decrement variable %}
-    {% decrement variable %}
+```
+{% decrement variable %}
+{% decrement variable %}
+{% decrement variable %}
+```
 
 ...would become...
 
-    -1
-    -2
-    -3
+```
+-1
+-2
+-3
+```
 
 For more, see
 [Template::Liquid::Tag::Decrement](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3ADecrement).
@@ -235,9 +279,11 @@ For more, see
 
 Liquid allows for loops over collections:
 
-    {% for item in array %}
-        {{ item }}
-    {% endfor %}
+```
+{% for item in array %}
+    {{ item }}
+{% endfor %}
+```
 
 Please see see [Template::Liquid::Tag::For](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3AFor).
 
@@ -247,24 +293,28 @@ You can store data in your own variables, to be used in output or other tags as
 desired. The simplest way to create a variable is with the assign tag, which
 has a pretty straightforward syntax:
 
-    {% assign name = 'freestyle' %}
+```
+{% assign name = 'freestyle' %}
 
-    {% for t in collections.tags %}{% if t == name %}
-        <p>Freestyle!</p>
-    {% endif %}{% endfor %}
+{% for t in collections.tags %}{% if t == name %}
+    <p>Freestyle!</p>
+{% endif %}{% endfor %}
+```
 
 Another way of doing this would be to assign true / false values to the
 variable:
 
-    {% assign freestyle = false %}
+```
+{% assign freestyle = false %}
 
-    {% for t in collections.tags %}{% if t == 'freestyle' %}
-        {% assign freestyle = true %}
-    {% endif %}{% endfor %}
+{% for t in collections.tags %}{% if t == 'freestyle' %}
+    {% assign freestyle = true %}
+{% endif %}{% endfor %}
 
-    {% if freestyle %}
-        <p>Freestyle!</p>
-    {% endif %}
+{% if freestyle %}
+    <p>Freestyle!</p>
+{% endif %}
+```
 
 If you want to combine a number of strings into a single string and save it to
 a variable, you can do that with the capture tag.
@@ -277,14 +327,16 @@ This tag is a block which "captures" whatever is rendered inside it, then
 assigns the captured value to the given variable instead of rendering it to the
 screen.
 
-    {% capture attribute_name %}{{ item.title | handleize }}-{{ i }}-color{% endcapture %}
+```
+{% capture attribute_name %}{{ item.title | handleize }}-{{ i }}-color{% endcapture %}
 
-    <label for="{{ attribute_name }}">Color:</label>
-    <select name="attributes[{{ attribute_name }}]" id="{{ attribute_name }}">
-        <option value="red">Red</option>
-        <option value="green">Green</option>
-        <option value="blue">Blue</option>
-    </select>
+<label for="{{ attribute_name }}">Color:</label>
+<select name="attributes[{{ attribute_name }}]" id="{{ attribute_name }}">
+    <option value="red">Red</option>
+    <option value="green">Green</option>
+    <option value="blue">Blue</option>
+</select>
+```
 
 For more, see [Template::Liquid::Tag::Capture](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3ACapture).
 
@@ -321,12 +373,14 @@ types for subclassing and exposes the following methods:
 This registers a package which must contain (directly or through inheritance)
 both a `parse` and `render` method.
 
-    # Register a new tag which Template::Liquid will look for in the calling package
-    Template::Liquid::register_tag( 'newtag' );
+```
+# Register a new tag which Template::Liquid will look for in the calling package
+Template::Liquid::register_tag( 'newtag' );
 
-    # Or simply say...
-    Template::Liquid::register_tag( 'newtag' );
-    # ...and Template::Liquid will assume the new tag is in the calling package
+# Or simply say...
+Template::Liquid::register_tag( 'newtag' );
+# ...and Template::Liquid will assume the new tag is in the calling package
+```
 
 Pre-existing tags are replaced when new tags are registered with the same name.
 You may want to do this to override some functionality.
@@ -341,12 +395,14 @@ by design and must return the modified content.
 This registers a package which Template::Liquid will assume contains one or
 more filters.
 
-    # Register a package as a filter
-    Template::Liquid::register_filter( 'Template::Solution::Filter::Amalgamut' );
+```
+# Register a package as a filter
+Template::Liquid::register_filter( 'Template::Solution::Filter::Amalgamut' );
 
-    # Or simply say...
-    Template::Liquid::register_filter( );
-    # ...and Template::Liquid will assume the filters are in the calling package
+# Or simply say...
+Template::Liquid::register_filter( );
+# ...and Template::Liquid will assume the filters are in the calling package
+```
 
 # Why should I use Template::Liquid?
 

@@ -99,13 +99,13 @@ diag "Loaded ", $INC{"${pkgname}.pm" =~ s/::/\//gr},
 
 die "Expected initial ${pkgname}::Foldwidth to be undef"
   if defined getPkgVar("Foldwidth");
-ivis("abc");
+() = ivis("abc");
 my $expected = getPkgVar("Foldwidth") // die "Foldwidth remained undef";
 
 # COLUMNS should over-ride the actual terminal width
 setPkgVar("Foldwidth", undef); # re-enable auto-detect
 { local $ENV{COLUMNS} = $expected + 13;
-  ivis("abc");
+  () = ivis("abc");
   die "${pkgname}::Foldwidth ",u(getPkgVar('Foldwidth'))," does not honor ENV{COLUMS}=$ENV{COLUMNS}"
     unless u(getPkgVar("Foldwidth")) == $expected + 13;
 }
@@ -114,7 +114,7 @@ setPkgVar("Foldwidth", undef); # re-enable auto-detect
 setPkgVar("Foldwidth", undef); # re-enable auto-detect
 if (unix_compatible_os()) {
   delete local $ENV{COLUMNS};
-  ivis("abc");
+  () = ivis("abc");
   die "${pkgname}::Foldwidth=",u(getPkgVar('Foldwidth'))," not defaulted correctly, expecting $expected" unless getPkgVar('Foldwidth') == $expected;
 }
 
@@ -134,7 +134,7 @@ if (unix_compatible_os()) {
     open(my $ttyfd, "</dev/tty") && die "/dev/tty unexpectedly still available";
     die "WHAT?? (should still be undef)" if defined(getPkgVar('Foldwidth'));
     setPkgVar("Foldwidth", undef); # re-enable auto-detect
-    ivis("abc");
+    () = ivis("abc");
     exit(getPkgVar('Foldwidth') // 253);
   }
   waitpid($pid,0);

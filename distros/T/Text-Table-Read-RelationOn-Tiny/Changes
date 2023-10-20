@@ -1,22 +1,28 @@
 Revision history for Text-Table-Read-RelationOn-Tiny
 
+v2.3.0     2023/10/12
+           Methods elems(), elem_ids(), tab_elems(), eq_ids(), matrix() now support an
+           additional DUP argument allowing to return a ref to a clone.
+           Removed subdir LICENSE, created file LICENSE.
+           Completed POD.
+
 v2.2.6     2023/05/02
-           Adapted README, added LICENSE file
+           Adapted README, added LICENSE file.
 
 v2.2.5     2023/04/30
-           Removed link to cpanratings.perl.org (Id: 148049)
+           Removed link to cpanratings.perl.org (Id: 148049).
 
 v2.2.4     2022/04/11
-           Used croak() from Carp instead of die() and confess()
+           Used croak() from Carp instead of die() and confess().
            Corrected typo in POD. Some minor improvements in POD section.
 
 v2.2.3     2022/04/11
-           Corrected typo in POD
+           Corrected typo in POD.
 
 v2.2.2     2022/04/11
-           Added subsection PITFALLS to POD
-           If pedantic is true, then first cheack indetation of a row
-           Added tests
+           Added subsection PITFALLS to POD.
+           If pedantic is true, then first cheack indetation of a row.
+           Added tests.
 
 v2.2.1     2022/04/09
            Some fixes in POD section.
@@ -25,7 +31,7 @@ v2.2.0     2022/04/08
            Add named argument 'pedantic' to get() to enable table format checking.
 
 v2.1.0     2021/06/28
-           Added constructor options 'ext' and 'elem_id' allowing to use external data
+           Added constructor options 'ext' and 'elem_id' allowing to use external data.
 
 v2.0.1     2021/06/27
            Fixed minor bug and completed description of constructor arguments 'inc' amd 'noinc'.
@@ -55,25 +61,25 @@ v1.0.2     2021/05/26
            Consequently use quotes in error messages.
 
 v1.0.1     2021/05/26
-           Switch to modern version string using version 0.77
+           Switch to modern version string using version 0.77.
 
 1.00.00.00 2021/05/25
-           New version number hopefully resolves a versioning problem with PAUSE
+           New version number hopefully resolves a versioning problem with PAUSE.
 
 0.10.2     2021/05/24
-           Added forgotten META.json to distribution
+           Added forgotten META.json to distribution.
 
 0.10.1     2021/05/24
-           Added info about new github repo
+           Added info about new github repo.
            Use version format m.m.p (major.minor.patch).
 
 0.10       2021/05/24
-           Adapted Makefile.PL: deps, especially min version of perl
-           Version is now artistic_2
-           distribution now contains META.yml and META.json
+           Adapted Makefile.PL: deps, especially min version of perl.
+           Version is now artistic_2.
+           distribution now contains META.yml and META.json.
 
 0.04       2021/05/22
-           Corrected version number
+           Corrected version number.
 
 0.03       2021/05/22
            Sort keys (elements) reported by error message. Should resolve the failed

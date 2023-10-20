@@ -1,5 +1,21 @@
 Tk::CodeText module changes log
+01 Oct 2023
+	Update to version 0.45
+	Added option -menutiems for the left-click popup menu.
+	Added method saveExport.
 
+15 septemer 2023
+	Update to version 0.44
+	Fixed bug in TagsEditor.
+
+15 septemer 2023
+	Update to version 0.43
+	TagsEditor now shows correct in Metacpan.
+	Highlighting and status bar updates now only happen when the widget has focus.
+	Added -position option
+	Focus now returns to text widget when search and replace window closes
+	Method themeUpdate now calls highlightPurge at the end
+	
 04 june 2023
 	Update to version 0.42. 
 	Fixed documentation typos and errors.
@@ -72,5 +88,8 @@ Tk::CodeText module changes log
 
 02 February 2003
 	First alpha version 0.1
+
+
+
 
 

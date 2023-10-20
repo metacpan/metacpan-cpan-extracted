@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'column_index' => {
      	datatype => 'int',
      	base_name => 'ColumnIndex',
-     	description => '',
+     	description => 'Point Column',
      	format => '',
      	read_only => '',
      		},
      'parse_method' => {
      	datatype => 'string',
      	base_name => 'ParseMethod',
-     	description => '',
+     	description => 'data parser method.             ToDateTime            ToString',
      	format => '',
      	read_only => '',
      		},

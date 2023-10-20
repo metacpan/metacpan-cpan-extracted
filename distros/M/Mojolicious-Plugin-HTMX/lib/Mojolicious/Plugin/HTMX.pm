@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::ByteStream;
 use Mojo::JSON qw(encode_json decode_json);
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 my @HX_RESWAPS = (qw[
     innerHTML
@@ -51,6 +51,7 @@ sub register {
     $app->helper('htmx.res.refresh'     => \&_res_refresh);
     $app->helper('htmx.res.replace_url' => \&_res_replace_url);
     $app->helper('htmx.res.reswap'      => \&_res_reswap);
+    $app->helper('htmx.res.reselect'    => \&_res_reselect);
     $app->helper('htmx.res.retarget'    => \&_res_retarget);
 
     $app->helper('htmx.res.trigger'              => sub { _res_trigger('default',      @_) });
@@ -143,6 +144,15 @@ sub _res_reswap {
     Carp::croak "Unknown reswap value" if (!$is_reswap);
 
     return $c->res->headers->header('HX-Reswap' => $reswap);
+
+}
+
+sub _res_reselect {
+
+    my ($c, $reselect) = @_;
+    return undef unless $reselect;
+
+    return $c->res->headers->header('HX-Reselect' => $reselect);
 
 }
 
@@ -364,6 +374,12 @@ The possible values of this attribute are:
 
 Based on C<HX-Reswap> header.
 
+=head3 htmx->res->reselect
+
+A CSS selector that allows you to choose which part of the response is used to be swapped in. Overrides an existing C<hx-select> on the triggering element
+
+Based on C<HX-Reselect> header.
+
 =head3 htmx->res->retarget
 
 A CSS selector that updates the target of the content update to a different element on the page.
@@ -465,7 +481,7 @@ L<https://github.com/giterlizzi/perl-Mojolicious-Plugin-HTMX>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2022, Giuseppe Di Terlizzi
+Copyright (c) 2022-2023, Giuseppe Di Terlizzi
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

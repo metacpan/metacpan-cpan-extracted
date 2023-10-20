@@ -12,7 +12,7 @@ use base 'PDF::API2::Basic::PDF::String';
 
 use strict;
 
-our $VERSION = '2.044'; # VERSION
+our $VERSION = '2.045'; # VERSION
 
 =head1 NAME
 

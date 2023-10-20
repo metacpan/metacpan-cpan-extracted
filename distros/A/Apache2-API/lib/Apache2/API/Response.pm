@@ -1309,6 +1309,13 @@ will print:
 
 See also L</status_line>
 
+=head2 header
+
+    $resp->header( 'Content-Type' => 'application/json' );
+    my $ct = $resp->header( 'Content-Type' );
+
+Sets or gets an HTTP header.
+
 =head2 headers
 
 Gets or sets the HTTP response headers using L<APR::Table> by calling L</Apache2::RequestRec/err_headers_out>

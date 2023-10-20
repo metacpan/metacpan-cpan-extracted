@@ -1,3 +1,7 @@
+******************************************************************************
+*                 Troubleshooting Graphics::Framebuffer                      *
+******************************************************************************
+
 TROUBLESHOOTING
 
   Ok, you've installed the module, but can't seem to get it to work properly.
@@ -25,7 +29,7 @@ TROUBLESHOOTING
 
     * It may be possible to get a framebuffer device with a proprietary driver
       by forcing Grub to go into a VESA VGA mode for the console (worked for
-      me with NVidia).
+      me with NVidia's proprietary drivers).
 
   It's Crashing
 
@@ -126,7 +130,7 @@ TROUBLESHOOTING
     Ok, it does say a PERL graphics library in the description, if I am not
     mistaken.  This means Perl is doing most of the work.  This also means it
     is only as fast as your system and its CPU, as it does not use your GPU at
-    all (at least not yet).
+    all.
 
     First, check to make sure the C acceleration routines are compiling
     properly.  Call the "acceleration" method without parameters.  It SHOULD

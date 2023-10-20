@@ -6,7 +6,7 @@ use App::Sandy::BGZF;
 use IO::Compress::Gzip '$GzipError';
 use PerlIO::gzip;
 
-our $VERSION = '0.24'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 sub with_open_r {
 	my ($self, $file) = @_;
@@ -63,7 +63,7 @@ App::Sandy::Role::IO - Input and output custom wrappers.
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 AUTHORS
 

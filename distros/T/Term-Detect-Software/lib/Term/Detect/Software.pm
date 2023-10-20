@@ -1,18 +1,16 @@
 package Term::Detect::Software;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-07-10'; # DATE
-our $DIST = 'Term-Detect-Software'; # DIST
-our $VERSION = '0.223'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
-use experimental 'smartmatch';
-#use Log::Any '$log';
 
-require Exporter;
-our @ISA       = qw(Exporter);
+use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-07-09'; # DATE
+our $DIST = 'Term-Detect-Software'; # DIST
+our $VERSION = '0.224'; # VERSION
+
 our @EXPORT_OK = qw(detect_terminal detect_terminal_cached);
 
 my $dt_cache;
@@ -91,7 +89,7 @@ sub detect_terminal {
             $info->{color_depth}       = $_[0] =~ /xfce4/ ? 16 : 256;
 
             $info->{unicode}           = 1;
-            if ($_[0] ~~ [qw/mlterm/]) {
+            if (grep { $_ eq $_[0] } (qw/mlterm/)) {
                 $info->{default_bgcolor} = 'ffffff';
             } else {
                 $info->{default_bgcolor} = '000000';
@@ -99,7 +97,7 @@ sub detect_terminal {
             $info->{box_chars} = 1;
         };
 
-        if (($ENV{COLORTERM} // '') ~~ $gnome_terminal_terms) {
+        if (grep { $_ eq ($ENV{COLORTERM} // '') } @$gnome_terminal_terms) {
             push @dbg, "detect: gnome-terminal via COLORTERM";
             $set_gnome_terminal_term->($ENV{COLORTERM});
             last DETECT;
@@ -142,11 +140,11 @@ sub detect_terminal {
             # [0] is shell
             my $proc = @$ppids >= 2 ? $ppids->[1]{name} : '';
             #say "D:proc=$proc";
-            if ($proc ~~ $gnome_terminal_terms) {
+            if (grep { $_ eq $proc } @$gnome_terminal_terms) {
                 push @dbg, "detect: gnome-terminal via procname ($proc)";
                 $set_gnome_terminal_term->($proc);
                 last DETECT;
-            } elsif ($proc ~~ [qw/rxvt mrxvt/]) {
+            } elsif (grep { $_ eq $proc } (qw/rxvt mrxvt/)) {
                 push @dbg, "detect: rxvt via procname ($proc)";
                 $info->{emulator_software} = $proc;
                 $info->{emulator_engine}   = 'rxvt';
@@ -164,7 +162,7 @@ sub detect_terminal {
                 $info->{default_bgcolor}   = '000000';
                 $info->{box_chars}         = 1; # some characters are currently flawed though as of 0.6
                 last DETECT;
-            } elsif ($proc ~~ [qw/pterm/]) {
+            } elsif (grep { $_ eq $proc } (qw/pterm/)) {
                 push @dbg, "detect: pterm via procname ($proc)";
                 $info->{emulator_software} = $proc;
                 $info->{emulator_engine}   = 'putty';
@@ -172,7 +170,7 @@ sub detect_terminal {
                 $info->{unicode}           = 0;
                 $info->{default_bgcolor}   = '000000';
                 last DETECT;
-            } elsif ($proc ~~ [qw/xvt/]) {
+            } elsif (grep { $_ eq $proc } (qw/xvt/)) {
                 push @dbg, "detect: xvt via procname ($proc)";
                 $info->{emulator_software} = $proc;
                 $info->{emulator_engine}   = 'xvt';
@@ -236,7 +234,7 @@ Term::Detect::Software - Detect terminal (emulator) software and its capabilitie
 
 =head1 VERSION
 
-This document describes version 0.223 of Term::Detect::Software (from Perl distribution Term-Detect-Software), released on 2020-07-10.
+This document describes version 0.224 of Term::Detect::Software (from Perl distribution Term-Detect-Software), released on 2023-07-09.
 
 =head1 SYNOPSIS
 
@@ -345,14 +343,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Term-Detec
 
 Source repository is at L<https://github.com/perlancar/perl-Term-Detect-Software>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Term-Detect-Software>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Term::Terminfo>
@@ -363,11 +353,43 @@ L<Term::Encoding>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2020, 2019, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Term-Detect-Software>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

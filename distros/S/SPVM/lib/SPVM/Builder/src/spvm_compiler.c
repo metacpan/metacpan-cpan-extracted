@@ -37,6 +37,7 @@
 #include "spvm_var.h"
 #include "spvm_string.h"
 #include "spvm_class_file.h"
+#include "spvm_mutex.h"
 
 #include "spvm_api.h"
 #include "spvm_api_runtime.h"
@@ -82,6 +83,13 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
   
   compiler->runtime = SPVM_RUNTIME_new();
   
+  int32_t compiler_mutex_compile_size = SPVM_MUTEX_size();
+  void* compiler_mutex_compile = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->global_allocator, compiler_mutex_compile_size);
+  
+  SPVM_MUTEX_init(compiler_mutex_compile);
+  
+  compiler->mutex_compile = compiler_mutex_compile;
+  
   return compiler;
 }
 
@@ -125,11 +133,17 @@ void SPVM_COMPILER_free(SPVM_COMPILER* compiler) {
   SPVM_ALLOCATOR_free(compiler->class_file_allocator);
   compiler->class_file_allocator = NULL;
   
+  SPVM_MUTEX_destroy(compiler->mutex_compile);
+  
   SPVM_ALLOCATOR_free(compiler->global_allocator);
   compiler->global_allocator = NULL;
 }
 
 int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler, const char* basic_type_name) {
+  
+  SPVM_MUTEX* compiler_mutex_compile = compiler->mutex_compile;
+  
+  SPVM_MUTEX_lock(compiler_mutex_compile);
   
   compiler->current_each_compile_allocator = SPVM_ALLOCATOR_new();
   
@@ -231,6 +245,8 @@ int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler, const char* basic_type_na
     
     SPVM_COMPILER_build_runtime(compiler);
   }
+  
+  SPVM_MUTEX_unlock(compiler_mutex_compile);
   
   return error_id;
 }
@@ -801,9 +817,9 @@ SPVM_RUNTIME* SPVM_COMPILER_build_runtime(SPVM_COMPILER* compiler) {
         runtime_method->is_class_method = method->is_class_method;
         runtime_method->is_init = method->is_init;
         runtime_method->is_anon = method->is_anon;
-        runtime_method->byte_vars_width  = method->byte_vars_width;
+        runtime_method->byte_vars_width = method->byte_vars_width;
         runtime_method->short_vars_width  = method->short_vars_width;
-        runtime_method->int_vars_width  = method->int_vars_width;
+        runtime_method->int_vars_width = method->int_vars_width;
         runtime_method->long_vars_width  = method->long_vars_width;
         runtime_method->float_vars_width  = method->float_vars_width;
         runtime_method->double_vars_width  = method->double_vars_width;

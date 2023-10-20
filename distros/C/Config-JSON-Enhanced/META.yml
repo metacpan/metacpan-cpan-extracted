@@ -5,6 +5,7 @@ author:
 build_requires:
   Cwd: '0'
   ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
   File::Temp: '0'
   FindBin: '0'
   Test2::Plugin::UTF8: '0'
@@ -25,5 +26,9 @@ no_index:
 requires:
   Data::Roundtrip: '0'
   perl: '5.006'
-version: '0.02'
+resources:
+  bugtracker: https://github.com/hadjiprocopis/Config-JSON-Enhanced/issues
+  homepage: https://metacpan.org/module/Config::JSON::Enhanced
+  repository: https://github.com/hadjiprocopis/Config-JSON-Enhanced
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

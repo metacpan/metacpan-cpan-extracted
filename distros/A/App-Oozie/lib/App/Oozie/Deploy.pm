@@ -1,6 +1,6 @@
 package App::Oozie::Deploy;
-$App::Oozie::Deploy::VERSION = '0.006';
-use 5.010;
+$App::Oozie::Deploy::VERSION = '0.010';
+use 5.014;
 use strict;
 use warnings;
 use namespace::autoclean -except => [qw/_options_data _options_config/];
@@ -23,10 +23,12 @@ USAGE
 use App::Oozie::Deploy::Template;
 use App::Oozie::Deploy::Validate::Spec;
 use App::Oozie::Types::Common qw( IsDir IsFile );
+use App::Oozie::Util::Misc qw( resolve_tmp_dir );
 use App::Oozie::Constants qw( OOZIE_STATES_RUNNING );
 
 use Carp ();
 use Config::Properties;
+use Config::General ();
 use DateTime::Format::Strptime;
 use DateTime;
 use Email::Valid;
@@ -35,7 +37,7 @@ use File::Basename  qw( basename dirname );
 use File::Find ();
 use File::Find::Rule;
 use File::Spec;
-use File::Temp      qw( tempdir );
+use File::Temp ();
 use List::MoreUtils qw( uniq );
 use List::Util      qw( max  );
 use Path::Tiny      qw( path );
@@ -108,6 +110,15 @@ option dump_xml_to_json => (
     format  => 's',
     doc     => 'Specify a directory to convert and dump XML files in the workflow as JSON. This implies a dryrun.',
 );
+
+option hdfs_properties_file => (
+    is      => 'rw',
+    isa     => Str,
+    format  => 's',
+    # i.e.: /share/oozie.properties
+    doc     => 'The location of the optional properties file on HDFS',
+);
+
 
 #------------------------------------------------------------------------------#
 
@@ -187,6 +198,14 @@ has configuration_files => (
     is      => 'rw',
     # TODO: type needs fixing for coercion
     # isa     => ArrayRef[IsFile],
+    lazy    => 1,
+    default => sub {
+        my $self  = shift;
+        my $ttlib = $self->ttlib_base_dir;
+        [
+            File::Spec->catfile( $ttlib, 'common.properties' ),
+        ],
+    },
 );
 
 has email_validator => (
@@ -383,6 +402,24 @@ sub destination_path {
             ;
 }
 
+sub __collect_internal_conf_hdfs {
+    my $self   = shift;
+    my $logger = $self->logger;
+    my $file   = $self->hdfs_properties_file;
+
+    return {} if ! $file; # not specified at all
+
+    $logger->debug( sprintf "If exists, fetching from HDFS: %s", $file );
+
+    return {} if ! $self->_hdfs_exists_no_exception( $file );
+
+    return {
+        Config::General::ParseConfig(
+            -String => $self->hdfs->read( $file ),
+        )
+    };
+}
+
 sub __collect_internal_conf {
     my $self  = shift;
     my $keep  = $self->keep_deploy_path;
@@ -410,7 +447,15 @@ sub __collect_internal_conf {
         }
     }
 
-    my $base_dest = tempdir( CLEANUP => ! $keep );
+    $config = {
+        %{ $config },
+        %{ $self->__collect_internal_conf_hdfs },
+    };
+
+    my $base_dest = File::Temp::tempdir(
+                        CLEANUP => ! $keep,
+                        DIR     => resolve_tmp_dir(),
+                    );
 
     $config->{base_dest} = $base_dest;
 
@@ -1186,7 +1231,7 @@ App::Oozie::Deploy
 
 =head1 VERSION
 
-version 0.006
+version 0.010
 
 =head1 SYNOPSIS
 

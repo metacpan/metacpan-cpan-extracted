@@ -22,22 +22,22 @@ name: Locale-CLDR-Locales-Gsw
 provides:
   Locale::CLDR::Locales::Gsw:
     file: lib/Locale/CLDR/Locales/Gsw.pm
-    version: v0.34.1
+    version: v0.34.2
   Locale::CLDR::Locales::Gsw::Any:
     file: lib/Locale/CLDR/Locales/Gsw/Any.pm
-    version: v0.34.1
+    version: v0.34.2
   Locale::CLDR::Locales::Gsw::Any::Ch:
     file: lib/Locale/CLDR/Locales/Gsw/Any/Ch.pm
-    version: v0.34.1
+    version: v0.34.2
   Locale::CLDR::Locales::Gsw::Any::Fr:
     file: lib/Locale/CLDR/Locales/Gsw/Any/Fr.pm
-    version: v0.34.1
+    version: v0.34.2
   Locale::CLDR::Locales::Gsw::Any::Li:
     file: lib/Locale/CLDR/Locales/Gsw/Any/Li.pm
-    version: v0.34.1
+    version: v0.34.2
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.34.1
+  Locale::CLDR: v0.34.2
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -47,5 +47,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.34.1
+version: v0.34.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::Builder::Tester;
-use Test::More;
+use Test2::V0;
 
 use Future::AsyncAwait 0.47;
 
@@ -36,7 +36,7 @@ ok( defined $i2c, 'defined $i2c' );
    test_out( "ok 2 - ->write_then_read" );
 
    $adapter->expect_write_then_read( "ABC", 3 )
-      ->returns( "DEF" );
+      ->will_done( "DEF" );
    is( await $i2c->write_then_read( "ABC", 3 ), "DEF", '->write_then_read return' );
    $adapter->check_and_clear( '->write_then_read' );
 

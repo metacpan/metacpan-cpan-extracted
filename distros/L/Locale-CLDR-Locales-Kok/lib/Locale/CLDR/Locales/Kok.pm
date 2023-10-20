@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Kok - Package for language Konkani
 
 =cut
 
 package Locale::CLDR::Locales::Kok;
-# This file auto generated from Data/common/main/kok.xml
-#	on Mon 11 Apr  5:32:07 pm GMT
+# This file auto generated from Data\common\main\kok.xml
+#	on Fri 13 Oct  9:24:33 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

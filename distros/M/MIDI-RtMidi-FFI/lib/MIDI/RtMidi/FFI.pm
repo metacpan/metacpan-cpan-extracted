@@ -9,7 +9,7 @@ use FFI::Platypus::Buffer qw/ scalar_to_buffer buffer_to_scalar /;
 use FFI::CheckLib 0.25 qw/ find_lib_or_exit /;
 use Carp;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # ABSTRACT: Bindings for librtmidi - Realtime MIDI library
 
@@ -235,7 +235,7 @@ MIDI::RtMidi::FFI - Bindings for librtmidi - Realtime MIDI library
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -465,7 +465,7 @@ John Barrett <john@jbrt.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by John Barrett.
+This software is copyright (c) 2023 by John Barrett.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

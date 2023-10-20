@@ -54,7 +54,7 @@
    "provides" : {
       "Crypt::OpenSSL::PKCS10" : {
          "file" : "lib/Crypt/OpenSSL/PKCS10.pm",
-         "version" : "0.23"
+         "version" : "0.25"
       }
    },
    "release_status" : "stable",
@@ -65,16 +65,16 @@
       "homepage" : "http://search.cpan.org/dist/Crypt-OpenSSL-PKCS10/",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/perl-net-saml2/perl-Crypt-OpenSSL-PKCS10.git",
-         "web" : "https://github.com/perl-net-saml2/perl-Crypt-OpenSSL-PKCS10"
+         "url" : "git://github.com/perl-openssl/perl-crypt-openssl-pkcs10.git",
+         "web" : "https://github.com/perl-openssl/perl-crypt-openssl-pkcs10"
       }
    },
-   "version" : "0.23",
-   "x_generated_by_perl" : "v5.36.1",
+   "version" : "0.25",
+   "x_generated_by_perl" : "v5.38.0",
    "x_maintainers" : [
       "Timothy Legge <timlegge@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

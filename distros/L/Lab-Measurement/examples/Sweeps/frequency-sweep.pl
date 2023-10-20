@@ -67,7 +67,7 @@ frequency-sweep.pl - Sweep a R&S SMB rf generator
 
 =head1 VERSION
 
-version 3.881
+version 3.901
 
 =head1 COPYRIGHT AND LICENSE
 

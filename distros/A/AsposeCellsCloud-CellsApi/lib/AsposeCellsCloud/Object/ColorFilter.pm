@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'filter_by_fill_color' => {
      	datatype => 'boolean',
      	base_name => 'FilterByFillColor',
-     	description => '',
+     	description => 'Flag indicating whether filter by the cell`s fill color. ',
      	format => '',
      	read_only => '',
      		},

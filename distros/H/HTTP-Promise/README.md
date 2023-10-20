@@ -7,6 +7,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
     use HTTP::Promise;
     my $p = HTTP::Promise->new(
         agent => 'MyBot/1.0'
+        accept_encoding => 'auto', # set to 'none' to disable receiving compressed data
         accept_language => [qw( fr-FR fr en-GB en ja-JP )],
         auto_switch_https => 1,
         # For example, a Cookie::Jar object
@@ -51,7 +52,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 # VERSION
 
-    v0.2.4
+    v0.3.1
 
 # DESCRIPTION
 
@@ -140,6 +141,16 @@ Cookies are automatically and transparently managed with [Cookie::Jar](https://m
 Provided with some optional parameters, and this instantiates a new [HTTP::Promise](https://metacpan.org/pod/HTTP%3A%3APromise) objects and returns it. If an error occurred, it will return `undef` and the error can be retrieved using [error](https://metacpan.org/pod/Module%3A%3AGeneric#error) method.
 
 It accepts the following parameters. Each of those options have a corresponding method, so you can get or change its value later:
+
+- `accept_encoding`
+
+    String. This sets whether we should accept compressed data.
+
+    You can set it to `none` to disable it. By default, this is `auto`, and it will set the `Accept-Encoding` `HTTP` header to all the supported encoding based on the availability of associated modules.
+
+    You can also set this to a comma-separated list of known encoding, typically: `bzip2,deflate,gzip,rawdeflate,brotli`
+
+    See [HTTP::Promise::Stream](https://metacpan.org/pod/HTTP%3A%3APromise%3A%3AStream) for more details.
 
 - `agent`
 
@@ -252,6 +263,18 @@ It accepts the following parameters. Each of those options have a corresponding 
 # METHODS
 
 The following methods are available. This interface provides similar interface as [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) while providing more granular control.
+
+## accept\_encoding
+
+String. Sets or gets whether we should accept compressed data.
+
+You can set it to `none` to disable it. By default, this is `auto`, and it will set the `Accept-Encoding` `HTTP` header to all the supported encoding based on the availability of associated modules.
+
+You can also set this to a comma-separated list of known encoding, typically: `bzip2,deflate,gzip,rawdeflate,brotli`
+
+See [HTTP::Promise::Stream](https://metacpan.org/pod/HTTP%3A%3APromise%3A%3AStream) for more details.
+
+Returns a [scalar object](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AScalar) of the current value.
 
 ## accept\_language
 
@@ -420,6 +443,12 @@ It returns a [promise](https://metacpan.org/pod/Promise%3A%3AMe), which can be u
         say( "Error code; ", $ex->code, " and message: ", $ex->message );
     });
 
+If you pass a special header name `Content` or `Query`, it will be used to set the query string of the [URI](https://metacpan.org/pod/URI).
+
+The value can be an hash reference, and [query\_form](https://metacpan.org/pod/URI#query_form) will be called.
+
+If the value is a string or an object that stringifies, [query](https://metacpan.org/pod/URI#query) will be called to set the value as-is. this option gives you direct control of the query string.
+
 However, if ["use\_promise"](#use_promise) is set to false, this will return an [HTTP::Promise::Response](https://metacpan.org/pod/HTTP%3A%3APromise%3A%3AResponse) object directly.
 
 ## head
@@ -528,6 +557,14 @@ It can then be used to call one or more [then](https://metacpan.org/pod/Promise%
 
 However, if ["use\_promise"](#use_promise) is set to false, this will return an [HTTP::Promise::Response](https://metacpan.org/pod/HTTP%3A%3APromise%3A%3AResponse) object directly.
 
+## new\_headers
+
+    my $headers = $p->new_headers( Accept => 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.8' );
+
+This takes some key-value pairs as header name and value, and instantiate a new [HTTP::Promise::Headers](https://metacpan.org/pod/HTTP%3A%3APromise%3A%3AHeaders) object and returns it.
+
+If an error occurs, this set an [error object](https://metacpan.org/pod/HTTP%3A%3APromise%3A%3AException) and return `undef` in scalar context or an empty list in list context.
+
 ## no\_proxy
 
 Sets or gets a list of domain names for which the proxy will not apply. By default this is empty.
@@ -565,15 +602,18 @@ However, if ["use\_promise"](#use_promise) is set to false, this will return an 
 
 Provided with an `uri` and an optional hash of form data, followed by an hash of header name/value pairs and this will issue a `PATCH` http request to the given `uri`.
 
-If a special header name `Content` is provided, its value will be used to create the key-value pairs form data.
+If a special header name `Content` is provided, its value will be used to create the key-value pairs form data. That `Content` value can either be an array reference, or an hash reference of key-value pairs. If if is just a string, it will be used as-is as the request body.
+
+If a special header name `Query` is provided, its value will be used to set the `URI` query string. The query string thus provided must already be escaped.
 
 It returns a [promise](https://metacpan.org/pod/Promise%3A%3AMe), which can be used to call one or more [then](https://metacpan.org/pod/Promise%3A%3AMe#then) and [catch](https://metacpan.org/pod/Promise%3A%3AMe#catch)
 
-    # or $p->patch( $uri, \@form, $field1 => $value1, $field2 => $value2 )
-    # or $p->patch( $uri, \%form, $field1 => $value1, $field2 => $value2 )
-    # or $p->patch( $uri, $field1 => $value1, $field2 => $value2 )
-    # or $p->patch( $uri, $field1 => $value1, $field2 => $value2, Content => \@form )
-    # or $p->patch( $uri, $field1 => $value1, $field2 => $value2, Content => \%form )
+    # or $p->patch( $uri, \@form, $field1 => $value1, $field2 => $value2 );
+    # or $p->patch( $uri, \%form, $field1 => $value1, $field2 => $value2 );
+    # or $p->patch( $uri, $field1 => $value1, $field2 => $value2 );
+    # or $p->patch( $uri, $field1 => $value1, $field2 => $value2, Content => \@form, Query => $escaped_string );
+    # or $p->patch( $uri, $field1 => $value1, $field2 => $value2, Content => \%form, Query => $escaped_string );
+    # or $p->patch( $uri, $field1 => $value1, $field2 => $value2, Content => $content, Query => $escaped_string );
     $p->patch( $uri )->then(sub
     {
         my( $resolve, $reject ) = @$_;
@@ -593,18 +633,20 @@ However, if ["use\_promise"](#use_promise) is set to false, this will return an 
 
 Provided with an `uri` and an optional hash of form data, followed by an hash of header name/value pairs and this will issue a `POST` http request to the given `uri`.
 
-If a special header name `Content` is provided, its value will be used to create the key-value pairs form data. THat `Content` value can either be an array reference, or an hash reference of key-value pairs. If if is just a string, it will be used as-is as the request body.
+If a special header name `Content` is provided, its value will be used to create the key-value pairs form data. That `Content` value can either be an array reference, or an hash reference of key-value pairs. If if is just a string, it will be used as-is as the request body.
+
+If a special header name `Query` is provided, its value will be used to set the `URI` query string. The query string thus provided must already be escaped.
 
 How the form data is formatted depends on the `Content-Type` set in the headers passed. If the `Content-Type` header is `form-data` or `multipart/form-data`, the form data will be formatted as a `multipart/form-data` post, otherwise they will be formatted as a `application/x-www-form-urlencoded` post.
 
 It returns a [promise](https://metacpan.org/pod/Promise%3A%3AMe), which can be used to call one or more [then](https://metacpan.org/pod/Promise%3A%3AMe#then) and [catch](https://metacpan.org/pod/Promise%3A%3AMe#catch)
 
-    # or $p->post( $uri, \@form, $field1 => $value1, $field2 => $value2 )
-    # or $p->post( $uri, \%form, $field1 => $value1, $field2 => $value2 )
-    # or $p->post( $uri, $field1 => $value1, $field2 => $value2 )
-    # or $p->post( $uri, $field1 => $value1, $field2 => $value2, Content => \@form )
-    # or $p->post( $uri, $field1 => $value1, $field2 => $value2, Content => \%form )
-    # or $p->post( $uri, $field1 => $value1, $field2 => $value2, Content => $content )
+    # or $p->post( $uri, \@form, $field1 => $value1, $field2 => $value2 );
+    # or $p->post( $uri, \%form, $field1 => $value1, $field2 => $value2 );
+    # or $p->post( $uri, $field1 => $value1, $field2 => $value2 );
+    # or $p->post( $uri, $field1 => $value1, $field2 => $value2, Content => \@form, Query => $escaped_string );
+    # or $p->post( $uri, $field1 => $value1, $field2 => $value2, Content => \%form, Query => $escaped_string );
+    # or $p->post( $uri, $field1 => $value1, $field2 => $value2, Content => $content, Query => $escaped_string );
     $p->post( $uri )->then(sub
     {
         my( $resolve, $reject ) = @$_;
@@ -674,16 +716,18 @@ Provided with an `uri` and an optional hash of form data, followed by an hash of
 
 If a special header name `Content` is provided, its value will be used to create the key-value pairs form data. THat `Content` value can either be an array reference, or an hash reference of key-value pairs. If if is just a string, it will be used as-is as the request body.
 
+If a special header name `Query` is provided, its value will be used to set the `URI` query string. The query string thus provided must already be escaped.
+
 How the form data is formatted depends on the `Content-Type` set in the headers passed. If the `Content-Type` header is `form-data` or `multipart/form-data`, the form data will be formatted as a `multipart/form-data` post, otherwise they will be formatted as a `application/x-www-form-urlencoded` put.
 
 It returns a [promise](https://metacpan.org/pod/Promise%3A%3AMe), which can be used to call one or more [then](https://metacpan.org/pod/Promise%3A%3AMe#then) and [catch](https://metacpan.org/pod/Promise%3A%3AMe#catch)
 
-    # or $p->put( $uri, \@form, $field1 => $value1, $field2 => $value2 )
-    # or $p->put( $uri, \%form, $field1 => $value1, $field2 => $value2 )
-    # or $p->put( $uri, $field1 => $value1, $field2 => $value2 )
-    # or $p->put( $uri, $field1 => $value1, $field2 => $value2, Content => \@form )
-    # or $p->put( $uri, $field1 => $value1, $field2 => $value2, Content => \%form )
-    # or $p->put( $uri, $field1 => $value1, $field2 => $value2, Content => $content )
+    # or $p->put( $uri, \@form, $field1 => $value1, $field2 => $value2 );
+    # or $p->put( $uri, \%form, $field1 => $value1, $field2 => $value2 );
+    # or $p->put( $uri, $field1 => $value1, $field2 => $value2 );
+    # or $p->put( $uri, $field1 => $value1, $field2 => $value2, Content => \@form, Query => $escaped_string );
+    # or $p->put( $uri, $field1 => $value1, $field2 => $value2, Content => \%form, Query => $escaped_string );
+    # or $p->put( $uri, $field1 => $value1, $field2 => $value2, Content => $content, Query => $escaped_string );
     $p->put( $uri )->then(sub
     {
         my( $resolve, $reject ) = @$_;
@@ -701,7 +745,7 @@ However, if ["use\_promise"](#use_promise) is set to false, this will return an 
 
 ## request
 
-This method will issue the propre request in accordance with the request object provided. It will process redirects and authentication responses transparently. This means it may end up sending multiple request, up to the limit set with the object option ["max\_redirect"](#max_redirect)
+This method will issue the proper request in accordance with the request object provided. It will process redirects and authentication responses transparently. This means it may end up sending multiple request, up to the limit set with the object option ["max\_redirect"](#max_redirect)
 
 This method takes the following parameters:
 

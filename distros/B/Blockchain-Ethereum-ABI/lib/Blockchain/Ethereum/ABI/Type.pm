@@ -1,37 +1,11 @@
 use v5.26;
 use Object::Pad ':experimental(init_expr)';
 
-package Blockchain::Ethereum::ABI::Type 0.012;
+package Blockchain::Ethereum::ABI::Type;
 class Blockchain::Ethereum::ABI::Type;
 
-=encoding utf8
-
-=head1 NAME
-
-Blockchain::Ethereum::ABI::Type - Interface for solidity variable types
-
-=head1 SYNOPSIS
-
-Allows you to define and instantiate a solidity variable type:
-
-    my $type = Blockchain::Ethereum::ABI::Type->new(
-        signature => $signature,
-        data      => $value
-    );
-
-    $type->encode();
-
-In most cases you don't want to use this directly, use instead:
-
-=over 4
-
-=item * B<Encoder>: L<Blockchain::Ethereum::ABI::Encoder>
-
-=item * B<Decoder>: L<Blockchain::Ethereum::ABI::Decoder>
-
-=back
-
-=cut
+our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
+our $VERSION   = '0.013';          # VERSION
 
 use Carp;
 use Module::Load;
@@ -81,24 +55,6 @@ method _push_dynamic ($data) {
     push($self->_dynamic->@*, ref $data eq 'ARRAY' ? $data->@* : $data);
 }
 
-=head2 pad_right
-
-Pads the given data to right 32 bytes with zeros
-
-Usage:
-
-    pad_right("1") -> "100000000000..0"
-
-=over 4
-
-=item * C<$data> data to be padded
-
-=back
-
-Returns the padded string
-
-=cut
-
 method pad_right ($data) {
 
     my @chunks;
@@ -106,22 +62,6 @@ method pad_right ($data) {
 
     return \@chunks;
 }
-
-=head2 pad_left
-
-Pads the given data to left 32 bytes with zeros
-
-Usage:
-
-    pad_left("1") -> "0000000000..1"
-
-=over 4
-
-=item * C<$data> data to be padded
-
-=back
-
-=cut
 
 method pad_left ($data) {
 
@@ -148,22 +88,6 @@ method _encoded {
     return scalar @data ? \@data : undef;
 }
 
-=head2 is_dynamic
-
-Checks if the type signature is dynamic
-
-Usage:
-
-    is_dynamic() -> 1/0
-
-=over 4
-
-=back
-
-Returns 1 for dynamic and 0 for static
-
-=cut
-
 method is_dynamic {
 
     return $self->signature =~ /(bytes|string)(?!\d+)|(\[\])/ ? 1 : 0;
@@ -185,22 +109,6 @@ method _get_initial_offset {
 
     return $offset;
 }
-
-=head2 fixed_length
-
-Check if that is a length specified for the given signature
-
-Usage:
-
-    fixed_length() -> integer length or undef
-
-=over 4
-
-=back
-
-Integer length or undef in case of no length specified
-
-=cut
 
 method fixed_length {
 
@@ -279,20 +187,93 @@ method _read_stack_set_data {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Blockchain::Ethereum::ABI::Type
+
+=head1 VERSION
+
+version 0.013
+
+=head1 SYNOPSIS
+
+Allows you to define and instantiate a solidity variable type:
+
+    my $type = Blockchain::Ethereum::ABI::Type->new(
+        signature => $signature,
+        data      => $value
+    );
+
+    $type->encode();
+
+In most cases you don't want to use this directly, use instead:
+
+=over 4
+
+=item * B<Encoder>: L<Blockchain::Ethereum::ABI::Encoder>
+
+=item * B<Decoder>: L<Blockchain::Ethereum::ABI::Decoder>
+
+=back
+
+=head1 METHODS
+
+=head2 pad_right
+
+Pads the given data to right 32 bytes with zeros
+
+=over 4
+
+=item * C<$data> data to be padded
+
+=back
+
+Returns the padded string
+
+=head2 pad_left
+
+Pads the given data to left 32 bytes with zeros
+
+=over 4
+
+=item * C<$data> data to be padded
+
+=back
+
+=head2 is_dynamic
+
+Checks if the type signature is dynamic
+
+=over 4
+
+=back
+
+Returns 1 for dynamic and 0 for static
+
+=head2 fixed_length
+
+Check if that is a length specified for the given signature
+
+=over 4
+
+=back
+
+Integer length or undef in case of no length specified
+
 =head1 AUTHOR
 
-Reginaldo Costa, C<< <refeco at cpan.org> >>
+Reginaldo Costa <refeco@cpan.org>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to L<https://github.com/refeco/perl-ABI>
-
-=head1 LICENSE AND COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2022 by REFECO.
 
 This is free software, licensed under:
 
-  The MIT License
+  The MIT (X11) License
 
 =cut

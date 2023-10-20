@@ -1,18 +1,21 @@
-lib/UI/Various/PoorTerm/Main.pm:	# uncoverable branch false count:4
-lib/UI/Various/PoorTerm/Main.pm-	if (not defined $_)
---
 lib/UI/Various/RichTerm/Main.pm:    # uncoverable condition right
 lib/UI/Various/RichTerm/Main.pm-    unless ($rows  and  $columns)
+--
+lib/UI/Various/RichTerm/Main.pm:	    # uncoverable branch true
+lib/UI/Various/RichTerm/Main.pm:	    # uncoverable branch false count:1
+lib/UI/Various/RichTerm/Main.pm:	    # uncoverable branch false count:2
+lib/UI/Various/RichTerm/Main.pm-	    $rows = $1 ? $1 : $2 ? $2 : 24;
+--
+lib/UI/Various/RichTerm/Main.pm:	    # uncoverable branch true
+lib/UI/Various/RichTerm/Main.pm:	    # uncoverable branch false count:1
+lib/UI/Various/RichTerm/Main.pm:	    # uncoverable branch false count:2
+lib/UI/Various/RichTerm/Main.pm-	    $columns = $1 ? $1 : $2 ? $2 : 80;
 --
 lib/UI/Various/RichTerm/Main.pm:	# uncoverable branch false count:4
 lib/UI/Various/RichTerm/Main.pm-	if (not defined $_)
 --
-lib/UI/Various/core.pm:	    # uncoverable branch true
-lib/UI/Various/core.pm:	    # uncoverable condition false
-lib/UI/Various/core.pm-	    unless (defined(caller(4))  and  (caller(4))[0]  eq  'Pod::Coverage')
---
-lib/UI/Various/core.pm:		    # uncoverable branch true
-lib/UI/Various/core.pm-		    if ($rc == 0)
+lib/UI/Various/Curses/Box.pm:	# uncoverable statement
+lib/UI/Various/Curses/Box.pm-    };
 --
 lib/UI/Various/Curses/Dialog.pm:	# uncoverable condition false
 lib/UI/Various/Curses/Dialog.pm:	# uncoverable condition right
@@ -22,5 +25,22 @@ lib/UI/Various/Curses/Window.pm:	# uncoverable condition false
 lib/UI/Various/Curses/Window.pm:	# uncoverable condition right
 lib/UI/Various/Curses/Window.pm-	$row += $_->_cui->height || 1;
 --
-lib/UI/Various/Curses/Box.pm:	# uncoverable statement
-lib/UI/Various/Curses/Box.pm-    };
+lib/UI/Various/PoorTerm/Main.pm:	# uncoverable branch true
+lib/UI/Various/PoorTerm/Main.pm:	# uncoverable branch false count:1
+lib/UI/Various/PoorTerm/Main.pm:	# uncoverable branch false count:2
+lib/UI/Various/PoorTerm/Main.pm-	$rows = $1 ? $1 : $2 ? $2 : 24;
+--
+lib/UI/Various/PoorTerm/Main.pm:	# uncoverable branch true
+lib/UI/Various/PoorTerm/Main.pm:	# uncoverable branch false count:1
+lib/UI/Various/PoorTerm/Main.pm:	# uncoverable branch false count:2
+lib/UI/Various/PoorTerm/Main.pm-	$columns = $1 ? $1 : $2 ? $2 : 80;
+--
+lib/UI/Various/PoorTerm/Main.pm:	# uncoverable branch false count:4
+lib/UI/Various/PoorTerm/Main.pm-	if (not defined $_)
+--
+lib/UI/Various/core.pm:	    # uncoverable branch true
+lib/UI/Various/core.pm:	    # uncoverable condition false
+lib/UI/Various/core.pm-	    unless (defined(caller(4))  and  (caller(4))[0]  eq  'Pod::Coverage')
+--
+lib/UI/Various/core.pm:		    # uncoverable branch true
+lib/UI/Various/core.pm-		    if ($rc == 0)

@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Seh - Package for language Sena
 
 =cut
 
 package Locale::CLDR::Locales::Seh;
-# This file auto generated from Data/common/main/seh.xml
-#	on Mon 11 Apr  5:37:35 pm GMT
+# This file auto generated from Data\common\main\seh.xml
+#	on Fri 13 Oct  9:36:57 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

@@ -21,7 +21,7 @@ diag( "Parsing failed: ", $p->error ) if( $DEBUG && !defined( $ent ) );
 SKIP:
 {
     skip( 'parser failed', 4 ) if( !defined( $ent ) );
-    $ent->debug( $DEBUG ) if( $DEBUG );
+    $ent->debug( $DEBUG );
     is( $ent->headers->type, 'multipart/form-data', 'type is multipart/form-data' );
     is( $ent->parts->length, 4, 'number of parts' );
     my $form = $ent->as_form_data;

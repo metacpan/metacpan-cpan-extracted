@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Ug - Package for language Uyghur
 
 =cut
 
 package Locale::CLDR::Locales::Ug;
-# This file auto generated from Data/common/main/ug.xml
-#	on Mon 11 Apr  5:40:27 pm GMT
+# This file auto generated from Data\common\main\ug.xml
+#	on Fri 13 Oct  9:46:32 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

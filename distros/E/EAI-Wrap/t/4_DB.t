@@ -1,4 +1,4 @@
-# to use these testcases (only MS SQL server), create a database testDB in the local sql server instance where the current account has dbo rights (tables are created/dropped)
+# to use these testcases (only MS SQL server), create a database pubs in the local sql server instance where the current account has dbo rights (tables are created/dropped)
 use strict; use warnings;
 use EAI::DB; use Test::More; use Data::Dumper;
 
@@ -9,7 +9,7 @@ if ($ENV{EAI_WRAP_AUTHORTEST}) {
 }
 require './t/setup.pl';
 chdir "./t";
-newDBH({database => "testDB", DSN => 'driver={SQL Server};Server=.;database=$DB->{database};TrustedConnection=Yes;'}, {});
+newDBH({}, 'driver={SQL Server};Server=.;database=pubs;TrustedConnection=Yes;');
 my ($dbHandle, $DSN) = getConn();
 doInDB({doString => "DROP TABLE [dbo].[theTestTable];"});
 my $createStmt = "CREATE TABLE [dbo].[theTestTable]([selDate] [datetime] NOT NULL,[ID0] [varchar](4) NOT NULL,[ID1] [bigint] NOT NULL,[ID2] [char](3) NOT NULL,[Number] [int] NOT NULL, [Amount] [decimal](28, 2) NOT NULL, CONSTRAINT [PK_theTestTable] PRIMARY KEY CLUSTERED (selDate ASC)) ON [PRIMARY]";

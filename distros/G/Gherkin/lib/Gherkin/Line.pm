@@ -1,10 +1,12 @@
 package Gherkin::Line;
-$Gherkin::Line::VERSION = '25.0.2';
+$Gherkin::Line::VERSION = '27.0.0';
 use strict;
 use warnings;
 
 use Class::XSAccessor accessors =>
-  [ qw/line_text line_number indent _trimmed_line_text/, ];
+  [ qw/line_text line_number indent _trimmed_line_text _tag_error/, ];
+
+use Gherkin::Exceptions;
 
 sub new {
     my ( $class, $options ) = @_;
@@ -134,26 +136,40 @@ sub tags {
     $items_line =~ s/\s+(#.*)?$//;
 
     my @tags;
+    my @errors;
     my @items = split( /@/, $items_line );
     shift(@items);    # Blank first item
 
-    for my $item (@items) {
-        my $original_item = $item;
+    for my $untrimmed (@items) {
+        my $item = $untrimmed;
         $item =~ s/^\s*//;
         $item =~ s/\s*$//;
+        next if length($item) == 0;
 
-        push(
-            @tags,
-            {
-                column => $column,
-                text   => '@' . $item,
-            }
-        );
+        if ($item !~ /^\S+$/) {
+            push @errors,
+                Gherkin::Exceptions::SingleParser->new(
+                    detailed_message => 'A tag may not contain whitespace',
+                    location => {
+                        line   => $self->line_number,
+                        column => $column,
+                    },
+                );
+        }
+        push @tags, {
+            column => $column,
+            text   => '@' . $item,
+        };
 
-        $column += length($original_item) + 1;
+        $column += length($untrimmed) + 1;
     }
 
-    return \@tags;
+    my $err;
+    if (@errors) {
+        $err = Gherkin::Exceptions::CompositeParser->new(@errors);
+    }
+
+    return (\@tags, $err);
 }
 
 1;

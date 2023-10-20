@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_Mercury::Magnet;
-$Lab::Moose::Instrument::OI_Mercury::Magnet::VERSION = '3.881';
+$Lab::Moose::Instrument::OI_Mercury::Magnet::VERSION = '3.901';
 #ABSTRACT: Oxford Instruments Mercury magnet power supply
 
 use v5.20;
@@ -550,7 +550,7 @@ Lab::Moose::Instrument::OI_Mercury::Magnet - Oxford Instruments Mercury magnet p
 
 =head1 VERSION
 
-version 3.881
+version 3.901
 
 =head1 SYNOPSIS
 
@@ -798,9 +798,7 @@ This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
             2018       Andreas K. Huettel, Simon Reinhardt
-            2019       Simon Reinhardt
-            2020       Andreas K. Huettel, Simon Reinhardt
-            2021-2022  Simon Reinhardt
+            2019-2022  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

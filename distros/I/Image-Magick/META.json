@@ -1,0 +1,39 @@
+{
+   "name" : "Image-Magick",
+   "abstract" : "ImageMagick PERL Extension",
+   "description" : [
+      "PerlMagick is a robust and user-friendly Perl interface designed to seamlessly integrate with ImageMagick. This powerful module empowers you to effortlessly perform a wide array of operations on images or image sequences right from within your Perl scripts. Its versatility and ease of use make it an ideal choice for crafting dynamic Web CGI scripts that involve image processing."
+   ],
+   "version" : "v7.1.1",
+   "release_status" : "stable",
+   "author" : [
+      "ImageMagick Studio LLC"
+   ],
+   "license" : [
+      "apache_2_0"
+   ],
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "parent" : "0"
+         }
+      }
+   },
+   "dynamic_config" : 1,
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   }
+}

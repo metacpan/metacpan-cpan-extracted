@@ -54,7 +54,6 @@ sub format
     if( @_ )
     {
         # my( $p, $f, $l ) = caller;
-        # $self->message( 3, "Property format called in package $p at line $l in file $f" );
 	    my $format = $self->SUPER::format( @_ ) || return( $self->pass_error );
         $self->values->foreach(sub
         {
@@ -117,20 +116,16 @@ sub value
         }
         else
         {
-            # $self->message( 3, "Creating a value object for value '$val'." );
             $valObj = CSS::Object::Value->new( $val,
                 debug  => $self->debug,
                 format => $self->format,
             );
             defined( $valObj ) || return( $self->error( "Unable to initialise CSS::Object::Value object for value \"$val\"." ) );
         }
-        # $self->message( 3, "Adding new value object '", overload::StrVal( $valObj ), " ($val) to our stack." );
         $self->values->set( $valObj );
-        # $self->message( 3, "Stack of values contains ", $self->values->length, " elements. Returning the CSS::Object::Value object (", $valObj->as_string, ")." );
         return( $valObj );
     }
     # my $last = $self->values->last;
-    # $self->message( 3, "Returning value object '", $last, "'." );
     return( $self->values->last );
 }
 

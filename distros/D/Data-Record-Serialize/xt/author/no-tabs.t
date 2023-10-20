@@ -8,7 +8,6 @@ use Test::NoTabs;
 
 my @files = (
     'lib/Data/Record/Serialize.pm',
-    'lib/Data/Record/Serialize/Encode/dbi.pm',
     'lib/Data/Record/Serialize/Encode/ddump.pm',
     'lib/Data/Record/Serialize/Encode/json.pm',
     'lib/Data/Record/Serialize/Encode/null.pm',
@@ -33,7 +32,6 @@ my @files = (
     't/bugs/duplicate-fields.t',
     't/bugs/rename-field-to-self.t',
     't/constructor.t',
-    't/encoders/dbi.t',
     't/encoders/ddump.t',
     't/encoders/json.t',
     't/encoders/null.t',

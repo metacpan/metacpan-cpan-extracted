@@ -34,13 +34,13 @@ no_index:
 provides:
   Alien::SeqAlignment::edlib:
     file: lib/Alien/SeqAlignment/edlib.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Alien::Base: '0'
   parent: '0'
   strict: '0'
   warnings: '0'
-version: '0.04'
+version: '0.05'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

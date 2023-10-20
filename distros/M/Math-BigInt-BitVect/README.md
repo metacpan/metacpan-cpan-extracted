@@ -51,10 +51,6 @@ You can also look for information at:
 
     [http://matrix.cpantesters.org/?dist=Math-BigInt-BitVect](http://matrix.cpantesters.org/?dist=Math-BigInt-BitVect)
 
-- CPAN Ratings
-
-    [https://cpanratings.perl.org/dist/Math-BigInt-BitVect](https://cpanratings.perl.org/dist/Math-BigInt-BitVect)
-
 # LICENSE
 
 This program is free software; you may redistribute it and/or modify it under

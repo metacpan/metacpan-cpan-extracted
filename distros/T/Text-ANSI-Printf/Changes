@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Printf
 
+2.02 2023-10-20T04:18:34Z
+
+    - Support argument reordering.
+
 2.01 2020-11-19T03:26:54Z
 
     - Update to use Text::Conceal module.

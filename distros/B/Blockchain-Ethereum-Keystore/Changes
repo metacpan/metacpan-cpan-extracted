@@ -1,4 +1,13 @@
-Revision history for Blockchain-Ethereum-Keystore
+0.009     2023-10-17 23:19:24-03:00 America/Sao_Paulo
+    - fix deprecated method warnings
+0.008     2023-10-15 23:49:18-03:00 America/Sao_Paulo
+    [Bug fix]
+    - add perlcritic and perltidy to build
+0.007     2023-10-14 22:30:36-03:00 America/Sao_Paulo
+    - MAKEFILE.SKIP
+0.006     2023-10-14 21:12:23-03:00 America/Sao_Paulo
+    [Improvements]
+    - Add Dist::Zilla
 0.005
     - Fix installation: incorrect CryptX version
 0.004

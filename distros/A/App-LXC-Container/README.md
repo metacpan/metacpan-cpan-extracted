@@ -10,12 +10,15 @@ App::LXC::Container - configure, create and run LXC application containers
 
 # ABSTRACT
 
-**Currently this module is unfinished work in progress!  It is only uploaded
-to test the development processes and see how the tests run and fail on the
-various different platforms.  In the first versions it also only supports
+**Currently this module is an alpha release.  It currently only supports
 Debian (and maybe Ubuntu and some other derivates) using Pipewire or
 Pulseaudio as audio system and X11 as windowing system.  Also see KNOWN BUGS
 below!**
+Other distributions derived from Debian using Pipewire / Pulseaudio and X11
+should be easy to add.  For RPM based distributions I've already some ideas
+how they could be added.  All those cases need some collaboration with users
+using them though.  Other distributions need some more work, but are welcome
+nonetheless.
 
 App::LXC::Container provides a toolbox to configure, create and run one or
 more applications inside of simple and secure LXC ([Linux

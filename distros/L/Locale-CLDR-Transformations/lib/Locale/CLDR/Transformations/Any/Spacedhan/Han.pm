@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Spacedhan::Han;
-# This file auto generated from Data/common/transforms/Han-Spacedhan.xml
-#	on Mon 11 Apr  5:22:56 pm GMT
+# This file auto generated from Data\common\transforms\Han-Spacedhan.xml
+#	on Fri 13 Oct  9:03:45 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

@@ -7,7 +7,7 @@ use Clone                    ();
 use Carp                     ();
 use PPI::Token::_QuoteEngine ();
 
-our $VERSION = '1.276';
+our $VERSION = '1.277';
 
 our @ISA = 'PPI::Token::_QuoteEngine';
 
@@ -43,6 +43,9 @@ my %QUOTES = (
 	# used yet, since I'm not sure on the context differences between
 	# this and the trinary operator, but it's here for completeness.
 	'?'   => { operator => undef, braced => 0,     separator => '?',   _sections => 1, modifiers => 1 },
+
+	# parse prototypes as a literal quote
+	'('   => { operator => undef, braced => 1,     separator => undef, _sections => 1, },
 );
 
 
@@ -70,9 +73,8 @@ sub new {
 	$self->{modifiers} = {} if $self->{modifiers};
 
 	# Handle the special < base
-	if ( $init eq '<' ) {
-		$self->{sections}->[0] = Clone::clone( $SECTIONS{'<'} );
-	}
+	$self->{sections}[0] = Clone::clone $SECTIONS{'<'} if $init eq '<';
+	$self->{sections}[0] = Clone::clone $SECTIONS{'('} if $init eq '(';
 
 	$self;
 }

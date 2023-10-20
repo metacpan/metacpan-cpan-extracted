@@ -67,10 +67,6 @@ You can also look for information at:
 
     [http://matrix.cpantesters.org/?dist=Math-BigInt-GMP](http://matrix.cpantesters.org/?dist=Math-BigInt-GMP)
 
-- CPAN Ratings
-
-    [https://cpanratings.perl.org/dist/Math-BigInt-GMP](https://cpanratings.perl.org/dist/Math-BigInt-GMP)
-
 # LICENSE
 
 This program is free software; you may redistribute it and/or modify it under

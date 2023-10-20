@@ -2,7 +2,7 @@ package Test2::Harness::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000152';
+our $VERSION = '1.000155';
 
 use File::Spec();
 
@@ -321,7 +321,13 @@ sub spawn_scheduler {
             exit(0);
         }
 
-        sleep($self->{+WAIT_TIME}) if $self->{+WAIT_TIME};
+        my $slept = 0;
+        if ($self->{+WAIT_TIME}) {
+            # This sleep is often interrupted by signals.
+            while ($slept < $self->{+WAIT_TIME}) {
+                $slept += sleep($self->{+WAIT_TIME} - $slept);
+            }
+        }
     }
 
     warn "Escaped scheduler loop";

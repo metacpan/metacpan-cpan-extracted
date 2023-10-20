@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Sg::Any::Cf - Package for language Sango
 
 =cut
 
 package Locale::CLDR::Locales::Sg::Any::Cf;
-# This file auto generated from Data/common/main/sg_CF.xml
-#	on Mon 11 Apr  5:37:36 pm GMT
+# This file auto generated from Data\common\main\sg_CF.xml
+#	on Fri 13 Oct  9:37:04 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

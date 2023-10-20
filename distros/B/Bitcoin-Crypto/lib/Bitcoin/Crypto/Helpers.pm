@@ -1,15 +1,14 @@
 package Bitcoin::Crypto::Helpers;
-$Bitcoin::Crypto::Helpers::VERSION = '1.008';
+$Bitcoin::Crypto::Helpers::VERSION = '2.001';
 use v5.10;
 use strict;
 use warnings;
 use Exporter qw(import);
-use Crypt::Digest::RIPEMD160 qw(ripemd160);
-use Crypt::Digest::SHA256 qw(sha256);
 use List::Util qw(max);
 use Crypt::PK::ECC;
+use Carp qw(carp);
 
-use Bitcoin::Crypto::Config;
+use Bitcoin::Crypto::Constants;
 use Bitcoin::Crypto::Exception;
 
 BEGIN {
@@ -25,26 +24,33 @@ BEGIN {
 }
 
 our @EXPORT_OK = qw(
-	new_bigint
 	pad_hex
 	ensure_length
-	verify_bytestring
-	hash160
-	hash256
 	add_ec_points
+	pack_varint
+	unpack_varint
+	carp_once
 );
 
-sub new_bigint
+our @CARP_NOT;
+my %warned;
+
+sub carp_once
 {
-	my ($bytes) = @_;
-	return Math::BigInt->from_hex(unpack "H*", $bytes);
+	my ($msg) = @_;
+
+	return if $warned{$msg};
+	$warned{$msg} = 1;
+	local @CARP_NOT = ((caller)[0]);
+	carp($msg);
 }
 
 sub pad_hex
 {
 	my ($hex) = @_;
-	$hex =~ s/^0x//;
-	return "0" x (length($hex) % 2) . $hex;
+	$hex =~ s/\A0x//;
+	$hex =~ tr/0-9a-fA-F//cd;
+	return '0' x (length($hex) % 2) . $hex;
 }
 
 sub ensure_length
@@ -59,33 +65,68 @@ sub ensure_length
 	return pack("x$missing") . $packed;
 }
 
-sub verify_bytestring
+sub pack_varint
 {
-	my ($string) = @_;
+	my ($value) = @_;
 
 	Bitcoin::Crypto::Exception->raise(
-		"invalid input value, expected string"
-	) if !defined $string || ref $string;
+		"VarInt must be positive or zero"
+	) if $value < 0;
 
-	my @characters = split //, $string;
-
-	Bitcoin::Crypto::Exception->raise(
-		"string contains characters with numeric values over 255 and cannot be used as a byte string"
-	) if (grep { ord($_) > 255 } @characters) > 0;
+	if ($value <= 0xfc) {
+		return pack 'C', $value;
+	}
+	elsif ($value <= 0xffff) {
+		return "\xfd" . pack 'v', $value;
+	}
+	elsif ($value <= 0xffffffff) {
+		return "\xfe" . pack 'V', $value;
+	}
+	else {
+		# 32 bit archs should not reach this
+		return "\xff" . (pack 'V', $value & 0xffffffff) . (pack 'V', $value >> 32);
+	}
 }
 
-sub hash160
+sub unpack_varint
 {
-	my ($data) = @_;
+	my ($stream) = @_;
 
-	return ripemd160(sha256($data));
-}
+	my $value = ord substr $stream, 0, 1, '';
+	my $length = 1;
 
-sub hash256
-{
-	my ($data) = @_;
+	if ($value == 0xfd) {
+		Bitcoin::Crypto::Exception->raise(
+			"cannot unpack VarInt: not enough data in stream"
+		) if length $stream < 2;
 
-	return sha256(sha256($data));
+		$value = unpack 'v', substr $stream, 0, 2;
+		$length += 2;
+	}
+	elsif ($value == 0xfe) {
+		Bitcoin::Crypto::Exception->raise(
+			"cannot unpack VarInt: not enough data in stream"
+		) if length $stream < 4;
+
+		$value = unpack 'V', substr $stream, 0, 4;
+		$length += 4;
+	}
+	elsif ($value == 0xff) {
+		Bitcoin::Crypto::Exception->raise(
+			"cannot unpack VarInt: no 64 bit support"
+		) if !Bitcoin::Crypto::Constants::is_64bit;
+
+		Bitcoin::Crypto::Exception->raise(
+			"cannot unpack VarInt: not enough data in stream"
+		) if length $stream < 8;
+
+		my $lower = unpack 'V', substr $stream, 0, 4;
+		my $higher = unpack 'V', substr $stream, 4, 4;
+		$value = ($higher << 32) + $lower;
+		$length += 8;
+	}
+
+	return ($length, $value);
 }
 
 # Self-contained implementation on elliptic curve points addition.
@@ -97,10 +138,10 @@ sub add_ec_points
 {
 	my ($point1, $point2) = @_;
 
-	my $curve_size = Bitcoin::Crypto::Config::key_max_length;
-	my $curve_data = Crypt::PK::ECC->new->generate_key(Bitcoin::Crypto::Config::curve_name)->curve2hash;
-	my $p = new_bigint(pack "H*", $curve_data->{prime});
-	my $a = new_bigint(pack "H*", $curve_data->{A});
+	my $curve_size = Bitcoin::Crypto::Constants::key_max_length;
+	my $curve_data = Crypt::PK::ECC->new->generate_key(Bitcoin::Crypto::Constants::curve_name)->curve2hash;
+	my $p = Math::BigInt->from_hex($curve_data->{prime});
+	my $a = Math::BigInt->from_hex($curve_data->{A});
 
 	my $add_points = sub {
 		my ($x1, $x2, $y1, $lambda) = @_;
@@ -130,8 +171,8 @@ sub add_ec_points
 	};
 
 	my $format = "(a$curve_size)*";
-	my ($px1, $py1) = map { new_bigint($_) } unpack $format, substr $point1, 1;
-	my ($px2, $py2) = map { new_bigint($_) } unpack $format, substr $point2, 1;
+	my ($px1, $py1) = map { Math::BigInt->from_bytes($_) } unpack $format, substr $point1, 1;
+	my ($px2, $py2) = map { Math::BigInt->from_bytes($_) } unpack $format, substr $point2, 1;
 
 	my $ret = sub {
 		if ($px1->bcmp($px2)) {
@@ -160,5 +201,24 @@ sub add_ec_points
 		: undef;
 }
 
+# not exported - used exclusively by the internal FormatDesc type
+
+sub parse_formatdesc
+{
+	my ($type, $data) = @{$_[0]};
+
+	if ($type eq 'hex') {
+		$data = pack 'H*', pad_hex $data;
+	}
+	elsif ($type eq 'base58') {
+		require Bitcoin::Crypto::Base58;
+		$data = Bitcoin::Crypto::Base58::decode_base58check($data);
+	}
+
+	return $data;
+}
+
 1;
+
+# Internal use only
 

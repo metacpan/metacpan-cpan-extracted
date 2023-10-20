@@ -1,4 +1,4 @@
-#  Copyright 1999 ImageMagick Studio LLC, a non-profit organization
+#  Copyright @ 1999 ImageMagick Studio LLC, a non-profit organization
 #  dedicated to making software imaging solutions freely available.
 #
 #  You may not use this file except in compliance with the License.  You may
@@ -194,7 +194,7 @@ WriteMakefile
    'AUTHOR' => 'ImageMagick Studio LLC',
 
    # Module version
-   'VERSION' => '7.1.0',
+   'VERSION' => '7.1.1',
 
    # Prerequisite version
    'PREREQ_PM' => {'parent' => '0'},

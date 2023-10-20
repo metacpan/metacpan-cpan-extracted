@@ -3521,10 +3521,10 @@ Local message type: 2 (231 octets, message name: session, message number: 18)
   nec_long (30-1-SINT32): -75.7368912 deg (-903576308)
   swc_lat (31-1-SINT32): 45.3889408 deg (541511157)
   swc_long (32-1-SINT32): -75.7408328 deg (-903623333)
-  xxx38 (38-1-SINT32): 541539562
-  xxx39 (39-1-SINT32): -903609925
+  end_position_lat (38-1-SINT32): 45.3913217 deg (541539562)
+  end_position_long (39-1-SINT32): -75.7397090 deg (-903609925)
   total_work (48-1-UINT32, INVALID): 4294967295
-  unknown110 (110-32-STRING): "MOUNTAIN"
+  sport_profile_name (110-32-STRING): "MOUNTAIN"
   time_standing (112-1-UINT32, INVALID): 4294967295
   avg_left_power_phase (116-4-UINT8, INVALID): {255, 255, 255, 255}
   avg_left_power_phase_peak (117-4-UINT8, INVALID): {255, 255, 255, 255}

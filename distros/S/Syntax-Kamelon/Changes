@@ -622,3 +622,7 @@ Version 0.21 Mar 2, 2023
 	Dotted the i's on the handling of deliminators
 	Fixed method SuggestSyntax in Syntax::Kamelon ... again
 	Improved testing
+
+	Version 0.24 Sep 24 2023
+	Patch from Andreas Vögele fix for matching section names with square brackets in Indexer.pm
+	Added newline to the list of deliminators

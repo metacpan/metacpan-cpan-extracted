@@ -143,7 +143,7 @@ __PACKAGE__->method_documentation({
      'new_name' => {
      	datatype => 'string',
      	base_name => 'NewName',
-     	description => '',
+     	description => 'rename worksheet name',
      	format => '',
      	read_only => '',
      		},

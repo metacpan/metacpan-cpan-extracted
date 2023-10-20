@@ -11,15 +11,15 @@ BEGIN {
    plan skip_all => "Future::AsyncAwait >= 0.40 is not available"
       unless eval { require Future::AsyncAwait;
                     Future::AsyncAwait->VERSION( '0.40' ) };
-   plan skip_all => "Object::Pad >= 0.73 is not available"
+   plan skip_all => "Object::Pad >= 0.800 is not available"
       unless eval { require Object::Pad;
-                    Object::Pad->VERSION( '0.73' ) };
+                    Object::Pad->VERSION( '0.800' ) };
    plan skip_all => "Syntax::Keyword::Dynamically >= 0.04 is not available"
       unless eval { require Syntax::Keyword::Dynamically;
                     Syntax::Keyword::Dynamically->VERSION( '0.04' ) };
 
    Future::AsyncAwait->import;
-   Object::Pad->import( ':experimental(init_expr)' );
+   Object::Pad->import;
    Syntax::Keyword::Dynamically->import;
 
    diag( "Future::AsyncAwait $Future::AsyncAwait::VERSION, " .

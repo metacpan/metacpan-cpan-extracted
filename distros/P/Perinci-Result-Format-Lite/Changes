@@ -1,19 +1,30 @@
-0.287   2022-05-16  Released-By: PERLANCAR; Urgency: high
+0.288   2023-07-29  Released-By: PERLANCAR; Urgency: low
 
-        - Merge releases 0.286 and 0.286.1.
+        - No functional changes.
+
+        - [doc] Document supported enveloped result metadata
+          properties/attributes.
+
+
+0.287   2022-09-12  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.286 & 0.286.2.
+
+        - Observe FORMAT_PRETTY_TABLE_BACKEND_OPTS environment variable.
+
+
+0.286.2 2022-05-03  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Align 'right' number columns by default.
+
+        - UPDATE 2022-09-12: rename release from 0.286 to 0.286.2 due to
+          conflict.
 
 
 0.286   2022-02-18  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Use double-doublequote escaping in CSV instead of
           backslash.
-
-
-0.286.1 2022-05-03  Released-By: PERLANCAR; Urgency: medium
-
-	- [ux] Align 'right' number columns by default.
-
-        - UPDATE: Rename release from 0.286 to 0.286.1 due to conflict.
 
 
 0.285   2022-01-23  Released-By: PERLANCAR; Urgency: medium

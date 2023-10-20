@@ -1,5 +1,5 @@
 package Selenium::Driver::Auto;
-$Selenium::Driver::Auto::VERSION = '1.05';
+$Selenium::Driver::Auto::VERSION = '1.06';
 #ABSTRACT: Automatically choose the best driver available for your browser choice
 
 use strict;
@@ -46,7 +46,7 @@ Selenium::Driver::Auto - Automatically choose the best driver available for your
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 SUBROUTINES
 
@@ -61,7 +61,7 @@ George S. Baugh <george@troglodyne.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by George S. Baugh.
+This software is Copyright (c) 2023 by George S. Baugh.
 
 This is free software, licensed under:
 

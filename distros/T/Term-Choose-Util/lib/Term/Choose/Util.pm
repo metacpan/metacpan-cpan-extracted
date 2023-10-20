@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.137';
+our $VERSION = '0.140';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -806,19 +806,31 @@ sub settings_menu {
     my ( $self, $menu, $curr, $opt ) = @_;
     $self->__prepare_opt( $opt );
     my $longest = 0;
-    my $new     = {};
-    my $name_w  = {};
+    my $new = {};
+    my $name_w = {};
     for my $sub ( @$menu ) {
-        my ( $key, $name ) = @$sub;
+        my ( $key, $name, $values ) = @$sub;
         $name_w->{$key} = print_columns_ext( $name, $self->{color} );
-        $longest      = $name_w->{$key} if $name_w->{$key} > $longest;
-        $curr->{$key} = 0       if ! defined $curr->{$key};
-        $new->{$key}  = $curr->{$key};
+        if ( $name_w->{$key} > $longest ) {
+            $longest = $name_w->{$key};
+        }
+        $curr->{$key} = 0 if ! defined $curr->{$key};
+        $curr->{$key} = 0 if $curr->{$key} > $#$values;
+        $curr->{$key} = 0 if ! defined $values->[$curr->{$key}];
+
+        while ( ! defined $values->[$curr->{$key}] ) {
+            ++$curr->{$key};
+            if ( $curr->{$key} > $#$values ) {
+                $curr->{$key} = 0;
+                last;
+            }
+        }
+        $new->{$key} = $curr->{$key};
     }
     my @print_keys;
     for my $sub ( @$menu ) {
         my ( $key, $name, $values ) = @$sub;
-        my $current = $values->[$new->{$key}];
+        my $current = $values->[$new->{$key}] // '';
         push @print_keys, $name . ( ' '  x ( $longest - $name_w->{$key} ) ) . " [$current]";
     }
     my @pre = ( undef, $self->{confirm} );
@@ -878,13 +890,23 @@ sub settings_menu {
             $count = 0;
             $default = $idx;
         }
-        ++$count;
-        my $curr_value = $values->[$new->{$key}];
-        $new->{$key}++;
-        if ( $new->{$key} == @$values ) {
-            $new->{$key} = 0;
+        my $curr_value = $values->[$new->{$key}] // '';
+        my $new_value;
+
+        while ( 1 ) {
+            ++$count;
+            if ( ++$new->{$key} > $#$values ) {
+                $new->{$key} = 0;
+            }
+            $new_value = $values->[$new->{$key}];
+            if ( defined $new_value ) {
+                last;
+            }
+            if ( $count == @$values ) {
+                $new_value = '';
+                last;
+            }
         }
-        my $new_value = $values->[$new->{$key}];
         $print_keys[$i] =~ s/  \[ \Q$curr_value\E \] \z /[$new_value]/x;
     }
 }
@@ -980,7 +1002,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.137
+Version 0.140
 
 =cut
 
@@ -1589,6 +1611,8 @@ the keys are the option names
 
 the values (C<0> if not defined) are the indexes of the current value of the respective key/option.
 
+If an index is out of bonds, it is set to C<0>.
+
 =back
 
 With the optional third argument (hash-reference), these options can be passed:
@@ -1623,8 +1647,8 @@ Default: C< ,>
 =back
 
 When C<settings_menu> is called, it displays for each array entry a row with the prompt string and the current value.
-It is possible to scroll through the rows. If a row is selected, the set and displayed value changes to the next. After
-scrolling through the list once the cursor jumps back to the top row.
+It is possible to scroll through the rows. If a row is selected, the set and displayed value changes to the next
+(undefined values are skipped). After scrolling through the list once the cursor jumps back to the top row.
 
 If the "I<back>" menu entry is chosen, C<settings_menu> does not apply the made changes and returns nothing. If the
 "I<confirm>" menu entry is chosen, C<settings_menu> applies the made changes in place to the passed configuration
@@ -1659,7 +1683,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2022 Matthäus Kiem.
+Copyright 2014-2023 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

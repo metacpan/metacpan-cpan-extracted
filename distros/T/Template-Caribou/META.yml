@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,25 +23,25 @@ name: Template-Caribou
 provides:
   Template::Caribou:
     file: lib/Template/Caribou.pm
-    version: v1.2.1
+    version: v1.2.2
   Template::Caribou::Files:
     file: lib/Template/Caribou/Files.pm
-    version: v1.2.1
+    version: v1.2.2
   Template::Caribou::Role:
     file: lib/Template/Caribou/Role.pm
-    version: v1.2.1
+    version: v1.2.2
   Template::Caribou::Tags:
     file: lib/Template/Caribou/Tags.pm
-    version: v1.2.1
+    version: v1.2.2
   Template::Caribou::Tags::HTML:
     file: lib/Template/Caribou/Tags/HTML.pm
-    version: v1.2.1
+    version: v1.2.2
   Template::Caribou::Tags::HTML::Extended:
     file: lib/Template/Caribou/Tags/HTML/Extended.pm
-    version: v1.2.1
+    version: v1.2.2
   Template::Caribou::Utils:
     file: lib/Template/Caribou/Utils.pm
-    version: v1.2.1
+    version: v1.2.2
 requires:
   Carp: '0'
   Class::Load: '0'
@@ -68,11 +68,17 @@ resources:
   bugtracker: https://github.com/yanick/Template-Caribou/issues
   homepage: https://github.com/yanick/Template-Caribou
   repository: https://github.com/yanick/Template-Caribou.git
-version: 1.2.1
+version: 1.2.2
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK
+x_contributor_covenant:
+  version: 0.02
 x_contributors:
   - 'Lisa Hare <lhare@inview.co.uk>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Paulo Custodio <pauloscustodio@gmail.com>'
+  - 'Yanick Champoux <yanick@babyl.ca>'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 use Test::Most tests => 23;
-use Test::NoWarnings;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
@@ -13,7 +12,10 @@ BEGIN {
 
 GEOCODEFARM: {
 	SKIP: {
-		skip 'Test requires Internet access', 21 unless(-e 't/online.enabled');
+		diag 'GeocodeFarm all fail, is the site down?';
+		skip('GeocodeFarm all fail, is the site down?', 22);
+
+		skip 'Test requires Internet access', 22 unless(-e 't/online.enabled');
 
 		eval {
 			require Geo::Coder::GeocodeFarm;
@@ -31,7 +33,7 @@ GEOCODEFARM: {
 
 		if($@) {
 			diag('Geo::Coder::GeocodeFarm not installed - skipping tests');
-			skip('Geo::Coder::GeocodeFarm not installed', 21);
+			skip('Geo::Coder::GeocodeFarm not installed', 22);
 		} else {
 			diag("Using Geo::Coder::GeocodeFarm $Geo::Coder::GeocodeFarm::VERSION");
 			diag('Test connection to geocode.farm') if($ENV{'TEST_VERBOSE'});
@@ -98,7 +100,7 @@ GEOCODEFARM: {
 		} else {
 			# It fails often, and I think the problem lies with geofarm
 			diag('Not enabling this test for smokers');
-			skip('Not enabling this test for smokers', 17);
+			skip('Not enabling this test for smokers', 22);
 		}
 	}
 }

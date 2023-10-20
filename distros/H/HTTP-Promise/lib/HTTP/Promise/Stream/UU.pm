@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Stream/UU.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/04/29
-## Modified 2022/04/29
+## Modified 2023/09/08
 ## All rights reserved.
 ## 
 ## 
@@ -25,7 +25,7 @@ BEGIN
     };
     our @EXPORT_OK = qw( decode_uu encode_uu );
     our $EXCEPTION_CLASS = 'HTTP::Promise::Exception';
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -193,7 +193,7 @@ HTTP::Promise::Stream::UU - Stream Encoder for UU Encoding
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

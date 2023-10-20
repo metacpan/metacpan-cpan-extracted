@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.18';
+our $VERSION = '0.24';
 
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
@@ -34,7 +34,7 @@ if( ! Getopt::Long::GetOptions(
   'I=s' => sub { $INPUT_STRING = Encode::decode_utf8($_[1]) },
   'o=s' => \$OUTPUT_FILE,
   'pretty|p!' => \$params{'pretty'},
-  'escape-unicode|e!' => \$params{'escape-unicode'},
+  'escape-unicode|e!' => sub { $params{'dont-bloody-escape-unicode'} = $_[1] ? 0 : 1 },
 ) ){ die usage() }
 
 if( defined $INPUT_FILE ){
@@ -68,7 +68,7 @@ perl2json.pl : convert a Perl data structure dump to JSON
 
 =head1 VERSION
 
-Version 0.18
+Version 0.24
 
 =head1 SYNOPSIS
 

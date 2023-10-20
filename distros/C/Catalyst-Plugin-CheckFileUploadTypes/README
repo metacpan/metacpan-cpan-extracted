@@ -1,0 +1,44 @@
+NAME
+
+    Catalyst::Plugin::CheckFileUploadTypes - check file uploads are
+    expected and right types
+
+SYNOPSIS
+
+      use Catalyst qw(CheckFileUploadTypes);
+    
+      # Actions can declare that they expect to receive file uploads:
+      sub upload_file : Local ExpectUploads { ... }
+    
+      # They can also specify that any uploaded files must be of expected types
+      # (determined from file content by File::MMagic, not what the client said)
+      sub upload_file : Local ExpectUploads(image/jpeg image/png) { ... }
+
+DESCRIPTION
+
+    This plugin allows Catalyst apps to easily accept and validate file
+    uploads.
+
+    If the action a request is about to be handed to does not declare that
+    it expects file uploads, by setting a ExpectUploads attribute, and the
+    HTTP request contains one or more file uploads, the request will be
+    rejected.
+
+    The action can also specify the type(s) of files it expects to receive,
+    and the request will be rejected if an uploaded file is of a different
+    type (as determined by File::MMagic from the file's content, not
+    trusting the file extension or what the client says it is). This avoids
+    uploading executable files / scripts etc to an action which expects
+    image uploads, for instance.
+
+AUTHOR
+
+    David Precious (BIGPRESH), <davidp@preshweb.co.uk>
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2023 by David Precious
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -94,7 +94,10 @@ sub search_and_replace {
             $sql->{insert_args} = $aoa;
             my $header_changed = 0;
             if ( $sf->{d}{stmt_types}[0] =~ /^Create_table\z/i ) {
-                for my $i ( 0 .. $#$header ) {
+                for my $i ( @$col_idxs ) {
+                    if ( ! defined $sql->{insert_args}[0][$i] ) {
+                        next;
+                    }
                     if ( $header->[$i] ne $sql->{insert_args}[0][$i] ) {
                         $header_changed = 1;
                         last;
@@ -104,7 +107,7 @@ sub search_and_replace {
             if ( $header_changed ) {
                 my ( $yes, $no ) = ( 'Yes', 'No' );
                 my $menu = [ undef, $yes, $no ];
-                my @tmp_info_addition = ( 'Header: ' . join( ', ', @{$sql->{insert_args}[0]} ), ' ' );
+                my @tmp_info_addition = ( 'Header: ' . join( ', ', map { $_ // '' } @{$sql->{insert_args}[0]} ), ' ' );
                 my $info = $cf->__get_filter_info( $sql, join( "\n", @tmp_info, @tmp_info_addition ) );
                 # Choose
                 my $idx = $tc->choose(
@@ -487,7 +490,7 @@ sub __get_entry_name {
             $prompt,
             { info => $info, default => $name_default, history => [] }
         );
-        if ( ! defined $new_name || ! length $new_name ) {
+        if ( ! length $new_name ) {
             return;
         }
         if ( any { $new_name eq $_ } keys %$saved ) {

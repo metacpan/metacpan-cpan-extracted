@@ -7,8 +7,8 @@ build_requires:
   Error::Pure::Utils: 0.15
   ExtUtils::MakeMaker: 6.36
   File::Object: 0.07
-  Tags::Output::Indent: 0
-  Tags::Output::Raw: 0
+  Tags::Output::Indent: 0.09
+  Tags::Output::Raw: 0.13
   Test::More: 0
   Test::NoWarnings: 0
   Unicode::UTF8: 0
@@ -16,7 +16,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,4 +40,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/PYX-SGML-Tags
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/PYX-SGML-Tags
-version: '0.08'
+version: '0.10'

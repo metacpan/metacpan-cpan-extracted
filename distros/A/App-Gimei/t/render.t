@@ -21,7 +21,7 @@ my $app = t::CLI->new;
     is $app->exit_code, 255;
     ok !$app->stdout;
     ok !$app->stderr;
-    is $app->error_message, "Error: unknown subtype or rendering: romaji\n";
+    is $app->error_message, "Error: rendering romaji is not supported for address\n";
 }
 
 {    # gender
@@ -33,12 +33,6 @@ my $app = t::CLI->new;
 }
 
 {
-    $app->run('name:name');
-    is $app->exit_code, 0;
-    like $app->stdout, qr/^\S+\s\S+$/;
-    ok !$app->stderr;
-    ok !$app->error_message;
-
     $app->run('name:kanji');
     is $app->exit_code, 0;
     like $app->stdout, qr/^\S+\s\S+$/;
@@ -56,12 +50,6 @@ my $app = t::CLI->new;
     like $app->stdout, qr/^\S+$/;
     ok !$app->stderr;
     ok !$app->error_message;
-
-    $app->run('address:prefecture:name');
-    is $app->exit_code, 0;
-    like $app->stdout, qr/^\S+$/;
-    ok !$app->stderr;
-    ok !$app->error_message;
 }
 
 {    # unknown rendering
@@ -69,7 +57,7 @@ my $app = t::CLI->new;
     is $app->exit_code, 255;
     ok !$app->stdout;
     ok !$app->stderr;
-    is $app->error_message, "Error: unknown subtype or rendering: romaji\n";
+    is $app->error_message, "Error: rendering romaji is not supported for address\n";
 }
 
 done_testing;

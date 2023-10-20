@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::EncryptedCredentials;
-$Telegram::Bot::Object::EncryptedCredentials::VERSION = '0.023';
+$Telegram::Bot::Object::EncryptedCredentials::VERSION = '0.024';
 # ABSTRACT: The base class for Telegram 'EncryptedCredentials' type objects
 
 
@@ -27,7 +27,7 @@ Telegram::Bot::Object::EncryptedCredentials - The base class for Telegram 'Encry
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 DESCRIPTION
 

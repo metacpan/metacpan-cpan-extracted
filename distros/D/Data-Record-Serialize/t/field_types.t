@@ -87,11 +87,7 @@ subtest "allow type fields to differ from fields" => sub {
         'retain type for non-existent field',
     );
 
-    is(
-        $s->output_types,
-        { b => 's' },
-        'no output type for non-existent field',
-    );
+    is( $s->output_types, { b => 's' }, 'no output type for non-existent field', );
 };
 
 
@@ -108,17 +104,17 @@ subtest "type lists follow output fields if numify/stringify/nullify is boolean"
                     types        => { a => 'N', b => 'S' },
                     fields       => [qw( b )],
                     default_type => 'S',
-                    numify => 1,
-                    stringify =>1,
-                    nullify => 1,
+                    numify       => 1,
+                    stringify    => 1,
+                    nullify      => 1,
                 );
             },
             'create serializer'
         ) or diag $@;
 
-        is( $s->numified, [  ], 'numified' );
-        is( $s->nullified, [ 'b'  ], 'nullified' );
-        is( $s->stringified, [ 'b' ], 'nullified' );
+        is( $s->numified,    [],    'numified' );
+        is( $s->nullified,   ['b'], 'nullified' );
+        is( $s->stringified, ['b'], 'nullified' );
 
     };
 
@@ -129,12 +125,12 @@ subtest "type lists follow output fields if numify/stringify/nullify is boolean"
         ok(
             lives {
                 $s = Data::Record::Serialize->new(
-                    encode       => '+My::Test::Encode::store',
-                    types        => { a => 'N', b => 'S' },
-                    fields       => 'all',
-                    numify => 1,
-                    stringify =>1,
-                    nullify => 1,
+                    encode    => '+My::Test::Encode::store',
+                    types     => { a => 'N', b => 'S' },
+                    fields    => 'all',
+                    numify    => 1,
+                    stringify => 1,
+                    nullify   => 1,
                 );
             },
             'create serializer'
@@ -164,11 +160,11 @@ subtest "type lists follow output fields if numify/stringify/nullify is boolean"
         ok(
             lives {
                 $s = Data::Record::Serialize->new(
-                    encode       => '+My::Test::Encode::store',
-                    fields       => [qw( b )],
-                    numify => 1,
-                    stringify =>1,
-                    nullify => 1,
+                    encode    => '+My::Test::Encode::store',
+                    fields    => [qw( b )],
+                    numify    => 1,
+                    stringify => 1,
+                    nullify   => 1,
                 );
             },
             'create serializer'
@@ -177,9 +173,9 @@ subtest "type lists follow output fields if numify/stringify/nullify is boolean"
 
         $s->send( { a => 1, b => 'foo' } );
 
-        is( $s->numified, [  ], 'numified' );
-        is( $s->nullified, [ 'b' ], 'nullified' );
-        is( $s->stringified, [ 'b' ], 'nullified' );
+        is( $s->numified,    [],    'numified' );
+        is( $s->nullified,   ['b'], 'nullified' );
+        is( $s->stringified, ['b'], 'nullified' );
 
     };
 

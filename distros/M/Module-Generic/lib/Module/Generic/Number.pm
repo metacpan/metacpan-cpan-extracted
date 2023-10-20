@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Number.pm
-## Version v2.0.1
+## Version v2.1.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/12/11
+## Modified 2023/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,7 +19,7 @@ BEGIN
     use parent qw( Module::Generic );
     use warnings::register;
     use vars qw( $SUPPORTED_LOCALES $DEFAULT $NUMBER_RE );
-    use Nice::Try;
+    # use Nice::Try;
     use POSIX qw( Inf NaN );
     use Regexp::Common qw( number );
     $NUMBER_RE = $RE{num}{real};
@@ -104,7 +104,7 @@ BEGIN
     # double floats.  To be safe, we cap at 2**53; use Math::BigFloat
     # instead for larger numbers.
     use constant MAX_INT => 2**53;
-    our( $VERSION ) = 'v2.0.1';
+    our( $VERSION ) = 'v2.1.0';
 };
 
 # use strict;
@@ -546,54 +546,53 @@ sub init
     }
     if( $self->{lang} )
     {
-        try
+        # try-catch
+        local $@;
+        my $try_locale = sub
         {
-            my $try_locale = sub
+            my $loc;
+            # The user provided only a language code such as fr_FR. We try it, and also other known combination like fr_FR.UTF-8 and fr_FR.ISO-8859-1, fr_FR.ISO8859-1
+            # Try several possibilities
+            # RT https://rt.cpan.org/Public/Bug/Display.html?id=132664
+            if( index( $_[0], '.' ) == -1 )
             {
-                my $loc;
-                # The user provided only a language code such as fr_FR. We try it, and also other known combination like fr_FR.UTF-8 and fr_FR.ISO-8859-1, fr_FR.ISO8859-1
-                # Try several possibilities
-                # RT https://rt.cpan.org/Public/Bug/Display.html?id=132664
-                if( index( $_[0], '.' ) == -1 )
+                $loc = POSIX::setlocale( &POSIX::LC_ALL, $_[0] );
+                $_[0] =~ s/^(?<locale>[a-z]{2,3})_(?<country>[a-z]{2})$/$+{locale}_\U$+{country}\E/;
+                if( !$loc && CORE::exists( $SUPPORTED_LOCALES->{ $_[0] } ) )
                 {
-                    $loc = POSIX::setlocale( &POSIX::LC_ALL, $_[0] );
-                    $_[0] =~ s/^(?<locale>[a-z]{2,3})_(?<country>[a-z]{2})$/$+{locale}_\U$+{country}\E/;
-                    if( !$loc && CORE::exists( $SUPPORTED_LOCALES->{ $_[0] } ) )
+                    foreach my $supported ( @{$SUPPORTED_LOCALES->{ $_[0] }} )
                     {
-                        foreach my $supported ( @{$SUPPORTED_LOCALES->{ $_[0] }} )
+                        if( ( $loc = POSIX::setlocale( &POSIX::LC_ALL, $supported ) ) )
                         {
-                            if( ( $loc = POSIX::setlocale( &POSIX::LC_ALL, $supported ) ) )
-                            {
-                                $_[0] = $supported;
-                                last;
-                            }
+                            $_[0] = $supported;
+                            last;
                         }
                     }
                 }
-                # We got something like fr_FR.ISO-8859
-                # The user is specific, so we try as is
-                else
-                {
-                    $loc = POSIX::setlocale( &POSIX::LC_ALL, $_[0] );
-                }
-                return( $loc );
-            };
-            
-            if( my $loc = $try_locale->( $self->{lang} ) )
-            {
-                my $lconv = POSIX::localeconv();
-                # Set back the LC_ALL to what it was, because we do not want to disturb the user environment
-                POSIX::setlocale( &POSIX::LC_ALL, $curr_locale );
-                $default = $lconv if( $lconv && scalar( keys( %$lconv ) ) );
             }
+            # We got something like fr_FR.ISO-8859
+            # The user is specific, so we try as is
             else
             {
-                return( $self->error( "Language \"$self->{lang}\" is not supported by your system." ) );
+                $loc = POSIX::setlocale( &POSIX::LC_ALL, $_[0] );
             }
-        }
-        catch( $e )
+            return( $loc );
+        };
+        
+        if( my $loc = eval{ $try_locale->( $self->{lang} ) } )
         {
-            return( $self->error( "An error occurred while getting the locale information for \"$self->{lang}\": $e" ) );
+            my $lconv = POSIX::localeconv();
+            # Set back the LC_ALL to what it was, because we do not want to disturb the user environment
+            POSIX::setlocale( &POSIX::LC_ALL, $curr_locale );
+            $default = $lconv if( $lconv && scalar( keys( %$lconv ) ) );
+        }
+        elsif( $@ )
+        {
+            return( $self->error( "An error occurred while getting the locale information for \"$self->{lang}\": $@" ) );
+        }
+        else
+        {
+            return( $self->error( "Language \"$self->{lang}\" is not supported by your system." ) );
         }
     }
 #     elsif( $curr_locale && 
@@ -680,6 +679,9 @@ sub abs { return( shift->_func( 'abs' ) ); }
 
 # sub asin { return( shift->_func( 'asin', { posix => 1 } ) ); }
 
+# This class does not convert to an HASH, but the TO_JSON method will convert to a string
+sub as_hash { return( $_[0] ); }
+
 sub atan { return( shift->_func( 'atan', { posix => 1 } ) ); }
 
 sub atan2 { return( shift->_func( 'atan2', @_ ) ); }
@@ -754,6 +756,7 @@ sub compute
     my $operation = $swap ? ( defined( $other_val ) ? $other_val : 'undef' ) . " ${op} \$self->{_number}" : "\$self->{_number} ${op} " . ( defined( $other_val ) ? $other_val : 'undef' );
     no warnings 'uninitialized';
     no strict;
+    local $@;
     if( $opts->{return_object} )
     {
         my $res = eval( $operation );
@@ -1332,17 +1335,21 @@ sub from_binary
     my $self = shift( @_ );
     my $binary = shift( @_ );
     return( $self->error( "No binary value was provided to instantiate a new number object." ) ) if( !defined( $binary ) || !CORE::length( $binary ) );
-    try
+    # Nice trick to convert from binary to decimal. See perlfunc -> oct
+    my $res = CORE::oct( "0b${binary}" );
+    return if( !defined( $res ) );
+    my $rv;
+    # try-catch
+    local $@;
+    eval
     {
-        # Nice trick to convert from binary to decimal. See perlfunc -> oct
-        my $res = CORE::oct( "0b${binary}" );
-        return if( !defined( $res ) );
-        return( $self->clone( $res ) );
-    }
-    catch( $e )
+        $rv = $self->clone( $res );
+    };
+    if( $@ )
     {
-        return( $self->error( "Error while getting number from binary value \"$binary\": $e" ) );
+        return( $self->error( "Error while getting number from binary value \"$binary\": $@" ) );
     }
+    return( $rv );
 }
 
 sub from_hex
@@ -1640,6 +1647,7 @@ sub _func
     my $namespace = $opts->{posix} ? 'POSIX' : 'CORE';
     my $val  = @_ ? shift( @_ ) : undef;
     my $expr = defined( $val ) ? "${namespace}::${func}( \$self->{_number}, $val )" : "${namespace}::${func}( \$self->{_number} )";
+    local $@;
     my $res = eval( $expr );
     return( $self->pass_error( $@ ) ) if( $@ );
     return if( !defined( $res ) );
@@ -1810,6 +1818,7 @@ sub _catchall
     my( $self, $other, $swap, $op ) = @_;
     no strict;
     my $expr = $swap ? "$other $op $self->{_number}" : "$self->{_number} $op $other";
+    local $@;
     my $res = eval( $expr );
     CORE::warn( "Error evaluating expression \"$expr\": $@" ) if( $@ );
     return if( $@ );
@@ -1829,6 +1838,7 @@ sub _func
     my $namespace = $opts->{posix} ? 'POSIX' : 'CORE';
     my $val  = @_ ? shift( @_ ) : undef;
     my $expr = defined( $val ) ? "${namespace}::${func}( $self->{_number}, $val )" : "${namespace}::${func}( $self->{_number} )";
+    local $@;
     my $res = eval( $expr );
     CORE::warn( $@ ) if( $@ );
     return if( !defined( $res ) );

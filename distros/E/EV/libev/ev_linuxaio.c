@@ -93,7 +93,7 @@
 
 #include <sys/syscall.h> /* no glibc wrappers */
 
-/* aio_abi.h is not versioned in any way, so we cannot test for its existance */
+/* aio_abi.h is not versioned in any way, so we cannot test for its existence */
 #define IOCB_CMD_POLL 5
 
 /* taken from linux/fs/aio.c. yup, that's a .c file.

@@ -1,5 +1,5 @@
 package Selenium::Subclass;
-$Selenium::Subclass::VERSION = '1.05';
+$Selenium::Subclass::VERSION = '1.06';
 #ABSTRACT: Generic template for Selenium sugar subclasses like Selenium::Session
 
 use strict;
@@ -95,7 +95,7 @@ Selenium::Subclass - Generic template for Selenium sugar subclasses like Seleniu
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 CONSTRUCTOR
 
@@ -109,7 +109,7 @@ George S. Baugh <george@troglodyne.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by George S. Baugh.
+This software is Copyright (c) 2023 by George S. Baugh.
 
 This is free software, licensed under:
 

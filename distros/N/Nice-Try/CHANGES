@@ -1,5 +1,10 @@
 Revision history for Perl module Nice::Try.
 
+v1.3.5 2023-09-29T12:28:19+0900
+    - Improved code by giving up early if no 'try' block is detected in the code.
+    - Fixed bug #6 arising when token __SUB__ is used within a try-catch block (Credits to Clay Fouts for finding this)
+    - Nice::Try now supports subroutine prototype and signature
+
 v1.3.4 2023-05-06T08:06:15+0900
     - Corrected a bug whereby Nice::Try would not return in void context when required to do so.
     - Corrected a bug where want was called with BOOLEAN instead of BOOL

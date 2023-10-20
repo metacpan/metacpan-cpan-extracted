@@ -225,7 +225,9 @@ t_is( vis [ \undef, \\undef ],
 EOF
 
 # Once hit an assertion
-t_is( dvis('\%{}'), '\%{}' );
+#t_is( dvis('\%{}'), '\%{}' );
+# 9/18/23: Now \x -> x for any x
+t_is( dvis('\%{}'), '%{}' );
 
 # Once hit an assertion
 { my $obj = bless do{ \(my $x = []) },"Foo::Bar";

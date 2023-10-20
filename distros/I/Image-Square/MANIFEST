@@ -1,0 +1,16 @@
+Changes
+lib/Image/Square.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-files.t
+t/02-image.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/version.t
+t/CoventryCathedral.png
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

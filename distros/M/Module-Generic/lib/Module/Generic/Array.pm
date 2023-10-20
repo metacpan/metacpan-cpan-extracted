@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Array.pm
-## Version v2.0.0
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v2.0.2
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/11/30
+## Modified 2023/09/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,7 +16,7 @@ BEGIN
     use common::sense;
     use warnings;
     use warnings::register;
-    use vars qw( $DEBUG $ERROR $RETURN $TRUE $FALSE );
+    use vars qw( $DEBUG $ERROR $ERRORS $RETURN $TRUE $FALSE );
     use List::Util ();
     use Scalar::Util ();
     use Want;
@@ -33,8 +33,9 @@ BEGIN
     );
     use constant BREAK_LOOP => \"BREAK";
     $DEBUG  = 0;
+    $ERRORS = {};
     $RETURN = {};
-    our $VERSION = 'v2.0.0';
+    our $VERSION = 'v2.0.2';
 };
 
 use strict;
@@ -79,7 +80,7 @@ sub as_hash
     my $self = CORE::shift( @_ );
     my $opts = {};
     $opts = CORE::shift( @_ ) if( ( Scalar::Util::reftype( $opts ) // '' ) eq 'HASH' );
-    my $ref = {};
+    # my $ref = {};
     my $offsets = $self->keys;
     if( $opts->{start_from} )
     {
@@ -89,9 +90,12 @@ sub as_hash
             $offsets->[ $i ] += $start;
         }
     }
-    @$ref{ @$self } = @$offsets;
     require Module::Generic::Hash;
-    CORE::return( Module::Generic::Hash->new( $ref ) );
+    # Since our array might contain reference, we instantiate first our special hash object, and then we add into it our elements
+    # Module::Generic::Hash, that uses Module::Generic::TieHash, knows how to handle keys as reference
+    my $ref = Module::Generic::Hash->new;
+    @$ref{ @$self } = @$offsets;
+    return( $ref );
 }
 
 sub as_string
@@ -245,7 +249,85 @@ sub eighth { CORE::return( CORE::shift->get_null(7) ); }
 
 sub empty { CORE::return( CORE::shift->reset( @_ ) ); }
 
-sub error { return( $ERROR ); }
+sub error
+{
+    my $self = CORE::shift( @_ );
+    my $addr = Scalar::Util::refaddr( $self ) || $self;
+    my $class = ref( $self ) || $self;
+    my $o;
+    no strict 'refs';
+    if( @_ )
+    {
+        my $args = {};
+        # We got an object as first argument. It could be a child from our exception package or from another package
+        # Either way, we use it as it is
+        if( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'Module::Generic::Exception' ) ) ||
+            Scalar::Util::blessed( $_[0] ) )
+        {
+            $o = CORE::shift( @_ );
+        }
+        elsif( ref( $_[0] ) eq 'HASH' )
+        {
+            $args  = CORE::shift( @_ );
+        }
+        else
+        {
+            $args->{message} = CORE::join( '', CORE::map( ref( $_ ) eq 'CODE' ? $_->() : $_, @_ ) );
+        }
+        
+        $args->{class} //= '';
+        my $ex_class = CORE::length( $args->{class} )
+            ? $args->{class}
+            : ( defined( ${"${class}\::EXCEPTION_CLASS"} ) && CORE::length( ${"${class}\::EXCEPTION_CLASS"} ) )
+                ? ${"${class}\::EXCEPTION_CLASS"}
+                : 'Module::Generic::Exception';
+        unless( CORE::scalar( CORE::keys( %{"${ex_class}\::"} ) ) )
+        {
+            my $pl = "use $ex_class;";
+            local $SIG{__DIE__} = sub{};
+            local $@;
+            eval( $pl );
+            # We have to die, because we have an error within another error
+            die( "${class}\::error() is unable to load exception class \"$ex_class\": $@" ) if( $@ );
+        }
+        $o = $ERRORS->{ $addr } = $ERROR = $ex_class->new( $args );
+        local $@;
+        eval
+        {
+            require Encode;
+        };
+        
+        if( $@ )
+        {
+            warn( $o ) if( $self->_warnings_is_enabled );
+        }
+        else
+        {
+            my $enc_str = eval
+            {
+                no strict 'subs';
+                Encode::encode( 'UTF-8', "$o", Encode::FB_CROAK );
+            };
+            # Display warnings if warnings for this class is registered and enabled or if not registered
+            warn( $@ ? $o : $enc_str ) if( $self->_warnings_is_enabled );
+        }
+
+        if( !$args->{no_return_null_object} && want( 'OBJECT' ) )
+        {
+            require Module::Generic::Null;
+            my $null = Module::Generic::Null->new( $o, { debug => $DEBUG, has_error => 1 });
+            rreturn( $null );
+        }
+        return;
+    }
+    if( !$ERRORS->{ $addr } && want( 'OBJECT' ) )
+    {
+        require Module::Generic::Null;
+        my $null = Module::Generic::Null->new( $o, { debug => $DEBUG, wants => 'object' });
+        rreturn( $null );
+    }
+    return( $ERRORS->{ $addr } );
+}
 
 # Credits: <https://www.perlmonks.org/?node_id=871696>
 sub even
@@ -351,10 +433,13 @@ sub foreach
     my $self = CORE::shift( @_ );
     my $code = CORE::shift( @_ );
     CORE::return if( ref( $code ) ne 'CODE' );
-    CORE::foreach my $v ( @$self )
+    # CORE::foreach my $v ( @$self )
+    CORE::foreach( @$self )
     {
-        local $_ = $v;
-        my $rv = $code->( $v );
+        # local $_;
+        # local $_ = $v;
+        # my $rv = $code->( $v );
+        my $rv = $code->( $_ );
         CORE::last if( CORE::defined( $rv ) && CORE::length( "$rv" ) && ( $rv eq BREAK_LOOP || !$rv ) );
         if( CORE::defined( my $ret = $self->return ) )
         {
@@ -634,6 +719,51 @@ sub push_arrayref
     CORE::return( $self->error( "Data provided ($ref) is not an array reference." ) ) if( !UNIVERSAL::isa( $ref, 'ARRAY' ) );
     CORE::push( @$self, @$ref );
     CORE::return( $self );
+}
+
+# Implementation of JavaScript reduce in perl.
+# This is different from the one in List::Util that departs from its JavaScript counterpart.
+# Ours is strictly compliant
+# See <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce>
+sub reduce
+{
+    my $self = CORE::shift( @_ );
+    my $cb = CORE::shift( @_ ) ||
+        CORE::return( $self->error( "No callback anonymous subroutine or reference to a subroutine was provided." ) );
+    if( ref( $cb ) ne 'CODE' )
+    {
+        CORE::return( $self->error( "No callback anonymous subroutine or reference to a subroutine was provided." ) );
+    }
+    elsif( !CORE::scalar( @$self ) )
+    {
+        CORE::return( $self->error( "Array object is empty. Nothing to run reduce on." ) );
+    }
+    my $init;
+    $init = CORE::shift( @_ ) if( @_ );
+    my( $accumulator, $pos );
+    if( CORE::defined( $init ) )
+    {
+        ( $accumulator, $pos ) = ( $init, 0 );
+    }
+    else
+    {
+        ( $accumulator, $pos ) = ( $self->[0], 1 );
+    }
+    for( my $i = $pos; $i < scalar( @$self ); $i++ )
+    {
+        # try-catch
+        local $@;
+        eval
+        {
+            local $_ = $self->[$i];
+            $accumulator = $cb->( $accumulator, $self->[$i], $i );
+        };
+        if( $@ )
+        {
+            CORE::return( $self->error( "Error calling reduce callback: $@" ) );
+        }
+    }
+    return( $accumulator );
 }
 
 sub remove
@@ -936,8 +1066,10 @@ sub _warnings_is_enabled { CORE::return( warnings::enabled( ref( $_[0] ) || $_[0
 
 sub DESTROY
 {
+    local( $., $@, $!, $^E, $? );
     my $self = CORE::shift( @_ );
     my $id = Scalar::Util::refaddr( $self );
+    CORE::delete( $ERRORS->{ $id } );
     CORE:delete( $RETURN->{ $id } );
     return( $self );
 }

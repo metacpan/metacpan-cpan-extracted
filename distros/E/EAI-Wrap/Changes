@@ -1,6 +1,28 @@
 0.01  Wed Apr 26 16:00:00 2023
-	- original version
+	- intial version
 0.02  Mon Sep 11 18:00:00 2023
 	- fixed author test 3b_Wrap_Integration.t for automated tests, enhanced 2_File.t with excel format_skip (+ improved logging)
 0.03  Wed Sep 13 23:00:00 2023
 	- completed getConn/setConn in EAI::DB and getHandle/setHandle in in EAI::FTP, added task{redoTimestampPatternPart} for redo improvement, added task{execOnly} and process{onlyExecFor} for selecting specific loads for execution, added checkParam for easier checking required parameters for EAI::Wrap API Calls, moved setting ErrSubject into EAI::Common::extractConfigs
+0.04  Sat Sep 16 12:00:00 2023
+	- refactored DB.pm, FTP.pm and File.pm to decouple from process and execute configs, added Log::Dispatch::Email::LogSender and use instead of Log::Dispatch::Email::MIMELite to fix a Mime:Lite problem with diacritic chars, fixed problems with execOnly/onlyExecFor, added feature unicode_strings, breaking change: renamed File{encoding} to File{format_encoding}, now only being used for reading and writing text files; removed all other encoding code.
+0.05  Mon Sep 18 23:00:00 2023
+	- fixed Issue #149802 (Testcase for DateUtil) by setting TZ explicitly in DateUtil.t and #149803 by including Text::Glob in Makefile.PL. replaced timelocal/gm with timelocal/gm_modern in DateUtil
+0.06  Fri Sep 22 23:00:00 2023
+	- added use warnings, restricted imports from used modules.
+0.07  Mon Sep 25 23:00:00 2023
+	- fixed trial Email::MIME leftover, added possibility to add custom calendars in DateUtil and refactored is_holiday.
+0.08  Mon Sep 25 24:00:00 2023
+	- added possibility to add custom locales in DateUtil, removed exported locale hashes and replaced with accessor functions.
+0.09  Tue Sep 26 23:00:00 2023
+	- refactored flat Dumper into function, moved site.config for automated tests into $ENV{EAI_WRAP_CONFIG_PATH}/t, decoupled EAI::DB completely from EAI::Wrap (no $execute dependency)
+1.0  Sat Sep 30 12:00:00 2023
+	- improved API Doc, enabled overriding of redoDir, logRootPath, historyFolder and historyFolderUpload using commandline parameters, e.g. --config redoDir=/your/redo/folder, prevent error mail (logger) and uncaught exception in sendGeneralMail when no smtp configured; use custom locales in DateUtil in all textual month functions now; allow anonymous subs in all configuration places, where strings were used (executeOnInit, postDumpProcessing, postReadProcessing, lineCode and fieldCode).
+1.1  Thu Oct 05 23:00:00 2023
+	- fixed hadDBError setting in EAI::Wrap::dumpDataIntoDB, enhanced plannedUntil to allow/show seconds, added setDebugLevel Tool for really quick changing log.config
+1.2  Sun Oct 08 23:00:00 2023
+	- fixed some problems in checkLogExist.pl, removed no warnings 'redundant' in DateUtil (causes problems with perl<5.20 tests), remove @previousline and @previoustempline in EAI::File as previous lines can anyway accessed using $data, fixed evalCustomCode in both EAI::File and EAI::Wrap and added some testcases.
+1.3  Sat Oct 14 12:00:00 2023
+	- removed timing test in Wrap.t (causes problems on sime CPAN testsites), added %templine in EAI::File, changed first looking up log.config from $ENV{EAI_WRAP_CONFIG_PATH}/$execute{envraw} to $ENV{EAI_WRAP_CONFIG_PATH}/$execute{env}, enhanced setDebugLevel.pl to switch between $ENV{EAI_WRAP_CONFIG_PATH}/$execute{env}/log.config and $ENV{EAI_WRAP_CONFIG_PATH}/log.config.
+1.4  Thu Oct 19 22:00:00 2023
+	- amended logfile naming to same principles as in config lookup keys (scriptname + addToScriptName suffix), restore @ARGV after commandline parsing to allow for own commandline parsing, improved suppressing error messages in EAI::FTP::fetchFiles, improved error handling for empty files.

@@ -1,29 +1,20 @@
-Changes
-inc/Module/Install.pm
-inc/Module/Install/AuthorTests.pm
-inc/Module/Install/Base.pm
-inc/Module/Install/Can.pm
-inc/Module/Install/Fetch.pm
-inc/Module/Install/Include.pm
-inc/Module/Install/Makefile.pm
-inc/Module/Install/Metadata.pm
-inc/Module/Install/TestBase.pm
-inc/Module/Install/Win32.pm
-inc/Module/Install/WriteAll.pm
-inc/Spiffy.pm
-inc/Test/Base.pm
-inc/Test/Base/Filter.pm
-inc/Test/Builder.pm
-inc/Test/Builder/Module.pm
-inc/Test/More.pm
+.editorconfig
+CHANGELOG.md
+doc/term-datamatrix.pod
 lib/Term/DataMatrix.pm
 Makefile.PL
 MANIFEST			This list of files
-META.yml
-README
-t/00_compile.t
-xt/01_podspell.t
-xt/02_perlcritic.t
-xt/03_pod.t
-xt/perlcriticrc
-term-datamatrix
+README.md
+t/api-constructor-values.t
+t/api-default-values.t
+t/api-getters-setters.t
+t/barcode-deterministic.t
+t/barcode-dims.t
+t/colors.t
+t/pixel-counts.t
+t/script.t
+t/unknown-constructor-args.t
+term-datamatrix.in
+term-datamatrix.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use POSIX qw{strftime floor};
-use Test::More 0.88;
+use Test::More 0.88;	# Because of done_testing()
 use Time::Local;
 
 ##use constant ASTRONOMICAL_UNIT => 149_597_870; # Meeus, Appendix 1, pg 407

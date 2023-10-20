@@ -1,5 +1,8 @@
 Revision history for Alien::proj
 
+1.26 2023-09025
+    - Share builds: add bin dirs to PATH on Windows
+
 1.25 2022-11-26
     - Share builds: use https for downloads
     - Noisier tests for debug purposes

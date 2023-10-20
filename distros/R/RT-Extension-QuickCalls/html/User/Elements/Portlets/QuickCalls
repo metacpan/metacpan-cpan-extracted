@@ -1,0 +1,3 @@
+<%INIT>
+$m->comp('/Elements/QuickCalls');
+</%INIT>

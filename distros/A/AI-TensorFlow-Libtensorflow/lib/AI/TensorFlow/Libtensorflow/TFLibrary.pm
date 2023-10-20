@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::TFLibrary;
 # ABSTRACT: TensorFlow dynamic library handle and ops
-$AI::TensorFlow::Libtensorflow::TFLibrary::VERSION = '0.0.6';
+$AI::TensorFlow::Libtensorflow::TFLibrary::VERSION = '0.0.7';
 use strict;
 use warnings;
 

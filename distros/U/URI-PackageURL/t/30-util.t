@@ -9,9 +9,9 @@ use URI::PackageURL::Util qw(purl_to_urls);
 
 my @tests = (
     {
-        purl           => 'pkg:cpan/GDT/URI-PackageURL@2.00',
-        download_url   => 'http://www.cpan.org/authors/id/G/GD/GDT/URI-PackageURL-2.00.tar.gz',
-        repository_url => 'https://metacpan.org/release/GDT/URI-PackageURL-2.00'
+        purl           => 'pkg:cpan/GDT/URI-PackageURL@2.01',
+        download_url   => 'https://www.cpan.org/authors/id/G/GD/GDT/URI-PackageURL-2.01.tar.gz',
+        repository_url => 'https://metacpan.org/release/GDT/URI-PackageURL-2.01'
     },
 
     {

@@ -34,6 +34,7 @@ po/repeatticket.pot
 README
 static/css/repeat-ticket.css
 xt/cf.t
+xt/create_on_recurring_date.t
 xt/daily.t
 xt/end_conditions.t
 xt/monthly.t

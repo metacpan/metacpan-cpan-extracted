@@ -78,6 +78,6 @@
          "x_repository" : "https://github.com/nigelhorne/Genealogy-ObituaryDailyTimes"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Es::Any::Ph - Package for language Spanish
 
 =cut
 
 package Locale::CLDR::Locales::Es::Any::Ph;
-# This file auto generated from Data/common/main/es_PH.xml
-#	on Mon 11 Apr  5:27:25 pm GMT
+# This file auto generated from Data\common\main\es_PH.xml
+#	on Fri 13 Oct  9:14:12 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

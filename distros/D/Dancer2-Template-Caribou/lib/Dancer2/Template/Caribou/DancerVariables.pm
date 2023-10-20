@@ -1,7 +1,7 @@
 package Dancer2::Template::Caribou::DancerVariables;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: Role providing Dancer attributes to the template objects
-$Dancer2::Template::Caribou::DancerVariables::VERSION = '1.0.0';
+$Dancer2::Template::Caribou::DancerVariables::VERSION = '1.0.1';
 
 use strict;
 use warnings;
@@ -32,7 +32,7 @@ Dancer2::Template::Caribou::DancerVariables - Role providing Dancer attributes t
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 SYNOPSIS
 
@@ -73,7 +73,7 @@ Yanick Champoux <yanick@babyl.dyndns.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Yanick Champoux.
+This software is copyright (c) 2023 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

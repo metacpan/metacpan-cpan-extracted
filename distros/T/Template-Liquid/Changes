@@ -1,5 +1,9 @@
 Changelog for Perl dist Template::Liquid
 
+1.0.23 2023-09-25T22:13:36Z
+
+  - Resolve issue around passing a single string to {%for ... %} (amit777++)
+
 1.0.22 2022-08-06T22:12:13Z
 
   - Resolve quadmath/128bit float test failures (https://github.com/Perl/perl5/issues/18322, etc.)

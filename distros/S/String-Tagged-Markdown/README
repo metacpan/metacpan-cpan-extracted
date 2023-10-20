@@ -69,6 +69,9 @@ CONSTRUCTORS
 
        `` fixed width with `literal backticks` inside it ``
 
+    HTML entities - such as &amp;, &ndash; or &#1234; are decoded, but only
+    when not inside `fixed` spans.
+
  new_from_formatting
 
        $st = String::Tagged::Markdown->new_from_formatting( $fmt, %args )
@@ -96,6 +99,9 @@ METHODS
     markers to format the tags in the given instance. Uses the notation
     given in the "parse_markdown" method above.
 
+    Non-ASCII Unicode characters are not generally emitted as HTML
+    entities; though &amp; and &nbsp; are generated for convenience.
+
  as_formatting
 
        $fmt = $st->as_formatting( %args )
@@ -112,6 +118,10 @@ METHODS
 
       Optionally provides additional tag conversion callbacks, as defined
       by "clone" in String::Tagged.
+
+TODO
+
+      * Fine-grained control of what HTML entities are generated on output.
 
 AUTHOR
 

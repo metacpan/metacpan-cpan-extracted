@@ -1,0 +1,30 @@
+name = "Alien-xmake"
+badges = ["github-actions/linux.yml", "github-actions/windows.yml", "github-actions/macos.yml", "metacpan"]
+module_maker="ModuleBuild"
+static_install = "auto"
+authority = "cpan:SANKO"
+license = "artistic_2"
+markdown_maker = "Pod::Markdown::Github"
+
+[build]
+build_class = "builder::xmake"
+
+[release]
+hooks=[
+    'tidyall -a'
+]
+
+[no_index]
+directory=[
+    "t",
+    "xt",
+    "inc",
+    "share",
+    "eg",
+    "examples",
+    "author",
+    "builder"
+]
+
+[Metadata]
+X_No_Archive = 'Yes'

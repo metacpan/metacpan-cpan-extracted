@@ -85,9 +85,9 @@ sub select {
                 ( $sql->{selected_cols}, $sql->{alias} ) = @{pop @bu};
             }
             else {
-                my $alias = $ax->alias( $sql, 'select_func_sq', $complex_col );
+                my $alias = $ax->alias( $sql, 'select_complex_col', $complex_col );
                 if ( length $alias ) {
-                    $sql->{alias}{$complex_col} = $ax->prepare_identifier( $alias );
+                    $sql->{alias}{$complex_col} = $ax->quote_alias( $alias );
                 }
                 push @{$sql->{selected_cols}}, $complex_col;
             }
@@ -290,9 +290,9 @@ sub __add_aggregate_substmt {
             $sql->{aggr_cols}[$i] .= "$qt_col)";
         }
     }
-    my $alias = $ax->alias( $sql, 'select_func_sq', $sql->{aggr_cols}[$i] );
+    my $alias = $ax->alias( $sql, 'select_complex_col', $sql->{aggr_cols}[$i] );
     if ( length $alias ) {
-        $sql->{alias}{$sql->{aggr_cols}[$i]} = $ax->prepare_identifier( $alias );
+        $sql->{alias}{$sql->{aggr_cols}[$i]} = $ax->quote_alias( $alias );
     }
     return 1;
 }
@@ -301,10 +301,11 @@ sub __add_aggregate_substmt {
 sub set {
     my ( $sf, $sql ) = @_;
     my $clause = 'set';
+    my $stmt = 'set_stmt';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $so = App::DBBrowser::Table::Substatements::Operators->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    $sql->{set_stmt} = "SET";
+    $sql->{$stmt} = "SET";
     my @bu;
     my @pre = ( undef, $sf->{i}{ok} );
 
@@ -318,24 +319,24 @@ sub set {
         $ax->print_sql_info( $info );
         if ( ! defined $qt_col ) {
             if ( @bu ) {
-                $sql->{set_stmt} = pop @bu;
+                $sql->{$stmt} = pop @bu;
                 next COL;
             }
             return;
         }
         if ( $qt_col eq $sf->{i}{ok} ) {
             if ( ! @bu ) {
-                $sql->{set_stmt} = '';
+                $sql->{$stmt} = '';
             }
             return 1;
         }
-        push @bu, $sql->{set_stmt};
+        push @bu, $sql->{$stmt};
         my $col_sep = @bu == 1 ? ' ' : ', ';
         my $op = '=';
-        $sql->{set_stmt} .= $col_sep . $qt_col . ' ' . $op;
-        my $ok = $so->read_and_add_value( $sql, $clause, $qt_col, $op );
+        $sql->{$stmt} .= $col_sep . $qt_col . ' ' . $op;
+        my $ok = $so->read_and_add_value( $sql, $clause, $stmt, $qt_col, $op );
         if ( !  $ok ) {
-            $sql->{set_stmt} = pop @bu;
+            $sql->{$stmt} = pop @bu;
             next COL;
         }
     }
@@ -397,9 +398,14 @@ sub group_by {
         }
         elsif ( $menu->[$idx[0]] eq $sf->{i}{menu_addition} ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $complex_column = $ext->column( $sql, $clause );
-            if ( defined $complex_column ) {
-                push @{$sql->{group_by_cols}}, $complex_column;
+            my $complex_col = $ext->column( $sql, $clause );
+            if ( defined $complex_col ) {
+                my $alias = $ax->alias( $sql, 'select_complex_col', $complex_col );
+                # this alias is used in select
+                if ( length $alias ) {
+                    $sql->{alias}{$complex_col} = $ax->quote_alias( $alias );
+                }
+                push @{$sql->{group_by_cols}}, $complex_col;
             }
             next GROUP_BY;
         }
@@ -428,20 +434,22 @@ sub order_by {
     if ( $sf->{o}{enable}{extended_cols} ) {
         push @pre, $sf->{i}{menu_addition};
     }
-    my @cols;
+    my @tmp_cols;
     if ( @{$sql->{aggr_cols}} || @{$sql->{group_by_cols}} ) {
-        @cols = ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} );
+        @tmp_cols = ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} );
     }
     else {
-        @cols = @{$sql->{cols}};
+        @tmp_cols = @{$sql->{cols}};
     }
-    my @aliases;
-    for my $col ( @{$sql->{selected_cols}} ) {
-        #if ( any { $_ eq $col } @cols ) {
-        #    next;
-        #}
-        if ( $sql->{alias}{$col} ) {
+    my ( @cols, @aliases );
+    my %count;
+    for my $col ( @tmp_cols, @{$sql->{selected_cols}}) {
+        next if ++$count{$col} > 1;
+        if ( length $sql->{alias}{$col} ) {
             push @aliases, $sql->{alias}{$col};
+        }
+        else {
+            push @cols, $col;
         }
     }
     if ( @aliases ) {

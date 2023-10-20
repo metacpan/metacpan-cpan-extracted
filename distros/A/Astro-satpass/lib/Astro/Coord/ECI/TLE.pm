@@ -229,7 +229,7 @@ package Astro::Coord::ECI::TLE;
 use strict;
 use warnings;
 
-our $VERSION = '0.129';
+our $VERSION = '0.130';
 
 use base qw{ Astro::Coord::ECI Exporter };
 
@@ -979,7 +979,7 @@ Examples of Molczan-format data are contained in F<mcnames.zip> and
 F<vsnames.zip> available on Mike McCants' web site; these can be fetched
 using the L<Astro::SpaceTrack|Astro::SpaceTrack> C<mccants()> method. An
 example of Quicksat-format data is contained in F<qsmag.zip>. See Mike
-McCants' web site, L<https://www.prismnet.com/~mmccants/> for an
+McCants' web site, L<https://www.mmccants.org//> for an
 explanation of the differences.
 
 Note that if you have one of the reported pure Perl versions of
@@ -8173,12 +8173,12 @@ sub _next_elevation_screen {
 #
 #   $ tools/heavens-above-mag --celestrak
 #
-# Last-Modified: Mon, 27 Feb 2023 21:40:21 GMT
+# Last-Modified: Tue, 26 Sep 2023 01:23:57 GMT
 
 # The following constants are unsupported, and may be modified or
 # revoked at any time. They exist to support
 # xt/author/magnitude_status.t
-use constant _CELESTRAK_VISUAL => 'Mon, 27 Feb 2023 21:40:21 GMT';
+use constant _CELESTRAK_VISUAL => 'Tue, 26 Sep 2023 01:23:57 GMT';
 use constant _MCCANTS_VSNAMES  => undef;
 use constant _MCCANTS_QUICKSAT => undef;
 
@@ -8320,8 +8320,6 @@ use constant _MCCANTS_QUICKSAT => undef;
   '28773' =>   4.2, # ASTRO E2
   '28931' =>   3.2, # ALOS
   '28932' =>   3.7, # H-2A R/B
-  '28939' =>   6.2, # ASTRO F (AKARI)
-  '29093' =>   3.2, # CZ-4B R/B
   '29228' =>   3.7, # RESURS DK-1
   '29252' =>   4.7, # GENESIS 1
   '29507' =>   2.7, # CZ-4B R/B
@@ -8343,17 +8341,16 @@ use constant _MCCANTS_QUICKSAT => undef;
 # '41337' => undef, # ASTRO H has no recorded magnitude
 # '42758' => undef, # HXMT has no recorded magnitude
 # '43521' => undef, # CZ-2C R/B has no recorded magnitude
-# '43600' => undef, # AEOLUS has no recorded magnitude
 # '43641' => undef, # SAOCOM 1-A has no recorded magnitude
 # '43682' => undef, # H-2A R/B has no recorded magnitude
 # '46265' => undef, # SAOCOM 1-B has no recorded magnitude
   '48274' =>   0.0, # CSS (TIANHE-1)
+# '48865' => undef, # COSMOS 2550 has no recorded magnitude
 # '51842' => undef, # OBJECT U has no recorded magnitude
-# '52260' => undef, # SZ-13 MODULE has no recorded magnitude
 # '52794' => undef, # CZ-2C R/B has no recorded magnitude
 # '53131' => undef, # CZ-2C R/B has no recorded magnitude
   '53807' =>   3.5, # BLUEWALKER 3
-# '54047' => undef, # DRAGON FREEDOM DEB has no recorded magnitude
+# '57800' => undef, # XRISM has no recorded magnitude
 );
 
 1;

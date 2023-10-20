@@ -10,47 +10,47 @@ sub _parent { undef }
 # standard dialogs
 
 sub message {
-	$_[1] = $_[1] || 'Kephra Message'; 
+	$_[1] = $_[1] || 'Kephra Message';
 	splice @_, 2, 0, &Wx::wxOK | &Wx::wxSTAY_ON_TOP;
 	_box( @_ );
 }
 sub info   {
-	$_[1] = $_[1] || 'Kephra Information'; 
+	$_[1] = $_[1] || 'Kephra Information';
 	splice @_, 2, 0, &Wx::wxOK | &Wx::wxICON_INFORMATION | &Wx::wxSTAY_ON_TOP;
 	_box( @_ );
 }
 sub warning {
-	$_[1] = $_[1] || 'Kephra Warning'; 
+	$_[1] = $_[1] || 'Kephra Warning';
 	splice @_, 2, 0, &Wx::wxOK | &Wx::wxICON_WARNING | &Wx::wxSTAY_ON_TOP;
 	_box( @_ );
 }
-sub yes_no  { 
-	$_[1] = $_[1] || 'Kephra Question'; 
+sub yes_no  {
+	$_[1] = $_[1] || 'Kephra Question';
 	splice @_, 2, 0, &Wx::wxYES_NO | &Wx::wxICON_QUESTION | &Wx::wxSTAY_ON_TOP;
 	_box( @_ );
 }
 sub yes_no_cancel {
-	$_[1] = $_[1] || 'Kephra Question'; 
+	$_[1] = $_[1] || 'Kephra Question';
 	splice @_, 2, 0, &Wx::wxYES_NO | &Wx::wxCANCEL | &Wx::wxICON_QUESTION | &Wx::wxSTAY_ON_TOP;
 	_box( @_ );
 }
 sub _box {                                   # $message, $title, $style, $parent
 	#Kephra::Log::warning('need at least a message as first parameter', 2) unless $_[0];
-	$_[3] = $_[3] || _parent(); 
+	$_[3] = $_[3] || _parent();
 	Wx::MessageBox( @_ );
 }
 
 sub get_file_open {
-	my $title  = shift // 'Open File ...';
 	my $dir    = shift // '.';
+	my $title  = shift // 'Open File ...';
 	my $filter = shift // '(*)|*';
 	my $parent = shift // _parent();
 	Wx::FileSelector( $title, $dir, '', '', $filter, &Wx::wxFD_OPEN, $parent);
 }
 
 sub get_files_open {
-	my $title  = shift // 'Open File ...';
 	my $dir    = shift // '.';
+	my $title  = shift // 'Open File ...';
 	my $filter = shift // '(*)|*';
 	my $parent = shift // _parent();
 	my $dialog = Wx::FileDialog->new
@@ -60,9 +60,9 @@ sub get_files_open {
 	}
 }
 
-sub get_file_save { 
-	my $title  = shift // 'Save File As ...';
+sub get_file_save {
 	my $dir    = shift // '.';
+	my $title  = shift // 'Save File As ...';
 	my $filter = shift // '(*)|*';
 	my $parent = shift // _parent();
 	Wx::FileSelector( $title, $dir, '', '', $filter, &Wx::wxFD_SAVE, $parent);

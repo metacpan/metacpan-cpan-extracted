@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Indicates batch convert file request',
                                   class => 'BatchConvertRequest',
                                   required => [], # TODO
 }                                 );
@@ -129,49 +129,49 @@ __PACKAGE__->method_documentation({
      'source_folder' => {
      	datatype => 'string',
      	base_name => 'SourceFolder',
-     	description => '',
+     	description => 'The directory stores files that need to format conversion.',
      	format => '',
      	read_only => '',
      		},
      'source_storage' => {
      	datatype => 'string',
      	base_name => 'SourceStorage',
-     	description => '',
+     	description => 'Aspose Cloud storage name.',
      	format => '',
      	read_only => '',
      		},
      'match_condition' => {
      	datatype => 'MatchConditionRequest',
      	base_name => 'MatchCondition',
-     	description => '',
+     	description => 'Indicates the match condition that needs to be processed for the file name.',
      	format => '',
      	read_only => '',
      		},
      'format' => {
      	datatype => 'string',
      	base_name => 'Format',
-     	description => '',
+     	description => 'Conversion format.',
      	format => '',
      	read_only => '',
      		},
      'out_folder' => {
      	datatype => 'string',
      	base_name => 'OutFolder',
-     	description => '',
+     	description => 'The directory that stores files whose format conversion was successful.',
      	format => '',
      	read_only => '',
      		},
      'out_storage' => {
      	datatype => 'string',
      	base_name => 'OutStorage',
-     	description => '',
+     	description => 'Aspose Cloud storage name.',
      	format => '',
      	read_only => '',
      		},
      'save_options' => {
      	datatype => 'SaveOptions',
      	base_name => 'SaveOptions',
-     	description => '',
+     	description => 'Indicates save options.',
      	format => '',
      	read_only => '',
      		},    

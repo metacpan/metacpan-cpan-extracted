@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Changes file management - ~/lib/Changes/Change.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/11/23
-## Modified 2022/11/23
+## Modified 2023/09/19
 ## All rights reserved
 ## 
 ## 
@@ -19,8 +19,8 @@ BEGIN
     use warnings::register;
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
-    use Nice::Try;
-    our $VERSION = 'v0.1.0';
+    # use Nice::Try;
+    our $VERSION = 'v0.1.1';
 };
 
 use strict;
@@ -74,13 +74,15 @@ sub as_string
         my $wrapper = $self->wrapper;
         if( $self->_is_code( $wrapper ) )
         {
-            try
+            # try-catch
+            local $@;
+            $text = eval
             {
-                $text = $wrapper->( $self->normalise->scalar, ( $max - $str->length ) );
-            }
-            catch( $e )
+                $wrapper->( $self->normalise->scalar, ( $max - $str->length ) );
+            };
+            if( $@ )
             {
-                warn( "Warning only: an error occurred while calling the wrapper calback with ", $self->normalise->length, " bytes of change text and a maximum width of ", ( $max - $str->length ), " characters: $e\n" ) if( $self->_warnings_is_enabled );
+                warn( "Warning only: an error occurred while calling the wrapper calback with ", $self->normalise->length, " bytes of change text and a maximum width of ", ( $max - $str->length ), " characters: $@\n" ) if( $self->_warnings_is_enabled );
             }
         }
         elsif( $self->_load_class( 'Text::Wrap' ) )
@@ -222,7 +224,7 @@ Changes::Change - Changes object class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

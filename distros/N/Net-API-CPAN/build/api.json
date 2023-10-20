@@ -1,0 +1,1097 @@
+{
+   "cpan_v1_01" : {
+      "author" : {
+         "asciiname" : {
+            "type" : "string"
+         },
+         "blog" : {
+            "def" : {
+               "feed" : "scalar",
+               "url" : "uri"
+            },
+            "type" : "class_array_object"
+         },
+         "city" : {
+            "type" : "string"
+         },
+         "country" : {
+            "type" : "string"
+         },
+         "donation" : {
+            "def" : {
+               "id" : "scalar",
+               "name" : "scalar"
+            },
+            "type" : "class_array_object"
+         },
+         "email" : {
+            "callback" : "        my( $class, $args ) = @_;\n        return( $class->parse_bare_address( $args->[0] ) );\n",
+            "class" : "Email::Address::XS",
+            "type" : "object_array_object"
+         },
+         "gravatar_url" : {
+            "type" : "uri"
+         },
+         "is_pause_custodial_account" : {
+            "type" : "boolean"
+         },
+         "links" : {
+            "def" : {
+               "backpan_directory" : "uri",
+               "cpan_directory" : "uri",
+               "cpantesters_matrix" : "uri",
+               "cpantesters_reports" : "uri",
+               "cpants" : "uri",
+               "metacpan_explorer" : "uri",
+               "repology" : "uri"
+            },
+            "type" : "class"
+         },
+         "location" : {
+            "type" : "array_as_object"
+         },
+         "name" : {
+            "type" : "string"
+         },
+         "pauseid" : {
+            "type" : "string"
+         },
+         "perlmongers" : {
+            "def" : {
+               "name" : "scalar",
+               "url" : "uri"
+            },
+            "type" : "class_array_object"
+         },
+         "profile" : {
+            "def" : {
+               "id" : "scalar",
+               "name" : "scalar"
+            },
+            "type" : "class_array_object"
+         },
+         "region" : {
+            "type" : "string"
+         },
+         "release_count" : {
+            "def" : {
+               "backpan_only" : "integer",
+               "cpan" : "integer",
+               "latest" : "integer"
+            },
+            "type" : "class"
+         },
+         "updated" : {
+            "type" : "datetime"
+         },
+         "user" : {
+            "type" : "string"
+         },
+         "website" : {
+            "class" : "URI",
+            "type" : "object_array_object"
+         }
+      },
+      "changes" : {
+         "author" : {
+            "type" : "string"
+         },
+         "authorized" : {
+            "type" : "boolean"
+         },
+         "binary" : {
+            "type" : "boolean"
+         },
+         "category" : {
+            "type" : "string"
+         },
+         "content" : {
+            "type" : "string"
+         },
+         "date" : {
+            "type" : "date"
+         },
+         "deprecated" : {
+            "type" : "boolean"
+         },
+         "directory" : {
+            "type" : "boolean"
+         },
+         "dist_fav_count" : {
+            "type" : "integer"
+         },
+         "distribution" : {
+            "type" : "string"
+         },
+         "download_url" : {
+            "type" : "uri"
+         },
+         "id" : {
+            "type" : "string"
+         },
+         "indexed" : {
+            "type" : "boolean"
+         },
+         "level" : {
+            "type" : "integer"
+         },
+         "maturity" : {
+            "type" : "string"
+         },
+         "mime" : {
+            "type" : "string"
+         },
+         "module" : {
+            "def" : {
+               "associated_pod" : "string",
+               "authorized" : "boolean",
+               "indexed" : "boolean",
+               "name" : "string",
+               "version" : "string",
+               "version_numified" : "number"
+            },
+            "type" : "class_array_object"
+         },
+         "name" : {
+            "type" : "string"
+         },
+         "path" : {
+            "type" : "string"
+         },
+         "pod" : {
+            "type" : "string"
+         },
+         "pod_lines" : {
+            "type" : "array"
+         },
+         "release" : {
+            "type" : "string"
+         },
+         "sloc" : {
+            "type" : "string"
+         },
+         "slop" : {
+            "type" : "string"
+         },
+         "stat" : {
+            "def" : {
+               "gid" : "integer",
+               "mode" : "integer",
+               "mtime" : "datetime",
+               "size" : "integer",
+               "uid" : "integer"
+            },
+            "type" : "class"
+         },
+         "status" : {
+            "type" : "string"
+         },
+         "version" : {
+            "def" : {
+               "class" : "Changes::Version",
+               "field" : "version"
+            },
+            "type" : "version"
+         },
+         "version_numified" : {
+            "type" : "float"
+         }
+      },
+      "changes_release" : {
+         "author" : {
+            "type" : "string"
+         },
+         "changes_file" : {
+            "type" : "string"
+         },
+         "changes_text" : {
+            "type" : "string"
+         },
+         "release" : {
+            "type" : "string"
+         }
+      },
+      "contributor" : {
+         "distribution" : {
+            "type" : "string"
+         },
+         "pauseid" : {
+            "type" : "string"
+         },
+         "release_author" : {
+            "type" : "string"
+         },
+         "release_name" : {
+            "type" : "string"
+         }
+      },
+      "cover" : {
+         "criteria" : {
+            "def" : {
+               "branch" : "float",
+               "condition" : "float",
+               "statement" : "float",
+               "subroutine" : "float",
+               "total" : "float"
+            },
+            "type" : "class"
+         },
+         "distribution" : {
+            "type" : "string"
+         },
+         "release" : {
+            "type" : "string"
+         },
+         "url" : {
+            "type" : "uri"
+         },
+         "version" : {
+            "def" : {
+               "class" : "Changes::Version",
+               "field" : "version"
+            },
+            "type" : "version"
+         }
+      },
+      "cve" : {
+         "affected_versions" : {
+            "type" : "string"
+         },
+         "cpansa_id" : {
+            "type" : "string"
+         },
+         "cves" : {
+            "type" : "string"
+         },
+         "description" : {
+            "type" : "string"
+         },
+         "distribution" : {
+            "type" : "string"
+         },
+         "references" : {
+            "type" : "string"
+         },
+         "releases" : {
+            "type" : "string"
+         },
+         "reported" : {
+            "type" : "date"
+         },
+         "severity" : {
+            "type" : "string"
+         },
+         "versions" : {
+            "type" : "string"
+         }
+      },
+      "diff" : {
+         "diff" : {
+            "type" : "string"
+         },
+         "source" : {
+            "type" : "string"
+         },
+         "statistics" : {
+            "def" : {
+               "deletions" : "integer",
+               "diff" : "string",
+               "insertions" : "integer",
+               "source" : "string",
+               "target" : "string"
+            },
+            "type" : "class_array_object"
+         },
+         "target" : {
+            "type" : "string"
+         }
+      },
+      "distribution" : {
+         "bugs" : {
+            "def" : {
+               "github" : {
+                  "def" : {
+                     "active" : "integer",
+                     "closed" : "integer",
+                     "open" : "integer",
+                     "source" : "uri"
+                  },
+                  "type" : "class"
+               },
+               "rt" : {
+                  "def" : {
+                     "active" : "integer",
+                     "closed" : "integer",
+                     "open" : "integer",
+                     "patched" : "integer",
+                     "recent" : "integer",
+                     "rejected" : "integer",
+                     "resolved" : "integer",
+                     "source" : "uri",
+                     "stalled" : "integer"
+                  },
+                  "type" : "class"
+               }
+            },
+            "type" : "class"
+         },
+         "external_package" : {
+            "def" : {
+               "cygwin" : "scalar",
+               "debian" : "scalar",
+               "fedora" : "scalar"
+            },
+            "type" : "class"
+         },
+         "name" : {
+            "type" : "string"
+         },
+         "river" : {
+            "def" : {
+               "bucket" : "integer",
+               "bus_factor" : "integer",
+               "immediate" : "integer",
+               "total" : "integer"
+            },
+            "type" : "class"
+         }
+      },
+      "download_url" : {
+         "checksum_md5" : {
+            "type" : "string"
+         },
+         "checksum_sha256" : {
+            "type" : "string"
+         },
+         "date" : {
+            "type" : "date"
+         },
+         "download_url" : {
+            "type" : "uri"
+         },
+         "release" : {
+            "type" : "string"
+         },
+         "status" : {
+            "type" : "string"
+         },
+         "version" : {
+            "def" : {
+               "class" : "Changes::Version",
+               "field" : "version"
+            },
+            "type" : "version"
+         }
+      },
+      "favorite" : {
+         "author" : {
+            "type" : "string"
+         },
+         "date" : {
+            "type" : "date"
+         },
+         "distribution" : {
+            "type" : "string"
+         },
+         "id" : {
+            "type" : "string"
+         },
+         "release" : {
+            "type" : "string"
+         },
+         "user" : {
+            "type" : "string"
+         }
+      },
+      "file" : {
+         "abstract" : {
+            "type" : "string"
+         },
+         "author" : {
+            "package" : "Net::API::CPAN::Author",
+            "type" : "scalar_or_object"
+         },
+         "authorized" : {
+            "type" : "boolean"
+         },
+         "binary" : {
+            "type" : "boolean"
+         },
+         "category" : {
+            "type" : "string"
+         },
+         "date" : {
+            "type" : "date"
+         },
+         "deprecated" : {
+            "type" : "boolean"
+         },
+         "description" : {
+            "type" : "string"
+         },
+         "dir" : {
+            "type" : "string"
+         },
+         "directory" : {
+            "type" : "boolean"
+         },
+         "dist_fav_count" : {
+            "type" : "integer"
+         },
+         "distribution" : {
+            "type" : "string"
+         },
+         "documentation" : {
+            "type" : "string"
+         },
+         "download_url" : {
+            "type" : "uri"
+         },
+         "id" : {
+            "type" : "string"
+         },
+         "indexed" : {
+            "type" : "boolean"
+         },
+         "level" : {
+            "type" : "integer"
+         },
+         "maturity" : {
+            "type" : "string"
+         },
+         "mime" : {
+            "type" : "string"
+         },
+         "module" : {
+            "def" : {
+               "associated_pod" : "string",
+               "authorized" : "boolean",
+               "indexed" : "boolean",
+               "name" : "string",
+               "version" : "string",
+               "version_numified" : "number"
+            },
+            "type" : "class_array_object"
+         },
+         "name" : {
+            "type" : "string"
+         },
+         "path" : {
+            "type" : "string"
+         },
+         "pod" : {
+            "type" : "string"
+         },
+         "pod_lines" : {
+            "type" : "array"
+         },
+         "release" : {
+            "package" : "Net::API::CPAN::Release",
+            "type" : "scalar_or_object"
+         },
+         "sloc" : {
+            "type" : "integer"
+         },
+         "slop" : {
+            "type" : "integer"
+         },
+         "stat" : {
+            "def" : {
+               "gid" : "integer",
+               "mode" : "integer",
+               "mtime" : "datetime",
+               "size" : "integer",
+               "uid" : "integer"
+            },
+            "type" : "class"
+         },
+         "status" : {
+            "type" : "string"
+         },
+         "suggest" : {
+            "def" : {
+               "input" : "array",
+               "payload" : "hash",
+               "weight" : "integer"
+            },
+            "type" : "class"
+         },
+         "version" : {
+            "def" : {
+               "class" : "Changes::Version",
+               "field" : "version"
+            },
+            "type" : "version"
+         },
+         "version_numified" : {
+            "type" : "float"
+         }
+      },
+      "mirror" : {
+         "A_or_CNAME" : {
+            "type" : "string"
+         },
+         "aka_name" : {
+            "type" : "string"
+         },
+         "ccode" : {
+            "type" : "string"
+         },
+         "city" : {
+            "type" : "string"
+         },
+         "contact" : {
+            "def" : {
+               "contact_site" : "string",
+               "contact_user" : "string"
+            },
+            "type" : "class_array_object"
+         },
+         "continent" : {
+            "type" : "string"
+         },
+         "country" : {
+            "type" : "string"
+         },
+         "distance" : {
+            "type" : "string"
+         },
+         "dnsrr" : {
+            "type" : "string"
+         },
+         "freq" : {
+            "type" : "string"
+         },
+         "ftp" : {
+            "type" : "uri"
+         },
+         "http" : {
+            "type" : "uri"
+         },
+         "inceptdate" : {
+            "type" : "date"
+         },
+         "location" : {
+            "type" : "array_as_object"
+         },
+         "name" : {
+            "type" : "string"
+         },
+         "note" : {
+            "type" : "string"
+         },
+         "org" : {
+            "type" : "string"
+         },
+         "region" : {
+            "type" : "string"
+         },
+         "reitredate" : {
+            "type" : "date"
+         },
+         "rsync" : {
+            "type" : "uri"
+         },
+         "src" : {
+            "type" : "uri"
+         },
+         "tz" : {
+            "type" : "string"
+         }
+      },
+      "mirrors" : {
+         "mirrors" : {
+            "class" : "Net::API::CPAN::Mirror",
+            "type" : "object_array_object"
+         },
+         "took" : {
+            "type" : "integer"
+         },
+         "total" : {
+            "type" : "integer"
+         }
+      },
+      "module" : {
+         "abstract" : {
+            "type" : "string"
+         },
+         "author" : {
+            "type" : "string"
+         },
+         "authorized" : {
+            "type" : "boolean"
+         },
+         "binary" : {
+            "type" : "boolean"
+         },
+         "date" : {
+            "type" : "date"
+         },
+         "deprecated" : {
+            "type" : "boolean"
+         },
+         "description" : {
+            "type" : "string"
+         },
+         "dir" : {
+            "type" : "string"
+         },
+         "directory" : {
+            "type" : "boolean"
+         },
+         "dist_fav_count" : {
+            "type" : "integer"
+         },
+         "distribution" : {
+            "type" : "string"
+         },
+         "documentation" : {
+            "type" : "string"
+         },
+         "download_url" : {
+            "type" : "uri"
+         },
+         "id" : {
+            "type" : "string"
+         },
+         "indexed" : {
+            "type" : "boolean"
+         },
+         "level" : {
+            "type" : "integer"
+         },
+         "maturity" : {
+            "type" : "string"
+         },
+         "mime" : {
+            "type" : "string"
+         },
+         "module" : {
+            "def" : {
+               "associated_pod" : "string",
+               "authorized" : "boolean",
+               "indexed" : "boolean",
+               "name" : "string",
+               "version" : "string",
+               "version_numified" : "number"
+            },
+            "type" : "class_array_object"
+         },
+         "name" : {
+            "type" : "string"
+         },
+         "path" : {
+            "type" : "string"
+         },
+         "pod" : {
+            "type" : "string"
+         },
+         "pod_lines" : {
+            "type" : "string"
+         },
+         "release" : {
+            "type" : "string"
+         },
+         "sloc" : {
+            "type" : "integer"
+         },
+         "slop" : {
+            "type" : "integer"
+         },
+         "stat" : {
+            "def" : {
+               "gid" : "integer",
+               "mode" : "integer",
+               "mtime" : "datetime",
+               "size" : "integer",
+               "uid" : "integer"
+            },
+            "type" : "class"
+         },
+         "status" : {
+            "type" : "string"
+         },
+         "suggest" : {
+            "def" : {
+               "input" : "array",
+               "payload" : "hash",
+               "weight" : "integer"
+            },
+            "type" : "class"
+         },
+         "version" : {
+            "def" : {
+               "class" : "Changes::Version",
+               "field" : "version"
+            },
+            "type" : "version"
+         },
+         "version_numified" : {
+            "type" : "float"
+         }
+      },
+      "package" : {
+         "author" : {
+            "type" : "string"
+         },
+         "dist_version" : {
+            "def" : {
+               "class" : "Changes::Version",
+               "field" : "dist_version"
+            },
+            "type" : "version"
+         },
+         "distribution" : {
+            "type" : "string"
+         },
+         "file" : {
+            "type" : "string"
+         },
+         "module_name" : {
+            "type" : "string"
+         },
+         "version" : {
+            "def" : {
+               "undef_ok" : 1
+            },
+            "type" : "float"
+         }
+      },
+      "permission" : {
+         "co_maintainers" : {
+            "type" : "array_as_object"
+         },
+         "module_name" : {
+            "type" : "string"
+         },
+         "owner" : {
+            "type" : "string"
+         }
+      },
+      "rating" : {
+         "author" : {
+            "type" : "string"
+         },
+         "date" : {
+            "type" : "date"
+         },
+         "details" : {
+            "def" : {
+               "description" : {
+                  "type" : "scalar"
+               }
+            },
+            "type" : "class"
+         },
+         "distribution" : {
+            "type" : "string"
+         },
+         "helpful" : {
+            "def" : {
+               "user" : "scalar",
+               "value" : "boolean"
+            },
+            "type" : "class_array_object"
+         },
+         "rating" : {
+            "type" : "float"
+         },
+         "release" : {
+            "type" : "string"
+         },
+         "user" : {
+            "type" : "string"
+         }
+      },
+      "release" : {
+         "abstract" : {
+            "type" : "string"
+         },
+         "archive" : {
+            "type" : "string"
+         },
+         "author" : {
+            "type" : "string"
+         },
+         "authorized" : {
+            "type" : "boolean"
+         },
+         "changes_file" : {
+            "type" : "string"
+         },
+         "checksum_md5" : {
+            "type" : "string"
+         },
+         "checksum_sha256" : {
+            "type" : "string"
+         },
+         "date" : {
+            "type" : "date"
+         },
+         "dependency" : {
+            "def" : {
+               "module" : "scalar",
+               "phase" : "scalar",
+               "relationship" : "scalar",
+               "version" : {
+                  "class" : "Changes::Version",
+                  "type" : "version"
+               }
+            },
+            "type" : "class_array_object"
+         },
+         "deprecated" : {
+            "type" : "boolean"
+         },
+         "distribution" : {
+            "type" : "string"
+         },
+         "download_url" : {
+            "type" : "uri"
+         },
+         "first" : {
+            "type" : "boolean"
+         },
+         "id" : {
+            "type" : "string"
+         },
+         "license" : {
+            "type" : "array_as_object"
+         },
+         "main_module" : {
+            "type" : "string"
+         },
+         "maturity" : {
+            "type" : "string"
+         },
+         "metadata" : {
+            "def" : {
+               "abstract" : "string",
+               "author" : "array_as_object",
+               "dynamic_config" : "boolean",
+               "generated_by" : "string",
+               "license" : "array_as_object",
+               "meta_spec" : {
+                  "def" : {
+                     "url" : "uri",
+                     "version" : {
+                        "class" : "Changes::Version",
+                        "type" : "version"
+                     }
+                  },
+                  "type" : "class"
+               },
+               "name" : "string",
+               "no_index" : {
+                  "def" : {
+                     "directory" : "array_as_object",
+                     "package" : "array_as_object"
+                  },
+                  "type" : "class"
+               },
+               "prereqs" : {
+                  "def" : {
+                     "build" : {
+                        "def" : {
+                           "recommends" : "hash_as_object",
+                           "requires" : "hash_as_object",
+                           "suggests" : "hash_as_object"
+                        },
+                        "type" : "class"
+                     },
+                     "configure" : {
+                        "def" : {
+                           "recommends" : "hash_as_object",
+                           "requires" : "hash_as_object",
+                           "suggests" : "hash_as_object"
+                        },
+                        "type" : "class"
+                     },
+                     "develop" : {
+                        "def" : {
+                           "recommends" : "hash_as_object",
+                           "requires" : "hash_as_object",
+                           "suggests" : "hash_as_object"
+                        },
+                        "type" : "class"
+                     },
+                     "runtime" : {
+                        "def" : {
+                           "recommends" : "hash_as_object",
+                           "requires" : "hash_as_object",
+                           "suggests" : "hash_as_object"
+                        },
+                        "type" : "class"
+                     },
+                     "test" : {
+                        "def" : {
+                           "recommends" : "hash_as_object",
+                           "requires" : "hash_as_object",
+                           "suggests" : "hash_as_object"
+                        },
+                        "type" : "class"
+                     }
+                  },
+                  "type" : "class"
+               },
+               "release_status" : "string",
+               "resources" : {
+                  "def" : {
+                     "bugtracker" : {
+                        "def" : {
+                           "mailto" : "uri",
+                           "type" : "string",
+                           "web" : "uri"
+                        },
+                        "type" : "class"
+                     },
+                     "homepage" : {
+                        "def" : {
+                           "web" : "uri"
+                        },
+                        "type" : "class"
+                     },
+                     "license" : "array_as_object",
+                     "repository" : {
+                        "def" : {
+                           "type" : "scalar",
+                           "url" : "uri",
+                           "web" : "uri"
+                        },
+                        "type" : "class"
+                     }
+                  },
+                  "type" : "class"
+               },
+               "version" : {
+                  "class" : "Changes::Version",
+                  "type" : "version"
+               },
+               "version_numified" : "float",
+               "x_contributors" : {
+                  "type" : "array"
+               },
+               "x_generated_by_perl" : {
+                  "type" : "string"
+               },
+               "x_serialization_backend" : {
+                  "type" : "string"
+               },
+               "x_spdx_expression" : {
+                  "type" : "string"
+               },
+               "x_static_install" : {
+                  "type" : "string"
+               }
+            },
+            "type" : "class"
+         },
+         "name" : {
+            "type" : "string"
+         },
+         "provides" : {
+            "type" : "array_as_object"
+         },
+         "resources" : {
+            "def" : {
+               "bugtracker" : {
+                  "def" : {
+                     "mailto" : "uri",
+                     "type" : "string",
+                     "web" : "uri"
+                  },
+                  "type" : "class"
+               },
+               "homepage" : {
+                  "def" : {
+                     "web" : "uri"
+                  },
+                  "type" : "class"
+               },
+               "license" : "array_as_object",
+               "repository" : {
+                  "def" : {
+                     "type" : "scalar",
+                     "url" : "uri",
+                     "web" : "uri"
+                  },
+                  "type" : "class"
+               }
+            },
+            "type" : "class"
+         },
+         "stat" : {
+            "def" : {
+               "gid" : "integer",
+               "mode" : "integer",
+               "mtime" : "datetime",
+               "size" : "integer",
+               "uid" : "integer"
+            },
+            "type" : "class"
+         },
+         "status" : {
+            "type" : "string"
+         },
+         "tests" : {
+            "def" : {
+               "fail" : "integer",
+               "na" : "integer",
+               "pass" : "integer",
+               "unknown" : "integer"
+            },
+            "type" : "class"
+         },
+         "version" : {
+            "def" : {
+               "class" : "Changes::Version",
+               "field" : "version"
+            },
+            "type" : "version"
+         },
+         "version_numified" : {
+            "type" : "float"
+         }
+      },
+      "release_recent" : {
+         "abstract" : {
+            "type" : "string"
+         },
+         "author" : {
+            "type" : "string"
+         },
+         "date" : {
+            "type" : "date"
+         },
+         "distribution" : {
+            "type" : "string"
+         },
+         "name" : {
+            "type" : "string"
+         },
+         "status" : {
+            "type" : "string"
+         }
+      },
+      "suggest" : {
+         "author" : {
+            "type" : "string"
+         },
+         "date" : {
+            "type" : "date"
+         },
+         "deprecated" : {
+            "type" : "boolean"
+         },
+         "distribution" : {
+            "type" : "string"
+         },
+         "name" : {
+            "type" : "string"
+         },
+         "release" : {
+            "type" : "string"
+         }
+      }
+   }
+}

@@ -1,3 +1,14 @@
+0.0013 2023-09-21
+
+ * Fix CPAN RT #147612. The "perl Makefile.PL" step would fail if Math::GMPz
+   was not installed.
+
+0.0012 2023-09-20
+
+ * Sync test files with Math-BigInt.
+
+ * Remove obsolete link to cpanratings.org.
+
 0.0011 2023-04-03
 
  * Sync test files with Math-BigInt.

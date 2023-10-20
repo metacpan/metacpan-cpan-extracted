@@ -87,4 +87,25 @@ use String::Tagged::Markdown;
       '->build_markdown link' );
 }
 
+# HTML entities
+{
+   my $str;
+
+   $str = String::Tagged::Markdown->new( "A dash \x{2013} like this & that" );
+
+   is( $str->build_markdown, "A dash \x{2013} like this &amp; that",
+      '->build_markdown inserts &amp; entities only' );
+
+   $str = String::Tagged::Markdown->new( "Non-breaking\xA0spaces" );
+
+   is( $str->build_markdown, "Non-breaking&nbsp;spaces",
+      '->build_markdown inserts &nbsp; entities' );
+
+   $str = String::Tagged::Markdown->new( "But not in " )
+      ->append_tagged( "this & place", fixed => 1 );
+
+   is( $str->build_markdown, "But not in \`this & place\`",
+      '->build_markdown does not escape & in code span' );
+}
+
 done_testing;

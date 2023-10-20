@@ -2,8 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 18;
-use Test::NoWarnings;
+use Test::Most tests => 17;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
@@ -59,7 +58,7 @@ GOOGLEPLACES: {
 			ok(!defined($geocoderlist->geocode('')));
 		} else {
 			diag('Set GMAP_KEY to enable more tests');
-			skip 'GMAP_KEY not set', 14;
+			skip 'GMAP_KEY not set', 16;
 		}
 	}
 }

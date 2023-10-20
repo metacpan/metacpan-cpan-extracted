@@ -12,6 +12,12 @@ push @extra_compiler_flags, qw( -std=c99 ) if $^V lt v5.36.0;
 
 push @extra_compiler_flags, qw( -DDEBUGGING=-g ) if $^X =~ m|/debugperl|;
 
+use Config;
+if( $Config{ccname} eq "gcc" ) {
+   # Enable some extra gcc warnings, largely just for author interest
+   push @extra_compiler_flags, qw( -Wall -Wno-unused-function -Wno-unused-value );
+}
+
 my $build = Module::Build::with::XSTests->new(
    module_name => 'XS::Parse::Sublike',
    requires => {

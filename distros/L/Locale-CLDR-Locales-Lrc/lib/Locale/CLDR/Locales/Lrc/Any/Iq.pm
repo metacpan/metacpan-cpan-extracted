@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Lrc::Any::Iq - Package for language Northern Luri
 
 =cut
 
 package Locale::CLDR::Locales::Lrc::Any::Iq;
-# This file auto generated from Data/common/main/lrc_IQ.xml
-#	on Mon 11 Apr  5:32:45 pm GMT
+# This file auto generated from Data\common\main\lrc_IQ.xml
+#	on Fri 13 Oct  9:25:53 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

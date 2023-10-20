@@ -6,7 +6,7 @@ use Acme::CPANModulesUtil::Misc;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-08-06'; # DATE
 our $DIST = 'Acme-CPANModules-CountryCodes'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our $LIST = {
     summary => 'List of modules related to country codes',
@@ -37,15 +37,20 @@ There are some modules for non-English country names, e.g.
 ## Types
 
 Sah: <pm:Sah::Schema::country::code>, <pm:Sah::Schema::country::code::alpha2>,
-<pm:Sah::Schema::country::code::alpha2>.
+<pm:Sah::Schema::country::code::alpha3>.
 
 Moose: <pm:MooseX::Types::Locale::Country>,
 <pm:MooseX::Types::Locale::Country::Fast>.
 
 
-## Other utilities
+## Other modules
 
-<pm:Locale::Util::Country>
+
+## CLI utilities
+
+<pm:App::ListCountries>
+
+<pm:App::LocaleCodesUtils>
 
 MARKDOWN
     'x.app.cpanmodules.show_entries' => 0,
@@ -68,7 +73,7 @@ Acme::CPANModules::CountryCodes - List of modules related to country codes
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::CountryCodes (from Perl distribution Acme-CPANModules-CountryCodes), released on 2023-08-06.
+This document describes version 0.004 of Acme::CPANModules::CountryCodes (from Perl distribution Acme-CPANModules-CountryCodes), released on 2023-08-06.
 
 =head1 DESCRIPTION
 
@@ -94,14 +99,18 @@ L<Locale::SubCountry>
 =head2 Types
 
 Sah: L<Sah::Schema::country::code>, L<Sah::Schema::country::code::alpha2>,
-L<Sah::Schema::country::code::alpha2>.
+L<Sah::Schema::country::code::alpha3>.
 
 Moose: L<MooseX::Types::Locale::Country>,
 L<MooseX::Types::Locale::Country::Fast>.
 
-=head2 Other utilities
+=head2 Other modules
 
-L<Locale::Util::Country>
+=head2 CLI utilities
+
+L<App::ListCountries>
+
+L<App::LocaleCodesUtils>
 
 =head1 ACME::CPANMODULES ENTRIES
 
@@ -139,6 +148,10 @@ Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
+=item L<Sah::Schema::country::code::alpha3>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
 =item L<MooseX::Types::Locale::Country>
 
 Author: L<MORIYA|https://metacpan.org/author/MORIYA>
@@ -147,7 +160,13 @@ Author: L<MORIYA|https://metacpan.org/author/MORIYA>
 
 Author: L<MORIYA|https://metacpan.org/author/MORIYA>
 
-=item L<Locale::Util::Country>
+=item L<App::ListCountries>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<App::LocaleCodesUtils>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =back
 
@@ -195,6 +214,8 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANM
 Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-CountryCodes>.
 
 =head1 SEE ALSO
+
+Related lists: L<Acme::CPANModules::LanguageCodes>
 
 L<Acme::CPANModules> - about the Acme::CPANModules namespace
 

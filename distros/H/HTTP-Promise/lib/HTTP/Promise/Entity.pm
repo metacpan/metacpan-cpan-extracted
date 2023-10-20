@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Entity.pm
-## Version v0.1.1
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/04/19
-## Modified 2022/08/06
+## Modified 2023/09/22
 ## All rights reserved.
 ## 
 ## 
@@ -25,14 +25,14 @@ BEGIN
     use HTTP::Promise::Headers;
     use HTTP::Promise::Body;
     use Module::Generic::HeaderValue;
-    use Nice::Try;
+    # use Nice::Try;
     use Symbol;
     use URI::Escape::XS ();
     use constant CRLF => "\015\012";
     our $EXCEPTION_CLASS = 'HTTP::Promise::Exception';
     our $BOUNDARY_DELIMITER = "\015\012";
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -78,7 +78,7 @@ sub as_form_data
     return(0) unless( lc( $type ) eq 'multipart/form-data' );
     $self->_load_class( 'HTTP::Promise::Body::Form::Data' ) || return( $self->pass_error );
     my $form = HTTP::Promise::Body::Form::Data->new;
-    $form->debug( $self->debug );
+    $form->debug( $self->debug // 0 );
     my $parts = $self->parts;
     # nothing to do
     return( $form ) if( $parts->is_empty );
@@ -145,13 +145,15 @@ sub as_string
     if( defined( $binmode ) )
     {
         $self->_load_class( 'Encode' ) || return( $self->pass_error );
-        try
+        # try-catch
+        local $@;
+        eval
         {
             $$output = Encode::decode( $binmode, $$output, ( Encode::FB_DEFAULT | Encode::LEAVE_SRC ) );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "Error decoding body content with character encoding '$binmode': $e" ) );
+            return( $self->error( "Error decoding body content with character encoding '$binmode': $@" ) );
         }
     }
     return( $output );
@@ -210,13 +212,15 @@ sub body_as_string
     if( defined( $binmode ) )
     {
         $self->_load_class( 'Encode' ) || return( $self->pass_error );
-        try
+        # try-catch
+        local $@;
+        eval
         {
             $$output = Encode::decode( $binmode, $$output, ( Encode::FB_DEFAULT | Encode::LEAVE_SRC ) );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "Error decoding body content with character encoding '$binmode': $e" ) );
+            return( $self->error( "Error decoding body content with character encoding '$binmode': $@" ) );
         }
     }
     return( $output );
@@ -554,16 +558,20 @@ sub content_charset
         if( length( $$cref ) )
         {
             return( 'US-ASCII' ) unless( $$cref =~ /[\x80-\xFF]/ );
-            try
+            my $encoding;
+            # try-catch
+            local $@;
+            eval
             {
                 Encode::decode_utf8( $$cref, ( Encode::FB_CROAK | Encode::LEAVE_SRC ) );
-                return( 'UTF-8' );
-            }
-            catch( $e )
+                $encoding = 'UTF-8';
+            };
+            if( $@ )
             {
-                return( $self->error( "Failed to decode utf8 content: $e" ) );
+                return( $self->error( "Failed to decode utf8 content: $@" ) );
             }
             # return( 'ISO-8859-1' );
+            return( $encoding );
         }
     }
     return( '' );
@@ -1207,15 +1215,17 @@ sub io_encoding
         else
         {
             $self->_load_class( 'Encode' ) || return( $self->pass_error );
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 my $test = Encode::decode( $charset, $$data, ( ( $opts->{charset_strict} ? Encode::FB_CROAK : 0 ) | Encode::LEAVE_SRC ) );
                 $enc = $charset;
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
                 my $retried = 0;
-                if( $e =~ /^Unknown encoding/ )
+                if( $@ =~ /^Unknown encoding/ )
                 {
                     my $alt_charset = lc( $opts->{alt_charset} || '' );
                     if( $alt_charset && $charset ne $alt_charset )
@@ -1226,7 +1236,7 @@ sub io_encoding
                         $enc = $alt_charset;
                     }
                 }
-                return( $self->error( $e ) ) unless( $retried );
+                return( $self->error( $@ ) ) unless( $retried );
             }
         }
     }
@@ -1253,9 +1263,11 @@ sub is_binary
     my $data;
     if( @_ )
     {
-        return(0) if( !defined( $_[0] ) || !length( "$_[0]" ) );
-        return( $self->error( "Bad argument. You can only provide a string or a scalar reference." ) ) if( ref( $_[0] ) && !$self->_is_scalar( $_[0] ) );
-        $data = ref( $_[0] ) ? $_[0] : \$_[0];
+        # We need to make a copy
+        my $this = shift( @_ );
+        return(0) if( !defined( $this ) || !length( "$this" ) );
+        return( $self->error( "Bad argument. You can only provide a string or a scalar reference." ) ) if( ref( $this ) && !$self->_is_scalar( $this ) );
+        $data = ref( $this ) ? $this : \$this;
     }
     else
     {
@@ -1955,7 +1967,7 @@ HTTP::Promise::Entity - HTTP Entity Class
 
 =head1 VERSION
 
-    v0.1.1
+    v0.2.1
 
 =head1 DESCRIPTION
 

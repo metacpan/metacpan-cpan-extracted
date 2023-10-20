@@ -17,7 +17,7 @@ my $scroller = Tickit::Widget::Scroller->new;
 ok( defined $scroller, 'defined $scroller' );
 
 $scroller->push(
-   map { Tickit::Widget::Scroller::Item::Text->new( $_ ) }
+   my @items = map { Tickit::Widget::Scroller::Item::Text->new( $_ ) }
       "The first line",
       "Another line in the middle",
       "The third line",
@@ -63,6 +63,10 @@ is( $scroller->item2line( 0 ),     0, 'item2line 0' );
 is( $scroller->item2line( 0, -1 ), 0, 'item2line 0, -1' );
 is( $scroller->item2line( 1 ),     1, 'item2line 1' );
 is( $scroller->item2line( 2 ),     2, 'item2line 2' );
+
+is( $scroller->item2line( $items[0] ), 0, 'item2line $items[0]' );
+is( $scroller->item2line( $items[1] ), 1, 'item2line $items[1]' );
+is( $scroller->item2line( $items[2] ), 2, 'item2line $items[2]' );
 
 is( $scroller->item2line( -1 ), 2, 'item2line -1' );
 

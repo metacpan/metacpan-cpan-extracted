@@ -26,10 +26,6 @@
 #ifndef NO_PPPORT_H
 #define NEED_my_snprintf_GLOBAL
 #define NEED_newRV_noinc_GLOBAL
-#define NEED_eval_pv
-#define NEED_grok_number
-#define NEED_grok_numeric_radix
-#define NEED_newCONSTSUB
 #define NEED_sv_2pv_flags
 #define NEED_newSVpvn_flags
 #define NEED_my_strlcat
@@ -54,9 +50,9 @@
 #ifndef gv_fetchfile_flags  /* added in perl 5.009005 */
 /* we know our uses don't contain embedded nulls, so we just need to copy to a
  * buffer so we can add a trailing null byte */
-#define gv_fetchfile_flags(a,b,c)   Perl_gv_fetchfile_flags(aTHX_ a,b,c)
+#define gv_fetchfile_flags(a,b,c)   gv_fetchfile_flags(a,b,c)
 static GV *
-Perl_gv_fetchfile_flags(pTHX_ const char *const name, const STRLEN namelen, const U32 flags) {
+gv_fetchfile_flags(pTHX_ const char *const name, const STRLEN namelen, const U32 flags) {
     char buf[2000];
     if (namelen >= sizeof(buf)-1)
         croak("panic: gv_fetchfile_flags overflow");
@@ -1278,7 +1274,7 @@ static int
 dopopcx_at(pTHX_ PERL_CONTEXT *cxstk, I32 startingblock, UV cx_type_mask)
 {
     I32 i;
-    register PERL_CONTEXT *cx;
+    PERL_CONTEXT *cx;
     for (i = startingblock; i >= 0; i--) {
         UV type_bit;
         cx = &cxstk[i];
@@ -1404,9 +1400,9 @@ visit_contexts(pTHX_ UV cx_type_mask, int (*callback)(pTHX_ PERL_CONTEXT *cx,
 UV *cx_type_mask_ptr))
 {
     /* modelled on pp_caller() in pp_ctl.c */
-    register I32 cxix = cxstack_ix;
-    register PERL_CONTEXT *cx = NULL;
-    register PERL_CONTEXT *ccstack = cxstack;
+    I32 cxix = cxstack_ix;
+    PERL_CONTEXT *cx = NULL;
+    PERL_CONTEXT *ccstack = cxstack;
     PERL_SI *top_si = PL_curstackinfo;
 
     if (trace_level >= 6)

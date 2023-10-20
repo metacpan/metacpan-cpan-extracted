@@ -7,6 +7,13 @@
       username => "User Name",
     },
     valiant => {
+      models => {
+        'example/schema/result_set/todo' => 'Task',
+        #'example/schema/result/todo' => {
+        #  one => 'Task',
+        #  many => 'Tasks',
+        #},
+      },
       errors => {
         models => {
           'example/schema/result/profile' => {

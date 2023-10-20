@@ -226,8 +226,8 @@ add_themes = critic
 [Perl::Critic::Policy::Subroutines::ProhibitUnusedPrivateSubroutines]
 add_themes = critic
 
-[Perl::Critic::Policy::Subroutines::ProtectPrivateSubs]
-add_themes = critic
+#[Perl::Critic::Policy::Subroutines::ProtectPrivateSubs]
+#add_themes = critic
 
 [Perl::Critic::Policy::Subroutines::RequireArgUnpacking]
 add_themes                  = critic
@@ -268,10 +268,10 @@ add_themes = critic
 add_themes       = critic
 max_chain_length = 3
 
-[Perl::Critic::Policy::ValuesAndExpressions::ProhibitMagicNumbers]
+#[Perl::Critic::Policy::ValuesAndExpressions::ProhibitMagicNumbers]
 # Not yet configured completely.
-add_themes     = critic
-allowed_values = -1 0 1
+#add_themes     = critic
+#allowed_values = -1 0 1
 
 [Perl::Critic::Policy::ValuesAndExpressions::ProhibitMixedBooleanOperators]
 add_themes = critic

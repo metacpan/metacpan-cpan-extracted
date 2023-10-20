@@ -95,4 +95,18 @@ use String::Tagged::Markdown;
       'Link text has link and fixed' );
 }
 
+# HTML entities
+{
+   my $str;
+
+   $str = String::Tagged::Markdown->parse_markdown( "A dash &ndash; like this &amp; that" );
+
+   # ndash = U+2013
+   is( $str->str, "A dash \x{2013} like this & that", 'HTML entities decoded' );
+
+   $str = String::Tagged::Markdown->parse_markdown( "But not in \`this &amp; place\`" );
+
+   is( $str->str, "But not in this &amp; place", 'HTML entities not decoded in code span' );
+}
+
 done_testing;

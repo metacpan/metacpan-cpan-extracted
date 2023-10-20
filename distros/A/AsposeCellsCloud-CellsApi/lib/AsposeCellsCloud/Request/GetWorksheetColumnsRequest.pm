@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetColumnsRequest.name :   ,
-# GetWorksheetColumnsRequest.sheetName :   ,
-# GetWorksheetColumnsRequest.offset :   ,
-# GetWorksheetColumnsRequest.count :   ,
-# GetWorksheetColumnsRequest.folder :   ,
+# GetWorksheetColumnsRequest.name : The workbook name.  ,
+# GetWorksheetColumnsRequest.sheetName : The worksheet name.  ,
+# GetWorksheetColumnsRequest.offset : Original workbook folder.  ,
+# GetWorksheetColumnsRequest.count : Storage name.  ,
+# GetWorksheetColumnsRequest.folder : The workdook folder.  ,
 # GetWorksheetColumnsRequest.storageName :    
 
 {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_columns' } = { 
-    	summary => '',
+    	summary => 'Get worksheet columns description.',
         params => $params,
         returns => 'ColumnsResponse',
     };
@@ -140,35 +140,35 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'offset' => {
      	datatype => 'int',
      	base_name => 'offset',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'count' => {
      	datatype => 'int',
      	base_name => 'count',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'The workdook folder.',
      	format => '',
      	read_only => '',
      		},

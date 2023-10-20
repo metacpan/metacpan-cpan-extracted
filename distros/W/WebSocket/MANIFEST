@@ -9,7 +9,7 @@ lib/WebSocket.pm
 lib/WebSocket/Client.pm
 lib/WebSocket/Common.pm
 lib/WebSocket/Connection.pm
-lib/WebSocket/Exception.pod
+lib/WebSocket/Exception.pm
 lib/WebSocket/Extension.pm
 lib/WebSocket/Frame.pm
 lib/WebSocket/Handshake.pm

@@ -10,7 +10,7 @@ BEGIN
     use JSON;
     use Test::More qw( no_plan );
     use_ok( 'Module::Generic::Scalar' ) || BAIL_OUT( "Unable to load Module::Generic::Scalar" );
-    use Nice::Try;
+    # use Nice::Try;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
@@ -200,12 +200,12 @@ is( $a6->[0], 'Hello world', 'as_array' );
 
 my $s7 = Module::Generic::Scalar->new( 'Jack John Paul Peter' );
 my $j = JSON->new->convert_blessed;
-try
+eval
 {
     my $json = $j->encode( $s7 );
     is( $json, '"Jack John Paul Peter"', 'TO_JSON' );
-}
-catch( $e )
+};
+if( $@ )
 {
     # diag( "Error encoding: $e" );
     fail( 'TO_JSON' );
@@ -296,7 +296,7 @@ EOT
     ok( !$rv, 'cannot syswrite in read-only mode' );
     SKIP:
     {
-        try
+        eval
         {
             # require Fcntl;
             # Fcntl->import;
@@ -316,8 +316,8 @@ EOT
             }
             ok( ( ( $bit > 0 && $bit & O_RDONLY ) || $bit == O_RDONLY ), 'scalar io has read-only bit' );
             ok( !( $bit & O_RDWR ), 'scalar io does not have write bit' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
             skip( "Fcntl is not available on $^O", 1 );
         }

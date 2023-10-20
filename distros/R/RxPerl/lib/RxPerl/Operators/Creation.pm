@@ -1,4 +1,6 @@
 package RxPerl::Operators::Creation;
+
+use v5.10;
 use strict;
 use warnings;
 
@@ -21,7 +23,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.27.1";
+our $VERSION = "v6.28.0";
 
 sub rx_observable;
 
@@ -130,10 +132,8 @@ sub rx_defer {
     });
 }
 
-my $rx_EMPTY;
-
 sub rx_EMPTY {
-    $rx_EMPTY //= rx_observable->new(sub {
+    state $rx_EMPTY = rx_observable->new(sub {
         my ($subscriber) = @_;
 
         $subscriber->{complete}->() if defined $subscriber->{complete};
@@ -425,12 +425,8 @@ sub rx_merge {
     });
 }
 
-my $rx_never;
-
 sub rx_NEVER {
-    return $rx_never //= rx_observable->new(sub {
-        return;
-    });
+    state $rx_never = rx_observable->new(sub { return });
 }
 
 sub rx_observable { "RxPerl::Observable" }
@@ -505,11 +501,10 @@ sub rx_partition {
         RxPerl::Operators::Pipeable::op_filter($predicate),
     );
 
-    my $i = -1;
+    my $i = 0;
     my $o2 = $source->pipe(
         RxPerl::Operators::Pipeable::op_filter(sub {
-            $i++;
-            return not $predicate->($_[0], $i);
+            return not $predicate->($_[0], $i++);
         }),
     );
 

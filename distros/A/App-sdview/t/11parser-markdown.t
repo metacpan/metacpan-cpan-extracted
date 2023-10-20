@@ -36,7 +36,7 @@ EOMARKDOWN
 
    is( $p[3]->type, "plain", 'p[3] type' );
    is( $p[3]->text, "The content with bold and code in it.", 'p[3] text' );
-   is( [ sort $p[3]->text->tagnames ], [qw( B C )], 'p[3] tags' );
+   is( [ sort $p[3]->text->tagnames ], [qw( bold monospace )], 'p[3] tags' );
 };
 
 subtest "Alternate headings" => sub {
@@ -76,21 +76,46 @@ subtest "Formatting" => sub {
 `code` `code_with_unders`
 
 [link](target://)
+
+~~strikethrough~~
 EOMARKDOWN
 
-   is( scalar @p, 4, 'Received 4 paragraphs' );
+   is( scalar @p, 5, 'Received 5 paragraphs' );
 
    is( $p[0]->text, "bold bold", 'bold text' );
-   ok( $p[0]->text->get_tag_at( 0, "B" ), 'bold tag' );
+   ok( $p[0]->text->get_tag_at( 0, "bold" ), 'bold tag' );
 
    is( $p[1]->text, "italic italic", 'italic text' );
-   ok( $p[1]->text->get_tag_at( 0, "I" ), 'italic tag' );
+   ok( $p[1]->text->get_tag_at( 0, "italic" ), 'italic tag' );
 
    is( $p[2]->text, "code code_with_unders", 'code text' );
-   ok( $p[2]->text->get_tag_at( 0, "C" ), 'code tag' );
+   ok( $p[2]->text->get_tag_at( 0, "monospace" ), 'code tag' );
 
    is( $p[3]->text, "link", 'link text' );
-   is( $p[3]->text->get_tag_at( 0, "L" ), { target => "target://" }, 'link tag' );
+   is( $p[3]->text->get_tag_at( 0, "link" ), { target => "target://" }, 'link tag' );
+
+   is( $p[4]->text, "strikethrough", 'strikethrough text' );
+   ok( $p[4]->text->get_tag_at( 0, "strikethrough" ), 'strikethrough tag' );
+};
+
+subtest "Verbatim language" => sub {
+   my @p = App::sdview::Parser::Markdown->new->parse_string( <<"EOPOD" );
+# EXAMPLE
+
+```perl
+use v5.14;
+use warnings;
+say "Hello, world";
+```
+
+EOPOD
+
+   is( scalar @p, 2, 'Received 2 paragraphs' );
+
+   is( $p[0]->text, "EXAMPLE", 'p[0] text' );
+
+   is( $p[1]->text, qq(use v5.14;\nuse warnings;\nsay "Hello, world";), 'p[1] text' );
+   is( $p[1]->language, "perl", 'p[1] language' );
 };
 
 subtest "Verbatim trimming" => sub {

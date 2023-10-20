@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
 	'Test2::Plugin::UTF8' => '0',
 	'File::Temp' => '0',
+	'File::Spec' => '0',
 	'FindBin' => '0',
 	'Cwd' => '0',
     },
@@ -32,6 +33,24 @@ my %WriteMakefileArgs = (
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Config-JSON-Enhanced-*' },
+    # Thanks to marto @ Perlmonks.org
+    # see https://perlmonks.org/?displaytype=displaycode;node_id=359256;part=1;abspart=1
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+	requires    => { perl    => '5.6.0' },
+        resources   => {
+            license    => 'artistic_2',
+	    homepage   => 'https://metacpan.org/module/Config::JSON::Enhanced',
+            repository => {
+                url  => 'https://github.com/hadjiprocopis/Config-JSON-Enhanced',
+                web  => 'https://github.com/hadjiprocopis/Config-JSON-Enhanced',
+                type => 'git',
+            },
+            bugtracker => {
+                web => 'https://github.com/hadjiprocopis/Config-JSON-Enhanced/issues',
+            }
+        },
+    },
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

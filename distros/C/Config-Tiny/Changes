@@ -1,5 +1,14 @@
 ﻿Revision history for Perl extension Config-Tiny:
 
+2.30  2023-10-12T17:17:08
+	- As of V 2.30, this module supports an array syntax for cases where you wish to
+		assign an array of values to a key.
+	- See the new POD section called ARRAY SYNTAX.
+	- See also the updated question in the FAQ: What happens if a key is repeated?
+	- See also the sample code in the Synopsis and in t/02.main.t and in t/test.conf.
+	- In each case, search for the word greetings to find the new code samples.
+	- This patch was kindly provided by Steven Schoch, with some additions by Ron Savage.
+
 2.29  2023-04-05T12:53:00
 	- Edit to remove Test::Pod from TEST_REQUIRES in Makefile.PL, again.
 		Thanx to Andrew Daugherity for the patch.
@@ -104,6 +113,7 @@
 	- Add MANIFEST.SKIP, Changelog.ini, Build.PL, META.json.
 	- Add an FAQ to the docs.
 	- Clean up the docs.
+	- As of this version, maintanence is by Ron Savage.
 
 2.14 Thu Mar 24 12:00:00 2011
 	- Resolved #63080: module can write multiline values but not read them

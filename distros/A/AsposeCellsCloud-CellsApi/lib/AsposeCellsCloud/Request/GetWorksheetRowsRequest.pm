@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetRowsRequest.name :   ,
-# GetWorksheetRowsRequest.sheetName :   ,
-# GetWorksheetRowsRequest.offset :   ,
-# GetWorksheetRowsRequest.count :   ,
+# GetWorksheetRowsRequest.name : The workbook name.  ,
+# GetWorksheetRowsRequest.sheetName : The worksheet name.  ,
+# GetWorksheetRowsRequest.offset : Original workbook folder.  ,
+# GetWorksheetRowsRequest.count : Storage name.  ,
 # GetWorksheetRowsRequest.folder :   ,
 # GetWorksheetRowsRequest.storageName :    
 
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_rows' } = { 
-    	summary => '',
+    	summary => 'Get rows description in worksheet.',
         params => $params,
         returns => 'RowsResponse',
     };
@@ -140,28 +140,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'offset' => {
      	datatype => 'int',
      	base_name => 'offset',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'count' => {
      	datatype => 'int',
      	base_name => 'count',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},

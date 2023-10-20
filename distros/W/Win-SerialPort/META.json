@@ -1,0 +1,54 @@
+{
+   "abstract" : "User interface to Win32 Serial API calls (fork for 64bit)",
+   "author" : [
+      "Bill Birthisel <wcbirthisel@alum.mit.edu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Win-SerialPort",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Win32" : "0",
+            "Win32::API" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Azq2/perl-win32-serialport-fork/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Azq2/perl-win32-serialport-fork",
+         "web" : "https://github.com/Azq2/perl-win32-serialport-fork"
+      }
+   },
+   "version" : "0.23",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

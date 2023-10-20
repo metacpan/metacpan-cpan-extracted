@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.19",
+   "generated_by" : "Minilla/v3.1.21",
    "license" : [
       "perl_5"
    ],
@@ -45,8 +45,8 @@
       },
       "runtime" : {
          "requires" : {
-            "App::Greple" : "8.58",
-            "App::Greple::update" : "0.03",
+            "App::Greple" : "9.08",
+            "App::Greple::update" : "1.01",
             "File::Share" : "0.27",
             "Getopt::EX" : "0",
             "Getopt::EX::termcolor" : "1.08",
@@ -66,7 +66,7 @@
    "provides" : {
       "App::Greple::subst" : {
          "file" : "lib/App/Greple/subst.pm",
-         "version" : "2.3104"
+         "version" : "2.3301"
       },
       "App::Greple::subst::Dict" : {
          "file" : "lib/App/Greple/subst/Dict.pm"
@@ -90,11 +90,11 @@
          "web" : "https://github.com/kaz-utashiro/greple-subst"
       }
    },
-   "version" : "2.3104",
+   "version" : "2.3301",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.12",
    "x_static_install" : 1
 }

@@ -1,7 +1,8 @@
 Changes
 doc/images/preview-screenshot.png
+etc/upgrade/remove_files
+html/Callbacks/RT-Extension-PreviewInSearch/Elements/ShowHistoryPage/ModifyPaths
 html/Callbacks/RT-Extension-PreviewInSearch/Search/Results.html/AfterResults
-html/Callbacks/RT-Extension-PreviewInSearch/Search/Results.html/BeforeResults
 html/Helpers/TicketPreview
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
@@ -12,6 +13,7 @@ inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/ReadmeFromPod.pm
 inc/Module/Install/RTx.pm
+inc/Module/Install/RTx/Remove.pm
 inc/Module/Install/RTx/Runtime.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm

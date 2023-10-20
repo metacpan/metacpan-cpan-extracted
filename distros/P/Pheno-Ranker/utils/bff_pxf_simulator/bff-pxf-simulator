@@ -1,0 +1,466 @@
+#!/usr/bin/env perl
+#
+#   A script that creates a JSON array of random BFF/PXF
+#
+#   Note: Monarch has a more sophisticated version at:
+#   https://github.com/monarch-initiative/PhenoImp
+#
+#   Last Modified: May/05/2023
+#
+#   Version 0.00
+#
+#   Copyright (C) 2023 Manuel Rueda - CNAG (manuel.rueda@cnag.crg.eu)
+#
+#   License: Artistic License 2.0
+#
+#   If this program helps you in your research, please cite.
+use strict;
+use warnings;
+use Getopt::Long qw(:config no_ignore_case);
+use Pod::Usage;
+
+##### Main #####
+randomize_ga4gh();
+################
+exit;
+
+sub randomize_ga4gh {
+
+    my $format             = 'bff';
+    my $number             = 100;
+    my $output             = 'individuals.json';
+    my $phenotypicFeatures = 1;
+    my $diseases           = 1;
+    my $treatments         = 1;
+    my $VERSION            = '0.00';
+
+    # Reading arguments
+    GetOptions(
+        'format|f=s'                    => \$format,                           # string
+        'number|n=i'                    => \$number,                           # string
+        'output|o=s'                    => \$output,                           # string
+        'phenotypicFeatures=i'          => \$phenotypicFeatures,               # integer
+        'max-phenotypicFeatures-pool=i' => \my $max_phenotypicFeatures_pool,   # integer
+        'diseases=i'                    => \$diseases,                         # integer
+        'max-diseases-pool=i'           => \my $max_diseases_pool,             # integer
+        'treatments=i'                  => \$treatments,                       # integer
+        'max-treatments-pool=i'         => \my $max_treatments_pool,           # integer
+        'random-seed=i'                 => \my $random_seed,                   # integer
+        'external-ontologies=s'         => \my $ext_ontologies,                # string
+        'help|?'                        => \my $help,                          # flag
+        'man'                           => \my $man,                           # flag
+        'debug=i'                       => \my $debug,                         # integer
+        'verbose|'                      => \my $verbose,                       # flag
+        'version|V' => sub { print "$0 Version $VERSION\n"; exit; }
+    ) or pod2usage(2);
+    pod2usage(1)                              if $help;
+    pod2usage( -verbose => 2, -exitval => 0 ) if $man;
+
+    # Create object
+    my $randomize = Randomizer->new(
+        {
+            format                      => $format,
+            number                      => $number,
+            output                      => $output,
+            phenotypicFeatures          => $phenotypicFeatures,
+            diseases                    => $diseases,
+            treatments                  => $treatments,
+            max_phenotypicFeatures_pool => $max_phenotypicFeatures_pool,
+            max_diseases_pool           => $max_diseases_pool,
+            max_treatments_pool         => $max_treatments_pool,
+            random_seed                 => $random_seed,
+            ext_ontologies              => $ext_ontologies,
+            debug                       => $debug,
+            verbose                     => $verbose
+        }
+    );
+
+    # Run method
+    $randomize->run;
+}
+
+package Randomizer;
+
+use strict;
+use warnings;
+use autodie;
+use feature qw(say);
+
+#use Data::Printer;
+use Data::Dumper;
+use Path::Tiny;
+use List::Util 1.50 qw(head shuffle);
+use JSON::XS;
+use Data::Fake qw(Core Company Dates Names);
+use FindBin    qw($Bin);
+use lib $Bin;
+use Ontologies qw($hpo_array $omim_array $rxnorm_array $ethnicity_array);
+
+sub new {
+    my ( $class, $self ) = @_;
+    bless $self, $class;
+    return $self;
+}
+
+sub run {
+
+    my $self        = shift;
+    my $number      = $self->{number};
+    my $format      = $self->{format};
+    my $output      = $self->{output};
+    my $random_seed = $self->{random_seed};
+    my %func        = (
+        bff => \&bff_generator,
+        pxf => \&pxf_generator
+    );
+
+    # Set seed if defined
+    srand($random_seed) if defined $random_seed;    # user can set it to 0
+
+    # Load external ontologies file is present
+    $self->{ontologies_data} =
+      $self->{ext_ontologies}
+      ? validate_json( $self->{ext_ontologies} )
+      : undef;                                      # setter
+
+    #########
+    # START #
+    #########
+
+    my $json_data;
+    for ( my $i = 1 ; $i <= $number ; $i++ ) {
+        push @$json_data, $func{$format}->( $i, $self );
+    }
+
+    #######
+    # END #
+    #######
+    #p $json_data;
+
+    # Serialize the data and write
+    write_json( { filepath => $output, data => $json_data } );
+}
+
+sub write_json {
+
+    my $arg       = shift;
+    my $file      = $arg->{filepath};
+    my $json_data = $arg->{data};
+
+    # Note that canonical DOES not match the order of nsort from Sort::Naturally
+    my $json = JSON::XS->new->utf8->canonical->pretty->encode($json_data);
+    path($file)->spew_utf8($json);
+    return 1;
+}
+
+sub pxf_generator {
+
+    my ( $id, $self ) = @_;
+    my $hash = load_ontologies($self);
+    my $pxf  = fake_hash(
+        {
+            id      => "Phenopacket_" . $id,
+            subject => {
+                id  => "IndividualId_" . $id,
+                age => {
+                    iso8601duration =>
+                      fake_template( "P%dY", fake_int_mod( 1, 99 ) )
+                },
+                sex => fake_pick_mod( [ 'MALE', 'FEMALE' ] )
+            },
+            diseases           => $hash->{diseases},
+            phenotypicFeatures => $hash->{phenotypicFeatures},
+            medicalActions     => $hash->{treatments}
+        }
+    );
+    return $pxf->();
+}
+
+sub bff_generator {
+
+    my ( $id, $self ) = @_;
+    my $hash = load_ontologies($self);
+    my $bff  = fake_hash(
+        {
+            id        => "Beacon_" . $id,
+            ethnicity => fake_pick_mod($ethnicity_array),
+            sex       => fake_pick_mod(
+                [
+                    { id => "NCIT:C20197", label => "Male" },
+                    { id => "NCIT:C16576", label => "Female" }
+                ]
+            ),
+            diseases           => $hash->{diseases},
+            phenotypicFeatures => $hash->{phenotypicFeatures},
+
+            treatments => $hash->{treatments}
+
+        }
+    );
+    return $bff->();
+}
+
+sub phenotypicFeatures {
+
+    my ( $format, $ont_array, $n, $max ) = @_;
+    my $type           = $format eq 'bff' ? 'featureType' : 'type';
+    my $onset          = $format eq 'bff' ? 'ageOfOnset'  : 'onset';
+    my $shuffled_slice = shuffle_slice( $max, $ont_array );
+    my $array;
+    for ( my $i = 0 ; $i < $n ; $i++ ) {
+        push @$array,
+          {
+            $type  => $shuffled_slice->[$i],
+            $onset => {
+                age => {
+                    iso8601duration =>
+                      fake_template( "P%dY", fake_int_mod( 1, 99 ) )
+                }
+            }
+          };
+    }
+    return $array;
+}
+
+sub diseases {
+
+    my ( $format, $ont_array, $n, $max ) = @_;
+    my $type           = $format eq 'bff' ? 'diseaseCode' : 'term';
+    my $onset          = $format eq 'bff' ? 'ageOfOnset'  : 'onset';
+    my $shuffled_slice = shuffle_slice( $max, $ont_array );
+    my $array;
+    for ( my $i = 0 ; $i < $n ; $i++ ) {
+        push @$array,
+          {
+            $type  => $shuffled_slice->[$i],
+            $onset => {
+                age => {
+                    iso8601duration =>
+                      fake_template( "P%dY", fake_int_mod( 1, 99 ) )
+                }
+            }
+          };
+    }
+    return $array;
+}
+
+sub treatments {
+
+    my ( $format, $ont_array, $n, $max ) = @_;
+    my $shuffled_slice = shuffle_slice( $max, $ont_array );
+    my $array;
+    for ( my $i = 0 ; $i < $n ; $i++ ) {
+        push @$array,
+          $format eq 'bff'
+          ? { treatmentCode => $shuffled_slice->[$i] }
+          : { treatment     => { agent => $shuffled_slice->[$i] } };
+    }
+    return $array;
+}
+
+sub load_ontologies {
+
+    my $self = shift;
+
+    my %func = (
+        diseases           => \&diseases,
+        phenotypicFeatures => \&phenotypicFeatures,
+        treatments         => \&treatments
+    );
+    my %ont = (
+        diseases           => $omim_array,
+        phenotypicFeatures => $hpo_array,
+        treatments         => $rxnorm_array
+    );
+
+    my %hash;
+    for my $item (qw/diseases phenotypicFeatures treatments/) {
+        my $ont_array =
+          exists $self->{ontologies_data}{$item}
+          ? $self->{ontologies_data}{$item}
+          : $ont{$item};
+
+        # format, ont_array, n, max
+        $hash{$item} = $func{$item}->(
+            $self->{format}, $ont_array, $self->{$item},
+            $self->{ 'max_' . $item . '_pool' }
+        );
+    }
+    return \%hash;
+}
+
+sub shuffle_slice {
+
+    my ( $max, $array ) = @_;
+
+    # head   -> 1.50 List::Util (5.26 has 1.4602)
+    #my @items = sample $count, @values; # 1.54 List::Util
+    my @slice          = defined $max ? head $max, @$array : @$array;    # slice of refs
+    my @shuffled_slice = shuffle @slice;
+    return wantarray ? @shuffled_slice : \@shuffled_slice;
+}
+
+sub fake_int_mod {
+
+    # This subroutine was built because fake_int did not respond to srand
+    my ( $low, $high ) = @_;
+    my $range = $high - $low;
+    return int( rand($range) ) + 1;
+}
+
+sub fake_pick_mod {
+
+    # This subroutine was built because fake_pick did not respond to srand
+    # NB: The original from Data::Fake worked with array (not with arrayref)
+    my $array = shift;
+    return $array->[ int( rand(@$array) ) ];
+}
+
+sub validate_json {
+
+    my $file   = shift;
+    my $data   = read_yaml($file);
+    my $schema = {
+        '$schema' => 'http://json-schema.org/draft-07/schema#',
+        type       => "object",
+        properties => {
+            diseases           => { '$ref' => '#/$defs/array' },
+            phenotypicFeatures => { '$ref' => '#/$defs/array' },
+            treatments         => { '$ref' => '#/$defs/array' }
+        },
+        '$defs' => {
+            array => {
+                type  => "array",
+                items => { '$ref' => '#/$defs/item' }
+            },
+            item => {
+                type       => "object",
+                required   => [ "id", "label" ],
+                properties => {
+                    id => { type => "string", pattern => qq/^\\w[^:]+:.+\$/ },
+                    label => { type => "string" }
+                }
+            }
+        }
+    };
+
+    # Load at runtime
+    require JSON::Validator;
+
+    # Create object and load schema
+    my $jv = JSON::Validator->new;
+
+    # Load schema in object
+    $jv->schema($schema);
+
+    # Validate data
+    my @errors = $jv->validate($data);
+
+    # Show error if any
+    say_errors( \@errors ) and die if @errors;
+
+    # return data if ok
+    return $data;
+
+}
+
+sub say_errors {
+
+    my $errors = shift;
+    if ( @{$errors} ) {
+        say join "\n", @{$errors};
+    }
+    return 1;
+}
+
+sub read_yaml {
+
+    # Load at runtime
+    require YAML::XS;
+    YAML::XS->import('LoadFile');
+    return LoadFile(shift);    # Decode to Perl data structure
+}
+
+1;
+
+=head1 NAME
+
+bff-pxf-simulator: A script that creates a JSON array of random BFF/PXF
+
+=head1 SYNOPSIS
+
+bff-pxf-simulator [-options]
+
+     Options:
+       -f|format                      Format [>bff|pxf]
+       -n|number                      Number of individuals
+       -diseases                      Number of [1]
+       -phenotypicFeatures            IDEM
+       -treatments                    IDEM
+       -max-diseases-pool             To narrow the selection to N first array elements
+       -max-phenotypicFeatures-pool   IDEM
+       -max-treatments-pool           IDEM
+       -o|output                      Output file [individuals.json]
+       -external-ontologies           YAML file with ontologies for diseases, phenotypicFeatures and treatments
+       -random-seed                   Initializes pseudorandom number sequences for reproducible results (int)
+
+     Generic Options;
+       -debug                         Print debugging (from 1 to 5, being 5 max)
+       -h|help                        Brief help message
+       -man                           Full documentation
+       -v|verbose                     Verbosity on
+       -V|version                     Print version
+
+=head1 DESCRIPTION
+
+A script that creates a JSON array of random BFF/PXF
+
+=head1 SUMMARY
+
+A script that creates a JSON array of random BFF/PXF. 
+
+For complex properties we only implemented C<diseases,phenotypicFeatures> and C<treatments>. Depending on the user's adoption we might implement more.
+
+=head1 INSTALLATION
+
+(only needed if you did not install C<Pheno-Ranker>)
+
+ $ cpanm --sudo --installdeps .
+
+=head3 System requirements
+
+  * Ideally a Debian-based distribution (Ubuntu or Mint), but any other (e.g., CentOs, OpenSuse) should do as well.
+  * Perl 5 (>= 5.10 core; installed by default in most Linux distributions). Check the version with "perl -v"
+  * 1GB of RAM.
+  * 1 core (it only uses one core per job).
+  * At least 1GB HDD.
+
+=head1 HOW TO RUN BFF-PXF-SIMULATOR
+
+The software runs without any argument and assumes defaults. If you want to change some parameters please take a look to the synopsis.
+
+B<Examples:>
+
+ $ ./bff-pxf-simulator -f pxf  # BFF with 100 samples
+
+ $ ./bff-pxf-simulator -f pxf -n 1000 -o pxf.json # PXF with 1K samples and saved to pxf.json
+
+ $ ./bff-pxf-simulator -phenotypicFeatures 10 # BFF with 100 samples and 10 pF each
+
+=head2 COMMON ERRORS AND SOLUTIONS
+
+ * Error message: Foo
+   Solution: Bar
+
+ * Error message: Foo
+   Solution: Bar
+
+=head1 AUTHOR 
+
+Written by Manuel Rueda, PhD. Info about CNAG can be found at L<https://www.cnag.crg.eu>.
+
+=head1 COPYRIGHT AND LICENSE
+
+This PERL file is copyrighted. See the LICENSE file included in this distribution.
+
+=cut

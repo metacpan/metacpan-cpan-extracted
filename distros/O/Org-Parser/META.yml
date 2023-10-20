@@ -25,79 +25,79 @@ name: Org-Parser
 provides:
   Org::Document:
     file: lib/Org/Document.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element:
     file: lib/Org/Element.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element::Block:
     file: lib/Org/Element/Block.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element::Comment:
     file: lib/Org/Element/Comment.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element::Drawer:
     file: lib/Org/Element/Drawer.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element::FixedWidthSection:
     file: lib/Org/Element/FixedWidthSection.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element::Footnote:
     file: lib/Org/Element/Footnote.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element::Headline:
     file: lib/Org/Element/Headline.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element::Link:
     file: lib/Org/Element/Link.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element::List:
     file: lib/Org/Element/List.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element::ListItem:
     file: lib/Org/Element/ListItem.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element::RadioTarget:
     file: lib/Org/Element/RadioTarget.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element::Setting:
     file: lib/Org/Element/Setting.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element::Table:
     file: lib/Org/Element/Table.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element::TableCell:
     file: lib/Org/Element/TableCell.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element::TableHLine:
     file: lib/Org/Element/TableHLine.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element::TableRow:
     file: lib/Org/Element/TableRow.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element::Target:
     file: lib/Org/Element/Target.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element::Text:
     file: lib/Org/Element/Text.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element::TimeRange:
     file: lib/Org/Element/TimeRange.pm
-    version: '0.559'
+    version: '0.560'
   Org::Element::Timestamp:
     file: lib/Org/Element/Timestamp.pm
-    version: '0.559'
+    version: '0.560'
   Org::ElementRole:
     file: lib/Org/ElementRole.pm
-    version: '0.559'
+    version: '0.560'
   Org::ElementRole::Block:
     file: lib/Org/ElementRole/Block.pm
-    version: '0.559'
+    version: '0.560'
   Org::ElementRole::Inline:
     file: lib/Org/ElementRole/Inline.pm
-    version: '0.559'
+    version: '0.560'
   Org::Parser:
     file: lib/Org/Parser.pm
-    version: '0.559'
+    version: '0.560'
 requires:
   Cwd: '0'
   DateTime: '0'
@@ -123,7 +123,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Org-Parser
   homepage: https://metacpan.org/release/Org-Parser
   repository: git://github.com/perlancar/perl-Org-Parser.git
-version: '0.559'
+version: '0.560'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -406,10 +406,6 @@ x_Dist_Zilla:
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
               version: '4.019'
-            -
-              class: Pod::Weaver::Plugin::Rinci
-              name: '@Author::PERLANCAR/Rinci'
-              version: '0.786'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

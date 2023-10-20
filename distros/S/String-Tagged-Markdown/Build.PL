@@ -9,6 +9,7 @@ my $build = Module::Build->new(
    requires => {
       'perl' => '5.026', # signatures
       'experimental' => 0,
+      'HTML::Entities' => 0,
       'List::Util' => '1.45',
       'String::Tagged' => '0.07',
    },

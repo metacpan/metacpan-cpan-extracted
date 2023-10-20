@@ -84,6 +84,7 @@ bin/rm
 bin/rmdir
 bin/robots
 bin/rot13
+bin/seq
 bin/shar
 bin/sleep
 bin/sort
@@ -124,6 +125,7 @@ Changes
 CONTRIBUTING.md
 INSTALL.SKIP
 lib/PerlPowerTools.pm
+lib/PerlPowerTools/SymbolicMode.pm
 lib/ppt.pm
 LICENSE-ARTISTIC2
 LICENSE-BSD2
@@ -159,11 +161,11 @@ t/rm/process_options.t
 t/rm/run.t
 t/robots/000.basic.t
 t/rot13/rot13.t
+t/seq/seq.t
 t/sort/sort.t
 t/true/true.t
 t/units/units.t
 t/uudecode/uudecode.t
-util/extract_metadata
 xt/changes.t
 xt/perlcritic.t
 xt/perlcriticrc

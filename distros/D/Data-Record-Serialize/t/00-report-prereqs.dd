@@ -74,31 +74,33 @@ do { my $x = {
        'runtime' => {
                       'recommends' => {
                                         'Cpanel::JSON::XS' => '3.0236',
-                                        'DBD::SQLite' => '1.31',
                                         'JSON::PP' => '0',
                                         'YAML::PP' => '0',
                                         'YAML::XS' => '0.67'
                                       },
                       'requires' => {
                                       'Data::Dumper' => '2.160',
+                                      'Exporter::Tiny' => '1.002',
+                                      'JSON::PP' => '0',
                                       'List::Util' => '1.33',
                                       'Module::Version' => '0.201',
                                       'Moo::Role' => '2.003004',
                                       'Package::Variant' => '0',
                                       'Ref::Util' => '0',
-                                      'SQL::Translator' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Type::Library' => '0',
+                                      'Type::Utils' => '0',
                                       'Types::Standard' => '1.010003',
                                       'custom::failures' => '0',
                                       'enum' => '0',
                                       'namespace::clean' => '0',
-                                      'perl' => '5.01000'
+                                      'perl' => '5.012'
                                     }
                     },
        'test' => {
                    'recommends' => {
                                      'CPAN::Meta' => '2.120900',
-                                     'Convert::Scalar' => '0',
-                                     'DBD::SQLite' => '1.31'
+                                     'Convert::Scalar' => '0'
                                    },
                    'requires' => {
                                    'Capture::Tiny' => '0',
@@ -112,7 +114,6 @@ do { my $x = {
                                    'String::RewritePrefix' => '0',
                                    'Test2::Bundle::More' => '0',
                                    'Test2::Plugin::NoWarnings' => '0',
-                                   'Test2::Tools::AfterSubtest' => '0',
                                    'Test2::V0' => '0',
                                    'Test::Lib' => '0',
                                    'Test::More' => '0',

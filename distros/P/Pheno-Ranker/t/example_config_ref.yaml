@@ -1,0 +1,13 @@
+---
+allowed_terms:
+- Bar
+- Baz
+- Foo
+- Id
+array_terms:
+- Bar
+format: CSV
+id_correspondence:
+  CSV:
+  - Bar: Bar
+primary_key: Id

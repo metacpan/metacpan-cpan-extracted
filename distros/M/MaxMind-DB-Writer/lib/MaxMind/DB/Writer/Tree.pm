@@ -5,7 +5,7 @@ use warnings;
 use namespace::autoclean;
 use autodie;
 
-our $VERSION = '0.300003';
+our $VERSION = '0.300004';
 
 use IO::Handle;
 use Math::Int64 0.51;
@@ -30,6 +30,11 @@ use XSLoader;
 ## no critic (ProhibitCallsToUnexportedSubs)
 XSLoader::load( __PACKAGE__, $VERSION );
 ## use critic
+
+warnings::warnif(
+    'deprecated',
+    'MaxMind::DB::Writer::Tree is deprecated and should no longer be used',
+);
 
 has ip_version => (
     is       => 'ro',
@@ -149,7 +154,7 @@ around BUILDARGS => sub {
 
     if ( $args->{merge_strategy}
         && !( $args->{merge_strategy} eq 'none' xor $merge_record_collisions )
-        ) {
+    ) {
         die sprintf(
             'merge_strategy cannot be "%s" if merge_record_collisions is "%s"',
             $args->{merge_strategy}, $args->{merge_record_collisions}
@@ -450,7 +455,7 @@ __PACKAGE__->meta()->make_immutable();
 
 1;
 
-# ABSTRACT: Tree representing a MaxMind DB database in memory - then write it to a file
+# ABSTRACT: DEPRECATED Tree representing a MaxMind DB database in memory - then write it to a file
 
 __END__
 
@@ -460,11 +465,11 @@ __END__
 
 =head1 NAME
 
-MaxMind::DB::Writer::Tree - Tree representing a MaxMind DB database in memory - then write it to a file
+MaxMind::DB::Writer::Tree - DEPRECATED Tree representing a MaxMind DB database in memory - then write it to a file
 
 =head1 VERSION
 
-version 0.300003
+version 0.300004
 
 =head1 SYNOPSIS
 
@@ -1047,7 +1052,7 @@ Mark Fowler <mfowler@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by MaxMind, Inc.
+This software is copyright (c) 2023 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

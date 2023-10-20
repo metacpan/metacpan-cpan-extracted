@@ -10,9 +10,9 @@ use Data::Dmp;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-28'; # DATE
+our $DATE = '2023-07-11'; # DATE
 our $DIST = 'App-GenPericmdCompleterScript'; # DIST
-our $VERSION = '0.125'; # VERSION
+our $VERSION = '0.126'; # VERSION
 
 our @EXPORT_OK = qw(gen_pericmd_completer_script);
 
@@ -234,10 +234,10 @@ sub gen_pericmd_completer_script {
 
     my $cli;
     {
-        use experimental 'smartmatch';
         my $spec = $SPEC{gen_pericmd_completer_script};
         my @attr_args = grep {
-            'category:pericmd-attribute' ~~ @{ $spec->{args}{$_}{tags} } }
+            my $arg = $_;
+            grep { $_ eq 'category:pericmd-attribute' } @{ $spec->{args}{$arg}{tags} } }
             keys %{ $spec->{args} };
         $cli = Perinci::CmdLine::Lite->new(
             map { $_ => $args{$_} } @attr_args
@@ -478,7 +478,7 @@ App::GenPericmdCompleterScript - Generate Perinci::CmdLine completer script
 
 =head1 VERSION
 
-This document describes version 0.125 of App::GenPericmdCompleterScript (from Perl distribution App-GenPericmdCompleterScript), released on 2022-08-28.
+This document describes version 0.126 of App::GenPericmdCompleterScript (from Perl distribution App-GenPericmdCompleterScript), released on 2023-07-11.
 
 =head1 FUNCTIONS
 
@@ -499,13 +499,19 @@ Arguments ('*' denotes required arguments):
 
 =item * B<completion> => I<code>
 
+(No description)
+
 =item * B<default_subcommand> => I<str>
+
+(No description)
 
 =item * B<exclude_package_functions_match> => I<re>
 
 Exclude package functions matching this pattern.
 
 =item * B<get_subcommand_from_arg> => I<int> (default: 1)
+
+(No description)
 
 =item * B<include_package_functions_match> => I<re>
 
@@ -529,7 +535,11 @@ Whether to overwrite output if previously exists.
 
 =item * B<per_arg_json> => I<bool>
 
+(No description)
+
 =item * B<per_arg_yaml> => I<bool>
+
+(No description)
 
 =item * B<program_name>* => I<str>
 
@@ -537,9 +547,15 @@ Program name that is being completed.
 
 =item * B<read_config> => I<bool>
 
+(No description)
+
 =item * B<read_env> => I<bool>
 
+(No description)
+
 =item * B<skip_format> => I<bool>
+
+(No description)
 
 =item * B<strip> => I<bool> (default: 0)
 
@@ -626,7 +642,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

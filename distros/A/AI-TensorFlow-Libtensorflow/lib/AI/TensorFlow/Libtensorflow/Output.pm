@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Output;
 # ABSTRACT: Output of operation as (operation, index) pair
-$AI::TensorFlow::Libtensorflow::Output::VERSION = '0.0.6';
+$AI::TensorFlow::Libtensorflow::Output::VERSION = '0.0.7';
 # See L<AI::TensorFlow::Libtensorflow::Input> for similar.
 # In fact, they are mostly the same, but keeping the classes separate for now
 # in case the upstream API changes.

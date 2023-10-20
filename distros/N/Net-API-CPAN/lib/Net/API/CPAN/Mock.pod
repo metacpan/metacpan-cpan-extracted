@@ -1,0 +1,1092 @@
+=encoding utf-8
+
+=head1 NAME
+
+Net::API::CPAN::Mock - Meta CPAN API
+
+=head1 SYNOPSIS
+
+    use Net::API::CPAN::Mock;
+    my $this = Net::API::CPAN::Mock->new(
+        pretty => 1,
+        openapi => '/path/to/cpan-openapi-specs.json',
+    ) || die( Net::API::CPAN::Mock->error, "\n" );
+    $mock->bind || die( $mock->error );
+    $mock->start || die( $mock->error );
+    my $url = $mock->url_base;
+    # perform tests by connecting to the mock MetaCPAN API at $url
+    $mock->stop;
+
+=head1 VERSION
+
+    v0.1.0
+
+=head1 DESCRIPTION
+
+This provides a mock MetaCPAN API server based on the original mock server idea in L<Test::HTTP::MockServer>
+
+It emulates all the known endpoints of the CPAN API, and endeavours to mimic its responses.
+
+It provides sample data for all endpoints. Those data are based on real CPAN modules, but have been completely anonymised using fake names and fake e-mail addresses.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+This instantiates a new C<Net::API::CPAN::Mock> object. It accepts the following options as an hash or hash reference.
+
+It returns the new object upon success, or upon error, sets an L<error|Net::API::CPAN::Exception> and returns C<undef> in scalar context, or an empty list in list context.
+
+=over 4
+
+=item * C<checksum>
+
+OpenAPI specifications file checksum for caching. This is set automatically by L<load_specs|/load_specs>
+
+=item * C<endpoints>
+
+OpenAPI resulting endpoints we derived from the specs
+
+=item * C<host>
+
+The C<host> to use when starting the mock CPAN API server.
+
+=item * C<openapi>
+
+This is the filepath to the L<OpenAPI specifications|https://spec.openapis.org/oas/v3.0.0> file.
+
+=item * C<port>
+
+The C<port> to use when starting the mock CPAN API server.
+
+=item * C<pretty>
+
+Boolean. If true, the C<JSON> data returned by the mock server will be in a human-readable format.
+
+=item * C<schema>
+
+The OpenAPI resulting schema we derived from the specs.
+
+=back
+
+=head1 METHODS
+
+=head2 bind
+
+This creates a socket, and binds it to the C<host> and C<port>
+
+If none provided, the C<host> is set to C<127.0.0.1>and the C<port> is randomly generated.
+
+Once done, it sets the C<host> and C<port> and C<socket> values to be accessible with their respective method.
+
+It returns the current object upon success, or, upon error, sets an L<error|Net::API::CPAN::Exception> and returns C<undef> in scalar context, or an empty list in list context.
+
+=head2 data
+
+    my $data = $self->data;
+
+Read-only. This returns the test data as an hash reference. The test data are stored in C<$Net::API::CPAN::Mock::TEST_DATA>
+
+=head2 endpoints
+
+Sets or gets the hash reference of endpoints derived from the specs analysed in L<load_specs|/load_specs>
+
+This returns an L<hash object|Module::Generic::Hash>, or C<undef> if nothing was set yet.
+
+=head2 host
+
+When used as a mutator, i.e. setting a value, this sets the C<host> to use when starting the server.
+
+In accessor mode, this ensures the socket is bound to the specified C<host> and C<port>.
+
+By default, the value used is C<127.0.0.1>
+
+This returns the current C<host> value.
+
+=head2 json
+
+Sets or gets the L<JSON> object.
+
+=head2 load_specs
+
+This takes a file path to an OpenAPI specifications, and will load its enclosed endpoints, schema and all specifications that will be used to run the mock CPAN API server.
+
+The result is cached, so it can be re-called safely. If the OpenAPI specifications have been changed, the next call to C<load_specs> will have it re-load the file.
+
+It sets the value for L<specs|/specs>, sets the MD5 checksum for the OpenAPI specifications file, and the hash reference of L<endpoints|/endpoints>.
+
+It returns the current object upon success, or, upon error, sets an L<error|Net::API::CPAN::Exception> and returns C<undef> in scalar context, or an empty list in list context.
+
+=head2 pid
+
+Sets or gets the process ID for this mock CPAN API server.
+
+Returns a regular number or C<undef> if nothing was set yet.
+
+=head2 port
+
+When used as a mutator, i.e. setting a value, this sets the C<port> to use when starting the server.
+
+In accessor mode, this ensures the socket is bound to the specified C<host> and C<port>.
+
+By default, the value used is a random integer.
+
+This returns the current C<host> value.
+
+=head2 pretty
+
+    $mock->pretty(1);
+    my $bool = $mock->pretty;
+
+Sets or gets the boolean value of whether the C<JSON> data returned by the mock server will be in a human-readable format.
+
+Defaults to false.
+
+=head2 socket
+
+Sets or gets the server socket value.
+
+Returns an C<IO::Socket> filehandle when set, or C<undef> otherwise.
+
+=head2 specs
+
+The OpenAPI JSON specifications as perl hash reference. This is set upon loading by L<load_specs|/load_specs>
+
+=head2 start
+
+Starts the mock CPAN API server, forks and returns the current object upon success, or, upon error, sets an L<error|Net::API::CPAN::Exception> and returns C<undef> in scalar context, or an empty list in list context.
+
+The child process whose C<pid> can be accessed with L<pid/pid> goes on waiting for connections.
+
+=head2 stop
+
+Stop the mock CPAN API server, and returns the killed process C<pid>
+
+=head2 url_base
+
+    my $uri = $mock->url_base; # http://127.0.0.1:1234
+
+Read-only. Based on the C<host> and C<port> set, this returns an L<URI> object representing the base HTTP URI for all endpoints.
+
+=for Pod::Coverage _build_recent
+
+=for Pod::Coverage _date_now
+
+=for Pod::Coverage _make_changes_from_module
+
+=for Pod::Coverage _search
+
+=head1 ENDPOINTS
+
+The following are the endpoints supported by MetaCPAN REST API:
+
+=over 4
+
+=item * C</v1/author>
+
+    curl https://fastapi.metacpan.org/v1/author?q=OALDERS
+    curl -XPOST https://fastapi.metacpan.org/v1/author -H 'Content-Type: application/json; charset=utf-8' --data-binary \@- <<EOT
+    {
+        "query": { "filtered": {
+            "query": { "match_all":{} },
+            "filter": {
+                "and": [
+                    { "term": { "pauseid": "OALDERS" } }
+                ]
+            }
+        }}
+    }
+    EOT
+
+C<GET> or C<POST> retrieves authors information details using a simple search
+
+=item * C</v1/author/_mapping>
+
+    curl https://fastapi.metacpan.org/v1/author/_mapping
+    curl -XPOST https://fastapi.metacpan.org/v1/author/_mapping
+
+C<GET> or C<POST> returns the available fields for the L<author object|https://explorer.metacpan.org/?url=/author/_mapping>
+
+=item * C</v1/author/_search>
+
+    curl https://fastapi.metacpan.org/v1/author/_search?from=10&q=Tokyo&size=10
+    curl -XPOST https://fastapi.metacpan.org/v1/author/_search -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "query" : {
+          "filtered" : {
+             "filter" : {
+                "and" : [
+                   {
+                      "term" : {
+                         "city" : "Tokyo"
+                      }
+                   }
+                ]
+             },
+             "query" : {
+                "match_all" : {}
+             }
+          }
+       }
+    }
+    EOT
+
+C<GET> or C<POST> returns the result set for the author search
+
+=item * C</v1/author/_search/scroll>
+
+C<GET> or C<POST> returns the result set for the author search and C<DELETE> clear a L<scroll|https://www.elastic.co/guide/en/elasticsearch/reference/8.9/paginate-search-results.html#clear-scroll>
+
+=item * C</v1/author/by_ids>
+
+    curl https://fastapi.metacpan.org/v1/author/by_ids?id=OALDERS&id=JDEGUEST
+    curl -XPOST https://fastapi.metacpan.org/v1/author/by_ids -H 'Content-Type: application/json; charset=utf-8' -d '{"id" : ["OALDERS", "JDEGUEST"]}'
+
+C<GET> or C<POST> retrieves author information details for the specified pause IDs
+
+=item * C</v1/author/by_prefix/{prefix}>
+
+    curl https://fastapi.metacpan.org/v1/author/by_prefix/OAL
+    curl -XPOST https://fastapi.metacpan.org/v1/author/by_prefix/O?from=40&size=20'
+
+C<GET> or C<POST> retrieves authors information details using the initial characters of their pause ID
+
+=item * C</v1/author/by_user>
+
+    curl https://fastapi.metacpan.org/v1/author/by_user?user=oa-cmsLWTTOALauLxve1LA&user=2n2yGvQ4QxenVpSzkkTitQ
+    curl -XPOST https://fastapi.metacpan.org/v1/author/by_user -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "user" : [
+          "oa-cmsLWTTOALauLxve1LA",
+          "2n2yGvQ4QxenVpSzkkTitQ"
+       ]
+    }
+    EOT
+
+C<GET> or C<POST> retrieves authors information details using their user ID
+
+=item * C</v1/author/by_user/{user}>
+
+    curl https://fastapi.metacpan.org/v1/author/by_user/FepgBJBZQ8u92eG_TcyIGQ
+    curl -XPOST https://fastapi.metacpan.org/v1/author/by_user/FepgBJBZQ8u92eG_TcyIGQ
+
+C<GET> or C<POST> retrieves a author information details using his or her user ID
+
+=item * C</v1/author/{author}>
+
+    curl https://fastapi.metacpan.org/v1/author/OALDERS?join=release
+    curl -XPOST https://fastapi.metacpan.org/v1/author/OALDERS
+
+C<GET> or C<POST> retrieves an author information details
+
+=item * C</v1/changes/by_releases>
+
+    curl https://fastapi.metacpan.org/v1/changes/by_releases?release=OALDERS%2FHTTP-Message-6.37&release=JDEGUEST%2FModule-Generic-v0.30.1
+    curl -XPOST https://fastapi.metacpan.org/v1/changes/by_releases -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "release" : [
+          "OALDERS/HTTP-Message-6.37",
+          "JDEGUEST/Module-Generic-v0.30.1"
+       ]
+    }
+    EOT
+
+C<GET> or C<POST> retrieves one or more distribution Changes file details using author and release information
+
+=item * C</v1/changes/{author}/{release}>
+
+    curl https://fastapi.metacpan.org/v1/changes/OALDERS/HTTP-Message-6.36
+    curl -XPOST https://fastapi.metacpan.org/v1/changes/OALDERS/HTTP-Message-6.36
+
+C<GET> or C<POST> retrieves a Changes file details based on the specified release
+
+=item * C</v1/changes/{distribution}>
+
+    curl https://fastapi.metacpan.org/v1/changes/HTTP-Message
+    curl -XPOST https://fastapi.metacpan.org/v1/changes/HTTP-Message
+
+C<GET> or C<POST> retrieves a Changes file details based on the latest release of the specified distribution
+
+=item * C</v1/contributor/_mapping>
+
+    curl https://fastapi.metacpan.org/v1/contributor/_mapping
+    curl -XPOST https://fastapi.metacpan.org/v1/contributor/_mapping
+
+C<GET> or C<POST> returns the available fields for the L<contributor object|https://explorer.metacpan.org/?url=/contributor/_mapping>
+
+=item * C</v1/contributor/by_pauseid/{author}>
+
+    curl https://fastapi.metacpan.org/v1/contributor/by_pauseid/OALDERS
+    curl -XPOST https://fastapi.metacpan.org/v1/contributor/by_pauseid/OALDERS
+
+C<GET> or C<POST> retrieves a list of module contributed to by the specified Pause ID
+
+=item * C</v1/contributor/{author}/{release}>
+
+    curl https://fastapi.metacpan.org/v1/contributor/OALDERS/HTTP-Message-6.37
+    curl -XPOST https://fastapi.metacpan.org/v1/contributor/OALDERS/HTTP-Message-6.37
+
+C<GET> or C<POST> retrieves a list of release contributors details
+
+=item * C</v1/cover/{release}>
+
+    curl https://fastapi.metacpan.org/v1/cover/HTTP-Message-6.37
+    curl -XPOST https://fastapi.metacpan.org/v1/cover/HTTP-Message-6.37
+
+C<GET> or C<POST> retrieves a module cover details
+
+=item * C</v1/cve>
+
+    curl https://fastapi.metacpan.org/v1/cve
+    curl -XPOST https://fastapi.metacpan.org/v1/cve
+
+C<GET> or C<POST> retrieves CVE (Common Vulnerabilities & Exposures) information details
+
+=item * C</v1/cve/dist/{distribution}>
+
+    curl https://fastapi.metacpan.org/v1/cve/dist/HTTP-Message
+    curl -XPOST https://fastapi.metacpan.org/v1/cve/dist/HTTP-Message
+
+C<GET> or C<POST> retrieves Distribution CVE (Common Vulnerabilities & Exposures) information details
+
+=item * C</v1/cve/release/{author}/{release}>
+
+    curl https://fastapi.metacpan.org/v1/cve/release/OALDERS/HTTP-Message-6.36
+    curl -XPOST https://fastapi.metacpan.org/v1/cve/release/OALDERS/HTTP-Message-6.36
+
+C<GET> or C<POST> retrieves Release CVE (Common Vulnerabilities & Exposures) information details
+
+=item * C</v1/cve/{cpanid}>
+
+    curl https://fastapi.metacpan.org/v1/cve/OALDERS
+    curl -XPOST https://fastapi.metacpan.org/v1/cve/OALDERS
+
+C<GET> or C<POST> retrieves CPAN ID CVE (Common Vulnerabilities & Exposures) information details
+
+=item * C</v1/diff/file/{file1}/{file2}>
+
+    curl https://fastapi.metacpan.org/v1/diff/file/AcREzFgg3ExIrFTURa0QJfn8nto/Ies7Ysw0GjCxUU6Wj_WzI9s8ysU
+    curl -XPOST https://fastapi.metacpan.org/v1/diff/file/AcREzFgg3ExIrFTURa0QJfn8nto/Ies7Ysw0GjCxUU6Wj_WzI9s8ysU
+
+C<GET> or C<POST> retrieves a diff of two files
+
+=item * C</v1/diff/release/{author1}/{release1}/{author2}/{release2}>
+
+    curl https://fastapi.metacpan.org/v1/diff/release/OALDERS/HTTP-Message-6.35/OALDERS/HTTP-Message-6.36
+    curl -XPOST https://fastapi.metacpan.org/v1/diff/release/OALDERS/HTTP-Message-6.35/OALDERS/HTTP-Message-6.36
+
+C<GET> or C<POST> retrieves a diff of two releases
+
+=item * C</v1/diff/release/{distribution}>
+
+    curl https://fastapi.metacpan.org/v1/diff/release/HTTP-Message
+    curl -XPOST https://fastapi.metacpan.org/v1/diff/release/HTTP-Message
+
+C<GET> or C<POST> retrieves a diff of the latest release and its previous version
+
+=item * C</v1/distribution>
+
+    curl https://fastapi.metacpan.org/v1/distribution?from=10&q=HTTP&size=10
+    curl -XPOST https://fastapi.metacpan.org/v1/distribution -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "query" : {
+          "regexp" : {
+             "name" : "HTTP.*"
+          }
+       }
+    }
+    EOT
+
+C<GET> or C<POST> retrieves distributions information details
+
+=item * C</v1/distribution/_mapping>
+
+    curl https://fastapi.metacpan.org/v1/distribution/_mapping
+    curl -XPOST https://fastapi.metacpan.org/v1/distribution/_mapping
+
+C<GET> or C<POST> returns the available fields for the L<distribution object|https://explorer.metacpan.org/?url=/distribution/_mapping>
+
+=item * C</v1/distribution/_search>
+
+    curl https://fastapi.metacpan.org/v1/distribution/_search?q=HTTP.*&size=10
+    curl -XPOST https://fastapi.metacpan.org/v1/distribution/_search -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "query" : {
+          "regexp" : {
+             "name" : "HTTP.*"
+          }
+       }
+    }
+    EOT
+
+C<GET> or C<POST> returns the result set for the distribution search
+
+=item * C</v1/distribution/_search/scroll>
+
+C<GET> or C<POST> returns the result set for the scroll search and C<DELETE> clear a L<scroll|https://www.elastic.co/guide/en/elasticsearch/reference/8.9/paginate-search-results.html#clear-scroll>
+
+=item * C</v1/distribution/river>
+
+    curl https://fastapi.metacpan.org/v1/distribution/river?distribution=HTTP-Message&distribution=Module-Generic
+    curl -XPOST https://fastapi.metacpan.org/v1/distribution/river -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "distribution" : [
+          "HTTP-Message",
+          "Module-Generic"
+       ]
+    }
+    EOT
+
+C<GET> or C<POST> returns the river of specified distributions
+
+=item * C</v1/distribution/river/{distribution}>
+
+    curl https://fastapi.metacpan.org/v1/distribution/river/HTTP-Message
+    curl -XPOST https://fastapi.metacpan.org/v1/distribution/river/HTTP-Message
+
+C<GET> or C<POST> returns the river of a specific distribution
+
+=item * C</v1/distribution/{distribution}>
+
+    curl https://fastapi.metacpan.org/v1/distribution/HTTP-Message
+    curl -XPOST https://fastapi.metacpan.org/v1/distribution/HTTP-Message
+
+C<GET> or C<POST> retrieves the specified distribution latest release information
+
+=item * C</v1/download_url/{module}>
+
+    curl https://fastapi.metacpan.org/v1/download_url/HTTP::Message
+    curl -XPOST https://fastapi.metacpan.org/v1/download_url/HTTP::Message
+
+C<GET> or C<POST> retrieves a download URL for a given module. The C</download_url> endpoint exists specifically for the C<cpanm> client. It takes a module name with an optional version (or range of versions) and an optional C<dev> flag (for development releases) and returns a C<download_url> as well as some other helpful info.
+
+Obviously anyone can use this endpoint, but we'll only consider changes to this endpoint after considering how C<cpanm> might be affected
+
+=item * C</v1/favorite>
+
+    curl https://fastapi.metacpan.org/v1/favorite?q=HTTP&size=10
+    curl -XPOST https://fastapi.metacpan.org/v1/favorite -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "query" : {
+          "regexp" : {
+             "release" : "HTTP.*"
+          }
+       }
+    }
+    EOT
+
+C<GET> or C<POST> retrieves favorites information details
+
+=item * C</v1/favorite/_mapping>
+
+C<GET> or C<POST> returns the available fields for the L<favorite object|https://explorer.metacpan.org/?url=/favorite/_mapping>
+
+=item * C</v1/favorite/_search>
+
+    curl https://fastapi.metacpan.org/v1/favorite/_search?from=40&q=HTTP&size=20
+    curl -XPOST https://fastapi.metacpan.org/v1/favorite/_search -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "from" : 40,
+       "query" : {
+          "regexp" : {
+             "distribution" : "HTTP.*"
+          }
+       },
+       "size" : 20
+    }
+    EOT
+
+C<GET> or C<POST> returns the result set for the favorite search
+
+=item * C</v1/favorite/_search/scroll>
+
+C<GET> or C<POST> returns the result set for the favorite search and C<DELETE> clear a L<scroll|https://www.elastic.co/guide/en/elasticsearch/reference/8.9/paginate-search-results.html#clear-scroll>
+
+=item * C</v1/favorite/agg_by_distributions>
+
+    curl https://fastapi.metacpan.org/v1/favorite/agg_by_distributions?distribution=HTTP-Message&distribution=DBI
+    curl -XPOST https://fastapi.metacpan.org/v1/favorite/agg_by_distributions -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "distribution" : [
+          "HTTP-Message",
+          "DBI"
+       ]
+    }
+    EOT
+
+C<GET> or C<POST> retrieves favorites agregate by distributions
+
+=item * C</v1/favorite/by_user/{user}>
+
+    curl https://fastapi.metacpan.org/v1/favorite/by_user/q_15sjOkRminDY93g9DuZQ
+    curl -XPOST https://fastapi.metacpan.org/v1/favorite/by_user/q_15sjOkRminDY93g9DuZQ
+
+C<GET> or C<POST> retrieves user favorites information details
+
+=item * C</v1/favorite/leaderboard>
+
+    curl https://fastapi.metacpan.org/v1/favorite/leaderboard
+    curl -XPOST https://fastapi.metacpan.org/v1/favorite/leaderboard
+
+C<GET> or C<POST> retrieves top favorite distributions (leaderboard)
+
+=item * C</v1/favorite/recent>
+
+    curl https://fastapi.metacpan.org/v1/favorite/recent?page=10&size=10
+    curl -XPOST https://fastapi.metacpan.org/v1/favorite/recent -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "page" : 10,
+       "size" : 10
+    }
+    EOT
+
+C<GET> or C<POST> retrieves list of recent favorite distributions
+
+=item * C</v1/favorite/users_by_distribution/{distribution}>
+
+    curl https://fastapi.metacpan.org/v1/favorite/users_by_distribution/HTTP-Message
+    curl -XPOST https://fastapi.metacpan.org/v1/favorite/users_by_distribution/HTTP-Message
+
+C<GET> or C<POST> retrieves list of users who favorited a distribution
+
+=item * C</v1/favorite/{user}/{distribution}>
+
+    curl https://fastapi.metacpan.org/v1/favorite/q_15sjOkRminDY93g9DuZQ/DBI
+    curl -XPOST https://fastapi.metacpan.org/v1/favorite/q_15sjOkRminDY93g9DuZQ/DBI
+
+C<GET> or C<POST> retrieves favorites information details for a specific distribution
+
+=item * C</v1/file>
+
+    curl https://fastapi.metacpan.org/v1/file?from=40&q=HTTP&size=20
+    curl -XPOST https://fastapi.metacpan.org/v1/file -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "from" : 40,
+       "query" : {
+          "regexp" : {
+             "release" : "HTTP.*"
+          }
+       },
+       "size" : 20
+    }
+    EOT
+
+C<GET> or C<POST> queries files information details using simple search
+
+=item * C</v1/file/_mapping>
+
+C<GET> or C<POST> returns the available fields for the L<file object|https://explorer.metacpan.org/?url=/file/_mapping>
+
+=item * C</v1/file/_search>
+
+    curl https://fastapi.metacpan.org/v1/file/_search?from=40&q=HTTP&size=20
+    curl -XPOST https://fastapi.metacpan.org/v1/file/_search -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "from" : 40,
+       "query" : {
+          "regexp" : {
+             "path" : ".*HTTP.*"
+          }
+       },
+       "size" : 20
+    }
+    EOT
+
+C<GET> or C<POST> returns the result set for the file search
+
+=item * C</v1/file/_search/scroll>
+
+C<GET> or C<POST> returns the result set for the file search and C<DELETE> clear a L<scroll|https://www.elastic.co/guide/en/elasticsearch/reference/8.9/paginate-search-results.html#clear-scroll>
+
+=item * C</v1/file/dir/{path}>
+
+    curl https://fastapi.metacpan.org/v1/file/dir/OALDERS/HTTP-Message-6.36/lib/HTTP
+    curl -XPOST https://fastapi.metacpan.org/v1/file/dir/OALDERS/HTTP-Message-6.36/lib/HTTP
+
+C<GET> or C<POST> retrieves a specific release directory content
+
+=item * C</v1/file/{author}/{release}/{path}>
+
+    curl https://fastapi.metacpan.org/v1/file/OALDERS/HTTP-Message-6.36/lib/HTTP/Message.pm
+    curl -XPOST https://fastapi.metacpan.org/v1/file/OALDERS/HTTP-Message-6.36/lib/HTTP/Message.pm
+
+C<GET> or C<POST> retrieves a file information details specified by its release and file path
+
+=item * C</v1/login/index>
+
+    curl https://fastapi.metacpan.org/v1/login/index
+    curl -XPOST https://fastapi.metacpan.org/v1/login/index
+
+C<GET> or C<POST> returns a login HTML page
+
+=item * C</v1/mirror>
+
+    curl https://fastapi.metacpan.org/v1/mirror
+    curl -XPOST https://fastapi.metacpan.org/v1/mirror
+
+C<GET> or C<POST> returns a C<mirrors> object containing a list of C<mirror> objects. Currently, the API only returns one mirror, because CPAN now uses CDN instead of mirrors
+
+=item * C</v1/mirror/search>
+
+    curl https://fastapi.metacpan.org/v1/mirror/search?from=0&q=CPAN&size=20
+    curl -XPOST https://fastapi.metacpan.org/v1/mirror/search -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "from" : 0,
+       "query" : {
+          "regexp" : {
+             "path" : ".*HTTP.*"
+          }
+       },
+       "size" : 20
+    }
+    EOT
+
+C<GET> or C<POST> returns a C<mirrors> object containing a list of C<mirror> objects. Currently, the API only returns one mirror, because CPAN now uses CDN instead of mirrors
+
+=item * C</v1/module>
+
+    curl https://fastapi.metacpan.org/v1/module?from=40&q=HTTP&size=20
+    curl -XPOST https://fastapi.metacpan.org/v1/module -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "from" : 40,
+       "query" : {
+          "regexp" : {
+             "name" : "HTTP.*"
+          }
+       },
+       "size" : 20
+    }
+    EOT
+
+C<GET> or C<POST> queries modules information details using simple search
+
+=item * C</v1/module/_mapping>
+
+C<GET> or C<POST> returns the available fields for the L<module object|https://explorer.metacpan.org/?url=/module/_mapping>
+
+=item * C</v1/module/_search>
+
+    curl https://fastapi.metacpan.org/v1/module/_search?from=40&q=HTTP&size=20
+    curl -XPOST https://fastapi.metacpan.org/v1/module/_search -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "from" : 40,
+       "query" : {
+          "regexp" : {
+             "path" : ".*HTTP.*"
+          }
+       },
+       "size" : 20
+    }
+    EOT
+
+C<GET> or C<POST> returns the result set for the module search
+
+=item * C</v1/module/_search/scroll>
+
+C<GET> or C<POST> returns the result set for the module search and C<DELETE> clear a L<scroll|https://www.elastic.co/guide/en/elasticsearch/reference/8.9/paginate-search-results.html#clear-scroll>
+
+=item * C</v1/module/{module}>
+
+    curl https://fastapi.metacpan.org/v1/module/HTTP::Message
+    curl -XPOST https://fastapi.metacpan.org/v1/module/HTTP::Message
+
+C<GET> or C<POST> returns the corresponding C<file> of the latest version of the C<module>. Considering that HTTP-Message-6.37 is the latest release, the result of L</module/HTTP::Message|https://fastapi.metacpan.org/v1/module/HTTP::Message> is the same as L</file/OALDERS/HTTP-Message-6.37/lib/HTTP/Message.pm|https://fastapi.metacpan.org/v1/file/OALDERS/HTTP-Message-6.37/lib/HTTP/Message.pm>
+
+=item * C</v1/package>
+
+    curl https://fastapi.metacpan.org/v1/package?from=40&q=HTTP&size=20
+    curl -XPOST https://fastapi.metacpan.org/v1/package -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "from" : 40,
+       "query" : {
+          "regexp" : {
+             "module_name" : "HTTP.*"
+          }
+       },
+       "size" : 20
+    }
+    EOT
+
+C<GET> or C<POST> queries packages information details using simple search
+
+=item * C</v1/package/modules/{distribution}>
+
+    curl https://fastapi.metacpan.org/v1/package/modules/HTTP-Message
+    curl -XPOST https://fastapi.metacpan.org/v1/package/modules/HTTP-Message
+
+C<GET> or C<POST> retrieves the list of a distribution packages
+
+=item * C</v1/package/{module}>
+
+    curl https://fastapi.metacpan.org/v1/package/HTTP::Message
+    curl -XPOST https://fastapi.metacpan.org/v1/package/HTTP::Message
+
+C<GET> or C<POST> retrieves the latest release and package information for the specified C<module>
+
+=item * C</v1/permission>
+
+    curl https://fastapi.metacpan.org/v1/permission?from=40&q=HTTP&size=20
+    curl -XPOST https://fastapi.metacpan.org/v1/permission -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "from" : 40,
+       "query" : {
+          "regexp" : {
+             "module_name" : "HTTP.*"
+          }
+       },
+       "size" : 20
+    }
+    EOT
+
+C<GET> or C<POST> queries permissions information details using simple search
+
+=item * C</v1/permission/by_author/{author}>
+
+    curl https://fastapi.metacpan.org/v1/permission/by_author/OALDERS?from=40&q=HTTP&size=20
+    curl -XPOST https://fastapi.metacpan.org/v1/permission/by_author/OALDERS -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "from" : 40,
+       "query" : {
+          "regexp" : {
+             "module_name" : "HTTP.*"
+          }
+       },
+       "size" : 20
+    }
+    EOT
+
+C<GET> or C<POST> retrieves permission information details for the specified author
+
+=item * C</v1/permission/by_module>
+
+    curl https://fastapi.metacpan.org/v1/permission/by_module?module=HTTP%3A%3AMessage&module=Nice%3A%3ATry
+    curl -XPOST https://fastapi.metacpan.org/v1/permission/by_module -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "module" : [
+          "HTTP::Message",
+          "Nice::Try"
+       ]
+    }
+    EOT
+
+C<GET> or C<POST> retrieves permission information details for the specified modules
+
+=item * C</v1/permission/by_module/{module}>
+
+    curl https://fastapi.metacpan.org/v1/permission/by_module/HTTP::Message
+    curl -XPOST https://fastapi.metacpan.org/v1/permission/by_module/HTTP::Message
+
+C<GET> or C<POST> retrieves permission information details for the specified module
+
+=item * C</v1/permission/{module}>
+
+    curl https://fastapi.metacpan.org/v1/permission/HTTP::Message
+    curl -XPOST https://fastapi.metacpan.org/v1/permission/HTTP::Message
+
+C<GET> or C<POST> returns the corresponding C<permission> for the specified C<module>
+
+=item * C</v1/pod/{author}/{release}/{path}>
+
+    curl https://fastapi.metacpan.org/v1/pod/OALDERS/HTTP-Message-6.36/lib/HTTP/Message.pm?content-type=text/x-markdown
+    curl -XPOST https://fastapi.metacpan.org/v1/pod/OALDERS/HTTP-Message-6.36/lib/HTTP/Message.pm?content-type=text/x-markdown
+
+C<GET> or C<POST> returns the POD of the given module in the specified release. You can change the output format by either passing a C<content-type> query parameter (e.g. L</pod/HTTP-Message?content-type=text/plain|https://fastapi.metacpan.org/v1/pod/HTTP-Message?content-type=text/plain> or by adding an C<Accept> header to the HTTP request. Valid content types are:
+
+=over 4
+
+=item * text/html (default)
+
+
+=item * text/plain
+
+
+=item * text/x-pod
+
+
+=item * text/x-markdown
+
+
+=back
+
+=item * C</v1/pod/{module}>
+
+    curl https://fastapi.metacpan.org/v1/pod/HTTP::Message?content-type=text/plain
+    curl -XPOST https://fastapi.metacpan.org/v1/pod/HTTP::Message?content-type=text/plain
+
+C<GET> or C<POST> returns the POD of the given module. You can change the output format by either passing a C<content-type> query parameter (e.g. L</pod/HTTP-Message?content-type=text/plain|https://fastapi.metacpan.org/v1/pod/HTTP::Message?content-type=text/plain> or by adding an C<Accept> header to the HTTP request. Valid content types are:
+
+=over 4
+
+=item * text/html (default)
+
+
+=item * text/plain
+
+
+=item * text/x-pod
+
+
+=item * text/x-markdown
+
+
+=back
+
+=item * C</v1/pod_render>
+
+    curl https://fastapi.metacpan.org/v1/pod_render?pod=%3Dencoding+utf-8%0A%0A%3Dhead1+Hello+World%0A%0ASomething+here%0A%0A%3Doops%0A%0A%3Dcut%0A
+    curl -XPOST https://fastapi.metacpan.org/v1/pod_render?pod=%3Dencoding+utf-8%0A%0A%3Dhead1+Hello+World%0A%0ASomething+here%0A%0A%3Doops%0A%0A%3Dcut%0A
+
+C<GET> or C<POST> takes some POD data and check for errors. It returns the POD provided in formatted plan text
+
+=item * C</v1/rating>
+
+    curl https://fastapi.metacpan.org/v1/rating?from=40&q=HTTP&size=20
+    curl -XPOST https://fastapi.metacpan.org/v1/rating -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "from" : 40,
+       "query" : {
+          "regexp" : {
+             "distribution" : "HTTP.*"
+          }
+       },
+       "size" : 20
+    }
+    EOT
+
+C<GET> or C<POST> queries ratings information details using simple search
+
+=item * C</v1/rating/_mapping>
+
+C<GET> or C<POST> returns the available fields for the L<rating object|https://explorer.metacpan.org/?url=/rating/_mapping>
+
+=item * C</v1/rating/_search>
+
+    curl https://fastapi.metacpan.org/v1/rating/_search?from=40&q=HTTP&size=20
+    curl -XPOST https://fastapi.metacpan.org/v1/rating/_search -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "from" : 40,
+       "query" : {
+          "regexp" : {
+             "distribution" : ".*HTTP.*"
+          }
+       },
+       "size" : 20
+    }
+    EOT
+
+C<GET> or C<POST> returns the result set for the rating search
+
+=item * C</v1/rating/_search/scroll>
+
+C<GET> or C<POST> returns the result set for the rating search and C<DELETE> clear a L<scroll|https://www.elastic.co/guide/en/elasticsearch/reference/8.9/paginate-search-results.html#clear-scroll>
+
+=item * C</v1/rating/by_distributions>
+
+    curl https://fastapi.metacpan.org/v1/rating/by_distributions?distribution=HTTP-Tiny
+    curl -XPOST https://fastapi.metacpan.org/v1/rating/by_distributions -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "distribution" : "HTTP-Tiny"
+    }
+
+C<GET> or C<POST> retrieves rating informations details for the specified distributions
+
+=item * C</v1/release>
+
+    curl https://fastapi.metacpan.org/v1/release?from=40&q=HTTP&size=20
+    curl -XPOST https://fastapi.metacpan.org/v1/release -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "from" : 40,
+       "query" : {
+          "regexp" : {
+             "distribution" : "HTTP.*"
+          }
+       },
+       "size" : 20
+    }
+    EOT
+
+C<GET> or C<POST> queries releases information details using simple search
+
+=item * C</v1/release/_mapping>
+
+C<GET> or C<POST> returns the available fields for the L<release object|https://explorer.metacpan.org/?url=/release/_mapping>
+
+=item * C</v1/release/_search>
+
+    curl https://fastapi.metacpan.org/v1/release/_search?from=40&q=HTTP&size=20
+    curl -XPOST https://fastapi.metacpan.org/v1/release/_search -H 'Content-Type: application/json; charset=utf-8' --data-binary @- <<EOT
+    {
+       "from" : 40,
+       "query" : {
+          "regexp" : {
+             "name" : ".*HTTP.*"
+          }
+       },
+       "size" : 20
+    }
+    EOT
+
+C<GET> or C<POST> returns the result set for the release search
+
+=item * C</v1/release/_search/scroll>
+
+C<GET> or C<POST> returns the result set for the release search and C<DELETE> clear a L<scroll|https://www.elastic.co/guide/en/elasticsearch/reference/8.9/paginate-search-results.html#clear-scroll>
+
+=item * C</v1/release/all_by_author/{author}>
+
+    curl https://fastapi.metacpan.org/v1/release/all_by_author/OALDERS?page=2&page_size=100
+    curl -XPOST https://fastapi.metacpan.org/v1/release/all_by_author/OALDERS?page=2&page_size=100
+
+C<GET> or C<POST> get all releases by the specified author
+
+=item * C</v1/release/by_author/{author}>
+
+    curl https://fastapi.metacpan.org/v1/release/by_author/OALDERS
+    curl -XPOST https://fastapi.metacpan.org/v1/release/by_author/OALDERS
+
+C<GET> or C<POST> get releases by a specified author
+
+=item * C</v1/release/contributors/{author}/{release}>
+
+    curl https://fastapi.metacpan.org/v1/release/contributors/OALDERS/HTTP-Message-6.36
+    curl -XPOST https://fastapi.metacpan.org/v1/release/contributors/OALDERS/HTTP-Message-6.36
+
+C<GET> or C<POST> retrieves the list of contributors for the specified release
+
+=item * C</v1/release/files_by_category/{author}/{release}>
+
+    curl https://fastapi.metacpan.org/v1/release/files_by_category/OALDERS/HTTP-Message-6.36
+    curl -XPOST https://fastapi.metacpan.org/v1/release/files_by_category/OALDERS/HTTP-Message-6.36
+
+C<GET> or C<POST> retrieves the list of release key files by category
+
+=item * C</v1/release/interesting_files/{author}/{release}>
+
+    curl https://fastapi.metacpan.org/v1/release/interesting_files/OALDERS/HTTP-Message-6.36
+    curl -XPOST https://fastapi.metacpan.org/v1/release/interesting_files/OALDERS/HTTP-Message-6.36
+
+C<GET> or C<POST> retrieves the list of interesting files for the specified release
+
+=item * C</v1/release/latest_by_author/{author}>
+
+    curl https://fastapi.metacpan.org/v1/release/latest_by_author/OALDERS
+    curl -XPOST https://fastapi.metacpan.org/v1/release/latest_by_author/OALDERS
+
+C<GET> or C<POST> get latest releases by the specified author
+
+=item * C</v1/release/latest_by_distribution/{distribution}>
+
+    curl https://fastapi.metacpan.org/v1/release/latest_by_distribution/HTTP-Message
+    curl -XPOST https://fastapi.metacpan.org/v1/release/latest_by_distribution/HTTP-Message
+
+C<GET> or C<POST> get latest releases for a specified distribution
+
+=item * C</v1/release/modules/{author}/{release}>
+
+    curl https://fastapi.metacpan.org/v1/release/modules/OALDERS/HTTP-Message-6.36
+    curl -XPOST https://fastapi.metacpan.org/v1/release/modules/OALDERS/HTTP-Message-6.36
+
+C<GET> or C<POST> retrieves the list of modules in the specified release
+
+=item * C</v1/release/recent>
+
+    curl https://fastapi.metacpan.org/v1/release/recent
+    curl -XPOST https://fastapi.metacpan.org/v1/release/recent
+
+C<GET> or C<POST> get recent releases
+
+=item * C</v1/release/top_uploaders>
+
+    curl https://fastapi.metacpan.org/v1/release/top_uploaders
+    curl -XPOST https://fastapi.metacpan.org/v1/release/top_uploaders
+
+C<GET> or C<POST> get top release uploaders
+
+=item * C</v1/release/versions/{distribution}>
+
+    curl https://fastapi.metacpan.org/v1/release/versions/HTTP-Message
+    curl -XPOST https://fastapi.metacpan.org/v1/release/versions/HTTP-Message
+
+C<GET> or C<POST> get all releases by versions for the specified distribution
+
+=item * C</v1/release/{author}/{release}>
+
+    curl https://fastapi.metacpan.org/v1/release/OALDERS/HTTP-Message-6.36
+    curl -XPOST https://fastapi.metacpan.org/v1/release/OALDERS/HTTP-Message-6.36
+
+C<GET> or C<POST> retrieves a distribution release information details. This C</release> endpoint accepts  the name of an C<author> and the name of the C<release> (e.g. L</release/DOY/OALDERS/HTTP-Message-6.37|https://fastapi.metacpan.org/v1/release/DOY/OALDERS/HTTP-Message-6.37)>, which returns the most recent release of the distribution
+
+=item * C</v1/release/{distribution}>
+
+    curl https://fastapi.metacpan.org/v1/release/HTTP-Message
+    curl -XPOST https://fastapi.metacpan.org/v1/release/HTTP-Message
+
+C<GET> or C<POST> retrieves the latest distribution release information details. The C</release> endpoint accepts either the name of a C<distribution> (e.g. L</release/HTTP-Message|https://fastapi.metacpan.org/v1/release/HTTP-Message)>, which returns the most recent release of the distribution
+
+=item * C</v1/reverse_dependencies/dist/{distribution}>
+
+    curl https://fastapi.metacpan.org/v1/reverse_dependencies/dist/HTTP-Message
+    curl -XPOST https://fastapi.metacpan.org/v1/reverse_dependencies/dist/HTTP-Message
+
+C<GET> or C<POST> returns a list of all the modules who depend on the specified distribution.`
+
+=item * C</v1/reverse_dependencies/module/{module}>
+
+    curl https://fastapi.metacpan.org/v1/reverse_dependencies/module/HTTP::Message
+    curl -XPOST https://fastapi.metacpan.org/v1/reverse_dependencies/module/HTTP::Message
+
+C<GET> or C<POST> returns a list of all the modules who depend on the specified module
+
+=item * C</v1/search>
+
+C<GET> or C<POST> returns result set based on the search query
+
+=item * C</v1/search/autocomplete>
+
+C<GET> or C<POST> returns result set based on the autocomplete search query
+
+=item * C</v1/search/autocomplete/suggest>
+
+C<GET> or C<POST> returns suggested result set based on the autocomplete search query.`
+
+=item * C</v1/search/first>
+
+C<GET> or C<POST> perform API search and return the first result (I'm Feeling Lucky)
+
+=item * C</v1/search/web>
+
+C<GET> or C<POST> perform API search in the same fashion as the Web UI
+
+=item * C</v1/source/{author}/{release}/{path}>
+
+    curl https://fastapi.metacpan.org/v1/source/OALDERS/HTTP-Message-6.36/lib/HTTP/Message.pm
+    curl -XPOST https://fastapi.metacpan.org/v1/source/OALDERS/HTTP-Message-6.36/lib/HTTP/Message.pm
+
+C<GET> or C<POST> returns the source code of the given module path within the specified release
+
+=item * C</v1/source/{module}>
+
+    curl https://fastapi.metacpan.org/v1/source/HTTP::Message
+    curl -XPOST https://fastapi.metacpan.org/v1/source/HTTP::Message
+
+C<GET> or C<POST> returns the full source of the latest, authorized version of the given C<module>
+
+=back
+
+=head1 SEE ALSO
+
+L<Net::API::CPAN>, L<Net::API::CPAN::Activity>, L<Net::API::CPAN::Author>, L<Net::API::CPAN::Changes>, L<Net::API::CPAN::Changes::Release>, L<Net::API::CPAN::Contributor>, L<Net::API::CPAN::Cover>, L<Net::API::CPAN::Diff>, L<Net::API::CPAN::Distribution>, L<Net::API::CPAN::DownloadUrl>, L<Net::API::CPAN::Exception>, L<Net::API::CPAN::Favorite>, L<Net::API::CPAN::File>, L<Net::API::CPAN::Filter>, L<Net::API::CPAN::Generic>, L<Net::API::CPAN::List>, L<Net::API::CPAN::Mirror>, L<Net::API::CPAN::Mirrors>, L<Net::API::CPAN::Module>, L<Net::API::CPAN::Package>, L<Net::API::CPAN::Permission>, L<Net::API::CPAN::Rating>, L<Net::API::CPAN::Release>, L<Net::API::CPAN::Release::Recent>, L<Net::API::CPAN::Release::Suggest>, L<Net::API::CPAN::Scroll>
+
+=head1 CREDITS
+
+Daniel Ruoso for the original C<Test::HTTP::MockServer>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright(c) 2023 DEGUEST Pte. Ltd.
+
+All rights reserved
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

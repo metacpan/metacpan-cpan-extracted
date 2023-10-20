@@ -8,7 +8,7 @@
 
 package Mail::Message::Head::Partial;
 use vars '$VERSION';
-$VERSION = '3.013';
+$VERSION = '3.014';
 
 use base 'Mail::Message::Head::Complete';
 

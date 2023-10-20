@@ -16,32 +16,32 @@ use Test::More 0.88;
 # plus Meeus' radius of the Earth.
 
 new( 7970.4, 0.1849966, 'OID 00005 (Vanguard 1) Epoch 09198.49982685' );
-check( semimajor =>  8624.14, 1 );
-check( periapsis =>  7029.14, 1 );
-check( apoapsis  => 10219.14, 1 );
-check( perigee   =>  7029.14, 1 );
-check( apogee    => 10219.14, 1 );
+verify( semimajor =>  8624.14, 1 );
+verify( periapsis =>  7029.14, 1 );
+verify( apoapsis  => 10219.14, 1 );
+verify( perigee   =>  7029.14, 1 );
+verify( apogee    => 10219.14, 1 );
 
 new( 5487.6, 0.0007102, 'OID 25544 (ISS) Epoch 09197.89571571' );
-check( semimajor =>  6724.64, 1 );
-check( periapsis =>  6720.14, 1 );
-check( apoapsis  =>  6729.14, 1 );
-check( perigee   =>  6720.14, 1 );
-check( apogee    =>  6729.14, 1 );
+verify( semimajor =>  6724.64, 1 );
+verify( periapsis =>  6720.14, 1 );
+verify( apoapsis  =>  6729.14, 1 );
+verify( perigee   =>  6720.14, 1 );
+verify( apogee    =>  6729.14, 1 );
 
 new( 43081.2, 0.0134177, 'OID 20959 (Navstar 22) Epoch 09197.50368658' );
-check( semimajor => 26561.14, 1 );
-check( periapsis => 26203.14, 2 );
-check( apoapsis  => 26919.14, 2 );
-check( perigee   => 26203.14, 2 );
-check( apogee    => 26919.14, 2 );
+verify( semimajor => 26561.14, 1 );
+verify( periapsis => 26203.14, 2 );
+verify( apoapsis  => 26919.14, 2 );
+verify( perigee   => 26203.14, 2 );
+verify( apogee    => 26919.14, 2 );
 
 new( 43107.0, 0.7271065, 'OID 21118 (Molniya 1-80) Epoch 09197.37303507' );
-check( semimajor => 26572.14, 1 );
-check( periapsis =>  7251.14, 1 );
-check( apoapsis  => 45893.14, 1 );
-check( perigee   =>  7251.14, 1 );
-check( apogee    => 45893.14, 1 );
+verify( semimajor => 26572.14, 1 );
+verify( periapsis =>  7251.14, 1 );
+verify( apoapsis  => 45893.14, 1 );
+verify( perigee   =>  7251.14, 1 );
+verify( apogee    => 45893.14, 1 );
 
 done_testing;
 
@@ -57,7 +57,7 @@ done_testing;
 	return;
     }
 
-    sub check {
+    sub verify {
 	my ( $method, $want, $tolerance ) = @_;
 	my $name = sprintf '%s %s', $tle->get( 'name' ), $method;
 	my $got = $tle->$method();

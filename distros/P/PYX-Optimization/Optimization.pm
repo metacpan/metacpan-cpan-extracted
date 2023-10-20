@@ -10,7 +10,7 @@ use PYX qw(char comment);
 use PYX::Parser;
 use PYX::Utils;
 
-our $VERSION = 0.04;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -139,20 +139,18 @@ PYX::Optimization - PYX optimization Perl class.
 
  use PYX::Optimization;
 
- my $obj = PYX::Parser->new(%parameters);
+ my $obj = PYX::Optimization->new(%parameters);
  $obj->parse($pyx, $out);
  $obj->parse_file($pyx_file, $out);
- $obj->parse_handle($pyx_file_handler, $out);
+ $obj->parse_handler($pyx_file_handler, $out);
 
 =head1 METHODS
 
 =head2 C<new>
 
- my $obj = PYX::Parser->new(%parameters);
+ my $obj = PYX::Optimization->new(%parameters);
 
 Constructor.
-
-Returns instance of object.
 
 =over 8
 
@@ -168,13 +166,15 @@ Default value is STDOUT.
 
 =back
 
+Returns instance of object.
+
 =head2 C<parse>
 
  $obj->parse($pyx, $out);
 
-Optimize PYX string $pyx.
+Optimize PYX defined by string C<$pyx>.
 Output print to output handler.
-If $out not present, use 'output_handler'.
+If C<$out> not present, use 'output_handler'.
 
 Returns undef.
 
@@ -182,19 +182,19 @@ Returns undef.
 
  $obj->parse_file($pux_file, $out);
 
-Optimize PYX file $pyx_file.
+Optimize PYX defined by file C<$pyx_file>.
 Output print to output handler.
-If $out not present, use 'output_handler'.
+If C<$out> not present, use 'output_handler'.
 
 Returns undef.
 
 =head2 C<parse_handler>
 
- $obj->parse_handle($pyx_file_handler, $out);
+ $obj->parse_handler($pyx_file_handler, $out);
 
-Optimize PYX file handler $pyx_file_handler.
+Optimize PYX defined by file handler C<$pyx_file_handler>.
 Output print to output handler.
-If $out not present, use 'output_handler'.
+If C<$out> not present, use 'output_handler'.
 
 Returns undef.
 
@@ -205,6 +205,8 @@ Returns undef.
                  Unknown parameter '%s'.
 
 =head1 EXAMPLE1
+
+=for comment filename=remove_whitespace_from_comments.pl
 
  use strict;
  use warnings;
@@ -234,6 +236,8 @@ Returns undef.
  # )element
 
 =head1 EXAMPLE2
+
+=for comment filename=run_on_pyx_file.pl
 
  use strict;
  use warnings;
@@ -282,12 +286,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2011-2021 Michal Josef Špaček
+© 2011-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.06
 
 =cut

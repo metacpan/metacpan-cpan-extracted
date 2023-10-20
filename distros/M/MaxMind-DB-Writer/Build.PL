@@ -19,7 +19,7 @@ my %module_build_args = (
   "configure_requires" => {
     "Module::Build" => "0.28"
   },
-  "dist_abstract" => "Create MaxMind DB database files",
+  "dist_abstract" => "DEPRECATED Create MaxMind DB database files",
   "dist_author" => [
     "Olaf Alders <oalders\@maxmind.com>",
     "Greg Oschwald <goschwald\@maxmind.com>",
@@ -27,7 +27,7 @@ my %module_build_args = (
     "Mark Fowler <mfowler\@maxmind.com>"
   ],
   "dist_name" => "MaxMind-DB-Writer",
-  "dist_version" => "0.300003",
+  "dist_version" => "0.300004",
   "license" => "perl",
   "module_name" => "MaxMind::DB::Writer",
   "recursive_test_files" => 1,
@@ -36,7 +36,7 @@ my %module_build_args = (
     "Data::Dumper::Concise" => 0,
     "Data::IEEE754" => 0,
     "Digest::MD5" => 0,
-    "Digest::SHA1" => 0,
+    "Digest::SHA" => 0,
     "Encode" => 0,
     "Exporter" => 0,
     "IO::Handle" => 0,

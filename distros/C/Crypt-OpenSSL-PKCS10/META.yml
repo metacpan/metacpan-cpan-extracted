@@ -19,7 +19,7 @@ name: Crypt-OpenSSL-PKCS10
 provides:
   Crypt::OpenSSL::PKCS10:
     file: lib/Crypt/OpenSSL/PKCS10.pm
-    version: '0.23'
+    version: '0.25'
 recommends:
   Crypt::OpenSSL::Bignum: '0'
 requires:
@@ -30,9 +30,9 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-OpenSSL-PKCS10
   homepage: http://search.cpan.org/dist/Crypt-OpenSSL-PKCS10/
-  repository: git://github.com/perl-net-saml2/perl-Crypt-OpenSSL-PKCS10.git
-version: '0.23'
-x_generated_by_perl: v5.36.1
+  repository: git://github.com/perl-openssl/perl-crypt-openssl-pkcs10.git
+version: '0.25'
+x_generated_by_perl: v5.38.0
 x_maintainers:
   - 'Timothy Legge <timlegge@cpan.org>'
 x_serialization_backend: 'YAML::Tiny version 1.74'

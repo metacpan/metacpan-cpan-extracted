@@ -11,7 +11,7 @@ use warnings::register qw( Encode::dbi::queue );
 
 use Data::Record::Serialize::Error -all;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use Package::Variant
   importing => [
@@ -20,19 +20,19 @@ use Package::Variant
         rewrite => {
             -as      => 'rewrite_encode',
             prefixes => {
-                ''  => 'Data::Record::Serialize::Encode::',
-                '+' => ''
+                q{}  => 'Data::Record::Serialize::Encode::',
+                q{+} => q{},
             },
-        }
+        },
     ],
     'String::RewritePrefix' => [
         rewrite => {
             -as      => 'rewrite_sink',
             prefixes => {
-                ''  => 'Data::Record::Serialize::Sink::',
-                '+' => ''
+                q{}  => 'Data::Record::Serialize::Sink::',
+                q{+} => q{},
             },
-        }
+        },
     ],
   ],
   subs => [qw( with has rewrite_encode rewrite_sink )];
@@ -44,9 +44,9 @@ use namespace::clean;
 
 
 sub make_variant {
-    my ( $class, $target, %attr ) = @_;
+    my ( undef, $target, %attr ) = @_;
 
-    error( 'attribute::value', "must specify <encode> attribute" )
+    error( 'attribute::value', 'must specify <encode> attribute' )
       unless defined $attr{encode};
 
     with 'Data::Record::Serialize::Role::Base';
@@ -58,8 +58,8 @@ sub make_variant {
     if ( $target->does( 'Data::Record::Serialize::Role::Sink' ) ) {
 
         error( 'attribute::value',
-            "encoder ($encoder) is already a sink; don't specify a sink attribute\n"
-        ) if defined $attr{sink};
+            "encoder ($encoder) is already a sink; don't specify a sink attribute\n" )
+          if defined $attr{sink};
     }
 
     else {
@@ -280,7 +280,7 @@ sub make_variant {
 
 sub new {
     my $class = shift;
-    my $attr = 'HASH' eq ref $_[0] ? shift : {@_};
+    my $attr  = 'HASH' eq ref $_[0] ? shift : {@_};
 
     my %class_attr = (
         encode => $attr->{encode},
@@ -317,7 +317,7 @@ Data::Record::Serialize - Flexible serialization of a record
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 
@@ -801,6 +801,8 @@ Encode and send the record to the associated sink.
 B<WARNING>: the passed hash is modified.  If you need the original
 contents, pass in a copy.
 
+=head1 INTERNALS
+
 =for Pod::Coverage make_variant
 
 =head1 ATTRIBUTES
@@ -890,7 +892,7 @@ Object attributes are provided by the following modules
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>
 
 =head2 Source
 

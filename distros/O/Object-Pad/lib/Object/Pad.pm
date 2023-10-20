@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.802;
+package Object::Pad 0.804;
 
 use v5.14;
 use warnings;
@@ -307,9 +307,19 @@ between module versions, though it can be relied on to be well-behaved as some
 kind of perl data structure for purposes of modules like L<Data::Dumper> or
 serialisation into things like C<YAML> or C<JSON>.
 
-This representation type may be useful when converting existing classes into
-using C<Object::Pad> where there may be existing subclasses of it that presume
-a blessed hash for their own use.
+   :repr(keys)
+
+I<Since version 0.803.>
+
+The representation will be a blessed hash reference. The instance data will
+be stored in individual keys of the hash, named after the class and the field
+variable name, separated by a C</> symbol. Objects in this representation
+should behave predictably with data printing modules like L<Data::Dumper> or
+serialisation via C<YAML> or C<JSON>.
+
+These two hash-based representation types may be useful when converting
+existing classes into using C<Object::Pad> where there may be existing
+subclasses of it that presume a blessed hash for their own use.
 
    :repr(magic)
 
@@ -319,6 +329,18 @@ instance is doing even in XS modules.
 
 This representation type is the only one that will work for subclassing
 existing classes that do not use blessed hashes.
+
+   :repr(pvobj)
+
+I<Since version 0.804.>
+
+The representation will be the C<SVt_PVOBJ> type newly added to Perl, which
+offers more efficient storage for object instances. This is only available on
+Perl version 5.38.0 onwards.
+
+This is also newly-added and may not be fully tested and reliable yet. Once it
+has more real-world testing and has proven reliable it may become the default
+instance representation on versions of Perl where it is available.
 
    :repr(autoselect), :repr(default)
 

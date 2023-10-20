@@ -6,9 +6,9 @@ use App::perlmv;
 use Getopt::Long::Complete; # just so we can detect script as using Getopt::Long::Complete
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-30'; # DATE
+our $DATE = '2023-07-15'; # DATE
 our $DIST = 'App-perlmv'; # DIST
-our $VERSION = '0.607'; # VERSION
+our $VERSION = '0.608'; # VERSION
 
 my $pmv = App::perlmv->new;
 $pmv->{ 'mode' } = 'link';
@@ -30,7 +30,7 @@ perlln - Link files using Perl code
 
 =head1 VERSION
 
-This document describes version 0.607 of perlln (from Perl distribution App-perlmv), released on 2023-06-30.
+This document describes version 0.608 of perlln (from Perl distribution App-perlmv), released on 2023-07-15.
 
 =head1 DESCRIPTION
 

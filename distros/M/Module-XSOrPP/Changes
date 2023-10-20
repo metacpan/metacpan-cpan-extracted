@@ -1,21 +1,26 @@
-Revision history for Module-XSOrPP
+0.120   2023-07-09  Released-By: PERLANCAR; Urgency: medium
 
-0.11    2016-01-15 (PERLANCAR)
+        - No functional changes.
+
+        - Remove usage of smartmatch.
+
+
+0.11    2016-01-15  Released-By: PERLANCAR
 
 	- Add DateTime to list of XS_OR_PP modules.
 
 
-0.10    2015-10-20 (PERLANCAR)
+0.10    2015-10-20  Released-By: PERLANCAR
 
 	- Add to xs_or_pp list: Params::Validate.
 
 
-0.09    2015-05-22 (PERLANCAR)
+0.09    2015-05-22  Released-By: PERLANCAR
 
 	- Add predefined XS modules: Scalar::Util.
 
 
-0.08    2015-04-21 (PERLANCAR)
+0.08    2015-04-21  Released-By: PERLANCAR
 
         - Add function: xs_or_pp().
 
@@ -23,42 +28,42 @@ Revision history for Module-XSOrPP
           checking against a predefined list.
 
 
-0.07    2014-12-27 (PERLANCAR)
+0.07    2014-12-27  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Module::Path with Module::Path::More.
 
 
-0.06    2014-12-05 (PERLANCAR)
+0.06    2014-12-05  Released-By: PERLANCAR
 
         - Rename dist from Module-MoreUtil to Module-XSOrPP.
 
 
-0.05    2014-12-03 (PERLANCAR)
+0.05    2014-12-03  Released-By: PERLANCAR
 
         - Rename dist from SHARYANTO-Module-Util to Module-MoreUtil.
 
 
-0.04    2014-04-05 (SHARYANTO)
+0.04    2014-04-05  Released-By: SHARYANTO
 
         - is_{pp,xs}: Add heuristics by looking at module name.
 
         - A couple of fixes.
 
 
-0.03    2014-04-05 (SHARYANTO)
+0.03    2014-04-05  Released-By: SHARYANTO
 
         - [bug fix] clobbered $_.
 
 
-0.02    2014-04-05 (SHARYANTO)
+0.02    2014-04-05  Released-By: SHARYANTO
 
         - No functional changes.
 
         - is_{pp,xs}: Don't warn if option warn=>1 is not given.
 
 
-0.01    2014-04-05 (SHARYANTO)
+0.01    2014-04-05  Released-By: SHARYANTO
 
         - First release.

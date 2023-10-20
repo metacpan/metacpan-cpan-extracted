@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Zu::Any::Za - Package for language Zulu
 
 =cut
 
 package Locale::CLDR::Locales::Zu::Any::Za;
-# This file auto generated from Data/common/main/zu_ZA.xml
-#	on Mon 11 Apr  5:43:11 pm GMT
+# This file auto generated from Data\common\main\zu_ZA.xml
+#	on Fri 13 Oct  9:53:06 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

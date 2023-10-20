@@ -21,11 +21,13 @@ no_index:
     - inc
 requires:
   Module::Load: '0.32'
+  Moo: '2'
   Scalar::Util: '1.23'
   Sub::Quote: '2'
+  namespace::clean: '0.27'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/dallaylaen/resource-silo-p5/issues
   repository: https://github.com/dallaylaen/resource-silo-p5.git
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

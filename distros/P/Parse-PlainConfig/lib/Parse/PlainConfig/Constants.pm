@@ -1,8 +1,8 @@
 # Parse::PlainConfig::Constants -- PPC Constants
 #
-# (c) 2012, Arthur Corliss <corliss@digitalmages.com>
+# (c) 2016 - 2013, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Parse/PlainConfig/Constants.pm, 3.05 2017/02/06 10:36:37 acorliss Exp $
+# $Id: lib/Parse/PlainConfig/Constants.pm, 3.06 2023/09/23 19:24:20 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -24,14 +24,15 @@ use warnings;
 use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS);
 use Exporter;
 use Class::EHierarchy qw(:all);
+use Paranoid::Debug;
 
 use base qw(Exporter);
 
-($VERSION) = ( q$Revision: 3.05 $ =~ /(\d+(?:\.(\d+))+)/sm );
+($VERSION) = ( q$Revision: 3.06 $ =~ /(\d+(?:\.(\d+))+)/sm );
 
-use constant PPCDLEVEL1   => 7;
-use constant PPCDLEVEL2   => 8;
-use constant PPCDLEVEL3   => 9;
+use constant PPCDLEVEL1   => PDEBUG6;
+use constant PPCDLEVEL2   => PDEBUG7;
+use constant PPCDLEVEL3   => PDEBUG8;
 use constant PPC_DEF_SIZE => 65_536;
 
 use constant MTIME => 9;
@@ -78,7 +79,7 @@ Parse::PlainConfig::Constants - PPC Constants
 
 =head1 VERSION
 
-$Id: lib/Parse/PlainConfig/Constants.pm, 3.05 2017/02/06 10:36:37 acorliss Exp $
+$Id: lib/Parse/PlainConfig/Constants.pm, 3.06 2023/09/23 19:24:20 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -162,5 +163,5 @@ Arthur Corliss (corliss@digitalmages.com)
 This software is licensed under the same terms as Perl, itself. 
 Please see http://dev.perl.org/licenses/ for more information.
 
-(c) 2016, Arthur Corliss (corliss@digitalmages.com)
+(c) 2016 - 2023, Arthur Corliss (corliss@digitalmages.com)
 

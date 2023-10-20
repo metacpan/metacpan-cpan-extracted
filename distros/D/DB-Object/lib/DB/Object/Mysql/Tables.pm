@@ -18,12 +18,11 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object::Mysql DB::Object::Tables );
-    use vars qw( $VERSION $VERBOSE $DEBUG );
-    $VERSION    = 'v0.300.1';
-    $VERBOSE    = 0;
-    $DEBUG      = 0;
+    use vars qw( $VERSION $DEBUG );
     use Devel::Confess;
     # <https://dev.mysql.com/doc/refman/8.0/en/data-types.html>
+    our $DEBUG = 0;
+    our $VERSION = 'v0.300.1';
 };
 
 use strict;
@@ -34,30 +33,8 @@ sub init
     return( shift->DB::Object::Tables::init( @_ ) );
 }
 
-# sub init
-# {
-#     my $self  = shift( @_ );
-#     my $table = '';
-#     $table    = shift( @_ ) if( @_ && @_ % 2 );
-#     return( $self->error( "You must provide a table name to create a table object." ) ) if( !$table );
-#     my %arg   = ( @_ );
-#     map{ $self->{ $_ } = $arg{ $_ } } keys( %arg );
-#     $self->{ 'table' }        = $table if( $table );
-#     $self->{ 'structure' }    ||= {};
-#     $self->{ 'fields' }        ||= {};
-#     $self->{ 'default' }    ||= {};
-#     $self->{ 'null' }        ||= {};
-#     $self->{ 'alias' }        = {};
-#     $self->{ 'avoid' }        = [];
-#     ## Load table default, fields, structure informations
-#     my $db = $self->database();
-#     $self->structure();
-#     return( $self->error( "There is no table by the name of $table" ) ) if( !%$ref );
-#     return( $self );
-# }
-
-## Inherited from DB::Object::Tables
-## sub alter
+# NOTE] sub alter is inherited from DB::Object::Tables
+# sub alter
 
 sub check
 {
@@ -82,15 +59,15 @@ sub check
 sub create
 {
     my $self  = shift( @_ );
-    ## $tbl->create( [ 'ROW 1', 'ROW 2'... ], { 'temporary' => 1, 'TYPE' => ISAM }, $obj );
+    # $tbl->create( [ 'ROW 1', 'ROW 2'... ], { 'temporary' => 1, 'TYPE' => ISAM }, $obj );
     my $data  = shift( @_ ) || [];
     my $opt   = shift( @_ ) || {};
     my $sth   = shift( @_ );
     my $table = $self->{table};
-    ## Set temporary in the object, so we can use it to recreate the table creation info as string:
-    ## $table->create( [ ... ], { ... }, $obj )->as_string();
+    # Set temporary in the object, so we can use it to recreate the table creation info as string:
+    # $table->create( [ ... ], { ... }, $obj )->as_string();
     my $temp  = $self->{temporary} = delete( $opt->{temporary} );
-    ## Check possible options
+    # Check possible options
     my $allowed = 
     {
     type            => qr/^(ISAM|MYISAM|HEAP)$/i,
@@ -108,7 +85,7 @@ sub create
     };
     my @options = ();
     my @errors  = ();
-    ## Avoid working for nothing, make this condition
+    # Avoid working for nothing, make this condition
     if( %$opt )
     {
         my %lc_opt  = map{ lc( $_ ) => $opt->{ $_ } } keys( %$opt );
@@ -132,7 +109,7 @@ sub create
     {
         warn( "The options '", join( ', ', @errors ), "' were either not recognized or malformed and thus were ignored.\n" );
     }
-    ## Check statement
+    # Check statement
     my $select = '';
     if( $sth && ref( $sth ) && ( $sth->isa( "DB::Object::Statement" ) || $sth->can( 'as_string' ) ) )
     {
@@ -145,9 +122,9 @@ sub create
     if( $self->exists() == 0 )
     {
         my $query = 'CREATE ' . ( $temp ? 'TEMPORARY ' : '' ) . "TABLE $table ";
-        ## Structure of table if any - 
-        ## structure may very well be provided using a select statement, such as:
-        ## CREATE TEMPORARY TABLE ploppy TYPE=HEAP COMMENT='this is kewl' MAX_ROWS=10 SELECT * FROM some_table LIMIT 0,0
+        # Structure of table if any - 
+        # structure may very well be provided using a select statement, such as:
+        # CREATE TEMPORARY TABLE ploppy TYPE=HEAP COMMENT='this is kewl' MAX_ROWS=10 SELECT * FROM some_table LIMIT 0,0
         my $def    = "(\n" . CORE::join( ",\n", @$data ) . "\n)" if( $data && ref( $data ) && @$data );
         my $tdef   = CORE::join( ' ', map{ "\U$_\E = $opt->{ $_ }" } @options );
         if( !$def && !$select )
@@ -156,14 +133,15 @@ sub create
         }
         $query .= join( ' ', $def, $tdef, $select );
         my $new = $self->prepare( $query ) ||
-        return( $self->error( "Error while preparing query to create table '$table':\n$query", $self->errstr() ) );
-        ## Trick so other method may follow, such as as_string(), fetchrow(), rows()
+            return( $self->error( "Error while preparing query to create table '$table':\n$query", $self->errstr() ) );
+        # Trick so other method may follow, such as as_string(), fetchrow(), rows()
         if( !defined( wantarray() ) )
         {
             # print( STDERR "create(): wantarrays in void context.\n" );
-            $new->execute() ||
-            return( $self->error( "Error while executing query to create table '$table':\n$query", $new->errstr() ) );
+            $new->execute ||
+                return( $self->error( "Error while executing query to create table '$table':\n$query", $new->errstr() ) );
         }
+        $self->reset_structure;
         return( $new );
     }
     else
@@ -176,7 +154,7 @@ sub create_info
 {
     my $self    = shift( @_ );
     my $table   = $self->{table};
-    $self->structure();
+    $self->structure || return( $self->pass_error );
     my $struct  = $self->{structure};
     my $fields  = $self->{fields};
     my $default = $self->{default};
@@ -203,22 +181,23 @@ sub create_info
     return( @output ? $str : undef() );
 }
 
-# Inherited from DB::Object::Tables
+# NOTE: sub default is inherited from DB::Object::Tables
 # sub default
 
 sub drop
 {
     my $self  = shift( @_ );
     my $table = $self->{table} || 
-    return( $self->error( "No table was provided to drop." ) );
+        return( $self->error( "No table was provided to drop." ) );
     my $query = "DROP TABLE $table";
     my $sth = $self->prepare( $query ) ||
-    return( $self->error( "Error while preparing query to drop table '$table':\n$query", $self->errstr() ) );
+        return( $self->error( "Error while preparing query to drop table '$table':\n$query", $self->errstr() ) );
     if( !defined( wantarray() ) )
     {
-        $sth->execute() ||
-        return( $self->error( "Error while executing query to drop table '$table':\n$query", $sth->errstr() ) );
+        $sth->execute ||
+            return( $self->error( "Error while executing query to drop table '$table':\n$query", $sth->errstr() ) );
     }
+    $self->reset_structure;
     return( $sth );
 }
 
@@ -230,8 +209,8 @@ sub exists
 sub lock
 {
     my $self = shift( @_ );
-    ## There is two arguments, the first one does not look like an exiting table name and the second is a number...
-    ## It pretty much looks like a statement lock
+    # There is two arguments, the first one does not look like an exiting table name and the second is a number...
+    # It pretty much looks like a statement lock
     if( @_ == 2 && ( !$self->exists( $_[ 0 ] ) || $_[ 1 ] =~ /^\d+$/ ) )
     {
         return( $self->SUPER::lock( @_ ) );
@@ -260,7 +239,7 @@ sub lock
         }
         return( 1 );
     };
-    ## No parameter, so we default to WRITE for read/write access, but with a low priority
+    # No parameter, so we default to WRITE for read/write access, but with a low priority
     if( !@_ )
     {
         push( @tables, "$self->{table} LOW_PRIORITY WRITE" );
@@ -270,12 +249,12 @@ sub lock
         my $arg   = shift( @_ );
         my $alias = '';
         my $opt   = '';
-        ## Array reference means 'table alias', 'access mode'
+        # Array reference means 'table alias', 'access mode'
         if( $self->_is_array( $arg ) )
         {
             ( $alias, $opt ) = @$arg;
         }
-        ## Otherwise just 'access mode'
+        # Otherwise just 'access mode'
         else
         {
             $opt = $arg;
@@ -316,19 +295,19 @@ sub lock
     }
     my $query = 'LOCK TABLES ' . CORE::join( ', ', @tables );
     my $sth   = $self->prepare( $query ) ||
-    return( $self->error( "Error while preparing query to do tables locking:\n$query", $self->errstr() ) );
+        return( $self->error( "Error while preparing query to do tables locking:\n$query", $self->errstr() ) );
     if( !defined( wantarray() ) )
     {
-        $sth->execute() ||
-        return( $self->error( "Error while executing query to do tables locking:\n$query", $sth->errstr() ) );
+        $sth->execute ||
+            return( $self->error( "Error while executing query to do tables locking:\n$query", $sth->errstr() ) );
     }
     return( $sth );
 }
 
-# Inherited from DB::Object::Tables
+# NOTE: sub name is inherited from DB::Object::Tables
 # sub name
 
-# Inherited from DB::Object::Tables
+# NOTE: sub null is inherited from DB::Object::Tables
 # sub null
 
 sub optimize
@@ -348,7 +327,7 @@ sub optimize
     return( $sth );
 }
 
-# Inherited from DB::Object::Tables
+# NOTE: sub primary is inherited from DB::Object::Tables
 # sub primary
 
 sub qualified_name
@@ -379,6 +358,7 @@ sub rename
         $sth->execute() ||
         return( $self->error( "Error while executing query to rename table '$table' into '$new':\n$query", $sth->errstr() ) );
     }
+    $self->reset_structure;
     return( $sth );
 }
 
@@ -409,9 +389,9 @@ sub stat
     my $db    = $self->{database};
     my $query = $table ? "SHOW TABLE STATUS FROM $db LIKE '$table'" : "SHOW TABLE STATUS FROM $db";
     my $sth   = $self->prepare( $query ) ||
-    return( $self->error( "Error while preparing query to get the status of table", ( $table ? " '$table'" : 's' ), ":\n$query", $self->errstr() ) );
-    $sth->execute() ||
-    return( $self->error( "Error while executing query to get the status of table", ( $table ? " '$table'" : 's' ), ":\n$query", $sth->errstr() ) );
+        return( $self->error( "Error while preparing query to get the status of table", ( $table ? " '$table'" : 's' ), ":\n$query", $self->errstr() ) );
+    $sth->execute ||
+        return( $self->error( "Error while executing query to get the status of table", ( $table ? " '$table'" : 's' ), ":\n$query", $sth->errstr ) );
     my $tables = {};
     my $ref    = '';
     while( $ref = $sth->fetchrow_hashref() )
@@ -421,24 +401,23 @@ sub stat
         # map{ $tables->{ $name }->{ $_ } = $data{ $_ } } keys( %data );
         $tables->{ $name } = \%data;
     }
-    $sth->finish();
+    $sth->finish;
     return( wantarray() ? () : undef() ) if( !%$tables );
     return( wantarray() ? %{ $tables->{ $table } } : $tables->{ $table } ) if( $table && exists( $tables->{ $table } ) );
     return( wantarray() ? %$tables : $tables );
 }
 
+# TODO: Must implement a cache mechanism for DB::Object::Mysql::structure()
 sub structure
 {
     my $self    = shift( @_ );
-    my $table   = shift( @_ ) || $self->{table} ||
-    do
-    {
-        $self->error( "No table provided to get its structure." );
-        return( wantarray() ? () : undef() );
-    };
+    return( $self->_clone( $self->{_cache_structure} ) ) if( $self->{_cache_structure} && !CORE::length( $self->{_reset_structure} // '' ) );
+    my $table   = $self->{table} ||
+        return( $self->error( "No table provided to get its structure." ) );
     my $sth1 = $self->prepare_cached( "SELECT * FROM information_schema.tables WHERE table_name = ?" ) ||
-    return( $self->error( "An error occured while preparing the sql query to get the details of table \"$table\": ", $self->errstr() ) );
-    $sth1->execute( $table ) || return( $self->error( "An erro occured while executing the sql query to get the details of table \"$table\": ", $sth1->errstr() ) );
+        return( $self->error( "An error occured while preparing the sql query to get the details of table \"$table\": ", $self->errstr() ) );
+    $sth1->execute( $table ) ||
+        return( $self->error( "An erro occured while executing the sql query to get the details of table \"$table\": ", $sth1->errstr() ) );
     my $def = $sth1->fetchrow_hashref;
     $sth1->finish;
     $self->{type} = lc( $def->{table_type} );
@@ -468,7 +447,7 @@ sub structure
         {
             my %data = map{ lc( $_ ) => $ref->{ $_ } } keys( %$ref );
             $data{default} = '' if( !defined( $data{default} ) );
-            ## push( @order, $data{ 'field' } );
+            # push( @order, $data{ 'field' } );
             $fields->{ $data{field} }  = ++$c;
             $types->{ $data{field} } = $data{type};
             $default->{ $data{field} } = '';
@@ -483,17 +462,19 @@ sub structure
         $sth->finish();
         if( @primary )
         {
-            ## $struct->{ '_primary' } = \@primary;
+            # $struct->{ '_primary' } = \@primary;
             $self->{primary} = \@primary;
         }
-        ## $self->{ '_structure_real' } = $struct;
+        # $self->{ '_structure_real' } = $struct;
         $self->{default}   = $default;
         $self->{fields}    = $fields;
         $self->{structure} = $struct;
         $self->{types}     = $types;
     }
-    return( wantarray() ? () : undef() ) if( !%$struct );
-    return( wantarray() ? %$struct : \%$struct );
+    # return( wantarray() ? () : undef() ) if( !%$struct );
+    # return( wantarray() ? %$struct : \%$struct );
+    $self->{_cache_structure} = $struct;
+    return( $self->_clone( $struct ) );
 }
 
 sub unlock

@@ -98,7 +98,8 @@ Rmpz_init_set_ui Rmpz_init_set_ui_nobless Rmpz_inp_str Rmpz_inp_raw
 Rmpz_invert Rmpz_ior new_from_MBI
 Rmpz_jacobi Rmpz_kronecker Rmpz_kronecker_si Rmpz_kronecker_ui Rmpz_lcm
 Rmpz_lcm_ui Rmpz_legendre Rmpz_lucnum2_ui Rmpz_lucnum_ui Rmpz_mod Rmpz_mod_ui
-Rmpz_mul Rmpz_mul_2exp Rmpz_mul_si Rmpz_mul_ui Rmpz_neg Rmpz_nextprime
+Rmpz_mul Rmpz_mul_2exp Rmpz_mul_si Rmpz_mul_ui Rmpz_neg
+Rmpz_nextprime Rmpz_prevprime
 Rmpz_odd_p Rmpz_out_str Rmpz_out_raw
 Rmpz_perfect_power_p Rmpz_perfect_square_p
 Rmpz_popcount Rmpz_pow_ui Rmpz_powm Rmpz_powm_sec Rmpz_powm_ui Rmpz_printf
@@ -121,7 +122,7 @@ zgmp_urandomb_ui zgmp_urandomm_ui
     );
 
     @Math::GMPz::EXPORT_OK = (@untagged, @tagged);
-    our $VERSION = '0.58';
+    our $VERSION = '0.61';
     #$VERSION = eval $VERSION;
 
     Math::GMPz->DynaLoader::bootstrap($VERSION);

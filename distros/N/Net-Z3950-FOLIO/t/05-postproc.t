@@ -5,11 +5,13 @@ use utf8;
 use MARC::Record;
 
 sub makeMarcRecord {
+    my @fields;
+    push @fields, new MARC::Field('001', 'fire');
+    push @fields, new MARC::Field('999', '', '', z => 'water');
+    push @fields, new MARC::Field('952', '', '', d => 'cn1', v => 'v1', b => '123');
+    push @fields, new MARC::Field('952', '', '', d => 'cn2', v => 'v2', b => '234');
     my $marc = new MARC::Record();
-    my $field = new MARC::Field('999','','','z' => 'water');
-    $marc->append_fields($field);
-    my $field2 = new MARC::Field('001','fire');
-    $marc->append_fields($field2);
+    $marc->append_fields(@fields);
     # warn $marc->as_formatted();
     return $marc;
 }
@@ -33,6 +35,10 @@ sub makeHoldings {
 	   bless([
 	       ['itemId', '1234567890'],
 	       ['enumAndChron', 'Spring edition'],
+	   ], 'Net::z3950::FOLIO::OPACXMLRecord::item'),
+	   bless([
+	       ['itemId', '1234567891'],
+	       ['enumAndChron', 'Summer edition'],
 	   ], 'Net::z3950::FOLIO::OPACXMLRecord::item'),
       ]],
     ], 'Net::z3950::FOLIO::OPACXMLRecord::holding'),
@@ -190,6 +196,20 @@ BEGIN {
 	    '998$y' => [ { op => 'regsub', pattern => '^$', replacement => '%{999$x}' } ]
 	  }, '998$y', undef, 'not creating subfield by substituting empty value'
 	],
+	[ $marc, {}, '952$d/0', 'cn1', 'null transformation in first copy of a field' ],
+	[ $marc, {}, '952$d/1', 'cn2', 'null transformation in second copy of a field' ],
+	[ $marc, {
+	    '952$d' => { op => 'regsub', pattern => '(.*)', replacement => '$1 %{952$v} - %{952$b}' }
+	  }, '952$d/0', 'cn1 v1 - 123', 'substitutions in first copy of a field'
+	],
+	[ $marc, {
+	    '952$d' => { op => 'regsub', pattern => '(.*)', replacement => '$1 %{952$v} - %{952$b}' }
+	  }, '952$d/1', 'cn2 v2 - 234', 'substitutions in second copy of a field'
+	],
+	[ $marc, {
+	    '952$d' => { op => 'regsub', pattern => '(.*)', replacement => '$1 %{952$v} - %{999$z}' }
+	  }, '952$d/1', 'cn2 v2 - water', 'substitutions in second copy from a separate field'
+	],
     );
     @postProcessHoldingsTests = (
 	# OPAC record, ruleset, field, expected, caption
@@ -224,6 +244,12 @@ BEGIN {
 		enumAndChron => $censorVowels,
 	    }
 	  }, '0.circulations.0.enumAndChron', 'Spr*ng *d*t**n', 'substitute item-level field'
+	],
+	[ makeHoldings(), {
+	    circulation => {
+		enumAndChron => $censorVowels,
+	    }
+	  }, '0.circulations.1.enumAndChron', 'S*mm*r *d*t**n', 'substitute second item-level field'
 	],
 	[ makeHoldings(), {
 	    circulation => {
@@ -283,8 +309,13 @@ foreach my $transformTest (@transformTests) {
 
 foreach my $postProcessMarcTest (@postProcessMarcTests) {
     my($marc, $cfg, $field, $expected, $caption) = @$postProcessMarcTest;
+    my $index;
+    if ($field =~ /(.*)\/(.*)/) {
+	$field = $1;
+	$index = $2;
+    }
     my $newMarc = postProcessMARCRecord($cfg, $marc);
-    my $got = marcFieldOrSubfield($newMarc, $field);
+    my $got = marcFieldOrSubfield($newMarc, $field, $index);
     is($got, $expected, "postProcessMARCRecord field $field ($caption)");
 }
 

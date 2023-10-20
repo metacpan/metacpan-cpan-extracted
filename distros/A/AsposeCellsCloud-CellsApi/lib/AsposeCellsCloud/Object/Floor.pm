@@ -131,7 +131,7 @@ __PACKAGE__->method_documentation({
      'border' => {
      	datatype => 'Line',
      	base_name => 'Border',
-     	description => '',
+     	description => 'Gets or sets the border .',
      	format => '',
      	read_only => '',
      		},

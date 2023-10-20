@@ -15,6 +15,7 @@ t/14_last_insert_id_in_postgresql.t
 t/15_auto_reconnect.t
 t/16_insert_with_last_insert_id.t
 t/17_last_insert_id_in_mysql.t
+t/18_row_class.t
 t/40_01_bug_single_with_void_result.t
 t/41_01_bug_deflate_with_last_update.t
 META.yml

@@ -6,9 +6,9 @@ build_requires:
   Test2::Harness: '0'
   Test2::V0: '0'
 configure_requires:
-  Module::Build::Tiny: '0.034'
+  Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.029, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.041, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,11 +17,12 @@ name: PerlX-ScopeFunction
 provides:
   PerlX::ScopeFunction:
     file: lib/PerlX/ScopeFunction.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Const::Fast: '0'
   Keyword::Simple: '0'
   PPR: '0'
-version: '0.03'
+  Package::Stash: '0'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: MIT

@@ -17,10 +17,10 @@ my $config = NBI::Slurm::load_config("$USER/.nbislurm.config");
 my $DEFAULT_SESSION = $config->{'session'} // "";
 my $SPECIAL_SESSION = $config->{'special_session'} // "";
 my $NAME = "session";
-my $MEM_MB = 1000;
-my $CORES = 1;
+my $MEM_MB = $config->{'session_memory'} // 1000;
+my $CORES = $config->{'session_cpus'} // 1;
 my $DAYS = 0;
-my $HOURS = 4;
+my $HOURS = $config->{'session_hours'} // 4;
 my $OPT_INTEL;
 my $OPT_PARTITION;
 my $OPT_SPECIAL;
@@ -158,7 +158,7 @@ session - Start an interactive session on the cluster
 
 =head1 VERSION
 
-version 0.6.1
+version 0.8.1
 
 =head1 SYNOPSIS
 

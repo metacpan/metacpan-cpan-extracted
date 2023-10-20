@@ -92,6 +92,7 @@ parameters.
 
 The following `curl` options are recognized but largely ignored:
 
+- ` --disable `
 - ` --dump-header `
 - ` --include `
 - ` --location `
@@ -197,6 +198,8 @@ of `->as_curl` than this module.
 
 [https://github.com/NickCarneiro/curlconverter](https://github.com/NickCarneiro/curlconverter) - a converter for multiple
 target languages
+
+[The cURL manpage](https://curl.se/docs/manpage.html)
 
 # REPOSITORY
 

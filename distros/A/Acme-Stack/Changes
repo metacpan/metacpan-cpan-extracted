@@ -1,0 +1,8 @@
+Revision history for Perl module Acme::Stack
+
+0.02 - Add versions of t/test1.t and t/test2.t (named repectively
+       t/test1_alt.t and t/test2.t) that provide a syntax that will
+       also be understood by perl-5.12 and earlier.
+       Thanks trizen.
+
+0.01 - initial release

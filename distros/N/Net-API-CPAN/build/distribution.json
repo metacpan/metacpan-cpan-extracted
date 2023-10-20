@@ -1,0 +1,33 @@
+{
+   "bugs" : {
+      "github" : {
+         "active" : 5,
+         "closed" : 10,
+         "open" : 3,
+         "source" : "https://github.com/momotaro/Folkore-Japan"
+      },
+      "rt" : {
+         "active" : "2",
+         "closed" : "18",
+         "new" : 0,
+         "open" : 2,
+         "patched" : 0,
+         "rejected" : 0,
+         "resolved" : 18,
+         "source" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Folkore-Japan",
+         "stalled" : 0
+      }
+   },
+   "external_package" : {
+      "cygwin" : "perl-Folkore-Japan",
+      "debian" : "folklore-japan-perl",
+      "fedora" : "perl-Folkore-Japan"
+   },
+   "name" : "Folklore-Japan",
+   "river" : {
+      "bucket" : 2,
+      "bus_factor" : 1,
+      "immediate" : 15,
+      "total" : 19
+   }
+}

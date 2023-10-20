@@ -104,7 +104,7 @@ subtest mock => sub {
 
   $cgroup->io->cgroup->_cgroup->child(
     Mojo::IOLoop::ReadWriteProcess::CGroup::v2::IO::STAT_INTERFACE())
-    ->spurt('20');
+    ->spew('20');
   is $cgroup->io->stat, '20', 'Correct io.max set';
 
   $cgroup->cpu->max('30');
@@ -115,27 +115,27 @@ subtest mock => sub {
   is $cgroup->cpu->weight_nice, '42', 'Correct cpu.weight_nice set';
   $cgroup->cpu->cgroup->_cgroup->child(
     Mojo::IOLoop::ReadWriteProcess::CGroup::v2::CPU::STAT_INTERFACE())
-    ->spurt('20');
+    ->spew('20');
   is $cgroup->cpu->stat, '20', 'Correct cpu.stat set';
 
   $cgroup->memory->cgroup->_cgroup->child(
     Mojo::IOLoop::ReadWriteProcess::CGroup::v2::Memory::EVENTS_INTERFACE())
-    ->spurt('230');
+    ->spew('230');
   is $cgroup->memory->events, '230', 'Correct memory.events set';
 
   $cgroup->memory->cgroup->_cgroup->child(
     Mojo::IOLoop::ReadWriteProcess::CGroup::v2::Memory::STAT_INTERFACE())
-    ->spurt('333');
+    ->spew('333');
   is $cgroup->memory->stat, '333', 'Correct memory.stat set';
 
   $cgroup->memory->cgroup->_cgroup->child(
     Mojo::IOLoop::ReadWriteProcess::CGroup::v2::Memory::CURRENT_INTERFACE())
-    ->spurt('foo');
+    ->spew('foo');
   is $cgroup->memory->current, 'foo', 'Correct memory.stat set';
 
   $cgroup->memory->cgroup->_cgroup->child(
     Mojo::IOLoop::ReadWriteProcess::CGroup::v2::Memory::SWAP_CURRENT_INTERFACE(
-    ))->spurt('bar');
+    ))->spew('bar');
   is $cgroup->memory->swap_current, 'bar', 'Correct memory.stat set';
 
   $cgroup->memory->max('4');
@@ -158,7 +158,7 @@ subtest mock => sub {
 
   $cgroup->pid->cgroup->_cgroup->child(
     Mojo::IOLoop::ReadWriteProcess::CGroup::v2::PID::CURRENT_INTERFACE())
-    ->spurt('test');
+    ->spew('test');
   is $cgroup->pid->current, 'test', 'Can get cgroup max';
 
   my $cgroup2
@@ -195,8 +195,7 @@ subtest mock => sub {
 
 
   $cgroup2->_cgroup->child(
-    Mojo::IOLoop::ReadWriteProcess::CGroup::v2::STAT_INTERFACE())
-    ->spurt('test');
+    Mojo::IOLoop::ReadWriteProcess::CGroup::v2::STAT_INTERFACE())->spew('test');
   is $cgroup2->stat, 'test', 'Can get cgroup stats';
 
 

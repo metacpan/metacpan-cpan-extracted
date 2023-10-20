@@ -19,20 +19,6 @@ perldoc command.
 
     perldoc Math::BigInt::Lite
 
-You can also look for information at:
-
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-BigInt-Lite
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Math-BigInt-Lite
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Math-BigInt-Lite
-
-    Search CPAN
-        http://search.cpan.org/dist/Math-BigInt-Lite
-
 COPYRIGHT AND LICENCE
 
 Copyright 2002-2007 Tels, L<http://bloodgate.com>.

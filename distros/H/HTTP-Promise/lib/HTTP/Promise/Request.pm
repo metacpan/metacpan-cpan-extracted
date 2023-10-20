@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Request.pm
-## Version v0.1.1
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.0
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/21
-## Modified 2023/08/27
+## Modified 2023/09/08
 ## All rights reserved.
 ## 
 ## 
@@ -26,7 +26,7 @@ BEGIN
     use HTTP::Promise::Exception;
     use HTTP::Promise::Parser;
     use HTTP::Promise::Stream;
-    use Nice::Try v1.2.0;
+    # use Nice::Try v1.2.0;
     use Regexp::Common qw( URI net );
     # URI::Fast is great, but only supports simple protocols
     # use URI::Fast 0.55;
@@ -50,7 +50,7 @@ BEGIN
     our $GROSS_URI_RE  = qr{(?<scheme>(?:https?:)?)//(?<host>[^/?\#]*)(?<rest>.*)};
     # [\x00-\x7f]
     our $INTL_URI_RE  = qr{(?<scheme>(?:https?:)?)//(?<host>[^\x00-\x7f]+\.[^/?\#]*)(?<rest>.*)};
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -430,7 +430,7 @@ HTTP::Promise::Request - HTTP Request Class
 
 =head1 VERSION
 
-    v0.1.1
+    v0.2.0
 
 =head1 DESCRIPTION
 

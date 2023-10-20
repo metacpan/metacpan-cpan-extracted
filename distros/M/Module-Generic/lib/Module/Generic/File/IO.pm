@@ -20,7 +20,7 @@ BEGIN
     use IO::File ();
     use parent qw( Module::Generic IO::File );
     use vars qw( $VERSION @EXPORT $THAW_REOPENS_FILE );
-    use Nice::Try;
+    # use Nice::Try;
     use Scalar::Util ();
     use Want;
     our @EXPORT = grep( /^(?:O_|F_GETFL|F_SETFL)/, @Fcntl::EXPORT );
@@ -41,26 +41,40 @@ sub new
     $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
     my $args = [@_];
     my $self;
-    try
+    # try-catch
+    local $@;
+    eval
     {
-        $self = $class->IO::File::new( @_ ) ||
-            return( $this->error( "Unable to open file \"", $_[0], "\" with arguments: '", join( "', '", @_[1..$#_] ), "': $!" ) );
-        if( exists( $opts->{fileno} ) &&
-            defined( $opts->{fileno} ) &&
-            length( $opts->{fileno} ) )
+        $self = $class->IO::File::new( @_ );
+    };
+    if( $@ )
+    {
+        return( $this->error( "Error trying to open file \"", $_[0], "\" with arguments: '", join( "', '", @_[1..$#_] ), "': $@" ) );
+    }
+    $self or return( $this->error( "Unable to open file \"", $_[0], "\" with arguments: '", join( "', '", @_[1..$#_] ), "': $!" ) );
+
+    if( exists( $opts->{fileno} ) &&
+        defined( $opts->{fileno} ) &&
+        length( $opts->{fileno} ) )
+    {
+        my $fileno = CORE::delete( $opts->{fileno} );
+        # > +<, etc and r, w, r+
+        my $mode = 'r';
+        $mode = CORE::delete( $opts->{mode} ) if( exists( $opts->{mode} ) && defined( $opts->{mode} ) && length( $opts->{mode} ) );
+        my $rv;
+        # try-catch
+        local $@;
+        eval
         {
-            my $fileno = CORE::delete( $opts->{fileno} );
-            # > +<, etc and r, w, r+
-            my $mode = 'r';
-            $mode = CORE::delete( $opts->{mode} ) if( exists( $opts->{mode} ) && defined( $opts->{mode} ) && length( $opts->{mode} ) );
-            $self->fdopen( $fileno, $mode ) || 
-                return( $this->error( "Unable to fdopen using file descriptor ${fileno} and mode ${mode}: $!" ) );
+            $rv = $self->fdopen( $fileno, $mode );
+        };
+        if( $@ )
+        {
+            return( $this->error( "Error trying to open file \"", $_[0], "\" with arguments: '", join( "', '", @_[1..$#_] ), "': $@" ) );
         }
+        $rv or return( $this->error( "Unable to fdopen using file descriptor ${fileno} and mode ${mode}: $!" ) );
     }
-    catch( $e )
-    {
-        return( $this->error( "Error trying to open file \"", $_[0], "\" with arguments: '", join( "', '", @_[1..$#_] ), "': $e" ) );
-    }
+    
     *$self = { args => $args };
     if( Want::want( 'OBJECT' ) )
     {
@@ -98,6 +112,9 @@ sub args
     my $self = shift( @_ );
     return( *$self->{args} );
 }
+
+# This class does not convert to an HASH
+sub as_hash { return( $_[0] ); }
 
 sub autoflush { return( shift->_filehandle_method( 'autoflush', @_ ) ); }
 
@@ -139,14 +156,18 @@ sub fcntl
     my $self = shift( @_ );
     return( $self->error( 'usage: $io->fcntl( OP, VALUE );' ) ) if( scalar( @_ ) != 2 );
     my( $op, $value ) = @_;
-    try
+    my $rv;
+    # try-catch
+    local $@;
+    eval
     {
-        return( CORE::fcntl( *$self, $op, $value ) );
-    }
-    catch( $e )
+        $rv = CORE::fcntl( *$self, $op, $value );
+    };
+    if( $@ )
     {
-        return( $self->error( "An unexpected error occurred while trying to call fcntl with function '$op' and value '$value': $e" ) );
+        return( $self->error( "An unexpected error occurred while trying to call fcntl with function '$op' and value '$value': $@" ) );
     }
+    return( $rv );
 }
 
 sub fdopen { return( shift->_filehandle_method( 'fdopen', @_ ) ); }
@@ -271,29 +292,39 @@ sub _filehandle_method
     my $self = shift( @_ );
     # e.g. print, printf, seek, tell, rewinddir, close, etc
     my $what = shift( @_ );
-    try
+    my @rv = ();
+    my $ref = IO::File->can( $what ) ||
+        return( $self->error( "Method '$what' is unsupported." ) );
+    no warnings 'uninitialized';
+    if( wantarray() )
     {
-        my @rv = ();
-        my $ref = IO::File->can( $what ) ||
-            return( $self->error( "Method '$what' is unsupported." ) );
-        no warnings 'uninitialized';
-        if( wantarray() )
+        local $@;
+        eval
         {
             @rv = $self->$ref( @_ );
+        };
+        if( $@ )
+        {
+            return( $self->error( "An unexpected error occurred while trying to call ${what} in list context: $@" ) );
         }
-        else
+    }
+    else
+    {
+        local $@;
+        eval
         {
             $rv[0] = $self->$ref( @_ );
+        };
+        if( $@ )
+        {
+            return( $self->error( "An unexpected error occurred while trying to call ${what}: $@" ) );
         }
-        return( $self->error({ skip_frames => 1, message => "Error with $what: $!" }) ) if( CORE::length( $! ) && ( !scalar( @rv ) || !CORE::defined( $rv[0] ) ) );
-        $self->clear_error;
-        return if( ( wantarray() && !scalar( @rv ) ) || ( !wantarray() && !defined( $rv[0] ) ) );
-        return( wantarray() ? @rv : $rv[0] );
     }
-    catch( $e )
-    {
-        return( $self->error( "An unexpected error occurred while trying to call ${what}: $e" ) );
-    }
+
+    return( $self->error({ skip_frames => 1, message => "Error with $what: $!" }) ) if( CORE::length( $! ) && ( !scalar( @rv ) || !CORE::defined( $rv[0] ) ) );
+    $self->clear_error;
+    return if( ( wantarray() && !scalar( @rv ) ) || ( !wantarray() && !defined( $rv[0] ) ) );
+    return( wantarray() ? @rv : $rv[0] );
 }
 
 sub DESTROY

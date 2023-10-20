@@ -1,13 +1,13 @@
 use strict;
 use warnings;
 use Module::Build;
- 
+
 my $builder = Module::Build->new(
     module_name         => 'AsposeCellsCloud::CellsApi',
     license             => 'MIT',
     dist_abstract       => 'Aspose.Cells Cloud SDK for Perl',
     dist_author         => 'Aspose.Cells',
-    dist_version => '23.6',
+    dist_version => '23.10',
     requires => {
                         'perl'           => '5.6.0',
                         'strict' => 0,
@@ -35,12 +35,12 @@ my $builder = Module::Build->new(
                                         'DateTime' => 0,
                                         'Data::Dumper' => 0,
                                         'Test::Exception' => 0
- 
+
                  },
     build_requires => {
         'Test::More' => '0.10',
     },
     create_makefile_pl => 'traditional'
 );
- 
+
 $builder->create_build_script();

@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "App-Music-ChordPro",
    "no_index" : {
@@ -22,6 +22,7 @@
          "lib/ChordPro/Delegate",
          "lib/ChordPro/Output",
          "lib/ChordPro/Wx",
+         "lib/ChordPro/lib",
          "lib/ChordPro/res",
          "pp"
       ],
@@ -76,11 +77,11 @@
    "provides" : {
       "App::Music::ChordPro" : {
          "file" : "lib/ChordPro.pm",
-         "version" : "6.020"
+         "version" : "6.030"
       },
       "chordpro" : {
          "file" : "script/chordpro",
-         "version" : "6.020"
+         "version" : "6.030"
       }
    },
    "release_status" : "stable",
@@ -96,6 +97,6 @@
          "url" : "https://github.com/sciurius/chordpro"
       }
    },
-   "version" : "6.020",
-   "x_serialization_backend" : "JSON::PP version 4.11"
+   "version" : "6.030",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

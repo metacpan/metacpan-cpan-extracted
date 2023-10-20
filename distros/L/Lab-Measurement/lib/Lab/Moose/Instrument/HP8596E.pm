@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HP8596E;
-$Lab::Moose::Instrument::HP8596E::VERSION = '3.881';
+$Lab::Moose::Instrument::HP8596E::VERSION = '3.901';
 #ABSTRACT: HP8596E Spectrum Analyzer
 
 use v5.20;
@@ -302,7 +302,7 @@ Lab::Moose::Instrument::HP8596E - HP8596E Spectrum Analyzer
 
 =head1 VERSION
 
-version 3.881
+version 3.901
 
 =head1 SYNOPSIS
 
@@ -379,7 +379,6 @@ L<Lab::Moose::Instrument::SCPI::Sense::Sweep>
 This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Eugeniy E. Mikhailov
-            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

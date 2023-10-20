@@ -190,11 +190,13 @@ static void S_pushdynhelem(pTHX_ HV *hv, SV *keysv, SV *curval)
 
 static void S_popdyn(pTHX_ void *_data)
 {
-  DynamicVar *dyn = (void *)SvPVX(av_top(dynamicstack));
+  AV *stack = dynamicstack;
+
+  DynamicVar *dyn = (void *)SvPVX(av_top(stack));
   if(dyn->var != (SV *)_data)
     croak("ARGH: dynamicstack top mismatch");
 
-  SV *sv = av_pop(dynamicstack);
+  SV *sv = av_pop(stack);
 
   if(dyn->keysv) {
     HV *hv = ENSURE_HV(dyn->var);
@@ -215,8 +217,10 @@ static void S_popdyn(pTHX_ void *_data)
 
 static void hook_postsuspend(pTHX_ CV *cv, HV *modhookdata, void *hookdata)
 {
-  IV i, max = av_top_index(dynamicstack);
-  SV **avp = AvARRAY(dynamicstack);
+  AV *stack = dynamicstack;
+
+  IV i, max = av_top_index(stack);
+  SV **avp = AvARRAY(stack);
   int height = PL_savestack_ix;
   AV *suspendedvars = NULL;
 
@@ -258,7 +262,7 @@ static void hook_postsuspend(pTHX_ CV *cv, HV *modhookdata, void *hookdata)
 
   if(i < max)
     /* truncate */
-    av_fill(dynamicstack, i);
+    av_fill(stack, i);
 
   for( ; i >= 0; i--) {
     DynamicVar *dyn = (void *)SvPVX(avp[i]);
@@ -504,8 +508,8 @@ static void enable_async_mode(pTHX_ void *_unused)
     return;
 
   is_async = TRUE;
-  dynamicstack = newAV();
-  av_extend(dynamicstack, 50);
+  AV *stack = dynamicstack = newAV();
+  av_extend(stack, 50);
 
   boot_future_asyncawait(0.60);
   register_future_asyncawait_hook(&faa_hooks, NULL);

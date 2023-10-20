@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -30,6 +30,7 @@
       "test" : {
          "requires" : {
             "Test2::V0" : "0",
+            "Test::ExpectAndCheck" : "0.06",
             "Test::Future::IO::Impl" : "0"
          }
       }
@@ -37,15 +38,15 @@
    "provides" : {
       "Future::IO" : {
          "file" : "lib/Future/IO.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       },
       "Future::IO::ImplBase" : {
          "file" : "lib/Future/IO/ImplBase.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       },
       "Future::IO::System" : {
          "file" : "lib/Future/IO/System.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
@@ -54,6 +55,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

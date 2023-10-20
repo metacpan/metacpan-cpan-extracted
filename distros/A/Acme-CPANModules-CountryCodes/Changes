@@ -1,3 +1,23 @@
+0.004   2023-08-06  Released-By: PERLANCAR; Urgency: medium
+
+        - Replace entry Locale::Util::Country with App::ListCountries &
+          App::LocaleCodesUtils.
+
+
+0.003   2023-08-06  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Typo.
+
+
+0.002   2023-08-06  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention related list: Acme::CPANModules::CountryCodes.
+
+
 0.001   2023-08-06  Released-By: PERLANCAR
 
         - First release.

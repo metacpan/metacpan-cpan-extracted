@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -435,20 +435,24 @@ Trying to initialize such resource will cause an expection, however.
 
 =head2 COMPATIBILITY
 
-As of current, using C<Resource::Silo -class> and C<Moose> in the same package
-doesn't work.
-
-Usage together with C<Moo> works, but only if L<Resource::Silo> comes first:
+L<Resource::Silo> uses L<Moo> internally and is therefore compatible with
+both L<Moo> and L<Moose> when in C<-class> mode:
 
     package My::App;
+
+    use Moose;
     use Resource::Silo -class;
-    use Moo;
 
-    has config_name => is => ro, default => sub { '/etc/myapp/myfile.yaml' };
+    has path => is => 'ro', default => sub { '/dev/null' };
+    resource fd => sub {
+        my $self = shift;
+        open my $fd, "<", $self->path;
+        return $fd;
+    };
 
-    resource config => sub { LoadFile( $_[0]->config_name ) };
-
-Compatibility issues are being slowly worked on.
+Extending such mixed classes will also work.
+However, the resource definitions will be taken
+from the nearest ancestor that has them, using breadth first search.
 
 =head1 MORE EXAMPLES
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Changes file management - ~/lib/Changes/Version.pm
-## Version v0.2.0
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.2
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/12/01
-## Modified 2023/08/20
+## Modified 2023/09/19
 ## All rights reserved
 ## 
 ## 
@@ -20,7 +20,7 @@ BEGIN
     use parent qw( Module::Generic );
     use vars qw( $VERSION $VERSION_LAX_REGEX $DEFAULT_TYPE );
     use version ();
-    use Nice::Try;
+    # use Nice::Try;
     # From version::regex
     # Comments in the regular expression below are taken from version::regex
     our $VERSION_LAX_REGEX = qr/
@@ -106,7 +106,7 @@ BEGIN
         'abs'   => \&_noop,
         'nomethod' => \&_noop,
     );
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.2';
 };
 
 use strict;
@@ -265,6 +265,7 @@ sub format
     my $self = shift( @_ );
     my $fmt  = shift( @_ ) ||
         return( $self->error( "No pattern was provided to format this version." ) );
+    # NOTE: numify()
     my $numify = sub
     {
         my $sep = shift( @_ ) || '';
@@ -288,6 +289,7 @@ sub format
         return( '' );
     };
 
+    # NOTE: dotted()
     my $dotted = sub
     {
         my $comp = $self->new_array;
@@ -302,45 +304,52 @@ sub format
         return( $comp->is_empty ? '' : $comp->map(sub{ 0 + $_ })->join( '.' )->scalar );
     };
 
+    # NOTE: map
     my $map =
     {
-        # alpha
+        # NOTE: alpha
         'A' => sub{ return( $self->alpha // '' ); },
-        # alpha with leading underscore
+        # NOTE: alpha with leading underscore
         'a' => sub
         {
             my $a = $self->alpha // '';
             return( length( $a ) ? "_${a}" : '' );
         },
-        # dotted versions like 1.2.3.4.5
+        # NOTE: dotted versions like 1.2.3.4.5
         'D' => sub
         {
             my $dots = $dotted->();
             return( length( $dots ) ? $dots : '' );
         },
-        # dotted versions with leading dot like .1.2.3.4.5
+        # NOTE: dotted versions with leading dot like .1.2.3.4.5
         'd' => sub
         {
             my $dots = $dotted->();
             return( length( $dots ) ? ( '.' . $dots ) : '' );
         },
-        # minor
+        # NOTE: minor
         'M' => sub{ return( $self->minor // '' ); },
-        # numified without underscore. e.g.: 5.006001 -> 006001
+        # NOTE: minor with leading dot
+        'm' => sub
+        {
+            my $minor = $self->minor // '';
+            return( length( $minor ) ? ( '.' . $minor ) : '' );
+        },
+        # NOTE: numified without underscore. e.g.: 5.006001 -> 006001
         'N' => sub{ return( $numify->( '_' ) ); },
-        # numified without underscore and with leading dot: 5.006001 -> .006001
+        # NOTE: numified without underscore and with leading dot: 5.006001 -> .006001
         'n' => sub
         {
             my $num = $numify->( '' );
             return( length( $num ) ? ( '.' . $num ) : '' );
         },
-        # patch
+        # NOTE: patch
         'P' => sub{ return( $self->patch // '' ); },
-        # major; R for release
+        # NOTE: major; R for release
         'R' => sub{ return( $self->major // '' ); },
-        # numified with underscore. e.g.: 5.006_001 -> 006_001
+        # NOTE: numified with underscore. e.g.: 5.006_001 -> 006_001
         'U' => sub{ return( $numify->( '_' ) ); },
-        # numified with underscore. e.g.: 5.006_001 -> .006_001
+        # NOTE: numified with underscore. e.g.: 5.006_001 -> .006_001
         'u' => sub
         {
             my $num = $numify->( '_' );
@@ -412,7 +421,9 @@ sub normal
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{raw} //= 0;
     my $v;
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         my $clone = $self->clone;
         if( !$self->qv )
@@ -430,11 +441,12 @@ sub normal
             $clone->type( 'dotted' );
             return( $clone );
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error normalising version $v: $e" ) );
+        return( $self->error( "Error normalising version $v: $@" ) );
     }
+    return( $rv );
 }
 
 sub numify
@@ -443,7 +455,9 @@ sub numify
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{raw} //= 0;
     my $v;
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         if( $opts->{raw} )
         {
@@ -462,13 +476,24 @@ sub numify
             my $new = $self->clone;
             # This will also remove qv boolean
             $new->type( 'decimal' );
+            my $alpha = $self->alpha;
+            if( length( $alpha // '' ) )
+            {
+                $new->pattern( '%R%n%a' );
+            }
+            else
+            {
+                $new->pattern( '%R%n' );
+            }
+            $new->reset(1);
             return( $new );
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error numifying version $v: $e" ) );
+        return( $self->error( "Error numifying version $v: $@" ) );
     }
+    return( $rv );
 }
 
 sub original { return( shift->_set_get_scalar_as_object( 'original', @_ ) ); }
@@ -579,7 +604,7 @@ sub parse
             # 1.002_03 where 03 is the alpha version and should be converted to 1.2_03, but instead becomes v1.2.30
             # If compatibility with 'compat' is enabled, then we use the classic albeit erroneous way of converting the decimal version
             push( @$fmt, '%R' );
-            push( @$fmt, '%M' ) if( defined( $def->{minor} ) && length( $def->{minor} ) );
+            push( @$fmt, '%m' ) if( defined( $def->{minor} ) && length( $def->{minor} ) );
             $def->{pattern} = join( '', @$fmt );
             if( defined( $def->{alpha} ) && 
                 length( $def->{alpha} ) < 3 && 
@@ -657,14 +682,16 @@ sub reset
         if( defined( $self->{major} ) )
         {
             my $str = $self->_stringify;
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 my $v = version->parse( "$str" );
                 $self->{_version} = $v;
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                warn( "Warning only: error trying to get a version object from version string '$str': $e\n" ) if( $self->_warnings_is_enabled );
+                warn( "Warning only: error trying to get a version object from version string '$str': $@\n" ) if( $self->_warnings_is_enabled );
             }
         }
     }
@@ -1188,13 +1215,15 @@ sub _version
     elsif( !exists( $self->{_version} ) || !defined( $self->{_version} ) )
     {
         my $str = $self->_stringify;
-        try
+        # try-catch
+        local $@;
+        eval
         {
             $self->{_version} = version->parse( "$str" );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            warn( "Warning only: error trying to get a version object from version string '$str': $e\n" ) if( $self->_warnings_is_enabled );
+            warn( "Warning only: error trying to get a version object from version string '$str': $@\n" ) if( $self->_warnings_is_enabled );
         }
     }
     return( $self->{_version} );
@@ -1256,7 +1285,7 @@ Changes::Version - Version string object class
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.2
 
 =head1 DESCRIPTION
 
@@ -1942,12 +1971,19 @@ This is designed so you can write:
 
 =item * C<%M>
 
-    my $v = Changes::Version->parse( "5.0.6.1.2.3.4_2" );
-    say $v->format( '%M' ); # 0
+    my $v = Changes::Version->parse( "5.2.6_3" );
+    say $v->format( '%M' ); # 2
 
 This returns the C<minor> part of the version.
 
 If there is no C<minor> fragment value, it returns an empty string.
+
+=item * C<%m>
+
+    my $v = Changes::Version->parse( "5.2.6_3" );
+    say $v->format( '%m' ); # .2
+
+This is similar to C<%M>, but will prepend a dot if the value is not null.
 
 =item * C<%N>
 

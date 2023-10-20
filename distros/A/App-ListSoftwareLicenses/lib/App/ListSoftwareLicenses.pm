@@ -1,14 +1,15 @@
 package App::ListSoftwareLicenses;
 
-our $DATE = '2015-09-15'; # DATE
-our $VERSION = '0.07'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
-use experimental 'smartmatch';
 
 use CHI;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-07-11'; # DATE
+our $DIST = 'App-ListSoftwareLicenses'; # DIST
+our $VERSION = '0.080'; # VERSION
 
 our %SPEC;
 
@@ -72,7 +73,7 @@ my $table_data = $cache->compute(
             'Software::License::', {list_modules=>1});
         my $data = [map {[$_]} sort keys %$res];
         for my $row (@$data) {
-            next if $row->[0] ~~ @excluded;
+            next if grep { $_ eq $row->[0] } @excluded;
             Module::Load::load($row->[0]);
             my $o;
             eval { $o = $row->[0]->new({holder => 'Copyright_Holder'}) };
@@ -106,7 +107,6 @@ my $res = gen_read_table_func(
 die "Can't generate list_software_licenses function: $res->[0] - $res->[1]"
     unless $res->[0] == 200;
 
-$SPEC{list_software_licenses}{args}{query}{pos} = 0;
 $SPEC{list_software_licenses}{examples} = [
     {
         argv    => [qw/perl/],
@@ -129,30 +129,51 @@ App::ListSoftwareLicenses - List all Software::License's
 
 =head1 VERSION
 
-This document describes version 0.07 of App::ListSoftwareLicenses (from Perl distribution App-ListSoftwareLicenses), released on 2015-09-15.
-
-=head1 SEE ALSO
-
-L<Software::License>
-
-L<App::Software::License> to print out license text
+This document describes version 0.080 of App::ListSoftwareLicenses (from Perl distribution App-ListSoftwareLicenses), released on 2023-07-11.
 
 =head1 FUNCTIONS
 
 
-=head2 list_software_licenses(%args) -> [status, msg, result, meta]
+=head2 list_software_licenses
+
+Usage:
+
+ list_software_licenses(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List all Software::License's.
 
 Examples:
 
- list_software_licenses( query => "perl");
+=over
 
+=item * String search:
 
-String search.
+ list_software_licenses(queries => ["perl"]);
 
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     "Software::License::Artistic_1_0",
+     "Software::License::Artistic_1_0_Perl",
+     "Software::License::Artistic_2_0",
+     "Software::License::LGPL_2_1",
+     "Software::License::LGPL_3_0",
+     "Software::License::Mozilla_1_0",
+     "Software::License::Mozilla_1_1",
+     "Software::License::Perl_5",
+     "Software::License::Sun",
+   ],
+   { "table.fields" => ["module"] },
+ ]
+
+=back
 
 REPLACE ME
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -163,6 +184,10 @@ Arguments ('*' denotes required arguments):
 Return array of full records instead of just ID fields.
 
 By default, only the key (ID) field is returned per result entry.
+
+=item * B<exclude_fields> => I<array[str]>
+
+Select fields to return.
 
 =item * B<fields> => I<array[str]>
 
@@ -388,11 +413,24 @@ Only return records where the 'notice' field is less than specified value.
 
 Only return records where the 'notice' field is greater than specified value.
 
-=item * B<query> => I<str>
+=item * B<queries> => I<array[str]>
 
 Search.
 
-=item * B<sort> => I<str>
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+=item * B<query_boolean> => I<str> (default: "and")
+
+Whether records must match all search queries ('and') or just one ('or').
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
+
+=item * B<sort> => I<array[str]>
 
 Order records according to certain field(s).
 
@@ -537,22 +575,23 @@ Show field 'with'.
 
 =item * B<with_field_names> => I<bool>
 
-Return field names in each record (as hash/associative array).
+Return field names in each record (as hashE<sol>associative array).
 
 When enabled, function will return each record as hash/associative array
 (field name => value pairs). Otherwise, function will return each record
 as list/array (field value, field value, ...).
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -564,6 +603,47 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-ListSo
 
 Source repository is at L<https://github.com/perlancar/perl-App-ListSoftwareLicenses>.
 
+=head1 SEE ALSO
+
+L<Software::License>
+
+L<App::Software::License> to print out license text
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListSoftwareLicenses>
@@ -571,16 +651,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

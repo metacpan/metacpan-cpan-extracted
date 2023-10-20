@@ -284,9 +284,19 @@ KEYWORDS
     structure for purposes of modules like Data::Dumper or serialisation
     into things like YAML or JSON.
 
-    This representation type may be useful when converting existing classes
-    into using Object::Pad where there may be existing subclasses of it
-    that presume a blessed hash for their own use.
+       :repr(keys)
+
+    Since version 0.803.
+
+    The representation will be a blessed hash reference. The instance data
+    will be stored in individual keys of the hash, named after the class
+    and the field variable name, separated by a / symbol. Objects in this
+    representation should behave predictably with data printing modules
+    like Data::Dumper or serialisation via YAML or JSON.
+
+    These two hash-based representation types may be useful when converting
+    existing classes into using Object::Pad where there may be existing
+    subclasses of it that presume a blessed hash for their own use.
 
        :repr(magic)
 
@@ -296,6 +306,19 @@ KEYWORDS
 
     This representation type is the only one that will work for subclassing
     existing classes that do not use blessed hashes.
+
+       :repr(pvobj)
+
+    Since version 0.804.
+
+    The representation will be the SVt_PVOBJ type newly added to Perl,
+    which offers more efficient storage for object instances. This is only
+    available on Perl version 5.38.0 onwards.
+
+    This is also newly-added and may not be fully tested and reliable yet.
+    Once it has more real-world testing and has proven reliable it may
+    become the default instance representation on versions of Perl where it
+    is available.
 
        :repr(autoselect), :repr(default)
 

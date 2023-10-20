@@ -2,7 +2,8 @@
 use strict;
 use warnings;
 use 5.020;
-use experimental qw(signatures postderef);
+use stable 0.031 'postderef';
+use experimental 'signatures';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
@@ -20,6 +21,7 @@ my $accepter = Test::JSON::Schema::Acceptance->new(
   test_dir => 't/tests/add_resource',
   additional_resources => 't/tests/add_resource/remotes',
   include_optional => 0,
+  supported_specifications => [ qw(draft2019-09 draft2020-12) ],
 );
 
 $accepter->acceptance(
@@ -36,6 +38,9 @@ cmp_deeply(
   {
     'http://localhost:1234/remote1.json' => { '$defs' => { foo => bool(1) } },
     'http://localhost:1234/subfolder/remote2.json' => { '$defs' => { bar => bool(0) } },
+    'http://localhost:1234/draft2020-12/remote3.json' => { '$defs' => { baz => bool(0) } },
+    'http://localhost:1234/draft2019-09/remote4.json' => { '$defs' => { quux => bool(0) } },
+    # but not http://localhost:1234/draft6/remote5.json
   },
   'user-supplied subref is called with additional resources found in test directory',
 );

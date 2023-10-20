@@ -4,7 +4,7 @@ Genealogy::Wills - Lookup in a database of wills
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 
@@ -19,7 +19,9 @@ Version 0.02
 
 Creates a Genealogy::Wills object.
 
-Takes an optional argument, directory, that is the directory containing wills.sql.
+Takes two optionals arguments:
+	directory: that is the directory containing obituaries.sql
+	logger: an object to send log messages to
 
 ## search
 
@@ -55,10 +57,6 @@ You can also look for information at:
 - RT: CPAN's request tracker
 
     [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Genealogy-Wills](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Genealogy-Wills)
-
-- CPANTS
-
-    [http://cpants.cpanauthors.org/dist/Genealogy-Wills](http://cpants.cpanauthors.org/dist/Genealogy-Wills)
 
 - CPAN Testers' Matrix
 

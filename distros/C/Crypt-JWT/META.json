@@ -4,7 +4,7 @@
       "Karel Miko"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,7 +37,7 @@
             "Exporter" : "5.57",
             "JSON" : "0",
             "Scalar::Util" : "0",
-            "Test::More" : "0",
+            "Test::More" : "0.88",
             "perl" : "5.006"
          }
       }
@@ -51,6 +51,6 @@
          "url" : "https://github.com/DCIT/perl-Crypt-JWT"
       }
    },
-   "version" : "0.034",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.035",
+   "x_serialization_backend" : "JSON::PP version 4.08"
 }

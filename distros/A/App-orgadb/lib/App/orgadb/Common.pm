@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2023-08-05'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 sub _heading_from_line {
     my $heading = shift;
@@ -496,7 +496,7 @@ App::orgadb::Common
 
 =head1 VERSION
 
-This document describes version 0.016 of App::orgadb::Common (from Perl distribution App-orgadb), released on 2023-01-19.
+This document describes version 0.017 of App::orgadb::Common (from Perl distribution App-orgadb), released on 2023-08-05.
 
 =head1 HOMEPAGE
 

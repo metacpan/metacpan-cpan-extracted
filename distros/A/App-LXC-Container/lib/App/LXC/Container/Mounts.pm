@@ -41,7 +41,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = "0.27";
+our $VERSION = "0.29";
 
 use Cwd 'abs_path';
 

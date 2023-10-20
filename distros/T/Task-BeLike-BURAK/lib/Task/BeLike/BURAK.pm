@@ -1,5 +1,5 @@
 package Task::BeLike::BURAK;
-$Task::BeLike::BURAK::VERSION = '0.24';
+$Task::BeLike::BURAK::VERSION = '0.26';
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ Task::BeLike::BURAK
 
 =head1 VERSION
 
-version 0.24
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,7 @@ See the meta files in the distribution.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>
+Burak Gursoy
 
 =head1 COPYRIGHT AND LICENSE
 

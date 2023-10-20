@@ -1,0 +1,107 @@
+NAME
+    List::Util::sglice - Remove some elements where code returns true
+
+VERSION
+    This document describes version 0.002 of List::Util::sglice (from Perl
+    distribution List-Util-sglice), released on 2023-09-18.
+
+SYNOPSIS
+     use List::Util::sglice qw(sglice);
+
+     my @ary = (1,2,3,4,5,6,7,8,9,10);
+
+     # 1. remove all even numbers (equivalent to: @ary = grep { !($_ % 2 == 0) } @ary
+
+     #                       --------------------------- 1st param: code to match elements to remove
+     #                      /     ---------------------- 2nd param: the array
+     #                     /     /  -------------------- 3rd param: (optional) how many matching elems to remove, undef means all, negative allowed to mean last N matching elems
+     #                    /     /  /
+     sglice { $_ % 2 == 0 } @ary    ;  # => (1,3,5,7,9)
+
+     # 3. remove first two even numbers
+     sglice { $_ % 2 == 0 } @ary,  2;  # => (1,3,5,6,7,8,9,10)
+
+     # 4. remove last two even numbers
+     sglice { $_ % 2 == 0 } @ary, -2;  # => (1,2,3,4,5,6,7,9)
+
+     # 5. remove elements #0..#2, equivalent to: splice @ary, 0, 2
+     sglice { $_[1] <= 2  } @ary;      # => (4,5,6,7,8,9,10)
+
+     # 6. put even numbers to the beginning of array
+     unshift @ary, sglice { $_ % 2 == 0 } @ary;  # => (2,4,6,8,10,  1,3,5,7,9)
+
+DESCRIPTION
+    This module provides "sglice".
+
+FUNCTIONS
+    Not exported by default but exportable.
+
+  sglice
+    Usage:
+
+     sglice CODE ARRAY, NUM_TO_REMOVE
+     sglice CODE ARRAY
+
+    "sglice" (mnemonic: "g" is for *grep*) somewhat resembles "splice".
+    Instead of specifying offset and number of elements to remove from
+    "ARRAY", you specify "CODE" to match elements to remove. Unlike
+    "splice", "sglice" does not let you reinsert new items (see
+    List::Util::msplice for that).
+
+    In CODE, $_ (as well as $_[0]) is set to array element. $_[1] is set to
+    the index of the element, so you can still remove elements by their
+    position.
+
+    The third parameter, "NUM_TO_REMOVE", is the number of elements to
+    remove. If unspecified, all matching elements will be removed. You can
+    also specify negative integer to remove NUM last matching elements.
+    Setting this to 0 effectively means a no-op.
+
+    In list context, the function returns the removed elements. In scalar
+    context, it returns the last removed elements.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/List-Util-sglice>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-List-Util-sglice>.
+
+SEE ALSO
+    List::Util::mapsplice.
+
+    "splice" in perlfunc.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=List-Util-sglice>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

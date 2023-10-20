@@ -1,0 +1,531 @@
+#!/usr/bin/env perl
+# License: Public Domain or CC0
+# See https://creativecommons.org/publicdomain/zero/1.0/
+# The author, Jim Avera (jim.avera at gmail) has waived all copyright and
+# related or neighboring rights.  Attribution is requested but is not required.
+use strict; use warnings FATAL => 'all'; use 5.010;
+
+{ no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = "def"; }
+our $VERSION = "0.001"; # Future: V ERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-10-14'; # DATE from Dist::Zilla::Plugin::OurDate
+
+#use 5.12; # for unicode_strings
+use v5.18; # for lexical_subs
+
+use strict; use warnings;
+use feature qw(switch state say lexical_subs current_sub fc);
+use feature qw(unicode_strings unicode_eval evalbytes);
+no warnings "experimental::lexical_subs";
+
+use open ':encoding(UTF-8)';
+{ use open ':locale'; } # Encode messages for the user's console
+
+use Carp; $Carp::MaxArgNums = 0;
+use Data::Dumper::Interp 6.007 qw/visnew dvis ivis dvisq visq qsh qshlist vis visq/;
+use Path::Tiny 0.144;
+use File::Spec::Functions qw(tmpdir);
+use Text::ParseWords 3.31 qw/parse_line shellwords/;
+use Encode qw(decode encode);
+use FindBin qw/$Bin $Script/;
+use Guard qw(guard scope_guard);
+use List::Util qw/min max any first/;
+use List::MoreUtils qw/indexes firstidx/;
+use List::MoreUtils qw/indexes/;
+use DateTime;
+
+use Getopt::Long 2.37 qw/GetOptions GetOptionsFromArray/;
+use Pod::Usage qw/pod2usage/;
+
+use Spreadsheet::Edit 1000.006 qw(title2ident);
+use Spreadsheet::Edit::IO qw/convert_spreadsheet
+             sheetname_from_spec filepath_from_spec form_spec_with_sheetname/;
+use Spreadsheet::Edit::Log 'oops', ':btw= ${lno}:';
+
+use ODF::lpOD;
+use ODF::lpOD_Helper qw/:DEFAULT arraytostring/;
+use ODF::MailMerge qw/replace_tokens MM_SUBST/;
+
+sub _eval_and_preen_exception(&) {
+  # Run some code which may fail because of a user error (file not found etc.)
+  # Warnings and exceptions are suppressed, but $@ is set if an exception
+  # occurred, with " at /path/to/our/code.pm line xxx" stripped from $@
+  # so it is suitable to be shown to the user.
+  state $FILE = __FILE__;
+  local $SIG{__WARN__} = sub {};
+  my ($r, @r);
+  if (wantarray) { @r = eval{ $_[0]->() } } else { $r = eval{ $_[0]->() } };
+  if ($@) {
+    $@ =~ s/\s* at \S*${FILE} line.*//; # strip reference to our code
+  }
+  wantarray ? @r : $r
+}
+
+sub _bracketize($) {
+  local $_ = shift;
+  return undef unless defined;
+  /\A\{.*\}\z/s ? $_ : "{${_}}"
+}
+sub _debracketize($) {
+  local $_ = shift;
+  return undef unless defined;
+  /\A\{(.*)\}\z/s or confess dvis 'no brackets in $_';
+  $1
+}
+
+my $exitstatus;
+
+my ($debug, $verbose);
+my %sheets; # path => opened sheet
+my $doc;
+my $body;
+
+sub run_command($@) {
+  my ($sourceinfo, $op, @args) = @_;
+  my sub mydie { die "(${sourceinfo}) ",qsh($op)," : ", @_,"\n" }
+  my sub compile_if_regex($) {
+    local $_ = shift;
+    if (m#\A(/.*/[a-z]*)\z#a) {
+      my $re = eval "qr".$1;  #  "qr/blahblah/msix"
+      mydie ivis 'Invalid regex $_ : ',$@ if $@;
+      die "bug ",vis(ref $re) unless ref($re) eq "Regexp";
+      return $re;
+    }
+    $_
+  }
+  my sub eval_if_styled_content($) {
+    local $_ = shift;
+    if (/^\[\[.*\],\s*["'].*\]$/) { # looks like [Styled content] Perl expr
+      my $c = eval $_;
+      mydie ivis 'Value $_ looks like a [Styled content] expression but something is wrong:\n',$@ if $@;
+      return $c;
+    }
+    $_
+  }
+  warn "> ", qshlist($op, @args),"\n" if $verbose;
+  if ($op eq 'print') {
+    say qshlist(@args);
+  }
+  elsif ($op eq 'skeleton') {
+    my $skelpath = $args[0] // mydie "No path specified";
+    @args == 1 or mydie ivis 'Extraneous argument: @args[1..$#args]';
+    warn "Opening ",qsh($skelpath),"\n" unless $verbose;
+    _eval_and_preen_exception {
+      # Not certain whether this dies on error or just warns and returns undef
+      $doc = odf_new_document_from_template($skelpath) // mydie $!;
+    };
+    mydie $@ if $@;
+    $body = $doc->get_body;
+  }
+  elsif ($op eq 'save') {
+    my $opt_force;
+    GetOptionsFromArray(\@args, 'f' => \$opt_force) or mydie "invalid argument";
+    mydie "No desitnation specified" unless @args;
+    @args == 1 or mydie ivis 'Extraneous argument: @args[1..$#args]';
+    my $dest = path($args[0]);
+    if ($opt_force) {
+      if ($dest->exists && ! -w $dest->canonpath) {
+        warn "> Attempting to give write permission to read-only $dest\n";
+        $dest->chmod("u+w");
+      }
+    } else {
+      mydie "$args[0] ALREADY EXISTS (use -f to force)"
+        if $dest->exists;
+    }
+    $doc->save(target => $args[0]);
+  }
+  elsif ($op eq '_eval_perlcode') {
+    # Undocumented, used in tests
+    eval join(" ",@args);
+    mydie ivis "eval failed: $@" if $@;
+  }
+  elsif ($op eq 'subst-value') {
+    mydie "Odd number arguments.  TOKEN VALUE pairs are expcted"
+      unless (scalar(@args) % 2) == 0;
+    mydie "A skeleton must be read first" unless $body;
+    my %hash;
+    while (@args) {
+      my $key = compile_if_regex(_debracketize(_bracketize(shift @args)));
+      my $value = eval_if_styled_content(shift @args);
+      $hash{$key} = $value;
+    }
+    warn dvis '  %hash\n' if $debug;
+    my $count = replace_tokens($body, \%hash);
+    warn "  $count token(s) replaced\n" if $debug;
+  }
+  elsif ($op eq 'mail-merge') {
+    my $proto_tag = _bracketize(shift @args) // mydie "missing arguments";
+    mydie "A skeleton must be read first" unless $body;
+    my $engine = ODF::MailMerge::Engine->new(context => $body,
+                                             proto_tag => $proto_tag);
+    # First open all the spreadsheets and install any aliases
+    my @sheets; #  [[keytoklist], sheet]
+    while (defined(local $_ = shift @args)) {
+      /^((?<keytoks> ( (?: [^,:\\]+ | \\. )*+ )  (?: ,(?-1))* ):)?(?<ss>.*)$/x
+        or oops;
+      my $ss = $+{ss};
+      my @keytoks = map{
+        my ($lhs, $rhs) = (/^([A-Za-z]\w*)=(.*)$/a);
+        if (!defined $rhs) { $lhs = $rhs = $_; }
+        [$lhs, $rhs]
+      } grep{defined() && $_ ne ""} parse_line(qr/[,:]/, 0, $+{keytoks});
+      my $sheet = Spreadsheet::Edit->new();
+      _eval_and_preen_exception { $sheet->read_spreadsheet($ss) };
+      mydie $@ if $@;
+      my %aliases;
+      Getopt::Long::Configure ("default", "require_order"); # stop after -a
+      GetOptionsFromArray(\@args, 'a=s' => \%aliases)
+       // mydie "Unknown option following SPREASHEET path";
+      while (my ($key,$val) = each %aliases) {
+        $sheet->alias($key => compile_if_regex($val));
+      }
+      btw dvis '$ss %aliases $sheet->colx()' if $debug;
+
+      my sub get_key_for_fieldvals($$) {
+        my ($sh, $colspecs) = @_;
+        my @parts;
+        foreach my $colspec (@$colspecs) {
+          my $val = $sh->{$colspec}
+            // mydie ivis '$colspec is not defined in $sh->data_source()';
+          push @parts, $val;
+        }
+        return arraytostring(\@parts);
+      }
+
+      my %key2rx;
+      if (@keytoks) {
+        mydie 'KEYTOKs may only be specified for secondary spreadsheets'
+          if @sheets==0;
+        my @secondary_keytoks = map{ $_->[1] } @keytoks;
+btw dvis '##CCC $#sheets @keytoks\n@secondary_keytoks';
+        $sheet->apply(sub{
+          my $key = get_key_for_fieldvals($sheet, \@secondary_keytoks);
+          if (exists $key2rx{$key}) {
+            mydie ivis '@secondary_keytoks are not unique in '
+                      .'$sheet->data_source() :\n'
+                      .'The same values @parts are in row ',
+                      ($key2rx{$key}+1)," and row ", ($sheet->rx()+1),")";
+          }
+          $key2rx{$key} = $sheet->rx();
+        });
+      } else {
+        mydie ivis 'KEYTOKs must be specified for $sheet->data_source'
+          if @sheets > 0;
+      }
+      push @sheets, [\@keytoks, $sheet, \%key2rx];
+    }
+    mydie "No spreadsheet specified" unless @sheets;
+
+    # Execute the mail-merge
+    my $mainsheet = $sheets[0][1];
+    my $maincolx = $mainsheet->colx();
+    $mainsheet->apply(sub{
+      $engine->add_record({ '*' => sub{
+        my ($tokname, $token) = @_;
+        if (exists $maincolx->{$tokname}) {
+btw ivis '$tokname found in primary' if $debug;
+          return(MM_SUBST,
+                 eval_if_styled_content($mainsheet->{$tokname} // oops));
+        }
+        my @row_stack = ($mainsheet->crow); # row being visited
+
+        for (my $ix = 1; $ix <= $#sheets; $ix++) {
+          my ($keytoks, $sh2, $key2rx) = @{ $sheets[$ix] };
+          my @primary_keytoks = map{ $_->[0] } @$keytoks;
+          my @parts;
+          KEYTOK:
+          foreach my $colspec (@primary_keytoks) {
+            for my $rowhash (reverse @row_stack) {
+              if (defined(my $val = $rowhash->{$colspec})) {
+                push @parts, $val;
+                next KEYTOK;
+              }
+            }
+            mydie ivis 'KEYTOK $colspec not found in previous spreadsheet(s)';
+          }
+          my $key = arraytostring(\@parts);
+          my $rx2 = $key2rx->{$key} // oops;
+          if (defined (my $val = $sh2->[$rx2]{$tokname})) {
+btw ivis '$tokname found in secondary $ix' if $debug;
+            return(MM_SUBST, eval_if_styled_content($val // oops));
+          }
+        }
+
+        mydie ivis 'No value for token $token';
+      }#'*' wildcard callback
+      }); #calling engine->add_record
+    });#mainsheet apply
+    $engine->finish;
+  }
+  else {
+    mydie 'Unknown command ';
+  }
+}
+
+sub run_script($$) {
+  my ($fh, $sourcename) = @_;
+  my sub mydie { die "(${sourcename} line $.) ", @_,"\n" }
+
+  while (<$fh>) {
+    while (s/\\\n\z//s) {
+      mydie "EOF following \\<newline>" if eof($fh);
+      $_ .= <$fh>;
+    }
+    chomp;
+    # Remove #comments only if not inside a 'quoted arg'.
+btw dvis 'LINE $_' if $debug;
+    # parse_line generates undef if string contains only delimiters!
+    # https://rt.cpan.org/Public/Bug/Display.html?id=50753
+    my @prelim = grep{defined} parse_line(qr/(\s+|\#)/, "delimiters", $_);
+btw dvis '     @prelim' if $debug;
+    if ((my $ix = firstidx{ /^#/ } @prelim) >= 0) {
+      splice @prelim, $ix;
+      $_ = join "",@prelim;
+btw dvis '#COM REMOVED $_ $ix @prelim' if $debug;
+    }
+    while (/\G( ([^;\\]+ | \\.)*+  )/xsgc) {
+      my @words = shellwords($1);
+btw 'CMD pos=',vis(pos),dvis ' @words' if $debug;
+      #####################
+      run_command("$sourcename line $.", @words)
+        if @words;
+      #####################
+      /\G;/sgc && next;
+      /\G./sgc && mydie "Parser bug: pos=",vis(pos),
+                        " : ",vis(substr($_,(pos//0),20));
+      last;
+    }
+  }
+}
+
+##################################################################
+#  MAIN BODY
+##################################################################
+
+### PARSE OPTIONS ###
+sub badargs_exit(@) { pod2usage(-output => \*STDERR, -exitval => 2, @_) }
+
+my $script;
+Getopt::Long::Configure ("default", "gnu_getopt", "auto_version");
+GetOptions(
+   "d|debug"                   => \$debug,
+   "v|verbose"                 => \$verbose,
+   "h|help"                    => sub{
+      pod2usage(-verbose => 2, -output => \*STDOUT, -exitval => 0)
+   },
+   "e=s"                       => sub{ ($script//="") .= $_[1]."\n"; },
+) or badargs_exit(-msg => "Invalid argument");
+if ($debug) {
+  $verbose = 1;
+  $Carp::Verbose = 1;
+}
+if (@ARGV==0 && !defined $script) {
+  if (-t STDIN) {
+    badargs_exit(-msg => "No script specified!");
+  }
+}
+
+### EXECUTE THE SCRIPT(S) ###
+if (!defined($script) && @ARGV==0) {
+  run_script(*STDIN, "<stdin>");
+} else {
+  if (defined $script) {
+    #btw dvis '### $script';
+    open my $fh, "<", \$script or die "Bug! $! ";
+    run_script($fh, "-e");
+  }
+  foreach (@ARGV) {
+    open my $fh, "<", $_ or die "$_ : $!\n";
+    run_script($fh, $_);
+  }
+}
+
+### EXIT ###
+$exitstatus //= 0;
+warn "> Exiting with status $exitstatus\n" if $debug;
+exit $exitstatus;
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+odfedit - replace tokens and do mail-merge in an Open Document file
+
+=head1 SYNOPSIS
+
+  odfedit [-v] <scriptfile
+  odfedit [-v] [-e 'script'] scriptfiles...
+
+Run C<odfedit --help> for details.
+
+=head1 DESCRIPTION
+
+This command-line tool allows L<ODF::MailMerge> to to be used in simple
+ways without writing Perl code.
+
+Place-holder tokens of the form "{key}" are replaced with real content,
+either individually or as part of a "mail merge" function where
+records from a spreadsheet are used to instantiate multiple copies of
+a table.
+
+A command script may be specified with B<-e> option(s) and/or
+read from B<scriptfile>(s),
+or if neither of those are given, read from I<stdin>.
+
+=head1 SCRIPT SYNTAX
+
+Scripts are parsed similarly to Unix shell scripts:
+
+=over 2
+
+#comments and blank lines are ignored
+
+Command names and arguments are delimited by white space.
+"double quotes", 'single quotes' or \-escapes may be used
+for arguments with embedded spaces or special characters.
+
+Commands must be on a single logical line. Use \<newline> to fold
+long lines and semicolon (;) to separate commands on the same line.
+
+=back
+
+=head1 Definitions
+
+Any B<TOKEN> argument has brackets added to form "{TOKEN}"
+unless the argument already contains the { and }.
+Literal { } or : characters may be used with \-escapes
+(such arguments should be 'single quoted' in the script).
+
+B<COLSPEC> means a spreadsheet column specifier: It may be an actual
+title, an identifier derived from a title by replacing offending characters
+with underscores, an absolute column letter ("A", "B" etc.)
+or a regular expression written as "/.../" which matches one title.
+
+B<SPREADSHEET> means the path of
+a .csv file or a spreadsheet (.ods, .xlsx, etc.)
+If a multi-sheet spreadsheet workbook is used, SPREADSHEET must be of
+the form "PATH!SHEETNAME" to specify which sheet to use.
+Spreadsheets may be used only if a modern version of Libre Office is
+installed; and, due to an LO bug, LO may not be open interactively even
+for unrelated purposes.   .csv files may always be used without issue.
+
+=head1 COMMANDS
+
+In general, scripts should first specify a I<skeleton> .odt file,
+then replace {tokens} and/or perform mail-merge operations,
+and finally I<save> to a different filename.
+
+=head2 skeleton I<INPUTPATH>  # .odt, .ods etc. file
+
+Read a document into memory.
+
+It should contain static content and "{token}" strings
+(including the curly brackets) where content should be substituted.
+
+=head2 save [-f] I<OUTPUTPATH>  # .odt etc.
+
+Write the document to the specified path, which must not already exist
+unless the B<-f> (force) option is specified.
+
+=head2 subst-value I<TOKEN> I<VALUE> ...
+
+Replace "{TOKEN}" with VALUE wherever it appears.
+
+The result will have the same formatting as {TOKEN} in the skeleton
+(specifically, the format of the '{' character).
+
+However if VALUE looks like a "[Styled content]" specifier as described in
+L<ODF::MailMerge> then it is evaluated as such and may
+specify format overrides.
+
+=head2 mailmerge I<PROTO-TOKEN> I<SPREADSHEET>
+
+=head2 mailmerge I<PROTO-TOKEN> I<SPREADSHEET> B<-a> I<aliasname=COLSPEC> ...
+
+First, a prototype Table is located which contains "{PROTO-TOKEN}"
+somewhere within it.  The "{PROTO-TOKEN}" string is used only to
+locate the table in the skeleton and is immediately deleted so it will not
+affect the final result.
+
+Then the prototype table is replicated once for each record in SPREADSHEET.
+Within each replicate, "{token}" fields are replaced with values
+from the corresponding spreadsheet record, using "token" (without the
+brackets) as a COLSPEC to identify which column value to use from the record.
+
+=over
+
+If B<-a> option(s) are specified, then each I<aliasname> is associated with
+the indicated I<COLSPEC>, and may be used instead of the
+column title
+(for example the prototype table may contain "{aliasname}" instaed
+of "{The Actual Column Title}").
+I<aliasname> must be an identifier (i.e. must start with a letter and contain
+only letters, digits, and underscores.)
+
+=back
+
+An error occurs if a "token" does not indicate any column in the spreadsheet.
+
+=head2 mailmerge I<PROTO-TOKEN> I<SPREADSHEET> I<KEYTOK>,I<KEYTOK>,...:I<SPREADSHEET2> ...
+
+(Although not shown, each SPREADSHEET* arg may be followed by B<-a> options
+to define column aliases.)
+
+In this form, some {token} values may be found in a record from a
+secondary spreadsheet selected using value(s) from the primary record.
+
+For example, a company directory of department contacts for Payroll,
+Personnel, etc. might use a prototype table containing
+{Dept}, {Name}, {Email} and {Phone} tokens to be interpolated.
+
+However the primary spreadsheet could contain only "Dept" and "Name" columns,
+with "Email" and "Phone" values looked up in a secondary spreadsheet
+using the value of "Name" as the key.
+Here is how it works:
+
+  For each record (i.e. row) in the primary spreadsheet:
+    For each {token} in the prototype table:
+      If "token" indicates a column in the current record:
+        Substitute the value
+      Else:
+        Locate the record in the secondary spreadsheet which has values
+        in columns indicated by KEYTOKs which match the corresponding
+        values in the primary record ("Name" in the example).
+        An error occurs unless exactly one record is found.
+
+        If "token" indicates a column in the selected secondary record
+        then substitute the value, otherwise fail with an error.
+
+KEYTOK may have the form "P=S" in which case P specifies the column
+in the primary spreadsheet and S specifies the corresponding column in
+the secondary spreadsheet (allows using different column names).
+
+Tertiary, etc. spreadsheets may be specified in additional command arguments;
+if "token" is not found in a secondary record, then the record in the
+next spreadsheet is used which has KEYTOK values matching those in the current
+secondary spreadsheet or, if not present, a predecessor spreadsheet.
+
+=head2 print [I<argument>s...]
+
+Print the arguments to stdout, separated by spaces, quoting arguments
+which contain spaces or special characters.
+
+=head1 SEE ALSO
+
+It may be helpful to refer to the following to understand how all this works:
+
+L<ODF::MailMerge>
+
+L<Spreadsheet::Edit>
+
+=head1 AUTHOR
+
+Jim Avera (jim.avera at gmail)
+
+=head1 LICENSE
+
+CC0 1.0 / Public Domain.   However this requires ODF::lpOD to function so
+as a practical matter you must comply with ODF::lpOD's license.
+
+=cut

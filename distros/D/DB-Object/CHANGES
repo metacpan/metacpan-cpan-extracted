@@ -1,5 +1,15 @@
 Revision history for Perl module DB::Object
 
+v0.11.9 2023-10-11T20:14:44+0900
+    - Corrected malformed signature for distribution release
+
+v0.11.8 2023-10-11T16:55:40+0900
+    - Corrected malformed signature for distribution release
+
+v0.11.7 2023-07-04T09:16:13+0900
+    - Corrected a minor bug in method execute() in DB::Object::Statement
+    - Corrected a bug in DB::Object::Query::Clause in building expressions with AND and OR
+
 v0.11.6 2023-06-21T16:46:21+0900
     - More correction to SQLite test unit
 

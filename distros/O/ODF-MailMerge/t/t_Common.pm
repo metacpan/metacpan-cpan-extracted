@@ -142,7 +142,7 @@ sub import {
   require Guard;
   Guard->import::into($target, qw(scope_guard guard));
 
-  use Data::Dumper::Interp 6.005 ();
+  use Data::Dumper::Interp 6.006 ();
   unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
     # unless we are testing DDI
     Data::Dumper::Interp->import::into($target,

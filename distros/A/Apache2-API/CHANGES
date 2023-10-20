@@ -1,5 +1,11 @@
 Revision history for Perl module Apache2::API
 
+v0.1.3 2023-10-11T16:30:29+0900
+    - Corrected malformed signature for distribution release
+
+v0.1.2 2023-06-14T15:30:05+0900
+    - Minor correction to the method cookie() in Apache2::API::Request, that, instead of returning the cookie value, was returning the cookie object itself.
+
 v0.1.1 2023-06-10T20:29:58+0900
     - Minor modification to init() in Apache2::API
     - Updated method headers() in Apache2::API::Request and Apache2::API::Response to return an empty hash in HASH context when no headers

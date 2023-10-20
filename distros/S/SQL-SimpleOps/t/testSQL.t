@@ -27,7 +27,7 @@
 	$Data::Dumper::Terse = 1;
 	$Data::Dumper::Pad = "";
 
-	our $VERSION = "2023.221.1";
+	our $VERSION = "2023.274.1";
 
 	BEGIN{ use_ok('SQL::SimpleOps'); }
 
@@ -49,7 +49,7 @@
 	## sql command tests
 
 	my $show_ok = (defined($ENV{SQL_SIMPLE_SQL_SHOW_OK}) && $ENV{SQL_SIMPLE_SQL_SHOW_OK} ne "");
-	my $er;
+	my @er;
 	my $ok;
 
 	&my_cmd
@@ -366,7 +366,7 @@
 	);
 
 	diag("################################################################");
-	fail($er." error") if ($er);
+	fail((@er+0)." error, tests: ".join(", ",@er)) if (@er);
 	pass($ok." successful") if ($ok);
 
 	if (!defined($ENV{SQL_SIMPLE_WHERE_SHOW_OK}) || $ENV{SQL_SIMPLE_WHERE_SHOW_OK} eq "")
@@ -423,13 +423,13 @@ sub my_cmd()
 			{
 				diag("savelog: ".$st);
 				diag("status: ERROR, mismatch");
-				$er++;
+				push(@er,$argv->{f});
 			}
 		}
 		else
 		{
 			diag("status: ERROR, ".$!);
-			$er++;
+			push(@er,$argv->{f});
 		}
 		return;
 	}
@@ -450,7 +450,7 @@ sub my_cmd()
 		diag("tester: ".$argv->{r2}) if (defined($argv->{r2}));
 		diag("result: ".$buffer);
 		diag("status: ERROR");
-		$er++;
+		push(@er,$argv->{f});
 	}
 }
 

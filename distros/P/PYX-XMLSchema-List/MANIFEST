@@ -1,5 +1,5 @@
 Changes
-examples/ex1.pl
+examples/list_xml_schemas.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

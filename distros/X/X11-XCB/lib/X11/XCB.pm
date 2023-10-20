@@ -4,7 +4,7 @@ use 5.010000;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.21';
 
 use Exporter 'import';
 
@@ -43,12 +43,14 @@ X11::XCB - perl bindings for libxcb
   my $x = X11::XCB::Connection->new;
 
   my $window = $x->root->create_child(
-    class => WINDOW_CLASS_INPUT_OUTPUT,
+    class => X11::XCB::WINDOW_CLASS_INPUT_OUTPUT(),
     rect => [0, 0, 200, 200],
     background_color => '#FF00FF',
   );
 
   $window->map;
+  print "Press Enter to continue\n";
+  <>;
 
 =head1 DESCRIPTION
 
@@ -73,7 +75,7 @@ in future versions. It is not yet widely used.
 
 The website of libxcb.
 
-=item L<http://code.stapelberg.de/git/X11-XCB/>
+=item L<https://github.com/zhmylove/X11-XCB>
 
 The git webinterface for the development of X11::XCB.
 
@@ -81,17 +83,32 @@ The git webinterface for the development of X11::XCB.
 
 The i3 window manager includes testcases which use X11::XCB.
 
+=item L<https://github.com/zhmylove/korgwm>
+
+The korgwm is written entirely in Perl and based on X11::XCB.
+
 =back
 
 =head1 AUTHOR
 
-Michael Stapelberg, E<lt>michael+xcb@stapelberg.deE<gt>
-Maik Fischer, E<lt>maikf+xcb@qu.cxE<gt>
+Michael Stapelberg, E<lt>michael+xcb@stapelberg.deE<gt>,
+Maik Fischer, E<lt>maikf+xcb@qu.cxE<gt>,
+Sergei Zhmylev, E<lt>zhmylove@cpan.orgE<gt>
+
+=head1 INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2011 Michael Stapelberg
-Copyright (C) 2011 Maik Fischer
+Copyright (C) 2009-2023 Michael Stapelberg,
+Copyright (C) 2011 Maik Fischer,
+Copyright (C) 2023 Sergei Zhmylev
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

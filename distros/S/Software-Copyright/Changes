@@ -1,3 +1,12 @@
+0.012 2023-09-27
+
+    * refine copyright cleanup
+
+0.011 2023-09-24
+
+    * ensure garbage in, garbage out mode (Debian #1052168)
+    * improve statement cleanup
+
 0.010 2023-06-15
 
     * reduce verbosity of invalid year range warning

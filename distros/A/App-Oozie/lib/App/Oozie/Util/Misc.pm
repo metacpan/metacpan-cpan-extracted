@@ -1,15 +1,30 @@
 package App::Oozie::Util::Misc;
-$App::Oozie::Util::Misc::VERSION = '0.006';
-use 5.010;
+$App::Oozie::Util::Misc::VERSION = '0.010';
+use 5.014;
 use strict;
 use warnings;
 use parent qw( Exporter );
 
 our @EXPORT_OK = qw(
     remove_newline
+    resolve_tmp_dir
 );
 
-sub remove_newline { my $s = shift; $s =~ s{\n+}{ }xmsg; $s }
+sub remove_newline {
+    my $s = shift;
+    $s =~ s{\n+}{ }xmsg;
+    return $s;
+}
+
+sub resolve_tmp_dir {
+    # Wokaround "/tmp is an existing symbolic link" error.
+    # Happens in EMR for example.
+    #
+    my $tmp = $ENV{TMPDIR} || $ENV{TMP} || '/tmp';
+    return $tmp if ! -l $tmp;
+    my $real = readlink $tmp;
+    return $real;
+}
 
 1;
 
@@ -25,7 +40,7 @@ App::Oozie::Util::Misc
 
 =head1 VERSION
 
-version 0.006
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -42,6 +57,8 @@ App::Oozie::Util::Misc - Miscellaneous utility functions
 =head1 Methods
 
 =head2 remove_newline
+
+=head2 resolve_tmp_dir
 
 =head1 SEE ALSO
 

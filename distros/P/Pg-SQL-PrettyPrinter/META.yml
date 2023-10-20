@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,7 +18,7 @@ name: Pg-SQL-PrettyPrinter
 provides:
   Pg::SQL::PrettyPrinter:
     file: lib/Pg/SQL/PrettyPrinter.pm
-    version: '0.7'
+    version: '0.11'
   Pg::SQL::PrettyPrinter::Node:
     file: lib/Pg/SQL/PrettyPrinter/Node.pm
   Pg::SQL::PrettyPrinter::Node::A_ArrayExpr:
@@ -133,5 +133,5 @@ resources:
   homepage: https://gitlab.com/depesz/pg-sql-prettyprinter
   license: http://opensource.org/licenses/BSD-3-Clause
   repository: https://gitlab.com/depesz/pg-sql-prettyprinter.git
-version: '0.7'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

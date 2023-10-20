@@ -9,7 +9,7 @@ my $b = Module::Build->new
   license       => 'perl',
   requires      =>
    {'Carp'             =>0,
-    'Data::Table::Text'              => 20200418,
+    'Data::Table::Text'              => 20201029,
      perl              => '5.26.1',
     'Test2::API'       =>0,
     'Test::More'       =>0,
@@ -17,6 +17,12 @@ my $b = Module::Build->new
   configure_requires => {'Module::Build' => 0.4224},
   create_readme =>  0,
   perl          => '5.16.0',
+  meta_merge =>
+   {resources =>
+     {repository => 'https://github.com/philiprbrenan/MathVectors2',
+      bugtracker => 'https://github.com/philiprbrenan/MathVectors2/issues'
+     }
+   },
  );
 
 $b->create_build_script();

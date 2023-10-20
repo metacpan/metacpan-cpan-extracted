@@ -29,7 +29,7 @@
 
 	our @EXPORT = qw(new Open Select SelectCursor Delete Insert Update Call $VERSION);
 
-	our $VERSION = "2023.106.1";
+	our $VERSION = "2023.274.1";
 
 	our @EXPORT_OK = @EXPORT;
 
@@ -42,9 +42,19 @@
 sub new()
 {
 	my $class = shift; $class = ref($class) || $class || 'SQL::SimpleOps::DBI::MyPlugin';
-	my $self = {};
+	my $self = {@_};
 
-	$self->{argv} = {@_};
+	# give my plugin name
+	$self->{sql_simple}->{init}{plugin_id} = "MyPlugin";
+	
+	# use '1' if your db have schema option format
+	$self->{sql_simple}->{init}{schema} = 1;
+	
+	# use '1' if your args must have server/tcport values
+	$self->{sql_simple}->{init}{test_server} = 1;
+	
+	# use '1' if between your field/alias infomation have 'as' value
+	$self->{sql_simple}->{init}{alias_with_as} = 0;
 
 	bless($self,$class);
 }
@@ -67,7 +77,7 @@ sub Open()
 	my $argv = shift;
 
 	## sets the dsnam here
-	## $self->{argv}{sql_simple}->{argv}{dsname} = ...
+	## $self->{sql_simple}->{argv}{dsname} = ...
 
 	return 0;
 }
@@ -96,6 +106,13 @@ sub Update()
 	return 0;
 }
 sub Call()
+{
+	my $self = shift;
+	my $argv = shift;
+	return 0;
+}
+
+sub PreFetch()
 {
 	my $self = shift;
 	my $argv = shift;

@@ -4,7 +4,7 @@
       "Joel Loudermilk <joel@loudermilk.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -34,6 +34,8 @@
             "JSON" : "0",
             "LWP::UserAgent" : "0",
             "URI" : "0",
+            "WWW::OAuth" : "0",
+            "WWW::OAuth::Util" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -41,6 +43,7 @@
       },
       "test" : {
          "requires" : {
+            "File::Temp" : "0",
             "Test::More" : "0"
          }
       }
@@ -48,7 +51,8 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/jlouder/garmin-connect-perl/issues"
+         "mailto" : "bug-webservice-garminconnect at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=WebService-GarminConnect"
       },
       "homepage" : "https://github.com/jlouder/garmin-connect-perl",
       "repository" : {
@@ -57,8 +61,13 @@
          "web" : "https://github.com/jlouder/garmin-connect-perl"
       }
    },
-   "version" : "1.0.9",
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+   "version" : "1.1.1",
+   "x_contributors" : [
+      "Neil Bowers <neil@bowers.com>",
+      "Raf D <noduck@gmail.com>"
+   ],
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "GPL-3.0-only"
 }
 

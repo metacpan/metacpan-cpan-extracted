@@ -1,5 +1,9 @@
 Revision history for Genealogy::ObituaryDailyTimes
 
+0.10	Sun Oct 15 16:04:03 EDT 2023
+	Latest DB.pm from NJH-Snippets
+	Allow new() to take a ref to a hash of arguments
+
 0.09	Sat Jun 24 09:14:41 EDT 2023
 	create_db failed on 5.36.1
 	freelists now separate lines by <br/> instead of <br />

@@ -121,7 +121,7 @@ package EV;
 use common::sense;
 
 BEGIN {
-   our $VERSION = '4.33';
+   our $VERSION = '4.34';
    use XSLoader;
    local $^W = 0; # avoid spurious warning
    XSLoader::load "EV", $VERSION;
@@ -874,6 +874,17 @@ in perlfunc).
 
 Return the pid of the awaited child (useful when you have installed a
 watcher for all pids).
+
+=item EV::Child::reinit [EXPERIMENTAL]
+
+Internally, libev installs a signal handler for C<SIGCHLD>. Unfortunately,
+a lot of Perl code does soemthing like C<< local $SIG{CHLD} >>, which,
+unfortunately, is broken and will not restore the signal handler.
+
+If this has happened, you can call this function to stop/rrestart the
+internal libev watcher, which will reset the signal handler.
+
+Note that this is an experimental function, whose interface might change.
 
 =back
 

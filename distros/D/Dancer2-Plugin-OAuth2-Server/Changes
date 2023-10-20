@@ -1,5 +1,8 @@
 Revision history for Dancer2-Plugin-OAuth2-Server
 
+0.11  2023-09-18 13:59:47 +08
+        - Double encoding bug fix, use of response_header keyword to works with recent Dancer2
+
 0.10  2016-01-05 16:45:26 CET
         - Allow to whitelist redirect uri, by providing the redirect_uri to the verify_client method
 

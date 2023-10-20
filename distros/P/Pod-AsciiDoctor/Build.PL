@@ -18,17 +18,24 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Pod-AsciiDoctor",
-  "dist_version" => "0.101003",
+  "dist_version" => "0.102000",
   "license" => "apache",
   "module_name" => "Pod::AsciiDoctor",
   "recursive_test_files" => 1,
   "requires" => {
+    "Carp" => 0,
+    "Getopt::Long" => 0,
+    "Path::Tiny" => 0,
     "Pod::Parser" => "1.65",
+    "autodie" => 0,
     "parent" => 0,
     "perl" => "5.014",
     "strict" => 0,
     "warnings" => 0
   },
+  "script_files" => [
+    "bin/pod2asciidoctor"
+  ],
   "test_requires" => {
     "File::Spec" => 0,
     "IO::Handle" => 0,

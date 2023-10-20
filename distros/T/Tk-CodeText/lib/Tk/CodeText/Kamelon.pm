@@ -32,3 +32,5 @@ sub Widget { return $_[0]->{WIDGET} }
 1;
 
 __END__
+
+

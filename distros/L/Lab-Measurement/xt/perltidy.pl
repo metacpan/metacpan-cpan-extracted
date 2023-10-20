@@ -29,7 +29,7 @@ else {
     );
 }
 
-push @files, catfile(qw/examples XPRESS Example5_VNA_gate_and_frequency.pl/);
+push @files, catfile(qw/examples Example5_VNA_gate_and_frequency.pl/);
 
 perltidy( perltidyrc => 'perltidyrc', argv => [ '-b', '-bext=/', @files ], );
 

@@ -1,3 +1,42 @@
+# 0.004003
+
+Add missing files to package manifest.
+
+# 0.004002
+
+Fix minor issues so git-autofixup works with Git for Windows:
+
+- close index temp file so git can write to it. (Windows has different file
+  locking behaviour than *nix.)
+- load Pod::Usage at runtime since Git for Windows doesn't include it and has
+  special handling for `git <cmd> --help` such that it wouldn't get used anyway
+  unless git-autofixup was invoked directly.
+
+Fix some test failures:
+
+- skip tests when perl is for Cygwin but git is for MSYS
+- skip testing backslashes on Windows (Cygwin|MSYS)
+- fallback to --set-upstream for old git versions where --set-upstream-to isn't
+  available
+
+# 0.004001
+
+- Fix test plans so Test::More::plan() doesn't get called twice when git isn't
+  available.
+
+# 0.004000
+
+- Automatically choose an upstream revision if one isn't supplied, based on the
+  upstream/tracking branch. Thanks to Walter Smuts and Johannes Altmanninger
+  for their help in figuring out the details.
+- Support quoted filenames in diff output. git-autofixup now works with
+  filenames containing non-ASCII characters.
+- Improve error messages and handling. For git commands that are expected to
+  fail, their stderr is captured, annotated with the command, and printed, to
+  clarify the cause of errors.
+- Deprecate --gitopt|-g in favor of using the GIT_CONFIG_{COUNT,KEY,VALUE}
+  environment variables.
+
 # 0.003002
 
 - Speed up creation of temporary git index by copying the existing one and

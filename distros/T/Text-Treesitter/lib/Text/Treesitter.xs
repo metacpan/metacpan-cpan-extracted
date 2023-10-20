@@ -153,6 +153,23 @@ void start_point(Text::Treesitter::_Node self)
     XSRETURN(2);
   }
 
+UV
+start_row(Text::Treesitter::_Node self)
+  ALIAS:
+    start_row    = 0
+    start_column = 1
+    end_row      = 2
+    end_column   = 3
+  CODE:
+    switch(ix) {
+      case 0: RETVAL = ts_node_start_point(self).row; break;
+      case 1: RETVAL = ts_node_start_point(self).column; break;
+      case 2: RETVAL = ts_node_end_point(self).row; break;
+      case 3: RETVAL = ts_node_end_point(self).column; break;
+    }
+  OUTPUT:
+    RETVAL
+
 bool ts_node_is_null(Text::Treesitter::_Node self)
 
 bool ts_node_is_named(Text::Treesitter::_Node self)
@@ -253,16 +270,24 @@ bool set_included_ranges(Text::Treesitter::Parser self, ...)
 
     for(int i = 0; i < rangecount; i++) {
       SV *range = ST(1+i);
-      if(!(SvROK(range) && SvTYPE(SvRV(range)) == SVt_PVAV))
-        croak("Expected an ARRAY ref for a range");
-      AV *rangeav = (AV *)SvRV(range);
-      if(av_count(rangeav) != 2)
-        croak("Expected a 2-element ARRAY ref for a range");
+      if(!(SvROK(range) && SvTYPE(SvRV(range)) == SVt_PVHV))
+        croak("Expected a HASH ref for a range");
+      HV *rangehv = (HV *)SvRV(range);
 
-      ranges[i] = (TSRange){
-        .start_byte = SvUV(*av_fetch(rangeav, 0, FALSE)),
-        .end_byte   = SvUV(*av_fetch(rangeav, 1, FALSE)),
-      };
+      ranges[i] = (TSRange){0};
+      SV **svp;
+
+      if(!(svp = hv_fetchs(rangehv, "start_byte", 0)))
+        croak("Expected range to have a 'start_byte' key");
+      ranges[i].start_byte = SvUV(*svp);
+      if(!(svp = hv_fetchs(rangehv, "end_byte", 0)))
+        croak("Expected range to have a 'end_byte' key");
+      ranges[i].end_byte = SvUV(*svp);
+
+      if((svp = hv_fetchs(rangehv, "start_row", 0)) && SvOK(*svp))
+        ranges[i].start_point.row = SvUV(*svp);
+      if((svp = hv_fetchs(rangehv, "start_column", 0)) && SvOK(*svp))
+        ranges[i].start_point.column = SvUV(*svp);
     }
 
     RETVAL = ts_parser_set_included_ranges(self, ranges, rangecount);

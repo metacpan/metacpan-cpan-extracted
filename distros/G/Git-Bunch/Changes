@@ -1,3 +1,11 @@
+0.630   2023-07-16  Released-By: PERLANCAR; Urgency: medium
+
+	- No functional changes.
+
+        - Remove usage of smartmatch to avoid deprecation warning under
+          perl 5.38.
+
+
 0.629   2021-01-31  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.
@@ -14,7 +22,7 @@
 
         - Add new subcommand: commit.
 
-	- [cli exec-bunch] Add option: command_opts.
+	- [subcommand exec] Add option: command_opts.
 
 	- [ux] Add --recent & -r as shortcut for --min-repo-access-time='2 weeks
 	  ago'.

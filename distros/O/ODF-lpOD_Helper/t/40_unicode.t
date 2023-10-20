@@ -1,9 +1,11 @@
 #!/usr/bin/perl
 use FindBin qw($Bin);
 use lib $Bin;
-use t_Common qw/oops/; # strict, warnings, Carp, Data::Dumper::Interp, etc.
-use t_TestCommon ':silent',
+use t_Common qw/oops btw/; # strict, warnings, Carp, Data::Dumper::Interp, etc.
+use t_TestCommon #':silent',
                  qw/bug tmpcopy_if_writeable $debug/;
+use Capture::Tiny ();
+use utf8; # just to be certain
 
 my %dvb = (map{ do{ no strict 'refs'; defined(${$_}) ? ($_ => ${$_}) : () }
               } qw/debug verbose silent/);
@@ -22,9 +24,9 @@ BEGIN {
 
 use ODF::lpOD_Helper qw/:bytes :DEFAULT/;
 
-is($ODF::lpOD::Common::INPUT_CHARSET, $def_INPUT_CHARSET, 
+is($ODF::lpOD::Common::INPUT_CHARSET, $def_INPUT_CHARSET,
    ":bytes leaves INPUT_CHARSET unchanged");
-is($ODF::lpOD::Common::OUTPUT_CHARSET, $def_INPUT_CHARSET, 
+is($ODF::lpOD::Common::OUTPUT_CHARSET, $def_INPUT_CHARSET,
    ":bytes leaves OUTPUT_CHARSET unchanged");
 
 use Encode qw/encode decode/;
@@ -36,12 +38,13 @@ my $body = $doc->get_body;
 
 my $ascii_only_re= qr/This.*Para.*has.*Unicode/;
 
-my $smiley_char = "☺"; 
+my $smiley_char = "\N{U+263A}";  # ☺
 my $justsmiley_re = qr/${smiley_char}/;
-my $full_char_re = qr/This.*Para.*${smiley_char}.*Unicode.*text\./;
 
 my $smiley_octets = encode("UTF-8", $smiley_char, Encode::LEAVE_SRC);
 my $justsmiley_octet_re = qr/${smiley_octets}/;
+
+my $full_char_re = qr/This.*Para.*${smiley_char}.*Unicode.*text\./;
 my $full_octet_re = qr/This.*Para.*${smiley_octets}.*Unicode.*text\./;
 
 bug unless length($ascii_only_re) == do{ use bytes; my $x=length($ascii_only_re) };
@@ -55,14 +58,14 @@ sub check_search_chars($) {
     # Sometimes inexplicably does not fail in cpantesters land...
     # I've tested this with LANG=C so there should be no default
     # STD* encoding going on.  Hmm...
-    ok(!defined($m) && $@ =~ /wide char/i, 
+    ok(!defined($m) && $@ =~ /wide char/i,
        "bytes mode: search(wide char) blows up (string)",
        dvis '$ODF::lpOD::Common::INPUT_CHARSET\n',
        dvis '$ODF::lpOD::Common::OUTPUT_CHARSET\n',
        dvis '$m\n$@\n segment ->\n',
                    u(eval{ fmt_tree($m->{segment}//undef) }),"\n",
                    do{ my @lay = PerlIO::get_layers(*STDOUT);
-                       join(" ", " STDOUT layers:", @lay ) 
+                       join(" ", " STDOUT layers:", @lay )
                      }
     );
   } else {
@@ -72,27 +75,54 @@ sub check_search_chars($) {
 
   $m = eval{ $body->search(qr/$smiley_char/) };
   if ($octet_mode) { # implicit encoding enabled
+    isnt($ODF::lpOD::Common::INPUT_CHARSET, undef,
+        dvis '$ODF::lpOD::Common::INPUT_CHARSET $ODF::lpOD::VERSION');
     # An exception is thrown when ODF::lpOD calles decode() on it's input
     # argument if it contains abstract "wide" characters
-    ok(!defined($m) && $@ =~ /wide char/i, 
+    if (defined $m) {
+      # 9/17/23: EXCEPT... on one cpan tester platform the match "succeeds"
+      #   because, for some reason, the match expression becomes "" and
+      #   so the match succeeds at the first character in $body.
+      #   That implies $smiley_char came back as "" with no 'wide char'
+      #   error from decode() in ODF::lpOD::Common::input_conversion
+      #   HOW IS THIS POSSIBLE?
+      my ($out,$err,$stat) = Capture::Tiny::capture {
+         no warnings FATAL => 'all'; no warnings; use warnings;  # undo FATAL
+         my $bytes_regex = qr/$smiley_char/;
+         btw dvis '$ODF::lpOD::Common::INPUT_CHARSET $ODF::lpOD::Common::INPUT_ENCODER';
+         my $bytes_regex_copy = $bytes_regex;
+         my $decoded_regex = eval{ $ODF::lpOD::Common::INPUT_ENCODER->decode($bytes_regex_copy) };
+         btw dvis '$decoded_regex $@';
+         my $m2 = eval{ $body->search($bytes_regex) };
+         btw dvis '$smiley_char $m2 $@';
+         my $m3 = eval{ $body->search(qr/${smiley_char}Unicode/) };
+         btw dvis '$m3 $@\nbody:', fmt_tree($body);
+      };
+      fail("bytes mode problem",
+           "OUT:$out<END stdout>\nERR:$err<END stderr>\n");
+    }
+    ok(!defined($m) && $@ =~ /wide char/i,
        "bytes mode: search(wide char) blows up (regex)",
-       dvis '$m\n$@\n');
+       dvis '$m\n$@\nbody:'.fmt_tree($body));
   } else {
+    is($ODF::lpOD::Common::INPUT_CHARSET, undef,
+        dvis '$ODF::lpOD::Common::INPUT_CHARSET $ODF::lpOD::VERSION');
     ok($m->{segment}, "chars mode: search(wide char) works (regex)",
        dvis '$m\n$@\n');
   }
 
   # But Hsearch does not throw because it does not try to decode() it's args
-  # and will not try to encode the result
+  # and will not try to encode the result.  However it will not match
+  # wide characters because __leaf2vtext() returns octets in :bytes mode.
   my @m = eval{ $body->Hsearch($smiley_char) };
   if ($octet_mode) {
-    ok(@m==0 && $@ eq "", 
+    ok(@m==0 && $@ eq "",
        "bytes mode: Hsearch(wide char) fails as expected",
-       dvis '$@  \@m=', join("\n   ", map{fmt_match} @m)
+       dvis '$@\n$ODF::lpOD::Common::INPUT_CHARSET\n$ODF::lpOD::Common::OUTPUT_CHARSET\n@m=', join("\n   ", map{fmt_match} @m)
       );
   } else {
-    ok(@m > 0 && $@ eq "", 
-       "chars mode: Hsearch(wide char) works", 
+    ok(@m > 0 && $@ eq "",
+       "chars mode: Hsearch(wide char) works",
        dvis '\n@m\n');
   }
 }
@@ -112,11 +142,11 @@ sub check_search_octets($) {
       || diag dvis '\n$m\n';
   }
   my @m = eval{ $body->Hsearch($smiley_octets, %dvb) };
-  if ($octet_mode) { 
+  if ($octet_mode) {
     ok(@m > 0, "bytes mode: Hsearch(octets) works",
        dvis '\n@m\n$@\n');
   } else {
-    ok(@m==0 && $@ eq "", "Hsearch(octets) fails in chars mode", 
+    ok(@m==0 && $@ eq "", "Hsearch(octets) fails in chars mode",
        dvis '\n@m\n$@\n');
   }
 }

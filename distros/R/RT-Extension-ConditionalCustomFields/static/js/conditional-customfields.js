@@ -145,7 +145,7 @@ function parseIP(ip) {
 
 function get_selector(name, type, render_type, rt_v5) {
     var selector;
-    if (type == 'Text' || type == 'Wikitext') {
+    if (type == 'Text' || type == 'Wikitext' || type == 'HTML') {
         selector = 'textarea[name="' + name + '"]';
     } else if ((type == 'Select' && render_type == 'List') || type == 'Image' || type == 'Binary' || (rt_v5 >= 0 && (type == 'Combobox' || type == 'Date' || type == 'DateTime'))) {
         selector = 'input[name="' + name + '"]';
@@ -238,4 +238,38 @@ function condition_is_met(condition_vals, cf_condition_vals, condition_op, lang)
     }
 
     return condition_met;
+}
+
+function waitForElm(selector) {
+    return new Promise(resolve => {
+        if (document.querySelector(selector)) {
+            return resolve(document.querySelector(selector));
+        }
+
+        const observer = new MutationObserver(mutations => {
+            if (document.querySelector(selector)) {
+                observer.disconnect();
+                resolve(document.querySelector(selector));
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
+}
+
+function respondToVisibility(element, callback) {
+  var options = {
+    root: document.documentElement
+  }
+
+  var observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      callback(entry.intersectionRatio > 0);
+    });
+  }, options);
+
+  observer.observe(element);
 }

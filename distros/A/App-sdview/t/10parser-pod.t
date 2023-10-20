@@ -38,7 +38,7 @@ EOPOD
 
    is( $p[3]->type, "plain", 'p[3] type' );
    is( $p[3]->text, "The content with bold and code in it.", 'p[3] text' );
-   is( [ sort $p[3]->text->tagnames ], [qw( B C )], 'p[3] tags' );
+   is( [ sort $p[3]->text->tagnames ], [qw( bold monospace )], 'p[3] tags' );
 };
 
 subtest "Formatting" => sub {
@@ -51,25 +51,35 @@ I<italic> I<< italic >>
 
 C<code> C<< code->with->arrows >>
 
+F<filename>
+
 L<link|target://> L<Module::Here>
+
+U<underline> U<< underline >>
 EOPOD
 
-   is( scalar @p, 4, 'Received 4 paragraphs' );
+   is( scalar @p, 6, 'Received 6 paragraphs' );
 
    is( $p[0]->text, "bold bold", 'bold text' );
-   ok( $p[0]->text->get_tag_at( 0, "B" ), 'bold tag' );
+   ok( $p[0]->text->get_tag_at( 0, "bold" ), 'bold tag' );
 
    is( $p[1]->text, "italic italic", 'italic text' );
-   ok( $p[1]->text->get_tag_at( 0, "I" ), 'italic tag' );
+   ok( $p[1]->text->get_tag_at( 0, "italic" ), 'italic tag' );
 
    is( $p[2]->text, "code code->with->arrows", 'code text' );
-   ok( $p[2]->text->get_tag_at( 0, "C" ), 'code tag' );
+   ok( $p[2]->text->get_tag_at( 0, "monospace" ), 'code tag' );
 
-   is( $p[3]->text, "link Module::Here", 'link text' );
-   is( $p[3]->text->get_tag_at( 0, "L" ), { target => "target://" },
+   is( $p[3]->text, "filename", 'file text' );
+   ok( $p[3]->text->get_tag_at( 0, "file" ), 'file tag' );
+
+   is( $p[4]->text, "link Module::Here", 'link text' );
+   is( $p[4]->text->get_tag_at( 0, "link" ), { target => "target://" },
       'link tag' );
-   is( $p[3]->text->get_tag_at( 5, "L" ), { target => "https://metacpan.org/pod/Module::Here" },
+   is( $p[4]->text->get_tag_at( 5, "link" ), { target => "https://metacpan.org/pod/Module::Here" },
       'link to metacpan' );
+
+   is( $p[5]->text, "underline underline", 'underline text' );
+   ok( $p[5]->text->get_tag_at( 0, "underline" ), 'underline tag' );
 };
 
 subtest "Verbatim trimming" => sub {

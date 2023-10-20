@@ -1,6 +1,11 @@
 Revision history for VMware::API::LabManager
 
-2.11  2015/06/08
+2.12  2023/09/18
+
+  Corrected:
+    Documentation errors found by Felix. (https://github.com/xxfelixxx)
+
+2.10  2014/04/30
 
   Corrected:
     Using GNU TAR now. The previous release had PAX headers in the tar file.

@@ -8,12 +8,12 @@ use Test2::V0;
 BEGIN {
    plan skip_all => "Syntax::Keyword::Dynamically is not available"
       unless eval { require Syntax::Keyword::Dynamically };
-   plan skip_all => "Object::Pad >= 0.73 is not available"
+   plan skip_all => "Object::Pad >= 0.800 is not available"
       unless eval { require Object::Pad;
-                    Object::Pad->VERSION( '0.73' ) };
+                    Object::Pad->VERSION( '0.800' ) };
 
    Syntax::Keyword::Dynamically->import;
-   Object::Pad->import( ':experimental(init_expr)' );
+   Object::Pad->import;
 
    diag( "Syntax::Keyword::Dynamically $Syntax::Keyword::Dynamically::VERSION, " .
          "Object::Pad $Object::Pad::VERSION" );

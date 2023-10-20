@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'result' => {
      	datatype => 'SplitResult',
      	base_name => 'Result',
-     	description => '',
+     	description => 'Gets or sets the splitting result.',
      	format => '',
      	read_only => '',
      		},

@@ -1,14 +1,16 @@
 package App::Oozie::XML;
-$App::Oozie::XML::VERSION = '0.006';
-use 5.010;
+$App::Oozie::XML::VERSION = '0.010';
+use 5.014;
 use strict;
 use warnings;
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
 use App::Oozie::Types::Common qw( IsFile );
+use App::Oozie::Util::Misc qw( resolve_tmp_dir );
+
 use Archive::Zip;
 use Clone qw( clone );
-use File::Temp;
+use File::Temp ();
 use Text::Trim qw( trim );
 use Moo;
 use MooX::Options;
@@ -289,7 +291,10 @@ sub _build_schema {
     my %prefixes;    # final prefix -> namespaces mapping
 
     my $oozie_client_jar = $self->oozie_client_jar;
-    my $tempdir          = File::Temp::tempdir(CLEANUP => 1);
+    my $tempdir          = File::Temp::tempdir(
+                                CLEANUP => 1,
+                                DIR     => resolve_tmp_dir(),
+                            );
     my $zip              = $self->zip;
 
     state $zip_error_code_to_str = {
@@ -426,7 +431,7 @@ App::Oozie::XML
 
 =head1 VERSION
 
-version 0.006
+version 0.010
 
 =head1 SYNOPSIS
 

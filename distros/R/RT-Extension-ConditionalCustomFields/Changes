@@ -1,5 +1,28 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
+1.13 2023-10-13
+ - Do NOT Limit to Dropdown CF retriggering change on Condition CF after inline form has been made visible
+ - No need to play with collapse
+ - Detect visibility of inline form from form input rather than .ticket-info-cfs div which is not unique with multiple groupings
+ - Process dynamically HTML Condition CF
+
+1.12 2023-10-12
+ - Fix Mason filters, should be not filtered, not html not js
+ - Add some doc about sort order on cascaded CF
+ - Limit to inline editing retriggering change on Dropdown Condition CF after inline form has been made visible
+ - Fix bad variable name
+ - Fix triggering show needed for cascaded CFs (wrongly deleted by commit #fcf12c1)
+
+1.11 2023-10-11
+ - Retrigger change on Dropdown Condition CF after bootstrap dropdown has made it visible
+ - Retrigger change on Dropdown Condition CF after inline form has been made visible
+ - Check whether condition is met for inline editing
+
+1.10 2023-10-10
+ - Really avoid JS error raised by bootstrap when triggering show on radio button (commit #62c0528 still raised error with chromium)
+ - Update links to 5.0.4 RT docs
+ - Process HTML Condition CF, only in a static way for now
+
 1.09 2023-06-01
  - Add patch for RT 5.0.4
  - Update copyright year to 2023

@@ -122,10 +122,6 @@ my $re1c = qr{$re__e\n};
 my $re2 = qr{unknown OS: Non-existing-distribution - .+$re__e};
 check_singleton('os-release-unknown', qr{^$re1a$re1b$re1c$re2$});
 
-# FIXME: remove when Smokers are OK: tests for distributions using unusual paths:
-diag($_, ' is ', App::LXC::Container::Data::find_executable($_))
-    foreach qw(ldd ls sh su);
-
 #########################################################################
 # All tests here trigger code paths in Data/Debian.pm not triggered by the
 # other tests:

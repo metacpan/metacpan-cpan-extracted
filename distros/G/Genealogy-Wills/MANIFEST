@@ -24,6 +24,7 @@ t/noopentickets.t
 t/noplan.t
 t/pod-cm.t
 t/pod-spelling.t
+t/pod-synopsis.t
 t/pod.t
 t/snippets.t
 t/strict.t

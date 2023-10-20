@@ -16,9 +16,7 @@ resource self_trigger =>
         $self->$name(0) if $self and $arg;
     };
 
-throws_ok {
-    silo->new({ self_trigger => 42 });
-} qr(Odd number.*in new\(\)), "new() checks number of args";
+my $container = ref silo;
 
 throws_ok {
     silo->ctl->fresh('my_resource_$');
@@ -50,13 +48,13 @@ subtest "cannot instantiate in cleanup", sub {
     local $SIG{__WARN__} = sub { push @warn, shift };
 
     lives_and {
-        is silo->new->self_trigger(0)->[2], 0, "resource instantiated correctly(0)";
+        is $container->new->self_trigger(0)->[2], 0, "resource instantiated correctly(0)";
     };
     is scalar @warn, 0, "no warnings";
     diag "found unexpected warning: $_" for @warn;
     @warn = ();
 
-    my $res = silo->new;
+    my $res = $container->new;
     lives_and {
         is $res->self_trigger(1)->[2], 1, "resource instantiated correctly(1)";
         $res->ctl->cleanup;

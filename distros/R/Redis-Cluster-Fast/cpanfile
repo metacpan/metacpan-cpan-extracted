@@ -5,7 +5,6 @@ on 'test' => sub {
 };
 
 on 'configure' => sub {
-    requires 'Devel::CheckBin';
     requires 'File::Which';
     requires 'File::chdir';
     requires 'Module::Build::XSUtil', '>=0.02';

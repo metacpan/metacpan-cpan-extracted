@@ -1,0 +1,78 @@
+{
+   "asciiname" : "Taro Momo",
+   "blog" : [
+      {
+         "feed" : "",
+         "url" : "https://momotaro.example.jp/"
+      },
+      {
+         "feed" : "https://blogs.perl.org/users/momotaro/atom.xml",
+         "url" : "https://blogs.perl.org/users/momotaro/"
+      },
+   ],
+   "city" : "Okayama",
+   "country" : "JP",
+   "donation" : [
+      {
+         "name" : "stripe",
+         "id" : "momo.taro@example.jp"
+      }
+   ],
+   "perlmongers": [
+      {
+         "name": "momo.taro"
+      }
+   ],
+   "email" : [
+      "momo.taro@example.jp"
+   ],
+   "gravatar_url" : "https://secure.gravatar.com/avatar/a123abc456def789ghi0jkl?s=130&d=identicon",
+   "links" : {
+      "backpan_directory" : "https://cpan.metacpan.org/authors/id/M/MO/MOMOTARO",
+      "cpan_directory" : "http://cpan.org/authors/id/M/MO/MOMOTARO",
+      "cpantesters_matrix" : "http://matrix.cpantesters.org/?author=MOMOTARO",
+      "cpantesters_reports" : "http://cpantesters.org/author/M/MOMOTARO.html",
+      "cpants" : "http://cpants.cpanauthors.org/author/MOMOTARO",
+      "metacpan_explorer" : "https://explorer.metacpan.org/?url=/author/MOMOTARO",
+      "repology" : "https://repology.org/maintainer/MOMOTARO%40cpan"
+   },
+   "location" : [
+      34.7338553,
+      133.7660595
+   ],
+   "name" : "桃太郎",
+   "pauseid" : "MOMOTARO",
+   "profile" : [
+      {
+         "id" : "momotaro",
+         "name" : "coderwall"
+      },
+      {
+         "id" : "momotaro",
+         "name" : "github"
+      },
+      {
+         "id" : "momotaro",
+         "name" : "linkedin"
+      },
+      {
+         "id" : "momotaro",
+         "name" : "twitter"
+      },
+      {
+         "id" : "momotaro",
+         "name" : "gitlab"
+      }
+   ],
+   "region" : "Okayama",
+   "release_count" : {
+      "backpan-only" : 12,
+      "cpan" : 420,
+      "latest" : 17
+   },
+   "updated" : "2023-07-29T04:45:10",
+   "user" : "j_20ap7aNOkaYA11m9a2",
+   "website" : [
+      "https://www.momotaro.jp/"
+   ]
+}

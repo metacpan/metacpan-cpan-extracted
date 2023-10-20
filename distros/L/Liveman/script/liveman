@@ -1,0 +1,155 @@
+#!/usr/bin/env perl
+
+use common::sense;
+
+use Getopt::Long qw(:config no_ignore_case bundling);
+use Pod::Usage;
+use Term::ANSIColor qw/:constants/;
+
+use Liveman;
+
+my $parse_options_ok = GetOptions(
+    'help|h'      => \( my $help = 0 ),
+    'man'         => \( my $man  = 0 ),
+    'O|options=s' => \( my $options ),
+    'p|prove!'    => \( my $prove = 0 ),
+    'o|open!'     => \( my $open = 0 ),
+    'c|compile!'  => \( my $compile_only = 0 ),
+    'f|force!'    => \( my $compile_force = 0 ),
+    'a|append!'   => \( my $append = 0 ),
+    'A|new!'      => \( my $project = 0 ),
+);
+
+if ( !$parse_options_ok ) {
+    pod2usage(2);
+}
+elsif ($help) {
+    pod2usage(
+        -sections => "NAME|SYNOPSIS|DESCRIPTION|OPTIONS",
+        -verbose  => 99
+    );
+}
+elsif ($man) {
+    pod2usage( -exitval => 0, -verbose => 2 );
+}
+elsif($project) {
+    require Liveman::Project;
+    Liveman::Project->new(pkg => $ARGV[0], license => $ARGV[1])->make;
+    exit 0;
+}
+elsif($append) {
+    require Liveman::Append;
+    my $liveman = Liveman::Append->new(files => \@ARGV)->appends;
+    exit $liveman->{count} > 0? 0: 1;
+}
+else {
+    my $liveman = Liveman->new(
+        files => \@ARGV,
+        options => $options,
+        prove => $prove,
+        open => $open,
+        compile_force => $compile_force,
+    );
+    $liveman->transforms;
+    exit 0 if $compile_only;
+    exit $liveman->tests->{exit_code};
+}
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+B<liveman> - "living manual". A utility for converting B<lib/**.md> files into test files (B<t/**.t>) and documentation (B<POD>), which is placed in the corresponding module (B<lib/**.pm>).
+
+=head1 VERSION
+
+Version 1.2
+
+=head1 SYNOPSIS
+
+    liveman [-h] [--man] [-A pkg] [-o][-c][-f][-s][-a] [<files> ...]
+
+=head1 DESCRIPTION
+
+The problem with modern projects is that, who documentation is divorced from testing.
+This means, that the examples in the documentation may not work, and the documentation itself may lag behind the code.
+
+The method of simultaneous documentation and testing solves this problem.
+
+The md format was chosen for documentation as it is the easiest to enter and widely used.
+The sections of B<perl> code described in it are translated into the test. And the documentation is translated into B<POD> and added to the B<__END__> section of the perl module.
+
+In other words, B<liveman> converts B<lib/**.md>-files into test files (B<t/**.t>) and documentation, which is placed in the corresponding B<lib/**.pm> module. And immediately runs tests with coverage.
+
+The coverage can be viewed in the file cover_db/coverage.html.
+
+Note: it is better to immediately place B<cover_db/> in B<.gitignore>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h>, B<--help>
+
+Show help and exit.
+
+=item B<--man>
+
+Print the manual and finish.
+
+=item B<-o>, B<--open>
+
+Open the coverage in your browser.
+
+=item B<-c>, B<--compile>
+
+Compile only, do not run tests.
+
+=item B<-f>, B<--force>
+
+Transform lib/**.md files even if they have not changed.
+
+=item B<-p>, B<--prove>
+
+Run tests in prove, not yath.
+
+=item B<-o>, B<--options> OPTIONS
+
+Pass a string with options to yath or prove. These options will be added to the default options.
+
+Default options for yath:
+
+    yath test -j4 --cover
+
+Default options for prove:
+
+    prove -Ilib -r t
+
+=item B<-а>, B<--append>
+
+Add function sections to *.md from *.pm and finish.
+
+=item B<-A>, B<--new> PACKAGE [, LICENSE]
+
+Creates a new repository. B<PACKAGE> is the name of a new package, such as B<Aion::View>.
+
+Default B<LICENSE> is perl_5. And it maybe gpl_3.
+
+=back
+
+=head1 LICENSE
+
+⚖ B<GPLv3>
+
+B<liveman>  Copyright (C) 2007  Yaroslav O. Kosmina E<lt>darviarush@mail.ruE<gt>
+This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+
+=head1 AUTHOR
+
+Yaroslav O. Kosmina E<lt>darviarush@mail.ruE<gt>
+
+=cut

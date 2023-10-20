@@ -20,108 +20,11 @@
 #include <DBIXS.h>  /* installed by the DBI module                        */
 #include <mysql.h>  /* Comes with MySQL-devel */
 #include <mysqld_error.h>  /* Comes MySQL */
-
 #include <errmsg.h> /* Comes with MySQL-devel */
 
 
-/*
- * This is the version of MySQL wherer
- * the server will be used to process prepare
- * statements as opposed to emulation in the driver
-*/
-#define SQL_STATE_VERSION 40101
-#define WARNING_COUNT_VERSION 40101
-#define FIELD_CHARSETNR_VERSION 40101 /* should equivalent to 4.1.0  */
-#define MULTIPLE_RESULT_SET_VERSION 40102
-#define SERVER_PREPARE_VERSION 40103
-#define CALL_PLACEHOLDER_VERSION 50503
-#define LIMIT_PLACEHOLDER_VERSION 50007
-#define GEO_DATATYPE_VERSION 50007
-#define NEW_DATATYPE_VERSION 50003
-#define MYSQL_VERSION_5_0 50001
-/* This is to avoid the ugly #ifdef mess in dbdimp.c */
-#if MYSQL_VERSION_ID < SQL_STATE_VERSION
-#define mysql_sqlstate(svsock) (NULL)
-#endif
-/*
- * This is the versions of libmysql that supports MySQL Fabric.
-*/
-#define LIBMYSQL_FABRIC_VERSION 60200
-#define LIBMYSQL_LAST_FABRIC_VERSION 69999
-
-#if LIBMYSQL_VERSION_ID >= LIBMYSQL_FABRIC_VERSION && LIBMYSQL_VERSION_ID <= LIBMYSQL_LAST_FABRIC_VERSION
-#define FABRIC_SUPPORT 1
-#else
-#define FABRIC_SUPPORT 0
-#endif
-
-#if MYSQL_VERSION_ID < WARNING_COUNT_VERSION
-#define mysql_warning_count(svsock) 0
-#endif
-
-#if MYSQL_VERSION_ID < WARNING_COUNT_VERSION
-#define mysql_warning_count(svsock) 0
-#endif
-
-#if !defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 80001
-#define my_bool bool
-#endif
-
-/* MYSQL_TYPE_BIT is not available on MySQL 4.1 */
-#ifndef MYSQL_TYPE_BIT
-#define MYSQL_TYPE_BIT 16
-#endif
-
 #define true 1
 #define false 0
-
-/*
- * Check which SSL settings are supported by API at compile time
- */
-
-/* Use mysql_options with MYSQL_OPT_SSL_VERIFY_SERVER_CERT */
-#if ((MYSQL_VERSION_ID >= 50023 && MYSQL_VERSION_ID < 50100) || MYSQL_VERSION_ID >= 50111) && (MYSQL_VERSION_ID < 80000 || defined(MARIADB_BASE_VERSION))
-#define HAVE_SSL_VERIFY
-#endif
-
-/* Use mysql_options with MYSQL_OPT_SSL_ENFORCE */
-#if !defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 50703 && MYSQL_VERSION_ID < 80000 && MYSQL_VERSION_ID != 60000
-#define HAVE_SSL_ENFORCE
-#endif
-
-/* Use mysql_options with MYSQL_OPT_SSL_MODE */
-#if !defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 50711 && MYSQL_VERSION_ID != 60000
-#define HAVE_SSL_MODE
-#endif
-
-/* Use mysql_options with MYSQL_OPT_SSL_MODE, but only SSL_MODE_REQUIRED is supported */
-#if !defined(MARIADB_BASE_VERSION) && ((MYSQL_VERSION_ID >= 50636 && MYSQL_VERSION_ID < 50700) || (MYSQL_VERSION_ID >= 50555 && MYSQL_VERSION_ID < 50600))
-#define HAVE_SSL_MODE_ONLY_REQUIRED
-#endif
-
-/*
- * Check which SSL settings are supported by API at runtime
- */
-
-/* MYSQL_OPT_SSL_VERIFY_SERVER_CERT automatically enforce SSL mode */
-static inline bool ssl_verify_also_enforce_ssl(void) {
-#ifdef MARIADB_BASE_VERSION
-	my_ulonglong version = mysql_get_client_version();
-	return ((version >= 50544 && version < 50600) || (version >= 100020 && version < 100100) || version >= 100106);
-#else
-	return false;
-#endif
-}
-
-/* MYSQL_OPT_SSL_VERIFY_SERVER_CERT is not vulnerable (CVE-2016-2047) and can be used */
-static inline bool ssl_verify_usable(void) {
-	my_ulonglong version = mysql_get_client_version();
-#ifdef MARIADB_BASE_VERSION
-	return ((version >= 50547 && version < 50600) || (version >= 100023 && version < 100100) || version >= 100110);
-#else
-	return ((version >= 50549 && version < 50600) || (version >= 50630 && version < 50700) || version >= 50712);
-#endif
-}
 
 /*
  *  The following are return codes passed in $h->err in case of
@@ -189,17 +92,9 @@ enum av_attribs {
  *  This declares a variable called "imp_drh" of type
  *  "struct imp_drh_st *".
  */
-typedef struct imp_drh_embedded_st {
-    int state;
-    SV * args;
-    SV * groups;
-} imp_drh_embedded_t;
 
 struct imp_drh_st {
     dbih_drc_t com;         /* MUST be first element in structure   */
-#if defined(DBD_MYSQL_EMBEDDED)
-    imp_drh_embedded_t embedded;     /* */
-#endif
 };
 
 
@@ -260,7 +155,7 @@ typedef struct imp_sth_phb_st {
       double dval;
     } numeric_val;
     unsigned long   length;
-    char            is_null;
+    bool         is_null;
 } imp_sth_phb_t;
 
 /*
@@ -272,21 +167,18 @@ typedef struct imp_sth_phb_st {
  */
 typedef struct imp_sth_fbh_st {
     unsigned long  length;
-    bool           is_null;
+    bool        is_null;
     bool           error;
     char           *data;
     int            charsetnr;
     double         ddata;
     IV             ldata;
-#if MYSQL_VERSION_ID < FIELD_CHARSETNR_VERSION
-    unsigned int   flags;
-#endif
 } imp_sth_fbh_t;
 
 
 typedef struct imp_sth_fbind_st {
    unsigned long   * length;
-   char            * is_null;
+   bool         * is_null;
 } imp_sth_fbind_t;
 
 
@@ -303,7 +195,6 @@ typedef struct imp_sth_fbind_st {
 struct imp_sth_st {
     dbih_stc_t com;       /* MUST be first element in structure     */
 
-#if (MYSQL_VERSION_ID >= SERVER_PREPARE_VERSION)
     MYSQL_STMT       *stmt;
     MYSQL_BIND       *bind;
     MYSQL_BIND       *buffer;
@@ -312,7 +203,6 @@ struct imp_sth_st {
     int              has_been_bound;
     int use_server_side_prepare;  /* server side prepare statements? */
     int disable_fallback_for_server_prepare;
-#endif
 
     MYSQL_RES* result;       /* result                                 */
     int currow;           /* number of current row                  */
@@ -381,7 +271,6 @@ my_ulonglong mysql_st_internal_execute(SV *,
                                        MYSQL *,
                                        int);
 
-#if MYSQL_VERSION_ID >= SERVER_PREPARE_VERSION
 my_ulonglong mysql_st_internal_execute41(SV *,
                                          int,
                                          MYSQL_RES **,
@@ -391,20 +280,8 @@ my_ulonglong mysql_st_internal_execute41(SV *,
 
 
 int mysql_st_clean_cursor(SV*, imp_sth_t*);
-#endif
 
-#if MYSQL_VERSION_ID >= MULTIPLE_RESULT_SET_VERSION
 int mysql_st_next_results(SV*, imp_sth_t*);
-#endif
-
-#if defined(DBD_MYSQL_EMBEDDED)
-int count_embedded_options(char *);
-char ** fill_out_embedded_options(PerlIO *, char *, int , int , int);
-int free_embedded_options(char **, int);
-/* We have to define dbd_discon_all method for mysqlEmb driver at least
-   to be able to stop embedded server properly */
-#define dbd_discon_all dbd_discon_all
-#endif
 
 AV* dbd_db_type_info_all (SV* dbh, imp_dbh_t* imp_dbh);
 SV* dbd_db_quote(SV*, SV*, SV*);
@@ -415,5 +292,4 @@ extern int mysql_db_reconnect(SV*);
 int mysql_st_free_result_sets (SV * sth, imp_sth_t * imp_sth);
 int mysql_db_async_result(SV* h, MYSQL_RES** resp);
 int mysql_db_async_ready(SV* h);
-
 int mysql_socket_ready(my_socket fd);

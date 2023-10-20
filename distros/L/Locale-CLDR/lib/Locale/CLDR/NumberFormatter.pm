@@ -2,7 +2,7 @@ package Locale::CLDR::NumberFormatter;
 
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 
 use v5.10.1;
@@ -655,7 +655,7 @@ sub _process_algorithmic_number_data_fractions {
 sub _get_algorithmic_number_format {
 	my ($self, $number, $format_data) = @_;
 	
-	use bignum;
+	use bigfloat;
 	return $format_data->{'-x'} if $number =~ /^-/ && exists $format_data->{'-x'};
 	return $format_data->{'x.x'} if $number =~ /\./ && exists $format_data->{'x.x'};
 	return $format_data->{0} if $number == 0 || $number =~ /^-/;

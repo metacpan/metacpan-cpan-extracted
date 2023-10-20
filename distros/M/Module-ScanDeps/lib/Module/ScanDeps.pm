@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use vars qw( $VERSION @EXPORT @EXPORT_OK @ISA $CurrentPackage @IncludeLibs $ScanFileRE );
 
-$VERSION   = '1.33';
+$VERSION   = '1.34';
 @EXPORT    = qw( scan_deps scan_deps_runtime );
 @EXPORT_OK = qw( scan_line scan_chunk add_deps scan_deps_runtime path_to_inc_name );
 
@@ -1280,17 +1280,17 @@ sub _glob_in_inc {
         my $dir = "$inc/$subdir";
         next unless -d $dir;
 
-        # canonicalize $inc as newer versions of File::Find return
-        # a canonicalized $File::Find::name
-        (my $canon = $inc) =~ s|\\|\/|g;
+        # canonicalize $inc (ie. use "/" as filename separator exclusively)
+        # as newer versions of File::Find return a canonicalized $File::Find::name
+        (my $canon = $inc) =~ s|\\|/|g;
         File::Find::find(
             sub {
                 return unless -f $_;
                 return if $pm_only and !/\.p[mh]$/i;
-                (my $name = $File::Find::name) =~ s|\\|\/|g;
-                $name =~ s|^\Q$canon\E/||;
+                (my $file = $File::Find::name) =~ s|\\|/|g;
+                (my $name = $file) =~ s|^\Q$canon\E/||;
                 push @files, $pm_only ? $name
-                                      : { file => $File::Find::name, name => $name };
+                                      : { file => $file, name => $name };
             },
             $dir
         );
@@ -1581,7 +1581,7 @@ sub _info2rv {
     my $rv = {};
 
     my $incs = join('|', sort { length($b) <=> length($a) }
-                              map { s:\\:/:g; s:^(/.*?)/+$:$1:; quotemeta($_) }
+                              map { s|\\|/|g; s|/+$||; quotemeta($_) }
                                   @{ $info->{'@INC'} });
     my $i = is_insensitive_fs() ? "i" : "";
     my $strip_inc_prefix = qr{^(?$i:$incs)/};
@@ -1589,7 +1589,14 @@ sub _info2rv {
     require File::Spec;
 
     foreach my $key (keys %{ $info->{'%INC'} }) {
-        (my $path = $info->{'%INC'}{$key}) =~ s:\\:/:g;
+        (my $path = $info->{'%INC'}{$key}) =~ s|\\|/|g;
+
+        # NOTE: %INC may contain (as keys) absolute pathnames, 
+        # e.g. for autosplit .ix and .al files. In the latter case,
+        # the key may also start with "./" if found via a relative path in @INC.
+        $key =~ s|\\|/|g;
+        $key =~ s|^\./||;
+        $key =~ s/$strip_inc_prefix//;
 
         $rv->{$key} = {
             'used_by' => [],
@@ -1600,7 +1607,7 @@ sub _info2rv {
     }
 
     foreach my $path (@{ $info->{dl_shared_objects} }) {
-        $path =~ s:\\:/:g;
+        $path =~ s|\\|/|g;
         (my $key = $path) =~ s/$strip_inc_prefix//;
 
         $rv->{$key} = {

@@ -48,13 +48,22 @@
 
 % if ( RT::Handle::cmp_version($RT::VERSION, '5.0.0') >= 0 ) {
 % # RT 5 version
-<&| /Widgets/TitleBox, title => loc('Quick Calls') &>
+<&| /Widgets/TitleBox, title => $title &>
 <div class="form-row">
   <div class="col-auto">
-    <form method="post"
-          action="<%$RT::WebPath%>/Helpers/QuickCalls">
+    <form method="post" action="<%$RT::WebPath%>/Helpers/QuickCalls">
+% if ( $quickcall_dashboard_id ) {
+    <input type="hidden" class="hidden" name="QuickCallsDashboard" value="<% $quickcall_dashboard_id %>">
+% }
+% for my $pass_argument ( keys %$DECODED_ARGS ) {
+    <input type="hidden" class="hidden" name="PassArguments" value="<% $pass_argument %>">
+%   for my $value ( ref $DECODED_ARGS->{$pass_argument} eq 'ARRAY' ? @{ $DECODED_ARGS->{$pass_argument} } : $DECODED_ARGS->{$pass_argument} ) {
+    <input type="hidden" class="hidden" name="<% $pass_argument %>" value="<% $value // '' %>">
+%   }
+% }
+    <input type="hidden" class="hidden" name="QuickCallsPath" value="<%RT->Config->Get('WebPath')%><% $r->path_info %>">
     <select name="QuickCall" class="selectpicker form-control">
-%     foreach my $QuickCall (@{$RT::QuickCalls||[]}) {
+%     foreach my $QuickCall (@$quickcalls) {
       <option value="<%$QuickCall->{Name}%>"><%$QuickCall->{Name}%>
 %     }
     </select>
@@ -71,7 +80,7 @@
 <&| /Widgets/TitleBox, title => loc('Quick Calls') &>
 <form action="<%$RT::WebPath%>/Helpers/QuickCalls">
 <select name="QuickCall">
-% foreach my $QuickCall (@{$RT::QuickCalls||[]}) {
+% foreach my $QuickCall (@$quickcalls) {
     <option value="<%$QuickCall->{Name}%>"><%$QuickCall->{Name}%>
 % }
 </select>
@@ -79,3 +88,46 @@
 </form>
 </&>
 % }
+<%INIT>
+my $title = loc('Quick Calls');
+my $config = RT->Config->Get('QuickCalls') || [];
+my $quickcalls;
+
+my $arg = $m->dhandler_arg || '';
+my ( $dashboard_id, $dashboard_name ) = split '/', $arg;
+my $system_default_id = 0;
+
+unless ( $dashboard_id ) {
+  # if there is no dhandler_arg we are on the default homepage dashboard
+  # following logic copied from share/html/Elements/MyRT to find user's default dashboard
+  my $user = $session{'CurrentUser'}->UserObj;
+  my ( $system_default ) = RT::System->new( $session{'CurrentUser'} )->Attributes->Named('DefaultDashboard');
+  $system_default_id = $system_default ? $system_default->Content : 0;
+  $dashboard_id = $user->Preferences( DefaultDashboard => $system_default_id );
+}
+
+# Allow any user to read system default dashboard
+my $Dashboard = RT::Dashboard->new( $system_default_id == $dashboard_id ? RT->SystemUser : $session{'CurrentUser'} );
+my ( $ok, $msg ) = $Dashboard->LoadById( $dashboard_id );
+if ( !$ok ) {
+  RT->Logger->error("Unable to load Dashboard '$dashboard_id': $msg");
+}
+
+my $quickcall_dashboard_id;
+if ( ref $config eq 'ARRAY' ) {
+  # old behavior
+  $quickcalls = $config;
+}
+elsif ( ref $config eq 'HASH' ) {
+  # new behavior
+  $quickcall_dashboard_id = $Dashboard ? $Dashboard->id : '';
+
+  my $quickcall_config = $config->{$quickcall_dashboard_id} || $config->{Default} || {};
+
+  if ( my $quickcall_title = $quickcall_config->{Title} ) {
+    $title .= " - $quickcall_title";
+  }
+  $quickcalls = $quickcall_config->{Actions};
+}
+
+</%INIT>

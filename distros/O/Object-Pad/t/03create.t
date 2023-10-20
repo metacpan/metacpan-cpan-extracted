@@ -128,6 +128,29 @@ class WithBuildargs {
    is( $o->field, "value", 'native HASH objects still support fields' );
 }
 
+# Create a base class with keys representation
+{
+   class NativelyHashWithKeys :repr(keys) {
+      field $s = "value";
+      field @a = ( 12, 34 );
+      field %h;
+      method fields { $s, \@a, \%h }
+   }
+
+   my $o = NativelyHashWithKeys->new;
+   is( reftype $o, "HASH", 'NativelyHashWithKeys is natively a HASH reference' );
+   is( [ $o->fields ], [ "value", [ 12, 34 ], {} ],
+      ':repr(keys) objects still support fields' );
+   is( $o->{'NativelyHashWithKeys/$s'}, "value",
+      ':repr(keys) object fields directly accessible' );
+   is( $o,
+      { 'NativelyHashWithKeys/$s' => "value",
+        'NativelyHashWithKeys/@a' => [ 12, 34 ],
+        'NativelyHashWithKeys/%h' => {},
+      },
+      ':repr(keys) object entirely' );
+}
+
 # Subclasses without BUILD shouldn't double-invoke superclass
 {
    my $BUILD_invoked;

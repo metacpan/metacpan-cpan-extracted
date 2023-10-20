@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API/Request.pm
-## Version v0.1.1
+## Version v0.1.2
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2023/06/11
+## Modified 2023/06/14
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -56,7 +56,7 @@ BEGIN
     use URI;
     use URI::Escape;
     use Want;
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
     our( $SERVER_VERSION, $ERROR );
 };
 
@@ -335,7 +335,8 @@ sub cookie
     my $jar = $self->cookies || return( $self->pass_error );
     # Cookie::Jar might return undef if there was no match
     my $v = $jar->get( $name );
-    return( $v );
+    return( $v ) unless( $v );
+    return( $v->value );
 }
 
 # To get all cookies; then we can fetch then with $jar->get( 'this_cookie' ) for example
@@ -1601,7 +1602,7 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 

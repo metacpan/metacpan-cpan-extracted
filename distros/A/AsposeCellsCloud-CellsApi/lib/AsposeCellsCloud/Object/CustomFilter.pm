@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'criteria' => {
      	datatype => 'string',
      	base_name => 'Criteria',
-     	description => '',
+     	description => 'Gets and sets the criteria. ',
      	format => '',
      	read_only => '',
      		},
      'filter_operator_type' => {
      	datatype => 'string',
      	base_name => 'FilterOperatorType',
-     	description => '',
+     	description => 'Gets and sets the filter operator type. ',
      	format => '',
      	read_only => '',
      		},    

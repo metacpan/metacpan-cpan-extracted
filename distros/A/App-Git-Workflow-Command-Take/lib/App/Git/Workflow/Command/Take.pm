@@ -8,15 +8,15 @@ package App::Git::Workflow::Command::Take;
 
 use strict;
 use warnings;
-use Pod::Usage ();
+use Pod::Usage   ();
 use Data::Dumper qw/Dumper/;
-use English qw/ -no_match_vars /;
+use English      qw/ -no_match_vars /;
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 use Path::Tiny;
 use File::Copy qw/copy/;
 
-our $VERSION  = 0.7;
+our $VERSION  = 0.8;
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -24,28 +24,22 @@ our %option;
 sub run {
     my ($self) = @_;
 
-    get_options(
-        \%option,
-        'quiet|q',
-        'ours|mine',
-        'theirs',
-        'add|a',
-    );
+    get_options( \%option, 'quiet|q', 'ours|mine', 'theirs', 'add|a!', );
 
     my @conflicts = (
-        map  { /^ \s+ both \s modified: \s+(.*)$/xms; $1 }
-        grep { /^ \s+ both \s modified: \s+/xms }
-        $workflow->git->status()
+        map    { /^ \s+ both \s (?:added|modified): \s+(.*)$/xms; $1 }
+          grep { /^ \s+ both \s (?:added|modified): \s+/xms }
+          $workflow->git->status()
     );
 
-    if (!@ARGV) {
+    if ( !@ARGV ) {
         @ARGV = ('./');
     }
 
-    CONFLICT:
+  CONFLICT:
     for my $conflict (@conflicts) {
 
-        PATH:
+      PATH:
         for my $path (@ARGV) {
             $path =~ s{^[.]/}{};
             next PATH unless $conflict =~ /^\Q$path\E/;
@@ -76,12 +70,12 @@ sub resolve {
     my $state = 'keep';
     my $side  = $option{theirs} ? 'theirs' : 'ours';
     my $read  = path($file)->openr;
-    my $tmp   = path($file . '.tmp');
+    my $tmp   = path( $file . '.tmp' );
     my $write = $tmp->openw;
 
-    LINE:
-    while (my $line = <$read>) {
-        for my $check (keys %states) {
+  LINE:
+    while ( my $line = <$read> ) {
+        for my $check ( keys %states ) {
             if ( $line =~ /$states{$check}/ ) {
                 $state = $check;
                 next LINE;
@@ -109,7 +103,7 @@ App::Git::Workflow::Command::Take - Resolve merge conflicts by only taking one s
 
 =head1 VERSION
 
-This documentation refers to git-take-mine version 0.7
+This documentation refers to git-take-mine version 0.8
 
 =head1 SYNOPSIS
 

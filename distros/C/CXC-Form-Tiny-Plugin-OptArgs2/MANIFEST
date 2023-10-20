@@ -13,6 +13,8 @@ examples/synopsis.pl
 lib/CXC/Form/Tiny/Plugin/OptArgs2.pm
 lib/CXC/Form/Tiny/Plugin/OptArgs2/Class.pm
 lib/CXC/Form/Tiny/Plugin/OptArgs2/Meta.pm
+mutagen.yml
+mutagen.yml.lock
 perlcritic.rc
 perltidy.rc
 t/00-compile.t

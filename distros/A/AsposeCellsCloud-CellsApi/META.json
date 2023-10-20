@@ -63,7 +63,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "23.8"
+         "version" : "23.10"
       },
       "AsposeCellsCloud::LiteCellsApi" : {
          "file" : "lib/AsposeCellsCloud/LiteCellsApi.pm"
@@ -106,6 +106,12 @@
       },
       "AsposeCellsCloud::Object::AboveAverage" : {
          "file" : "lib/AsposeCellsCloud/Object/AboveAverage.pm"
+      },
+      "AsposeCellsCloud::Object::AbstractCalculationEngine" : {
+         "file" : "lib/AsposeCellsCloud/Object/AbstractCalculationEngine.pm"
+      },
+      "AsposeCellsCloud::Object::AbstractCalculationMonitor" : {
+         "file" : "lib/AsposeCellsCloud/Object/AbstractCalculationMonitor.pm"
       },
       "AsposeCellsCloud::Object::AutoFilter" : {
          "file" : "lib/AsposeCellsCloud/Object/AutoFilter.pm"
@@ -191,6 +197,9 @@
       "AsposeCellsCloud::Object::DataSorter" : {
          "file" : "lib/AsposeCellsCloud/Object/DataSorter.pm"
       },
+      "AsposeCellsCloud::Object::DataSorterKey" : {
+         "file" : "lib/AsposeCellsCloud/Object/DataSorterKey.pm"
+      },
       "AsposeCellsCloud::Object::DateTimeGroupItem" : {
          "file" : "lib/AsposeCellsCloud/Object/DateTimeGroupItem.pm"
       },
@@ -217,6 +226,12 @@
       },
       "AsposeCellsCloud::Object::FormulaFormatCondition" : {
          "file" : "lib/AsposeCellsCloud/Object/FormulaFormatCondition.pm"
+      },
+      "AsposeCellsCloud::Object::FormulaSettings" : {
+         "file" : "lib/AsposeCellsCloud/Object/FormulaSettings.pm"
+      },
+      "AsposeCellsCloud::Object::GlobalizationSettings" : {
+         "file" : "lib/AsposeCellsCloud/Object/GlobalizationSettings.pm"
       },
       "AsposeCellsCloud::Object::HorizontalPageBreak" : {
          "file" : "lib/AsposeCellsCloud/Object/HorizontalPageBreak.pm"
@@ -283,6 +298,9 @@
       },
       "AsposeCellsCloud::Object::ProtectSheetParameter" : {
          "file" : "lib/AsposeCellsCloud/Object/ProtectSheetParameter.pm"
+      },
+      "AsposeCellsCloud::Object::QueryTable" : {
+         "file" : "lib/AsposeCellsCloud/Object/QueryTable.pm"
       },
       "AsposeCellsCloud::Object::Range" : {
          "file" : "lib/AsposeCellsCloud/Object/Range.pm"
@@ -367,6 +385,15 @@
       },
       "AsposeCellsCloud::Object::Worksheets" : {
          "file" : "lib/AsposeCellsCloud/Object/Worksheets.pm"
+      },
+      "AsposeCellsCloud::Object::WriteProtection" : {
+         "file" : "lib/AsposeCellsCloud/Object/WriteProtection.pm"
+      },
+      "AsposeCellsCloud::Object::XmlDataBinding" : {
+         "file" : "lib/AsposeCellsCloud/Object/XmlDataBinding.pm"
+      },
+      "AsposeCellsCloud::Object::XmlMap" : {
+         "file" : "lib/AsposeCellsCloud/Object/XmlMap.pm"
       },
       "AsposeCellsCloud::Object::CellsObjectOperateTaskParameter" : {
          "file" : "lib/AsposeCellsCloud/Object/CellsObjectOperateTaskParameter.pm"
@@ -457,6 +484,9 @@
       },
       "AsposeCellsCloud::Object::ListObjects" : {
          "file" : "lib/AsposeCellsCloud/Object/ListObjects.pm"
+      },
+      "AsposeCellsCloud::Object::PivotGlobalizationSettings" : {
+         "file" : "lib/AsposeCellsCloud/Object/PivotGlobalizationSettings.pm"
       },
       "AsposeCellsCloud::Object::DifSaveOptions" : {
          "file" : "lib/AsposeCellsCloud/Object/DifSaveOptions.pm"
@@ -884,8 +914,8 @@
       "AsposeCellsCloud::Object::PivotTableFieldRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/PivotTableFieldRequest.pm"
       },
-      "AsposeCellsCloud::Object::ProtectWorkbookRequst" : {
-         "file" : "lib/AsposeCellsCloud/Object/ProtectWorkbookRequst.pm"
+      "AsposeCellsCloud::Object::ProtectWorkbookRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/ProtectWorkbookRequest.pm"
       },
       "AsposeCellsCloud::Object::RangeCopyRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/RangeCopyRequest.pm"
@@ -896,14 +926,14 @@
       "AsposeCellsCloud::Object::RangeSetStyleRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/RangeSetStyleRequest.pm"
       },
+      "AsposeCellsCloud::Object::RangeSortRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/RangeSortRequest.pm"
+      },
       "AsposeCellsCloud::Object::TableTotalRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/TableTotalRequest.pm"
       },
       "AsposeCellsCloud::Object::TextWaterMarkerRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/TextWaterMarkerRequest.pm"
-      },
-      "AsposeCellsCloud::Object::TotalRequest" : {
-         "file" : "lib/AsposeCellsCloud/Object/TotalRequest.pm"
       },
       "AsposeCellsCloud::Object::WorkbookEncryptionRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/WorkbookEncryptionRequest.pm"
@@ -1111,6 +1141,9 @@
       },
       "AsposeCellsCloud::Object::ChartFrame" : {
          "file" : "lib/AsposeCellsCloud/Object/ChartFrame.pm"
+      },
+      "AsposeCellsCloud::Object::ChartGlobalizationSettings" : {
+         "file" : "lib/AsposeCellsCloud/Object/ChartGlobalizationSettings.pm"
       },
       "AsposeCellsCloud::Object::ChartPoint" : {
          "file" : "lib/AsposeCellsCloud/Object/ChartPoint.pm"
@@ -1550,15 +1583,6 @@
       "AsposeCellsCloud::Request::PostMergeRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostMergeRequest.pm"
       },
-      "AsposeCellsCloud::Request::PostUnlockRequest" : {
-         "file" : "lib/AsposeCellsCloud/Request/PostUnlockRequest.pm"
-      },
-      "AsposeCellsCloud::Request::PostLockRequest" : {
-         "file" : "lib/AsposeCellsCloud/Request/PostLockRequest.pm"
-      },
-      "AsposeCellsCloud::Request::PostProtectRequest" : {
-         "file" : "lib/AsposeCellsCloud/Request/PostProtectRequest.pm"
-      },
       "AsposeCellsCloud::Request::PostSplitRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostSplitRequest.pm"
       },
@@ -1621,6 +1645,12 @@
       },
       "AsposeCellsCloud::Request::PostWorksheetListObjectSortTableRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostWorksheetListObjectSortTableRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetListObjectRemoveDuplicatesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetListObjectRemoveDuplicatesRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetListObjectInsertSlicerRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetListObjectInsertSlicerRequest.pm"
       },
       "AsposeCellsCloud::Request::PostWorksheetListColumnRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostWorksheetListColumnRequest.pm"
@@ -1793,8 +1823,38 @@
       "AsposeCellsCloud::Request::DeleteDocumentPropertiesRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/DeleteDocumentPropertiesRequest.pm"
       },
-      "AsposeCellsCloud::Request::PostWorksheetCellsRangesRequest" : {
-         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetCellsRangesRequest.pm"
+      "AsposeCellsCloud::Request::PostDigitalSignatureRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostDigitalSignatureRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostEncryptWorkbookRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostEncryptWorkbookRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteDecryptWorkbookRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteDecryptWorkbookRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostProtectWorkbookRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostProtectWorkbookRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteUnProtectWorkbookRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteUnProtectWorkbookRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PutDocumentProtectFromChangesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PutDocumentProtectFromChangesRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteDocumentUnProtectFromChangesRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteDocumentUnProtectFromChangesRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostUnlockRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostUnlockRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostLockRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostLockRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostProtectRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostProtectRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetCellsRangesCopyRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetCellsRangesCopyRequest.pm"
       },
       "AsposeCellsCloud::Request::PostWorksheetCellsRangeMergeRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostWorksheetCellsRangeMergeRequest.pm"
@@ -1813,6 +1873,9 @@
       },
       "AsposeCellsCloud::Request::PostWorksheetCellsRangeMoveToRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostWorksheetCellsRangeMoveToRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorksheetCellsRangeSortRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorksheetCellsRangeSortRequest.pm"
       },
       "AsposeCellsCloud::Request::PostWorksheetCellsRangeOutlineBorderRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostWorksheetCellsRangeOutlineBorderRequest.pm"
@@ -1874,21 +1937,6 @@
       "AsposeCellsCloud::Request::PostRunTaskRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostRunTaskRequest.pm"
       },
-      "AsposeCellsCloud::Request::PostDigitalSignatureRequest" : {
-         "file" : "lib/AsposeCellsCloud/Request/PostDigitalSignatureRequest.pm"
-      },
-      "AsposeCellsCloud::Request::PostEncryptWorkbookRequest" : {
-         "file" : "lib/AsposeCellsCloud/Request/PostEncryptWorkbookRequest.pm"
-      },
-      "AsposeCellsCloud::Request::DeleteDecryptWorkbookRequest" : {
-         "file" : "lib/AsposeCellsCloud/Request/DeleteDecryptWorkbookRequest.pm"
-      },
-      "AsposeCellsCloud::Request::PostProtectWorkbookRequest" : {
-         "file" : "lib/AsposeCellsCloud/Request/PostProtectWorkbookRequest.pm"
-      },
-      "AsposeCellsCloud::Request::DeleteUnProtectWorkbookRequest" : {
-         "file" : "lib/AsposeCellsCloud/Request/DeleteUnProtectWorkbookRequest.pm"
-      },
       "AsposeCellsCloud::Request::GetWorkbookDefaultStyleRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/GetWorkbookDefaultStyleRequest.pm"
       },
@@ -1915,12 +1963,6 @@
       },
       "AsposeCellsCloud::Request::DeleteWorkbookNameRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/DeleteWorkbookNameRequest.pm"
-      },
-      "AsposeCellsCloud::Request::PutDocumentProtectFromChangesRequest" : {
-         "file" : "lib/AsposeCellsCloud/Request/PutDocumentProtectFromChangesRequest.pm"
-      },
-      "AsposeCellsCloud::Request::DeleteDocumentUnProtectFromChangesRequest" : {
-         "file" : "lib/AsposeCellsCloud/Request/DeleteDocumentUnProtectFromChangesRequest.pm"
       },
       "AsposeCellsCloud::Request::PostWorkbooksMergeRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostWorkbooksMergeRequest.pm"
@@ -2161,6 +2203,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "23.8",
+   "version" : "23.10",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

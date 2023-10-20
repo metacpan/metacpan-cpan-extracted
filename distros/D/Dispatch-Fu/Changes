@@ -39,3 +39,22 @@ Revision history for Dispatch::Fu.
 0.96 Wed Aug 23 19:05:09 2023
      - POD updates
      - no functional changes
+
+0.97 Sat Sep 16 20:05:09 2023
+     - added "cases" keyword that can be used inside of
+       the "dispatch" BLOCK to get a list of cases added
+       by the C<on> keyword. When used outside of the a
+       "dispatch" block, it returns undef.
+     - "cases" introspection allows for much more idiomatic
+       recipes inside of the "dispatch" BLOCK.
+
+0.98 Sat Sep 27 20:05:09 2023
+     - added xdefault handling the situation where
+       the case name is the same as the string value,
+       which is the simlest case possible and what people
+       use straight HASH ref dispatching for; see the
+       tests and POD examples
+
+0.99 Sat Sep 30 20:05:09 2023
+     - fixed xdefault to allow for the first parameter to
+       to be C<undef>

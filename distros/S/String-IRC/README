@@ -1,47 +1,101 @@
-String-IRC version 0.0.1
+NAME
 
-[ REPLACE THIS...
+    String::IRC - add color codes for mIRC compatible client
 
-  The README is used to introduce the module and provide instructions on
-  how to install the module, any machine dependencies it may have (for
-  example C compilers and installed libraries) and any other information
-  that should be understood before the module is installed.
+SYNOPSIS
 
-  A README file is required for CPAN modules since CPAN extracts the
-  README file from a module distribution so that people browsing the
-  archive can use it get an idea of the modules uses. It is usually a
-  good idea to provide version information here so that people can
-  decide whether fixes for the module are worth downloading.
-]
+        use String::IRC;
+    
+        my $si1 = String::IRC->new('hello');
+        $si1->red->underline;
+        my $si2 = String::IRC->new('world')->yellow('green')->bold;
+        my $msg = "$si1, $si2!";
 
+DESCRIPTION
 
-INSTALLATION
+    String::IRC can be used to add color or decoration code to string.
 
-To install this module, run the following commands:
+METHODS
 
-    perl Build.PL
-    ./Build
-    ./Build test
-    ./Build install
+ new
 
+      $si = String::IRC->new('I love YAKINIKU.');
 
-Alternatively, to install with Module::Install, you can use the following commands:
+    This method constructs a new "String::IRC" instance and returns it.
 
-    perl Makefile.PL
-    make
-    make test
-    make install
+ COLOR
 
+      $si->COLOR([BG_COLOR]);
 
+    Add color code and return String::IRC object. BG_COLOR is optional.
+    Available COLOR and BC_COLOR are as follows.
 
-DEPENDENCIES
+      white
+      black
+      blue navy
+      green
+      red
+      brown maroon
+      purple
+      orange olive
+      yellow
+      light_green lime
+      teal
+      light_cyan cyan aqua
+      light_blue royal
+      pink light_purple fuchsia
+      grey
+      light_grey silver
 
-None.
+ bold
 
+      $si->bold;
 
-COPYRIGHT AND LICENCE
+    Add bold code and return String::IRC object.
 
-Copyright (C) 2007, HIROSE Masaaki
+ underline
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+      $si->underline;
+
+    Add underline code and return String::IRC object.
+
+ inverse
+
+      $si->inverse;
+
+    Add inverse code and return String::IRC object.
+
+ stringify
+
+      $si->stringify;
+
+    Return string which is added color or decoration code.
+
+    String::IRC calls this method implicitly by context. You may call it
+    explicitly.
+
+AUTHOR
+
+    HIROSE Masaaki <hirose31@gmail.com>
+
+REPOSITORY
+
+    https://github.com/hirose31/String-IRC
+
+        git clone https://github.com/hirose31/String-IRC.git
+
+    patches and collaborators are welcome.
+
+SEE ALSO
+
+    http://www.mirc.co.uk/help/color.txt
+
+COPYRIGHT
+
+    Copyright HIROSE Masaaki
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

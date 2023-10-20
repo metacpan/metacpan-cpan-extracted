@@ -1,5 +1,5 @@
 package Template::Liquid::Filters;
-our $VERSION = '1.0.22';
+our $VERSION = '1.0.23';
 use strict;
 use warnings;
 
@@ -1347,8 +1347,10 @@ You may pass a currency symbol to override the default dollar sign (C<$>).
 sub stock_price {
     my ($x, $y) = @_;
     return if $x !~ m[^[\+-]?(\d*\.)?\d+?$]o;
-    return (($x < 0 ? '-' : '') . (defined $y ? $y : '$') .
-                sprintf '%.' . (int(CORE::abs($x)) > 0 ? 2 : 4) . 'f',
+    return (($x < 0         ? '-' : '') .
+                (defined $y ? $y  : '$') .
+                sprintf '%.' .
+                (int(CORE::abs($x)) > 0 ? 2 : 4) . 'f',
             CORE::abs($x)
     );
 }
@@ -1361,7 +1363,7 @@ CPAN ID: SANKO
 
 =head1 License and Legal
 
-Copyright (C) 2009-2020 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+Copyright (C) 2009-2023 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of L<The Artistic License
@@ -1374,5 +1376,7 @@ by the L<Creative Commons Attribution-Share Alike 3.0
 License|http://creativecommons.org/licenses/by-sa/3.0/us/legalcode>. See the
 L<clarification of the
 CCA-SA3.0|http://creativecommons.org/licenses/by-sa/3.0/us/>.
+
+=for stopwords website
 
 =cut

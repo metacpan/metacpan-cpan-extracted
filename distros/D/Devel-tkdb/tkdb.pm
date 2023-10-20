@@ -1,4 +1,4 @@
-$tkdb::VERSION = '2.2';
+$tkdb::VERSION = '2.3';
 
 use strict;
 use Data::Dumper;
@@ -17,23 +17,30 @@ package Devel::tkdb;
 
 Devel::tkdb - Perl debugger using a Tcl/Tk GUI
 
-=head1 DESCRIPTION
-
-  tkdb is a debugger for perl that uses perl+Tcl/Tk for a user interface.
-  Features include:
-
-    Hot Variable Inspection (currently disabled)
-    Breakpoint Control Panel
-    Expression List
-    Subroutine Tree
-
 =head1 SYNOPSIS
-
-To debug a script using tkdb invoke perl like this:
 
     perl -d:tkdb myscript.pl
 
+=head1 DESCRIPTION
+
+tkdb is a debugger for perl that uses perl+Tcl/Tk for a user interface.
+Features include:
+
+=over 4
+
+=item Hot Variable Inspection (currently disabled)
+
+=item Breakpoint Control Panel
+
+=item Expression List
+
+=item Subroutine Tree
+
+=back
+
 =head1 Usage
+
+To debug a script using tkdb invoke perl like this:
 
     perl -d:tkdb myscript.pl
 
@@ -46,11 +53,10 @@ To debug a script using tkdb invoke perl like this:
 Line numbers are presented on the left side of the window. Lines that
 have lines through them are not breakable. Lines that are plain text
 are breakable. Clicking on these line numbers will insert a
-breakpoint on that line and change the line number color to
-$ENV{'PTKDB_BRKPT_COLOR'} (Defaults to Red). Clicking on the number
-again will remove the breakpoint.  If you disable the breakpoint with
-the controls on the BrkPt notebook page the color will change to
-$ENV{'PTKDB_DISABLEDBRKPT_COLOR'} (Defaults to Green).
+breakpoint on that line and change the line number color to red.
+Clicking on the number again will remove the breakpoint.  If you
+disable the breakpoint with
+the controls on the BrkPt notebook page the color will change to green.
 
 =item Cursor Motion
 
@@ -59,8 +65,7 @@ If you place the cursor over a variable (i.e. $myVar, @myVar, or
 value of the variable and pop a balloon up with the evaluated
 result.
 
-Data::Dumper will be used to format the result.  If there is an active 
-selection, the text of that selection will be evaluated.
+If there is an active selection, the text of that selection will be evaluated.
 
 =back
 
@@ -94,7 +99,7 @@ it. Subroutines are listed by their full package names.
 Presents a list of the breakpoints current in use. The pushbutton
 allows a breakpoint to be 'disabled' without removing it. Expressions
 can be applied to the breakpoint.  If the expression evaluates to be
-'true'(results in a defined value that is not 0) the debugger will
+'true' (results in a defined value that is not 0) the debugger will
 stop the script.  Pressing the 'Goto' button will set the text pane
 to that file and line where the breakpoint is set.  Pressing the
 'Delete' button will delete the breakpoint.
@@ -109,7 +114,7 @@ to that file and line where the breakpoint is set.  Pressing the
 
 =item About...
 
-Presents a dialog box telling you about the version of ptkdb.  It
+Presents a dialog box telling you about the version of tkdb.  It
 recovers your OS name, version of perl, version of Tcl/Tk, and some other
 information
 
@@ -125,8 +130,6 @@ Prompts for a filename to save the
 configuration to. Saves the breakpoints, expressions, eval text and
 window geometry. If the name given as the default is used and the
 script is reinvoked, this configuration will be reloaded automatically.
-
-    B<NOTE:>  You may find this preferable to using 
 
 =item Restore Config...
 
@@ -236,15 +239,9 @@ Delete all expressions in the expression window.
 Pops up a two pane window. Expressions of virtually unlimitted length
 can be entered in the top pane.  Pressing the 'Eval' button will cause
 the expression to be evaluated and its placed in the lower pane. 
-Data::Dumper is used to format the resulting
-text.  Undo is enabled for the text in the upper pane.
+Undo is enabled for the text in the upper pane.
 
 HINT:  You can enter multiple expressions by separating them with commas.  
-
-=item Use Data::Dumper for Eval Window
-
-Enables or disables the use of Data::Dumper for formatting the results
-of expressions in the Eval window.  
 
 =back
 
@@ -296,37 +293,9 @@ fonts.
     ptkdb.toplevel.button2.font: fixed         /* "Clear Results" Button */
     ptkdb.toplevel.button3.font: fixed         /* "Clear Dismiss" Button */
 
-    /*
-    * Background color for where the debugger has stopped 
-    */  
-    ptkdb*stopcolor: blue
-
-    /*
-    * Background color for set breakpoints  
-    */
-    ptkdb*breaktagcolor*background: yellow
-    ptkdb*disabledbreaktagcolor*background: white
-    /*
-    * Font for where the debugger has stopped
-    */
-    ptkdb*stopfont: -*-fixed-bold-*-*-*-*-*-*-*-*-*-*-*
-
-    /*
-    * Background color for the search tag
-    */  
-    ptkdb*searchtagcolor: green
-
 =head1 Environmental Variables
 
 =over 4
-
-=item PTKDB_BRKPT_COLOR
-
-Sets the background color of a set breakpoint
-
-=item PTKDB_DISABLEDBRKPT_COLOR
-
-Sets the background color of a disabled breakpoint
 
 =item PTKDB_CODE_FONT
 
@@ -348,10 +317,6 @@ Useful for debugging CGI scripts on remote systems.
 =item PTKDB_BOOKMARKS_PATH
 
 Sets the path of the bookmarks file.  Default is $ENV{'HOME'}/.ptkdb_bookmarks
-
-=item PTKDB_STOP_TAG_COLOR
-
-Sets the color that highlights the line where the debugger is stopped 
 
 =back
 
@@ -413,13 +378,6 @@ application is running, its 'MainLoop' call will accept these events
 and then dispatch them to appropriate callbacks associated with the
 appropriate widgets.
 
-Ptkdb has its own event loop that runs whenever you've stopped at a
-breakpoint and entered the debugger. However, it can accept events
-that are generated by other perlTk windows and dispatch their
-callbacks.  The problem here is that the application is supposed to be
-'stopped', and logically the application should not be able to process
-events.
-
 =head2 Debugging CGI Scripts
 
 One advantage of ptkdb over the builtin debugger(-d) is that it can be
@@ -435,10 +393,8 @@ to
   #! /usr/local/bin/perl -d:tkdb
 
 TIP: You can debug scripts remotely if you're using a unix based
-Xserver and where you are authoring the script has an Xserver.  The
-Xserver can be another unix workstation, a Macintosh or Win32 platform
-with an appropriate XWindows package.  In your script insert the
-following BEGIN subroutine:
+Xserver and where you are authoring the script has an Xserver.
+In your script insert the following BEGIN subroutine:
 
     sub BEGIN {
       $ENV{'DISPLAY'} = "myHostname:0.0" ;
@@ -459,6 +415,10 @@ variable.  NOTE: for debugging web scripts you may have to have the
 or whatever username your webserver is running under.  Also try
 installing a .ptkdbrc file in the same directory as the target script.
 
+=head1 See also
+
+https://github.com/vadrer/Perl-Devel-tkdb
+
 =head1 AUTHORS
 
  Andrew E. Page
@@ -477,7 +437,6 @@ sub BEGIN {
 
    # Fonts used in the displays
 
- @Devel::tkdb::button_font = $ENV{'PTKDB_BUTTON_FONT'} ? ( "-font" => $ENV{'PTKDB_CODE_FONT'} ) : () ; # font for buttons
  @Devel::tkdb::code_text_font = $ENV{'PTKDB_CODE_FONT'} ? ( "-font" => $ENV{'PTKDB_CODE_FONT'} ) : () ;
 
  @Devel::tkdb::expression_text_font = $ENV{'PTKDB_EXPRESSION_FONT'} ? ( "-font" => $ENV{'PTKDB_EXPRESSION_FONT'} ) : () ;
@@ -506,13 +465,10 @@ sub BEGIN {
 ##
 sub brkpt {
   my ($fName, @idx) = @_ ;
-  my($offset) ;
   local(*dbline) = $main::{'_<' . $fName} ;
 
-  $offset = $dbline[1] =~ /use\s+.*Devel::_?tkdb/ ? 1 : 0 ;
-
   for( @idx ) {
-    if( !&DB::checkdbline($fName, $_ + $offset) ) {
+    if( !&DB::checkdbline($fName, $_) ) {
       my ($package, $filename, $line) = caller ;
       print "$filename:$line:  $fName line $_ is not breakable\n" ;
       next ;
@@ -528,12 +484,10 @@ sub condbrkpt {
   my ($fname) = shift ;
   local(*dbline) = $main::{'_<' . $fname} ;
 
-  my $offset = $dbline[1] =~ /use\s+.*Devel::_?tkdb/ ? 1 : 0 ;
-
   while( @_ ) { # arg loop
     my($index, $expr) = splice @_, 0, 2 ; # take args 2 at a time
 
-    if( !&DB::checkdbline($fname, $index + $offset) ) {
+    if( !&DB::checkdbline($fname, $index) ) {
       my ($package, $filename, $line) = caller ;
       print "$filename:$line:  $fname line $index is not breakable\n" ;
       next ;
@@ -565,8 +519,7 @@ sub brkonsub {
 }
 
 #
-# set breakpoints on subroutines matching a regular
-# expression
+# set breakpoints on subroutines matching a regular expression
 #
 sub brkonsub_regex {
   my(@regexps) = @_ ;
@@ -601,45 +554,46 @@ sub do_user_init_files {
 # Constructor for our Devel::tkdb
 #
 sub new {
-  my($type) = @_ ;
-  my($self) = {} ;
+  my($type) = @_;
 
-  bless $self, $type ;
+  my $self = {
 
   # Current position of the executing program
 
-  $self->{current_file} = "" ; 
-  $self->{current_line} = -1 ; # initial value indicating we haven't set our line/tag
-  $self->{window_pos_offset} = 10 ; # when we enter how far from the top of the text are we positioned down
-  $self->{search_start} = "1.0" ;
-  $self->{fwdOrBack} = 1 ;
-  $self->{BookMarksPath} = $ENV{'PTKDB_BOOKMARKS_PATH'} || "$ENV{'HOME'}/.ptkdb_bookmarks" || '.ptkdb_bookmarks'  ;
+      current_file => "",
+      current_line => -1, # initial value indicating we haven't set our line/tag
+      window_pos_offset => 10, # when we enter how far from the top of the text are we positioned down
+      search_start => "1.0",
+      fwdOrBack => 1,
+      BookMarksPath => ($ENV{'PTKDB_BOOKMARKS_PATH'} || "$ENV{'HOME'}/.ptkdb_bookmarks" || '.ptkdb_bookmarks'),
 
-  $self->{'expr_list'} = [] ; # list of expressions to eval in our window fields:  {'expr'} The expr itself {'depth'} expansion depth
+  # list of expressions to eval in our window fields:  {'expr'} The expr itself {'depth'} expansion depth
+      expr_list => [], 
 
+      brkPtCnt => 0,
 
-  $self->{'brkPtCnt'} = 0 ;
-  $self->{'brkPtSlots'} = [] ; # open slots for adding breakpoints to the table 
+      main_window => undef,
 
-  $self->{'main_window'} = undef ;
+      subs_list_cnt => 0,
+  };
+  bless $self, $type;
 
-  $self->{'subs_list_cnt'} = 0 ;
+  $self->setup_main_window();
 
-  $self->setup_main_window() ;
-
-  return $self ;
-
+  return $self;
 } # end of new
 
 sub setup_main_window {
   my($self) = @_ ;
 
   # Main Window
-  $self->{int} = new Tcl::Tk;
-  $self->{int}->packageRequireTreectrl;
+  my $int = new Tcl::Tk;
+  $self->{int} = $int;
+
+  $int->_packageRequire('treectrl');
 
   $self->{main_window} = $self->{int}->mainwindow();
-  $self->{main_window}->geometry($ENV{'PTKDB_GEOMETRY'} || "800x600") ;
+  $self->{main_window}->geometry($ENV{'PTKDB_GEOMETRY'} || "800x600");
 
   $self->{main_window}->bind('<Control-c>', \&DB::dbint_handler) ;
 
@@ -648,14 +602,13 @@ sub setup_main_window {
   # 
   $self->{main_window}->protocol('WM_DELETE_WINDOW', sub { $self->close_ptkdb_window(); } );
 
-  # Menu bar
-  $self->setup_menu_bar();
-
   #
   # setup Frames
   # Setup our Code, Data, and breakpoints
   $self->setup_frames();
 
+  # Menu bar
+  $self->setup_menu_bar();
 }
 
 #
@@ -668,6 +621,7 @@ sub DoQuit {
     $self->save_bookmarks($self->{BookMarksPath}) if $self->{'bookmarks_changed'};
     $self->{main_window}->destroy if $self->{main_window} ; 
     $self->{main_window} = undef;
+
 }
 
 #
@@ -679,7 +633,7 @@ sub DoQuit {
 #
 sub DoOpen {
   my $self = shift ;
-  my ($topLevel, $listBox, $frame, $selectedFile, @fList) ;
+  my ($topLevel, $listBox, $selectedFile, @fList) ;
 
   #
   # subroutine we call when we've selected a file
@@ -711,8 +665,7 @@ sub DoOpen {
   } grep s/^_<//, keys %main:: ;
 
   #
-  # Create a list box with all of our files
-  # to select from
+  # Create a list box with all of our files to select from
   #
   $topLevel = $self->{main_window}->Toplevel(-title => "File Select", -overanchor => 'cursor') ;
 
@@ -721,24 +674,23 @@ sub DoOpen {
 	     -width => 30)->pack(qw/-side top -fill both -expand 1/);
 
 
-  # Bind a double click on the mouse button to the same action
-  # as pressing the Okay button
+  # Bind a double click on the mouse button to the same action as pressing the Okay button
 
   $listBox->bind('<Double-Button-1>' => $chooseSub) ;
 
   $listBox->_insertEnd(@fList);
 
-  $topLevel->Button(-text => "Okay", -command => $chooseSub, @Devel::tkdb::button_font,
-                     )->pack(-side => 'left', -fill => 'both', -expand => 1) ;
+  $topLevel->Button(-text => "Okay", -command => $chooseSub)
+  	->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
-  $topLevel->Button( -text => "Cancel", @Devel::tkdb::button_font,
-                     -command => sub { $topLevel->destroy; } )->pack(qw/-side left -fill both -expand 1/);
+  $topLevel->Button( -text => "Cancel", -command => "destroy $topLevel")
+  	->pack(qw/-side left -fill both -expand 1/);
 } # end of DoOpen
 
 sub do_tabs {
-  my $w = $DB::window->{'main_window'}->DialogBox(-title => "Tabs", -buttons => [qw/Okay Cancel/]) ;
+  my $w = $DB::window->{'main_window'}->DialogBox(-title => "Tabs", -buttons => [qw/Okay Cancel/]);
 
-  my $tabs_cfg = $DB::window->{'text'}->cget('-tabs');
+  my $tabs_cfg = $DB::window->{text}->cget('-tabs');
   my $tabs_str = join " ", @$tabs_cfg if $tabs_cfg;
 
   $w->add('Label', -text => 'Tabs:')->pack(-side => 'left');
@@ -756,7 +708,7 @@ sub close_ptkdb_window {
   $self->{current_file} = ""; # force a file reset
   $self->{'main_window'}->destroy;
   $self->{'main_window'} = undef;
-  $self->{int}->Eval('set event run');
+  $self->{int}->SetVar('event','run');
 }
 
 sub setup_menu_bar {
@@ -765,43 +717,42 @@ sub setup_menu_bar {
   my $mw = $self->{main_window} ;
   my $int = $self->{int};
 
-
   # file menu in menu bar
 
-  my $items1 = [ [ 'command' => 'About...', -command => sub { $self->DoAbout() ; } ],
-						 [ 'command' => 'Bug Report...', -command => 'puts "bugreport TBD"' ],
+  my $items1 = [ [ command => 'About...', -command => sub { $self->DoAbout() ; } ],
+		 [ command => 'Bug Report...', -command => 'puts "bugreport TBD"' ],
              "-",
 
-             [ 'command' => 'Open', -accelerator => 'Alt+O',
+             [ command => 'Open', -accelerator => 'Alt+O',
                -underline => 0,
                -command => sub { $self->DoOpen() ; } ],
 
-             [ 'command' => 'Save Config...', 
+             [ command => 'Save Config...', 
                -underline => 0,
                -command => \&DB::SaveState ],
 
-             [ 'command' => 'Restore Config...',
+             [ command => 'Restore Config...',
                -underline => 0,
                -command => \&DB::RestoreState],
 
-             [ 'command' => 'Goto Line...',
+             [ command => 'Goto Line...',
                -underline => 0,
                -accelerator => 'Alt-g',
                -command => sub { $self->GotoLine() ; } ],
 
-             [ 'command' => 'Find Text...',
+             [ command => 'Find Text...',
                -accelerator => 'Ctrl-f',
                -underline => 0,
                -command => sub { $self->FindText() ; } ],
 
-             [ 'command' => "Tabs...", -command => \&do_tabs ],
+             [ command => "Tabs...", -command => \&do_tabs ],
 
              "-",
 
-             [ 'command' => 'Close Window and Run', -accelerator => 'Alt+W',
+             [ command => 'Close Window and Run', -accelerator => 'Alt+W',
                -underline => 6, -command => sub { $self->close_ptkdb_window ; } ],
 
-             [ 'command' => 'Quit...', -accelerator => 'Alt+Q',
+             [ command => 'Quit...', -accelerator => 'Alt+Q',
                -underline => 0,
                -command => sub { $self->DoQuit } ]
              ];
@@ -810,81 +761,79 @@ sub setup_menu_bar {
   $mw->bind('<Alt-g>' =>  sub { $self->GotoLine() ; }) ;
   $mw->bind('<Control-f>' => sub { $self->FindText() ; }) ;
   $mw->bind('<Control-r>' => \&Devel::tkdb::DoRestart) ;
-  $mw->bind('<Alt-q>' => sub { $int->Eval('set event quit') } );
+  $mw->bind('<Alt-q>' => 'set event quit' );
   $mw->bind('<Alt-w>' => sub { $self->close_ptkdb_window ; });
 
 
   # Control Menu
 
-  my $runSub = sub { $DB::step_over_depth = -1 ; $int->Eval('set event run') };
+  my $runSub = sub { $DB::step_over_depth = -1 ; $int->SetVar('event','run') };
 
-  my $runToSub = sub { $int->Eval('set event run') if  $DB::window->SetBreakPoint(1) ; } ;
+  my $runToSub = sub { $int->SetVar('event','run') if  $DB::window->SetBreakPoint(1) ; } ;
 
   my $stepOverSub = sub { &DB::SetStepOverBreakPoint(0) ; 
                         $DB::single = 1 ; 
-                        $int->Eval('set event step');
+                        $int->SetVar('event','step');
 		    } ;
 
   my $stepInSub = sub { 
                       $DB::step_over_depth = -1 ; 
                       $DB::single = 1 ; 
-                      $int->Eval('set event step');
+                      $int->SetVar('event','step');
 		  };
 
   my $returnSub =  sub { 
       &DB::SetStepOverBreakPoint(-1) ;
-      $int->Eval('set event run');
+      $int->SetVar('event','run');
   };
 
 
-  my $items2 = [ [ 'command' => 'Run', -accelerator => 'Alt+r', -underline => 0, -command => $runSub ],
-             [ 'command' => 'Run To Here', -accelerator => 'Alt+t', -underline => 5, -command => $runToSub ],
+  my $items2 = [ [ command => 'Run', -accelerator => 'Alt+r', -underline => 0, -command => $runSub ],
+             [ command => 'Run To Here', -accelerator => 'Alt+t', -underline => 5, -command => $runToSub ],
              '-',
-             [ 'command' =>  'Set Breakpoint', -underline => 4, -command => sub { $self->SetBreakPoint ; }, -accelerator => 'Ctrl-b' ],
-             [ 'command' => 'Clear Breakpoint', -command => sub { $self->UnsetBreakPoint } ],
-             [ 'command' => 'Clear All Breakpoints', -underline => 6, -command => sub {     
+             [ command =>  'Set Breakpoint', -underline => 4, -command => sub { $self->SetBreakPoint ; }, -accelerator => 'Ctrl-b' ],
+             [ command => 'Clear Breakpoint', -command => sub { $self->UnsetBreakPoint } ],
+             [ command => 'Clear All Breakpoints', -underline => 6, -command => sub {     
              $DB::window->removeAllBreakpoints($DB::window->{current_file});
                &DB::clearalldblines();
              } ],
              '-',
-             [ 'command' => 'Step Over', -accelerator => 'Alt+N', -underline => 0, -command => $stepOverSub ],
-             [ 'command' => 'Step In', -accelerator => 'Alt+S', -underline => 5, -command => $stepInSub ],
-             [ 'command' => 'Return', -accelerator => 'Alt+U', -underline => 3, -command => $returnSub ],
+             [ command => 'Step Over', -accelerator => 'Alt+N', -underline => 0, -command => $stepOverSub ],
+             [ command => 'Step In', -accelerator => 'Alt+S', -underline => 5, -command => $stepInSub ],
+             [ command => 'Return', -accelerator => 'Alt+U', -underline => 3, -command => $returnSub ],
              '-',
-             [ 'command' => 'Restart...', -accelerator => 'Ctrl-r', -underline => 0, -command => \&Devel::tkdb::DoRestart ],
+             [ command => 'Restart...', -accelerator => 'Ctrl-r', -underline => 0, -command => \&Devel::tkdb::DoRestart ],
              '-',
-             [ 'checkbutton' => 'Stop On Warning', -variable => \$DB::tkdb::stop_on_warning, -command => \&set_stop_on_warning ]
-               ] ; # end of control menu items
+             [ checkbutton => 'Stop On Warning', -variable => \$DB::tkdb::stop_on_warning, -command => \&set_stop_on_warning ]
+           ]; # end of control menu items
 
   $mw->bind('<Alt-r>' => $runSub) ;
   $mw->bind('<Alt-t>', $runToSub) ;
   $mw->bind('<Control-b>', sub { $self->SetBreakPoint ; });
 
   # step over a subroutine
-  for ('<F9>', '<Alt-n>', '<Shift-Button-3>') {
+  for ('<F9>', '<Alt-n>') {
     $mw->bind($_ => $stepOverSub);
   }
 
   # keys for step into a subroutine 
-  for ('<Shift-F9>', '<Alt-s>', '<Button-3>') {
+  for ('<Shift-F9>', '<Alt-s>') {
     $mw->bind($_ => $stepInSub );
   }
 
   # return from a subroutine
-  for ('<Alt-u>', '<Control-Button-3>') {
-    $mw->bind($_ => $returnSub );
-  }
+  $mw->bind('<Alt-u>' => $returnSub );
 
   # Data Menu
 
-  my $items3 = [ [ 'command' => 'Enter Expression', -accelerator => 'Alt+E', -command => sub { $self->EnterExpr() } ],
-             [ 'command' => 'Delete Expression', -accelerator => 'Ctrl+D', -command => sub { $self->deleteExpr() } ],
-             [ 'command' => 'Delete All Expressions',  -command => sub { 
+  my $items3 = [ [ command => 'Enter Expression', -accelerator => 'Alt+E', -command => sub { $self->EnterExpr() } ],
+             [ command => 'Delete Expression', -accelerator => 'Ctrl+D', -command => sub { $self->deleteExpr() } ],
+             [ command => 'Delete All Expressions',  -command => sub { 
                                        $self->deleteAllExprs() ;
-                                       $self->{'expr_list'} = [] ; # clears list by dropping ref to it, replacing it with a new one  
+                                       $self->{'expr_list'} = [];
                                      } ],
              '-',
-             [ 'command' => 'Expression Eval Window...', -accelerator => 'F8', -command => sub { $self->setupEvalWindow() ; } ],
+             [ command => 'Expression Eval Window...', -accelerator => 'F8', -command => sub { $self->setupEvalWindow() ; } ],
 	  ];
 
   $mw->bind('<Alt-e>' => sub { $self->EnterExpr() } ) ;
@@ -894,13 +843,13 @@ sub setup_menu_bar {
   #
   # Windows Menu
   #
-  my $bsub = sub { $self->{'text'}->focus() };
-  my $csub = sub { $self->{'quick_entry'}->focus() };
-  my $dsub = sub { $self->{'entry'}->focus() };
+  my $bsub = "focus $self->{text}";
+  my $csub = "focus $self->{quick_entry}";
+  my $dsub = "focus $self->{entry}";
 
-  my $items4 = [ [ 'command' => 'Code Pane', -accelerator => 'Alt+0', -command => $bsub ],
-             [ 'command' => 'Quick Entry', -accelerator => 'F9', -command => $csub ],
-             [ 'command' => 'Expr Entry', -accelerator => 'F11', -command => $dsub ]
+  my $items4 = [ [ command => 'Code Pane', -accelerator => 'Alt+0', -command => $bsub ],
+             [ command => 'Quick Entry', -accelerator => 'F9', -command => $csub ],
+             [ command => 'Expr Entry', -accelerator => 'F11', -command => $dsub ]
            ];
 
   $mw->bind('<Alt-0>', $bsub);
@@ -930,18 +879,14 @@ sub setup_menu_bar {
   # Bar for some popular controls
   my $bb = $mw->Frame()->pack(-side => 'top');
 
-  $bb->Button(-text => "Step In", @Devel::tkdb::button_font,
-               -command => $stepInSub) ->pack(-side => 'left');
-  $bb->Button(-text => "Step Over", @Devel::tkdb::button_font,
-               -command => $stepOverSub) ->pack(-side => 'left');
-  $bb->Button(-text => "Return", @Devel::tkdb::button_font,
-               -command => $returnSub) ->pack(-side => 'left');
-  $bb->Button(-text => "Run", -background => 'green', @Devel::tkdb::button_font,
-               -command => $runSub) ->pack(-side => 'left');
-  $bb->Button(-text => "Run To", @Devel::tkdb::button_font,
-               -command => $runToSub) ->pack(-side => 'left');
-  $bb->Button(-text => "Break", @Devel::tkdb::button_font,
-               -command => sub { $self->SetBreakPoint ; } ) ->pack(-side => 'left');
+  $bb->Button(-text => "Step In", -command => $stepInSub) ->pack(-side => 'left');
+  $bb->Button(-text => "Step Over", -command => $stepOverSub) ->pack(-side => 'left');
+  $bb->Button(-text => "Return", -command => $returnSub) ->pack(-side => 'left');
+  $bb->Button(-text => "Run", -background => 'green', -command => $runSub) ->pack(-side => 'left');
+  $bb->Button(-text => "Run To", -command => $runToSub) ->pack(-side => 'left');
+  $bb->Button(-text => "Break", -command => sub { $self->SetBreakPoint ; } ) ->pack(-side => 'left');
+  $bb->Button(-text => "eval selection <F6>", -command => 'set event vexpr') ->pack(-side => 'left');
+  $mw->bind('<F6>', 'set event vexpr');
 
 } # end of setup_menu_bar
 
@@ -949,7 +894,7 @@ sub edit_bookmarks {
   my ($self) = @_ ;
 
   my $top =  $self->{main_window}->Toplevel(-title => "Edit Bookmarks");
-  my $list = $top->Scrolled('Listbox', -selectmode => 'multiple')->pack(-side => 'top', -fill => 'both', -expand => 1) ;
+  my $list = $top->Scrolled('Listbox', -selectmode => 'multiple')->pack(qw/-side top -fill both -expand 1/);
 
   my $deleteSub = sub {
     my $cnt = 0 ;
@@ -964,9 +909,9 @@ sub edit_bookmarks {
 
   my $frm = $top->Frame()->pack(-side => 'top', -fill => 'x', -expand => 1 ) ;
 
-  my $deleteBtn = $frm->Button(-text => 'Delete', -command => $deleteSub)->pack(-side => 'left', -fill => 'x', -expand => 1 );
-  my $cancelBtn = $frm->Button(-text => 'Cancel', -command => sub { $top->destroy; })->pack(-side  =>'left', -fill => 'x', -expand => 1 );
-  my $dismissBtn = $frm->Button(-text => 'Okay', -command => $okaySub)->pack(-side => 'left', -fill => 'x', -expand => 1 );
+  $frm->Button(-text => 'Delete', -command => $deleteSub)->pack(-side => 'left', -fill => 'x', -expand => 1 );
+  $frm->Button(-text => 'Cancel', -command => "destroy $top")->pack(-side  =>'left', -fill => 'x', -expand => 1 );
+  $frm->Button(-text => 'Okay', -command => $okaySub)->pack(-side => 'left', -fill => 'x', -expand => 1 );
 
   $list->insert('end', @{$self->{'bookmarks'}}) ;
 
@@ -981,14 +926,13 @@ sub setup_bookmarks_menu {
   my $bkMarkSub = sub { $self->add_bookmark() ; } ;
 
   $self->{'bookmarks_menu'}->command(-label => "Add Bookmark",
-                                     -accelerator => 'Alt+k',
-                                     -command => $bkMarkSub
-                                     ) ;
+			 -accelerator => 'Alt+k',
+			 -command => $bkMarkSub);
 
   $self->{'main_window'}->bind('<Alt-k>', $bkMarkSub) ;
 
   $self->{'bookmarks_menu'}->command(-label => "Edit Bookmarks", 
-                                     -command => sub { $self->edit_bookmarks() } ) ;
+			 -command => sub { $self->edit_bookmarks() } );
 
   $self->{'bookmarks_menu'}->separator() ;
 
@@ -1107,7 +1051,7 @@ sub change_breakpoint_tag {
   #
   @tagSet = ( "$idx.0", "$idx.$Devel::tkdb::linenumber_length" ) ;
 
-  $brkPt = &DB::getdbline($self->{'current_file'}, $idx + $self->{'line_offset'}) ;
+  $brkPt = &DB::getdbline($self->{'current_file'}, $idx) ;
   return unless $brkPt ;
 
   #
@@ -1306,23 +1250,6 @@ sub fill_subs_page {
   }
 }
 
-sub setup_subs_page {
-  my $self = shift;
-
-  $self->{'subs_page_activated'} = 1;
-
-  my $w1 = $self->{'subs_page'}->Scrolled('Listbox', -selectmode=>'single');
-  $self->{'sub_list0'} = $w1->Subwidget;
-  $self->{int}->bind($self->{'sub_list0'}, "<Double-1>" => sub { $self->sub_list_cmd0(@_); });
-
-  $w1->pack(qw/-side left -fill both -expand 1/);
-
-  $self->fill_subs_page();
-
-  $self->{'subs_list_cnt'} = scalar keys %DB::sub;
-
-} # end of setup_subs_page
-
 
 sub check_search_request {
   my($entry, $self, $searchButton, $regexBtn) = @_ ;
@@ -1346,7 +1273,7 @@ sub setup_search_panel {
   my ($self, $parent) = @_ ;
   my ($srchBtn, $regexBtn, $entry) ;
 
-  my $frm = $parent->Frame();
+  my $frm = $parent->Frame()->pack(qw/-side top -fill x/);
 
   $frm->Button(-text => 'Goto', -command => sub { $self->DoGoto($entry) })->pack(-side => 'left');
   $srchBtn = $frm->Button(-text => 'Search', -command => sub { $self->FindSearch($entry, $srchBtn, 0) ; }
@@ -1360,29 +1287,13 @@ sub setup_search_panel {
 
   $entry->bind('<Return>', sub { check_search_request($entry, $self, $srchBtn, $regexBtn) ; } );
 
-  $frm->pack(qw/-side top -fill x/);
-
 } # end of setup search_panel
-
-sub setup_breakpts_page {
-  my ($self) = @_ ;
-
-  $self->{'notebook'}->_insertEnd("brkptspage", -text => "BrkPts") ;
-
-  my $sw = $self->{'notebook'}->getframe("brkptspage")->ScrolledWindow()->pack(qw(-side top -fill both -expand  1));
-
-  $self->{'breakpts_table'} = $sw->ScrollableFrame();
-  $sw->setwidget($self->{'breakpts_table'});
-
-  $self->{'breakpts_table_data'} = {}; # controls addressed by "fname:lineno"
-
-} # end of setup_breakpts_page
 
 sub setup_frames {
   my ($self) = @_;
   my $mw = $self->{'main_window'};
 
-  my $pw = $mw->Panedwindow()->pack(qw/-side left -fill both -expand 1/);
+  my $pw = $mw->Frame->pack(qw/-side bottom -fill both -expand 1/)->Panedwindow()->pack(qw/-side left -fill both -expand 1/);
   my $frm = $pw->Frame->pack(qw/-side top -fill both -expand 1/); # frame for our code pane and search controls
 
   $self->setup_search_panel($frm);
@@ -1403,6 +1314,7 @@ sub setup_frames {
 
   my $nb = $self->{'notebook'} = $pw->BWNoteBook()
         ->pack(qw/-side left -fill both -expand 1/);
+  $self->{w_nb} = $nb;
 
   $pw->add($frm, $nb);
 
@@ -1443,13 +1355,28 @@ sub setup_frames {
   $w_tree->styleLayout('st','bar',-union=>'foo');
   $w_tree->configure(-defaultstyle=>'st',-treecolumn=>$self->{data_list0}->[1]);
 
-  $self->{'subs_page_activated'} = 0 ;
+  # subs page
+  #$self->setup_subs_page();
   $nb->_insertEnd("subspage", -text => "Subs");
-  $self->{'subs_page'} = $nb->getframe("subspage");
+  my $w1 = $nb->getframe("subspage")->Scrolled('Listbox', -selectmode=>'single');
+  $self->{'sub_list0'} = $w1->Subwidget;
+  $self->{int}->bind($self->{'sub_list0'}, "<Double-1>" => sub { $self->sub_list_cmd0(@_); });
+  $w1->pack(qw/-side left -fill both -expand 1/);
+  $self->fill_subs_page();
+  $self->{'subs_list_cnt'} = scalar keys %DB::sub;
 
-  $self->setup_subs_page();
-  $self->setup_breakpts_page();
+  # breakpts page
+  $self->{'notebook'}->_insertEnd("brkptspage", -text => "BrkPts") ;
+  my $sw = $self->{'notebook'}->getframe("brkptspage")->ScrolledWindow()->pack(qw(-side top -fill both -expand  1));
+  $self->{'breakpts_table'} = $sw->ScrollableFrame();
+  $sw->setwidget($self->{'breakpts_table'});
+  $self->{'breakpts_table_data'} = {}; # controls addressed by "fname:lineno"
 
+  # eval page
+  $nb->_insertEnd("evalpage", -text => "Eval");
+  $self->{'w_eval_text'} = $nb->getframe("evalpage")->Scrolled('Text')->pack(qw/-side  top -fill both  -expand 1/);
+
+  # done
   $nb->_raise("datapage");
 
 } # end of setup_frames
@@ -1476,7 +1403,6 @@ sub configure_text {
     $self->{'quick_dumper'}->Terse(1);
     $self->{'quick_dumper'}->Indent(0);
 
-
   # tags for the text
   #  'code'               Format for code in the text pane
   #  'stoppt'             Format applied to the line where the debugger is currently stopped
@@ -1486,18 +1412,13 @@ sub configure_text {
   #  'breakdisabledLine'  Format applied to line numbers were a disabled breakpoint is set
   #  'search_tag'         Format applied to text when located by a search.  
 
-  my @stopTagConfig = ( -foreground => 'white', -background  => $mw->optionGet("stopcolor", "background") || $ENV{'PTKDB_STOP_TAG_COLOR'} || 'blue' );
+  $txt->_tagConfigure('stoppt', -foreground => 'white', -background  => 'blue');
+  $txt->_tagConfigure('search_tag', -background => "green");
 
-  my $stopFnt = $mw->optionGet("stopfont", "background") || $ENV{'PTKDB_STOP_TAG_FONT'} ;
-  push @stopTagConfig, ( -font => $stopFnt ) if $stopFnt ; # user may not have specified a font, if not, stay with the default
-
-  $txt->_tagConfigure('stoppt', @stopTagConfig) ;
-  $txt->_tagConfigure('search_tag', "-background" => $mw->optionGet("searchtagcolor", "background") || "green") ;
-
-  $txt->_tagConfigure("breakableLine", -overstrike => 0) ;
-  $txt->_tagConfigure("nonbreakableLine", -overstrike => 1) ;
-  $txt->_tagConfigure("breaksetLine", -background => $mw->optionGet("breaktagcolor", "background") || $ENV{'PTKDB_BRKPT_COLOR'} || 'red') ;
-  $txt->_tagConfigure("breakdisabledLine", -background => $mw->optionGet("disabledbreaktagcolor", "background") || $ENV{'PTKDB_DISABLEDBRKPT_COLOR'} || 'green') ;
+  $txt->_tagConfigure("breakableLine", -overstrike => 0);
+  $txt->_tagConfigure("nonbreakableLine", -overstrike => 1);
+  $txt->_tagConfigure("breaksetLine", -background => 'red');
+  $txt->_tagConfigure("breakdisabledLine", -background => 'green');
 
   $txt->tagBind("breakableLine", '<Button-1>', \\'xy', sub {my($ex,$ey)=($_[-2],$_[-1]);$self->set_breakpoint_tag($txt, "\@$ex,$ey", 1 )} );
   $txt->tagBind("breakableLine", '<Shift-Button-1>', \\'xy', sub {my($ex,$ey)=($_[-2],$_[-1]); $self->set_breakpoint_tag($txt, "\@$ex,$ey", 0 )} ) ;
@@ -1514,14 +1435,11 @@ sub configure_text {
 sub DoAlert {
   my($self, $msg, $title) = @_ ;
 
-  my $dlg = $self->{main_window}->Toplevel(-title => $title || "Alert", -overanchor => 'cursor') ;
-  my $okaySub = sub {
-    $dlg->destroy;
-  };
+  my $dlg = $self->{main_window}->Toplevel(-title => $title || "Alert", -overanchor => 'cursor');
 
-  $dlg->Label(-text => $msg )->pack( -side => 'top' ) ;
-  $dlg->Button(-text => "Okay", -command => $okaySub )->pack(-side => 'top')->focus;
-  $dlg->bind('<Return>', $okaySub);
+  $dlg->Label(-text => $msg)->pack( -side => 'top');
+  $dlg->Button(-text => "Okay", -command => "destroy $dlg")->pack(-side => 'top')->focus;
+  $dlg->bind('<Return>', "destroy $dlg");
 
 } # end of DoAlert
 
@@ -1531,10 +1449,10 @@ sub simplePromptBox {
 
   my $top = $self->{main_window}->Toplevel(-title => $title, -overanchor => 'cursor');
   my $entry = $top->Entry(-textvariable => \$Devel::tkdb::promptString)->pack(-side => 'top', -fill => 'both', -expand => 1);
-  $top->Button(-text => "Okay", @Devel::tkdb::button_font, -command => sub { &$okaySub(); $top->destroy ;}
+  $top->Button(-text => "Okay", -command => sub { &$okaySub(); $top->destroy ;}
 	   )->pack(-side => 'left', -fill => 'both', -expand => 1);
   $top->Button(-text => "Cancel", -command => sub { &$cancelSub() if $cancelSub ; $top->destroy() }, 
-      @Devel::tkdb::button_font)->pack(-side => 'left', -fill => 'both', -expand => 1);
+      )->pack(-side => 'left', -fill => 'both', -expand => 1);
   $entry->icursor('end');
   $entry->selectionRange(0, 'end');
   $entry->focus();
@@ -1580,10 +1498,7 @@ sub clear_entry_text {
 
 sub brkPtCheckbutton {
   my ($self, $fname, $idx, $brkPt) = @_ ;
-  my ($widg) ;
-
-  $self->change_breakpoint_tag($self->{'text'}, "$idx.0", $brkPt->{'value'}) if $fname eq $self->{'current_file'} ;
-
+  $self->change_breakpoint_tag($self->{text}, "$idx.0", $brkPt->{value}) if $fname eq $self->{'current_file'} ;
 } # end of brkPtCheckbutton
 
 #
@@ -1600,10 +1515,7 @@ sub insertBreakpoint {
   my ($self, $fname, @brks) = @_ ;
   my ($btn, $cnt, $item) ;
 
-  my($offset) ;
   local(*dbline) = $main::{'_<' . $fname} ;
-
-  $offset = $dbline[1] =~ /use\s+.*Devel::_?tkdb/ ? 1 : 0 ;
 
   while( @brks ) {
     my($index, $value, $expression) = splice @brks, 0, 3 ; # take args 3 at a time
@@ -1613,7 +1525,7 @@ sub insertBreakpoint {
     @$brkPt{'type', 'line',  'expr',      'value', 'fname', 'text'} =
         ('user',   $index, $expression, $value,   $fname,  "$txt") ;
 
-    &DB::setdbline($fname, $index + $offset, $brkPt) ;
+    &DB::setdbline($fname, $index, $brkPt) ;
     $self->add_brkpt_to_brkpt_page($brkPt) ;
 
     next unless $fname eq $self->{'current_file'} ;
@@ -1633,38 +1545,33 @@ sub add_brkpt_to_brkpt_page {
   $self->{'brkPtCnt'} += 1 ; 
 
   my $btnName = $fname ;
-  $btnName =~ s/.*\/([^\/]*)$/$1/o ; 
+  $btnName =~ s/.*\/([^\/]*)$/$1/;
 
-  # take the last leaf of the pathname 
+  # take the last leaf of the pathname
 
   my $frm = $self->{'breakpts_table'}->getframe;
   my $upperFrame = $frm->Frame()->pack(qw/-side top -fill x -expand 1/);
 
+  $upperFrame->Checkbutton(-text => "$btnName:$index",
+	  -variable => \$brkPt->{'value'}, # CAUTION value tracking
+	  -command => sub { $self->brkPtCheckbutton($fname, $index, $brkPt) })
+      ->pack(-side => 'left') ;
 
-  my $btn = $upperFrame->Checkbutton(-text => "$btnName:$index",
-                                  -variable => \$brkPt->{'value'}, # CAUTION value tracking
-                                  -command => sub { $self->brkPtCheckbutton($fname, $index, $brkPt) }) ;
-
-  $btn->pack(-side => 'left') ;
-
-  $btn = $upperFrame->Button(-text => "Delete", -command => sub { $self->removeBreakpoint($fname, $index) ; } )
+  $upperFrame->Button(-text => "Delete", -command => sub { $self->removeBreakpoint($fname, $index) ; } )
       ->pack(qw/-side left -fill x -expand 1/);
 
-  $btn = $upperFrame->Button(-text => "Goto", -command => sub { $self->set_file($fname, $index) ; } )
+  $upperFrame->Button(-text => "Goto", -command => sub { $self->set_file($fname, $index) ; } )
       ->pack(qw/-side left -fill x -expand 1/);
 
-  my $lowerFrame = $frm->Frame()->pack(-side => 'top', '-fill' => 'x', '-expand' => 1) ;
+  my $lowerFrame = $frm->Frame()->pack(-side => 'top', '-fill' => 'x', '-expand' => 1);
 
-  $lowerFrame->Label(-text => "Cond:")->pack(-side => 'left') ;
+  $lowerFrame->Label(-text => "Cond:")->pack(-side => 'left');
 
-  $btn = $lowerFrame->Entry(-textvariable => \$brkPt->{'expr'})
+  $lowerFrame->Entry(-textvariable => \$brkPt->{'expr'})
       ->pack(qw/-side left -fill x -expand 1/);
 
-  my $row;
-  $row = pop @{$self->{'brkPtSlots'}} or $row = $self->{'brkPtCnt'} ;
-
-  $self->{'breakpts_table_data'}->{"$fname:$index"}->{'frm'} = $frm ;
-  $self->{'breakpts_table_data'}->{"$fname:$index"}->{'row'} = $row ;
+  $self->{'breakpts_table_data'}->{"$fname:$index"}->{'frm1'} = $upperFrame;
+  $self->{'breakpts_table_data'}->{"$fname:$index"}->{'frm2'} = $lowerFrame;
 
   #TODO $self->{'main_window'}->update;
 
@@ -1682,20 +1589,11 @@ sub remove_brkpt_from_brkpt_page {
 
   # Delete the breakpoint control in the breakpoints window
 
-  # TODO deleting means ->packForget, with {'row'} etc go away
-  $table->windowDelete(($self->{'breakpts_table_data'}->{"$fname:$idx"}->{'row'}-1).',0' ) ; # delete?
+  $self->{'breakpts_table_data'}->{"$fname:$idx"}->{frm1}->destroy;
+  $self->{'breakpts_table_data'}->{"$fname:$idx"}->{frm2}->destroy;
+  delete $self->{'breakpts_table_data'}->{"$fname:$idx"};
 
-  #
-  # Add this now empty slot to the list of ones we have open
-  #
-
-  push @{$self->{'brkPtSlots'}}, $self->{'breakpts_table_data'}->{"$fname:$idx"}->{'row'} ;
-
-  $self->{'brkPtSlots'} = [ sort { $b <=> $a } @{$self->{'brkPtSlots'}} ] ;
-
-  delete $self->{'breakpts_table_data'}->{"$fname:$idx"} ;
-
-  $self->{'brkPtCnt'} -= 1 ;
+  $self->{'brkPtCnt'} -= 1;
 
 } # end of remove_brkpt_from_brkpt_page
 
@@ -1705,51 +1603,42 @@ sub remove_brkpt_from_brkpt_page {
 #
 sub insertTempBreakpoint {
   my ($self, $fname, $index) = @_ ;
-  my($offset) ;
   local(*dbline) = $main::{'_<' . $fname} ;
 
-  $offset = $dbline[1] =~ /use\s+.*Devel::_?tkdb/ ? 1 : 0 ;
+  return if( &DB::getdbline($fname, $index) ) ; # we already have a breakpoint here
 
-  return if( &DB::getdbline($fname, $index + $offset) ) ; # we already have a breakpoint here
-
-  &DB::setdbline($fname, $index + $offset, {'type' => 'temp', 'line' => $index, 'value' => 1 } ) ;
+  &DB::setdbline($fname, $index, {type => 'temp', line => $index, value => 1 } ) ;
 
 } # end of insertTempBreakpoint
 
 sub reinsertBreakpoints {
   my ($self, $fname) = @_ ;
-  my ($brkPt) ;
 
-  foreach $brkPt ( &DB::getbreakpoints($fname) ) {
+  for my $brkPt ( &DB::getbreakpoints($fname) ) {
     #
-    # Our breakpoints are indexed by line
-    # therefore we can have 'gaps' where there
-    # lines, but not breaks set for them.
+    # Our breakpoints are indexed by line therefore we can have 'gaps' where
+    # there lines, but not breaks set for them.
     #
-    next unless defined $brkPt ;
+    next unless defined $brkPt;
 
-    $self->insertBreakpoint($fname, @$brkPt{'line', 'value', 'expr'}) if( $brkPt->{'type'} eq 'user' ) ;
-    $self->insertTempBreakpoint($fname, $brkPt->{line}) if( $brkPt->{'type'} eq 'temp' ) ;
+    $self->insertBreakpoint($fname, @$brkPt{'line', 'value', 'expr'}) if( $brkPt->{'type'} eq 'user' );
+    $self->insertTempBreakpoint($fname, $brkPt->{line}) if( $brkPt->{'type'} eq 'temp' );
   } # end of reinsert loop
 
 } # end of reinsertBreakpoints
 
 sub removeBreakpointTags {
   my ($self, @brkPts) = @_ ;
-  my($idx, $brkPt) ;
 
-  foreach $brkPt (@brkPts) {
-
-    $idx = $brkPt->{'line'} ;
-
+  for my $brkPt (@brkPts) {
+    my $idx = $brkPt->{'line'};
     if ( $brkPt->{'value'} ) {
-      $self->{'text'}->tagRemove("breaksetLine", "$idx.0", "$idx.$Devel::tkdb::linenumber_length") ;
+      $self->{'text'}->tagRemove("breaksetLine", "$idx.0", "$idx.$Devel::tkdb::linenumber_length");
     }
     else {
-      $self->{'text'}->tagRemove("breakdisabledLine", "$idx.0", "$idx.$Devel::tkdb::linenumber_length") ; 
+      $self->{'text'}->tagRemove("breakdisabledLine", "$idx.0", "$idx.$Devel::tkdb::linenumber_length");
     }
-
-    $self->{'text'}->tagAdd("breakableLine", "$idx.0", "$idx.$Devel::tkdb::linenumber_length") ;         
+    $self->{'text'}->tagAdd("breakableLine", "$idx.0", "$idx.$Devel::tkdb::linenumber_length");
   }
 } # end of removeBreakpointTags
 
@@ -1757,18 +1646,15 @@ sub removeBreakpointTags {
 # Remove a breakpoint from the current window
 #
 sub removeBreakpoint {
-  my ($self, $fname, @idx) = @_ ;
-  my ($idx, $chkIdx, $i, $j, $info) ;
-  my($offset) ;
+  my ($self, $fname, @idx) = @_;
+
   local(*dbline) = $main::{'_<' . $fname} ;
 
-  $offset = $dbline[1] =~ /use\s+.*Devel::_?tkdb/ ? 1 : 0 ;
-
-  foreach $idx (@idx) { # end of removal loop
+  for my $idx (@idx) { # end of removal loop
     next unless defined $idx ;
-    my $brkPt = &DB::getdbline($fname, $idx + $offset) ;
+    my $brkPt = &DB::getdbline($fname, $idx);
     next unless $brkPt ; # if we do not have an entry
-    &DB::cleardbline($fname, $idx + $offset) ;
+    &DB::cleardbline($fname, $idx);
 
     $self->remove_brkpt_from_brkpt_page($fname, $idx) ;
 
@@ -1794,9 +1680,10 @@ sub removeAllBreakpoints {
 #
 sub deleteAllExprs {
   my ($self) = @_ ;
-  my @c = $self->{data_list0}->[0]->itemChildrenRoot =~ /(\d+)/g;
-  print STDERR "{{{@c;$#c}}}";
-  $self->{data_list0}->[0]->itemDelete($_) for @c;
+  my $c = $self->{data_list0}->[0]->_item('children','root'); # this returns Tcl::List or empty. TODO - do this better
+  my @c = ref $c ? @$c : split / /,$c;
+  #print STDERR "{{{@c;$#c;($c);w=$self->{data_list0}->[0]}}}";
+  $self->{data_list0}->[0]->_item(delete=>$_) for @c;
 } # end of deleteAllExprs
 
 sub EnterExpr {
@@ -1804,7 +1691,7 @@ sub EnterExpr {
   my $str = $self->clear_entry_text() ;
   if( $str && $str !~ /^\s*$/ ) { # if there is an expression and it's more than white space
     $self->{'expr'} = $str ;
-    $self->{int}->Eval('set event expr');
+    $self->{int}->SetVar('event','expr');
   }
 } # end of EnterExpr
 
@@ -1812,39 +1699,26 @@ sub EnterExpr {
 #
 sub QuickExpr {
   my ($self) = @_;
-
   my $str = $self->{'quick_entry'}->get() ;
   if( $str && $str !~ /^\s*$/ ) { # if there is an expression and it's more than white space
     $self->{'qexpr'} = $str ;
-    $self->{int}->Eval('set event qexpr');
+    $self->{int}->SetVar('event','qexpr');
   }
 } # end of QuickExpr
 
 sub deleteExpr {
   my ($self) = @_ ;
-  my ($entry, @indexes) ;
-  my @sList = $self->{'data_list'}->info('select'); # TBD TODO TBD
-  my @sList0 = $self->{data_list0}->[0]->selectionGet;
+  my ($tv, $tcol) = @{$self->{data_list0}}; 
+  my $ret = $tv->_selectionGet; # TODO
+  my @sList = ref $ret ? @$ret : split / /,$ret;
 
-  #
-  # if we're deleteing a top level expression
-  # we have to take it out of the list of expressions
-  #
-
-  foreach $entry ( @sList ) {
-    next if ($entry =~ /\//) ; # goto next expression if we're not a top level ( expr/entry)
-    my $i = 0 ;
-    grep { push @indexes, $i if ($_->{'expr'} eq $entry) ; $i++ ; } @{$self->{'expr_list'}} ;
-  } # end of check loop
-
-  # now take out our list of indexes ;
-
-  for (0..$#indexes) {
-      splice @{$self->{'expr_list'}}, $indexes[$_] - $_, 1 ;
-  }
-
-  for( @sList ) {
-      $self->{'data_list'}->delete('entry', $_) ;
+  for (@sList) {
+      if ($tv->itemParent($_) == 0) {
+          # if we're deleteing a top level expression we have to take it out of the list of expressions
+          my $e = delete $self->{el2expr}->{$_};
+          $self->{'expr_list'} = [grep {$_->{expr} ne $e} @{$self->{'expr_list'}}];
+      }
+      $tv->_item('delete', $_);
   }
 } # end of deleteExpr
 
@@ -1862,9 +1736,9 @@ sub deleteExpr {
 # Returns 1 if sucessfully added 0 if not
 #
 sub insertExpr {
-  my($self, $reusedRefs, $theRef, $name, $depth, $el) = @_ ;
-  my($type, $result, @circRefs, $t) ;
-  local($^W) = 0 ; # spare us uncessary warnings about comparing strings with ==  
+  my ($self, $reusedRefs, $theRef, $name, $depth, $el) = @_;
+  my ($type, $result, @circRefs);
+  local $^W = 0; # spare us uncessary warnings about comparing strings with ==
   my ($tv, $tcol) = @{$self->{data_list0}}; 
 
   while( ref $theRef eq 'SCALAR' ) {
@@ -1887,8 +1761,9 @@ sub insertExpr {
 
   if( !$type || $type eq "" || $type eq "GLOB" || $type eq "CODE") {
     eval {
-	$t = "$name = $label" . (defined $theRef?$theRef:"undef");
-	$el = $tv->itemCreate(-button=>'yes',-parent=>$el);
+	my $t = "$name = $label" . (defined $theRef?$theRef:"undef");
+	$el = $tv->itemCreate(-button=>'no',-parent=>$el);
+        $self->{el2expr}->{$el->[0]} = $name;
 	$tv->itemElementConfigure($el, $tcol, 'foo', -text=>"$t");
     };
     $self->DoAlert($@), return 0 if $@ ;
@@ -1899,6 +1774,7 @@ sub insertExpr {
     my $idx = 0 ;
     eval {
 	$el = $tv->itemCreate(-button=>'yes',-parent=>$el);
+        $self->{el2expr}->{$el->[0]} = $name;
 	$tv->itemElementConfigure($el, $tcol, 'foo', -text=>"$name = $theRef");
     } ;
     if( $@ ) {
@@ -1930,6 +1806,7 @@ sub insertExpr {
   if ("$theRef" !~ /HASH\050\060x[\da-f]*\051/) {
     eval {
 	$el = $tv->itemCreate(-button=>'yes',-parent=>$el);
+        $self->{el2expr}->{$el->[0]} = $name;
 	$tv->itemElementConfigure($el, $tcol, 'foo', -text=>"$name = $theRef");
     };
     if( $@ ) {
@@ -1939,13 +1816,12 @@ sub insertExpr {
     return 1 ;
   }
 # 
-# Anything else at this point is
-# either a 'HASH' or an object
-# of some kind.
+# Anything else at this point is # either a 'HASH' or an object of some kind.
 #
   my $idx = 0 ;
   my @theKeys = sort keys %$theRef;
-  $el = $tv->itemCreate(-parent=>$el);
+  $el = $tv->itemCreate(-button=>'yes',-parent=>$el);
+  $self->{el2expr}->{$el->[0]} = $name;
   $tv->itemElementConfigure($el, $tcol, 'foo', -text=>"$name = " . "$theRef");
   $result = 1 ;
 
@@ -1991,7 +1867,7 @@ sub set_line {
   if( $self->{current_line} > 0 ) {
     $text->tagRemove('stoppt', "$self->{current_line}.0 linestart", "$self->{current_line}.0 lineend") ;
   }
-  $self->{current_line} = $lineno - $self->{'line_offset'} ;
+  $self->{current_line} = $lineno;
   $text->tagAdd('stoppt', "$self->{current_line}.0 linestart", "$self->{current_line}.0 lineend") ;
 
   $self->{'text'}->see("$self->{current_line}.0 linestart") ;
@@ -2007,9 +1883,8 @@ sub set_line {
 
 sub set_file {
   my ($self, $fname, $line) = @_ ;
-  my ($lineStr, $offset, $text, @text);
 
-  return unless $fname ;  # we're getting an undef here on 'Restart...'
+  return unless $fname;  # we're getting an undef here on 'Restart...'
 
   local(*dbline) = $main::{'_<' . $fname};
 
@@ -2018,21 +1893,12 @@ sub set_file {
   # we've found that with various combinations of other options the
   # files haven't come in at the right offsets
   #
-  $offset = 0 ;
-  $offset = 1 if $dbline[1] =~ /use\s+.*Devel::_?tkdb/ ;
-  $self->{'line_offset'} = $offset ;
-
-  $text = $self->{'text'} ;
-
   if( $fname eq $self->{current_file} ) {
-    $self->set_line($line) ;
-    return ;
-  } ;
+    $self->set_line($line);
+    return;
+  }
 
-  $self->{main_window}->configure('-title' => $fname) ;
-
-  # Erase any existing text
-  $text->delete('1.0','end');
+  $self->{main_window}->configure(-title => $fname) ;
 
   #
   # This is the tightest loop we have in the ptkdb code.
@@ -2044,14 +1910,15 @@ sub set_file {
 
   local($^W) = 0 ; # spares us useless warnings under -w when checking $dbline[$_] != 0
 
-  my $noCode = ($#dbline - ($offset + 1)) < 0 ;
+  my $noCode = ($#dbline - 1) < 0 ;
 
   my $i0 = "0" x $Devel::tkdb::linenumber_length;
-  $text->_insertEnd(map {
+  $self->{text}->_delete('1.0','end');
+  $self->{text}->_insertEnd(map {
     #$lineStr .= "\n" unless /\n$/; # append a \n if there isn't one already
     ($i0++, ($_==0?'nonbreakableLine':'breakableLine'), " $_", 'code') # a string,tag pair for text insert
 
-  } @dbline[$offset+1 .. $#dbline] ) unless $noCode;
+  } @dbline[1 .. $#dbline] ) unless $noCode;
 
   #
   # Reinsert breakpoints (if info provided)
@@ -2111,7 +1978,7 @@ sub GotoLine {
   $self->{goto_text}->bind('<Return>', $okaySub) ; # make a CR do the same thing as pressing an okay
   $self->{goto_text}->focus();
 
-  $topLevel->Button( -text => "Okay", -command => $okaySub, @Devel::tkdb::button_font,
+  $topLevel->Button( -text => "Okay", -command => $okaySub,
                      )->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
   #
@@ -2122,10 +1989,10 @@ sub GotoLine {
     delete $self->{goto_window} ; # remove the entry from our hash so we won't
   } ;
 
-  $topLevel->Button( -text => "Dismiss", @Devel::tkdb::button_font,
+  $topLevel->Button( -text => "Dismiss",
                      -command => $dismissSub )->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
-  $topLevel->protocol('WM_DELETE_WINDOW', sub { $topLevel->destroy; } ) ;
+  $topLevel->protocol('WM_DELETE_WINDOW', "destroy $topLevel");
   $self->{goto_window} = $topLevel;
 
 } # end of GotoLine
@@ -2163,12 +2030,12 @@ sub FindSearch {
     $btn->bell() ;
 
     delete $self->{search_tag} ;
-    $self->{'search_start'} = "0.0" ;
+    $self->{'search_start'} = "1.0" ;
   }
   else { # text found
     $self->{'text'}->see($result) ;
     # set the insertion of the text as well
-    $self->{'text'}->markSet('insert' => $result) ;
+    $self->{'text'}->markSet(insert => $result) ;
     my $len = length $txt;
 
     if( $self->{fwdOrBack} ) {
@@ -2229,9 +2096,9 @@ sub FindText {
 
   $self->{fwdOrBack} = 'forward';
   $frm->Radiobutton(-text => "Forward", -value => 1, -variable => \$self->{fwdOrBack})
-       ->pack(-side => 'left', -fill => 'both', -expand => 1);
+      ->pack(-side => 'left', -fill => 'both', -expand => 1);
   $frm->Radiobutton(-text => "Backward", -value => 0, -variable => \$self->{fwdOrBack})
-       ->pack(-side => 'left', -fill => 'both', -expand => 1);
+      ->pack(-side => 'left', -fill => 'both', -expand => 1);
 
   my $regExp = 0 ;
   $frm->Checkbutton(-text => "RegExp", -variable => \$regExp)
@@ -2239,13 +2106,12 @@ sub FindText {
 
   # Okay and dismiss buttons
   $okayBtn = $top->Button( -text => "Okay", -command => sub { $self->FindSearch($we, $okayBtn, $regExp) ; }, 
-                         @Devel::tkdb::button_font,
-                           )->pack(-side => 'left', -fill => 'both', -expand => 1) ;
+          )->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
   $we->bind('<Return>', sub { $self->FindSearch($we, $okayBtn, $regExp) ; }) ;
 
-  $top->Button( -text => "Dismiss", @Devel::tkdb::button_font,
-                -command => $dismissSub)->pack(-side => 'left', -fill => 'both', -expand => 1) ;
+  $top->Button( -text => "Dismiss",
+        -command => $dismissSub)->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
   $top->protocol('WM_DELETE_WINDOW', $dismissSub) ;
   $we->focus();
@@ -2255,39 +2121,28 @@ sub FindText {
 
 sub main_loop {
   my ($self) = @_;
-  my $evt;
 
  SWITCH:
-   for ($evt = 'null' ; $DB::window->{main_window}; ) {
+   for (; $DB::window->{main_window}; ) {
 
-       $self->{int}->tkwait('variable', 'event');
-       $evt = $self->{int}->GetVar('event');
-
-       $evt eq 'step' && do { last SWITCH ; } ;
-       $evt eq 'null' && do { next SWITCH ; } ;
-       $evt eq 'run' && do { last SWITCH ; } ;
-       $evt eq 'quit' && do { $self->DoQuit ; } ;
-       $evt eq 'expr' && do { return $evt ; } ; # adds an expression to our expression window
-       $evt eq 'qexpr' && do { return $evt ; } ; # does a 'quick' expression
-       $evt eq 'update' && do { return $evt ; } ; # forces an update on our expression window
-       $evt eq 'reeval' && do { return $evt ; } ; # updated the open expression eval window
-       $evt eq 'balloon_eval' && do { return $evt } ;
+       $self->{int}->invoke('tkwait', 'variable', 'event');
+       my $evt = $self->{int}->GetVar('event');
+       #print STDERR "evt=$evt;\n";
+       $evt eq 'step' && do { return $evt; };
+       $evt eq 'null' && do { next SWITCH; };
+       $evt eq 'run' && do { return $evt; };
+       $evt eq 'quit' && do { $self->DoQuit; };
+       $evt eq 'expr' && do { return $evt; }; # adds an expression to our expression window
+       $evt eq 'vexpr' && do { return $evt; };
+       $evt eq 'qexpr' && do { return $evt; }; # does a 'quick' expression
+       $evt eq 'update' && do { return $evt; }; # forces an update on our expression window
+       $evt eq 'reeval' && do { return $evt; }; # updated the open expression eval window
+       $evt eq 'balloon_eval' && do { return $evt };
   } # end of switch block
-  return $evt ;
 } # end of main_loop
 
-#
-# $subStackRef   A reference to the current subroutine stack
-#
-
-sub goto_sub_from_stack {
-  my ($self, $f, $lineno) = @_ ;
-  $self->set_file($f, $lineno) ;
-} # end of goto_sub_from_stack ;
-
 sub refresh_stack_menu {
-  my ($self) = @_ ;
-  my ($name, $i, $sub_offset, $subStack) ;
+  my ($self) = @_;
 
   #
   # CAUTION:  In the effort to 'rationalize' the code
@@ -2298,25 +2153,25 @@ sub refresh_stack_menu {
   # it will not be incremented, and thus represents the stack depth
   # of the target program.  
   #
-  $sub_offset = 1 ;
-  $subStack = [] ;
+  my $sub_offset = 1;
+  my $subStack = [];
 
   # clear existing entries
 
-  for( $i = 0 ; $i <= $DB::subroutine_depth ; $i++ ) {
+  for (my $i = 0 ; $i <= $DB::subroutine_depth ; $i++) {
     my ($package, $filename, $line, $subName) = caller $i+$sub_offset ;
     last if !$subName ;
-    push @$subStack, { 'name' => $subName, 'pck' => $package, 'filename' => $filename, 'line' => $line } ;
+    push @$subStack, {name => $subName, pck => $package, filename => $filename, line => $line};
   }
 
   $self->{stack_menu}->menu->delete(0, 'last') ; # delete existing menu items
 
-  for( $i = 0 ; $subStack->[$i] ; $i++ ) {
+  for (my $i = 0 ; $subStack->[$i] ; $i++) {
 
     my $str = defined $subStack->[$i+1] ? "$subStack->[$i+1]->{name}" : "MAIN" ;
 
     my ($f, $line) = ($subStack->[$i]->{filename}, $subStack->[$i]->{line}) ; # make copies of the values for use in 'sub'
-    $self->{stack_menu}->command(-label => $str, -command => sub { $self->goto_sub_from_stack($f, $line) ; } ) ;
+    $self->{stack_menu}->command(-label => $str, -command => sub { $self->set_file($f, $line); } );
   }
 } # end of refresh_stack_menu
 
@@ -2324,10 +2179,9 @@ no strict ;
 
 sub get_state {
   my ($self, $fname) = @_ ;
-  my ($val) ;
   local($files, $expr_list, $eval_saved_text, $main_win_geometry) ;
 
-  do "$fname"  ;
+  do "$fname";
 
   if( $@ ) {
     $self->DoAlert($@) ;
@@ -2341,16 +2195,13 @@ use strict ;
 
 sub restoreStateFile {
   my ($self, $fname) = @_ ;
-  local(*F) ;
-  my ($saveCurFile, $s, @n, $n) ;
 
   if (!(-e $fname && -r $fname)) {
     $self->DoAlert("$fname does not exist") ;
-    return ;
+    return;
   }
 
   my ($files, $expr_list, $eval_saved_text, $main_win_geometry) = $self->get_state($fname) ;
-  my ($f, $brks) ;
 
   return unless defined $files || defined $expr_list ;
 
@@ -2359,7 +2210,7 @@ sub restoreStateFile {
   #
   # This should force the breakpoints to be restored
   #
-  $saveCurFile = $self->{current_file} ;
+  my $saveCurFile = $self->{current_file} ;
 
   @$self{ 'current_file', 'expr_list', 'eval_saved_text' } =
       ( ""             , $expr_list,  $eval_saved_text) ;
@@ -2370,7 +2221,7 @@ sub restoreStateFile {
     # restore the height and width of the window
     $self->{main_window}->geometry( $main_win_geometry ) ;
   }
-  $self->{int}->Eval('set event update');
+  $self->{int}->SetVar('event','update');
 
 } # end of retstoreState
 
@@ -2455,21 +2306,22 @@ sub setupEvalWindow {
 	       @Devel::tkdb::eval_text_font
 	  )->pack(qw/-side top -fill both -expand 1/);
 
-  my $btn = $top->Button(-text => 'Eval...', -command => sub { $DB::window->{event} = 'reeval' ; }
+  my $btn = $top->Button(-text => 'Eval...',
+          -command => 'set event reeval'
 	 )->pack(-side => 'left', -fill => 'x', -expand => 1);
 
   my $dismissSub = sub { 
-    $self->{eval_saved_text} = $self->{eval_text}->get('0.0', 'end') ;
+    $self->{eval_saved_text} = $self->{eval_text}->get('1.0', 'end') ;
     $self->{eval_window}->destroy ;
     delete $self->{eval_window} ;
   };
 
   $top->protocol('WM_DELETE_WINDOW', $dismissSub ) ;
 
-  $top->Button(-text => 'Clear Eval', -command => sub { $self->{eval_text}->delete('0.0', 'end') }
+  $top->Button(-text => 'Clear Eval', -command => sub { $self->{eval_text}->delete('1.0', 'end') }
 	   )->pack(-side => 'left', -fill => 'x', -expand => 1);
 
-  $top->Button(-text => 'Clear Results', -command => sub { $self->{eval_results}->delete('0.0', 'end') }
+  $top->Button(-text => 'Clear Results', -command => sub { $self->{eval_results}->delete('1.0', 'end') }
                )->pack(-side => 'left', -fill => 'x', -expand => 1) ;
 
   $top->Button(-text => 'Dismiss', -command => $dismissSub)->pack(-side => 'left', -fill => 'x', -expand => 1) ;
@@ -2499,7 +2351,7 @@ sub DoAbout {
   my $self = shift ;
   my $str = <<"__STR__" ;
 tkdb $tkdb::VERSION
-Copyright 1998,2003 by Andrew E. Page, 2010,2011 Vadim Konovalov.
+Copyright 1998,2003 by Andrew E. Page, 2010,2011,2023 Vadim Konovalov.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of either:
@@ -2521,7 +2373,7 @@ Tcl::Tk Version $Tcl::Tk::VERSION
 Perl Version $]
 __STR__
 
-    $self->DoAlert($str, "About ptkdb") ;
+    $self->DoAlert($str, "About tkdb");
 } # end of DoAbout
 
 #
@@ -2529,23 +2381,23 @@ __STR__
 # return 0 if otherwise
 #
 sub SetBreakPoint {
-  my ($self, $isTemp) = @_ ;
-  my $dbw = $DB::window ;
+  my ($self, $isTemp) = @_;
+  my $dbw = $DB::window;
   my $lineno = $dbw->get_lineno();
-  my $expr = $dbw->clear_entry_text() ;
+  my $expr = $dbw->clear_entry_text();
   local($^W) = 0 ;
 
-  if( !&DB::checkdbline($DB::window->{current_file}, $lineno + $self->{'line_offset'}) ) {
-    $dbw->DoAlert("line $lineno in $DB::window->{current_file} is not breakable") ;
+  if( !&DB::checkdbline($dbw->{current_file}, $lineno) ) {
+    $dbw->DoAlert("line $lineno in $dbw->{current_file} is not breakable") ;
     return 0 ;
   }
 
   if( !$isTemp ) {
-    $dbw->insertBreakpoint($DB::window->{current_file}, $lineno, 1, $expr) ;
+    $dbw->insertBreakpoint($dbw->{current_file}, $lineno, 1, $expr) ;
     return 1 ;
   }
   else {
-    $dbw->insertTempBreakpoint($DB::window->{current_file}, $lineno) ;
+    $dbw->insertTempBreakpoint($dbw->{current_file}, $lineno) ;
     return 1 ;
   }
 
@@ -2577,17 +2429,17 @@ sub balloon_motion {
 
   $self->{'balloon_coord'} = "$offset_x,$offset_y" ;
 
-  $x -= $txt->rootx ;
-  $y -= $txt->rooty ;
+  $x -= $txt->rootx;
+  $y -= $txt->rooty;
   #
   # Post an event that will cause us to put up a popup
   #
 
   if ($txt2->_tagRangesSel) { # check to see if 'sel' tag exists (return undef value)
-    $data = $txt2->get("sel.first", "sel.last") ; # get the text between the 'first' and 'last' point of the sel (selection) tag
+    $data = $txt2->get("sel.first", "sel.last") ; # get the text selection
   }
   else {
-    $data = $DB::window->retrieve_text_expr($x, $y) ;
+    $data = $DB::window->retrieve_text_expr($x, $y);
   }
 
   if( !$data ) {
@@ -2597,8 +2449,8 @@ sub balloon_motion {
 
   return 0 if ($data eq $self->{'balloon_expr'}) ; # nevermind if it's the same expression
 
-  $self->{'balloon_expr'} = $data ;
-  $self->{int}->Eval('set event balloon_eval');
+  $self->{'balloon_expr'} = $data;
+  $self->{int}->SetVar('event','balloon_eval');
 
   return 1 ; # ballon will be canceled and a new one put up(maybe)
 } # end of balloon_motion
@@ -2685,11 +2537,9 @@ sub BEGIN {
 ## Save the ptkdb state file and restart the debugger
 ##
 sub DoRestart {
-  my($fname) ;
-
-  $fname = $ENV{'TMP'} || $ENV{'TMPDIR'} || $ENV{'TMP_DIR'} || $ENV{'TEMP'} || $ENV{'HOME'} ;
-  $fname .= '/' if $fname ;
-  $fname = "" unless $fname ;
+  my $fname = $ENV{'TMP'} || $ENV{'TMPDIR'} || $ENV{'TMP_DIR'} || $ENV{'TEMP'} || $ENV{'HOME'};
+  $fname .= '/' if $fname;
+  $fname = "" unless $fname;
 
   $fname .= "ptkdb_restart_state$$" ;
 
@@ -2745,11 +2595,9 @@ sub set_stop_on_warning {
 
 package DB;
 
-use vars '$VERSION';
 use vars '@dbline', '%dbline';
 
-$VERSION = '2.0';
-$DB::window->{current_file} = "" ;
+our $VERSION = '2.0';
 
 #
 # Here's the clue...
@@ -2926,20 +2774,16 @@ sub fix_breakpoints {
 # Restore breakpoints saved above
 #
 sub restore_breakpoints_from_save {
-  my ($brkList) = @_ ;
-  my ($key, $list, $brkPt, @newList) ;
+  my ($brkList) = @_;
 
-  while ( ($key, $list) = each %$brkList ) { # reinsert loop
-    next unless exists $main::{$key} ;
-    local(*dbline) = $main::{$key} ;
+  while ( my ($key, $list) = each %$brkList ) { # reinsert loop
+    next unless exists $main::{$key};
+    local(*dbline) = $main::{$key};
 
-    my $offset = 0;
-    $offset = 1 if $dbline[1] =~ /use\s+.*Devel::_?tkdb/ ;
+    my @newList = fix_breakpoints(@$list);
 
-    @newList = fix_breakpoints(@$list) ;
-
-    foreach $brkPt ( @newList ) {
-      if( !&DB::checkdbline($key, $brkPt->{'line'} + $offset) ) {
+    for my $brkPt ( @newList ) {
+      if( !&DB::checkdbline($key, $brkPt->{'line'}) ) {
         print "Breakpoint $key:$brkPt->{'line'} in config file is not breakable.\n" ;
         next ;
       }
@@ -3011,22 +2855,20 @@ sub restoreState {
 } # end of Restore State
 
 sub makeFileSaveName {
-    return "$_[0].ptkdb";
+    return "$_[0].tkdb";
 }
 
 sub save_state_file {
-  my($fname) = @_ ;
+  my ($fname) = @_;
 
   my $files = &DB::breakpoints_to_save();
 
-  my $d = Data::Dumper->new( [ $files, $DB::window->{'expr_list'}, "" ], 
-                          [ "files", "expr_list",  "eval_saved_text" ] ) ;
-  $d->Purity(1) ;
+  my $d = Data::Dumper->new( [ $files, $DB::window->{'expr_list'}, "" ],
+                          [ "files", "expr_list",  "eval_saved_text" ] );
+  $d->Purity(1);
 
-  local(*F) ;
-  open F, ">$fname" || die "Couldn't open file $fname" ;
-  print F $d->Dump() || die "Couldn't write file" ;
-  close F ;
+  open my $fh, ">$fname" or die "Couldn't open file $fname";
+  print $fh $d->Dump() or die "Couldn't write file";
 } # end of save_state_file
 
 sub SaveState {
@@ -3063,14 +2905,12 @@ sub SaveState {
     my $d = Data::Dumper->new( [ $files, $win->{'expr_list'}, $eval_saved_text,   $main_win_geometry ], 
                             [ "files", "expr_list",        "eval_saved_text",  "main_win_geometry"] ) ;
     $d->Purity(1) ;
-    local(*F) ;
     eval {
-      open F, ">$saveName" || die "Couldn't open file $saveName" ;
-      print F $d->Dump() || die "Couldn't write file" ;
-      close F ;
+      open my $fh, ">$saveName" or die "Couldn't open file $saveName";
+      print $fh $d->Dump() or die "Couldn't write file";
     };
-    $win->DoAlert($@) if $@ ;
-    $win->{int}->Eval('set event null');
+    $win->DoAlert($@) if $@;
+    $win->{int}->SetVar('event','null');
   }; # end of save sub
 
   my $cancelSub = sub {
@@ -3142,17 +2982,16 @@ sub isBreakPoint {
 #
 sub breakPointEvalExpr {
   my ($brkPt, $package) = @_ ;
-  my (@result) ;
 
   return 1 unless $brkPt->{expr} ; # return if there is no expression
 
   no strict ;
-  @result = &DB::dbeval($package, $brkPt->{'expr'}) ;
+  my @result = &DB::dbeval($package, $brkPt->{expr}) ;
   use strict ;
 
   $DB::window->DoAlert($@) if $@ ;
 
-  return $result[0] or @result ; # we could have a case where the 1st element is undefined
+  return $result[0] || @result ; # we could have a case where the 1st element is undefined
   # but subsequent elements are defined
 
 } # end of breakPointEvalExpr
@@ -3164,8 +3003,6 @@ sub breakPointEvalExpr {
 #
 sub dbeval {
   my($ptkdb__package, $ptkdb__expr) = @_ ;
-  my(@ptkdb__result, $ptkdb__str) ;
-  my(@ptkdb_args) ;
   local($^W) = 0 ; # temporarily turn off warnings
 
   no strict ;
@@ -3178,20 +3015,15 @@ sub dbeval {
 
   $ptkdb__expr =~ s/^\s*%/\\%/;
 
-  @_ = @DB::saved_args ; # replace @_ arg array with what we came in with
+  @_ = @DB::saved_args; # replace @_ arg array with what we came in with
 
-  @ptkdb__result = eval <<__EVAL__ ;
-
-
-  \$\@ = \$DB::save_err ;
-
-  package $ptkdb__package;
-
+  my @ptkdb__result = eval <<__EVAL__;
+  \$\@ = \$DB::save_err;
+  ${ \ ( $ptkdb__package ? "package $ptkdb__package;":"")}
   $ptkdb__expr;
-
 __EVAL__
 
-      @ptkdb__result = ("ERROR ($@)") if $@ ;
+    @ptkdb__result = ("ERROR ($@)") if $@ ;
 
   use strict ;
 
@@ -3210,7 +3042,7 @@ sub dbexit {
 
 #
 # This is the primary entry point for the debugger.  When a perl program
-# is parsed with the -d(in our case -d:tkdb) option set the parser will
+# is parsed with the -d (in our case -d:tkdb) option set the parser will
 # insert a call to DB::DB in front of every excecutable statement.  
 # 
 # Refs:  Progamming Perl 2nd Edition, Larry Wall, O'Reilly & Associates, Chapter 8
@@ -3239,7 +3071,7 @@ sub DB {
 
   $DB::window->setup_main_window() unless $DB::window->{'main_window'} ;
 
-  $DB::window->EnterActions() ; 
+  $DB::window->EnterActions(); 
 
    my ($saveP) = $^P;
    $^P = 0 ;
@@ -3251,11 +3083,11 @@ sub DB {
 # this will make the debugger run right after startup without
 # the user having to press the 'run' button.  
 #
-   if( $DB::no_stop_at_start ) {
-   $DB::no_stop_at_start = 0 ;
-   $DB::on = 0 ;
-     $@ = $DB::save_err ;
-     return ;
+   if ($DB::no_stop_at_start) {
+     $DB::no_stop_at_start = 0;
+     $DB::on = 0;
+     $@ = $DB::save_err;
+     return;
    }
 
    if( !$DB::sigint_disable ) {
@@ -3263,8 +3095,7 @@ sub DB {
      $SIG{'INT'} = "DB::dbexit" unless   $DB::dbint_handler_save ;
    }
 
-  #$DB::window->{main_window}->raise() ; # bring us to the top make sure OUR event loop runs
-  $DB::window->{main_window}->focus() ;
+  $DB::window->{main_window}->focus();
 
   $DB::window->set_file($filename, $line) ;
    #
@@ -3275,34 +3106,43 @@ sub DB {
    #
    # Update subs Page if necessary
    #
-   my $cnt = scalar keys %DB::sub ;
-   if ( $cnt != $DB::window->{'subs_list_cnt'} && $DB::window->{'subs_page_activated'} ) {
+   my $cnt = scalar keys %DB::sub;
+   if ( $cnt != $DB::window->{'subs_list_cnt'} && exists $DB::window->{'subs_list0'} ) {
      $DB::window->fill_subs_page();
      $DB::window->{'subs_list_cnt'} = $cnt;
    }
    #
    # Update the subroutine stack menu
    #
-   $DB::window->refresh_stack_menu() ;
-   $DB::window->{run_flag} = 1 ;
+   $DB::window->refresh_stack_menu();
 
-   my ($evt, @result, $r) ;
+   my (@result);
 
    for( ; ; ) {
      #
      # we wait here for something to do
      #
-     $evt = $DB::window->main_loop() ;
+     my $evt = $DB::window->main_loop();
 
-     last if( $evt eq 'step' ) ;
+     last if( $evt eq 'step' );
 
-     $DB::single = 0 if ($evt eq 'run' )  ;
+     $DB::single = 0 if ($evt eq 'run');
 
      if ($evt eq 'balloon_eval' ) {
          $DB::window->code_motion_eval(&DB::dbeval($package, $DB::window->{'balloon_expr'})) ;
          next ;
      }
 
+     if ( $evt eq 'vexpr' ) {
+         @result = &DB::dbeval($package, $DB::window->{text}->get('sel.first','sel.last'));
+         my $s = Data::Dumper->new([@result])->Terse(2)->Dump();
+         #print STDERR "[$s]";
+         $DB::window->{w_nb}->_raise("evalpage");
+         $DB::window->{w_eval_text}->insert('end', $s);
+         $DB::window->{w_eval_text}->_seeEnd;
+         $evt = 'null';
+         next;
+     }
      if ( $evt eq 'qexpr' ) {
          @result = &DB::dbeval($package, $DB::window->{'qexpr'}) ;
          $DB::window->{'quick_entry'}->delete(0, 'end') ; # clear old text
@@ -3319,21 +3159,21 @@ sub DB {
            # but first check to make sure that we don't already have it.
            #
 
-           if ( grep $_->{'expr'} eq $DB::window->{'expr'}, @{$DB::window->{'expr_list'}} ) {
-             $DB::window->DoAlert("$DB::window->{'expr'} is already listed") ;
+           if ( grep $_->{expr} eq $DB::window->{expr}, @{$DB::window->{'expr_list'}} ) {
+             $DB::window->DoAlert("$DB::window->{expr} is already listed") ;
              next ;
            }
 
            @result = &DB::dbeval($package, $DB::window->{expr}) ;
 	   my $rr = (@result == 1? $result[0] : \@result);
-           $r = $DB::window->insertExpr([ $rr ], $rr, $DB::window->{'expr'}, -1,'root') ;
+           my $r = $DB::window->insertExpr([ $rr ], $rr, $DB::window->{expr}, -1,'root') ;
 
            #
            # $r will be 1 if the expression was added succesfully, 0 if not,
            # and it if wasn't added sucessfully it won't be reevalled the 
            # next time through.  
            #
-           push @{$DB::window->{'expr_list'}}, { 'expr' => $DB::window->{'expr'}, 'depth' => -1 } if $r;
+           push @{$DB::window->{'expr_list'}}, { expr => $DB::window->{expr}, depth => -1 } if $r;
 
            next;
          }
@@ -3344,14 +3184,14 @@ sub DB {
          if( $evt eq 'reeval' ) {
            #
            # Reevaluate the contents of the expression eval window
-           my $txt = $DB::window->{'eval_text'}->get('1.0', 'end') ;
-           my @result = &DB::dbeval($package, $txt) ;
+           my $txt = $DB::window->{'eval_text'}->get('1.0', 'end');
+           my @result = &DB::dbeval($package, $txt);
 
            $DB::window->updateEvalWindow(@result) ;
 
-           next ;
+           next;
          }
-         last ;
+         last;
        }
        $^P = $saveP ;
        $SIG{'INT'} = "DB::dbint_handler"   unless $DB::sigint_disable ; # set our signal handler
@@ -3384,8 +3224,7 @@ sub DB {
 # Refs:  Progamming Perl 2nd Edition, Larry Wall, O'Reilly & Associates, Chapter 8
 #
 #
-     sub sub {
-       my ($result, @result) ;
+   sub sub {
 #
 # See NOTES(1)
 #
@@ -3396,7 +3235,7 @@ sub DB {
 	 # array context
 
          no strict ; # otherwise perl gripes about calling the sub by the reference
-         @result = &$DB::sub ; # call the subroutine by name
+         my @result = &$DB::sub ; # call the subroutine by name
          use strict ;
 
        $DB::subroutine_depth -= 1 unless $DB::on ;
@@ -3407,7 +3246,7 @@ sub DB {
 	 # scalar context
 
          no strict;
-         $result = &$DB::sub;
+         my $result = &$DB::sub;
          use strict;
 
        $DB::subroutine_depth -= 1 unless $DB::on;
@@ -3427,7 +3266,7 @@ sub DB {
 
        }
 
-     } # end of sub
+   } # end of sub
 
 1; # return true value
 

@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::En::Any::In - Package for language English
 
 =cut
 
 package Locale::CLDR::Locales::En::Any::In;
-# This file auto generated from Data/common/main/en_IN.xml
-#	on Mon 11 Apr  5:27:04 pm GMT
+# This file auto generated from Data\common\main\en_IN.xml
+#	on Fri 13 Oct  9:13:21 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';
@@ -36,7 +36,7 @@ has 'algorithmic_number_format_data' => (
 	isa => HashRef,
 	init_arg => undef,
 	default => sub { 
-		use bignum;
+		use bigfloat;
 		return {
 		'2d-year' => {
 			'private' => {
@@ -396,10 +396,6 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(=%spellout-numbering=),
 				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(←← point →→),
-				},
 				'100' => {
 					base_value => q(100),
 					divisor => q(100),
@@ -443,9 +439,13 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(not a number),
 				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(←← point →→),
+				},
 				'max' => {
 					divisor => q(1),
-					rule => q(not a number),
+					rule => q(←← point →→),
 				},
 			},
 		},

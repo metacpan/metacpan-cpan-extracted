@@ -192,7 +192,7 @@ sub Select {
 ##                 Main Module                                          ##
 ##########################################################################
 
-package main;
+package Tk::CodeText::StatusBar;
 
 =head1 NAME
 
@@ -284,6 +284,7 @@ sub Populate {
 	my $info = '';
 	my $syntax = 'None';
 	my $tabs = '';
+	$self->{CYCLEACTIVE} = 1;
 	$self->{INDENT} = \$indent;
 	$self->{INFO} = \$info;
 	$self->{SYNTAX} = \$syntax;
@@ -369,7 +370,7 @@ sub Populate {
 	$t->Put($tab);
 	$self->Advertise('Tabs', $t);
 
-	$self->after(200, ['StatusUpdate', $self]);
+	$self->after(200, ['updateStatus', $self]);
 
 	$self->ConfigSpecs(
 		-statusinterval => ['PASSIVE', undef, undef, 200],
@@ -413,8 +414,23 @@ sub Tabs {
 	return $$l
 }
 
-sub StatusUpdate {
+sub updateActive {
+	return $_[0]->{CYCLEACTIVE}
+}
+
+sub updatePause {
+	$_[0]->{CYCLEACTIVE} = 0;
+}
+
+sub updateResume {
 	my $self = shift;
+	$self->{CYCLEACTIVE} = 1;
+	$self->updateStatus;
+}
+
+sub updateStatus {
+	my $self = shift;
+	return unless $self->updateActive;
 	my $text = $self->cget('-widget');
 
 	my $pos = $text->index('insert');
@@ -448,7 +464,7 @@ sub StatusUpdate {
 		$modlab->packForget
 	}
 
-	$self->after($self->cget('-statusinterval'), ['StatusUpdate', $self]);
+	$self->after($self->cget('-statusinterval'), ['updateStatus', $self]);
 }
 
 =head1 AUTHOR
@@ -474,3 +490,4 @@ Unknown. If you find any, please contact the author.
 1;
 
 __END__
+

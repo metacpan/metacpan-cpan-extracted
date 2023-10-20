@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Indicates batch protect file request',
                                   class => 'BatchProtectRequest',
                                   required => [], # TODO
 }                                 );
@@ -128,21 +128,21 @@ __PACKAGE__->method_documentation({
      'source_folder' => {
      	datatype => 'string',
      	base_name => 'SourceFolder',
-     	description => '',
+     	description => 'The directory stores files that need to format conversion.            ',
      	format => '',
      	read_only => '',
      		},
      'source_storage' => {
      	datatype => 'string',
      	base_name => 'SourceStorage',
-     	description => '',
+     	description => 'Aspose Cloud storage name',
      	format => '',
      	read_only => '',
      		},
      'match_condition' => {
      	datatype => 'MatchConditionRequest',
      	base_name => 'MatchCondition',
-     	description => '',
+     	description => 'Indicates the match condition that needs to be processed for the file name.',
      	format => '',
      	read_only => '',
      		},
@@ -156,21 +156,21 @@ __PACKAGE__->method_documentation({
      'password' => {
      	datatype => 'string',
      	base_name => 'Password',
-     	description => '',
+     	description => '            ',
      	format => '',
      	read_only => '',
      		},
      'out_folder' => {
      	datatype => 'string',
      	base_name => 'OutFolder',
-     	description => '',
+     	description => 'The directory that stores files whose format conversion was successful.',
      	format => '',
      	read_only => '',
      		},
      'out_storage' => {
      	datatype => 'string',
      	base_name => 'OutStorage',
-     	description => '',
+     	description => 'Aspose Cloud storage name.',
      	format => '',
      	read_only => '',
      		},    

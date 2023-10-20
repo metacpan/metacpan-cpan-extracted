@@ -10,6 +10,8 @@ use File::chdir;
 use Test::Expander -tempdir => {}, -srand => time;
 use Test::Expander::Constants qw( $FMT_INVALID_ENV_ENTRY );
 
+plan( 12 );
+
 $METHOD     //= '_set_env';
 $METHOD_REF //= $CLASS->can( $METHOD );
 can_ok( $CLASS, $METHOD );
@@ -33,6 +35,7 @@ $test_path->child( $class_path )->mkpath;
   path( $test_file )->touch;
 
   subtest '1st env variable filled from a variable, 2nd one kept from %ENV, 3rd one ignored' => sub {
+    plan( 2 );
     our $var  = 'abc';
     my $name  = 'ABC';
     my $value = '$' . __PACKAGE__ . '::var';
@@ -46,6 +49,7 @@ $test_path->child( $class_path )->mkpath;
   };
 
   subtest 'env variable filled by a self-implemented sub' => sub {
+    plan( 2 );
     my $name  = 'ABC';
     my $value = __PACKAGE__ . "::testEnv( lc( '$name' ) )";
     $env_file->spew( "$name = $value" );
@@ -58,6 +62,7 @@ $test_path->child( $class_path )->mkpath;
   };
 
   subtest "env variable filled by a 'File::Temp::tempdir'" => sub {
+    plan( 3 );
     my $name  = 'ABC';
     my $value = 'File::Temp::tempdir';
     $env_file->spew( "$name = $value" );
@@ -71,6 +76,7 @@ $test_path->child( $class_path )->mkpath;
   };
 
   subtest 'env file does not exist' => sub {
+    plan( 2 );
     $env_file->remove;
     %ENV = ( XXX => 'yyy' );
 
@@ -81,6 +87,7 @@ $test_path->child( $class_path )->mkpath;
   };
 
   subtest 'directory structure does not correspond to class hierarchy' => sub {
+    plan( 2 );
     $env_file->remove;
     %ENV = ( XXX => 'yyy' );
 
@@ -91,6 +98,7 @@ $test_path->child( $class_path )->mkpath;
   };
 
   subtest 'multiple levels of env files, cascade usage of their entries, overwrite entry' => sub {
+    plan( 2 );
     path( $env_file->parent->parent . '.env' )->spew( "C = '0'" );
     path( $env_file->parent         . '.env' )->spew( "A = '1'\nB = '2'\nD = \$ENV{ A } . \$ENV{ C }" );
     $env_file->spew( "C = '3'" );
@@ -107,6 +115,7 @@ $test_path->child( $class_path )->mkpath;
   };
 
   subtest 'env file with invalid syntax' => sub {
+    plan( 1 );
     my $name  = 'ABC';
     my $value = 'abc->';
     $env_file->spew( "$name = $value" );
@@ -116,6 +125,7 @@ $test_path->child( $class_path )->mkpath;
   };
 
   subtest 'env file with undefined values' => sub {
+    plan( 1 );
     my $name  = 'ABC';
     my $value = '$undefined';
     $env_file->spew( "$name = $value" );
@@ -124,7 +134,5 @@ $test_path->child( $class_path )->mkpath;
     like( dies { $METHOD_REF->( $CLASS, $test_file ) }, qr/$expected/m, 'expected exception raised' );
   };
 }
-
-done_testing();
 
 sub testEnv { return $_[ 0 ] }                               ## no critic (RequireArgUnpacking)

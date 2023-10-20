@@ -7,7 +7,7 @@ use Catmandu::Hits;
 use Catmandu::Error;
 use Moo;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 with 'Catmandu::Bag';
 

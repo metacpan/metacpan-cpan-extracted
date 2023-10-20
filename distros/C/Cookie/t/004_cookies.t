@@ -226,6 +226,7 @@ subtest 'cookie parse' => sub
 
 subtest 'cookie jar' => sub
 {
+    $Cookie::Jar::COOKIES_DEBUG = $DEBUG;
     # For server repository
     my $srv = Cookie::Jar->new( debug => $DEBUG );
     # For client repository
@@ -339,8 +340,16 @@ subtest 'cookie jar' => sub
     {
         diag( "fetch returned an error: ", $srv->error ) if( $DEBUG );
     };
+    # XXX
+    $srv->debug(5);
     $csrf_cookie = $srv->get( csrf_token => 'example.com' );
     ok( $csrf_cookie );
+    if( !defined( $csrf_cookie ) )
+    {
+        diag( "Cannot find cookie name 'csrf_token' with host 'example.com': ", $srv->error );
+    }
+    # XXX
+    $srv->debug(0);
     $resp = HTTP::Response->new( 200 => 'OK' );
     SKIP:
     {

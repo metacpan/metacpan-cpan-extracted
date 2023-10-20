@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait 0.47;
@@ -11,7 +11,7 @@ use Future::AsyncAwait 0.47;
 use Device::Chip::ProtocolBase::SPI;
 
 {
-   use Object::Pad 0.57;
+   use Object::Pad 0.800;
 
    class TestAdapter
       :isa(Test::Device::Chip::Adapter)
@@ -24,7 +24,8 @@ my $protocol = await $adapter->make_protocol( "SPI" );
 # readwrite
 {
    $adapter->expect_assert_ss;
-   $adapter->expect_readwrite_no_ss( "AB" )->returns( "CD" );
+   $adapter->expect_readwrite_no_ss( "AB" )
+      ->will_done( "CD" );
    $adapter->expect_release_ss;
 
    is( await $protocol->readwrite( "AB" ), "CD",
@@ -36,7 +37,8 @@ my $protocol = await $adapter->make_protocol( "SPI" );
 # write
 {
    $adapter->expect_assert_ss;
-   $adapter->expect_readwrite_no_ss( "EF" )->returns( "XX" );
+   $adapter->expect_readwrite_no_ss( "EF" )
+      ->will_done( "XX" );
    $adapter->expect_release_ss;
 
    is( await $protocol->write( "EF" ), undef,
@@ -48,7 +50,8 @@ my $protocol = await $adapter->make_protocol( "SPI" );
 # read
 {
    $adapter->expect_assert_ss;
-   $adapter->expect_readwrite_no_ss( "\0\0" )->returns( "KL" );
+   $adapter->expect_readwrite_no_ss( "\0\0" )
+      ->will_done( "KL" );
    $adapter->expect_release_ss;
 
    is( await $protocol->read( 2 ), "KL",
@@ -60,8 +63,10 @@ my $protocol = await $adapter->make_protocol( "SPI" );
 # write_then_read
 {
    $adapter->expect_assert_ss;
-   $adapter->expect_readwrite_no_ss( "GH" )->returns( "XX" );
-   $adapter->expect_readwrite_no_ss( "\0\0" )->returns( "IJ" );
+   $adapter->expect_readwrite_no_ss( "GH" )
+      ->will_done( "XX" );
+   $adapter->expect_readwrite_no_ss( "\0\0" )
+      ->will_done( "IJ" );
    $adapter->expect_release_ss;
 
    is( await $protocol->write_then_read( "GH", 2 ), "IJ",

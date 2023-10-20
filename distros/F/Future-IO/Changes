@@ -1,5 +1,12 @@
 Revision history for Future-IO
 
+0.15    2023-10-18
+        [BUGFIXES]
+         * Avoid creating a long `->then` chain of Futures when handling
+           EAGAIN (RT150117)
+         * Temporarily enable blocking mode on filehandles when the default
+           event loop is not using `select()`, to avoid a CPU spin (RT150117)
+
 0.14    2023-04-25
         [CHANGES]
          * Moved `Test::Future::IO::Impl` into its own distribution, so that

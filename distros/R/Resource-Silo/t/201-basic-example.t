@@ -90,7 +90,7 @@ subtest 'config caching' => sub {
 
 subtest 'separate container' => sub {
     do {
-        my $temp = silo->new;
+        my $temp = (ref silo)->new;
         is ref $temp, 'My::Res', 'same package';
         my $dbh = $temp->dbh;
         is $dbh->id, 2, 'a different db connection id';

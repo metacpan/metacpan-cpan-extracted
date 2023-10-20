@@ -8,7 +8,7 @@
 
 package Mail::Message::Field::AddrGroup;
 use vars '$VERSION';
-$VERSION = '3.013';
+$VERSION = '3.014';
 
 use base 'User::Identity::Collection::Emails';
 

@@ -2,7 +2,7 @@
 
 =head1 DESCRIPTION
 
-Check interoperability with Moo
+Check interoperability with Moo.
 
 =cut
 
@@ -10,17 +10,12 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN {
-    plan skip_all => 'No Moo found'
-        unless eval { require Moo };
-};
-
 my %conn;
 my $id;
 {
     package My::Mixed;
-    use Resource::Silo -class;
     use Moo;
+    use Resource::Silo -class;
 
     has prefix => is => 'ro', default => sub { 'foo' };
     resource conn =>
@@ -56,5 +51,19 @@ subtest 'with parameter' => sub {
     undef $mixed;
     is_deeply \%conn, {}, "Cleanup worked";
 };
+
+subtest 'inheritance' => sub {
+    {
+        package My::Mixed::Subclass;
+        use Moo;
+        extends 'My::Mixed';
+
+        has '+prefix', default => sub { 'baz' };
+    };
+
+    my $inst = My::Mixed::Subclass->new;
+    is $inst->conn, 'baz_3', "resource machinery works for subclass as well";
+};
+
 
 done_testing;

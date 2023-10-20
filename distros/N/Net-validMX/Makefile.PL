@@ -18,11 +18,25 @@ my (%MAKEFILE);
                        SUFFIX => 'gz', 
                        PREOP => "cd \$(DISTVNAME) && pod2text lib/Net/validMX.pm > README && \$(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'eval { maniadd({q{README} => q{Module README created from pod2text}}) } '"
                      },
+  'LICENSE'       => 'Artistic',
   'AUTHOR'        => 'The McGrail Foundation & Kevin A. McGrail <kevin.mcgrail-netvalidmx@mcgrail.com>',
   'ABSTRACT'      => 'Perl DNS mail exchange & email format validation module',
   'PMLIBDIRS' => [ 'lib' ],
   'EXE_FILES' => [ 'example/check_email_and_mx.pl' ],
   'INSTALLDIRS' => 'perl',
+  'META_MERGE' => {
+        'meta-spec' => { version => 2 },
+         resources => {
+             repository => {
+                 type => 'git',
+                 url  => 'https://github.com/The-McGrail-Foundation/Net-validMX.git',
+                 web  => 'https://github.com/The-McGrail-Foundation/Net-validMX',
+             },
+             bugtracker => {
+                 web => 'https://github.com/The-McGrail-Foundation/Net-validMX/issues'
+             },
+         },
+    },
 );
 
 WriteMakefile(%MAKEFILE);
@@ -37,9 +51,6 @@ sub metafile {
   my $meta    = $self->SUPER::metafile_target(@_);
 
   my ($echo, $extra);
-
-  ($echo) = $self->echo('license: artistic', '$(DISTVNAME)/META.yml', 1);
-  $extra .= "\t$echo\n";
 
   ($echo) = $self->echo('abstract: '.$MAKEFILE{'ABSTRACT'}, '$(DISTVNAME)/META.yml', 1);
   $extra .= "\t$echo\n";

@@ -7,7 +7,7 @@ BEGIN
     use vars qw( $DEBUG );
     use Test::More qw( no_plan );
     use JSON;
-    use Nice::Try;
+    # use Nice::Try;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
@@ -334,12 +334,12 @@ is( "@$odd", '2 4 6 8 10', 'odd' );
 
 my $a14 = Module::Generic::Array->new( [qw( Jack John Paul Peter )] );
 my $j = JSON->new->convert_blessed;
-try
+eval
 {
     my $json = $j->encode( $a14 );
     is( $json, '["Jack","John","Paul","Peter"]', 'TO_JSON' );
-}
-catch( $e )
+};
+if( $@ )
 {
     # diag( "Error encoding: $e" );
     fail( 'TO_JSON' );
@@ -396,6 +396,11 @@ my $ex1 = Module::Generic::Array->new( [qw( Jack John Paul Peter )] );
 my $other = Module::Generic::Array->new( [qw( Emmanuel Gabriel Paul Peter Raphael )] );
 my $ex2 = $ex1->except( $other );
 is( "@$ex2", "Jack John" );
+
+my $a2h = Module::Generic::Array->new( [qw( Jack John Peter Gabriel Raphael Emmanuel )] );
+my $hashified = $a2h->as_hash;
+isa_ok( $hashified => 'Module::Generic::Hash' );
+is_deeply( $hashified => { Jack => 0, John => 1, Peter => 2, Gabriel => 3, Raphael => 4, Emmanuel => 5 }, 'as_hash' );
 
 subtest 'callback' => sub
 {

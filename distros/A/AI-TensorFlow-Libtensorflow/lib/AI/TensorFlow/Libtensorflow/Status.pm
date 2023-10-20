@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Status;
 # ABSTRACT: Status used for error checking
-$AI::TensorFlow::Libtensorflow::Status::VERSION = '0.0.6';
+$AI::TensorFlow::Libtensorflow::Status::VERSION = '0.0.7';
 use strict;
 use warnings;
 use namespace::autoclean;

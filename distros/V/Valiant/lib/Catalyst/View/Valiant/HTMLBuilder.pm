@@ -7,6 +7,7 @@ use Attribute::Handlers;
 use Module::Runtime;
 use Carp;
 use Catalyst::View::Valiant::HTMLBuilder::Form;
+use Catalyst::View::Valiant::HTMLBuilder::Pager;
 use namespace::clean ();
 
 extends 'Catalyst::View::BasePerRequest';
@@ -14,15 +15,23 @@ extends 'Catalyst::View::BasePerRequest';
 ## Shared Form Object
 
 my $form;
+my $pager;
 
 sub form_args { return () }
+sub pager_args { return () }
 
 sub _install_form {
   my $class = shift;
   my $target = shift;
-  my $form_class = shift;
   my $view = Module::Runtime::use_module('Valiant::HTML::Util::View')->new; # Placeholder
   $form = Catalyst::View::Valiant::HTMLBuilder::Form->new(view=>$view, $class->form_args);
+}
+
+sub _install_pager {
+  my $class = shift;
+  my $target = shift;
+  my $view = Module::Runtime::use_module('Valiant::HTML::Util::View')->new; # Placeholder
+  $pager = Catalyst::View::Valiant::HTMLBuilder::Pager->new(view=>$view, $class->pager_args);
 }
 
 ## Code Attributes
@@ -34,9 +43,15 @@ sub Renders :ATTR(CODE) {
     my $wrapper = sub {
       my ($self, @args) = @_;
       croak "View method called without correct self" unless $self->isa($package);
+
       local $form->{view} = $self; # Evil Hack lol
       local $form->{context} = $self->ctx;
       local $form->{controller} = $self->ctx->controller;
+
+      local $pager->{view} = $self; # Evil Hack lol
+      local $pager->{context} = $self->ctx;
+      local $pager->{controller} = $self->ctx->controller;
+
       return $referent->(@_);
     };
     Moo::_Utils::_install_tracked($package, "__attr_${name}", $wrapper);
@@ -88,6 +103,7 @@ sub import {
   Moo->_maybe_reset_handlemoose($target);
 
   $class->_install_form($target);
+  $class->_install_pager($target);
   $class->_install_tags($target, @tags);
   $class->_install_views($target, @views);
   $class->_install_utils($target, @utils);
@@ -96,6 +112,8 @@ sub import {
 }
 
 sub form { $form }
+sub pager { $pager}
+
 sub tags { $form->tags }
 
 sub _install_utils {
@@ -274,6 +292,24 @@ sub _install_tags {
           return $form->$tag(@args), @_; 
         };
       #}
+    } elsif($pager->can($tag)) {
+
+      $method = Sub::Util::set_subname "${target}::${tag}" => sub {
+        ## return $form->safe_concat($form->$tag(@_));
+        ## Will ponder this, it seems to be a performance hit
+        my @args = ();
+        if($tag eq 'pager_for') {
+          while(@_) {
+            my $element = shift;
+            push @args, $element;
+            last if ref($element) eq 'CODE' && (ref($_[0])||'') ne 'CODE';
+          }
+          return $pager->$tag(@args), @_;
+        } else {
+          die "pager doesn't support method $tag";
+        }
+      };
+
     } else {
       die "No such tag '$tag' for view";
     }
@@ -285,9 +321,15 @@ sub _install_tags {
     Moo::_Utils::_install_tracked($target, "_tag_${tag}", \&{"${target}::${tag}"});
     Moo::_Utils::_install_tracked($target, $tag, sub {
       my $view = shift if Scalar::Util::blessed($_[0]) && $_[0]->isa($target);
-      local $form->{view} = $view if $view;
-      local $form->{context} = $view->ctx if $view;
-      local $form->{controller} = $view->ctx->controller if $view;
+      if($view) {
+        local $form->{view} = $view if $view;
+        local $form->{context} = $view->ctx if $view;
+        local $form->{controller} = $view->ctx->controller if $view;
+
+        local $pager->{view} = $view if $view;
+        local $pager->{context} = $view->ctx if $view;
+        local $pager->{controller} = $view->ctx->controller if $view;
+      }
       return $target->can("_tag_${tag}")->(@_);
     });
   }
@@ -332,6 +374,10 @@ sub _install_views {
       local $form->{view} = $view if $view;
       local $form->{context} = $view->ctx if $view;
       local $form->{controller} = $view->ctx->controller if $view;
+      local $pager->{view} = $view if $view;
+      local $pager->{context} = $view->ctx if $view;
+      local $pager->{controller} = $view->ctx->controller if $view;
+
       return $target->can("_view_${name}")->(@_);
     });
   }
@@ -413,19 +459,29 @@ sub path {
 
 around 'get_rendered' => sub {
   my ($orig, $self, @args) = @_;
-  $self->ctx->stash->{__view_for_code} = $self->form->view if $self->has_code;
+  $self->ctx->stash->{__view_for_code_form} = $self->form->view if $self->has_code;
+  $self->ctx->stash->{__view_for_code_pager} = $self->pager->view if $self->has_code;
+
   local $form->{view} = $self; # Evil Hack lol
   local $form->{context} = $self->ctx;
   local $form->{controller} = $self->ctx->controller;
+  local $pager->{view} = $self; # Evil Hack lol
+  local $pager->{context} = $self->ctx;
+  local $pager->{controller} = $self->ctx->controller;  
   return $self->$orig(@args);
 };
 
 around 'execute_code_callback' => sub {
   my ($orig, $self, @args) = @_;
-  my $old_view = delete $self->ctx->stash->{__view_for_code};
-  local $form->{view} = $old_view; # Evil Hack lol
-  local $form->{context} = $old_view->ctx;
-  local $form->{controller} = $old_view->ctx->controller;
+  my $old_view_form = delete $self->ctx->stash->{__view_for_code_form};
+  my $old_view_pager = delete $self->ctx->stash->{__view_for_code_pager};
+
+  local $form->{view} = $old_view_form; # Evil Hack lol
+  local $form->{context} = $old_view_form->ctx;
+  local $form->{controller} = $old_view_form->ctx->controller;
+  local $pager->{view} = $old_view_pager; # Evil Hack lol
+  local $pager->{context} = $old_view_pager->ctx;
+  local $pager->{controller} = $old_view_pager->ctx->controller;  
   return $self->$orig(@args);
 };
 

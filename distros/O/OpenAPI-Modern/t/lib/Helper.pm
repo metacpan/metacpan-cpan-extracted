@@ -9,11 +9,13 @@ no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use Safe::Isa;
+use List::Util 'pairs';
 use HTTP::Request;
 use HTTP::Response;
 use HTTP::Status ();
 use Mojo::Message::Request;
 use Mojo::Message::Response;
+use Test2::API 'context_do';
 
 # type can be
 # 'lwp': classes of type URI, HTTP::Headers, HTTP::Request, HTTP::Response
@@ -21,6 +23,7 @@ use Mojo::Message::Response;
 our @TYPES = qw(lwp mojo);
 our $TYPE;
 
+# Note: if you want your query parameters or uri fragment to be normalized, set them afterwards
 sub request ($method, $uri_string, $headers = [], $body_content = undef) {
   die '$TYPE is not set' if not defined $TYPE;
 
@@ -28,18 +31,21 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
   if ($TYPE eq 'lwp') {
     my $uri = URI->new($uri_string);
     my $host = $uri->$_call_if_can('host');
-    $req = HTTP::Request->new($method => $uri, [ @$headers, $host ? ( Host => $host ) : () ], $body_content);
-    $req->protocol('HTTP/1.1'); # not added by HTTP::Request constructor
+    $req = HTTP::Request->new($method => $uri, [], $body_content);
+    $req->headers->header(Host => $host) if $host;
+    $req->headers->push_header(@$_) foreach pairs @$headers;
+    $req->protocol('HTTP/1.1'); # required, but not added by HTTP::Request constructor
   }
   elsif ($TYPE eq 'mojo') {
     my $uri = Mojo::URL->new($uri_string);
     my $host = $uri->host;
     $req = Mojo::Message::Request->new(method => $method, url => Mojo::URL->new($uri_string));
-    while (my ($name, $value) = splice(@$headers, 0, 2)) {
-      $req->headers->header($name, $value);
-    }
     $req->headers->header('Host', $host) if $host;
+    $req->headers->add(@$_) foreach pairs @$headers;
     $req->body($body_content) if defined $body_content;
+
+    # add missing Content-Length, etc
+    $req->fix_headers;
   }
   else {
     die '$TYPE '.$TYPE.' not supported';
@@ -90,6 +96,24 @@ sub uri ($uri_string, @path_parts) {
   return $uri;
 }
 
+# sets query parameters on the request
+sub query_params ($request, $pairs) {
+  die '$TYPE is not set' if not defined $TYPE;
+
+  my $uri;
+  if ($TYPE eq 'lwp') {
+    $request->uri->query_form($pairs);
+  }
+  elsif ($TYPE eq 'mojo') {
+    $request->url->query->pairs($pairs);
+  }
+  else {
+    die '$TYPE '.$TYPE.' not supported';
+  }
+
+  return $uri;
+}
+
 # create a Result object out of the document errors; suitable for stringifying
 # as the OpenAPI::Modern constructor might do.
 sub document_result ($document) {
@@ -97,6 +121,23 @@ sub document_result ($document) {
     valid => $document->has_errors,
     errors => [ $document->errors ],
   );
+}
+
+# deep comparison, with strict typing
+sub is_equal ($x, $y, $test_name = undef) {
+  context_do {
+    my $ctx = shift;
+    my ($x, $y, $test_name) = @_;
+    my $equal = JSON::Schema::Modern::Utilities::is_equal($x, $y, my $state = {});
+    if ($equal) {
+      $ctx->pass($test_name);
+    }
+    else {
+      $ctx->fail($test_name);
+      $ctx->note('structures differ'.($state->{path} ? ' starting at '.$state->{path} : ''));
+    }
+    return $equal;
+  } $x, $y, $test_name;
 }
 
 1;

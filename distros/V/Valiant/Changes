@@ -1,5 +1,13 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.002003 2023 October 04
+          - This is probably not a mandatory upgrade, it has lots of small
+            tweaks, tests and doc updates but nothing major.
+          - POC Pager HTML component.  Totally undocumented or tested.
+          - Updates to the example application to help test this better
+          - Lots of minor tweaks and fixes to the way internationalization
+            and model naming works.  Added more test cases.
+
 0.002002 2023 August 27
           - Fixes to how Formhandler computes a default action for the form
             based on the passed model and information provided by the view

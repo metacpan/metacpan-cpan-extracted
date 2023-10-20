@@ -76,6 +76,7 @@ sub window_function {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $driver = $sf->{i}{driver};
     my $count_all = 'COUNT*';
     my $count_all_regex = quotemeta $count_all;
@@ -83,7 +84,7 @@ sub window_function {
     my @win_func_rank = ( 'CUME_DIST', 'DENSE_RANK', 'NTILE', 'PERCENT_RANK', 'RANK', 'ROW_NUMBER' );
     my @win_func_value = ( 'FIRST_VALUE', 'LAG', 'LAST_VALUE', 'LEAD', 'NTH_VALUE' );
 
-    my @functions = ( @win_func_aggr, @win_func_rank, @win_func_value );
+    my @functions = sort( @win_func_aggr, @win_func_rank, @win_func_value );
 
     my @no_col_func = ( 'CUME_DIST', 'DENSE_RANK', 'PERCENT_RANK', 'RANK', 'ROW_NUMBER' );
     my $no_col_func_regex = join( '|', map { quotemeta } @no_col_func );
@@ -99,15 +100,16 @@ sub window_function {
 
     my $info = $opt->{info} // $ax->get_sql_info( $sql );
     my $win_func_data = {};
-    my $old_idx_wf = 0;
+    my $hidden = 'Window function:';
+    my $old_idx_wf = 1;
 
     WINDOW_FUNCTION: while( 1 ) {
-        my @pre = ( undef );
+        my @pre = ( $hidden, undef );
         my $menu = [ @pre, map { '- ' . $_ } @functions ];
         # Choose
         my $idx_wf = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Window function:', index => 1,
+            { %{$sf->{i}{lyt_v}}, info => $info, prompt => '', index => 1,
               default => $old_idx_wf, undef => '<=' }
         );
         if ( ! defined $idx_wf || ! defined $menu->[$idx_wf] ) {
@@ -115,10 +117,20 @@ sub window_function {
         }
         if ( $sf->{o}{G}{menu_memory} ) {
             if ( $old_idx_wf == $idx_wf && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $old_idx_wf = 0;
+                $old_idx_wf = 1;
                 next WINDOW_FUNCTION;
             }
             $old_idx_wf = $idx_wf;
+        }
+        if ( $menu->[$idx_wf] eq $hidden ) {
+            $ext->enable_extended_arguments( $info );
+            if ( $sf->{o}{enable}{extended_args} ) {
+                $hidden = 'Window functions:*';
+            }
+            else {
+                $hidden = 'Window functions:';
+            }
+            next WINDOW_FUNCTION;
         }
         my $func = $functions[$idx_wf-@pre];
         $win_func_data->{func} = $func;
@@ -138,10 +150,7 @@ sub window_function {
             }
             elsif ( $func =~ /^(?:$col_is_number_func_regex)\z/i ) {
                 # Readline
-                $col = $tr->readline(
-                    'n = ',
-                    { info => $info . "\n" . $func . '(n)' }
-                );
+                $col = $ext->argument( $sql, $clause, { info => $info . "\n" . $func . '(n)', history => undef, prompt => 'n = ' } );
                 if ( ! length $col ) {
                     next WINDOW_FUNCTION;
                 }
@@ -157,24 +166,17 @@ sub window_function {
             if ( $func =~ /^(?:$offset_func_regex)\z/i ) {
                 $tmp_info = $info . "\n" . $sf->__get_win_func_stmt( $win_func_data );
                 # Readline
-                my $offset = $tr->readline(
-                    'offset: ',
-                    { info => $tmp_info }
-                );
+                my $offset = $ext->argument( $sql, $clause, { info => $tmp_info, history => undef, prompt => 'offset: ' } );
                 if ( ! defined $offset ) {
                     next WINDOW_FUNCTION;
                 }
-
                 if ( length $offset ) {
                     $col .= ',' . $offset;
                     $win_func_data->{col} = $col;
                     $tmp_info = $info . "\n" . $sf->__get_win_func_stmt( $win_func_data );
                     if ( $func =~ /^(?:$default_value_func_regex)\z/i ) {
                         # Readline
-                        my $default_value = $tr->readline(
-                            'default: ',
-                            { info => $tmp_info }
-                        );
+                        my $default_value = $ext->argument( $sql, $clause, { info => $tmp_info, history => undef, prompt => 'default: ' } );
                         if ( ! defined $default_value) {
                             next WINDOW_FUNCTION;
                         }
@@ -235,7 +237,7 @@ sub window_function {
                     }
                 }
                 elsif ( $wd eq $frame_clause ) {
-                    my $ret = $sf->__add_frame_clause( $sql, $win_func_data );
+                    my $ret = $sf->__add_frame_clause( $sql, $clause, $win_func_data );
                     if ( ! $ret ) {
                         pop @bu;
                     }
@@ -374,7 +376,7 @@ sub __add_order_by {
 
 
 sub __add_frame_clause {
-    my ( $sf, $sql, $win_func_data ) = @_;
+    my ( $sf, $sql, $clause, $win_func_data ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my @frame_clause_modes = ( 'ROWS', 'RANGE' );
@@ -446,14 +448,14 @@ sub __add_frame_clause {
             }
             push @bu, { %$frame_clause_data };
             if ( $choice eq $frame_start ) {
-                my $ret = $sf->__add_frame_start_or_end( $frame_clause_data, $info, 'frame_start' );
+                my $ret = $sf->__add_frame_start_or_end( $sql, $clause, $frame_clause_data, $info, 'frame_start' );
                 if ( ! defined $ret ) {
                     pop @bu;
                     next FRAME_END_AND_EXCLUSION;
                 }
             }
             elsif ( $choice eq $frame_end ) {
-                my $ret = $sf->__add_frame_start_or_end( $frame_clause_data, $info, 'frame_end' );
+                my $ret = $sf->__add_frame_start_or_end( $sql, $clause, $frame_clause_data, $info, 'frame_end' );
                 if ( ! defined $ret ) {
                     pop @bu;
                     next FRAME_END_AND_EXCLUSION;
@@ -472,7 +474,7 @@ sub __add_frame_clause {
 
 
 sub __add_frame_start_or_end {
-    my ( $sf, $frame_clause_data, $info, $pos ) = @_;
+    my ( $sf, $sql, $clause, $frame_clause_data, $info, $pos ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
@@ -504,14 +506,12 @@ sub __add_frame_start_or_end {
             delete $frame_clause_data->{$pos};
         }
         else {
+            my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             $point =~ s/-\s//;
             $frame_clause_data->{$pos} = $point;
             if ( $point =~ /^n / ) {
                 my $tmp_info = $info . "\n" . $sf->__get_frame_clause_stmt( $frame_clause_data );
-                my $offset = $tr->readline(
-                    'n = ',
-                    { info => $tmp_info }
-                );
+                my $offset = $ext->argument( $sql, $clause, { info => $tmp_info, history => undef, prompt => 'n = ' } );
                 if ( ! length $offset ) {
                     next FRAME_START;
                 }

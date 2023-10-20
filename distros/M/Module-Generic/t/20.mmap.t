@@ -6,7 +6,7 @@ BEGIN
     use lib './lib';
     use vars qw( $DEBUG $SERIALISER );
     use Errno;
-    use Nice::Try;
+    # use Nice::Try;
     use Test2::IPC;
     use Test2::V0;
     use POSIX ":sys_wait_h";
@@ -209,7 +209,7 @@ subtest 'serialisation with cbor' => sub
         ok( $s, 'mmap cache opened' );
         skip( "Failed to instantiate a mmap object.", 6 ) if( !defined( $s ) );
         ok( $s->write({ name => 'John Doe', location => 'Tokyo' }), 'write to cache mmap' );
-        try
+        eval
         {
             my $serial = $cbor->encode( $s );
             ok( ( defined( $serial ) && length( $serial ) ), 'object serialised' );
@@ -219,10 +219,10 @@ subtest 'serialisation with cbor' => sub
             is( $s->cache_file->length, $obj->cache_file->length, 'cache mmap file has same size as before' );
             my $h = $obj->read;
             is( $h->{name}, 'John Doe', 'stored data matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Error serialising or deserialising: $e" );
+            fail( "Error serialising or deserialising: $@" );
         }
     };
 };
@@ -246,7 +246,7 @@ subtest 'serialisation with sereal' => sub
         ) || die( Module::Generic::File::Mmap->error );
         my $s = $cache->open({ mode => 'w' });
         ok( $s->write({ name => 'John Doe', location => 'Tokyo' }), 'write to cache mmap' );
-        try
+        eval
         {
             my $serial = $enc->encode( $s );
             ok( ( defined( $serial ) && length( $serial ) ), 'object serialised' );
@@ -256,10 +256,10 @@ subtest 'serialisation with sereal' => sub
             is( $s->cache_file->length, $obj->cache_file->length, 'cache mmap file has same size as before' );
             my $h = $obj->read;
             is( $h->{name}, 'John Doe', 'stored data matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Error serialising or deserialising: $e" );
+            fail( "Error serialising or deserialising: $@" );
         }
     };
 };
@@ -281,7 +281,7 @@ subtest 'serialisation with storable' => sub
         ) || die( Module::Generic::File::Mmap->error );
         my $s = $cache->open({ mode => 'w' });
         ok( $s->write({ name => 'John Doe', location => 'Tokyo' }), 'write to cache mmap' );
-        try
+        eval
         {
             my $serial = Storable::Improved::freeze( $s );
             ok( ( defined( $serial ) && length( $serial ) ), 'object serialised' );
@@ -291,10 +291,10 @@ subtest 'serialisation with storable' => sub
             is( $s->cache_file->length, $obj->cache_file->length, 'cache mmap file has same size as before' );
             my $h = $obj->read;
             is( $h->{name}, 'John Doe', 'stored data matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Error serialising or deserialising: $e" );
+            fail( "Error serialising or deserialising: $@" );
         }
     };
 };

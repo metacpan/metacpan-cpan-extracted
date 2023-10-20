@@ -21,6 +21,8 @@ my %WriteMakefileArgs = (
         'Module::Load'          => 0.32,
         'Scalar::Util'          => 1.23,
         'Sub::Quote'            => 2,
+        'Moo'                   => 2,
+        'namespace::clean'      => 0.27,
     },
     META_MERGE => {
         "meta-spec" => { version => 2 },

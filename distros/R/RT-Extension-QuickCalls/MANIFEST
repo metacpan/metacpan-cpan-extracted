@@ -1,6 +1,7 @@
 Changes
 html/Elements/QuickCalls
 html/Helpers/QuickCalls
+html/User/Elements/Portlets/QuickCalls
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
@@ -18,7 +19,9 @@ lib/RT/Extension/QuickCalls.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
+patches/0001-Support-QuickCreate-to-pass-arguments-to-redirect-UR.patch
 README
 xt/00.load.t
 xt/pod-coverage.t
 xt/pod.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

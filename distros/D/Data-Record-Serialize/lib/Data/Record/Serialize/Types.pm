@@ -2,26 +2,23 @@ package Data::Record::Serialize::Types;
 
 # ABSTRACT: Types for Data::Record::Serialize
 
+use v5.12;
 use strict;
 use warnings;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use Type::Utils -all;
 use Types::Standard qw( ArrayRef Str Enum );
-use Type::Library -base,
-  -declare => qw[ ArrayOfStr SerializeType ];
+use Type::Library -base, -declare => qw[ ArrayOfStr SerializeType ];
 
 use namespace::clean;
 
-declare ArrayOfStr,
-  as ArrayRef[ Str ];
+declare ArrayOfStr, as ArrayRef [Str];
 
-coerce ArrayOfStr,
-  from Str, q { [ $_ ] };
+coerce ArrayOfStr, from Str, q { [ $_ ] };
 
-declare SerializeType,
-  as Enum[ qw( N I S B) ];
+declare SerializeType, as Enum [qw( N I S B)];
 
 #
 # This file is part of Data-Record-Serialize
@@ -47,13 +44,15 @@ Data::Record::Serialize::Types - Types for Data::Record::Serialize
 
 =head1 VERSION
 
-version 1.04
+version 1.05
+
+=head1 INTERNALS
 
 =head1 SUPPORT
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>
 
 =head2 Source
 

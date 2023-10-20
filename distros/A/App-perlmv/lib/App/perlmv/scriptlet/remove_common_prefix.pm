@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-30'; # DATE
+our $DATE = '2023-07-15'; # DATE
 our $DIST = 'App-perlmv'; # DIST
-our $VERSION = '0.607'; # VERSION
+our $VERSION = '0.608'; # VERSION
 
 our $SCRIPTLET = {
     summary => 'Remove prefix that are common to all args, e.g. (file1, file2b) -> (1, 2b)',
@@ -45,7 +45,7 @@ App::perlmv::scriptlet::remove_common_prefix - Remove prefix that are common to 
 
 =head1 VERSION
 
-This document describes version 0.607 of App::perlmv::scriptlet::remove_common_prefix (from Perl distribution App-perlmv), released on 2023-06-30.
+This document describes version 0.608 of App::perlmv::scriptlet::remove_common_prefix (from Perl distribution App-perlmv), released on 2023-07-15.
 
 =head1 DESCRIPTION
 

@@ -2,16 +2,16 @@ package Data::Record::Serialize::Role::Base;
 
 # ABSTRACT: Base Role for Data::Record::Serialize
 
+use v5.12;
 use Moo::Role;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use Data::Record::Serialize::Error { errors => [ 'fields', 'types' ] }, -all;
 
 use Data::Record::Serialize::Util -all;
 
-use Types::Standard
-  qw[ ArrayRef CodeRef CycleTuple HashRef Enum Str Bool is_HashRef Maybe ];
+use Types::Standard qw[ ArrayRef CodeRef CycleTuple HashRef Enum Str Bool is_HashRef Maybe ];
 use Data::Record::Serialize::Types qw( SerializeType );
 
 use Ref::Util qw( is_coderef is_arrayref );
@@ -38,7 +38,8 @@ use namespace::clean;
 
 has types => (
     is  => 'rwp',
-    isa => ( HashRef [ SerializeType ] | CycleTuple [ Str, SerializeType ] ),   # need parens for perl <= 5.12.5
+    isa => ( HashRef [SerializeType] | CycleTuple [ Str, SerializeType ] )
+    ,    # need parens for perl <= 5.12.5
     predicate => 1,
     trigger   => sub {
         $_[0]->clear_type_index;
@@ -59,9 +60,9 @@ has types => (
 
 
 has default_type => (
-    is  => 'ro',
-    isa => SerializeType,
-    predicate => 1
+    is        => 'ro',
+    isa       => SerializeType,
+    predicate => 1,
 );
 
 
@@ -75,11 +76,11 @@ has default_type => (
 
 
 has fields => (
-    is      => 'rwp',
-    isa     => ( ArrayRef [Str] | Enum ['all'] ),  # need parens for perl <= 5.12.5
+    is        => 'rwp',
+    isa       => ( ArrayRef [Str] | Enum ['all'] ),    # need parens for perl <= 5.12.5
     predicate => 1,
-    clearer => 1,
-    trigger => sub {
+    clearer   => 1,
+    trigger   => sub {
         $_[0]->_clear_fieldh;
         $_[0]->clear_output_types;
         $_[0]->clear_output_fields;
@@ -157,7 +158,7 @@ has _can_bool => (
     is       => 'lazy',
     isa      => Bool,
     init_arg => undef,
-    builder  => sub { !! $_[0]->can( 'to_bool' ) },
+    builder  => sub { !!$_[0]->can( 'to_bool' ) },
 );
 
 
@@ -179,8 +180,8 @@ has _can_bool => (
 sub _build_field_list_with_type {
     my ( $self, $list_spec, $type, $error_label ) = @_;
 
-    my $fieldh    = $self->_fieldh;
-    my $list = do {
+    my $fieldh = $self->_fieldh;
+    my $list   = do {
         if ( is_coderef( $list_spec ) ) {
             ( ArrayRef [Str] )->assert_return( $list_spec->( $self ) );
         }
@@ -190,7 +191,7 @@ sub _build_field_list_with_type {
         else {
             # want all of the fields. actually just want the ones that will be output,
             # otherwise the check below will fail.
-            [ grep { exists $fieldh->{$_} } $list_spec ? @{ $self->type_index->[ $type ] } : () ];
+            [ grep { exists $fieldh->{$_} } $list_spec ? @{ $self->type_index->[$type] } : () ];
         }
     };
 
@@ -238,7 +239,7 @@ sub _build_field_list_with_type {
 
 has [ 'nullify', 'numify', 'stringify' ] => (
     is        => 'rw',
-    isa       => ( ArrayRef [Str] | CodeRef | Bool ),  # need parens for perl <= 5.12.5
+    isa       => ( ArrayRef [Str] | CodeRef | Bool ),    # need parens for perl <= 5.12.5
     predicate => 1,
     trigger   => 1,
 );
@@ -266,7 +267,7 @@ sub _trigger_stringify { $_[0]->_clear_stringified }
 
 sub nullified {
     my $self = shift;
-    return [ $self->has_fields ? @{$self->_nullified} : () ];
+    return [ $self->has_fields ? @{ $self->_nullified } : () ];
 }
 
 
@@ -289,7 +290,7 @@ sub nullified {
 
 sub numified {
     my $self = shift;
-    return [ $self->has_fields ? @{$self->_numified} : () ];
+    return [ $self->has_fields ? @{ $self->_numified } : () ];
 }
 
 
@@ -311,7 +312,7 @@ sub numified {
 
 sub stringified {
     my $self = shift;
-    return [ $self->has_fields ? @{$self->_stringified} : () ];
+    return [ $self->has_fields ? @{ $self->_stringified } : () ];
 }
 
 
@@ -376,7 +377,7 @@ sub numeric_fields { $_[0]->type_index->[NUMBER] }
 
 
 
-sub boolean_fields { $_[0]->type_index->[ BOOLEAN ] }
+sub boolean_fields { $_[0]->type_index->[BOOLEAN] }
 
 
 
@@ -418,7 +419,7 @@ has type_index => (
     clearer  => 1,
     builder  => sub {
         my $self = shift;
-        error( 'types', "no types for fields are available" )
+        error( 'types', 'no types for fields are available' )
           unless $self->has_types;
         index_types( $self->types );
     },
@@ -451,20 +452,20 @@ sub _build_output_types {
     my @int_fields = grep { defined $self->types->{$_} } @{ $self->fields };
     @types{@int_fields} = @{ $self->types }{@int_fields};
 
-    unless ( $self->_encoder_has_type(BOOLEAN) ) {
+    unless ( $self->_encoder_has_type( BOOLEAN ) ) {
         $types{$_} = T_INTEGER for @{ $self->boolean_fields };
-        $self->_set__convert_boolean_to_int(1);
+        $self->_set__convert_boolean_to_int( 1 );
     }
 
-    unless ( $self->_encoder_has_type(INTEGER) ) {
+    unless ( $self->_encoder_has_type( INTEGER ) ) {
         $types{$_} = T_NUMBER for @{ $self->numeric_fields };
     }
 
     if ( my $map_types = $self->_map_types ) {
         for my $field ( keys %types ) {
             my $type = $types{$field};
-            next unless  exists $map_types->{$type};
-            $types{$field} = $map_types->{ $type }
+            next unless exists $map_types->{$type};
+            $types{$field} = $map_types->{$type};
         }
     }
 
@@ -484,7 +485,7 @@ sub _trigger_output_types { }
 
 sub _encoder_has_type {
     my ( $self, $type ) = @_;
-    any { is_type($_, $type ) } keys %{ $self->_map_types // {} };
+    any { is_type( $_, $type ) } keys %{ $self->_map_types // {} };
 }
 
 
@@ -496,7 +497,7 @@ sub _encoder_has_type {
 
 has format_fields => (
     is  => 'ro',
-    isa => HashRef [Str | CodeRef],
+    isa => HashRef [ Str | CodeRef ],
 );
 
 
@@ -506,8 +507,8 @@ has format_fields => (
 
 
 has format_types => (
-    is        => 'ro',
-    isa       => HashRef [ Str | CodeRef ],
+    is  => 'ro',
+    isa => HashRef [ Str | CodeRef ],
 );
 
 
@@ -606,12 +607,12 @@ sub BUILD {
 
         if ( 'HASH' eq ref $types ) {
             $self->_set_fields( [ keys %{$types} ] )
-             unless $self->has_fields;
+              unless $self->has_fields;
         }
         elsif ( 'ARRAY' eq ref $types ) {
             $self->_set_types( { @{$types} } );
 
-            if ( ! $self->has_fields ) {
+            if ( !$self->has_fields ) {
                 my @fields;
                 # pull off "keys"
                 push @fields, ( shift @$types, shift @$types )[0] while @$types;
@@ -619,7 +620,7 @@ sub BUILD {
             }
         }
         else {
-            error( '::attribute::value', "internal error" );
+            error( '::attribute::value', 'internal error' );
         }
     }
 
@@ -654,7 +655,7 @@ sub _set_types_from_record {
 
     for my $field ( grep !defined $types->{$_}, @{ $self->fields } ) {
         my $value = $data->{$field};
-        my $def = Scalar::Util::looks_like_number( $value ) ? T_NUMBER : T_STRING;
+        my $def   = Scalar::Util::looks_like_number( $value ) ? T_NUMBER : T_STRING;
 
         $def = T_INTEGER
           if $def eq T_NUMBER
@@ -674,8 +675,7 @@ sub _set_types_from_default {
 
     my $types = $self->has_types ? $self->types : {};
 
-    $types->{$_} = $self->default_type
-      for grep { !defined $types->{$_} } @{ $self->fields };
+    $types->{$_} = $self->default_type for grep { !defined $types->{$_} } @{ $self->fields };
 
     $self->_set_types( $types );
     $self->_set__have_initialized_types( 1 );
@@ -706,7 +706,7 @@ Data::Record::Serialize::Role::Base - Base Role for Data::Record::Serialize
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 DESCRIPTION
 
@@ -714,7 +714,7 @@ C<Data::Record::Serialize::Role::Base> is the base role for
 L<Data::Record::Serialize>.  It serves the place of a base class, except
 as a role there is no overhead during method lookup
 
-=head1 ATTRIBUTES
+=head1 OBJECT ATTRIBUTES
 
 =head2 C<types>
 
@@ -903,6 +903,8 @@ The fully resolved mapping between output field name and output field type.  If 
 encoder has specified a type map, the output types are the result of
 that mapping.  This is only valid after the first record has been sent.
 
+=head1 INTERNALS
+
 =begin internals
 
 =sub _build_field_list_with_type
@@ -921,7 +923,7 @@ ANY ) if the specification is boolean, return a list.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>
 
 =head2 Source
 

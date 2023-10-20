@@ -74,7 +74,9 @@ lib/SPVM/Builder/include/spvm_api_class_file.h
 lib/SPVM/Builder/include/spvm_api_class_var.h
 lib/SPVM/Builder/include/spvm_api_compiler.h
 lib/SPVM/Builder/include/spvm_api_field.h
+lib/SPVM/Builder/include/spvm_api_internal.h
 lib/SPVM/Builder/include/spvm_api_method.h
+lib/SPVM/Builder/include/spvm_api_mutex.h
 lib/SPVM/Builder/include/spvm_api_runtime.h
 lib/SPVM/Builder/include/spvm_api_string_buffer.h
 lib/SPVM/Builder/include/spvm_api_type.h
@@ -144,7 +146,9 @@ lib/SPVM/Builder/src/spvm_api_class_file.c
 lib/SPVM/Builder/src/spvm_api_class_var.c
 lib/SPVM/Builder/src/spvm_api_compiler.c
 lib/SPVM/Builder/src/spvm_api_field.c
+lib/SPVM/Builder/src/spvm_api_internal.c
 lib/SPVM/Builder/src/spvm_api_method.c
+lib/SPVM/Builder/src/spvm_api_mutex.c
 lib/SPVM/Builder/src/spvm_api_runtime.c
 lib/SPVM/Builder/src/spvm_api_string_buffer.c
 lib/SPVM/Builder/src/spvm_api_type.c
@@ -192,6 +196,8 @@ lib/SPVM/Builder/Util/API.pm
 lib/SPVM/Byte.pm
 lib/SPVM/ByteList.pm
 lib/SPVM/ByteList.spvm
+lib/SPVM/Callback.pm
+lib/SPVM/Callback.spvm
 lib/SPVM/Cloneable.pm
 lib/SPVM/Cloneable.spvm
 lib/SPVM/Cloner.pm
@@ -228,8 +234,10 @@ lib/SPVM/Document/NativeAPI/ClassFile.pm
 lib/SPVM/Document/NativeAPI/ClassVariable.pm
 lib/SPVM/Document/NativeAPI/Compiler.pm
 lib/SPVM/Document/NativeAPI/Field.pm
+lib/SPVM/Document/NativeAPI/Internal.pm
 lib/SPVM/Document/NativeAPI/Method.pm
 lib/SPVM/Document/NativeAPI/ModuleFile.pm
+lib/SPVM/Document/NativeAPI/Mutex.pm
 lib/SPVM/Document/NativeAPI/Runtime.pm
 lib/SPVM/Document/NativeAPI/StringBuffer.pm
 lib/SPVM/Document/NativeAPI/Type.pm
@@ -334,8 +342,6 @@ lib/SPVM/Native/MethodCall.c
 lib/SPVM/Native/MethodCall.config
 lib/SPVM/Native/MethodCall.pm
 lib/SPVM/Native/MethodCall.spvm
-lib/SPVM/Native/MethodCall/Callback.pm
-lib/SPVM/Native/MethodCall/Callback.spvm
 lib/SPVM/Native/Runtime.c
 lib/SPVM/Native/Runtime.config
 lib/SPVM/Native/Runtime.pm
@@ -351,8 +357,6 @@ lib/SPVM/Point3D.spvm
 lib/SPVM/Runtime.pm
 lib/SPVM/Scope/Guard.pm
 lib/SPVM/Scope/Guard.spvm
-lib/SPVM/Scope/Guard/Handler.pm
-lib/SPVM/Scope/Guard/Handler.spvm
 lib/SPVM/Short.pm
 lib/SPVM/ShortList.pm
 lib/SPVM/ShortList.spvm
@@ -367,6 +371,10 @@ lib/SPVM/Stringer.pm
 lib/SPVM/Stringer.spvm
 lib/SPVM/StringList.pm
 lib/SPVM/StringList.spvm
+lib/SPVM/Sync/Mutex.c
+lib/SPVM/Sync/Mutex.config
+lib/SPVM/Sync/Mutex.pm
+lib/SPVM/Sync/Mutex.spvm
 lib/SPVM/Time.pm
 lib/SPVM/Time/Info.pm
 LICENSE
@@ -684,6 +692,7 @@ t/02_vm/08_module/ShortList.t
 t/02_vm/08_module/Sort.t
 t/02_vm/08_module/StringBuffer.t
 t/02_vm/08_module/StringList.t
+t/02_vm/08_module/Sync_Mutex.t
 t/02_vm/09_stdio/stdio.t
 t/02_vm/99_extra/examples.t
 t/02_vm/99_extra/issues.t
@@ -805,6 +814,7 @@ t/02_vm/lib/SPVM/TestCase/Module/ShortList.spvm
 t/02_vm/lib/SPVM/TestCase/Module/Sort.spvm
 t/02_vm/lib/SPVM/TestCase/Module/StringBuffer.spvm
 t/02_vm/lib/SPVM/TestCase/Module/StringList.spvm
+t/02_vm/lib/SPVM/TestCase/Module/Sync/Mutex.spvm
 t/02_vm/lib/SPVM/TestCase/ModuleContainsMultiClass.spvm
 t/02_vm/lib/SPVM/TestCase/ModuleContainsMultiClass/FloatMatrix.spvm
 t/02_vm/lib/SPVM/TestCase/ModuleContainsMultiPackage.spvm

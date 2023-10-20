@@ -7,7 +7,7 @@ SYNOPSIS
      my $obj = PYX::GraphViz->new(%parameters);
      $obj->parse($pyx, $out);
      $obj->parse_file($input_file, $out);
-     $obj->parse_handle($input_file_handler, $out);
+     $obj->parse_handler($input_file_handler, $out);
 
 METHODS
     "new(%parameters)"
@@ -132,5 +132,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

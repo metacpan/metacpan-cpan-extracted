@@ -1,0 +1,8 @@
+{
+  "App::DBI": {
+    Database: {
+       value1: "__ENV(LOL)__",
+       value2: "__ENV(LOL_WITH_UNDERSCORE)__",
+    }
+  }
+}

@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Ky::Any::Kg - Package for language Kyrgyz
 
 =cut
 
 package Locale::CLDR::Locales::Ky::Any::Kg;
-# This file auto generated from Data/common/main/ky_KG.xml
-#	on Mon 11 Apr  5:32:26 pm GMT
+# This file auto generated from Data\common\main\ky_KG.xml
+#	on Fri 13 Oct  9:25:12 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

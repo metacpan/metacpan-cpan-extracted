@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,16 +25,19 @@ requires:
   Exporter: '0'
   File::Temp: '0'
   File::chdir: '0'
+  Getopt::Long: '0'
   Importer: '0'
   PadWalker: '0'
   Path::Tiny: '0.125'
   Scalar::Readonly: '0'
+  Test2::API: '0'
   Test2::Tools::Basic: '0'
   Test2::Tools::Explain: '0'
+  Test2::Tools::Subtest: '0'
   Test2::V0: '0'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/jsf116/Test-Expander/issues
   repository: git://github.com/jsf116/Test-Expander.git
-version: v2.1.5
+version: v2.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,8 +1,8 @@
 # Parse::PlainConfig::Legacy -- Parsing Engine Legacy for Parse::PlainConfig
 #
-# (c) 2002 - 2016, Arthur Corliss <corliss@digitalmages.com>,
+# (c) 2002 - 2023, Arthur Corliss <corliss@digitalmages.com>,
 #
-# $Id: lib/Parse/PlainConfig/Legacy.pm, 3.05 2017/02/06 10:36:37 acorliss Exp $
+# $Id: lib/Parse/PlainConfig/Legacy.pm, 3.06 2023/09/23 19:24:20 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -23,7 +23,7 @@ use strict;
 use warnings;
 use vars qw($VERSION);
 
-($VERSION) = ( q$Revision: 3.05 $ =~ /(\d+(?:\.(\d+))+)/sm );
+($VERSION) = ( q$Revision: 3.06 $ =~ /(\d+(?:\.(\d+))+)/sm );
 
 use Parse::PlainConfig::Constants qw(:all);
 use Text::ParseWords;
@@ -77,8 +77,7 @@ sub new {
     my %args = @_;
     my ( $k, $v, $rv );
 
-    pdebug( 'entering', PPCDLEVEL1 );
-    pIn();
+    subPreamble( PPCDLEVEL1, '$%', $class, %args );
 
     bless $self, $class;
 
@@ -93,8 +92,7 @@ sub new {
 
     $self = undef unless $rv;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PPCDLEVEL1, $self );
+    subPostamble( PPCDLEVEL1, '$', $self );
 
     return $self;
 }
@@ -117,8 +115,7 @@ sub property {
     croak 'Mandatory first argument must be a valid property name'
         unless defined $arg and exists $$self{$arg};
 
-    pdebug( 'entering w/(%s)(%s)', PPCDLEVEL1, $arg, $ival );
-    pIn();
+    subPreamble( PPCDLEVEL1, '$$', $arg, $val );
 
     pdebug( 'method is in ' . ( scalar @args == 2 ? 'set' : 'get' ) . ' mode',
         PPCDLEVEL1 );
@@ -233,8 +230,7 @@ sub property {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PPCDLEVEL1, $rv );
+    subPostamble( PPCDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -248,8 +244,7 @@ sub purge {
     my $self = shift;
     my ( $k, $v );
 
-    pdebug( 'entering', PPCDLEVEL1 );
-    pIn();
+    subPreamble( PPCDLEVEL1, '$', $self );
 
     # First, purge all existing values
     delete @{ $$self{CONF} }{ keys %{ $$self{CONF} } };
@@ -259,8 +254,7 @@ sub purge {
         $$self{CONF}{$k} = { 'Value' => $v };
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: 1', PPCDLEVEL1 );
+    subPostamble( PPCDLEVEL1, '$', 1 );
 
     return 1;
 }
@@ -282,8 +276,7 @@ sub read {
         . 'property must be set'
         unless defined $file;
 
-    pdebug( 'entering w/(%s)', PPCDLEVEL1, $file );
-    pIn();
+    subPreamble( PPCDLEVEL1, '$$', $self, $file );
 
     # Reset the error string and update the internal filename
     Parse::PlainConfig::Legacy::ERROR = '';
@@ -316,8 +309,7 @@ sub read {
     # Restore old size limit
     PIOMAXFSIZE = $oldSize;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PPCDLEVEL1, $rv );
+    subPostamble( PPCDLEVEL1, '$', $rv );
 
     # Return the result code
     return $rv;
@@ -338,8 +330,7 @@ sub readIfNewer ($) {
 
     croak 'The FILE property must be set' unless defined $file;
 
-    pdebug( 'entering w/(%s)', PPCDLEVEL1, $file );
-    pIn();
+    subPreamble( PPCDLEVEL1, '$', $self );
 
     # Try to read the file
     if ( -e $file && -r _ ) {
@@ -359,8 +350,7 @@ sub readIfNewer ($) {
             PPCDLEVEL1, $file );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PPCDLEVEL1, $rv );
+    subPostamble( PPCDLEVEL1, '$', $rv );
 
     # Return the result code
     return $rv;
@@ -399,8 +389,7 @@ sub write {
     $padding = 2 unless defined $padding;
     $tw -= 2 unless $smart;
 
-    pdebug( 'entering w/(%s)(%s)', PPCDLEVEL1, $file, $padding );
-    pIn();
+    subPreamble( PPCDLEVEL1, '$$$', $self, $file, $padding );
 
     # Pad the delimiter as specified
     $paramDelim =
@@ -522,8 +511,7 @@ sub write {
             pdebug( 'illegal characters in filename: %s', PPCDLEVEL1, $file );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PPCDLEVEL1, $rv );
+    subPostamble( PPCDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -573,8 +561,7 @@ sub parameter {
     croak 'Mandatory firest argument must be a defined parameter name'
         unless defined $param;
 
-    pdebug( 'entering w/(%s)(%s)', PPCDLEVEL1, $param, $ivalue );
-    pIn();
+    subPreamble( PPCDLEVEL1, '$$$', $self, $param, $ivalue );
 
     if ( scalar @args == 2 ) {
         pdebug( 'method in set mode', PPCDLEVEL1 );
@@ -704,8 +691,7 @@ sub parameter {
             :                             undef;
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PPCDLEVEL1, $rv );
+    subPostamble( PPCDLEVEL1, '$', $rv );
 
     return ref $rv eq 'HASH' ? (%$rv) : ref $rv eq 'ARRAY' ? (@$rv) : $rv;
 }
@@ -730,8 +716,7 @@ sub coerce {
     croak 'Remaining arguments must be defined parameter names'
         unless @params;
 
-    pdebug( 'entering w/(%s)(%s)', PPCDLEVEL1, $type, @params );
-    pIn();
+    subPreamble( PPCDLEVEL1, '$$@', $self, $type, @params );
 
     foreach (@params) {
         if (defined) {
@@ -750,8 +735,7 @@ sub coerce {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PPCDLEVEL1, $rv );
+    subPostamble( PPCDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -767,8 +751,7 @@ sub describe {
     my $coerce = $$self{COERCE};
     my %new    = (@_);
 
-    pdebug( 'entering', PPCDLEVEL1 );
-    pIn();
+    subPreamble( PPCDLEVEL1, '$', $self );
 
     # TODO: Consider allowing comment tags to be specified
 
@@ -791,8 +774,7 @@ sub describe {
         $$conf{$_}{Description} = $new{$_};
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: 1', PPCDLEVEL1 );
+    subPostamble( PPCDLEVEL1, '$', 1 );
 
     return 1;
 }
@@ -841,8 +823,7 @@ sub _parse {
     croak 'LIST_DELIM and HASH_DELIM cannot be the same character sequence!'
         unless $$self{LIST_DELIM} ne $$self{HASH_DELIM};
 
-    pdebug( 'entering', PPCDLEVEL2 );
-    pIn();
+    subPreamble( PPCDLEVEL1, '$', $self );
 
     # Flatten lines using an explicit backslash
     for ( $i = 0; $i <= $#lines; $i++ ) {
@@ -1005,8 +986,7 @@ sub _parse {
     }
     &$saveEntry() if length $entry;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PPCDLEVEL2, $rv );
+    subPostamble( PPCDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -1026,10 +1006,9 @@ sub _wrap {
     my $paragraph   = shift;
     my ( @lines, $segment, $output );
 
-    pdebug( "entering w/(%s)(%s)(%s)(%s):\n\t%s",
-        PPCDLEVEL2, $firstIndent, $subIndent, $textWidth, $lineBreak,
-        $paragraph );
-    pIn();
+    subPreamble( PPCDLEVEL2, '$$$$p', $firstIndent, $subIndent,
+        $textWidth, $lineBreak, $paragraph
+        );
 
     # Expand tabs in everything -- sorry everyone
     ($firstIndent) = expand($firstIndent);
@@ -1075,8 +1054,7 @@ sub _wrap {
 
     $output = join '', @lines;
 
-    pOut();
-    pdebug( "leaving w/rv:\n%s", PPCDLEVEL2, $output );
+    subPostamble( PPCDLEVEL1, 'p', $output );
 
     return $output;
 }
@@ -1096,13 +1074,11 @@ sub hasParameter {
     croak 'Mandatory first parameter must be a defined parameter name'
         unless defined $param;
 
-    pdebug( 'entering w/(%s)', PPCDLEVEL1, $param );
-    pIn();
+    subPreamble( PPCDLEVEL1, '$$', $self, $param );
 
     $rv = scalar grep /^\Q$param\E$/sm, @params;
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PPCDLEVEL1, $rv );
+    subPostamble( PPCDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -1117,7 +1093,7 @@ Parse::PlainConfig::Legacy - Parsing engine Legacy for Parse::PlainConfig
 
 =head1 VERSION
 
-$Id: lib/Parse/PlainConfig/Legacy.pm, 3.05 2017/02/06 10:36:37 acorliss Exp $
+$Id: lib/Parse/PlainConfig/Legacy.pm, 3.06 2023/09/23 19:24:20 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -1579,5 +1555,5 @@ Arthur Corliss (corliss@digitalmages.com)
 This software is licensed under the same terms as Perl, itself. 
 Please see http://dev.perl.org/licenses/ for more information.
 
-(c) 2002 - 2016, Arthur Corliss (corliss@digitalmages.com)
+(c) 2002 - 2023, Arthur Corliss (corliss@digitalmages.com)
 

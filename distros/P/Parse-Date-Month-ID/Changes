@@ -1,3 +1,10 @@
+0.003   2023-07-25  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Mention Parse::Date::Month::EN.
+
+
 0.002   2023-06-16  Released-By: PERLANCAR; Urgency: medium
 
         - Add 2-letter abbreviations.

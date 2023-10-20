@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMemXS.pm
-## Version v0.1.3
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 1970/01/01
-## Modified 2022/11/18
+## Modified 2023/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -20,7 +20,7 @@ BEGIN
     use vars qw( $SUPPORTED_RE $SYSV_SUPPORTED $SEMOP_ARGS $SHEM_REPO $ID2OBJ $N $HAS_B64 );
     use Config;
     use File::Spec ();
-    use Nice::Try;
+    # use Nice::Try;
     use Scalar::Util ();
     use JSON 4.03 qw( -convert_blessed_universally );
     use Storable::Improved ();
@@ -109,7 +109,7 @@ EOT
             lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.1.3';
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -149,15 +149,24 @@ sub addr
     my $self = shift( @_ );
     my $shm = $self->_ipc_shared ||
         return( $self->error( "No IPC::SharedMem object set. Have you opened the shared memory?" ) );
-    try
+    # try-catch
+    local $@;
+    my @rv = eval
     {
         return( $shm->addr );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error with \$shm->addr: $e" ) );
+        return( $self->error( "Error with \$shm->addr: $@" ) );
+    }
+    else
+    {
+        return( $rv[0] );
     }
 }
+
+# This class does not convert to an HASH
+sub as_hash { return( $_[0] ); }
 
 sub attach
 {
@@ -166,13 +175,19 @@ sub attach
     $flags = $self->flags if( !defined( $flags ) );
     my $shm = $self->_ipc_shared ||
         return( $self->error( "No IPC::SharedMem object set. Have you opened the shared memory?" ) );
-    try
+    # try-catch
+    local $@;
+    my @rv = eval
     {
         return( $shm->attach( $flags ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error with \$shm->attach: $e" ) );
+        return( $self->error( "Error with \$shm->attach: $@" ) );
+    }
+    else
+    {
+        return( $rv[0] );
     }
 }
 
@@ -204,15 +219,18 @@ sub detach
     my $self = shift( @_ );
     my $shm = $self->_ipc_shared ||
         return( $self->error( "No IPC::SharedMem object set. Have you opened the shared memory?" ) );
-    try
+    my $rv;
+    # try-catch
+    local $@;
+    eval
     {
-        my $rv = $shm->detach;
-        return( $self->error( "Unable to detach from shared memory: $!" ) ) if( !defined( $rv ) );
-    }
-    catch( $e )
+        $rv = $shm->detach;
+    };
+    if( $@ )
     {
-        return( $self->error( "Error detaching shared memory block previously attached: $e" ) );
+        return( $self->error( "Error detaching shared memory block previously attached: $@" ) );
     }
+    return( $self->error( "Unable to detach from shared memory: $!" ) ) if( !defined( $rv ) );
     return( $self );
 }
 
@@ -240,31 +258,32 @@ sub exists
     no strict 'subs';
     $flags = ( $flags ^ &IPC::SysV::IPC_CREAT );
     
-    try
+    my $shm;
+    # try-catch
+    local $@;
+    eval
     {
-        my $shm;
         if( defined( $key ) )
         {
             $shm = IPC::SharedMem->new( $key, $opts->{size}, $flags );
-            return(0) if( !defined( $shm ) );
+        }
+    };
+    if( $@ )
+    {
+        if( $@ =~ /shmget[[:blank:]\h]+not[[:blank:]\h]+implemented/i )
+        {
+            return( $self->error( "IPC SysV is supported, but somehow shmget is not implemented: $@" ) );
         }
         else
         {
-            # $shm = IPC::SharedMem->new( &IPC::SysV::IPC_PRIVATE, $opts->{size}, $flags );
-            # No key is specified, thus we would be using IPC_PRIVATE, which would mean 
-            # creating a new shared memory
-            return(0);
+            return( $self->error( "Error trying to find out if this shared memory segment already exists: $@" ) );
         }
-        return( $shm->id );
     }
-    catch( $e where { /shmget[[:blank:]\h]+not[[:blank:]\h]+implemented/i } )
-    {
-        return( $self->error( "IPC SysV is supported, but somehow shmget is not implemented: $e" ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Error trying to find out if this shared memory segment already exists: $e" ) );
-    }
+    # $shm = IPC::SharedMem->new( &IPC::SysV::IPC_PRIVATE, $opts->{size}, $flags );
+    # No key is specified, thus we would be using IPC_PRIVATE, which would mean 
+    # creating a new shared memory
+    return(0) if( !defined( $shm ) );
+    return( $shm->id );
 }
 
 sub flags
@@ -288,14 +307,18 @@ sub id
     my $self = shift( @_ );
     my $shm = $self->_ipc_shared ||
         return( $self->error( "No IPC::SharedMem object set. Have you opened the shared memory?" ) );
-    try
+    my $rv;
+    # try-catch
+    local $@;
+    eval
     {
-        return( $shm->id );
-    }
-    catch( $e )
+        $rv = $shm->id;
+    };
+    if( $@ )
     {
-        return( $self->error( "Error with \$shm->id: $e" ) );
+        return( $self->error( "Error with \$shm->id: $@" ) );
     }
+    return( $rv );
 }
 
 sub json { return( shift->_packing_method( 'json' ) ); }
@@ -327,24 +350,28 @@ sub lock
         return( $self->error( "No IPC::Semaphore object set. Have you opened the shared memory?" ) );
     my $semid = $sem->id;
     return( $self->error( "No semaphore id set yet." ) ) if( !defined( $semid ) );
-    try
+    my $rc;
+    # try-catch
+    local $@;
+    eval
     {
         local $SIG{ALRM} = sub{ die( "timeout" ); };
         alarm( $timeout );
-        my $rc = $sem->op( @{$SEMOP_ARGS->{ $type }} );
+        $rc = $sem->op( @{$SEMOP_ARGS->{ $type }} );
         alarm(0);
-        if( $rc )
-        {
-            $self->locked( $type );
-        }
-        else
-        {
-            return( $self->error( "Failed to set a lock on semaphore id \"$semid\" for lock type $type: $!" ) );
-        }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Unable to set a lock: $e" ) );
+        return( $self->error( "Unable to set a lock: $@" ) );
+    }
+    
+    if( $rc )
+    {
+        $self->locked( $type );
+    }
+    else
+    {
+        return( $self->error( "Failed to set a lock on semaphore id \"$semid\" for lock type $type: $!" ) );
     }
     return( $self );
 }
@@ -391,14 +418,16 @@ sub open
     my $flags = $self->flags( create => $create, ( $opts->{mode} =~ /^\d+$/ ? $opts->{mode} : () ) );
     
     my $shm;
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $key //= &IPC::SysV::IPC_PRIVATE;
         $shm = IPC::SharedMem->new( $key, $opts->{size}, $flags );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error instantiating a new IPC::SharedMem object: $e" ) );
+        return( $self->error( "Error instantiating a new IPC::SharedMem object: $@" ) );
     }
     
     if( !defined( $shm ) )
@@ -407,13 +436,15 @@ sub open
     }
     
     my $sem;
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $sem = IPC::Semaphore->new( $key, 3, $flags );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error instantiating a new IPC::Semaphore object: $e" ) );
+        return( $self->error( "Error instantiating a new IPC::Semaphore object: $@" ) );
     }
     
     if( !defined( $sem ) )
@@ -468,13 +499,15 @@ sub op
     my $id = $sem->id;
     return( $self->error( "No semaphore set yet. You must open the shared memory first to set the semaphore." ) ) if( !length( $id ) );
     my $rv;
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $rv = $sem->op( @_ );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error passing operation list to semaphore id $id: $e" ) );
+        return( $self->error( "Error passing operation list to semaphore id $id: $@" ) );
     }
     return( $rv );
 }
@@ -488,15 +521,18 @@ sub pid
     return( $self->error( "No semaphore provided." ) ) if( !defined( $sem ) || !length( $sem ) );
     my $obj = $self->_sem ||
         return( $self->error( "No IPC::Semaphore object set. Have you opened the shared memory?" ) );
-    try
+    my $rv;
+    # try-catch
+    local $@;
+    eval
     {
-        my $rv = $obj->getpid( $sem );
-        return( ( defined( $rv ) && $rv ) ? 0 + $rv : undef() );
-    }
-    catch( $e )
+        $rv = $obj->getpid( $sem );
+    };
+    if( $@ )
     {
-        return( $self->error( "Error getting the last process id of the semaphore: $e" ) );
+        return( $self->error( "Error getting the last process id of the semaphore: $@" ) );
     }
+    return( ( defined( $rv ) && $rv ) ? 0 + $rv : undef() );
 }
 
 sub rand
@@ -523,15 +559,17 @@ sub read
     my $id = $shm->id;
     return( $self->error( "No shared memory id! Have you opened it first?" ) ) if( !length( $id ) );
     my $buffer;
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $buffer = $shm->read( 0, $size );
-        return( $self->error( "Error reading from shared memory: $!" ) ) if( !defined( $buffer ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error with \$shm->read: $e" ) );
+        return( $self->error( "Error with \$shm->read: $@" ) );
     }
+    return( $self->error( "Error reading from shared memory: $!" ) ) if( !defined( $buffer ) );
     
     my $packing = $self->_packing_method;
     # NOTE: Get rid of nulls end padded only for CBOR::XS, but not for Sereal and Storable who know how to handle them
@@ -549,13 +587,24 @@ sub read
             substr( $buffer, $len, length( $buffer ), '' );
         }
         
-        try
+        if( $packing eq 'json' )
         {
-            if( $packing eq 'json' )
+            # try-catch
+            local $@;
+            eval
             {
                 $data = $self->_decode_json( $buffer );
+            };
+            if( $@ )
+            {
+                return( $self->error( "An error occured while decoding data using $packing with base64 set to '", ( $self->{base64} // '' ), "': $@" ) );
             }
-            elsif( $packing eq 'cbor' )
+        }
+        elsif( $packing eq 'cbor' )
+        {
+            # try-catch
+            local $@;
+            eval
             {
                 $data = $self->deserialise(
                     data => $buffer,
@@ -563,8 +612,17 @@ sub read
                     allow_sharing => 1,
                     ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
                 );
+            };
+            if( $@ )
+            {
+                return( $self->error( "An error occured while decoding data using $packing with base64 set to '", ( $self->{base64} // '' ), "': $@" ) );
             }
-            elsif( $packing eq 'sereal' )
+        }
+        elsif( $packing eq 'sereal' )
+        {
+            # try-catch
+            local $@;
+            eval
             {
                 $data = $self->deserialise(
                     data => $buffer,
@@ -572,9 +630,18 @@ sub read
                     freeze_callbacks => 1,
                     ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
                 );
+            };
+            if( $@ )
+            {
+                return( $self->error( "An error occured while decoding data using $packing with base64 set to '", ( $self->{base64} // '' ), "': $@" ) );
             }
-            # By default Storable::Improved
-            else
+        }
+        # By default Storable::Improved
+        else
+        {
+            # try-catch
+            local $@;
+            eval
             {
                 # $data = Storable::Improved::thaw( $buffer );
                 $data = $self->deserialise(
@@ -582,11 +649,11 @@ sub read
                     serialiser => 'Storable::Improved',
                     ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
                 );
+            };
+            if( $@ )
+            {
+                return( $self->error( "An error occured while decoding data using $packing with base64 set to '", ( $self->{base64} // '' ), "': $@" ) );
             }
-        }
-        catch( $e )
-        {
-            return( $self->error( "An error occured while decoding data using $packing with base64 set to '", ( $self->{base64} // '' ), "': $e" ) );
         }
     }
     else
@@ -617,14 +684,16 @@ sub remove
     $semid = $sem->id if( $sem );
     $self->unlock();
     my $rv;
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $sem->remove if( $sem );
         $rv = $shm->remove;
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error with \$shm->remove: $e" ) );
+        return( $self->error( "Error with \$shm->remove: $@" ) );
     }
     if( $rv )
     {
@@ -655,13 +724,15 @@ sub remove_semaphore
     $self->unlock();
     my $rv;
     
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $rv = $sem->remove;
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error removing semaphore object: $e" ) );
+        return( $self->error( "Error removing semaphore object: $@" ) );
     }
     
     if( !defined( $rv ) )
@@ -710,14 +781,18 @@ sub semid
     my $self = shift( @_ );
     my $sem = $self->_sem ||
         return( $self->error( "No IPC::Semaphore object set. Have you opened the shared memory?" ) );
-    try
+    my $rv;
+    # try-catch
+    local $@;
+    eval
     {
-        return( $sem->id );
-    }
-    catch( $e )
+        $rv = $sem->id;
+    };
+    if( $@ )
     {
-        return( $self->error( "Error with retrieving semaphore id: $e" ) );
+        return( $self->error( "Error with retrieving semaphore id: $@" ) );
     }
+    return( $rv );
 }
 
 sub sereal { return( shift->_packing_method( 'sereal' ) ); }
@@ -734,14 +809,18 @@ sub shmstat
     my $self = shift( @_ );
     my $shm = $self->_ipc_shared ||
         return( $self->error( "No IPC::SharedMem object set. Have you opened the shared memory?" ) );
-    try
+    my $rv; 
+    # try-catch
+    local $@;
+    eval
     {
-        return( $shm->stat );
-    }
-    catch( $e )
+        $rv = $shm->stat;
+    };
+    if( $@ )
     {
-        return( $self->error( "Error with \$shm->stat: $e" ) );
+        return( $self->error( "Error with \$shm->stat: $@" ) );
     }
+    return( $rv );
 }
 
 sub size { return( shift->_set_get_scalar( 'size', @_ ) ); }
@@ -757,30 +836,37 @@ sub stat
         if( @_ == 1 )
         {
             my $sem = shift( @_ );
-            try
+            my $v;
+            # try-catch
+            local $@;
+            eval
             {
-                my $v = $obj->getval( $sem );
-                return( $self->error( "Error with \$sem->getval: $!" ) ) if( !defined( $v ) && $! );
-                return if( !defined( $v ) );
-                return( 0 + $v );
-            }
-            catch( $e )
+                $v = $obj->getval( $sem );
+            };
+            if( $@ )
             {
-                return( $self->error( "Error getting value for semaphore '$sem': $e" ) );
+                return( $self->error( "Error getting value for semaphore '$sem': $@" ) );
             }
+            return( $self->error( "Error with \$sem->getval: $!" ) ) if( !defined( $v ) && $! );
+            return if( !defined( $v ) );
+            return( 0 + $v );
         }
         else
         {
             my( $sem, $val ) = @_;
-            try
+            my $rv;
+            # try-catch
+            local $@;
+            eval
             {
-                $obj->setval( $sem => $val ) ||
-                    return( $self->error( "Unable to semctl with semaphore id '$id', semaphore '$sem', SETVAL='", &IPC::SysV::SETVAL, "' and value='$val': $!" ) );
-            }
-            catch( $e )
+                $rv = $obj->setval( $sem => $val );
+            };
+            if( $@ )
             {
-                return( $self->error( "Error setting value for semaphore '$sem': $e" ) );
+                return( $self->error( "Error setting value for semaphore '$sem': $@" ) );
             }
+            return( $self->error( "Unable to semctl with semaphore id '$id', semaphore '$sem', SETVAL='", &IPC::SysV::SETVAL, "' and value='$val': $!" ) ) if( !defined( $rv ) );
+            return( $rv );
         }
     }
     else
@@ -788,26 +874,34 @@ sub stat
         my $data = '';
         if( wantarray() )
         {
-            try
+            my @sem;
+            # try-catch
+            local $@;
+            eval
             {
-                return( $obj->getall );
-            }
-            catch( $e )
+                @sem = $obj->getall;
+            };
+            if( $@ )
             {
-                return( $self->error( "Error getting all semaphore values as an array: $e" ) );
+                return( $self->error( "Error getting all semaphore values as an array: $@" ) );
             }
+            return( @sem );
         }
         else
         {
-            try
+            my $stats;
+            # try-catch
+            local $@;
+            eval
             {
-                return( $obj->stat ) ||
-                    return( $self->error( "Unable to stat semaphore with id '$id': $!" ) );
-            }
-            catch( $e )
+                $stats = $obj->stat;
+            };
+            if( $@ )
             {
-                return( $self->error( "Error getting a stat object for semaphore id $id: $e" ) );
+                return( $self->error( "Error getting a stat object for semaphore id $id: $@" ) );
             }
+            return( $self->error( "Unable to stat semaphore with id '$id': $!" ) ) if( !$stats );
+            return( $stats );
         }
     }
 }
@@ -848,49 +942,78 @@ sub write
     my $size = int( $self->size() ) || SHM_BUFSIZ;
     my $packing = $self->_packing_method;
     my $encoded;
-    try
+    if( $packing eq 'json' )
     {
-        if( $packing eq 'json' )
+        # try-catch
+        local $@;
+        eval
         {
             $encoded = $self->_encode_json( $data );
+        };
+        if( $@ )
+        {
+            return( $self->error( "An error occured encoding data provided using $packing with base64 set to '", ( $self->{base64} // '' ), ": $@. Data was: '$data'" ) );
         }
-        elsif( $packing eq 'cbor' )
+    }
+    elsif( $packing eq 'cbor' )
+    {
+        # try-catch
+        local $@;
+        eval
         {
             $encoded = $self->serialise( $data,
                 serialiser => 'CBOR::XS',
                 allow_sharing => 1,
                 ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
             );
-            return( $self->error( "Unable to serialise ", CORE::length( $data ), " bytes of data using CBOR::XS with base64 set to '", ( $self->{base64} // '' ), ": ", $self->error ) ) if( !defined( $encoded ) );
-        }
-        elsif( $packing eq 'sereal' )
+        };
+        if( $@ )
         {
-            $self->_load_class( 'Sereal::Encoder' ) || return( $self->pass_error );
-            my $const;
-            $const = \&{"Sereal\::Encoder::SRL_ZLIB"} if( defined( &{"Sereal\::Encoder::SRL_ZLIB"} ) );
+            return( $self->error( "An error occured encoding data provided using $packing with base64 set to '", ( $self->{base64} // '' ), ": $@. Data was: '$data'" ) );
+        }
+        return( $self->error( "Unable to serialise ", CORE::length( $data ), " bytes of data using CBOR::XS with base64 set to '", ( $self->{base64} // '' ), ": ", $self->error ) ) if( !defined( $encoded ) );
+    }
+    elsif( $packing eq 'sereal' )
+    {
+        $self->_load_class( 'Sereal::Encoder' ) || return( $self->pass_error );
+        my $const;
+        $const = \&{"Sereal\::Encoder::SRL_ZLIB"} if( defined( &{"Sereal\::Encoder::SRL_ZLIB"} ) );
+        # try-catch
+        local $@;
+        eval
+        {
             $encoded = $self->serialise( $data,
                 serialiser => 'Sereal',
                 freeze_callbacks => 1,
                 ( defined( $const ) ? ( compress => $const->() ) : () ),
                 ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
             );
-            return( $self->error( "Unable to serialise ", CORE::length( $data ), " bytes of data using Sereal with base64 set to '", ( $self->{base64} // '' ), ": ", $self->error ) ) if( !defined( $encoded ) );
-        }
-        # Default to Storable::Improved
-        else
+        };
+        if( $@ )
         {
-            # local $Storable::forgive_me = 1;
-            # $encoded = Storable::Improved::freeze( $data );
+            return( $self->error( "An error occured encoding data provided using $packing with base64 set to '", ( $self->{base64} // '' ), ": $@. Data was: '$data'" ) );
+        }
+        return( $self->error( "Unable to serialise ", CORE::length( $data ), " bytes of data using Sereal with base64 set to '", ( $self->{base64} // '' ), ": ", $self->error ) ) if( !defined( $encoded ) );
+    }
+    # Default to Storable::Improved
+    else
+    {
+        # try-catch
+        local $@;
+        # local $Storable::forgive_me = 1;
+        # $encoded = Storable::Improved::freeze( $data );
+        eval
+        {
             $encoded = $self->serialise( $data,
                 serialiser => 'Storable::Improved',
                 ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
             );
-            return( $self->error( "Unable to serialise ", CORE::length( $data ), " bytes of data using Storable with base64 set to '", ( $self->{base64} // '' ), ": ", $self->error ) ) if( !defined( $encoded ) );
+        };
+        if( $@ )
+        {
+            return( $self->error( "An error occured encoding data provided using $packing with base64 set to '", ( $self->{base64} // '' ), ": $@. Data was: '$data'" ) );
         }
-    }
-    catch( $e )
-    {
-        return( $self->error( "An error occured encoding data provided using $packing with base64 set to '", ( $self->{base64} // '' ), ": $e. Data was: '$data'" ) );
+        return( $self->error( "Unable to serialise ", CORE::length( $data ), " bytes of data using Storable with base64 set to '", ( $self->{base64} // '' ), ": ", $self->error ) ) if( !defined( $encoded ) );
     }
     
     # Simple encapsulation
@@ -903,15 +1026,18 @@ sub write
         return( $self->error( "Data to write are ${len} bytes long and exceed the maximum you have set of '$size'." ) );
     }
     
-    try
+    my $rv;
+    # try-catch
+    local $@;
+    eval
     {
-        my $rv = $shm->write( $encoded, 0, $len ) ||
-            return( $self->error( "Unable to write ${len} bytes of data to shared memory block: $!" ) );
-    }
-    catch( $e )
+        $rv = $shm->write( $encoded, 0, $len );
+    };
+    if( $@ )
     {
-        return( $self->error( "Error with \$shm->write: $e" ) );
+        return( $self->error( "Error with \$shm->write: $@" ) );
     }
+    return( $self->error( "Unable to write ${len} bytes of data to shared memory block: $!" ) ) if( !$rv );
     return( $self );
 }
 
@@ -954,16 +1080,19 @@ sub _decode_json
         return( $this );
     };
     
-    try
+    my $result;
+    # try-catch
+    local $@;
+    eval
     {
         my $decoded = $j->decode( $data );
-        my $result = $crawl->( $decoded );
-        return( $result );
-    }
-    catch( $e )
+        $result = $crawl->( $decoded );
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to decode JSON data: $e" ) );
+        return( $self->error( "An error occurred while trying to decode JSON data: $@" ) );
     }
+    return( $result );
 }
 
 # Purpose of this method is to recursively check the given data and change scalar reference if they are anything else than 1 or 0, otherwise JSON would complain
@@ -1020,15 +1149,18 @@ sub _encode_json
     };
     my $ref = $crawl->( $data );
     my $j = JSON->new->utf8->relaxed->allow_nonref->convert_blessed;
-    try
+    my $encoded;
+    # try-catch
+    local $@;
+    eval
     {
-        my $encoded = $j->encode( $ref );
-        return( $encoded );
-    }
-    catch( $e )
+        $encoded = $j->encode( $ref );
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to JSON encode data: $e" ) );
+        return( $self->error( "An error occurred while trying to JSON encode data: $@" ) );
     }
+    return( $encoded );
 }
 
 sub _ipc_shared { return( shift->_set_get_scalar( '_ipc_shared', @_ ) ); }
@@ -1131,7 +1263,9 @@ sub THAW
         my $flags = ( defined( $new->{flags} ) && length( $new->{flags} ) ) ? $new->{flags} : &IPC::SysV::S_IRWXU;
         $flags |= &IPC::SysV::IPC_CREAT if( defined( $new->{create} ) && $new->{create} );
         my $key = $new->{key};
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $shm;
             if( defined( $key ) && length( $key ) )
@@ -1143,25 +1277,30 @@ sub THAW
             {
                 $shm = IPC::SharedMem->new( &IPC::SysV::IPC_PRIVATE, $size, $flags );
             }
-        }
-        catch( $e )
+            $new->{_ipc_shared} = $shm;
+        };
+        if( $@ )
         {
-            return( $self->error( "Error creating a new IPC::SharedMem object: $e" ) );
+            return( $self->error( "Error creating a new IPC::SharedMem object: $@" ) );
         }
         
-        try
+        my $sem;
+        # try-catch
+        local $@;
+        eval
         {
-            my $sem = IPC::Semaphore->new( $key, 3, $flags );
-            if( !defined( $sem ) )
-            {
-                return( $self->error( "Unable to create semaphore with key \"", ( $key // '' ), "\" and flags \"$flags\": $!" ) );
-            }
-            $new->{_sem} = $sem;
-        }
-        catch( $e )
+            $sem = IPC::Semaphore->new( $key, 3, $flags );
+        };
+        if( $@ )
         {
-            return( $self->error( "Error creating a new IPC::Semaphore object: $e" ) );
+            return( $self->error( "Error creating a new IPC::Semaphore object: $@" ) );
         }
+        
+        if( !defined( $sem ) )
+        {
+            return( $self->error( "Unable to create semaphore with key \"", ( $key // '' ), "\" and flags \"$flags\": $!" ) );
+        }
+        $new->{_sem} = $sem;
     }
     CORE::return( $new );
 }
@@ -1286,7 +1425,7 @@ Module::Generic::SharedMemXS - Shared Memory Manipulation with XS API
 
 =head1 VERSION
 
-    v0.1.3
+    v0.2.0
 
 =head1 DESCRIPTION
 

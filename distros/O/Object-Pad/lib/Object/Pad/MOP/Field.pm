@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Field 0.802;
+package Object::Pad::MOP::Field 0.804;
 
 use v5.14;
 use warnings;
@@ -33,14 +33,14 @@ effect. They can be silenced with
 
 =head2 name
 
-   $name = $metafield->name
+   $name = $metafield->name;
 
 Returns the name of the field, as a plain string including the leading sigil
 character.
 
 =head2 sigil
 
-   $sigil = $metafield->sigil
+   $sigil = $metafield->sigil;
 
 I<Since version 0.56.>
 
@@ -48,28 +48,28 @@ Returns the first character of the field name, giving just its leading sigil.
 
 =head2 class
 
-   $metaclass = $metafield->class
+   $metaclass = $metafield->class;
 
 Returns the L<Object::Pad::MOP::Class> instance representing the class of
 which this field is a member.
 
 =head2 value
 
-   $current = $metafield->value( $instance )
-   @current = $metafield->value( $instance )
-   %current = $metafield->value( $instance )
+   $current = $metafield->value( $instance );
+   @current = $metafield->value( $instance );
+   %current = $metafield->value( $instance );
 
 An accessor method which returns the current value of the field from an object
 instance.
 
-   $metafield->value( $instance ) = $new
+   $metafield->value( $instance ) = $new;
 
 On scalar fields, this method can also act as an lvalue mutator allowing a new
 value to be set.
 
 =head2 has_attribute
 
-   $exists = $metafield->has_attribute( $name )
+   $exists = $metafield->has_attribute( $name );
 
 I<Since version 0.57.>
 
@@ -79,7 +79,7 @@ character.
 
 =head2 get_attribute_value
 
-   $value = $metafield->get_attribute_value( $name )
+   $value = $metafield->get_attribute_value( $name );
 
 I<Since version 0.57.>
 
@@ -93,7 +93,7 @@ define how that data is generated and used.
 
 =head2 get_attribute_values
 
-   @values = $metafield->get_attribute_values( $name )
+   @values = $metafield->get_attribute_values( $name );
 
 I<Since version 0.66.>
 

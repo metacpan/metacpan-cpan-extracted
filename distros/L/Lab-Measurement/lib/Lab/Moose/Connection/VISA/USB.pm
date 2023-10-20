@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::VISA::USB;
-$Lab::Moose::Connection::VISA::USB::VERSION = '3.881';
+$Lab::Moose::Connection::VISA::USB::VERSION = '3.901';
 #ABSTRACT: USB-TMC frontend to National Instruments' VISA library.
 
 use v5.20;
@@ -69,7 +69,7 @@ Lab::Moose::Connection::VISA::USB - USB-TMC frontend to National Instruments' VI
 
 =head1 VERSION
 
-version 3.881
+version 3.901
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,6 @@ Creates a USB resource name for the VISA backend.
 This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2018-2019  Simon Reinhardt
-            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

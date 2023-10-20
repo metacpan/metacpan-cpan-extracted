@@ -28,9 +28,10 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "4.52",
+            "ExtUtils::MakeMaker" : "6.52",
             "Inline::MakeMaker" : "0.45",
-            "Term::ANSIColor" : "0"
+            "Term::ANSIColor" : "0",
+            "Term::ReadKey" : "0"
          }
       },
       "runtime" : {
@@ -48,6 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "6.54",
+   "version" : "6.56",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

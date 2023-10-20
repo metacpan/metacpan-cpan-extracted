@@ -1,3 +1,8 @@
+0.003   2023-08-06  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Tweak completion of trashed files.
+
+
 0.002   2023-08-02  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Add completion of trashed filenames to trash-rm, trash-list,

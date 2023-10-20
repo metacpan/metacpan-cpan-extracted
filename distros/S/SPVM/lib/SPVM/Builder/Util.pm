@@ -64,10 +64,12 @@ sub get_spvm_core_header_file_names {
     spvm_api_field.h
     spvm_api.h
     spvm_api_method.h
+    spvm_api_mutex.h
     spvm_api_class_file.h
     spvm_api_runtime.h
     spvm_api_string_buffer.h
     spvm_api_type.h
+    spvm_api_internal.h
     spvm_array_field_access.h
     spvm_attribute.h
     spvm_basic_type.h
@@ -136,10 +138,12 @@ sub get_spvm_core_source_file_names {
     spvm_api_compiler.c
     spvm_api_field.c
     spvm_api_method.c
+    spvm_api_mutex.c
     spvm_api_class_file.c
     spvm_api_runtime.c
     spvm_api_string_buffer.c
     spvm_api_type.c
+    spvm_api_internal.c
     spvm_array_field_access.c
     spvm_attribute.c
     spvm_basic_type.c
@@ -200,7 +204,6 @@ sub get_spvm_compiler_and_runtime_class_file_names {
     SPVM/Native/Field.spvm
     SPVM/Native/Method.c
     SPVM/Native/MethodCall.c
-    SPVM/Native/MethodCall/Callback.spvm
     SPVM/Native/MethodCall.spvm
     SPVM/Native/Method.spvm
     SPVM/Native/ClassFile.c

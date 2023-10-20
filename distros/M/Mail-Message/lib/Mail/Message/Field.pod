@@ -906,6 +906,11 @@ The numeric value of a field is requested (for instance the C<Lines> or
 C<Content-Length> fields should be numerical), however the data contains
 weird characters.
 
+=item Error: Field name too long (max $length), in '$name'
+
+It is not specified in the RFCs how long a field name can be, but
+at least it should be a few characters shorter than the line wrap.
+
 =item Warning: Illegal character in field name $name
 
 A new field is being created which does contain characters not permitted
@@ -924,8 +929,8 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.013,
-built on June 24, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message distribution version 3.014,
+built on October 18, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

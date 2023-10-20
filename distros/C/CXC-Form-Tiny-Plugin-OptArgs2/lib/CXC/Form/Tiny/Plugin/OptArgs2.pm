@@ -7,7 +7,7 @@ use v5.20;
 use warnings;
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.08';
+our $VERSION = '0.11';
 
 use parent 'Form::Tiny::Plugin';
 
@@ -60,7 +60,7 @@ CXC::Form::Tiny::Plugin::OptArgs2 - A Plugin to interface Form::Tiny with OptArg
 
 =head1 VERSION
 
-version 0.08
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -228,7 +228,10 @@ generated for L<OptArgs2>:
   --stuff_upload
   --stuff_nonsense
 
-and when the validated form data is retrieved via C<$form->fields>, it
+The path separator defaults to C<_>, but may be changed via the
+L</optargs_opts> configuration keyword.
+
+When the validated form data is retrieved via C<$form->fields>, it
 will look like:
 
    { stuff => { upload => { ... } },

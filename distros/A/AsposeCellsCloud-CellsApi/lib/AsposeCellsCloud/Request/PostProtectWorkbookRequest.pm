@@ -60,7 +60,7 @@ sub new {
 
 # Run Operation Request
 # PostProtectWorkbookRequest.name : The workbook name.  ,
-# PostProtectWorkbookRequest.protection : The protection settings.  ,
+# PostProtectWorkbookRequest.protectWorkbookRequest : The protection settings.  ,
 # PostProtectWorkbookRequest.folder : Original workbook folder.  ,
 # PostProtectWorkbookRequest.storageName : Storage name.   
 
@@ -113,9 +113,9 @@ sub run_http_request {
     my $_body_data;
 
     # body params
-    if (defined $self->protection) {
-        #$_body_data = $self->protection;
-         $_body_data = JSON->new->convert_blessed->encode( $self->protection);
+    if (defined $self->protect_workbook_request) {
+        #$_body_data = $self->protect_workbook_request;
+         $_body_data = JSON->new->convert_blessed->encode( $self->protect_workbook_request);
     }
     # authentication setting, if any
     my $auth_settings = [qw()];
@@ -134,9 +134,9 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'protection' => {
-     	datatype => 'WorkbookProtectionRequest',
-     	base_name => 'protection',
+     'protect_workbook_request' => {
+     	datatype => 'ProtectWorkbookRequest',
+     	base_name => 'protectWorkbookRequest',
      	description => 'The protection settings.',
      	format => '',
      	read_only => '',
@@ -160,7 +160,7 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->attribute_map( {
     'name' => 'name',
-    'protection' => 'protection',
+    'protect_workbook_request' => 'protectWorkbookRequest',
     'folder' => 'folder',
     'storage_name' => 'storageName' 
 } );

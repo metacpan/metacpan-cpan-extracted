@@ -14,6 +14,9 @@ my $has_devfd = -r sprintf "/dev/fd/%d", DATA->fileno;
 line(update(qw(fox --cm sub{uc} --diff t/SAMPLE.txt))
      ->run->{stdout}, 9, "--diff");
 
+line(update(qw(fox --cm sub{uc} --discard t/SAMPLE.txt))
+     ->run->{stdout}, 0, "--discard");
+
 SKIP: {
     skip("/dev/fd is not available", 1) unless $has_devfd;
     line(update(qw(fox --cm sub{uc} --diff))

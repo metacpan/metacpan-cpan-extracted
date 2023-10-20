@@ -677,8 +677,8 @@ immensely.
 
 =item C<EVBACKEND_PORT>    (value 32, Solaris 10)
 
-This uses the Solaris 10 event port mechanism. As with everything on Solaris,
-it's really slow, but it still scales very well (O(active_fds)).
+This uses the Solaris 10 event port mechanism. As with everything on
+Solaris, it's really slow, but it still scales very well (O(active_fds)).
 
 While this backend scales well, it requires one system call per active
 file descriptor per loop iteration. For small and medium numbers of file
@@ -961,8 +961,8 @@ future versions):
    - Queue all idle watchers with priority higher than that of pending events.
    - Queue all check watchers.
    - Call all queued watchers in reverse order (i.e. check watchers first).
-     Signals and child watchers are implemented as I/O watchers, and will
-     be handled here by queueing them when their watcher gets executed.
+     Signals, async and child watchers are implemented as I/O watchers, and
+     will be handled here by queueing them when their watcher gets executed.
    - If ev_break has been called, or EVRUN_ONCE or EVRUN_NOWAIT
      were used, or there are no active watchers, goto FINISH, otherwise
      continue with step LOOP.
@@ -1398,7 +1398,10 @@ therefore a good idea to always call its C<ev_TYPE_stop> function.
 
 Returns a true value iff the watcher is active (i.e. it has been started
 and not yet been stopped). As long as a watcher is active you must not modify
-it.
+it unless documented otherwise.
+
+Obviously, it is safe to call this on an active watcher, or actually any
+watcher that is initialised.
 
 =item bool ev_is_pending (ev_TYPE *watcher)
 
@@ -1408,6 +1411,9 @@ is pending (but not active) you must not call an init function on it (but
 C<ev_TYPE_set> is safe), you must not change its priority, and you must
 make sure the watcher is available to libev (e.g. you cannot C<free ()>
 it).
+
+It is safe to call this on any watcher in any state as long as it is
+initialised.
 
 =item callback ev_cb (ev_TYPE *watcher)
 
@@ -1431,8 +1437,8 @@ from being executed (except for C<ev_idle> watchers).
 If you need to suppress invocation when higher priority events are pending
 you need to look at C<ev_idle> watchers, which provide this functionality.
 
-You I<must not> change the priority of a watcher as long as it is active or
-pending.
+You I<must not> change the priority of a watcher as long as it is active
+or pending. Reading the priority with C<ev_priority> is fine in any state.
 
 Setting a priority outside the range of C<EV_MINPRI> to C<EV_MAXPRI> is
 fine, as long as you do not mind that the priority value you query might
@@ -1464,8 +1470,9 @@ callback to be invoked, which can be accomplished with this function.
 
 Feeds the given event set into the event loop, as if the specified event
 had happened for the specified watcher (which must be a pointer to an
-initialised but not necessarily started event watcher). Obviously you must
-not free the watcher as long as it has pending events.
+initialised but not necessarily started event watcher, though it can be
+active). Obviously you must not free the watcher as long as it has pending
+events.
 
 Stopping the watcher, letting libev invoke it, or calling
 C<ev_clear_pending> will clear the pending event, even if the watcher was
@@ -1503,24 +1510,33 @@ C<ev_TYPE_init> again.
 
 Once a watcher has been started with a call to C<ev_TYPE_start> it becomes
 property of the event loop, and is actively waiting for events. While in
-this state it cannot be accessed (except in a few documented ways), moved,
-freed or anything else - the only legal thing is to keep a pointer to it,
-and call libev functions on it that are documented to work on active watchers.
+this state it cannot be accessed (except in a few documented ways, such as
+stoping it), moved, freed or anything else - the only legal thing is to
+keep a pointer to it, and call libev functions on it that are documented
+to work on active watchers.
+
+As a rule of thumb, before accessing a member or calling any function on
+a watcher, it should be stopped (or freshly initialised). If that is not
+convenient, you can check the documentation for that function or member to
+see if it is safe to use on an active watcher.
 
 =item pending
 
 If a watcher is active and libev determines that an event it is interested
-in has occurred (such as a timer expiring), it will become pending. It will
-stay in this pending state until either it is stopped or its callback is
-about to be invoked, so it is not normally pending inside the watcher
-callback.
+in has occurred (such as a timer expiring), it will become pending. It
+will stay in this pending state until either it is explicitly stopped or
+its callback is about to be invoked, so it is not normally pending inside
+the watcher callback.
 
-The watcher might or might not be active while it is pending (for example,
-an expired non-repeating timer can be pending but no longer active). If it
-is stopped, it can be freely accessed (e.g. by calling C<ev_TYPE_set>),
-but it is still property of the event loop at this time, so cannot be
-moved, freed or reused. And if it is active the rules described in the
-previous item still apply.
+Generally, the watcher might or might not be active while it is pending
+(for example, an expired non-repeating timer can be pending but no longer
+active). If it is pending but not active, it can be freely accessed (e.g.
+by calling C<ev_TYPE_set>), but it is still property of the event loop at
+this time, so cannot be moved, freed or reused. And if it is active the
+rules described in the previous item still apply.
+
+Explicitly stopping a watcher will also clear the pending state
+unconditionally, so it is safe to stop a watcher and then free it.
 
 It is also possible to feed an event on a watcher that is not active (e.g.
 via C<ev_feed_event>), in which case it becomes pending without being
@@ -3864,10 +3880,10 @@ event loop thread and an unspecified mechanism to wake up the main thread.
 First, you need to associate some data with the event loop:
 
    typedef struct {
-     mutex_t lock; /* global loop lock */
+     pthread_mutex_t lock; /* global loop lock */
+     pthread_t tid;
+     pthread_cond_t invoke_cv;
      ev_async async_w;
-     thread_t tid;
-     cond_t invoke_cv;
    } userdata;
 
    void prepare_loop (EV_P)
@@ -3875,19 +3891,19 @@ First, you need to associate some data with the event loop:
       // for simplicity, we use a static userdata struct.
       static userdata u;
 
-      ev_async_init (&u->async_w, async_cb);
-      ev_async_start (EV_A_ &u->async_w);
+      ev_async_init (&u.async_w, async_cb);
+      ev_async_start (EV_A_ &u.async_w);
 
-      pthread_mutex_init (&u->lock, 0);
-      pthread_cond_init (&u->invoke_cv, 0);
+      pthread_mutex_init (&u.lock, 0);
+      pthread_cond_init (&u.invoke_cv, 0);
 
       // now associate this with the loop
-      ev_set_userdata (EV_A_ u);
+      ev_set_userdata (EV_A_ &u);
       ev_set_invoke_pending_cb (EV_A_ l_invoke);
       ev_set_loop_release_cb (EV_A_ l_release, l_acquire);
 
       // then create the thread running ev_run
-      pthread_create (&u->tid, 0, l_run, EV_A);
+      pthread_create (&u.tid, 0, l_run, EV_A);
    }
 
 The callback for the C<ev_async> watcher does nothing: the watcher is used
@@ -4270,7 +4286,7 @@ For C<ev::embed> watchers this method is called C<set_embed>, to avoid
 clashing with the C<set (loop)> method.
 
 For C<ev::io> watchers there is an additional C<set> method that acepts a
-new event mask only, and internally calls C<ev_io_modfify>.
+new event mask only, and internally calls C<ev_io_modify>.
 
 =item w->start ()
 

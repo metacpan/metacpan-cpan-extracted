@@ -5,5 +5,7 @@ Int113.pod
 t/basic.t
 t/bitwise.t
 t/corner_cases.t
+t/coverage.t
+t/modulus.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

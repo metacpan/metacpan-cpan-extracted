@@ -227,13 +227,15 @@ sub LoadIndex {
 	unless ($noindex) { $file = $self->XMLFolder . '/' . $self->IndexFile }
 	if (-e $file) {
 		if (open(OFILE, "<", $file)) {
+			local our $re;
+			$re = qr{\[ ( (?: (?> [^[\]]+ ) | (??{ $re }) )* ) \]}x;
 			my %index = ();
 			my $section;
 			my %inf = ();
 			while (<OFILE>) {
 				my $line = $_;
 				chomp $line;
-				if ($line =~ /^\[([^\]]+)\]/) { #new section
+				if ($line =~ $re) { #new section
 					if (defined $section) { $index{$section} = { %inf } }
 					$section = $1;
 					%inf = ();

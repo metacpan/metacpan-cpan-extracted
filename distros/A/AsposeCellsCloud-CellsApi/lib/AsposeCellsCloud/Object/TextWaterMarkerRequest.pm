@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Indicates text water marker request.',
                                   class => 'TextWaterMarkerRequest',
                                   required => [], # TODO
 }                                 );
@@ -135,28 +135,28 @@ __PACKAGE__->method_documentation({
      'font_name' => {
      	datatype => 'string',
      	base_name => 'FontName',
-     	description => '',
+     	description => 'Indicates font name.',
      	format => '',
      	read_only => '',
      		},
      'font_size' => {
      	datatype => 'int',
      	base_name => 'FontSize',
-     	description => '',
+     	description => 'Indicates font size.',
      	format => '',
      	read_only => '',
      		},
      'height' => {
      	datatype => 'int',
      	base_name => 'Height',
-     	description => '',
+     	description => 'Indicates image height.',
      	format => '',
      	read_only => '',
      		},
      'width' => {
      	datatype => 'int',
      	base_name => 'Width',
-     	description => '',
+     	description => 'Indicates image width.',
      	format => '',
      	read_only => '',
      		},    

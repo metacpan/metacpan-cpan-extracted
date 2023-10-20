@@ -1,3 +1,10 @@
+0.048   2023-08-06  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Add tips section.
+
+
 0.047   2021-03-14  Released-By: PERLANCAR; Urgency: medium
 
 	- Add options: -0 (like perl's), --para.

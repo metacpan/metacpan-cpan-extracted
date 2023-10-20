@@ -1,5 +1,8 @@
 Revision history for Perl extension App::Bitcoin::PaperWallet.
 
+1.11  Sun Oct 15 2023
+	- adjusted to work with Bitcoin::Crypto 2.000 without deprecation warnings
+
 1.10  Wed Dec 28 2022
 	- fix unicode handling
 	- new option in paper-wallet: -o, --stdout - print to standard output

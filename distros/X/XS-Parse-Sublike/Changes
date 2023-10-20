@@ -1,5 +1,12 @@
 Revision history for XS-Parse-Sublike
 
+0.21    2023-10-11
+        [BUGFIXES]
+         * Ensure that exceptions thrown from runtime signature handling
+           appear to come from the callsite and not declaration
+         * Fix signedness of printf format when complaining about 
+           mismatched `->ver`
+
 0.20    2023-09-09
         [BUGFIXES]
          * Correct ->VERSION check for Object::Pad or Future::AsyncAwait

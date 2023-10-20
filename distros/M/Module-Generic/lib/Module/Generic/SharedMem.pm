@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.3.6
+## Version v0.4.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2022/11/18
+## Modified 2023/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -20,7 +20,7 @@ BEGIN
     use vars qw( $SUPPORTED_RE $SYSV_SUPPORTED $SEMOP_ARGS $SHEM_REPO $ID2OBJ $N $HAS_B64 );
     use Config;
     use File::Spec ();
-    use Nice::Try;
+    # use Nice::Try;
     use Scalar::Util ();
     use JSON 4.03 qw( -convert_blessed_universally );
     use Storable::Improved ();
@@ -117,7 +117,7 @@ EOT
             lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.3.6';
+    our $VERSION = 'v0.4.0';
 };
 
 # use strict;
@@ -157,6 +157,9 @@ sub init
 }
 
 sub addr { return( shift->_set_get_scalar( 'addr', @_ ) ); }
+
+# This class does not convert to an HASH
+sub as_hash { return( $_[0] ); }
 
 sub attach
 {
@@ -238,7 +241,9 @@ sub exists
     no strict 'subs';
     $flags = ( $flags ^ &IPC::SysV::IPC_CREAT );
     my $semid;
-    try
+    # try-catch
+    local $@;
+    my @rv = eval
     {
         $semid = semget( $serial, 0, $flags );
         if( defined( $semid ) )
@@ -254,23 +259,28 @@ sub exists
             return(0) if( $! =~ /\bNo[[:blank:]]+such[[:blank:]]+file\b/ );
             return;
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
         # warn( "Trying to access shared memory triggered error: $e" ) if( $self->_warnings_is_enabled );
         my $arg = 0;
         if( $semid )
         {
-            try
+            # try-catch
+            local $@;
+            if( !eval
             {
                 semctl( $semid, 0, &IPC::SysV::IPC_RMID, $arg );
-            }
-            catch( $e2 )
+            })
             {
-                warn( "Error trying to remove semaphore id ${semid} after checking if shared memory existed: $e2" ) if( $self->_warnings_is_enabled );
+                warn( "Error trying to remove semaphore id ${semid} after checking if shared memory existed: $@" ) if( $self->_warnings_is_enabled );
             }
         }
         return(0);
+    }
+    else
+    {
+        return( $rv[0] );
     }
 }
 
@@ -330,12 +340,22 @@ sub lock
     $self->unlock if( $self->locked );
     my $semid = $self->semid;
     return( $self->error( "No semaphore id set yet." ) ) if( !defined( $semid ) );
-    try
+    # try-catch
+    local $@;
+    my $rc;
+    eval
     {
         local $SIG{ALRM} = sub{ die( "timeout" ); };
         alarm( $timeout );
-        my $rc = $self->op( @{$SEMOP_ARGS->{ $type }} );
+        $rc = $self->op( @{$SEMOP_ARGS->{ $type }} );
         alarm(0);
+    };
+    if( $@ )
+    {
+        return( $self->error( "Unable to set a lock: $@" ) );
+    }
+    else
+    {
         if( $rc )
         {
             $self->locked( $type );
@@ -344,10 +364,6 @@ sub lock
         {
             return( $self->error( "Failed to set a lock on semaphore id \"$semid\" for lock type $type: $!" ) );
         }
-    }
-    catch( $e )
-    {
-        return( $self->error( "Unable to set a lock: $e" ) );
     }
     return( $self );
 }
@@ -421,7 +437,9 @@ sub open
     my $flags = $self->flags( create => $create, ( $opts->{mode} =~ /^\d+$/ ? $opts->{mode} : () ) );
     
     my $id;
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $id = shmget( $serial, $opts->{size}, $flags );
         if( defined( $id ) )
@@ -440,14 +458,17 @@ sub open
                 last if( defined( $id ) );
             }
         }
-    }
-    catch( $e where { /shmget[[:blank:]\h]+not[[:blank:]\h]+implemented/i } )
+    };
+    if( $@ )
     {
-        return( $self->error( "IPC SysV is supported, but somehow shmget is not implemented: $e" ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Error while trying to get the shared memory id: $e" ) );
+        if( $@ =~ /shmget[[:blank:]\h]+not[[:blank:]\h]+implemented/i )
+        {
+            return( $self->error( "IPC SysV is supported, but somehow shmget is not implemented: $@" ) );
+        }
+        else
+        {
+            return( $self->error( "Error while trying to get the shared memory id: $@" ) );
+        }
     }
     
     if( !defined( $id ) )
@@ -459,24 +480,29 @@ sub open
     # The value 3 can be anything above 0 and below the limit set by SEMMSL. On Linux system, this is usually 32,000. Seem semget(2) man page:
     # "The argument nsems can be 0 (a don't care) when a semaphore set is  not being  created.   Otherwise, nsems must be greater than 0 and less than or equal  to  the  maximum  number  of  semaphores  per  semaphore  set (SEMMSL)."
     my $semid;
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $semid = semget( $serial, ( $create ? 3 : 0 ), $flags );
         if( !defined( $semid ) )
         {
             my $newflags = ( $flags | &IPC::SysV::IPC_CREAT );
             $semid = semget( $serial, 3, $newflags );
-            return( $self->error( "Unable to get a semaphore for shared memory key \"", ( $opts->{key} || $self->key ), "\" wth id \"$id\": $!" ) ) if( !defined( $semid ) );
+        }
+    };
+    if( $@ )
+    {
+        if( $@ =~ /semget[[:blank:]\h]+not[[:blank:]\h]+implemented/i )
+        {
+            return( $self->error( "IPC SysV is supported, but somehow semget is not implemented: $@" ) );
+        }
+        else
+        {
+            return( $self->error( "Error while trying to get the semaphore for shared memory id: $@" ) );
         }
     }
-    catch( $e where { /semget[[:blank:]\h]+not[[:blank:]\h]+implemented/i } )
-    {
-        return( $self->error( "IPC SysV is supported, but somehow semget is not implemented: $e" ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Error while trying to get the semaphore for shared memory id: $e" ) );
-    }
+    return( $self->error( "Unable to get a semaphore for shared memory key \"", ( $opts->{key} || $self->key ), "\" wth id \"$id\": $!" ) ) if( !defined( $semid ) );
     
     my $new = $self->new(
         key     => ( $opts->{key} || $self->key ),
@@ -524,15 +550,18 @@ sub pid
         return( $self->error( "No semaphore set yet. You must open the shared memory first to remove semaphore." ) );
     no strict 'subs';
     my $arg = 0;
-    try
+    # try-catch
+    local $@;
+    my @rv = eval
     {
         my $v = semctl( $semid, $sem, &IPC::SysV::GETPID, $arg );
         return( $v ? 0 + $v : undef() );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error trying to get semaphore pid using semaphore id ${semid}: $e" ) );
+        return( $self->error( "Error trying to get semaphore pid using semaphore id ${semid}: $@" ) );
     }
+    return( $rv[0] );
 }
 
 sub rand
@@ -540,14 +569,24 @@ sub rand
     my $self = shift( @_ );
     my $size = $self->size || 1024;
     no strict 'subs';
-    try
+    # try-catch
+    local $@;
+    my $key;
+    eval
     {
-        my $key  = shmget( &IPC::SysV::IPC_PRIVATE, $size, &IPC::SysV::S_IRWXU | &IPC::SysV::S_IRWXG | &IPC::SysV::S_IRWXO ) || return( $self->error( "Unable to generate a share memory key: $!" ) );
-        return( $key );
+        $key  = shmget( &IPC::SysV::IPC_PRIVATE, $size, &IPC::SysV::S_IRWXU | &IPC::SysV::S_IRWXG | &IPC::SysV::S_IRWXO );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error trying to get a random private key using shmget and IPC_PRIVATE: $@" ) );
     }
-    catch( $e )
+    if( !defined( $key ) )
     {
-        return( $self->error( "Error trying to get a random private key using shmget and IPC_PRIVATE: $e" ) );
+        return( $self->error( "Unable to generate a share memory key: $!" ) )
+    }
+    else
+    {
+        return( $key );
     }
 }
 
@@ -594,7 +633,9 @@ sub read
             substr( $buffer, $len, length( $buffer ), '' );
         }
     
-        try
+        # try-catch
+        local $@;
+        eval
         {
             if( $packing eq 'json' )
             {
@@ -628,10 +669,10 @@ sub read
                     ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
                 );
             }
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "An error occured while decoding data using $packing with base64 set to '", ( $self->{base64} // '' ), "': $e" ) );
+            return( $self->error( "An error occured while decoding data using $packing with base64 set to '", ( $self->{base64} // '' ), "': $@" ) );
         }
     }
     else
@@ -834,49 +875,76 @@ sub write
     # my @callinfo = caller;
     my $packing = $self->_packing_method;
     my $encoded;
-    try
+    if( $packing eq 'json' )
     {
-        if( $packing eq 'json' )
+        # try-catch
+        local $@;
+        eval
         {
             $encoded = $self->_encode_json( $data );
+        };
+        if( $@ )
+        {
+            return( $self->error( "An error occured encoding data provided using $packing with base64 set to '", ( $self->{base64} // '' ), ": $@. Data was: '$data'" ) );
         }
-        elsif( $packing eq 'cbor' )
+    }
+    elsif( $packing eq 'cbor' )
+    {
+        # try-catch
+        local $@;
+        eval
         {
             $encoded = $self->serialise( $data,
                 serialiser => 'CBOR::XS',
                 allow_sharing => 1,
                 ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
             );
-            return( $self->error( "Unable to serialise ", CORE::length( $data ), " bytes of data using CBOR::XS with base64 set to '", ( $self->{base64} // '' ), ": ", $self->error ) ) if( !defined( $encoded ) );
-        }
-        elsif( $packing eq 'sereal' )
+        };
+        if( $@ )
         {
-            $self->_load_class( 'Sereal::Encoder' ) || return( $self->pass_error );
-            my $const;
-            $const = \&{"Sereal\::Encoder::SRL_ZLIB"} if( defined( &{"Sereal\::Encoder::SRL_ZLIB"} ) );
+            return( $self->error( "An error occured encoding data provided using $packing with base64 set to '", ( $self->{base64} // '' ), ": $@. Data was: '$data'" ) );
+        }
+        return( $self->error( "Unable to serialise ", CORE::length( $data ), " bytes of data using CBOR::XS with base64 set to '", ( $self->{base64} // '' ), ": ", $self->error ) ) if( !defined( $encoded ) );
+    }
+    elsif( $packing eq 'sereal' )
+    {
+        $self->_load_class( 'Sereal::Encoder' ) || return( $self->pass_error );
+        my $const;
+        $const = \&{"Sereal\::Encoder::SRL_ZLIB"} if( defined( &{"Sereal\::Encoder::SRL_ZLIB"} ) );
+        # try-catch
+        local $@;
+        eval
+        {
             $encoded = $self->serialise( $data,
                 serialiser => 'Sereal',
                 freeze_callbacks => 1,
                 ( defined( $const ) ? ( compress => $const->() ) : () ),
                 ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
             );
-            return( $self->error( "Unable to serialise ", CORE::length( $data ), " bytes of data using Sereal with base64 set to '", ( $self->{base64} // '' ), ": ", $self->error ) ) if( !defined( $encoded ) );
-        }
-        # Default to Storable::Improved
-        else
+        };
+        if( $@ )
         {
-            # local $Storable::forgive_me = 1;
-            # $encoded = Storable::Improved::freeze( $data );
+            return( $self->error( "An error occured encoding data provided using $packing with base64 set to '", ( $self->{base64} // '' ), ": $@. Data was: '$data'" ) );
+        }
+        return( $self->error( "Unable to serialise ", CORE::length( $data ), " bytes of data using Sereal with base64 set to '", ( $self->{base64} // '' ), ": ", $self->error ) ) if( !defined( $encoded ) );
+    }
+    # Default to Storable::Improved
+    else
+    {
+        # local $Storable::forgive_me = 1;
+        # $encoded = Storable::Improved::freeze( $data );
+        eval
+        {
             $encoded = $self->serialise( $data,
                 serialiser => 'Storable::Improved',
                 ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
             );
-            return( $self->error( "Unable to serialise ", CORE::length( $data ), " bytes of data using Storable with base64 set to '", ( $self->{base64} // '' ), ": ", $self->error ) ) if( !defined( $encoded ) );
+        };
+        if( $@ )
+        {
+            return( $self->error( "An error occured encoding data provided using $packing with base64 set to '", ( $self->{base64} // '' ), ": $@. Data was: '$data'" ) );
         }
-    }
-    catch( $e )
-    {
-        return( $self->error( "An error occured encoding data provided using $packing with base64 set to '", ( $self->{base64} // '' ), ": $e. Data was: '$data'" ) );
+        return( $self->error( "Unable to serialise ", CORE::length( $data ), " bytes of data using Storable with base64 set to '", ( $self->{base64} // '' ), ": ", $self->error ) ) if( !defined( $encoded ) );
     }
     
     # Simple encapsulation
@@ -942,16 +1010,19 @@ sub _decode_json
         return( $this );
     };
     
-    try
+    my $result;
+    # try-catch
+    local $@;
+    eval
     {
         my $decoded = $j->decode( $data );
-        my $result = $crawl->( $decoded );
-        return( $result );
-    }
-    catch( $e )
+        $result = $crawl->( $decoded );
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to decode JSON data: $e" ) );
+        return( $self->error( "An error occurred while trying to decode JSON data: $@" ) );
     }
+    return( $result );
 }
 
 # Purpose of this method is to recursively check the given data and change scalar reference if they are anything else than 1 or 0, otherwise JSON would complain
@@ -1008,15 +1079,18 @@ sub _encode_json
     };
     my $ref = $crawl->( $data );
     my $j = JSON->new->utf8->relaxed->allow_nonref->convert_blessed;
-    try
+    my $encoded;
+    # try-catch
+    local $@;
+    eval
     {
-        my $encoded = $j->encode( $ref );
-        return( $encoded );
-    }
-    catch( $e )
+        $encoded = $j->encode( $ref );
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to JSON encode data: $e" ) );
+        return( $self->error( "An error occurred while trying to JSON encode data: $@" ) );
     }
+    return( $encoded );
 }
 
 sub _packing_method { return( shift->_set_get_scalar( '_packing_method', @_ ) ); }

@@ -3,9 +3,9 @@
 package BorderStyle;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-14'; # DATE
+our $DATE = '2023-07-14'; # DATE
 our $DIST = 'BorderStyle'; # DIST
-our $VERSION = '3.0.2'; # VERSION
+our $VERSION = '3.0.3'; # VERSION
 
 1;
 # ABSTRACT: Border styles
@@ -26,7 +26,7 @@ BorderStyle - Border styles
 
 =head1 VERSION
 
-This document describes version 3.0.2 of BorderStyle (from Perl distribution BorderStyle), released on 2022-02-14.
+This document describes version 3.0.3 of BorderStyle (from Perl distribution BorderStyle), released on 2023-07-14.
 
 =head1 DESCRIPTION
 
@@ -270,6 +270,11 @@ Please visit the project's homepage at L<https://metacpan.org/release/BorderStyl
 
 Source repository is at L<https://github.com/perlancar/perl-BorderStyle>.
 
+=head1 SEE ALSO
+
+Somewhat related: L<ColorTheme> specification, because they are often used
+together in an application.
+
 =head1 HISTORY
 
 =head2 v3
@@ -312,13 +317,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

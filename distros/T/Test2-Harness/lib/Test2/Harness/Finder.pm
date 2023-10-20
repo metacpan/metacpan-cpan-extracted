@@ -2,7 +2,7 @@ package Test2::Harness::Finder;
 use strict;
 use warnings;
 
-our $VERSION = '1.000152';
+our $VERSION = '1.000155';
 
 use Test2::Harness::Util qw/clean_path mod2file/;
 use Test2::Harness::Util::JSON qw/decode_json encode_json/;
@@ -220,7 +220,8 @@ sub find_changes {
     my $self = shift;
     my ($plugins, $settings) = @_;
 
-    my @listed_changes = @{$self->{+CHANGED}} if $self->{+CHANGED};
+    my @listed_changes;
+    @listed_changes = @{$self->{+CHANGED}} if $self->{+CHANGED};
 
     my ($type, $diff) = $self->get_diff($plugins, $settings);
 

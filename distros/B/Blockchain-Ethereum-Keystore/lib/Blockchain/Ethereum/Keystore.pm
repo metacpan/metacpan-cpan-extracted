@@ -1,8 +1,12 @@
 use v5.26;
 use Object::Pad;
+# ABSTRACT: Ethereum wallet management utilities
 
-package Blockchain::Ethereum::Keystore 0.005;
+package Blockchain::Ethereum::Keystore;
 class Blockchain::Ethereum::Keystore;
+
+our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
+our $VERSION   = '0.009';          # VERSION
 
 1;
 
@@ -14,13 +18,13 @@ __END__
 
 =head1 NAME
 
-Blockchain::Ethereum::Keystore - Ethereum keystorage utilities
+Blockchain::Ethereum::Keystore - Ethereum wallet management utilities
+
+=head1 VERSION
+
+version 0.009
 
 =head1 SYNOPSIS
-
-Collection of utilities for keystore management
-
-Examples:
 
 Generating a new address and writing it to a keyfile:
 
@@ -45,7 +49,7 @@ Importing a keyfile and changing the password:
     my $keyfile = Blockchain::Ethereum::Keystore::Keyfile->new;
     my $password = "old_password";
     $keyfile->import_file("...", $password);
-    $keyfile->change_password($password, "newpassword");
+    $keyfile->change_password($password, "new_password");
     $keyfile->write_to_file("...");
 
 Signing a transaction:
@@ -66,20 +70,34 @@ Export private key:
     # private key bytes
     print $keyfile->private_key->export;
 
+=head1 OVERVIEW
+
+This module provides a collection of Ethereum wallet management utilities.
+
+Core functionalities:
+
+=over 4
+
+=item * Manage Ethereum keyfiles, facilitating import, export, and password change.
+
+=item * Sign L<Blockchain::Ethereum::Transaction> transactions.
+
+=item * Private key and seed generation through L<Crypt::PRNG>
+
+=item * Support for BIP44 for hierarchical deterministic wallets and key derivation.
+
+=back
+
 =head1 AUTHOR
 
-Reginaldo Costa, C<< <refeco at cpan.org> >>
+Reginaldo Costa <refeco@cpan.org>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to L<https://github.com/refeco/perl-ethereum-keystore>
-
-=head1 LICENSE AND COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2023 by REFECO.
 
 This is free software, licensed under:
 
-  The MIT License
+  The MIT (X11) License
 
 =cut

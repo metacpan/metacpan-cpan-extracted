@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::Builder::Tester;
-use Test::More;
+use Test2::V0;
 
 use Future::AsyncAwait 0.47;
 
@@ -36,7 +36,7 @@ ok( defined $spi, 'defined $spi' );
    test_out( "ok 2 - ->readwrite" );
 
    $adapter->expect_readwrite( "ABC" )
-      ->returns( "DEF" );
+      ->will_done( "DEF" );
    is( await $spi->readwrite( "ABC" ), "DEF", '->readwrite return' );
    $adapter->check_and_clear( '->readwrite' );
 

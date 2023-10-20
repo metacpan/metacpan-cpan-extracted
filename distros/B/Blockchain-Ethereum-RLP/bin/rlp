@@ -1,32 +1,9 @@
 #!/usr/bin/env perl
+# PODNAME: RLP
+# ABSTRACT: Command line RLP encoding/decoding utility
 
-=head1 NAME
-
-rlp
-
-=head1 SYNOPSIS
-
-rlp [options] [params]
-
-Options:
-
-    --action=encode/decode (required)
-
-Example:
-
-Encoding:
-
-    rlp --action=encode 0x9 0x4a817c800 0x5208 0x3535353535353535353535353535353535353535 0xde0b6b3a7640000 0x 0x1 0x 0x
-
-Decoding:
-
-    rlp --action=decode ec098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a764000080018080
-
-=head1 DESCRIPTION
-
-Standalone version for decoding and encoding RLP
-
-=cut
+our $VERSION   = '0.009';          # VERSION
+our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
 
 use strict;
 use warnings;
@@ -68,3 +45,53 @@ sub encode {
 }
 
 &$ref;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RLP - Command line RLP encoding/decoding utility
+
+=head1 VERSION
+
+version 0.009
+
+=head1 SYNOPSIS
+
+rlp [options] [params]
+
+Options:
+
+    --action=encode/decode (required)
+
+Example:
+
+Encoding:
+
+    rlp --action=encode 0x9 0x4a817c800 0x5208 0x3535353535353535353535353535353535353535 0xde0b6b3a7640000 0x 0x1 0x 0x
+
+Decoding:
+
+    rlp --action=decode ec098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a764000080018080
+
+=head1 DESCRIPTION
+
+Standalone version for decoding and encoding RLP
+
+=head1 AUTHOR
+
+Reginaldo Costa <refeco@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023 by REFECO.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

@@ -1,96 +1,112 @@
 use warnings;
 use strict;
 use Math::GMPq;
+use Config;
 
-print "1..1\n";
+use Test::More;
 
-my($rop, $op, $op_pow, $mpq, $ok);
+my($rop, $op, $op_pow, $mpq);
 
 eval {require Math::MPFR;};
 
 
 unless($@) {
-  if($Math::MPFR::VERSION <= 3.12) {
-    warn "\n  Skipping tests -  Math::MPFR version 3.13 (or later)\n" .
+  if($Math::MPFR::VERSION < 4.19) {
+    warn "\n  Skipping tests -  Math::MPFR version 4.19 (or later)\n" .
           "  is needed. We have only version $Math::MPFR::VERSION\n";
-    print "ok 1\n";
+    is(1,1);
   }
   else {
 
-    if($Math::MPFR::VERSION >= 4.19) {
-      # Run the tests.
-      $op = Math::MPFR->new(100);
-      $op_pow = Math::MPFR->new(3.5);
-      $mpq = Math::GMPq->new(10075);
+    my $expected_refcnt = 1;
+    $expected_refcnt++
+      if $Config{ccflags} =~ /\-DPERL_RC_STACK/;
 
+    # Run the tests.
+    $op = Math::MPFR->new(100);
+    $op_pow = Math::MPFR->new(3.5);
+    $mpq = Math::GMPq->new(10075);
+
+    cmp_ok(Math::GMPq::get_refcnt($op), '==', $expected_refcnt, '1: $op reference count as expected');
+    cmp_ok(Math::GMPq::get_refcnt($op_pow), '==', $expected_refcnt, '1: $op_pow reference count as expected');
+    cmp_ok(Math::GMPq::get_refcnt($mpq), '==', $expected_refcnt, '1: $mpq reference count as expected');
+
+    $rop = $mpq + $op;
+    cmp_ok(ref($rop), 'eq', 'Math::MPFR', '1: Math::MPFR object reurned');
+    cmp_ok($rop, '==', 10175, 'returned Math::MPFR object == 10175');
+
+    cmp_ok(Math::GMPq::get_refcnt($op), '==', $expected_refcnt, '2: $op reference count as expected');
+    cmp_ok(Math::GMPq::get_refcnt($rop), '==', $expected_refcnt, '2: $rop reference count as expected');
+    cmp_ok(Math::GMPq::get_refcnt($mpq), '==', $expected_refcnt, '2: $mpq reference count as expected');
+
+    $rop = $mpq * $op;
+
+    cmp_ok(Math::GMPq::get_refcnt($op), '==', $expected_refcnt, '3: $op reference count as expected');
+    cmp_ok(Math::GMPq::get_refcnt($rop), '==', $expected_refcnt, '3: $rop reference count as expected');
+    cmp_ok(Math::GMPq::get_refcnt($mpq), '==', $expected_refcnt, '3: $mpq reference count as expected');
+
+    cmp_ok(ref($rop), 'eq', 'Math::MPFR', '2: Math::MPFR object reurned');
+    cmp_ok($rop, '==', 1007500, 'returned Math::MPFR object == 1007500');
+
+    $rop = $mpq - $op;
+
+    cmp_ok(Math::GMPq::get_refcnt($op), '==', $expected_refcnt, '4: $op reference count as expected');
+    cmp_ok(Math::GMPq::get_refcnt($rop), '==', $expected_refcnt, '4: $rop reference count as expected');
+    cmp_ok(Math::GMPq::get_refcnt($mpq), '==', $expected_refcnt, '4: $mpq reference count as expected');
+
+    cmp_ok(ref($rop), 'eq', 'Math::MPFR', '3: Math::MPFR object reurned');
+    cmp_ok($rop, '==', 9975, 'returned Math::MPFR object == 9975');
+
+    $rop = $mpq / $op;
+
+    cmp_ok(Math::GMPq::get_refcnt($op), '==', $expected_refcnt, '5: $op reference count as expected');
+    cmp_ok(Math::GMPq::get_refcnt($rop), '==', $expected_refcnt, '5: $rop reference count as expected');
+    cmp_ok(Math::GMPq::get_refcnt($mpq), '==', $expected_refcnt, '5: $mpq reference count as expected');
+
+    cmp_ok(ref($rop), 'eq', 'Math::MPFR', '4: Math::MPFR object reurned');
+    cmp_ok($rop, '==', 100.75, 'returned Math::MPFR object == 100.75');
+
+    $mpq /= 100;
+    $mpq -= 0.75;
+
+    cmp_ok(Math::GMPq::get_refcnt($mpq), '==', $expected_refcnt, '6: $mpq reference count as expected');
+
+    $rop = $mpq ** $op_pow;
+
+    cmp_ok(Math::GMPq::get_refcnt($op_pow), '==', $expected_refcnt, '7: $op_pow reference count as expected');
+    cmp_ok(Math::GMPq::get_refcnt($rop), '==', $expected_refcnt, '7: $rop reference count as expected');
+    cmp_ok(Math::GMPq::get_refcnt($mpq), '==', $expected_refcnt, '7: $mpq reference count as expected');
+
+    cmp_ok(ref($rop), 'eq', 'Math::MPFR', '5: Math::MPFR object reurned');
+    cmp_ok($rop, '==', 10000000, 'returned Math::MPFR object == 10000000');
+
+    my $ccount = Math::GMPq::_wrap_count();
+
+    for(1..100) {
       $rop = $mpq + $op;
-      if(ref($rop) eq 'Math::MPFR'){$ok .= 'a'}
-      else { warn "1a: ref: ", ref($rop), "\n"}
-      if($rop == 10175) {$ok .= 'b'}
-      else {warn "1b: \$rop: $rop\n"}
-
-      $rop = $mpq * $op;
-      if(ref($rop) eq 'Math::MPFR'){$ok .= 'c'}
-      else { warn "1c: ref: ", ref($rop), "\n"}
-      if($rop == 1007500) {$ok .= 'd'}
-      else {warn "1d: \$rop: $rop\n"}
-
       $rop = $mpq - $op;
-      if(ref($rop) eq 'Math::MPFR'){$ok .= 'e'}
-      else { warn "1e: ref: ", ref($rop), "\n"}
-      if($rop == 9975) {$ok .= 'f'}
-      else {warn "1f: \$rop: $rop\n"}
-
+      $rop = $mpq * $op;
       $rop = $mpq / $op;
-      if(ref($rop) eq 'Math::MPFR'){$ok .= 'g'}
-      else { warn "1g: ref: ", ref($rop), "\n"}
-      if($rop == 100.75) {$ok .= 'h'}
-      else {warn "1h: \$rop: $rop\n"}
-
-      $mpq /= 100;
-      $mpq -= 0.75;
-
       $rop = $mpq ** $op_pow;
-      if(ref($rop) eq 'Math::MPFR'){$ok .= 'i'}
-      else { warn "1i: ref: ", ref($rop), "\n"}
-      if($rop == 10000000) {$ok .= 'j'}
-      else {warn "1j: \$rop: $rop\n"}
-
-      my $ccount = Math::GMPq::_wrap_count();
-
-      for(1..100) {
-        $rop = $mpq + $op;
-        $rop = $mpq - $op;
-        $rop = $mpq * $op;
-        $rop = $mpq / $op;
-        $rop = $mpq ** $op_pow;
-      }
-
-      my $ncount = Math::GMPq::_wrap_count();
-
-      if($ccount == $ncount) {$ok .= 'k'}
-      else {
-        warn "1k: \$ccount: $ccount \$ncount: $ncount\n";
-        warn "Looks like we have a memory leak\n" if $ncount > $ccount;
-      }
-
-      if($ok eq 'abcdefghijk') {print "ok 1\n"}
-      else {
-        warn "\$ok: $ok\n";
-        print "not ok 1\n";
-      }
     }
-    else {
-      warn "\nSkipping all tests, as some of these tests will fail.\n";
-      warn "Math-MPFR-4.19 or later is needed for all tests to PASS\n";
-      warn "We have only version $Math::MPFR::VERSION";
-      print "ok 1\n";
+
+    my $ncount = Math::GMPq::_wrap_count();
+
+    cmp_ok($ccount, '==', $ncount, "counts match");
+
+    if($ccount != $ncount) {
+      warn "Looks like we have a memory leak\n" if $ncount > $ccount;
     }
+
+    cmp_ok(Math::GMPq::get_refcnt($op_pow), '==', $expected_refcnt, '8: $op_pow reference count as expected');
+    cmp_ok(Math::GMPq::get_refcnt($rop), '==', $expected_refcnt, '8: $rop reference count as expected');
+    cmp_ok(Math::GMPq::get_refcnt($mpq), '==', $expected_refcnt, '8: $mpq reference count as expected');
+    cmp_ok(Math::GMPq::get_refcnt($op), '==', $expected_refcnt, '8: $op reference count as expected');
   }
 }
 else {
   warn "\nSkipping tests - no Math::MPFR\n";
-  print "ok 1\n";
+  is(1,1);
 }
 
 # Check that the &PL_sv_yes bug
@@ -99,3 +115,5 @@ else {
 
 sub hmmmm () {!0}
 sub aaarh () {!1}
+
+done_testing();

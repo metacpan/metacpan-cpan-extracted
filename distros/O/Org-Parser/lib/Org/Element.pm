@@ -7,9 +7,9 @@ use Moo;
 use Scalar::Util qw(refaddr);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-12'; # DATE
+our $DATE = '2023-08-05'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.559'; # VERSION
+our $VERSION = '0.560'; # VERSION
 
 has document => (is => 'rw');
 has parent => (is => 'rw');
@@ -19,6 +19,13 @@ has children => (is => 'rw');
 # this, usually only more complex elements
 has _str => (is => 'rw');
 has _str_include_children => (is => 'rw');
+
+sub die {
+    my ($self, $msg) = @_;
+    die $msg .
+        " (element: ".ref($self).
+        ", document: ".($self->document && $self->document->_srclabel ? $self->document->_srclabel : "-").")";
+}
 
 sub children_as_string {
     my ($self) = @_;
@@ -203,7 +210,7 @@ Org::Element - Base class for Org document elements
 
 =head1 VERSION
 
-This document describes version 0.559 of Org::Element (from Perl distribution Org-Parser), released on 2023-07-12.
+This document describes version 0.560 of Org::Element (from Perl distribution Org-Parser), released on 2023-08-05.
 
 =head1 SYNOPSIS
 
@@ -306,6 +313,10 @@ or a description term in a description list:
 =head2 $el->remove()
 
 Remove element from the tree. Basically just remove the element from its parent.
+
+=head2 $el->die(STR)
+
+Utility method to format C<die> message.
 
 =head1 HOMEPAGE
 

@@ -1,6 +1,8 @@
 Revision history for Alien-SeqAlignment-edlib
 
-0.04      2023-09-03 22:12:05-06:00 America/Denver
+0.05      2023-09-23 20:22:19-06:00 America/Denver
+ - Fixed mistakes in the POD documentation
+0.04      2023-09-04 00:01:00-06:00 America/Denver
  - Formatted alienfile through perltidy
  - Code checks for Windows OS to determine executable file extension
  - Fixed XS and FFI test that referred to an earlier name of this package

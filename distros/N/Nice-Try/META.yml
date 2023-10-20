@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +23,7 @@ requires:
   Exporter: '5.73'
   Filter::Util::Call: '1.59'
   List::Util: '1.33'
-  PPI: '1.276'
+  PPI: '1.277'
   PPI::XS: '0.910'
   Scalar::Util: '1.50'
   Want: '0.29'
@@ -33,5 +33,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Nice-Try/issues
   repository: https://gitlab.com/jackdeguest/Nice-Try
-version: v1.3.4
+version: v1.3.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

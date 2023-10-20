@@ -3,7 +3,7 @@ requires 'indirect' => 0.36;
 requires 'multidimensional' => 0.011;
 requires 'strictures' => 1.0;
 requires 'Text::Diff' => 1.37;
-requires 'UI::Various' => 0.41;
+requires 'UI::Various' => 0.43;
 
 # Unfortunately apparently cpanfile does not support the syntax of
 # Module::Install::External, but we still add those as comment:

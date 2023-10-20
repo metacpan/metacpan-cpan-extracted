@@ -1,5 +1,24 @@
 Revision history for Object-Pad
 
+0.804   2023-10-04
+        [CHANGES]
+         * Add `:repr(pvobj)` for Perl 5.38+
+         * Much internal code adjustment to support instances not backed by
+           `SVt_PVAV`
+
+        [BUGFIXES]
+         * Fix the METHSTART_CONTAINS_FIELD_BINDINGS optimisation that had been
+           recently broken, restoring its performance gains
+
+0.803   2023-09-20
+        [CHANGES]
+         * Add `:repr(keys)` to use one hash key per field
+         * Performance improvements to constructor:
+            + Use `av_*_simple()` functions when operating on internal AVs
+            + Don't bother calling the universal `->BUILDARGS` method if the
+              class doesn't override it
+            + Calculate the argument count just once
+
 0.802   2023-08-22
         [CHANGES]
          * Internal XS-level changes:

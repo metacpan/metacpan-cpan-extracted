@@ -8,8 +8,11 @@ use LWP::UserAgent;
 use URI;
 use JSON;
 use Data::Dumper;
+use WWW::OAuth;
+use WWW::OAuth::Util qw( form_urldecode );
+#use LWP::ConsoleLogger::Everywhere ();
 
-our $VERSION = '1.0.9'; # VERSION
+our $VERSION = '1.1.1'; # VERSION
 
 =head1 NAME
 
@@ -17,7 +20,7 @@ WebService::GarminConnect - Access data from Garmin Connect
 
 =head1 VERSION
 
-version 1.0.9
+version 1.1.1
 
 =head1 SYNOPSIS
 
@@ -51,9 +54,10 @@ specified:
 
 (Required) The user's Garmin Connect password.
 
-=item loginurl
+=item cache_dir
 
-(Optional) Override the default login URL for Garmin Connect.
+(Optional) Directory where the user's authentication token will be cached.
+If not specified, defaults to $HOME/.cache/webservice-garminconnect.
 
 =item searchurl
 
@@ -76,8 +80,8 @@ sub new {
   return bless {
     username  => $options{username},
     password  => $options{password},
-    loginurl  => $options{loginurl} || 'https://sso.garmin.com/sso/signin',
-    searchurl => $options{searchurl} || 'https://connect.garmin.com/modern/proxy/activitylist-service/activities/search/activities',
+    cache_dir => $options{cache_dir},
+    searchurl => $options{searchurl} || 'https://connectapi.garmin.com/activitylist-service/activities/search/activities',
   }, $self;
 }
 
@@ -87,58 +91,186 @@ sub _login {
   # Bail out if we're already logged in.
   return if defined $self->{is_logged_in};
 
-  my $ua = LWP::UserAgent->new(agent => 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko');
+  my $ua = LWP::UserAgent->new(agent => 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_5 like Mac OS X) ' .
+                                        'AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148');
   $ua->cookie_jar( {} );
   push @{ $ua->requests_redirectable }, 'POST';
 
-  # Retrieve the login page
-  my %params = (
-    service   => "https://connect.garmin.com/post-auth/login",
-    gauthHost => "https://sso.garmin.com/sso",
-    clientId  => "GarminConnect",
-    consumeServiceTicket => "false",
+  # location for saved access token
+  my $cache_path = $self->{cache_dir};
+  if (!defined $cache_path) {
+    $cache_path = (getpwuid($>))[7]."/.cache";
+    -d $cache_path || mkdir $cache_path, 0700;
+    $cache_path .= "/webservice-garminconnect";
+    -d $cache_path || mkdir $cache_path, 0700;
+  }
+  # untaint
+  $self->{username} =~ m/([a-z0-9+\-_.=\?@]+)/i;
+  $cache_path .= "/${1}_oauth";
+
+  # try saved access token
+  if (open my $cache_fh, '<', $cache_path) {
+    (my $access_token = <$cache_fh>) =~ s/\s+//;
+
+    $ua->default_header('Authorization', 'Bearer ' . $access_token);
+    $self->{useragent} = $ua;
+    $self->{is_logged_in} = 1;
+
+    # simple api call to validate
+    eval { $self->profile };
+    return unless $@;
+  }
+
+  my %sso_embed_params = (
+    id          => 'gauth-widget',
+    embedWidget => 'true',
+    gauthHost   => 'https://sso.garmin.com/sso',
   );
-  my $uri = URI->new($self->{loginurl});
-  $uri->query_form(%params);
+  my $uri = URI->new('https://sso.garmin.com/sso/embed');
+  $uri->query_form(%sso_embed_params);
   my $response = $ua->get($uri);
-  croak "Can't retrieve login page: " . $response->status_line
+  croak "Can't retrieve /sso/embed: " . $response->status_line
     unless $response->is_success;
 
-  # Get sso ticket
-  $uri = URI->new("https://sso.garmin.com/sso/login");
-  $uri->query_form(%params);
-  $response = $ua->post($uri, origin => 'https://sso.garmin.com',
-    content => {
-      username => $self->{username},
-      password => $self->{password},
-      _eventId => "submit",
-      embed    => "true",
-  });
-  croak "Can't retrieve sso page: " . $response->status_line
-    unless $response->is_success;
-  if ($response->content =~ />sendEvent\('FAIL'\)/) {
-    croak "invalid login";
-  }
-  if ($response->content =~ />sendEvent\('ACCOUNT_LOCKED'\)/) {
-    croak "account locked";
-  }
-  if ($response->content =~ /renewPassword/) {
-    croak "renew password";
-  }
-  if ($response->content !~ /\?ticket=([^"]+)"/) {
-    croak "no service ticket in response";
-  }
-  my $ticket=$1;
-
-  #$uri = URI->new('https://connect.garmin.com/post-auth/login?ticket=$1');
-  $uri = URI->new("https://connect.garmin.com/modern/?ticket=$ticket");
+  my %signin_params = (
+    id                              => 'gauth-widget',
+    embedWidget                     => 'true',
+    gauthHost                       => 'https://sso.garmin.com/sso/embed',
+    service                         => 'https://sso.garmin.com/sso/embed',
+    source                          => 'https://sso.garmin.com/sso/embed',
+    redirectAfterAccountLoginUrl    => 'https://sso.garmin.com/sso/embed',
+    redirectAfterAccountCreationUrl => 'https://sso.garmin.com/sso/embed',
+  );
+  $uri = URI->new('https://sso.garmin.com/sso/signin');
+  $uri->query_form(%signin_params);
   $response = $ua->get($uri);
-  croak "Can't retrieve post-auth page: " . $response->status_line
+  croak "Can't retrieve /sso/signin: " . $response->status_line
     unless $response->is_success;
+  # get the CSRF token from the response, it's a hidden form field
+  my $csrf_token;
+  if ($response->decoded_content =~ /name="_csrf"\s+value="(.+?)"/) {
+    $csrf_token = $1;
+  } else {
+    croak "couldn't find CSRF token";
+  }
+
+  # submit login form with email and password
+  $response = $ua->post($uri, Referer => "$uri", Content => {
+    username => $self->{username},
+    password => $self->{password},
+    embed    => 'true',
+    _csrf    => $csrf_token,
+  });
+  croak "Can't submit login  page: " . $response->status_line
+    unless $response->is_success;
+  my $title;
+  if ($response->decoded_content =~ m:<title>(.+)</title>:) {
+    $title = $1;
+  } else {
+    croak "couldn't find <title> in login response";
+  }
+  if ($title ne 'Success') {
+    croak "expected post-login <title> of \"Success\", not \"$title\"";
+  }
+  my $ticket;
+  if ($response->decoded_content =~ /embed\?ticket=([^"]+)"/) {
+    $ticket = $1;
+  } else {
+    croak "couldn't find ticket in login response";
+  }
+
+  # get oauth1 token, these came from https://thegarth.s3.amazonaws.com/oauth_consumer.json
+  # and are what the Garmin Connect mobile app uses. Perhaps we should
+  # try to fetch these from there at runtime in case they ever change?
+  my $oauth = WWW::OAuth->new(
+    client_id => "fc3e99d2-118c-44b8-8ae3-03370dde24c0",
+    client_secret => "E08WAR897WEy2knn7aFBrvegVAf0AFdWBBF",
+  );
+
+
+  $uri = 'https://connectapi.garmin.com/oauth-service/oauth/' .
+         "preauthorized?ticket=$ticket&login-url=" .
+         'https://sso.garmin.com/sso/embed&accepts-mfa-tokens=true';
+  $ua->add_handler(request_prepare => sub { $oauth->authenticate($_[0]) });
+  $response = $ua->get($uri);
+  croak "Can't retrieve oauth1 page: " . $response->status_line
+    unless $response->is_success;
+  my %response_data = @{form_urldecode($response->content)};
+  foreach my $key ( qw( oauth_token oauth_token_secret ) ) {
+    if (!defined $response_data{$key}) {
+      croak "oauth response didn't include \"$key\"";
+    }
+  }
+  $oauth->token($response_data{oauth_token});
+  $oauth->token_secret($response_data{oauth_token_secret});
+
+  $uri = 'https://connectapi.garmin.com/oauth-service/oauth/exchange/user/2.0';
+  $response = $ua->post($uri);
+  croak "Can't retrieve oauth1 page: " . $response->status_line
+    unless $response->is_success;
+  my $response_data = decode_json($response->content);
+  if (!defined $response_data->{access_token}) {
+    croak "couldn't find access token in response";
+  }
+
+  # make subsequent calls use the access token in the Authorization header
+  $ua->remove_handler('request_prepare');
+  my $access_token = $response_data->{access_token};
+  $ua->default_header('Authorization', 'Bearer ' . $access_token);
+
+  #$uri = 'https://connectapi.garmin.com/activitylist-service/activities/search/activities?limit=20&start=0';
+  #$response = $ua->get($uri);
+  #croak "Can't retrieve activity search  page: " . $response->status_line
+  #  unless $response->is_success;
 
   # Record our logged-in status so future calls will skip login.
   $self->{useragent} = $ua;
   $self->{is_logged_in} = 1;
+
+  # save access token
+  if (open my $cache_fh, '>', $cache_path) {
+    chmod 0600, $cache_fh;
+    print $cache_fh $access_token, "\n";
+    close $cache_fh;
+  }
+}
+
+sub _api {
+  my $self = shift;
+  my ($api, %opts) = @_;
+  my $json = JSON->new();
+
+  # Ensure we are logged in
+  $self->_login();
+  my $ua = $self->{useragent};
+
+  my $url = URI->new($self->{searchurl});
+	$url->path($api);
+  $url->query_form(%opts);
+
+  my $headers = [
+    'NK' => 'NT',
+    'X-app-ver' => '4.71.1.4',
+    'X-lang' => 'en-US',
+    'X-Requested-With' => 'XMLHttpRequest',
+  ];
+  my $request = HTTP::Request->new('GET', $url, $headers);
+  my $response = $ua->request($request);
+  croak "Can't make $api request: " . $response->status_line
+    unless $response->is_success;
+
+  return $json->decode($response->content);
+}
+
+=head2 profile
+
+Returns the user's Garmin Connect profile
+
+=cut
+
+sub profile {
+  my $self = shift;
+  return $self->_api("/userprofile-service/socialProfile");
 }
 
 =head2 activities( %search_criteria )
@@ -192,19 +324,7 @@ sub activities {
   my $data = [];
   do {
     # Make a search request
-    my $searchurl = $self->{searchurl} .
-      "?start=$start&limit=$pagesize";
-
-    my $headers = [
-      'NK' => 'NT',
-    ];
-    my $request = HTTP::Request->new('GET', $searchurl, $headers);
-    my $response = $ua->request($request);
-    croak "Can't make search request: " . $response->status_line
-      unless $response->is_success;
-
-    # Parse the JSON search results
-    $data = $json->decode($response->content);
+    $data = $self->_api("/activitylist-service/activities/search/activities", start => $start, limit => $pagesize);
 
     # Add this set of activities to the list.
     foreach my $activity ( @{$data} ) {
@@ -271,7 +391,7 @@ L<https://github.com/jlouder/garmin-connect-perl>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2015 Joel Loudermilk.
+Copyright 2023 Joel Loudermilk.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

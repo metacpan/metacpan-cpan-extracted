@@ -1,5 +1,9 @@
 Revision history for Perl extension Mac::FSEvents.
 
+0.22  2023-10-09 22:48:07 JST
+        - Fix memory leak in "watch" method (#4)
+        - Set PROTOTYPES: DISABLE (#5)
+
 0.21  2023-07-13 19:28:40 JST
         - Cosmetic changes (#2)
 

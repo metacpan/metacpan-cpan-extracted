@@ -14,7 +14,7 @@ my @tests = (
     { cmd => [ '--verbose', '-g', '-s', '-i', '$url' ],
       name => 'ignore --include option' },
     { cmd => [ '--verbose', '-s', '-g', '$url', '--request', 'TEST' ] },
-    { cmd => [ '--verbose', '-s', '-g', '$url', '--request', 'PUT', '--data', '{key:"value"}' ] },
+    { cmd => [ '--verbose', '-s', '-g', '$url', '--request', 'PUT', '--data', "{key:'value'}" ] },
 );
 
 run_curl_tests( @tests );

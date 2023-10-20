@@ -58,7 +58,6 @@ sub __choose_columns {
             }
             return;
         }
-        push @bu, [ @$subset ];
         if ( $menu->[$idx[0]] eq $sf->{i}{ok} ) {
             shift @idx;
             push @$subset, @{$menu}[@idx];
@@ -83,6 +82,7 @@ sub __choose_columns {
             if ( ! defined $complex_col ) {
                 next COLUMNS;
             }
+            push @bu, [ @$subset ];
             push @$subset, $complex_col;
         }
         elsif ( $menu->[$idx[0]] eq $const ) {
@@ -93,9 +93,11 @@ sub __choose_columns {
             if ( ! defined $value ) {
                 next COLUMNS;
             }
+            push @bu, [ @$subset ];
             push @$subset, $ax->quote_constant( $value );
         }
         else {
+            push @bu, [ @$subset ];
             push @$subset, @{$menu}[@idx];
         }
     }
@@ -139,27 +141,6 @@ sub __nested_func_info {
     return join( '', map { $_ . '(' } @$nested_func ) . ( $fill_string // '' ) . ( ')' x @$nested_func );
 }
 
-sub __enable_extended_arguments {
-    my ( $sf, $tmp_info ) = @_;
-    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $prompt = 'Extended arguments:';
-    my $yes = '- YES';
-    # Choose
-    my $choice = $tc->choose(
-        [ undef, '- NO', $yes ],
-        { %{$sf->{i}{lyt_v}}, info => $tmp_info, prompt => $prompt, undef => '<=' }
-    );
-    if ( ! defined $choice ) {
-        next SCALAR_FUNCTION;
-    }
-    if ( $choice eq $yes ) {
-        $sf->{o}{enable}{extended_func_args} = 1;
-    }
-    else {
-        $sf->{o}{enable}{extended_func_args} = 0;
-    }
-}
-
 
 sub col_function {
     my ( $sf, $sql, $clause, $qt_cols, $r_data ) = @_;
@@ -177,6 +158,7 @@ sub col_function {
     }
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $driver = $sf->{i}{driver};
     my $cast         = 'CAST';
     my $char_length  = 'CHAR_LENGTH';
@@ -248,8 +230,8 @@ sub col_function {
             $old_idx = $idx;
         }
         if ( $menu->[$idx] eq $hidden ) {
-            $sf->__enable_extended_arguments($tmp_info );
-            if ( $sf->{o}{enable}{extended_func_args} ) {
+            $ext->enable_extended_arguments( $tmp_info );
+            if ( $sf->{o}{enable}{extended_args} ) {
                 $hidden = 'Scalar functions:*';
             }
             else {
@@ -297,15 +279,15 @@ sub col_function {
                 my ( $prompt, $history );
                 if ( $func =~ /^$cast\z/i ) {
                     $prompt = 'Data type: ';
-                    $history = [ qw(VARCHAR TEXT INT BIGINT DECIMAL DATE) ];
+                    $history = [ sort qw(VARCHAR CHAR TEXT INT BIGINT DECIMAL DATE DATETIME TIME TIMESTAMP) ];
                 }
                 if ( $func =~ /^$extract\z/i ) {
                     $prompt = 'Field: ';
                     if ( $sf->{i}{driver} eq 'Informix' ) {
-                        $history = [ qw(YEAR MONTH DAY HOUR MINUTE SECOND day_of_week) ];
+                        $history = [ sort qw(YEAR QUARTER MONTH      DAY HOUR MINUTE SECOND DAY_OF_WEEK) ];
                     }
                     else {
-                        $history = [ qw(YEAR MONTH WEEK DAY HOUR MINUTE SECOND day_of_week day_of_year) ];
+                        $history = [ sort qw(YEAR QUARTER MONTH WEEK DAY HOUR MINUTE SECOND DAY_OF_WEEK DAY_OF_YEAR) ];
                     }
                 }
                 elsif ( $func =~ /^(?:$round|$truncate)\z/i ) {

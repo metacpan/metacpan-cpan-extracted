@@ -58,7 +58,7 @@ SYNOPSIS
         }
 
 VERSION
-        v0.31.1
+        v0.32.4
 
 DESCRIPTION
     Module::Generic as its name says it all, is a generic module to inherit
@@ -1445,6 +1445,23 @@ SUPPORT METHODS
 
     This would set $ref to be an hash reference with keys "foo baz debug"
 
+  _get_symbol
+        my $obj = My::Class->new;
+        my $sym = $obj->_get_symbol( '$VERSION' );
+        my $sym = $obj->_get_symbol( 'Other::Class' => '$VERSION' );
+
+    This returns the symbol for the given variable in the current package,
+    or, if a package is explicitly specified, in that package.
+
+    Variables can be "scalar" with "$", "array" with "@", "hash" with "%",
+    or "code" with "&"
+
+    It returns a reference if found, otherwise, if not found, "undef" in
+    scalar context or an empty list in list context.
+
+    If an error occurs, it sets an error object and returns "undef" in
+    scalar context or an empty list in list context.
+
   _get_stack_trace
     This will return a Devel::StackTrace object initiated with the following
     options set:
@@ -1472,6 +1489,21 @@ SUPPORT METHODS
     knows only of Crypt::Misc and MIME::Base64, so if you want to use any
     other one, arrange yourself to pass to "_has_base64" an array reference
     of 2 code references as explained above.
+
+  _has_symbol
+        my $obj = My::Class->new;
+        my $bool = $obj->_has_symbol( '$VERSION' );
+        my $bool = $obj->_has_symbol( 'Other::Class' => '$VERSION' );
+
+    This returns true (1) if the specified variable exists in the current
+    package, or, if a package is explicitly specified, in that package. It
+    returns false (0) if the package does not have that variable.
+
+    Variables can be "scalar" with "$", "array" with "@", "hash" with "%",
+    or "code" with "&"
+
+    If an error occurs, it sets an error object and returns "undef" in
+    scalar context or an empty list in list context.
 
   _implement_freeze_thaw
     Provided with a list of package names and this method will implement in
@@ -1615,6 +1647,11 @@ SUPPORT METHODS
     Provided with some data, this checks if the data is of type scalar
     reference, e.g. "SCALAR(0x7fc0d3b7cea0)", even if it is an object.
 
+  _is_tty
+    Returns true if the program is attached to a tty (terminal), meaning
+    that it is run interactively, or false otherwise, such as when its
+    output is piped.
+
   _is_uuid
     Provided with a non-zero length value and this will check if it looks
     like a valid "UUID", i.e. a unique universal ID, and upon successful
@@ -1622,6 +1659,24 @@ SUPPORT METHODS
     Module::Generic::Scalar object.
 
     An empty string or "undef" can be provided and will not be checked.
+
+  _list_symbols
+        my $obj = My::Class->new;
+        my @symbols = $obj->_list_symbols;
+        my @symbols = $obj->_list_symbols( 'Other::Class' );
+        # possible types are: scalar, array, hash and code
+        # specify a type to get only the symbols of that type
+        my @symbols = $obj->_list_symbols( 'My::Class' => 'scalar' );
+
+    This returns a list of all the symbols for the current package, or, if a
+    package is explicitly specified, from that package.
+
+    A symbol type can optionally be specified to limit the list of symbols
+    returned. However, if you want to specify a type, you also need to
+    specify a package, even if it is for the current package.
+
+    If an error occurs, it sets an error object and returns "undef" in
+    scalar context or an empty list in list context.
 
   _load_class
         $self->_load_class( 'My::Module' ) || die( $self->error );

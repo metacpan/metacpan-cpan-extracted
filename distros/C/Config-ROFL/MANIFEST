@@ -1,0 +1,25 @@
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Config/ROFL.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/config-rofl.t
+t/data/config/config.conf
+t/data/config/etc/config.yml
+t/data/config/json/config.json
+t/data/config/overriden_config_path/config.yml
+t/data/config/share/etc/config.yaml
+t/data/config/yaml_true_value/config.yml
+t/test-subclass/lib/Foo/Config.pm
+t/test-subclass/share/etc/config.yml
+TODO

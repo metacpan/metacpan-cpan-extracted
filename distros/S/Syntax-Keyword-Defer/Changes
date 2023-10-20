@@ -1,5 +1,12 @@
 Revision history for Syntax-Keyword-Defer
 
+0.10    2023-09-21
+        [CHANGES]
+         * Removed `Syntax/Keyword/Finally.pm`
+
+        [BUGFIXES]
+         * Need to set `-DNO_XLOCKS=1` to keep MSWin32 happy (RT149716)
+
 0.09    2023-07-13
         [CHANGES]
          * Updates to compile cleanly on perl v5.38

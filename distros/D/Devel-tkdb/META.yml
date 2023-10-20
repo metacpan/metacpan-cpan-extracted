@@ -1,21 +1,31 @@
---- #YAML:1.0
-name:               Devel-tkdb
-version:            2.2
-abstract:           ~
-author:  []
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+---
+abstract: unknown
+author:
+  - unknown
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Tcl::Tk:  1.03
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - Tk
+  - Tcl/Tk
+  - GUI
+  - Debuger
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-tkdb
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Tcl::Tk: '1.03'
+resources:
+  MailingList: mailto:tcltk@perl.org
+  repository: https://github.com/vadrer/Perl-Devel-tkdb
+version: '2.3'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

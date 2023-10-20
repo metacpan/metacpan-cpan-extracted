@@ -1,5 +1,18 @@
 Revision history for App-Oozie
 
+0.010     2023-10-19 04:16:22+02:00 Europe/Brussels
+- perl 5.14.0 is now required for the "/r" modifier.
+
+0.009     2023-10-11 21:31:55+02:00 Europe/Brussels
+- Support an HDFS properties file.
+- Enable local common.properties inclusion.
+
+0.008     2023-10-11 19:20:58+02:00 Europe/Brussels
+- Wokaround "/tmp is an existing symbolic link" error.
+
+0.007     2023-09-26 12:32:17+02:00 Europe/Brussels
+- Fork ttree as a module (not enabled yet).
+
 0.006     2023-09-08 12:47:12+02:00 Europe/Brussels
 - New option template_namenode to giving the ability
   to override the Oozie variable nameNode from cli.

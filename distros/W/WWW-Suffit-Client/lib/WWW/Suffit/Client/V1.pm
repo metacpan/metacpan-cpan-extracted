@@ -11,7 +11,7 @@ WWW::Suffit::Client::V1 - The Suffit API client library for V1 methods
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -49,6 +49,13 @@ Performs user authentication on the OWL system
 
 Performs user authorization on the OWL system
 
+=head2 pubkey
+
+    my $status = $client->pubkey();
+    my $status = $client->pubkey(1); # Set public_key to object
+
+Returns RSA public key of the token owner
+
 =head1 DEPENDENCIES
 
 L<Mojolicious>, L<WWW::Suffit>
@@ -78,7 +85,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use parent qw/ WWW::Suffit::Client /;
 
@@ -139,6 +146,24 @@ sub authz {
         },
         json => {%data},
     );
+}
+sub pubkey {
+    my $self = shift;
+    my $set = shift || 0;
+
+    # Request
+    my $status = $self->request(GET => $self->str2url("v1/publicKey"),
+        { # Headers
+            Accept => CONTENT_TYPE_JSON, # "*/*"
+        },
+    );
+    return 0 unless $status;
+
+    # Get public_key
+    my $public_key = $self->res->json("/public_key") if $self->res->json("/status");
+    $self->public_key($public_key) if $set && length($public_key // '');
+
+    return $status;
 }
 
 1;

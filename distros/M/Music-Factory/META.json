@@ -1,0 +1,58 @@
+{
+   "abstract" : "some factory class for your music factory class",
+   "author" : [
+      "Jeremy Mates <jmates@thrig.me>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Music-Factory",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Object::Pad" : "0.66",
+            "perl" : "v5.26.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000060",
+            "perl" : "v5.26.0"
+         }
+      }
+   },
+   "provides" : {
+      "Music::Factory" : {
+         "file" : "lib/Music/Factory.pm",
+         "version" : "0.01"
+      },
+      "Music::Factory::AssemblyLine" : {
+         "file" : "lib/Music/Factory.pm"
+      },
+      "Music::Factory::Generator" : {
+         "file" : "lib/Music/Factory.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/BSD-3-Clause"
+      ],
+      "repository" : {
+         "url" : "https://thrig.me/src/Music-Factory.git"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

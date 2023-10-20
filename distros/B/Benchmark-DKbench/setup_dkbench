@@ -8,7 +8,9 @@ setup_dkbench - DKbench Perl CPU Benchmark utility setup script
 
 This is a setup script, part of the L<Benchmark::DKbench> distribution.
 
-Refer to the distribution POD for more information on the DKbench suite.
+Refer to the distribution POD for more information on the DKbench suite:
+
+ perldoc Benchmark::DKbench
 
 =head1 SYNOPSIS
 
@@ -29,8 +31,14 @@ may show 'Fail' under Pass/Fail and scores may not be comparable to the baseline
 This might be perfectly fine for your purposes - in fact it might be intended if
 you are benchmarking to compare different software instead of hardware.
 
-This installer assumes you have at least cpanm already installed
-(C<curl -L https://cpanmin.us | perl - --sudo App::cpanminus>).
+This installer assumes you have at least cpanm (L<App::cpanminus>) already installed.
+If not, on must systems you can do that with:
+
+ # System-wide with sudo:
+ curl -L https://cpanmin.us | perl - --sudo App::cpanminus
+
+ # Locally or system-wide when root
+ curl -L https://cpanmin.us | perl - App::cpanminus
 
 You will also need to have a build enviroment set up (compiler, make etc). If you
 want to add a couple of optional BioPerl bencharks you'd want an XML library in
@@ -39,11 +47,11 @@ most popular pqckage managers (run as root or with sudo):
 
  # Debian/Ubuntu etc
  apt-get update
- apt-get -y install wget build-essential perl cpanminus libxml-simple-perl
+ apt-get install wget build-essential perl cpanminus libxml-simple-perl
 
  # CentOS/Redhat
  yum update
- yum -y install wget gcc make patch perl perl-App-cpanminus perl-XML-LibXML perl-XML-Parser
+ yum install wget gcc make patch perl perl-App-cpanminus perl-XML-LibXML perl-XML-Parser
 
 The above will have you ready for using the default (system) perl. If you want to
 specifically install the reference perl version for this suite (currently 5.36.0),
@@ -59,6 +67,8 @@ Note that the suite can be installed to as low as perl 5.12, however if you have
 version lower than 5.14 make sure you install L<IO::Socket::IP> 0.41 or lower first:
 
  cpanm -n http://cpan.metacpan.org/authors/id/P/PE/PEVANS/IO-Socket-IP-0.41.tar.gz
+
+Some benchmarks will report failure on "ancient" Perls.
 
 =cut
 

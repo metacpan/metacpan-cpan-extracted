@@ -65,7 +65,7 @@ sub case {
     my @bu;
     my $else_on = 0;
 
-    ROWS: while ( 1 ) { # name
+    SUBSTMT: while ( 1 ) {
         my ( $when, $else, $end ) = ( '  WHEN', '  ELSE', '  END' );
         my @pre = ( undef );
         my $menu;
@@ -79,14 +79,14 @@ sub case {
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Your choice:', index => 1, undef => '  <=' }
+            { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Your choice:', index => 1, undef => '  <=' } ##
         );
         $ax->print_sql_info( $info );
         if ( ! $idx ) {
             if ( @bu ) {
                 $tmp_sql->{case_stmt} = pop @bu;
                 $else_on = 0;
-                next ROWS;
+                next SUBSTMT;
             }
             delete $tmp_sql->{case_stmt};
             return;
@@ -111,7 +111,7 @@ sub case {
             if ( ! defined $ret ) {
                 delete $tmp_sql->{when_stmt};
                 $tmp_sql->{case_stmt} = pop @bu;
-                next ROWS;
+                next SUBSTMT;
             }
             $tmp_sql->{case_stmt} .= "\n" . delete $tmp_sql->{when_stmt};
             $tmp_sql->{case_stmt} .= " THEN";
@@ -120,7 +120,7 @@ sub case {
             pop @{$r_data->{case}};
             if ( ! defined $value ) {
                 $tmp_sql->{case_stmt} = pop @bu;
-                next ROWS;
+                next SUBSTMT;
             }
             $tmp_sql->{case_stmt} .= ' ' . $value;
         }
@@ -131,7 +131,7 @@ sub case {
             pop @{$r_data->{case}};
             if ( ! defined $value ) {
                 $tmp_sql->{case_stmt} = pop @bu;
-                next ROWS;
+                next SUBSTMT;
             }
             $tmp_sql->{case_stmt} .= ' ' . $value;
             $else_on = 1;

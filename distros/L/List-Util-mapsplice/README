@@ -1,0 +1,109 @@
+NAME
+    List::Util::mapsplice - Splice array with code, replace items with
+    result from code
+
+VERSION
+    This document describes version 0.001 of List::Util::mapsplice (from
+    Perl distribution List-Util-mapsplice), released on 2023-09-30.
+
+SYNOPSIS
+     use List::Util::mapsplice qw(masplice);
+
+     my @ary = (1,2,3,4,5,6,7,8,9,10);
+
+     # 1. remove all even numbers (equivalent to: @ary = grep { !($_ % 2 == 0) } @ary  or  @ary = map { $_ % 2 == 0 ? () : ($_) } @ary
+
+     #                                       --------------------------- 1st param: code to match elements to remove
+     #                                      /     ---------------------- 2nd param: the array
+     #                                     /     /  -------------------- 3rd param: (optional) offset to start mapping, negative offset allowed
+     #                                    /     /  /   ----------------- 4th param: (optional) number of elements to process, negative number allowed to reverse the direction of processing
+     #                                   /     /  /   /
+     mapsplice { $_ % 2 == 0 ? () : ($_) } @ary        ;  # => (1,3,5,7,9)
+
+     # 2. replace all even numbers with two elements containing half of the original number, equivalent to: @ary = map { $_ % 2 == 0 ? ($_/2, $_/2) : ($_) } @ary
+     mapsplice { $_ % 2 == 0 ? ($_/2, $_/2) : ($_) } @ary;  # => (1, 1,1, 3, 2,2, 5, 3,3, 7, 4,4, 9, 5,5)
+
+     # 4. replace first two even numbers with their negative values
+     mapsplice { $_ % 2 == 0 ? (-$_) : ($_) } @ary, 0, 4;  # => (1,-2,3,-4,5,6,7,8,9,10)
+
+     # 5. replace the last two even numbers with their negative values
+     mapsplice { $_ % 2 == 0 ? (-$_) : ($_) } @ary, -1, -4;  # => (1,2,3,4,5,6,7,-8,9,-10)
+
+DESCRIPTION
+    This module provides "mapsplice".
+
+FUNCTIONS
+    Not exported by default but exportable.
+
+  mapsplice
+    Usage:
+
+     mapsplice CODE ARRAY, OFFSET, LENGTH
+     mapsplice CODE ARRAY, OFFSET
+     mapsplice CODE ARRAY
+
+    "mapsplice" sort of combines "map" and "splice" (hence the name). You
+    provide a code which will be called for each element of array and is
+    expected to return zero or more replacement for the element. A simple
+    "map" usually can also do the job, but "mapsplice" offers these: 1)
+    directly modify the array; 2) option to limit the range of elements to
+    process; 3) element index in $_[1]; 4) return the replaced elements.
+
+    In CODE, $_ (as well as $_[0]) is set to the element. $_[1] is set to
+    the index of the element.
+
+    The third parameter, "OFFSET", is the array index to start processing, 0
+    meaning the first element. Default if not specified is 0. Negative
+    number is allowed, -1 means the last element, -2 the second last and so
+    on. An out-of-bound error will be thrown if index outside of the array
+    is specified.
+
+    The fourth parameter, "LENGTH", is the number of elements to process.
+    Undef means unlimited/all, and is the default if unspecified. Negative
+    number is allowed, meaning to process backwards to decreasing index. If
+    the end of array (or beginning if direction is backwards) is reached,
+    processing is stopped.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/List-Util-mapsplice>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-List-Util-mapsplice>.
+
+SEE ALSO
+    "map" and "splice" in perlfunc.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=List-Util-mapsplice>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

@@ -1,7 +1,7 @@
 package Template::Caribou::Files;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: Role to load templates from files
-$Template::Caribou::Files::VERSION = '1.2.1';
+$Template::Caribou::Files::VERSION = '1.2.2';
 
 use strict;
 use warnings;
@@ -137,7 +137,7 @@ Template::Caribou::Files - Role to load templates from files
 
 =head1 VERSION
 
-version 1.2.1
+version 1.2.2
 
 =head1 SYNOPSIS
 
@@ -241,7 +241,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Yanick Champoux.
+This software is copyright (c) 2023 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

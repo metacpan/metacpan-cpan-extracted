@@ -6,7 +6,7 @@ BEGIN
 
     use Test::More qw( no_plan );
 
-    # use Nice::Try debug => 5, debug_file => './dev/debug.pl';
+    # use Nice::Try debug => 7, debug_file => './dev/debug-015-eof.pl', debug_code => 1;
     use Nice::Try;
 };
 

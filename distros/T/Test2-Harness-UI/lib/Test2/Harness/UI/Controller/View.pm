@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::View;
 use strict;
 use warnings;
 
-our $VERSION = '0.000138';
+our $VERSION = '0.000144';
 
 use Data::GUID;
 use Text::Xslate(qw/mark_raw/);
@@ -37,18 +37,20 @@ sub handle {
 
     if ($id) {
         my $p_rs = $schema->resultset('Project');
-        $project //= eval { $p_rs->search({project_id => $uuid})->first };
         $project //= eval { $p_rs->search({name => $id})->first };
+        $project //= eval { $p_rs->search({project_id => $uuid})->first };
 
         if ($project) {
+            $uuid = uuid_inflate($project->project_id);
             $self->{+TITLE} .= ">" . $project->name;
         }
         else {
             my $u_rs = $schema->resultset('User');
-            $user //= eval { $u_rs->search({user_id => $uuid})->first };
             $user //= eval { $u_rs->search({username => $id})->first };
+            $user //= eval { $u_rs->search({user_id => $uuid})->first };
 
             if ($user) {
+                $uuid = uuid_inflate($user->user_id);
                 $self->{+TITLE} .= ">" . $user->username;
             }
             else {

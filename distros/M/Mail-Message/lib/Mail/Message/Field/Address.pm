@@ -8,7 +8,7 @@
 
 package Mail::Message::Field::Address;
 use vars '$VERSION';
-$VERSION = '3.013';
+$VERSION = '3.014';
 
 use base 'Mail::Identity';
 

@@ -1,4 +1,4 @@
-requires 'Mojolicious';
+requires 'Mojolicious', '>= 9.34';
 requires 'IPC::SharedMem';
 
 on configure => sub {

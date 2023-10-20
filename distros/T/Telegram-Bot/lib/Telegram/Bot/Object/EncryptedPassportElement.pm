@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::EncryptedPassportElement;
-$Telegram::Bot::Object::EncryptedPassportElement::VERSION = '0.023';
+$Telegram::Bot::Object::EncryptedPassportElement::VERSION = '0.024';
 # ABSTRACT: The base class for Telegram 'EncryptedPassportElement' type objects
 
 
@@ -33,7 +33,7 @@ Telegram::Bot::Object::EncryptedPassportElement - The base class for Telegram 'E
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,16 @@
 Revision history for Perl extension Devel::tkdb.
+
+2.3	2023-09-17
+	F6 - selection eval
+	expression window fixes
+	(2011-02-xx) removed $ENV{'PTKDB_BUTTON_FONT'} - it was not active due to bug anyway
+	removed PTKDB_STOP_TAG_COLOR, PTKDB_BRKPT_COLOR
+	$ENV{PTKDB_STOP_TAG_FONT} was even never described
+	fixed Eval window
+        never used $DB::window->{run_flag}
+	goto_sub_from_stack replaced with set_file
+        removed all '$offset = $dbline[1] =~ /use\s+.*Devel::_?tkdb/ ? 1 : 0 ;'
+	removed array $self->{'brkPtSlots'}, scalar $self->{'row'}
  
 2.2	2011-02-24
 	name change

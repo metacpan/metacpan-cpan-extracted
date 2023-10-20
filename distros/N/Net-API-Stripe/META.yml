@@ -1,15 +1,15 @@
 ---
 abstract: 'An interface to the Stripe API'
 author:
-  - 'Jacques Deguest (jack@deguest.jp)'
+  - 'Jacques Deguest <jack@deguest.jp>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test::More: '0'
-  Test::Pod: '0'
+  Test::More: '1.302162'
+  Test::Pod: '1.52'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,25 +29,27 @@ requires:
   Digest::MD5: '2.55'
   Digest::SHA: '6.02'
   Encode: '3.01'
-  HTTP::Promise: v0.2.1
+  HTTP::Promise: v0.3.1
   JSON: '4.02'
   MIME::Base64: '3.15'
   MIME::QuotedPrint: '3.13'
-  Module::Generic: v0.29.3
+  Module::Generic: v0.32.5
   Net::IP: '1.26'
-  Nice::Try: v1.3.1
+  Nice::Try: v1.3.5
   Regexp::Common: '2017060201'
   Scalar::Util: '1.54'
   URI::Escape: '3.31'
   Want: '0.29'
   common::sense: '0'
   constant: '0'
-  overload: '1.26'
+  overload: '0'
   parent: '0'
   perl: '5.006000'
+  strict: '0'
   vars: '0'
+  warnings: '0'
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Net-API-Stripe/issues
   repository: https://gitlab.com/jackdeguest/Net-API-Stripe
-version: v2.0.2
+version: v2.0.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

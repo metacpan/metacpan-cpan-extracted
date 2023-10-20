@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future::Buffer;
 
@@ -101,7 +101,7 @@ ok( !@next_fill_f, 'fill not yet invoked before any ->read_atmost' );
    );
 
    my $f = $buf->read_atmost( 1 );
-   isa_ok( $f, "Some::Future::Subclass", '$f' );
+   isa_ok( $f, [ "Some::Future::Subclass" ], '$f' );
 }
 
 done_testing;

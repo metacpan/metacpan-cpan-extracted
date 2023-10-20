@@ -106,6 +106,19 @@ subtest 'Response: HX-Reswap' => sub {
 
 };
 
+subtest 'Response: HX-Reselect' => sub {
+
+    get '/hx_reselect_1' => sub {
+        my $c = shift;
+        $c->htmx->res->reselect('#test');
+        $c->rendered(200);
+    };
+
+    $t->get_ok('/hx_reselect_1')->status_is(200)->header_exists('HX-Reselect');
+    $t->get_ok('/hx_reselect_1')->status_is(200)->header_is('HX-Reselect', '#test');
+
+};
+
 subtest 'Response: HX-Retarget' => sub {
 
     get '/hx_retarget_1' => sub {

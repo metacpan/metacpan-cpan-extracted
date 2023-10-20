@@ -26,7 +26,7 @@ sub new {
     $self->{'state_count'} = 2;  # nr of currently used
     $self->{'current_state'} = 1;
 
-    $self->{'state_colors'}       = [ color('white')->gradient_to('black', $self->{'state_count'}) ];
+    $self->{'state_colors'}       = [ color('white')->gradient( to => 'black', steps => $self->{'state_count'}) ];
     $self->{'state_colors'}[$_]   = color( $default_color_def ) for $self->{'state_count'} .. $self->{'last_state'};
     $self->{'state_marker'}       = [ map { App::GUI::Cellgraph::Widget::PositionMarker->new($self, $self->{'rule_square_size'}, 20, $_, '', $default_color_def) } 0 ..$self->{'last_state'} ];
     $self->{'state_pic'}[$_]      = App::GUI::Cellgraph::Widget::ColorDisplay->new($self, $self->{'rule_square_size'}, $self->{'rule_square_size'}, $_, $self->{'state_colors'}[$_]->rgb_hash) for 0 .. $self->{'last_state'};
@@ -64,16 +64,18 @@ sub new {
 
 
     Wx::Event::EVT_BUTTON( $self, $self->{'btn'}{'gray'}, sub {
-        $self->set_all_colors( color('white')->gradient_to( 'black', $self->{'state_count'}, $self->{'dynamics'}->GetValue) );
+        $self->set_all_colors( color('white')->gradient( to => 'black', steps => $self->{'state_count'}, dynamic => $self->{'dynamics'}->GetValue) );
     });
     Wx::Event::EVT_BUTTON( $self, $self->{'btn'}{'gradient'}, sub {
         my @c = $self->get_all_colors;
-        my @new_colors = $c[0]->rgb_gradient_to( $c[ $self->{'current_state'} ], $self->{'current_state'}+1, $self->{'dynamics'}->GetValue);
+        my @new_colors = $c[0]->gradient( to => $c[ $self->{'current_state'} ], in => 'RGB', steps => $self->{'current_state'}+1, dynamics => $self->{'dynamics'}->GetValue);
         $self->set_all_colors( @new_colors );
     });
     Wx::Event::EVT_BUTTON( $self, $self->{'btn'}{'complement'}, sub {
         my @c = $self->get_all_colors;
-        my @new_colors = $c[ $self->{'current_state'} ]->complementary( $self->{'current_state'}+1, $self->{'Sdelta'}->GetValue, $self->{'Ldelta'}->GetValue);
+        my @new_colors = $c[ $self->{'current_state'} ]->complement( steps => $self->{'current_state'}+1,
+                                                                     saturation_tilt => $self->{'Sdelta'}->GetValue,
+                                                                     lightness_tilt => $self->{'Ldelta'}->GetValue );
         push @new_colors, shift @new_colors;
         $self->set_all_colors( @new_colors );
     });
@@ -167,7 +169,7 @@ sub get_settings {
         delta_S => $self->{'Sdelta'}->GetValue,
         delta_L => $self->{'Ldelta'}->GetValue,
     };
-    $data->{$_} = $self->{'state_colors'}[$_]->string for 0 .. $self->{'last_state'};
+    $data->{$_} = $self->{'state_colors'}[$_]->values(as => 'string') for 0 .. $self->{'last_state'};
     $data;
 }
 
@@ -206,6 +208,7 @@ sub set_all_colors {
     $self->{'state_colors'}[$_] = $color[$_] for 0 .. $#color;
     # $self->{'state_colors'}[$_] = color( $default_color_def ) for $self->{'state_count'} .. $self->{'last_state'};
     $self->{'state_pic'}[$_]->set_color( $self->{'state_colors'}[$_]->rgb_hash ) for 0 .. $self->{'last_state'};
+    $self->{'state_pic'}[$_]->set_color( $self->{'state_colors'}[$_]->values ) for 0 .. $self->{'last_state'};
     $self->select_state;
     $self->{'call_back'}->( 'color' ); # update whole app
 }

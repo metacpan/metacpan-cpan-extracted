@@ -1,26 +1,30 @@
 #!/usr/bin/perl
-package main;
+package Autofixup;
 use 5.008004;
 use strict;
 use warnings FATAL => 'all';
 
 use Carp qw(croak);
-use Pod::Usage;
-use Getopt::Long qw(:config bundling);
 use File::Copy;
-use File::Temp;
 use File::Spec ();
+use File::Temp;
+use Getopt::Long qw(:config bundling);
+use IPC::Open3;
 
-our $VERSION = 0.003002;
+our $VERSION = 0.004003;
 
 my $VERBOSE;
 my @GIT_OPTIONS;
 
 # Strictness levels.
-my ($CONTEXT, $ADJACENT, $SURROUNDED) = (0..10);
+my @STRICTNESS_LEVELS = (
+    my $CONTEXT = 0,
+    my $ADJACENT = 1,
+    my $SURROUNDED = 2,
+);
 
 my $usage =<<'END';
-usage: git-autofixup [<options>] <revision>
+usage: git-autofixup [<options>] [<revision>]
 
 -h                 show usage
 --help             show manpage
@@ -42,7 +46,8 @@ usage: git-autofixup [<options>] <revision>
     must be correlated with the same topic branch commit in order to be
     assigned to it. See the --help for more details.
 -g ARG, --gitopt ARG
-    Specify option for git. Can be used multiple times.
+    Specify option for git. Can be used multiple times. Deprecated in favor of
+    GIT_CONFIG_{COUNT,KEY,VALUE} environment variables; see `git help config`.
 END
 
 # Parse hunks out of `git diff` output. Return an array of hunk hashrefs.
@@ -52,16 +57,12 @@ sub parse_hunks {
     my @hunks;
     my $line;
     while ($line = <$fh>) {
-        if ($line =~ /^--- (.*?)\t?$/) {
-            $file_a = $1;
-        } elsif ($line =~ /^\+\+\+ (.*?)\t?$/) {
-            $file_b = $1;
+        if ($line =~ /^--- (.*)/) {
+            $file_a = dequote_diff_filename($1);
+        } elsif ($line =~ /^\+\+\+ (.*)/) {
+            $file_b = dequote_diff_filename($1);
         } elsif ($line =~ /^@@ -(\d+)(?:,(\d+))? \+\d+(?:,\d+)? @@/) {
             my $header = $line;
-
-            for ($file_a, $file_b) {
-                s#^[abiwco]/##;
-            }
 
             next if $file_a ne $file_b; # Ignore creations and deletions.
 
@@ -89,14 +90,153 @@ sub parse_hunks {
     return @hunks;
 }
 
+# Dequote and unescape filenames that appear in diff output.
+#
+# If the filename is otherwise "normal" but contains spaces it's followed by a
+# trailing tab, and if it contains uncommon control characters or non-ASCII
+# characters, then the filename gets surrounded in double-quotes and non-ASCII
+# characters get replaced with octal escape sequences.
+#
+# For details about exactly what gets quoted, see the sq_lookup array in
+# git/quote.c.
+#
+# Also, remove the side-marker prefix, by default `a/` or `b/`.
+sub dequote_diff_filename {
+    $_ = shift;
+
+    s/\t$//m;  # Remove trailing tab.
+
+    if (startswith($_, '"')) {
+        s/^"|"$//gm;  # Remove surrounding quotes.
+        # Replace octal and control character escapes.
+        s/\\((?:\d{3})|(?:[abtnvfr"\\]))/"qq(\\$1)"/eeg;
+    }
+
+    # Remove prefix.
+    # a/b by default, or (i)ndex (w)orktree (c)ommit (o)bject if
+    # diff.mnemonicPrefix is set.
+    s#^[abiwco]/##;
+
+    return $_;
+}
+
 sub git_cmd {
     return ('git', @GIT_OPTIONS, @_);
 }
 
+# With a linear git history there'll be a single merge base that's easy to
+# refer to with @{upstream}, but during an interactive rebase we need to get
+# the "current" branch from the rebase metadata.
+#
+# Unusual cases:
+#
+# While there can be multiple merge bases if there have been criss-cross
+# merges, there'll still be a single fork point unless the relevant reflog
+# entries have already been garbage-collected.
+#
+# When multiple upstreams are configured via `branch.<name>.merge` in git's
+# config the most correct approach is probably to find the fork-point for each
+# merge value and return those. But it seems unlikely that someone is doing
+# octopus merges and using git-autofixup, so we're not handling that specially
+# currently.
+sub find_merge_bases {
+    my $upstream = '@{upstream}';
+
+    # If an interactive rebase is in progress, derive the upstream from the
+    # rebase meatadata.
+    my $gitdir = git_dir();
+    if (-e "$gitdir/rebase-merge") {
+         my $branch = slurp("$gitdir/rebase-merge/head-name");
+         chomp $branch;
+         $branch =~ s#^refs/heads/##;
+         $upstream = "$branch\@{upstream}";
+    }
+
+    # `git merge-base` will fail if there's no tracking branch. In that case
+    # redirect stderr and communicate failure by returning an empty list. Also,
+    # with the --fork-point option, no merge bases are returned if the relevant
+    # reflog entries have been GC'd, so fall back to normal merge-bases.
+    my @merge_bases = ();
+    my ($out, $err, $exit_code) = capture(qw(git merge-base --all --fork-point), $upstream, 'HEAD');
+    if ($exit_code == 0) {
+        @merge_bases = map {chomp; $_} split(/\n/, $out);
+    } else {
+        my ($out, $err, $exit_code) = capture(qw(git merge-base --all), $upstream, 'HEAD');
+        if ($exit_code != 0) {
+            die "git merge-base: $err";
+        }
+        @merge_bases = map {chomp; $_} split("\n", $out);
+    }
+
+    return wantarray ? @merge_bases : \@merge_bases;
+}
+
+sub git_dir {
+    my ($out, $err, $exit_code) = capture(qw(git rev-parse --git-dir));
+    if ($exit_code != 0) {
+        warn "git rev-parse --git-dir: $err\n";
+        die "Can't find repo's git dir\n";
+    }
+    chomp $out;
+    return $out;
+}
+
+sub toplevel_dir {
+    my ($out, $err, $exit_code) = capture(qw(git rev-parse --show-toplevel));
+    if ($exit_code != 0) {
+        warn "git rev-parse --show-toplevel: $err\n";
+        die "Can't find repo's toplevel dir\n";
+    }
+    chomp $out;
+    return $out;
+}
+
+# Run the given command, capture stdout and stderr, and return an array of
+# (stdout, stderr, exit_code).
+sub capture {
+    open(my $out_fh, '>', undef) or die "create stdout tempfile: $!";
+    open(my $err_fh, '>', undef) or die "create stderr tempfile: $!";
+    my $pid = open3(my $in_fh, $out_fh, $err_fh, @_);
+    waitpid $pid, 0;
+    if ($? & 127) {
+        my $signal = $? & 127;
+        die "capture: child died with signal $signal; exiting";
+    }
+    my $exit_code = $? >> 8;
+    local $/;  # slurp
+    my $stdout = readline $out_fh;
+    my $stderr = readline $err_fh;
+    my @array = ($stdout, $stderr, $exit_code);
+    return wantarray ? @array : \@array;
+}
+
+# Return a description of what $? means.
+sub child_error_desc {
+    my $err = shift;
+    if ($err == -1) {
+        return "failed to execute: $!";
+    } elsif ($err & 127) {
+        return "died with signal " . ($err & 127);
+    } else {
+        return "exited with " . ($err >> 8);
+    }
+}
+
+sub slurp {
+    my $filename = shift;
+    open my $fh, '<', $filename or die "slurp $filename: $!";
+    local $/;
+    my $content = readline $fh;
+    return $content;
+}
+
 sub summary_for_commits {
-    my $rev = shift;
+    my @upstreams = @_;
     my %commits;
-    for (qx(git log --no-merges --format=%H:%s $rev..)) {
+    my $negative = join(" ", map {"^$_"} @upstreams);
+    my @lines = qx(git log --no-merges --format=%H:%s HEAD $negative);
+    die "git log: " . child_error_desc($?) if $?;
+    for (@lines) {
         chomp;
         my ($sha, $msg) = split ':', $_, 2;
         $commits{$sha} = $msg;
@@ -128,6 +268,8 @@ sub sha_aliases {
     return \%aliases;
 }
 
+# Given hunk, blame, and commit data, return the SHA for the commit the hunk
+# should fixup, or undef if an appropriate commit isn't found.
 sub fixup_sha {
     my $args = shift;
     my $hunk = $args->{hunk};
@@ -322,7 +464,7 @@ sub blame {
         '--', "$hunk->{file}");
     my %blame;
     my ($sha, $line_num);
-    open(my $fh, '-|', @cmd) or die "git blame: $!\n";
+    open(my $fh, '-|', @cmd) or die "run git blame: $!\n";
     while (my $line = <$fh>) {
         if ($line =~ /^([0-9a-f]{40}) \d+ (\d+)/) {
              ($sha, $line_num) = ($1, $2);
@@ -334,7 +476,7 @@ sub blame {
             $blame{$line_num} = {sha => $sha, text => substr($line, 1)};
         }
     }
-    close($fh) or die "git blame: non-zero exit code";
+    close($fh) or die "git blame: " . child_error_desc($?) . "\n";
     return \%blame;
 }
 
@@ -344,9 +486,9 @@ sub diff_hunks {
     if (is_index_dirty()) {
         push @cmd, "--cached";
     }
-    open(my $fh, '-|', @cmd) or die $!;
+    open(my $fh, '-|', @cmd) or die "run git diff: $!";
     my @hunks = parse_hunks($fh, keep_lines => 1);
-    close($fh) or die "git diff: non-zero exit code";
+    close($fh) or die "git diff: " . child_error_desc($?) . "\n";
     return wantarray ? @hunks : \@hunks;
 }
 
@@ -361,8 +503,12 @@ sub commit_fixup {
             @{$hunk->{lines}},
         );
     }
-    close $fh or die "git apply: non-zero exit code\n";
-    system(git_cmd('commit', "--fixup=$sha")) == 0 or die "git commit: $!\n";
+    close $fh or die "git apply: " . child_error_desc($?) . "\n";
+    my (undef, $err, $exit_code) = capture(git_cmd('commit', "--fixup=$sha"));
+    if ($exit_code != 0) {
+        warn "git commit: $err\n";
+        die "git commit exited with $exit_code\n";
+    }
     return;
 }
 
@@ -477,19 +623,20 @@ sub create_temp_index {
     # The index ought to be equivalent to HEAD. The fastest way to create it
     # is to start with the current index, and subtract the changes since HEAD.
     if (not defined($old_index)) {
-        my $gitdir = qx(git rev-parse --git-dir) or die "git rev-parse: $!\n";
-        chomp $gitdir;
+        my $gitdir = git_dir();
         $old_index = "$gitdir/index";
     }
+    close $tempfile or die "close temp index: $!";
     copy($old_index, $tempfile->filename()) or die "Can't copy Git index '$old_index' to '$tempfile': $!\n";
 
     $ENV{GIT_INDEX_FILE} = $tempfile->filename();
 
     # Remove any staged changes from the new index - we want to turn them into fixup commits.
     my $index_changes = qx(git diff-index --patch --no-ext-diff --ignore-submodules --cached HEAD);
-    open my $fh, '|-', git_cmd(qw(apply --cached --whitespace=nowarn --reverse -)) or die "git apply: $!\n";
+    die "git diff-index: " . child_error_desc($?) if $?;
+    open my $fh, '|-', git_cmd(qw(apply --cached --whitespace=nowarn --reverse -)) or die "run git apply: $!\n";
     print $fh $index_changes;
-    close $fh or die "git apply: non-zero exit code\n";
+    close $fh or die "git apply: " . child_error_desc($?) . "\n";
 
     return $tempfile;
 }
@@ -498,15 +645,27 @@ sub create_temp_index {
 # commit doesn't have any parents, resulting in blame only searching back as
 # far back as the upstream commit.
 sub create_grafts_file {
-    my $upstream = shift;
+    my @upstreams = @_;
     my $grafts_file = File::Temp->new(
         TEMPLATE => 'git-autofixup_grafts.XXXXXX',
         DIR => File::Spec->tmpdir());
-    my $merge_base = qx(git merge-base $upstream HEAD) or return "/dev/null";
     open(my $fh, '>', $grafts_file) or die "Can't open $grafts_file: $!\n";
-    print $fh $merge_base, "\n";
-    close($fh) or die "Error closing grafts file: $!\n";
+    for (@upstreams) {
+        print $fh $_, "\n";
+    }
+    close($fh) or die "close grafts file: $!\n";
     return $grafts_file;
+}
+
+sub rev_parse {
+    my $rev = shift;
+    my ($out, $err, $exit_code) = capture(qw(git rev-parse --verify --end-of-options), $rev);
+    if ($exit_code != 0) {
+        warn "git rev-parse: $err\n";
+        die "Can't resolve given revision\n";
+    }
+    chomp $out;
+    return $out;
 }
 
 sub main {
@@ -539,34 +698,54 @@ sub main {
         return 0;
     }
     if ($man) {
-        pod2usage(-exitval => 0, -verbose => 2);
+        eval {
+            require Pod::Usage;
+            pod2usage(-exitval => 0, -verbose => 2);
+        };
+        die <<'EOF';
+Pod::Usage unavailable for formatting the manual. The manual can be found at
+the end of the git-autofixup script.
+EOF
+    }
+    if (@GIT_OPTIONS) {
+        warn <<'EOF';
+--gitopt|-g is deprecated and will be removed in a future release. Please use
+the GIT_CONFIG_{COUNT,KEY,VALUE} environment variables instead; see `git help
+config`.
+EOF
     }
 
-    @ARGV == 1 or die "No upstream commit given.\n";
-    my $upstream = shift @ARGV;
-    qx(git rev-parse --verify ${upstream}^{commit});
-    $? == 0 or die "Can't resolve given commit.\n";
+    # "upstream" revisions as 40 byte SHA1 hex hashes.
+    my @upstreams = ();
+    if (@ARGV == 1) {
+        my $raw_upstream = shift @ARGV;
+        my $upstream = rev_parse("${raw_upstream}^{commit}");
+        push @upstreams, $upstream;
+    } else {
+        @upstreams = find_merge_bases();
+        if (!@upstreams) {
+            die "Can't find tracking branch. Please specify a revision.\n";
+        }
+    }
 
     if ($num_context_lines < 0) {
-        die "invalid number of context lines: $num_context_lines\n";
+        die "number of context lines must be zero or greater\n";
     }
 
-    if ($strict < 0) {
+    if (!grep { $strict == $_ } @STRICTNESS_LEVELS) {
         die "invalid strictness level: $strict\n";
     } elsif ($strict > 0 && $num_context_lines == 0) {
         die "strict hunk assignment requires context\n";
     }
 
 
-    my $toplevel = qx(git rev-parse --show-toplevel);
-    chomp $toplevel;
-    $? == 0 or die "Can't get repo toplevel dir\n";
-    chdir $toplevel or die $!;
+    my $toplevel = toplevel_dir();
+    chdir $toplevel or die "cd to toplevel: $!\n";
 
     my $hunks = diff_hunks($num_context_lines);
-    my $summary_for = summary_for_commits($upstream);
+    my $summary_for = summary_for_commits(@upstreams);
     my $alias_for = sha_aliases($summary_for);
-    my $grafts_file = create_grafts_file($upstream);
+    my $grafts_file = create_grafts_file(@upstreams);
     my %blame_for = map {$_ => blame($_, $alias_for, $grafts_file)} @{$hunks};
     my $hunks_for = fixup_hunks_by_sha({
         hunks => $hunks,
@@ -615,13 +794,11 @@ App::Git::Autofixup - create fixup commits for topic branches
 
 =head1 SYNOPSIS
 
-    git-autofixup [<options>] <revision>
+    git-autofixup [<options>] [<revision>]
 
 =head1 DESCRIPTION
 
-F<git-autofixup> parses hunks of changes in the working directory out of C<git diff> output and uses C<git blame> to assign those hunks to commits in C<E<lt>revisionE<gt>..HEAD>, which will typically represent a topic branch, and then creates fixup commits to be used with C<git rebase --interactive --autosquash>. It is assumed that hunks near changes that were previously committed to the topic branch are related.
-
-C<@{upstream}> or C<@{u}> is likely a convenient value to use for C<E<lt>revisionE<gt>> if the current branch has a tracking branch. See C<git help revisions> for other ways to specify revisions.
+F<git-autofixup> parses hunks of changes in the working directory out of C<git diff> output and uses C<git blame> to assign those hunks to commits in C<E<lt>revisionE<gt>..HEAD>, which will typically represent a topic branch, and then creates fixup commits to be used with C<git rebase --interactive --autosquash>. It is assumed that hunks near changes that were previously committed to the topic branch are related. C<E<lt>revisionE<gt>> defaults to C<git merge-base --fork-point HEAD @{upstream} || git merge-base HEAD @{upstream}>, but this will only work if the current branch has an upstream/tracking branch. See C<git help revisions> for info about how to specify revisions.
 
 If any changes have been staged to the index using C<git add>, then F<git-autofixup> will only consider staged hunks when trying to create fixup commits. A temporary index is used to create any resulting commits.
 
@@ -724,18 +901,17 @@ Unexpected error occurred.
 
 =head1 INSTALLATION
 
-If cpan is available, run C<cpan -i App::Git::Autofixup>. Otherwise, copy F<git-autofixup> to a directory in C<PATH> and ensure it has execute permissions. It can then be invoked as either C<git autofixup> or C<git-autofixup>, since git searches C<PATH> for appropriately named binaries.
+If cpan is available, run C<cpan -i App::Git::Autofixup>. Otherwise, copy F<git-autofixup> to a directory in C<PATH> and ensure it has execute permissions. It can then be invoked as either C<git-autofixup> or C<git autofixup>, since git searches C<PATH> for appropriately named binaries.
 
 Git is distributed with Perl 5 for platforms not expected to already have it installed, but installing modules with cpan requires other tools that might not be available, such as make. This script has no dependencies outside of the standard library, so it is hoped that it works on any platform that Git does without much trouble.
 
 Requires a git supporting C<commit --fixup>: 1.7.4 or later.
 
-
 =head1 BUGS/LIMITATIONS
 
-If a topic branch adds some lines in one commit and subsequently removes some of them in another, a hunk in the working directory that re-adds those lines will be assigned to fixup the first commit, and during rebasing they'll be removed again by the later commit.
+git-autofixup works on Windows, but be careful not to use a perl compiled for cygwin with a git compiled for msys, such as L<Git for Windows|https://gitforwindows.org/>. It can be used from Git for Windows' "Git Bash" or "Git CMD", or you can install git using Cygwin's package manager and use git-autofixup from Cygwin. Note that while every release gets tested on Cygwin via the CPAN Testers network, testing with Git for Windows requires more effort since it's a constrained environment; thus it doesn't get tested as often. If you run into any issues, please report them on L<GitHub|https://github.com/torbiak/git-autofixup/issues>.
 
-Not tested in F<cmd.exe> on Windows. Run it from Git Bash, Cygwin, or a similar Unix emulation environment.
+If a topic branch adds some lines in one commit and subsequently removes some of them in another, a hunk in the working directory that re-adds those lines will be assigned to fixup the first commit, and during rebasing they'll be removed again by the later commit.
 
 =head1 ACKNOWLEDGEMENTS
 

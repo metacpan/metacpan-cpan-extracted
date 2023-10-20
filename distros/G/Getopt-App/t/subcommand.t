@@ -19,7 +19,7 @@ subtest 'dispatch to method' => sub {
 subtest 'dispatch to script' => sub {
   my $res = capture($app, []);
   is $res->[2], 10, 'main exit';
-  like $res->[0], qr{\bcool$}, 'main stdout' or diag "ERROR: $res->[1]";
+  like $res->[0], qr{^0\|.*\bcool$}, 'main stdout' or diag "ERROR: $res->[1]";
 
   $res = capture($app, [qw(nope)]);
   is $res->[1], "Unknown subcommand: nope\n", 'nope';
@@ -30,7 +30,7 @@ subtest 'dispatch to script' => sub {
   is $res->[2], 2, 'invalid exit';
 
   $res = capture($app, [qw(beans a 24)]);
-  like $res->[0], qr{^beans\|.*\bbeans\.pl\|.*\bbeans\.pl\|a\|24$}, 'beans stdout' or diag "ERROR: $res->[1]";
+  like $res->[0], qr{^1\|beans\|.*\bbeans\.pl\|.*\bbeans\.pl\|a\|24$}, 'beans stdout' or diag "ERROR: $res->[1]";
   is $res->[2], 11, 'beans exit';
 
   $res = capture($app, [qw(coffee b 42)]);

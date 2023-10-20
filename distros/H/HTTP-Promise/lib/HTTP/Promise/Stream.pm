@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Stream.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/28
-## Modified 2022/03/28
-## All rights reserved
+## Modified 2023/09/08
+## All rights reserved.
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -18,10 +19,10 @@ BEGIN
     use warnings::register;
     use parent qw( Module::Generic );
     use vars qw( $FILTER_MAP $CLASSES $ENCODING_SUFFIX $SUFFIX_ENCODING );
-    use Nice::Try;
+    # use Nice::Try;
     use Scalar::Util;
     use constant HAS_BROWSER_SUPPORT => 1;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -65,452 +66,518 @@ no warnings 'uninitialized';
         {
             base64 => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require HTTP::Promise::Stream::Base64;
-                    my $rv = HTTP::Promise::Stream::Base64::encode_b64( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $HTTP::Promise::Stream::Base64::Base64Error );
-                    return( $rv );
-                }
-                catch( $e )
+                    HTTP::Promise::Stream::Base64::encode_b64( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $HTTP::Promise::Stream::Base64::Base64Error );
+                return( $rv );
             },
             brotli => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require HTTP::Promise::Stream::Brotli;
-                    my $rv = HTTP::Promise::Stream::Brotli::encode_bro( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $HTTP::Promise::Stream::Brotli::BrotliError );
-                    return( $rv );
-                }
-                catch( $e )
+                    HTTP::Promise::Stream::Brotli::encode_bro( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $HTTP::Promise::Stream::Brotli::BrotliError );
+                return( $rv );
             },
             bzip2 => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Compress::Bzip2;
-                    my $rv = IO::Compress::Bzip2::bzip2( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Compress::Bzip2::Bzip2Error );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Compress::Bzip2::bzip2( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Compress::Bzip2::Bzip2Error );
+                return( $rv );
             },
             deflate => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Compress::Deflate;
-                    my $rv = IO::Compress::Deflate::deflate( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Compress::Deflate::DeflateError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Compress::Deflate::deflate( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Compress::Deflate::DeflateError );
+                return( $rv );
             },
             gzip => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Compress::Gzip;
-                    my $rv = IO::Compress::Gzip::gzip( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Compress::Gzip::GzipError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Compress::Gzip::gzip( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Compress::Gzip::GzipError );
+                return( $rv );
             },
             lzf => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Compress::Lzf;
-                    my $rv = IO::Compress::Lzf::lzip( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Compress::Lzf::LzfError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Compress::Lzf::lzip( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Compress::Lzf::LzfError );
+                return( $rv );
             },
             lzip => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Compress::Lzip;
-                    my $rv = IO::Compress::Lzip::lzip( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Compress::Lzip::LzipError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Compress::Lzip::lzip( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Compress::Lzip::LzipError );
+                return( $rv );
             },
             lzma => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Compress::Lzma;
-                    my $rv = IO::Compress::Lzma::lzma( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Compress::Lzma::LzmaError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Compress::Lzma::lzma( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Compress::Lzma::LzmaError );
+                return( $rv );
             },
             lzop => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Compress::Lzop;
-                    my $rv = IO::Compress::Lzip::lzop( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Compress::Lzop::LzopError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Compress::Lzip::lzop( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Compress::Lzop::LzopError );
+                return( $rv );
             },
             lzw => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require HTTP::Promise::Streem::LZW;
-                    my $rv = HTTP::Promise::Streem::LZW::encode_lzw( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $HTTP::Promise::Streem::LZW::LZWError );
-                    return( $rv );
-                }
-                catch( $e )
+                    HTTP::Promise::Streem::LZW::encode_lzw( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $HTTP::Promise::Streem::LZW::LZWError );
+                return( $rv );
             },
             qp => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require HTTP::Promise::Stream::QuotedPrint;
-                    my $rv = HTTP::Promise::Stream::QuotedPrint::encode_qp( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $HTTP::Promise::Stream::QuotedPrint::QuotedPrintError );
-                    return( $rv );
-                }
-                catch( $e )
+                    HTTP::Promise::Stream::QuotedPrint::encode_qp( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $HTTP::Promise::Stream::QuotedPrint::QuotedPrintError );
+                return( $rv );
             },
             rawdeflate => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Compress::RawDeflate;
-                    my $rv = IO::Compress::RawDeflate::rawdeflate( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Compress::RawDeflate::RawDeflateError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Compress::RawDeflate::rawdeflate( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Compress::RawDeflate::RawDeflateError );
+                return( $rv );
             },
             uu => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require HTTP::Promise::Stream::UU;
-                    my $rv = HTTP::Promise::Stream::UU::encode_uu( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $HTTP::Promise::Stream::UU::UUError );
-                    return( $rv );
-                }
-                catch( $e )
+                    HTTP::Promise::Stream::UU::encode_uu( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $HTTP::Promise::Stream::UU::UUError );
+                return( $rv );
             },
             xz => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Compress::Xz;
-                    my $rv = IO::Compress::Xz::xz( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Compress::Xz::XzError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Compress::Xz::xz( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Compress::Xz::XzError );
+                return( $rv );
             },
             zip => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Compress::Zip;
-                    my $rv = IO::Compress::Zip::zip( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Compress::Zip::ZipError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Compress::Zip::zip( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Compress::Zip::ZipError );
+                return( $rv );
             },
             zstd => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Compress::Zstd;
-                    my $rv = IO::Compress::Zstd::zstd( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Compress::Zstd::ZstdError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Compress::Zstd::zstd( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Compress::Zstd::ZstdError );
+                return( $rv );
             },
         },
         decode =>
         {
             base64 => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require HTTP::Promise::Stream::Base64;
-                    my $rv = HTTP::Promise::Stream::Base64::decode_b64( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $HTTP::Promise::Stream::Base64::Base64Error );
-                    return( $rv );
-                }
-                catch( $e )
+                    HTTP::Promise::Stream::Base64::decode_b64( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $HTTP::Promise::Stream::Base64::Base64Error );
+                return( $rv );
             },
             brotli => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require HTTP::Promise::Stream::Brotli;
-                    my $rv = HTTP::Promise::Stream::Brotli::decode_bro( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $HTTP::Promise::Stream::Brotli::BrotliError );
-                    return( $rv );
-                }
-                catch( $e )
+                    HTTP::Promise::Stream::Brotli::decode_bro( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $HTTP::Promise::Stream::Brotli::BrotliError );
+                return( $rv );
             },
             bzip2 => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Uncompress::Bunzip2;
-                    my $rv = IO::Uncompress::Bunzip2::bunzip2( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Uncompress::Bunzip2::Bunzip2Error );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Uncompress::Bunzip2::bunzip2( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Uncompress::Bunzip2::Bunzip2Error );
+                return( $rv );
             },
             gzip => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Uncompress::Gunzip;
-                    my $rv = IO::Uncompress::Gunzip::gunzip( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Uncompress::Gunzip::GunzipError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Uncompress::Gunzip::gunzip( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Uncompress::Gunzip::GunzipError );
+                return( $rv );
             },
             inflate => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Uncompress::Inflate;
-                    my $rv = IO::Uncompress::Inflate::inflate( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Uncompress::Inflate::InflateError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Uncompress::Inflate::inflate( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Uncompress::Inflate::InflateError );
+                return( $rv );
             },
             lzf => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Uncompress::UnLzf;
-                    my $rv = IO::Uncompress::UnLzf::unlzf( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Uncompress::UnLzf::UnLzfError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Uncompress::UnLzf::unlzf( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Uncompress::UnLzf::UnLzfError );
+                return( $rv );
             },
             lzip => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Uncompress::UnLzip;
-                    my $rv = IO::Uncompress::UnLzip::unlzip( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Uncompress::UnLzip::UnLzipError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Uncompress::UnLzip::unlzip( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Uncompress::UnLzip::UnLzipError );
+                return( $rv );
             },
             lzma => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Uncompress::UnLzma;
-                    my $rv = IO::Uncompress::UnLzma::unlzma( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Uncompress::UnLzma::UnLzmaError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Uncompress::UnLzma::unlzma( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Uncompress::UnLzma::UnLzmaError );
+                return( $rv );
             },
             lzop => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Uncompress::UnLzop;
-                    my $rv = IO::Uncompress::UnLzop::unlzop( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Uncompress::UnLzop::UnLzopError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Uncompress::UnLzop::unlzop( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Uncompress::UnLzop::UnLzopError );
+                return( $rv );
             },
             lzw => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require HTTP::Promise::Streem::LZW;
-                    my $rv = HTTP::Promise::Streem::LZW::decode_lzw( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $HTTP::Promise::Streem::LZW::LZWError );
-                    return( $rv );
-                }
-                catch( $e )
+                    HTTP::Promise::Streem::LZW::decode_lzw( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $HTTP::Promise::Streem::LZW::LZWError );
+                return( $rv );
             },
             qp => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require HTTP::Promise::Stream::QuotedPrint;
-                    my $rv = HTTP::Promise::Stream::QuotedPrint::decode_qp( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $HTTP::Promise::Stream::QuotedPrint::QuotedPrintError );
-                    return( $rv );
-                }
-                catch( $e )
+                    HTTP::Promise::Stream::QuotedPrint::decode_qp( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $HTTP::Promise::Stream::QuotedPrint::QuotedPrintError );
+                return( $rv );
             },
             rawinflate => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Uncompress::RawInflate;
-                    my $rv = IO::Uncompress::RawInflate::rawinflate( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Uncompress::RawInflate::RawInflateError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Uncompress::RawInflate::rawinflate( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Uncompress::RawInflate::RawInflateError );
+                return( $rv );
             },
             uu => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require HTTP::Promise::Stream::UU;
-                    my $rv = HTTP::Promise::Stream::UU::decode_uu( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $HTTP::Promise::Stream::UU::UUError );
-                    return( $rv );
-                }
-                catch( $e )
+                    HTTP::Promise::Stream::UU::decode_uu( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $HTTP::Promise::Stream::UU::UUError );
+                return( $rv );
             },
             xz => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Uncompress::UnXz;
-                    my $rv = IO::Uncompress::UnXz::unxz( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Uncompress::UnXz::UnXzError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Uncompress::UnXz::unxz( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Uncompress::UnXz::UnXzError );
+                return( $rv );
             },
             zip => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Uncompress::Unzip;
-                    my $rv = IO::Uncompress::Unzip::unzip( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Uncompress::Unzip::UnzipError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Uncompress::Unzip::unzip( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Uncompress::Unzip::UnzipError );
+                return( $rv );
             },
             zstd => sub
             {
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     require IO::Uncompress::UnZstd;
-                    my $rv = IO::Uncompress::UnZstd::unzstd( $_[0] => $_[1], @_[2..$#_] ) ||
-                        return( undef, $IO::Uncompress::UnZstd::UnZstdError );
-                    return( $rv );
-                }
-                catch( $e )
+                    IO::Uncompress::UnZstd::unzstd( $_[0] => $_[1], @_[2..$#_] );
+                };
+                if( $@ )
                 {
-                    return( undef, $e );
+                    return( undef, $@ );
                 }
+                $rv or return( undef, $IO::Uncompress::UnZstd::UnZstdError );
+                return( $rv );
             },
         }
     };
@@ -682,31 +749,24 @@ sub decode
         return( '' );
     }
     my $filters = $FILTER_MAP->{decode};
-    try
+    return( $self->error( "Unknown decoding \"$dec\"." ) ) if( !exists( $filters->{ $dec } ) );
+    my $params = $self->_io_compress_params( $opts );
+    my $rv;
+    # Decode some data provided and into the stream
+    if( @_ >= 2 )
     {
-        return( $self->error( "Unknown decoding \"$dec\"." ) ) if( !exists( $filters->{ $dec } ) );
-        my $params = $self->_io_compress_params( $opts );
-        my $rv;
-        # Decode some data provided and into the stream
-        if( @_ >= 2 )
-        {
-            ( $rv, my $err ) = $filters->{ $dec }->( $_[0] => $src, %$params );
-            return( $self->error( "Unable to decode $size bytes of data into the stream with $dec: $err" ) ) if( !defined( $rv ) );
-            return( $rv );
-        }
-        # Decode the stream and return the decoded data
-        else
-        {
-            my $buf;
-            ( $rv, my $err ) = $filters->{ $dec }->( $src => \$buf, %$params );
-            return( $self->error( "Unable to decode $size bytes of data from the stream with $dec: $err" ) ) if( !defined( $rv ) );
-            return( $buf ) if( defined( $rv ) );
-            return( $rv );
-        }
+        ( $rv, my $err ) = $filters->{ $dec }->( $_[0] => $src, %$params );
+        return( $self->error( "Unable to decode $size bytes of data into the stream with $dec: $err" ) ) if( !defined( $rv ) );
+        return( $rv );
     }
-    catch( $e )
+    # Decode the stream and return the decoded data
+    else
     {
-        return( $self->error( "Error decoding $size bytes of data with $dec: $e" ) );
+        my $buf;
+        ( $rv, my $err ) = $filters->{ $dec }->( $src => \$buf, %$params );
+        return( $self->error( "Unable to decode $size bytes of data from the stream with $dec: $err" ) ) if( !defined( $rv ) );
+        return( $buf ) if( defined( $rv ) );
+        return( $rv );
     }
 }
 
@@ -739,32 +799,25 @@ sub encode
         return( '' );
     }
     my $filters = $FILTER_MAP->{encode};
-    try
+    return( $self->error( "Unknown encoding \"$enc\". Supported encodings are: ", join( ', ', sort( keys( %$filters ) ) ) ) ) if( !exists( $filters->{ $enc } ) );
+    my $params = $self->_io_compress_params( $opts );
+    my $rv;
+    # Encode some data provided and into the stream
+    if( @_ >= 2 )
     {
-        return( $self->error( "Unknown encoding \"$enc\". Supported encodings are: ", join( ', ', sort( keys( %$filters ) ) ) ) ) if( !exists( $filters->{ $enc } ) );
-        my $params = $self->_io_compress_params( $opts );
-        my $rv;
-        # Encode some data provided and into the stream
-        if( @_ >= 2 )
-        {
-            ( $rv, my $err ) = $filters->{ $enc }->( $_[0] => $src, %$params );
-            return( $self->error( "Unable to encode $size bytes of data into the stream with $enc: $err" ) ) if( !defined( $rv ) );
-            return( $rv );
-        }
-        # Encode the stream and return the decoded data
-        else
-        {
-            my $buf;
-            my $ref = \$buf;
-            ( $rv, my $err ) = $filters->{ $enc }->( $src => \$buf, %$params );
-            return( $self->error( "Unable to encode $size bytes of data from the stream with $enc: $err" ) ) if( !defined( $rv ) );
-            return( $buf ) if( defined( $rv ) );
-            return( $rv );
-        }
+        ( $rv, my $err ) = $filters->{ $enc }->( $_[0] => $src, %$params );
+        return( $self->error( "Unable to encode $size bytes of data into the stream with $enc: $err" ) ) if( !defined( $rv ) );
+        return( $rv );
     }
-    catch( $e )
+    # Encode the stream and return the decoded data
+    else
     {
-        return( $self->error( "Error encoding $size bytes of data with $enc: $e" ) );
+        my $buf;
+        my $ref = \$buf;
+        ( $rv, my $err ) = $filters->{ $enc }->( $src => \$buf, %$params );
+        return( $self->error( "Unable to encode $size bytes of data from the stream with $enc: $err" ) ) if( !defined( $rv ) );
+        return( $buf ) if( defined( $rv ) );
+        return( $rv );
     }
 }
 
@@ -893,13 +946,15 @@ sub read
             return( $self->error( "Unable to read bytes from source: $!" ) ) if( !defined( $len ) );
         }
         
-        try
+        # try-catch
+        local $@;
+        eval
         {
             $_[1]->( $buf );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "Callback raised an exception when sending it the ", length( $buf ), " bytes of data read from source: $e" ) );
+            return( $self->error( "Callback raised an exception when sending it the ", length( $buf ), " bytes of data read from source: $@" ) );
         }
     }
     elsif( Scalar::Util::reftype( $_[1] ) eq 'SCALAR' )
@@ -1052,113 +1107,153 @@ sub write
     my $data;
     my $size;
     my $len;
-    try
+    if( $type eq 'code' )
     {
-        if( $type eq 'code' )
+        # try-catch
+        local $@;
+        my $buf = eval
         {
-            my $buf = $_[1]->();
-            $data = \$buf;
-            $size = length( $$data );
+            $_[1]->()
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error getting data from callback: $@" ) );
         }
+        $data = \$buf;
+        $size = length( $$data );
+    }
+    else
+    {
+        $size = $self->_get_size( $_[1] );
+        # If the data provided is not a reference i.e. a string and it does not have any 
+        # CRLF sequence and it is not a file that exists, OR it has multiple CRLF 
+        # sequences, then we treat it as a string, and to remove ambiguity, we make it a
+        # scalar reference
+        if( !ref( $_[1] ) && 
+            (
+                ( index( $_[1], "\n" ) == -1 &&  !-e( $_[1] ) ) ||
+                ( index( $_[1], "\n" ) != -1 )
+            ) )
+        {
+            $data = \$_[1];
+        }
+        elsif( $type eq 'scalar' )
+        {
+            $data = $_[1];
+        }
+        elsif( $self->_is_a( $_[1] => 'Module::Generic::File' ) ||
+               $self->_can( $_[1] => 'filename' ) )
+        {
+            $data = $_[1]->filename;
+        }
+        # otherwise, it is either a scalar reference, a glob or a file, and if it is none
+        # of those, we return an error
         else
         {
-            $size = $self->_get_size( $_[1] );
-            # If the data provided is not a reference i.e. a string and it does not have any 
-            # CRLF sequence and it is not a file that exists, OR it has multiple CRLF 
-            # sequences, then we treat it as a string, and to remove ambiguity, we make it a
-            # scalar reference
-            if( !ref( $_[1] ) && 
-                (
-                    ( index( $_[1], "\n" ) == -1 &&  !-e( $_[1] ) ) ||
-                    ( index( $_[1], "\n" ) != -1 )
-                ) )
-            {
-                $data = \$_[1];
-            }
-            elsif( $type eq 'scalar' )
-            {
-                $data = $_[1];
-            }
-            elsif( $self->_is_a( $_[1] => 'Module::Generic::File' ) ||
-                   $self->_can( $_[1] => 'filename' ) )
-            {
-                $data = $_[1]->filename;
-            }
-            # otherwise, it is either a scalar reference, a glob or a file, and if it is none
-            # of those, we return an error
-            else
-            {
-                $data = $_[1];
-                return( $self->error( "Unsupported data type '", overload::StrVal( $data ), "'. You can only provide a string, a scalar reference, a code reference, a glob or a file path." ) ) if( ref( $data ) && $type ne 'scalar' && $type ne 'glob' && $type ne 'code' );
-            }
-            
-            # If we are dealing with a file, open it and use its file glob instead, 
-            # because some encoder like IO::Compress::Zip actually creates and archive of the file with the file path included, rather than just the file content as advertised.
-            # See Bug #38
-            # <https://github.com/pmqs/IO-Compress/issues/38>
-            if( !ref( $data ) )
-            {
-                my $f = $self->new_file( $data );
-                $data = $f->open( '<', { binmode => 'raw' } ) ||
-                    return( $self->pass_error( $f->error ) );
-            }
+            $data = $_[1];
+            return( $self->error( "Unsupported data type '", overload::StrVal( $data ), "'. You can only provide a string, a scalar reference, a code reference, a glob or a file path." ) ) if( ref( $data ) && $type ne 'scalar' && $type ne 'glob' && $type ne 'code' );
+        }
+        
+        # If we are dealing with a file, open it and use its file glob instead, 
+        # because some encoder like IO::Compress::Zip actually creates and archive of the file with the file path included, rather than just the file content as advertised.
+        # See Bug #38
+        # <https://github.com/pmqs/IO-Compress/issues/38>
+        if( !ref( $data ) )
+        {
+            my $f = $self->new_file( $data );
+            $data = $f->open( '<', { binmode => 'raw' } ) ||
+                return( $self->pass_error( $f->error ) );
         }
     }
-    catch( $e )
-    {
-        return( $self->error( "Error getting data from callback: $e" ) );
-    }
-    
+
     my $stype = lc( Scalar::Util::reftype( $src ) );
     if( $stype eq 'code' )
     {
-        try
+        if( $enc )
         {
-            if( $enc )
+            my $params = $self->_io_compress_params;
+            # try-catch
+            local $@;
+            eval
             {
-                my $params = $self->_io_compress_params;
                 $src->( $self->encode( $data, $params ) );
-                $len = $size;
-            }
-            elsif( $dec )
+            };
+            if( $@ )
             {
-                my $params = $self->_io_compress_params;
+                return( $self->error( "Error executing calback to write $size bytes of data: $@" ) );
+            }
+            $len = $size;
+        }
+        elsif( $dec )
+        {
+            my $params = $self->_io_compress_params;
+            # try-catch
+            local $@;
+            eval
+            {
                 $src->( $self->decode( $data, $params ) );
-                $len = $size;
+            };
+            if( $@ )
+            {
+                return( $self->error( "Error executing calback to write $size bytes of data: $@" ) );
+            }
+            $len = $size;
+        }
+        else
+        {
+            if( $type eq 'scalar' )
+            {
+                $len = length( $$data );
+                # try-catch
+                local $@;
+                eval
+                {
+                    $src->( $$data );
+                };
+                if( $@ )
+                {
+                    return( $self->error( "Error executing calback to write $size bytes of data: $@" ) );
+                }
+            }
+            elsif( $type eq 'glob' )
+            {
+                my( $rv, $buf );
+                while( $rv = CORE::read( $data, $buf, 10240 ) )
+                {
+                    # try-catch
+                    local $@;
+                    eval
+                    {
+                        $src->( $buf );
+                    };
+                    if( $@ )
+                    {
+                        return( $self->error( "Error executing calback to write $size bytes of data: $@" ) );
+                    }
+                    $len += length( $buf );
+                }
+                return( $self->error( "Unable to read data from glob provided: $!" ) ) if( !defined( $rv ) );
             }
             else
             {
-                if( $type eq 'scalar' )
+                my $f = $self->new_file( $data ) || return( $self->pass_error );
+                my $fh = $f->open( '<' ) || return( $self->pass_error( $f->error ) );
+                my $buf;
+                my $rv = $fh->read( $buf );
+                return( $self->error( "Unable to read data from file \"$f\" provided: $!" ) ) if( !defined( $rv ) );
+                # try-catch
+                local $@;
+                eval
                 {
-                    $len = length( $$data );
-                    $src->( $$data );
-                }
-                elsif( $type eq 'glob' )
-                {
-                    my( $rv, $buf );
-                    while( $rv = CORE::read( $data, $buf, 10240 ) )
-                    {
-                        $src->( $buf );
-                        $len += length( $buf );
-                    }
-                    return( $self->error( "Unable to read data from glob provided: $!" ) ) if( !defined( $rv ) );
-                }
-                else
-                {
-                    my $f = $self->new_file( $data ) || return( $self->pass_error );
-                    my $fh = $f->open( '<' ) || return( $self->pass_error( $f->error ) );
-                    my $buf;
-                    my $rv = $fh->read( $buf );
-                    return( $self->error( "Unable to read data from file \"$f\" provided: $!" ) ) if( !defined( $rv ) );
                     $src->( $buf );
-                    $fh->close;
-                    $len = length( $buf );
+                };
+                if( $@ )
+                {
+                    return( $self->error( "Error executing calback to write $size bytes of data: $@" ) );
                 }
+                $fh->close;
+                $len = length( $buf );
             }
-        }
-        catch( $e )
-        {
-            return( $self->error( "Error executing calback to write $size bytes of data: $e" ) );
         }
     }
     else
@@ -1173,126 +1268,137 @@ sub write
             $filters = $FILTER_MAP->{encode};
         }
         
-        try
+        my $rv;
+        if( $dec )
         {
-            my $rv;
-            if( $dec )
+            my $params = $self->_io_compress_params;
+            return( $self->error( "No encoding found for \"$dec\"." ) ) if( !exists( $filters->{ $dec } ) );
+            # try-catch
+            local $@;
+            ( $rv, my $err ) = eval
             {
-                my $params = $self->_io_compress_params;
-                return( $self->error( "No encoding found for \"$dec\"." ) ) if( !exists( $filters->{ $dec } ) );
-                ( $rv, my $err ) = $filters->{ $dec }->( $data => $src, %$params );
-                return( $self->error( "Unable to decode data to write to source: $err" ) ) if( !defined( $rv ) );
-                $len = $size;
+                $filters->{ $dec }->( $data => $src, %$params );
+            };
+            if( $@ )
+            {
+                return( $self->error( "Error ", ( $self->encode ? 'encoding' : 'decoding' ), " $size bytes of data: $@" ) );
             }
-            elsif( $enc )
+            return( $self->error( "Unable to decode data to write to source: $err" ) ) if( !defined( $rv ) );
+            $len = $size;
+        }
+        elsif( $enc )
+        {
+            my $params = $self->_io_compress_params;
+            return( $self->error( "No encoding found for \"$enc\"." ) ) if( !exists( $filters->{ $enc } ) );
+            # try-catch
+            local $@;
+            ( $rv, my $err ) = eval
             {
-                my $params = $self->_io_compress_params;
-                return( $self->error( "No encoding found for \"$enc\"." ) ) if( !exists( $filters->{ $enc } ) );
-                ( $rv, my $err ) = $filters->{ $enc }->( $data => $src, %$params );
-                return( $self->error( "Unable to encode data to write to source: $err" ) ) if( !defined( $rv ) );
-                $len = $size;
+                $filters->{ $enc }->( $data => $src, %$params );
+            };
+            if( $@ )
+            {
+                return( $self->error( "Error ", ( $self->encode ? 'encoding' : 'decoding' ), " $size bytes of data: $@" ) );
             }
-            elsif( $stype eq 'scalar' )
+            return( $self->error( "Unable to encode data to write to source: $err" ) ) if( !defined( $rv ) );
+            $len = $size;
+        }
+        elsif( $stype eq 'scalar' )
+        {
+            if( $type eq 'scalar' )
             {
-                if( $type eq 'scalar' )
+                $$src .= $$data;
+                $len = length( $$data );
+            }
+            elsif( $type eq 'glob' )
+            {
+                my( $rv, $buf );
+                while( $rv = CORE::read( $data, $buf, 10240 ) )
                 {
-                    $$src .= $$data;
-                    $len = length( $$data );
-                }
-                elsif( $type eq 'glob' )
-                {
-                    my( $rv, $buf );
-                    while( $rv = CORE::read( $data, $buf, 10240 ) )
-                    {
-                        $$src .= $buf;
-                        $len += length( $buf );
-                    }
-                    return( $self->error( "Unable to read data from glob provided: $!" ) ) if( !defined( $rv ) );
-                }
-                else
-                {
-                    my $f = $self->new_file( $data ) || return( $self->pass_error );
-                    my $fh = $f->open( '<' ) ||
-                        return( $self->pass_error( $f->error ) );
-                    my $buf;
-                    my $rv = $fh->read( $buf );
-                    return( $self->error( "Unable to read data from file \"$f\" provided: $!" ) ) if( !defined( $rv ) );
                     $$src .= $buf;
-                    $len = length( $buf );
+                    $len += length( $buf );
                 }
+                return( $self->error( "Unable to read data from glob provided: $!" ) ) if( !defined( $rv ) );
             }
-            elsif( $stype eq 'glob' )
+            else
             {
-                if( $type eq 'scalar' )
+                my $f = $self->new_file( $data ) || return( $self->pass_error );
+                my $fh = $f->open( '<' ) ||
+                    return( $self->pass_error( $f->error ) );
+                my $buf;
+                my $rv = $fh->read( $buf );
+                return( $self->error( "Unable to read data from file \"$f\" provided: $!" ) ) if( !defined( $rv ) );
+                $$src .= $buf;
+                $len = length( $buf );
+            }
+        }
+        elsif( $stype eq 'glob' )
+        {
+            if( $type eq 'scalar' )
+            {
+                print( $src, $$data ) ||
+                    return( $self->error( "Unable to write ", length( $$data ), " bytes of data to source glob: $!" ) );
+                $len = length( $$data );
+            }
+            elsif( $type eq 'glob' )
+            {
+                my $buf;
+                while( CORE::read( $data, $buf, 10240 ) )
                 {
-                    print( $src, $$data ) ||
-                        return( $self->error( "Unable to write ", length( $$data ), " bytes of data to source glob: $!" ) );
-                    $len = length( $$data );
-                }
-                elsif( $type eq 'glob' )
-                {
-                    my $buf;
-                    while( CORE::read( $data, $buf, 10240 ) )
-                    {
-                        print( $src, $buf ) ||
-                            return( $self->error( "Unable to write ", length( $buf ), " bytes of data to source glob: $!" ) );
-                        $len += length( $buf );
-                    }
-                }
-                else
-                {
-                    my $f = $self->new_file( $data ) || return( $self->pass_error );
-                    my $fh = $f->open( '<' ) ||
-                        return( $self->pass_error( $f->error ) );
-                    my $buf;
-                    while( $fh->read( $buf, 10240 ) )
-                    {
-                        print( $src, $buf ) ||
-                            return( $self->error( "Unable to write ", length( $buf ), " bytes of data to source glob: $!" ) );
-                        $len += length( $buf );
-                    }
+                    print( $src, $buf ) ||
+                        return( $self->error( "Unable to write ", length( $buf ), " bytes of data to source glob: $!" ) );
+                    $len += length( $buf );
                 }
             }
             else
             {
-                my $f = $self->new_file( $src ) || return( $self->pass_error );
-                my $fh = $f->open( '>', { autoflush => 1 } ) || return( $self->pass_error( $f->error ) );
-                if( $type eq 'scalar' )
+                my $f = $self->new_file( $data ) || return( $self->pass_error );
+                my $fh = $f->open( '<' ) ||
+                    return( $self->pass_error( $f->error ) );
+                my $buf;
+                while( $fh->read( $buf, 10240 ) )
                 {
-                    $fh->print( $$data ) ||
-                        return( $self->error( "Unable to write ", length( $$data ), " bytes of data to file \"$f\": $!" ) );
-                    $len = length( $$data );
+                    print( $src, $buf ) ||
+                        return( $self->error( "Unable to write ", length( $buf ), " bytes of data to source glob: $!" ) );
+                    $len += length( $buf );
                 }
-                elsif( $type eq 'glob' )
-                {
-                    my $buf;
-                    while( CORE::read( $data, $buf, 10240 ) )
-                    {
-                        $fh->print( $buf ) ||
-                        return( $self->error( "Unable to write ", length( $buf ), " bytes of data to file \"$f\": $!" ) );
-                        $len += length( $buf );
-                    }
-                }
-                else
-                {
-                    my $f2 = $self->new_file( $data ) || return( $self->pass_error );
-                    my $fh2 = $f2->open( '<' ) ||
-                        return( $self->pass_error( $f2->error ) );
-                    my $buf;
-                    while( $fh2->read( $buf, 10240 ) )
-                    {
-                        $fh->print( $buf ) ||
-                            return( $self->error( "Unable to write ", length( $buf ), " bytes of data to source file \"$f\": $!" ) );
-                        $len += length( $buf );
-                    }
-                    $fh2->close;
-                }
-                $fh->close;
             }
         }
-        catch( $e )
+        else
         {
-            return( $self->error( "Error ", ( $self->encode ? 'encoding' : 'decoding' ), " $size bytes of data: $e" ) );
+            my $f = $self->new_file( $src ) || return( $self->pass_error );
+            my $fh = $f->open( '>', { autoflush => 1 } ) || return( $self->pass_error( $f->error ) );
+            if( $type eq 'scalar' )
+            {
+                $fh->print( $$data ) ||
+                    return( $self->error( "Unable to write ", length( $$data ), " bytes of data to file \"$f\": $!" ) );
+                $len = length( $$data );
+            }
+            elsif( $type eq 'glob' )
+            {
+                my $buf;
+                while( CORE::read( $data, $buf, 10240 ) )
+                {
+                    $fh->print( $buf ) ||
+                    return( $self->error( "Unable to write ", length( $buf ), " bytes of data to file \"$f\": $!" ) );
+                    $len += length( $buf );
+                }
+            }
+            else
+            {
+                my $f2 = $self->new_file( $data ) || return( $self->pass_error );
+                my $fh2 = $f2->open( '<' ) ||
+                    return( $self->pass_error( $f2->error ) );
+                my $buf;
+                while( $fh2->read( $buf, 10240 ) )
+                {
+                    $fh->print( $buf ) ||
+                        return( $self->error( "Unable to write ", length( $buf ), " bytes of data to source file \"$f\": $!" ) );
+                    $len += length( $buf );
+                }
+                $fh2->close;
+            }
+            $fh->close;
         }
     }
     return( $len );
@@ -1310,7 +1416,7 @@ sub _decodable_encodable
     {
         $list = $what;
     }
-    elsif( $what eq 'all' )
+    elsif( $what eq 'all' || $what eq 'auto' )
     {
         $list = [sort( keys( %$CLASSES ) )];
     }
@@ -1331,6 +1437,11 @@ sub _decodable_encodable
     {
         # inflate is just an alias for deflate
         next if( $enc eq 'inflate' || $enc eq 'rawinflate' || substr( $enc, 0, 2 ) eq 'x-' );
+        if( !exists( $CLASSES->{ $enc } ) )
+        {
+            warn( "Unsupported content encoding \"$enc\"." ) if( $self->_is_warnings_enabled( 'HTTP::Promise' ) );
+            next;
+        }
         my $encoder_class = $CLASSES->{ $enc }->[$offset];
         my $is_installed_method = ( $enc_or_dec ? 'is_encoder_installed' : 'is_decoder_installed' );
         if( my $coderef = $encoder_class->can( $is_installed_method ) )
@@ -1472,7 +1583,7 @@ sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
         use vars qw( $VERSION $EXCEPTION_CLASS );
         use Module::Generic::File::IO;
         use Module::Generic::Scalar::IO;
-        use Nice::Try;
+        # use Nice::Try;
         our $EXCEPTION_CLASS = 'HTTP::Promise::Exception';
         our $VERSION = $HTTP::Promise::Stream::VERSION;
     };
@@ -1570,32 +1681,34 @@ sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
             {
                 $op = sub
                 {
-                    try
+                    # try-catch
+                    local $@;
+                    my $rv = eval
                     {
-                        my $rv = $fh->$meth( @_ );
-                        if( !defined( $rv ) )
+                        $fh->$meth( @_ );
+                    };
+                    if( $@ )
+                    {
+                        return( $self->error( "Error writing ", CORE::length( $_[0] ), " bytes of data to output: $@" ) );
+                    }
+                    if( !defined( $rv ) )
+                    {
+                        my $err;
+                        if( defined( $! ) )
                         {
-                            my $err;
-                            if( defined( $! ) )
-                            {
-                                $err = $!;
-                            }
-                            elsif( $self->_can( $fh => 'error' ) )
-                            {
-                                $err = $fh->error;
-                            }
-                            elsif( $self->_can( $fh => 'errstr' ) )
-                            {
-                                $err = $fh->errstr;
-                            }
-                            return( $self->error( "Error writing ", CORE::length( $_[0] ), " bytes of data to output: $err" ) );
+                            $err = $!;
                         }
-                        return( $rv );
+                        elsif( $self->_can( $fh => 'error' ) )
+                        {
+                            $err = $fh->error;
+                        }
+                        elsif( $self->_can( $fh => 'errstr' ) )
+                        {
+                            $err = $fh->errstr;
+                        }
+                        return( $self->error( "Error writing ", CORE::length( $_[0] ), " bytes of data to output: $err" ) );
                     }
-                    catch( $e )
-                    {
-                        return( $self->error( "Error writing ", CORE::length( $_[0] ), " bytes of data to output: $e" ) );
-                    }
+                    return( $rv );
                 };
             }
             else
@@ -1618,32 +1731,34 @@ sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
             {
                 $op = sub
                 {
-                    try
+                    # try-catch
+                    local $@;
+                    my $n = eval
                     {
-                        my $n = $fh->read( @_ );
-                        if( !defined( $n ) )
+                        $fh->read( @_ );
+                    };
+                    if( $@ )
+                    {
+                        return( $self->error( "Error reading ", $_[1], " bytes of data from input: $@" ) );
+                    }
+                    if( !defined( $n ) )
+                    {
+                        my $err;
+                        if( defined( $! ) )
                         {
-                            my $err;
-                            if( defined( $! ) )
-                            {
-                                $err = $!;
-                            }
-                            elsif( $self->_can( $fh => 'error' ) )
-                            {
-                                $err = $fh->error;
-                            }
-                            elsif( $self->_can( $fh => 'errstr' ) )
-                            {
-                                $err = $fh->errstr;
-                            }
-                            return( $self->error( "Error reading ", $_[1], " bytes of data from intput: $err" ) );
+                            $err = $!;
                         }
-                        return( $n );
+                        elsif( $self->_can( $fh => 'error' ) )
+                        {
+                            $err = $fh->error;
+                        }
+                        elsif( $self->_can( $fh => 'errstr' ) )
+                        {
+                            $err = $fh->errstr;
+                        }
+                        return( $self->error( "Error reading ", $_[1], " bytes of data from intput: $err" ) );
                     }
-                    catch( $e )
-                    {
-                        return( $self->error( "Error reading ", $_[1], " bytes of data from input: $e" ) );
-                    }
+                    return( $n );
                 };
             }
             else
@@ -1681,7 +1796,7 @@ HTTP::Promise::Stream - Data Stream Encoding and Decoding
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

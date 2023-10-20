@@ -32,16 +32,16 @@ no_index:
 provides:
   Net::Async::Redis::Cluster::Node::XS:
     file: lib/Net/Async/Redis/Cluster/Node/XS.pm
-    version: '0.011'
+    version: '0.012'
   Net::Async::Redis::Cluster::XS:
     file: lib/Net/Async/Redis/Cluster/XS.pm
-    version: '0.011'
+    version: '0.012'
   Net::Async::Redis::Protocol::XS:
     file: lib/Net/Async/Redis/XS.pm
-    version: '0.011'
+    version: '0.012'
   Net::Async::Redis::XS:
     file: lib/Net/Async/Redis/XS.pm
-    version: '0.011'
+    version: '0.012'
 requires:
   Future::AsyncAwait: '0.61'
   IO::Async::Loop: '0'
@@ -51,10 +51,10 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Redis-XS/issues
   homepage: https://github.com/team-at-cpan/Net-Async-Redis-XS
   repository: https://github.com/team-at-cpan/Net-Async-Redis-XS.git
-version: '0.011'
+version: '0.012'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Gabor Szabo <gabor@szabgab.com>'
-x_generated_by_perl: v5.36.0
+x_generated_by_perl: v5.38.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

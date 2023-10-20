@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'icon_id' => {
      	datatype => 'int',
      	base_name => 'IconId',
-     	description => '',
+     	description => 'Gets and sets Zero-based index of an icon in an icon set. ',
      	format => '',
      	read_only => '',
      		},
      'icon_set_type' => {
      	datatype => 'string',
      	base_name => 'IconSetType',
-     	description => '',
+     	description => 'Gets and sets which icon set is used in the filter criteria. ',
      	format => '',
      	read_only => '',
      		},    

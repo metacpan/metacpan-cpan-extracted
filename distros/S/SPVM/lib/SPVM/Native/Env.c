@@ -17,11 +17,7 @@ int32_t SPVM__Native__Env__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   if (error_id) { return error_id; }
   
   if (obj_compiler) {
-    env->set_field_object_by_name(env, stack, obj_self, "compiler", obj_compiler, &error_id, __func__, FILE_NAME, __LINE__);
-    if (error_id) { return error_id; }
-    
     void* compiler = env->get_pointer(env, stack, obj_compiler);
-    new_env->compiler = compiler;
     
     stack[0].oval = obj_compiler;
     env->call_instance_method_by_name(env, stack, "get_runtime", 0, &error_id, __func__, FILE_NAME, __LINE__);
@@ -31,7 +27,14 @@ int32_t SPVM__Native__Env__new(SPVM_ENV* env, SPVM_VALUE* stack) {
     env->set_field_object_by_name(env, stack, obj_self, "runtime", obj_runtime, &error_id, __func__, FILE_NAME, __LINE__);
     if (error_id) { return error_id; }
     
-    new_env->runtime = env->get_pointer(env, stack, obj_runtime);
+    void* runtime = env->get_pointer(env, stack, obj_runtime);
+    
+    env->api->runtime->set_compiler(runtime, compiler);
+    
+    env->set_field_object_by_name(env, stack, obj_runtime, "compiler", obj_compiler, &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    new_env->runtime = runtime;
   }
   
   stack[0].oval = obj_self;

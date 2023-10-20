@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Extend DateTime::TimeZone catalog - ~/lib/DateTime/TimeZone/Catalog/Extend.pm
-## Version v0.3.0
+## Version v0.3.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/11/29
-## Modified 2022/12/06
+## Modified 2023/10/11
 ## All rights reserved
 ## 
 ## 
@@ -22,7 +22,7 @@ BEGIN
     our @ISA = qw( Exporter );
     use DateTime::TimeZone::Alias;
     use Nice::Try;
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.3.1';
 };
 
 use strict;
@@ -508,7 +508,7 @@ DateTime::TimeZone::Catalog::Extend - Extend DateTime::TimeZone catalog
 
 =head1 VERSION
 
-    v0.3.0
+    v0.3.1
 
 =head1 DESCRIPTION
 

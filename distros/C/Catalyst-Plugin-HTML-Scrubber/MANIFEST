@@ -20,7 +20,7 @@ t/00_compile.t
 t/02_basic.t
 t/03_params.t
 t/04_manual.t
-t/05_ignore_params.t
+t/05_rest.t
 t/lib/MyApp02.pm
 t/lib/MyApp02/Controller/Root.pm
 t/lib/MyApp03.pm

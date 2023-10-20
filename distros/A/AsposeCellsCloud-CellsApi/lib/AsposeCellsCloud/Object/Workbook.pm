@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'file_name' => {
      	datatype => 'string',
      	base_name => 'FileName',
-     	description => '',
+     	description => 'Gets and sets the current file name. ',
      	format => '',
      	read_only => '',
      		},
@@ -143,14 +143,14 @@ __PACKAGE__->method_documentation({
      'worksheets' => {
      	datatype => 'LinkElement',
      	base_name => 'Worksheets',
-     	description => '',
+     	description => 'Gets the  collection in the spreadsheet. ',
      	format => '',
      	read_only => '',
      		},
      'default_style' => {
      	datatype => 'LinkElement',
      	base_name => 'DefaultStyle',
-     	description => '',
+     	description => 'Gets or sets the default  object of the workbook. ',
      	format => '',
      	read_only => '',
      		},
@@ -171,7 +171,7 @@ __PACKAGE__->method_documentation({
      'settings' => {
      	datatype => 'LinkElement',
      	base_name => 'Settings',
-     	description => '',
+     	description => 'Represents the workbook settings. ',
      	format => '',
      	read_only => '',
      		},

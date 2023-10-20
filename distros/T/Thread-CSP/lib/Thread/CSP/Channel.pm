@@ -1,5 +1,5 @@
 package Thread::CSP::Channel;
-$Thread::CSP::Channel::VERSION = '0.010';
+$Thread::CSP::Channel::VERSION = '0.011';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ Thread::CSP::Channel - Channels for Communicating sequential processes
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

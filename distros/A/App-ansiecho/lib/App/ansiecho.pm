@@ -1,6 +1,6 @@
 package App::ansiecho;
 
-our $VERSION = "1.04";
+our $VERSION = "1.05";
 
 use v5.14;
 use warnings;
@@ -57,7 +57,7 @@ use App::ansiecho::Util;
 use Getopt::EX v1.24.1;
 use Text::ANSI::Printf 2.01 qw(ansi_sprintf);
 
-use List::Util qw(sum);
+use List::Util qw(sum max);
 
 sub run {
     my $app = shift;
@@ -82,12 +82,13 @@ sub retrieve {
     my $app = shift;
     my $count = shift;
     my $in = $app->params;
-    my @out;
-    my @pending;
     my(@style, @effect);
 
-    my $append = sub {
-	push @out, join '', splice(@pending), @_;
+    my @out;
+    my @pending;
+    my $charge = sub { push @pending, @_ };
+    my $discharge = sub {
+	push @out, join '', splice(@pending), @_ if @pending or @_;
     };
 
     while (@$in) {
@@ -128,7 +129,7 @@ sub retrieve {
 		$arg = $code;
 	    } else {
 		if (@out == 0 or $opt eq 'i') {
-		    push @pending, $code;
+		    $charge->($code);
 		} else {
 		    $out[-1] .= $code;
 		}
@@ -140,9 +141,26 @@ sub retrieve {
 	#
 	elsif ($arg =~ /^-f(.+)?$/) {
 	    my($format) = defined $1 ? safe_backslash($1) : $app->retrieve(1);
-	    my $n = sum map {
-		{ '%' => 0, '*' => 2, '*.*' => 3 }->{$_} // 1
-	    } $format =~ /(?| %(%) | %[-+ #0]*+(\*(?:\.\*)?|.) )/xg;
+	    state $param_re = do {
+		my $P = qr/\d+\$/;
+		my $W = qr/\d+|\*$P?/;
+		qr{ %% |
+		    (?<A> % $P?) [-+#0]*+
+		    (?: (?<B>$W) (?:\.(?<C>$W))? | \.(?<D>$W) )? [a-zA-Z]
+		}x;
+	    };
+	    my($pos, $n) = (0, 0);
+	    while ($format =~ /$param_re/g) {
+		$+{A} // next;
+		for ($+{A}, grep { defined and /\*/ } @+{qw(B C D)}) {
+		    if (/(\d+)\$/) {
+			$pos = max($pos, $1);
+		    } else {
+			$n++;
+		    }
+		}
+	    }
+	    $n = max($pos, $n);
 	    $arg = ansi_sprintf($format, $app->retrieve($n));
 	}
 	#
@@ -162,7 +180,7 @@ sub retrieve {
 	    $arg = $func->(@opts, $arg);
 	}
 
-	$append->($arg);
+	$discharge->($arg);
 
 	if ($count) {
 	    my $out = @out + !!@pending;
@@ -170,7 +188,7 @@ sub retrieve {
 	    last if $out == $count;
 	}
     }
-    @pending and $append->();
+    $discharge->();
     die "Not enough argument.\n" if $count and @out < $count;
     return @out;
 }

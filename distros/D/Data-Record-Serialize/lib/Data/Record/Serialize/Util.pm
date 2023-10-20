@@ -2,9 +2,10 @@ package Data::Record::Serialize::Util;
 
 # ABSTRACT: Useful things
 
+use v5.12;
 use strict;
 use warnings;
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use parent 'Exporter::Tiny';
 
@@ -22,39 +23,39 @@ BEGIN {
     );
 
     %TYPES = (
-        T_INTEGER        => 'I',
-        T_NUMBER         => 'N',
-        T_STRING         => 'S',
-        T_BOOLEAN        => 'B',
+        T_INTEGER => 'I',
+        T_NUMBER  => 'N',
+        T_STRING  => 'S',
+        T_BOOLEAN => 'B',
     );
 }
 
 use enum @TYPE_CATEGORY_NAMES;
 use constant \%TYPES;
 
-our @TYPE_CATEGORIES = map {;  # add a ; to help 5.10
-    no strict 'refs'; ## no critic(ProhibitNoStrict)
+our @TYPE_CATEGORIES = map {
+    ;                    # add a ; to help 5.10
+    no strict 'refs';    ## no critic(ProhibitNoStrict)
     $_->();
 } @TYPE_CATEGORY_NAMES;
 
 our %EXPORT_TAGS = (
-    types     => [ keys %TYPES ],
+    types      => [ keys %TYPES ],
     categories => \@TYPE_CATEGORY_NAMES,
-    subs       => [ qw( is_type index_types ) ],
+    subs       => [qw( is_type index_types )],
 );
 
 our @EXPORT_OK = map { @{$_} } values %EXPORT_TAGS;
 
 my @TypeRE;
 $TypeRE[ $_->[0] ] = $_->[1]
-  for
-  [ ANY             ,=> qr/.*/     ],
-  [ STRING          ,=> qr/^S/i    ],
-  [ FLOAT           ,=> qr/^N/i    ],
-  [ INTEGER         ,=> qr/^I/i    ],
-  [ BOOLEAN         ,=> qr/^B/i    ],
-  [ NUMBER          ,=> qr/^[NI]/i ],
-  [ NOT_STRING      ,=> qr/^[^S]+/ ];
+  for [ +( ANY ) => qr/.*/ ],
+  [ +( STRING )     => qr/^S/i ],
+  [ +( FLOAT )      => qr/^N/i ],
+  [ +( INTEGER )    => qr/^I/i ],
+  [ +( BOOLEAN )    => qr/^B/i ],
+  [ +( NUMBER )     => qr/^[NI]/i ],
+  [ +( NOT_STRING ) => qr/^[^S]+/ ];
 
 sub is_type {
     my ( $type, $type_enum ) = @_;
@@ -99,7 +100,9 @@ Data::Record::Serialize::Util - Useful things
 
 =head1 VERSION
 
-version 1.04
+version 1.05
+
+=head1 INTERNALS
 
 =for Pod::Coverage index_types
 is_type
@@ -108,7 +111,7 @@ is_type
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>
 
 =head2 Source
 

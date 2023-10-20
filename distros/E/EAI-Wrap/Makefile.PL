@@ -6,6 +6,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
 	NAME          => 'EAI::Wrap',
 	AUTHOR        => 'Roland Kapl',
+	LICENSE       => 'MIT',
 	ABSTRACT_FROM => 'lib/EAI/Wrap.pm',
 	VERSION_FROM  => 'lib/EAI/Wrap.pm',
 	PREREQ_PM     => {
@@ -24,6 +25,8 @@ WriteMakefile(
 		'Spreadsheet::WriteExcel' => 0,
 		'Spreadsheet::ParseExcel' => 0,
 		'Text::CSV' => 0,
+		'Text::Glob' => 0,
+		'Time::Local' => 1.27,
 		'XML::LibXML' => 0,
 		'XML::LibXML::Debugging' => 0
 	},
@@ -40,6 +43,9 @@ WriteMakefile(
 				type => 'git',
 				url  => 'https://github.com/rkapl123/EAI-Wrap.git',
 				web  => 'https://github.com/rkapl123/EAI-Wrap',
+			},
+			bugtracker => {
+				web => 'https://github.com/rkapl123/EAI-Wrap/issues',
 			},
 		},
 		prereqs => {

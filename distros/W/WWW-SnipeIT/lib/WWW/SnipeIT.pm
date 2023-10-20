@@ -1,15 +1,14 @@
 package WWW::SnipeIT;
-
-use v5.26.0;
-use Modern::Perl '2018'; #5.26
-our $VERSION = '0.02';
+use v5.26;
 use Object::Pad;
 use WWW::SnipeIT::Hardware;
 
+our $VERSION = '0.04';
 
 class SnipeIT {
-  has $accessToken :param;
-  has $endpoint :param;
+  
+  field $endpoint :param = 0;
+  field $accessToken :param = 0;
 
   method snipe () {
     my $header = ['Content-Type' => 'application/json; charset=UTF-8', 'Authorization' => 'Bearer '.$accessToken];
@@ -18,7 +17,6 @@ class SnipeIT {
     return {'hardware' => $asset};
   }
 }
-
 
 1;
 __END__

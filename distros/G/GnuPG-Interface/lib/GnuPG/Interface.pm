@@ -29,7 +29,7 @@ use GnuPG::Options;
 use GnuPG::Handles;
 use Scalar::Util 'tainted';
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 has passphrase => (
     isa     => 'Any',
@@ -351,7 +351,11 @@ sub fork_attach_exec( $% ) {
             @commands,     @command_args
         );
 
-        local $ENV{PATH} if tainted $ENV{PATH};
+        # On Unix, PATH is by default '.' and Perl >= v5.38 rejects '.'
+        # being in the path when in taint mode. Set a path, if running
+        # in taint mode whomever is calling us should be providing the
+        # path to the gpg program to use.
+        local $ENV{PATH} = '/usr/bin' if tainted $ENV{PATH};
         exec @command or die "exec() error: $ERRNO";
     }
 

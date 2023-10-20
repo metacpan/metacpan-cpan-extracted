@@ -1,5 +1,11 @@
 Revision history for Perl extension RxPerl
 
+v6.28.0 2023-09-28T18:45:00Z
+
+    - removed op_group_by operator, because it was too buggy.
+        (If anyone has a good grasp of how it works/what it should do, feel free to contact me)
+    - removed EXPERIMENTAL status of the two promise functions, since rxjs v7 has been released
+
 v6.27.1 2023-03-13T15:18:32Z
 
     - fixed bug on rx_from_event and rx_from_event_array

@@ -10,7 +10,20 @@ SYNOPSIS
         MyApp->config( 
             scrubber => {
                 auto => 1,  # automatically run on request
+    
+                # Exempt certain parameter names from scrubbing
                 ignore_params => [ qr/_html$/, 'article_body' ],
+    
+                # Don't scrub at all for certain URL paths:
+                ignore_paths => [
+                    '/foo',
+                    qr{^/foo/.+},
+                ],
+    
+                # HTML::Scrubber will HTML-encode some chars, e.g. angle
+                # brackets.  If you don't want that, enable this setting and
+                # the scrubbed values will be unencoded.
+                no_decode_entities => 0,
                 
                 # The following are options to HTML::Scrubber
                 params => [
@@ -38,10 +51,12 @@ EXTENDED METHODS
       certain fields) and passing on any options from HTML::Scrubber to
       control exactly what scrubbing happens.
 
-    prepare_parameters
+    dispatch
 
       Sanitize HTML tags in all parameters (unless `ignore_params` exempts
-      them).
+      them) - this includes normal POST params, and serialised data (e.g. a
+      POSTed JSON body) accessed via `$c->req->body_data` or
+      `$c->req->data`.
 
 SEE ALSO
 

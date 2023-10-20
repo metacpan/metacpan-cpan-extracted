@@ -1,23 +1,33 @@
 use strict;
 use warnings;
-use Dispatch::Fu qw/dispatch on/;
-use Test::More tests => 99;
+use Test::More;
+use Dispatch::Fu;
 
 sub _runner {
-    my $CASES = shift;
+    my $INPUT = shift;
+
     my $ouput = dispatch {
-        my $cases = shift;
-        return ( scalar @$cases > 5 )
+        my $input_ref = shift;
+
+        # checking internal inspection routine, cases
+        my @cases = cases;
+        is 6, @cases, q{found expected number of cases};
+
+        return ( scalar @$input_ref > 5 )
           ? q{case5}
-          : sprintf qq{case%d}, scalar @$cases;
+          : sprintf qq{case%d}, scalar @$input_ref;
     }
-    $CASES,
+    $INPUT,
       on case0 => sub { return qq{0} },
       on case1 => sub { return qq{1} },
       on case2 => sub { return qq{2} },
       on case3 => sub { return qq{3} },
       on case4 => sub { return qq{4} },
       on case5 => sub { return qq{5} };
+
+      my @cases = cases;
+      is 0, @cases, q{found expected number of cases};
+
     return $ouput;
 }
 
@@ -31,3 +41,5 @@ foreach my $i ( 6 ... 98 ) {
     is _runner( \@queue ), 5, q{Got expected result back from dispatch};
     push @queue, $i;
 }
+
+done_testing;

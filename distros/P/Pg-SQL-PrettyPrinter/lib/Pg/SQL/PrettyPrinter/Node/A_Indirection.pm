@@ -56,6 +56,11 @@ sub as_text {
     my $self        = shift;
     my $arg_as_text = $self->{ 'arg' }->as_text;
     $arg_as_text = "( $arg_as_text )" unless $self->{ 'arg' }->isa( 'Pg::SQL::PrettyPrinter::Node::ColumnRef' );
+    if ( 1 == scalar @{ $self->{ 'indirection' } } ) {
+        my $ind = $self->{ 'indirection' }->[ 0 ];
+        return "${arg_as_text}.*"                        if $ind->isa( 'Pg::SQL::PrettyPrinter::Node::A_Star' );
+        return join( '.', $arg_as_text, $ind->as_ident ) if $ind->isa( 'Pg::SQL::PrettyPrinter::Node::String' );
+    }
     return sprintf(
         '%s%s',
         $arg_as_text,
@@ -67,6 +72,12 @@ sub pretty_print {
     my $self        = shift;
     my $arg_as_text = $self->{ 'arg' }->pretty_print;
     $arg_as_text = "( $arg_as_text )" unless $self->{ 'arg' }->isa( 'Pg::SQL::PrettyPrinter::Node::ColumnRef' );
+    if ( 1 == scalar @{ $self->{ 'indirection' } } ) {
+        my $ind = $self->{ 'indirection' }->[ 0 ];
+        return "${arg_as_text}.*"                        if $ind->isa( 'Pg::SQL::PrettyPrinter::Node::A_Star' );
+        return join( '.', $arg_as_text, $ind->as_ident ) if $ind->isa( 'Pg::SQL::PrettyPrinter::Node::String' );
+    }
+
     return sprintf(
         '%s%s',
         $arg_as_text,

@@ -5,6 +5,21 @@ use Test::More;    # Requires 0.94 as noted in Build.PL
 use Template::Liquid;
 
 # Various condition types
+is(Template::Liquid->parse(<<'INPUT')->render(), <<'EXPECTED', '1==1');
+{% if 1==1 %}One equals one{% endif %}
+INPUT
+One equals one
+EXPECTED
+is(Template::Liquid->parse(<<'INPUT')->render(), <<'EXPECTED', '1== 1');
+{% if 1== 1 %}One equals one{% endif %}
+INPUT
+One equals one
+EXPECTED
+is(Template::Liquid->parse(<<'INPUT')->render(), <<'EXPECTED', '1 ==1');
+{% if 1 ==1 %}One equals one{% endif %}
+INPUT
+One equals one
+EXPECTED
 is(Template::Liquid->parse(<<'INPUT')->render(), <<'EXPECTED', '1 == 1');
 {% if 1 == 1 %}One equals one{% endif %}
 INPUT
@@ -52,6 +67,24 @@ EXPECTED
 is( Template::Liquid->parse(
         <<'INPUT')->render(), <<'EXPECTED', q['This string' != 'some other string']);
 {% if 'This string' != 'some other string' %}Yep.{% endif %}
+INPUT
+Yep.
+EXPECTED
+is( Template::Liquid->parse(
+        <<'INPUT')->render(), <<'EXPECTED', q['This string'!='some other string']);
+{%if 'This string'!='some other string' %}Yep.{%endif%}
+INPUT
+Yep.
+EXPECTED
+is( Template::Liquid->parse(
+        <<'INPUT')->render(), <<'EXPECTED', q['This string' !='some other string']);
+{%if 'This string' !='some other string' %}Yep.{%endif%}
+INPUT
+Yep.
+EXPECTED
+is( Template::Liquid->parse(
+        <<'INPUT')->render(), <<'EXPECTED', q['This string'!=  'some other string']);
+{%if 'This string'!=  'some other string' %}Yep.{%endif%}
 INPUT
 Yep.
 EXPECTED

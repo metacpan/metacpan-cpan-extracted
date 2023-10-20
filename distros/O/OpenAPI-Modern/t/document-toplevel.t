@@ -90,14 +90,14 @@ subtest 'top level document fields' => sub {
         instanceLocation => '',
         keywordLocation => '/required',
         absoluteKeywordLocation => SCHEMA.'#/required',
-        error => 'missing property: openapi',
+        error => 'object is missing property: openapi',
       },
     ],
     'missing openapi',
   );
   is(
     document_result($doc),
-    q!'': missing property: openapi!,
+    q!'': object is missing property: openapi!,
     'stringified errors',
   );
 
@@ -118,7 +118,7 @@ subtest 'top level document fields' => sub {
         instanceLocation => '/info',
         keywordLocation => '/$ref/properties/info/$ref/required',
         absoluteKeywordLocation => SCHEMA.'#/$defs/info/required',
-        error => 'missing properties: title, version',
+        error => 'object is missing properties: title, version',
       },
       {
         instanceLocation => '',
@@ -130,7 +130,7 @@ subtest 'top level document fields' => sub {
     'missing /info properties',
   );
   is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
-'/info': missing properties: title, version
+'/info': object is missing properties: title, version
 '': not all properties are valid
 ERRORS
 
@@ -265,7 +265,7 @@ ERRORS
         instanceLocation => '',
         keywordLocation => '/$ref/anyOf/'.$iter.'/required',
         absoluteKeywordLocation => SCHEMA.'#/anyOf/'.$iter++.'/required',
-        error => 'missing property: '.$_,
+        error => 'object is missing property: '.$_,
       }, qw(paths components webhooks)),
       {
         instanceLocation => '',
@@ -290,9 +290,9 @@ ERRORS
   );
 
   is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
-'': missing property: paths
-'': missing property: components
-'': missing property: webhooks
+'': object is missing property: paths
+'': object is missing property: components
+'': object is missing property: webhooks
 '': no subschemas are valid
 '/externalDocs': got string, not object
 '/security': got string, not array

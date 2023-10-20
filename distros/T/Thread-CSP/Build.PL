@@ -12,6 +12,7 @@ my $builder = Module::Build->new(
   module_name  => 'Thread::CSP',
   c_source     => 'src',
   'build_requires' => {
+    'ExtUtils::ParseXS' => '3.50',
     'Module::Build' => '0.28',
     'Test::More' => '0',
     'lib' => '0',

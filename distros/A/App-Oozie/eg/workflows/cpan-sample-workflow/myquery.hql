@@ -1,1 +1,1 @@
-select $DATE as foo;
+select "$DATE" as foo;

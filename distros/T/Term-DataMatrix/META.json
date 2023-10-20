@@ -1,0 +1,66 @@
+{
+   "abstract" : "Generate terminal-based Data Matrix 2D barcodes",
+   "author" : [
+      "Dan Church <h3xx [a] gmx <d> com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Term-DataMatrix",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Barcode::DataMatrix" : "0",
+            "Carp" : "0",
+            "Term::ANSIColor" : "0",
+            "fields" : "0",
+            "perl" : "5.012"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "List::Util" : "0",
+            "Term::ANSIColor" : "2.01",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/h3xx/perl-Term-DataMatrix/issues"
+      },
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://codeberg.org/h3xx/perl-Term-DataMatrix.git",
+         "web" : "https://codeberg.org/h3xx/perl-Term-DataMatrix"
+      }
+   },
+   "version" : "1.000000",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -23472,6 +23472,15 @@
       "name" : "Fangschleuse"
    },
    {
+      "ds100" : "BFTS",
+      "eva" : 8079310,
+      "latlong" : [
+         52.392288,
+         13.797417
+      ],
+      "name" : "Fangschleuse Tesla Süd"
+   },
+   {
       "ds100" : "MFCH",
       "eva" : 8001961,
       "latlong" : [
@@ -23938,6 +23947,15 @@
          13.710388
       ],
       "name" : "Finsterwalde(Niederlausitz)"
+   },
+   {
+      "ds100" : "XIFRC",
+      "eva" : 8300180,
+      "latlong" : [
+         43.777575,
+         11.27659
+      ],
+      "name" : "Firenze Campo di Marte"
    },
    {
       "ds100" : "XIFRS",
@@ -58194,6 +58212,15 @@
       "name" : "Nordhausen-Salza"
    },
    {
+      "ds100" : "NNOR",
+      "eva" : 8071974,
+      "latlong" : [
+         50.477217,
+         10.180724
+      ],
+      "name" : "Nordheim v. d. Rhön"
+   },
+   {
       "ds100" : "TNO",
       "eva" : 8004458,
       "latlong" : [
@@ -85174,6 +85201,15 @@
          9.040983279214
       ],
       "name" : "Wil SG"
+   },
+   {
+      "ds100" : "MWBN",
+      "eva" : 8070620,
+      "latlong" : [
+         49.025406,
+         10.397023
+      ],
+      "name" : "Wilburgstetten Bf"
    },
    {
       "ds100" : "RWIN",

@@ -9,13 +9,13 @@ App::Greple::type - file type filter module for greple
 
 # VERSION
 
-Version 1.01
+Version 1.0301
 
 # DESCRIPTION
 
 This module filters search target files by given rule.  It is
 convenient to use with other **greple** module which support recursive
-or multi-file search such as **-Mfind**, **-Mdig** or **-Mgit**.
+or multi-file search such as `-Mfind`, `-Mdig` or `-Mgit`.
 
 For example, option for Perl is defined as this:
 
@@ -23,19 +23,33 @@ For example, option for Perl is defined as this:
            --suffix=pl,PL,pm,pod,t,psgi \
            --shebang=perl
 
-Using this option, only files those name end with **--suffix** option
+Using this option, only files those name end with `--suffix` option
 or files which contains string `perl` in the first `#!` (shebang)
 line will be searched.
 
 Option **--suffix** and **--shebang** are defined in
 [App::Greple::select](https://metacpan.org/pod/App%3A%3AGreple%3A%3Aselect) module.
 
-# SHORT NAME
+## NEGATIVE OPTIONS
 
-Calling module as **-Mtype::config(short)** or **-Mtype::config=short**
-introduce short name for rule options.  When short name mode is
-activated, all **--type-xxxx** options can be used as **--xxxx** as
-well.
+Negative options are automatically generated from positive options
+with `--no-` prefix.  For example, `--no-type-perl` option is
+defined as this:
+
+    option --no-type-perl \
+           --x-suffix=pl,PL,pm,pod,t,psgi \
+           --x-shebang=perl
+
+## SHORT NAMES
+
+Short name mode is activated by default on this version.  When
+activated, all `--type-xxxx` and `--no-type-xxxx` options can be
+used as `--xxxx` and `--no-xxxx` as well.
+
+As for Perl, `--perl` and `--no-perl` can be used.
+
+If you want to disable this mode, call module with config function
+call, like `-Mtype::config(short=0)` or `-Mtype::config=short=0`.
 
 # OPTIONS
 

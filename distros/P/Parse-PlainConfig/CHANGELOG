@@ -1,5 +1,12 @@
 CHANGELOG
 
+v3.06 (2023/09/23)
+------------------
+--Typos in documentation (Debian Perl Group)
+--Made PPC class subclassable, allowing for inherited parameters and 
+  prototypes
+--Adjusted debug output for Paranoid::Debug v2.10
+
 v3.05 (2017/03/23)
 ------------------
 --Forgot to update minimum version for Class::EHierarchy in Makefile.PL

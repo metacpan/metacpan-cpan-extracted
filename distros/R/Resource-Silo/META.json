@@ -33,8 +33,10 @@
       "runtime" : {
          "requires" : {
             "Module::Load" : "0.32",
+            "Moo" : "2",
             "Scalar::Util" : "1.23",
             "Sub::Quote" : "2",
+            "namespace::clean" : "0.27",
             "perl" : "5.010"
          }
       },
@@ -56,6 +58,6 @@
          "web" : "https://github.com/dallaylaen/resource-silo-p5"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

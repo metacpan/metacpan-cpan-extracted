@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
-use Object::Pad 0.57;
+use Object::Pad 0.800;
 
-package Tickit::Widget::Scroller::Item::RichText 0.31;
+package Tickit::Widget::Scroller::Item::RichText 0.32;
 class Tickit::Widget::Scroller::Item::RichText
    :strict(params)
    :isa(Tickit::Widget::Scroller::Item::Text);
@@ -89,6 +89,16 @@ sub new_from_formatting ( $class, $str, %opts )
    );
 }
 
+my %PENCACHE;
+method pen_for_tags ( $tags )
+{
+   # Cache the pens
+   my $key = join "|", map { "$_=" . ( $tags->{$_} // "" ) } sort keys %$tags;
+
+   # Don't worry if extra tags left over, they just aren't rendering attributes
+   return $PENCACHE{$key} //= Tickit::Pen::Immutable->new_from_attrs( $tags );
+}
+
 method _build_chunks_for ( $str )
 {
    my @chunks;
@@ -96,8 +106,7 @@ method _build_chunks_for ( $str )
    $str->iter_substr_nooverlap(
       sub {
          my ( $substr, %tags ) = @_;
-         my $pen = Tickit::Pen->new_from_attrs( \%tags );
-         # Don't worry if extra tags left over, they just aren't rendering attributes
+         my $pen = $self->pen_for_tags( \%tags );
          my @lines = split m/\n/, $substr, -1 or return;
          my $lastline = pop @lines;
          push @chunks, [ $_, textwidth( $_ ), pen => $pen, linebreak => 1 ] for @lines;

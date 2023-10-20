@@ -1,4 +1,6 @@
-Revision history for Blockchain-Ethereum-ABI
+0.013     2023-10-15 23:12:26-03:00 America/Sao_Paulo
+    [Improvements]
+    - Dist::Zilla
 0.012
     [Bug fixes]
     - Fix test for all supported perl versions

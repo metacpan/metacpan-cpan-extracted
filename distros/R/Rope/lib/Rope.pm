@@ -1,10 +1,11 @@
 package Rope;
 
 use 5.006; use strict; use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use Rope::Object;
 my (%META, %PRO);
+our @ISA;
 BEGIN {
 	%PRO = (
 		keyword => sub {
@@ -133,6 +134,8 @@ BEGIN {
 							$merge->{properties}->{$_} = $initial->{properties}->{$_};
 						}
 					}
+					my $isa = '@' . $caller . '::ISA';
+					eval "push $isa, '$extend'";
 					$META{$caller} = $merge;
 				}
 			}
@@ -173,17 +176,18 @@ sub import {
 		for qw/function property prototyped extends new/;
 }
 
+
 1;
 
 __END__
 
 =head1 NAME
 
-Rope - The great new Rope!
+Rope - Tied objects
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
@@ -207,6 +211,7 @@ Perhaps a little code snippet.
 
 	properties {
 		bends => {
+			type => sub { $_[0] =~ m/^\d+$/ ? $_[0] : die "$_[0] != integer" },
 			value => 10,
 			writeable => 0,
 			configurable => 1,
@@ -230,7 +235,7 @@ Perhaps a little code snippet.
 	
 	$k->{add_loops}(5);
 
-	say $k->{loops}; # 5;
+	say $k->{loops}; # 6;
 
 	$k->{add_loops} = 5; # errors
 
@@ -268,9 +273,7 @@ L<https://metacpan.org/release/Rope>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -279,7 +282,6 @@ This software is Copyright (c) 2023 by LNATION.
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
-
 
 =cut
 

@@ -131,14 +131,14 @@ __PACKAGE__->method_documentation({
      'area' => {
      	datatype => 'Area',
      	base_name => 'Area',
-     	description => '',
+     	description => 'Gets the .',
      	format => '',
      	read_only => '',
      		},
      'border' => {
      	datatype => 'Line',
      	base_name => 'Border',
-     	description => '',
+     	description => 'Gets the border .',
      	format => '',
      	read_only => '',
      		},

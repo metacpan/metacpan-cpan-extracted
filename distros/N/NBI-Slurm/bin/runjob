@@ -43,7 +43,7 @@ GetOptions(
     'm|memory=s'    => \$memory,
     'c|cores|threads=i' => \$threads,
     'q|queue=s'     => \$queue,
-    't|time=s'      => \$time,
+    'T|t|time=s'      => \$time,
     'w|tmpdir=s'    => \$tmpdir,
     'n|name=s'      => \$name,
     'r|run'         => \$run,
@@ -53,7 +53,7 @@ GetOptions(
     'verbose'       => \$verbose,
     'version'       => sub { say "runjob v", $NBI::Slurm::VERSION; exit },
     'debug'         => \$debug,
-    'help'          => sub { usage() },
+    'help'          => sub { usage(1) },
 ) or usage(1);
 
 $debug = 1 if ($ENV{"DEBUG"});
@@ -61,7 +61,7 @@ $debug = 1 if ($ENV{"DEBUG"});
 my $time_hours = NBI::Opts::_time_to_hour($time);
 $queue = update_queue($queue, $time_hours);
 $command = join(" ", @ARGV);
-usage(1) unless ( $command);
+usage(1) unless ($command);
 
 # Check threadshours
 if (-d $time) {
@@ -120,35 +120,75 @@ my $opts = NBI::Opts->new(
 
 
 if ($verbose) {
-    say STDERR "CONFIG:\n", Dumper($config);
+    say STDERR GREEN, "CONFIG:\n", RESET;
+    xdump($config);
+    print STDERR "\n";
+    #say STDERR GREEN, "OPTS:\n", RESET;
     say STDERR $opts->view();
 }
 
+
+sub xdump {
+    my ($hash_of_hashes, $indent) = @_;
+    $indent //= '  ';
+    while (my ($key, $value) = each %$hash_of_hashes) {
+        if (ref $value eq 'HASH') {
+            print STDERR BOLD, "$indent$key :\n", RESET;
+            xdump($value, "$indent    ");
+            print "$indent\n";
+        } else {
+            print STDERR "$indent$key = $value\n";
+        }
+    }
+}
+
+
+# If the command starts with a number, it might be a typo like -t 8h instead
 my $job = NBI::Job->new(
     -name => $name,
     -command =>  "cd \"$user_current_dir\"",
     -opts => $opts
 );
 if ($debug) {
-    say STDERR "JOB:\n", Dumper($job);
+    say STDERR YELLOW, "JOB:\n", RESET, Dumper($job);
 }
 $job->append_command($command);
 if ($verbose and not $run) {
+    say STDERR GREEN, "JOB SCRIPT\n", RESET;
     say STDERR $job->script();
 }
 
+
+my $err = 0;
 if ($run) {
+    
     if (my $j = $job->run()) {
-        say STDERR GREEN, "Job sumbitted", RESET;
+        
+        if ($verbose) {
+            #say STDERR GREEN, "JOB OBJECT:\n", RESET;
+            say STDERR $job->view();
+        }
+
         say "$j";
     } else {
         say STDERR RED, "Job not submitted: $j", RESET;
-        exit 1;
+        if ($verbose) {
+            #say STDERR RED, "JOB OBJECT:\n", RESET;
+            say STDERR $job->view();
+        }
+        $err = 1;
     }
 } else {
+    say STDERR GREEN, "JOB SCRIPT:\n", RESET;
     say $job->script();
 }
 
+
+if ($err) {
+    exit 1;
+} else {
+    say STDERR GREEN, "Job sumbitted: ", $job->jobid, RESET, "\t(", $job->name, ")", RESET;
+}
 sub usage {
     say STDERR <<END;
 
@@ -171,13 +211,23 @@ END
 sub autoname {
     my $string = shift;
     my @parts = split(/\s+/, $string);
-    my @ints = ["bash", "perl", "python", "python3", "R", "Rscript", "sh", "zsh"];
-    # If the first part is in ints, use the second item as name
-    if (grep {$_ eq $parts[0]} @ints) {
+    my @ints = ("bash", "perl", "python", "python3", "R", "Rscript", "sh", "zsh");
+    my @subs = ("bwa", "samtools", "seqfu", "seqkit", "bedtools", "taxonkit", "kmcp", "seqtk", "usearch", "vsearch");
+    
+    # From each @parts, replace it with the first [A-Za-z0-9]+ part
+    for my $i (0..$#parts) {
+        $parts[$i] =~ /^([A-Za-z0-9]+)/;
+        $parts[$i] = $1;
+    }
+    # check if $fisrt is part of the @int array of strings
+    if (grep {$_ eq $parts[0]} @ints and defined $parts[1]) {
         return $parts[1];
+    } elsif (grep {$_ eq $parts[0]} @subs and defined $parts[1]) {
+        return $parts[0] . "-" . $parts[1];
     } else {
         return $parts[0];
     }
+
 }
 
 
@@ -216,7 +266,7 @@ runjob - Run a job in the cluster using NBI::Slurm
 
 =head1 VERSION
 
-version 0.6.1
+version 0.8.1
 
 =head1 SYNOPSIS
 
@@ -250,7 +300,7 @@ An integer is interpreted as Mb if > 200, otherwise it is interpreted as Gb.
 
 Specifies the number of threads (cores) to use for the job. The default value is 1.
 
-=item B<-T, --time> STR
+=item B<-t, --time> STR
 
 Specifies the B<time string> for the job. The default value is "C<0d 8h>". 
 The format should be in the format of "C<Xd Xh Xm>" where X represents the number of days (d), hours (h), and minutes (m) respectively.

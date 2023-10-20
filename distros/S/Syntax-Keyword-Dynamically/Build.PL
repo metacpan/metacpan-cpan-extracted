@@ -6,6 +6,13 @@ use Module::Build;
 use Future::AsyncAwait::ExtensionBuilder;
 use XS::Parse::Keyword::Builder;
 
+my @extra_compiler_flags = qw( -I. -Ihax -ggdb );
+
+# MSWin32 needs NO_XSLOCKS to make longjmp work.
+if( $^O eq "MSWin32" ) {
+   push @extra_compiler_flags, "-DNO_XSLOCKS=1";
+}
+
 my $build = Module::Build->new(
    module_name => "Syntax::Keyword::Dynamically",
    test_requires => {
@@ -20,7 +27,7 @@ my $build = Module::Build->new(
       'perl' => '5.014', # pluggable keywords, XOP
       'XS::Parse::Keyword' => '0.13',
    },
-   extra_compiler_flags => [qw( -I. -Ihax -ggdb )],
+   extra_compiler_flags => \@extra_compiler_flags,
    license => 'perl',
    create_license => 1,
    create_readme  => 1,

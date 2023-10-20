@@ -1,0 +1,432 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/DrugUtils/tabulate_drug_concentration
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-10-19'; # DATE
+our $DIST = 'App-DrugUtils'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/DrugUtils/tabulate_drug_concentration",
+    program_name => "tabulate-drug-concentration",
+    pass_cmdline_object => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Tabulate drug concentration over time, with one or more dosages of a drug of specified half-life
+# PODNAME: tabulate-drug-concentration
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tabulate-drug-concentration - Tabulate drug concentration over time, with one or more dosages of a drug of specified half-life
+
+=head1 VERSION
+
+This document describes version 0.001 of tabulate-drug-concentration (from Perl distribution App-DrugUtils), released on 2023-10-19.
+
+=head1 SYNOPSIS
+
+B<tabulate-drug-concentration> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<tabulate-drug-concentration> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<tabulate-drug-concentration> [(B<L<--dosages|/"--dosages=s@">>=I<str>)+|B<L<--dosages-json|/"--dosages=s@">>=I<json>|(B<L<-d|/"--dosages=s@">>=I<str>)+] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--half-life|/"--half-life=s*, -H">>=I<L<ufloat|Sah::Schema::ufloat>>|B<L<-H|/"--half-life=s*, -H">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--period|/"--period=s, -p">>=I<L<uint|Sah::Schema::uint>>|B<L<-p|/"--period=s, -p">>=I<L<uint|Sah::Schema::uint>>] [B<L<--regular-dosage|/"--regular-dosage=s, -r">>=I<str>|B<L<-r|/"--regular-dosage=s, -r">>=I<str>]
+
+
+
+See examples in the L</EXAMPLES> section.
+
+=head1 DESCRIPTION
+
+Drug concentration over time is calculated using a simple equation:
+
+ D(t) = D(0) * exp(-t/T)
+
+where T is a constant and can be calculated from half-life where D(t)/D(0) =
+0.5:
+
+ 0.5 = 1 * exp(-half_life / T)
+ log(0.5) = -half_life / T
+ T = half_life / log(0.5)
+
+When given multiple dosages, each dosage's concentration will be added up.
+
+By default, hourly concentration will be calculated for 10 half-lives.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--dosages-json>=I<s>, B<-d>
+
+Dosages, each of which in the form of d@t (amount followed by comma and time in hour) (JSON-encoded).
+
+See C<--dosages>.
+
+=item B<--dosages>=I<s@>
+
+Dosages, each of which in the form of d@t (amount followed by comma and time in hour).
+
+Can be specified multiple times.
+
+=item B<--half-life>=I<s>*, B<-H>
+
+Drug half life, in hours.
+
+=item B<--period>=I<s>, B<-p>
+
+How many hours to tabulate.
+
+If unspecified, defaults to 10 * half-life.
+
+
+=item B<--regular-dosage>=I<s>, B<-r>
+
+Regular dosage, in the form of d@t (amount followed by at sign and period in hour, meaning dosage given every t hours).
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C tabulate-drug-concentration tabulate-drug-concentration
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete tabulate-drug-concentration 'p/*/`tabulate-drug-concentration`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 EXAMPLES
+
+=head2 Tabulate concentration of tadalafil (half-life 17.5h) over 1 week period if we give 2.5mg each day for a week
+
+ % tabulate-drug-concentration -H 17.5 -p 144 -d 2.5@0 -d2.5@24 -d2.5@48 -d2.5@72 -d2.5@96 -d2.5@120 -d 2.5@144
+ +------+---------------+
+ | time | concentration |
+ +------+---------------+
+ |    0 |         2.500 |
+ |    1 |         2.403 |
+ |    2 |         2.310 |
+ |    3 |         2.220 |
+ |    4 |         2.134 |
+ |    5 |         2.051 |
+ |    6 |         1.971 |
+ |    7 |         1.895 |
+ |    8 |         1.821 |
+ |    9 |         1.750 |
+ |   10 |         1.682 |
+ |   11 |         1.617 |
+ |   12 |         1.554 |
+ |   13 |         1.494 |
+ |   14 |         1.436 |
+ |   15 |         1.380 |
+ |   16 |         1.327 |
+ |   17 |         1.275 |
+ |   18 |         1.225 |
+ |   19 |         1.178 |
+ |   20 |         1.132 |
+ |   21 |         1.088 |
+ |   22 |         1.046 |
+ |   23 |         1.005 |
+ |   24 |         3.466 |
+ |   25 |         3.332 |
+ |   26 |         3.202 |
+ |   27 |         3.078 |
+ |   28 |         2.958 |
+ |   29 |         2.844 |
+ |   30 |         2.733 |
+ |   31 |         2.627 |
+ |   32 |         2.525 |
+ |   33 |         2.427 |
+ |   34 |         2.333 |
+ |   35 |         2.242 |
+ |   36 |         2.155 |
+ |   37 |         2.071 |
+ |   38 |         1.991 |
+ |   39 |         1.914 |
+ |   40 |         1.839 |
+ |   41 |         1.768 |
+ |   42 |         1.699 |
+ |   43 |         1.633 |
+ |   44 |         1.570 |
+ |   45 |         1.509 |
+ |   46 |         1.450 |
+ |   47 |         1.394 |
+ |   48 |         3.840 |
+ |   49 |         3.691 |
+ |   50 |         3.547 |
+ |   51 |         3.410 |
+ |   52 |         3.277 |
+ |   53 |         3.150 |
+ |   54 |         3.028 |
+ |   55 |         2.910 |
+ |   56 |         2.797 |
+ |   57 |         2.688 |
+ |   58 |         2.584 |
+ |   59 |         2.484 |
+ |   60 |         2.387 |
+ |   61 |         2.294 |
+ |   62 |         2.205 |
+ |   63 |         2.120 |
+ |   64 |         2.037 |
+ |   65 |         1.958 |
+ |   66 |         1.882 |
+ |   67 |         1.809 |
+ |   68 |         1.739 |
+ |   69 |         1.671 |
+ |   70 |         1.606 |
+ |   71 |         1.544 |
+ |   72 |         3.984 |
+ |   73 |         3.829 |
+ |   74 |         3.681 |
+ |   75 |         3.538 |
+ |   76 |         3.400 |
+ |   77 |         3.268 |
+ |   78 |         3.141 |
+ |   79 |         3.019 |
+ |   80 |         2.902 |
+ |   81 |         2.789 |
+ |   82 |         2.681 |
+ |   83 |         2.577 |
+ |   84 |         2.477 |
+ |   85 |         2.381 |
+ |   86 |         2.288 |
+ |   87 |         2.199 |
+ |   88 |         2.114 |
+ |   89 |         2.032 |
+ |   90 |         1.953 |
+ |   91 |         1.877 |
+ |   92 |         1.804 |
+ |   93 |         1.734 |
+ |   94 |         1.667 |
+ |   95 |         1.602 |
+ |   96 |         4.040 |
+ |   97 |         3.883 |
+ |   98 |         3.732 |
+ |   99 |         3.587 |
+ |  100 |         3.448 |
+ |  101 |         3.314 |
+ |  102 |         3.185 |
+ |  103 |         3.062 |
+ |  104 |         2.943 |
+ |  105 |         2.828 |
+ |  106 |         2.719 |
+ |  107 |         2.613 |
+ |  108 |         2.512 |
+ |  109 |         2.414 |
+ |  110 |         2.320 |
+ |  111 |         2.230 |
+ |  112 |         2.144 |
+ |  113 |         2.060 |
+ |  114 |         1.980 |
+ |  115 |         1.903 |
+ |  116 |         1.830 |
+ |  117 |         1.758 |
+ |  118 |         1.690 |
+ |  119 |         1.625 |
+ |  120 |         4.061 |
+ |  121 |         3.904 |
+ |  122 |         3.752 |
+ |  123 |         3.606 |
+ |  124 |         3.466 |
+ |  125 |         3.332 |
+ |  126 |         3.202 |
+ |  127 |         3.078 |
+ |  128 |         2.958 |
+ |  129 |         2.844 |
+ |  130 |         2.733 |
+ |  131 |         2.627 |
+ |  132 |         2.525 |
+ |  133 |         2.427 |
+ |  134 |         2.333 |
+ |  135 |         2.242 |
+ |  136 |         2.155 |
+ |  137 |         2.071 |
+ |  138 |         1.991 |
+ |  139 |         1.914 |
+ |  140 |         1.839 |
+ |  141 |         1.768 |
+ |  142 |         1.699 |
+ |  143 |         1.633 |
+ |  144 |         4.070 |
+ +------+---------------+
+
+=head2 Same as previous example, but uses -r
+
+ % tabulate-drug-concentration -H 17.5 -p 144 -r2.5@24
+
+=head2 Same as previous example, but plot it (requires xyplot)
+
+ % tabulate-drug-concentration -H 17.5 -p 144 -r2.5@24 | xyplot -
+
+=head2 What if we dose 2.5mg every 12 hours?
+
+ % tabulate-drug-concentration -H 17.5 -p 144 -r2.5@12 | xyplot -
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-DrugUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-DrugUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-DrugUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

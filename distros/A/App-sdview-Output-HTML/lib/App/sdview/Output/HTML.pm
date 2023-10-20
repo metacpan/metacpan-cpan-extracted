@@ -8,9 +8,9 @@ use warnings;
 
 use Object::Pad 0.800;
 
-package App::sdview::Output::HTML 0.01;
+package App::sdview::Output::HTML 0.02;
 class App::sdview::Output::HTML
-   :does(App::sdview::Output)
+   :does(App::sdview::Output 0.13)
    :strict(params);
 
 use constant format => "HTML";
@@ -114,13 +114,15 @@ method _convert_str ( $s, $tag = undef )
 {
    return String::Tagged::HTML->clone(
       $s,
-      only_tags => [qw( B I C L )],
+      only_tags => [qw( bold italic monospace underline strikethrough link )],
       convert_tags => {
-         B => "strong",
-         I => "em",
-         C => "tt",
+         bold => "strong",
+         italic => "em",
+         monospace => "tt",
+         underline => "u",
+         strikethrough => "s",
          # TODO: F
-         L => sub ($t, $v) { a => { href => $v->{target} };
+         link => sub ($t, $v) { a => { href => $v->{target} };
          },
       },
    )->as_html( $tag );

@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
 require 5.008_001; # just as DBI
@@ -15,7 +13,7 @@ our @ISA = qw(DynaLoader);
 # SQL_DRIVER_VER is formatted as dd.dd.dddd
 # for version 5.x please switch to 5.00(_00) version numbering
 # keep $VERSION in Bundle/DBD/mysql.pm in sync
-our $VERSION = '4.050';
+our $VERSION = '5.001';
 
 bootstrap DBD::mysql $VERSION;
 
@@ -401,15 +399,6 @@ sub table_info ($) {
   $dbh->{mysql_server_prepare}= $mysql_server_prepare_save;
   return $sth;
 }
-
-sub _ListTables {
-  my $dbh = shift;
-  if (!$DBD::mysql::QUIET) {
-    warn "_ListTables is deprecated, use \$dbh->tables()";
-  }
-  return map { $_ =~ s/.*\.//; $_ } $dbh->tables();
-}
-
 
 sub column_info {
   my ($dbh, $catalog, $schema, $table, $column) = @_;
@@ -1062,16 +1051,12 @@ Example DSN:
 
 =item mysql_client_found_rows
 
-Enables (TRUE value) or disables (FALSE value) the flag CLIENT_FOUND_ROWS
-while connecting to the MySQL server. This has a somewhat funny effect:
-Without mysql_client_found_rows, if you perform a query like
+If TRUE (Default), sets the CLIENT_FOUND_ROWS flag when connecting to MySQL.
+This causes UPDATE statements to return the number of rows *matched*, not
+the number of rows actually changed.
 
-  UPDATE $table SET id = 1 WHERE id = 1;
-
-then the MySQL engine will always return 0, because no rows have changed.
-With mysql_client_found_rows however, it will return the number of rows
-that have an id 1, as some people are expecting. (At least for compatibility
-to other engines.)
+If you want the number of rows changed in response to an UPDATE statement,
+specify "mysql_client_found_rows=0" in the DSN.
 
 =item mysql_compression
 
@@ -1305,31 +1290,6 @@ Useful when you want to be sure that statement is going to be executed as
 server side prepared. Error message and code in case of failure is propagated
 back to DBI.
 
-=item mysql_embedded_options
-
-The option <mysql_embedded_options> can be used to pass 'command-line'
-options to embedded server.
-
-Example:
-
-  use DBI;
-  $testdsn="DBI:mysqlEmb:database=test;mysql_embedded_options=--help,--verbose";
-  $dbh = DBI->connect($testdsn,"a","b");
-
-This would cause the command line help to the embedded MySQL server library
-to be printed.
-
-
-=item mysql_embedded_groups
-
-The option <mysql_embedded_groups> can be used to specify the groups in the
-config file(I<my.cnf>) which will be used to get options for embedded server.
-If not specified [server] and [embedded] groups will be used.
-
-Example:
-
-  $testdsn="DBI:mysqlEmb:database=test;mysql_embedded_groups=embedded_server,common";
-
 =item mysql_conn_attrs
 
 The option <mysql_conn_attrs> is a hash of attribute names and values which can be
@@ -1339,8 +1299,6 @@ and 'program_name' is added by DBD::mysql.
 
 You can then later read these attributes from the performance schema tables which
 can be quite helpful for profiling your database or creating statistics.
-You'll have to use a MySQL 5.6 server and libmysqlclient or newer to leverage this
-feature.
 
   my $dbh= DBI->connect($dsn, $user, $password,
     { AutoCommit => 0,

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Iterator::Flex::Utils ':IterAttrs';
 use Ref::Util;
@@ -147,7 +147,7 @@ Iterator::Flex::Cycle - Array Cycle Iterator Class
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 METHODS
 

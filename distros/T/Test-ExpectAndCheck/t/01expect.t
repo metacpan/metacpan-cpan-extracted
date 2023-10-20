@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::Builder::Tester;
-use Test::More;
+use Test2::V0;
 
 use Test::ExpectAndCheck;
 
@@ -58,16 +58,25 @@ my ( $controller, $mock ) = Test::ExpectAndCheck->create;
 
 # will_return_using
 {
-   test_out q[ok 1 - $mock->three returns 3];
+   test_out q[ok 1 - args to ->will_return_using sub];
+   test_out q[ok 2 - $mock->three returns 3];
+   test_out q[ok 3 - ->will_return_using can modify args];
    test_out q[# Subtest: ->three];
-   test_out q[    ok 1 - ->three()];
+   test_out q[    ok 1 - ->three('abc')];
    test_out q[    1..1];
-   test_out q[ok 2 - ->three];
+   test_out q[ok 4 - ->three];
 
    my $result = 3;
-   $controller->expect( three => )
-      ->will_return_using( sub { return $result } );
-   is( $mock->three, 3, '$mock->three returns 3' );
+   $controller->expect( three => "abc" )
+      ->will_return_using( sub {
+         my ( $args ) = @_;
+         is( $args, [ "abc" ], 'args to ->will_return_using sub' );
+         $args->[0] = "def";
+         return $result;
+      } );
+   my $val = "abc";
+   is( $mock->three( $val ), 3, '$mock->three returns 3' );
+   is( $val, "def", '->will_return_using can modify args' );
    $controller->check_and_clear( '->three' );
 
    test_test 'three OK';

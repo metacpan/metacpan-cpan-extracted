@@ -1,16 +1,45 @@
 use v5.26;
 use Object::Pad;
+# ABSTRACT: Solidity address type interface
 
-package Blockchain::Ethereum::ABI::Type::Address 0.012;
+package Blockchain::Ethereum::ABI::Type::Address;
 class Blockchain::Ethereum::ABI::Type::Address
     :isa(Blockchain::Ethereum::ABI::Type)
     :does(Blockchain::Ethereum::ABI::TypeRole);
 
-=encoding utf8
+our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
+our $VERSION   = '0.013';          # VERSION
+
+method _configure { return }
+
+method encode {
+
+    return $self->_encoded if $self->_encoded;
+    $self->_push_static($self->pad_left(substr($self->data, 2)));
+
+    return $self->_encoded;
+}
+
+method decode {
+
+    return '0x' . substr $self->data->[0], -40;
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-Blockchain::Ethereum::ABI::Address - Interface for solidity address type
+Blockchain::Ethereum::ABI::Type::Address - Solidity address type interface
+
+=head1 VERSION
+
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -33,17 +62,11 @@ In most cases you don't want to use this directly, use instead:
 
 =back
 
-=cut
-
-method _configure { return }
+=head1 METHODS
 
 =head2 encode
 
 Encodes the given data to the type of the signature
-
-Usage:
-
-    encode() -> encoded string
 
 =over 4
 
@@ -51,23 +74,9 @@ Usage:
 
 ABI encoded hex string
 
-=cut
-
-method encode {
-
-    return $self->_encoded if $self->_encoded;
-    $self->_push_static($self->pad_left(substr($self->data, 2)));
-
-    return $self->_encoded;
-}
-
 =head2 decode
 
 Decodes the given data to the type of the signature
-
-Usage:
-
-    decoded() -> address
 
 =over 4
 
@@ -75,31 +84,16 @@ Usage:
 
 String 0x prefixed address
 
-=cut
-
-method decode {
-
-    return '0x' . substr $self->data->[0], -40;
-}
-
-1;
-
-__END__
-
 =head1 AUTHOR
 
-Reginaldo Costa, C<< <refeco at cpan.org> >>
+Reginaldo Costa <refeco@cpan.org>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to L<https://github.com/refeco/perl-ABI>
-
-=head1 LICENSE AND COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2022 by REFECO.
 
 This is free software, licensed under:
 
-  The MIT License
+  The MIT (X11) License
 
 =cut

@@ -210,7 +210,7 @@ sub new {
     $self->{'tab'}{'circular'}->SetSizer( $circular_sizer );
 
     my $pen_sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
-    $pen_sizer->AddSpacer(5);
+    $pen_sizer->AddSpacer( 5);
     $pen_sizer->Add( $self->{'line'},             0, $vert_attr, 10);
     $pen_sizer->Add( Wx::StaticLine->new( $self->{'tab'}{'pen'}, -1, [-1,-1], [ 135, 2] ),  0, $vert_attr, 10);
     $pen_sizer->Add( $self->{'color_flow'},       0, $vert_attr, 15);
@@ -222,7 +222,7 @@ sub new {
     $pen_sizer->Add( Wx::StaticText->new( $self->{'tab'}{'pen'}, -1, 'End Color', [-1,-1], [-1,-1], &Wx::wxALIGN_CENTRE_HORIZONTAL), 0, &Wx::wxALIGN_CENTER_HORIZONTAL|&Wx::wxGROW|&Wx::wxALL, 5);
     $pen_sizer->Add( $self->{'color'}{'end'},     0, $vert_attr, 0);
     $pen_sizer->Add( Wx::StaticLine->new( $self->{'tab'}{'pen'}, -1, [-1,-1], [ 135, 2] ),  0, $vert_attr, 10);
-    $pen_sizer->AddSpacer(10);
+    $pen_sizer->AddSpacer( 3);
     $pen_sizer->Add( $self->{'color'}{'startio'}, 0, $vert_attr,  5);
     $pen_sizer->Add( $self->{'color'}{'endio'},   0, $vert_attr,  5);
 
@@ -251,7 +251,7 @@ sub new {
     $cmds_sizer->Add( 0, 0, &Wx::wxEXPAND | &Wx::wxGROW);
 
     my $board_sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
-    $board_sizer->Add( $self->{'board'}, 0, $all_attr,  5);
+    $board_sizer->Add( $self->{'board'}, 1, $all_attr,  5);
     $board_sizer->Add( $cmdi_sizer,      0, $vert_attr, 5);
     $board_sizer->Add( 0, 5);
     $board_sizer->Add( Wx::StaticLine->new( $self, -1, [-1,-1], [ 125, 2] ),  0, $line_attr, 20);
@@ -264,12 +264,12 @@ sub new {
     #$setting_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
 
     my $main_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
-    $main_sizer->Add( $board_sizer, 0, &Wx::wxEXPAND, 0);
+    $main_sizer->Add( $board_sizer, 1, &Wx::wxEXPAND, 0);
     $main_sizer->Add( $setting_sizer, 1, &Wx::wxEXPAND|&Wx::wxLEFT, 10);
 
     $self->SetSizer($main_sizer);
     $self->SetAutoLayout( 1 );
-    my $size = [1260, 820];
+    my $size = [1230, 823];
     $self->SetSize($size);
     $self->SetMinSize($size);
     $self->SetMaxSize($size);

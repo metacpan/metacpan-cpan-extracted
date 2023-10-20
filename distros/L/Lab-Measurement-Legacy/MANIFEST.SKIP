@@ -1,0 +1,51 @@
+# Avoid version control files.
+\.gitignore$
+\.git$
+
+# Avoid Makemaker generated and utility files.
+\bMakefile$
+\bblib
+\bMakeMaker-\d
+\bpm_to_blib$
+\bblibdirs$
+^MYMETA\.yml$
+^MYMETA\.json$
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\bBuild.bat$
+\b_build
+.tar.gz$
+
+# Avoid tars and their unpacked directory trees
+^Lab-Measurement
+
+# Avoid temp and backup files.
+~$
+\.tmp$
+\.old$
+\.bak$
+\#$
+\b\.#
+
+# NYTProf profiling output
+nytprof
+
+# Devel::Cover output
+^cover_db
+
+# coding documentation not for distribution
+\bdoc\b
+
+# drivers and modules that are not ready yet for release
+
+# dont distribute the old examples
+^examples/Old
+
+# dont distribute the real world scripts
+^examples/RealWorld
+
+# not ready yet
+^lib/Lab/Instrument/AgilentE8362A.pm
+^lib/Lab/XPRESS/Sweep/SweepND.pm
+^lib/Lab/XPRESS/Sweep/VM_DIR.pm

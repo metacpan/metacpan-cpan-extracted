@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Parser.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/25
-## Modified 2022/03/25
-## All rights reserved
+## Modified 2023/09/08
+## All rights reserved.
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -28,7 +29,7 @@ BEGIN
     use HTTP::Promise::Headers;
     use HTTP::Promise::IO;
     use Module::Generic::File qw( sys_tmpdir );
-    use Nice::Try;
+    # use Nice::Try;
     use URI;
     use URI::Encode::XS;
     use Want;
@@ -73,7 +74,7 @@ BEGIN
     our $ERROR    = '';
     our $DEBUG    = 0;
     our $EXCEPTION_CLASS = 'HTTP::Promise::Exception';
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -502,7 +503,9 @@ sub parse_headers_xs($$)
     my $r = {};
     my $len;
     my $bkp_version;
-    try
+    # try-catch
+    local $@;
+    eval
     {
         if( $opts->{request} )
         {
@@ -530,10 +533,10 @@ sub parse_headers_xs($$)
             }
             $len = HTTP::Parser2::XS::parse_http_response( $$str, $r );
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error({ code => 400, message => $e, class => $EXCEPTION_CLASS }) );
+        return( $self->error({ code => 400, message => $@, class => $EXCEPTION_CLASS }) );
     }
     
     if( $len == -1 )
@@ -1110,7 +1113,7 @@ HTTP::Promise::Parser - Fast HTTP Request & Response Parser
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

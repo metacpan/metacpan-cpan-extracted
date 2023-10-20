@@ -20,7 +20,7 @@ our @ISA = qw(Math::BigInt Exporter);
 our @EXPORT_OK = qw/objectify/;
 my $class = 'Math::BigInt::Lite';
 
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 
 ##############################################################################
 # global constants, flags and accessory
@@ -1022,8 +1022,25 @@ sub blsft {
     $x;
 }
 
-##############################################################################
-# bitwise logical operators
+###############################################################################
+# Bitwise methods
+###############################################################################
+
+# Bitwise left shift.
+
+sub bblsft {
+    my ($class, $x, $y, @r) = ref($_[0]) ? (ref($_[0]), @_) : @_;
+    # For now, upgrade, but we should handle simple cases here. Fixme!
+    $upgrade -> bblsft($x, $y, @r);
+}
+
+# Bitwise right shift.
+
+sub bbrsft {
+    my ($class, $x, $y, @r) = ref($_[0]) ? (ref($_[0]), @_) : @_;
+    # For now, upgrade, but we should handle simple cases here. Fixme!
+    $upgrade -> bbrsft($x, $y, @r);
+}
 
 sub band {
     # AND two objects
@@ -1778,25 +1795,21 @@ You can also look for information at:
 
 =over 4
 
-=item * GitHub
+=item * GitHub Source Repository
 
-L<https://github.com/pjacklam/p5-Math-BigInt>
+L<https://github.com/pjacklam/p5-Math-BigInt-Lite>
 
 =item * RT: CPAN's request tracker
 
-L<https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt>
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigInt-Lite>
 
 =item * MetaCPAN
 
-L<https://metacpan.org/release/Math-BigInt>
+L<https://metacpan.org/release/Math-BigInt-Lite>
 
 =item * CPAN Testers Matrix
 
-L<http://matrix.cpantesters.org/?dist=Math-BigInt>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/dist/Math-BigInt>
+L<http://matrix.cpantesters.org/?dist=Math-BigInt-Lite>
 
 =back
 

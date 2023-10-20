@@ -8,8 +8,6 @@ lib/Parse/PlainConfig.pm
 lib/Parse/PlainConfig/Constants.pm
 lib/Parse/PlainConfig/Legacy.pm
 lib/Parse/PlainConfig/Settings.pm
-t/98_pod_coverage.t
-t/99_pod.t
 t/lib/01_include_me.conf
 t/lib/BadConf.pm
 t/lib/CStyle.pm
@@ -18,6 +16,9 @@ t/lib/NoDefaults.pm
 t/lib/mac.conf
 t/lib/msdos.conf
 t/lib/unix.conf
+t/lib/MyConf2.pm
+t/98_pod_coverage.t
+t/99_pod.t
 t/v2_01_ini.t
 t/v2_02_property.t
 t/v2_03_read.t
@@ -44,5 +45,7 @@ t/v3_06_c_style.t
 t/v3_07_unix.t
 t/v3_08_msdos.t
 t/v3_09_mac.t
+t/v3_10_subclass-init.t
+t/v3_11_subclass-parameters.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

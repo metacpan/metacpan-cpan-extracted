@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Voice;
-$Telegram::Bot::Object::Voice::VERSION = '0.023';
+$Telegram::Bot::Object::Voice::VERSION = '0.024';
 # ABSTRACT: The base class for Telegram 'Voice' type objects
 
 
@@ -29,7 +29,7 @@ Telegram::Bot::Object::Voice - The base class for Telegram 'Voice' type objects
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 DESCRIPTION
 

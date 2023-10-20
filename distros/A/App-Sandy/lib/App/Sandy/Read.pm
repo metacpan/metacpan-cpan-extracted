@@ -8,7 +8,7 @@ use constant NUM_TRIES => 1000;
 
 with 'App::Sandy::Role::BSearch';
 
-our $VERSION = '0.24'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 has 'sequencing_error' => (
 	is         => 'ro',
@@ -216,7 +216,7 @@ App::Sandy::Read - Base class to simulate reads
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 AUTHORS
 

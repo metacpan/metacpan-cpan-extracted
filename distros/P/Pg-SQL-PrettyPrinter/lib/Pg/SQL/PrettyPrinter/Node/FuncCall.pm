@@ -266,7 +266,8 @@ sub as_text {
         $args_as_text[ -1 ] = 'VARIADIC ' . $args_as_text[ -1 ];
     }
     my $args_str = join( ', ', @args_as_text );
-    $args_str .= ' ' . $agg_order if $agg_order;
+    $args_str .= ' ' . $agg_order       if $agg_order;
+    $args_str = 'DISTINCT ' . $args_str if $self->{ 'agg_distinct' };
     return $self->func_name . '( ' . $args_str . ' )' . $suffix;
 }
 
@@ -303,6 +304,9 @@ sub pretty_print {
     if (   ( 1 == scalar @{ $self->{ 'args' } } )
         && ( 40 > length( $args_str ) ) )
     {
+        if ( $self->{ 'agg_distinct' } ) {
+            $args_str = 'DISTINCT ' . $args_str;
+        }
         return $self->func_name . '( ' . $args_str . ' )' . $suffix;
     }
     my @lines = ();
@@ -310,6 +314,9 @@ sub pretty_print {
     my @args_pp = map { $_->pretty_print } @{ $self->{ 'args' } };
     if ( $self->{ 'func_variadic' } ) {
         $args_pp[ -1 ] = 'VARIADIC ' . $args_pp[ -1 ];
+    }
+    if ( $self->{ 'agg_distinct' } ) {
+        $args_pp[ 0 ] = 'DISTINCT ' . $args_pp[ 0 ];
     }
     push @lines, map { $self->increase_indent( $_ ) . ',' } @args_pp;
     $lines[ -1 ] =~ s/,\z//;

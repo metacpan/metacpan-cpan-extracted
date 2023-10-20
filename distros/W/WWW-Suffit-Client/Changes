@@ -1,4 +1,7 @@
 # Version/Revision history
 
+1.01 Fri 22 Sep 2023 18:42:48 MSK
+    * Added the pubkey method to V1 module
+
 1.00 Fri 21 Jul 2023 14:44:55 MSK
     * Initial release

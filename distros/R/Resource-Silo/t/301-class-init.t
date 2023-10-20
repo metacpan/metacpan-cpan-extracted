@@ -29,8 +29,10 @@ resource literal =>
     class           => 'My::Class',
     dependencies    => { life => 1, fine => \137 };
 
+my $container = ref silo;
+
 subtest 'happy path' => sub {
-    my $container = silo->new;
+    my $container = $container->new;
 
     is $INC{'My/Class.pm'}, undef, "module not loaded";
 
@@ -43,7 +45,7 @@ subtest 'happy path' => sub {
 };
 
 subtest 'pass literal value' => sub {
-    my $container = silo->new;
+    my $container = $container->new;
     my $item = $container->literal;
     is $item->{life}, 42, "abbreviated dependency works";
     is $item->{fine}, 137, "literal value in dependency works";

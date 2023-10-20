@@ -11,8 +11,8 @@ package Spreadsheet::Edit::Log;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.006'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-09-06'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.009'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-09-23'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 
@@ -21,40 +21,45 @@ our @EXPORT = qw/fmt_call log_call fmt_methcall log_methcall
                  nearest_call abbrev_call_fn_ln_subname/;
 
 sub _btwTN($$@) {
-  my $pfx=shift; my $N=shift; local $_ = join("",@_);
+  local ($@, $_); # dont clobber callers variables
+  my $pfxexpr=shift; my $N=shift; local $_ = join("",@_);
   s/\n\z//s;
   my ($package, $path, $lno) = caller($N);
   (my $fname = $path) =~ s/.*[\\\/]//;
   (my $pkg = $package) =~ s/.*:://;
-  my $s = eval "\"${pfx}\"";
-  confess "ERROR IN btw prefix '$pfx': $@" if $@;
+  my $s = eval "\"${pfxexpr}\"";
+  confess "ERROR IN btw prefix '$pfxexpr': $@" if $@;
   printf "%s %s\n", $s, $_;
 }
 
-sub _genbtw($$) {
+sub _genbtw_funcs($$) {
   my ($pkg, $pfx) = @_;
-  my $btw  = eval{ sub(@) { unshift @_,$pfx,0; goto &_btwTN } } // die $@;
   no strict 'refs';
-  *{"${pkg}::btw"} = \&$btw;
-}
-sub _genbtwN($$) {
-  my ($pkg, $pfx) = @_;
   my $btwN  = eval{ sub($@) { unshift @_,$pfx; goto &_btwTN } } // die $@;
-  no strict 'refs';
+  my $btw   = eval{ sub(@)  { unshift @_,0 ; goto &{"${pkg}::btwN"} } } // die $@;
   *{"${pkg}::btwN"} = \&$btwN;
+  *{"${pkg}::btw"}  = \&$btw;
 }
 BEGIN {
-  _genbtw(__PACKAGE__,'$lno:');
-  _genbtwN(__PACKAGE__,'$lno:');
+  _genbtw_funcs(__PACKAGE__,'$lno:');  # Generate versions used when imported the usual way
 }
 
 sub import {
   my $class = shift;
   my $pkg = caller;
   my @remaining_args;
-  foreach(@_) {
-    if (/:btw=(.*)/)     { _genbtw($pkg,$1) }
-    elsif (/:btwN=(.*)/) { _genbtwN($pkg,$1) }
+  foreach (@_) {
+    local $_ = $_; # mutable copy
+    # Generate customized version of btwN() (called by btw) which uses an
+    # arbitrary prefix expression.  The expression is eval'd each time, referencing
+    # variables $path $fname $lno $package .
+    if (/:btwN=(.*)/) {
+      warn ":btwN is deprecated,\njust use :btw=... and both btw() and btwN() will be generated\n";
+      $_ = ":btw=$1";
+    }
+    if (/:btw=(.*)/) {
+      _genbtw_funcs($pkg,$1);
+    }
     else {
       push @remaining_args, $_;
     }

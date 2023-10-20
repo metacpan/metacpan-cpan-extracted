@@ -1,0 +1,8 @@
+Revision history for Net-Versa-Director
+
+0.002000  2023-10-11 14:34:40+02:00 Europe/Vienna
+    - change get_director_info API endpoint
+      because the previous isn't accessible with a tenant user
+
+0.001000  2023-10-09 17:08:19+02:00 Europe/Vienna
+    - initial release

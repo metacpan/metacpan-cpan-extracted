@@ -7,10 +7,11 @@ extends 'Example::View::JS';
 has 'account' => ( is=>'ro', required=>1 );
 
 sub get_form_html($self) {
-  return my $form = $self->ctx->view(
+  my $content = $self->ctx->view(
     'HTML::Account::Form',
-    account=>$self->account
+    account => $self->account
   )->get_rendered;
+  return $self->escape_javascript($content);
 }
 
 1;

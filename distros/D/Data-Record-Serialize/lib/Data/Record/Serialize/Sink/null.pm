@@ -2,11 +2,12 @@ package Data::Record::Serialize::Sink::null;
 
 # ABSTRACT: send output to nowhere.
 
+use v5.12;
 use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 
 
@@ -46,7 +47,7 @@ Data::Record::Serialize::Sink::null - send output to nowhere.
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 
@@ -62,6 +63,8 @@ B<Data::Record::Serialize::Sink::stream> sends data to the bitbucket.
 
 It performs the L<Data::Record::Serialize::Role::Sink> role.
 
+=head1 INTERNALS
+
 =for Pod::Coverage print
  say
  close
@@ -70,7 +73,7 @@ It performs the L<Data::Record::Serialize::Role::Sink> role.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>
 
 =head2 Source
 

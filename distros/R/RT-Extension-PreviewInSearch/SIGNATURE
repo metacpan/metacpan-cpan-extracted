@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.88.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,35 +12,41 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 03a49f044db056da64784af13c3f84a8d93c23ac Changes
-SHA1 44acb7ae0ffcec32bd764a1326d501ee6623c069 MANIFEST
-SHA1 28b1f10e72814d61b02967e5ecdaece01db57dfc META.yml
-SHA1 cce36fa22630e9a325720718144c4d87aa231a14 Makefile.PL
-SHA1 ed32c40481c9526def3572b263045b41f82cc836 README
-SHA1 513c9bbddbfbb4363f861c6e9f4266e7f7dd0539 doc/images/preview-screenshot.png
-SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 html/Callbacks/RT-Extension-PreviewInSearch/Search/Results.html/AfterResults
-SHA1 e024245f81d6c573558497e5b13f21d8b48dc7e4 html/Callbacks/RT-Extension-PreviewInSearch/Search/Results.html/BeforeResults
-SHA1 ae5691feaf7096d74084e281e6647a6266b69754 html/Helpers/TicketPreview
-SHA1 d2664c57b65686abbfbbe1e71229761625be4922 inc/Module/Install.pm
-SHA1 da41a8d9904f7b409b49a5f6c338d3eb305a2b4b inc/Module/Install/Base.pm
-SHA1 0db0afe19cd298abba248fa089e5525bd5ab3ab6 inc/Module/Install/Can.pm
-SHA1 e7152bfd5ca67d0e33f96d09c59d600bca5c1f15 inc/Module/Install/Fetch.pm
-SHA1 bd2183c72617105d0b65f3ef81d013bf4af337d6 inc/Module/Install/Include.pm
-SHA1 29ee1cb0dc262b00983e3a2f5cf00b538dff5069 inc/Module/Install/Makefile.pm
-SHA1 e963f80cfe255f16e55067d1feb6841cff3ed2fe inc/Module/Install/Metadata.pm
-SHA1 2e6d9ed3ead010223a770841a5944e7ae5d1dc7a inc/Module/Install/RTx.pm
-SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 65a1f09af1f4f9e47a98b6b45667c328b1b2f9c0 inc/Module/Install/Win32.pm
-SHA1 f191c49475b3f51775180cd4f7e41e3bdab7f85a inc/Module/Install/WriteAll.pm
-SHA1 7173d20065379a781d0218b7e747ca7a9b11f7a0 inc/YAML/Tiny.pm
-SHA1 8165d6b758b309d0f5f24014b03d4aab02a7b4b9 lib/RT/Extension/PreviewInSearch.pm
+SHA256 6f5ecd1491be5cbb29ee0c0c997af95879cdc9c9afeb0878e2bf2ce03ca4a46b Changes
+SHA256 f7235f05814c19161ed096e53de534efb0f40cb26baa5544fa1f5fbf2cfe61eb MANIFEST
+SHA256 250556fabffa48a4245f3038629ae7420b9f820b1ef4d8be4416dc8bb2309049 META.yml
+SHA256 2b61ae78f68ccc6ddcc49712151bd444ac3cfa7c5167eed45b419416489046da Makefile.PL
+SHA256 a853b0e11dc408cbee1a4da4a71971512704c8498e638d527436e6116dff1ea7 README
+SHA256 2af5a483e173f6e596b5105b02b0454bb878180261dde6656653710760b29df3 doc/images/preview-screenshot.png
+SHA256 021d29dc2d28c8c3cc82b167cb9953b3c00141fcaa784ec07e1cfd68ea1aaab7 etc/upgrade/remove_files
+SHA256 10a35ea3048f22e748131419e9f9a565013f58209271d9d50aa3e15ac298c78d html/Callbacks/RT-Extension-PreviewInSearch/Elements/ShowHistoryPage/ModifyPaths
+SHA256 47b2d8719969c23961555aba172d92d5524c3cbbc3070bc743014497f1520d16 html/Callbacks/RT-Extension-PreviewInSearch/Search/Results.html/AfterResults
+SHA256 7f22233919226eb8481f9c6d02084ed8fbda217de15dbc9202e6264a41b29263 html/Helpers/TicketPreview
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 aa71b16c882fd2d8af83ac3e9761ef314bb45627905359435ae986d3129b199a inc/Module/Install/Include.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 492f566c84b3db9340895ef53f31f0d83310feb01f0362db28b9d579ef90e01a inc/Module/Install/RTx.pm
+SHA256 79041c4e1ae77b609f87c0c5e180466598fef1597557097ba976b5ba9a67863a inc/Module/Install/RTx/Remove.pm
+SHA256 a7c5323f81fc052097b0470bd3e6e7e2de2ac9d90c59646948d89c4c7e46cfe6 inc/Module/Install/RTx/Runtime.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 13657f8f62b45bf40c807d21be76ef3bcd17162b2b29c6b286f321ce90034524 inc/YAML/Tiny.pm
+SHA256 0165a5ea27de5cc87a182c7369dc59314e4893eb844296381d96761127463a6c lib/RT/Extension/PreviewInSearch.pm
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAlT40/wACgkQMflWJZZAbqAJ6QCeNI08aZRiblFH6oKt0niopNyI
-fCoAoIezVHBbaY23hZjGCIbXjBOhtfKW
-=YVuL
+iQEzBAEBCAAdFiEExJs3Lyv4ShkBFmAnDfCig/6sgLIFAmUTGHcACgkQDfCig/6s
+gLL6Hgf+PQ5k3FubNf0uK2IhNeVxIOsxVkFaH6/P2o3+lh5S7ceTa3/5O5gr4jnL
+qhCL8EbgdiPfdGEDhN0zR7SyuAwWMid1rgbZLYxrM71YBOb8xMwOdQa9yd4lo/mH
+vxcPB9kM9VwCkrDkHLVm4tAHwQpVvRQLfYTbs2DYtyF4Jjq4XvIds4i2HrDhl7FY
+ZRv/ZujUUomniG2B2fkC2M0B9p3A48MuKT1gbRQ+1AEtElCyY1mHImq/fOAOj7QJ
+hVVY2KaMWnrfCvEjsT1vkWXeYpHcW7QYBzJdn2gho7bpQKdm02ZHfOQaGJAK42SB
+16gnmWN92crSnuuTSWhlXAz0vrSmDA==
+=4KUu
 -----END PGP SIGNATURE-----

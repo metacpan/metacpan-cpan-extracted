@@ -4,7 +4,7 @@
       "Michael Conrad <mconrad@intellitree.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -62,7 +62,7 @@
          "web" : "https://github.com/nrdvana/perl-DBIx-Class-ResultDDL"
       }
    },
-   "version" : "2.03",
+   "version" : "2.04",
    "x_contributors" : [
       "Veesh Goldman <rabbiveesh@gmail.com>"
    ],

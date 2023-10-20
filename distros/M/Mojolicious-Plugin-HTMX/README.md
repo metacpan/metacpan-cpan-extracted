@@ -71,4 +71,4 @@ Using App::cpanminus:
 
 ## Copyright
 
-Copyright (C) 2022 by Giuseppe Di Terlizzi
+Copyright (C) 2022-2023 by Giuseppe Di Terlizzi

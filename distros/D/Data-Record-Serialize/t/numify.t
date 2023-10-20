@@ -13,31 +13,27 @@ subtest "default behavior" => sub {
     my $drs;
     ok(
         lives {
-            $drs = Data::Record::Serialize->new(
-                encode => '+My::Test::Encode::store',
-            )
+            $drs = Data::Record::Serialize->new( encode => '+My::Test::Encode::store', )
         },
         'construct object'
     ) or note $@;
 
-    is( $drs->numified, [],
-        "no numified fields prior to sending first record" );
+    is( $drs->numified, [], "no numified fields prior to sending first record" );
 
     # prime @fields to get the correct types
     $drs->send( { number => 1.1, string => 'string', integer => 1 } );
 
-    is( $drs->numified, [],
-        "no numified fields after sending first record" );
+    is( $drs->numified, [], "no numified fields after sending first record" );
 
     $drs->send( { number => "1.1", string => 3, integer => "1" } );
 
-    SKIP : {
+  SKIP: {
         skip 'Need Convert::Scalar' unless $have_Convert_Scalar;
         subtest "no output fields numified" => sub {
             my $output = $drs->output->[-1];
-            ok( is_string( $output->{number} ), 'number' );
+            ok( is_string( $output->{number} ),  'number' );
             ok( is_string( $output->{integer} ), 'integer' );
-            ok( is_number( $output->{string} ), 'string' );
+            ok( is_number( $output->{string} ),  'string' );
         };
     }
 
@@ -74,13 +70,13 @@ subtest "numify boolean" => sub {
     # these will be numified
     $drs->send( { integer => "1", string => 3, number => "2.2" } );
 
-    SKIP : {
+  SKIP: {
         skip 'Need Convert::Scalar' unless $have_Convert_Scalar;
         subtest "proper output fields numified" => sub {
             my $output = $drs->output->[-1];
-            ok( is_number( $output->{number} ), 'number' );
+            ok( is_number( $output->{number} ),  'number' );
             ok( is_number( $output->{integer} ), 'integer' );
-            ok( is_number( $output->{string} ), 'string' );
+            ok( is_number( $output->{string} ),  'string' );
         };
     }
 
@@ -106,7 +102,7 @@ subtest "bad field name" => sub {
     ok(
         lives {
             $drs = Data::Record::Serialize->new(
-                encode  => '+My::Test::Encode::store',
+                encode => '+My::Test::Encode::store',
                 numify => ['foobar'] )
         },
         'construct object'
@@ -122,7 +118,7 @@ subtest "bad field name" => sub {
         ['Data::Record::Serialize::Error::Role::Base::fields'],
         "send: caught bad numification field error"
     );
-    like ( $error, qr/foobar/, 'identified bad field name' );
+    like( $error, qr/foobar/, 'identified bad field name' );
 
     $error = dies { $drs->numified };
     isa_ok(
@@ -130,7 +126,7 @@ subtest "bad field name" => sub {
         ['Data::Record::Serialize::Error::Role::Base::fields'],
         "numified: caught bad numification field error"
     );
-    like ( $error, qr/foobar/, 'identified bad field name' );
+    like( $error, qr/foobar/, 'identified bad field name' );
 
 
 };
@@ -141,7 +137,7 @@ subtest "numify sub" => sub {
     ok(
         lives {
             $drs = Data::Record::Serialize->new(
-                encode  => '+My::Test::Encode::store',
+                encode => '+My::Test::Encode::store',
                 numify => sub { shift->numeric_fields },
             )
         },
@@ -164,13 +160,13 @@ subtest "numify sub" => sub {
 
     $drs->send( { integer => "1", string => 3, number => "2.2" } );
 
-    SKIP : {
+  SKIP: {
         skip 'Need Convert::Scalar' unless $have_Convert_Scalar;
         subtest "proper output fields numified" => sub {
             my $output = $drs->output->[-1];
-            ok( is_number( $output->{number} ), 'number' );
+            ok( is_number( $output->{number} ),  'number' );
             ok( is_number( $output->{integer} ), 'integer' );
-            ok( is_number( $output->{string} ), 'string' );
+            ok( is_number( $output->{string} ),  'string' );
         };
     }
 

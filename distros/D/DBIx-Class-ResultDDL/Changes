@@ -1,3 +1,10 @@
+2.04 - 2023-09-27
+  - Enhancements to SchemaLoaderMixin:
+    - Pass '$class' to 'generate_resultddl_import_line'
+    - Handle undef values when deparsing to perl source
+    - Add 'nvarchar', 'nchar', 'binary', 'varbinary' to the
+      types it attempts to replace with sugar functions.
+
 2.03 - 2023-01-02
   - Fix SchemaLoaderMixin for earlier versions of perl
 

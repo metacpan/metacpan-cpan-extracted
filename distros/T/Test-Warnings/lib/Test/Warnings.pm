@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Test::Warnings; # git description: v0.030-6-gf367162
+package Test::Warnings; # git description: v0.031-5-g17d6729
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Test for warnings and the lack of them
 # KEYWORDS: testing tests warnings
 
-our $VERSION = '0.031';
+our $VERSION = '0.032';
 
 use parent 'Exporter';
 use Test::Builder;
@@ -143,8 +143,15 @@ sub allowing_warnings() { $warnings_allowed }
 
 # call at any time to assert no (unexpected) warnings so far
 sub had_no_warnings(;$) {
-    _builder->ok(!$forbidden_warnings_found, shift || 'no (unexpected) warnings');
-    if ($report_warnings and $forbidden_warnings_found) {
+    if ($ENV{PERL_TEST_WARNINGS_ONLY_REPORT_WARNINGS}) {
+        $forbidden_warnings_found
+            and _builder->diag("Found $forbidden_warnings_found warnings but allowing them because PERL_TEST_WARNINGS_ONLY_REPORT_WARNINGS is set");
+    }
+    else {
+        _builder->ok(!$forbidden_warnings_found, shift || 'no (unexpected) warnings');
+    }
+    if (($report_warnings or $ENV{PERL_TEST_WARNINGS_ONLY_REPORT_WARNINGS})
+          and $forbidden_warnings_found) {
         _builder->diag("Got the following unexpected warnings:");
         for my $i (1 .. @collected_warnings) {
             _builder->diag("  $i: $collected_warnings[ $i - 1 ]");
@@ -166,7 +173,7 @@ Test::Warnings - Test for warnings and the lack of them
 
 =head1 VERSION
 
-version 0.031
+version 0.032
 
 =head1 SYNOPSIS
 
@@ -355,6 +362,15 @@ and rely on the end-of-tests check otherwise.
 
 When used, C<had_no_warnings()> will print all the unexempted warning content, in case it had been suppressed
 earlier by other captures (such as L<Test::Output/stderr_like> or L<Capture::Tiny/capture>).
+
+=head1 OTHER OPTIONS
+
+You can temporarily turn off the failure behaviour of this module, swapping it out for reporting
+(see C<:report_warnings> above) with:
+
+  $ENV{PERL_TEST_WARNINGS_ONLY_REPORT_WARNINGS} = 1;
+
+This can be useful for working around problematic modules that have warnings in newer Perl versions.
 
 =head1 CAVEATS
 

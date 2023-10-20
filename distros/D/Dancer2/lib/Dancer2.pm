@@ -1,5 +1,5 @@
 package Dancer2;
-$Dancer2::VERSION = '0.400001';
+$Dancer2::VERSION = '1.0.0';
 # ABSTRACT: Lightweight yet powerful web application framework
 
 use 5.12.0;
@@ -129,7 +129,7 @@ Dancer2 - Lightweight yet powerful web application framework
 
 =head1 VERSION
 
-version 0.400001
+version 1.0.0
 
 =head1 DESCRIPTION
 
@@ -206,11 +206,25 @@ how to convert a Dancer (1) based application to Dancer2.
 
 =over
 
-=item * Git Guide
+=item * Core and Community Policy, and Standards of Conduct
 
-The L<Git guide|GitGuide> describes how to set up your development environment to contribute
-to the development of Dancer2, Dancer2's Git workflow, submission guidelines, and
-various coding standards.
+The L<Dancer core and community policy, and standards of conduct|Dancer2::Policy> defines
+what constitutes acceptable behavior in our community, what behavior is considered
+abusive and unacceptable, and what steps will be taken to remediate inappropriate
+and abusive behavior. By participating in any public forum for Dancer or its
+community, you are agreeing to the terms of this policy.
+
+=item * GitHub Wiki
+
+Our L<GitHub wiki|https://github.com/PerlDancer/Dancer2/wiki> has community-contributed
+documentation, as well as other information that doesn't quite fit within
+this manual.
+
+=item * Contributing
+
+The L<contribution guidelines|https://github.com/PerlDancer/Dancer2/blob/master/Contributing.md> describe
+how to set up your development environment to contribute to the development of Dancer2,
+Dancer2's Git workflow, submission guidelines, and various coding standards.
 
 =item * Deprecation Policy
 
@@ -220,16 +234,10 @@ for guiding and shaping future development of Dancer2.
 
 =back
 
-=head1 FUNCTIONS
-
-=head2 my $runner=runner();
-
-Returns the current runner. It is of type L<Dancer2::Core::Runner>.
-
 =head1 SECURITY REPORTS
 
 If you need to report a security vulnerability in Dancer2, send all pertinent
-information to L<mailto:dancer-security@dancer.pm>. These matters are taken
+information to L<dancer-security@dancer.pm|mailto:dancer-security@dancer.pm>. These matters are taken
 extremely seriously, and will be addressed in the earliest timeframe possible.
 
 =head1 SUPPORT
@@ -246,6 +254,7 @@ We are also on IRC: #dancer on irc.perl.org.
 
     Alberto Simões
     Alexis Sukrieh
+    D Ruth Holloway (GeekRuthie)
     Damien Krotkine
     David Precious
     Franck Cuny
@@ -255,12 +264,12 @@ We are also on IRC: #dancer on irc.perl.org.
     Russell Jenkins
     Sawyer X
     Stefan Hornburg (Racke)
-    Steven Humphrey
     Yanick Champoux
 
 =head2 CORE DEVELOPERS EMERITUS
 
     David Golden
+    Steven Humphrey
 
 =head2 CONTRIBUTORS
 
@@ -313,10 +322,12 @@ We are also on IRC: #dancer on irc.perl.org.
     Dinis Rebolo
     dtcyganov
     Elliot Holden
+    Emil Perhinschi
     Erik Smit
     Fayland Lam
     ferki
     Gabor Szabo
+    GeekRuthie
     geistteufel
     Gideon D'souza
     Gil Magno
@@ -358,6 +369,7 @@ We are also on IRC: #dancer on irc.perl.org.
     Mateu X Hunter
     Matt Phillips
     Matt S Trout
+    mauke
     Maurice
     MaxPerl
     Ma_Sys.ma
@@ -397,6 +409,7 @@ We are also on IRC: #dancer on irc.perl.org.
     Snigdha
     Steve Bertrand
     Steve Dondley
+    Steven Humphrey
     Tatsuhiko Miyagawa
     Timothy Alexis Vass
     Tina Müller

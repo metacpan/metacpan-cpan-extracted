@@ -235,6 +235,7 @@ use Syntax::Keyword::Defer;
    is($e, "Oopsie\n", 'Thrown exception still occurs after defer');
 }
 
+# unimport
 {
    no Syntax::Keyword::Defer;
 

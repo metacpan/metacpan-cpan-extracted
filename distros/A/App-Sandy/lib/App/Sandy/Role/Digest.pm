@@ -14,7 +14,7 @@ use List::Util 'uniq';
 
 requires qw/default_opt opt_spec rm_opt/;
 
-our $VERSION = '0.24'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 use constant {
 	COUNT_LOOPS_BY_OPT    => ['coverage', 'number-of-reads'],
@@ -496,7 +496,7 @@ App::Sandy::Role::Digest - Wrapper on Simulator class for genome/transcriptome s
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 AUTHORS
 

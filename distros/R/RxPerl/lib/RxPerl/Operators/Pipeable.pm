@@ -20,7 +20,7 @@ our @EXPORT_OK = qw/
     op_audit op_audit_time op_buffer op_buffer_count op_buffer_time op_catch_error op_combine_latest_with op_concat_all
     op_concat_map op_concat_with op_count op_debounce op_debounce_time op_default_if_empty op_delay op_delay_when
     op_distinct op_distinct_until_changed op_distinct_until_key_changed op_element_at op_end_with op_every
-    op_exhaust_all op_exhaust_map op_filter op_finalize op_find op_find_index op_first op_group_by op_ignore_elements
+    op_exhaust_all op_exhaust_map op_filter op_finalize op_find op_find_index op_first op_ignore_elements
     op_is_empty op_last op_map op_map_to op_max op_merge_all op_merge_map op_merge_with op_min op_multicast
     op_on_error_resume_next_with op_pairwise op_pluck op_race_with op_reduce op_ref_count op_repeat op_retry op_sample
     op_sample_time op_scan op_share op_single op_skip op_skip_last op_skip_until op_skip_while op_start_with
@@ -29,7 +29,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.27.1";
+our $VERSION = "v6.28.0";
 
 sub op_audit {
     my ($duration_selector) = @_;
@@ -900,57 +900,6 @@ sub op_first {
         unshift @pipes, op_filter($condition) if defined $condition;
 
         return $source->pipe(@pipes);
-    };
-}
-
-sub op_group_by {
-    my ($key_fn) = @_;
-
-    return sub {
-        my ($source) = @_;
-
-        return rx_observable->new(sub {
-            my ($subscriber) = @_;
-
-            my %observables;
-            my @observables;
-            my $stop_producing_observables;
-
-            $subscriber->subscription->add(sub {
-                $stop_producing_observables = 1;
-            });
-
-            my $own_subscriber = {
-                # %$subscriber,
-                next     => sub {
-                    my ($v) = @_;
-
-                    my $key = do { local $_ = $v; $key_fn->($v); };
-                    $observables{$key} //= do {
-                        my $new_obs = rx_subject->new;
-                        push @observables, $new_obs;
-                        $subscriber->{next}->($new_obs);
-                        $new_obs;
-                    } unless $stop_producing_observables;
-                    $observables{$key}{next}->($v) if exists $observables{$key} and defined $observables{$key}{next};
-                },
-                error    => sub {
-                    $subscriber->{error}->() if defined $subscriber->{error};
-                },
-                complete => sub {
-                    for my $val (@observables) {
-                        $val->{complete}->() if defined $val->{complete};
-                    }
-                    $subscriber->{complete}->() if defined $subscriber->{complete};
-                    undef @observables;
-                    %observables = ();
-                },
-            };
-
-            $source->subscribe($own_subscriber);
-
-            return;
-        });
     };
 }
 

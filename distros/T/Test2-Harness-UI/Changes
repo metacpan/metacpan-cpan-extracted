@@ -1,3 +1,29 @@
+0.000144  2023-10-10 12:51:53-07:00 America/Los_Angeles
+
+    - Fix accidental code deletion from Sync
+
+0.000143  2023-10-10 10:47:30-07:00 America/Los_Angeles
+
+    - Sync has_coverage
+
+0.000142  2023-09-28 08:49:37-07:00 America/Los_Angeles
+
+    - Work harder at uploading results
+
+0.000141  2023-09-20 13:21:43-07:00 America/Los_Angeles
+
+    - Make it so sync will skip bad runs on import, allowing the process to continue
+
+0.000140  2023-09-19 10:26:15-07:00 America/Los_Angeles
+
+    - Fix Changes file
+
+0.000139  2023-09-19 10:08:29-07:00 America/Los_Angeles
+
+    - Fix some typos and docs
+    - Fix /view/username and similar urls
+    - Fix sort order on runs
+
 0.000138  2023-08-29 14:39:30-07:00 America/Los_Angeles
 
     - Fix issue where duplication occurs on disconnect/reconnect

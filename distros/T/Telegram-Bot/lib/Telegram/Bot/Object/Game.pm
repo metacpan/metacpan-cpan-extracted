@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Game;
-$Telegram::Bot::Object::Game::VERSION = '0.023';
+$Telegram::Bot::Object::Game::VERSION = '0.024';
 # ABSTRACT: The base class for Telegram message 'Game' type.
 
 
@@ -39,7 +39,7 @@ Telegram::Bot::Object::Game - The base class for Telegram message 'Game' type.
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,23 @@
+0.0.7 2023-10-05 01:27:42-0400
+
+  Features
+
+   - Add object detection demo. See <https://github.com/EntropyOrg/perl-AI-TensorFlow-Libtensorflow/pull/23>.
+
+  Refactoring
+
+   - Add timer to the notebooks to time the inference steps. See <https://github.com/EntropyOrg/perl-AI-TensorFlow-Libtensorflow/pull/17>.
+
+  Documentation
+
+   - Add information about installing GPU version of `libtensorflow` either on
+     the "bare metal" or with Docker GPU runtime support. See <https://github.com/EntropyOrg/perl-AI-TensorFlow-Libtensorflow/pull/18>.
+
+  Build changes
+
+   - Add Dockerfile that builds GPU version of the omnibus notebook image.
+     Update the CI to additionally build the GPU Docker image. See <https://github.com/EntropyOrg/perl-AI-TensorFlow-Libtensorflow/pull/16>.
+
 0.0.6 2023-01-30 15:22:04-0500
 
   - Documentation

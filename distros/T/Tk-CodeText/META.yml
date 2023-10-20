@@ -28,5 +28,5 @@ requires:
   Tk::PopList: '0.04'
 resources:
   repository: git://github.com/haje61/Tk-CodeText.git
-version: '0.42'
+version: '0.45'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -31,7 +31,7 @@
       "runtime" : {
          "requires" : {
             "Bit::Vector" : "0",
-            "Math::BigInt" : "1.999838"
+            "Math::BigInt" : "1.99984"
          }
       },
       "test" : {
@@ -48,6 +48,6 @@
          "web" : "https://github.com/pjacklam/p5-Math-BigInt-BitVect"
       }
    },
-   "version" : "1.20",
+   "version" : "1.21",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -7,7 +7,7 @@ SYNOPSIS
      my $obj = PYX::Hist->new(%parameters);
      $obj->parse($pyx, $out);
      $obj->parse_file($input_file, $out);
-     $obj->parse_handle($input_file_handler, $out);
+     $obj->parse_handler($input_file_handler, $out);
 
 METHODS
   "new"
@@ -19,6 +19,8 @@ METHODS
 
              Output handler.
              Default value is \*STDOUT.
+
+    Returns instance of object.
 
   "parse"
      $obj->parse($pyx, $out);
@@ -37,7 +39,7 @@ METHODS
     Returns undef.
 
   "parse_handler"
-     $obj->parse_handle($input_file_handler, $out);
+     $obj->parse_handler($input_file_handler, $out);
 
     Parse PYX handler and print histogram of PYX input. If $out not present,
     use 'output_handler'.
@@ -175,5 +177,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.07
+    0.08
 

@@ -5,7 +5,7 @@ use base 'PDF::API2::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '2.044'; # VERSION
+our $VERSION = '2.045'; # VERSION
 
 use Carp;
 use Compress::Zlib ();
@@ -1475,6 +1475,8 @@ sub shade {
 
 Places an image or other external object (a.k.a. XObject) on the page in the
 specified location.
+
+If C<$x> and C<$y> are omitted, the object will be placed at C<[0, 0]>.
 
 For images, C<$scale_x> and C<$scale_y> represent the width and height of the
 image on the page in points.  If C<$scale_x> is omitted, it will default to 72

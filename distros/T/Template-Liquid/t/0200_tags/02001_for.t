@@ -3,8 +3,22 @@ use warnings;
 use lib qw[../../lib ../../blib/lib];
 use Test::More;    # Requires 0.94 as noted in Build.PL
 use Template::Liquid;
+
+#{% assign items = "foo"%}{%for item in items%}{{item}}{%endfor%}
 $|++;
 #
+is( Template::Liquid->parse(
+        <<'TEMPLATE')->render(array => "foo,bar"), <<'EXPECTED', 'string split');
+{% assign items = array | split: ","  %}{%for item in items%}{{item}}{%endfor%}
+TEMPLATE
+foobar
+EXPECTED
+is( Template::Liquid->parse(
+         <<'TEMPLATE')->render(array => "foo"), <<'EXPECTED', 'plain string');
+{% assign items = array %}{%for item in items%}{{item}}{%endfor%}
+TEMPLATE
+foo
+EXPECTED
 is(Template::Liquid->parse(<<'TEMPLATE')->render(), <<'EXPECTED', '(1..5)');
 {%for x in (1..5) %}X{%endfor%}
 TEMPLATE

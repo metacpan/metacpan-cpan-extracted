@@ -152,7 +152,8 @@ sub client_api_version { return( shift->_test({ method => 'client_api_version', 
 
 sub connection { return( shift->_test({ method => 'connection', expect => 'Apache2::Connection', type => 'isa' }) ); }
 
-sub cookie { return( shift->_test({ method => 'cookie', expect => 'Cookie', type => 'isa', args => ['my_session'] }) ); }
+# sub cookie { return( shift->_test({ method => 'cookie', expect => 'Cookie', type => 'isa', args => ['my_session'] }) ); }
+sub cookie { return( shift->_test({ method => 'cookie', expect => 'foo', args => ['my_session'] }) ); }
 
 my $sample_data = <<EOT;
 {

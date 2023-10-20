@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Os::Any::Ru - Package for language Ossetic
 
 =cut
 
 package Locale::CLDR::Locales::Os::Any::Ru;
-# This file auto generated from Data/common/main/os_RU.xml
-#	on Mon 11 Apr  5:36:03 pm GMT
+# This file auto generated from Data\common\main\os_RU.xml
+#	on Fri 13 Oct  9:32:48 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

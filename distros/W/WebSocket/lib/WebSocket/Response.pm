@@ -141,7 +141,7 @@ sub headers_as_string
     );
     # return( $self->error( "Host is required" ) ) unless( $self->host->defined );
     my $location = URI->new( 'ws' . ( $self->secure ? 's' : '' ) . '://' . $self->host );
-    $location->path( $self->uri->path ) if( $self->uri->path ne '/' );
+    $location->path( $self->uri->path ) if( $self->uri && $self->uri->path ne '/' );
     my $origin = URI->new( $self->origin ? $self->origin : 'http://' . $location->host );
     $origin->scheme( 'https' ) if( !$self->origin && $self->secure );
 

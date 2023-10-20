@@ -27,6 +27,10 @@ You may want to check out Aspose free [Powerpoint to PDF](https://products.aspos
 **Web:** HTML/HTML5
 **Other:** MPEG4, SWF (export whole presentations)
 
+## Enhancements in Version 23.9
+
+* Added **ReplaceImage** and **ReplaceImageOnline** methods that enable replacing images in a presentation.
+
 ## Enhancements in Version 23.7
 
 * New methods **ReplaceTextFormatting** and **ReplaceTextFormatting** allow to replace text with formatting.

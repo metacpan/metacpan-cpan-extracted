@@ -3,7 +3,7 @@ package Net::Async::Redis::Cluster::XS;
 use strict;
 use warnings;
 
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use parent qw(Net::Async::Redis::Cluster);
 
@@ -30,6 +30,7 @@ async sub bootstrap {
     try {
         $self->add_child(
             $redis = Net::Async::Redis::XS->new(
+                $self->node_config,
                 host => $args{host},
                 port => $args{port},
             )

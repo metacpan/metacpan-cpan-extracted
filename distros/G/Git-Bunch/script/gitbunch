@@ -1,15 +1,15 @@
 #!perl
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-31'; # DATE
-our $DIST = 'Git-Bunch'; # DIST
-our $VERSION = '0.629'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-07-16'; # DATE
+our $DIST = 'Git-Bunch'; # DIST
+our $VERSION = '0.630'; # VERSION
 
 Perinci::CmdLine::Any->new(
     url => '/Git/Bunch/',
@@ -39,7 +39,7 @@ gitbunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.629 of gitbunch (from Perl distribution Git-Bunch), released on 2021-01-31.
+This document describes version 0.630 of gitbunch (from Perl distribution Git-Bunch), released on 2023-07-16.
 
 =head1 SYNOPSIS
 
@@ -128,9 +128,29 @@ C<*> marks required options.
 
 Set path to configuration file.
 
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
 =item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
+
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
 
 =item B<--debug>
 
@@ -144,6 +164,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--help>, B<-h>, B<-?>
 
 Display help message and exit.
@@ -156,6 +182,17 @@ Set output format to json.
 
 Set log level.
 
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
 =item B<--naked-res>
 
 When outputing as JSON, strip result envelope.
@@ -166,28 +203,40 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
+
 =item B<--no-env>
 
 Do not read environment for default options.
 
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
+
 =item B<--page-result>
 
 Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
 
 =item B<--quiet>
 
@@ -213,6 +262,11 @@ Display program's version and exit.
 
 View output using a viewer.
 
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
 =back
 
 =head2 Options for subcommand check
@@ -223,16 +277,16 @@ View output using a viewer.
 
 Exclude files from processing.
 
-This only applies to `sync_bunch` operations. Operations like `check_bunch` and
-`exec_bunch` already ignore these and only operate on git repos.
+This only applies to C<sync_bunch> operations. Operations like C<check_bunch> and
+C<exec_bunch> already ignore these and only operate on git repos.
 
 
 =item B<--exclude-non-git-dirs>
 
 Exclude non-git dirs from processing.
 
-This only applies to and `sync_bunch` operations. Operations like `check_bunch`
-and `exec_bunch` already ignore these and only operate on git repos.
+This only applies to and C<sync_bunch> operations. Operations like C<check_bunch>
+and C<exec_bunch> already ignore these and only operate on git repos.
 
 
 =item B<--exclude-repos-json>=I<s>
@@ -290,6 +344,8 @@ Only process a single repo.
 
 Directory to check.
 
+Can also be specified as the 1st command-line argument.
+
 =item B<-r>
 
 Shortcut for --min-repo-access-time="2 weeks ago".
@@ -316,16 +372,16 @@ Options to pass to IPC::System::Options's system().
 
 Exclude files from processing.
 
-This only applies to `sync_bunch` operations. Operations like `check_bunch` and
-`exec_bunch` already ignore these and only operate on git repos.
+This only applies to C<sync_bunch> operations. Operations like C<check_bunch> and
+C<exec_bunch> already ignore these and only operate on git repos.
 
 
 =item B<--exclude-non-git-dirs>
 
 Exclude non-git dirs from processing.
 
-This only applies to and `sync_bunch` operations. Operations like `check_bunch`
-and `exec_bunch` already ignore these and only operate on git repos.
+This only applies to and C<sync_bunch> operations. Operations like C<check_bunch>
+and C<exec_bunch> already ignore these and only operate on git repos.
 
 
 =item B<--exclude-repos-json>=I<s>
@@ -391,6 +447,8 @@ Only process a single repo.
 
 Directory to check.
 
+Can also be specified as the 1st command-line argument.
+
 =item B<-r>
 
 Shortcut for --min-repo-access-time="2 weeks ago".
@@ -417,20 +475,22 @@ Options to pass to IPC::System::Options's system().
 
 Command to execute.
 
+Can also be specified as the 2nd command-line argument and onwards.
+
 =item B<--exclude-files>
 
 Exclude files from processing.
 
-This only applies to `sync_bunch` operations. Operations like `check_bunch` and
-`exec_bunch` already ignore these and only operate on git repos.
+This only applies to C<sync_bunch> operations. Operations like C<check_bunch> and
+C<exec_bunch> already ignore these and only operate on git repos.
 
 
 =item B<--exclude-non-git-dirs>
 
 Exclude non-git dirs from processing.
 
-This only applies to and `sync_bunch` operations. Operations like `check_bunch`
-and `exec_bunch` already ignore these and only operate on git repos.
+This only applies to and C<sync_bunch> operations. Operations like C<check_bunch>
+and C<exec_bunch> already ignore these and only operate on git repos.
 
 
 =item B<--exclude-repos-json>=I<s>
@@ -488,6 +548,8 @@ Only process a single repo.
 
 Directory to check.
 
+Can also be specified as the 1st command-line argument.
+
 =item B<-r>
 
 Shortcut for --min-repo-access-time="2 weeks ago".
@@ -508,16 +570,16 @@ Show detailed record for each entry instead of just its name.
 
 Exclude files from processing.
 
-This only applies to `sync_bunch` operations. Operations like `check_bunch` and
-`exec_bunch` already ignore these and only operate on git repos.
+This only applies to C<sync_bunch> operations. Operations like C<check_bunch> and
+C<exec_bunch> already ignore these and only operate on git repos.
 
 
 =item B<--exclude-non-git-dirs>
 
 Exclude non-git dirs from processing.
 
-This only applies to and `sync_bunch` operations. Operations like `check_bunch`
-and `exec_bunch` already ignore these and only operate on git repos.
+This only applies to and C<sync_bunch> operations. Operations like C<check_bunch>
+and C<exec_bunch> already ignore these and only operate on git repos.
 
 
 =item B<--exclude-repos-json>=I<s>
@@ -583,6 +645,8 @@ Valid values:
 
 Directory to check.
 
+Can also be specified as the 1st command-line argument.
+
 =item B<-r>
 
 Shortcut for --min-repo-access-time="2 weeks ago".
@@ -613,9 +677,9 @@ This setting lets you express that you want to perform synchronizing to a backup
 target, and that you do not do work on the target. Thus, you do not care about
 uncommitted or untracked files/dirs in the target repos (might happen if you
 also do periodic copying of repos to backup using cp/rsync). When this setting
-is turned on, the function will first do a `git clean -f -d` (to delete
-untracked files/dirs) and then `git checkout .` (to discard all uncommitted
-changes). This setting will also implicitly turn on `create_bare` setting
+is turned on, the function will first do a C<git clean -f -d> (to delete
+untracked files/dirs) and then C<git checkout .> (to discard all uncommitted
+changes). This setting will also implicitly turn on C<create_bare> setting
 (unless that setting has been explicitly enabled/disabled).
 
 
@@ -624,9 +688,9 @@ changes). This setting will also implicitly turn on `create_bare` setting
 Whether to create bare git repo when target does not exist.
 
 When target repo does not exist, gitbunch can either copy the source repo using
-`rsync` (the default, if this setting is undefined), or it can create target
-repo with `git init --bare` (if this setting is set to 1), or it can create
-target repo with `git init` (if this setting is set to 0).
+C<rsync> (the default, if this setting is undefined), or it can create target
+repo with C<git init --bare> (if this setting is set to 1), or it can create
+target repo with C<git init> (if this setting is set to 0).
 
 Bare git repositories contain only contents of the .git folder inside the
 directory and no working copies of your source files.
@@ -645,16 +709,16 @@ Whether to delete branches in dest repos not existing in source repos.
 
 Exclude files from processing.
 
-This only applies to `sync_bunch` operations. Operations like `check_bunch` and
-`exec_bunch` already ignore these and only operate on git repos.
+This only applies to C<sync_bunch> operations. Operations like C<check_bunch> and
+C<exec_bunch> already ignore these and only operate on git repos.
 
 
 =item B<--exclude-non-git-dirs>
 
 Exclude non-git dirs from processing.
 
-This only applies to and `sync_bunch` operations. Operations like `check_bunch`
-and `exec_bunch` already ignore these and only operate on git repos.
+This only applies to and C<sync_bunch> operations. Operations like C<check_bunch>
+and C<exec_bunch> already ignore these and only operate on git repos.
 
 
 =item B<--exclude-repos-json>=I<s>
@@ -712,8 +776,8 @@ Only process a single repo.
 
 Whether to use --del rsync option.
 
-When rsync-ing non-repos, by default `--del` option is not used for more safety
-because rsync is a one-way action. To add rsync `--del` option, enable this
+When rsync-ing non-repos, by default C<--del> option is not used for more safety
+because rsync is a one-way action. To add rsync C<--del> option, enable this
 
 
 =item B<--rsync-opt-maintain-ownership>
@@ -742,9 +806,13 @@ option.
 
 Directory to check.
 
+Can also be specified as the 1st command-line argument.
+
 =item B<--target>=I<s>*
 
 Destination bunch.
+
+Can also be specified as the 2nd command-line argument.
 
 =item B<-r>
 
@@ -792,7 +860,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/gitbunch.conf>, F<~/gitbunch.conf>, or F</etc/gitbunch.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/gitbunch.conf>, F</home/u1/gitbunch.conf>, or F</etc/gitbunch.conf>.
 
 All found files will be read and merged.
 
@@ -804,7 +872,7 @@ You can put multiple profiles in a single file by using section names like C<[pr
 
 You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
 
-You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
 
 To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
 
@@ -825,9 +893,6 @@ List of available configuration parameters:
 
 =head2 Common for all subcommands
 
- format (see --format)
- log_level (see --log-level)
- naked_res (see --naked-res)
 
 =head2 Configuration for subcommand check
 
@@ -905,17 +970,17 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 GITBUNCH_OPT => str
+=head2 GITBUNCH_OPT
 
-Specify additional command-line options.
+String. Specify additional command-line options.
 
 =head1 FILES
 
-F<~/.config/gitbunch.conf>
+=head2 /home/u1/.config/gitbunch.conf
 
-F<~/gitbunch.conf>
+=head2 /home/u1/gitbunch.conf
 
-F</etc/gitbunch.conf>
+=head2 /etc/gitbunch.conf
 
 =head1 HOMEPAGE
 
@@ -924,14 +989,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Git-Bunch>
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Git-Bunch>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Git-Bunch/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -956,11 +1013,37 @@ L<got> from L<App::GitGot>, L<group-git> from L<Group::Git>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Git-Bunch>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

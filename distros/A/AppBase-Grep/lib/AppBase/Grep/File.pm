@@ -4,6 +4,11 @@ use strict;
 use warnings;
 use Log::ger;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-07-22'; # DATE
+our $DIST = 'AppBase-Grep'; # DIST
+our $VERSION = '0.011'; # VERSION
+
 our %argspecs_files = (
     files => {
         'x.name.is_plural' => 1,
@@ -117,7 +122,7 @@ AppBase::Grep::File - Resources for AppBase::Grep-based scripts that use file so
 
 =head1 VERSION
 
-This document describes version 0.010 of AppBase::Grep::File (from Perl distribution AppBase-Grep), released on 2022-11-04.
+This document describes version 0.011 of AppBase::Grep::File (from Perl distribution AppBase-Grep), released on 2023-07-22.
 
 =head1 FUNCTIONS
 
@@ -155,7 +160,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

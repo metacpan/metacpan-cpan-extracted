@@ -7,6 +7,7 @@ META.json
 META.yml
 Makefile.PL
 README
+README.pod
 dist.ini
 examples/arpeggiator.pl
 examples/callback.pl
@@ -20,10 +21,10 @@ t/01-api.t
 t/02-device.t
 t/03-callback.t
 t/04-event.t
-t/05-grow.t
-t/06-ignore.t
+t/05-ignore.t
 t/author-critic.t
 t/author-pod-syntax.t
 t/author-synopsis.t
 t/lib/MIDI/RtMidi/FFI/TestUtils.pm
 t/release-kwalitee.t
+xt/grow.t

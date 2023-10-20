@@ -86,3 +86,35 @@ Revision history for Data-Roundtrip
 	Added a new test file '12-from-file.t' which tests file-related
 	functionality including said two functions.
 	Documentation supplemented.
+
+0.19    2023-10-03 01:00
+        added printing the yaml structure in test file '12-from-file.t'
+        if it fails to ease debugging.
+
+0.20    2023-10-03 14:00
+        YAML::Load complains for strings like 'abc\"xyz',
+        so I have decided to remove all such strings from the
+        randomly created data structures of test file '12-from-file.t'.
+        This does not affect the behaviour of yaml2* subs but
+        only limits the testing range for input strings to yaml2* subs.
+
+0.21    2023-10-03 14:45
+        Fixed bug in script/yaml2perl.pl to print the data structure.
+
+0.22    2023-10-06 11:00
+        Switched from YAML to YAML::PP because the former failed on
+        some tricky input, see https://github.com/ingydotnet/yaml-pm/issues/224
+        Added extra test file (t/13-yaml-tricky-cases.t) for testing
+        these cases.
+        Added extra author test suit (xt/deficiencies run with make deficiencies)
+        to test the tricky cases for all YAML, YAML::PP, YAML::XS
+        Enclosed within eval {} all JSON::* calls (which were not already enclosed)
+
+0.23    2023-10-11 11:30
+        Modified t/12-from-file.t to delete temp dirs on success
+        but keep them on failure.
+        I am trying to debug t/12-from-file.t killed on some test environments.
+
+0.24    String input to yaml2perl() is now being untainted in order
+        to avoid a bug with Perls < v5.14 which causes YAML::PP to
+        loop indefinetely and the OS to kill the script. Until YAML::PP is fixed.

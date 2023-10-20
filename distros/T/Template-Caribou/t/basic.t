@@ -29,7 +29,6 @@ subtest 'inner_tmpl' => sub {
     is $self->inner_tmpl => 'hello world';
 };
 
-$::NOW = 1;
 subtest 'outer' => sub {
     is $self->outer => 'xhello worldx';
 };

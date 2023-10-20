@@ -15,9 +15,6 @@ ok(
     "constructor"
 ) or diag $@;
 
-ok(
-   lives { $s->send( { a => 1, b => 2, c => 'nyuck nyuck' } ) },
-   'send'
-  );
+ok( lives { $s->send( { a => 1, b => 2, c => 'nyuck nyuck' } ) }, 'send' );
 
 done_testing;

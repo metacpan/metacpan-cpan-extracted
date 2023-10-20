@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Device::Chip::Adapter;
 
 use Future::AsyncAwait 0.47;
@@ -32,7 +32,7 @@ await $chip->mount( $adapter );
 # read
 {
    $adapter->expect_write_then_read( pack( "C", 123 ), 1 )
-      ->returns( "B" );
+      ->will_done( "B" );
 
    is( await $chip->read_reg( 123, 1 ), "B", '->read_reg value' );
 
@@ -42,7 +42,7 @@ await $chip->mount( $adapter );
 # cached read
 {
    $adapter->expect_write_then_read( pack( "C", 2 ), 1 )
-      ->returns( "\x20" );
+      ->will_done( "\x20" );
 
    is( await $chip->cached_read_reg( 2, 1 ), "\x20",
          '->cached_read_reg the first time' );
@@ -59,17 +59,17 @@ await $chip->mount( $adapter );
    $adapter->expect_write( pack( "C a", 2, "\x25" ) );
 
    await $chip->write_reg( 2, "\x25" );
-   is_deeply( await $chip->cached_read_reg( 2, 1 ), "\x25",
+   is( await $chip->cached_read_reg( 2, 1 ), "\x25",
          '->cached_read_reg snoops on writes' );
 
    $adapter->check_and_clear( '->cached_read_reg does not readdress after write snoop' );
 
 
    $adapter->expect_write_then_read( pack( "C", 2 ), 1 )
-      ->returns( "\x30" );
+      ->will_done( "\x30" );
 
    await $chip->read_reg( 2, 1 );
-   is_deeply( await $chip->cached_read_reg( 2, 1 ), "\x30",
+   is( await $chip->cached_read_reg( 2, 1 ), "\x30",
          '->cached_read_reg snoops on reads' );
 
    $adapter->check_and_clear( '->cached_read_reg does not readdress after read snoop' );
@@ -99,7 +99,7 @@ await $chip->mount( $adapter );
 # cached read multi
 {
    $adapter->expect_write_then_read( pack( "C", 6 ), 2 )
-      ->returns( "BC" );
+      ->will_done( "BC" );
 
    is( await $chip->cached_read_reg( 6, 2 ), "BC",
       '->cached_read_reg multi initially' );
@@ -107,9 +107,9 @@ await $chip->mount( $adapter );
    $adapter->check_and_clear( '->cached_read_reg multi initially' );
 
    $adapter->expect_write_then_read( pack( "C", 5 ), 1 )
-      ->returns( "A" );
+      ->will_done( "A" );
    $adapter->expect_write_then_read( pack( "C", 8 ), 2 )
-      ->returns( "DE" );
+      ->will_done( "DE" );
 
    is( await $chip->cached_read_reg( 5, 5 ), "ABCDE",
       '->cached_read_reg multi again' );
@@ -137,14 +137,14 @@ await $chip->mount( $adapter );
 # cached write with mask
 {
    $adapter->expect_write_then_read( pack( "C", 11 ), 1 )
-      ->returns( "\x88" );
+      ->will_done( "\x88" );
    $adapter->expect_write( pack( "C a*", 10, "\x5A\x58\x5A" ) );
 
    await $chip->cached_write_reg_masked( 10, "\x5A\x5A\x5A", "\xFF\xF0\xFF" );
 
    $adapter->check_and_clear( '->cached_write_reg_masked' );
 
-   is_deeply( await $chip->cached_read_reg( 10, 3 ), "\x5A\x58\x5A",
+   is( await $chip->cached_read_reg( 10, 3 ), "\x5A\x58\x5A",
       '->cached_read_reg reads back masked write data' );
 
    $adapter->check_and_clear( '->cached_read_reg after ->cached_write_reg_masked' );
@@ -171,7 +171,7 @@ await $chip->mount( $adapter );
 
    {
       $adapter->expect_write_then_read( pack( "C", 0x11 ), 2 )
-         ->returns( "cd" );
+         ->will_done( "cd" );
 
       is( await $chip->read_reg( 0x11, 1 ), "cd",
          '->read_reg returns value for 16 bit data' );

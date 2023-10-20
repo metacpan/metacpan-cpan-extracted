@@ -6,6 +6,7 @@ use warnings;
 use PGObject;
 use JSON;
 use Carp 'croak';
+use Scalar::Util 'blessed';
 
 
 =head1 NAME
@@ -14,11 +15,11 @@ PGObject::Type::JSON - JSON wrappers for PGObject
 
 =head1 VERSION
 
-Version 2.0.1
+Version 2.1.1
 
 =cut
 
-our $VERSION = 2.000001;
+our $VERSION = '2.1.1';
 
 
 =head1 SYNOPSIS
@@ -73,19 +74,24 @@ sub register{
 
 =head2 new($ref)
 
-Stores this as a reference.  Currently database nulls are stored as cyclical 
-references which is probably a bad idea.  In the future we should probably 
-have a lexically scoped table for this.
+Stores this as a reference. Nulls are now scoped references to a lexically
+scoped variable.
+
+If values other than scalars, arrayrefs, or hashes are passed in, throws an
+error.
 
 =cut
 
 sub new {
     my ($class, $ref) = @_;
-    if (!ref $ref) {
+    $ref = null() unless defined $ref;
+    if (not ref $ref){
         my $src = $ref;
-        $ref = \$src;
+	$ref = \$src;
     }
     bless $ref, $class;
+    croak 'unsupported reftype' unless $ref->reftype =~ /^(SCALAR|ARRAY|HASH)$/;
+    return $ref;
 } 
 
 =head2 from_db
@@ -95,11 +101,20 @@ json null's.
 
 =cut
 
+my $db_null;
+
+sub null { \$db_null} 
+
+my $json_null;
+sub json_null { \$json_null }
+sub is_json_null { json_null eq shift };
+
 sub from_db {
-    my ($class, $var) = @_;
-    $var = \$var unless defined $var;
-    return "$class"->new($var) if ref $var;
-    return "$class"->new(JSON->new->allow_nonref->decode($var));
+    my ($class, $var) = @_; 
+    return $class->new(undef) unless defined $var;
+    return $class->new(json_null) if $var eq 'null';
+    my $obj = $class->new(JSON->new->allow_nonref->decode($var));
+    return $obj->reftype eq 'SCALAR' ? $$obj : $obj ;
 }
 
 
@@ -109,17 +124,32 @@ returns undef if is_null.  Otherwise returns the value encoded as JSON
 
 =cut
 
+=head2 null
+
+Return a null type for storage in the db.
+
+=cut
+
+=head2 TO_JSON
+
+The handler for setting this to the JSON parser
+
+=cut
+
+sub TO_JSON {
+    my $self = shift;
+    for ($self->reftype){
+        if ($_ eq 'SCALAR') { return $$self; }
+        if ($_ eq 'ARRAY')  { return [@$self]; }
+        if ($_ eq 'HASH')   { return { %$self } }
+    }
+}
+
 sub to_db {
     my $self = shift @_;
     return undef if $self->is_null;
-    my $copy;
-    for ($self->reftype){
-       if    ($_ eq 'SCALAR') { $copy = $$self if $_ eq 'SCALAR' }
-       elsif ($_ eq 'ARRAY')  { $copy = []; push @$copy, $_ for @$self; }
-       elsif ($_ eq 'HASH')  { $copy = {}; 
-                                $copy->{$_} = $self->{$_} for keys %$self; }
-    }
-    return JSON->new->allow_nonref->convert_blessed->encode($copy);
+    return 'null' if $self->is_json_null;
+    return JSON->new->allow_blessed->convert_blessed->encode($self);
 }
 
 =head2 reftype
@@ -131,7 +161,7 @@ Returns the reftype of the object (i.e. HASH, SCALAR, ARRAY)
 sub reftype {
     my ($self) = @_;
     my $reftype = "$self";
-    my $pkg = __PACKAGE__;
+    my $pkg = blessed $self;
     $reftype =~ s/${pkg}=(\w+)\(.*\)/$1/;
     $reftype = 'SCALAR' if $reftype eq 'REF';
     return $reftype;
@@ -145,11 +175,17 @@ Returns true if is a database null.
 
 sub is_null {
     my $self = shift @_;
-    return 0 if $self->reftype ne 'SCALAR';
-    return 0 if !defined $$self;
-    return 1 if ref $self && ($self eq $$self);
+    return 1 if ref $self && ($self eq null);
     return 0;
 }
+
+=head2 json_null
+
+Returns a JSON null
+
+=head2 is_json_null
+
+Returns true if the value is a JSON null.  Else it returns false
 
 =head1 AUTHOR
 
@@ -199,7 +235,7 @@ L<http://search.cpan.org/dist/PGObject-Type-JSON/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 Chris Travers.
+Copyright 2013-2023 Chris Travers.
 
 This program is released under the following license: BSD
 

@@ -32,6 +32,12 @@ __PACKAGE__->has_many(
   { 'foreign.person_id' => 'self.id' }
 );
 
+__PACKAGE__->has_many(
+  meetings =>
+  'Schema::Nested::Result::Meeting',
+  { 'foreign.person_id' => 'self.id' }
+);
+
 __PACKAGE__->many_to_many('roles' => 'person_roles', 'role');
 __PACKAGE__->accept_nested_for('state');
 __PACKAGE__->validates(state => (presence=>1));

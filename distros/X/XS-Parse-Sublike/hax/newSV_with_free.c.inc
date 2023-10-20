@@ -4,6 +4,7 @@ static int magic_free(pTHX_ SV *sv, MAGIC *mg)
 {
   void (*freefunc)(pTHX_ SV *sv) = (void *)mg->mg_ptr;
   (*freefunc)(aTHX_ sv);
+  return 0;
 }
 
 static const MGVTBL vtbl_sv_with_free = {

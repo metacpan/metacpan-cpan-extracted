@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Qu::Any::Pe - Package for language Quechua
 
 =cut
 
 package Locale::CLDR::Locales::Qu::Any::Pe;
-# This file auto generated from Data/common/main/qu_PE.xml
-#	on Mon 11 Apr  5:36:48 pm GMT
+# This file auto generated from Data\common\main\qu_PE.xml
+#	on Fri 13 Oct  9:34:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

@@ -1,0 +1,27 @@
+From 2ded707673d13706a6dad0769ecfa514fe204f62 Mon Sep 17 00:00:00 2001
+From: sunnavy <sunnavy@bestpractical.com>
+Date: Wed, 4 Oct 2023 14:38:46 -0400
+Subject: [PATCH] Support QuickCreate to pass arguments to redirect URL after
+ ticket creation
+
+This is initially for QuickCalls extension, where we need to pass user
+id on user summary page, to "QuickCreate" a ticket there.
+---
+ lib/RT/Interface/Web.pm | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/RT/Interface/Web.pm b/lib/RT/Interface/Web.pm
+index 64ce8dc64..5b4722428 100644
+--- a/lib/RT/Interface/Web.pm
++++ b/lib/RT/Interface/Web.pm
+@@ -4329,6 +4329,7 @@ sub ProcessQuickCreate {
+         MaybeRedirectForResults(
+             Actions   => \@results,
+             Path      => $path,
++            $params{PassArguments} ? ( Arguments => $params{PassArguments} ) : (),
+         );
+     }
+ 
+-- 
+2.25.1
+

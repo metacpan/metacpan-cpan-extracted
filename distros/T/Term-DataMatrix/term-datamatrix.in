@@ -1,0 +1,50 @@
+#!perl
+use 5.012;
+use warnings;
+# :squash-remove-start:
+use FindBin;
+use lib "$FindBin::Bin/lib";
+# :squash-remove-end:
+
+require Term::DataMatrix;
+use Carp qw/ croak /;
+
+if (($ARGV[0] // '') eq '--help') {
+    print HELP_MESSAGE();
+    exit 0;
+}
+
+if (($ARGV[0] // '') eq '--version') {
+    print VERSION_MESSAGE();
+    exit 0;
+}
+
+if (@ARGV != 1) {
+    print STDERR USAGE();
+    exit 2;
+}
+
+my $text = shift;
+say Term::DataMatrix->new->plot($text);
+
+sub USAGE {
+    return <<'EOUSAGE'
+Usage: term-datamatrix [TEXT]
+EOUSAGE
+}
+
+sub HELP_MESSAGE {
+    return USAGE() . <<'EOHELP';
+Generate terminal-based Data Matrix 2D barcodes
+
+Options:
+    --help      Show this message
+    --version   Show version
+EOHELP
+}
+
+sub VERSION_MESSAGE {
+    return <<"EOVERSION";
+term-datamatrix (Term::DataMatrix) $Term::DataMatrix::VERSION
+EOVERSION
+}

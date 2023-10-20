@@ -4,7 +4,7 @@
       "George S. Baugh <george@troglodyne.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -25,6 +25,7 @@
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta" : "0",
             "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::DistManifest" : "0",
             "Test::EOL" : "0",
             "Test::Kwalitee" : "1.21",
             "Test::MinimumVersion" : "0",
@@ -37,6 +38,7 @@
             "Test::Pod::LinkCheck" : "0",
             "Test::Portability::Files" : "0",
             "Test::Synopsis" : "0",
+            "Test::Vars" : "0",
             "Test::Version" : "1"
          }
       },
@@ -82,55 +84,55 @@
    "provides" : {
       "Selenium::Capabilities" : {
          "file" : "lib/Selenium/Client.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "Selenium::Client" : {
          "file" : "lib/Selenium/Client.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "Selenium::Driver::Auto" : {
          "file" : "lib/Selenium/Driver/Auto.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "Selenium::Driver::Chrome" : {
          "file" : "lib/Selenium/Driver/Chrome.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "Selenium::Driver::Edge" : {
          "file" : "lib/Selenium/Driver/Edge.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "Selenium::Driver::Gecko" : {
          "file" : "lib/Selenium/Driver/Gecko.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "Selenium::Driver::Safari" : {
          "file" : "lib/Selenium/Driver/Safari.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "Selenium::Driver::SeleniumHQ::Jar" : {
          "file" : "lib/Selenium/Driver/SeleniumHQ/Jar.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "Selenium::Driver::WinApp" : {
          "file" : "lib/Selenium/Driver/WinApp.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "Selenium::Element" : {
          "file" : "lib/Selenium/Client.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "Selenium::Session" : {
          "file" : "lib/Selenium/Client.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "Selenium::Specification" : {
          "file" : "lib/Selenium/Specification.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "Selenium::Subclass" : {
          "file" : "lib/Selenium/Subclass.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       }
    },
    "release_status" : "stable",
@@ -145,13 +147,13 @@
          "web" : "https://github.com/troglodyne-internet-widgets/selenium-client-perl"
       }
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_contributors" : [
       "Chris Faylor <cgf@realedsolutions.com>",
       "Manni Heumann <heumann@strato.de>"
    ],
-   "x_generated_by_perl" : "v5.32.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "MIT"
 }
 

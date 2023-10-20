@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
 
-package String::Tagged::Markdown 0.04;
+package String::Tagged::Markdown 0.05;
 
 use v5.26;
 use warnings;
@@ -11,6 +11,8 @@ use experimental 'signatures';
 use base qw( String::Tagged );
 
 use List::Util 1.45 qw( any uniqstr );
+
+use HTML::Entities qw( decode_entities );
 
 =head1 NAME
 
@@ -143,6 +145,9 @@ backticks will be stripped, if present.
 
    `` fixed width with `literal backticks` inside it ``
 
+HTML entities - such as C<&amp;>, C<&ndash;> or C<&#1234;> are decoded, but
+only when not inside C<`fixed`> spans.
+
 =cut
 
 sub parse_markdown ( $class, $str )
@@ -183,6 +188,7 @@ sub parse_markdown ( $class, $str )
             $str =~ m/\G(.*?)(?:\Q$marker\E|$)/gc;
             my $inner = $1;
             $inner =~ s/^ (.*) $/$1/ if length $marker > 1;
+            # No decode_entities() inside `code span`
             $self->append_tagged( $inner, %tags_in_effect, $tag => 1 );
             next;
          }
@@ -192,7 +198,9 @@ sub parse_markdown ( $class, $str )
       }
       else {
          $str =~ m/\G(.*?)(?=$MARKER_PATTERN|\\|\[|\]|$)/gc;
-         $self->append_tagged( $1, %tags_in_effect );
+         my $fragment = $1;
+         $fragment = decode_entities( $fragment );
+         $self->append_tagged( $fragment, %tags_in_effect );
       }
    }
 
@@ -260,6 +268,9 @@ Returns a plain text string containing Markdown-like inline formatting markers
 to format the tags in the given instance. Uses the notation given in the
 L</parse_markdown> method above.
 
+Non-ASCII Unicode characters are I<not> generally emitted as HTML entities;
+though C<&amp;> and C<&nbsp;> are generated for convenience.
+
 =cut
 
 sub build_markdown ( $self )
@@ -317,6 +328,8 @@ sub build_markdown ( $self )
          $substr = "$more $substr $more" if length $more and $substr =~ m/^`|`$/;
       }
       else {
+         $substr =~ s/&/\&amp;/g;
+         $substr =~ s/\xA0/\&nbsp;/g;
          $substr =~ s/($NEEDS_ESCAPE_PATTERN)/\\$1/g;
       }
       $ret .= $substr;
@@ -374,6 +387,16 @@ sub as_formatting ( $self, %args )
       convert_tags => $CONVERSIONS,
    );
 }
+
+=head1 TODO
+
+=over 4
+
+=item *
+
+Fine-grained control of what HTML entities are generated on output.
+
+=back
 
 =head1 AUTHOR
 

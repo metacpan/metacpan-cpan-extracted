@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents options of saving ooxml file.',
                                   class => 'OoxmlSaveOptions',
                                   required => [], # TODO
 }                                 );
@@ -128,35 +128,35 @@ __PACKAGE__->method_documentation({
      'export_cell_name' => {
      	datatype => 'boolean',
      	base_name => 'ExportCellName',
-     	description => '',
+     	description => 'Indicates if export cell name to Excel2007 .xlsx (.xlsm, .xltx, .xltm) file.               If the output file may be accessed by SQL Server DTS, this value must be               true.  Setting the value to false will highly increase the performance and               reduce the file size when creating large file.  Default value is false.',
      	format => '',
      	read_only => '',
      		},
      'update_zoom' => {
      	datatype => 'boolean',
      	base_name => 'UpdateZoom',
-     	description => '',
+     	description => 'Indicates whether update scaling factor before saving the file if the PageSetup.FitToPagesWide and PageSetup.FitToPagesTall properties control how the worksheet is scaled.',
      	format => '',
      	read_only => '',
      		},
      'enable_zip64' => {
      	datatype => 'boolean',
      	base_name => 'EnableZip64',
-     	description => '',
+     	description => 'Always use ZIP64 extensions when writing zip archives, even when unnecessary.',
      	format => '',
      	read_only => '',
      		},
      'embed_ooxml_as_ole_object' => {
      	datatype => 'boolean',
      	base_name => 'EmbedOoxmlAsOleObject',
-     	description => '',
+     	description => 'Indicates whether embedding Ooxml files of OleObject as ole object.',
      	format => '',
      	read_only => '',
      		},
      'compression_type' => {
      	datatype => 'string',
      	base_name => 'CompressionType',
-     	description => '',
+     	description => 'Gets and sets the compression type for ooxml file.',
      	format => '',
      	read_only => '',
      		},

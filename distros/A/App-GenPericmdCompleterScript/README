@@ -3,9 +3,9 @@ NAME
     script
 
 VERSION
-    This document describes version 0.125 of App::GenPericmdCompleterScript
+    This document describes version 0.126 of App::GenPericmdCompleterScript
     (from Perl distribution App-GenPericmdCompleterScript), released on
-    2022-08-28.
+    2023-07-11.
 
 FUNCTIONS
   gen_pericmd_completer_script
@@ -21,13 +21,19 @@ FUNCTIONS
 
     *   completion => *code*
 
+        (No description)
+
     *   default_subcommand => *str*
+
+        (No description)
 
     *   exclude_package_functions_match => *re*
 
         Exclude package functions matching this pattern.
 
     *   get_subcommand_from_arg => *int* (default: 1)
+
+        (No description)
 
     *   include_package_functions_match => *re*
 
@@ -51,7 +57,11 @@ FUNCTIONS
 
     *   per_arg_json => *bool*
 
+        (No description)
+
     *   per_arg_yaml => *bool*
+
+        (No description)
 
     *   program_name* => *str*
 
@@ -59,9 +69,15 @@ FUNCTIONS
 
     *   read_config => *bool*
 
+        (No description)
+
     *   read_env => *bool*
 
+        (No description)
+
     *   skip_format => *bool*
+
+        (No description)
 
     *   strip => *bool* (default: 0)
 
@@ -145,8 +161,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2016, 2015
-    by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022, 2021, 2020, 2018, 2017, 2016,
+    2015 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

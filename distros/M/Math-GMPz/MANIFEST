@@ -41,6 +41,7 @@ t/misc.t
 t/power.t
 t/primes.t
 t/random.t
+t/random2.t
 t/theoretic.t
 t/div2.t
 t/divby0.t
@@ -61,6 +62,7 @@ t/overload_cross_class.t
 t/overload_op_eq.t
 t/overload_switch.t
 t/printf.t
+t/random2.t
 t/PV_NV_BUG.t
 t/set_uj_sj.t
 t/TRmpz_out_str.t

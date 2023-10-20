@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -45,14 +45,17 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-OAI/issues
   homepage: https://github.com/LibreCat/Catmandu-OAI
   repository: https://github.com/LibreCat/Catmandu-OAI.git
-version: '0.19'
+version: '0.20'
 x_contributors:
   - 'Christian Pietsch <christian.pietsch@uni-bielefeld.de>'
   - 'Jakob Voss <voss@gbv.de>'
   - 'Matthias Vandermaesen <matthias@colada.be>'
-  - 'Nicolas Franck <Nicolas.Franck@ugent.be>'
+  - 'Nicolas Franck <nicolas.franck@ugent.be>'
   - 'Nicolas Franck <njfranck@ca20c533.ugent.be>'
   - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
-  - 'Patrick Hochstenbach <Patrick.Hochstenbach@UGent.be>'
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
   - 'Yanick Champoux <yanick@babyl.dyndns.org>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.24.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 1

@@ -7,10 +7,12 @@ use utf8;
 use Getopt::Long qw( GetOptionsFromArray :config gnu_compat pass_through );
 use Pod::Usage;
 use Carp;
-use URI::PackageURL;
-
 use JSON qw(encode_json);
 use Data::Dumper;
+
+use URI::PackageURL;
+
+our $VERSION = '2.02';
 
 sub cli_error {
     my ($error) = @_;

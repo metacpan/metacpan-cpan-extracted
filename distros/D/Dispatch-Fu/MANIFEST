@@ -11,4 +11,5 @@ dist.ini
 lib/Dispatch/Fu.pm
 t/00-example.t
 t/01-example.t
+t/02-xdefault.t
 t/release-kwalitee.t

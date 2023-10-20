@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents the options of saving .xls file.',
                                   class => 'XlsSaveOptions',
                                   required => [], # TODO
 }                                 );

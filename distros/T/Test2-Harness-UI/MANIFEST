@@ -193,6 +193,7 @@ lib/Test2/Harness/UI/Schema/Result/User.pm
 lib/Test2/Harness/UI/Schema/ResultBase.pm
 lib/Test2/Harness/UI/Schema/ResultSet.pm
 lib/Test2/Harness/UI/Sweeper.pm
+lib/Test2/Harness/UI/Sync.pm
 lib/Test2/Harness/UI/UUID.pm
 lib/Test2/Harness/UI/Util.pm
 lib/Test2/Harness/UI/Util/DateTimeFormat.pm
@@ -298,4 +299,5 @@ t/simple.json
 t/simple.t
 t/util.t
 t/uuid.t
+t2ui.tar.gz
 xt/author/pod-syntax.t

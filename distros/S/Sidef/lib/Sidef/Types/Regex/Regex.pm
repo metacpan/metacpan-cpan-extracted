@@ -64,28 +64,28 @@ package Sidef::Types::Regex::Regex {
 
     sub lt {
         my ($x, $y) = @_;
-        Math::GMPz::Rmpz_sgn(${$x->cmp($y)}) < 0
+        $x->cmp($y)->lt(Sidef::Types::Number::Number::ZERO)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub le {
         my ($x, $y) = @_;
-        Math::GMPz::Rmpz_sgn(${$x->cmp($y)}) <= 0
+        $x->cmp($y)->le(Sidef::Types::Number::Number::ZERO)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub gt {
         my ($x, $y) = @_;
-        Math::GMPz::Rmpz_sgn(${$x->cmp($y)}) > 0
+        $x->cmp($y)->gt(Sidef::Types::Number::Number::ZERO)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub ge {
         my ($x, $y) = @_;
-        Math::GMPz::Rmpz_sgn(${$x->cmp($y)}) >= 0
+        $x->cmp($y)->ge(Sidef::Types::Number::Number::ZERO)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -224,8 +224,7 @@ package Sidef::Types::Regex::Regex {
         my $str   = $self->{raw};
         my $flags = $self->{flags};
 
-        Sidef::Types::String::String->new(
-                                    '/' . $str =~ s{(?<!\\)(?:\\\\)*\K/}{\\/}gr . '/' . $flags . ($self->{global} ? 'g' : ''));
+        Sidef::Types::String::String->new('/' . $str =~ s{(?<!\\)(?:\\\\)*\K/}{\\/}gr . '/' . $flags . ($self->{global} ? 'g' : ''));
     }
 
     *to_s   = \&dump;

@@ -46,21 +46,53 @@
 %# 
 %# END BPS TAGGED BLOCK }}}
 <%init>
-if ($QuickCall) {
-    my ($QuickCall) = grep { $_->{Name} eq $QuickCall} @{$RT::QuickCalls||[]};
-    # copy so we don't nuke the config variable
-    $QuickCall = { map { $_ => $QuickCall->{$_} } keys %$QuickCall };
-    $QuickCall->{Subject} ||= $QuickCall->{Name};
-    $QuickCall->{Owner} = $session{CurrentUser}->Id if ($QuickCall->{SetOwnerToCurrentUser});
-    delete $QuickCall->{SetOwnerToCurrentUser};
-    delete $QuickCall->{Name};
+if ( $QuickCall ) {
+    my $config = RT->Config->Get('QuickCalls');
+    my $quickcalls;
 
-    # Anon subrefs can be used to generate dynamic values
-    $QuickCall->{$_} = $QuickCall->{$_}->()
-        for grep {ref $QuickCall->{$_} eq "CODE"} keys %{$QuickCall};
+    if ( ref $config eq 'ARRAY' ) {
+        # old behavior
+        $quickcalls = $config;
+    }
+    elsif ( ref $config eq 'HASH' ) {
+        # new behavior
+        my $quickcall_dashboard_id = $ARGS{QuickCallsDashboard} || '';
+        my $quickcall_config = $config->{$quickcall_dashboard_id} || $config->{Default} || {};
+        $quickcalls = $quickcall_config->{Actions} || [];
+    }
 
-    my $query = $m->comp( '/Elements/QueryString', %$QuickCall);
-    RT::Interface::Web::Redirect($RT::WebURL."Ticket/Create.html?$query");
+    if ( my ( $QuickCall ) = grep { $_->{Name} eq $QuickCall } @$quickcalls ) {
+        # copy so we don't nuke the config variable
+        $QuickCall = { map { $_ => $QuickCall->{$_} } keys %$QuickCall };
+        $QuickCall->{Subject} ||= $QuickCall->{Name};
+        $QuickCall->{Owner} = $session{CurrentUser}->Id
+            if ( $QuickCall->{SetOwnerToCurrentUser} );
+
+        delete $QuickCall->{SetOwnerToCurrentUser};
+        delete $QuickCall->{Name};
+
+        # Anon subrefs can be used to generate dynamic values
+        $QuickCall->{$_} = $QuickCall->{$_}->()
+            for grep { ref $QuickCall->{$_} eq "CODE" } keys %{$QuickCall};
+
+        if ( $QuickCall->{QuickCreate} ) {
+            ProcessQuickCreate(
+                Path => $ARGS{QuickCallsPath},
+                ARGSRef => $QuickCall,
+                $ARGS{PassArguments}
+                ? (
+                    PassArguments => {
+                        map { $_ => $ARGS{$_} } ref $ARGS{PassArguments} eq 'ARRAY' ? @{ $ARGS{PassArguments} } : $ARGS{PassArguments}
+                    },
+                )
+                : (),
+            );
+        }
+        else {
+            my $query = $m->comp( '/Elements/QueryString', %$QuickCall );
+            RT::Interface::Web::Redirect( $RT::WebURL . "Ticket/Create.html?$query" );
+        }
+    }
 }
 </%init>
 <%args>

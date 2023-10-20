@@ -117,64 +117,76 @@ else {
 $Math::GMPz::RETYPE = 1;
 
 if($have_gmpq) {
-  my $z = Math::GMPz->new(123);
-  cmp_ok($Math::GMPz::RETYPE, '==', 1, "retyping allowed");
-  $z *= $q;
-  cmp_ok(ref($z), 'eq', 'Math::GMPq', '$z changes to a Math::GMPq object');
-  cmp_ok($z, '==', $q * Math::GMPz->new(123), '$z *= $q sets $z to 123/11');
+  if($Math::GMPq::VERSION < 0.35) {
+    warn "\n  Skipping Math::GMPq tests -  Math::GMPq version 0.35(or later)\n" .
+          "  is needed. We have only version $Math::GMPq::VERSION\n";
+  }
+  else {
+    my $z = Math::GMPz->new(123);
+    cmp_ok($Math::GMPz::RETYPE, '==', 1, "retyping allowed");
+    $z *= $q;
+    cmp_ok(ref($z), 'eq', 'Math::GMPq', '$z changes to a Math::GMPq object');
+    cmp_ok($z, '==', $q * Math::GMPz->new(123), '$z *= $q sets $z to 123/11');
 
-  $z = Math::GMPz->new(123);
-  cmp_ok(ref($z), 'eq', 'Math::GMPz', '$z has been reverted to a Math::GMPz object');
-  $z += $q;
-  cmp_ok(ref($z), 'eq', 'Math::GMPq', '$z changes to a Math::GMPq object');
-  cmp_ok($z, '==', $q + Math::GMPz->new(123), '$z += $q sets $z to 1354/11');
+    $z = Math::GMPz->new(123);
+    cmp_ok(ref($z), 'eq', 'Math::GMPz', '$z has been reverted to a Math::GMPz object');
+    $z += $q;
+    cmp_ok(ref($z), 'eq', 'Math::GMPq', '$z changes to a Math::GMPq object');
+    cmp_ok($z, '==', $q + Math::GMPz->new(123), '$z += $q sets $z to 1354/11');
 
-  $z = Math::GMPz->new(123);
-  $z -= $q;
-  cmp_ok(ref($z), 'eq', 'Math::GMPq', '$z changes to a Math::GMPq object');
-  cmp_ok($z, '==', Math::GMPz->new(123) - $q, '$z -= $q sets $z to 1352/11');
+    $z = Math::GMPz->new(123);
+    $z -= $q;
+    cmp_ok(ref($z), 'eq', 'Math::GMPq', '$z changes to a Math::GMPq object');
+    cmp_ok($z, '==', Math::GMPz->new(123) - $q, '$z -= $q sets $z to 1352/11');
 
-  $z = Math::GMPz->new(123);
-  $z /= $q;
-  cmp_ok(ref($z), 'eq', 'Math::GMPq', '$z changes to a Math::GMPq object');
-  cmp_ok($z, '==', Math::GMPz->new(123) / $q, '$z /= $q sets $z to 1353');
+    $z = Math::GMPz->new(123);
+    $z /= $q;
+    cmp_ok(ref($z), 'eq', 'Math::GMPq', '$z changes to a Math::GMPq object');
+    cmp_ok($z, '==', Math::GMPz->new(123) / $q, '$z /= $q sets $z to 1353');
+  }
 }
 
 ############################################
 
 if($have_mpfr) {
-  cmp_ok($Math::GMPz::RETYPE, '==', 1, "retyping allowed");
-  my $z = Math::GMPz->new(123);
-  cmp_ok(ref($z), 'eq', 'Math::GMPz', '$z has been reverted to a Math::GMPz object');
-  $z *= $fr;
-  cmp_ok(ref($z), 'eq', 'Math::MPFR', '$z changes to a Math::MPFR object');
-  cmp_ok($z, '==', $fr * Math::GMPz->new(123), '$z *= $fr sets $z to 2.1033000000000002e3');
+  if($Math::MPFR::VERSION < 4.19) {
+    warn "\n  Skipping remaining tests -  Math::MPFR version 4.19 (or later)\n" .
+          "  is needed. We have only version $Math::MPFR::VERSION\n";
+  }
+  else {
+    cmp_ok($Math::GMPz::RETYPE, '==', 1, "retyping allowed");
+    my $z = Math::GMPz->new(123);
+    cmp_ok(ref($z), 'eq', 'Math::GMPz', '$z has been reverted to a Math::GMPz object');
+    $z *= $fr;
+    cmp_ok(ref($z), 'eq', 'Math::MPFR', '$z changes to a Math::MPFR object');
+    cmp_ok($z, '==', $fr * Math::GMPz->new(123), '$z *= $fr sets $z to 2.1033000000000002e3');
 
-  $z = Math::GMPz->new(123);
-  $z += $fr;
-  cmp_ok(ref($z), 'eq', 'Math::MPFR', '$z changes to a Math::MPFR object');
-  cmp_ok($z, '==', $fr + Math::GMPz->new(123), '$z += $fr sets $z to 1.4009999999999999e2');
+    $z = Math::GMPz->new(123);
+    $z += $fr;
+    cmp_ok(ref($z), 'eq', 'Math::MPFR', '$z changes to a Math::MPFR object');
+    cmp_ok($z, '==', $fr + Math::GMPz->new(123), '$z += $fr sets $z to 1.4009999999999999e2');
 
-  $z = Math::GMPz->new(123);
-  $z -= $fr;
-  cmp_ok(ref($z), 'eq', 'Math::MPFR', '$z changes to a Math::MPFR object');
-  cmp_ok($z, '==', Math::GMPz->new(123) - $fr, '$z -= $fr sets $z to 1.0590000000000001e2');
+    $z = Math::GMPz->new(123);
+    $z -= $fr;
+    cmp_ok(ref($z), 'eq', 'Math::MPFR', '$z changes to a Math::MPFR object');
+    cmp_ok($z, '==', Math::GMPz->new(123) - $fr, '$z -= $fr sets $z to 1.0590000000000001e2');
 
-  $z = Math::GMPz->new(123);
-  $z /= $fr;
-  cmp_ok(ref($z), 'eq', 'Math::MPFR', '$z changes to a Math::MPFR object');
-  cmp_ok($z, '==', Math::GMPz->new(123) / $fr, '$z /= $fr sets $z to 7.1929824561403501');
+    $z = Math::GMPz->new(123);
+    $z /= $fr;
+    cmp_ok(ref($z), 'eq', 'Math::MPFR', '$z changes to a Math::MPFR object');
+    cmp_ok($z, '==', Math::GMPz->new(123) / $fr, '$z /= $fr sets $z to 7.1929824561403501');
 
-  $z = Math::GMPz->new(2);
-  $z **= Math::MPFR->new(0.5);
-  cmp_ok(ref($z), 'eq', 'Math::MPFR', '$z changes to a Math::MPFR object');
-  cmp_ok($z, '==', Math::GMPz->new(2) ** Math::MPFR->new(0.5), '$z **= $Math::MPFR->new(0.5) sets $z to 1.4142135623730951');
+    $z = Math::GMPz->new(2);
+    $z **= Math::MPFR->new(0.5);
+    cmp_ok(ref($z), 'eq', 'Math::MPFR', '$z changes to a Math::MPFR object');
+    cmp_ok($z, '==', Math::GMPz->new(2) ** Math::MPFR->new(0.5), '$z **= $Math::MPFR->new(0.5) sets $z to 1.4142135623730951');
 
-  $z = Math::GMPz->new(2);
-  Math::MPFR::Rmpfr_set_default_prec(113);
-  $z **= Math::MPFR->new(0.5);
-  cmp_ok(ref($z), 'eq', 'Math::MPFR', '$z changes to a Math::MPFR object');
-  cmp_ok($z, '==', Math::GMPz->new(2) ** Math::MPFR->new(0.5), '$z **= Math::MPFR->new(0.5) sets $z to 1.41421356237309504880168872420969798');
+    $z = Math::GMPz->new(2);
+    Math::MPFR::Rmpfr_set_default_prec(113);
+    $z **= Math::MPFR->new(0.5);
+    cmp_ok(ref($z), 'eq', 'Math::MPFR', '$z changes to a Math::MPFR object');
+    cmp_ok($z, '==', Math::GMPz->new(2) ** Math::MPFR->new(0.5), '$z **= Math::MPFR->new(0.5) sets $z to 1.41421356237309504880168872420969798');
+  }
 
 }
 

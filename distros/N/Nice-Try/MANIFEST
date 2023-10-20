@@ -31,6 +31,8 @@ t/021_forks.t
 t/022_do.t
 t/022_use_try_right_after.t
 t/023_return.t
+t/024_signature.t
+t/025_sub_token.t
 t/900_pod.t
 t/910_signature.t
 t/999_kwalitee.t

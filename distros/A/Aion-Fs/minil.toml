@@ -1,0 +1,9 @@
+name = "Aion-Fs"
+
+authority="cpan:DART"
+license="gpl_3"
+
+badges = ["github-actions/test.yml"]
+markdown_maker = "Liveman::MinillaPod2Markdown"
+module_maker="ModuleBuildTiny"
+static_install = "auto"

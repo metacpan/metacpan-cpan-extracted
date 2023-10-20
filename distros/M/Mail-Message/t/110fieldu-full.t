@@ -102,8 +102,8 @@ is($b->encode('abc', encoding => 'Q', force => 1), '=?us-ascii?Q?abc?=');
 
 my $utf8 = decode('ISO-8859-1', "\x{E4}bc");
 
-is($b->encode($utf8), '=?us-ascii?q?=3Fbc?=');   # conversion &auml; fails to \?
-is($b->encode($utf8, encoding => 'Q'), '=?us-ascii?Q?=3Fbc?=');
+is($b->encode($utf8), '=?utf8?q?=C3=A4bc?=');  # autodetect utf8
+is($b->encode($utf8, encoding => 'Q'), '=?utf8?Q?=C3=A4bc?=');
 
 is($b->encode($utf8, charset => 'iso-8859-1'), '=?iso-8859-1?q?=E4bc?=');
 is($b->encode($utf8, charset => 'ISO-8859-1'), '=?ISO-8859-1?q?=E4bc?=');

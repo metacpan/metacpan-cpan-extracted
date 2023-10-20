@@ -3,22 +3,23 @@ abstract: "Email verification module for Perl using MailboxValidator API. It val
 author:
   - 'MailboxValidator.com <support@mailboxvalidator.com>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.132830'
-license: lgpl
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: MailboxValidator-SingleValidation
 no_index:
   directory:
     - t
     - inc
 requires:
-  JSON::Parse: 0
-  LWP::Simple: 0
-  URI::Escape: 0
-version: 1.11
+  JSON::PP: '0'
+  LWP::Simple: '0'
+  URI::Escape: '0'
+version: '2.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

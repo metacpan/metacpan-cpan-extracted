@@ -17,9 +17,11 @@ The following class-variables can be changed during runtime:
     Num!ROUND           = 0          # rounding mode for floating-point numbers
     Num!VERBOSE         = false      # true to enable verbose/debug mode
     Num!USE_YAFU        = false      # true to use YAFU for factoring large integers
+    Num!USE_PARI_GP     = false      # true to use PARI/GP in several methods
     Num!USE_FACTORDB    = false      # true to use factordb.com for factoring large integers
     Num!USE_PRIMESUM    = false      # true to use Kim Walisch's primesum in prime_sum(n)
     Num!USE_PRIMECOUNT  = false      # true to use Kim Walisch's primecount in prime_count(n)
+    Num!USE_CONJECTURES = false      # true to use conjectured methods for better performance
     Num!SPECIAL_FACTORS = true       # true to try to find factors of special form in factor(n)
 
 The supported rounding modes for floating-point numbers, are:
@@ -1282,7 +1284,7 @@ Binary search, returning the largest integer value in the range C<a..b> that sat
 
 where:
 
-    n = 546 is the  largest value satisfying pi(n) <= 100
+    n = 546 is the largest value satisfying pi(n) <= 100
 
 =cut
 
@@ -1886,7 +1888,7 @@ Returns an array with the continued fraction convergents for a given real number
 
 =head2 cop_factor
 
-    cop_factor(n, tries=n.ilog2)
+    n.cop_factor(tries=n.ilog2)
 
 Congruence of Powers (CoP) factorization method, trying to find algebraic factors of C<n>.
 
@@ -2239,8 +2241,8 @@ Aliases: I<cyclotomic_polynomial>
 
 =head2 cyclotomic_factor
 
-    cyclotomic_factor(n)
-    cyclotomic_factor(n, bases...)
+    n.cyclotomic_factor
+    n.cyclotomic_factor(bases...)
 
 Factorization method, based on cyclotomic polynomials, trying to find algebraic factors of C<n>.
 
@@ -2540,7 +2542,7 @@ When three arguments are given, it does integer modular division: C<(a/b) % m>.
 
 =head2 dop_factor
 
-    dop_factor(n, tries=n.ilog2)
+    n.dop_factor(tries=n.ilog2)
 
 Difference of Powers (DoP) factorization method, trying to find algebraic factors of C<n>.
 
@@ -3429,7 +3431,7 @@ The value of C<d> is always nonnegative.
 
 =head2 gcd_factors
 
-    gcd_factors(n, [a, b, ...])
+    n.gcd_factors([a, b, ...])
 
 Given a positive integer and an array of integers, it tries to find nontrivial factors of C<n>, checking each C<gcd(n, array[0])>, C<gcd(n, array[1])>, etc.
 
@@ -4043,12 +4045,14 @@ Aliases: I<integer_quadratic_formula>
     irand(n)
     irand(a,b)
 
-Returns a pseudorandom integer in range C<0..n> (all inclusive), or in the range C<a..b> (all inclusive).
+Returns a cryptographically-secure pseudorandom integer in the range C<0..n> (all inclusive), or in the range C<a..b> (all inclusive).
 
 If C<a> is greater than C<b>, the returned integer will be in the range C<b..a>.
 
     irand(10)        # a pseudorandom integer in the interval [0, 10]
     irand(10, 20)    # a pseudorandom integer in the interval [10, 20]
+
+The underlying CSPRNG is ISAAC-32.
 
 =cut
 
@@ -4246,11 +4250,16 @@ Return true if C<n> can be proved prime using the Elliptic Curve Primality Provi
 
 =cut
 
-=head2 iseed
+=head2 useed
 
     iseed(n)
+    useed(n)
 
-Re-seed the C<irand()> function. The value for C<n> can be any arbitrary large integer.
+Takes a nonnegative integer C<n>, which is used to seed the internal CSPRNG (currently, ISAAC-32) used for random functions, such as C<irand>, C<urand> and the random prime functions.
+
+For good security, C<n> should be at least an 128-bit random integer.
+
+Internally, the value of C<n> is converted into a binary string, SHA-512 hashed and expanded into a 8192-bit key.
 
 =cut
 
@@ -4414,6 +4423,16 @@ Returns true if C<2^n * k - 1> is prime, using the Lucas-Lehmer-Riesel (LLR) pri
 
 =cut
 
+=head2 is_lucas_psp
+
+    n.is_lucas_psp
+
+Return true if C<n> is a Lucas pseudoprime.
+
+Aliases: I<is_lucas_pseudoprime>
+
+=cut
+
 =head2 is_lucas
 
     n.is_lucas
@@ -4430,16 +4449,6 @@ Returns true if C<n> is a Lucas-Carmichael number.
 
     say 10.by(:is_lucas_carmichael)                               # OEIS: A006972
     say is_lucas_carmichael(58735331016965175152455996272482303)  # true
-
-=cut
-
-=head2 is_lucas_psp
-
-    n.is_lucas_psp
-
-Return true if C<n> is a Lucas pseudoprime.
-
-Aliases: I<is_lucas_pseudoprime>
 
 =cut
 
@@ -4808,9 +4817,17 @@ Returns true if C<n> is probably prime. The method does some trial division, the
 
 =head2 is_prob_squarefree
 
-    n.is_prob_squarefree(k)
+    n.is_prob_squarefree
+    n.is_prob_squarefree(limit)
 
-Returns true iff C<n> is not a power and is not divisible by a square <= C<k>.
+Returns true if C<n> is probably squarefree, checking if C<n> is divisible by a square C<p^2> with C<p> less than or equal to C<limit>:
+
+    say is_prob_squarefree(2**512 - 1, 1e6)   # true   (probably squarefree)
+    say is_prob_squarefree(10**136 + 1, 1e3)  # false  (definitely not squarefree)
+
+If C<n> is less than C<limit^3> and the function returns C<true>, then C<n> is definitely squarefree.
+
+If the C<limit> parameter is omitted, multiple limits are tested internally, trying to find a square factor of C<n>, up to C<limit = 10^7>.
 
 =cut
 
@@ -4929,6 +4946,16 @@ Returns true if C<n> has exactly two prime factors (not necessarily distinct).
 
 =cut
 
+=head2 is_strong_lucas_psp
+
+    n.is_strong_lucas_psp
+
+Return true if C<n> is a strong Lucas pseudoprime.
+
+Aliases: I<is_strong_lucas_pseudoprime>
+
+=cut
+
 =head2 is_smooth
 
     n.is_smooth(k)
@@ -4942,6 +4969,16 @@ Returns true if all the prime factors of C<n> are <= C<k>. False otherwise.
     n.is_smooth_over_prod(k)
 
 Returns true when C<n> is smooth over the prime factors of C<k>.
+
+=cut
+
+=head2 is_strong_psp
+
+    n.is_strong_psp(bases...)
+
+Return true if C<n> is a strong pseudoprime.
+
+Aliases: I<miller_rabin>, I<is_strong_fermat_psp>, I<is_strong_pseudoprime>, I<is_strong_fermat_pseudoprime>
 
 =cut
 
@@ -5041,26 +5078,6 @@ Aliases: I<is_strongish_lucas_pseudoprime>
 
 =cut
 
-=head2 is_strong_lucas_psp
-
-    n.is_strong_lucas_psp
-
-Return true if C<n> is a strong Lucas pseudoprime.
-
-Aliases: I<is_strong_lucas_pseudoprime>
-
-=cut
-
-=head2 is_strong_psp
-
-    n.is_strong_psp(bases...)
-
-Return true if C<n> is a strong pseudoprime.
-
-Aliases: I<miller_rabin>, I<is_strong_fermat_psp>, I<is_strong_pseudoprime>, I<is_strong_fermat_pseudoprime>
-
-=cut
-
 =head2 is_super_psp
 
     n.is_super_psp(bases...)
@@ -5107,6 +5124,25 @@ Aliases: I<subint>
 Return true if C<n> passes the efficient Frobenius test of Paul Underwood.
 
 Aliases: I<is_underwood_pseudoprime>, I<is_frobenius_underwood_psp>, I<is_frobenius_underwood_pseudoprime>
+
+=cut
+
+=head2 is_vpsp
+
+    n.is_vpsp
+
+Returns true if C<n> passes the Lucas-V BFW test: C<V_{n+1} == 2*Q (mod n)> for carefully chosen values of C<P> and C<Q>.
+
+The composite numbers that pass this test are extremely rare (see OEIS A365514).
+
+When combined with a strong Fermat pseudoprime test to base 2, there are no known composites that pass both tests.
+
+Reference:
+
+    Strengthening the Baillie-PSW primality test
+    https://arxiv.org/abs/2006.14425
+
+Aliases: I<is_bfw_psp>
 
 =cut
 
@@ -6532,7 +6568,7 @@ The product of the factors will give back C<n>. However, some factors may be com
 
 =head2 pell_factor
 
-    pell_factor(n, tries=1e4)
+    n.pell_factor(tries=1e4)
 
 Pell factorization method, trying to find a factor of C<n>.
 
@@ -8267,7 +8303,7 @@ Sum of the primes dividing C<n> (with repetition).
 
 =head2 special_factor
 
-    special_factor(n, tries=1)
+    n.special_factor(tries=1)
 
 Tries to find special factors of C<n>, using various special-factorization methods, including trial division, p-1 method, p+1 method, HOLF method, Fermat method, Pell method, Miller-Rabin method and the Lucas-Miller method.
 
@@ -8629,7 +8665,7 @@ Returns the count of square divisors of C<n>.
 
     squares_r(n, k=2)
 
-Sum of squares function C<r_k(n)>: returns the number of ways or representing C<n> as a sum of C<k> squares.
+The sum of squares function C<r_k(n)> returns the number of ways of representing C<n> as a sum of C<k> squares.
 
     say 30.of { .squares_r(2) }     # OEIS: A004018
     say 30.of { .squares_r(3) }     # OEIS: A005875
@@ -8969,29 +9005,19 @@ The unitary totient function. (OEIS: A047994)
     urand(n)
     urand(a, b)
 
-Given a positive integer C<n>, returns a random unsigned integer smaller than C<n>.
+Given a positive integer C<n>, returns a cryptographically-secure pseudorandom unsigned integer smaller than C<n>.
 
-    say urand(100)          # random integer in [0,99]
+    say urand(100)          # pseudorandom integer in [0,99]
 
-When two arguments are given, returns a uniform random unsigned integer in the range C<[a,b]> (inclusive on both ends).
+When two arguments are given, returns a uniform pseudorandom unsigned integer in the range C<[a,b]> (inclusive on both ends).
 
-    say urand(100, 110)     # random integer in [100, 110]
+    say urand(100, 110)     # pseudorandom integer in [100, 110]
 
-Both arguments must be nonnegative. If C<a> is greater than C<b>, then function will return a random integer in the range C<[b,a]>.
+Both arguments must be nonnegative. If C<a> is greater than C<b>, then will return a pseudorandom integer in the range C<[b,a]>.
+
+The underlying CSPRNG is ISAAC-32.
 
 Aliases: I<urandomm>
-
-=cut
-
-=head2 useed
-
-    useed(n)
-
-Takes a nonnegative integer C<n>, which is used to seed the internal CSPRNG used for random functions, such as C<urand> and the random prime functions.
-
-For good security, C<n> should be at least an 128-bit random integer.
-
-Internally, the value of C<n> is converted into a binary string, SHA-512 hashed and expanded into a 8192-bit key.
 
 =cut
 

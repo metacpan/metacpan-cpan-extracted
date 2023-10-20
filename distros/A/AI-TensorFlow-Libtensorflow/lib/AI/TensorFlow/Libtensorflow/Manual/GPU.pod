@@ -1,0 +1,69 @@
+# ABSTRACT: GPU-specific installation and usage information.
+# PODNAME: AI::TensorFlow::Libtensorflow::Manual::GPU
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+AI::TensorFlow::Libtensorflow::Manual::GPU - GPU-specific installation and usage information.
+
+=head1 DESCRIPTION
+
+This guide provides information about using the GPU version of
+C<libtensorflow>. This is currently specific to NVIDIA GPUs as
+they provide the CUDA API that C<libtensorflow> targets for GPU devices.
+
+=head1 INSTALLATION
+
+In order to use a GPU with C<libtensorflow>, you will need to check that the
+L<hardware requirements|https://www.tensorflow.org/install/pip#hardware_requirements> and
+L<software requirements|https://www.tensorflow.org/install/pip#software_requirements> are
+met. Please refer to the official documentation for the specific
+hardware capabilities and software versions.
+
+An alternative to installing all the software listed on the "bare metal" host
+machine is to use C<libtensorflow> via a Docker container and the
+NVIDIA Container Toolkit. See L<AI::TensorFlow::Libtensorflow::Manual::Quickstart/DOCKER IMAGES>
+for more information.
+
+=head1 RUNTIME
+
+When running C<libtensorflow>, your program will attempt to acquire quite a bit
+of GPU VRAM. You can check if you have enough free VRAM by using the
+C<nvidia-smi> command which displays resource information as well as which
+processes are currently using the GPU.  If C<libtensorflow> is not able to
+allocate enough memory, it will crash with an out-of-memory (OOM) error. This
+is typical when running multiple programs that both use the GPU.
+
+If you have multiple GPUs, you can control which GPUs your program can access
+by using the
+L<C<CUDA_VISIBLE_DEVICES> environment variable|https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#env-vars>
+provided by the underlying CUDA library. This is typically
+done by setting the variable in a C<BEGIN> block before loading
+L<AI::TensorFlow::Libtensorflow>:
+
+  BEGIN {
+      # Set the specific GPU device that is available
+      # to this program to GPU index 0, which is the
+      # first GPU as listed in the output of `nvidia-smi`.
+      $ENV{CUDA_VISIBLE_DEVICES} = '0';
+      require AI::TensorFlow::Libtensorflow;
+  }
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2022-2023 by Auto-Parallel Technologies, Inc.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

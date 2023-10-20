@@ -10,8 +10,8 @@ use JSON::XS;
 
 class Hardware {
 
-    has $endpoint :param;
-    has $header :param;
+    field $endpoint :param;
+    field $header :param;
 
 
 
@@ -110,12 +110,6 @@ class Hardware {
 
         return $results;
     }
-
-
-
-
 }
 
-
 1;
-

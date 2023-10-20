@@ -1,0 +1,154 @@
+#! perl
+
+use 5.014;
+use warnings;
+
+use Getopt::Long qw/:config gnu_getopt no_bundling/;
+use ExtUtils::Typemaps;
+use Module::Runtime 'require_module';
+use List::Util 'max';
+
+GetOptions(
+	'file=s'                         => \(my $file = 'typemap'),
+	'replace!'                       => \(my $replace = 1),
+	'merge=s@'                       => \my @merge,
+	'add_string|add-string=s@'       => \my @add_string,
+	'add_file|add-file=s@'           => \my @add_file,
+	'add_type|add-type=s{2}'         => \my @add_type,
+	'add_input|add-input=s{2}'       => \my @add_input,
+	'add_output|add-output=s{2}'     => \my @add_output,
+	'remove_type|remove-type=s@'     => \my @remove_type,
+	'remove_input|remove-input=s@'   => \my @remove_input,
+	'remove_output|remove-output=s@' => \my @remove_output,
+	) or die "Error in command line arguments";
+
+my $typemap = ExtUtils::Typemaps->new(file => $file);
+
+for my $name (@merge) {
+	my $module = $name =~ s/^\+/ExtUtils::Typemaps::/gr;
+	require_module($module);
+	$typemap->merge(typemap => $module->new, replace => $replace);
+}
+
+for my $string (@add_string) {
+	$typemap->add_string(string => $string, replace => $replace);
+}
+
+for my $add_file (@add_file) {
+	my $add_typemap = ExtUtils::Typemaps->new(file => $add_file);
+	$typemap->merge(typemap => $add_typemap, replace => $replace);
+}
+
+while (my ($ctype, $xstype) = splice @add_type, 0, 2) {
+	$typemap->add_typemap(ctype => $ctype, xstype => $xstype, replace => $replace);
+}
+
+while (my ($xstype, $code) = splice @add_input, 0, 2) {
+	$typemap->add_inputmap(xstype => $xstype, code => $code, replace => $replace);
+}
+
+while (my ($xstype, $code) = splice @add_output, 0, 2) {
+	$typemap->add_outputmap(xstype => $xstype, code => $code, replace => $replace);
+}
+
+for my $remove (@remove_type) {
+	$typemap->remove_typemap(ctype => $remove);
+}
+
+for my $remove (@remove_input) {
+	$typemap->remove_inputmap(xstype => $remove);
+}
+
+for my $remove (@remove_output) {
+	$typemap->remove_outputmap(xstype => $remove);
+}
+
+$typemap->write(file => $file);
+
+# PODNAME: typemap
+# ABSTRACT: A tool for manipulating typemaps
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+typemap - A tool for manipulating typemaps
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+ typemap --merge +Magic
+
+=head1 DESCRIPTION
+
+This script can modify, create and write Perl XS typemap files. If you don't know what a typemap is, please confer the L<perlxstut> and L<perlxs> manuals.
+
+=head2 ARGUMENTS
+
+=over 4
+
+=item * file <filename>
+
+The file that we're manipulating, this defaults to C<typemap>.
+
+=item * merge <module-name>
+
+This option takes an C<ExtUtils::Typemaps> module name as argument, and will merge that into the current typemap. The prefix C<+> is replaced with C<ExtUtils::Typemaps::> for convenience. This may be passed multiple times.
+
+=item * no-replace
+
+This will disable replacing existing entries.
+
+=item * add-string <content>
+
+This will parse a string entry and merge it into the typemap.
+
+=item * add-file <filename>
+
+This will parse a file and merge it into the typemap.
+
+=item * add-type <c-type> <xs-type>
+
+This will add a type mapping entry to the typemap. It takes two arguments: a C type (e.g. C<double>) and an XS type (e.g. C<T_NV>).
+
+=item * add-input <xs-type> <code>
+
+This will add an input entry to the typemap. It takes two arguments: an XS type (e.g. C<T_NV>) and a piece of code to associate with it (e.g. C<'$var = ($type)SvNV($arg);'>).
+
+=item * add-output <xs-type> <code>
+
+This will add an output entry to the typemap. It takes two arguments: an XS type (e.g. C<T_NV>) and a piece of code to associate with it (e.g. C<'sv_setnv($arg, (NV)$var);'>).
+
+=item * remove-type <c-type>
+
+This takes a C type as its only argument, and will remove the type mapping for that type.
+
+=item * remove-input <xs-type>
+
+This takes an XS type as its only argument and will remove the associated input entry.
+
+=item * remove-output <xs-type>
+
+This takes an XS type as its only argument and will remove the associated output entry.
+
+=back
+
+=head1 AUTHOR
+
+Leon Timmermans <leont@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by Leon Timmermans.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

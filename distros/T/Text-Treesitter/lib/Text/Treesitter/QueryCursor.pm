@@ -5,9 +5,9 @@
 
 use v5.26;
 use warnings;
-use Object::Pad 0.73;
+use Object::Pad 0.800;
 
-package Text::Treesitter::QueryCursor 0.10;
+package Text::Treesitter::QueryCursor 0.11;
 class Text::Treesitter::QueryCursor
    :strict(params);
 

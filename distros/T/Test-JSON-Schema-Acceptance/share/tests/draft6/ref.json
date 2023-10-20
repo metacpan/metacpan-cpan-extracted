@@ -446,6 +446,33 @@
         ]
     },
     {
+        "description": "Reference an anchor with a non-relative URI",
+        "schema": {
+            "$id": "https://example.com/schema-with-anchor",
+            "allOf": [{
+                "$ref": "https://example.com/schema-with-anchor#foo"
+            }],
+            "definitions": {
+                "A": {
+                    "$id": "#foo",
+                    "type": "integer"
+                }
+            }
+        },
+        "tests": [
+            {
+                "data": 1,
+                "description": "match",
+                "valid": true
+            },
+            {
+                "data": "a",
+                "description": "mismatch",
+                "valid": false
+            }
+        ]
+    },
+    {
         "description": "Location-independent identifier with base URI change in subschema",
         "schema": {
             "$id": "http://localhost:1234/root",
@@ -810,6 +837,91 @@
              {
                  "description": "an integer is invalid",
                  "data": 12,
+                 "valid": false
+             }
+         ]
+     },
+     {
+         "description": "$id with file URI still resolves pointers - *nix",
+         "schema": {
+             "$id": "file:///folder/file.json",
+             "definitions": {
+                 "foo": {
+                     "type": "number"
+                 }
+             },
+             "allOf": [
+                 {
+                     "$ref": "#/definitions/foo"
+                 }
+             ]
+         },
+         "tests": [
+             {
+                 "description": "number is valid",
+                 "data": 1,
+                 "valid": true
+             },
+             {
+                 "description": "non-number is invalid",
+                 "data": "a",
+                 "valid": false
+             }
+         ]
+     },
+     {
+         "description": "$id with file URI still resolves pointers - windows",
+         "schema": {
+             "$id": "file:///c:/folder/file.json",
+             "definitions": {
+                 "foo": {
+                     "type": "number"
+                 }
+             },
+             "allOf": [
+                 {
+                     "$ref": "#/definitions/foo"
+                 }
+             ]
+         },
+         "tests": [
+             {
+                 "description": "number is valid",
+                 "data": 1,
+                 "valid": true
+             },
+             {
+                 "description": "non-number is invalid",
+                 "data": "a",
+                 "valid": false
+             }
+         ]
+     },
+     {
+         "description": "empty tokens in $ref json-pointer",
+         "schema": {
+             "definitions": {
+                 "": {
+                     "definitions": {
+                         "": { "type": "number" }
+                     }
+                 } 
+             },
+             "allOf": [
+                 {
+                     "$ref": "#/definitions//definitions/"
+                 }
+             ]
+         },
+         "tests": [
+             {
+                 "description": "number is valid",
+                 "data": 1,
+                 "valid": true
+             },
+             {
+                 "description": "non-number is invalid",
+                 "data": "a",
                  "valid": false
              }
          ]

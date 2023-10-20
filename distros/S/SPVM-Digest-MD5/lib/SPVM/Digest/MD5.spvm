@@ -2,7 +2,7 @@
 # MIT License
 
 class Digest::MD5 {
-  version "1.001002";
+  version "1.001003";
   
   use Digest::MD5::Context;
   
@@ -19,7 +19,7 @@ class Digest::MD5 {
   # Instance Methods
   native method DESTROY : void ();
   
-  native method add : Digest::MD5 ($data : string);
+  native method add : void ($data : string);
   
   native method digest : string ();
   

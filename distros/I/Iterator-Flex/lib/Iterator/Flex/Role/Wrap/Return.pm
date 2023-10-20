@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Wrap::Return;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Iterator::Flex::Utils qw( :default INPUT_EXHAUSTION );
 use Scalar::Util;
@@ -106,7 +106,7 @@ Iterator::Flex::Role::Wrap::Return - wrap imported iterator which returns a sent
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 INTERNALS
 

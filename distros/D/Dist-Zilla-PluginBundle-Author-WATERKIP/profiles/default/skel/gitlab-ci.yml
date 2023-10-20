@@ -18,10 +18,10 @@ build:
   except:
     - master
   script:
-    - docker pull $CONTAINER_IMAGE:$CI_BUILD_REF_NAME || true
+    - docker pull $CONTAINER_IMAGE:$CI_COMMIT_REF_NAME || true
     - docker pull $CONTAINER_IMAGE:latest || true
-    - docker build --cache-from $CONTAINER_IMAGE:latest --cache-from $CONTAINER_IMAGE:$CI_BUILD_REF_NAME --tag $CONTAINER_IMAGE:$CI_BUILD_REF_NAME .
-    - docker push $CONTAINER_IMAGE:$CI_BUILD_REF_NAME
+    - docker build --cache-from $CONTAINER_IMAGE:latest --cache-from $CONTAINER_IMAGE:$CI_COMMIT_REF_NAME --tag $CONTAINER_IMAGE:$CI_COMMIT_REF_NAME .
+    - docker push $CONTAINER_IMAGE:$CI_COMMIT_REF_NAME
 
 build-latest:
   stage: build

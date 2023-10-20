@@ -180,6 +180,7 @@ t/500parser-field.t
 t/501parser-readmp.t
 t/502parser-nested.t
 t/503parser-unnested.t
+t/504parser-preamble.t
 xt/99pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

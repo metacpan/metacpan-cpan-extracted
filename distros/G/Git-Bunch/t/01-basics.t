@@ -194,7 +194,7 @@ test_gb(
                 "repo $repo copied (.git exists)");
             is( read_text("sync/1/$repo/a"), "apple",
                 "repo $repo copied (working copy copied)");
-            like(~~readpipe("cd sync/1/$repo && git log"), qr/commit1-$repo/i,
+            like(scalar(readpipe("cd sync/1/$repo && git log")), qr/commit1-$repo/i,
                  "repo $repo copied (git log works)");
         }
     },
@@ -233,7 +233,7 @@ test_gb(
         ok(!(-e "sync/1/repo1/k"), "repo1: k moved (1)");
         is(read_text("sync/1/repo1/d/k"), "kangkung",
            "repo1: k moved (2)");
-        like(~~readpipe("cd sync/1/repo1 && git log"),
+        like(scalar(readpipe("cd sync/1/repo1 && git log")),
              qr/commit6.+commit5.+commit4.+commit3/s,
              "repo1: commits sync-ed");
         my %status = (

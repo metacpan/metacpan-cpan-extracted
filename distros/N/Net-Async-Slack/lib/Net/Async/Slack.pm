@@ -4,7 +4,7 @@ package Net::Async::Slack;
 use strict;
 use warnings;
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use parent qw(IO::Async::Notifier Net::Async::Slack::Commands);
 
@@ -220,7 +220,8 @@ sub conversations_invite {
 
 async sub users_list {
     my ($self, %args) = @_;
-    return await $self->http_get(
+    return await $self->http_get_paged(
+        key => 'members',
         uri => $self->endpoint(
             'users_list',
             %args
@@ -281,6 +282,16 @@ async sub users_profile_get {
             'users_profile_get',
             %args
         ),
+    )
+}
+
+async sub workflows_update_step {
+    my ($self, %args) = @_;
+    return await $self->http_post(
+        $self->endpoint(
+            'workflows_update_step',
+        ),
+        \%args,
     )
 }
 
@@ -436,6 +447,31 @@ sub http_get {
     })
 }
 
+async sub http_get_paged {
+    my ($self, %args) = @_;
+    my $key = delete $args{key}
+        or die 'need a hash key to find the results array in the response';
+    my $uri = delete $args{uri};
+    $uri = URI->new($uri) unless ref($uri);
+    $uri->query_param(limit => 500) unless $uri->query_param('limit');
+    my $data;
+    my $found;
+    my $offset;
+    do {
+        my $res = await $self->http_get(uri => $uri, %args);
+        die $res unless $res->{ok};
+        $offset = $res->{offset};
+        $uri->query_param(offset => $offset);
+        $found = 0 + $res->{$key}->@*;
+        if($data) {
+            push $data->@*, $res->{$key}->@*;
+        } else {
+            $data = $res->{$key};
+        }
+    } while $found and $offset;
+    return $data;
+}
+
 sub auth_headers {
     my ($self) = @_;
     return {} unless $self->token;
@@ -539,5 +575,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2016-2022. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2016-2023. Licensed under the same terms as Perl itself.
 

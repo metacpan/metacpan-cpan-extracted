@@ -30,7 +30,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Math::BigInt" : "1.999838",
+            "Math::BigInt" : "1.99984",
             "Math::Pari" : "2.010709",
             "perl" : "5.006002"
          }
@@ -49,6 +49,6 @@
          "web" : "https://github.com/pjacklam/p5-Math-BigInt-Pari"
       }
    },
-   "version" : "1.3011",
+   "version" : "1.3012",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

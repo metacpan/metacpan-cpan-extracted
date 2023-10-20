@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Indicates pivot table field request',
                                   class => 'PivotTableFieldRequest',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'data' => {
      	datatype => 'ARRAY[int?]',
      	base_name => 'Data',
-     	description => '',
+     	description => 'Intdex array.',
      	format => '',
      	read_only => '',
      		},    

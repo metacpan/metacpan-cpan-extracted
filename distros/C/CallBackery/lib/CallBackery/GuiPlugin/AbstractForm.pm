@@ -91,12 +91,18 @@ sub validateData {
     if (not ref $entry){
         die mkerror(4095,trm("sorry, don't know the field you are talking about"));
     }
-    return if not $entry->{set}{required} and (not defined $formData->{$fieldName} or length($formData->{$fieldName}) == 0);
+    my $fieldIsEmpty = (not defined $formData->{$fieldName} or length($formData->{$fieldName}) == 0);
+    return if not $entry->{set}{required} and $fieldIsEmpty;
     if ($entry->{validator}){
         my $start = time;
         my $data = $entry->{validator}->($formData->{$fieldName},$fieldName,$formData);
         $self->log->debug(sprintf("validator %s: %0.2fs",$fieldName,time-$start));
         return $data;
+    }
+    # if there is no validator but the field is required, complain
+    # if the content is empty
+    elsif ($entry->{set}{required} and $fieldIsEmpty){
+        return trm('The %1 field is required',$fieldName);
     }
     return;
 }

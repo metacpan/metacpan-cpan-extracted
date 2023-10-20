@@ -1,5 +1,10 @@
 Changes to Spreadsheet::Edit, Spreadsheet::Edit::IO, and/or Spreadsheet::Edit::Log
 
+1000.009 : Remove first/last_data_rx. Detect title clashes in insert_cols
+1000.008 : Fix AUTHOR_TESTING test plan glitch
+1000.007 : Elide internal frames in backtraces in apply handlers (exc. w debug)
+           Fix bug where $@ and $_ were clobbered by btw() and btwN().
+           Spreadsheet::Edit::Log ':btw=PREFIX' now generates both btw & btwN.
 1000.006 : Add openlibreoffice_path() and friends to Spreadsheet::Edit::IO
 1000.004 : Add Spreadsheet::Edit::Log :btw=PFX and :btwN=PFX import tags
 1000.003 : Handle symlink issues on Windows

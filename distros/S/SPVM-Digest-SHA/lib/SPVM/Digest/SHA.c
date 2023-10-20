@@ -28,11 +28,11 @@ int32_t SPVM__Digest__SHA__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_self = env->new_object_by_name(env, stack, "Digest::SHA", &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
   
-  SHA *state = env->new_memory_stack(env, stack, sizeof(SHA));
+  SHA *state = env->new_memory_block(env, stack, sizeof(SHA));
 
   if (!shainit(state, alg)) {
-    env->free_memory_stack(env, stack, state);
-    return env->die(env, stack, "Can't initalize SHA state. The specified algorithm is %d", alg, __func__, FILE_NAME, __LINE__);
+    env->free_memory_block(env, stack, state);
+    return env->die(env, stack, "The SHA state cannot be initalized. The specified algorithm is %d.", alg, __func__, FILE_NAME, __LINE__);
   }
   
   void* obj_state = env->new_object_by_name(env, stack, "Digest::SHA::State", &e, __func__, FILE_NAME, __LINE__);
@@ -58,7 +58,7 @@ int32_t SPVM__Digest__SHA__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   SHA* state = env->get_pointer(env, stack, obj_state);
   assert(state);
   
-  env->free_memory_stack(env, stack, state);
+  env->free_memory_block(env, stack, state);
   
   return 0;
 }
@@ -74,14 +74,14 @@ static int32_t SPVM__Digest__SHA__sha(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_data = stack[0].oval;
   
   if (!obj_data) {
-    return env->die(env, stack, "The input data must be defined", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$data must be defined.", __func__, FILE_NAME, __LINE__);
   }
 
   int32_t ix = stack[1].ival;
 
   int32_t alg = ix2alg[ix];
   if (!shainit(&sha, alg)) {
-    return env->die(env, stack, "Can't initalize SHA state. The specified algorithm is %d", alg, __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The SHA state cannot be initalized. The specified algorithm is %d.", alg, __func__, FILE_NAME, __LINE__);
   }
 
   data = (unsigned char *)env->get_chars(env, stack, obj_data);
@@ -169,7 +169,7 @@ static int32_t SPVM__Digest__SHA__hmac_sha(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_data = stack[0].oval;
   
   if (!obj_data) {
-    return env->die(env, stack, "The input data must be defined", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$data must be defined.", __func__, FILE_NAME, __LINE__);
   }
   data = (unsigned char *)env->get_chars(env, stack, obj_data);
 
@@ -183,7 +183,7 @@ static int32_t SPVM__Digest__SHA__hmac_sha(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t ix = stack[2].ival;
   int32_t alg = ix2alg[ix];
   if (hmacinit(&hmac, alg, key, (unsigned int) len) == NULL) {
-    return env->die(env, stack, "Can't initalize HMAC. The specified algorithm is %d", alg, __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "HMAC cannot be initalized. The specified algorithm is %d.", alg, __func__, FILE_NAME, __LINE__);
   }
   len = env->length(env, stack, obj_data);
   while (len > MAX_WRITE_SIZE) {
@@ -378,7 +378,7 @@ int32_t SPVM__Digest__SHA__clone(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_self_clone = env->new_object_by_name(env, stack, "Digest::SHA", &e, __func__, FILE_NAME, __LINE__);
   if (e) { return e; }
   
-  SHA* state_clone = env->new_memory_stack(env, stack, sizeof(SHA));
+  SHA* state_clone = env->new_memory_block(env, stack, sizeof(SHA));
   
   Copy(state, state_clone, 1, SHA);
 

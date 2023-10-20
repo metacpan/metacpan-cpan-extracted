@@ -1,5 +1,5 @@
 Changes
-examples/ex1.pl
+examples/pyx_as_sgml.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

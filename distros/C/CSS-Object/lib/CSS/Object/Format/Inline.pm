@@ -47,7 +47,6 @@ sub copy_parameters_from
     my $fmt  = shift( @_ ) || return( $self->error( "No formatter object was provided to copy the parameters from." ) );
     return( $self->error( "Formatter object provided is actually not a formatter object." ) ) if( !$self->_is_a( $fmt, 'CSS::Object::Format' ) );
     # my( $p, $f, $l ) = caller();
-    # $self->message( 3, "copy_parameters_from called from package $p at line $l in file $f to set indent from '", $self->indent->scalar, "' to '", $fmt->indent->scalar, "'." );
     ## We only copy the property separator, and ignore all other possible parameters
     my @ok_params = qw(
         property_separator
@@ -90,7 +89,6 @@ sub rule_as_string
 {
 	my( $self, $rule ) = @_;
 	no overloading;
-	# $self->message( 3, "Stringifying rule for inline style" );
 	return( $self->error( "No rule object was provided." ) ) if( !$rule );
 	return( $self->error( "Rule object provided (", overload::Overloaded( $rule ) ? overload::StrVal( $rule ) : $rule ,") is not an actual rule object." ) ) if( !$self->_is_a( $rule, 'CSS::Object::Rule' ) );
 	return( $rule->elements_as_string );

@@ -1,3 +1,11 @@
+0.017   2023-08-05  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - [ux] When logging formatting error, include formatter names to
+          aid debugging.
+
+
 0.016   2023-01-19  Released-By: PERLANCAR; Urgency: low
 
         - Tweak schema for field_value_formatters to fix completion.

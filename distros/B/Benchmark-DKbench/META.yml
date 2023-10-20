@@ -4,13 +4,12 @@ author:
   - 'Dimitrios Kechagias <dkechag@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test2::Tools::Exception: '0'
   Test2::V0: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.52'
   File::ShareDir::Install: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,23 +24,25 @@ requires:
   Astro::Coord::Precession: '0'
   CSS::Inliner: '0'
   Crypt::JWT: '0.032'
+  CryptX: '0.067'
   DBD::Mock: '0'
-  DBI: '0'
-  DateTime: '0'
+  DBI: '1.642'
+  DateTime: '1.52'
   File::ShareDir: '0'
   HTML::FormatText: '0'
   HTML::Parser: '0'
   HTML::TreeBuilder: '0'
   Image::PHash: '0.3'
-  Imager: '1'
-  JSON::XS: '0'
+  Imager: '1.007'
+  JSON::XS: '4.0'
   MCE::Loop: '0'
   Math::DCT: '0'
   Math::MatrixReal: '0'
-  Moose: '0'
+  Moose: '2.2005'
   SQL::Abstract::Classic: '0'
   SQL::Inserter: '0'
-  System::Info: '0'
+  System::CPU: '0'
+  System::Info: '0.057'
   Test::Harness: '0'
   Test::Requires: '0'
   Text::Levenshtein::Damerau::XS: '0'
@@ -49,5 +50,5 @@ requires:
   perl: '5.012000'
 resources:
   repository: git://github.com/dkechag/Benchmark-DKbench.git
-version: '2.1'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '2.4'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

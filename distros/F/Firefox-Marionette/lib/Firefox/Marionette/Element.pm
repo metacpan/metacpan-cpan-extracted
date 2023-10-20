@@ -3,7 +3,7 @@ package Firefox::Marionette::Element;
 use strict;
 use warnings;
 
-our $VERSION = '1.44';
+our $VERSION = '1.46';
 
 sub IDENTIFIER { return 'element-6066-11e4-a52e-4f735466cecf' }
 
@@ -66,8 +66,8 @@ sub clear {
 }
 
 sub scroll {
-    my ($self) = @_;
-    return $self->browser()->scroll($self);
+    my ( $self, $arguments ) = @_;
+    return $self->browser()->scroll( $self, $arguments );
 }
 
 sub text {
@@ -360,7 +360,7 @@ Firefox::Marionette::Element - Represents a Firefox element retrieved using the 
 
 =head1 VERSION
 
-Version 1.44
+Version 1.46
 
 =head1 SYNOPSIS
 

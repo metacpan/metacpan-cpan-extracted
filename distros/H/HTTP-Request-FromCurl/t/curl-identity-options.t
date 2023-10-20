@@ -23,6 +23,18 @@ my @tests = (
     { cmd => [ '--verbose', '--parallel', '-s', '$url', '-S' ],
       version => '007068000',
     },
+    { cmd => [ '--verbose', '--interface', '$host', '-s', '$url', '-S' ],
+      version => '007057000',
+    },
+    { cmd => [ '--verbose', '--disable', '-s', '$url', '-S' ],
+      version => '007050000',
+    },
+    { cmd => [ '--verbose', '--max-filesize', '32768', '-s', '$url', '-S' ],
+      version => '007058000',
+    },
+    { cmd => [ '--verbose', '--max-filesize', '3m', '-s', '$url', '-S' ],
+      version => '007058000',
+    },
 );
 
 run_curl_tests( @tests );

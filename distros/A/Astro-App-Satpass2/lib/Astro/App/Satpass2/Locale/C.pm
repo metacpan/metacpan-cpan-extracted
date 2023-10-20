@@ -11,7 +11,7 @@ use Astro::Coord::ECI::TLE 0.059 qw{ :constants };
 use Astro::App::Satpass2::Utils qw{ @CARP_NOT };
 use Scalar::Util ();
 
-our $VERSION = '0.051';
+our $VERSION = '0.052';
 
 my @event_names;
 $event_names[PASS_EVENT_NONE]		= '';
@@ -169,7 +169,7 @@ EOD
 [%- END %]
 [%- FOR pass IN data %]
     [%- events = pass.events %]
-    [%- evt = events.first %]
+    [%- evt = events.first_tle %]
 
     [%- evt.date %]    [% evt.oid %] - [% evt.name( width = '' ) %]
 

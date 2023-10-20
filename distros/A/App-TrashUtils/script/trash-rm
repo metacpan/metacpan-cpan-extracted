@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-02'; # DATE
+our $DATE = '2023-08-06'; # DATE
 our $DIST = 'App-TrashUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/TrashUtils/trash_rm",
@@ -40,7 +40,7 @@ trash-rm - Permanently remove files in trash
 
 =head1 VERSION
 
-This document describes version 0.002 of trash-rm (from Perl distribution App-TrashUtils), released on 2023-08-02.
+This document describes version 0.003 of trash-rm (from Perl distribution App-TrashUtils), released on 2023-08-06.
 
 =head1 SYNOPSIS
 

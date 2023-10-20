@@ -107,25 +107,14 @@ CREATE TABLE IF NOT EXISTS %SCHEMA%.slave (
 CREATE ROLE user_read LOGIN PASSWORD 'password_read';
 CREATE ROLE user_update LOGIN PASSWORD 'password_update';
 
-GRANT SELECT ON TABLE
-	%SCHEMA%.standard_notnull,
-	%SCHEMA%.standard_null,
-	%SCHEMA%.standard_single,
-	%SCHEMA%.autoincrement_1,
-	%SCHEMA%.standard_indexed,
-	%SCHEMA%.master,
-	%SCHEMA%.slave
-	TO user_read;
+GRANT SELECT ON ALL TABLES IN SCHEMA %SCHEMA% TO user_read;
+GRANT ALL ON ALL TABLES IN SCHEMA %SCHEMA% TO user_update;
 
-GRANT SELECT,INSERT,UPDATE,DELETE ON TABLE
-	%SCHEMA%.standard_notnull,
-	%SCHEMA%.standard_null,
-	%SCHEMA%.standard_single,
-	%SCHEMA%.autoincrement_1,
-	%SCHEMA%.standard_indexed,
-	%SCHEMA%.master,
-	%SCHEMA%.slave
-	TO user_update;
+GRANT SELECT ON DATABASE %DSNAME% TO user_read;
+GRANT ALL ON DATABASE %DSNAME% TO user_update;
+
+GRANT pg_read_all_data TO user_read;
+GRANT pg_write_all_data TO user_update;
 
 -- -----------------------------------------------------
 -- ENDED

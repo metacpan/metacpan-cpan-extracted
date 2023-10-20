@@ -82,7 +82,7 @@ Other methods are describe below and the parameters they take are documented in 
 
 =head1 VERSION
 
-    v2.0.2
+    v2.0.4
 
 =head1 DESCRIPTION
 
@@ -3774,20 +3774,58 @@ More information from Stripe api documentation at L<https://stripe.com/docs/api/
 L<Net::API::Stripe> never dies, or at least not voluntarily. Instead, when an error occurs and is reported, it returns undef and the error can be retrieved with the L</"error"> method, such as:
 
     my $prod = $stripe->products( retrieve => $prod_id ) || die( $stripe->error, "\n" );
+    # or
+    my $pm = $stripe->payment_methods( retrieve => $id );
+    say "Payment method returned is: ", ( $pm // 'undefined' );
+    if( !defined( $pm ) )
+    {
+        my $ex = $stripe->error;
+        say "Error: ", $ex;
+        say "HTTP code: ", $ex->http_code;
+        say "HTTP response headers: ", $ex->http_headers->as_string;
+        say "Stripe code: ", $ex->code;
+        say "Message: ", $ex->message;
+        say "Request log URL: ", $ex->request_log_url;
+        say "Type: ", $ex->type;
+    }
+    else
+    {
+        say "Ok, payment method is '", $pm->id, "'";
+    }
 
-The B<error> method returns the L<Module::Generic::Exception> set. Please refer to the manual page of L<Module::Generic/"error"> for more information, but essentially, the following methods are available with the error objects:
+The B<error> method returns the L<Net::API::Stripe::Exception> object, which inherits from L<Module::Generic::Exception>. Please refer to the manual page of L<Net::API::Stripe::Exception> for more information, but essentially, the following methods are available with the error objects:
 
 =head2 as_string
 
 This is triggered when the error object is stringified
 
+=head2 charge
+
+String. For card errors, sets or gets the ID of the failed charge.
+
 =head2 code
 
 The error code returned by Stripe
 
+=head2 decline_code
+
+A short string for card errors resulting from a card issuer decline. This is a short string indicating the card issuer’s reason for the decline if they provide one.
+
+=head2 doc_url
+
+The url of the Stripe documentation detailing that error code. For example: <https://stripe.com/docs/error-codes/resource-missing>
+
 =head2 file
 
 The file containing the error
+
+=head2 http_code
+
+The HTTP status code returned by Stripe. For example 200 or 400, etc.
+
+=head2 http_headers
+
+The HTTP headers object from the Stripe HTTP response.
 
 =head2 line
 
@@ -3801,9 +3839,37 @@ The actual error message
 
 The package name where the error occurred.
 
+=head2 param
+
+The error param. For example: C<payment_method>
+
+=head2 payment_intent
+
+The PaymentIntent object for errors returned on a request involving a PaymentIntent.
+
+=head2 payment_method
+
+The PaymentMethod object for errors returned on a request involving a PaymentMethod.
+
+=head2 payment_method_type
+
+The payment method type that had a problem. This field is only populated for invoice-related errors.
+
+=head2 request_log_url
+
+The uri in the dashboard to get details about the error that occurred.
+
 =head2 rethrow
 
 Used to re-trigger the error
+
+=head2 setup_intent
+
+The SetupIntent object for errors returned on a request involving a SetupIntent.
+
+=head2 source
+
+The source object for errors returned on a request involving a source.
 
 =head2 subroutine
 
@@ -3815,7 +3881,7 @@ The full stack trace object. This is a L<Devel::StackTrace>
 
 =head2 type
 
-The error type, if any
+The error type, if any. This can be any of C<api_error>, C<card_error>, C<idempotency_error>, C<invalid_request_error>
 
 =head1 EVENT
 

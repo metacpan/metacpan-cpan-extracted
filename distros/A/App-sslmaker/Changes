@@ -1,5 +1,11 @@
 Revision history for perl distribution App-sslmaker
 
+0.19 2023-10-05T15:21:23
+ - Add support for --ext for ex "subjectAltName=DNS:example.com"
+ - Add "subjectAltName=DNS:$domainname" as default for "generate" sub command
+ - Add copy_extensions=copy to copy subjectAltName from csr to crt
+ - Add --help and -h
+
 0.18 2022-10-23T10:17:47
  - Replaced Applify with Getopt::App
  - Fix installing script/sslmaker

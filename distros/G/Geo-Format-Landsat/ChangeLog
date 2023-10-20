@@ -1,9 +1,17 @@
 
 ============= ChangeLog for Geo::Format::Landsat
+
 All modifications where created by Mark Overmeer, unless explicitly
 stated differently.
 
+version 0.90: Tue 23 Jan 17:26:41 CET 2018
+
+	Improvements:
+	- convert to GIT
+	- publish on GitHUB
+
 version 0.03: Thu Jan 29 16:52:29 CET 2009
+
 	- added example output.txt of example/landsat.pl
 	- minor typos in a few fieldnames
 	- added landsat_meta_from_filename()

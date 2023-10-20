@@ -1,7 +1,8 @@
 #!/usr/bin/env perl
 
 # A quick script to use to restore the console to text mode,
-# if it is stuck in graphics mode.
+# if it is stuck in graphics mode.  You have to blindly run it.
+# I suggest for ease of use, just copy it to "/usr/local/bin".
 
 use strict;
 

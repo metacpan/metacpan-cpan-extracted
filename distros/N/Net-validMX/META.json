@@ -4,9 +4,9 @@
       "The McGrail Foundation & Kevin A. McGrail <kevin.mcgrail-netvalidmx@mcgrail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "artistic_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -38,6 +38,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v2.5.1",
-   "x_serialization_backend" : "JSON::PP version 4.11"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/The-McGrail-Foundation/Net-validMX/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/The-McGrail-Foundation/Net-validMX.git",
+         "web" : "https://github.com/The-McGrail-Foundation/Net-validMX"
+      }
+   },
+   "version" : "v2.5.2",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

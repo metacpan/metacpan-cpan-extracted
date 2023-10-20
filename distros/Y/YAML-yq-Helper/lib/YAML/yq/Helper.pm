@@ -12,11 +12,11 @@ YAML::yq::Helper - Wrapper for yq for various common tasks so YAML files can be 
 
 =head1 VERSION
 
-Version 0.1.1
+Version 0.1.2
 
 =cut
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.1.2';
 
 =head1 SYNOPSIS
 
@@ -432,7 +432,7 @@ sub ensure {
 	my $raw = read_file( $self->{file} );
 
 	# starts
-	if ( $raw =~ /^\%YANL/ ) {
+	if ( $raw =~ /^\%YAML/ ) {
 		return;
 	}
 

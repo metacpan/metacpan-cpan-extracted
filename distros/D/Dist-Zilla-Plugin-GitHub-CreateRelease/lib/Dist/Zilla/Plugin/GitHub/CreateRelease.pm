@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Dist::Zilla::Plugin::GitHub::CreateRelease;
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 # ABSTRACT: Create a GitHub Release
 
@@ -15,6 +15,7 @@ use URI::Escape qw( uri_unescape );
 use File::Slurper qw/read_text read_binary/;
 use Exporter qw(import);
 use Moose;
+use Try::Tiny;
 with 'Dist::Zilla::Role::AfterRelease';
 
 use namespace::autoclean;
@@ -22,6 +23,7 @@ use namespace::autoclean;
 has hash_alg => (is => 'ro', default => 'sha256');
 has repo => (is => 'ro');
 has branch => (is => 'ro', default => 'main');
+has remote_name => (is => 'ro', default => 'origin');
 has title_template => (is => 'ro', default => 'Version RELEASE - TRIAL CPAN release');
 has notes_as_code => (is => 'ro', default => 1);
 has github_notes => (is => 'ro', default => 0);
@@ -65,8 +67,14 @@ sub _create_release {
       generate_release_notes => $self->{github_notes} ? JSON::MaybeXS::true : JSON::MaybeXS::false,
     }
   );
-  die "Unable to create GitHub release\n" if (! defined $release->content->{id});
+  die "Discussion category name is invalid" if  ($release->response eq '404');
+  die "Validation failed, or the endpoint has been spammed." if  ($release->response eq '422');
+  die "login ($identity{login}) or token invalid for the specified repository ($releases->{repo})\n"
+      if  ($release->code eq '403');
 
+  if (! defined $release->content->{id}) {
+    die "Unable to create GitHub release\n";
+  }
   $self->log("Release created at $releases->{repo} for $identity{login}");
 
   my $asset = $releases->assets->create(
@@ -83,16 +91,65 @@ sub _create_release {
   }
 
 }
+sub _menu {
+  my $self = shift;
+  my @items = @_;
 
+  print "Enter the number of the git remote where you want to create a release:\n";
+  print "Valid values are:\n";
+  print "\n?: ";
+  my $count = 0;
+  foreach my $item( @items ) {
+    $item =~ m/remote\.(.*)\.url/;
+    printf "%d: %s\n", ++$count, $1;
+  }
+
+  print "\n?: ";
+
+  while( my $line = <STDIN> ) {
+    chomp $line;
+    if ( $line =~ m/\d+/ && $line <= @items ) {
+      return $line - 1;
+    }
+    print "\n?: ";
+  }
+}
 sub _get_repo_name {
-  my $self;
+  my $self = shift;
 
+  my $setting = "remote." . $self->{remote_name} . ".url";
+  $self->log("Release will be created using $setting\n");
   my $git = Git::Wrapper->new('./');
-  my @url = $git->RUN('config', '--get', 'remote.origin.url');
+  my @url;
+  try {
+    @url = $git->RUN('config', '--get', $setting);
+  }
+  catch {
+    $self->log("Unable to find git \'$setting\' using git config --get $setting\n");
+    my @settings;
+    try {
+      @settings = $git->RUN('config', '--name-only', '--get-regexp', 'remote\..*\.url');
+    }
+    catch {
+      $self->log("You do not seem to have any remote repositories defined'\n");
+      $self->log("Run \'git config --name-only --get-regexp remote\..*\.url\' to review\n");
+      return "";
+    };
+    my $number = $self->_menu(@settings);
+    try {
+      @url = $git->RUN('config', '--get', $settings[$number]);
+    }
+    catch {
+      $self->log("Unable to find git \'$settings[$number]\' using git config --get $settings[$number]\n");
+      $self->log("You do not seem to have a remote repository set at: \'$settings[$number]\'\n");
+      return "";
+    };
+  };
 
   #FIXME there must be a better way...
   my $basename = uri_unescape( basename(URI->new( $url[0])->path));
   $basename =~ s/.git//;
+  $self->log("Release will be created using $basename");
 
   return $basename;
 
@@ -115,8 +172,16 @@ sub _get_notes_from_changes {
   my $filename  = shift;
 
   my $git = Git::Wrapper->new('./');
-  my @tags = $git->RUN('for-each-ref', 'refs/tags/*', '--sort=-taggerdate', '--count=2', '--format=%(refname:short)');
-
+  my @tags;
+  try {
+    @tags = $git->RUN('for-each-ref', 'refs/tags/*', '--sort=-taggerdate', '--count=2', '--format=%(refname:short)');
+  }
+  catch {
+    $self->log("Unable to get the last two tags from git");
+    #FIXME this is pretty much a failure but we will at least return something
+    return $self->{add_checksum} ? $self->_as_code($self->_get_checksum($filename)) :
+            $self->_as_code($filename);
+  };
   my $vers = $tags[0];
   my $prev = $tags[1];
 
@@ -198,7 +263,14 @@ sub _get_git_tag {
 
   my $git = Git::Wrapper->new('./');
 
-  my @tags = $git->RUN('for-each-ref', 'refs/tags/*', '--sort=-taggerdate', '--count=1', '--format=%(refname:short)');
+  my @tags;
+  try {
+    @tags = $git->RUN('for-each-ref', 'refs/tags/*', '--sort=-taggerdate', '--count=1', '--format=%(refname:short)');
+  }
+  catch {
+    $self->log("Unable to get the current release's tag from git");
+    #FIXME this is pretty much a failure
+  };
 
   return $tags[0];
 }
@@ -266,7 +338,7 @@ Dist::Zilla::Plugin::GitHub::CreateRelease - Create a GitHub Release
 
 =head1 VERSION
 
-version 0.0003
+version 0.0005
 
 =head1 SYNOPSIS
 
@@ -314,7 +386,7 @@ This module uses Config::Identity::GitHub to access the GitHub API credentials.
 You need to create a file in your home directory named B<.github-identity>.  It
 requires the following fields:
 
- login github_username
+ login github_username OR github_organization
  token github_....
 
 The GitHub API has a lot of options for the generation of Personal Access Tokens.
@@ -336,6 +408,19 @@ have gpg configured you can encrypt the file:
  # Replace the clear text version (uncomment next line)
  # mv ~/.github-identity.asc ~/.github-identity
 
+=head2 PERSONAL ACCOUNT VERSUS ORGANIZATION
+
+The B<login> specified in the B<.github-identity> file above should reference the
+personal account B<OR> the organization that contains the repo.
+
+A personal access token must have the B<Resource owner> set to the organization but
+does not require special permissions on the organization.  It simply needs read/write
+on the code and read access on the metadata of the repository.
+
+As specified in the B<org_id> attribute details below you can have separate identities
+for each repository.  The org_id tells the module where to look for the specific
+identity file that contains the correct login and token.
+
 =head1 ATTRIBUTES
 
 =over
@@ -349,6 +434,13 @@ cpan upload file.
 
 A string value that specifies the name of the github repository.  The module determines the
 name based on the remote url but this setting can override the name that is detected.
+
+=item remote_name
+
+A string value that specifies the name of the git remote URL.  This is typically
+origin or upstream.  It is the name of the URL where you want to create the release.
+
+It defaults to B<origin>.
 
 =item branch
 

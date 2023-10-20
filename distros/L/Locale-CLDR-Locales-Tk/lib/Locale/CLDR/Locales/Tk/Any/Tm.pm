@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Tk::Any::Tm - Package for language Turkmen
 
 =cut
 
 package Locale::CLDR::Locales::Tk::Any::Tm;
-# This file auto generated from Data/common/main/tk_TM.xml
-#	on Mon 11 Apr  5:39:36 pm GMT
+# This file auto generated from Data\common\main\tk_TM.xml
+#	on Fri 13 Oct  9:44:35 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

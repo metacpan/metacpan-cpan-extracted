@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Stream/QuotedPrint.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/05/30
-## Modified 2022/05/30
-## All rights reserved
+## Modified 2023/09/08
+## All rights reserved.
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -22,7 +23,7 @@ BEGIN
     use Module::Generic::File::IO;
     our @EXPORT_OK = qw( decode_qp encode_qp );
     our $EXCEPTION_CLASS = 'HTTP::Promise::Exception';
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
     our $DEBUG = 0;
 };
 
@@ -177,7 +178,7 @@ HTTP::Promise::Stream::QuotedPrint - Stream Encoder for QuotedPrint Encoding
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

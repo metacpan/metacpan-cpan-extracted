@@ -21,16 +21,15 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object::Statement DB::Object::Postgres );
-    use vars qw( $VERSION $VERBOSE $DEBUG );
-    $VERSION    = 'v0.301.2';
-    $VERBOSE    = 0;
-    $DEBUG      = 0;
+    use vars qw( $VERSION $DEBUG );
+    our $DEBUG = 0;
+    our $VERSION = 'v0.301.2';
 };
 
 use strict;
 use warnings;
 
-# Inherited from DB::Object::Statement
+# NOTE: sub bind_param is inherited from DB::Object::Statement
 # sub bind_param
 
 # sub commit is called by dbh, so it is in DB::Object::Postgres
@@ -42,7 +41,7 @@ sub disable_trigger
     $opts->{all} //= 0;
     $opts->{name} //= '';
     my $query = $self->{query} ||
-    return( $self->error( "No query found to temporarily disable trigger." ) );
+        return( $self->error( "No query found to temporarily disable trigger." ) );
     my $q = $self->query_object;
     my $tables = $q->join_tables->length ? $q->join_tables : $self->new_array( $q->table_object );
     my( $before, $after );
@@ -68,7 +67,7 @@ sub disable_trigger
     my $new = "${before} ${query}; ${after}";
     $q->query( $new );
     my $sth = $self->table_object->_cache_this( $q ) ||
-    return( $self->error( "Error while preparing new query temporarily disabling triggers:\n$new" ) );
+        return( $self->error( "Error while preparing new query temporarily disabling triggers:\n$new" ) );
     if( !defined( wantarray() ) )
     {
         $sth->execute() ||
@@ -83,7 +82,7 @@ sub distinct
     my $self = shift( @_ );
     my $what = shift( @_ );
     my $query = $self->{query} ||
-    return( $self->error( "No query to set as to be ignored." ) );
+        return( $self->error( "No query to set as to be ignored." ) );
     
     my $type = uc( ( $query =~ /^\s*(\S+)\s+/ )[ 0 ] );
     # ALTER for table alteration statements (DB::Object::Tables
@@ -102,11 +101,11 @@ sub distinct
     # $self->{ 'query' } = $query;
     # saving parameters to bind later on must have been done previously
     my $sth = $self->_cache_this( $query ) ||
-    return( $self->error( "Error while preparing new ignored query:\n$query" ) );
+        return( $self->error( "Error while preparing new ignored query:\n$query" ) );
     if( !defined( wantarray() ) )
     {
-        $sth->execute() ||
-        return( $self->error( "Error while executing new ignored query:\n$query" ) );
+        $sth->execute ||
+            return( $self->error( "Error while executing new ignored query:\n$query" ) );
     }
     return( $sth );
 }
@@ -119,7 +118,7 @@ sub dump
     my $vsep  = ",";
     my $hsep  = "\n";
     my $width = 35;
-    require IO::File;
+    $self->_load_class( 'IO::File' ) || return( $self->pass_error );
     my $fh    = IO::File->new;
     $fh->fdopen( fileno( STDOUT ), "w" );
     $vsep  = $args->{vsep} if( exists( $args->{vsep} ) );
@@ -167,7 +166,7 @@ sub dump
         }
         $fh = IO::File->new_from_fd( $args->{fh}, 'w' ) || return( $self->error( $! ) );
     }
-    my $max    = 0;
+    my $max = 0;
     # foreach my $field ( keys( %$fields ) )
     foreach my $field ( @fields )
     {
@@ -181,33 +180,33 @@ sub dump
     }
     $template .= "\n";
     my @data = ();
-    while( @data = $self->fetchrow() )
+    while( @data = $self->fetchrow )
     {
         $fh->printf( $template, @data );
     }
-    $self->finish();
+    $self->finish;
     return( $self );
 }
 
-# Inherited from DB::Object::Statement
+# NOTE: sub execute is inherited from DB::Object::Statement
 # sub execute
 
-# Inherited from DB::Object::Statement
+# NOTE: sub executed is inherited from DB::Object::Statement
 # sub executed
 
-# Inherited from DB::Object::Statement
+# NOTE: sub fetchall_arrayref is inherited from DB::Object::Statement
 # sub fetchall_arrayref($@)
 
-# Inherited from DB::Object::Statement
+# NOTE: sub fetchcol is inherited from DB::Object::Statement
 # sub fetchcol($;$)
 
-# Inherited from DB::Object::Statement
+# NOTE: sub fetchhash is inherited from DB::Object::Statement
 # sub fetchhash(@)
 
-# Inherited from DB::Object::Statement
+# NOTE: sub fetchrow is inherited from DB::Object::Statement
 # sub fetchrow(@)
 
-# Inherited from DB::Object::Statement
+# NOTE: sub finish is inherited from DB::Object::Statement
 # sub finish
 
 sub ignore
@@ -215,10 +214,10 @@ sub ignore
     return( shift->error( "INSERT | UPDATE | ALTER IGNORE is not supported by Postgres." ) );
 }
 
-# Inherited from DB::Object::Statement
+# NOTE: sub join is inherited from DB::Object::Statement
 # sub join
 
-# Inherited from DB::Object::Statement
+# NOTE: sub object is inherited from DB::Object::Statement
 # sub object
 
 sub last_insert_id
@@ -241,9 +240,9 @@ sub only
 {
     my $self     = shift( @_ );
     my $table    = $self->{table} ||
-    return( $self->error( "No table provided to perform select statement." ) );
+        return( $self->error( "No table provided to perform select statement." ) );
     my $q        = $self->query_object || return( $self->error( "No query formatter object was set" ) );
-    my $tbl_o    = $q->table_object || $self->{ 'table_object' } || return( $self->error( "No table object is set." ) );
+    my $tbl_o    = $q->table_object || $self->{table_object} || return( $self->error( "No table object is set." ) );
     my $db       = $tbl_o->database();
     my $multi_db = $tbl_o->param( 'multi_db' );
     my $type = uc( ( $self->{query} =~ /^(SELECT|DELETE|INSERT|UPDATE)\b/i )[0] );
@@ -259,8 +258,9 @@ sub only
     }
     elsif( $type eq 'UPDATE' )
     {
-        my $qv = $q->query_values || return( $self->error( "Something wen wrong. No query values found. Please investigate." ) );
-        return( $self->error( "I was expecting a scalar reference for uery values, but got instead '$qv'." ) ) if( ref( $qv ) ne 'SCALAR' );
+        my $qv = $q->query_values || 
+            return( $self->error( "Something went wrong. No query values found. Please investigate." ) );
+        return( $self->error( "I was expecting a scalar reference for uery values, but got instead '$qv'." ) ) if( !$self->_is_scalar( $qv ) );
         my $values = $$qv;
         @query = ( "UPDATE ONLY $table SET $values" );
     }
@@ -275,12 +275,12 @@ sub only
     my $sth = $tbl_o->_cache_this( $q );
     if( !defined( $sth ) )
     {
-        return( $self->error( "Error while preparing query to select on table '$self->{ 'table' }':\n$query", $self->errstr() ) );
+        return( $self->error( "Error while preparing query to select on table '$self->{table}':\n$query", $self->errstr() ) );
     }
     if( !defined( wantarray() ) )
     {
-        $sth->execute() ||
-        return( $self->error( "Error while executing query to select:\n", $self->as_string(), $sth->errstr() ) );
+        $sth->execute ||
+            return( $self->error( "Error while executing query to select:\n", $self->as_string(), $sth->errstr() ) );
     }
     return( $sth );
 }
@@ -292,10 +292,10 @@ sub priority
 
 # rollback is called using the dbh handler and is located in DB::Object::Postgres
 
-# Inherited from DB::Object::Statement
+# NOTE: sub rows is inherited from DB::Object::Statement
 # sub rows(@)
 
-# Inherited from DB::Object::Statement
+# NOTE: sub undo is inherited from DB::Object::Statement
 # sub undo
 
 # Does nothing in Postgres. This is a Mysql feature
@@ -323,7 +323,8 @@ DB::Object::Postgres::Statement - PostgreSQL Statement Object
 =head1 SYNOPSIS
 
     use DB::Object::Postgres::Statement;
-    my $this = DB::Object::Postgres::Statement->new || die( DB::Object::Postgres::Statement->error, "\n" );
+    my $this = DB::Object::Postgres::Statement->new || 
+        die( DB::Object::Postgres::Statement->error, "\n" );
 
 =head1 VERSION
 
@@ -331,7 +332,7 @@ DB::Object::Postgres::Statement - PostgreSQL Statement Object
 
 =head1 DESCRIPTION
 
-This is a PostgreSQL specific statement object class.
+This is a PostgreSQL specific statement object class. It inherits from L<DB::Object::Statement>
 
 =head1 METHODS
 
@@ -443,7 +444,7 @@ This is unsupported under PostgreSQL and it will be silently ignore, returning t
 
 =head1 SEE ALSO
 
-L<perl>
+L<DB::Object::Statement>, L<DB::Object>, L<DB::Object::Postgres::Query>
 
 =head1 AUTHOR
 
@@ -451,7 +452,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2023 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

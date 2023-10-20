@@ -3,7 +3,7 @@ package Crypt::JWT;
 use strict;
 use warnings;
 
-our $VERSION = '0.034';
+our $VERSION = '0.035';
 
 use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw(decode_jwt encode_jwt)] );
@@ -761,13 +761,14 @@ sub decode_jwt {
   if (!$args{token}) {
     croak "JWT: missing token";
   }
-  elsif ($args{token} =~ /^([a-zA-Z0-9_-]+)=*\.([a-zA-Z0-9_-]*)=*\.([a-zA-Z0-9_-]+)=*\.([a-zA-Z0-9_-]+)=*\.([a-zA-Z0-9_-]+)=*$/) {
-    # JWE token (5 segments)
-    ($header, $payload) = _decode_jwe($1, $2, $3, $4, $5, undef, {}, {}, %args);
-  }
-  elsif ($args{token} =~ /^([a-zA-Z0-9_-]+)=*\.([a-zA-Z0-9_-]+)=*\.([a-zA-Z0-9_-]*)=*$/) {
-    # JWS token (3 segments)
-    ($header, $payload) = _decode_jws($1, $2, $3, {}, %args);
+  elsif ($args{token} =~ /^([a-zA-Z0-9_-]+)=*\.([a-zA-Z0-9_-]*)=*\.([a-zA-Z0-9_-]*)=*(?:\.([a-zA-Z0-9_-]+)=*\.([a-zA-Z0-9_-]+)=*)?$/) {
+    if (length($5)) {
+        # JWE token (5 segments)
+        ($header, $payload) = Crypt::JWT::_decode_jwe($1, $2, $3, $4, $5, undef, {}, {}, %args);
+    } else {
+        # JWS token (3 segments)
+        ($header, $payload) = Crypt::JWT::_decode_jws($1, $2, $3, {}, %args);
+    }
   }
   elsif ($args{token} =~ /^\s*\{.*?\}\s*$/s) {
     my $hash = decode_json($args{token});
@@ -1022,6 +1023,17 @@ This parametes can be either a JWK Set JSON string (see RFC7517) or a perl HASH 
   };
   my $payload = decode_jwt(token=>$t, kid_keys=>$keylist);
 
+You can use L<Crypt::PK::RSA/"export_key_jwk"> to generate a JWK for RSA:
+
+  my $pubkey = Crypt::PK::RSA->new('rs256-4096-public.pem');
+  my $jwk_hash = $pubkey->export_key_jwk('public', 1);
+  $jwk_hash->{kid} = 'key1';
+  my $keylist = {
+    keys => [
+      $jwk_hash,
+    ]
+  };
+
 The structure described above is used e.g. by L<https://www.googleapis.com/oauth2/v2/certs>
 
   use Mojo::UserAgent;
@@ -1036,7 +1048,7 @@ B<SINCE 0.019> we also support alternative structure used e.g. by L<https://www.
   my $payload = decode_jwt(token => $t, kid_keys => $google_certs);
 
 When the token header contains C<kid> item the corresponding key is looked up in C<kid_keys> list and used for token
-decoding (you do not need to pass the explicit key via C<key> parameter).
+decoding (you do not need to pass the explicit key via C<key> parameter). Add a kid header using L</"extra_headers">.
 
 B<INCOMPATIBLE CHANGE in 0.023:> When C<kid_keys> is specified it croaks if token header does not contain C<kid> value or
 if C<kid> was not found in C<kid_keys>.
@@ -1346,6 +1358,10 @@ iteration count (p2c) via C<extra_headers> like this:
  my $token = encode_jwt(payload=>$p, key=>$k, alg=>'PBES2-HS512+A256KW', extra_headers=>{p2c=8000, p2s=>32});
  #NOTE: handling of p2s header is a special case, in the end it is replaced with the generated salt
 
+You can also use this to specify a kid value (see L</"kid_keys">)
+
+ my $token = encode_jwt(payload=>$p, key=>$k, alg => 'RS256', extra_headers=>{kid=>'key1'});
+
 =item unprotected_headers
 
 A hash with additional integrity unprotected headers - JWS and JWE (not available for C<compact> serialization);
@@ -1404,4 +1420,4 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 COPYRIGHT
 
-Copyright (c) 2015-2021 DCIT, a.s. L<https://www.dcit.cz> / Karel Miko
+Copyright (c) 2015-2023 DCIT, a.s. L<https://www.dcit.cz> / Karel Miko

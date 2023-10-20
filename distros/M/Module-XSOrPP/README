@@ -1,71 +1,117 @@
-SYNOPSIS
+NAME
+    Module::XSOrPP - Determine if an installed module is XS or pure-perl
 
+VERSION
+    This document describes version 0.120 of Module::XSOrPP (from Perl
+    distribution Module-XSOrPP), released on 2023-07-09.
+
+SYNOPSIS
      use Module::XSOrPP qw(
          is_xs is_pp xs_or_pp
      );
-    
+
      say "Class::XSAccessor is an XS module" if is_xs("Class/XSAccessor.pm");
      say "JSON::PP is a pure-Perl module" if is_pp("JSON::PP");
      say "Params::Util is an XS module with PP fallback" if xs_or_pp("Class/XSAccessor.pm") =~ /^(xs|xs_or_pp)$/;
 
 DESCRIPTION
-
 FUNCTIONS
-
- xs_or_pp($mod, \%opts) => str
-
+  xs_or_pp($mod, \%opts) => str
     Return either "xs", "pp", or "xs_or_pp" (XS with a PP fallback). Return
     undef if can't determine which. $mod value can be in the form of
-    Package/SubPkg.pm or Package::SubPkg. The following ways are tried, in
-    order:
+    "Package/SubPkg.pm" or "Package::SubPkg". The following ways are tried,
+    in order:
 
-      * Predetermined list
+    *   Predetermined list
 
-      Some CPAN modules are XS with a PP fallback. This module maintains
-      the list.
+        Some CPAN modules are XS with a PP fallback. This module maintains
+        the list.
 
-      * Looking at the .packlist
+    *   Looking at the ".packlist"
 
-      If a .{bs,so,dll} file is listed in the .packlist, then it is assumed
-      to be an XS module. This method will fail if there is no .packlist
-      available (e.g. core or uninstalled or when the package management
-      strips the packlist), or if a dist contains both pure-Perl and XS.
+        If a .{bs,so,dll} file is listed in the ".packlist", then it is
+        assumed to be an XS module. This method will fail if there is no
+        ".packlist" available (e.g. core or uninstalled or when the package
+        management strips the packlist), or if a dist contains both
+        pure-Perl and XS.
 
-      * Looking at the source file for usage of XSLoader or DynaLoader
+    *   Looking at the source file for usage of "XSLoader" or "DynaLoader"
 
-      If the module source code has something like use XSLoader; or <use
-      DynaLoader;> then it is assumed to be an XS module. This is currently
-      implemented using a simple regex, so it is somewhat brittle.
+        If the module source code has something like "use XSLoader;" or <use
+        DynaLoader;> then it is assumed to be an XS module. This is
+        currently implemented using a simple regex, so it is somewhat
+        brittle.
 
-      * Guessing from the name
+    *   Guessing from the name
 
-      If the module has "XS" in its name then it's assumed to be an XS
-      module. If the module has "PP" in its name, it's assumed to be a
-      pure-Perl module.
+        If the module has "XS" in its name then it's assumed to be an XS
+        module. If the module has "PP" in its name, it's assumed to be a
+        pure-Perl module.
 
-      Known false positives will be prevented in the future.
+        Known false positives will be prevented in the future.
 
     Other methods will be added in the future (e.g. a database like in
     Module::CoreList, consulting MetaCPAN, etc).
 
     Options:
 
-      * warn => BOOL (default: 0)
+    *   warn => BOOL (default: 0)
 
-      If set to true, will warn to STDERR if fail to determine.
+        If set to true, will warn to STDERR if fail to determine.
 
-      * debug => BOOL (default: 0)
+    *   debug => BOOL (default: 0)
 
-      If set to true will print debugging message to STDERR.
+        If set to true will print debugging message to STDERR.
 
- is_xs($mod, \%opts) => BOOL
+  is_xs($mod, \%opts) => BOOL
+    Return true if module $mod is an XS module, false if a pure Perl module,
+    or undef if can't determine either. See "xs_or_pp" for more details.
 
-    Return true if module $mod is an XS module, false if a pure Perl
-    module, or undef if can't determine either. See xs_or_pp for more
-    details.
-
- is_pp($mod, \%opts) => BOOL
-
+  is_pp($mod, \%opts) => BOOL
     Return true if module $mod is a pure Perl module or XS module with a PP
-    fallback. See is_xs for more details. See xs_or_pp for more details.
+    fallback. See "is_xs" for more details. See "xs_or_pp" for more details.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-XSOrPP>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-XSOrPP>.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023, 2016, 2015, 2014 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-XSOrPP>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

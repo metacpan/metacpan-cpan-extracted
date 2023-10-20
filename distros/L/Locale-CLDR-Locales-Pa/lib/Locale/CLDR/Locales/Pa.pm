@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Pa - Package for language Punjabi
 
 =cut
 
 package Locale::CLDR::Locales::Pa;
-# This file auto generated from Data/common/main/pa.xml
-#	on Mon 11 Apr  5:36:03 pm GMT
+# This file auto generated from Data\common\main\pa.xml
+#	on Fri 13 Oct  9:32:48 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

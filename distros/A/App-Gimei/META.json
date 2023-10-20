@@ -61,7 +61,13 @@
    "provides" : {
       "App::Gimei" : {
          "file" : "lib/App/Gimei.pm",
-         "version" : "v0.2.1"
+         "version" : "v0.2.2"
+      },
+      "App::Gimei::Generator" : {
+         "file" : "lib/App/Gimei/Generator.pm"
+      },
+      "App::Gimei::Parser" : {
+         "file" : "lib/App/Gimei/Parser.pm"
       },
       "App::Gimei::Runner" : {
          "file" : "lib/App/Gimei/Runner.pm"
@@ -79,7 +85,7 @@
          "web" : "https://github.com/youpong/App-Gimei"
       }
    },
-   "version" : "v0.2.1",
+   "version" : "v0.2.2",
    "x_authority" : "cpan:YOUPONG",
    "x_contributors" : [
       "NAKAJIMA Yusaku <yupong7@gmail.com>",

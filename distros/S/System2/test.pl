@@ -8,7 +8,7 @@
 
 BEGIN { $| = 1; print "1..4\n"; }
 END {print "not ok 1\n" unless $loaded;}
-use POSIX;
+use File::Temp qw /tempfile/;
 use System2;
 $loaded = 1;
 print "ok 1\n";
@@ -28,12 +28,13 @@ if (0)
   print "debug is $System2::debug\n";
 }
 
-my $tmpout = POSIX::tmpnam();
-my $tmperr = POSIX::tmpnam();
+my ($out_fd, $tmpout) = tempfile();
+my ($err_fd, $tmperr) = tempfile();
+
 
 # Run some deterministic program to generate stdout as well as stderr
 # (We're going to run this twice, and the results have to match,
-# so no time-dependant code).  (Foolish people might run this as
+# so no time-dependant code).  (Foolish people might run this test as
 # root, so try to keep this nondestructive.)
 
 my @command = qw( perl -w ./io_test.pl);

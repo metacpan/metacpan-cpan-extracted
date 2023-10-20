@@ -1,0 +1,31 @@
+{
+   "mirrors" : [
+      {
+         "ccode" : "zz",
+         "city" : "Everywhere",
+         "contact" : [
+            {
+               "contact_site" : "perl.org",
+               "contact_user" : "cpan"
+            }
+         ],
+         "continent" : "Global",
+         "country" : "Global",
+         "distance" : null,
+         "dnsrr" : "N",
+         "freq" : "instant",
+         "http" : "http://www.cpan.org/",
+         "inceptdate" : "2021-04-09T00:00:00",
+         "location" : [
+            0,
+            0
+         ],
+         "name" : "www.cpan.org",
+         "org" : "Global CPAN CDN",
+         "src" : "rsync://cpan-rsync.perl.org/CPAN/",
+         "tz" : "0"
+      }
+   ],
+   "took" : 2,
+   "total" : 1
+}

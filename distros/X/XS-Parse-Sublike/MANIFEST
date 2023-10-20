@@ -4,6 +4,7 @@ Changes
 hax/block_end.c.inc
 hax/block_start.c.inc
 hax/COP_SEQ_RANGE_HIGH_set.c.inc
+hax/croak_from_caller.c.inc
 hax/lexer-additions.c.inc
 hax/LOGOP_ANY.c.inc
 hax/make_argcheck_aux.c.inc
@@ -48,9 +49,9 @@ t/42parts-signature.t
 t/50flags-no-body.t
 t/60actions.t
 t/70extended.t
-t/71extended+async.t
-t/71extended+feature-class.t
-t/71extended+Object-Pad.t
+t/80extended+async.t
+t/80extended+feature-class.t
+t/80extended+Object-Pad.t
 t/99pod.t
 t/actions.xs
 t/any.xs

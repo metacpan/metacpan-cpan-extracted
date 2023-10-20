@@ -15,7 +15,7 @@ if ($meta) {
 }
 
 my %configure_and_runtime_requires = (
-  'SPVM' => '0.973',
+  'SPVM' => '0.989047',
 );
 WriteMakefile(
   NAME              => 'SPVM::Digest::SHA',

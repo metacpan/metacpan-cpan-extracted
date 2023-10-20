@@ -5,6 +5,6 @@ use warnings
 
 use Test::Expander;
 
-ok( !exists( $main::{ CLASS } ), 'there is no class corresponding to this test file' );
+plan( 1 );
 
-done_testing();
+ok( !exists( $main::{ CLASS } ), 'there is no class corresponding to this test file' );

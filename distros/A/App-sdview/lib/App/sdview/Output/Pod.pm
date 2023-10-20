@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.800;
 
-package App::sdview::Output::Pod 0.12;
+package App::sdview::Output::Pod 0.13;
 class App::sdview::Output::Pod
    :does(App::sdview::Output)
    :strict(params);
@@ -30,6 +30,9 @@ formatting. Given a POD file as input, the output should be relatively
 similar, up to minor details like whitespacing. Given input in some other
 format, it will do a reasonable job attempting to represent most of the
 structure and formatting.
+
+As an extension it will output underline formatting using the C<UE<lt>...E<gt>>
+code, which is recognised by L<App::sdview::Parser::Pod>.
 
 =cut
 
@@ -118,7 +121,7 @@ method _convert_str ( $s )
          my ( $open, $close ) =
             ( $count == 1 ) ? ( "<", ">" ) : ( "<"x$count . " ", " " . ">"x$count );
 
-         if( my $link = $tags{L} ) {
+         if( my $link = $tags{link} ) {
             # TODO: This is even suckier than the bit in the parser
             if( $link->{target} eq "https://metacpan.org/pod/$substr" ) {
                $pod = "L$open$substr$close";
@@ -128,10 +131,11 @@ method _convert_str ( $s )
             }
          }
 
-         $pod = "C$open$pod$close" if $tags{C};
-         $pod = "B$open$pod$close" if $tags{B};
-         $pod = "I$open$pod$close" if $tags{I};
-         $pod = "F$open$pod$close" if $tags{F};
+         $pod = "C$open$pod$close" if $tags{monospace};
+         $pod = "B$open$pod$close" if $tags{bold};
+         $pod = "I$open$pod$close" if $tags{italic};
+         $pod = "F$open$pod$close" if $tags{file};
+         $pod = "U$open$pod$close" if $tags{underline};
 
          $ret .= $pod;
       }

@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+# synop - the syopsis code
+use 5.26.0;
+
+use Data::Dumper;
+use Music::Factory;
+
+# this could be put into a MIDI::Track at the end
+my $events = [];
+
+my $silence = Music::Factory::AssemblyLine->new(
+    events => $events,
+    gen    => Music::Factory::Rest->new,
+    maxlen => 48,
+);
+
+my $short = Music::Factory::AssemblyLine->new(
+    events => $events,
+    gen    => Music::Factory::Note->new(
+        duration => 96,
+        pitch    => sub { 60 },
+        velo     => sub { 96 },
+    ),
+    maxlen => 96,
+);
+
+my $long = Music::Factory::AssemblyLine->new(
+    events => $events,
+    gen    => Music::Factory::Note->new(
+        duration => 192,
+        pitch    => sub { 60 },
+        velo     => sub { 96 },
+    ),
+    maxlen => 192,
+);
+
+sub dit { $_->update for $short, $silence }
+sub dah { $_->update for $long, $silence }
+
+dit; dit; dit;
+dah; dah; dah;
+dit; dit; dit;
+
+print Dumper $events;

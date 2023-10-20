@@ -7,7 +7,7 @@ BEGIN
     use vars qw( $DEBUG );
     use Test2::V0;
     use Module::Generic::File qw( file );
-    use Nice::Try;
+    # use Nice::Try;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
@@ -82,33 +82,39 @@ subtest 'CBOR' => sub
         my $cbor = CBOR::XS->new;
         $cbor->allow_sharing(1);
         my $serial;
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $body = HTTP::Promise::Body::File->new( '/some/where/file.txt' );
             $serial = $cbor->encode( $body );
             my $body2  = $cbor->decode( $serial );
             isa_ok( $body2 => ['HTTP::Promise::Body::File'], 'deserialised element is a HTTP::Promise::Body::File object' );
             is( $body2->filepath, $body->filepath, 'HTTP::Promise::Body::File: filepath matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Body::File test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Body::File test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $body = HTTP::Promise::Body::Scalar->new( 'Some data' );
             $serial = $cbor->encode( $body );
             my $body2  = $cbor->decode( $serial );
             isa_ok( $body2 => ['HTTP::Promise::Body::Scalar'], 'deserialised element is a HTTP::Promise::Body::Scalar object' );
             is( $body2->as_string, $body->as_string, 'HTTP::Promise::Body::Scalar: content matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Body::Scalar test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Body::Scalar test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $form = HTTP::Promise::Body::Form->new({
                 name => 'John Doe',
@@ -119,13 +125,15 @@ subtest 'CBOR' => sub
             isa_ok( $form2 => ['HTTP::Promise::Body::Form'], 'deserialised element is a HTTP::Promise::Body::Form object' );
             is( $form2->{name}, $form->{name}, 'HTTP::Promise::Body::Form: item "name" matches' );
             is( $form2->{location}, $form->{location}, 'HTTP::Promise::Body::Form: item "name" matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Body::Form test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Body::Form test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $form = HTTP::Promise::Body::Form::Data->new({
                 name => 'John Doe',
@@ -136,13 +144,15 @@ subtest 'CBOR' => sub
             isa_ok( $form2 => ['HTTP::Promise::Body::Form::Data'], 'deserialised element is a HTTP::Promise::Body::Form::Data object' );
             is( $form2->{name}, $form->{name}, 'HTTP::Promise::Body::Form::Data: item "name" matches' );
             is( $form2->{location}, $form->{location}, 'HTTP::Promise::Body::Form::Data: item "name" matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Body::Form test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Body::Form test for CBOR: $@" );
         }
     
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $field = HTTP::Promise::Body::Form::Field->new(
                 name => 'picture',
@@ -154,25 +164,29 @@ subtest 'CBOR' => sub
             isa_ok( $field2 => ['HTTP::Promise::Body::Form::Field'], 'deserialised element is a HTTP::Promise::Body::Form::Field object' );
             is( $field2->name => $field->name, 'HTTP::Promise::Body::Form::Field field name matches' );
             is( $field2->body->file => $field->body->file, 'HTTP::Promise::Body::Form::Field body filepath matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Body::Form::Field test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Body::Form::Field test for CBOR: $@" );
         }
     
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $ent = HTTP::Promise::Entity->new;
             $serial = $cbor->encode( $ent );
             my $ent2  = $cbor->decode( $serial );
             isa_ok( $ent2 => ['HTTP::Promise::Entity'], 'deserialised element is a HTTP::Promise::Entity object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Entity test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Entity test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $ex = HTTP::Promise::Exception->new( code => 400, message => 'Oops' );
             $serial = $cbor->encode( $ex );
@@ -180,13 +194,15 @@ subtest 'CBOR' => sub
             isa_ok( $ex2 => ['HTTP::Promise::Exception'], 'deserialised element is a HTTP::Promise::Exception object' );
             is( $ex2->code, $ex->code, 'HTTP::Promise::Exception test value #1' );
             is( $ex2->message, $ex->message, 'HTTP::Promise::Exception test value #2' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Exception test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Exception test for CBOR: $@" );
         }
     
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $h = HTTP::Promise::Headers->new(
                 Content_Type => 'text/html',
@@ -202,65 +218,75 @@ subtest 'CBOR' => sub
             is( $h2->header( 'Accept-Encoding' ) => $h->header( 'Accept-Encoding' ), 'HTTP::Promise::Headers field Accept-Encoding matches' );
             is( $h2->header( 'Accept-Language' ) => $h->header( 'Accept-Language' ), 'HTTP::Promise::Headers field Accept-Language matches' );
             is( $h2->header( 'Conection' ) => $h->header( 'Conection' ), 'HTTP::Promise::Headers field Conection matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers test for CBOR: $@" );
         }
     
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $accept = HTTP::Promise::Headers::Accept->new( 'text/html, application/json, application/xml;q=0.9, */*;q=0.8' );
             $serial = $cbor->encode( $accept );
             my $accept2  = $cbor->decode( $serial );
             isa_ok( $accept2 => ['HTTP::Promise::Headers::Accept'], 'deserialised element is a HTTP::Promise::Headers::Accept object' );
             is( $accept2->as_string => $accept->as_string, 'HTTP::Promise::Headers::Accept string matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::Accept test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::Accept test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $accept = HTTP::Promise::Headers::AcceptEncoding->new( 'deflate, gzip;q=1.0, *;q=0.5' );
             $serial = $cbor->encode( $accept );
             my $accept2  = $cbor->decode( $serial );
             isa_ok( $accept2 => ['HTTP::Promise::Headers::AcceptEncoding'], 'deserialised element is a HTTP::Promise::Headers::AcceptEncoding object' );
             is( "$accept2" => "$accept", 'HTTP::Promise::Headers::AcceptEncoding string matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::AcceptEncoding test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::AcceptEncoding test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $accept = HTTP::Promise::Headers::AcceptLanguage->new( 'fr-FR, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5' );
             $serial = $cbor->encode( $accept );
             my $accept2  = $cbor->decode( $serial );
             isa_ok( $accept2 => ['HTTP::Promise::Headers::AcceptLanguage'], 'deserialised element is a HTTP::Promise::Headers::AcceptLanguage object' );
             is( "$accept2" => "$accept", 'HTTP::Promise::Headers::AcceptLanguage string matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::AcceptLanguage test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::AcceptLanguage test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $alt = HTTP::Promise::Headers::AltSvc->new( q{h2="alt.example.com:443"} );
             $serial = $cbor->encode( $alt );
             my $alt2  = $cbor->decode( $serial );
             isa_ok( $alt2 => ['HTTP::Promise::Headers::AltSvc'], 'deserialised element is a HTTP::Promise::Headers::AltSvc object' );
             is( "$alt2" => "$alt", 'HTTP::Promise::Headers::AltSvc string matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::AltSvc test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::AltSvc test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $cache = HTTP::Promise::Headers::CacheControl->new( 'max-age=604800' );
             $serial = $cbor->encode( $cache );
@@ -268,13 +294,15 @@ subtest 'CBOR' => sub
             isa_ok( $cache2 => ['HTTP::Promise::Headers::CacheControl'], 'deserialised element is a HTTP::Promise::Headers::CacheControl object' );
             is( "$cache2" => "$cache", 'HTTP::Promise::Headers::CacheControl string matches' );
             is( $cache2->max_age => $cache->max_age, 'HTTP::Promise::Headers::CacheControl max_age matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::CacheControl test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::CacheControl test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $clear = HTTP::Promise::Headers::ClearSiteData->new( q{"cache", "cookies", "storage", "executionContexts"} );
             $serial = $cbor->encode( $clear );
@@ -285,13 +313,15 @@ subtest 'CBOR' => sub
             is( $clear2->cookies => $clear->cookies, 'HTTP::Promise::Headers::CacheControl cookies matches' );
             is( $clear2->storage => $clear->storage, 'HTTP::Promise::Headers::CacheControl storage matches' );
             is( $clear2->execution_contexts => $clear->execution_contexts, 'HTTP::Promise::Headers::CacheControl execution_contexts matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ClearSiteData test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::ClearSiteData test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $dispo = HTTP::Promise::Headers::ContentDisposition->new( q{attachment; filename="filename.jpg"} );
             $serial = $cbor->encode( $dispo );
@@ -300,13 +330,15 @@ subtest 'CBOR' => sub
             is( "$dispo2" => "$dispo", 'HTTP::Promise::Headers::ContentDisposition string matches' );
             is( $dispo2->disposition => $dispo->disposition, 'HTTP::Promise::Headers::ContentDisposition disposition matches' );
             is( $dispo2->filename => $dispo->filename, 'HTTP::Promise::Headers::ContentDisposition filename matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ContentDisposition test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::ContentDisposition test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $range = HTTP::Promise::Headers::ContentRange->new( 'bytes 200-1000/67589' );
             $serial = $cbor->encode( $range );
@@ -317,13 +349,15 @@ subtest 'CBOR' => sub
             is( $range2->range_end => $range->range_end, 'HTTP::Promise::Headers::ContentRange range_end matches' );
             is( $range2->size => $range->size, 'HTTP::Promise::Headers::ContentRange size matches' );
             is( $range2->unit => $range->unit, 'HTTP::Promise::Headers::ContentRange unit matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ContentRange test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::ContentRange test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $policy = HTTP::Promise::Headers::ContentSecurityPolicy->new( q{default-src 'self'; img-src *; media-src media1.com media2.com; script-src userscripts.example.com} );
             $serial = $cbor->encode( $policy );
@@ -334,13 +368,15 @@ subtest 'CBOR' => sub
             is( $policy2->img_src => $policy->img_src, 'HTTP::Promise::Headers::ContentSecurityPolicy img_src matches' );
             is( $policy2->media_src => $policy->media_src, 'HTTP::Promise::Headers::ContentSecurityPolicy media_src matches' );
             is( $policy2->script_src => $policy->script_src, 'HTTP::Promise::Headers::ContentSecurityPolicy script_src matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ContentSecurityPolicy test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::ContentSecurityPolicy test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $policy = HTTP::Promise::Headers::ContentSecurityPolicyReportOnly->new( q{default-src https:; report-uri /csp-violation-report-endpoint/} );
             $serial = $cbor->encode( $policy );
@@ -349,13 +385,15 @@ subtest 'CBOR' => sub
             is( "$policy2" => "$policy", 'HTTP::Promise::Headers::ContentSecurityPolicyReportOnly string matches' );
             is( $policy2->default_src => $policy->default_src, 'HTTP::Promise::Headers::ContentSecurityPolicyReportOnly default_src matches' );
             is( $policy2->report_uri => $policy->report_uri, 'HTTP::Promise::Headers::ContentSecurityPolicyReportOnly report_uri matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ContentSecurityPolicyReportOnly test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::ContentSecurityPolicyReportOnly test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $ct = HTTP::Promise::Headers::ContentType->new( q{text/html; charset=UTF-8} );
             $serial = $cbor->encode( $ct );
@@ -364,13 +402,15 @@ subtest 'CBOR' => sub
             is( "$ct2" => "$ct", 'HTTP::Promise::Headers::ContentType string matches' );
             is( $ct2->type => $ct->type, 'HTTP::Promise::Headers::ContentType type matches' );
             is( $ct2->charset => $ct->charset, 'HTTP::Promise::Headers::ContentType charset matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ContentType test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::ContentType test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $c = HTTP::Promise::Headers::Cookie->new( q{name=value; name2=value2; name3=value3} );
             $serial = $cbor->encode( $c );
@@ -380,13 +420,15 @@ subtest 'CBOR' => sub
             my $cookies = $c->cookies;
             my $cookies2 = $c2->cookies;
             is( "@$cookies2" => "@$cookies", 'HTTP::Promise::Headers::Cookie cookies matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::Cookie test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::Cookie test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::ExpectCT->new( q{max-age=86400, enforce, report-uri="https://foo.example.com/report"} );
             $serial = $cbor->encode( $o );
@@ -396,13 +438,15 @@ subtest 'CBOR' => sub
             is( $o2->max_age => $o->max_age, 'HTTP::Promise::Headers::ExpectCT max_age matches' );
             is( $o2->enforce => $o->enforce, 'HTTP::Promise::Headers::ExpectCT enforce matches' );
             is( $o2->report_uri => $o->report_uri, 'HTTP::Promise::Headers::ExpectCT report_uri matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ExpectCT test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::ExpectCT test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::Forwarded->new( q{for=192.0.2.60;proto=http;by=203.0.113.43} );
             $serial = $cbor->encode( $o );
@@ -412,13 +456,15 @@ subtest 'CBOR' => sub
             is( $o2->by => $o->by, 'HTTP::Promise::Headers::Forwarded by matches' );
             is( $o2->for => $o->for, 'HTTP::Promise::Headers::Forwarded for matches' );
             is( $o2->proto => $o->proto, 'HTTP::Promise::Headers::Forwarded proto matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::Forwarded test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::Forwarded test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::KeepAlive->new( q{timeout=5, max=1000} );
             $serial = $cbor->encode( $o );
@@ -427,13 +473,15 @@ subtest 'CBOR' => sub
             is( "$o2" => "$o", 'HTTP::Promise::Headers::KeepAlive string matches' );
             is( $o2->max => $o->max, 'HTTP::Promise::Headers::KeepAlive max matches' );
             is( $o2->timeout => $o->timeout, 'HTTP::Promise::Headers::KeepAlive timeout matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::KeepAlive test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::KeepAlive test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::Link->new( q{<https://example.com>; rel="preconnect"; title="Foo"; anchor="#bar"} );
             $serial = $cbor->encode( $o );
@@ -444,13 +492,15 @@ subtest 'CBOR' => sub
             is( $o2->rel => $o->rel, 'HTTP::Promise::Headers::Link rel matches' );
             is( $o2->link => $o->link, 'HTTP::Promise::Headers::Link link matches' );
             is( $o2->title => $o->title, 'HTTP::Promise::Headers::Link title matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::Link test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::Link test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::Range->new( q{bytes=200-1000, 2000-6576, 19000-} );
             $serial = $cbor->encode( $o );
@@ -479,13 +529,15 @@ subtest 'CBOR' => sub
                         ), "No $i HTTP::Promise::Headers::Range::StartEnd objects match" );
                 }
             };
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::Range test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::Range test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::ServerTiming->new( q{cache;desc="Cache Read";dur=23.2} );
             $serial = $cbor->encode( $o );
@@ -495,13 +547,15 @@ subtest 'CBOR' => sub
             is( $o2->desc => $o->desc, 'HTTP::Promise::Headers::ServerTiming desc matches' );
             is( $o2->dur => $o->dur, 'HTTP::Promise::Headers::ServerTiming dur matches' );
             is( $o2->name => $o->name, 'HTTP::Promise::Headers::ServerTiming name matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ServerTiming test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::ServerTiming test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::StrictTransportSecurity->new( q{max-age=63072000; includeSubDomains; preload} );
             $serial = $cbor->encode( $o );
@@ -511,39 +565,45 @@ subtest 'CBOR' => sub
             is( $o2->max_age => $o->max_age, 'HTTP::Promise::Headers::StrictTransportSecurity max_age matches' );
             is( $o2->preload => $o->preload, 'HTTP::Promise::Headers::StrictTransportSecurity preload matches' );
             is( $o2->include_subdomains => $o->include_subdomains, 'HTTP::Promise::Headers::StrictTransportSecurity include_subdomains matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::StrictTransportSecurity test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::StrictTransportSecurity test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::TE->new( q{trailers, deflate;q=0.5} );
             $serial = $cbor->encode( $o );
             my $o2  = $cbor->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Headers::TE'], 'deserialised element is a HTTP::Promise::Headers::TE object' );
             is( "$o2" => "$o", 'HTTP::Promise::Headers::TE string matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::TE test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::TE test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::WantDigest->new( q{SHA-512;q=0.3, sha-256;q=1, md5;q=0} );
             $serial = $cbor->encode( $o );
             my $o2  = $cbor->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Headers::WantDigest'], 'deserialised element is a HTTP::Promise::Headers::WantDigest object' );
             is( "$o2" => "$o", 'HTTP::Promise::Headers::WantDigest string matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::WantDigest test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Headers::WantDigest test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $me = file( __FILE__ );
             my $fh = $me->open || die( "Unable to open $me: ", $me->error );
@@ -552,25 +612,29 @@ subtest 'CBOR' => sub
             my $o2  = $cbor->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::IO'], 'deserialised element is a HTTP::Promise::IO object' );
             is( $o2->debug => $o->debug, 'HTTP::Promise::IO debug value matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::IO test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::IO test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::MIME->new || die( HTTP::Promise::IO->error );
             $serial = $cbor->encode( $o );
             my $o2  = $cbor->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::MIME'], 'deserialised element is a HHTTP::Promise::MIME object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::MIME test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::MIME test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Message->new(
                 [ 'Content-Type' => 'text/plain' ],
@@ -581,37 +645,43 @@ subtest 'CBOR' => sub
             isa_ok( $o2 => ['HTTP::Promise::Message'], 'deserialised element is a HTTP::Promise::Message object' );
             is( $o2->headers->content_type => $o->headers->content_type, 'HTTP::Promise::Message content_type header value matches' );
             is( $o2->decoded_content => $o->decoded_content, 'HTTP::Promise::Message decoded_content value matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Message test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Message test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Parser->new || die( HTTP::Promise::Parser->error );
             $serial = $cbor->encode( $o );
             my $o2  = $cbor->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Parser'], 'deserialised element is a HTTP::Promise::Parser object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Parser test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Parser test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Pool->new || die( HTTP::Promise::Pool->error );
             $serial = $cbor->encode( $o );
             my $o2  = $cbor->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Pool'], 'deserialised element is a HTTP::Promise::Pool object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Pool test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Pool test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Request->new(
                 GET => 'https://example.com/some/where',
@@ -626,13 +696,15 @@ subtest 'CBOR' => sub
             is( $o2->method => $o->method, 'HTTP::Promise::Request method value matches' );
             is( $o2->uri => $o->uri, 'HTTP::Promise::Request uri value matches' );
             is( $o2->headers->content_type => $o->headers->content_type, 'HTTP::Promise::Request content_type header value matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Request test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Request test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Response->new(
                 200 => 'OK',
@@ -651,62 +723,70 @@ subtest 'CBOR' => sub
             is( $o2->headers->content_type => $o->headers->content_type, 'HTTP::Promise::Response Content-Type header value matches' );
             is( $o2->headers->cache_control => 'no-cache, no-store', 'HTTP::Promise::Response Cache-Control header value matches' );
             is( $o2->headers->content_encoding => 'gzip', 'HTTP::Promise::Response Content-Ttype header value matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Response test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Response test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Status->new || die( HTTP::Promise::Status->error );
             $serial = $cbor->encode( $o );
             my $o2  = $cbor->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Status'], 'deserialised element is a HTTP::Promise::Status object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Status test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Status test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Stream->new( __FILE__ ) || die( HTTP::Promise::Stream->error );
             $serial = $cbor->encode( $o );
             my $o2  = $cbor->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Stream'], 'deserialised element is a HTTP::Promise::Stream object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Stream test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Stream test for CBOR: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Stream::Base64->new || die( HTTP::Promise::Stream::Base64->error );
             $serial = $cbor->encode( $o );
             my $o2  = $cbor->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Stream::Base64'], 'deserialised element is a HTTP::Promise::Stream::Base64 object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Stream::Base64 test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Stream::Base64 test for CBOR: $@" );
         }
     
         SKIP:
         {
             eval( "use IO::Compress::Brotli; use IO::Uncompress::Brotli;" );
             skip( "IO::Compress::Brotli or IO::Uncompress::Brotli is not installed on your system.", 1 ) if( $@ );
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 my $o = HTTP::Promise::Stream::Brotli->new || die( HTTP::Promise::Stream::Brotli->error );
                 $serial = $cbor->encode( $o );
                 my $o2  = $cbor->decode( $serial );
                 isa_ok( $o2 => ['HTTP::Promise::Stream::Brotli'], 'deserialised element is a HTTP::Promise::Stream::Brotli object' );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                fail( "Failed HTTP::Promise::Stream::Brotli test for CBOR: $e" );
+                fail( "Failed HTTP::Promise::Stream::Brotli test for CBOR: $@" );
             }
         };
 
@@ -714,16 +794,18 @@ subtest 'CBOR' => sub
         {
             eval( "use Compress::LZW;" );
             skip( "Compress::LZW is not installed on your system.", 1 ) if( $@ );
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 my $o = HTTP::Promise::Stream::LZW->new || die( HTTP::Promise::Stream::LZW->error );
                 $serial = $cbor->encode( $o );
                 my $o2  = $cbor->decode( $serial );
                 isa_ok( $o2 => ['HTTP::Promise::Stream::LZW'], 'deserialised element is a HTTP::Promise::Stream::LZW object' );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                fail( "Failed HTTP::Promise::Stream::LZW test for CBOR: $e" );
+                fail( "Failed HTTP::Promise::Stream::LZW test for CBOR: $@" );
             }
         };
 
@@ -731,29 +813,33 @@ subtest 'CBOR' => sub
         {
             eval( "use MIME::QuotedPrint;" );
             skip( "MIME::QuotedPrint is not installed on your system.", 1 ) if( $@ );
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 my $o = HTTP::Promise::Stream::QuotedPrint->new || die( HTTP::Promise::Stream::QuotedPrint->error );
                 $serial = $cbor->encode( $o );
                 my $o2  = $cbor->decode( $serial );
                 isa_ok( $o2 => ['HTTP::Promise::Stream::QuotedPrint'], 'deserialised element is a HTTP::Promise::Stream::QuotedPrint object' );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                fail( "Failed HTTP::Promise::Stream::QuotedPrint test for CBOR: $e" );
+                fail( "Failed HTTP::Promise::Stream::QuotedPrint test for CBOR: $@" );
             }
         };
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Stream::UU->new || die( HTTP::Promise::Stream::UU->error );
             $serial = $cbor->encode( $o );
             my $o2  = $cbor->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Stream::UU'], 'deserialised element is a HTTP::Promise::Stream::UU object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Stream::UU test for CBOR: $e" );
+            fail( "Failed HTTP::Promise::Stream::UU test for CBOR: $@" );
         }
     };
 };
@@ -769,33 +855,39 @@ subtest 'Sereal' => sub
         my $enc = Sereal::get_sereal_encoder({ freeze_callbacks => 1 });
         my $dec = Sereal::get_sereal_decoder();
         my $serial;
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $body = HTTP::Promise::Body::File->new( '/some/where/file.txt' );
             $serial = $enc->encode( $body );
             my $body2  = $dec->decode( $serial );
             isa_ok( $body2 => ['HTTP::Promise::Body::File'], 'deserialised element is a HTTP::Promise::Body::File object' );
             is( $body2->filepath, $body->filepath, 'HTTP::Promise::Body::File: filepath matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Body::File test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Body::File test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $body = HTTP::Promise::Body::Scalar->new( 'Some data' );
             $serial = $enc->encode( $body );
             my $body2  = $dec->decode( $serial );
             isa_ok( $body2 => ['HTTP::Promise::Body::Scalar'], 'deserialised element is a HTTP::Promise::Body::Scalar object' );
             is( $body2->as_string, $body->as_string, 'HTTP::Promise::Body::Scalar: content matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Body::Scalar test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Body::Scalar test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $form = HTTP::Promise::Body::Form->new({
                 name => 'John Doe',
@@ -806,13 +898,15 @@ subtest 'Sereal' => sub
             isa_ok( $form2 => ['HTTP::Promise::Body::Form'], 'deserialised element is a HTTP::Promise::Body::Form object' );
             is( $form2->{name}, $form->{name}, 'HTTP::Promise::Body::Form: item "name" matches' );
             is( $form2->{location}, $form->{location}, 'HTTP::Promise::Body::Form: item "name" matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Body::Form test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Body::Form test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $form = HTTP::Promise::Body::Form::Data->new({
                 name => 'John Doe',
@@ -823,13 +917,15 @@ subtest 'Sereal' => sub
             isa_ok( $form2 => ['HTTP::Promise::Body::Form::Data'], 'deserialised element is a HTTP::Promise::Body::Form::Data object' );
             is( $form2->{name}, $form->{name}, 'HTTP::Promise::Body::Form::Data: item "name" matches' );
             is( $form2->{location}, $form->{location}, 'HTTP::Promise::Body::Form::Data: item "name" matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Body::Form test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Body::Form test for Sereal: $@" );
         }
     
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $field = HTTP::Promise::Body::Form::Field->new(
                 name => 'picture',
@@ -841,25 +937,29 @@ subtest 'Sereal' => sub
             isa_ok( $field2 => ['HTTP::Promise::Body::Form::Field'], 'deserialised element is a HTTP::Promise::Body::Form::Field object' );
             is( $field2->name => $field->name, 'HTTP::Promise::Body::Form::Field field name matches' );
             is( $field2->body->file => $field->body->file, 'HTTP::Promise::Body::Form::Field body filepath matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Body::Form::Field test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Body::Form::Field test for Sereal: $@" );
         }
     
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $ent = HTTP::Promise::Entity->new;
             $serial = $enc->encode( $ent );
             my $ent2  = $dec->decode( $serial );
             isa_ok( $ent2 => ['HTTP::Promise::Entity'], 'deserialised element is a HTTP::Promise::Entity object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Entity test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Entity test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $ex = HTTP::Promise::Exception->new( code => 400, message => 'Oops' );
             $serial = $enc->encode( $ex );
@@ -867,13 +967,15 @@ subtest 'Sereal' => sub
             isa_ok( $ex2 => ['HTTP::Promise::Exception'], 'deserialised element is a HTTP::Promise::Exception object' );
             is( $ex2->code, $ex->code, 'HTTP::Promise::Exception test value #1' );
             is( $ex2->message, $ex->message, 'HTTP::Promise::Exception test value #2' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Exception test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Exception test for Sereal: $@" );
         }
     
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $h = HTTP::Promise::Headers->new(
                 Content_Type => 'text/html',
@@ -889,65 +991,75 @@ subtest 'Sereal' => sub
             is( $h2->header( 'Accept-Encoding' ) => $h->header( 'Accept-Encoding' ), 'HTTP::Promise::Headers field Accept-Encoding matches' );
             is( $h2->header( 'Accept-Language' ) => $h->header( 'Accept-Language' ), 'HTTP::Promise::Headers field Accept-Language matches' );
             is( $h2->header( 'Conection' ) => $h->header( 'Conection' ), 'HTTP::Promise::Headers field Conection matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers test for Sereal: $@" );
         }
     
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $accept = HTTP::Promise::Headers::Accept->new( 'text/html, application/json, application/xml;q=0.9, */*;q=0.8' );
             $serial = $enc->encode( $accept );
             my $accept2  = $dec->decode( $serial );
             isa_ok( $accept2 => ['HTTP::Promise::Headers::Accept'], 'deserialised element is a HTTP::Promise::Headers::Accept object' );
             is( $accept2->as_string => $accept->as_string, 'HTTP::Promise::Headers::Accept string matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::Accept test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::Accept test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $accept = HTTP::Promise::Headers::AcceptEncoding->new( 'deflate, gzip;q=1.0, *;q=0.5' );
             $serial = $enc->encode( $accept );
             my $accept2  = $dec->decode( $serial );
             isa_ok( $accept2 => ['HTTP::Promise::Headers::AcceptEncoding'], 'deserialised element is a HTTP::Promise::Headers::AcceptEncoding object' );
             is( "$accept2" => "$accept", 'HTTP::Promise::Headers::AcceptEncoding string matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::AcceptEncoding test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::AcceptEncoding test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $accept = HTTP::Promise::Headers::AcceptLanguage->new( 'fr-FR, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5' );
             $serial = $enc->encode( $accept );
             my $accept2  = $dec->decode( $serial );
             isa_ok( $accept2 => ['HTTP::Promise::Headers::AcceptLanguage'], 'deserialised element is a HTTP::Promise::Headers::AcceptLanguage object' );
             is( "$accept2" => "$accept", 'HTTP::Promise::Headers::AcceptLanguage string matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::AcceptLanguage test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::AcceptLanguage test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $alt = HTTP::Promise::Headers::AltSvc->new( q{h2="alt.example.com:443"} );
             $serial = $enc->encode( $alt );
             my $alt2  = $dec->decode( $serial );
             isa_ok( $alt2 => ['HTTP::Promise::Headers::AltSvc'], 'deserialised element is a HTTP::Promise::Headers::AltSvc object' );
             is( "$alt2" => "$alt", 'HTTP::Promise::Headers::AltSvc string matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::AltSvc test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::AltSvc test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $cache = HTTP::Promise::Headers::CacheControl->new( 'max-age=604800' );
             $serial = $enc->encode( $cache );
@@ -955,13 +1067,15 @@ subtest 'Sereal' => sub
             isa_ok( $cache2 => ['HTTP::Promise::Headers::CacheControl'], 'deserialised element is a HTTP::Promise::Headers::CacheControl object' );
             is( "$cache2" => "$cache", 'HTTP::Promise::Headers::CacheControl string matches' );
             is( $cache2->max_age => $cache->max_age, 'HTTP::Promise::Headers::CacheControl max_age matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::CacheControl test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::CacheControl test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $clear = HTTP::Promise::Headers::ClearSiteData->new( q{"cache", "cookies", "storage", "executionContexts"} );
             $serial = $enc->encode( $clear );
@@ -972,13 +1086,15 @@ subtest 'Sereal' => sub
             is( $clear2->cookies => $clear->cookies, 'HTTP::Promise::Headers::CacheControl cookies matches' );
             is( $clear2->storage => $clear->storage, 'HTTP::Promise::Headers::CacheControl storage matches' );
             is( $clear2->execution_contexts => $clear->execution_contexts, 'HTTP::Promise::Headers::CacheControl execution_contexts matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ClearSiteData test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::ClearSiteData test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $dispo = HTTP::Promise::Headers::ContentDisposition->new( q{attachment; filename="filename.jpg"} );
             $serial = $enc->encode( $dispo );
@@ -987,13 +1103,15 @@ subtest 'Sereal' => sub
             is( "$dispo2" => "$dispo", 'HTTP::Promise::Headers::ContentDisposition string matches' );
             is( $dispo2->disposition => $dispo->disposition, 'HTTP::Promise::Headers::ContentDisposition disposition matches' );
             is( $dispo2->filename => $dispo->filename, 'HTTP::Promise::Headers::ContentDisposition filename matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ContentDisposition test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::ContentDisposition test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $range = HTTP::Promise::Headers::ContentRange->new( 'bytes 200-1000/67589' );
             $serial = $enc->encode( $range );
@@ -1004,13 +1122,15 @@ subtest 'Sereal' => sub
             is( $range2->range_end => $range->range_end, 'HTTP::Promise::Headers::ContentRange range_end matches' );
             is( $range2->size => $range->size, 'HTTP::Promise::Headers::ContentRange size matches' );
             is( $range2->unit => $range->unit, 'HTTP::Promise::Headers::ContentRange unit matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ContentRange test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::ContentRange test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $policy = HTTP::Promise::Headers::ContentSecurityPolicy->new( q{default-src 'self'; img-src *; media-src media1.com media2.com; script-src userscripts.example.com} );
             $serial = $enc->encode( $policy );
@@ -1021,13 +1141,15 @@ subtest 'Sereal' => sub
             is( $policy2->img_src => $policy->img_src, 'HTTP::Promise::Headers::ContentSecurityPolicy img_src matches' );
             is( $policy2->media_src => $policy->media_src, 'HTTP::Promise::Headers::ContentSecurityPolicy media_src matches' );
             is( $policy2->script_src => $policy->script_src, 'HTTP::Promise::Headers::ContentSecurityPolicy script_src matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ContentSecurityPolicy test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::ContentSecurityPolicy test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $policy = HTTP::Promise::Headers::ContentSecurityPolicyReportOnly->new( q{default-src https:; report-uri /csp-violation-report-endpoint/} );
             $serial = $enc->encode( $policy );
@@ -1036,13 +1158,15 @@ subtest 'Sereal' => sub
             is( "$policy2" => "$policy", 'HTTP::Promise::Headers::ContentSecurityPolicyReportOnly string matches' );
             is( $policy2->default_src => $policy->default_src, 'HTTP::Promise::Headers::ContentSecurityPolicyReportOnly default_src matches' );
             is( $policy2->report_uri => $policy->report_uri, 'HTTP::Promise::Headers::ContentSecurityPolicyReportOnly report_uri matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ContentSecurityPolicyReportOnly test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::ContentSecurityPolicyReportOnly test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $ct = HTTP::Promise::Headers::ContentType->new( q{text/html; charset=UTF-8} );
             $serial = $enc->encode( $ct );
@@ -1051,13 +1175,15 @@ subtest 'Sereal' => sub
             is( "$ct2" => "$ct", 'HTTP::Promise::Headers::ContentType string matches' );
             is( $ct2->type => $ct->type, 'HTTP::Promise::Headers::ContentType type matches' );
             is( $ct2->charset => $ct->charset, 'HTTP::Promise::Headers::ContentType charset matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ContentType test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::ContentType test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $c = HTTP::Promise::Headers::Cookie->new( q{name=value; name2=value2; name3=value3} );
             $serial = $enc->encode( $c );
@@ -1067,13 +1193,15 @@ subtest 'Sereal' => sub
             my $cookies = $c->cookies;
             my $cookies2 = $c2->cookies;
             is( "@$cookies2" => "@$cookies", 'HTTP::Promise::Headers::Cookie cookies matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::Cookie test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::Cookie test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::ExpectCT->new( q{max-age=86400, enforce, report-uri="https://foo.example.com/report"} );
             $serial = $enc->encode( $o );
@@ -1083,13 +1211,15 @@ subtest 'Sereal' => sub
             is( $o2->max_age => $o->max_age, 'HTTP::Promise::Headers::ExpectCT max_age matches' );
             is( $o2->enforce => $o->enforce, 'HTTP::Promise::Headers::ExpectCT enforce matches' );
             is( $o2->report_uri => $o->report_uri, 'HTTP::Promise::Headers::ExpectCT report_uri matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ExpectCT test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::ExpectCT test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::Forwarded->new( q{for=192.0.2.60;proto=http;by=203.0.113.43} );
             $serial = $enc->encode( $o );
@@ -1099,13 +1229,15 @@ subtest 'Sereal' => sub
             is( $o2->by => $o->by, 'HTTP::Promise::Headers::Forwarded by matches' );
             is( $o2->for => $o->for, 'HTTP::Promise::Headers::Forwarded for matches' );
             is( $o2->proto => $o->proto, 'HTTP::Promise::Headers::Forwarded proto matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::Forwarded test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::Forwarded test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::KeepAlive->new( q{timeout=5, max=1000} );
             $serial = $enc->encode( $o );
@@ -1114,13 +1246,15 @@ subtest 'Sereal' => sub
             is( "$o2" => "$o", 'HTTP::Promise::Headers::KeepAlive string matches' );
             is( $o2->max => $o->max, 'HTTP::Promise::Headers::KeepAlive max matches' );
             is( $o2->timeout => $o->timeout, 'HTTP::Promise::Headers::KeepAlive timeout matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::KeepAlive test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::KeepAlive test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::Link->new( q{<https://example.com>; rel="preconnect"; title="Foo"; anchor="#bar"} );
             $serial = $enc->encode( $o );
@@ -1131,13 +1265,15 @@ subtest 'Sereal' => sub
             is( $o2->rel => $o->rel, 'HTTP::Promise::Headers::Link rel matches' );
             is( $o2->link => $o->link, 'HTTP::Promise::Headers::Link link matches' );
             is( $o2->title => $o->title, 'HTTP::Promise::Headers::Link title matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::Link test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::Link test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::Range->new( q{bytes=200-1000, 2000-6576, 19000-} );
             $serial = $enc->encode( $o );
@@ -1166,13 +1302,15 @@ subtest 'Sereal' => sub
                         ), "No $i HTTP::Promise::Headers::Range::StartEnd objects match" );
                 }
             };
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::Range test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::Range test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::ServerTiming->new( q{cache;desc="Cache Read";dur=23.2} );
             $serial = $enc->encode( $o );
@@ -1182,13 +1320,15 @@ subtest 'Sereal' => sub
             is( $o2->desc => $o->desc, 'HTTP::Promise::Headers::ServerTiming desc matches' );
             is( $o2->dur => $o->dur, 'HTTP::Promise::Headers::ServerTiming dur matches' );
             is( $o2->name => $o->name, 'HTTP::Promise::Headers::ServerTiming name matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ServerTiming test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::ServerTiming test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::StrictTransportSecurity->new( q{max-age=63072000; includeSubDomains; preload} );
             $serial = $enc->encode( $o );
@@ -1198,39 +1338,45 @@ subtest 'Sereal' => sub
             is( $o2->max_age => $o->max_age, 'HTTP::Promise::Headers::StrictTransportSecurity max_age matches' );
             is( $o2->preload => $o->preload, 'HTTP::Promise::Headers::StrictTransportSecurity preload matches' );
             is( $o2->include_subdomains => $o->include_subdomains, 'HTTP::Promise::Headers::StrictTransportSecurity include_subdomains matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::StrictTransportSecurity test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::StrictTransportSecurity test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::TE->new( q{trailers, deflate;q=0.5} );
             $serial = $enc->encode( $o );
             my $o2  = $dec->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Headers::TE'], 'deserialised element is a HTTP::Promise::Headers::TE object' );
             is( "$o2" => "$o", 'HTTP::Promise::Headers::TE string matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::TE test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::TE test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::WantDigest->new( q{SHA-512;q=0.3, sha-256;q=1, md5;q=0} );
             $serial = $enc->encode( $o );
             my $o2  = $dec->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Headers::WantDigest'], 'deserialised element is a HTTP::Promise::Headers::WantDigest object' );
             is( "$o2" => "$o", 'HTTP::Promise::Headers::WantDigest string matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::WantDigest test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Headers::WantDigest test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $me = file( __FILE__ );
             my $fh = $me->open || die( "Unable to open $me: ", $me->error );
@@ -1239,25 +1385,29 @@ subtest 'Sereal' => sub
             my $o2  = $dec->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::IO'], 'deserialised element is a HTTP::Promise::IO object' );
             is( $o2->debug => $o->debug, 'HTTP::Promise::IO debug value matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::IO test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::IO test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::MIME->new || die( HTTP::Promise::IO->error );
             $serial = $enc->encode( $o );
             my $o2  = $dec->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::MIME'], 'deserialised element is a HHTTP::Promise::MIME object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::MIME test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::MIME test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Message->new(
                 [ 'Content-Type' => 'text/plain' ],
@@ -1268,37 +1418,43 @@ subtest 'Sereal' => sub
             isa_ok( $o2 => ['HTTP::Promise::Message'], 'deserialised element is a HTTP::Promise::Message object' );
             is( $o2->headers->content_type => $o->headers->content_type, 'HTTP::Promise::Message content_type header value matches' );
             is( $o2->decoded_content => $o->decoded_content, 'HTTP::Promise::Message decoded_content value matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Message test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Message test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Parser->new || die( HTTP::Promise::Parser->error );
             $serial = $enc->encode( $o );
             my $o2  = $dec->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Parser'], 'deserialised element is a HTTP::Promise::Parser object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Parser test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Parser test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Pool->new || die( HTTP::Promise::Pool->error );
             $serial = $enc->encode( $o );
             my $o2  = $dec->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Pool'], 'deserialised element is a HTTP::Promise::Pool object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Pool test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Pool test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Request->new(
                 GET => 'https://example.com/some/where',
@@ -1313,13 +1469,15 @@ subtest 'Sereal' => sub
             is( $o2->method => $o->method, 'HTTP::Promise::Request method value matches' );
             is( $o2->uri => $o->uri, 'HTTP::Promise::Request uri value matches' );
             is( $o2->headers->content_type => $o->headers->content_type, 'HTTP::Promise::Request content_type header value matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Request test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Request test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Response->new(
                 200 => 'OK',
@@ -1338,62 +1496,70 @@ subtest 'Sereal' => sub
             is( $o2->headers->content_type => $o->headers->content_type, 'HTTP::Promise::Response Content-Type header value matches' );
             is( $o2->headers->cache_control => 'no-cache, no-store', 'HTTP::Promise::Response Cache-Control header value matches' );
             is( $o2->headers->content_encoding => 'gzip', 'HTTP::Promise::Response Content-Ttype header value matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Response test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Response test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Status->new || die( HTTP::Promise::Status->error );
             $serial = $enc->encode( $o );
             my $o2  = $dec->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Status'], 'deserialised element is a HTTP::Promise::Status object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Status test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Status test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Stream->new( __FILE__ ) || die( HTTP::Promise::Stream->error );
             $serial = $enc->encode( $o );
             my $o2  = $dec->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Stream'], 'deserialised element is a HTTP::Promise::Stream object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Stream test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Stream test for Sereal: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Stream::Base64->new || die( HTTP::Promise::Stream::Base64->error );
             $serial = $enc->encode( $o );
             my $o2  = $dec->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Stream::Base64'], 'deserialised element is a HTTP::Promise::Stream::Base64 object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Stream::Base64 test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Stream::Base64 test for Sereal: $@" );
         }
     
         SKIP:
         {
             eval( "use IO::Compress::Brotli; use IO::Uncompress::Brotli;" );
             skip( "IO::Compress::Brotli or IO::Uncompress::Brotli is not installed on your system.", 1 ) if( $@ );
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 my $o = HTTP::Promise::Stream::Brotli->new || die( HTTP::Promise::Stream::Brotli->error );
                 $serial = $enc->encode( $o );
                 my $o2  = $dec->decode( $serial );
                 isa_ok( $o2 => ['HTTP::Promise::Stream::Brotli'], 'deserialised element is a HTTP::Promise::Stream::Brotli object' );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                fail( "Failed HTTP::Promise::Stream::Brotli test for Sereal: $e" );
+                fail( "Failed HTTP::Promise::Stream::Brotli test for Sereal: $@" );
             }
         };
 
@@ -1401,16 +1567,18 @@ subtest 'Sereal' => sub
         {
             eval( "use Compress::LZW;" );
             skip( "Compress::LZW is not installed on your system.", 1 ) if( $@ );
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 my $o = HTTP::Promise::Stream::LZW->new || die( HTTP::Promise::Stream::LZW->error );
                 $serial = $enc->encode( $o );
                 my $o2  = $dec->decode( $serial );
                 isa_ok( $o2 => ['HTTP::Promise::Stream::LZW'], 'deserialised element is a HTTP::Promise::Stream::LZW object' );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                fail( "Failed HTTP::Promise::Stream::LZW test for Sereal: $e" );
+                fail( "Failed HTTP::Promise::Stream::LZW test for Sereal: $@" );
             }
         };
 
@@ -1418,29 +1586,33 @@ subtest 'Sereal' => sub
         {
             eval( "use MIME::QuotedPrint;" );
             skip( "MIME::QuotedPrint is not installed on your system.", 1 ) if( $@ );
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 my $o = HTTP::Promise::Stream::QuotedPrint->new || die( HTTP::Promise::Stream::QuotedPrint->error );
                 $serial = $enc->encode( $o );
                 my $o2  = $dec->decode( $serial );
                 isa_ok( $o2 => ['HTTP::Promise::Stream::QuotedPrint'], 'deserialised element is a HTTP::Promise::Stream::QuotedPrint object' );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                fail( "Failed HTTP::Promise::Stream::QuotedPrint test for Sereal: $e" );
+                fail( "Failed HTTP::Promise::Stream::QuotedPrint test for Sereal: $@" );
             }
         };
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Stream::UU->new || die( HTTP::Promise::Stream::UU->error );
             $serial = $enc->encode( $o );
             my $o2  = $dec->decode( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Stream::UU'], 'deserialised element is a HTTP::Promise::Stream::UU object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Stream::UU test for Sereal: $e" );
+            fail( "Failed HTTP::Promise::Stream::UU test for Sereal: $@" );
         }
     };
 };
@@ -1454,33 +1626,39 @@ subtest 'Storable' => sub
         note( "Processing tests for Storable" );
         # $Storable::forgive_me = 1;
         my $serial;
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $body = HTTP::Promise::Body::File->new( '/some/where/file.txt' );
             $serial = Storable::Improved::freeze( $body );
             my $body2  = Storable::Improved::thaw( $serial );
             isa_ok( $body2 => ['HTTP::Promise::Body::File'], 'deserialised element is a HTTP::Promise::Body::File object' );
             is( $body2->filepath, $body->filepath, 'HTTP::Promise::Body::File: filepath matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Body::File test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Body::File test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $body = HTTP::Promise::Body::Scalar->new( 'Some data' );
             $serial = Storable::Improved::freeze( $body );
             my $body2  = Storable::Improved::thaw( $serial );
             isa_ok( $body2 => ['HTTP::Promise::Body::Scalar'], 'deserialised element is a HTTP::Promise::Body::Scalar object' );
             is( $body2->as_string, $body->as_string, 'HTTP::Promise::Body::Scalar: content matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Body::Scalar test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Body::Scalar test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $form = HTTP::Promise::Body::Form->new({
                 name => 'John Doe',
@@ -1491,13 +1669,15 @@ subtest 'Storable' => sub
             isa_ok( $form2 => ['HTTP::Promise::Body::Form'], 'deserialised element is a HTTP::Promise::Body::Form object' );
             is( $form2->{name}, $form->{name}, 'HTTP::Promise::Body::Form: item "name" matches' );
             is( $form2->{location}, $form->{location}, 'HTTP::Promise::Body::Form: item "name" matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Body::Form test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Body::Form test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $form = HTTP::Promise::Body::Form::Data->new({
                 name => 'John Doe',
@@ -1508,13 +1688,15 @@ subtest 'Storable' => sub
             isa_ok( $form2 => ['HTTP::Promise::Body::Form::Data'], 'deserialised element is a HTTP::Promise::Body::Form::Data object' );
             is( $form2->{name}, $form->{name}, 'HTTP::Promise::Body::Form::Data: item "name" matches' );
             is( $form2->{location}, $form->{location}, 'HTTP::Promise::Body::Form::Data: item "name" matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Body::Form test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Body::Form test for Storable: $@" );
         }
     
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $field = HTTP::Promise::Body::Form::Field->new(
                 name => 'picture',
@@ -1526,25 +1708,29 @@ subtest 'Storable' => sub
             isa_ok( $field2 => ['HTTP::Promise::Body::Form::Field'], 'deserialised element is a HTTP::Promise::Body::Form::Field object' );
             is( $field2->name => $field->name, 'HTTP::Promise::Body::Form::Field field name matches' );
             is( $field2->body->file => $field->body->file, 'HTTP::Promise::Body::Form::Field body filepath matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Body::Form::Field test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Body::Form::Field test for Storable: $@" );
         }
     
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $ent = HTTP::Promise::Entity->new;
             $serial = Storable::Improved::freeze( $ent );
             my $ent2  = Storable::Improved::thaw( $serial );
             isa_ok( $ent2 => ['HTTP::Promise::Entity'], 'deserialised element is a HTTP::Promise::Entity object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Entity test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Entity test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $ex = HTTP::Promise::Exception->new( code => 400, message => 'Oops' );
             $serial = Storable::Improved::freeze( $ex );
@@ -1552,13 +1738,15 @@ subtest 'Storable' => sub
             isa_ok( $ex2 => ['HTTP::Promise::Exception'], 'deserialised element is a HTTP::Promise::Exception object' );
             is( $ex2->code, $ex->code, 'HTTP::Promise::Exception test value #1' );
             is( $ex2->message, $ex->message, 'HTTP::Promise::Exception test value #2' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Exception test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Exception test for Storable: $@" );
         }
     
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $h = HTTP::Promise::Headers->new(
                 Content_Type => 'text/html',
@@ -1589,65 +1777,75 @@ subtest 'Storable' => sub
             is( $h2->header( 'Accept-Encoding' ) => $h->header( 'Accept-Encoding' ), 'HTTP::Promise::Headers field Accept-Encoding matches' );
             is( $h2->header( 'Accept-Language' ) => $h->header( 'Accept-Language' ), 'HTTP::Promise::Headers field Accept-Language matches' );
             is( $h2->header( 'Conection' ) => $h->header( 'Conection' ), 'HTTP::Promise::Headers field Conection matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers test for Storable: $@" );
         }
     
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $accept = HTTP::Promise::Headers::Accept->new( 'text/html, application/json, application/xml;q=0.9, */*;q=0.8' );
             $serial = Storable::Improved::freeze( $accept );
             my $accept2  = Storable::Improved::thaw( $serial );
             isa_ok( $accept2 => ['HTTP::Promise::Headers::Accept'], 'deserialised element is a HTTP::Promise::Headers::Accept object' );
             is( $accept2->as_string => $accept->as_string, 'HTTP::Promise::Headers::Accept string matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::Accept test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::Accept test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $accept = HTTP::Promise::Headers::AcceptEncoding->new( 'deflate, gzip;q=1.0, *;q=0.5' );
             $serial = Storable::Improved::freeze( $accept );
             my $accept2  = Storable::Improved::thaw( $serial );
             isa_ok( $accept2 => ['HTTP::Promise::Headers::AcceptEncoding'], 'deserialised element is a HTTP::Promise::Headers::AcceptEncoding object' );
             is( "$accept2" => "$accept", 'HTTP::Promise::Headers::AcceptEncoding string matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::AcceptEncoding test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::AcceptEncoding test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $accept = HTTP::Promise::Headers::AcceptLanguage->new( 'fr-FR, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5' );
             $serial = Storable::Improved::freeze( $accept );
             my $accept2  = Storable::Improved::thaw( $serial );
             isa_ok( $accept2 => ['HTTP::Promise::Headers::AcceptLanguage'], 'deserialised element is a HTTP::Promise::Headers::AcceptLanguage object' );
             is( "$accept2" => "$accept", 'HTTP::Promise::Headers::AcceptLanguage string matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::AcceptLanguage test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::AcceptLanguage test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $alt = HTTP::Promise::Headers::AltSvc->new( q{h2="alt.example.com:443"} );
             $serial = Storable::Improved::freeze( $alt );
             my $alt2  = Storable::Improved::thaw( $serial );
             isa_ok( $alt2 => ['HTTP::Promise::Headers::AltSvc'], 'deserialised element is a HTTP::Promise::Headers::AltSvc object' );
             is( "$alt2" => "$alt", 'HTTP::Promise::Headers::AltSvc string matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::AltSvc test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::AltSvc test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $cache = HTTP::Promise::Headers::CacheControl->new( 'max-age=604800' );
             $serial = Storable::Improved::freeze( $cache );
@@ -1655,13 +1853,15 @@ subtest 'Storable' => sub
             isa_ok( $cache2 => ['HTTP::Promise::Headers::CacheControl'], 'deserialised element is a HTTP::Promise::Headers::CacheControl object' );
             is( "$cache2" => "$cache", 'HTTP::Promise::Headers::CacheControl string matches' );
             is( $cache2->max_age => $cache->max_age, 'HTTP::Promise::Headers::CacheControl max_age matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::CacheControl test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::CacheControl test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $clear = HTTP::Promise::Headers::ClearSiteData->new( q{"cache", "cookies", "storage", "executionContexts"} );
             $serial = Storable::Improved::freeze( $clear );
@@ -1672,13 +1872,15 @@ subtest 'Storable' => sub
             is( $clear2->cookies => $clear->cookies, 'HTTP::Promise::Headers::CacheControl cookies matches' );
             is( $clear2->storage => $clear->storage, 'HTTP::Promise::Headers::CacheControl storage matches' );
             is( $clear2->execution_contexts => $clear->execution_contexts, 'HTTP::Promise::Headers::CacheControl execution_contexts matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ClearSiteData test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::ClearSiteData test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $dispo = HTTP::Promise::Headers::ContentDisposition->new( q{attachment; filename="filename.jpg"} );
             $serial = Storable::Improved::freeze( $dispo );
@@ -1687,13 +1889,15 @@ subtest 'Storable' => sub
             is( "$dispo2" => "$dispo", 'HTTP::Promise::Headers::ContentDisposition string matches' );
             is( $dispo2->disposition => $dispo->disposition, 'HTTP::Promise::Headers::ContentDisposition disposition matches' );
             is( $dispo2->filename => $dispo->filename, 'HTTP::Promise::Headers::ContentDisposition filename matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ContentDisposition test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::ContentDisposition test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $range = HTTP::Promise::Headers::ContentRange->new( 'bytes 200-1000/67589' );
             $serial = Storable::Improved::freeze( $range );
@@ -1705,13 +1909,15 @@ subtest 'Storable' => sub
             is( $range2->range_end => $range->range_end, 'HTTP::Promise::Headers::ContentRange range_end matches' );
             is( $range2->size => $range->size, 'HTTP::Promise::Headers::ContentRange size matches' );
             is( $range2->unit => $range->unit, 'HTTP::Promise::Headers::ContentRange unit matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ContentRange test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::ContentRange test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $policy = HTTP::Promise::Headers::ContentSecurityPolicy->new( q{default-src 'self'; img-src *; media-src media1.com media2.com; script-src userscripts.example.com} );
             $serial = Storable::Improved::freeze( $policy );
@@ -1722,13 +1928,15 @@ subtest 'Storable' => sub
             is( $policy2->img_src => $policy->img_src, 'HTTP::Promise::Headers::ContentSecurityPolicy img_src matches' );
             is( $policy2->media_src => $policy->media_src, 'HTTP::Promise::Headers::ContentSecurityPolicy media_src matches' );
             is( $policy2->script_src => $policy->script_src, 'HTTP::Promise::Headers::ContentSecurityPolicy script_src matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ContentSecurityPolicy test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::ContentSecurityPolicy test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $policy = HTTP::Promise::Headers::ContentSecurityPolicyReportOnly->new( q{default-src https:; report-uri /csp-violation-report-endpoint/} );
             $serial = Storable::Improved::freeze( $policy );
@@ -1737,13 +1945,15 @@ subtest 'Storable' => sub
             is( "$policy2" => "$policy", 'HTTP::Promise::Headers::ContentSecurityPolicyReportOnly string matches' );
             is( $policy2->default_src => $policy->default_src, 'HTTP::Promise::Headers::ContentSecurityPolicyReportOnly default_src matches' );
             is( $policy2->report_uri => $policy->report_uri, 'HTTP::Promise::Headers::ContentSecurityPolicyReportOnly report_uri matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ContentSecurityPolicyReportOnly test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::ContentSecurityPolicyReportOnly test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $ct = HTTP::Promise::Headers::ContentType->new( q{text/html; charset=UTF-8} );
             $serial = Storable::Improved::freeze( $ct );
@@ -1752,13 +1962,15 @@ subtest 'Storable' => sub
             is( "$ct2" => "$ct", 'HTTP::Promise::Headers::ContentType string matches' );
             is( $ct2->type => $ct->type, 'HTTP::Promise::Headers::ContentType type matches' );
             is( $ct2->charset => $ct->charset, 'HTTP::Promise::Headers::ContentType charset matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ContentType test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::ContentType test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $c = HTTP::Promise::Headers::Cookie->new( q{name=value; name2=value2; name3=value3} );
             $serial = Storable::Improved::freeze( $c );
@@ -1768,13 +1980,15 @@ subtest 'Storable' => sub
             my $cookies = $c->cookies;
             my $cookies2 = $c2->cookies;
             is( "@$cookies2" => "@$cookies", 'HTTP::Promise::Headers::Cookie cookies matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::Cookie test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::Cookie test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::ExpectCT->new( q{max-age=86400, enforce, report-uri="https://foo.example.com/report"} );
             $serial = Storable::Improved::freeze( $o );
@@ -1784,13 +1998,15 @@ subtest 'Storable' => sub
             is( $o2->max_age => $o->max_age, 'HTTP::Promise::Headers::ExpectCT max_age matches' );
             is( $o2->enforce => $o->enforce, 'HTTP::Promise::Headers::ExpectCT enforce matches' );
             is( $o2->report_uri => $o->report_uri, 'HTTP::Promise::Headers::ExpectCT report_uri matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ExpectCT test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::ExpectCT test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::Forwarded->new( q{for=192.0.2.60;proto=http;by=203.0.113.43} );
             $serial = Storable::Improved::freeze( $o );
@@ -1800,13 +2016,15 @@ subtest 'Storable' => sub
             is( $o2->by => $o->by, 'HTTP::Promise::Headers::Forwarded by matches' );
             is( $o2->for => $o->for, 'HTTP::Promise::Headers::Forwarded for matches' );
             is( $o2->proto => $o->proto, 'HTTP::Promise::Headers::Forwarded proto matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::Forwarded test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::Forwarded test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::KeepAlive->new( q{timeout=5, max=1000} );
             $serial = Storable::Improved::freeze( $o );
@@ -1815,13 +2033,15 @@ subtest 'Storable' => sub
             is( "$o2" => "$o", 'HTTP::Promise::Headers::KeepAlive string matches' );
             is( $o2->max => $o->max, 'HTTP::Promise::Headers::KeepAlive max matches' );
             is( $o2->timeout => $o->timeout, 'HTTP::Promise::Headers::KeepAlive timeout matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::KeepAlive test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::KeepAlive test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::Link->new( q{<https://example.com>; rel="preconnect"; title="Foo"; anchor="#bar"} );
             $serial = Storable::Improved::freeze( $o );
@@ -1832,13 +2052,15 @@ subtest 'Storable' => sub
             is( $o2->rel => $o->rel, 'HTTP::Promise::Headers::Link rel matches' );
             is( $o2->link => $o->link, 'HTTP::Promise::Headers::Link link matches' );
             is( $o2->title => $o->title, 'HTTP::Promise::Headers::Link title matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::Link test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::Link test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::Range->new( q{bytes=200-1000, 2000-6576, 19000-} );
             $serial = Storable::Improved::freeze( $o );
@@ -1867,13 +2089,15 @@ subtest 'Storable' => sub
                         ), "No $i HTTP::Promise::Headers::Range::StartEnd objects match" );
                 }
             };
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::Range test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::Range test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::ServerTiming->new( q{cache;desc="Cache Read";dur=23.2} );
             $serial = Storable::Improved::freeze( $o );
@@ -1883,13 +2107,15 @@ subtest 'Storable' => sub
             is( $o2->desc => $o->desc, 'HTTP::Promise::Headers::ServerTiming desc matches' );
             is( $o2->dur => $o->dur, 'HTTP::Promise::Headers::ServerTiming dur matches' );
             is( $o2->name => $o->name, 'HTTP::Promise::Headers::ServerTiming name matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::ServerTiming test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::ServerTiming test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::StrictTransportSecurity->new( q{max-age=63072000; includeSubDomains; preload} );
             $serial = Storable::Improved::freeze( $o );
@@ -1899,39 +2125,45 @@ subtest 'Storable' => sub
             is( $o2->max_age => $o->max_age, 'HTTP::Promise::Headers::StrictTransportSecurity max_age matches' );
             is( $o2->preload => $o->preload, 'HTTP::Promise::Headers::StrictTransportSecurity preload matches' );
             is( $o2->include_subdomains => $o->include_subdomains, 'HTTP::Promise::Headers::StrictTransportSecurity include_subdomains matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::StrictTransportSecurity test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::StrictTransportSecurity test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::TE->new( q{trailers, deflate;q=0.5} );
             $serial = Storable::Improved::freeze( $o );
             my $o2  = Storable::Improved::thaw( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Headers::TE'], 'deserialised element is a HTTP::Promise::Headers::TE object' );
             is( "$o2" => "$o", 'HTTP::Promise::Headers::TE string matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::TE test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::TE test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Headers::WantDigest->new( q{SHA-512;q=0.3, sha-256;q=1, md5;q=0} );
             $serial = Storable::Improved::freeze( $o );
             my $o2  = Storable::Improved::thaw( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Headers::WantDigest'], 'deserialised element is a HTTP::Promise::Headers::WantDigest object' );
             is( "$o2" => "$o", 'HTTP::Promise::Headers::WantDigest string matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Headers::WantDigest test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Headers::WantDigest test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $me = file( __FILE__ );
             my $fh = $me->open || die( "Unable to open $me: ", $me->error );
@@ -1940,25 +2172,29 @@ subtest 'Storable' => sub
             my $o2  = Storable::Improved::thaw( $serial );
             isa_ok( $o2 => ['HTTP::Promise::IO'], 'deserialised element is a HTTP::Promise::IO object' );
             is( $o2->debug => $o->debug, 'HTTP::Promise::IO debug value matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::IO test for Storable: $e" );
+            fail( "Failed HTTP::Promise::IO test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::MIME->new || die( HTTP::Promise::IO->error );
             $serial = Storable::Improved::freeze( $o );
             my $o2  = Storable::Improved::thaw( $serial );
             isa_ok( $o2 => ['HTTP::Promise::MIME'], 'deserialised element is a HHTTP::Promise::MIME object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::MIME test for Storable: $e" );
+            fail( "Failed HTTP::Promise::MIME test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Message->new(
                 [ 'Content-Type' => 'text/plain' ],
@@ -1970,37 +2206,43 @@ subtest 'Storable' => sub
             isa_ok( $o2 => ['HTTP::Promise::Message'], 'deserialised element is a HTTP::Promise::Message object' );
             is( $o2->headers->content_type => $o->headers->content_type, 'HTTP::Promise::Message content_type header value matches' );
             is( $o2->decoded_content => $o->decoded_content, 'HTTP::Promise::Message decoded_content value matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Message test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Message test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Parser->new || die( HTTP::Promise::Parser->error );
             $serial = Storable::Improved::freeze( $o );
             my $o2  = Storable::Improved::thaw( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Parser'], 'deserialised element is a HTTP::Promise::Parser object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Parser test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Parser test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Pool->new || die( HTTP::Promise::Pool->error );
             $serial = Storable::Improved::freeze( $o );
             my $o2  = Storable::Improved::thaw( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Pool'], 'deserialised element is a HTTP::Promise::Pool object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Pool test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Pool test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Request->new(
                 GET => 'https://example.com/some/where',
@@ -2015,13 +2257,15 @@ subtest 'Storable' => sub
             is( $o2->method => $o->method, 'HTTP::Promise::Request method value matches' );
             is( $o2->uri => $o->uri, 'HTTP::Promise::Request uri value matches' );
             is( $o2->headers->content_type => $o->headers->content_type, 'HTTP::Promise::Request content_type header value matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Request test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Request test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Response->new(
                 200 => 'OK',
@@ -2040,62 +2284,70 @@ subtest 'Storable' => sub
             is( $o2->headers->content_type => $o->headers->content_type, 'HTTP::Promise::Response Content-Type header value matches' );
             is( $o2->headers->cache_control => 'no-cache, no-store', 'HTTP::Promise::Response Cache-Control header value matches' );
             is( $o2->headers->content_encoding => 'gzip', 'HTTP::Promise::Response Content-Ttype header value matches' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Response test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Response test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Status->new || die( HTTP::Promise::Status->error );
             $serial = Storable::Improved::freeze( $o );
             my $o2  = Storable::Improved::thaw( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Status'], 'deserialised element is a HTTP::Promise::Status object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Status test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Status test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Stream->new( __FILE__ ) || die( HTTP::Promise::Stream->error );
             $serial = Storable::Improved::freeze( $o );
             my $o2  = Storable::Improved::thaw( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Stream'], 'deserialised element is a HTTP::Promise::Stream object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Stream test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Stream test for Storable: $@" );
         }
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Stream::Base64->new || die( HTTP::Promise::Stream::Base64->error );
             $serial = Storable::Improved::freeze( $o );
             my $o2  = Storable::Improved::thaw( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Stream::Base64'], 'deserialised element is a HTTP::Promise::Stream::Base64 object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Stream::Base64 test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Stream::Base64 test for Storable: $@" );
         }
     
         SKIP:
         {
             eval( "use IO::Compress::Brotli; use IO::Uncompress::Brotli;" );
             skip( "IO::Compress::Brotli or IO::Uncompress::Brotli is not installed on your system.", 1 ) if( $@ );
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 my $o = HTTP::Promise::Stream::Brotli->new || die( HTTP::Promise::Stream::Brotli->error );
                 $serial = Storable::Improved::freeze( $o );
                 my $o2  = Storable::Improved::thaw( $serial );
                 isa_ok( $o2 => ['HTTP::Promise::Stream::Brotli'], 'deserialised element is a HTTP::Promise::Stream::Brotli object' );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                fail( "Failed HTTP::Promise::Stream::Brotli test for Storable: $e" );
+                fail( "Failed HTTP::Promise::Stream::Brotli test for Storable: $@" );
             }
         };
 
@@ -2103,16 +2355,18 @@ subtest 'Storable' => sub
         {
             eval( "use Compress::LZW;" );
             skip( "Compress::LZW is not installed on your system.", 1 ) if( $@ );
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 my $o = HTTP::Promise::Stream::LZW->new || die( HTTP::Promise::Stream::LZW->error );
                 $serial = Storable::Improved::freeze( $o );
                 my $o2  = Storable::Improved::thaw( $serial );
                 isa_ok( $o2 => ['HTTP::Promise::Stream::LZW'], 'deserialised element is a HTTP::Promise::Stream::LZW object' );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                fail( "Failed HTTP::Promise::Stream::LZW test for Storable: $e" );
+                fail( "Failed HTTP::Promise::Stream::LZW test for Storable: $@" );
             }
         };
 
@@ -2120,29 +2374,33 @@ subtest 'Storable' => sub
         {
             eval( "use MIME::QuotedPrint;" );
             skip( "MIME::QuotedPrint is not installed on your system.", 1 ) if( $@ );
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 my $o = HTTP::Promise::Stream::QuotedPrint->new || die( HTTP::Promise::Stream::QuotedPrint->error );
                 $serial = Storable::Improved::freeze( $o );
                 my $o2  = Storable::Improved::thaw( $serial );
                 isa_ok( $o2 => ['HTTP::Promise::Stream::QuotedPrint'], 'deserialised element is a HTTP::Promise::Stream::QuotedPrint object' );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                fail( "Failed HTTP::Promise::Stream::QuotedPrint test for Storable: $e" );
+                fail( "Failed HTTP::Promise::Stream::QuotedPrint test for Storable: $@" );
             }
         };
 
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $o = HTTP::Promise::Stream::UU->new || die( HTTP::Promise::Stream::UU->error );
             $serial = Storable::Improved::freeze( $o );
             my $o2  = Storable::Improved::thaw( $serial );
             isa_ok( $o2 => ['HTTP::Promise::Stream::UU'], 'deserialised element is a HTTP::Promise::Stream::UU object' );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            fail( "Failed HTTP::Promise::Stream::UU test for Storable: $e" );
+            fail( "Failed HTTP::Promise::Stream::UU test for Storable: $@" );
         }
     };
 };

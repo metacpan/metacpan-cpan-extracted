@@ -5,9 +5,9 @@
 
 use v5.26;
 use warnings;
-use Object::Pad 0.70 ':experimental(adjust_params)';
+use Object::Pad 0.800 ':experimental(adjust_params)';
 
-package Tickit::Widget::Scroller::Item::Text 0.31;
+package Tickit::Widget::Scroller::Item::Text 0.32;
 class Tickit::Widget::Scroller::Item::Text
    :strict(params);
 
@@ -42,7 +42,7 @@ the C</\s/> regexp pattern).
 
 =head2 new
 
-   $item = Tickit::Widget::Scroller::Item::Text->new( $text, %opts )
+   $item = Tickit::Widget::Scroller::Item::Text->new( $text, %opts );
 
 Constructs a new text item, containing the given string of text. Once
 constructed, the item is immutable.
@@ -112,7 +112,7 @@ ADJUST :params (
 
 =head2 chunks
 
-   @chunks = $item->chunks
+   @chunks = $item->chunks;
 
 Returns the chunks of text displayed by this item. Each chunk is represented
 by an ARRAY reference of three fields, giving the text string, its width in
@@ -166,23 +166,23 @@ method height_for_width ( $width )
       my ( $text, $textwidth, %opts ) = @$chunk;
 
       if( $textwidth <= $line_remaining ) {
-         push @$thisline, [ $text, $textwidth, $opts{pen} ];
+         push @$thisline, [ $text =~ s/\xA0/ /gr, $textwidth, $opts{pen} ];
          $line_remaining -= $textwidth;
       }
       else {
          # Split this chunk at most $line_remaining chars
          my $eol_ch = cols2chars $text, $line_remaining;
 
-         if( $eol_ch < length $text && substr( $text, $eol_ch, 1 ) =~ m/\S/ ) {
+         if( $eol_ch < length $text && substr( $text, $eol_ch, 1 ) =~ m/[\S\xA0]/ ) {
             # TODO: This surely must be possible without substr()ing a temporary
-            if( substr( $text, 0, $eol_ch ) =~ m/\S+$/ and
+            if( substr( $text, 0, $eol_ch ) =~ m/[\S\xA0]+$/ and
                 ( $-[0] > 0 or @$thisline ) ) {
                $eol_ch = $-[0];
             }
          }
 
          my $partial_text = substr( $text, 0, $eol_ch );
-         my $partial_chunk = [ $partial_text, textwidth( $partial_text ), $opts{pen} ];
+         my $partial_chunk = [ $partial_text =~ s/\xA0/ /gr, textwidth( $partial_text ), $opts{pen} ];
          push @$thisline, $partial_chunk;
 
          my $bol_ch = pos $text = $eol_ch;

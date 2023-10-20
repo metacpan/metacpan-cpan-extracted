@@ -1,0 +1,15 @@
+diseases:
+  - id: OMIM:11
+    label: Foo
+  - id: OMIM:22
+    label: Bar
+phenotypicFeatures:
+  - id: HP:11
+    label: Foo
+  - id: HP:22
+    label: Bar
+treatments:
+  - id: RxNorm:11
+    label: Foo
+  - id: RxNorm:22
+    label: Bar

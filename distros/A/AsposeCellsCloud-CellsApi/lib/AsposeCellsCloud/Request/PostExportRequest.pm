@@ -59,7 +59,7 @@ sub new {
 
 
 # Run Operation Request
-# PostExportRequest.File : File to upload  ,
+# PostExportRequest.File : workbook/worksheet/chart/comment/picture/shape/listobject/oleobject  ,
 # PostExportRequest.objectType : workbook/worksheet/chart/comment/picture/shape/listobject/oleobject  ,
 # PostExportRequest.format : The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
 # PostExportRequest.password :   ,
@@ -138,7 +138,7 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'File to upload',
+     	description => 'workbook/worksheet/chart/comment/picture/shape/listobject/oleobject',
      	format => '',
      	read_only => '',
      		},

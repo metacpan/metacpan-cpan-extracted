@@ -9,7 +9,7 @@ Geo::Coder::List - Call many Geo-Coders
 
 # VERSION
 
-Version 0.31
+Version 0.32
 
 # SYNOPSIS
 

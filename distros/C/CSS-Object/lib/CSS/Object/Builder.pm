@@ -60,7 +60,6 @@ sub new_rule
 {
     my $self = shift( @_ );
     my $css = $self->css || return( $self->error( "Our main css object is gone!" ) );
-    $self->message( 3, "Creating new CSS::Object::Builder::Rule object with css object '$css' and formatter set to '", $css->format, "'." );
 #     return( CSS::Object::Builder::Rule->new( @_,
 #         format => $css->format,
 #         debug => $self->debug,
@@ -71,7 +70,6 @@ sub new_rule
         debug => $self->debug,
         css => $css,
     );
-    # $self->message( 3, "Returning rule object '", overload::StrVal( $rule ), "'." );
     return( $rule );
 }
 
@@ -103,11 +101,9 @@ sub select
     }
     else
     {
-        $self->message( 3, "Creating new CSS::Object::Builder::Rule object." );
         $rule = $self->new_rule->add_to( $css );
         defined( $rule ) || return( $self->error( "Cannot create CSS::Object::Builder::Rule object: ", CSS::Object::Builder::Rule->error ) );
     }
-    # $self->message( 3, "Rule object is '", overload::StrVal( $rule ), "'." );
     if( $self->_is_array( $this ) )
     {
         foreach my $s ( @$this )
@@ -119,7 +115,7 @@ sub select
     return( $rule );
 }
 
-# XXX CSS::Object::Builder::Rule class
+# NOTE: CSS::Object::Builder::Rule class
 # Dynamic css property name pakcage
 package CSS::Object::Builder::Rule;
 BEGIN

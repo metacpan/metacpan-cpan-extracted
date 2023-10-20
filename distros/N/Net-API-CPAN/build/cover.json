@@ -1,0 +1,13 @@
+{
+   "criteria" : {
+      "branch" : "54.68",
+      "total" : "67.65",
+      "condition" : "57.56",
+      "subroutine" : "80.00",
+      "statement" : "78.14"
+   },
+   "version" : "v1.2.3",
+   "distribution" : "Folklore-Japan",
+   "url" : "http://cpancover.com/latest/Folklore-Japan-v1.2.3/index.html",
+   "release" : "Folklore-Japan-v1.2.3"
+}

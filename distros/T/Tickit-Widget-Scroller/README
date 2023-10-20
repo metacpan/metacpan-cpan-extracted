@@ -101,14 +101,14 @@ METHODS
 
  set_on_scrolled
 
-       $on_scrolled = $scroller->on_scrolled
+       $on_scrolled = $scroller->on_scrolled;
     
-       $scroller->set_on_scrolled( $on_scrolled )
+       $scroller->set_on_scrolled( $on_scrolled );
 
     Return or set the CODE reference to be called when the scroll position
     is adjusted.
 
-       $on_scrolled->( $scroller, $delta )
+       $on_scrolled->( $scroller, $delta );
 
     This is invoked by the scroll method, including the scroll_to,
     scroll_to_top and scroll_to_bottom. In normal cases it will be given
@@ -118,7 +118,7 @@ METHODS
 
  items
 
-       $count = scalar $scroller->items;
+       $count = $scroller->items;
 
     Since version 0.31.
 
@@ -128,7 +128,7 @@ METHODS
 
  push
 
-       $scroller->push( @items )
+       $scroller->push( @items );
 
     Append the given items to the end of the list.
 
@@ -141,7 +141,7 @@ METHODS
 
  unshift
 
-       $scroller->unshift( @items )
+       $scroller->unshift( @items );
 
     Prepend the given items to the beginning of the list.
 
@@ -154,7 +154,7 @@ METHODS
 
  shift
 
-       @items = $scroller->shift( $count )
+       @items = $scroller->shift( $count );
 
     Remove the given number of items from the start of the list and returns
     them.
@@ -168,7 +168,7 @@ METHODS
 
  pop
 
-       @items = $scroller->pop( $count )
+       @items = $scroller->pop( $count );
 
     Remove the given number of items from the end of the list and returns
     them.
@@ -182,7 +182,7 @@ METHODS
 
  scroll
 
-       $scroller->scroll( $delta )
+       $scroller->scroll( $delta );
 
     Move the display up or down by the given $delta amount; with positive
     moving down. This will be a physical count of displayed lines; if some
@@ -191,36 +191,37 @@ METHODS
 
  scroll_to
 
-       $scroller->scroll_to( $line, $itemidx, $itemline )
+       $scroller->scroll_to( $line, $item_or_idx, $itemline );
 
     Moves the display up or down so that display line $line contains line
-    $itemline of item $itemidx. Any of these counts may be negative to
-    count backwards from the display lines, items, or lines within the
-    item.
+    $itemline of the item; which may be given by object reference or index
+    number. Any of these counts may be negative to count backwards from the
+    display lines, items, or lines within the item.
 
  scroll_to_top
 
-       $scroller->scroll_to_top( $itemidx, $itemline )
+       $scroller->scroll_to_top( $item_or_idx, $itemline );
 
     Shortcut for scroll_to to set the top line of display; where $line is
-    0. If $itemline is undefined, it will be passed as 0. If $itemidx is
-    also undefined, it will be passed as 0. Calling this method with no
+    0. If $itemline is undefined, it will be passed as 0. If $item_or_idx
+    is also undefined, it will be passed as 0. Calling this method with no
     arguments, therefore scrolls to the very top of the display.
 
  scroll_to_bottom
 
-       $scroller->scroll_to_bottom( $itemidx, $itemline )
+       $scroller->scroll_to_bottom( $item_or_idx, $itemline );
 
     Shortcut for scroll_to to set the bottom line of display; where $line
-    is -1. If $itemline is undefined, it will be passed as -1. If $itemidx
-    is also undefined, it will be passed as -1. Calling this method with no
-    arguments, therefore scrolls to the very bottom of the display.
+    is -1. If $itemline is undefined, it will be passed as -1. If
+    $item_or_idx is also undefined, it will be passed as -1. Calling this
+    method with no arguments, therefore scrolls to the very bottom of the
+    display.
 
  line2item
 
-       $itemidx = $scroller->line2item( $line )
+       $itemidx = $scroller->line2item( $line );
     
-       ( $itemidx, $itemline ) = $scroller->line2item( $line )
+       ( $itemidx, $itemline ) = $scroller->line2item( $line );
 
     Returns the item index currently on display at the given line of the
     window. In list context, also returns the line number within item. If
@@ -230,14 +231,15 @@ METHODS
 
  item2line
 
-       $line = $scroller->item2line( $itemidx, $itemline )
+       $line = $scroller->item2line( $item_or_idx, $itemline );
     
-       ( $line, $offscreen ) = $scroller->item2line( $itemidx, $itemline, $count_offscreen )
+       ( $line, $offscreen ) = $scroller->item2line( $item_or_idx, $itemline, $count_offscreen );
 
     Returns the display line in the window of the given line of the item at
-    the given index. $itemidx may be given negative, to count backwards
-    from the last item. $itemline may be negative to count backward from
-    the last line of the item.
+    the given index. $item_or_idx may be an item directly, a non-negative
+    integer to give its index, or a negative to count backwards from the
+    last item. $itemline may be negative to count backward from the last
+    line of the item.
 
     In list context, also returns a value describing the offscreen nature
     of the item. For items fully on display, this value is undef. If the
@@ -251,13 +253,13 @@ METHODS
 
  lines_above
 
-       $count = $scroller->lines_above
+       $count = $scroller->lines_above;
 
     Returns the number of lines of content above the scrolled display.
 
  lines_below
 
-       $count = $scroller->lines_below
+       $count = $scroller->lines_below;
 
     Returns the number of lines of content below the scrolled display.
 
@@ -265,9 +267,9 @@ METHODS
 
  set_gen_bottom_indicator
 
-       $scroller->set_gen_top_indicator( $method )
+       $scroller->set_gen_top_indicator( $method );
     
-       $scroller->set_gen_bottom_indicator( $method )
+       $scroller->set_gen_bottom_indicator( $method );
 
     Accessors for the generators for the top and bottom indicator text. If
     set, each should be a CODE reference or method name on the scroller
@@ -277,14 +279,14 @@ METHODS
     in an indicator window. This will be a small one-line window displayed
     at the top right or bottom right corner of the Scroller's window.
 
-       $text = $scroller->$method()
+       $text = $scroller->$method();
 
     The ability to pass method names allows subclasses to easily implement
     custom logic as methods without having to capture a closure.
 
  update_indicators
 
-       $scroller->update_indicators
+       $scroller->update_indicators;
 
     Calls any defined generators for indicator text, and updates the
     indicator windows with the returned text. This may be useful if the

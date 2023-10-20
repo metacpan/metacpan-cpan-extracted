@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Kl::Any::Gl - Package for language Kalaallisut
 
 =cut
 
 package Locale::CLDR::Locales::Kl::Any::Gl;
-# This file auto generated from Data/common/main/kl_GL.xml
-#	on Mon 11 Apr  5:31:41 pm GMT
+# This file auto generated from Data\common\main\kl_GL.xml
+#	on Fri 13 Oct  9:23:38 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

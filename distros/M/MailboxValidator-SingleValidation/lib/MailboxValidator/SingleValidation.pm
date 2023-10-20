@@ -1,18 +1,22 @@
-# Copyright (C) 2013-2018 MailboxValidator.com
-# All Rights Reserved
-#
-# This library is free software: you can redistribute it and/or
-# modify it under the terms of the GNU Lesser General Public
-# License as published by the Free Software Foundation, either
-# version 3 of the License, or (at your option) any later version.
-#
-# This library is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public
-# License along with this library; If not, see <http://www.gnu.org/licenses/>.
+# Copyright (c) 2023 MailboxValidator.com
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
 package MailboxValidator::SingleValidation;
 
@@ -20,9 +24,9 @@ use strict;
 use vars qw(@ISA $VERSION @EXPORT);
 use LWP::Simple;
 use URI::Escape;
-use JSON::Parse 'parse_json';
+use JSON::PP;
 
-$VERSION = '1.11';
+$VERSION = '2.00';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -39,13 +43,13 @@ sub Init
 sub ValidateEmail
 {
 	my ($self, $email) = @_;
-	my $url = 'http://api.mailboxvalidator.com/v1/validation/single?key=' . uri_escape($self->{api_key}) . '&format=json&email=' . uri_escape($email);
+	my $url = 'http://api.mailboxvalidator.com/v2/validation/single?key=' . uri_escape($self->{api_key}) . '&format=json&email=' . uri_escape($email);
 	
 	my $contents = get($url);
 	
 	if (defined($contents))
 	{
-		return parse_json($contents);
+		return decode_json $contents;
 	}
 	else
 	{
@@ -56,13 +60,13 @@ sub ValidateEmail
 sub DisposableEmail
 {
 	my ($self, $email) = @_;
-	my $url = 'http://api.mailboxvalidator.com/v1/email/disposable?key=' . uri_escape($self->{api_key}) . '&format=json&email=' . uri_escape($email);
+	my $url = 'http://api.mailboxvalidator.com/v2/email/disposable?key=' . uri_escape($self->{api_key}) . '&format=json&email=' . uri_escape($email);
 	
 	my $contents = get($url);
 	
 	if (defined($contents))
 	{
-		return parse_json($contents);
+		return decode_json $contents;
 	}
 	else
 	{
@@ -73,13 +77,13 @@ sub DisposableEmail
 sub FreeEmail
 {
 	my ($self, $email) = @_;
-	my $url = 'http://api.mailboxvalidator.com/v1/email/free?key=' . uri_escape($self->{api_key}) . '&format=json&email=' . uri_escape($email);
+	my $url = 'http://api.mailboxvalidator.com/v2/email/free?key=' . uri_escape($self->{api_key}) . '&format=json&email=' . uri_escape($email);
 	
 	my $contents = get($url);
 	
 	if (defined($contents))
 	{
-		return parse_json($contents);
+		return decode_json $contents;
 	}
 	else
 	{
@@ -235,8 +239,8 @@ L<MailboxValidator Website|https://www.mailboxvalidator.com>
 
 =head1 AUTHOR
 
-Copyright (c) 2018 MailboxValidator.com
+Copyright (c) 2023 MailboxValidator.com
 
-All rights reserved. This package is free software; It is licensed under the GPL.
+All rights reserved. This package is free software; It is licensed under MIT.
 
 =cut

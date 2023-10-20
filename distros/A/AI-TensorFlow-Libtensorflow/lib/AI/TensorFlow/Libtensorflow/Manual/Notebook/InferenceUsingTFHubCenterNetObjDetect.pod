@@ -1,0 +1,880 @@
+# PODNAME: AI::TensorFlow::Libtensorflow::Manual::Notebook::InferenceUsingTFHubCenterNetObjDetect
+
+
+## DO NOT EDIT. Generated from notebook/InferenceUsingTFHubCenterNetObjDetect.ipynb using ./maint/process-notebook.pl.
+
+use strict;
+use warnings;
+use utf8;
+use constant IN_IPERL => !! $ENV{PERL_IPERL_RUNNING};
+no if IN_IPERL, warnings => 'redefine'; # fewer messages when re-running cells
+
+use feature qw(say state postderef);
+use Syntax::Construct qw(each-array);
+
+use lib::projectroot qw(lib);
+
+BEGIN {
+    if( IN_IPERL ) {
+        $ENV{TF_CPP_MIN_LOG_LEVEL} = 3;
+    }
+    require AI::TensorFlow::Libtensorflow;
+}
+
+use URI ();
+use HTTP::Tiny ();
+use Path::Tiny qw(path);
+
+use File::Which ();
+
+use List::Util 1.56 qw(mesh);
+
+use Data::Printer ( output => 'stderr', return_value => 'void', filters => ['PDL'] );
+use Data::Printer::Filter::PDL ();
+use Text::Table::Tiny qw(generate_table);
+
+use Imager;
+
+my $s = AI::TensorFlow::Libtensorflow::Status->New;
+sub AssertOK {
+    die "Status $_[0]: " . $_[0]->Message
+        unless $_[0]->GetCode == AI::TensorFlow::Libtensorflow::Status::OK;
+    return;
+}
+AssertOK($s);
+
+use PDL;
+use AI::TensorFlow::Libtensorflow::DataType qw(FLOAT UINT8);
+
+use FFI::Platypus::Memory qw(memcpy);
+use FFI::Platypus::Buffer qw(scalar_to_pointer);
+
+sub FloatPDLTOTFTensor {
+    my ($p) = @_;
+    return AI::TensorFlow::Libtensorflow::Tensor->New(
+        FLOAT, [ reverse $p->dims ], $p->get_dataref, sub { undef $p }
+    );
+}
+
+sub FloatTFTensorToPDL {
+    my ($t) = @_;
+
+    my $pdl = zeros(float,reverse( map $t->Dim($_), 0..$t->NumDims-1 ) );
+
+    memcpy scalar_to_pointer( ${$pdl->get_dataref} ),
+        scalar_to_pointer( ${$t->Data} ),
+        $t->ByteSize;
+    $pdl->upd_data;
+
+    $pdl;
+}
+
+sub Uint8PDLTOTFTensor {
+    my ($p) = @_;
+    return AI::TensorFlow::Libtensorflow::Tensor->New(
+        UINT8, [ reverse $p->dims ], $p->get_dataref, sub { undef $p }
+    );
+}
+
+sub Uint8TFTensorToPDL {
+    my ($t) = @_;
+
+    my $pdl = zeros(byte,reverse( map $t->Dim($_), 0..$t->NumDims-1 ) );
+
+    memcpy scalar_to_pointer( ${$pdl->get_dataref} ),
+        scalar_to_pointer( ${$t->Data} ),
+        $t->ByteSize;
+    $pdl->upd_data;
+
+    $pdl;
+}
+
+# image_size => [width, height] (but usually square images)
+my %model_name_to_params = (
+    centernet_hourglass_512x512 => {
+        handle => 'https://tfhub.dev/tensorflow/centernet/hourglass_512x512/1',
+        image_size => [ 512, 512 ],
+    },
+);
+
+my $model_name = 'centernet_hourglass_512x512';
+
+say "Selected model: $model_name : $model_name_to_params{$model_name}{handle}";
+
+my $model_uri = URI->new( $model_name_to_params{$model_name}{handle} );
+$model_uri->query_form( 'tf-hub-format' => 'compressed' );
+my $model_base = substr( $model_uri->path, 1 ) =~ s,/,_,gr;
+my $model_archive_path = "${model_base}.tar.gz";
+
+my $http = HTTP::Tiny->new;
+
+for my $download ( [ $model_uri  => $model_archive_path ],) {
+    my ($uri, $path) = @$download;
+    say "Downloading $uri to $path";
+    next if -e $path;
+    $http->mirror( $uri, $path );
+}
+
+use Archive::Extract;
+my $ae = Archive::Extract->new( archive => $model_archive_path );
+die "Could not extract archive" unless $ae->extract( to => $model_base );
+
+my $saved_model = path($model_base)->child('saved_model.pb');
+say "Saved model is in $saved_model" if -f $saved_model;
+
+# Get the labels
+my $response = $http->get('https://raw.githubusercontent.com/tensorflow/models/a4944a57ad2811e1f6a7a87589a9fc8a776e8d3c/object_detection/data/mscoco_label_map.pbtxt');
+
+my %labels_map = $response->{content} =~ m<
+(?:item \s+ \{  \s+
+  \Qname:\E \s+ "[^"]+" \s+
+  \Qid:\E   \s+ (\d+) \s+
+  \Qdisplay_name:\E \s+ "([^"]+)" \s+
+})+
+>sgx;
+
+my $label_count = List::Util::max keys %labels_map;
+
+say "We have a label count of $label_count. These labels include: ",
+    join ", ", List::Util::head( 5, @labels_map{ sort keys %labels_map } );
+
+my @tags = ( 'serve' );
+
+if( File::Which::which('saved_model_cli')) {
+    local $ENV{TF_CPP_MIN_LOG_LEVEL} = 3; # quiet the TensorFlow logger for the following command
+    system(qw(saved_model_cli show),
+        qw(--dir)           => $model_base,
+        qw(--tag_set)       => join(',', @tags),
+        qw(--signature_def) => 'serving_default'
+    ) == 0 or die "Could not run saved_model_cli";
+} else {
+    say "Install the tensorflow Python package to get the `saved_model_cli` command.";
+}
+
+my $opt = AI::TensorFlow::Libtensorflow::SessionOptions->New;
+
+my $graph = AI::TensorFlow::Libtensorflow::Graph->New;
+my $session = AI::TensorFlow::Libtensorflow::Session->LoadFromSavedModel(
+    $opt, undef, $model_base, \@tags, $graph, undef, $s
+);
+AssertOK($s);
+
+my %ops = (
+    in  => {
+        op   =>  $graph->OperationByName('serving_default_input_tensor'),
+        dict => {
+            input_tensor => 0,
+        }
+    },
+    out => {
+        op => $graph->OperationByName('StatefulPartitionedCall'),
+        dict => {
+            detection_boxes   => 0,
+            detection_classes => 1,
+            detection_scores  => 2,
+            num_detections    => 3,
+        }
+    },
+);
+
+my %outputs;
+
+%outputs = map {
+    my $put_type = $_;
+    my $op = $ops{$put_type}{op};
+    my $port_dict = $ops{$put_type}{dict};
+
+   $put_type => +{
+        map {
+            my $dict_key = $_;
+            my $index = $port_dict->{$_};
+            $dict_key => AI::TensorFlow::Libtensorflow::Output->New( {
+                oper => $op,
+                index => $index,
+            });
+        } keys %$port_dict
+     }
+} keys %ops;
+
+p %outputs;
+
+use HTML::Tiny;
+
+my %images_for_test_to_uri = (
+    "beach_scene" => 'https://github.com/tensorflow/models/blob/master/research/object_detection/test_images/image2.jpg?raw=true',
+);
+
+my @image_names = sort keys %images_for_test_to_uri;
+my $h = HTML::Tiny->new;
+
+my $image_name = 'beach_scene';
+if( IN_IPERL ) {
+    IPerl->html(
+        $h->a( { href => $images_for_test_to_uri{$image_name} },
+            $h->img({
+                src => $images_for_test_to_uri{$image_name},
+                alt => $image_name,
+                width => '100%',
+            })
+        ),
+    );
+}
+
+sub load_image_to_pdl {
+    my ($uri, $image_size) = @_;
+
+    my $http = HTTP::Tiny->new;
+    my $response = $http->get( $uri );
+    die "Could not fetch image from $uri" unless $response->{success};
+    say "Downloaded $uri";
+
+    my $img = Imager->new;
+    $img->read( data => $response->{content} );
+
+    # Create PDL ndarray from Imager data in-memory.
+    my $data;
+    $img->write( data => \$data, type => 'raw' )
+        or die "could not write ". $img->errstr;
+
+    die "Image does not have 3 channels, it has @{[ $img->getchannels ]} channels"
+        if $img->getchannels != 3;
+
+    # $data is packed as PDL->dims == [w,h] with RGB pixels
+    my $pdl_raw = zeros(byte, $img->getchannels, $img->getwidth, $img->getheight);
+    ${ $pdl_raw->get_dataref } = $data;
+    $pdl_raw->upd_data;
+
+    $pdl_raw;
+}
+
+my @pdl_images = map {
+    load_image_to_pdl(
+        $images_for_test_to_uri{$_},
+        $model_name_to_params{$model_name}{image_size}
+    );
+} ($image_names[0]);
+
+my $pdl_image_batched = cat(@pdl_images);
+my $t = Uint8PDLTOTFTensor($pdl_image_batched);
+
+die "There should be 4 dimensions" unless $pdl_image_batched->ndims == 4;
+
+die "With the final dimension of length 1" unless $pdl_image_batched->dim(3) == 1;
+
+p $pdl_image_batched;
+p $t;
+
+my $RunSession = sub {
+    my ($session, $t) = @_;
+    my @outputs_t;
+
+    my @keys = keys %{ $outputs{out} };
+    my @values = $outputs{out}->@{ @keys };
+    $session->Run(
+        undef,
+        [ values %{$outputs{in} } ], [$t],
+        \@values, \@outputs_t,
+        undef,
+        undef,
+        $s
+    );
+    AssertOK($s);
+
+    return { mesh \@keys, \@outputs_t };
+};
+
+undef;
+
+my $tftensor_output_by_name = $RunSession->($session, $t);
+
+my %pdl_output_by_name = map {
+    $_ => FloatTFTensorToPDL( $tftensor_output_by_name->{$_} )
+} keys $tftensor_output_by_name->%*;
+
+undef;
+
+my $min_score_thresh = 0.30;
+
+my $which_detect = which( $pdl_output_by_name{detection_scores} > $min_score_thresh );
+
+my %subset;
+
+$subset{detection_boxes}   = $pdl_output_by_name{detection_boxes}->dice('X', $which_detect);
+$subset{detection_classes} = $pdl_output_by_name{detection_classes}->dice($which_detect);
+$subset{detection_scores}  = $pdl_output_by_name{detection_scores}->dice($which_detect);
+
+$subset{detection_class_labels}->@* = map { $labels_map{$_} } $subset{detection_classes}->list;
+
+p %subset;
+
+use PDL::Graphics::Gnuplot;
+
+my $plot_output_path = 'objects-detected.png';
+my $gp = gpwin('pngcairo', font => ",12", output => $plot_output_path, aa => 2, size => [10] );
+
+my @qual_cmap = ('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6');
+
+$gp->options(
+    map {
+        my $idx = $_;
+        my $lc_rgb = $qual_cmap[ $subset{detection_classes}->slice("($idx)")->squeeze % @qual_cmap ];
+
+        my $box_corners_yx_norm = $subset{detection_boxes}->slice([],$idx,[0,0,0]);
+        $box_corners_yx_norm->reshape(2,2);
+
+        my $box_corners_yx_img = $box_corners_yx_norm * $pdl_images[0]->shape->slice('-1:-2');
+
+        my $from_xy = join ",", $box_corners_yx_img->slice('-1:0,(0)')->list;
+        my $to_xy   = join ",", $box_corners_yx_img->slice('-1:0,(1)')->list;
+        my $label_xy = join ",", $box_corners_yx_img->at(1,1), $box_corners_yx_img->at(0,1);
+
+        (
+            [ object => [ "rect" =>
+                from => $from_xy, to => $to_xy,
+                qq{front fs empty border lc rgb "$lc_rgb" lw 5} ], ],
+            [ label => [
+                sprintf("%s: %.1f",
+                    $subset{detection_class_labels}[$idx],
+                    100*$subset{detection_scores}->at($idx,0) ) =>
+                at => $label_xy, 'left',
+                offset => 'character 0,-0.25',
+                qq{font ",12" boxed front tc rgb "#ffffff"} ], ],
+        )
+    } 0..$subset{detection_boxes}->dim(1)-1
+);
+
+$gp->plot(
+    topcmds => q{set style textbox opaque fc "#505050f0" noborder},
+    square => 1,
+    yrange => [$pdl_images[0]->dim(2),0],
+    with => 'image', $pdl_images[0],
+);
+
+$gp->close;
+
+IPerl->png( bytestream => path($plot_output_path)->slurp_raw ) if IN_IPERL;
+
+use Filesys::DiskUsage qw/du/;
+
+my $total = du( { 'human-readable' => 1, dereference => 1 },
+    $model_archive_path, $model_base );
+
+say "Disk space usage: $total"; undef;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+AI::TensorFlow::Libtensorflow::Manual::Notebook::InferenceUsingTFHubCenterNetObjDetect - Using TensorFlow to do object detection using a pre-trained model
+
+=head1 SYNOPSIS
+
+The following tutorial is based on the L<TensorFlow Hub Object Detection Colab notebook|https://www.tensorflow.org/hub/tutorials/tf2_object_detection>. It uses a pre-trained model based on the I<CenterNet> architecture trained on the I<COCO 2017> dataset. Running the code requires an Internet connection to download the model (from Google servers) and testing data (from GitHub servers).
+
+Some of this code is identical to that of C<InferenceUsingTFHubMobileNetV2Model> notebook. Please look there for an explanation for that code. As stated there, this will later be wrapped up into a high-level library to hide the details behind an API.
+
+=head1 COLOPHON
+
+The following document is either a POD file which can additionally be run as a Perl script or a Jupyter Notebook which can be run in L<IPerl|https://p3rl.org/Devel::IPerl> (viewable online at L<nbviewer|https://nbviewer.org/github/EntropyOrg/perl-AI-TensorFlow-Libtensorflow/blob/master/notebook/InferenceUsingTFHubCenterNetObjDetect.ipynb>). If you are reading this as POD, there should be a generated list of Perl dependencies in the L<CPANFILE|/CPANFILE> section. Furthermore,
+
+=over
+
+=item *
+
+C<PDL::Graphics::Gnuplot> requires C<gnuplot>.
+
+=back
+
+If you are running the code, you may optionally install the L<C<tensorflow> Python package|https://www.tensorflow.org/install/pip> in order to access the C<saved_model_cli> command, but this is only used for informational purposes.
+
+=head1 TUTORIAL
+
+=head2 Load the library
+
+First, we need to load the C<AI::TensorFlow::Libtensorflow> library and more helpers. We then create an C<AI::TensorFlow::Libtensorflow::Status> object and helper function to make sure that the calls to the C<libtensorflow> C library are working properly.
+
+  use strict;
+  use warnings;
+  use utf8;
+  use constant IN_IPERL => !! $ENV{PERL_IPERL_RUNNING};
+  no if IN_IPERL, warnings => 'redefine'; # fewer messages when re-running cells
+  
+  use feature qw(say state postderef);
+  use Syntax::Construct qw(each-array);
+  
+  use lib::projectroot qw(lib);
+  
+  BEGIN {
+      if( IN_IPERL ) {
+          $ENV{TF_CPP_MIN_LOG_LEVEL} = 3;
+      }
+      require AI::TensorFlow::Libtensorflow;
+  }
+  
+  use URI ();
+  use HTTP::Tiny ();
+  use Path::Tiny qw(path);
+  
+  use File::Which ();
+  
+  use List::Util 1.56 qw(mesh);
+  
+  use Data::Printer ( output => 'stderr', return_value => 'void', filters => ['PDL'] );
+  use Data::Printer::Filter::PDL ();
+  use Text::Table::Tiny qw(generate_table);
+  
+  use Imager;
+  
+  my $s = AI::TensorFlow::Libtensorflow::Status->New;
+  sub AssertOK {
+      die "Status $_[0]: " . $_[0]->Message
+          unless $_[0]->GetCode == AI::TensorFlow::Libtensorflow::Status::OK;
+      return;
+  }
+  AssertOK($s);
+
+And create helpers for converting between C<PDL> ndarrays and C<TFTensor> ndarrays.
+
+  use PDL;
+  use AI::TensorFlow::Libtensorflow::DataType qw(FLOAT UINT8);
+  
+  use FFI::Platypus::Memory qw(memcpy);
+  use FFI::Platypus::Buffer qw(scalar_to_pointer);
+  
+  sub FloatPDLTOTFTensor {
+      my ($p) = @_;
+      return AI::TensorFlow::Libtensorflow::Tensor->New(
+          FLOAT, [ reverse $p->dims ], $p->get_dataref, sub { undef $p }
+      );
+  }
+  
+  sub FloatTFTensorToPDL {
+      my ($t) = @_;
+  
+      my $pdl = zeros(float,reverse( map $t->Dim($_), 0..$t->NumDims-1 ) );
+  
+      memcpy scalar_to_pointer( ${$pdl->get_dataref} ),
+          scalar_to_pointer( ${$t->Data} ),
+          $t->ByteSize;
+      $pdl->upd_data;
+  
+      $pdl;
+  }
+  
+  sub Uint8PDLTOTFTensor {
+      my ($p) = @_;
+      return AI::TensorFlow::Libtensorflow::Tensor->New(
+          UINT8, [ reverse $p->dims ], $p->get_dataref, sub { undef $p }
+      );
+  }
+  
+  sub Uint8TFTensorToPDL {
+      my ($t) = @_;
+  
+      my $pdl = zeros(byte,reverse( map $t->Dim($_), 0..$t->NumDims-1 ) );
+  
+      memcpy scalar_to_pointer( ${$pdl->get_dataref} ),
+          scalar_to_pointer( ${$t->Data} ),
+          $t->ByteSize;
+      $pdl->upd_data;
+  
+      $pdl;
+  }
+
+=head2 Fetch the model and labels
+
+We are going to use an L<object detection model|https://tfhub.dev/tensorflow/centernet/hourglass_512x512/1> from TensorFlow Hub based on the CenterNet architecture. We download both the model and COCO 2017 labels.
+
+  # image_size => [width, height] (but usually square images)
+  my %model_name_to_params = (
+      centernet_hourglass_512x512 => {
+          handle => 'https://tfhub.dev/tensorflow/centernet/hourglass_512x512/1',
+          image_size => [ 512, 512 ],
+      },
+  );
+  
+  my $model_name = 'centernet_hourglass_512x512';
+  
+  say "Selected model: $model_name : $model_name_to_params{$model_name}{handle}";
+
+We download the model to the current directory and then extract the model to a folder with the name given in C<$model_base>.
+
+  my $model_uri = URI->new( $model_name_to_params{$model_name}{handle} );
+  $model_uri->query_form( 'tf-hub-format' => 'compressed' );
+  my $model_base = substr( $model_uri->path, 1 ) =~ s,/,_,gr;
+  my $model_archive_path = "${model_base}.tar.gz";
+  
+  my $http = HTTP::Tiny->new;
+  
+  for my $download ( [ $model_uri  => $model_archive_path ],) {
+      my ($uri, $path) = @$download;
+      say "Downloading $uri to $path";
+      next if -e $path;
+      $http->mirror( $uri, $path );
+  }
+  
+  use Archive::Extract;
+  my $ae = Archive::Extract->new( archive => $model_archive_path );
+  die "Could not extract archive" unless $ae->extract( to => $model_base );
+  
+  my $saved_model = path($model_base)->child('saved_model.pb');
+  say "Saved model is in $saved_model" if -f $saved_model;
+
+We need to download the COCO 2017 classification labels and parse out the mapping from the numeric index to the textual descriptions.
+
+  # Get the labels
+  my $response = $http->get('https://raw.githubusercontent.com/tensorflow/models/a4944a57ad2811e1f6a7a87589a9fc8a776e8d3c/object_detection/data/mscoco_label_map.pbtxt');
+  
+  my %labels_map = $response->{content} =~ m<
+  (?:item \s+ \{  \s+
+    \Qname:\E \s+ "[^"]+" \s+
+    \Qid:\E   \s+ (\d+) \s+
+    \Qdisplay_name:\E \s+ "([^"]+)" \s+
+  })+
+  >sgx;
+  
+  my $label_count = List::Util::max keys %labels_map;
+  
+  say "We have a label count of $label_count. These labels include: ",
+      join ", ", List::Util::head( 5, @labels_map{ sort keys %labels_map } );
+
+=head2 Load the model and session
+
+We define the tag set C<[ 'serve' ]> which we will use to load the model.
+
+  my @tags = ( 'serve' );
+
+We can examine what computations are contained in the graph in terms of the names of the inputs and outputs of an operation found in the graph by running C<saved_model_cli>.
+
+  if( File::Which::which('saved_model_cli')) {
+      local $ENV{TF_CPP_MIN_LOG_LEVEL} = 3; # quiet the TensorFlow logger for the following command
+      system(qw(saved_model_cli show),
+          qw(--dir)           => $model_base,
+          qw(--tag_set)       => join(',', @tags),
+          qw(--signature_def) => 'serving_default'
+      ) == 0 or die "Could not run saved_model_cli";
+  } else {
+      say "Install the tensorflow Python package to get the `saved_model_cli` command.";
+  }
+
+The above C<saved_model_cli> output shows that the model input is at C<serving_default_input_tensor:0> which means the operation named C<serving_default_input_tensor> at index C<0> and there are multiple outputs with different shapes.
+
+Per the L<model description|https://tfhub.dev/tensorflow/centernet/hourglass_512x512/1> on TensorFlow Hub:
+
+=over 2
+
+B<Inputs>
+
+A three-channel image of variable size - the model does NOT support batching. The input tensor is a C<tf.uint8> tensor with shape [1, height, width, 3] with values in [0, 255].
+
+B<Outputs>
+
+The output dictionary contains:
+
+=over
+
+=item -
+
+C<num_detections>: a C<tf.int> tensor with only one value, the number of detections [N].
+
+=item -
+
+C<detection_boxes>: a C<tf.float32> tensor of shape [N, 4] containing bounding box coordinates in the following order: [ymin, xmin, ymax, xmax].
+
+=item -
+
+C<detection_classes>: a C<tf.int> tensor of shape [N] containing detection class index from the label file.
+
+=item -
+
+C<detection_scores>: a C<tf.float32> tensor of shape [N] containing detection scores.
+
+=back
+
+=back
+
+Note that the above documentation has two errors: both C<num_detections> and C<detection_classes> are not of type C<tf.int>, but are actually C<tf.float32>.
+
+Now we can load the model from that folder with the tag set C<[ 'serve' ]> by using the C<LoadFromSavedModel> constructor to create a C<::Graph> and a C<::Session> for that graph.
+
+  my $opt = AI::TensorFlow::Libtensorflow::SessionOptions->New;
+  
+  my $graph = AI::TensorFlow::Libtensorflow::Graph->New;
+  my $session = AI::TensorFlow::Libtensorflow::Session->LoadFromSavedModel(
+      $opt, undef, $model_base, \@tags, $graph, undef, $s
+  );
+  AssertOK($s);
+
+So let's use the names from the C<saved_model_cli> output to create our C<::Output> C<ArrayRef>s.
+
+  my %ops = (
+      in  => {
+          op   =>  $graph->OperationByName('serving_default_input_tensor'),
+          dict => {
+              input_tensor => 0,
+          }
+      },
+      out => {
+          op => $graph->OperationByName('StatefulPartitionedCall'),
+          dict => {
+              detection_boxes   => 0,
+              detection_classes => 1,
+              detection_scores  => 2,
+              num_detections    => 3,
+          }
+      },
+  );
+  
+  my %outputs;
+  
+  %outputs = map {
+      my $put_type = $_;
+      my $op = $ops{$put_type}{op};
+      my $port_dict = $ops{$put_type}{dict};
+  
+     $put_type => +{
+          map {
+              my $dict_key = $_;
+              my $index = $port_dict->{$_};
+              $dict_key => AI::TensorFlow::Libtensorflow::Output->New( {
+                  oper => $op,
+                  index => $index,
+              });
+          } keys %$port_dict
+       }
+  } keys %ops;
+  
+  p %outputs;
+
+Now we can get the following testing image from GitHub.
+
+  use HTML::Tiny;
+  
+  my %images_for_test_to_uri = (
+      "beach_scene" => 'https://github.com/tensorflow/models/blob/master/research/object_detection/test_images/image2.jpg?raw=true',
+  );
+  
+  my @image_names = sort keys %images_for_test_to_uri;
+  my $h = HTML::Tiny->new;
+  
+  my $image_name = 'beach_scene';
+  if( IN_IPERL ) {
+      IPerl->html(
+          $h->a( { href => $images_for_test_to_uri{$image_name} },
+              $h->img({
+                  src => $images_for_test_to_uri{$image_name},
+                  alt => $image_name,
+                  width => '100%',
+              })
+          ),
+      );
+  }
+
+=head2 Download the test image and transform it into suitable input data
+
+We now fetch the image and prepare it to be in the needed format by using C<Imager>. Note that this model does not need the input image to be of a certain size so no resizing or padding is required.
+
+Then we turn the C<Imager> data into a C<PDL> ndarray. Since we just need the 3 channels of the image as they are, they can be stored directly in a C<PDL> ndarray of type C<byte>.
+
+The reason why we need to concatenate the C<PDL> ndarrays here despite the model only taking a single image at a time is to get an ndarray with four (4) dimensions with the last C<PDL> dimension of size one (1).
+
+  sub load_image_to_pdl {
+      my ($uri, $image_size) = @_;
+  
+      my $http = HTTP::Tiny->new;
+      my $response = $http->get( $uri );
+      die "Could not fetch image from $uri" unless $response->{success};
+      say "Downloaded $uri";
+  
+      my $img = Imager->new;
+      $img->read( data => $response->{content} );
+  
+      # Create PDL ndarray from Imager data in-memory.
+      my $data;
+      $img->write( data => \$data, type => 'raw' )
+          or die "could not write ". $img->errstr;
+  
+      die "Image does not have 3 channels, it has @{[ $img->getchannels ]} channels"
+          if $img->getchannels != 3;
+  
+      # $data is packed as PDL->dims == [w,h] with RGB pixels
+      my $pdl_raw = zeros(byte, $img->getchannels, $img->getwidth, $img->getheight);
+      ${ $pdl_raw->get_dataref } = $data;
+      $pdl_raw->upd_data;
+  
+      $pdl_raw;
+  }
+  
+  my @pdl_images = map {
+      load_image_to_pdl(
+          $images_for_test_to_uri{$_},
+          $model_name_to_params{$model_name}{image_size}
+      );
+  } ($image_names[0]);
+  
+  my $pdl_image_batched = cat(@pdl_images);
+  my $t = Uint8PDLTOTFTensor($pdl_image_batched);
+  
+  die "There should be 4 dimensions" unless $pdl_image_batched->ndims == 4;
+  
+  die "With the final dimension of length 1" unless $pdl_image_batched->dim(3) == 1;
+  
+  p $pdl_image_batched;
+  p $t;
+
+=head2 Run the model for inference
+
+We can use the C<Run> method to run the session and get the multiple output C<TFTensor>s. The following uses the names in C<$outputs> mapping to help process the multiple outputs more easily.
+
+  my $RunSession = sub {
+      my ($session, $t) = @_;
+      my @outputs_t;
+  
+      my @keys = keys %{ $outputs{out} };
+      my @values = $outputs{out}->@{ @keys };
+      $session->Run(
+          undef,
+          [ values %{$outputs{in} } ], [$t],
+          \@values, \@outputs_t,
+          undef,
+          undef,
+          $s
+      );
+      AssertOK($s);
+  
+      return { mesh \@keys, \@outputs_t };
+  };
+  
+  undef;
+
+
+
+  my $tftensor_output_by_name = $RunSession->($session, $t);
+  
+  my %pdl_output_by_name = map {
+      $_ => FloatTFTensorToPDL( $tftensor_output_by_name->{$_} )
+  } keys $tftensor_output_by_name->%*;
+  
+  undef;
+
+=head2 Results summary
+
+Then we use a score threshold to select the objects of interest.
+
+  my $min_score_thresh = 0.30;
+  
+  my $which_detect = which( $pdl_output_by_name{detection_scores} > $min_score_thresh );
+  
+  my %subset;
+  
+  $subset{detection_boxes}   = $pdl_output_by_name{detection_boxes}->dice('X', $which_detect);
+  $subset{detection_classes} = $pdl_output_by_name{detection_classes}->dice($which_detect);
+  $subset{detection_scores}  = $pdl_output_by_name{detection_scores}->dice($which_detect);
+  
+  $subset{detection_class_labels}->@* = map { $labels_map{$_} } $subset{detection_classes}->list;
+  
+  p %subset;
+
+The following uses the bounding boxes and class label information to draw boxes and labels on top of the image using Gnuplot.
+
+  use PDL::Graphics::Gnuplot;
+  
+  my $plot_output_path = 'objects-detected.png';
+  my $gp = gpwin('pngcairo', font => ",12", output => $plot_output_path, aa => 2, size => [10] );
+  
+  my @qual_cmap = ('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6');
+  
+  $gp->options(
+      map {
+          my $idx = $_;
+          my $lc_rgb = $qual_cmap[ $subset{detection_classes}->slice("($idx)")->squeeze % @qual_cmap ];
+  
+          my $box_corners_yx_norm = $subset{detection_boxes}->slice([],$idx,[0,0,0]);
+          $box_corners_yx_norm->reshape(2,2);
+  
+          my $box_corners_yx_img = $box_corners_yx_norm * $pdl_images[0]->shape->slice('-1:-2');
+  
+          my $from_xy = join ",", $box_corners_yx_img->slice('-1:0,(0)')->list;
+          my $to_xy   = join ",", $box_corners_yx_img->slice('-1:0,(1)')->list;
+          my $label_xy = join ",", $box_corners_yx_img->at(1,1), $box_corners_yx_img->at(0,1);
+  
+          (
+              [ object => [ "rect" =>
+                  from => $from_xy, to => $to_xy,
+                  qq{front fs empty border lc rgb "$lc_rgb" lw 5} ], ],
+              [ label => [
+                  sprintf("%s: %.1f",
+                      $subset{detection_class_labels}[$idx],
+                      100*$subset{detection_scores}->at($idx,0) ) =>
+                  at => $label_xy, 'left',
+                  offset => 'character 0,-0.25',
+                  qq{font ",12" boxed front tc rgb "#ffffff"} ], ],
+          )
+      } 0..$subset{detection_boxes}->dim(1)-1
+  );
+  
+  $gp->plot(
+      topcmds => q{set style textbox opaque fc "#505050f0" noborder},
+      square => 1,
+      yrange => [$pdl_images[0]->dim(2),0],
+      with => 'image', $pdl_images[0],
+  );
+  
+  $gp->close;
+  
+  IPerl->png( bytestream => path($plot_output_path)->slurp_raw ) if IN_IPERL;
+
+=head1 RESOURCE USAGE
+
+  use Filesys::DiskUsage qw/du/;
+  
+  my $total = du( { 'human-readable' => 1, dereference => 1 },
+      $model_archive_path, $model_base );
+  
+  say "Disk space usage: $total"; undef;
+
+=head1 CPANFILE
+
+  requires 'AI::TensorFlow::Libtensorflow';
+  requires 'AI::TensorFlow::Libtensorflow::DataType';
+  requires 'Archive::Extract';
+  requires 'Data::Printer';
+  requires 'Data::Printer::Filter::PDL';
+  requires 'FFI::Platypus::Buffer';
+  requires 'FFI::Platypus::Memory';
+  requires 'File::Which';
+  requires 'Filesys::DiskUsage';
+  requires 'HTML::Tiny';
+  requires 'HTTP::Tiny';
+  requires 'Imager';
+  requires 'List::Util', '1.56';
+  requires 'PDL';
+  requires 'PDL::Graphics::Gnuplot';
+  requires 'Path::Tiny';
+  requires 'Syntax::Construct';
+  requires 'Text::Table::Tiny';
+  requires 'URI';
+  requires 'constant';
+  requires 'feature';
+  requires 'lib::projectroot';
+  requires 'strict';
+  requires 'utf8';
+  requires 'warnings';
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2022-2023 by Auto-Parallel Technologies, Inc.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

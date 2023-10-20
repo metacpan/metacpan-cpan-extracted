@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.800;
 
-package App::sdview::Output::Markdown 0.12;
+package App::sdview::Output::Markdown 0.13;
 class App::sdview::Output::Markdown
    :does(App::sdview::Output)
    :strict(params);
@@ -60,7 +60,7 @@ method output_verbatim ( $para )
 
    # TODO: Offer a choice of ``` vs indented
 
-   $self->say( "```" );
+   $self->say( "```" . ( $para->language // "" ) );
    $self->say( $para->text );
    $self->say( "```" );
 }
@@ -114,13 +114,13 @@ method output_table ( $para )
 method _convert_str ( $s )
 {
    return String::Tagged::Markdown->clone( $s,
-      only_tags => [qw( C B I F L )],
+      only_tags => [qw( bold italic monospace strikethrough file link )],
       convert_tags => {
-         C => "fixed",
-         B => "bold",
-         I => "italic",
-         F => "italic", # There isn't a "filename" format in Markdown
-         L => sub ($t, $v) { return link => $v->{target} },
+         # bold, italic remain as they are
+         monospace => "fixed",
+         strikethrough => "strike",
+         file => "italic", # There isn't a "filename" format in Markdown
+         link => sub ($t, $v) { return link => $v->{target} },
       }
    )->build_markdown;
 }

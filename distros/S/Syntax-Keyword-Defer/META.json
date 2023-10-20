@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -40,11 +40,7 @@
    "provides" : {
       "Syntax::Keyword::Defer" : {
          "file" : "lib/Syntax/Keyword/Defer.pm",
-         "version" : "0.09"
-      },
-      "Syntax::Keyword::Finally" : {
-         "file" : "lib/Syntax/Keyword/Finally.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -54,6 +50,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

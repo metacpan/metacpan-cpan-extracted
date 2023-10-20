@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.42';
+$VERSION = '0.45';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -167,6 +167,11 @@ against nested occurrences.
 
 Default: [-background => 'blue', -foreground => 'yellow'].
 Specifies the options for the match tag.
+
+=item Switch: B<-menuitems>
+
+Specify the menu items for the left-click popup menu.
+By default set to undef, meaning no popup menu.
 
 =item Switch: B<-minusimg>
 
@@ -453,7 +458,7 @@ sub Populate {
 	my $statusbar = $self->StatusBar(
 		-widget => $self,
 	);
-	$self->after(10, ['StatusUpdate', $statusbar]);
+	$self->after(10, ['updateStatus', $statusbar]);
 	#create progressbar for loading and saving
 	$self->Advertise(XText => $text);
 	$self->Advertise(Numbers => $numbers);
@@ -477,6 +482,7 @@ sub Populate {
 			-data => $plusimg,
 			-foreground => $fg,
 		)],
+		-position => ['METHOD'],
 		-saveimage => [$statusbar],
 		-showfolds => [qw/METHOD showFolds ShowFolds/, 1],
 		-shownumbers => [qw/METHOD showNumers ShowNumbers/, 1],
@@ -505,6 +511,8 @@ sub Populate {
 
 	#configure all the bindings for the text widget
 	$text->bind('<KeyPress>', [$self, 'OnKeyPress', Ev('K') ]);
+	$text->bind('<FocusIn>', [$self, 'OnFocusIn']);
+	$text->bind('<FocusOut>', [$self, 'OnFocusOut']);
 	#lazy events
 	my @levents = qw(
 		ButtonPress ButtonRelease-1 
@@ -620,14 +628,9 @@ sub FindAndOrReplace {
 
 sub FindClose {
 	my $self = shift;
+	$self->Subwidget('XText')->focus;
 	$self->Subwidget('SandR')->packForget;
 }
-
-# sub FindNext {
-# 	my ($self, $direction, $mode, $case, $find) = @_;
-# 	print "Search $direction, $mode, $case, $find\n";
-# 	return $self->Subwidget('XText')->FindNext($direction, $mode, $case, $find);
-# }
 
 sub foldButton {
 	my ($self, $line) = @_;
@@ -835,6 +838,12 @@ Sets the insert cursor to $index.
 
 =cut
 
+sub goTo {
+	my ($self, $index) = @_;
+	$self->Subwidget('XText')->goTo($index);
+	$self->contentCheckLight;
+}
+
 sub hideLine {
 	my ($self, $line) = @_;
 	$self->tagAdd('Hidden', "$line.0", "$line.0 lineend + 1c");
@@ -844,6 +853,7 @@ sub highlightCheck {
 	my ($self, $pos) = @_;
 	return if $self->NoHighlighting;
 	my $line = $self->linenumber($pos);
+	my $colored = $self->Colored;
 	$self->highlightPurge($line) if $line <= $self->Colored;
 }
 
@@ -867,6 +877,7 @@ sub highlightLine {
 	my $k = $cli->[$num - 1];
 	$kam->StateSet(@$k);
 	my $txt = $xt->get($begin, $end); #get the text to be highlighted
+#	print "'$txt'\n";
 	if ($txt ne '') { #if the line is not empty
 		my $pos = 0;
 		my $start = 0;
@@ -1044,6 +1055,8 @@ sub LoopActive {
 
 sub modifiedCheck {
 	my ($self, $index) = @_;
+	my $line = $self->linenumber($index);
+	$self->Colored($line);
 	$self->highlightCheck($index);
 # 	$self->lnumberCheck;
 }
@@ -1052,6 +1065,21 @@ sub NoHighlighting {
 	my $self = shift;
 	$self->{NOHIGHLIGHTING} = shift if @_;
 	return $self->{NOHIGHLIGHTING}
+}
+
+sub OnFocusIn {
+	my $self = shift;
+	my $flag = $self->{'nohl_save'};
+	$self->NoHighlighting($flag) if defined $flag;
+	$self->highlightLoop;
+	$self->Subwidget('Statusbar')->updateResume;
+}
+
+sub OnFocusOut {
+	my $self = shift;
+	$self->{'nohl_save'} = $self->NoHighlighting;
+	$self->NoHighlighting(1);
+	$self->Subwidget('Statusbar')->updatePause;
 }
 
 sub OnKeyPress {
@@ -1063,6 +1091,15 @@ sub OnKeyPress {
 	}
 }
 
+sub position {
+	my ($self, $pos) = @_;
+	if (defined $pos) {
+		$self->goTo($pos);
+		$self->see($pos);
+	}
+	return $self->index('insert');
+}
+
 =item B<redo>
 
 Redoes the last undo.
@@ -1072,6 +1109,10 @@ Redoes the last undo.
 =item B<save>I<($file)>
 
 Saves the text into $file. Returns 1 if successfull.
+
+=item B<saveExport>I<($file)>
+
+Same as save, except it does not clear the modified flag.
 
 =cut
 
@@ -1150,7 +1191,7 @@ sub showstatus {
 				-fill => 'x',
 			);
 			$self->{STATUSVISIBLE} = 1;
-			$f->StatusUpdate;
+			$f->updateStatus;
 		} else {
 			$f->packForget;
 			$self->{STATUSVISIBLE} = 0;
@@ -1271,7 +1312,6 @@ sub themeDialog {
 	if ($button eq 'Ok') {
 		$theme->put($editor->get);
 		$self->themeUpdate;
-		$self->highlightPurge;
 	}
 	$dialog->destroy;
 }
@@ -1317,6 +1357,7 @@ sub themeUpdate {
 			-font => $nfont,
 		);
 	}
+	$self->highlightPurge(1);
 }
 
 =item B<uncomment>
@@ -1430,3 +1471,14 @@ If you find any, please contact the author.
 1;
 
 __END__
+
+
+
+
+
+
+
+
+
+
+

@@ -1,5 +1,19 @@
 Revision history for Perl extension DateTime::Format::Natural.
 
+1.18  2023-10-05  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+1.17_02  2023-10-03  <schubiger@cpan.org>
+
+ - Validate 'daytime' parameter.
+
+1.17_01  2023-10-01  <schubiger@cpan.org>
+
+ - Minor wording tweak.
+
+ - Minor indentation tweak.
+
 1.17  2023-06-20  <schubiger@cpan.org>
 
  - Merged development version to stable.

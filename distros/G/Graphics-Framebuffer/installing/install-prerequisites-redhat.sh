@@ -1,6 +1,8 @@
 #!/bin/bash
 
-sudo yum update
+# Install the prerequisites for Graphics::Framebuffer
+
+sudo yum update # Bring RedHat's module database up to date
 
 # I use "upgrade" instead of "install" to prevent errors if you already
 # have some of these packages installed.  "upgrade" will install them if
@@ -17,6 +19,7 @@ sudo yum upgrade gcc \
                  byacc \
                  flex \
                  patch \
+				 ffmpeg \
                  giflib-devel \
                  libjpeg-turbo-devel \
                  libpng-devel \
@@ -34,5 +37,6 @@ case $yn in
                          perl-imager \
                          perl-inline-c \
                          perl-sys-cpu \
+                         perl-term-readkey \
                          perl-test-most;;
 esac

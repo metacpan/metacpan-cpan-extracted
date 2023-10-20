@@ -29,8 +29,9 @@ subtest "just an unicode name" => sub {
 subtest "just a number" => sub {
     my $owner = Software::Copyright::Owner->new("2021");
 
-    is("$owner", "", "check owner string when a number was given");
+    is("$owner", "2021", "check owner string when a number was given");
     is($owner->name, undef, "check owner name when a number was given");
+    is($owner->record, "2021", "check owner name when a number was given");
 };
 
 subtest "combined owners" => sub {
@@ -64,12 +65,20 @@ subtest "name and email" => sub {
 };
 
 subtest "create with name and email" => sub {
-    my $owner = Software::Copyright::Owner->new('Marcel <marcel@example.com>');
+    my @tests = (
+        ['Marcel <marcel@example.com>', Marcel => 'marcel@example.com'],
+        ['Marcel <marcel2015@example.com>', Marcel => 'marcel2015@example.com'],
+    );
 
-    is($owner->name, "Marcel", "check name");
-    is($owner->email, 'marcel@example.com', "check email");
+    foreach my $test (@tests) {
+        my ($in, $name, $email, $out) = $test->@*;
+        my $owner = Software::Copyright::Owner->new($in);
 
-    is("$owner", 'Marcel <marcel@example.com>', "check owner and email");
+        is($owner->name, $name, "check name");
+        is($owner->email, $email, "check email");
+
+        is("$owner", $out // $in, "check owner and email");
+    }
 };
 
 subtest "invalid owners" => sub {
@@ -77,7 +86,7 @@ subtest "invalid owners" => sub {
 
     is($owner->name, undef, "check name");
     is($owner->email, undef, "check email");
-    is($owner->record, undef, "check record");
+    is($owner->record, "**", "check record");
 };
 
 done_testing;

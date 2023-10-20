@@ -1,5 +1,11 @@
 Revision history for Iterator-Flex
 
+0.16      2023-09-28 19:17:13-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * document cache iterator's 'at' method (and make it work)
+
 0.15      2022-07-18 11:50:51-04:00 America/New_York
 
   [BUG FIX]

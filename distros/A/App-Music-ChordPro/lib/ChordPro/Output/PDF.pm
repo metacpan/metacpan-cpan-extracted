@@ -92,6 +92,14 @@ sub generate_songbook {
 	$song->{meta}->{tocpage} = $page;
 	push( @book, [ $song->{meta}->{title}->[0], $song ] );
 
+	# Copy persistent assets into each of the songs.
+	if ( $sb->{assets} ) {
+	    $song->{assets} //= {};
+	    while ( my ($k,$v) = each %{$sb->{assets}} ) {
+		$song->{assets}->{$k} = $v;
+	    }
+	}
+
 	$page += $song->{meta}->{pages} =
 	  generate_song( $song, { pr        => $pr,
 				  startpage => $page,
@@ -123,12 +131,12 @@ sub generate_songbook {
 	my $book = prep_outlines( [ map { $_->[1] } @book ], $ctl );
 
 	# Create a pseudo-song for the table of contents.
-	my $t = $ctl->{label};
+	my $t = fmt_subst( $book[0][-1], $ctl->{label} );
 	my $l = $ctl->{line};
 	my $start = $start_of{songbook} - $options->{"start-page-number"};
 	my $pgtpl = $ctl->{pageno};
 	my $song =
-	  { title     => $t,
+	  { title     =>  $t,
 	    meta => { title => [ $t ] },
 	    structure => "linear",
 	    body      => [
@@ -330,7 +338,8 @@ my $chordscapo = 0;		# capo in a separate column
 my $i_tag;
 our $assets;
 
-use constant SIZE_ITEMS => [ qw (chord text tab grid diagram toc title footer) ];
+use constant SIZE_ITEMS => [ qw( chord text chorus tab grid diagram
+				 toc title footer ) ];
 
 sub generate_song {
     my ( $s, $opts ) = @_;
@@ -370,7 +379,7 @@ sub generate_song {
 #    warn("X1: ", $ps->{fonts}->{$_}->{size}, "\n") for "text";
     $pr->init_fonts();
     my $fonts = $ps->{fonts};
-    $pr->{_df}->{$_} = { %{$fonts->{$_}} } for qw( text chord grid toc tab );
+    $pr->{_df}->{$_} = { %{$fonts->{$_}} } for qw( text chorus chord grid toc tab );
 #    warn("X2: ", $pr->{_df}->{$_}->{size}, "\n") for "text";
 
     $structured = ( $options->{'backend-option'}->{structure} // '' ) eq 'structured';
@@ -901,7 +910,7 @@ sub generate_song {
 
 	    my $ftext;
 	    if ( $type eq "songline" ) {
-		$ftext = $fonts->{text};
+		$ftext = $curctx eq "chorus" ? $fonts->{chorus} : $fonts->{text};
 	    }
 	    elsif ( $type =~ /^comment/ ) {
 		$ftext = $fonts->{$type} || $fonts->{comment};
@@ -1157,55 +1166,105 @@ sub generate_song {
 	if ( $elt->{type} eq "svg" ) {
 	    # We turn SVG into one (or more) XForm objects.
 
-	    require PDF::SVG;
-	    my $p = PDF::SVG->new
-	      ( pdf => $ps->{pr}->{pdf}, atts => { debug => $config->{debug}->{images} > 1 } );
+	    require SVGPDF;
+	    SVGPDF->VERSION(0.070);
+
+	    # Note we need special font and text handlers.
+	    my $p = SVGPDF->new
+	      ( pdf  => $ps->{pr}->{pdf},
+		fc   => sub { svg_fonthandler( $ps, @_ ) },
+		tc   => sub { svg_texthandler( $ps, @_ ) },
+		atts => { debug => $config->{debug}->{svg} > 1,
+			  verbose => $config->{debug}->{svg},
+			} );
 	    my $o = $p->process( $elt->{uri} );
 	    warn("PDF: SVG objects: ", 0+@$o, "\n")
-	      if $config->{debug}->{images} || !@$o;
+	      if $config->{debug}->{svg} || !@$o;
 	    if ( ! @$o ) {
-		warn("Error in SVG embedding\n");
+		warn("Error in SVG embedding (no SVG objects found)\n");
 		next;
 	    }
 
 	    my @res;
+	    my $i = 0;
 	    for my $xo ( @$o ) {
 		state $imgcnt = 0;
+		$i++;
 		my $assetid = sprintf("XFOasset%03d", $imgcnt++);
 		$assets->{$assetid} = { type => "xform", data => $xo };
+		my $sep = $i == @$o ? 0 : $elt->{opts}->{sep} || 0;
 
 		push( @res,
-		      { type => "xform",
-			width => $xo->{width},
-			height => $xo->{height},
-			id  => $assetid,
+		      { type     => "xform",
+			width    => $xo->{width},
+			height   => $xo->{height},
+			vwidth   => $xo->{vwidth},
+			vheight  => $xo->{vheight},
+			id       => $assetid,
 			opts => { center => $elt->{opts}->{center},
-				  scale => $elt->{opts}->{scale} || 1 } },
+				  scale  => $elt->{opts}->{scale} || 1,
+				  sep    => $sep },
+		      }
 		    );
 		warn("Created asset $assetid (xform, ",
-		     $xo->{width}, "x", $xo->{height}, ")",
+		     $xo->{vwidth}, "x", $xo->{vheight}, ")",
 		     " scale=", $elt->{opts}->{scale} || 1,
 		     " center=", $elt->{opts}->{center}//0,
+		     " sep=", $sep,
 		     "\n")
 		  if $config->{debug}->{images};
 	    }
-
 	    unshift( @elts, @res );
 	    next;
 	}
 
 	if ( $elt->{type} eq "xform" ) {
-	    my $h = $elt->{height};
+	    my $h = $elt->{height};# + ($elt->{opts}->{sep}||0);
 	    my $w = $elt->{width};
-	    my $scale = $elt->{opts}->{scale};
+	    my $vh = $elt->{vheight};
+	    my $vw = $elt->{vwidth};
+	    my $xo = $assets->{ $elt->{id} };
+
+	    my $scale = min( $vw / $w, $vh / $h );
+	    my $sep = $elt->{opts}->{sep} || 0;
+
+	    # Available width and height.
+	    my $pw;
+	    if ( $ps->{columns} > 1 ) {
+		$pw = $ps->{columnoffsets}->[1]
+		  - $ps->{columnoffsets}->[0]
+		  - $ps->{columnspace};
+	    }
+	    else {
+		$pw = $ps->{__rightmargin} - $ps->{_leftmargin};
+	    }
+	    my $ph = $ps->{_margintop} - $ps->{_marginbottom};
+
+	    if ( $w * $scale > $pw ) {
+		$scale = $pw / $w;
+	    }
+	    if ( $h * $scale > $ph ) {
+		$scale = $ph / $h;
+	    }
+	    warn("XForm asset ", $elt->{id}, " (",
+		 $vw, "x", $vh, ")",
+		 " [$x,$y]",
+		 " scale=", $scale,
+		 " center=", $elt->{opts}->{center}//0,
+		 " sep=", $sep,
+		 "\n")
+	      if $config->{debug}->{images};
+
+	    $scale *= $elt->{opts}->{scale};
 	    my $vsp = $h * $scale;
 	    $checkspace->($vsp);
 	    $ps->{pr}->show_vpos( $y, 1 ) if $config->{debug}->{spacing};
 
-	    my $xo = $assets->{ $elt->{id} };
-	    $pr->{pdfgfx}->object( $xo->{data}->{xo}, $x, $y-$vsp, $scale );
+	    $pr->{pdfgfx}->object( $xo->{data}->{xo},
+				   $x-$xo->{data}->{vbox}->[0]*$scale,
+				   $y, $scale );
 
-	    $y -= $vsp;
+	    $y -= $vsp + $sep;
 	    $pr->show_vpos( $y, 1 ) if $config->{debug}->{spacing};
 
 	    next;
@@ -1280,7 +1339,7 @@ sub generate_song {
 	}
 
 	if ( $elt->{type} eq "control" ) {
-	    if ( $elt->{name} =~ /^(text|chord|grid|toc|tab)-size$/ ) {
+	    if ( $elt->{name} =~ /^(text|chord|chorus|grid|toc|tab)-size$/ ) {
 		if ( defined $elt->{value} ) {
 		    $do_size->( $1, $elt->{value} );
 		}
@@ -1288,9 +1347,11 @@ sub generate_song {
 		    # Restore default.
 		    $ps->{fonts}->{$1}->{size} =
 		      $pr->{_df}->{$1}->{size};
+		    warn("No size to restore for font $1\n")
+		      unless $ps->{fonts}->{$1}->{size};
 		}
 	    }
-	    elsif ( $elt->{name} =~ /^(text|chord|grid|toc|tab)-font$/ ) {
+	    elsif ( $elt->{name} =~ /^(text|chord|chorus|grid|toc|tab)-font$/ ) {
 		my $f = $1;
 		if ( defined $elt->{value} ) {
 		    my ( $fn, $sz ) = $elt->{value} =~ /^(.*) (\d+(?:\.\d+)?)$/;
@@ -1322,7 +1383,7 @@ sub generate_song {
 		}
 		$pr->init_font($f);
 	    }
-	    elsif ( $elt->{name} =~ /^(text|chord|grid|toc|tab)-color$/ ) {
+	    elsif ( $elt->{name} =~ /^(text|chord|chorus|grid|toc|tab)-color$/ ) {
 		if ( defined $elt->{value} ) {
 		    $ps->{fonts}->{$1}->{color} = $elt->{value};
 		}
@@ -1670,7 +1731,7 @@ sub songline {
     }
 
     # assert $type eq "songline";
-    $ftext = $fonts->{text};
+    $ftext = $fonts->{ $elt->{context} eq "chorus" ? "chorus" : "text" };
     $ytext  = $ytop - font_bl($ftext); # unless lyrics AND chords
 
     my $fchord = $fonts->{chord};
@@ -2243,6 +2304,10 @@ sub imageline {
     my $scale = 1;
     my ( $w, $h ) = ( $opts->{width}  || $img->width,
 		      $opts->{height} || $img->height );
+
+  if ( $config->{debug}->{x1} ) {
+
+    # Current approach: user scale overrides.
     if ( defined $opts->{scale} ) {
 	$scale = $opts->{scale} || 1;
     }
@@ -2254,6 +2319,22 @@ sub imageline {
 	    $scale = $ph / $h;
 	}
     }
+  }
+  else {
+
+    # Better, but may break things.
+    if ( $w > $pw ) {
+	$scale = $pw / $w;
+    }
+    if ( $h*$scale > $ph ) {
+	$scale = $ph / $h;
+    }
+    if ( $opts->{scale} ) {
+	$scale *= $opts->{scale};
+    }
+
+  }
+
     warn("Image scale: $scale\n") if $config->{debug}->{images};
     $h *= $scale;
     $w *= $scale;
@@ -2275,9 +2356,11 @@ sub imageline {
     my $oy = $opts->{y};
 
     my $calc = sub {
-	my ( $l, $r, $t, $b ) = @_;
+	my ( $l, $r, $t, $b, $mirror ) = @_;
 	my $_ox = $ox // 0;
 	my $_oy = $oy // 0;
+	$x = $l;
+	$y = $t;
 
 	if ( $_ox =~ /^([-+]?[\d.]+)\%$/ ) {
 	    $ox = $_ox = $1/100 * ($r - $l) - ( $1/100 ) * $w;
@@ -2285,28 +2368,29 @@ sub imageline {
 	if ( $_oy =~ /^([-+]?[\d.]+)\%$/ ) {
 	    $oy = $_oy = $1/100 * ($t - $b) - ( $1/100 ) * $h;
 	}
-	$x = $l;
-	$y = $t;
+	if ( $mirror ) {
+	    $x = $r - $w if $_ox =~ /^-/;
+	    $y = $b + $h if $_oy =~ /^-/;
+	}
     };
 
     if ( $anchor eq "column" ) {
 	# Relative to the column.
 	$calc->( @{$ps}{qw( __leftmargin __rightmargin
-			    __topmargin __bottommargin )} );
+			    __topmargin __bottommargin )}, 0 );
     }
     elsif ( $anchor eq "page" ) {
 	# Relative to the page.
 	$calc->( @{$ps}{qw( _marginleft _marginright
-			    __topmargin __bottommargin )} );
+			    __topmargin __bottommargin )}, 0 );
     }
     elsif ( $anchor eq "paper" ) {
 	# Relative to the paper.
-	$calc->( 0, $ps->{papersize}->[0], $ps->{papersize}->[1], 0 );
+	$calc->( 0, $ps->{papersize}->[0], $ps->{papersize}->[1], 0, 1 );
     }
     else {
 	# image is line oriented.
-	$calc->( $x, $ps->{__rightmargin},
-		 $y, $ps->{__bottommargin} );
+	$calc->( $x, $ps->{__rightmargin}, $y, $ps->{__bottommargin}, 0 );
     }
 
     $x += $ox if defined $ox;
@@ -2486,6 +2570,7 @@ sub _vsp {
     # Calculate the vertical span of this element.
 
     my $font = $ps->{fonts}->{$eltype};
+    confess("Font $eltype has no size!") unless $font->{size};
     $font->{size} * $ps->{spacing}->{$sptype};
 }
 
@@ -2506,16 +2591,18 @@ sub toc_vsp   {
 sub text_vsp {
     my ( $elt, $ps ) = @_;
 
+    my $ftext = $ps->{fonts}->{ $elt->{context} eq "chorus"
+				? "chorus" : "text" };
     my $layout = Text::Layout->new( $ps->{pr}->{pdf} );
-    $layout->set_font_description( $ps->{fonts}->{text}->{fd} );
-    $layout->set_font_size( $ps->{fonts}->{text}->{size} );
+    $layout->set_font_description( $ftext->{fd} );
+    $layout->set_font_size( $ftext->{size} );
     #warn("vsp: ".join( "", @{$elt->{phrases}} )."\n");
     $layout->set_markup( join( "", @{$elt->{phrases}} ) );
     my $vsp = $layout->get_size->{height} * $ps->{spacing}->{lyrics};
     #warn("vsp $vsp \"", $layout->get_text, "\"\n");
     # Calculate the vertical span of this line.
 
-    _vsp( "text", $ps, "lyrics" );
+    _vsp( $elt->{context} eq "chorus" ? "chorus" : "text", $ps, "lyrics" );
 }
 
 sub set_columns {
@@ -2767,6 +2854,7 @@ sub configurator {
 	}
     };
     $fm->( qw( subtitle       text     ) );
+    $fm->( qw( chorus         text     ) );
     $fm->( qw( comment_italic text     ) );
     $fm->( qw( comment_box    text     ) );
     $fm->( qw( comment        text     ) );
@@ -2784,6 +2872,7 @@ sub configurator {
 
     # This one is fixed.
     $fonts->{chordfingers}->{file} = "ChordProSymbols.ttf";
+    $fonts->{chordprosymbols} = $fonts->{chordfingers};
 }
 
 # Get a format string for a given page class and type.
@@ -2872,7 +2961,7 @@ sub wrap {
 	my $ex = "";
 	#warn("wrap x=$x rm=$m w=", $m - $x, " ch=$chord, ph=$phrase\n");
 
-	if ( @rchords ) {
+	if ( @rchords && $chord ) {
 	    # Does the chord fit?
 	    my $c = $chord->chord_display;
 	    my $w;
@@ -2977,6 +3066,95 @@ my %corefonts =
 
 sub is_corefont {
     $corefonts{lc $_[0]};
+}
+
+# Font handler for SVG embedding.
+sub svg_fonthandler {
+    my ( $ps, $el, $pdf, $style ) = @_;
+
+    my $family = $style->{'font-family'};
+    my $stl    = $style->{'font-style'}   // "normal";
+    my $weight = $style->{'font-weight'}  // "normal";
+    my $size   = $style->{'font-size'}    || 12;
+    my $key    = join( "|", $family, $stl, $weight );
+    state $fc  = {};
+
+    # As a special case we handle fonts with 'names' like
+    # pdf.font.foo and map these to the corresponding font
+    # in the pdf.fonts structure.
+    if ( $family =~ /^pdf\.fonts\.(.*)/ ) {
+	my $try = $ps->{fonts}->{$1};
+	if ( $try ) {
+	    warn("SVG: Font $family found in config: ",
+		 $try->{_ff}, "\n")
+	      if $config->{debug}->{svg};
+	    # The font may change during the run, so we do not
+	    # cache it.
+	    return $try->{fd}->{font};
+	}
+    }
+
+    local *Text::Layout::FontConfig::_fallback = sub { 0 };
+
+    my $font = $fc->{$key} //= do {
+
+	my $t;
+	my $try =
+	  eval {
+	      $t = Text::Layout::FontConfig->find_font( $family, $stl, $weight );
+	      $t->get_font(Text::Layout->new($pdf));
+	  };
+	if ( $try ) {
+	    warn("SVG: Font $key found in font config: ",
+		 $t->{loader_data},
+		 "\n")
+	      if $config->{debug}->{svg};
+	    $try;
+	}
+	else {
+	    return;
+	}
+    };
+
+    return $font;
+}
+
+# Text handler for SVG embedding.
+sub svg_texthandler {
+    my ( $ps, $el, $xo, $pdf, $style, $text, %opts ) = @_;
+    my @t = split( /([♯♭])/, $text );
+    if ( @t == 1 ) {
+	# Nothing special.
+	$el->set_font( $xo, $style );
+	return $xo->text( $text, %opts );
+    }
+
+    my ( $font, $sz ) = $el->root->fontmanager->find_font($style);
+    my $has_sharp = $font->glyphByUni(ord("♯")) ne ".notdef";
+    my $has_flat  = $font->glyphByUni(ord("♭")) ne ".notdef";
+    # For convenience we assume that either both are available, or missing.
+
+    if ( $has_sharp && $has_flat ) {
+	# Nothing special.
+	$xo->font( $font, $sz );
+	return $xo->text( $text, %opts );
+    }
+
+    # Replace the sharp and flat glyphs by glyps from the chordfingers font.
+    my $d = 0;
+    my $this = 0;
+    while ( @t ) {
+	my $text = shift(@t);
+	my $fs   = shift(@t);
+	$xo->font( $font, $sz ) unless $this eq $font;
+	$d += $xo->text($text);
+	$this = $font;
+	next unless $fs;
+	$xo->font( $ps->{fonts}->{chordfingers}->{fd}->{font}, $sz );
+	$this = 0;
+	$d += $xo->text( $fs eq '♭' ? '!' : '#' );
+    }
+    return $d;
 }
 
 sub _dump {

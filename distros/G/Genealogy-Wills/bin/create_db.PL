@@ -26,12 +26,14 @@ sub flush($);
 sub normalise_name($);
 
 BEGIN {
-	$SIG{__WARN__} = sub {
-		my $warning = shift;
-		if($warning =~ /^Use of uninitialized value/) {
-			die $warning;
-		}
-	}
+        $SIG{__WARN__} = sub {
+                my $warning = shift;
+                if(($warning =~ /^Use of uninitialized value/) ||
+                   ($warning =~ /isn't numeric in numeric eq /i)) {
+                        die $warning;
+                }
+                warn $warning;
+        }
 }
 
 my $force_flag;

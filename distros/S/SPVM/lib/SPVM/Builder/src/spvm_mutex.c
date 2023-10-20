@@ -2,17 +2,40 @@
 // MIT License
 
 #include "spvm_mutex.h"
+#include "spvm_allocator.h"
 
 #if defined(_WIN32)
 
 #include <windows.h>
 
-void SPVM_MUTEX_init(SPVM_MUTEX* mutex) { InitializeSRWLock((SRWLOCK*)mutex->mutex); }
-void SPVM_MUTEX_destroy(SPVM_MUTEX* mutex) { }
-void SPVM_MUTEX_lock(SPVM_MUTEX* mutex) { AcquireSRWLockExclusive((SRWLOCK*)mutex->mutex); }
-void SPVM_MUTEX_unlock(SPVM_MUTEX* mutex) { ReleaseSRWLockExclusive((SRWLOCK*)mutex->mutex); }
-void SPVM_MUTEX_reader_lock(SPVM_MUTEX* mutex) { AcquireSRWLockShared((SRWLOCK*)mutex->mutex); }
-void SPVM_MUTEX_reader_unlock(SPVM_MUTEX* mutex) { ReleaseSRWLockShared((SRWLOCK*)mutex->mutex); }
+void SPVM_MUTEX_init(void* mutex) {
+  
+  InitializeSRWLock((SRWLOCK*)mutex);
+}
+
+void SPVM_MUTEX_destroy(void* mutex) {
+  
+}
+
+void SPVM_MUTEX_lock (void* mutex) {
+  AcquireSRWLockExclusive((SRWLOCK*)mutex);
+}
+
+void SPVM_MUTEX_unlock (void* mutex) {
+  ReleaseSRWLockExclusive((SRWLOCK*)mutex);
+}
+
+void SPVM_MUTEX_reader_lock (void* mutex) {
+  AcquireSRWLockShared((SRWLOCK*)mutex);
+}
+
+void SPVM_MUTEX_reader_unlock (void* mutex) {
+  ReleaseSRWLockShared((SRWLOCK*)mutex);
+}
+
+int32_t SPVM_MUTEX_size () {
+  return sizeof(SRWLOCK);
+}
 
 #else
 
@@ -25,13 +48,33 @@ void SPVM_MUTEX_reader_unlock(SPVM_MUTEX* mutex) { ReleaseSRWLockShared((SRWLOCK
     if ((fncall) != 0) abort(); \
   } while (0)
 
-void SPVM_MUTEX_init(SPVM_MUTEX* mutex) { SAFE_PTHREAD(pthread_rwlock_init((pthread_rwlock_t*)mutex->mutex, NULL)); }
-void SPVM_MUTEX_destroy(SPVM_MUTEX* mutex) { SAFE_PTHREAD(pthread_rwlock_destroy((pthread_rwlock_t*)mutex->mutex)); }
-void SPVM_MUTEX_lock(SPVM_MUTEX* mutex) { SAFE_PTHREAD(pthread_rwlock_wrlock((pthread_rwlock_t*)mutex->mutex)); }
-void SPVM_MUTEX_unlock(SPVM_MUTEX* mutex) { SAFE_PTHREAD(pthread_rwlock_unlock((pthread_rwlock_t*)mutex->mutex)); }
-void SPVM_MUTEX_reader_lock(SPVM_MUTEX* mutex) { SAFE_PTHREAD(pthread_rwlock_rdlock((pthread_rwlock_t*)mutex->mutex)); }
-void SPVM_MUTEX_reader_unlock(SPVM_MUTEX* mutex) { SAFE_PTHREAD(pthread_rwlock_unlock((pthread_rwlock_t*)mutex->mutex)); }
+void SPVM_MUTEX_init(void* mutex) {
+  
+  SAFE_PTHREAD(pthread_rwlock_init((pthread_rwlock_t*)mutex, NULL));
+}
 
-#undef SAFE_PTHREAD
+void SPVM_MUTEX_destroy(void* mutex) {
+  SAFE_PTHREAD(pthread_rwlock_destroy((pthread_rwlock_t*)mutex));
+}
+
+void SPVM_MUTEX_lock (void* mutex) {
+  SAFE_PTHREAD(pthread_rwlock_wrlock((pthread_rwlock_t*)mutex));
+}
+
+void SPVM_MUTEX_unlock (void* mutex) {
+  SAFE_PTHREAD(pthread_rwlock_unlock((pthread_rwlock_t*)mutex));
+}
+
+void SPVM_MUTEX_reader_lock (void* mutex) {
+  SAFE_PTHREAD(pthread_rwlock_rdlock((pthread_rwlock_t*)mutex));
+}
+
+void SPVM_MUTEX_reader_unlock (void* mutex) {
+  SAFE_PTHREAD(pthread_rwlock_unlock((pthread_rwlock_t*)mutex));
+}
+
+int32_t SPVM_MUTEX_size () {
+  return sizeof(pthread_rwlock_t);
+}
 
 #endif

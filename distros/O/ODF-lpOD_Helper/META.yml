@@ -4,9 +4,10 @@ author:
   - 'Jim Avera'
 build_requires:
   Archive::Zip: '0'
+  Capture::Tiny: '0'
   Cwd: '0'
   Data::Dumper: '0'
-  Data::Dumper::Interp: '6.005'
+  Data::Dumper::Interp: '6.006'
   Encode: '0'
   English: '0'
   Env: '0'
@@ -42,10 +43,10 @@ name: ODF-lpOD_Helper
 provides:
   ODF::lpOD_Helper:
     file: lib/ODF/lpOD_Helper.pm
-    version: '6.004'
+    version: '6.007'
 requires:
   Carp: '0'
-  Data::Dumper::Interp: '6.005'
+  Data::Dumper::Interp: '6.006'
   Exporter: '0'
   File::Basename: '0'
   Getopt::Long: '0'
@@ -64,7 +65,7 @@ resources:
   bugtracker: https://github.com/jimav/ODF-lpOD_Helper/issues
   homepage: https://github.com/jimav/ODF-lpOD_Helper
   repository: https://github.com/jimav/ODF-lpOD_Helper.git
-version: '6.004'
+version: '6.007'
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: CC0-1.0

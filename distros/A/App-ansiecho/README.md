@@ -47,7 +47,7 @@ Example:
 
 # VERSION
 
-Version 1.04
+Version 1.05
 
 # DESCRIPTION
 
@@ -112,6 +112,23 @@ and given to another format.
 
 Formatting is done by Perl `sprintf` function.  See
 ["sprintf" in perlfunc](https://metacpan.org/pod/perlfunc#sprintf) for detail.
+
+## REORDERED ARGUMENTS
+
+Position specifiers may also be used in the format string.
+Next command produces `34 12`.
+
+    ansiecho -f '%2$d %1$d' 12 34
+
+Oddly enough
+
+    ansiecho -f '%2$d %d %d' 12 34
+
+prints `34 12 34`, but don't be surprised.  When using position
+specifiers, it is safe to use them for all arguments.
+
+If you are using perl v5.24 or later, you can also use reordered 
+precision arguments.
 
 ## ANSI SEQUENCE
 

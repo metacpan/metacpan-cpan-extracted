@@ -11,10 +11,11 @@ use List::MoreUtils qw(firstidx);
 use Time::HiRes qw(gettimeofday tv_interval);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-12'; # DATE
+our $DATE = '2023-08-05'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.559'; # VERSION
+our $VERSION = '0.560'; # VERSION
 
+has _srclabel               => (is => 'rw');
 has tags                    => (is => 'rw');
 has todo_states             => (is => 'rw');
 has done_states             => (is => 'rw');
@@ -809,7 +810,7 @@ Org::Document - Represent an Org document
 
 =head1 VERSION
 
-This document describes version 0.559 of Org::Document (from Perl distribution Org-Parser), released on 2023-07-12.
+This document describes version 0.560 of Org::Document (from Perl distribution Org-Parser), released on 2023-08-05.
 
 =head1 SYNOPSIS
 

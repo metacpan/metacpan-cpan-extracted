@@ -10,9 +10,9 @@ with 'Org::ElementRole';
 with 'Org::ElementRole::Block';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-12'; # DATE
+our $DATE = '2023-08-05'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.559'; # VERSION
+our $VERSION = '0.560'; # VERSION
 
 has level => (is => 'rw');
 has title => (is => 'rw');
@@ -116,7 +116,7 @@ sub promote_node {
     my ($self, $num_levels) = @_;
     $num_levels //= 1;
     return if $num_levels == 0;
-    die "Please specify a positive number of levels" if $num_levels < 0;
+    $self->die("Please specify a positive number of levels") if $num_levels < 0;
 
     for my $i (1..$num_levels) {
 
@@ -159,7 +159,7 @@ sub demote_node {
     my ($self, $num_levels) = @_;
     $num_levels //= 1;
     return if $num_levels == 0;
-    die "Please specify a positive number of levels" if $num_levels < 0;
+    $self->die("Please specify a positive number of levels") if $num_levels < 0;
 
     for my $i (1..$num_levels) {
 
@@ -185,7 +185,7 @@ sub promote_branch {
     my ($self, $num_levels) = @_;
     $num_levels //= 1;
     return if $num_levels == 0;
-    die "Please specify a positive number of levels" if $num_levels < 0;
+    $self->die("Please specify a positive number of levels") if $num_levels < 0;
 
     for my $i (1..$num_levels) {
         last if $self->level <= 1;
@@ -197,7 +197,7 @@ sub demote_branch {
     my ($self, $num_levels) = @_;
     $num_levels //= 1;
     return if $num_levels == 0;
-    die "Please specify a positive number of levels" if $num_levels < 0;
+    $self->die("Please specify a positive number of levels") if $num_levels < 0;
 
     for my $i (1..$num_levels) {
         $_->demote_node() for $self->find('Headline');
@@ -304,7 +304,7 @@ Org::Element::Headline - Represent Org headline
 
 =head1 VERSION
 
-This document describes version 0.559 of Org::Element::Headline (from Perl distribution Org-Parser), released on 2023-07-12.
+This document describes version 0.560 of Org::Element::Headline (from Perl distribution Org-Parser), released on 2023-08-05.
 
 =head1 DESCRIPTION
 

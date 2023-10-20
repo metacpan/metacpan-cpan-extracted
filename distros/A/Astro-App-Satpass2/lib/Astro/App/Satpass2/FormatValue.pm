@@ -23,7 +23,7 @@ use POSIX qw{ floor };
 use Scalar::Util 1.26 qw{ isdual reftype };
 use Text::Wrap ();
 
-our $VERSION = '0.051';
+our $VERSION = '0.052';
 
 use constant NONE => undef;
 use constant RE_ALL_DIGITS	=> qr{ \A [0-9]+ \z }smx;

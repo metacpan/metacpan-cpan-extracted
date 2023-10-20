@@ -1,13 +1,12 @@
-# Pragmas.
+use lib '.';
 use strict;
 use warnings;
 
-# Modules.
 use inc::Module::Install;
 
 # Definition.
 abstract 'Processing PYX data or file and print list of XML schemas.';
-author 'Michal Spacek <skim@cpan.org>';
+author 'Michal Josef Spacek <skim@cpan.org>';
 author_requires 'English' => 0;
 author_requires 'File::Object' => 0.07;
 author_requires 'Test::More' => 0;
@@ -24,10 +23,9 @@ requires 'List::Util' => 0;
 requires 'PYX::Parser' => 0.02;
 requires 'Readonly' => 0;
 requires 'perl' => '5.6.0';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=PYX-XMLSchema-List';
-resources 'homepage' => 'https://github.com/tupinek/PYX-XMLSchema-List';
-resources 'repository' => 'git://github.com/tupinek/PYX-XMLSchema-List';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/PYX-XMLSchema-List/issues';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/PYX-XMLSchema-List';
+resources 'repository' => 'git://github.com/michal-josef-spacek/PYX-XMLSchema-List';
 test_requires 'English' => 0;
 test_requires 'File::Object' => 0.07;
 test_requires 'Error::Pure::Utils' => 0.22;
@@ -36,7 +34,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 1.02;
 tests_recursive;
-version '0.04';
+version '0.06';
 
 # Run.
 WriteAll();

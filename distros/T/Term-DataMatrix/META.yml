@@ -1,25 +1,34 @@
 ---
-abstract: 'Generate terminal base DataMatrix 2D Code'
+abstract: 'Generate terminal-based Data Matrix 2D barcodes'
 author:
   - 'Dan Church <h3xx [a] gmx <d> com>'
 build_requires:
-  Test::More: 0
-distribution_type: module
-generated_by: 'Module::Install version 0.770'
+  ExtUtils::MakeMaker: '0'
+  List::Util: '0'
+  Term::ANSIColor: '2.01'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Term-DataMatrix
 no_index:
   directory:
-    - inc
     - t
+    - inc
 requires:
-  Carp: 0
-  FindBin: 0
-  Term::ANSIColor: 0
-  Barcode::DataMatrix: 0
+  Barcode::DataMatrix: '0'
+  Carp: '0'
+  Term::ANSIColor: '0'
+  fields: '0'
+  perl: '5.012'
 resources:
-  license: http://dev.perl.org/licenses/
-version: 0.01
+  bugtracker: https://codeberg.org/h3xx/perl-Term-DataMatrix/issues
+  license: https://dev.perl.org/licenses/
+  repository: https://codeberg.org/h3xx/perl-Term-DataMatrix.git
+version: '1.000000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

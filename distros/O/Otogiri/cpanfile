@@ -2,7 +2,7 @@ requires 'perl', '5.008001';
 requires 'Class::Accessor::Lite';
 requires 'SQL::Maker', '1.16';
 requires 'SQL::QueryMaker', '0.02';
-requires 'DBIx::Sunny';
+requires 'DBIx::Sunny', '>= 0.9993';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';

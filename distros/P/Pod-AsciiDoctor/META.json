@@ -40,7 +40,11 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "Getopt::Long" : "0",
+            "Path::Tiny" : "0",
             "Pod::Parser" : "1.65",
+            "autodie" : "0",
             "parent" : "0",
             "perl" : "5.014",
             "strict" : "0",
@@ -59,7 +63,7 @@
    "provides" : {
       "Pod::AsciiDoctor" : {
          "file" : "lib/Pod/AsciiDoctor.pm",
-         "version" : "0.101003"
+         "version" : "0.102000"
       }
    },
    "release_status" : "stable",
@@ -74,7 +78,7 @@
          "web" : "https://github.com/shlomif/Pod-AsciiDoctor"
       }
    },
-   "version" : "0.101003",
+   "version" : "0.102000",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036001"
@@ -420,7 +424,7 @@
                      {
                         "class" : "Pod::Weaver::Section::Support",
                         "name" : "@SHLOMIF/Support",
-                        "version" : "1.013"
+                        "version" : "1.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Authors",
@@ -456,6 +460,11 @@
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Filter/UploadToCPAN",
+            "version" : "6.030"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "ExecDir",
             "version" : "6.030"
          },
          {

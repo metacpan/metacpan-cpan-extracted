@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 21;
+use Test::Most tests => 22;
 use lib 't/lib';
 use MyLogger;
 
@@ -31,6 +31,15 @@ TRANSLATE: {
 	is($places->translate({ place => 'Dover', 'from' => 'en' }), 'Dover', 'LANGUAGE set to English');
 
 	delete $ENV{'LANGUAGE'};
+
+	diag($places->translate(place => 'Canterbury', from => 'en', to => 'fr'));
+	TODO: {
+		# Should be Cantorbéry.  See BUGS in the documentation
+		# https://www.geonames.org/2653877/canterbury.html
+		local $TODO = 'Canterbury should translate to Cantorbéry';
+
+		cmp_ok($places->translate({ place => 'Canterbury', from => 'en', to => 'fr' }), 'eq', 'Cantorbéry', 'Translate to Cantorbéry has started to work');
+	}
 
 	$ENV{'LANG'} = 'fr_FR';
 	is($places->translate(place => 'Dover', 'from' => 'en'), 'Douvres', 'Target LANG set to French');

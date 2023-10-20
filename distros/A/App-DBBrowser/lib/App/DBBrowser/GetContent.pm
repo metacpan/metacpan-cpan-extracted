@@ -190,6 +190,7 @@ sub get_content {
                     elsif ( $menu->[$idx] eq $change_dir ) {
                         $source->{dir} = $cs->__new_search_dir();
                         if ( length $source->{dir} ) {
+                            $cs->__add_to_history( $source->{dir} );
                             $files_in_chosen_dir = $cs->__files_in_dir( $source->{dir} );
                         }
                         next FILE;

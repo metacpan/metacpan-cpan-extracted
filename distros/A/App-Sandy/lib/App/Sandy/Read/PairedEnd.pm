@@ -7,7 +7,7 @@ use constant NUM_TRIES => 1000;
 
 extends 'App::Sandy::Read';
 
-our $VERSION = '0.24'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 has 'fragment_mean' => (
 	is       => 'ro',
@@ -85,7 +85,7 @@ App::Sandy::Read::PairedEnd - App::Sandy::Read subclass for simulate paired-end 
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 AUTHORS
 

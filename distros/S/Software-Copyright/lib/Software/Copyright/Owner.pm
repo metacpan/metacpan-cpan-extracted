@@ -8,7 +8,7 @@
 #   The GNU General Public License, Version 3, June 2007
 #
 package Software::Copyright::Owner;
-$Software::Copyright::Owner::VERSION = '0.010';
+$Software::Copyright::Owner::VERSION = '0.012';
 use warnings;
 use 5.20.0;
 use utf8;
@@ -40,9 +40,12 @@ has email => (
 around BUILDARGS => sub ($orig, $class, @args) {
     my $params = {  } ;
 
-    return $class->$orig() unless $args[0] =~ /^[[:alpha:]]/;
-
-    if ($args[0] =~ /\b(and|,)\b/) {
+    # detect garbage in string argument
+    if ($args[0] !~ /^[[:alpha:]]/) {
+        # don't try to be smart, keep the record as is: garbage in, garbage out
+        $params->{record} = $args[0];
+    }
+    elsif ($args[0] =~ /\b(and|,)\b/) {
         # combined records, do not try to extract name and email.
         $params->{record} = NFC($args[0]);
     }
@@ -97,7 +100,7 @@ Software::Copyright::Owner - Copyright owner class
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -146,12 +149,15 @@ one person. See synopsis for details.
 
 Set or get owner's name. Note that names with Unicode characters are
 normalized to Canonical Composition (NFC). Name can be empty when the
-copyright owners has more that one name (i.e. C<John Doe and Jane Doe>.
+copyright owners has more that one name (i.e. C<John Doe and Jane
+Doe>) or if the string passed to C<new()> contains unexpected
+information (like a year).
 
 =head2 record
 
 Set or get the record of a copyright. The record is set by constructor
-when the owner contains more than one name.
+when the owner contains more than one name or if the owner contains
+unexpected information.
 
 =head2 identifier
 

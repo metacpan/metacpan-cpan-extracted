@@ -8,7 +8,7 @@
 
 package Mail::Message::Body::Lines;
 use vars '$VERSION';
-$VERSION = '3.013';
+$VERSION = '3.014';
 
 use base 'Mail::Message::Body';
 
@@ -53,6 +53,7 @@ sub _data_from_glob(@)
 
 sub _data_from_lines(@)
 {   my ($self, $lines)  = @_;
+
     $lines = [ split /^/, $lines->[0] ]    # body passed in one string.
         if @$lines==1;
 

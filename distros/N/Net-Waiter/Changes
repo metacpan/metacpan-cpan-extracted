@@ -1,5 +1,20 @@
 Revision history for Perl extension Net::Waiter
 
+1.08  2023.10.04
+
+    1. changed accept socket to non-blocking
+    2. expanded shared memory to 1MiB (TODO: should be an option)
+    3. removed extra debug messages
+
+1.07  2023.10.02
+
+    1. default Timeout for accept() is set to 4 seconds
+    2. return non-error when prefork child accept() fails
+
+1.06  2023.09.22
+
+    1. added on_child_exit() handler. code cleanup.
+
 1.05  2023.04.05
 
     1. prefork logic tuning, helper functions, cleanup

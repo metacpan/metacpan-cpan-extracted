@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Message.pm
-## Version v0.1.2
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.0
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/21
-## Modified 2023/08/15
+## Modified 2023/09/08
 ## All rights reserved.
 ## 
 ## 
@@ -21,12 +21,12 @@ BEGIN
     use vars qw( $DEBUG $ERROR $AUTOLOAD $CRLF $HTTP_VERSION );
     use Data::UUID;
     require HTTP::Promise::Headers;
-    use Nice::Try;
+    # use Nice::Try;
     use URI;
     our $CRLF = "\015\012";
     # HTTP/1.0, HTTP/1.1, HTTP/2
     our $HTTP_VERSION  = qr/(?<http_protocol>HTTP\/(?<http_version>(?<http_vers_major>[0-9])(?:\.(?<http_vers_minor>[0-9]))?))/;
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -279,15 +279,19 @@ sub as_form_data
     elsif( $type eq 'application/json' )
     {
         return( HTTP::Promise::Body::Form->new ) unless( length( $payload ) );
-        try
+        my $form;
+        # try-catch
+        local $@;
+        eval
         {
             my $hash = $self->new_json->decode( $payload );
-            return( HTTP::Promise::Body::Form->new( $hash ) );
-        }
-        catch( $e )
+            $form = HTTP::Promise::Body::Form->new( $hash );
+        };
+        if( $@ )
         {
-            return( $self->error( "Error trying to decode the JSON payload: $e" ) );
+            return( $self->error( "Error trying to decode the JSON payload: $@" ) );
         }
+        return( $form );
     }
     elsif( $self->can( 'uri' ) && 
         ( $uri = $self->uri ) && 
@@ -560,13 +564,15 @@ sub decoded_content
     if( defined( $binmode ) )
     {
         $self->_load_class( 'Encode' ) || return( $self->pass_error );
-        try
+        # try-catch
+        local $@;
+        eval
         {
             $$content = Encode::decode( $binmode, $$content, ( Encode::FB_DEFAULT | Encode::LEAVE_SRC ) );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "Error decoding body content with character encoding '$binmode': $e" ) );
+            return( $self->error( "Error decoding body content with character encoding '$binmode': $@" ) );
         }
     }
     
@@ -1028,18 +1034,21 @@ sub _set_content
 sub _utf8_downgrade
 {
     my $self = shift( @_ );
-    try
+    my $rv;
+    # try-catch
+    local $@;
+    eval
     {
         if( defined( &utf8::downgrade ) )
         {
-            utf8::downgrade( $_[0], 1 ) ||
-                return( $self->error( 'HTTP::Promise::Message content must be bytes' ) );
+            $rv = utf8::downgrade( $_[0], 1 );
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error downgrading utf8 data: $e" ) );
+        return( $self->error( "Error downgrading utf8 data: $@" ) );
     }
+    $rv || return( $self->error( 'HTTP::Promise::Message content must be bytes' ) );
 }
 
 sub AUTOLOAD
@@ -1125,7 +1134,7 @@ HTTP::Promise::Message - HTTP Message Class
 
 =head1 VERSION
 
-    v0.1.2
+    v0.2.0
 
 =head1 DESCRIPTION
 

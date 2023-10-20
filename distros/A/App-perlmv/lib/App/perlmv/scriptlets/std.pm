@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-30'; # DATE
+our $DATE = '2023-07-15'; # DATE
 our $DIST = 'App-perlmv'; # DIST
-our $VERSION = '0.607'; # VERSION
+our $VERSION = '0.608'; # VERSION
 
 # ABSTRACT: A collection of perlmv scriptlets
 
@@ -108,7 +108,7 @@ App::perlmv::scriptlets::std - A collection of perlmv scriptlets
 
 =head1 VERSION
 
-This document describes version 0.607 of App::perlmv::scriptlets::std (from Perl distribution App-perlmv), released on 2023-06-30.
+This document describes version 0.608 of App::perlmv::scriptlets::std (from Perl distribution App-perlmv), released on 2023-07-15.
 
 =head1 SCRIPTLETS
 

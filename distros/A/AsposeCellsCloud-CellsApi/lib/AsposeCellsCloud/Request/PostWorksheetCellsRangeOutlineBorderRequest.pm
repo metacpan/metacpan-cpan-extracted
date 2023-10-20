@@ -61,7 +61,7 @@ sub new {
 # Run Operation Request
 # PostWorksheetCellsRangeOutlineBorderRequest.name : The workbook name.  ,
 # PostWorksheetCellsRangeOutlineBorderRequest.sheetName : The worksheet name.  ,
-# PostWorksheetCellsRangeOutlineBorderRequest.rangeOperate : Range Set OutlineBorder Request   ,
+# PostWorksheetCellsRangeOutlineBorderRequest.rangeOperate : Range Set OutlineBorder Request.  ,
 # PostWorksheetCellsRangeOutlineBorderRequest.folder : Original workbook folder.  ,
 # PostWorksheetCellsRangeOutlineBorderRequest.storageName : Storage name.   
 
@@ -151,7 +151,7 @@ __PACKAGE__->method_documentation({
      'range_operate' => {
      	datatype => 'RangeSetOutlineBorderRequest',
      	base_name => 'rangeOperate',
-     	description => 'Range Set OutlineBorder Request ',
+     	description => 'Range Set OutlineBorder Request.',
      	format => '',
      	read_only => '',
      		},

@@ -1,5 +1,5 @@
 package Selenium::Client;
-$Selenium::Client::VERSION = '1.05';
+$Selenium::Client::VERSION = '1.06';
 # ABSTRACT: Module for communicating with WC3 standard selenium servers
 
 use strict;
@@ -46,12 +46,14 @@ sub new($class,%options) {
     $options{headless}   //= 1;
     $options{normalize}  //= 1;
     $options{fatal}      //= 1;
+    # Use the hardcoded JSON version of the stable spec in Selenium::Specification's DATA section.
+    $options{hardcode}   //= 1;
 
     #create client_dir and log-dir
     my $dir = File::Spec->catdir( $options{client_dir},"perl-client" );
     make_path($dir);
     #Grab the spec
-    $options{spec}= Selenium::Specification::read($options{client_dir},$options{version},$options{nofetch});
+    $options{spec}= Selenium::Specification::read($options{client_dir},$options{version},$options{nofetch}, $options{hardcode});
 
     my $self = bless(\%options, $class);
     $self->{sessions} = [];
@@ -376,15 +378,15 @@ sub _objectify($self,$result,$inject) {
 
 
 package Selenium::Capabilities;
-$Selenium::Capabilities::VERSION = '1.05';
+$Selenium::Capabilities::VERSION = '1.06';
 use parent qw{Selenium::Subclass};
 1;
 package Selenium::Session;
-$Selenium::Session::VERSION = '1.05';
+$Selenium::Session::VERSION = '1.06';
 use parent qw{Selenium::Subclass};
 1;
 package Selenium::Element;
-$Selenium::Element::VERSION = '1.05';
+$Selenium::Element::VERSION = '1.06';
 use parent qw{Selenium::Subclass};
 1;
 
@@ -400,7 +402,7 @@ Selenium::Client - Module for communicating with WC3 standard selenium servers
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 CONSTRUCTOR
 
@@ -696,7 +698,7 @@ George S. Baugh <george@troglodyne.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by George S. Baugh.
+This software is Copyright (c) 2023 by George S. Baugh.
 
 This is free software, licensed under:
 

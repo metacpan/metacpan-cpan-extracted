@@ -1,6 +1,43 @@
 TYPEMAP
-Channel* T_CHANNEL
+Thread::GoChannel	T_MAGICEXT
 
 INPUT
-T_CHANNEL
-	$var = sv_to_channel($arg)
+T_MAGIC
+	{
+	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, NULL) : NULL;
+	if (magic)
+		$var = (${type})magic->mg_ptr;
+	else
+		Perl_croak(aTHX_ \"${ntype} object is lacking magic\");
+	}
+
+T_MAGICBUF
+	{
+	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, NULL) : NULL;
+	if (magic)
+		$var = (${type})magic->mg_ptr;
+	else
+		Perl_croak(aTHX_ \"${ntype} object is lacking magic\");
+	}
+
+T_MAGICEXT
+	{
+	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, &${type}_magic) : NULL;
+	if (magic)
+		$var = (${type})magic->mg_ptr;
+	else
+		Perl_croak(aTHX_ \"${ntype} object is lacking magic\");
+	}
+
+
+OUTPUT
+T_MAGIC
+	sv_magic(newSVrv($arg, \"${ntype}\"), NULL, PERL_MAGIC_ext, (const char*)$var, 0);
+T_MAGICBUF
+	sv_magic(newSVrv($arg, \"${ntype}\"), NULL, PERL_MAGIC_ext, (const char*)$var, sizeof(*$var));
+T_MAGICEXT
+	{
+	MAGIC* magic = sv_magicext(newSVrv($arg, \"${ntype}\"), NULL, PERL_MAGIC_ext, &${type}_magic, (const char*)$var, 0);
+	magic->mg_flags |= MGf_COPY|MGf_DUP;
+	}
+

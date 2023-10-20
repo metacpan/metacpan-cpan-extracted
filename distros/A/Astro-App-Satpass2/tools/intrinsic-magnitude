@@ -10,7 +10,7 @@ use Astro::Coord::ECI::Sun;
 use Getopt::Long 2.33 qw{ :config auto_version };
 use Pod::Usage;
 
-our $VERSION = '0.051';
+our $VERSION = '0.052';
 
 my %opt = (
     load	=> 'usual.tle',

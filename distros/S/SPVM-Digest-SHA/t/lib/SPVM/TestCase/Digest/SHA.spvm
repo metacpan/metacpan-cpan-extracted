@@ -1,7 +1,596 @@
 class TestCase::Digest::SHA {
+  use Fn;
   use Digest::SHA;
-  static method test : int () {
-    
+
+  static method sha1 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->sha1(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
     return 1;
   }
+
+  static method sha1_hex : int() {
+    # Exception
+    {
+      eval { Digest::SHA->sha1_hex(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method sha1_base64 : int() {
+    # base64.t
+    {
+      my $ok = 1;
+      my $tests = [
+        "abc" => "qZk+NkcGgWq6PiVxeFDCbJzQ2J0",
+      ];
+      for (my $i = 0; $i < @$tests; $i += 2) {
+        unless ( Digest::SHA->sha1_base64($tests->[$i]) eq $tests->[$i+1] ) {
+          $ok = 0;
+        }
+      }
+      unless ($ok) {
+        return 0;
+      }
+    }
+    # Exception
+    {
+      eval { Digest::SHA->sha1_base64(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method sha224 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->sha224(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method sha224_hex : int() {
+    # Exception
+    {
+      eval { Digest::SHA->sha224_hex(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method sha224_base64 : int() {
+    # base64.t
+    {
+      my $ok = 1;
+      my $tests = [
+        "abc" => "Iwl9IjQF2CKGQqR3vaJVsyqtvOS9oLP342ydpw"
+      ];
+      for (my $i = 0; $i < @$tests; $i += 2) {
+        unless ( Digest::SHA->sha224_base64($tests->[$i]) eq $tests->[$i+1] ) {
+          $ok = 0;
+        }
+      }
+      unless ($ok) {
+        return 0;
+      }
+    }
+    # Exception
+    {
+      eval { Digest::SHA->sha224_base64(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method sha256 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->sha256(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method sha256_hex : int() {
+    # Exception
+    {
+      eval { Digest::SHA->sha256_hex(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method sha256_base64 : int() {
+    # base64.t
+    {
+      my $ok = 1;
+      my $tests = [
+        "abc" => "ungWv48Bz+pBQUDeXa4iI7ADYaOWF3qctBD/YfIAFa0"
+      ];
+      for (my $i = 0; $i < @$tests; $i += 2) {
+        unless ( Digest::SHA->sha256_base64($tests->[$i]) eq $tests->[$i+1] ) {
+          $ok = 0;
+        }
+      }
+      unless ($ok) {
+        return 0;
+      }
+    }
+    # Exception
+    {
+      eval { Digest::SHA->sha256_base64(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method sha384 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->sha384(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method sha384_hex : int() {
+    # Exception
+    {
+      eval { Digest::SHA->sha384_hex(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method sha384_base64 : int() {
+    # base64.t
+    {
+      my $ok = 1;
+      my $tests = [
+        "abc" => "ywB1P0WjXou1oD1pmsZQBycsMqsO3tFjGotgWkP/W+2AhgcroefMI1i67KE0yCWn"
+      ];
+      for (my $i = 0; $i < @$tests; $i += 2) {
+        unless ( Digest::SHA->sha384_base64($tests->[$i]) eq $tests->[$i+1] ) {
+          $ok = 0;
+        }
+      }
+      unless ($ok) {
+        return 0;
+      }
+    }
+    # Exception
+    {
+      eval { Digest::SHA->sha384_base64(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method sha512 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->sha512(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method sha512_hex : int() {
+    # Exception
+    {
+      eval { Digest::SHA->sha512_hex(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method sha512_base64 : int() {
+    # base64.t
+    {
+      my $ok = 1;
+      my $tests = [
+        "abc" => "3a81oZNherrMQXNJriBBMRLm+k6JqX6iCp7u5ktV05ohkpkqJ0/BqDa6PCOj/uu9RU1EI2Q86A4qmslPpUyknw"
+      ];
+      for (my $i = 0; $i < @$tests; $i += 2) {
+        unless ( Digest::SHA->sha512_base64($tests->[$i]) eq $tests->[$i+1] ) {
+          $ok = 0;
+        }
+      }
+      unless ($ok) {
+        return 0;
+      }
+    }
+    # Exception
+    {
+      eval { Digest::SHA->sha512_base64(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method sha512224 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->sha512224(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method sha512224_hex : int() {
+    # Exception
+    {
+      eval { Digest::SHA->sha512224_hex(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method sha512224_base64 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->sha512224_base64(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method sha512256 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->sha512256(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method sha512256_hex : int() {
+    # Exception
+    {
+      eval { Digest::SHA->sha512256_hex(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method sha512256_base64 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->sha512256_base64(undef); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha1 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha1(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha1_hex : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha1_hex(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha1_base64 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha1_base64(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha224 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha224(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha224_hex : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha224_hex(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha224_base64 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha224_base64(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha256 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha256(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha256_hex : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha256_hex(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha256_base64 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha256_base64(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha384 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha384(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha384_hex : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha384_hex(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha384_base64 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha384_base64(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha512 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha512(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha512_hex : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha512_hex(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha512_base64 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha512_base64(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha512224 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha512224(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha512224_hex : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha512224_hex(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha512224_base64 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha512224_base64(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha512256 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha512256(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha512256_hex : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha512256_hex(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method hmac_sha512256_base64 : int() {
+    # Exception
+    {
+      eval { Digest::SHA->hmac_sha512256_base64(undef,""); };
+      unless (Fn->contains($@, "\$data must be defined.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
+  static method new : int() {
+    # Exception
+    {
+      eval { Digest::SHA->new(100); };
+      unless (Fn->contains($@, "The SHA state cannot be initalized. The specified algorithm is 100.")) {
+        return 0;
+      }
+    }
+    $@ = undef;
+    return 1;
+  }
+
 }

@@ -8,9 +8,9 @@ sub is_block { 1 }
 sub is_inline { 0 }
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-12'; # DATE
+our $DATE = '2023-08-05'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.559'; # VERSION
+our $VERSION = '0.560'; # VERSION
 
 1;
 # ABSTRACT: Role for block elements
@@ -27,7 +27,7 @@ Org::ElementRole::Block - Role for block elements
 
 =head1 VERSION
 
-This document describes version 0.559 of Org::ElementRole::Block (from Perl distribution Org-Parser), released on 2023-07-12.
+This document describes version 0.560 of Org::ElementRole::Block (from Perl distribution Org-Parser), released on 2023-08-05.
 
 =head1 DESCRIPTION
 

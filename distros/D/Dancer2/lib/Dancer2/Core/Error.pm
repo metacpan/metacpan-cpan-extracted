@@ -1,6 +1,6 @@
 package Dancer2::Core::Error;
 # ABSTRACT: Class representing fatal errors
-$Dancer2::Core::Error::VERSION = '0.400001';
+$Dancer2::Core::Error::VERSION = '1.0.0';
 use Moo;
 use Carp;
 use Dancer2::Core::Types;
@@ -483,11 +483,10 @@ Dancer2::Core::Error - Class representing fatal errors
 
 =head1 VERSION
 
-version 0.400001
+version 1.0.0
 
 =head1 SYNOPSIS
 
-    # taken from send_file:
     use Dancer2::Core::Error;
 
     my $error = Dancer2::Core::Error->new(
@@ -495,7 +494,7 @@ version 0.400001
         message => "No such file: `$path'"
     );
 
-    Dancer2::Core::Response->set($error->render);
+    $error->throw;
 
 =head1 DESCRIPTION
 

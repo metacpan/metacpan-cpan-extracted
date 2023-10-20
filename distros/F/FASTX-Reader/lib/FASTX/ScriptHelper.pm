@@ -344,6 +344,14 @@ FASTX::ScriptHelper - Shared routines for binaries using FASTX::Reader and FASTX
 
 =head1 VERSION
 
+version 1.12.0
+
+=head1 NAME
+
+FASTX::ScriptHelper - Shared routines for binaries using FASTX::Reader and FASTX::PE.
+
+=head1 VERSION
+
 version 1.11.0
 
 =head2 new()
@@ -417,6 +425,18 @@ Execute a command. Options are:
 =head2 cpu_count
 
 Returns the number of detected cores, default 1
+
+=head1 AUTHOR
+
+Andrea Telatin <andrea@telatin.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =head1 AUTHOR
 

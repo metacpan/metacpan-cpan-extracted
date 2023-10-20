@@ -1,0 +1,96 @@
+{
+   "abstract" : "a postmodern object system for Perl 5, as C<Moose> and C<Moo>, but with improvements",
+   "author" : [
+      "Yaroslav O. Kosmina LL<mailto:dart@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.19",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Aion",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Attribute::Handlers" : "1.03",
+            "Data::Printer" : "1.000004",
+            "Exporter" : "5.77",
+            "List::Util" : "1.63",
+            "Math::BigInt" : "1.999837",
+            "Scalar::Util" : "1.63",
+            "Sub::Util" : "1.63",
+            "common::sense" : "3.75",
+            "config" : "1.3",
+            "perl" : "v5.22.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Aion" : {
+         "file" : "lib/Aion.pm",
+         "version" : "0.1"
+      },
+      "Aion::Type" : {
+         "file" : "lib/Aion/Type.pm"
+      },
+      "Aion::Types" : {
+         "file" : "lib/Aion/Types.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/darviarush/perl-aion/issues"
+      },
+      "homepage" : "https://github.com/darviarush/perl-aion",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/darviarush/perl-aion.git",
+         "web" : "https://github.com/darviarush/perl-aion"
+      }
+   },
+   "version" : "0.1",
+   "x_authority" : "cpan:DART",
+   "x_contributors" : [
+      "Iaroslav O. Kosmina <darviarush@ya.ru>",
+      "Yaroslav O. Kosmina <dart@cpan.org>",
+      "Yaroslav O. Kosmina <darviarush@mail.ru>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

@@ -10,9 +10,12 @@ my $build = Module::Build->new(
       perl => '5.026',
       'Object::Pad' => '0.800',
 
+      'App::sdview::Output' => '0.13',
       'String::Tagged::HTML' => 0,
    },
    test_requires => {
+      'App::sdview::Parser::Pod' => '0.13',
+      'App::sdview::Parser::Markdown' => '0.13',
       'Test2::V0' => 0,
    },
    configure_requires => {

@@ -2,6 +2,9 @@ Build.PL
 Changes
 LICENSE
 META.json
+README.JA.md
+README.KO.md
+README.ZH.md
 README.md
 cpanfile
 lib/App/Greple/subst.pm

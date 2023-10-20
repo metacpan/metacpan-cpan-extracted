@@ -1,6 +1,6 @@
 use strict; use warnings; use Data::Dumper;
-use EAI::Common; use Test::More; use Test::File; use File::Spec;
-use Test::More tests => 19;
+use EAI::Common; use EAI::DateUtil; use Test::More; use Test::File; use File::Spec;
+use Test::More tests => 21;
 
 require './t/setup.pl';
 chdir "./t";
@@ -47,23 +47,24 @@ $config{invalid} = "invalid key";
 is(checkHash(\%config,"config"),0,"detected invalid key in hash");
 
 # 10 invalid key exception thrown
-like($@, qr/key name not allowed: \$config\{invalid\}, when calling/, "invalid key exception");
-delete $config{invalid};
+like($@, qr/key name not allowed: \$config\{invalid\}/, "invalid key exception");
+delete $config{invalid};  # remove otherwise this will be potentially thrown below...
 
 # 11 detected invalid key value in hash
 $config{smtpTimeout} = "invalid value";
 is(checkHash(\%config,"config"),0,"detected invalid key value in hash");
 
 # 12 invalid key value exception thrown
-like($@, qr/wrong type for value: \$config\{smtpTimeout\}, when calling/, "invalid key value exception");
-$config{smtpTimeout} = 60;
+like($@, qr/wrong non-numeric type for value: \$config\{smtpTimeout\}/, "invalid key value exception");
+$config{smtpTimeout} = 60; # reset to correct type otherwise this will be thrown below...
 
 # 13 detected invalid key reference value in hash
 $config{logRootPath} = "invalid value";
 is(checkHash(\%config,"config"),0,"detected invalid key reference value in hash");
 
 # 14 invalid key reference value exception thrown
-like($@, qr/wrong reference type for value: \$config\{logRootPath\}:/, "invalid key reference value exception");
+like($@, qr/wrong reference type for value: \$config\{logRootPath\}/, "invalid key reference value exception");
+$config{logRootPath} = {}; # reset to correct type otherwise this will be thrown below...
 
 # 15 checkParam found $process{uploadCMDPath}
 is(checkParam($process,"uploadCMDPath"),1,"checkParam found \$process{uploadCMDPath}");
@@ -79,8 +80,20 @@ is(checkParam(\%DB,"irrelevant"),0,"checkParam didn't find anything in undefined
 is(checkStartingCond(\%common),0,"no starting condition exit");
 
 # 19 starting condition exit because holiday
+sub testCalSpecial {
+	return 1;
+}
+addCalendar("TEST",{},{},\&testCalSpecial);
 $common{task}{skipHolidays} = "TEST";
 is(checkStartingCond(\%common),1,"starting condition exit because holiday");
+
+# 20 detected invalid key value in hash having alternative type
+$config{executeOnInit} = 1;
+is(checkHash(\%config,"config"),0,"detected invalid key value in hash having alternative type");
+
+# 21 invalid key value exception thrown
+like($@, qr/wrong numeric type for value: \$config\{executeOnInit\}/, "invalid key value exception");
+
 
 
 unlink "config/site.config";

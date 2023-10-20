@@ -1,4 +1,9 @@
 Revision history for App-sdview-Output-HTML
 
+0.02    2023-09-22
+        [CHANGES]
+         * Updated for `App::sdview` v0.13's new formatting tag names
+         * Also support new underline and strikethrough format tags
+
 0.01    2023-08-25
         First version, released on an unsuspecting world.

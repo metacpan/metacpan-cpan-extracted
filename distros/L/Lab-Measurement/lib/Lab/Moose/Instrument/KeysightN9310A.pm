@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::KeysightN9310A;
-$Lab::Moose::Instrument::KeysightN9310A::VERSION = '3.881';
+$Lab::Moose::Instrument::KeysightN9310A::VERSION = '3.901';
 #ABSTRACT: Keysight N9310A Signal Generator
 
 use v5.20;
@@ -196,7 +196,7 @@ Lab::Moose::Instrument::KeysightN9310A - Keysight N9310A Signal Generator
 
 =head1 VERSION
 
-version 3.881
+version 3.901
 
 =head1 SYNOPSIS
 
@@ -245,7 +245,6 @@ This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Andreas K. Huettel, Simon Reinhardt
             2018       Simon Reinhardt
-            2020       Andreas K. Huettel
             2023       Andreas K. Huettel
 
 

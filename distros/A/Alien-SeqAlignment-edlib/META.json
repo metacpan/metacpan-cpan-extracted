@@ -77,11 +77,11 @@
    "provides" : {
       "Alien::SeqAlignment::edlib" : {
          "file" : "lib/Alien/SeqAlignment/edlib.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "version" : "0.05",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {

@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Bg - Package for language Bulgarian
 
 =cut
 
 package Locale::CLDR::Locales::Bg;
-# This file auto generated from Data/common/main/bg.xml
-#	on Mon 11 Apr  5:24:15 pm GMT
+# This file auto generated from Data\common\main\bg.xml
+#	on Fri 13 Oct  9:06:57 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';
@@ -36,7 +36,7 @@ has 'algorithmic_number_format_data' => (
 	isa => HashRef,
 	init_arg => undef,
 	default => sub { 
-		use bignum;
+		use bigfloat;
 		return {
 		'spellout-cardinal-feminine' => {
 			'public' => {

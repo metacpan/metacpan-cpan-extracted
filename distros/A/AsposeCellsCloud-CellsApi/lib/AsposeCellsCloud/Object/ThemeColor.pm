@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'color_type' => {
      	datatype => 'string',
      	base_name => 'ColorType',
-     	description => '',
+     	description => 'Gets and sets the theme type. ',
      	format => '',
      	read_only => '',
      		},
      'tint' => {
      	datatype => 'double',
      	base_name => 'Tint',
-     	description => '',
+     	description => 'Gets and sets the tint value. ',
      	format => '',
      	read_only => '',
      		},    

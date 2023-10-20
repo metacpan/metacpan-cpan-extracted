@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie/Jar.pm
-## Version v0.3.0
+## Version v0.3.1
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2023/05/30
+## Modified 2023/09/19
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -36,10 +36,9 @@ BEGIN
     use DateTime;
     use JSON;
     use Module::Generic::HeaderValue;
-    use Nice::Try;
     use Scalar::Util;
     use URI::Escape ();
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.3.1';
     # This flag to allow extensive debug message to be enabled
     our $COOKIES_DEBUG = 0;
     use constant CRYPTX_VERSION => '0.074';
@@ -120,6 +119,7 @@ sub add
     {
         return( $self->error( "No data was provided to add a cookie in the repository." ) );
     }
+    
     if( ref( $this ) eq 'HASH' )
     {
         $this = $self->make( $this );
@@ -301,7 +301,6 @@ sub add_response_header
     my $ref = $self->_cookies;
     foreach my $c ( sort{ $a->path->length <=> $b->path->length } @$ref )
     {
-        
         $c->debug( $self->debug );
         if( $c->discard )
         {
@@ -361,7 +360,7 @@ sub delete
                     # if( !$self->_is_array( $idx->{ $key } ) )
                     if( !Scalar::Util::reftype( $idx->{ $key } ) eq 'ARRAY' )
                     {
-                        return( $self->error( "I was expecting an array for key '$key', but got '", overload::StrVal( $idx->{ $key } ), "' (", ref( $idx->{ $key } ), ")" ) );
+                        return( $self->error( "I was expecting an array for key '$key', but got '", overload::StrVal( $idx->{ $key } // 'undef' ), "' (", ref( $idx->{ $key } ), ")" ) );
                     }
                     for( my $j = 0; $j < scalar( @{$idx->{ $key }} ); $j++ )
                     {
@@ -390,7 +389,7 @@ sub delete
         my $key = $self->key( $name => $host, $path );
         my $removed = $self->new_array;
         return( $removed ) if( !CORE::exists( $idx->{ $key } ) );
-        return( $self->error( "I was expecting an array for key '$key', but got '", overload::StrVal( $idx->{ $key } ), "'" ) ) if( !$self->_is_array( $idx->{ $key } ) );
+        return( $self->error( "I was expecting an array for key '$key', but got '", overload::StrVal( $idx->{ $key } // 'undef' ), "'" ) ) if( !$self->_is_array( $idx->{ $key } ) );
         $removed->push( @{$idx->{ $key }} );
         foreach my $c ( @$removed )
         {
@@ -421,7 +420,9 @@ sub do
     foreach my $c ( @$ref )
     {
         next if( !ref( $c ) || !$self->_is_a( $c, 'Cookie' ) );
-        try
+        # try-catch
+        local $@;
+        eval
         {
             local $_ = $c;
             my $rv = $code->( $c );
@@ -433,10 +434,10 @@ sub do
             {
                 $all->push( $c );
             }
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "An unexpected error occurred while calling code reference on cookie named \"", $ref->{ $c }->name, "\": $e" ) );
+            return( $self->error( "An unexpected error occurred while calling code reference on cookie named \"", $ref->{ $c }->name, "\": $@" ) );
         }
     }
     return( $all );
@@ -616,6 +617,7 @@ sub extract
                 my $arr;
                 $arr = $self->delete( $_ ) || do
                 {
+                    # Error trying to remove cookie
                 };
             }
         }
@@ -742,7 +744,9 @@ sub fetch
     my $cookies = [];
     if( $r )
     {
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $pool = $r->pool;
             # my $o = APR::Request::Apache2->handle( $r->pool );
@@ -765,10 +769,12 @@ sub fetch
             }
             else
             {
+                # Malformed cookie found:
             }
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
+            # An error occurred while trying to get cookies using APR::Request::Apache2, reverting to Cookie header.
         }
         $cookie_header = $r->headers_in->get( 'Cookie' );
     }
@@ -857,7 +863,7 @@ sub get
         
         next unless( $c_name eq $name );
         
-        
+
         if( !defined( $host ) || !CORE::length( $host ) )
         {
             push( @found, $c );
@@ -941,7 +947,7 @@ sub key
     else
     {
         ( $name, $host, $path ) = @_;
-        return( $self->error( "Received cookie object '", overload::StrVal( $name ), "' along with cookie host '$host' and path '$path' while I was expecting cookie name, host and path. If you want to call key() with a cookie object, pass it with no other argument." ) ) if( ref( $name ) && $self->_is_a( $name, ref( $self ) ) );
+        return( $self->error( "Received cookie object '", overload::StrVal( $name // 'undef' ), "' along with cookie host '$host' and path '$path' while I was expecting cookie name, host and path. If you want to call key() with a cookie object, pass it with no other argument." ) ) if( ref( $name ) && $self->_is_a( $name, ref( $self ) ) );
     }
     return( $self->error( "No cookie name was provided to get its key." ) ) if( !CORE::length( $name ) );
     return( join( ';', $host, $path, $name ) ) if( defined( $host ) && CORE::length( $host ) );
@@ -978,29 +984,33 @@ sub load
         my $algo = $opts->{algo};
         return( $self->error( "Cookies file encryption was enabled, but no key was set to decrypt it." ) ) if( !defined( $key ) || !CORE::length( "$key" ) );
         return( $self->error( "Cookies file encryption was enabled, but no algorithm was set to decrypt it." ) ) if( !defined( $algo ) || !CORE::length( "$algo" ) );
-        try
+        $self->_load_class( 'Crypt::Misc', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
+        my $p = $self->_encrypt_objects( @$opts{qw( key algo iv )} ) || return( $self->pass_error );
+        # try-catch
+        local $@;
+        eval
         {
-            $self->_load_class( 'Crypt::Misc', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
-            my $p = $self->_encrypt_objects( @$opts{qw( key algo iv )} ) || return( $self->pass_error );
             my $crypt = $p->{crypt};
             my $bin = Crypt::Misc::decode_b64( "$json" );
             $json = $crypt->decrypt( "$bin", @$p{qw( key iv )} );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "An error occurred while trying to decrypt cookies file \"$file\": $e" ) );
+            return( $self->error( "An error occurred while trying to decrypt cookies file \"$file\": $@" ) );
         }
     }
     
     my $j = JSON->new->relaxed->utf8;
     my $hash;
-    try
+    # try-catch
+    local $@;
+    $hash = eval
     {
-        $hash = $j->decode( $json );
-    }
-    catch( $e )
+        $j->decode( $json );
+    };
+    if( $@ )
     {
-        return( $self->error( "Unable to decode ", CORE::length( $json ), " bytes of json data to perl: $e" ) );
+        return( $self->error( "Unable to decode ", CORE::length( $json ), " bytes of json data to perl: $@" ) );
     }
     if( ref( $hash ) ne 'HASH' )
     {
@@ -1050,6 +1060,7 @@ sub load_as_lwp
         }
         else
         {
+            # Line does not match regep.
         }
     };
     
@@ -1061,22 +1072,24 @@ sub load_as_lwp
         my $algo = $opts->{algo};
         return( $self->error( "Cookies file encryption was enabled, but no key was set to decrypt it." ) ) if( !defined( $key ) || !CORE::length( "$key" ) );
         return( $self->error( "Cookies file encryption was enabled, but no algorithm was set to decrypt it." ) ) if( !defined( $algo ) || !CORE::length( "$algo" ) );
-        try
+        $self->_load_class( 'Crypt::Misc', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
+        my $p = $self->_encrypt_objects( @$opts{qw( key algo iv )} ) || return( $self->pass_error );
+        # try-catch
+        local $@;
+        my $data = eval
         {
-            $self->_load_class( 'Crypt::Misc', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
-            my $p = $self->_encrypt_objects( @$opts{qw( key algo iv )} ) || return( $self->pass_error );
             my $crypt = $p->{crypt};
             my $bin = Crypt::Misc::decode_b64( "$raw" );
-            my $data = $crypt->decrypt( "$bin", @$p{qw( key iv )} );
-            my $scalar = $self->new_scalar( \$data );
-            my $io = $scalar->open || return( $self->pass_error( $! ) );
-            $io->line( $code, chomp => 1, auto_next => 1 ) || return( $self->pass_error( $f->error ) );
-            $io->close;
-        }
-        catch( $e )
+            $crypt->decrypt( "$bin", @$p{qw( key iv )} );
+        };
+        if( $@ )
         {
-            return( $self->error( "An error occurred while trying to decrypt cookies file \"$file\": $e" ) );
+            return( $self->error( "An error occurred while trying to decrypt cookies file \"$file\": $@" ) );
         }
+        my $scalar = $self->new_scalar( \$data );
+        my $io = $scalar->open || return( $self->pass_error( $! ) );
+        $io->line( $code, chomp => 1, auto_next => 1 ) || return( $self->pass_error( $f->error ) );
+        $io->close;
     }
     else
     {
@@ -1123,6 +1136,7 @@ EOT
     if( $requires_dbi ||
         ( !$opts->{use_dbi} && !$opts->{sqlite} ) )
     {
+        local $@;
         eval
         {
             require DBI;
@@ -1157,7 +1171,9 @@ EOT
             # );
             # 'expiry' is a unix timestamp
             # 'lastAccessed' and 'creationTime' are in microseconds
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 my $dbh = DBI->connect( "dbi:SQLite:dbname=${sqldb}", '', '', { RaiseError => 1 } ) ||
                     die( "Unable to connect to SQLite database file ${sqldb}: ", $DBI::errstr );
@@ -1178,16 +1194,16 @@ EOT
                 $sth->finish;
                 $dbh->disconnect;
                 $sqldb->remove;
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
                 if( $requires_dbi )
                 {
-                    return( $self->error( "Error trying to get mozilla cookies from SQLite database ${sqldb} using DBI: $e" ) );
+                    return( $self->error( "Error trying to get mozilla cookies from SQLite database ${sqldb} using DBI: $@" ) );
                 }
                 else
                 {
-                    warn( "Non fatal error occurred while trying to get mozilla cookies from SQLite database ${sqldb} using DBI: $e\n" ) if( $self->_warnings_is_enabled );
+                    warn( "Non fatal error occurred while trying to get mozilla cookies from SQLite database ${sqldb} using DBI: $@\n" ) if( $self->_warnings_is_enabled );
                 }
             }
         }
@@ -1297,7 +1313,7 @@ sub merge
     my $self = shift( @_ );
     my $jar  = shift( @_ ) || return( $self->error( "No Cookie::Jar object was provided to merge." ) );
     my $opts = $self->_get_args_as_hash( @_ );
-    return( $self->error( "Cookie::Jar object provided (", overload::StrVal( $jar ), ") is not a Cookie::Jar object." ) ) if( !$self->_is_a( $jar, 'Cookie::Jar' ) );
+    return( $self->error( "Cookie::Jar object provided (", overload::StrVal( $jar // 'undef' ), ") is not a Cookie::Jar object." ) ) if( !$self->_is_a( $jar, 'Cookie::Jar' ) );
     # We require the do method on purpose, because the scan method is from the old HTTP::Cookies api which does not send an object, but a list of cookie property value
     return( $self->error( "Cookie::Jar object provided does not have a method \"do\"." ) ) if( !$jar->can( 'do' ) );
     $opts->{overwrite} //= 0;
@@ -1366,7 +1382,7 @@ sub merge
             }
             else
             {
-                $error = "Cookie object received (" . overload::StrVal( $c ) . ") is not a Cookie object and does not support the methods name, value, domain, path, port, expires, max_age, secure, same_site and http_only";
+                $error = "Cookie object received (" . overload::StrVal( $c // 'undef' ) . ") is not a Cookie object and does not support the methods name, value, domain, path, port, expires, max_age, secure, same_site and http_only";
                 die( $error ) if( $opts->{die} );
             }
         }
@@ -1504,11 +1520,13 @@ sub save
     my $tz;
     # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
     # "Cannot determine local time zone"
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $tz = DateTime::TimeZone->new( name => 'local' );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
         $tz = DateTime::TimeZone->new( name => 'UTC' );
     }
@@ -1525,13 +1543,14 @@ sub save
     my $f = $self->new_file( $file ) || return( $self->pass_error );
     my $j = JSON->new->allow_nonref->pretty->canonical->convert_blessed;
     my $json;
-    try
+    # try-catch
+    $json = eval
     {
-        $json = $j->encode( $data );
-    }
-    catch( $e )
+        $j->encode( $data );
+    };
+    if( $@ )
     {
-        return( $self->error( "Unable to encode data to json: $e" ) );
+        return( $self->error( "Unable to encode data to json: $@" ) );
     }
 
     $f->open( '>', { binmode => ( $opts->{encrypt} ? 'raw' : 'utf8' ) }) ||
@@ -1774,14 +1793,20 @@ EOT
                 $core_fields->{ $f }->{constant} = $code->();
             }
             
-            try
+            # try-catch;
+            local $@;
+            my $err;
+            eval
             {
                 my $dbh = DBI->connect( "dbi:SQLite:dbname=${sqldb}", '', '', { RaiseError => 1, AutoCommit => 1 } ) ||
                     die( "Unable to connect to SQLite database file ${sqldb}: ", $DBI::errstr );
                 if( $opts->{log_sql} )
                 {
-                    $log_file->open( '>>', { binmode => 'utf-8', autoflush => 1 } ) ||
-                        return( $self->pass_error( $log_file->error ) );
+                    if( !$log_file->open( '>>', { binmode => 'utf-8', autoflush => 1 } ) )
+                    {
+                        $err = $log_file->error;
+                        return;
+                    }
                     $dbh->sqlite_trace(sub
                     {
                         my $sql = shift( @_ );
@@ -1850,7 +1875,9 @@ EOT
                             }
                             if( scalar( @$missing ) || scalar( @$bad_datatype ) )
                             {
-                                return( $self->error( sprintf( "Found an existing SQLite database file ${sqldb} with a table 'moz_cookies', but found %d missing fields (%s) and %d fields with inappropriate data type (%s)", scalar( @$missing ), join( ', ', @$missing ), scalar( @$bad_datatype ), join( ', ', @$bad_datatype ) ) ) );
+                                $self->error( sprintf( "Found an existing SQLite database file ${sqldb} with a table 'moz_cookies', but found %d missing fields (%s) and %d fields with inappropriate data type (%s)", scalar( @$missing ), join( ', ', @$missing ), scalar( @$bad_datatype ), join( ', ', @$bad_datatype ) ) );
+                                $err = $self->error;
+                                return;
                             }
                         }
                     }
@@ -1919,19 +1946,20 @@ EOT
                 }
                 $insert_sth->finish;
                 $dbh->disconnect;
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
                 if( $requires_dbi )
                 {
-                    return( $self->error( "Error trying to save mozilla cookies to SQLite database ${sqldb} using DBI: $e" ) );
+                    return( $self->error( "Error trying to save mozilla cookies to SQLite database ${sqldb} using DBI: $@" ) );
                 }
                 else
                 {
-                    $dbi_error = $e;
-                    warn( "Non fatal error occurred while trying to save mozilla cookies to SQLite database ${sqldb} using DBI: $e\n" ) if( $self->_warnings_is_enabled );
+                    $dbi_error = $@;
+                    warn( "Non fatal error occurred while trying to save mozilla cookies to SQLite database ${sqldb} using DBI: $@\n" ) if( $self->_warnings_is_enabled );
                 }
             }
+            return( $self->pass_error( $err ) ) if( defined( $err ) );
         }
     }
     
@@ -2151,38 +2179,58 @@ sub _encrypt_objects
     my( $key, $algo, $iv ) = @_;
     return( $self->error( "Key provided is empty!" ) ) if( !defined( $key ) || !CORE::length( "$key" ) );
     return( $self->error( "No algorithm was provided to encrypt cookie value. You can choose any <NAME> for which there exists Crypt::Cipher::<NAME>" ) ) if( !defined( $algo ) || !CORE::length( "$algo" ) );
-    try
+    $self->_load_class( 'Crypt::Mode::CBC', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
+    $self->_load_class( 'Bytes::Random::Secure' ) || return( $self->pass_error );
+    # try-catch
+    local $@;
+    my $crypt = eval
     {
-        $self->_load_class( 'Crypt::Mode::CBC', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
-        $self->_load_class( 'Bytes::Random::Secure' ) || return( $self->pass_error );
-        my $crypt = Crypt::Mode::CBC->new( "$algo" ) || return( $self->error( "Unable to create a Crypt::Mode::CBC object." ) );
-        my $class = "Crypt::Cipher::${algo}";
-        $self->_load_class( $class ) || return( $self->pass_error );
-        my $key_len = $class->keysize;
-        my $block_len = $class->blocksize;
-        return( $self->error( "The size of the key provided (", CORE::length( $key ), ") does not match the minimum key size required for this algorithm \"$algo\" (${key_len})." ) ) if( CORE::length( $key ) < $key_len );
-        # Generate an "IV", i.e. Initialisation Vector based on the required block size
-        if( defined( $iv ) && CORE::length( "$iv" ) )
-        {
-            if( CORE::length( $iv ) != $block_len )
-            {
-                return( $self->error( "The Initialisation Vector provided for cookie encryption has a length (", CORE::length( $iv ), ") which does not match the algorithm ($algo) size requirement ($block_len). Please refer to the Cookie::Jar package documentation." ) );
-            }
-        }
-        else
-        {
-            $iv = Bytes::Random::Secure::random_bytes( $block_len );
-            # Save it for decryption
-            $self->_initialisation_vector( $iv );
-        }
-        my $key_pack = pack( 'H' x $key_len, $key );
-        my $iv_pack  = pack( 'H' x $block_len, $iv );
-        return({ 'crypt' => $crypt, key => $key_pack, iv => $iv_pack });
-    }
-    catch( $e )
+        Crypt::Mode::CBC->new( "$algo" );
+    };
+    if( $@ )
     {
-        return( $self->error( "Error getting the encryption objects for algorithm \"$algo\": $e" ) );
+        return( $self->error( "Error getting the encryption objects for algorithm \"$algo\": $@" ) );
     }
+    $crypt or return( $self->error( "Unable to create a Crypt::Mode::CBC object." ) );
+
+    my $class = "Crypt::Cipher::${algo}";
+    $self->_load_class( $class ) || return( $self->pass_error );
+    
+    my( $key_len, $block_len );
+    eval
+    {
+        $key_len = $class->keysize;
+        $block_len = $class->blocksize;
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error getting the encryption key and block size for algorithm \"$algo\": $@" ) );
+    }
+    return( $self->error( "The size of the key provided (", CORE::length( $key ), ") does not match the minimum key size required for this algorithm \"$algo\" (${key_len})." ) ) if( CORE::length( $key ) < $key_len );
+    # Generate an "IV", i.e. Initialisation Vector based on the required block size
+    if( defined( $iv ) && CORE::length( "$iv" ) )
+    {
+        if( CORE::length( $iv ) != $block_len )
+        {
+            return( $self->error( "The Initialisation Vector provided for cookie encryption has a length (", CORE::length( $iv ), ") which does not match the algorithm ($algo) size requirement ($block_len). Please refer to the Cookie::Jar package documentation." ) );
+        }
+    }
+    else
+    {
+        $iv = eval
+        {
+            Bytes::Random::Secure::random_bytes( $block_len );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error trying to get $block_len secure random bytes: $@" ) );
+        }
+        # Save it for decryption
+        $self->_initialisation_vector( $iv );
+    }
+    my $key_pack = pack( 'H' x $key_len, $key );
+    my $iv_pack  = pack( 'H' x $block_len, $iv );
+    return({ 'crypt' => $crypt, key => $key_pack, iv => $iv_pack });
 }
 
 sub _index { return( shift->_set_get_hash_as_mix_object( '_index', @_ ) ); }
@@ -2371,7 +2419,7 @@ Cookie::Jar - Cookie Jar Class for Server & Client
 
 =head1 VERSION
 
-    v0.3.0
+    v0.3.1
 
 =head1 DESCRIPTION
 
@@ -2397,17 +2445,17 @@ It is also compatible with L<HTTP::Promise>, such as:
     use HTTP::Promise;
     my $ua = HTTP::Promise->new( cookie_jar => Cookie::Jar->new );
 
-This module does not die upon error, but instead returns C<undef> and sets an L<error|Module::Generic/error>, so you should always check the return value of a method.
+This module does not die upon error, but instead sets an L<error|Module::Generic/error> and returns C<undef> in scalar context or an empty list in list context, so you should always check the return value of a method.
 
 =head1 METHODS
 
 =head2 new
 
-This initiates the package and takes the following parameters:
+This instantiates a new package object and accepts the following options:
 
 =over 4
 
-=item C<request>
+=item * C<request>
 
 This is an optional parameter to provide a L<Apache2::RequestRec> object. When provided, it will be used in various methods to get or set cookies from or onto http headers.
 
@@ -2439,7 +2487,7 @@ This is an optional parameter to provide a L<Apache2::RequestRec> object. When p
         return( Apache2::Const::OK );
     }
 
-=item C<debug>
+=item * C<debug>
 
 Optional. If set with a positive integer, this will activate verbose debugging message
 
@@ -2459,7 +2507,7 @@ This is an alias for L</add_request_header> for backward compatibility with L<HT
 
 =head2 add_request_header
 
-Provided with a request object, such as, but not limited to L<HTTP::Request> and this will add all relevant cookies in the repository into the C<Cookie> http request header. The object method needs to have the C<header> method in order to get, or set the C<Cookie> or C<Set-Cookie> headers and the C<uri> method.
+Provided with a request object, such as, but not limited to L<HTTP::Request> and this will add all relevant cookies in the repository into the C<Cookie> C<HTTP> request header. The object method needs to have the C<header> method in order to get, or set the C<Cookie> or C<Set-Cookie> headers and the C<uri> method.
 
 As long as the object provided supports the C<uri> and C<header> method, you can provide any class of object you want.
 
@@ -2490,12 +2538,12 @@ If no response, nor Apache2 object were set, then this will simply return a list
 
 Be careful not to do the following:
 
-    # get cookies sent by the http client
+    # get cookies sent by the HTTP client
     $jar->fetch || die( $jar->error );
     # set the response headers with the cookies from our repository
     $jar->add_response_header;
 
-Why? Well, because L</fetch> retrieves the cookies sent by the http client and store them into the repository. However, cookies sent by the http client only contain the cookie name and value, such as:
+Why? Well, because L</fetch> retrieves the cookies sent by the HTTP client and store them into the repository. However, cookies sent by the HTTP client only contain the cookie name and value, such as:
 
     GET /my/path/ HTTP/1.1
     Host: www.example.org
@@ -2505,9 +2553,9 @@ As you can see, 3 cookies were sent: C<session_token>, C<csrf_token> and C<site_
 
 So, when L</fetch> creates an object for each one and store them, those cookies have no C<path> value and no other attribute, and when L</add_response_header> is then called, it stringifies the cookies and create a C<Set-Cookie> header for each one, but only with their value and no other attribute.
 
-The http client, when receiving those cookies will derive the  missing cookie path to be C</my/path>, i.e. the current uri path, and will create a duplicate cookie from the previously stored cookie with the same name for that host, but that had the path set to C</>
+The HTTP client, when receiving those cookies will derive the  missing cookie path to be C</my/path>, i.e. the current URI path, and will create a duplicate cookie from the previously stored cookie with the same name for that host, but that had the path set to C</>
 
-So you can create a repository and use it to store the cookies sent by the http client using L</fetch>, but in preparation of the server response, either use a separate repository with, for example, C<< my $jar_out = Cookie::Jar->new >> or use L</set> which will not add the cookie to the repository, but rather only set the C<Set-Cookie> header for that cookie.
+So you can create a repository and use it to store the cookies sent by the HTTP client using L</fetch>, but in preparation of the server response, either use a separate repository with, for example, C<< my $jar_out = Cookie::Jar->new >> or use L</set> which will not add the cookie to the repository, but rather only set the C<Set-Cookie> header for that cookie.
 
     # Add Set-Cookie header for that cookie, but do not add cookie to repository
     $jar->set( $cookie_object );
@@ -2538,15 +2586,15 @@ It returns an L<array object|Module::Generic::Array> of cookie objects removed.
     printf( "%d cookie(s) removed.\n", $arr->length );
     print( "Cookie value removed was: ", $arr->first->value, "\n" );
 
-If you are interested in telling the http client to remove all your cookies, you can set the C<Clear-Site-Data> header:
+If you are interested in telling the HTTP client to remove all your cookies, you can set the C<Clear-Site-Data> header:
 
     Clear-Site-Data: "cookies"
 
-You can instruct the http client to remove other data like local storage:
+You can instruct the HTTP client to remove other data like local storage:
 
     Clear-Site-Data: "cookies", "cache", "storage", "executionContexts"
 
-Although this is widely supported, there is no guarantee the http client will actually comply with this request.
+Although this is widely supported, there is no guarantee the HTTP client will actually comply with this request.
 
 See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Clear-Site-Data> for more information.
 
@@ -2619,11 +2667,11 @@ If provided, it will be used to set the cookie object C<port> property.
 
 This method does the equivalent of L</extract>, but for the server.
 
-It retrieves all possible cookies from the http request received from the web browser.
+It retrieves all possible cookies from the HTTP request received from the web browser.
 
 It takes an optional hash or hash reference of parameters, such as C<host>. If it is not provided, the value set with L</host> is used instead.
 
-If the parameter C<request> containing an http request object, such as, but not limited to L<HTTP::Request>, is provided, it will use it to get the C<Cookie> header value. The object method needs to have the C<header> method in order to get, or set the C<Cookie> or C<Set-Cookie> headers.
+If the parameter C<request> containing an HTTP request object, such as, but not limited to L<HTTP::Request>, is provided, it will use it to get the C<Cookie> header value. The object method needs to have the C<header> method in order to get, or set the C<Cookie> or C<Set-Cookie> headers.
 
 Alternatively, if a value for L</request> has been set, it will use it to get the C<Cookie> header value from Apache modperl.
 
@@ -2716,21 +2764,21 @@ Supported options are:
 
 =over 4
 
-=item I<algo> string
+=item * C<algo> string
 
 Algorithm to use to decrypt the cookie file.
 
 It can be any of L<AES|Crypt::Cipher::AES>, L<Anubis|Crypt::Cipher::Anubis>, L<Blowfish|Crypt::Cipher::Blowfish>, L<CAST5|Crypt::Cipher::CAST5>, L<Camellia|Crypt::Cipher::Camellia>, L<DES|Crypt::Cipher::DES>, L<DES_EDE|Crypt::Cipher::DES_EDE>, L<KASUMI|Crypt::Cipher::KASUMI>, L<Khazad|Crypt::Cipher::Khazad>, L<MULTI2|Crypt::Cipher::MULTI2>, L<Noekeon|Crypt::Cipher::Noekeon>, L<RC2|Crypt::Cipher::RC2>, L<RC5|Crypt::Cipher::RC5>, L<RC6|Crypt::Cipher::RC6>, L<SAFERP|Crypt::Cipher::SAFERP>, L<SAFER_K128|Crypt::Cipher::SAFER_K128>, L<SAFER_K64|Crypt::Cipher::SAFER_K64>, L<SAFER_SK128|Crypt::Cipher::SAFER_SK128>, L<SAFER_SK64|Crypt::Cipher::SAFER_SK64>, L<SEED|Crypt::Cipher::SEED>, L<Skipjack|Crypt::Cipher::Skipjack>, L<Twofish|Crypt::Cipher::Twofish>, L<XTEA|Crypt::Cipher::XTEA>, L<IDEA|Crypt::Cipher::IDEA>, L<Serpent|Crypt::Cipher::Serpent> or simply any <NAME> for which there exists Crypt::Cipher::<NAME>
 
-=item I<decrypt> boolean
+=item * C<decrypt> boolean
 
 Must be set to true to enable decryption.
 
-=item I<iv> string
+=item * C<iv> string
 
 Set the L<Initialisation Vector|https://en.wikipedia.org/wiki/Initialization_vector> used for file encryption and decryption. This must be the same value used for encryption. See L</save>
 
-=item I<key> string
+=item * C<key> string
 
 Set the encryption key used to decrypt the cookies file.
 
@@ -2862,13 +2910,13 @@ This method also takes an hash or hash reference of options:
 
 =over 4
 
-=item I<die> boolean
+=item * C<die> boolean
 
 If true, the anonymous code passed to the C<do> method called, will die upon error. Default to false.
 
 By default, if an error occurs, C<undef> is returned and the L<error|Module::Generic/error> is set.
 
-=item I<overwrite> boolean
+=item * C<overwrite> boolean
 
 If true, when an existing cookie is found it will be overwritten by the new one. Default to false.
 
@@ -2888,9 +2936,9 @@ Upon success this will return the current object, and if there was an error, thi
 
 =head2 parse
 
-This method is used by L</fetch> to parse cookies sent by http client. Parsing is much simpler than for http client receiving cookies from server.
+This method is used by L</fetch> to parse cookies sent by HTTP client. Parsing is much simpler than for HTTP client receiving cookies from server.
 
-It takes the raw C<Cookie> string sent by the http client, and returns an hash reference (possibly empty) of cookie name to cookie value pairs.
+It takes the raw C<Cookie> string sent by the HTTP client, and returns an hash reference (possibly empty) of cookie name to cookie value pairs.
 
     my $cookies = $jar->parse( 'foo=bar; site_prefs=lang%3Den-GB' );
     # You can safely do as well:
@@ -2949,17 +2997,17 @@ Supported options are:
 
 =over 4
 
-=item I<algo> string
+=item * C<algo> string
 
 Algorithm to use to encrypt the cookie file.
 
 It can be any of L<AES|Crypt::Cipher::AES>, L<Anubis|Crypt::Cipher::Anubis>, L<Blowfish|Crypt::Cipher::Blowfish>, L<CAST5|Crypt::Cipher::CAST5>, L<Camellia|Crypt::Cipher::Camellia>, L<DES|Crypt::Cipher::DES>, L<DES_EDE|Crypt::Cipher::DES_EDE>, L<KASUMI|Crypt::Cipher::KASUMI>, L<Khazad|Crypt::Cipher::Khazad>, L<MULTI2|Crypt::Cipher::MULTI2>, L<Noekeon|Crypt::Cipher::Noekeon>, L<RC2|Crypt::Cipher::RC2>, L<RC5|Crypt::Cipher::RC5>, L<RC6|Crypt::Cipher::RC6>, L<SAFERP|Crypt::Cipher::SAFERP>, L<SAFER_K128|Crypt::Cipher::SAFER_K128>, L<SAFER_K64|Crypt::Cipher::SAFER_K64>, L<SAFER_SK128|Crypt::Cipher::SAFER_SK128>, L<SAFER_SK64|Crypt::Cipher::SAFER_SK64>, L<SEED|Crypt::Cipher::SEED>, L<Skipjack|Crypt::Cipher::Skipjack>, L<Twofish|Crypt::Cipher::Twofish>, L<XTEA|Crypt::Cipher::XTEA>, L<IDEA|Crypt::Cipher::IDEA>, L<Serpent|Crypt::Cipher::Serpent> or simply any <NAME> for which there exists Crypt::Cipher::<NAME>
 
-=item I<encrypt> boolean
+=item * C<encrypt> boolean
 
 Must be set to true to enable encryption.
 
-=item I<iv> string
+=item * C<iv> string
 
 Set the L<Initialisation Vector|https://en.wikipedia.org/wiki/Initialization_vector> used for file encryption. If you do not provide one, it will be automatically generated. If you want to provide your own, make sure the size meets the encryption algorithm size requirement. You also need to keep this to decrypt the cookies file.
 
@@ -2969,7 +3017,7 @@ To find the right size for the Initialisation Vector, for example for algorithm 
 
 which would yield C<16>
 
-=item I<key> string
+=item * C<key> string
 
 Set the encryption key used to encrypt the cookies file.
 
@@ -3119,7 +3167,7 @@ String. Sets or gets the secret string to use for decrypting or encrypting the c
 
 =head2 set
 
-Given a cookie object, and an optional hash or hash reference of parameters, and this will add the cookie to the outgoing http headers using the C<Set-Cookie> http header. To do so, it uses the L<Apache2::RequestRec> value set in L</request>, if any, or a L<HTTP::Response> compatible response object provided with the C<response> parameter.
+Given a cookie object, and an optional hash or hash reference of parameters, and this will add the cookie to the outgoing HTTP headers using the C<Set-Cookie> HTTP header. To do so, it uses the L<Apache2::RequestRec> value set in L</request>, if any, or a L<HTTP::Response> compatible response object provided with the C<response> parameter.
 
     $jar->set( $c, response => $http_response_object ) ||
         die( $jar->error );

@@ -4,12 +4,11 @@
 
 =head1 NAME
 
-Set::Relation::V1 -
-Bundled original implementation of Set::Relation role
+Set::Relation::V1 - Bundled original implementation of Set::Relation role
 
 =head1 VERSION
 
-This document describes Set::Relation::V1 version 0.13.2 for Perl.
+This document describes Set::Relation::V1 version 0.13.4 for Perl.
 
 =head1 SYNOPSIS
 
@@ -203,7 +202,7 @@ Darren Duncan (C<darren@DarrenDuncan.net>)
 
 =head1 LICENSE AND COPYRIGHT
 
-Set::Relation is Copyright © 2006-2019, Muldis Data Systems, Inc.
+Set::Relation is Copyright © 2006-2023, Muldis Data Systems, Inc.
 
 See the LICENSE AND COPYRIGHT of L<Set::Relation> for details.
 

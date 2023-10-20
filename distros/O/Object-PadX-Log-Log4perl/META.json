@@ -26,6 +26,7 @@
          },
          "requires" : {
             "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
             "Dist::Zilla::PluginBundle::Author::WATERKIP" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Software::License::Perl_5" : "0",
@@ -50,7 +51,7 @@
       "runtime" : {
          "requires" : {
             "Log::Log4perl" : "0",
-            "Object::Pad" : "0",
+            "Object::Pad" : "0.66",
             "perl" : "v5.26.0"
          }
       },
@@ -68,7 +69,7 @@
    "provides" : {
       "Object::PadX::Log::Log4perl" : {
          "file" : "lib/Object/PadX/Log/Log4perl.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -79,7 +80,7 @@
          "web" : "https://gitlab.com/waterkip/object-padx-log-log4perl"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_contributors" : [
       "Wesley Schwengle <waterkip@cpan.org>"
    ],

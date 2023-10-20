@@ -1,5 +1,12 @@
 Revision history for Text-Treesitter
 
+0.11    2023-09-18
+        [CHANGES]
+         * Added `$node->start_row` and similar convenience accessors
+         * Permit `->parse_string_range` to set the start row+column position
+           of returned subnodes, or a `node` directly for convenience
+         * Use `Object::Pad` v0.800
+
 0.10    2023-08-11
         [CHANGES]
          * Added `$ts->parse_string_range` for substring parsing

@@ -33,7 +33,7 @@ See L<Mojolicious::Guides> for more information.
 
 package Game::FaceGenerator;
 
-our $VERSION = 1.02;
+our $VERSION = 1.03;
 
 use Modern::Perl;
 use Mojolicious::Lite;

@@ -2,12 +2,13 @@ package Data::Record::Serialize::Role::EncodeAndSink;
 
 # ABSTRACT: Both an Encode and Sink. handle unwanted/unused required routines
 
+use v5.12;
 use strict;
 use warnings;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
-use Data::Record::Serialize::Error { errors => [ qw( internal  ) ] }, -all;
+use Data::Record::Serialize::Error { errors => [qw( internal  )] }, -all;
 
 use Moo::Role;
 
@@ -15,10 +16,10 @@ use namespace::clean;
 
 ( *say, *print, *encode ) = map {
     my $stub = $_;
-    sub { error ( 'internal', "internal error: stub method <$stub> invoked" ) }
+    sub { error( 'internal', "internal error: stub method <$stub> invoked" ) }
 } qw( say print encode );
 
-sub close {}
+sub close { }
 
 with 'Data::Record::Serialize::Role::Sink';
 with 'Data::Record::Serialize::Role::Encode';
@@ -47,7 +48,9 @@ Data::Record::Serialize::Role::EncodeAndSink - Both an Encode and Sink. handle u
 
 =head1 VERSION
 
-version 1.04
+version 1.05
+
+=head1 INTERNALS
 
 =for Pod::Coverage say
 print
@@ -58,7 +61,7 @@ close
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>
 
 =head2 Source
 

@@ -1,5 +1,13 @@
 Revision history for Locale::Places
 
+0.08	Tue Sep 19 11:19:41 EDT 2023
+	New URL for GB.zip
+	Look into http://www.cpantesters.org/cpan/report/a03259ca-6c02-1014-bd5e-9b11492b42cd
+	Added bin/translate.PL
+	translate(): improved params validation
+	Catch unzip failures
+	Calling new on an object now returns a clone rather than setting the defaults in the new object
+
 0.07	Sat Mar 19 14:37:45 EDT 2022
 	Handle the case when there are more than one preferred value but
 		either not all translate or they all translate to the same

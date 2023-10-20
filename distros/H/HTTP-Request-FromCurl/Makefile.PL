@@ -67,7 +67,7 @@ my %module = (
         'File::Basename'           => 0, # core anyway
     },
     TEST_REQUIRES => {
-        'Test::More'              => '0.88', # for done_testing support
+        'Test2::V0'              => '0',
         'Data::Dumper'            => 0,
         'Capture::Tiny'           => 0,
         'Path::Tiny'              => 0,

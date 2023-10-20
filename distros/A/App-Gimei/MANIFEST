@@ -7,11 +7,14 @@ author/format.sh
 cpanfile
 cpanfile.snapshot
 lib/App/Gimei.pm
+lib/App/Gimei/Generator.pm
+lib/App/Gimei/Parser.pm
 lib/App/Gimei/Runner.pm
 minil.toml
 script/gimei
 t/00_compile.t
 t/CLI.pm
+t/generator.t
 t/help.t
 t/option_n.t
 t/option_sep.t

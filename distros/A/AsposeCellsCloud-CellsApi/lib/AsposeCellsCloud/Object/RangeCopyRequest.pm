@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Indicates range copy request',
                                   class => 'RangeCopyRequest',
                                   required => [], # TODO
 }                                 );
@@ -129,28 +129,28 @@ __PACKAGE__->method_documentation({
      'operate' => {
      	datatype => 'string',
      	base_name => 'Operate',
-     	description => '',
+     	description => 'copydata, copystyle, copyto, copyvalue.',
      	format => '',
      	read_only => '',
      		},
      'source' => {
      	datatype => 'Range',
      	base_name => 'Source',
-     	description => '',
+     	description => 'Source range. ',
      	format => '',
      	read_only => '',
      		},
      'target' => {
      	datatype => 'Range',
      	base_name => 'Target',
-     	description => '',
+     	description => 'Target range.',
      	format => '',
      	read_only => '',
      		},
      'paste_options' => {
      	datatype => 'PasteOptions',
      	base_name => 'PasteOptions',
-     	description => '',
+     	description => 'Represents the paste special options.            ',
      	format => '',
      	read_only => '',
      		},    

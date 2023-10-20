@@ -89,13 +89,8 @@ package Sidef::Types::Array::Matrix {
 
         bless [
             map {
-                bless(
-                      [(Sidef::Types::Number::Number::ZERO) x ($_ - 1),
-                       Sidef::Types::Number::Number::ONE,
-                       (Sidef::Types::Number::Number::ZERO) x ($n - $_)
-                      ],
-                      'Sidef::Types::Array::Array'
-                     )
+                bless([(Sidef::Types::Number::Number::ZERO) x ($_ - 1), Sidef::Types::Number::Number::ONE, (Sidef::Types::Number::Number::ZERO) x ($n - $_)],
+                      'Sidef::Types::Array::Array')
               } 1 .. $n
         ];
     }
@@ -158,13 +153,7 @@ package Sidef::Types::Array::Matrix {
 
         bless [
             map {
-                bless(
-                      [(Sidef::Types::Number::Number::ZERO) x ($_ - 1),
-                       $value,
-                       (Sidef::Types::Number::Number::ZERO) x ($n - $_)
-                      ],
-                      'Sidef::Types::Array::Array'
-                     )
+                bless([(Sidef::Types::Number::Number::ZERO) x ($_ - 1), $value, (Sidef::Types::Number::Number::ZERO) x ($n - $_)], 'Sidef::Types::Array::Array')
               } 1 .. $n
         ];
     }
@@ -406,11 +395,12 @@ package Sidef::Types::Array::Matrix {
     sub pow {
         my ($A, $pow) = @_;
 
-        $pow = CORE::int($pow);
-        my $neg = ($pow < 0);
-        $pow = CORE::int(CORE::abs($pow));
+        my $neg = $pow->is_neg;
 
-        return $A->inv if ($neg and $pow == 1);
+        if ($neg) {
+            return $A->inv if $pow->is_mone;
+            $pow = $pow->abs;
+        }
 
 #<<<
         my $n = $#$A;
@@ -424,11 +414,12 @@ package Sidef::Types::Array::Matrix {
         } 0 .. $n];
 #>>>
 
-        return $B if ($pow == 0);
+        return $B if $pow->is_zero;
 
         while (1) {
-            $B = $B->mul($A) if ($pow & 1);
-            $pow >>= 1 or last;
+            $B   = $B->mul($A) if $pow->is_odd;
+            $pow = $pow->rsft(Sidef::Types::Number::Number::ONE);
+            last if $pow->is_zero;
             $A = $A->mul($A);
         }
 
@@ -658,12 +649,8 @@ package Sidef::Types::Array::Matrix {
 
         my $n = $#$self;
 
-        my @I = map {
-            [(Sidef::Types::Number::Number::ZERO) x $_,
-             Sidef::Types::Number::Number::ONE,
-             (Sidef::Types::Number::Number::ZERO) x ($n - $_)
-            ]
-        } 0 .. $n;
+        my @I =
+          map { [(Sidef::Types::Number::Number::ZERO) x $_, Sidef::Types::Number::Number::ONE, (Sidef::Types::Number::Number::ZERO) x ($n - $_)] } 0 .. $n;
         my @A = map { [@{$self->[$_]}, @{$I[$_]}] } 0 .. $n;
 
         my $r = rref(\@A);

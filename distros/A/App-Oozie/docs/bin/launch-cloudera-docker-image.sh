@@ -36,6 +36,10 @@ echo -e "\033[31m[INFO]\033[0m ... do not be surprised if the services are not u
 # Note that these are the ports set inside the image and we don't control
 # any of those from here and just making them accessible with port forwarding.
 #
+# EMR ports can also be different (FYI)
+#
+#     https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-service-ports.html
+#
 
 HTTPFS_ADMIN_PORT=14001
 HTTPFS_HTTP_PORT=14000

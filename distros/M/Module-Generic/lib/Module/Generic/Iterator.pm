@@ -44,6 +44,9 @@ sub init
     return( $self );
 }
 
+# This class does not convert to an HASH
+sub as_hash { return( $_[0] ); }
+
 sub elements { return( shift->_set_get_array_as_object( 'elements', @_ ) ); }
 
 sub eof
@@ -227,6 +230,9 @@ sub init
     $self->{value} = $value;
     return( $self );
 }
+
+# This class does not convert to an HASH
+sub as_hash { return( $_[0] ); }
 
 sub has_next
 {

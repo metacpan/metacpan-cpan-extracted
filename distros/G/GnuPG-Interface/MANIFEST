@@ -48,6 +48,7 @@ t/MyTestSpecific.pm
 t/passphrase_handling.t
 t/sign.t
 t/sign_and_encrypt.t
+t/taint_mode.t
 t/UserId.t
 t/verify.t
 t/version_updates.t

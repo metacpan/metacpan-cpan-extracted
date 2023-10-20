@@ -38,7 +38,9 @@ use DateTime;
 use AsposeCellsCloud::Object::AutoFilter;
 use AsposeCellsCloud::Object::Link;
 use AsposeCellsCloud::Object::LinkElement;
-use AsposeCellsCloud::Object::ListColumn; 
+use AsposeCellsCloud::Object::ListColumn;
+use AsposeCellsCloud::Object::Range;
+use AsposeCellsCloud::Object::XmlMap; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -131,105 +133,147 @@ __PACKAGE__->method_documentation({
      'auto_filter' => {
      	datatype => 'AutoFilter',
      	base_name => 'AutoFilter',
-     	description => '',
+     	description => 'Gets auto filter.',
      	format => '',
      	read_only => '',
      		},
      'display_name' => {
      	datatype => 'string',
      	base_name => 'DisplayName',
-     	description => '',
+     	description => 'Gets and sets the display name.',
      	format => '',
      	read_only => '',
      		},
      'start_column' => {
      	datatype => 'int',
      	base_name => 'StartColumn',
-     	description => '',
+     	description => 'Gets the start column of the range.',
      	format => '',
      	read_only => '',
      		},
      'start_row' => {
      	datatype => 'int',
      	base_name => 'StartRow',
-     	description => '',
+     	description => 'Gets the start row of the range.',
      	format => '',
      	read_only => '',
      		},
      'end_column' => {
      	datatype => 'int',
      	base_name => 'EndColumn',
-     	description => '',
+     	description => 'Gets the end column of the range.',
      	format => '',
      	read_only => '',
      		},
      'end_row' => {
      	datatype => 'int',
      	base_name => 'EndRow',
-     	description => '',
+     	description => 'Gets the end  row of the range.',
      	format => '',
      	read_only => '',
      		},
      'list_columns' => {
      	datatype => 'ARRAY[ListColumn]',
      	base_name => 'ListColumns',
-     	description => '',
+     	description => 'Gets ListColumns of the ListObject.',
      	format => '',
      	read_only => '',
      		},
      'show_header_row' => {
      	datatype => 'boolean',
      	base_name => 'ShowHeaderRow',
-     	description => '',
+     	description => 'Gets and sets whether this ListObject show header row.',
      	format => '',
      	read_only => '',
      		},
      'show_table_style_column_stripes' => {
      	datatype => 'boolean',
      	base_name => 'ShowTableStyleColumnStripes',
-     	description => '',
+     	description => 'Indicates whether column stripe formatting is applied.',
      	format => '',
      	read_only => '',
      		},
      'show_table_style_first_column' => {
      	datatype => 'boolean',
      	base_name => 'ShowTableStyleFirstColumn',
-     	description => '',
+     	description => 'Indicates whether the first column in the table should have the style applied.',
      	format => '',
      	read_only => '',
      		},
      'show_table_style_last_column' => {
      	datatype => 'boolean',
      	base_name => 'ShowTableStyleLastColumn',
-     	description => '',
+     	description => 'Indicates whether the last column in the table should have the style applied.',
      	format => '',
      	read_only => '',
      		},
      'show_table_style_row_stripes' => {
      	datatype => 'boolean',
      	base_name => 'ShowTableStyleRowStripes',
-     	description => '',
+     	description => 'Indicates whether row stripe formatting is applied.',
      	format => '',
      	read_only => '',
      		},
      'show_totals' => {
      	datatype => 'boolean',
      	base_name => 'ShowTotals',
-     	description => '',
+     	description => 'Gets and sets whether this ListObject show total row.',
      	format => '',
      	read_only => '',
      		},
      'table_style_name' => {
      	datatype => 'string',
      	base_name => 'TableStyleName',
-     	description => '',
+     	description => 'Gets and sets the table style name.',
      	format => '',
      	read_only => '',
      		},
      'table_style_type' => {
      	datatype => 'string',
      	base_name => 'TableStyleType',
-     	description => '',
+     	description => 'Gets and the built-in table style.',
+     	format => '',
+     	read_only => '',
+     		},
+     'data_range' => {
+     	datatype => 'Range',
+     	base_name => 'DataRange',
+     	description => 'Gets the data range of the ListObject.',
+     	format => '',
+     	read_only => '',
+     		},
+     'data_source_type' => {
+     	datatype => 'string',
+     	base_name => 'DataSourceType',
+     	description => 'Gets the data source type of the table.',
+     	format => '',
+     	read_only => '',
+     		},
+     'comment' => {
+     	datatype => 'string',
+     	base_name => 'Comment',
+     	description => 'Gets and sets the comment of the table.',
+     	format => '',
+     	read_only => '',
+     		},
+     'xml_map' => {
+     	datatype => 'XmlMap',
+     	base_name => 'XmlMap',
+     	description => 'Gets an  used for this list.',
+     	format => '',
+     	read_only => '',
+     		},
+     'alternative_text' => {
+     	datatype => 'string',
+     	base_name => 'AlternativeText',
+     	description => 'Gets and sets the alternative text.',
+     	format => '',
+     	read_only => '',
+     		},
+     'alternative_description' => {
+     	datatype => 'string',
+     	base_name => 'AlternativeDescription',
+     	description => 'Gets and sets the alternative description.',
      	format => '',
      	read_only => '',
      		},
@@ -258,6 +302,12 @@ __PACKAGE__->swagger_types( {
     'show_totals' => 'boolean',
     'table_style_name' => 'string',
     'table_style_type' => 'string',
+    'data_range' => 'Range',
+    'data_source_type' => 'string',
+    'comment' => 'string',
+    'xml_map' => 'XmlMap',
+    'alternative_text' => 'string',
+    'alternative_description' => 'string',
     'link' => 'Link' 
 } );
 
@@ -277,6 +327,12 @@ __PACKAGE__->attribute_map( {
     'show_totals' => 'ShowTotals',
     'table_style_name' => 'TableStyleName',
     'table_style_type' => 'TableStyleType',
+    'data_range' => 'DataRange',
+    'data_source_type' => 'DataSourceType',
+    'comment' => 'Comment',
+    'xml_map' => 'XmlMap',
+    'alternative_text' => 'AlternativeText',
+    'alternative_description' => 'AlternativeDescription',
     'link' => 'link' 
 } );
 

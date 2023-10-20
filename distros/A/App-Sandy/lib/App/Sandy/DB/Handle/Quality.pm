@@ -29,7 +29,7 @@ with qw{
 	App::Sandy::Role::Counter
 };
 
-our $VERSION = '0.24'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 sub insertdb {
 	my ($self, $file, $name, $source, $is_user_provided, $error, $single_molecule, $type) = @_;
@@ -331,7 +331,7 @@ App::Sandy::DB::Handle::Quality - Class to handle quality database schemas.
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 AUTHORS
 

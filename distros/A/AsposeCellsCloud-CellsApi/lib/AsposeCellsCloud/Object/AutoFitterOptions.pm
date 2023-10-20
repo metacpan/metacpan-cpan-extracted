@@ -128,28 +128,63 @@ __PACKAGE__->method_documentation({
      'auto_fit_merged_cells_type' => {
      	datatype => 'string',
      	base_name => 'AutoFitMergedCellsType',
-     	description => '',
+     	description => 'Gets and set the type of auto fitting row height of merged cells.',
      	format => '',
      	read_only => '',
      		},
      'auto_fit_merged_cells' => {
      	datatype => 'boolean',
      	base_name => 'AutoFitMergedCells',
-     	description => '',
+     	description => 'Indicates whether auto fit row height when the cells is merged in a row.                        The default value is false.',
      	format => '',
      	read_only => '',
      		},
      'ignore_hidden' => {
      	datatype => 'boolean',
      	base_name => 'IgnoreHidden',
-     	description => '',
+     	description => 'Ignores the hidden rows/columns.',
      	format => '',
      	read_only => '',
      		},
      'only_auto' => {
      	datatype => 'boolean',
      	base_name => 'OnlyAuto',
-     	description => '',
+     	description => 'Indicates whether only fit the rows which height are not customed.',
+     	format => '',
+     	read_only => '',
+     		},
+     'default_edit_language' => {
+     	datatype => 'string',
+     	base_name => 'DefaultEditLanguage',
+     	description => 'Gets or sets default edit language.',
+     	format => '',
+     	read_only => '',
+     		},
+     'max_row_height' => {
+     	datatype => 'double',
+     	base_name => 'MaxRowHeight',
+     	description => 'Gets and sets the max row height(in unit of Point) when autofitting rows.',
+     	format => '',
+     	read_only => '',
+     		},
+     'auto_fit_wrapped_text_type' => {
+     	datatype => 'string',
+     	base_name => 'AutoFitWrappedTextType',
+     	description => 'Gets and sets the type of auto fitting wrapped text.',
+     	format => '',
+     	read_only => '',
+     		},
+     'format_strategy' => {
+     	datatype => 'string',
+     	base_name => 'FormatStrategy',
+     	description => 'Gets and sets the formatted strategy.',
+     	format => '',
+     	read_only => '',
+     		},
+     'for_rendering' => {
+     	datatype => 'boolean',
+     	base_name => 'ForRendering',
+     	description => 'Indicates whether fit for rendering purpose.',
      	format => '',
      	read_only => '',
      		},    
@@ -159,14 +194,24 @@ __PACKAGE__->swagger_types( {
     'auto_fit_merged_cells_type' => 'string',
     'auto_fit_merged_cells' => 'boolean',
     'ignore_hidden' => 'boolean',
-    'only_auto' => 'boolean' 
+    'only_auto' => 'boolean',
+    'default_edit_language' => 'string',
+    'max_row_height' => 'double',
+    'auto_fit_wrapped_text_type' => 'string',
+    'format_strategy' => 'string',
+    'for_rendering' => 'boolean' 
 } );
 
 __PACKAGE__->attribute_map( {
     'auto_fit_merged_cells_type' => 'AutoFitMergedCellsType',
     'auto_fit_merged_cells' => 'AutoFitMergedCells',
     'ignore_hidden' => 'IgnoreHidden',
-    'only_auto' => 'OnlyAuto' 
+    'only_auto' => 'OnlyAuto',
+    'default_edit_language' => 'DefaultEditLanguage',
+    'max_row_height' => 'MaxRowHeight',
+    'auto_fit_wrapped_text_type' => 'AutoFitWrappedTextType',
+    'format_strategy' => 'FormatStrategy',
+    'for_rendering' => 'ForRendering' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

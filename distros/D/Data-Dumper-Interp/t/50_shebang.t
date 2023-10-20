@@ -33,6 +33,7 @@ $SIG{__DIE__} = sub {
   if ($^S or !defined($^S)) { 
     die(@_); # in eval or at compile time
   } else {
+    warn "!! die trapped : @_";
     my $via_carp;
     for (my $i=0; ;$i++) {
       my $pkg = caller($i) || last;
@@ -45,9 +46,9 @@ $SIG{__DIE__} = sub {
       fail("croak/confess caught", @_);
     } else {
       my ($fn, $lno) = (caller(0))[1,2];
-      fail("croak/confess caught at ${fn}:$lno", Carp::longmess(@_));
+      fail("die caught at ${fn}:$lno", Carp::longmess(@_));
     }
-    bail_out("die trapped");
+    bail_out("__DIE__ trap");
   }
 };
 
@@ -63,7 +64,6 @@ sub visFoldwidth() {
  ." Foldwidth1=".u($Data::Dumper::Interp::Foldwidth1)
  .($Data::Dumper::Interp::Foldwidth ? ("\n".("." x $Data::Dumper::Interp::Foldwidth)) : "")
 }
-
 
 confess("Non-zero initial CHILD_ERROR ($?)") if $? != 0;
 
@@ -173,7 +173,7 @@ foreach (
         {
           my $v = eval "{ local \$Data::Dumper::Interp::$confname = \$value;
                           my \$obj = Data::Dumper::Interp->new();
-                          \$obj->$codestr ;   # discard dump result
+                          () = \$obj->$codestr ;   # discard dump result
                           \$obj->$confname()  # fetch effective setting
                         }";
         confess("bug:$@ ") if $@;
@@ -333,13 +333,13 @@ if ($^O eq "MSWin32") {
 
 # Check that $1 etc. can be passed (this was once a bug...)
 # The duplicated calls are to check that $1 is preserved
-{ my $code = '" a~b" =~ / (.*)()/ && qsh($1); oops unless $1 eq "a~b";qsh($1)';
+{ my $code = '" a~b" =~ / (.*)()/ && qsh($1) && ($1 eq "a~b") && qsh($1)';
   mycheck $code, '"a~b"', eval $code; }
-{ my $code = '" a~b" =~ / (.*)()/ && qshpath($1); oops unless $1 eq "a~b";qshpath($1)';
+{ my $code = '" a~b" =~ / (.*)()/ && qshpath($1) && ($1 eq "a~b") && qshpath($1)';
   mycheck $code, '"a~b"', eval $code; }
-{ my $code = '" a~b" =~ / (.*)()/ && vis($1); oops unless $1 eq "a~b";vis($1)';
+{ my $code = '" a~b" =~ / (.*)()/ && vis($1) && ($1 eq "a~b") && vis($1)';
   mycheck $code, '"a~b"', eval $code; }
-{ my $code = 'my $vv=123; \' a $vv b\' =~ / (.*)/ && dvis($1); oops unless $1 eq "a \$vv b"; dvis($1)';
+{ my $code = 'my $vv=123; \' a $vv b\' =~ / (.*)/ && dvis($1) && ($1 eq "a \$vv b") && dvis($1)';
   mycheck $code, 'a vv=123 b', eval $code; }
 
 # Check Deparse support

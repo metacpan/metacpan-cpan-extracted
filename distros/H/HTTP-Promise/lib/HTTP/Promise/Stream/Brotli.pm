@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Stream/Brotli.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/05/04
-## Modified 2022/05/04
+## Modified 2023/09/08
 ## All rights reserved.
 ## 
 ## 
@@ -19,14 +19,14 @@ BEGIN
     use HTTP::Promise::Stream;
     use parent -norequire, qw( HTTP::Promise::Stream::Generic );
     use vars qw( @EXPORT_OK $VERSION $EXCEPTION_CLASS $BrotliError );
-    use Nice::Try;
+    # use Nice::Try;
     use constant {
         ENCODE_BUFFER_SIZE  => ( 32 * 1024 ),
         DECODE_BUFFER_SIZE  => ( 32 * 1024 ),
     };
     our @EXPORT_OK = qw( decode_bro encode_bro );
     our $EXCEPTION_CLASS = 'HTTP::Promise::Exception';
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -45,18 +45,20 @@ sub decode
     $self->_load_class( 'IO::Uncompress::Brotli', { no_import => 1 } ) || return( $self->pass_error );
     my $c = IO::Uncompress::Brotli->create;
     
-    try
+    while( $n = $reader->( $buff, DECODE_BUFFER_SIZE ) )
     {
-        while( $n = $reader->( $buff, DECODE_BUFFER_SIZE ) )
+        my $decoded = $c->decompress( $buff );
+        # try-catch
+        local $@;
+        my $rv = eval
         {
-            my $decoded = $c->decompress( $buff );
-            my $rv = $writer->( $decoded );
-            return( $self->pass_error ) if( !defined( $rv ) );
+            $writer->( $decoded );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error decompressing with Brotli: $@" ) );
         }
-    }
-    catch( $e )
-    {
-        return( $self->error( "Error decompressing with Brotli: $e" ) );
+        return( $self->pass_error ) if( !defined( $rv ) );
     }
     return( $self->pass_error ) if( !defined( $n ) );
     return( $self );
@@ -91,20 +93,23 @@ sub encode
     $self->_load_class( 'IO::Compress::Brotli', { no_import => 1 } ) || return( $self->pass_error );
     my $c = IO::Compress::Brotli->create;
     
-    try
+    while( $n = $reader->( $buff, ENCODE_BUFFER_SIZE ) )
     {
-        while( $n = $reader->( $buff, ENCODE_BUFFER_SIZE ) )
+        my $encoded = $c->compress( $buff );
+        # try-catch
+        local $@;
+        my $rv = eval
         {
-            my $encoded = $c->compress( $buff );
-            my $rv = $writer->( $encoded );
-            return( $self->pass_error ) if( !defined( $rv ) );
+            $writer->( $encoded );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error compressing with Brotli: $@" ) );
         }
-        $c->finish;
+        return( $self->pass_error ) if( !defined( $rv ) );
     }
-    catch( $e )
-    {
-        return( $self->error( "Error compressing with Brotli: $e" ) );
-    }
+    $c->finish;
+
     return( $self->pass_error ) if( !defined( $n ) );
     return( $self );
 }
@@ -170,7 +175,7 @@ HTTP::Promise::Stream::Brotli - Stream Encoder for Brotli Encoding
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

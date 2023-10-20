@@ -1,6 +1,6 @@
 package Dancer2::Core::Route;
 # ABSTRACT: Dancer2's route handler
-$Dancer2::Core::Route::VERSION = '0.400001';
+$Dancer2::Core::Route::VERSION = '1.0.0';
 use Moo;
 use Dancer2::Core::Types;
 use Module::Runtime 'use_module';
@@ -264,10 +264,10 @@ sub _build_regexp_from_string {
         }
         if (@params) {
             first { $_ eq 'splat' } @params
-                and warn q{Named placeholder 'splat' is deprecated};
+                and croak q{Named placeholder 'splat' is deprecated};
 
             first { $_ eq 'captures' } @params
-                and warn q{Named placeholder 'captures' is deprecated};
+                and croak q{Named placeholder 'captures' is deprecated};
 
             $string =~ s!(:[^\/\.\?]+)!(?#token)([^/]+)!g;
             $capture = 1;
@@ -318,7 +318,7 @@ Dancer2::Core::Route - Dancer2's route handler
 
 =head1 VERSION
 
-version 0.400001
+version 1.0.0
 
 =head1 ATTRIBUTES
 

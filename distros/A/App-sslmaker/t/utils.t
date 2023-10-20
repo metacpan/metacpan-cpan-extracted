@@ -13,15 +13,14 @@ my $sslmaker = App::sslmaker->new;
   is $sslmaker->subject, '', 'default subject';
   like $sslmaker->_random_passphrase(63), qr/^[A-Za-z0-9]{63}$/, 'generated passphrase';
   is(
-    $sslmaker->subject(
-      '/C=NO/ST=Oslo/L=Oslo/O=Example/OU=Prime/CN=example.com/emailAddress=admin@example.com',
+    $sslmaker->subject('/C=NO/ST=Oslo/L=Oslo/O=Example/OU=Prime/CN=example.com/emailAddress=admin@example.com',
       '/C=US/CN=/emailAddress=jhthorsen@cpan.org')->subject,
     '/C=US/ST=Oslo/L=Oslo/O=Example/OU=Prime/CN=/emailAddress=jhthorsen@cpan.org',
     'merged ssl subject',
   );
 
   is eval { $sslmaker->openssl(qw(genrsa -invalid)); 'ok' }, undef, 'genrsa -invalid 42';
-  like $@, qr{^openssl genrsa -invalid FAIL \(\d+\) .}, 'openssl died';
+  like $@, qr{invalid}, 'openssl died';
 }
 
 {
@@ -51,7 +50,7 @@ my $sslmaker = App::sslmaker->new;
     {home => 'local/tmp/utils',},
   );
 
-  ok $path, 'OPENSSL_CONF generated';
+  ok $path,    'OPENSSL_CONF generated';
   ok -e $path, 'OPENSSL_CONF file exist';
 
   my $conf = Path::Tiny->new($path)->slurp;

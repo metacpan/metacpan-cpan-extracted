@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# DeleteWorksheetRowsRequest.name :   ,
-# DeleteWorksheetRowsRequest.sheetName :   ,
-# DeleteWorksheetRowsRequest.startrow :   ,
-# DeleteWorksheetRowsRequest.totalRows :   ,
-# DeleteWorksheetRowsRequest.updateReference :   ,
-# DeleteWorksheetRowsRequest.folder :   ,
-# DeleteWorksheetRowsRequest.storageName :    
+# DeleteWorksheetRowsRequest.name : The workbook name.  ,
+# DeleteWorksheetRowsRequest.sheetName : The worksheet name.  ,
+# DeleteWorksheetRowsRequest.startrow : The begin row index to be operated.  ,
+# DeleteWorksheetRowsRequest.totalRows : Number of rows to be operated.  ,
+# DeleteWorksheetRowsRequest.updateReference : Indicates if update references in other worksheets.  ,
+# DeleteWorksheetRowsRequest.folder : Original workbook folder.  ,
+# DeleteWorksheetRowsRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_worksheet_rows' } = { 
-    	summary => '',
+    	summary => 'Delete several rows in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -145,49 +145,49 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'startrow' => {
      	datatype => 'int',
      	base_name => 'startrow',
-     	description => '',
+     	description => 'The begin row index to be operated.',
      	format => '',
      	read_only => '',
      		},
      'total_rows' => {
      	datatype => 'int',
      	base_name => 'totalRows',
-     	description => '',
+     	description => 'Number of rows to be operated.',
      	format => '',
      	read_only => '',
      		},
      'update_reference' => {
      	datatype => 'string',
      	base_name => 'updateReference',
-     	description => '',
+     	description => 'Indicates if update references in other worksheets.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'Original workbook folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

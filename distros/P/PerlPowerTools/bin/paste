@@ -13,42 +13,48 @@ License: perl
 
 
 use strict;
-no strict 'refs';
 
-my ($VERSION) = '1.2';
+use File::Basename qw(basename);
+use Getopt::Std qw(getopts);
 
-my @fh;
+use constant EX_SUCCESS => 0;
+use constant EX_FAILURE => 1;
 
-my @sep = ( "\t" );
-my $dash_ess = 0;
+my $Program = basename($0);
+my ($VERSION) = '1.3';
+my (@fh, @sep, %opt);
 
-while ($ARGV[0] =~ /^-.+$/) {
-	$_ = shift @ARGV;
-	/^-\?$/ and do { print <<EOF;
-Usage: $0 [-s] [-d list] [file...]
-
-Merges the corresponding lines of files.
-EOF
-		exit;
-	};
-	/^-d$/ and do {
-		my $arg = shift;
-		@sep = split(//, eval qq{sprintf("$arg")});
-		next;
-	};
-	/^-s$/ and do { $dash_ess = 1; next; }
+unless (getopts('d:s', \%opt)) {
+	print "usage: $Program [-s] [-d list] [file ...]\n";
+	exit EX_FAILURE;
 }
-
-if (@ARGV) {
-	for my $i (0..$#ARGV) {
-		$fh[$i] = "F$i";
-		open($fh[$i], '<', $ARGV[$i]) or die "$0: cannot open $ARGV[$i]";
-	}
+if (defined $opt{'d'}) {
+	@sep = split //, eval { "$opt{d}" };
 } else {
-	$fh[0] = \*STDIN;
+	@sep = ("\t");
 }
 
-if ($dash_ess) {
+if (scalar(@ARGV) == 0) {
+	@ARGV = ('-');
+}
+foreach my $f (@ARGV) {
+	if (-d $f) {
+		warn "$Program: '$f': is a directory\n";
+		exit EX_FAILURE;
+	}
+	if ($f eq '-') {
+		push @fh, *STDIN;
+	} else {
+		my $fil;
+		unless (open $fil, '<', $f) {
+			warn "$Program: '$f': $!\n";
+			exit EX_FAILURE;
+		}
+		push @fh, $fil;
+	}
+}
+
+if ($opt{'s'}) {
 	for my $i (0..$#fh) {
 		my $fh;
 		$fh = $fh[$i];
@@ -100,12 +106,12 @@ paste - merge corresponding or subsequent lines of files
 
 =head1 SYNOPSIS
 
-paste [-s] [-d list] [file...]
+paste [-s] [-d list] [file ...]
 
 =head1 DESCRIPTION
 
 Paste combines the corresponding lines of multiple files. Each line of each
-file is printed seperated by tab (or by the characters listed in the -d
+file is printed separated by a tab character (or by the characters listed in the -d
 option).  If no files are specified, stdin is read.
 
 =head2 OPTIONS
@@ -134,8 +140,7 @@ The working of I<paste> is not influenced by any environment variables.
 
 =head1 BUGS
 
-I<paste> has no known bugs, unless you count the use of eval EXPR. Getting
-it to work under 'strict refs' would be nice, too.
+I<paste> has no known bugs, unless you count the use of eval EXPR.
 
 =head1 AUTHOR
 

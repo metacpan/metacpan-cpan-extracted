@@ -96,6 +96,7 @@ Tony O'Dell
 Timo Paulssen
 Elizabeth Mattijsen!,
     ],
+    ["\@copyright{} 2001--2023 Free Software Foundation, Inc.", '2001-2023, Free Software Foundation, Inc.']
 );
 
 subtest "single statement" => sub {

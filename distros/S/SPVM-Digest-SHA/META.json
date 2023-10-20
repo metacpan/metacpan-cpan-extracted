@@ -28,12 +28,12 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.973"
+            "SPVM" : "0.989047"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.973"
+            "SPVM" : "0.989047"
          }
       },
       "test" : {
@@ -48,6 +48,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Digest-SHA"
       }
    },
-   "version" : "0.061",
+   "version" : "0.061001",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

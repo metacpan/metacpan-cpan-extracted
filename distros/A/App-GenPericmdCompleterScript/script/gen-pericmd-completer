@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/GenPericmdCompleterScript/gen_pericmd_completer_script
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-28'; # DATE
+our $DATE = '2023-07-11'; # DATE
 our $DIST = 'App-GenPericmdCompleterScript'; # DIST
-our $VERSION = '0.125'; # VERSION
+our $VERSION = '0.126'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/GenPericmdCompleterScript/gen_pericmd_completer_script",
@@ -36,11 +36,15 @@ gen-pericmd-completer - Generate Perinci::CmdLine completer script
 
 =head1 VERSION
 
-This document describes version 0.125 of gen-pericmd-completer (from Perl distribution App-GenPericmdCompleterScript), released on 2022-08-28.
+This document describes version 0.126 of gen-pericmd-completer (from Perl distribution App-GenPericmdCompleterScript), released on 2023-07-11.
 
 =head1 SYNOPSIS
 
-B<gen-pericmd-completer> [B<--completion>=I<code>|B<--completion-json>=I<json>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--default-subcommand>=I<str>] [B<--exclude-package-functions-match>=I<re>] [B<--format>=I<name>|B<--json>] [B<--get-subcommand-from-arg>=I<int>] [B<--include-package-functions-match>=I<re>] [B<--interpreter-path>=I<str>] [(B<--load-module>=I<str>)+|B<--load-module-json>=I<json>] [B<--(no)naked-res>] [B<--no-env>] [B<--output-file>=I<filename>|B<-o>=I<filename>] [B<--overwrite>|B<--no-overwrite>|B<--nooverwrite>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--per-arg-json>|B<--no-per-arg-json>|B<--noper-arg-json>] [B<--per-arg-yaml>|B<--no-per-arg-yaml>|B<--noper-arg-yaml>] [B<--read-config>|B<--no-read-config>|B<--noread-config>] [B<--read-env>|B<--no-read-env>|B<--noread-env>] [B<--skip-format>|B<--no-skip-format>|B<--noskip-format>] [B<--strip>|B<--no-strip>|B<--nostrip>] [B<--subcommands-from-package-functions>] [B<--subcommands>=I<any*>|B<--subcommands-json>=I<json>|B<-s>=I<any*>] -- E<lt>I<program_name>E<gt> E<lt>I<url>E<gt>
+B<gen-pericmd-completer> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<gen-pericmd-completer> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<gen-pericmd-completer> [B<L<--completion|/"--completion=s">>=I<code>|B<L<--completion-json|/"--completion=s">>=I<json>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--default-subcommand|/"--default-subcommand=s">>=I<str>] [B<L<--exclude-package-functions-match|/"--exclude-package-functions-match=s">>=I<re>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--get-subcommand-from-arg|/"--get-subcommand-from-arg=s">>=I<int>] [B<L<--include-package-functions-match|/"--include-package-functions-match=s">>=I<re>] [B<L<--interpreter-path|/"--interpreter-path=s">>=I<str>] [(B<L<--load-module|/"--load-module=s@">>=I<str>)+|B<L<--load-module-json|/"--load-module=s@">>=I<json>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--output-file|/"--output-file=s, -o">>=I<L<filename|Sah::Schema::filename>>|B<L<-o|/"--output-file=s, -o">>=I<L<filename|Sah::Schema::filename>>] [B<L<--overwrite|/"--overwrite">>|B<L<--no-overwrite|/"--overwrite">>|B<L<--nooverwrite|/"--overwrite">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--per-arg-json|/"--per-arg-json">>|B<L<--no-per-arg-json|/"--per-arg-json">>|B<L<--noper-arg-json|/"--per-arg-json">>] [B<L<--per-arg-yaml|/"--per-arg-yaml">>|B<L<--no-per-arg-yaml|/"--per-arg-yaml">>|B<L<--noper-arg-yaml|/"--per-arg-yaml">>] [B<L<--read-config|/"--read-config">>|B<L<--no-read-config|/"--read-config">>|B<L<--noread-config|/"--read-config">>] [B<L<--read-env|/"--read-env">>|B<L<--no-read-env|/"--read-env">>|B<L<--noread-env|/"--read-env">>] [B<L<--skip-format|/"--skip-format">>|B<L<--no-skip-format|/"--skip-format">>|B<L<--noskip-format|/"--skip-format">>] [B<L<--strip|/"--strip">>|B<L<--no-strip|/"--strip">>|B<L<--nostrip|/"--strip">>] [B<L<--subcommands-from-package-functions|/"--subcommands-from-package-functions">>] [B<L<--subcommands|/"--subcommands=s">>=I<any*>|B<L<--subcommands-json|/"--subcommands=s">>=I<json>|B<L<-s|/"--subcommands=s">>=I<any*>] -- E<lt>I<L<program_name|/"--program-name=s*">>E<gt> E<lt>I<L<url|/"--url=s*">>E<gt>
 
 =head1 OPTIONS
 
@@ -246,7 +250,13 @@ See C<--completion>.
 
 =item B<--completion>=I<s>
 
+(No description)
+
+
 =item B<--default-subcommand>=I<s>
+
+(No description)
+
 
 =item B<--get-subcommand-from-arg>=I<s>
 
@@ -260,13 +270,28 @@ Valid values:
 
 =item B<--per-arg-json>
 
+(No description)
+
+
 =item B<--per-arg-yaml>
+
+(No description)
+
 
 =item B<--read-config>
 
+(No description)
+
+
 =item B<--read-env>
 
+(No description)
+
+
 =item B<--skip-format>
+
+(No description)
+
 
 =item B<--subcommands-json>=I<s>, B<-s>
 
@@ -452,7 +477,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

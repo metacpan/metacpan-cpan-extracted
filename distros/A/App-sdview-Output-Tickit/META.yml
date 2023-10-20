@@ -16,18 +16,19 @@ name: App-sdview-Output-Tickit
 provides:
   App::sdview::Output::Tickit:
     file: lib/App/sdview/Output/Tickit.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   App::sdview::Style: '0.12'
   Object::Pad: '0.800'
-  String::Tagged: '0.17'
+  String::Tagged: '0.21'
   Tickit: '0'
   Tickit::Style: '0'
   Tickit::Widget::FloatBox: '0'
-  Tickit::Widget::Scroller: '0.31'
+  Tickit::Widget::Scroller: '0.32'
   Tickit::Widget::Scroller::Item::RichText: '0'
+  Tickit::Widget::Static: '0'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

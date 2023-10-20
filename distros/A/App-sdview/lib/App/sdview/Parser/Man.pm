@@ -9,7 +9,7 @@ use utf8;
 
 use Object::Pad 0.800;
 
-package App::sdview::Parser::Man 0.12;
+package App::sdview::Parser::Man 0.13;
 class App::sdview::Parser::Man
    :does(App::sdview::Parser)
    :strict(params);
@@ -66,9 +66,9 @@ method _parse ( $dom )
 }
 
 my %FONTTAGS = (
-   B  => { B => 1 },
-   I  => { I => 1 },
-   CW => { C => 1 },
+   B  => { bold => 1 },
+   I  => { italic => 1 },
+   CW => { monospace => 1 },
 );
 
 sub _chunklist_to_taggedstring ( $chunks, %opts )

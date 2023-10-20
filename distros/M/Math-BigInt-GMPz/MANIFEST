@@ -7,6 +7,7 @@ README
 README.md
 t/00sig.t
 t/01load.t
+t/02gmpcompat.t
 t/bigfltpm.inc
 t/bigfltpm.t
 t/bigintpm.inc

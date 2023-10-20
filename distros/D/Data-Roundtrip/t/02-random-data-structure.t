@@ -4,9 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-use utf8;
-
-our $VERSION='0.18';
+our $VERSION='0.24';
 
 # NO UTF8 here, we are checking with random
 # data structure which provides no unicode

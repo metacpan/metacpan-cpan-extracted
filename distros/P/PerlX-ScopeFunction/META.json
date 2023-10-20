@@ -4,7 +4,7 @@
       "Kang-min Liu  C<< <gugod@gugod.org> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.029",
+   "generated_by" : "App::ModuleBuildTiny version 0.041",
    "license" : [
       "mit"
    ],
@@ -16,19 +16,20 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.034"
+            "Module::Build::Tiny" : "0.039"
          }
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.029"
+            "App::ModuleBuildTiny" : "0.041"
          }
       },
       "runtime" : {
          "requires" : {
             "Const::Fast" : "0",
             "Keyword::Simple" : "0",
-            "PPR" : "0"
+            "PPR" : "0",
+            "Package::Stash" : "0"
          }
       },
       "test" : {
@@ -41,11 +42,11 @@
    "provides" : {
       "PerlX::ScopeFunction" : {
          "file" : "lib/PerlX/ScopeFunction.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_spdx_expression" : "MIT"
 }

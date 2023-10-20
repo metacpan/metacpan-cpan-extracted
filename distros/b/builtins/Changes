@@ -27,3 +27,9 @@ Revision history for builtins
 
     * Automated detection of the current list of builtin:: functions
       (so module will adapt automatically as new functions are added)
+
+
+0.000006  Fri Sep 22 16:24:05 2023
+
+    * Added support for builtin::unimport
+      (thanks Andreas!)

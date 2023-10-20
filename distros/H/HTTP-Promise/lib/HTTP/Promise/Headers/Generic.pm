@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Headers/Generic.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/05/06
-## Modified 2022/05/06
+## Modified 2023/09/08
 ## All rights reserved.
 ## 
 ## 
@@ -29,7 +29,7 @@ BEGIN
     # Accept: audio/*; q=0.2, audio/basic
     our $QV_ELEMENT = qr/(?:[^\;\,]+)/;
     our $QV_VALUE   = qr/(?:0(?:\.[0-9]{0,3})?|1(?:\.0{0,3})?)/;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 use strict;
@@ -668,7 +668,7 @@ sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
     
     sub element { return( shift->_set_get_scalar_as_object( 'element', @_ ) ); }
     
-    sub value { return( shift->_set_get_number( 'value', @_ ) ); }
+    sub value { return( shift->_set_get_number( { field => 'value', undef_ok => 1 }, @_ ) ); }
 
     # NOTE: sub FREEZE is inherited
 
@@ -699,7 +699,7 @@ HTTP::Promise::Headers::Generic - Generic HTTP Header Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

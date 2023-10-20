@@ -8,8 +8,10 @@ use Wx::STC;
 use Wx::DND;
 #use Wx::Scintilla;
 use Kephra::App::Editor::Edit;
+use Kephra::App::Editor::Goto;
 use Kephra::App::Editor::Move;
 use Kephra::App::Editor::Position;
+use Kephra::App::Editor::Property;
 use Kephra::App::Editor::Select;
 use Kephra::App::Editor::SyntaxMode;
 use Kephra::App::Editor::Tool;
@@ -18,21 +20,100 @@ use Kephra::App::Editor::View;
 sub new {
     my( $class, $parent, $style) = @_;
     my $self = $class->SUPER::new( $parent, -1,[-1,-1],[-1,-1] );
-    $self->{'tab_size'} = 4;
-    $self->{'tab_space'} = ' ' x $self->{'tab_size'};
+    $self->mount_events();
     $self->SetWordChars('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._$@%&*\\');
-    #$self->BraceHighlightIndicator( 1, 1);
     $self->SetAdditionalCaretsBlink( 1 );
     $self->SetAdditionalCaretsVisible( 1 );
     $self->SetAdditionalSelectionTyping( 1 );
-    $self->SetIndentationGuides( 2 );  # wxSTC_WS_VISIBLEAFTERINDENT   2   wxSTC_WS_VISIBLEALWAYS 1
+    $self->SetIndentationGuides( &Wx::wxSTC_WS_VISIBLEAFTERINDENT );  # wxSTC_WS_VISIBLEAFTERINDENT   2   wxSTC_WS_VISIBLEALWAYS 1
     # $self->SetAdditionalSelAlpha( 1 );
     $self->SetScrollWidth(300);
-    Kephra::App::Editor::SyntaxMode::apply( $self );
-    $self->mount_events();
+    $self->SetYCaretPolicy( &Wx::wxSTC_CARET_SLOP, 5);
+    $self->SetVisiblePolicy( &Wx::wxSTC_VISIBLE_SLOP, 5);
+    $self->set_margin;
+    $self->load_font;  # before setting highlighting
+    Kephra::App::Editor::SyntaxMode::apply( $self, 'perl' );
     $self->{'change_pos'} = $self->{'change_prev'} = -1;
     return $self;
 }
+
+sub window { $_[0]->GetParent }
+
+sub apply_config {
+    my ($self, $config) = @_;
+    my $config_value = $config->get_value('document');
+    $self->set_tab_size( $config_value->{'tab_size'} );
+    $self->set_tab_usage( !$config_value->{'soft_tabs'} );
+    $self->set_EOL( $config_value->{'line_ending'} );
+
+    $config_value = $config->get_value('view');
+    $self->set_zoom_level( $config_value->{'zoom_level'} );
+    $self->toggle_view_whitespace     unless $config_value->{'whitespace'}    == $self->view_whitespace_mode;
+    $self->toggle_view_eol            unless $config_value->{'line_ending'}   == $self->view_eol_mode;
+    $self->toggle_view_indent_guide   unless $config_value->{'indent_guide'}  == $self->indent_guide_mode;
+    $self->toggle_view_right_margin   unless $config_value->{'right_margin'}  == $self->right_margin_mode;
+    $self->toggle_view_line_nr_margin unless $config_value->{'line_nr_margin'}== $self->line_nr_margin_mode;
+    $self->toggle_view_marker_margin  unless $config_value->{'marker_margin'} == $self->marker_margin_mode;
+    $self->toggle_view_caret_line     unless $config_value->{'caret_line'}    == $self->view_caret_line_mode;
+    $self->toggle_view_line_wrap      unless $config_value->{'line_wrap'}     == $self->line_wrap_mode;
+    $self->window->toggle_full_screen unless $config_value->{'full_screen'}   == $self->window->IsFullScreen;
+
+    $config_value = $config->get_value('editor');
+    $self->{ $_ } = $config_value->{ $_ } for qw/change_pos change_prev/;
+    $self->init_marker( @{$config_value->{'marker'}} );
+    $self->SetSelection( $config_value->{'caret_pos'}, $config_value->{'caret_pos'});
+    $self->EnsureCaretVisible;
+}
+
+sub save_config {
+    my ($self, $config) = @_;
+    $config->set_value( { soft_tabs => !$self->{'tab_usage'},
+                          indention_size => $self->{'tab_size'},
+                          line_ending   => $self->get_EOL,
+                        # encoding   => 'utf-8',
+                        } , 'document');
+    $config->set_value( { change_pos => $self->{'change_pos'},
+                          change_prev => $self->{'change_prev'},
+                          caret_pos => $self->GetCurrentPos,
+                          marker => [ $self->marker_lines ],
+                        } , 'editor');
+    $config->set_value( { whitespace     => $self->view_whitespace_mode,
+                          line_ending    => $self->view_eol_mode,
+                          indent_guide   => $self->indent_guide_mode,
+                          right_margin   => $self->right_margin_mode,
+                          line_nr_margin => $self->line_nr_margin_mode,
+                          marker_margin  => $self->marker_margin_mode,
+                          caret_line     => $self->view_caret_line_mode,
+                          line_wrap      => $self->line_wrap_mode,
+                          zoom_level     => $self->get_zoom_level,
+                          full_screen    => int $self->window->IsFullScreen,
+                        } , 'view');
+}
+
+sub load_font {
+    my ($self, $font) = @_;
+    my ( $fontweight, $fontstyle ) = ( &Wx::wxNORMAL, &Wx::wxNORMAL );
+    $font = {
+        family => $^O eq 'darwin' ? 'Andale Mono' : 'Courier New', # old default
+        # family => 'DejaVu Sans Mono', # new    # Courier New
+        size => $^O eq 'darwin' ? 13 : 11,
+        style => 'normal',
+        weight => 'normal',
+    } unless defined $font;
+    #my $font = _config()->{font};
+    $fontweight = &Wx::wxLIGHT  if $font->{weight} eq 'light';
+    $fontweight = &Wx::wxBOLD   if $font->{weight} eq 'bold';
+    $fontstyle  = &Wx::wxSLANT  if $font->{style}  eq 'slant';
+    $fontstyle  = &Wx::wxITALIC if $font->{style}  eq 'italic';
+    my $wx_font = Wx::Font->new(
+        $font->{size}, &Wx::wxDEFAULT, $fontstyle, $fontweight, 0, $font->{family}, &Wx::wxFONTENCODING_DEFAULT
+    );
+    $self->StyleSetFont( &Wx::wxSTC_STYLE_DEFAULT, $wx_font ) if $wx_font->Ok > 0;
+    # wxFONTENCODING_ISO8859_1
+    # wxFONTENCODING_UTF8
+    # wxFONTENCODING_UTF16(L|BE)
+}
+
 
 sub mount_events {
     my ($self, @which) = @_;
@@ -46,7 +127,7 @@ sub mount_events {
         my $mod = $event->GetModifiers; #  say $code;
         #   alt ",$event->AltDown, " ; ctrl ",$event->ControlDown; say "mod $mod code $code";
 
-        if ( $event->ControlDown and $mod != 3) { # $mod == 2 and 
+        if ( $event->ControlDown and $mod != 3) { # $mod == 2 and
             if ($event->AltDown) {
                 $event->Skip
             } else {
@@ -73,8 +154,8 @@ sub mount_events {
             }
         } else {
             if ($mod == 3) { # Alt Gr
-                if ($event->ShiftDown) {  
-                    $event->Skip 
+                if ($event->ShiftDown) {
+                    $event->Skip
                 } else {
                     if    ($code == 81)                    { $ed->insert_text('@') } # Q
                     elsif ($code == 55 )                   { $ed->insert_brace('{', '}') }
@@ -121,31 +202,31 @@ sub mount_events {
         my ($ed, $ev) = @_;
         #my $XY = $ev->GetLogicalPosition( Wx::MemoryDC->new( ) );
         #my $pos = $ed->XYToPosition( $XY->x, $XY->y);
-        # $ed->expand_selecton( $pos ) or 
+        # $ed->expand_selecton( $pos ) or
         $ev->Skip;
     });
     # Wx::Event::EVT_RIGHT_DOWN( $self, sub {});
     Wx::Event::EVT_MIDDLE_UP( $self, sub {  $_[1]->Skip;  });
- 
+
     # Wx::Event::EVT_STC_CHARADDED( $self, $self, sub {  });
     Wx::Event::EVT_STC_CHANGE ( $self, -1, sub {  # edit event
         my ($ed, $event) = @_;
         my $pos = $ed->GetCurrentPos;
-        unless ($ed->{'change_pos'} == $pos) { 
+        unless ($ed->{'change_pos'} == $pos) {
             $ed->{'change_prev'} = $ed->{'change_pos'};
             $ed->{'change_pos'} = $pos;
         }
         # if ($self->SelectionIsRectangle) { } else { }
         $event->Skip;
     });
-    
+
     Wx::Event::EVT_STC_UPDATEUI(         $self, -1, sub { # cursor move event
         my ($ed, $event) = @_;
         my $p = $self->GetCurrentPos;
         my ($start_pos, $end_pos) = $self->GetSelection;
         $ed->{'set_pos'} = $p if $start_pos == $end_pos; # say "move ",$ed->{'set_pos'};
         $self->bracelight( $p );
-        my $psrt = $self->GetCurrentLine.':'.$self->GetColumn( $p );
+        my $psrt = ($self->GetCurrentLine+1).':'.$self->GetColumn( $p );
         $psrt .= ' ('.($end_pos - $start_pos).')' if $start_pos != $end_pos;
         $self->GetParent->SetStatusText( $psrt , 0); # say 'ui';
     });
@@ -153,7 +234,7 @@ sub mount_events {
     Wx::Event::EVT_STC_SAVEPOINTLEFT(    $self, -1, sub { $self->GetParent->set_title(1) });
     Wx::Event::EVT_SET_FOCUS(            $self,     sub { my ($ed, $event ) = @_;        $event->Skip;   });
     # Wx::Event::EVT_DROP_FILES       ($self, sub { say $_[0], $_[1];    $self->GetParent->open_file()  });
-#    Wx::Event::EVT_STC_DO_DROP  ($self, -1, sub { 
+#    Wx::Event::EVT_STC_DO_DROP  ($self, -1, sub {
 #        my ($ed, $event ) = @_; # StyledTextEvent=SCALAR
 #        my $str = $event->GetDragText;
 #        chomp $str;
@@ -174,7 +255,7 @@ sub new_text {
     $self->EmptyUndoBuffer unless defined $soft;
     $self->SetSavePoint;
 }
-           
+
 sub bracelight{
     my ($self, $pos) = @_;
     my $char_before = $self->GetTextRange( $pos-1, $pos );
@@ -186,8 +267,8 @@ sub bracelight{
         $mpos != &Wx::wxSTC_INVALID_POSITION
             ? $self->BraceHighlight($pos - 1, $mpos)
             : $self->BraceBadLight($pos - 1);
-    } elsif ($char_after eq '(' or $char_after eq ')' 
-          or $char_after eq '{' or $char_after eq '}' 
+    } elsif ($char_after eq '(' or $char_after eq ')'
+          or $char_after eq '{' or $char_after eq '}'
           or $char_after eq '[' or $char_after eq ']'){
         my $mpos = $self->BraceMatch( $pos );
         $mpos != &Wx::wxSTC_INVALID_POSITION
@@ -216,7 +297,7 @@ sub new_line {
             $char_before = $self->GetTextRange( $pos-1, $pos );
         }
         if ($char_before eq '{')    { $i+= $self->{'tab_size'} }
-        elsif ($char_before eq '}') { 
+        elsif ($char_before eq '}') {
             my $mpos = $self->BraceMatch( $pos - 1 );
             if ($mpos != &Wx::wxSTC_INVALID_POSITION){
                 $i = $self->GetLineIndentation( $self->LineFromPosition( $mpos ) );
@@ -227,7 +308,7 @@ sub new_line {
         }
     }
     $self->SetLineIndentation( $l, $i );
-    $self->GotoPos( $self->GetLineIndentPosition( $l ) ); 
+    $self->GotoPos( $self->GetLineIndentPosition( $l ) );
 }
 
 sub escape {
@@ -238,135 +319,53 @@ sub escape {
     if ($win->IsFullScreen) { return $win->toggle_full_screen};
     # 3. focus  to edit field
     #say 'esc';
-}    
+}
 
 sub sel {
     my ($self) = @_;
     my $pos = $self->GetCurrentPos;
-    #say $self->GetStyleAt( $pos);
-}
-
-sub goto_last_edit {
-    my ($self) = @_;
-    return $self->GotoPos( $self->{'change_pos'} ) unless $self->GetCurrentPos == $self->{'change_pos'};
-    $self->GotoPos( $self->{'change_prev'} );
-}
-
-
-sub toggle_marker {
-    my ($self) = @_;
-    my $line = 	$self->GetCurrentLine ();
-    $self->MarkerGet( $line ) ? $self->MarkerDelete( $line, 1) : $self->MarkerAdd( $line, 1);
-}
-sub delete_all_marker { $_[0]->MarkerDeleteAll(1) }
-
-sub goto_prev_marker {
-    my ($self) = @_;
-    my $line = 	$self->GetCurrentLine ();
-    $line-- if $self->MarkerGet( $line );
-    my $target = $self->MarkerPrevious ( $line, 2);
-    $target = $self->MarkerPrevious ( $self->GetLineCount, 2 ) if $target == -1;
-    $self->GotoLine( $target ) if $target > -1;
-}
-
-sub goto_next_marker { 
-    my ($self) = @_;
-    my $line = 	$self->GetCurrentLine ();
-    $line++ if $self->MarkerGet( $line );
-    my $target = $self->MarkerNext( $line, 2);
-    $target = $self->MarkerNext( 0, 2 ) if $target == -1;
-    $self->GotoLine( $target ) if $target > -1;
-}
-
-sub goto_prev_block {
-    my ($self) = @_;
-    $self->GotoPos( $self->smart_up_pos );
-    $self->EnsureCaretVisible;
-}
-
-sub goto_next_block {
-    my ($self) = @_;
-    $self->GotoPos( $self->smart_down_pos );
-    $self->EnsureCaretVisible;
-}
-
-sub smart_up_pos {
-    my ($self, $pos) = @_;
-    $pos = $self->GetCurrentPos unless defined $pos;
-    my $bpos = $self->prev_brace_pos( $pos );
-    return $bpos if $bpos != $pos;
-    my $line_nr = $self->get_prev_block_start( $pos );
-    defined $line_nr ? $self->PositionFromLine( $line_nr ) : $pos;
-}
-
-sub smart_down_pos {
-    my ($self, $pos) = @_;
-    $pos = $self->GetCurrentPos unless defined $pos;
-    my $bpos = $self->next_brace_pos( $pos );
-    return $bpos if $bpos != $pos;
-    my $line_nr = $self->get_next_block_start( $pos );
-    defined $line_nr ? $self->PositionFromLine( $line_nr ) : $pos;
-}
-
-sub prev_brace_pos {
-    my ($self, $pos) = @_;
-    $pos = $self->GetCurrentPos unless defined $pos;
-    my $char_before = $self->GetTextRange( $pos-1, $pos );
-    my $char_after = $self->GetTextRange( $pos, $pos + 1);
-    if ( $char_before eq ')' or $char_before eq '}' or $char_before eq ']' ) {
-        my $mpos = $self->BraceMatch( $pos - 1 );
-        return $mpos if $mpos != &Wx::wxSTC_INVALID_POSITION;
-    } elsif ($char_after eq ')' or $char_after eq '}' or $char_after eq ']'){
-        my $mpos = $self->BraceMatch( $pos );
-        return $mpos + 1 if $mpos != &Wx::wxSTC_INVALID_POSITION;
-    }
-    $pos;
-}
-
-sub next_brace_pos {
-    my ($self, $pos) = @_;
-    $pos = $self->GetCurrentPos unless defined $pos;
-    my $char_before = $self->GetTextRange( $pos-1, $pos );
-    my $char_after = $self->GetTextRange( $pos, $pos + 1);
-    if ( $char_before eq '(' or $char_before eq '{' or $char_before eq '[' ) {
-        my $mpos = $self->BraceMatch( $pos - 1 );
-        return $mpos if $mpos != &Wx::wxSTC_INVALID_POSITION;
-    } elsif ($char_after eq '(' or $char_after eq '{' or $char_after eq '['){
-        my $mpos = $self->BraceMatch( $pos );
-        return $mpos + 1 if $mpos != &Wx::wxSTC_INVALID_POSITION;
-    }
-    $pos;
-}
-
-sub goto_prev_sub {
-    my ($self) = @_;
-    my $pos = $self->GetCurrentPos;
-    my $new_pos = $self->prev_sub;
-    if ($new_pos > -1) { $self->GotoPos( $self->GetCurrentPos ) }
-    else               { $self->GotoPos( $pos )  }
-    
-}
-sub goto_next_sub {
-    my ($self) = @_;
-    my $pos = $self->GetCurrentPos;
-    my $new_pos = $self->next_sub;
-    if ($new_pos > -1) { $self->GotoPos( $self->GetCurrentPos ) }
-    else               { $self->GotoPos( $pos )  }
-}
-
-
-sub marker_toggle {
-    my ($self) = @_;
-    
-}
-
-sub marker_prev {
-    my ($self) = @_;
-    
-}
-sub marker_next {
-    my ($self) = @_;
-    
+    say $self->GetStyleAt( $pos);
 }
 
 1;
+
+__END__
+
+$self->SetIndicatorCurrent( $c);
+$self->IndicatorFillRange( $start, $len );
+$self->IndicatorClearRange( 0, $len )
+#Wx::Event::EVT_STC_STYLENEEDED($self, sub{})
+#Wx::Event::EVT_STC_CHARADDED($self, sub {});
+#Wx::Event::EVT_STC_ROMODIFYATTEMPT($self, sub{})
+#Wx::Event::EVT_STC_KEY($self, sub{})
+#Wx::Event::EVT_STC_DOUBLECLICK($self, sub{})
+Wx::Event::EVT_STC_UPDATEUI($self, -1, sub {
+#my ($ed, $event) = @_; $event->Skip; print "change \n";
+});
+#Wx::Event::EVT_STC_MODIFIED($self, sub {});
+#Wx::Event::EVT_STC_MACRORECORD($self, sub{})
+#Wx::Event::EVT_STC_MARGINCLICK($self, sub{})
+#Wx::Event::EVT_STC_NEEDSHOWN($self, sub {});
+#Wx::Event::EVT_STC_PAINTED($self, sub{})
+#Wx::Event::EVT_STC_USERLISTSELECTION($self, sub{})
+#Wx::Event::EVT_STC_UR$selfROPPED($self, sub {});
+#Wx::Event::EVT_STC_DWELLSTART($self, sub{})
+#Wx::Event::EVT_STC_DWELLEND($self, sub{})
+#Wx::Event::EVT_STC_START_DRAG($self, sub{})
+#Wx::Event::EVT_STC_DRAG_OVER($self, sub{})
+#Wx::Event::EVT_STC_DO_DROP($self, sub {});
+#Wx::Event::EVT_STC_ZOOM($self, sub{})
+#Wx::Event::EVT_STC_HOTSPOT_CLICK($self, sub{})
+#Wx::Event::EVT_STC_HOTSPOT_DCLICK($self, sub{})
+#Wx::Event::EVT_STC_CALLTIP_CLICK($self, sub{})
+#Wx::Event::EVT_STC_AUTOCOMP_SELECTION($self, sub{})
+#$self->SetAcceleratorTable( Wx::AcceleratorTable->new() );
+#Wx::Event::EVT_STC_SAVEPOINTREACHED($self, -1, \&Kephra::File::savepoint_reached);
+#Wx::Event::EVT_STC_SAVEPOINTLEFT($self, -1, \&Kephra::File::savepoint_left);
+$self->SetAcceleratorTable(
+Wx::AcceleratorTable->new(
+[&Wx::wxACCEL_CTRL, ord 'n', 1000],
+));
+
+
+

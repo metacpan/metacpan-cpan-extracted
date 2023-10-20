@@ -1,47 +1,59 @@
 Revision history for Perl extension SQL::SimpleOps.
 
+2023.274.1 Sun Oct 1 01:34:53 2023
+	- news: Option 'buffer_hashkey' added; by CCELSO
+	- news: Option 'buffer_arrayref' added; by CCELSO
+	- news: Function 'PreFetch' added in plugins; by CCELSO
+	- news: Function 'setDumper' added in module; by CCELSO
+	- fix: select fields with aliases not in sql command; by CCELSO
+	- fix: message code 039 is missing; by CCELSO
+	- change: drive_id environment deprecared; by CCELSO
+	- change: SQL_SIMPLE_DB_[PG|MARIADB|SQLLITE3] constant value deprecated; by CCELSO
+	- change: standard drive initialization enviroments moved to plugins; by CCELSO
+	- change: new section in the pod to explain the supported format of arguments; by CCELSO
+	
 2023.221.1 Wed Aug 9 12:08:27 2023
 	- fix: Argument "asc|desc" isn't numeric in numeric eq (==) at /usr/lib/perl5/site_perl/5.26.1/SQL/SimpleOps.pm line 850.; by CCELSO
-	- changes: [ATTENTION:] new order_by format configuration, see POD before install; by CCELSO
+	- change: [ATTENTION:] new order_by format configuration, see POD before install; by CCELSO
 
 2023.199.1 Tue Jul 18 04:41:04 2023
-	- added: aliases fields on sql select; by CCELSO
+	- news: aliases fields on sql select; by CCELSO
 
 2023.111.1 Fri Apr 21 09:39:34 2023
 	- fix: mkdir permission denied, logfile creation folder for non-root user; by CCELSO
 	- fix: getLastSQL mismatch on syntax error condition; by CCELSO
 
 2023.106.1 Sun Apr 16 10:18:13 2023
-	- added: use warnings added; by CCELSO
-	- added: license file created; by CCELSO
-	- change: Makefile.pl tester review; by CCELSO
+	- news: use warnings added; by CCELSO
+	- news: license file created; by CCELSO
 	- fix: POD text; by CCELSO
+	- change: Makefile.pl tester review; by CCELSO
 
 2022.302.1 Sat Oct 29 21:35:29 2022
-	- tester t/testDB.t fake fails in CPAN Testers Reports
-	- The DBD::SQLite, DBD::Pg and DBD::mysql is mandatory just for testers
-	- Now testDB.t has been disabled in CPAN Testers Reports
-	- Run it only in manual process, see README and SAMPLES
+	- fix: tester t/testDB.t fake fails in CPAN Testers Reports
+	- fix: The DBD::SQLite, DBD::Pg and DBD::mysql is mandatory just for testers
+	- change: Now testDB.t has been disabled in CPAN Testers Reports
+	- change: Run it only in manual process, see README and SAMPLES
 
 2022.301.1 Fri Oct 28 12:37:49 2022
 	- fix: invalid first/last for scalar cursor_info; by CCELSO
 	- fix: mismatch limit=1 search; by CCELSO
 
 2022.266.1 Fri Sep 23 22:53:40 2022
-	- tester t/testDB.t fix for SQLite (required); by CCELSO
-	- tester t/testSQL.t fix; force /tmp as workdir to test; by CCELSO
+	- fix: tester t/testDB.t for SQLite (required); by CCELSO
+	- fix: tester t/testSQL.t fix; force /tmp as workdir to test; by CCELSO
 
 2022.264.1 Wed Sep 21 17:05:13 2022
-	- POD fix; by CCELSO
+	- fix: POD file; by CCELSO
 
 2022.263.2 Tue Sep 20 21:27:15 2022
-	- tester t/testDB.t fix; by CCELSO
+	- fix: tester t/testDB.t; by CCELSO
 
 2022.263.1 Tue Sep 20 21:27:15 2022
-	- POD fix; by CCELSO
+	- fix: POD file; by CCELSO
 
 2022.212.1 Sun Jul 31 18:18:34 2022
-	- standardization for CPAN Module Project; by CCELSO
+	- news: standardization for CPAN Module Project; by CCELSO
 
 2022.046.1 Tue Feb 15 00:00:00 2022
 	- news: postgres support added; by CCELSO
@@ -53,10 +65,9 @@ Revision history for Perl extension SQL::SimpleOps.
 	- fix: syslog null line; by CCELSO
 
 2009.314.1 Tue Nov 10 00:00:00 2009
-	- sqlite2 support added; by CCELSO
+	- news: sqlite2 support added; by CCELSO
 
 2008.109.1 Fri Apr 18 00:00:00 2022
-	- initial version; created by CCELSO
-	- mysql support only
+	- news: initial version, mysql support only; created by CCELSO
 
 ENDED

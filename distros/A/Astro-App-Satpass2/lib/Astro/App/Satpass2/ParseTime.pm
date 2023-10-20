@@ -15,7 +15,7 @@ use Astro::App::Satpass2::Utils qw{
 };
 use Astro::Coord::ECI::Utils 0.059 qw{ looks_like_number };
 
-our $VERSION = '0.051';
+our $VERSION = '0.052';
 
 my %static = (
     perltime	=> 0,

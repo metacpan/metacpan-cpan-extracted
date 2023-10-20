@@ -17,10 +17,10 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object::Query );
-    use vars qw( $VERSION $DEBUG $VERBOSE );
-    $VERSION = 'v0.3.9';
-    $DEBUG = 0;
-    $VERBOSE = 0;
+    use vars qw( $VERSION $DEBUG );
+    use Want;
+    our $DEBUG = 0;
+    our $VERSION = 'v0.3.9';
 };
 
 use strict;
@@ -79,30 +79,28 @@ sub having { return( shift->_where_having( 'having', 'having', @_ ) ); }
 sub limit
 {
     my $self  = shift( @_ );
-    my $limit = $self->_process_limit( @_ );
-    if( CORE::length( $limit->metadata->limit ) )
+    my $limit = $self->{limit};
+    if( @_ )
     {
-        $limit->generic( CORE::length( $limit->metadata->offset ) ? 'LIMIT ? OFFSET ?' : 'LIMIT ?' );
-        # User is managing the binding of value
-        if( (
-                $limit->metadata->offset eq '?' &&
-                $limit->metadata->limit eq '?'
-            ) || $limit->metadata->limit eq '?' )
+        # Returns a DB::Object::Query::Clause
+        $limit = $self->_process_limit( @_ ) ||
+            return( $self->pass_error );
+
+        if( CORE::length( $limit->metadata->limit // '' ) )
         {
+            $limit->generic( CORE::length( $limit->metadata->offset // '' ) ? 'LIMIT ? OFFSET ?' : 'LIMIT ?' );
+            # %s works for integer, and also for numbered placeholders like $1 or ?1, or regular placeholder like ?
             $limit->value(
-                CORE::length( $limit->metadata->offset )
-                ?  'LIMIT ? OFFSET ?'
-                : 'LIMIT ?'
+                CORE::length( $limit->metadata->offset // '' )
+                    ? CORE::sprintf( 'LIMIT %s OFFSET %s', $limit->metadata->limit, $limit->metadata->offset )
+                    : CORE::sprintf( 'LIMIT %s', $limit->metadata->limit )
             );
         }
-        else
-        { 
-            $limit->value(
-                CORE::length( $limit->metadata->offset )
-                ? CORE::sprintf( 'LIMIT %d OFFSET %d', $limit->metadata->limit, $limit->metadata->offset )
-                : CORE::sprintf( 'LIMIT %d', $limit->metadata->limit )
-            );
-        }
+    }
+
+    if( !$limit && want( 'OBJECT' ) )
+    {
+        return( $self->new_null( type => 'object' ) );
     }
     return( $limit );
 }

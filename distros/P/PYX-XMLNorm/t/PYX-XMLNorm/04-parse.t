@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use File::Object;
 use File::Slurp qw(slurp);
 use PYX::XMLNorm;

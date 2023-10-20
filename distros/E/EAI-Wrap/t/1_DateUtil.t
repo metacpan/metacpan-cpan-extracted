@@ -1,6 +1,9 @@
-use strict; use warnings; use Test::More;
+use strict; use warnings; use Test::More; use utf8;
 use EAI::DateUtil; use Time::Piece;
-use Test::More tests => 175;
+use Test::More tests => 188;
+
+$ENV{TZ} = 'UTC';
+scalar localtime;
 
 my @res = ("20150102","20150105","20150107","20150108","20150109","20150112","20150113","20150114","20150115","20150116","20150119","20150120","20150121","20150122","20150123","20150126","20150127","20150128","20150129","20150130","20150202","20150203","20150204","20150205","20150206","20150209","20150210","20150211","20150212","20150213","20150216","20150217","20150218","20150219","20150220","20150223","20150224","20150225","20150226","20150227","20150302");
 is(get_dateseries("20150102","20150302","AT"),@res,'get_dateseries');
@@ -141,8 +144,10 @@ like(get_curdate_dash_plus_X_years(100),qr/\d{2}\-\d{2}\-21\d{2}/,'get_curdate_d
 like(get_curtime(),qr/\d{2}:\d{2}:\d{2}/,'get_curtime');
 like(get_curtime("%02d_%02d_%02d"),qr/\d{2}_\d{2}_\d{2}/,'get_curtime with format %02d_%02d_%02d');
 like(get_curtime("%02d%02d%02d"),qr/\d{2}\d{2}\d{2}/,'get_curtime with format %02d%02d%02d');
-print "get_curtime HHMM:".get_curtime("%02d%02d")."\n";
-like(get_curtime("%02d%02d"),qr/\d{2}\d{2}/,'get_curtime with format %02d%02d');
+print "get_curtime HHMMSS:".get_curtime("%02d%02d%02d")."\n";
+print "get_curtime HHMMSS + 30 seconds:".get_curtime("%02d%02d%02d",30)."\n";
+#like(get_curtime("%02d%02d"),qr/\d{2}\d{2}/,'get_curtime with format %02d%02d'); this throws a warning Redundant argument in sprintf at C:\dev\EAI\lib/EAI/DateUtil.pm
+like(get_curtime("%02d%02d%02d"),qr/\d{2}\d{2}\d{2}/,'get_curtime with format %02d%02d%02d');
 like(get_curtime_HHMM(),qr/\d{4}/,'get_curtime_HHMM');
 like(get_curdate_gen("D.M.Y"),qr/\d{2}\.\d{2}\.20\d{2}/,'get_curdate_gen D.M.Y');
 like(get_curdate_gen("D/M/Y"),qr/\d{2}\/\d{2}\/20\d{2}/,'get_curdate_gen D/M/Y');
@@ -156,9 +161,9 @@ is(convertToThousendDecimal(0,1),"0",'convertToThousendDecimal 0 without decimal
 is(convertToThousendDecimal(12345.20,1),"12.345",'convertToThousendDecimal decimal without decimal places');
 is(convertToThousendDecimal(-12345.20,1),"-12.345",'convertToThousendDecimal negative decimal without decimal places');
 is(convertToThousendDecimal(-123456789),"-123.456.789,0",'convertToThousendDecimal negative integer');
-is(parseFromDDMMYYYY("01.01.1970"),-3600,'parseFromDDMMYYYY 01.01.1970');
-is(parseFromDDMMYYYY("02.01.1970"),-3600+24*60*60,'parseFromDDMMYYYY 02.01.1970');
-is(parseFromYYYYMMDD("19700102"),-3600+24*60*60,'parseFromYYYYMMDD 19700102');
+is(parseFromDDMMYYYY("01.01.1970"),0,'parseFromDDMMYYYY 01.01.1970');
+is(parseFromDDMMYYYY("02.01.1970"),24*60*60,'parseFromDDMMYYYY 02.01.1970');
+is(parseFromYYYYMMDD("19700102"),24*60*60,'parseFromYYYYMMDD 19700102');
 is((parseFromYYYYMMDD("19700103")-parseFromYYYYMMDD("19700101"))/(24*60*60),2,'diff between 19700103 - 19700101 in days');
 is((parseFromYYYYMMDD("20191104")-parseFromDDMMYYYY("01.11.2019"))/(24*60*60),3,'diff between 20191104 - 01.11.2019 in days');
 is(parseFromYYYYMMDD("19000100"),"invalid date",'expect error with invalid argument (year >= 1900, 1<=month<=12, 1<=day<=31): returns 0');
@@ -173,4 +178,22 @@ is(get_last_day_of_month("20011215"),"20011231",'get_last_day_of_month 20011231'
 is(get_last_day_of_month("20010115"),"20010131",'get_last_day_of_month 20010131');
 is(get_last_day_of_month("20010215"),"20010228",'get_last_day_of_month 20010228');
 is(get_last_day_of_month("20040215"),"20040229",'get_last_day_of_month 20040229');
+sub testCalSpecial {
+	my ($y,$m,$d) = $_[0] =~ /(.{4})(..)(..)/;
+	return 1 if $y eq "2002" and $m eq "09" and $d eq "08";
+	return 0;
+}
+is(addCalendar("TC",{"0101"=>1,"0105"=>1,"2512"=>1,"2612"=>1},{"EM"=>1,"GF"=>1},\&testCalSpecial),1,'added test calendar');
+is(is_holiday("TC","20020908"),1,'special holiday testcalendar');
+is(is_holiday("TC","20120406"),1,'good friday testcalendar');
+is(is_holiday("TC","20120501"),1,'may day testcalendar');
+is(addLocaleMonths("FR",["jan","fév","mars","avr","mai","juin","juil","août","sept","oct","nov","déc"]),1,'added french short months');
+is(monthsToInt("jan","FR"),"01",'1 from french january');
+is(monthsToInt("jan","EN"),"01",'1 from english january');
+is(monthsToInt("fév","FR"),"02",'2 from french february');
+is(intToMonths(8,"FR"),"août",'french august from 8');
+is(monthsToInt("mär","GE"),"03",'3 from german march');
+is(intToMonths(3,"GE"),"Mär",'german march from 3');
+is(formatDate(2019,3,1,"D.mmm.Y[fr]"),"01.mars.2019",'formatDate D.mmm.Y french');
+is(formatDate(2019,3,1,"D.mmm.Y"),"01.Mär.2019",'formatDate D.mmm.Y german');
 done_testing();

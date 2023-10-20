@@ -1,0 +1,969 @@
+   {
+      "diseases" : [
+         {
+            "ageOfOnset" : {
+               "ageRange" : {
+                  "end" : {
+                     "iso8601duration" : "P9Y"
+                  },
+                  "start" : {
+                     "iso8601duration" : "P0Y"
+                  }
+               }
+            },
+            "diseaseCode" : {
+               "id" : "NCIT:C3138",
+               "label" : "Inflammatory Bowel Disease"
+            },
+            "familyHistory" : false,
+            "severity" : {
+               "id" : "NCIT:NA0000",
+               "label" : "NA"
+            },
+            "stage" : {
+               "id" : "NCIT:NA0000",
+               "label" : "NA"
+            }
+         }
+      ],
+      "ethnicity" : {
+         "id" : "NCIT:C41261",
+         "label" : "Caucasian"
+      },
+      "exposures" : [
+         {
+            "ageAtExposure" : {
+               "age" : {
+                  "iso8601duration" : "P999Y"
+               }
+            },
+            "date" : "1900-01-01",
+            "duration" : "P999Y",
+            "exposureCode" : {
+               "id" : "NCIT:C2190",
+               "label" : "Alcohol"
+            },
+            "unit" : {
+               "id" : "NCIT:C17998",
+               "label" : "Unknown"
+            },
+            "value" : 4
+         },
+         {
+            "ageAtExposure" : {
+               "age" : {
+                  "iso8601duration" : "P999Y"
+               }
+            },
+            "date" : "1900-01-01",
+            "duration" : "P999Y",
+            "exposureCode" : {
+               "id" : "NCIT:C154329",
+               "label" : "Smoking"
+            },
+            "unit" : {
+               "id" : "NCIT:C65108",
+               "label" : "Never Smoker"
+            },
+            "value" : 0
+         }
+      ],
+      "id" : "107:week_0_arm_1",
+      "info" : {
+         "age" : {
+            "ageRange" : {
+               "end" : {
+                  "iso8601duration" : "P29Y"
+               },
+               "start" : {
+                  "iso8601duration" : "P25Y"
+               }
+            }
+         },
+         "consent" : {
+            "Field Label" : "Patient consented to BFU+/CED?",
+            "Field Note" : "",
+            "Field Type" : "yesno",
+            "value" : 1
+         },
+         "consent_date" : {
+            "Field Label" : "Date of consent",
+            "Field Note" : "",
+            "Field Type" : "text",
+            "value" : "25.10.2020"
+         },
+         "consent_devices" : {
+            "Field Label" : "Patient consented to device studies?",
+            "Field Note" : "",
+            "Field Type" : "yesno",
+            "value" : 0
+         },
+         "consent_noneu" : {
+            "Field Label" : "Patient consented to transfer of data/samples to non-EU countries?",
+            "Field Note" : "",
+            "Field Type" : "yesno",
+            "value" : 0
+         },
+         "consent_recontact" : {
+            "Field Label" : "Patient consented for the possibility to be recontacted for study purposes?",
+            "Field Note" : "",
+            "Field Type" : "yesno",
+            "value" : 1
+         },
+         "consent_week2_endo" : {
+            "Field Label" : "Patient consented for endoscopy at week 2?",
+            "Field Note" : "",
+            "Field Type" : "yesno",
+            "value" : 0
+         },
+         "consents_and_demographics_complete" : {
+            "Field Label" : null,
+            "Field Note" : null,
+            "Field Type" : null,
+            "value" : 2
+         },
+         "diet" : "Unknown",
+         "education" : "high-school diploma (Fachhochschulreife/Abitur)",
+         "metaData" : null,
+         "redcap_event_name" : "week_0_arm_1",
+         "study_id" : "107"
+      },
+      "interventionsOrProcedures" : [
+         {
+            "ageAtProcedure" : {
+               "age" : {
+                  "iso8601duration" : "P999Y"
+               }
+            },
+            "bodySite" : {
+               "id" : "NCIT:C12736",
+               "label" : "intestine"
+            },
+            "dateOfProcedure" : "2021-02-01",
+            "procedureCode" : {
+               "id" : "NCIT:C157823",
+               "label" : "Colon Resection"
+            }
+         },
+         {
+            "ageAtProcedure" : {
+               "age" : {
+                  "iso8601duration" : "P999Y"
+               }
+            },
+            "bodySite" : {
+               "id" : "NCIT:C12736",
+               "label" : "intestine"
+            },
+            "dateOfProcedure" : "2021-02-01",
+            "procedureCode" : {
+               "id" : "NCIT:NA0000",
+               "label" : "NA"
+            }
+         }
+      ],
+      "measures" : [
+         {
+            "assayCode" : {
+               "id" : "NCIT:C51948",
+               "label" : "Leukocyte Count"
+            },
+            "date" : "1900-01-01",
+            "measurementValue" : {
+               "quantity" : {
+                  "referenceRange" : {
+                     "high" : 200,
+                     "low" : 0,
+                     "unit" : {
+                        "id" : "NCIT:C67242",
+                        "label" : "Cells per Microliter"
+                     }
+                  },
+                  "unit" : {
+                     "id" : "NCIT:C67242",
+                     "label" : "Cells per Microliter"
+                  },
+                  "value" : 8.91
+               }
+            },
+            "notes" : "leucocytes /// Field Label=Leucocytes /// Field Note=xx.xx /10^-9 l /// Field Type=text",
+            "procedure" : {
+               "procedureCode" : {
+                  "id" : "NCIT:C27232",
+                  "label" : "Blood Test Result"
+               }
+            }
+         },
+         {
+            "assayCode" : {
+               "id" : "NCIT:C64848",
+               "label" : "Hemoglobin Measurement"
+            },
+            "date" : "1900-01-01",
+            "measurementValue" : {
+               "quantity" : {
+                  "referenceRange" : {
+                     "high" : 20,
+                     "low" : 0,
+                     "unit" : {
+                        "id" : "NCIT:C64783",
+                        "label" : "Gram per Deciliter"
+                     }
+                  },
+                  "unit" : {
+                     "id" : "NCIT:C64783",
+                     "label" : "Gram per Deciliter"
+                  },
+                  "value" : 11.2
+               }
+            },
+            "notes" : "hemoglobin /// Field Label=Hemoglobin /// Field Note=xx.x g/dl /// Field Type=text",
+            "procedure" : {
+               "procedureCode" : {
+                  "id" : "NCIT:C27232",
+                  "label" : "Blood Test Result"
+               }
+            }
+         },
+         {
+            "assayCode" : {
+               "id" : "NCIT:C64796",
+               "label" : "Hematocrit Measurement"
+            },
+            "date" : "1900-01-01",
+            "measurementValue" : {
+               "quantity" : {
+                  "referenceRange" : {
+                     "high" : 100,
+                     "low" : 0,
+                     "unit" : {
+                        "id" : "NCIT:C25613",
+                        "label" : "Percentage"
+                     }
+                  },
+                  "unit" : {
+                     "id" : "NCIT:C25613",
+                     "label" : "Percentage"
+                  },
+                  "value" : 34
+               }
+            },
+            "notes" : "hematokrit /// Field Label=Hematokrit /// Field Note=xx.x % /// Field Type=text",
+            "procedure" : {
+               "procedureCode" : {
+                  "id" : "NCIT:C27232",
+                  "label" : "Blood Test Result"
+               }
+            }
+         },
+         {
+            "assayCode" : {
+               "id" : "NCIT:C51951",
+               "label" : "Platelet Count"
+            },
+            "date" : "1900-01-01",
+            "measurementValue" : {
+               "quantity" : {
+                  "referenceRange" : {
+                     "high" : 2000,
+                     "low" : 0,
+                     "unit" : {
+                        "id" : "NCIT:C67242",
+                        "label" : "Cells per Microliter"
+                     }
+                  },
+                  "unit" : {
+                     "id" : "NCIT:C67242",
+                     "label" : "Cells per Microliter"
+                  },
+                  "value" : 442
+               }
+            },
+            "notes" : "thrombocytes /// Field Label=Thrombocytes /// Field Note=xxxx /10^-9 l /// Field Type=text",
+            "procedure" : {
+               "procedureCode" : {
+                  "id" : "NCIT:C27232",
+                  "label" : "Blood Test Result"
+               }
+            }
+         },
+         {
+            "assayCode" : {
+               "id" : "NCIT:C64547",
+               "label" : "Creatinine Measurement"
+            },
+            "date" : "1900-01-01",
+            "measurementValue" : {
+               "quantity" : {
+                  "referenceRange" : {
+                     "high" : 10000,
+                     "low" : 0,
+                     "unit" : {
+                        "id" : "NCIT:C48508",
+                        "label" : "Micromole per Liter"
+                     }
+                  },
+                  "unit" : {
+                     "id" : "NCIT:C48508",
+                     "label" : "Micromole per Liter"
+                  },
+                  "value" : 76
+               }
+            },
+            "notes" : "creatinine /// Field Label=Creatinine /// Field Note=xxx Âµmol/l /// Field Type=text",
+            "procedure" : {
+               "procedureCode" : {
+                  "id" : "NCIT:C27232",
+                  "label" : "Blood Test Result"
+               }
+            }
+         },
+         {
+            "assayCode" : {
+               "id" : "NCIT:C90505",
+               "label" : "Glomerular Filtration Rate"
+            },
+            "date" : "1900-01-01",
+            "measurementValue" : {
+               "quantity" : {
+                  "referenceRange" : {
+                     "high" : 200,
+                     "low" : 0,
+                     "unit" : {
+                        "id" : "NCIT:C98734",
+                        "label" : "Glomerular Filtration Rate Adjusted for BSA"
+                     }
+                  },
+                  "unit" : {
+                     "id" : "NCIT:C98734",
+                     "label" : "Glomerular Filtration Rate Adjusted for BSA"
+                  },
+                  "value" : 123
+               }
+            },
+            "notes" : "gfr /// Field Label=GFR CKD-Epi /// Field Note=xxx ml/min/1.73 /// Field Type=text",
+            "procedure" : {
+               "procedureCode" : {
+                  "id" : "NCIT:C27232",
+                  "label" : "Blood Test Result"
+               }
+            }
+         },
+         {
+            "assayCode" : {
+               "id" : "NCIT:C38037",
+               "label" : "Total Bilirubin Measurement"
+            },
+            "date" : "1900-01-01",
+            "measurementValue" : {
+               "quantity" : {
+                  "referenceRange" : {
+                     "high" : 10000,
+                     "low" : 0,
+                     "unit" : {
+                        "id" : "NCIT:C48508",
+                        "label" : "Micromole per Liter"
+                     }
+                  },
+                  "unit" : {
+                     "id" : "NCIT:C48508",
+                     "label" : "Micromole per Liter"
+                  },
+                  "value" : 3.5
+               }
+            },
+            "notes" : "bilirubin /// Field Label=Bilirubin /// Field Note=xxx.x Âµmol/l /// Field Type=text",
+            "procedure" : {
+               "procedureCode" : {
+                  "id" : "NCIT:C27232",
+                  "label" : "Blood Test Result"
+               }
+            }
+         },
+         {
+            "assayCode" : {
+               "id" : "NCIT:C55098",
+               "label" : "Serum Glutamic Pyruvic Transaminase, CTCAE"
+            },
+            "date" : "1900-01-01",
+            "measurementValue" : {
+               "quantity" : {
+                  "referenceRange" : {
+                     "high" : 10000,
+                     "low" : 0,
+                     "unit" : {
+                        "id" : "NCIT:C67376",
+                        "label" : "International Unit per Liter"
+                     }
+                  },
+                  "unit" : {
+                     "id" : "NCIT:C67376",
+                     "label" : "International Unit per Liter"
+                  },
+                  "value" : 18
+               }
+            },
+            "notes" : "gpt /// Field Label=GPT /// Field Note=xx.x U/l /// Field Type=text",
+            "procedure" : {
+               "procedureCode" : {
+                  "id" : "NCIT:C27232",
+                  "label" : "Blood Test Result"
+               }
+            }
+         },
+         {
+            "assayCode" : {
+               "id" : "NCIT:C61025",
+               "label" : "Serum Gamma Glutamyl Transpeptidase Measurement"
+            },
+            "date" : "1900-01-01",
+            "measurementValue" : {
+               "quantity" : {
+                  "referenceRange" : {
+                     "high" : 10000,
+                     "low" : 0,
+                     "unit" : {
+                        "id" : "NCIT:C67376",
+                        "label" : "International Unit per Liter"
+                     }
+                  },
+                  "unit" : {
+                     "id" : "NCIT:C67376",
+                     "label" : "International Unit per Liter"
+                  },
+                  "value" : 19
+               }
+            },
+            "notes" : "ggt /// Field Label=gammaGT /// Field Note=xx.x U/l /// Field Type=text",
+            "procedure" : {
+               "procedureCode" : {
+                  "id" : "NCIT:C27232",
+                  "label" : "Blood Test Result"
+               }
+            }
+         },
+         {
+            "assayCode" : {
+               "id" : "NCIT:C117748",
+               "label" : "Lipase Measurement"
+            },
+            "date" : "1900-01-01",
+            "measurementValue" : {
+               "quantity" : {
+                  "referenceRange" : {
+                     "high" : 10000,
+                     "low" : 0,
+                     "unit" : {
+                        "id" : "NCIT:C67376",
+                        "label" : "International Unit per Liter"
+                     }
+                  },
+                  "unit" : {
+                     "id" : "NCIT:C67376",
+                     "label" : "International Unit per Liter"
+                  },
+                  "value" : 46
+               }
+            },
+            "notes" : "lipase /// Field Label=Lipase /// Field Note=xx.x U/l /// Field Type=text",
+            "procedure" : {
+               "procedureCode" : {
+                  "id" : "NCIT:C27232",
+                  "label" : "Blood Test Result"
+               }
+            }
+         },
+         {
+            "assayCode" : {
+               "id" : "NCIT:C64548",
+               "label" : "C-Reactive Protein Measurement"
+            },
+            "date" : "1900-01-01",
+            "measurementValue" : {
+               "quantity" : {
+                  "referenceRange" : {
+                     "high" : 1000,
+                     "low" : 0,
+                     "unit" : {
+                        "id" : "NCIT:C85710",
+                        "label" : "Milligram per Liter per Milligram"
+                     }
+                  },
+                  "unit" : {
+                     "id" : "NCIT:C85710",
+                     "label" : "Milligram per Liter per Milligram"
+                  },
+                  "value" : 1.77
+               }
+            },
+            "notes" : "crp /// Field Label=CRP /// Field Note=xxx.x mg/l /// Field Type=text",
+            "procedure" : {
+               "procedureCode" : {
+                  "id" : "NCIT:C27232",
+                  "label" : "Blood Test Result"
+               }
+            }
+         },
+         {
+            "assayCode" : {
+               "id" : "NCIT:C74679",
+               "label" : "Iron Measurement"
+            },
+            "date" : "1900-01-01",
+            "measurementValue" : {
+               "quantity" : {
+                  "referenceRange" : {
+                     "high" : 1000,
+                     "low" : 0,
+                     "unit" : {
+                        "id" : "NCIT:C48508",
+                        "label" : "Micromole per Liter"
+                     }
+                  },
+                  "unit" : {
+                     "id" : "NCIT:C48508",
+                     "label" : "Micromole per Liter"
+                  },
+                  "value" : 3.7
+               }
+            },
+            "notes" : "iron /// Field Label=Iron /// Field Note=xx.x Âµmol/l /// Field Type=text",
+            "procedure" : {
+               "procedureCode" : {
+                  "id" : "NCIT:C27232",
+                  "label" : "Blood Test Result"
+               }
+            }
+         },
+         {
+            "assayCode" : {
+               "id" : "NCIT:C20451",
+               "label" : "Interleukin-6"
+            },
+            "date" : "1900-01-01",
+            "measurementValue" : {
+               "quantity" : {
+                  "referenceRange" : {
+                     "high" : 10000,
+                     "low" : 0,
+                     "unit" : {
+                        "id" : "NCIT:C67327",
+                        "label" : "Nanogram per Liter"
+                     }
+                  },
+                  "unit" : {
+                     "id" : "NCIT:C67327",
+                     "label" : "Nanogram per Liter"
+                  },
+                  "value" : 2.3
+               }
+            },
+            "notes" : "il6 /// Field Label=IL-6 /// Field Note=xxxx.x ng/l /// Field Type=text",
+            "procedure" : {
+               "procedureCode" : {
+                  "id" : "NCIT:C27232",
+                  "label" : "Blood Test Result"
+               }
+            }
+         }
+      ],
+      "phenotypicFeatures" : [
+         {
+            "excluded" : true,
+            "featureType" : {
+               "id" : "NCIT:C28397",
+               "label" : "Asthma"
+            },
+            "notes" : "comorb_asthma /// Field Label=Comorbidities - Asthma /// Field Note= /// Field Type=yesno"
+         },
+         {
+            "excluded" : true,
+            "featureType" : {
+               "id" : "NCIT:NA0000",
+               "label" : "NA"
+            },
+            "notes" : "comorb_copd /// Field Label=Comorbidities - COPD /// Field Note= /// Field Type=yesno"
+         },
+         {
+            "excluded" : true,
+            "featureType" : {
+               "id" : "NCIT:NA0000",
+               "label" : "NA"
+            },
+            "notes" : "comorb_ms /// Field Label=Comorbidities - demyelating disease/multiple sclerosis /// Field Note= /// Field Type=yesno"
+         },
+         {
+            "excluded" : true,
+            "featureType" : {
+               "id" : "NCIT:C3201",
+               "label" : "Systemic Lupus Erythematosus"
+            },
+            "notes" : "comorb_sle /// Field Label=Comorbidities - systemic lupus erythematosus /// Field Note= /// Field Type=yesno"
+         },
+         {
+            "excluded" : true,
+            "featureType" : {
+               "id" : "NCIT:C2884",
+               "label" : "Rheumatoid Arthritis"
+            },
+            "notes" : "comorb_ra /// Field Label=Comorbidities - rheumatoid arthritis /// Field Note= /// Field Type=yesno"
+         },
+         {
+            "excluded" : true,
+            "featureType" : {
+               "id" : "NCIT:C3346",
+               "label" : "Psoriasis"
+            },
+            "notes" : "comorb_pso /// Field Label=Comorbidities - psoriasis /// Field Note= /// Field Type=yesno"
+         },
+         {
+            "excluded" : true,
+            "featureType" : {
+               "id" : "NCIT:NA0000",
+               "label" : "NA"
+            },
+            "notes" : "comorb_ad /// Field Label=Comorbidities - atopic dermatitis /// Field Note= /// Field Type=yesno"
+         },
+         {
+            "excluded" : true,
+            "featureType" : {
+               "id" : "NCIT:NA0000",
+               "label" : "NA"
+            },
+            "notes" : "comorb_cancer /// Field Label=Comorbidities - cancer /// Field Note= /// Field Type=yesno"
+         },
+         {
+            "excluded" : true,
+            "featureType" : {
+               "id" : "NCIT:C3117",
+               "label" : "Hypertension"
+            },
+            "notes" : "comorb_hypertension /// Field Label=Comorbidities - hypertension /// Field Note= /// Field Type=yesno"
+         },
+         {
+            "excluded" : true,
+            "featureType" : {
+               "id" : "NCIT:C2985",
+               "label" : "Diabetes Mellitus"
+            },
+            "notes" : "comorb_diabetes /// Field Label=Comorbidities - diabetes mellitus /// Field Note= /// Field Type=yesno"
+         },
+         {
+            "excluded" : true,
+            "featureType" : {
+               "id" : "NCIT:NA0000",
+               "label" : "NA"
+            },
+            "notes" : "comorb_lipids /// Field Label=Comorbidities - Hyper-/dyslipidemia /// Field Note= /// Field Type=yesno"
+         },
+         {
+            "excluded" : true,
+            "featureType" : {
+               "id" : "NCIT:C3390",
+               "label" : "Stroke"
+            },
+            "notes" : "comorb_stroke /// Field Label=Comorbidities - Stroke /// Field Note= /// Field Type=yesno"
+         },
+         {
+            "excluded" : true,
+            "featureType" : {
+               "id" : "NCIT:NA0000",
+               "label" : "NA"
+            },
+            "notes" : "comorb_other_ai /// Field Label=Comorbidities - other autoimmune disease /// Field Note= /// Field Type=yesno"
+         },
+         {
+            "excluded" : true,
+            "featureType" : {
+               "id" : "NCIT:C39725",
+               "label" : "Immunodeficiency"
+            },
+            "notes" : "immunodeficiency /// Field Label=Primary immunodeficiency known? /// Field Note= /// Field Type=yesno"
+         },
+         {
+            "featureType" : {
+               "id" : "NCIT:NA0000",
+               "label" : "NA"
+            },
+            "notes" : "rectal_bleeding /// Field Label=Rectal bleeding score /// Field Note= /// Field Type=radio"
+         }
+      ],
+      "sex" : {
+         "id" : "NCIT:C20197",
+         "label" : "Male"
+      },
+      "treatments" : [
+         {
+            "_info" : {
+               "dose" : null,
+               "drug" : "budesonide",
+               "drug_name" : "budesonide",
+               "duration" : null,
+               "field" : "budesonide_oral_status",
+               "route" : "oral",
+               "start" : null,
+               "status" : "former treatment",
+               "value" : 2
+            },
+            "ageAtOnset" : {
+               "age" : {
+                  "iso8601duration" : "P999Y"
+               }
+            },
+            "cumulativeDose" : {
+               "unit" : {
+                  "id" : "NCIT:NA0000",
+                  "label" : "NA"
+               },
+               "value" : -1
+            },
+            "doseIntervals" : [],
+            "routeOfAdministration" : {
+               "id" : "NCIT:C38288",
+               "label" : "Oral Route of Administration"
+            },
+            "treatmentCode" : {
+               "id" : "NCIT:C1027",
+               "label" : "Budesonide"
+            }
+         },
+         {
+            "_info" : {
+               "dose" : null,
+               "drug" : "budesonide",
+               "drug_name" : "budesonide",
+               "duration" : null,
+               "field" : "budesonide_rectal_status",
+               "route" : "rectal",
+               "start" : null,
+               "status" : "never treated",
+               "value" : 1
+            },
+            "ageAtOnset" : {
+               "age" : {
+                  "iso8601duration" : "P999Y"
+               }
+            },
+            "cumulativeDose" : {
+               "unit" : {
+                  "id" : "NCIT:NA0000",
+                  "label" : "NA"
+               },
+               "value" : -1
+            },
+            "doseIntervals" : [],
+            "routeOfAdministration" : {
+               "id" : "NCIT:C38295",
+               "label" : "Rectal Route of Administration"
+            },
+            "treatmentCode" : {
+               "id" : "NCIT:C1027",
+               "label" : "Budesonide"
+            }
+         },
+         {
+            "_info" : {
+               "dose" : null,
+               "drug" : "prednisolone",
+               "drug_name" : "prednisolone",
+               "duration" : null,
+               "field" : "prednisolone_status",
+               "route" : "oral",
+               "start" : null,
+               "status" : "current treatment",
+               "value" : 3
+            },
+            "ageAtOnset" : {
+               "age" : {
+                  "iso8601duration" : "P999Y"
+               }
+            },
+            "cumulativeDose" : {
+               "unit" : {
+                  "id" : "NCIT:NA0000",
+                  "label" : "NA"
+               },
+               "value" : -1
+            },
+            "doseIntervals" : [],
+            "routeOfAdministration" : {
+               "id" : "NCIT:C38288",
+               "label" : "Oral Route of Administration"
+            },
+            "treatmentCode" : {
+               "id" : "NCIT:C769",
+               "label" : "Prednisolone"
+            }
+         },
+         {
+            "_info" : {
+               "dose" : null,
+               "drug" : "asa",
+               "drug_name" : "aspirin",
+               "duration" : null,
+               "field" : "asa_oral_status",
+               "route" : "oral",
+               "start" : null,
+               "status" : "former treatment",
+               "value" : 2
+            },
+            "ageAtOnset" : {
+               "age" : {
+                  "iso8601duration" : "P999Y"
+               }
+            },
+            "cumulativeDose" : {
+               "unit" : {
+                  "id" : "NCIT:NA0000",
+                  "label" : "NA"
+               },
+               "value" : -1
+            },
+            "doseIntervals" : [],
+            "routeOfAdministration" : {
+               "id" : "NCIT:C38288",
+               "label" : "Oral Route of Administration"
+            },
+            "treatmentCode" : {
+               "id" : "NCIT:C287",
+               "label" : "Aspirin"
+            }
+         },
+         {
+            "_info" : {
+               "dose" : null,
+               "drug" : "asa",
+               "drug_name" : "aspirin",
+               "duration" : null,
+               "field" : "asa_rectal_status",
+               "route" : "rectal",
+               "start" : null,
+               "status" : "never treated",
+               "value" : 1
+            },
+            "ageAtOnset" : {
+               "age" : {
+                  "iso8601duration" : "P999Y"
+               }
+            },
+            "cumulativeDose" : {
+               "unit" : {
+                  "id" : "NCIT:NA0000",
+                  "label" : "NA"
+               },
+               "value" : -1
+            },
+            "doseIntervals" : [],
+            "routeOfAdministration" : {
+               "id" : "NCIT:C38295",
+               "label" : "Rectal Route of Administration"
+            },
+            "treatmentCode" : {
+               "id" : "NCIT:C287",
+               "label" : "Aspirin"
+            }
+         },
+         {
+            "_info" : {
+               "dose" : null,
+               "drug" : "aza",
+               "drug_name" : "azathioprine",
+               "duration" : null,
+               "field" : "aza_status",
+               "route" : "oral",
+               "start" : null,
+               "status" : "never treated",
+               "value" : 1
+            },
+            "ageAtOnset" : {
+               "age" : {
+                  "iso8601duration" : "P999Y"
+               }
+            },
+            "cumulativeDose" : {
+               "unit" : {
+                  "id" : "NCIT:NA0000",
+                  "label" : "NA"
+               },
+               "value" : -1
+            },
+            "doseIntervals" : [],
+            "routeOfAdministration" : {
+               "id" : "NCIT:C38288",
+               "label" : "Oral Route of Administration"
+            },
+            "treatmentCode" : {
+               "id" : "NCIT:C290",
+               "label" : "Azathioprine"
+            }
+         },
+         {
+            "_info" : {
+               "dose" : null,
+               "drug" : "mtx",
+               "drug_name" : "methotrexate",
+               "duration" : null,
+               "field" : "mtx_status",
+               "route" : "oral",
+               "start" : null,
+               "status" : "never treated",
+               "value" : 1
+            },
+            "ageAtOnset" : {
+               "age" : {
+                  "iso8601duration" : "P999Y"
+               }
+            },
+            "cumulativeDose" : {
+               "unit" : {
+                  "id" : "NCIT:NA0000",
+                  "label" : "NA"
+               },
+               "value" : -1
+            },
+            "doseIntervals" : [],
+            "routeOfAdministration" : {
+               "id" : "NCIT:C38288",
+               "label" : "Oral Route of Administration"
+            },
+            "treatmentCode" : {
+               "id" : "NCIT:C642",
+               "label" : "Methotrexate"
+            }
+         },
+         {
+            "_info" : {
+               "dose" : null,
+               "drug" : "mp",
+               "drug_name" : "mercaptopurine",
+               "duration" : null,
+               "field" : "mp_status",
+               "route" : "oral",
+               "start" : null,
+               "status" : "never treated",
+               "value" : 1
+            },
+            "ageAtOnset" : {
+               "age" : {
+                  "iso8601duration" : "P999Y"
+               }
+            },
+            "cumulativeDose" : {
+               "unit" : {
+                  "id" : "NCIT:NA0000",
+                  "label" : "NA"
+               },
+               "value" : -1
+            },
+            "doseIntervals" : [],
+            "routeOfAdministration" : {
+               "id" : "NCIT:C38288",
+               "label" : "Oral Route of Administration"
+            },
+            "treatmentCode" : {
+               "id" : "NCIT:C195",
+               "label" : "Mercaptopurine"
+            }
+         }
+      ]
+   }

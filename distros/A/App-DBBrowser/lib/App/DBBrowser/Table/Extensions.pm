@@ -24,7 +24,7 @@ sub new {
     };
     $sf->{const} = 'Value';
     $sf->{subquery} = 'SQ';
-    $sf->{scalar_func} = 'f()';
+    $sf->{scalar_func} = 'func()';
     $sf->{window_func} = 'win()';
     $sf->{case} = 'case';
     $sf->{math} = 'math()';
@@ -103,7 +103,7 @@ sub value {
 
 sub argument {
     my ( $sf, $sql, $clause, $opt ) = @_;
-    my $ext_express = $sf->{o}{enable}{ext_express_func_arg};
+    my $ext_express = $sf->{o}{enable}{extended_args};
     my $extensions = [];
     if ( $ext_express ) {
         $extensions = [ $sf->{const}, $sf->{subquery}, $sf->{scalar_func}, $sf->{case}, $sf->{math}, $sf->{col} ];
@@ -113,6 +113,28 @@ sub argument {
     }
     $opt->{caller} = 'argument';
     return $sf->__choose_extension( $sql, $clause, {}, $extensions, $opt );
+}
+
+
+sub enable_extended_arguments {
+    my ( $sf, $info ) = @_;
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $prompt = 'Extended arguments:';
+    my $yes = '- YES';
+    # Choose
+    my $choice = $tc->choose(
+        [ undef, '- NO', $yes ],
+        { %{$sf->{i}{lyt_v}}, info => $info, prompt => $prompt, undef => '<=' }
+    );
+    if ( ! defined $choice ) {
+        return;
+    }
+    if ( $choice eq $yes ) {
+        $sf->{o}{enable}{extended_args} = 1;
+    }
+    else {
+        $sf->{o}{enable}{extended_args} = 0;
+    }
 }
 
 
@@ -181,9 +203,9 @@ sub __choose_extension {
         elsif ( $extension eq $sf->{subquery} ) {
             require App::DBBrowser::Subqueries;
             my $new_sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $subq = $new_sq->choose_subquery( $sql, $opt );
+            my $subq = $new_sq->subquery( $sql, $opt );
             if ( ! defined $subq ) {
-                return if @$extensions = 1;
+                return if @$extensions == 1;
                 next EXTENSION;
             }
             return $subq;
@@ -193,7 +215,7 @@ sub __choose_extension {
             my $new_func = App::DBBrowser::Table::Extensions::ScalarFunctions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $scalar_func_stmt = $new_func->col_function( $sql, $clause, $qt_cols, $r_data, $opt ); # recursion yes
             if ( ! defined $scalar_func_stmt ) {
-                return if @$extensions = 1;
+                return if @$extensions == 1;
                 next EXTENSION;
             }
             return $scalar_func_stmt;
@@ -203,6 +225,7 @@ sub __choose_extension {
             my $wf = App::DBBrowser::Table::Extensions::WindowFunctions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $win_func_stmt = $wf->window_function( $sql, $clause, $qt_cols, $opt );
             if ( ! defined $win_func_stmt ) {
+                return if @$extensions == 1;
                 next EXTENSION;
             }
             return $win_func_stmt;
@@ -212,7 +235,7 @@ sub __choose_extension {
             my $new_cs = App::DBBrowser::Table::Extensions::Case->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $case_stmt = $new_cs->case( $sql, $clause, $qt_cols, $r_data, $opt ); # recursion yes
             if ( ! defined $case_stmt ) {
-                return if @$extensions = 1;
+                return if @$extensions == 1;
                 next EXTENSION;
             }
             return $case_stmt;
@@ -222,7 +245,7 @@ sub __choose_extension {
             my $new_math = App::DBBrowser::Table::Extensions::Maths->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $arith = $new_math->maths( $sql, $clause, $qt_cols, $opt );
             if ( ! defined $arith ) {
-                return if @$extensions = 1;
+                return if @$extensions == 1;
                 next EXTENSION;
             }
             return $arith;
@@ -232,11 +255,11 @@ sub __choose_extension {
             # Choose
             my $col = $tc->choose(
                 [ undef, map { '- ' . $_ } @$qt_cols ],
-                { %{$sf->{i}{lyt_v}}, info => $info, prompt => $prompt, undef => '<=' }
+                { %{$sf->{i}{lyt_v}}, info => $info, prompt => $prompt, undef => '<<' }
             );
             $ax->print_sql_info( $info );
             if ( ! defined $col ) {
-                return if @$extensions = 1;
+                return if @$extensions == 1;
                 next EXTENSION;
             }
             return $col =~ s/^- //r;

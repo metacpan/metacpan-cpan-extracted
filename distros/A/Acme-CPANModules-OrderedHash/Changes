@@ -1,0 +1,15 @@
+0.003   2023-10-06  Released-By: PERLANCAR; Urgency: medium
+
+        - Add dataset: iterating; add benchmark notes.
+
+
+0.002   2023-10-05  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Forgot to add dzil plugin to show images.
+
+
+0.001   2023-10-05  Released-By: PERLANCAR
+
+        - First release.

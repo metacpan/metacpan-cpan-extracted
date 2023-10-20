@@ -7,7 +7,7 @@ use vars qw($Debug $VERSION);
 use Carp;
 
 $Debug = 0;
-$VERSION = '0.83';
+$VERSION = '0.84';
 
 =head1 NAME
 
@@ -193,14 +193,22 @@ documentation on skyline
 
 =cut
 
+=item track->skyline({ ...options... })
+
+skylines the entire track.  Modifies the track.  See MIDI::Score for
+documentation on skyline
+
+=cut
+
 sub skyline {
     my $track = shift;
-    my $options_r = ref($_[1]) eq 'HASH' ? $_[1] : {};
+    my $options_r = ref($_[0]) eq 'HASH' ? $_[0] : {};
     my $score_r = MIDI::Score::events_r_to_score_r($track->events_r);
     my $new_score_r = MIDI::Score::skyline($score_r,$options_r);
     my $events_r = MIDI::Score::score_r_to_events_r($new_score_r);
     $track->events_r($events_r);
 }
+
 
 ###########################################################################
 # These three modify all the possible attributes of a track

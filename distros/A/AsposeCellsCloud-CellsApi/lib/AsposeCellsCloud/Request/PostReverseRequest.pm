@@ -59,7 +59,7 @@ sub new {
 
 
 # Run Operation Request
-# PostReverseRequest.File : File to upload  ,
+# PostReverseRequest.File : rows/cols/both  ,
 # PostReverseRequest.rotateType : rows/cols/both  ,
 # PostReverseRequest.format : CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers  ,
 # PostReverseRequest.password :   ,
@@ -138,7 +138,7 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'File to upload',
+     	description => 'rows/cols/both',
      	format => '',
      	read_only => '',
      		},

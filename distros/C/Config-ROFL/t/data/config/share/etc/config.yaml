@@ -1,0 +1,6 @@
+---
+App::DBI:
+  database:
+    test:
+      username: user
+      password: password

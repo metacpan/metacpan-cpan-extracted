@@ -121,7 +121,7 @@ sub o_auth_post {
     if($self->{config}->{api_version} eq "v1.1"){
         $_resource_path = '/oauth2/token';
     }
-    
+
     my $_method = 'POST';
     my $query_params = {};
     my $header_params = {};
@@ -263,8 +263,8 @@ sub call_api {
     else {
     }
     #proxy####################################################################
-    # $self->{ua}=LWP::UserAgent->new(ssl_opts => { verify_hostname => 0 },);
-    # $self->{ua}->proxy(['https'], "http://127.0.0.1:8888"); 
+    #$self->{ua}=LWP::UserAgent->new(ssl_opts => { verify_hostname => 0 },);
+    #$self->{ua}->proxy(['https'], "http://127.0.0.1:8888"); 
     #printf $self->{ua}->ssl_opts;############################################
     $self->{ua}->timeout($self->{http_timeout} || $self->{config}{http_timeout});
     $self->{ua}->agent($self->{http_user_agent} || $self->{config}{http_user_agent});

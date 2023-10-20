@@ -35,7 +35,11 @@ I<italic>
 
 C<code> C<< code->with->arrows >>
 
+F<filename>
+
 L<link|target://> L<Module::Here>
+
+U<underline>
 EOPOD
 
 dotest "Verbatim", <<"EOPOD";

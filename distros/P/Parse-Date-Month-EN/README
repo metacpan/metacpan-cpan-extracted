@@ -2,8 +2,8 @@ NAME
     Parse::Date::Month::EN - Parse month name from English text
 
 VERSION
-    This document describes version 0.001 of Parse::Date::Month::EN (from
-    Perl distribution Parse-Date-Month-EN), released on 2023-06-16.
+    This document describes version 0.002 of Parse::Date::Month::EN (from
+    Perl distribution Parse-Date-Month-EN), released on 2023-07-25.
 
 SYNOPSIS
      use Parse::Date::Month::EN qw(parse_date_month_en);
@@ -51,7 +51,7 @@ SOURCE
     <https://github.com/perlancar/perl-Parse-Date-Month-EN>.
 
 SEE ALSO
-    Other "Parse::Month::Name::*" modules.
+    Other "Parse::Month::Name::*" modules, e.g. Parse::Date::Month::ID.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

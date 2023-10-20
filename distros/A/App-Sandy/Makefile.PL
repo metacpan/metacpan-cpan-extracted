@@ -77,7 +77,7 @@ my %WriteMakefileArgs = (
     "Test::UseAllModules" => 0,
     "autodie" => 0
   },
-  "VERSION" => "0.24",
+  "VERSION" => "0.25",
   "XS" => {
     "xs/RNG.xs" => "xs/RNG.c"
   },

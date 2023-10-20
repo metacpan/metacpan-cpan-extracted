@@ -1,5 +1,13 @@
 Revision history for Test-ExpectAndCheck
 
+0.06    2023-10-17
+        [CHANGES]
+         * Ensure that the callback in `->will_return_using` can modify caller
+           arguments if necessary for successfully mocking mutator functions
+         * Various module style updates:
+            + use Perl 5.14
+            + swap unit tests to Test2::V0
+
 0.05    2022-10-07
         [CHANGES]
          * Added `->whenever` for creating stub helper methods that assist the

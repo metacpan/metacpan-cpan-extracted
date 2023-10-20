@@ -11,9 +11,9 @@ use Exporter qw(import);
 use List::Util qw(first max);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-16'; # DATE
+our $DATE = '2023-07-29'; # DATE
 our $DIST = 'Perinci-Result-Format-Lite'; # DIST
-our $VERSION = '0.287'; # VERSION
+our $VERSION = '0.288'; # VERSION
 
 our @EXPORT_OK = qw(format);
 
@@ -368,12 +368,20 @@ sub __gen_table {
         my $fres;
         my $backend = $ENV{FORMAT_PRETTY_TABLE_BACKEND};
         $backend //= "Text::Table::Org" if $ENV{INSIDE_EMACS};
+        my $backend_opts = $ENV{FORMAT_PRETTY_TABLE_BACKEND_OPTS};
+        if (defined $backend_opts) {
+            $backend_opts = eval { _json->decode($backend_opts) };
+            die "Invalid JSON in FORMAT_PRETTY_TABLE_BACKEND_OPTS: $@" if $@;
+        } else {
+            $backend_opts = {};
+        }
         if ($backend) {
             require Text::Table::Any;
             $fres = Text::Table::Any::table(
                 rows => $data,
                 header_row => $header_row,
                 backend => $backend,
+                backend_opts => $backend_opts,
                 (caption => $resmeta->{caption}) x !!defined($resmeta->{caption}),
             );
         } else {
@@ -569,7 +577,7 @@ Perinci::Result::Format::Lite - Format enveloped result
 
 =head1 VERSION
 
-This document describes version 0.287 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2022-05-16.
+This document describes version 0.288 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2023-07-29.
 
 =head1 SYNOPSIS
 
@@ -587,6 +595,89 @@ long-term goal is to reunite the two formatting modules back to a
 modular/pluggable module.
 
 =for Pod::Coverage ^(firstidx)$
+
+=head1 SUPPORTED RESULT METADATA PROPERTIES/ATTRIBUTES
+
+The L<enveloped result specification|Rinci::function/"Enveloped result">
+specifies various properties/attributes that can be used as formatting hints.
+Below are the list of properties/attributes supported by this module, including
+those that are not in the specification:
+
+=over
+
+=item * table.html_class
+
+Str. Used when formatting result as HTML table.
+
+=item * table.fields
+
+Array of str. Define fields in order. Used when formatting result as text table.
+Fields that are not defined in this array will be displayed after the defined
+fields (or hidden, if you set C<table.hide_unknown_fields>).
+
+=item * table.hide_unknown_fields
+
+Bool. If set to true, then unknown fields (those not defined in C<table.fields>)
+will not be shown. Used when formatting result as text table.
+
+=item * table.field_orders
+
+Array of str. Like C<table.fields>, but with higher precedence.
+
+=item * table.field_labels
+
+Array of str. Define labels for each field (each element correspond to the field
+of the same element as defined in C<table.fields>). Used when formatting result
+as text table. Will show this in header for fields instead the actual field
+name.
+
+=item * table.field_units
+
+Array of str. Define units for each field (each element correspond to the field
+of the same element as defined in C<table.fields>). Used when formatting result
+as text table. Will show this along with field name/label. For example if a
+field's unit is defined as `cm` and field name is `length`, then the field
+header will show as `length (cm)`.
+
+=item * table.field_formats
+
+Array of str. Define format for each field (each element correspond to the field
+of the same element as defined in C<table.fields>). Used when formatting result
+as text table. Known formats: `iso8601_datetime`, `iso8601_date`, `datetime`,
+`date`, `boolstr`, `filesize`, `sci2dec`, `percent`, `number`.
+
+=item * table.field_format_code
+
+Coderef. Will be called with argument of field name. Expected to return format
+name (see C<table.field_formats>). Used when formatting result as text table.
+This option can be used when you want to dynamically determine a suitable format
+based on field name.
+
+=item * table.default_field_format
+
+Str. Instead of defining format for each field using `table.field_formats`, you
+can also specify default format for all fields.
+
+=item * table.field_aligns
+
+Array of str. Define alignment for each field (each element correspond to the
+field of the same element as defined in C<table.fields>). Used when formatting
+result as text table. Known alignment value for each field: `number` (special
+rule to align on decimal point or `E`), `right`, `middle`|`center`, `right`.
+
+=item * table.field_align_code
+
+Coderef. Will be called with argument of field name. Expected to return
+alignment name (see C<table.field_aligns>). Used when formatting result as text
+table. This option can be used when you want to dynamically determine a suitable
+alignment based on field name.
+
+=item * table.default_field_align
+
+Str. Instead of defining alignment for each field using `table.field_aligns`,
+you can also specify default alignment for all fields.
+
+=back
 
 =head1 FUNCTIONS
 
@@ -607,6 +698,16 @@ L<Text::Table::Org> backend is already installed):
 For convenience, a default is chosen for you under certain condition. When
 inside Emacs (environment C<INSIDE_EMACS> is set), C<Text::Table::Org> is used
 as default.
+
+=head2 FORMAT_PRETTY_TABLE_BACKEND_OPTS
+
+Str, JSON-encoding expected. This setting is to accompany
+L</FORMAT_PRETTY_TABLE_BACKEND>, to be passed to
+L<Text::Table::Any>C<::table()>'s C<backend_opts> argument. It should be a hash
+encoded in JSON, e.g.:
+
+ # keep table aligned in the presence of wide Unicode characters
+ % FORMAT_PRETTY_TABLE_BACKEND=Text::Table::More FORMAT_PRETTY_TABLE_BACKEND_OPTS='{"wide_char":1}' tabledata locale::JP::City::MIC --page
 
 =head2 FORMAT_PRETTY_TABLE_COLUMN_ORDERS => array (json)
 
@@ -654,7 +755,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

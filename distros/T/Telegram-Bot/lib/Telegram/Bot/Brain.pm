@@ -1,5 +1,5 @@
 package Telegram::Bot::Brain;
-$Telegram::Bot::Brain::VERSION = '0.023';
+$Telegram::Bot::Brain::VERSION = '0.024';
 # ABSTRACT: A base class to make your very own Telegram bot
 
 
@@ -175,6 +175,34 @@ sub sendPhoto {
 }
 
 
+sub sendDocument {
+  my $self = shift;
+  my $args = shift || {};
+  my $send_args = {};
+
+  croak "no chat_id supplied" unless $args->{chat_id};
+  $send_args->{chat_id} = $args->{chat_id};
+
+  # document can be a string (which might be either a URL for telegram servers
+  # to fetch, or a file_id string) or a file on disk to upload - we need
+  # to handle that last case here as it changes the way we create the HTTP
+  # request
+  croak "no document supplied" unless $args->{document};
+  if (-e $args->{document}) {
+    $send_args->{document} = { document => { file => $args->{document} } };
+  }
+  else {
+    $send_args->{document} = $args->{document};
+  }
+
+  my $token = $self->token || croak "no token?";
+  my $url = "https://api.telegram.org/bot${token}/sendDocument";
+  my $api_response = $self->_post_request($url, $send_args);
+
+  return Telegram::Bot::Object::Message->create_from_hash($api_response, $self);
+}
+
+
 sub _add_getUpdates_handler {
   my $self = shift;
 
@@ -190,8 +218,8 @@ sub _add_getUpdates_handler {
     my $updateURL = "https://api.telegram.org/bot${token}/getUpdates?offset=${offset}&timeout=60";
     $http_active = 1;
 
-    $self->ua->get($updateURL => sub {
-      my ($ua, $tx) = @_;
+    $self->ua->get_p($updateURL)->then(sub {
+      my ($tx) = @_;
       my $res = $tx->res->json;
       my $items = $res->{result};
       foreach my $item (@$items) {
@@ -199,6 +227,11 @@ sub _add_getUpdates_handler {
         $self->_process_message($item);
       }
 
+      $http_active = 0;
+    })->catch(sub {
+      my ($error) = @_;
+      warn "Connection error: $error";
+      
       $http_active = 0;
     });
   });
@@ -258,7 +291,7 @@ Telegram::Bot::Brain - A base class to make your very own Telegram bot
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 
@@ -382,6 +415,45 @@ They all return immediately with the corresponding Telegram::Bot::Object
 subclass - consult the documenation for each below to see what to expect.
 
 Note that not all methods have yet been implemented.
+
+=head2 sendDocument
+
+Send a file. See L<https://core.telegram.org/bots/api#sendDocument>.
+
+Takes two argument hashes C<$ags> and C<$send_args>. C<$args> needs to contain
+two keys:
+
+=over
+
+=item C<chat_id>
+
+the id of the chat we are writing to
+
+=item C<document>
+
+a reference to a L<Mojo::Asset::Memory>, internal Telegram file ID or a URL
+
+=back
+
+C<$send_args> can contain other arguments documented in Telegram's API docs.
+
+Returns a L<Telegram::Bot::Object::Message> object.
+
+    sub file_sending_listener {
+      my $self = shift;
+      my $msg  = shift;
+
+      my $string = "...";
+
+      my $file = Mojo::Asset::Memory->new->add_chunk($string);
+      $self->sendDocument(
+        {    # args
+          chat_id  => $msg->chat->id,
+          document => { file => $file, filename => 'bot_export.csv' }
+        },
+        {}    # send_args
+      );
+    }
 
 =head1 AUTHORS
 

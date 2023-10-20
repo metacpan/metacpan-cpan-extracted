@@ -37,5 +37,3 @@ Imager's lack of support for RGB565 (16 bit) is the reason for this need.  The
 slight increase in speed won't hurt either.
 
 ==============================================================================
-
-

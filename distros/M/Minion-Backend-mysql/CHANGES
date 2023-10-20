@@ -1,8 +1,13 @@
 Revision history for Perl extension Minion::Backend::mysql.
 
-*** NOTE ***
+1.003     2023-09-21 17:39:03-05:00 America/Chicago
 
-You must upgrade to v0.30 before upgrading to v1.00 and beyond!
+  [Fixed]
+
+  - Added primary keys to the tables missing them. This improves
+    performance of the larger tables on distributed MySQL derivatives
+    like Galera. Thanks Alan Lee of @GrantStreetGroup for providing this
+    fix!
 
 1.002     2023-09-11 13:37:53-05:00 America/Chicago
 

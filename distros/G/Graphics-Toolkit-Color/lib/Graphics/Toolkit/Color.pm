@@ -2,8 +2,9 @@
 # read only color holding object with methods for relation, mixing and transitions
 
 package Graphics::Toolkit::Color;
-our $VERSION = '1.61';
+our $VERSION = '1.71';
 use v5.12;
+use warnings;
 
 use Carp;
 use Graphics::Toolkit::Color::Name;
@@ -97,17 +98,17 @@ sub values      {
 
 ## measurement methods ##############################################################
 
-sub distance_to { distance(@_) }
+    sub distance_to { distance(@_) }
 sub distance {
     my ($self) = shift;
     my %args = (not @_ % 2) ? @_ :
                (@_ == 1)    ? (to => $_[0])
                             : return carp "accept four optional, named arguments: to => 'color or color definition', in => 'RGB', metric => 'r', range => 16";
-    my ($c2, $space_name, $metric, $range) = ($args{'to'}, $args{'in'}, $args{'metric'}, $args{'range'});
+    my ($c2, $space_name, $select, $range) = ($args{'to'}, $args{'in'}, $args{'select'}, $args{'range'});
     return carp "missing argument: color object or scalar color definition" unless defined $c2;
     $c2 = _new_from_scalar( $c2 );
     return carp "second color for distance calculation (named argument 'to') is badly defined" unless ref $c2 eq __PACKAGE__;
-    $self->{'values'}->distance( $c2->{'values'}, $space_name, $metric );
+    $self->{'values'}->distance( $c2->{'values'}, $space_name, $select, $range );
 }
 
 ## single color creation methods #######################################
@@ -133,7 +134,7 @@ sub add {
     _new_from_value_obj( $self->{'values'}->add( $arg ) );
 }
 
-sub blend_with { $_[0]->blend( with => $_[1], pos => $_[2], in => 'HSL') }
+    sub blend_with { $_[0]->blend( with => $_[1], pos => $_[2], in => 'HSL') }
 sub blend {
     my ($self, @args) = @_;
     my $arg = _get_arg_hash( @args );
@@ -150,10 +151,10 @@ sub blend {
 
 
 # for compatibility
-sub gradient_to     { hsl_gradient_to( @_ ) }
-sub rgb_gradient_to { $_[0]->gradient( to => $_[1], steps => $_[2], dynamic => $_[3], in => 'RGB' ) }
-sub hsl_gradient_to { $_[0]->gradient( to => $_[1], steps => $_[2], dynamic => $_[3], in => 'HSL' ) }
-sub gradient {
+    sub gradient_to     { hsl_gradient_to( @_ ) }
+    sub rgb_gradient_to { $_[0]->gradient( to => $_[1], steps => $_[2], dynamic => $_[3], in => 'RGB' ) }
+    sub hsl_gradient_to { $_[0]->gradient( to => $_[1], steps => $_[2], dynamic => $_[3], in => 'HSL' ) }
+sub gradient { # $to ~in + steps +dynamic +variance --> @_
     my ($self, @args) = @_;
     my $arg = _get_arg_hash( @args );
     return unless ref $arg eq 'HASH';
@@ -179,40 +180,138 @@ sub gradient {
     return $self, @colors, $c2;
 }
 
-sub complementary { complement(@_) }
-sub complement { # steps => +,  delta => {}
+
+my $comp_help = 'set constructor "complement" accepts 4 named args: "steps" (positive int), '.
+                '"hue_tilt" or "h" (-180 .. 180), '.
+                '"saturation_tilt or "s" (-100..100) or { s => (-100..100), h => (-180..180)} and '.
+                '"lightness_tilt or "l" (-100..100) or { l => (-100..100), h => (-180..180)}';
+    sub complementary { complement(@_) }
+sub complement { # +steps +hue_tilt +saturation_tilt +lightness_tilt --> @_
     my ($self) = shift;
-    my ($count) = int ((shift // 1) + 0.5);
-    my ($saturation_change) = shift // 0;
-    my ($lightness_change) = shift // 0;
-    my @hsl2 = my @hsl_l = my @hsl_r = $self->values('HSL');
-    my $HSL = Graphics::Toolkit::Color::Space::Hub::get_space('HSL');
-    $hsl2[0] += 180;
-    $hsl2[1] += $saturation_change;
-    $hsl2[2] += $lightness_change;
-    my $c2 = _new_from_scalar( [ 'HSL', @hsl2 ] );
-    return $c2 if $count < 2;
-    my (@colors_r, @colors_l);
-    my @delta = (360 / $count, (($hsl2[1] - $hsl_r[1]) * 2 / $count), (($hsl2[2] - $hsl_r[2]) * 2 / $count) );
-    for (1 .. ($count - 1) / 2){
-        $hsl_r[$_] += $delta[$_] for 0..2;
-        $hsl_l[0] -= $delta[0];
-        $hsl_l[$_] = $hsl_r[$_] for 1,2;
-        $hsl_l[0] += 360 if $hsl_l[0] <    0;
-        $hsl_r[0] -= 360 if $hsl_l[0] >= 360;
-        push    @colors_r, _new_from_scalar( [ 'HSL', @hsl_r ] );
-        unshift @colors_l, _new_from_scalar( [ 'HSL', @hsl_l ] );
+    my %arg = (not @_ % 2) ? @_ :
+              (@_ == 1)    ? (steps => $_[0]) : return carp $comp_help;
+    my $steps = int abs($arg{'steps'} // 1);
+    my $hue_tilt = (exists $arg{'h'}) ? (delete $arg{'h'}) :
+                   (exists $arg{'hue_tilt'}) ? (delete $arg{'hue_tilt'}) : 0;
+    return carp $comp_help if ref $hue_tilt;
+    my $saturation_tilt = (exists $arg{'s'}) ? (delete $arg{'s'}) :
+                          (exists $arg{'saturation_tilt'}) ? (delete $arg{'saturation_tilt'}) : 0;
+    return carp $comp_help if ref $saturation_tilt and ref $saturation_tilt ne 'HASH';
+    my $saturation_axis_offset = 0;
+    if (ref $saturation_tilt eq 'HASH'){
+        my ($pos_hash, $space_name) = Graphics::Toolkit::Color::Space::Hub::partial_hash_deformat( $saturation_tilt );
+        return carp $comp_help if not defined $space_name or $space_name ne 'HSL' or not exists $pos_hash->{1};
+        $saturation_axis_offset = $pos_hash->{0} if exists $pos_hash->{0};
+        $saturation_tilt = $pos_hash->{1};
     }
-    push @colors_r, $c2 unless $count % 2;
-    $self, @colors_r, @colors_l;
+    my $lightness_tilt = (exists $arg{'l'}) ? (delete $arg{'l'}) :
+                         (exists $arg{'lightness_tilt'}) ? (delete $arg{'lightness_tilt'}) : 0;
+    return carp $comp_help if ref $lightness_tilt and ref $lightness_tilt ne 'HASH';
+    my $lightness_axis_offset = 0;
+    if (ref $lightness_tilt eq 'HASH'){
+        my ($pos_hash, $space_name) = Graphics::Toolkit::Color::Space::Hub::partial_hash_deformat( $lightness_tilt );
+        return carp $comp_help if not defined $space_name or $space_name ne 'HSL' or not exists $pos_hash->{2};
+        $lightness_axis_offset = $pos_hash->{0} if exists $pos_hash->{0};
+        $lightness_tilt = $pos_hash->{2};
+    }
+
+    my @hsl2 = my @hsl = $self->values('HSL');
+    my @hue_turn_point = ($hsl[0] + 90, $hsl[0] + 270, 800); # Dmax, Dmin and Pseudo-Inf
+    my @sat_turn_point  = ($hsl[0] + 90, $hsl[0] + 270, 800);
+    my @light_turn_point = ($hsl[0] + 90, $hsl[0] + 270, 800);
+    my $sat_max_hue = $hsl[0] + 90 + $saturation_axis_offset;
+    my $sat_step = $saturation_tilt * 4 / $steps;
+    my $light_max_hue = $hsl[0] + 90 + $lightness_axis_offset;
+    my $light_step = $lightness_tilt * 4 / $steps;
+    if ($saturation_axis_offset){
+        $sat_max_hue -= 360 while $sat_max_hue > $hsl[0]; # putting dmax in range
+        $sat_max_hue += 360 while $sat_max_hue <= $hsl[0]; # above c1->hue
+        my $dmin_first = $sat_max_hue > $hsl[0] + 180;
+        @sat_turn_point =  $dmin_first ? ($sat_max_hue - 180, $sat_max_hue, 800)
+                                       : ($sat_max_hue, $sat_max_hue + 180, 800);
+        $sat_step = - $sat_step if $dmin_first;
+        my $sat_start_delta = $dmin_first ? ((($sat_max_hue - 180 - $hsl[0]) / 90 * $saturation_tilt) - $saturation_tilt)
+                                          : (-(($sat_max_hue -      $hsl[0]) / 90 * $saturation_tilt) + $saturation_tilt);
+        $hsl[1] += $sat_start_delta;
+        $hsl2[1] -= $sat_start_delta;
+    }
+    if ($lightness_axis_offset){
+        $light_max_hue -= 360 while $light_max_hue > $hsl[0];
+        $light_max_hue += 360 while $light_max_hue <= $hsl[0];
+        my $dmin_first = $light_max_hue > $hsl[0] + 180;
+        @light_turn_point =  $dmin_first ? ($light_max_hue - 180, $light_max_hue, 800)
+                                         : ($light_max_hue, $light_max_hue + 180, 800);
+        $light_step = - $light_step if $dmin_first;
+        my $light_start_delta = $dmin_first ? ((($light_max_hue - 180 - $hsl[0]) / 90 * $lightness_tilt) - $lightness_tilt)
+                                            : (-(($light_max_hue -      $hsl[0]) / 90 * $lightness_tilt) + $lightness_tilt);
+        $hsl[2] += $light_start_delta;
+        $hsl2[2] -= $light_start_delta;
+    }
+    my $c1 = _new_from_scalar( [ 'HSL', @hsl ] );
+    $hsl2[0] += 180 + $hue_tilt;
+    my $c2 = _new_from_scalar( [ 'HSL', @hsl2 ] ); # main complementary color
+    return $c2 if $steps < 2;
+    return $c1, $c2 if $steps == 2;
+
+    my (@result) = $c1;
+    my $hue_avg_step = 360 / $steps;
+    my $hue_c2_distance = $self->distance( to => $c2, in => 'HSL', select => 'hue');
+    my $hue_avg_tight_step = $hue_c2_distance * 2 / $steps;
+    my $hue_sec_deg_delta = 8 * ($hue_avg_step - $hue_avg_tight_step) / $steps; # second degree delta
+    $hue_sec_deg_delta = -$hue_sec_deg_delta if $hue_tilt < 0; # if c2 on right side
+    my $hue_last_step = my $hue_ak_step = $hue_avg_step; # bar height of pseudo integral
+    my $hue_current = my $hue_current_naive = $hsl[0];
+    my $saturation_current = $hsl[1];
+    my $lightness_current = $hsl[2];
+    my $hi = my $si = my $li = 0; # index of next turn point where hue step increase gets flipped (at Dmax and Dmin)
+    for my $i (1 .. $steps - 1){
+        $hue_current_naive += $hue_avg_step;
+
+        if ($hue_current_naive >= $hue_turn_point[$hi]){
+            my $bar_width = ($hue_turn_point[$hi] - $hue_current_naive + $hue_avg_step) / $hue_avg_step;
+            $hue_ak_step += $hue_sec_deg_delta * $bar_width;
+            $hue_current += ($hue_ak_step + $hue_last_step) / 2 * $bar_width;
+            $hue_last_step = $hue_ak_step;
+            $bar_width = 1 - $bar_width;
+            $hue_sec_deg_delta = -$hue_sec_deg_delta;
+            $hue_ak_step += $hue_sec_deg_delta * $bar_width;
+            $hue_current += ($hue_ak_step + $hue_last_step) / 2 * $bar_width;
+            $hi++;
+        } else {
+            $hue_ak_step += $hue_sec_deg_delta;
+            $hue_current += ($hue_ak_step + $hue_last_step) / 2;
+        }
+        $hue_last_step = $hue_ak_step;
+
+        if ($hue_current_naive >= $sat_turn_point[$si]){
+            my $bar_width = ($sat_turn_point[$si] - $hue_current_naive + $hue_avg_step) / $hue_avg_step;
+            $saturation_current += $sat_step * ((2 * $bar_width) - 1);
+            $sat_step = -$sat_step;
+            $si++;
+        } else {
+            $saturation_current += $sat_step;
+        }
+
+        if ($hue_current_naive >= $light_turn_point[$li]){
+            my $bar_width = ($light_turn_point[$li] - $hue_current_naive + $hue_avg_step) / $hue_avg_step;
+            $lightness_current += $light_step * ((2 * $bar_width) - 1);
+            $light_step = -$light_step;
+            $li++;
+        } else {
+            $lightness_current += $light_step;
+        }
+
+        $result[$i] = _new_from_scalar( [ HSL => $hue_current, $saturation_current, $lightness_current ] );
+    }
+
+    return @result;
 }
 
-sub bowl {
+sub bowl {# +radius +distance|count +variance ~in @range
     my ($self, @args) = @_;
     my $arg = _get_arg_hash( @args );
     return unless ref $arg eq 'HASH';
-# radius size in
-# distance | count
+
 }
 
 1;
@@ -223,7 +322,7 @@ __END__
 
 =head1 NAME
 
-Graphics::Toolkit::Color - color palette creation helper
+Graphics::Toolkit::Color - color palette constructor
 
 =head1 SYNOPSIS
 
@@ -231,40 +330,49 @@ Graphics::Toolkit::Color - color palette creation helper
 
     my $red = Graphics::Toolkit::Color->new('red'); # create color object
     say $red->add( 'blue' => 255 )->name;           # add blue value: 'fuchsia'
-    color( 0, 0, 255)->values('HSL');               # 240, 100, 50 = blue
-                                                    # mix blue with a little grey in HSL
-    $blue->blend( with => { H=> 0, S=> 0, L=> 80 }, pos => 0.1);
+    my $blue = color( 0, 0, 255)->values('HSL');    # 240, 100, 50 = blue
+    $blue->blend( with => [HSL => 0,0,80], pos => 0.1);# mix blue with a little grey in HSL
     $red->gradient( to => '#0000FF', steps => 10);  # 10 colors from red to blue
     $red->complement( 3 );                          # get fitting red green and blue
 
 
 =head1 DESCRIPTION
 
-ATTENTION: deprecated methods of the old API will be removed on version 2.0.
+ATTENTION: deprecated methods of the old API ( I<string>, I<rgb>, I<red>,
+I<green>, I<blue>, I<rgb_hex>, I<rgb_hash>, I<hsl>, I<hue>, I<saturation>,
+I<lightness>, I<hsl_hash>, I<blend_with>, I<gradient_to>,
+I<rgb_gradient_to>, I<hsl_gradient_to>, I<complementary>)
+will be removed on version 2.0.
 
-Graphics::Toolkit::Color, for short GTC, is the top level API of this
-module. It is designed to get fast access to a set of related colors,
-that serve your need. While it can understand and output many color
-formats, its primary (internal) format is RGB, because this it is
-about colors that can be shown on the screen.
+Graphics::Toolkit::Color, for short GTC, is the top level API of this module
+and the only one a regular user should be concerned with.
+Its main purpose is the creation of sets of related colors, such as
+gradients, complements and others.
+
+GTC are read only color holding objects with no additional dependencies.
+Create them in many different ways (see section L</CONSTRUCTOR>).
+Access its values via methods from section L</GETTER>.
+Measure differences with the I<distance> method. L</SINGLE-COLOR>
+methods create one a object that is related to the current one and
+L</COLOR-SETS> methods will create a host of color that are not
+only related to the current color but also have relations between each other.
+
+While this module can understand and output color values in many spaces,
+such as YIQ, HSL and many more, RGB is the (internal) primal one,
+because GTC is about colors that can be shown on the screen, and these
+are usually encoded in RGB.
 
 Humans access colors on hardware level (eye) in RGB, on cognition level
 in HSL (brain) and on cultural level (language) with names.
-Having easy access to all three and some color math should enable you to get the color
-palette you desire quickly.
-
-GTC are read only color holding objects with no additional dependencies.
-Create them in many different ways (see section I<CONSTRUCTOR>).
-Access its values via methods from section I<GETTER> or measure differences
-and create related color objects via methods listed under I<METHODS>.
-
+Having easy access to all three and some color math should enable you to
+get the color palette you desire quickly.
 
 =head1 CONSTRUCTOR
 
-There are many options to create a color objects.  In short you can
-either use the name of a constant or provide values in several
-L<Graphics::Toolkit::Color::Space::Hub/COLOR-SPACES> and many formats
-as described in this paragraph.
+There are many options to create a color objects. In short you can
+either use the name of a constant or provide values in one of several
+L<Graphics::Toolkit::Color::Space::Hub/COLOR-SPACES>, which also can be
+formatted in many ways as described in this paragraph.
 
 =head2 new('name')
 
@@ -354,10 +462,9 @@ C<color>, which takes all the same arguments as described above.
     my $darkblue = color([20, 20, 250]);
 
 
-=head1 GETTER / ATTRIBUTES
+=head1 GETTER
 
-are read only methods - giving access to different parts of the
-objects data.
+giving access to different parts of the objects data.
 
 =head2 name
 
@@ -369,99 +476,44 @@ If no color is found, C<name> returns an empty string.
 All names are at: L<Graphics::Toolkit::Color::Name::Constant/NAMES>
 (See als: L</new('name')>)
 
-=head2 string
-
-DEPRECATED:
-String that can be serialized back into a color an object
-(recreated by Graphics::Toolkit::Color->new( $string )).
-It is either the color L</name> (if color has one) or result of L</rgb_hex>.
-
 =head2 values
 
-Returns the values of the color in given color space and with given format.
-In short any format acceptable by the constructor can also be reproduce
-by a getter method and in most cases by this one.
+Returns the values of the color in given color space and format.
+It accepts three named, optional arguments.
 
 First argument is the name of a color space (named argument C<in>).
-The options are to be found under: L<Graphics::Toolkit::Color::Space::Hub/COLOR-SPACES>
-This is the only argument where the name can be left out.
+All options are under: L<Graphics::Toolkit::Color::Space::Hub/COLOR-SPACES>
+The order of named arguments is of course chosen by the user, but I call
+it the first (most important) argument, because if you give the method
+only one value, it is assumed to be the color space.
 
-Second argument is the format (named argument C<as>).
-Not all formats are available under all color spaces, but the alway present
-options are: C<list> (default), C<hash>, C<char_hash> and C<array>.
+Second argument is the format (name: C<as>).
+In short any SCALAR format acceptable to the L</CONSTRUCTOR> can also be
+reproduced by a getter method and the numerical cases by this one.
+Not all formats are available under all color spaces, but the always
+present options are: C<list> (default), C<hash>, C<char_hash> and C<array>.
 
-Third named argument is the upper border of the range inide which the
-numerical values have to be. RGB are normally between 0..255 and
-CMYK between 0 .. 1. If you want to change that order a different range.
-Only a range of C<1> a.k.a. C<normal> displays decimals.
+Third named argument is the range inside which the numerical values have
+to be. RGB are normally between 0 .. 255 and CMYK between 0 .. 1 ('normal').
+Only a range of C<1> a.k.a. C<'normal'> displays decimals.
+There are three syntax option to set the ranges. One value will be
+understood as upper limit of all dimensions and zero being the lower one.
+If you want to set the upper limits of all dimensions separately, you
+have to  deliver an ARRAY ref with the 3 or 4 upper limits. To also
+define the lower boundary, you replace the number with an ARRAY ref containing
+the lower and then the upper limit.
 
+    $blue->values();                               # get list in RGB: 0, 0, 255
+    $blue->values( in => 'RGB', as => 'list');     # same call
+    $blue->values( in => 'RGB', as => 'hash');     # { red => 0, green => 0, blue => 255}
+    $blue->values( in => 'RGB', as => 'char_hash');# { r => 0, g => 0, b => 255}
+    $blue->values( in => 'RGB', as => 'hex');      # '#00FFFF'
+    $color->values('HSL');                         # 240, 100, 50
+    $color->values( in => 'HSL', range => 1);      # 0.6666, 1, 0.5
+    $color->values( in => 'RGB', range => 2**16);  # values in RGB16
+    $color->values( in => 'HSB', as => 'hash')->{'hue'};  # how to get single values
+   ($color->values( 'HSB'))[0];                           # same, but shorter
 
-    $blue->values();                              # get list of rgb : 0, 0, 255
-    $blue->values( in => 'RGB', as => 'list');    # same call
-    $blue->values('RGB', as => 'hash');           # { red => 0. green => 0, blue => 255}
-    $blue->values('RGB', as =>'char_hash');       # { r => 0. g => 0, b => 255}
-    $blue->values('RGB', as => 'hex');            # '#00FFFF'
-    $color->values(in => 'HSL');                  # 240, 100, 50
-    $color->values(in => 'HSL', range => 1);      # 0.6666, 1, 0.5
-    $color->values(in => 'RGB', range => 16);     # values in RGB16
-    $color->values('HSB', as => 'hash')->{'hue'}; # how to get single values
-
-=head2 hue
-
-DEPRECATED:
-Integer between 0 .. 359 describing the angle (in degrees) of the
-circular dimension in HSL space named hue.
-0 approximates red, 30 - orange, 60 - yellow, 120 - green, 180 - cyan,
-240 - blue, 270 - violet, 300 - magenta, 330 - pink.
-0 and 360 point to the same coordinate. This module only outputs 0,
-even if accepting 360 as input.
-
-=head2 saturation
-
-DEPRECATED:
-Integer between 0 .. 100 describing percentage of saturation in HSL space.
-0 is grey and 100 the most colorful (except when lightness is 0 or 100).
-
-=head2 lightness
-
-DEPRECATED:
-Integer between 0 .. 100 describing percentage of lightness in HSL space.
-0 is always black, 100 is always white and 50 the most colorful
-(depending on L</hue> value) (or grey - if saturation = 0).
-
-=head2 rgb
-
-DEPRECATED:
-List (no I<ARRAY> reference) with values of L</red>, L</green> and L</blue>.
-
-=head2 hsl
-
-DEPRECATED:
-List (no I<ARRAY> reference) with values of L</hue>, L</saturation> and L</lightness>.
-
-=head2 rgb_hex
-
-DEPRECATED:
-String starting with character '#', followed by six hexadecimal lower case figures.
-Two digits for each of L</red>, L</green> and L</blue> value -
-the format used in CSS (#rrggbb).
-
-=head2 rgb_hash
-
-DEPRECATED:
-Reference to a I<HASH> containing the keys C<'red'>, C<'green'> and C<'blue'>
-with their respective values as defined above.
-
-=head2 hsl_hash
-
-DEPRECATED:
-Reference to a I<HASH> containing the keys C<'hue'>, C<'saturation'> and C<'lightness'>
-with their respective values as defined above.
-
-
-=head1 COLOR RELATION METHODS
-
-create new, related color (objects) or compute similarity of colors
 
 =head2 distance
 
@@ -480,10 +532,14 @@ want to compute the distance with the default ranges of the selected color
 space.
 
     my $d = $blue->distance( to => 'lapisblue' );              # how close is blue to lapis color?
-    $d = $blue->distance( to => 'airyblue', in => 'RGB', metric => 'Blue'); # same amount of blue?
-    $d = $color->distance( to => $c2, in => 'HSL', metric => 'hue' );                  # same hue?
+    $d = $blue->distance( to => 'airyblue', in => 'RGB', select => 'Blue'); # same amount of blue?
+    $d = $color->distance( to => $c2, in => 'HSL', select => 'hue' );                  # same hue?
     # compute distance when with all value ranges 0 .. 1
-    $d = $color->distance( to => $c2, in => 'HSL', metric => 'hue', range => 'normal' );
+    $d = $color->distance( to => $c2, in => 'HSL', select => 'hue', range => 'normal' );
+
+=head1 SINGLE COLOR
+
+construct colors that are related to the current object.
 
 =head2 set
 
@@ -535,7 +591,10 @@ It takes three named arguments, only the first is required.
     $color->blend({ with => 'silver', pos => 0.6 });             # works too!
     $blue->blend( with => {H => 240, S =>100, L => 50}, in => 'RGB' ); # teal
 
-=head1 COLOR SET CREATION METHODS
+=head1 COLOR SETS
+
+construct many interrelated color objects at once.
+
 
 =head2 gradient
 
@@ -543,26 +602,26 @@ Creates a gradient (a list of colors that build a transition) between
 current (C1) and a second, given color (C2) by named argument I<to>.
 
 The only required argument you have to give under the name I<to> is C2.
-Either as an Graphics::Toolkit::Color object or a scalar (name, hex, hash
-or reference), which is acceptable to a L</constructor>. This is the same
+Either as an Graphics::Toolkit::Color object or a scalar (name, hex, HASH
+or ARRAY), which is acceptable to a L</CONSTRUCTOR>. This is the same
 behaviour as in L</distance>.
 
-An optional argument under the name I<steps> is the number of colors,
+An optional argument under the name I<steps> sets the number of colors,
 which make up the gradient (including C1 and C2). It defaults to 3.
-Negative numbers will berectified by C<abs>.
+Negative numbers will be rectified by C<abs>.
 These 3 color objects: C1, C2 and a color in between, which is the same
 as the result of method L</blend>.
 
-Another optional argument under the name I<dynamic> is also a float number,
-which defaults to zero. It defines the position of weight of the transition
-between the two colors. If $dynamic == 0 you get a linear transition,
-meaning the L</distance> between neighbouring colors in the gradient.
+Another optional argument under the name I<dynamic> is a float number,
+that defines the position of weight in the color transition from C1 to C2.
+It defaults to zero which gives you a linear transition,
+meaning the L</distance> between neighbouring colors in the gradient is equal.
 If $dynamic > 0, the weight is moved toward C1 and vice versa.
 The greater $dynamic, the slower the color change is in the beginning
-of the gradient and faster at the end (C2).
+of the gradient and the faster at the end (C2).
 
-The last optional argument names I<in> defines the color space the changes
-are computed in. It parallels the argument of the same name of the method
+The last optional argument named I<in> defines the color space the changes
+are computed in. It parallels the argument of the same name from the method
 L</blend> and L</distance>.
 
     # we turn to grey
@@ -572,28 +631,50 @@ L</blend> and L</distance>.
 
 =head2 complement
 
-Creates a set of complementary colors.
-It accepts 3 numerical arguments: n, delta_S and delta_L.
+Creates a set of complementary colors, which will be computed in I<HSL>
+color space. It accepts 4 optional, named arguments.
+Complementary colors have a different I<hue> value but same
+I<saturation> and I<lightness>. Because they form a circle in HSL, they
+will be called in this paragraph a circle.
 
-Imagine an horizontal circle in HSL space, whith a center in the (grey)
-center column. The saturation and lightness of all colors on that
-circle is the same, they differ only in hue. The color of the current
-color object ($self a.k.a C1) lies on that circle as well as C2,
-which is 180 degrees (half the circumference) apposed to C1.
+If you provide no names (just a single argument), the value is understood
+as I<steps>. I<steps> is the amount (count) of complementary colors,
+which defaults to 1 (giving you then THE complementary color).
+If more than one color is requested, the result will contain the calling
+object as the first color.
 
-This circle will be divided in $n (first argument) equal partitions,
-creating $n equally distanced colors. All of them will be returned,
-as objects, starting with C1. However, when $n is set to 1 (default),
-the result is only C2, which is THE complementary color to C1.
+The second optional argument is I<hue_tilt>, in short I<h>, which defaults
+to zero. When zero, the hue distance between all resulting colors on the
+circle is the same. When not zero, the I<hue_tilt> gets added (see L</add>)
+to THE complementary color. The so computed color divides the circle in a
+shorter and longer part. Both of these parts will now contain an equal
+amount of result colors. The distribution will be computed in a way,
+that there will be a place on the circle where the distance between colors
+is the highest (let's call it Dmax) and one where it is the lowest (Dmin).
+The distance between two colors increases or decreases steadily.
+When I<hue_tilt> is zero, the axis through Dmax and Dmin and the axis
+through $self and C2 are orthogonal.
 
-The second argument moves C2 along the S axis (both directions),
-so that the center of the circle is no longer in the HSL middle column
-and the complementary colors differ in saturation. (C1 stays unmoved. )
+The third optional argument I<saturation_tilt>, or short I<s>, which also
+defaults to zero. If the value differs from zero it gets added the color
+on Dmax (last paragraph), subtracted on Dmin, changed accordingly in between,
+so that the circle gets moved in direction Dmin. If you want to move
+the circle in any other direction you have to give I<saturation_tilt>
+a HASH reference with 2 keys. First is I<saturation> or I<s>, which is
+the  value as described. Secondly  I<hue> or I<h> rotates the direction
+in which the circle will be moved. Please not, this will not change
+the position of Dmin and Dmax, because it just defines the angle
+between the Dmin-Dmax axis and the direction where the circle is moved.
 
-The third argument moves C2 along the L axis (vertical), which gives the
-circle a tilt, so that the complementary colors will differ in lightness.
+The fourth optional argument is I<lightness_tilt> or I<l>m which works
+analogously to I<saturation_tilt>. Only difference is that it tilts the
+circle in the up-down direction, which is in HSL color space lightness.
 
-    my @colors = $c->complement( 3, +20, -10 );
+    my @colors = $c->complement( 4 );    # $self + 3 compementary (square) colors
+    my @colors = $c->complement( steps => 3, s => 20, l => -10 );
+    my @colors = $c->complement( steps => 3, hue_tilt => -40,
+                                     saturation_tilt => {saturation => 300, hue => -50},
+                                     lightness_tilt => {l => -10, hue => 30} );
 
 =head1 SEE ALSO
 

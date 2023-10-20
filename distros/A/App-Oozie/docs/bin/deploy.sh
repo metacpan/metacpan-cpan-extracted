@@ -12,14 +12,15 @@ perl -I$TEST_LIB \
 -MCarp::Always \
 -MData::Dumper \
 -MApp::Oozie::Deploy -wE 'warn Dumper \@ARGV; App::Oozie::Deploy->new_with_options->run( \@ARGV )' -- \
---local_oozie_code_path $TEST_BIN"/eg"                  \
---webhdfs_hostname hadoop-httpfs.example.com            \
---oozie_uri http://hadoop-oozie.example.com:11000/oozie \
---verbose                                               \
---oozie_client_jar /local/path/oozie-client.jar         \
---git_repo_path ~/gitrepo/where/workflows/are           \
---oozie_cli ~/bin/oozie                                 \
-"$@"                                                    \
-cpan-sample-workflow                                    \
+--git_repo_path         $TEST_BIN"/eg"                              \
+--local_oozie_code_path $TEST_BIN"/eg"                              \
+--oozie_cli             /usr/bin/oozie                              \
+--oozie_client_jar      /usr/lib/oozie/lib/oozie-client-5.2.1.jar   \
+--oozie_uri             http://hadoop-oozie.example.com:11000/oozie \
+--webhdfs_hostname      hadoop-httpfs.example.com                   \
+--webhdfs_port          9870                                        \
+--verbose                                                           \
+"$@"                                                                \
+cpan-sample-workflow                                                \
 
 echo "FIN."

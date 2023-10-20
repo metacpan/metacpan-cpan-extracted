@@ -1,24 +1,11 @@
 use v5.26;
 use Object::Pad;
 
-package Blockchain::Ethereum::Keystore::Address 0.005;
+package Blockchain::Ethereum::Keystore::Address;
 class Blockchain::Ethereum::Keystore::Address;
 
-=encoding utf8
-
-=head1 NAME
-
-Blockchain::Ethereum::Keystore::Address
-
-=head1 SYNOPSIS
-
-Address utilities
-
-    my $address = Blockchain::Ethereum::Address->new(0x...);
-    print $address;
-    ...
-
-=cut
+our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
+our $VERSION   = '0.009';          # VERSION
 
 use Carp;
 use Crypt::Digest::Keccak256 qw(keccak256_hex);
@@ -60,21 +47,53 @@ method to_string {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Blockchain::Ethereum::Keystore::Address
+
+=head1 VERSION
+
+version 0.009
+
+=head1 SYNOPSIS
+
+Import an existing address:
+
+    my $address = Blockchain::Ethereum::Address->new(0x...);
+    # print checksummed address
+    print $address;
+
+Generate a new address:
+
+    my $key = Blockchain::Ethereum::Key->new;
+    my $address = $key->address;
+
+=head1 METHODS
+
+=head2 no_prefix
+
+Returns the checksummed address without the 0x prefix
+
+=head2 to_string
+
+Returns the checksummed 0x prefixed address
+
+This function will be called as the default stringification method
+
 =head1 AUTHOR
 
-Reginaldo Costa, C<< <refeco at cpan.org> >>
+Reginaldo Costa <refeco@cpan.org>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to L<https://github.com/refeco/perl-ethereum-keystore>
-
-=head1 LICENSE AND COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2023 by REFECO.
 
 This is free software, licensed under:
 
-  The MIT License
+  The MIT (X11) License
 
 =cut
-

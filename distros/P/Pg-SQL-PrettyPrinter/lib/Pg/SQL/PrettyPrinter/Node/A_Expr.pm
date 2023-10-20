@@ -55,16 +55,17 @@ sub new {
     }
 
     $self->objectify( 'name', 'rexpr', 'lexpr' );
+    use Data::Dumper;
     return $self;
 }
 
 sub operator {
     my $self = shift;
     if ( 1 == scalar @{ $self->{ 'name' } } ) {
-        return $self->{ 'name' }->[ 0 ]->{ 'str' };
+        return $self->{ 'name' }->[ 0 ]->string;
     }
     my @elements = map { $_->as_ident() } @{ $self->{ 'name' } };
-    $elements[ -1 ] = $self->{ 'name' }->[ -1 ]->{ 'str' };
+    $elements[ -1 ] = $self->{ 'name' }->[ -1 ]->string;
     return sprintf( "OPERATOR( %s )", join( '.', @elements ) );
 }
 
@@ -72,9 +73,11 @@ sub as_text {
     my $self = shift;
 
     if ( $self->{ 'kind' } eq 'AEXPR_IN' ) {
+        my $op = $self->operator eq '<>' ? 'NOT IN' : 'IN';
         return sprintf(
-            '%s IN %s',
+            '%s %s %s',
             $self->{ 'lexpr' }->as_text,
+            $op,
             $self->{ 'rexpr' }->as_text
         );
     }
@@ -118,9 +121,11 @@ sub as_text {
         );
     }
     elsif ( $self->{ 'kind' } eq 'AEXPR_LIKE' ) {
+        my $op = $self->operator eq '!~~' ? 'NOT LIKE' : 'LIKE';
         return sprintf(
-            '%s LIKE %s',
+            '%s %s %s',
             $self->{ 'lexpr' }->as_text,
+            $op,
             $self->{ 'rexpr' }->as_text,
         );
     }
@@ -189,9 +194,11 @@ sub as_text {
 sub pretty_print {
     my $self = shift;
     if ( $self->{ 'kind' } eq 'AEXPR_IN' ) {
+        my $op = $self->operator eq '<>' ? 'NOT IN' : 'IN';
         return sprintf(
-            '%s IN %s',
+            '%s %s %s',
             $self->{ 'lexpr' }->pretty_print,
+            $op,
             $self->{ 'rexpr' }->pretty_print
         );
     }
@@ -235,9 +242,11 @@ sub pretty_print {
         );
     }
     elsif ( $self->{ 'kind' } eq 'AEXPR_LIKE' ) {
+        my $op = $self->operator eq '!~~' ? 'NOT LIKE' : 'LIKE';
         return sprintf(
-            '%s LIKE %s',
+            '%s %s %s',
             $self->{ 'lexpr' }->pretty_print,
+            $op,
             $self->{ 'rexpr' }->pretty_print,
         );
     }

@@ -1,17 +1,15 @@
 struct promise;
-typedef struct promise Promise;
 
-Promise* promise_alloc(UV);
-SV* S_promise_get(pTHX_ Promise* promise);
+struct promise* S_promise_alloc(pTHX_ UV);
+#define promise_alloc(count) S_promise_alloc(aTHX_ count)
+SV* S_promise_get(pTHX_ struct promise* promise);
 #define promise_get(promise) S_promise_get(aTHX_ promise)
-void promise_set_value(Promise* promise, SV* value);
-void promise_set_exception(Promise* promise, SV* value);
-bool promise_is_finished(Promise*);
-void promise_refcount_dec(Promise* promise);
-SV* S_promise_finished_fh(pTHX_ Promise* promise);
+void promise_set_value(struct promise* promise, SV* value);
+void promise_set_exception(struct promise* promise, SV* value);
+bool promise_is_finished(struct promise*);
+void S_promise_refcount_dec(pTHX_ struct promise* promise);
+#define promise_refcount_dec(promise) S_promise_refcount_dec(aTHX_ promise)
+SV* S_promise_finished_fh(pTHX_ struct promise* promise);
 #define promise_finished_fh(promise) S_promise_finished_fh(aTHX_ promise)
 
-SV* S_promise_to_sv(pTHX_ Promise* promise);
-#define promise_to_sv(promise) S_promise_to_sv(aTHX_ promise)
-Promise* S_sv_to_promise(pTHX_ SV* sv);
-#define sv_to_promise(sv) S_sv_to_promise(aTHX_ sv)
+extern const MGVTBL Thread__CSP__Promise_magic;

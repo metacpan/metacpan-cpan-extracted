@@ -5,43 +5,58 @@
 # Joan Ntzougani, ✞
 
 package Dancer2::Plugin::WebService;
-our	$VERSION = '4.4.3';
+our	$VERSION = '4.4.6';
 use	strict;
 use	warnings;
 use Encode;
 use	Dancer2::Plugin;
 use	Storable;
+use Cpanel::JSON::XS;
 use	XML::Hash::XS; $XML::Hash::XS::canonical=0;    $XML::Hash::XS::utf8=1;  $XML::Hash::XS::doc=0;  $XML::Hash::XS::root='root'; $XML::Hash::XS::encoding='utf-8'; $XML::Hash::XS::indent=2; $XML::Hash::XS::xml_decl=0;
+use YAML::XS;      # for user posted yaml to hash
+use YAML::Syck;    $YAML::Syck::ImplicitUnicode=1;  # for hash to reply string
 use	Data::Dumper;  $Data::Dumper::Trailingcomma=0; $Data::Dumper::Indent=2; $Data::Dumper::Terse=1; $Data::Dumper::Deepcopy=1; $Data::Dumper::Purity=1; $Data::Dumper::Sortkeys=0;
-use YAML::Syck;    $YAML::Syck::ImplicitTyping=1;  $YAML::Syck::Headless=0; $YAML::Syck::ImplicitUnicode=0;
-use Cpanel::JSON::XS; my $JSON=Cpanel::JSON::XS->new; $JSON->space_before(1);$JSON->canonical(0);  $JSON->allow_tags(1);  $JSON->allow_unknown(0); $JSON->pretty(0); $JSON->indent(1); $JSON->space_after(1); $JSON->max_size(0); $JSON->relaxed(0); $JSON->shrink(0); $JSON->allow_nonref(0); $JSON->allow_blessed(1); $JSON->convert_blessed(1); $JSON->max_depth(1024); $JSON->utf8(0);
-
 
 if ($^O=~/(?i)MSWin/) {warn "Operating system is not supported\n"; exit 1}
+
+my $JSON = Cpanel::JSON::XS->new;
+$JSON->space_before(0);
+$JSON->canonical(0);
+$JSON->allow_tags(1);
+$JSON->allow_unknown(0);
+$JSON->pretty(0);
+$JSON->indent(0);
+$JSON->space_after(1);
+$JSON->max_size(0);
+$JSON->relaxed(0);
+$JSON->shrink(0);
+$JSON->allow_nonref(0);
+$JSON->allow_blessed(1);
+$JSON->convert_blessed(1);
+$JSON->max_depth(1024);
+
 my $dir;
 my %Handler;
 my %TokenDB = ();
-my %Formats = ( json=>'application/json', xml=>'text/xml', yaml=>'text/x-yaml', perl=>'text/html', human=>'text/html' );
-   $_ = join '|', sort keys %Formats;
-my $fmt_rgx = qr/^($_)$/;
+my %Formats = (json=>'application/json', xml=>'application/xml', yaml=>'application/yaml', perl=>'text/plain', human=>'text/plain');
+my $fmt_rgx = eval 'qr/^('. join('|', sort keys %Formats) .')$/';
 
-has error           => (is=>'rw', lazy=>1, default=> 0);
-has sort            => (is=>'rw', lazy=>1, default=> 0);
-has pretty          => (is=>'rw', lazy=>1, default=> 1);
-has route_name      => (is=>'rw', lazy=>1, default=> '');
-has ClientIP        => (is=>'rw', lazy=>1, default=> '');
-has reply_text      => (is=>'rw', lazy=>1, default=> '');
-has auth_method     => (is=>'rw', lazy=>1, default=> '');
-has auth_command    => (is=>'rw', lazy=>1, default=> '');
-has auth_config     => (is=>'rw', lazy=>1, default=> sub{ {} });
-has data            => (is=>'rw', lazy=>1, default=> sub{ {} }); # user posted data as hash
-has Format          => (is=>'rw', lazy=>1, default=> sub{ {from => undef, to => undef} });
-has Session_timeout => (is=>'ro', lazy=>0, from_config=>'Session idle timeout',default=> sub{ 3600 }, isa => sub {unless ( $_[0]=~/^\d+$/ ) {warn "Session idle timeout \"$_[0]\" It is not a number\n"; exit 1}} );
-has rules           => (is=>'ro', lazy=>0, from_config=>'Allowed hosts',       default=> sub{ ['127.*', '192.168.*', '172.16.*'] });
-has rules_compiled  => (is=>'ro', lazy=>0, default=> sub {my $array = [@{$_[0]->rules}]; for (@{$array}) { s/([^?*]+)/\Q$1\E/g; s|\?|.|g; s|\*+|.*?|g; $_ = qr/^$_$/i } $array});
-has dir_session     => (is=>'ro', lazy=>0, default=> sub {my $D = exists $_[0]->config->{'Session directory'} ? $_[0]->config->{'Session directory'}."/$_[0]->{app}->{name}" : "$_[0]->{app}->{config}->{appdir}/session"; $D=~s|/+|/|g; my @MD = split /(?:\\|\/)+/, $D; my $i; for ($i=$#MD; $i>=0; $i--) { last if -d join '/', @MD[0..$i] } for (my $j=$i+1; $j<=$#MD; $j++) { unless (mkdir join '/', @MD[0 .. $j]) {warn "Could not create the session directory \"$D\" because $!\n"; exit 1} } $D} );
-has rm              => (is=>'ro', lazy=>0, default=> sub{foreach (qw[/usr/bin /bin /usr/sbin /sbin]) {return "$_/rm" if -f "$_/rm" && -x "$_/rm" } warn "Could not found utility rm\n"; exit 1});
-
+has error           => (is=>'rw', lazy=>1, default     => 0);
+has sort            => (is=>'rw', lazy=>1, default     => 0);
+has pretty          => (is=>'rw', lazy=>1, default     => 1);
+has route_name      => (is=>'rw', lazy=>1, default     => '');
+has ClientIP        => (is=>'rw', lazy=>1, default     => '');
+has reply_text      => (is=>'rw', lazy=>1, default     => '');
+has auth_method     => (is=>'rw', lazy=>1, default     => '');
+has auth_command    => (is=>'rw', lazy=>1, default     => '');
+has auth_config     => (is=>'rw', lazy=>1, default     => sub{ {} });
+has data            => (is=>'rw', lazy=>1, default     => sub{ {} }); # user posted data as hash
+has Format          => (is=>'rw', lazy=>1, default     => sub{ {from => undef, to => undef} });
+has Session_timeout => (is=>'ro', lazy=>0, from_config => 'Session idle timeout',default=> sub{ 3600 }, isa => sub {unless ( $_[0]=~/^\d+$/ ) {warn "Session idle timeout \"$_[0]\" It is not a number\n"; exit 1}} );
+has rules           => (is=>'ro', lazy=>0, from_config => 'Allowed hosts',       default=> sub{ ['127.*', '192.168.*', '172.16.*'] });
+has rules_compiled  => (is=>'ro', lazy=>0, default     => sub {my $array = [@{$_[0]->rules}]; for (@{$array}) { s/([^?*]+)/\Q$1\E/g; s|\?|.|g; s|\*+|.*?|g; $_ = qr/^$_$/i } $array});
+has dir_session     => (is=>'ro', lazy=>0, default     => sub {my $D = exists $_[0]->config->{'Session directory'} ? $_[0]->config->{'Session directory'}."/$_[0]->{app}->{name}" : "$_[0]->{app}->{config}->{appdir}/session"; $D=~s|/+|/|g; my @MD = split /(?:\\|\/)+/, $D; my $i; for ($i=$#MD; $i>=0; $i--) { last if -d join '/', @MD[0..$i] } for (my $j=$i+1; $j<=$#MD; $j++) { unless (mkdir join '/', @MD[0 .. $j]) {warn "Could not create the session directory \"$D\" because $!\n"; exit 1} } $D} );
+has rm              => (is=>'ro', lazy=>0, default     => sub{foreach (qw[/usr/bin /bin /usr/sbin /sbin]) {return "$_/rm" if -f "$_/rm" && -x "$_/rm" } warn "Could not found utility rm\n"; exit 1});
 
 # Recursive walker of custom Perl Data Structures
 %Handler=(
@@ -58,24 +73,21 @@ sub BUILD
 my $plg = shift;
 my $app = $plg->app;
 
-# Security of the built-in routes
+# Module directory
+(my $module_dir =__FILE__) =~s|/[^/]+$||;
+unless (-d $module_dir) {CORE::warn "Could not find the Dancer2::Plugin::WebService installation directory\n"; exit 1}
+
+# Security of the built-in routes and default settings
 $plg->config->{Routes}->{WebService} = {Protected=>0};
 $plg->config->{Routes}->{login}      = {Protected=>0};
 $plg->config->{Routes}->{logout}     = {Protected=>1, Groups=>[]};
+$app->config->{charset}            //= 'UTF-8';
+$app->config->{encoding}           //= 'UTF-8';
+$app->config->{show_errors}        //= 0;
+$plg->config->{'Default format'}     = 'json' if ((! exists $plg->config->{'Default format'}) || ($plg->config->{'Default format'} !~ $fmt_rgx));
+$app->config->{content_type}         = $Formats{ $plg->config->{'Default format'} };
 
-# Default settings
-$app->config->{charset}        //= 'UTF-8';
-$app->config->{encoding}       //= 'UTF-8';
-$app->config->{show_errors}    //= 0;
-$plg->config->{'Default format'} = 'json' if ((! exists $plg->config->{'Default format'}) || ($plg->config->{'Default format'} !~ $fmt_rgx));
-$app->config->{content_type}     = $Formats{ $plg->config->{'Default format'} };
-
-# Module directory
-(my $module_dir =__FILE__) =~s|/[^/]+$||;
-unless (-d $module_dir) {warn "Could not find the Dancer2::Plugin::WebService installation directory\n"; exit 1}
-
-# Use the first active authentication method
-
+  # Use the first active authentication method
   foreach my $method (@{$plg->config->{'Authentication methods'}}) {
   next unless ((exists $method->{Active}) && ($method->{Active}=~/(?i)[y1t]/));
   $plg->auth_method( $method->{Name} );
@@ -110,7 +122,8 @@ delete $plg->config->{'Authentication methods'};
   foreach (keys %{$plg->config->{Routes}}) {
 
     if ((exists $plg->config->{Routes}->{$_}->{Protected}) && ($plg->config->{Routes}->{$_}->{Protected}=~/(?i)[y1t]/)) {
-    $plg->config->{Routes}->{$_}->{Protected} = 1;
+    delete $plg->config->{Routes}->{$_}->{Protected};
+           $plg->config->{Routes}->{$_}->{Protected}=1;
 
       if ($plg->auth_method eq '') {
       warn "While there is at least one protected route ( $_ ) there is not any active authorization method\n"; exit 1
@@ -126,7 +139,8 @@ delete $plg->config->{'Authentication methods'};
       }
     }
     else {
-    $plg->config->{Routes}->{$_}->{Protected} = 0
+    delete $plg->config->{Routes}->{$_}->{Protected};
+           $plg->config->{Routes}->{$_}->{Protected}=0
     }
   }
 
@@ -208,7 +222,7 @@ closedir DIR;
       }
     }
 
-  # add header
+  # Header Content-Type
   $app->request->header('Content-Type'=> $Formats{$plg->Format->{to}});
 
   # route name
@@ -216,16 +230,17 @@ closedir DIR;
   elsif ( $app->request->{route}->{regexp} =~/^\^[\/\\]+(.*?)\$/ )                  { $plg->route_name($1) }
   else  { $app->halt($plg->reply('error'=>'Could not recognize the route')) }
 
-  # Convert the posted string (data), to hash $plg->data
+  # Convert the posted data string, to hash $plg->data
   $plg->data({});
 
     if ($app->request->body) {
 
       eval  {
-      if    ($plg->Format->{from} eq 'json')  { $plg->data(Cpanel::JSON::XS::decode_json  Encode::encode('UTF-8',$app->request->body)) }
-      elsif ($plg->Format->{from} eq 'xml')   { $plg->data(XML::Hash::XS::xml2hash $app->request->body) }
-      elsif ($plg->Format->{from} eq 'yaml')  { $plg->data(YAML::Syck::Load        $app->request->body) }
-      elsif ($plg->Format->{from} eq 'perl')  { $plg->data(eval                    $app->request->body) }
+
+      if    ($plg->Format->{from} eq 'json')  { $JSON->utf8(1); $plg->data( $JSON->decode($app->request->body)         ) }
+      elsif ($plg->Format->{from} eq 'xml')   {                 $plg->data( XML::Hash::XS::xml2hash $app->request->body) }
+      elsif ($plg->Format->{from} eq 'yaml')  {                 $plg->data( YAML::XS::Load          $app->request->body) }
+      elsif ($plg->Format->{from} eq 'perl')  {                 $plg->data( eval                    $app->request->body) }
       elsif ($plg->Format->{from} eq 'human') { my $arrayref;
 
           while ( $app->request->body =~/(.*)$/gm ) {
@@ -510,7 +525,6 @@ $plg->reply_text('');
 
 		if ($plg->Format->{to} eq 'json') {
 		$JSON->canonical($plg->sort);
-		$JSON->space_before(0);
 
 			if ($plg->pretty) {
 			$JSON->pretty(1);
@@ -521,7 +535,8 @@ $plg->reply_text('');
 			$JSON->space_after(0)
 			}
 
-		$plg->{reply_text} = $JSON->encode($_[0])
+    $JSON->utf8(0);
+    $plg->{reply_text} = Encode::decode_utf8 $JSON->encode($_[0])
 		}
 		elsif ($plg->Format->{to} eq 'xml') {
 		$XML::Hash::XS::canonical=$plg->sort;
@@ -529,8 +544,8 @@ $plg->reply_text('');
 		$plg->{reply_text} = XML::Hash::XS::hash2xml $_[0]
 		}
 		elsif ($plg->Format->{to} eq 'yaml') {
-		$YAML::Syck::SortKeys=$plg->sort;
-		$plg->{reply_text} = YAML::Syck::Dump $_[0]
+		$YAML::Syck::SortKey=$plg->sort;
+    $plg->{reply_text} = YAML::Syck::Dump $_[0]
 		}
 		elsif ($plg->Format->{to} eq 'perl') {
 		$Data::Dumper::Indent=$plg->pretty;
@@ -552,12 +567,12 @@ $plg->reply_text('');
 
 
 
-#	Returns a reply as: json, xml, yaml, perl or human
-#	It always include the error
+#	Returns a reply as string formated : json, xml, yaml, perl or human
+#	Always includes the error
 #
-#	reply						only the error
-#	reply(   k1=>'v1', ... )	specific keys , values
-#	reply( { k1=>'v1', ... } )	specific keys , values
+#	reply						            only the error
+#	reply(   k1=>'v1', ... )    specific keys , values
+#	reply( { k1=>'v1', ... } )  specific keys , values
 #
 sub reply :PluginKeyword
 {
@@ -591,11 +606,10 @@ $plg->dsl->halt( $plg->reply_text )
 
 
 
-#  Return a list/hash of all or the selected posted keys
+#  Return all or the selected posted keys/values
 #
-#	           PostData();              # all                posted keys/values
-#	my %DATA = PostData('k1', 'k2');    # hash with selected posted keys/values
-#   my @DATA = PostData('k1', 'k2');    # list with selected posted keys/values
+#	 PostData();              # all                posted keys/values
+#	 PostData('k1', 'k2');    # hash with selected posted keys/values
 #
 sub PostData :PluginKeyword
 {
@@ -758,7 +772,7 @@ Dancer2::Plugin::WebService - RESTful Web Services with login, persistent data, 
 
 =head1 VERSION
 
-version 4.4.3
+version 4.4.6
 
 =head2 SYNOPSIS
 

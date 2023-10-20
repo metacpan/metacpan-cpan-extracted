@@ -6,9 +6,9 @@ use App::perlmv;
 use Getopt::Long::Complete; # just so we can detect script as using Getopt::Long::Complete
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-30'; # DATE
+our $DATE = '2023-07-15'; # DATE
 our $DIST = 'App-perlmv'; # DIST
-our $VERSION = '0.607'; # VERSION
+our $VERSION = '0.608'; # VERSION
 
 my $pmv = App::perlmv->new;
 #$pmv->{ 'mode' } = 'move'; # the default
@@ -30,7 +30,7 @@ perlmv - Rename/move files using Perl code
 
 =head1 VERSION
 
-This document describes version 0.607 of perlmv (from Perl distribution App-perlmv), released on 2023-06-30.
+This document describes version 0.608 of perlmv (from Perl distribution App-perlmv), released on 2023-07-15.
 
 =head1 SYNOPSIS
 
@@ -232,6 +232,7 @@ L<App::perlmv::scriptlet::rename_common_suffix>).
  -M <MODE> (--mode) Specify mode, default is 'rename' (or 'r'). Use 'copy' or
      'c' to copy instead of rename, 'symlink' or 's' to create a symbolic link,
      and 'link' or 'l' to create a (hard) link.
+ -N  (--no-dry-run) Turn off dry-run mode.
  -o  (--overwrite) Overwrite (by default, ".1", ".2", and so on will be appended
      to avoid overwriting existing files)
  -p  (--parents) Create intermediate directories
@@ -247,6 +248,18 @@ L<App::perlmv::scriptlet::rename_common_suffix>).
      if there is only one scriptlet to execute, and scriptlet name is specified
      as the first argument, and there is no -e specified.
  -a <arg=value> (--arg) Supply arguments for code/scriptlet.
+
+Details on some options:
+
+=over
+
+=item * -N, --no-dry-run
+
+This turns off the dry-run mode. Useful if you have a shell alias or wrapper
+that uses C<-d> to turn on dry-run mode by default (for safety) and you want to
+override by specifying C<-N> after.
+
+=back
 
 =head1 COMPLETION
 

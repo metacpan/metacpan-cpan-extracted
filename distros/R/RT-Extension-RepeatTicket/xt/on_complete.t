@@ -26,6 +26,8 @@ $m->submit_form_ok(
             'repeat-type'                     => 'monthly',
             'repeat-details-monthly'          => 'complete',
             'repeat-details-monthly-complete' => 0,
+            'repeat-create-on-recurring-date' => 0,
+            'repeat-coexistent-number'        => 1,
         },
         button => 'SubmitTicket',
     },

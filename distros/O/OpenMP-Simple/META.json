@@ -1,0 +1,52 @@
+{
+   "abstract" : "Provides some DWIM helpers for using OpenMP via C<Inline::C>.",
+   "author" : [
+      "oodler <oodler@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "OpenMP-Simple",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::OpenMP" : "0",
+            "Inline::C" : "0",
+            "OpenMP::Environment" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "File::Temp" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/Perl-OpenMP/p5-OpenMP-Simple",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Perl-OpenMP/p5-OpenMP-Simple.git",
+         "web" : "https://github.com/Perl-OpenMP/p5-OpenMP-Simple"
+      }
+   },
+   "version" : "0.0.3",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

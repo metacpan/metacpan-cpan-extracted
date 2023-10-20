@@ -32,6 +32,12 @@
       <foaf:mbox rdf:resource="mailto:pauloscustodio@gmail.com" />
     </foaf:Person>
   </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@babyl.ca" />
+    </foaf:Person>
+  </helper>
   <license rdf:resource="http://dev.perl.org/licenses/" />
   <homepage rdf:resource="https://github.com/yanick/Template-Caribou" />
   <bug-database rdf:resource="https://github.com/yanick/Template-Caribou/issues" />
@@ -93,6 +99,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.2.0</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-02-25</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.2.1</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-04-02</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

@@ -1,11 +1,12 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Test::ExpectAndCheck" );
-use_ok( "Test::ExpectAndCheck::Future" );
+require Test::ExpectAndCheck;
+require Test::ExpectAndCheck::Future;
 
+pass( 'Modules loaded' );
 done_testing;

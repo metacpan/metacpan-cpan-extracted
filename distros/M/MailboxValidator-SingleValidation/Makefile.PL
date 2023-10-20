@@ -5,13 +5,13 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'MailboxValidator::SingleValidation',
     VERSION_FROM      => 'lib/MailboxValidator/SingleValidation.pm', # finds $VERSION
-    PREREQ_PM         => { 'LWP::Simple' => 0, 'URI::Escape' => 0, 'JSON::Parse' => 0 }, # e.g., Module::Name => 1.1
+    PREREQ_PM         => { 'LWP::Simple' => 0, 'URI::Escape' => 0, 'JSON::PP' => 0 }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/MailboxValidator/SingleValidation.pm', # retrieve abstract from module
        AUTHOR         => 'MailboxValidator.com <support@mailboxvalidator.com>') : ()),
     LIBS              => [''], # e.g., '-lm'
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
-    LICENSE           => 'lgpl_3_0',
+    LICENSE           => 'mit',
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'
 	# Un-comment this if you add C files to link with later:
     # OBJECT            => '$(O_FILES)', # link all the C files too

@@ -110,6 +110,7 @@ void c_get_screen_info(char *fb_file) {
     Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.rotate)));
 
     Inline_Stack_Done;
+    // Phew!
 }
 
 // Sets the framebuffer to text mode, which enables the cursor
@@ -127,7 +128,6 @@ void c_graphics_mode(char *tty_file)
    ioctl(tty_fd,KDSETMODE,KD_GRAPHICS);
    close(tty_fd);
 }
-
 
 /* The other routines call this.  It handles all draw modes
  * 
@@ -172,6 +172,10 @@ void c_plot(
                         {
                             *((unsigned short*)(framebuffer + index)) = (short) color; // 16 bit can send a word at a time, the second most efficient method.
                         }
+				        break;
+				    case 8 :
+				        break;
+                    case 1 :
                         break;
                 }
             break;
@@ -194,6 +198,10 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) ^= (short) color;
                         }
                         break;
+				    case 8 :
+				        break;
+                    case 1 :
+                        break;
                 }
             break;
             case OR_MODE :
@@ -215,6 +223,10 @@ void c_plot(
                            *((unsigned short*)(framebuffer + index)) |= (short) color;
                         }
                         break;
+				    case 8 :
+				        break;
+                    case 1 :
+                        break;
                 }
             break;
             case AND_MODE :
@@ -235,6 +247,10 @@ void c_plot(
                         {
                             *((unsigned short*)(framebuffer + index)) &= (short) color;
                         }
+                        break;
+				    case 8 :
+				        break;
+                    case 1 :
                         break;
                 }
             break;
@@ -263,6 +279,10 @@ void c_plot(
                             }
                         }
                         break;
+				    case 8 :
+				        break;
+                    case 1 :
+                        break;
                 }
             break;
             case UNMASK_MODE :
@@ -290,6 +310,10 @@ void c_plot(
                              }
                          }
                          break;
+				    case 8 :
+				        break;
+                    case 1 :
+                        break;
                 }
             break;
             case ALPHA_MODE :
@@ -349,6 +373,10 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) = rgb565;
                         }
                         break;
+				    case 8 :
+				        break;
+                    case 1 :
+                        break;
                 }
             break;
             case ADD_MODE :
@@ -369,6 +397,10 @@ void c_plot(
                         {
                             *((unsigned short*)(framebuffer + index)) += (short) color;
                         }
+                        break;
+				    case 8 :
+				        break;
+                    case 1 :
                         break;
                 }
             break;
@@ -391,6 +423,10 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) -= (short) color;
                         }
                         break;
+				    case 8 :
+				        break;
+                    case 1 :
+                        break;
                 }
             break;
             case MULTIPLY_MODE :
@@ -412,6 +448,10 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) *= (short) color;
                         }
                         break;
+				    case 8 :
+				        break;
+                    case 1 :
+                        break;
                 }
             break;
             case DIVIDE_MODE :
@@ -432,6 +472,10 @@ void c_plot(
                         {
                             *((unsigned short*)(framebuffer + index)) /= (short) color;
                         }
+                        break;
+				    case 8 :
+				        break;
+                    case 1 :
                         break;
                 }
             break;

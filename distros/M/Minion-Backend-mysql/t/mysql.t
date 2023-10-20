@@ -40,9 +40,9 @@ subtest 'Nothing to repair' => sub {
 };
 
 subtest 'Migrate up and down' => sub {
-  is $minion->backend->mysql->migrations->active, 13, 'active version is 13';
+  is $minion->backend->mysql->migrations->active, 14, 'active version is 14';
   is $minion->backend->mysql->migrations->migrate(0)->active, 0, 'active version is 0';
-  is $minion->backend->mysql->migrations->migrate->active, 13, 'active version is 13';
+  is $minion->backend->mysql->migrations->migrate->active, 14, 'active version is 14';
 };
 
 subtest 'Register and unregister' => sub {

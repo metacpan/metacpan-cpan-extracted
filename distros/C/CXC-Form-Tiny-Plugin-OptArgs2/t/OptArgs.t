@@ -16,10 +16,13 @@ package My::Form {
     use Form::Tiny plugins => ['+CXC::Form::Tiny::Plugin::OptArgs2'];
 
     use Types::Standard       qw( Any ArrayRef Bool Enum HashRef Str );
+    use Types::Path::Tiny     qw( Path File Dir);
     use Types::Common::String qw( NonEmptyStr );
 
-    form_field 'file' => ( type => NonEmptyStr, );
+    form_field 'dir' => ( type => Dir, coerce => 1 );
+    option( comment => 'existing directory', );
 
+    form_field 'file' => ( type => File, coerce => 1 );
     option(
         comment  => 'Query in a file',
         isa_name => 'ADQL in a file',
@@ -42,7 +45,7 @@ package My::Form {
         show_default => 1,
     );
 
-    form_field 'output.file' => ( type => NonEmptyStr, );
+    form_field 'output.file' => ( type => Path, coerce => 1 );
     option(
         name     => 'output',
         comment  => 'File to store parsed results',
@@ -61,7 +64,7 @@ package My::Form {
         comment => sprintf( 'requested VO format [%s]', join( ' | ', qw( foo bar ) ) ),
     );
 
-    form_field 'raw.file' => ( type => NonEmptyStr, );
+    form_field 'raw.file' => ( type => Path, coerce => 1 );
     option(
         name     => 'raw-output',
         comment  => 'store raw results from CSC server in this file',
@@ -115,6 +118,7 @@ sub options {
         'raw-output' => 3,
         'raw-format' => 'foo',
         encoding     => 'json',
+        dir          => 't/data',
         file         => 't/data/cscquery.csc',
         output       => 2,
         url          => 1,
@@ -171,6 +175,7 @@ ok( lives { $args = optargs( comment => 'comment', optargs => $form->optargs ) }
             field arg1         => $options{arg1};
             field arg2         => $options{arg2};
             field file         => $options{file};
+            field dir          => $options{dir};
             field url          => $options{url};
             field output       => $options{output};
             field encoding     => $options{encoding};
@@ -211,6 +216,7 @@ ok( $form->valid, 'form validated input' )
             field arg1   => $options{arg1};
             field arg2   => $options{arg2};
             field file   => $options{file};
+            field dir    => $options{dir};
             field url    => $options{url};
             field output => hash {
                 field file     => $options{output};

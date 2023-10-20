@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow;
 # ABSTRACT: Bindings for Libtensorflow deep learning library
-$AI::TensorFlow::Libtensorflow::VERSION = '0.0.6';
+$AI::TensorFlow::Libtensorflow::VERSION = '0.0.7';
 use strict;
 use warnings;
 
@@ -70,6 +70,9 @@ AI::TensorFlow::Libtensorflow - Bindings for Libtensorflow deep learning library
 
 The C<libtensorflow> library provides low-level C bindings
 for TensorFlow with a stable ABI.
+
+For more detailed information about this library including how to get started,
+see L<AI::TensorFlow::Libtensorflow::Manual>.
 
 =head1 CLASS METHODS
 

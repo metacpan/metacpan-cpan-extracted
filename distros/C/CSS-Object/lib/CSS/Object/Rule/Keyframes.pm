@@ -35,7 +35,6 @@ sub init
 sub as_string
 {
     my $self = shift( @_ );
-    # $self->messagef( 3, "There are %d elements for this keyframes.", $self->elements->length );
     return( $self->format->keyframes_as_string( $self ) );
 }
 
@@ -55,7 +54,6 @@ sub frame
     my $frame_rule = $css->new_rule->add_to( $self ) ||
         return( $self->error( "Cannot add new rule: ", CSS::Object::Rule::Keyframes->error ) );
     $frame_rule->format->indent( '    ' );
-    ## $self->message( 3, "Frame rule indent is now '", $frame_rule->format->indent->scalar, "'." );
     if( $self->_is_array( $offset ) )
     {
         foreach my $this ( @$offset )
@@ -69,11 +67,9 @@ sub frame
     }
     while( my( $prop, $val ) = CORE::splice( @props, 0, 2 ) )
     {
-        # $self->message( 3, "Adding property '$prop' with value '$val' to keyframes." );
         $prop =~ tr/_/-/;
         $css->new_property( name => $prop, value => $val )->add_to( $frame_rule )->format->indent( '        ' );
     }
-    # $self->messagef( 3, "Frame rules completed registering %d elements.", $frame_rule->elements->length );
     ## For chaining
     return( $self );
 }

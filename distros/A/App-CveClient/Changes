@@ -1,0 +1,38 @@
+v1.0.5 - 2023-10-14
+	* MANIFEST.SKIP: Ignore unpacked distribution
+	* Fix VERSION
+	* MANIFEST.SKIP: Ignore distribution tarballs
+	* cve-client: Add pod
+	* MANIFEST: Remove t/cve_schema50.CVE-2024-24903.json
+
+v1.0.4 - 2023-03-27
+	* Makefile.PL: perltidy
+	* Add tests
+	* lib/App/CveClient: Move-in subs of cve-client
+
+v1.0.3 - 2023-03-27
+	* MANIFEST: Add
+	* Makefile.PL: Add trailing-/ on repo URLs, add bugtracker email
+
+v1.0.2 - 2023-03-27
+	* Fix metadata
+	* cve-client: Remove obsolete VERSION_MESSAGE
+
+v1.0.1 - 2023-03-27
+	* cve-client: Add abstract
+	* Makefile.PL: Add repository + homepage metadata
+	* Makefile.PL: Add requirements
+
+v1.0.0 - 2023-03-27
+	* Fix gemini formatting for 5.0
+	* Add handling for schema 5.0
+	* Add support for vendor+product metadata
+	* cve-client: Allow multiple CVEs at once
+	* cve-client: Add -g to usage line
+	* Introduce Makefile.PL
+	* Remove broken quotes around descriptions
+	* Handle error sent from API
+	* Gemtext option
+	* Perl tidy
+	* README.md: Add
+	* Initial Commit

@@ -14,11 +14,11 @@ Genealogy::ObituaryDailyTimes - Lookup an entry in the Obituary Daily Times
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -32,13 +32,16 @@ our $VERSION = '0.09';
 
 Creates a Genealogy::ObituaryDailyTimes object.
 
-Takes an optional argument, directory, that is the directory containing obituaries.sql.
+Takes two optional arguments:
+	directory: that is the directory containing obituaries.sql
+	logger: an object to send log messages to
 
 =cut
 
 sub new {
-	my($proto, %args) = @_;
-	my $class = ref($proto) || $proto;
+	my $class = $_[0];
+	shift;
+	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	if(!defined($class)) {
 		# Use Genealogy::ObituaryDailyTimes->new, not Genealogy::ObituaryDailyTimes::new
@@ -54,6 +57,9 @@ sub new {
 
 	my $directory = $args{'directory'} || Module::Info->new_from_loaded(__PACKAGE__)->file();
 	$directory =~ s/\.pm$//;
+
+	# The database is updated daily
+	$args{'cache_duration'} ||= '1 day';
 
 	Genealogy::ObituaryDailyTimes::DB::init(directory => File::Spec->catfile($directory, 'database'), %args);
 	return bless { }, $class;

@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Indicates range set style request.',
                                   class => 'RangeSetStyleRequest',
                                   required => [], # TODO
 }                                 );
@@ -129,14 +129,14 @@ __PACKAGE__->method_documentation({
      'range' => {
      	datatype => 'Range',
      	base_name => 'Range',
-     	description => '',
+     	description => 'Encapsulates the object that represents a range of cells within a spreadsheet.',
      	format => '',
      	read_only => '',
      		},
      'style' => {
      	datatype => 'Style',
      	base_name => 'Style',
-     	description => '',
+     	description => 'Represents display style of excel document,such as font,color,alignment,border,etc.            ',
      	format => '',
      	read_only => '',
      		},    

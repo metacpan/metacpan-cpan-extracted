@@ -1,4 +1,6 @@
 use 5.010;
+use strict;
+use warnings;
 use rlib;
 use Scalar::Util qw /refaddr/;
 
@@ -101,6 +103,14 @@ my $one_item = List::Unique::DeterministicOrder->new (
 $one_item->delete_key_at_pos (0);
 
 is (scalar $one_item->keys, 0, 'empty list');
+
+#  delete last entry
+my $one_item_mk2 = List::Unique::DeterministicOrder->new (
+    data => ['a_key'],
+);
+$one_item_mk2->delete ('a_key');
+is (scalar $one_item_mk2->keys, 0, 'empty list');
+
 
 #  boolean overload
 ok (!$one_item, 'false boolean');

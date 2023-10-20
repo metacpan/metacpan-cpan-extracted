@@ -1,5 +1,9 @@
 Revision history for Selenium-Client
 
+1.06 2023-09-19 TEODESIAN
+    [NEW FEATURES]
+    - Hardcode the spec inside of Selenium::Specification's __DATA__ to idiot-proof this in preparation for use by S::R::D
+
 1.05 2021-07-16 TEODESIAN
     [BUG FIXES]
     - Handle UTF-8 content correctly

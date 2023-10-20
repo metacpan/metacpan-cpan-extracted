@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Sublike::Extended 0.20;
+package Sublike::Extended 0.21;
 
 use v5.14;
 use warnings;

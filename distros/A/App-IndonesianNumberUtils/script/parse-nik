@@ -1,11 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Business/ID/NIK/parse_nik
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
-
-our $DATE = '2019-11-21'; # DATE
-our $DIST = 'App-IndonesianNumberUtils'; # DIST
-our $VERSION = '0.031'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -13,6 +9,11 @@ use warnings;
 use Log::ger;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-10-04'; # DATE
+our $DIST = 'App-IndonesianNumberUtils'; # DIST
+our $VERSION = '0.032'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Business/ID/NIK/parse_nik",
@@ -39,45 +40,19 @@ parse-nik - Parse Indonesian citizenship registration number (NIK)
 
 =head1 VERSION
 
-This document describes version 0.031 of parse-nik (from Perl distribution App-IndonesianNumberUtils), released on 2019-11-21.
+This document describes version 0.032 of parse-nik (from Perl distribution App-IndonesianNumberUtils), released on 2023-10-04.
 
 =head1 SYNOPSIS
 
-Usage:
+B<parse-nik> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
- % parse-nik [options] <nik>
+B<parse-nik> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-Examples:
+B<parse-nik> [B<L<--check-locality|/"--no-check-locality">>|B<L<--no-check-locality|/"--no-check-locality">>|B<L<--nocheck-locality|/"--no-check-locality">>] [B<L<--check-province|/"--no-check-province">>|B<L<--no-check-province|/"--no-check-province">>|B<L<--nocheck-province|/"--no-check-province">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<nik|/"--nik=s*">>E<gt>
 
- % parse-nik '32 7300 010101 0001'
- +---------------+------------+
- | key           | value      |
- +---------------+------------+
- | dob           | 2001-01-01 |
- | gender        | M          |
- | loc_code      | 3273       |
- | loc_ind_name  | BANDUNG    |
- | loc_type      | 1          |
- | prov_code     | 32         |
- | prov_eng_name | West Java  |
- | prov_ind_name | Jawa Barat |
- | serial        | 0001       |
- +---------------+------------+
 
- % parse-nik '32 7300 710101 0001'
- +---------------+------------+
- | key           | value      |
- +---------------+------------+
- | dob           | 2001-01-31 |
- | gender        | F          |
- | loc_code      | 3273       |
- | loc_ind_name  | BANDUNG    |
- | loc_type      | 1          |
- | prov_code     | 32         |
- | prov_eng_name | West Java  |
- | prov_ind_name | Jawa Barat |
- | serial        | 0001       |
- +---------------+------------+
+
+See examples in the L</EXAMPLES> section.
 
 =head1 OPTIONS
 
@@ -91,9 +66,17 @@ C<*> marks required options.
 
 Input NIK to be validated.
 
+Can also be specified as the 1st command-line argument.
+
 =item B<--no-check-locality>
 
+(No description)
+
+
 =item B<--no-check-province>
+
+(No description)
+
 
 =back
 
@@ -108,6 +91,17 @@ Shortcut for --log-level=debug.
 =item B<--log-level>=I<s>
 
 Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
 
 =item B<--quiet>
 
@@ -135,6 +129,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -149,15 +149,32 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
 
 
 =back
@@ -210,6 +227,42 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
+=head1 EXAMPLES
+
+=head2 Example #1
+
+ % parse-nik '32 7300 010101 0001'
+ +---------------+------------+
+ | key           | value      |
+ +---------------+------------+
+ | dob           | 2001-01-01 |
+ | gender        | M          |
+ | loc_code      | 3273       |
+ | loc_ind_name  | BANDUNG    |
+ | loc_type      | 1          |
+ | prov_code     | 32         |
+ | prov_eng_name | West Java  |
+ | prov_ind_name | Jawa Barat |
+ | serial        | 0001       |
+ +---------------+------------+
+
+=head2 Example #2
+
+ % parse-nik '32 7300 710101 0001'
+ +---------------+------------+
+ | key           | value      |
+ +---------------+------------+
+ | dob           | 2001-01-31 |
+ | gender        | F          |
+ | loc_code      | 3273       |
+ | loc_ind_name  | BANDUNG    |
+ | loc_type      | 1          |
+ | prov_code     | 32         |
+ | prov_eng_name | West Java  |
+ | prov_ind_name | Jawa Barat |
+ | serial        | 0001       |
+ +---------------+------------+
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-IndonesianNumberUtils>.
@@ -218,6 +271,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Indone
 
 Source repository is at L<https://github.com/perlancar/perl-App-IndonesianNumberUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2019, 2018, 2016, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-IndonesianNumberUtils>
@@ -225,16 +307,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2019, 2018, 2016, 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

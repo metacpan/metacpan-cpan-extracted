@@ -36,6 +36,7 @@ my %deliminators = (
 	' ' => 1,
 	"\\" => 1,
 	"\t" => 1,
+	"\n" => 1,
 );
 my %wordwrapdeliminators = %deliminators;
 
@@ -349,3 +350,4 @@ sub XMLSetContext {
 }
 
 1;
+

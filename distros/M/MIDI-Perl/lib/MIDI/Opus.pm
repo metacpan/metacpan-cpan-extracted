@@ -1,5 +1,5 @@
 
-# Time-stamp: "2010-12-23 10:00:01 conklin"
+# Time-stamp: "2023-10-11 11:08:32 conklin"
 require 5;
 package MIDI::Opus;
 use strict;
@@ -7,7 +7,7 @@ use vars qw($Debug $VERSION);
 use Carp;
 
 $Debug = 0;
-$VERSION = 0.83;
+$VERSION = 0.84;
 
 =head1 NAME
 
@@ -64,17 +64,17 @@ handle, if that's a problem.
 If you specify either C<from_file> or C<from_handle>, you probably
 don't want to specify any of the other options -- altho you may well
 want to specify options that'll get passed down to the decoder in
-MIDI::Events, such as 'include' => ['sysex_f0', 'sysex_f7'], just for
+L<MIDI::Event>, such as C<'include' => ['sysex_f0', 'sysex_f7']>, just for
 example.
 
-Finally, the option C<no_parse> can be used in conjuction with either
+Finally, the option C<no_parse> can be used in conjunction with either
 C<from_file> or C<from_handle>, and, if true, will block MTrk tracks'
 data from being parsed into MIDI events, and will leave them as track
 data (i.e., what you get from $track->data).  This is useful if you
 are just moving tracks around across files (or just counting them in
 files, as in the code in the Synopsis, above), without having to deal
 with any of the events in them.  (Actually, this option is implemented
-in code in MIDI::Track, but in a routine there that I've left
+in code in L<MIDI::Track>, but in a routine there that I've left
 undocumented, as you should access it only thru here.)
 
 =cut
@@ -241,6 +241,51 @@ sub format {
   $this->{'format'} = $_[0] if defined($_[0]);
   return $this->{'format'};
 }
+
+=item the method $new_opus = $opus->skyline
+
+This skylines an $opus.  It first converts the score to format 0 with
+the skyline result as the track.  See the documentation for
+Score::skyline() and Track::skyline().  Original $opus is modified, use
+MIDI::Opus::copy if you want to take a copy first.  Appearance order
+of concurrent events may not be preserved.
+
+=cut
+
+sub skyline {
+  my $this = $_[0];
+  my $options_r = ref($_[1]) eq 'HASH' ? $_[1] : {};
+  $this->format0();
+  my ($track) = $this->tracks();
+  $track->skyline($options_r);
+}
+
+=item the method $new_opus = $opus->format0
+
+This converts $opus to format 0 by collapsing all tracks into one.
+Original $opus is modified, use MIDI::Opus::copy if you want to take a
+copy first.
+
+=cut
+
+sub format0 {
+    my $this = shift;
+    my @events = ();
+    my $score_r;
+    foreach my $track ($this->tracks) { # build a long list of concatenated tracks
+	$score_r = MIDI::Score::events_r_to_score_r($track->events_r);
+	push(@events,@{$score_r});
+    }
+# and now sort them
+    $score_r = MIDI::Score::sort_score_r(\@events);
+    my $events_r = MIDI::Score::score_r_to_events_r($score_r);
+    my $ztrack = MIDI::Track->new;
+    $ztrack->events_r($events_r);
+    $this->format(0);
+# set the track list to just this single track
+    $this->tracks($ztrack);
+}
+
 
 sub info { # read-only
   # Hm, do I really want this routine?  For ANYTHING at all?
@@ -724,18 +769,17 @@ object anymore, since it isn't one.
 
 If you want to use "negative" values for ticks (so says the spec: "If
 division is negative, it represents the division of a second
-represented by the delta-times in the file,[...]"), then it's up to
-you to figure out how to represent that whole ball of wax so that when
-it gets C<pack()>'d as an "n", it comes out right.  I think it'll involve
-something like:
+represented by the delta-times in the file,[...]"), then you'll want to use
+something like this syntax:
 
-  $opus->ticks(  (unpack('C', pack('c', -25)) << 8) & 80  );
+  $opus->ticks( ( -25 << 8 ) | 80 );
 
 for bit resolution (80) at 25 f/s.
 
-But I've never tested this.  Let me know if you get it working right,
-OK?  If anyone I<does> get it working right, and tells me how, I'll
-try to support it natively.
+This is tested to work properly and produce the right header values in the
+resulting output file. However, it should be noted that many MIDI synthesizers
+don't support this header format at last check, such as VLC/Fluidsynth and wildmidi.
+Some do, such as Windows Media Player and Timidity++.
 
 =head1 NOTE ON WARN-ING AND DIE-ING
 
@@ -749,7 +793,7 @@ MIDI file that may or may not be well-formed.  If this I<is> the kind
 of task you or someone you know may want to do, let me know and I'll
 consider some kind of 'no_die' parameter in future releases.
 (Or just trap the die in an eval { } around your call to anything you
-think you could die.)
+think could die.)
 
 =head1 COPYRIGHT 
 

@@ -1,5 +1,14 @@
 Revision history for Perl extension Otogiri
 
+0.21 2023-10-15T02:01:51Z
+
+    - Bump up
+
+0.20 2023-10-15T02:00:22Z
+
+    - Added row_class($class_name) and no_row_class() feature.
+    - Fix a failure in t/14_last_insert_id_in_postgresql.t that uses postmaster.
+
 0.19 2020-01-17T11:11:53Z
 
     - Added test prereq Test::Exception suggested by CPANTS. [manwar]

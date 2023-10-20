@@ -1,17 +1,14 @@
 package PYX::XMLNorm;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use PYX qw(end_element);
 use PYX::Parser;
 
-# Version.
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -179,65 +176,80 @@ PYX::XMLNorm - Processing PYX data or file and do XML normalization.
 =head1 SYNOPSIS
 
  use PYX::XMLNorm;
+
  my $obj = PYX::XMLNorm->new(%parameters);
  $obj->parse($pyx, $out);
  $obj->parse_file($input_file, $out);
- $obj->parse_handle($input_file_handler, $out);
+ $obj->parse_handler($input_file_handler, $out);
 
 =head1 METHODS
 
-=over 8
+=head2 C<new(%parameters)>
 
-=item C<new(%parameters)>
+ my $obj = PYX::XMLNorm->new(%parameters);
 
- Constructor.
+Constructor.
 
 =over 8
 
 =item * C<flush_stack>
 
- Flush stack on finalization.
- Default value is 0.
+Flush stack on finalization.
+
+Default value is 0.
 
 =item * C<output_handler>
 
- Output handler.
- Default value is \*STDOUT.
+Output handler.
+
+Default value is \*STDOUT.
 
 =item * C<rules>
 
- XML normalization rules.
- Parameter is required.
- Format of rules is:
- Outer element => list of inner elements.
- e.g.
+XML normalization rules.
+Parameter is required.
+Format of rules is:
+Outer element => list of inner elements.
+e.g.
+
  {
          'middle' => ['end'],
  },
- Outer element can be '*'.
- Default value is {}.
+
+Outer element can be '*'.
+
+Default value is {}.
 
 =back
 
-=item C<parse($pyx[, $out])>
+Returns instance of object.
 
- Parse PYX text or array of PYX text.
- If $out not present, use 'output_handler'.
- Returns undef.
+=head2 C<parse($pyx[, $out])>
 
-=item C<parse_file($input_file[, $out])>
+ $obj->parse($pyx, $out);
 
- Parse file with PYX data.
- If $out not present, use 'output_handler'.
- Returns undef.
+Parse PYX text or array of PYX text.
+If C<$out> not present, use 'output_handler'.
 
-=item C<parse_handler($input_file_handler[, $out])>
+Returns undef.
 
- Parse PYX handler.
- If $out not present, use 'output_handler'.
- Returns undef.
+=head2 C<parse_file($input_file[, $out])>
 
-=back
+ $obj->parse_file($input_file, $out);
+
+Parse file with PYX data.
+If C<$out> not present, use 'output_handler'.
+
+Returns undef.
+
+=head2 C<parse_handler($input_file_handler[, $out])>
+
+ $obj->parse_handler($input_file_handler, $out);
+
+Parse PYX handler.
+If C<$out> not present, use 'output_handler'.
+
+Returns undef.
 
 =head1 ERRORS
 
@@ -248,11 +260,11 @@ PYX::XMLNorm - Processing PYX data or file and do XML normalization.
 
 =head1 EXAMPLE
 
- # Pragmas.
+=for comment filename=normalize_xml.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use PYX::XMLNorm;
 
  # Example data.
@@ -307,19 +319,20 @@ Install the PYX modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/PYX-XMLNorm>
+L<https://github.com/michal-josef-spacek/PYX-XMLNorm>
 
 =head1 AUTHOR
 
-Michal Špaček L<skim@cpan.org>.
+Michal Josef Špaček L<skim@cpan.org>.
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2015 Michal Špaček
- BSD 2-Clause License
+© 2011-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

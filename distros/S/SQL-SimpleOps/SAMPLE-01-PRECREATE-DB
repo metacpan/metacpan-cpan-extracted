@@ -1,5 +1,12 @@
 # Tue Sep 20 19:17:20 -03 2022
 
+## step-01 create database for the tests
+
+## you dont need expor all envs
+## export only required engine for your test.
+
+# export SQL_SIMPLE_DB_TEST_CREATE_ALLOWED=
+# export SQL_SIMPLE_DB_TEST_SKIP_CREATE=
 # export SQL_SIMPLE_DB_SHOW_CREATE="1"
 
 # export SQL_SIMPLE_MYSQL="1"
@@ -14,6 +21,11 @@
 # export SQL_SIMPLE_PG_PASSWORD="password_update"
 
 # export SQL_SIMPLE_SQLITE="1"
+
+## step-02 show the sql commands for iteractive creation
+
+## you must copy/paste the commands in your prefered database.
+## this sample show all sql command for each supported database.
 
 # perl t/testDB.t
 ok 1 - use SQL::SimpleOps;
@@ -269,6 +281,14 @@ GRANT SELECT,INSERT,UPDATE,DELETE ON TABLE
  test_db.master,
  test_db.slave
  TO user_update;
+
+GRANT SELECT ON ALL TABLES IN SCHEMA test_db TO user_read;
+GRANT ALL ON ALL TABLES IN SCHEMA test_db TO user_update;
+GRANT SELECT ON DATABASE test_db TO user_read;
+GRANT ALL ON DATABASE test_db TO user_update;
+GRANT pg_read_all_data TO user_read;
+GRANT pg_write_all_data TO user_update;
+
 # Postgres done
 
 ============

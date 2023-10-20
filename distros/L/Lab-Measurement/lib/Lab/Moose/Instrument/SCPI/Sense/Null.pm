@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::Null;
-$Lab::Moose::Instrument::SCPI::Sense::Null::VERSION = '3.881';
+$Lab::Moose::Instrument::SCPI::Sense::Null::VERSION = '3.901';
 #ABSTRACT: Role for the HP/Agilent/Keysight SCPI SENSe:$function:NULL subsystem
 
 use v5.20;
@@ -75,7 +75,7 @@ Lab::Moose::Instrument::SCPI::Sense::Null - Role for the HP/Agilent/Keysight SCP
 
 =head1 VERSION
 
-version 3.881
+version 3.901
 
 =head1 METHODS
 
@@ -102,7 +102,6 @@ Query/Set state of null function.
 This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
-            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

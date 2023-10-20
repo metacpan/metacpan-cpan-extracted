@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package Test::ExpectAndCheck;
+package Test::ExpectAndCheck 0.06;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.05';
 
 use Carp;
 
@@ -191,18 +189,19 @@ sub _stringify_args
 sub _call
 {
    my $self = shift;
-   my ( $method, @args ) = @_;
+   my $method = shift;
+   my $args = \@_;
 
    my $e;
    $e = first { !$_->_called } @{ $self->{expectations} } and
-      $e->_consume( $method, @args ) and
-      return $e->_result( @args );
+      $e->_consume( $method, @$args ) and
+      return $e->_result( $args );
 
-   if( my $wh = first { $_->_consume( $method, @args ) } @{ $self->{whenever}{$method} } ) {
-      return $wh->_result( @args );
+   if( my $wh = first { $_->_consume( $method, @$args ) } @{ $self->{whenever}{$method} } ) {
+      return $wh->_result( $args );
    }
 
-   my $message = Carp::shortmess( "Unexpected call to ->$method(${\ _stringify_args @args })" );
+   my $message = Carp::shortmess( "Unexpected call to ->$method(${\ _stringify_args @$args })" );
    $message .= "... while expecting " . $e->_stringify if $e;
    $message .= "... after all expectations done" if !$e;
    die "$message.\n";
@@ -311,6 +310,11 @@ Sets the result that will be returned, calculated by invoking the code.
 The code block is invoked at the time that a result is needed. It is invoked
 with an array reference containing the arguments to the original method call.
 This is especially useful for expectations created using L</whenever>.
+
+I<Since version 0.06> the code block is passed a reference to the caller's
+actual arguments array, and therefore can modify values in it if required -
+e.g. when trying to mock functions such as C<open()> or C<sysread()> which
+modify lvalues passed in as arguments.
 
 There is no corresponding C<will_throw_using>, but an exception thrown by this
 code will be seen by the calling code.
@@ -430,14 +434,14 @@ sub _check
 sub _result
 {
    my $self = shift;
-   my @args = @_;
+   my ( $args ) = @_;
 
    if( my $also = $self->{also} ) {
       $_->() for @$also;
    }
 
    my @result;
-   @result = $self->{gen_return}->( \@args ) if $self->{gen_return};
+   @result = $self->{gen_return}->( $args ) if $self->{gen_return};
    return @result if wantarray;
    return $result[0];
 }

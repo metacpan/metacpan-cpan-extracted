@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Indicates table total request',
                                   class => 'TableTotalRequest',
                                   required => [], # TODO
 }                                 );
@@ -128,21 +128,21 @@ __PACKAGE__->method_documentation({
      'list_column_index' => {
      	datatype => 'int',
      	base_name => 'ListColumnIndex',
-     	description => '',
+     	description => 'Indicates list column index.',
      	format => '',
      	read_only => '',
      		},
      'totals_calculation' => {
      	datatype => 'string',
      	base_name => 'TotalsCalculation',
-     	description => '',
+     	description => 'Indicates totals calculation.',
      	format => '',
      	read_only => '',
      		},
      'custom_formula' => {
      	datatype => 'string',
      	base_name => 'CustomFormula',
-     	description => '',
+     	description => 'Indicates custom formula.',
      	format => '',
      	read_only => '',
      		},    

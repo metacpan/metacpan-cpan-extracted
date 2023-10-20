@@ -97,7 +97,7 @@ waitjobs - Wait for selected jobs to exit the queue
 
 =head1 VERSION
 
-version 0.6.1
+version 0.8.1
 
 =head1 SYNOPSIS
 

@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Pl::Any::Pl - Package for language Polish
 
 =cut
 
 package Locale::CLDR::Locales::Pl::Any::Pl;
-# This file auto generated from Data/common/main/pl_PL.xml
-#	on Mon 11 Apr  5:36:22 pm GMT
+# This file auto generated from Data\common\main\pl_PL.xml
+#	on Fri 13 Oct  9:33:34 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

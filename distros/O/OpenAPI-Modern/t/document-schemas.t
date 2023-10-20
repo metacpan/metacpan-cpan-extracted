@@ -12,6 +12,7 @@ use Helper;
 
 use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
+use Test::Fatal;
 use Test::Deep;
 use JSON::Schema::Modern;
 use JSON::Schema::Modern::Document::OpenAPI;
@@ -245,6 +246,72 @@ subtest 'identify subschemas' => sub {
       }), 2..3,
     },
     'subschema resources are correctly identified in the document',
+  );
+};
+
+subtest recursive_get => sub {
+  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema',
+    evaluator => my $js = JSON::Schema::Modern->new,
+    schema => {
+      %$preamble,
+      components => {
+        parameters => {
+          foo => { '$ref' => '#/components/parameters/bar' },
+          bar => { '$ref' => '#/components/parameters/foo' },
+          baz => { name => 'baz', in => 'query', schema => {} },
+          blip => { '$ref' => '#/components/schemas/bar/properties/foo' },
+        },
+        schemas => {
+          foo => { '$ref' => 'http://localhost:5678/api#/properties/foo' },
+          bar => {
+            '$id' => 'http://localhost:5678/api',
+            type => 'object',
+            properties => { foo => { type => 'string' } },
+          },
+        },
+      },
+      paths => {
+        '/foo' => {
+          post => {
+            parameters => [
+              { '$ref' => '#/i_do_not_exist' },
+              { '$ref' => '#/components/parameters/foo' },
+              { '$ref' => '#/components/parameters/baz' },
+              { '$ref' => '#/components/parameters/blip' },
+            ],
+          },
+        },
+      },
+    },
+  );
+
+  is($doc->errors, 0, 'no errors during traversal');
+  $js->add_schema($doc);
+
+  like(
+    exception { $doc->recursive_get('/paths/~1foo/post/parameters/0') },
+    qr{^unable to find resource http://localhost:1234/api#/i_do_not_exist},
+    'failure to resolve $ref',
+  );
+
+  like(
+    exception { $doc->recursive_get('/paths/~1foo/post/parameters/1') },
+    qr{^maximum evaluation depth exceeded},
+    'endless loop',
+  );
+
+  cmp_deeply(
+    [ $doc->recursive_get('/paths/~1foo/post/parameters/2') ],
+    [ { name => 'baz', in => 'query', schema => {} }, str('http://localhost:1234/api#/components/parameters/baz') ],
+    'successful get through a $ref',
+  );
+
+  cmp_deeply(
+    [ $doc->recursive_get('/paths/~1foo/post/parameters/3') ],
+    [ { type => 'string'}, str('http://localhost:5678/api#/properties/foo') ],
+    'successful get through multiple $refs, with a change of base uri',
   );
 };
 

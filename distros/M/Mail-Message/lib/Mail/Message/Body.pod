@@ -1006,8 +1006,8 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.013,
-built on June 24, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message distribution version 3.014,
+built on October 18, 2023. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

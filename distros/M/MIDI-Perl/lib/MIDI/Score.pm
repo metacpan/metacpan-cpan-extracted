@@ -1,12 +1,11 @@
-
-# Time-stamp: "2013-02-01 22:40:45 conklin"
+# Time-stamp: "2023-10-11 11:08:01 conklin"
 require 5;
 package MIDI::Score;
 use strict;
 use vars qw($Debug $VERSION);
 use Carp;
 
-$VERSION = '0.83';
+$VERSION = '0.84';
 
 =head1 NAME
 
@@ -31,7 +30,7 @@ are abstracted into a single 'note' item in a score structure.
 
 'note' takes the following form:
 
- ('note_on', I<start_time>, I<duration>, I<channel>, I<note>, I<velocity>)
+ ('note_on', start_time, duration, channel, note, velocity)
 
 The problem that score structures are meant to solve is that 1)
 people definitely don't think in delta-times -- they think in absolute
@@ -468,7 +467,7 @@ event durations (default off).
 
 When durations of note events are quantized, they can get 0 duration.
 These events are I<not dropped> from the returned score, and it is the
-responsiblity of the caller to deal with them.
+responsibility of the caller to deal with them.
 
 =cut
 
@@ -516,7 +515,6 @@ duration of E is clipped to just the * portion above
 
 =cut
 
-# new in 0.83! author DC
 sub skyline {
     my $score_r = $_[0];
     my $options_r = ref($_[1]) eq 'HASH' ? $_[1] : {};

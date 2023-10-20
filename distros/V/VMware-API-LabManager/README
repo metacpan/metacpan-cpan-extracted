@@ -9,6 +9,14 @@ SYNOPSIS:
   public and private APIs for the VMware product Lab Manager.
 
 ================================================================================
+END OF LIFE NOTICE:
+================================================================================
+
+	VMware ended support for Lab Manager on May 31, 2014.
+
+	Correspondingly, this module will likely see no further development.
+
+================================================================================
 INSTALLATION:
 ================================================================================
 
@@ -29,9 +37,9 @@ USAGE:
 AUTHORSHIP:
 ================================================================================
 
-    VMware::API::LabManager 2.11 (2015/06/08)
+    VMware::API::LabManager 2.12 (2023/09/18)
 
-    (c) 2009-2015, Phillip Pollard <bennie@cpan.org>
+    (c) 2009-2023, Phillip Pollard <bennie@cpan.org>
     Released under the Perl Artistic License
 
     Additional contributions:

@@ -24,7 +24,6 @@ BEGIN
     use Digest::MD5 ();
     use HTTP::Status ();
     use MIME::Base64 ();
-    use Nice::Try;
     use Scalar::Util qw( readonly );
     use WebSocket::Headers;
     use WebSocket::Version;
@@ -53,19 +52,20 @@ sub init
 {
     my $self = shift( @_ );
     # There is no method for this. We use this as internal buffer
-    $self->{buffer}         = '' unless( length( $self->{buffer} ) );
-    $self->{checksum}       = undef unless( length( $self->{checksum} ) );
-    $self->{cookies}        = undef unless( length( $self->{cookies} ) );
+    $self->{buffer}         = '' unless( length( $self->{buffer} // '' ) );
+    $self->{checksum}       = undef unless( length( $self->{checksum} // '' ) );
+    $self->{cookies}        = undef unless( length( $self->{cookies} // '' ) );
     $self->{extensions}     = [] unless( exists( $self->{extensions} ) && length( $self->{extensions} ) );
-    $self->{max_message_size} = $MAX_MESSAGE_SIZE unless( length( $self->{max_message_size} ) );
-    $self->{protocol}       = '' unless( length( $self->{protocol} ) );
+    $self->{max_message_size} = $MAX_MESSAGE_SIZE unless( length( $self->{max_message_size} // '' ) );
+    $self->{protocol}       = '' unless( length( $self->{protocol} // '' ) );
     # Chunk parser
     $self->{state}          = 'blank';
     # <https://datatracker.ietf.org/doc/html/rfc6455#section-1.9>
     $self->{subprotocol}    = [];
-    $self->{uri}            = '' unless( length( $self->{uri} ) );
+    $self->{uri}            = '' unless( length( $self->{uri} // '' ) );
     # $self->{version}        = 'draft-ietf-hybi-17' unless( length( $self->{version} ) );
-    $self->{version}        = '' unless( length( $self->{version} ) );
+    $self->{version}        = '' unless( length( $self->{version} // '' ) );
+    $self->{_exception_class} = 'WebSocket::Exception' unless( defined( $self->{_exception_class} ) );
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     my $headers = $self->headers;

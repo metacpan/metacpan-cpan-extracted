@@ -8,3 +8,28 @@
   width:35em;
   margin:auto;
 }
+
+/* Pager component CSS */
+
+.pager_window_info {
+  text-align:center;
+  margin-top:0; 
+  margin-bottom: .5rem;
+}
+
+.pager_page {
+  margin: 0.5em;
+}
+
+.pager_current_page {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.pager_current_page {
+  text-align:center;
+  margin-top:0; 
+  margin-bottom: .5rem;
+}
+
+/* End Pager component CSS */

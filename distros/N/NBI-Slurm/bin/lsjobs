@@ -110,7 +110,7 @@ for my $job (sort keys %{$jobs}) {
     if (scalar @ids > 0 and not grep {$_ eq $job} @ids) {
         next;
     }
-    my $array = [$jobs->{$job}->{JOBID},
+    my $array = [$jobs->{$job}->{JOBID} =~/_/ ? substr($jobs->{$job}->{JOBID}, 0, index($jobs->{$job}->{JOBID}, '_'))."#" : $jobs->{$job}->{JOBID},
                  $jobs->{$job}->{USER},
                  $jobs->{$job}->{PARTITION},
                  $jobs->{$job}->{NAME},
@@ -171,6 +171,7 @@ if ($opt_delete_bool and (scalar @selected_ids)) {
 
 sub state_string {
     my $s = shift;
+    $s = substr($s, 0, 1);
     my $c = RESET;
     if ($s =~/^R/) {
         $c = GREEN . ON_BLACK;
@@ -384,7 +385,7 @@ lsjobs - List your jobs (or others), and delete them if you wish
 
 =head1 VERSION
 
-version 0.6.1
+version 0.8.1
 
 =head1 SYNOPSIS
 

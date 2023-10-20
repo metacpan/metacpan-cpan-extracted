@@ -52,11 +52,35 @@ sub new {
 
 sub as_text {
     my $self = shift;
+    if ( exists $self->{ 'ival' } ) {
+        return $self->{ 'ival' }->{ 'ival' } // 0;
+    }
+    if ( $self->{ 'isnull' } ) {
+        return 'NULL';
+    }
+    if ( exists $self->{ 'sval' } ) {
+        return $self->quote_literal( $self->{ 'sval' }->{ 'sval' } // '' );
+    }
+    if ( exists $self->{ 'boolval' } ) {
+        return $self->{ 'boolval' }->{ 'boolval' } ? 'true' : 'false';
+    }
     return $self->{ 'val' }->as_text;
 }
 
 sub pretty_print {
     my $self = shift;
+    if ( exists $self->{ 'ival' } ) {
+        return $self->{ 'ival' }->{ 'ival' } // 0;
+    }
+    if ( $self->{ 'isnull' } ) {
+        return 'NULL';
+    }
+    if ( exists $self->{ 'sval' } ) {
+        return $self->quote_literal( $self->{ 'sval' }->{ 'sval' } // '' );
+    }
+    if ( exists $self->{ 'boolval' } ) {
+        return $self->{ 'boolval' }->{ 'boolval' } ? 'true' : 'false';
+    }
     return $self->{ 'val' }->pretty_print;
 }
 

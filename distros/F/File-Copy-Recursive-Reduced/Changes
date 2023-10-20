@@ -1,5 +1,9 @@
 Revision history for Perl module File::Copy::Recursive::Reduced
 
+0.007 Sat Sep 16 07:48:17 AM EDT 2023
+    - Corrections to better accommodate Windows path separators, mostly
+      provided by Håkon Hægland.
+
 0.006 Fri Apr 20 10:21:48 EDT 2018
     - File::Copy::Recursive 0.41 has been released to CPAN and
       addresses the problem which was the focus of

@@ -1,6 +1,10 @@
 Build.PL
+CHANGES
+CONTRIBUTING
 lib/Math/Vectors2.pm
-MANIFEST			This list of files
+MANIFEST
+README
+README.md
 test.pl
 META.yml
 META.json

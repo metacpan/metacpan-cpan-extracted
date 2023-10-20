@@ -1,0 +1,46 @@
+---
+abstract: 'a tiling window manager for X11'
+author:
+  - 'Sergei Zhmylev <zhmylove@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: X11-korgwm
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+    - resources
+requires:
+  AnyEvent: '0'
+  AnyEvent::Handle: '0'
+  AnyEvent::Socket: '0'
+  Carp: '0'
+  Data::Dumper: '0'
+  Encode: '0'
+  Exporter: '0'
+  Glib::Object::Introspection: '0'
+  Gtk3: '0'
+  List::Util: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  X11::XCB: '0.21'
+  YAML::Tiny: '0'
+resources:
+  bugtracker: https://github.com/zhmylove/korgwm/issues
+  license: https://mit-license.org/
+  repository: https://github.com/zhmylove/korgwm.git
+version: '1.0'
+x_authority: cpan:ZHMYLOVE
+x_contributors: []
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

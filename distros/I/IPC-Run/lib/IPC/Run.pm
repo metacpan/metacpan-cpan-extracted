@@ -524,7 +524,7 @@ that variable:
    print $out;
 
 Scalars used in incremental (start()/pump()/finish()) applications are treated
-as queues: input is removed from input scalers, resulting in them dwindling
+as queues: input is removed from input scalars, resulting in them dwindling
 to '', and output is appended to output scalars.  This is not true of 
 harnesses run() in batch mode.
 
@@ -687,7 +687,7 @@ a file descriptor.  If you want to grab stderr separately, do this:
 
 Child processes harnessed to a pseudo terminal have their stdin, stdout,
 and stderr completely closed before any redirection operators take
-effect.  This casts of the bonds of the controlling terminal.  This is
+effect.  This casts off the bonds of the controlling terminal.  This is
 not done when using pipes.
 
 Right now, this affects all children in a harness that has a pty in use,
@@ -1016,7 +1016,7 @@ use Exporter ();
 use vars qw{$VERSION @ISA @FILTER_IMP @FILTERS @API @EXPORT_OK %EXPORT_TAGS};
 
 BEGIN {
-    $VERSION = '20220807.0';
+    $VERSION = '20231003.0';
     @ISA     = qw{ Exporter };
 
     ## We use @EXPORT for the end user's convenience: there's only one function
@@ -3458,15 +3458,24 @@ sub reap_nb {
             _debug "kid $kid->{NUM} ($kid->{PID}) exited"
               if _debugging;
 
-            $kid->{PROCESS}->GetExitCode( $kid->{RESULT} )
+            my $native_result;
+            $kid->{PROCESS}->GetExitCode($native_result)
               or croak "$! while GetExitCode()ing for Win32 process";
 
-            unless ( defined $kid->{RESULT} ) {
+            unless ( defined $native_result ) {
                 $kid->{RESULT} = "0 but true";
                 $? = $kid->{RESULT} = 0x0F;
             }
             else {
-                $? = $kid->{RESULT} << 8;
+                my $win32_full_result = $native_result << 8;
+                if ( $win32_full_result >> 8 != $native_result ) {
+
+                    # !USE_64_BIT_INT build and exit code > 0xFFFFFF
+                    require Math::BigInt;
+                    $win32_full_result = Math::BigInt->new($native_result);
+                    $win32_full_result->blsft(8);
+                }
+                $? = $kid->{RESULT} = $win32_full_result;
             }
         }
         else {
@@ -3515,7 +3524,7 @@ be left in an unstable state, it's best to kill the harness to get rid
 of all the child processes, etc.
 
 Specifically, if a timeout expires in finish(), finish() will not
-kill all the children.  Call C<<$h->kill_kill>> in this case if you care.
+kill all the children.  Call C<< $h->kill_kill >> in this case if you care.
 This differs from the behavior of L</run>.
 
 =cut
@@ -4291,6 +4300,10 @@ be implemented one day, do chdir() and %ENV changes can be made.
 Win32 does not fully support signals.  signal() is likely to cause errors
 unless sending a signal that Perl emulates, and C<kill_kill()> is immediately
 fatal (there is no grace period).
+
+=item C<$?> cannot represent all Win32 exit codes
+
+Prefer C<full_result( ... )>, C<result( ... )>, or other IPC::Run methods.
 
 =item helper processes
 

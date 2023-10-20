@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Lt::Any::Lt - Package for language Lithuanian
 
 =cut
 
 package Locale::CLDR::Locales::Lt::Any::Lt;
-# This file auto generated from Data/common/main/lt_LT.xml
-#	on Mon 11 Apr  5:32:55 pm GMT
+# This file auto generated from Data\common\main\lt_LT.xml
+#	on Fri 13 Oct  9:26:15 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

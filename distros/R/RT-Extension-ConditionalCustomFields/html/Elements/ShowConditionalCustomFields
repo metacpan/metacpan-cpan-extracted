@@ -8,11 +8,11 @@ jQuery(function() {
 %       $condition_cf->Load($condition->{CF});
 %       if ($condition_cf->id) {
 %           if ($ParentSelector eq 'id') {
-    var condition_selector = <% '#CF-' . $condition_cf->id . '-ShowRow' |h,n,j%>;
-    var cf_selector = <% '#CF-' . $CustomField->id . '-ShowRow' |h,n,j%>;
+    var condition_selector = '<% '#CF-' . $condition_cf->id . '-ShowRow' |n%>';
+    var cf_selector = '<% '#CF-' . $CustomField->id . '-ShowRow' |n%>';
 %           } else {
-    var condition_selector = <% '.record-field.CustomField__' . $condition_cf->Name . '_' |h,n,j%>;
-    var cf_selector = <% '.record-field.CustomField__' . $CustomField->Name . '_' |h,n,j%>;
+    var condition_selector = '<% '.record-field.CustomField__' . $condition_cf->Name . '_' |n%>';
+    var cf_selector = '<% '.record-field.CustomField__' . $CustomField->Name . '_' |n%>';
 %           }
 %           my $cf_condition_vals_str = $Object->CustomFieldValuesAsString($condition_cf->id);
 %           my @cf_condition_vals = split(/\n/, $cf_condition_vals_str);

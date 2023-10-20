@@ -3,7 +3,8 @@ use warnings;
 package SchemaParser;
 
 use 5.020;
-use experimental qw(signatures postderef);
+use stable 0.031 'postderef';
+use experimental 'signatures';
 use feature 'state';
 use JSON::MaybeXS 1.002004 'is_bool';
 

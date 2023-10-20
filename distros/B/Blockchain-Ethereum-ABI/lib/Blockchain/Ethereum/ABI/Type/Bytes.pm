@@ -1,59 +1,18 @@
 use v5.26;
 use Object::Pad;
+# ABSTRACT: Solidity bytes type interface
 
-package Blockchain::Ethereum::ABI::Type::Bytes 0.012;
+package Blockchain::Ethereum::ABI::Type::Bytes;
 class Blockchain::Ethereum::ABI::Type::Bytes
     :isa(Blockchain::Ethereum::ABI::Type)
     :does(Blockchain::Ethereum::ABI::TypeRole);
 
-=encoding utf8
-
-=head1 NAME
-
-Blockchain::Ethereum::ABI::Bytes - Interface for solidity bytes type
-
-=head1 SYNOPSIS
-
-Allows you to define and instantiate a solidity bytes type:
-
-    my $type = Blockchain::Ethereum::ABI::Bytes->new(
-        signature => $signature,
-        data      => $value
-    );
-
-    $type->encode();
-
-In most cases you don't want to use this directly, use instead:
-
-=over 4
-
-=item * B<Encoder>: L<Blockchain::Ethereum::ABI::Encoder>
-
-=item * B<Decoder>: L<Blockchain::Ethereum::ABI::Decoder>
-
-=back
-
-=cut
+our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
+our $VERSION   = '0.013';          # VERSION
 
 use Carp;
 
 method _configure { return }
-
-=head2 encode
-
-Encodes the given data to the type of the signature
-
-Usage:
-
-    encode() -> encoded string
-
-=over 4
-
-=back
-
-ABI encoded hex string
-
-=cut
 
 method encode {
 
@@ -77,22 +36,6 @@ method encode {
     return $self->_encoded;
 }
 
-=head2 decode
-
-Decodes the given data to the type of the signature
-
-Usage:
-
-    decoded() -> hexadecimal encoded bytes
-
-=over 4
-
-=back
-
-hexadecimal encoded bytes string
-
-=cut
-
 method decode {
 
     my @data = $self->data->@*;
@@ -115,20 +58,71 @@ method decode {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Blockchain::Ethereum::ABI::Type::Bytes - Solidity bytes type interface
+
+=head1 VERSION
+
+version 0.013
+
+=head1 SYNOPSIS
+
+Allows you to define and instantiate a solidity bytes type:
+
+    my $type = Blockchain::Ethereum::ABI::Bytes->new(
+        signature => $signature,
+        data      => $value
+    );
+
+    $type->encode();
+
+In most cases you don't want to use this directly, use instead:
+
+=over 4
+
+=item * B<Encoder>: L<Blockchain::Ethereum::ABI::Encoder>
+
+=item * B<Decoder>: L<Blockchain::Ethereum::ABI::Decoder>
+
+=back
+
+=head1 METHODS
+
+=head2 encode
+
+Encodes the given data to the type of the signature
+
+=over 4
+
+=back
+
+ABI encoded hex string
+
+=head2 decode
+
+Decodes the given data to the type of the signature
+
+=over 4
+
+=back
+
+hexadecimal encoded bytes string
+
 =head1 AUTHOR
 
-Reginaldo Costa, C<< <refeco at cpan.org> >>
+Reginaldo Costa <refeco@cpan.org>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to L<https://github.com/refeco/perl-ABI>
-
-=head1 LICENSE AND COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2022 by REFECO.
 
 This is free software, licensed under:
 
-  The MIT License
+  The MIT (X11) License
 
 =cut

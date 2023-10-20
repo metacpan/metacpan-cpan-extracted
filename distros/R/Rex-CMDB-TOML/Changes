@@ -1,4 +1,8 @@
 Revision history for Rex-CMDB-TOML
 
+0.0.2	 2023-10-19/23:15
+		 - Note paths only supports scalars when roles are in use.
+		 - Work properly when the path is not ./cmdb/roles/ for the role directory.
+
 0.0.1	 2021-10-19/20:15
 		 - Initial release.

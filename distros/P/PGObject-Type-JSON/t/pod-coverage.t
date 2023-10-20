@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test2::V0;
 
 # Ensure a recent version of Test::Pod::Coverage
 my $min_tpc = 1.08;

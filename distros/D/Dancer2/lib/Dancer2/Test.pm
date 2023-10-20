@@ -1,6 +1,6 @@
 package Dancer2::Test;
 # ABSTRACT: Useful routines for testing Dancer2 apps
-$Dancer2::Test::VERSION = '0.400001';
+$Dancer2::Test::VERSION = '1.0.0';
 use strict;
 use warnings;
 
@@ -56,7 +56,7 @@ our $NO_WARN = 0;
 # or can be fed a response (which is passed through without
 # any modification)
 sub dancer_response {
-    carp 'DEPRECATED: Dancer2::Test. Please use Plack::Test instead'
+    croak 'DEPRECATED: Dancer2::Test. Please use Plack::Test instead'
         unless $NO_WARN;
 
     _find_dancer_apps_for_dispatcher();
@@ -629,7 +629,7 @@ Dancer2::Test - Useful routines for testing Dancer2 apps
 
 =head1 VERSION
 
-version 0.400001
+version 1.0.0
 
 =head1 SYNOPSIS
 

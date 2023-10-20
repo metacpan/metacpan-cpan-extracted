@@ -136,7 +136,7 @@
    "provides" : {
       "App::Netdisco" : {
          "file" : "lib/App/Netdisco.pm",
-         "version" : "2.065002"
+         "version" : "2.067002"
       },
       "App::Netdisco::AnyEvent::Nbtstat" : {
          "file" : "lib/App/Netdisco/AnyEvent/Nbtstat.pm"
@@ -847,6 +847,9 @@
       "App::Netdisco::Worker::Plugin::Hook::HTTP" : {
          "file" : "lib/App/Netdisco/Worker/Plugin/Hook/HTTP.pm"
       },
+      "App::Netdisco::Worker::Plugin::Internal::BackendFQDN" : {
+         "file" : "lib/App/Netdisco/Worker/Plugin/Internal/BackendFQDN.pm"
+      },
       "App::Netdisco::Worker::Plugin::Internal::SNMPFastDiscover" : {
          "file" : "lib/App/Netdisco/Worker/Plugin/Internal/SNMPFastDiscover.pm"
       },
@@ -898,11 +901,17 @@
       "App::Netdisco::Worker::Plugin::Power" : {
          "file" : "lib/App/Netdisco/Worker/Plugin/Power.pm"
       },
+      "App::Netdisco::Worker::Plugin::PrimeSkiplist" : {
+         "file" : "lib/App/Netdisco/Worker/Plugin/PrimeSkiplist.pm"
+      },
       "App::Netdisco::Worker::Plugin::Psql" : {
          "file" : "lib/App/Netdisco/Worker/Plugin/Psql.pm"
       },
       "App::Netdisco::Worker::Plugin::Renumber" : {
          "file" : "lib/App/Netdisco/Worker/Plugin/Renumber.pm"
+      },
+      "App::Netdisco::Worker::Plugin::Scheduler" : {
+         "file" : "lib/App/Netdisco/Worker/Plugin/Scheduler.pm"
       },
       "App::Netdisco::Worker::Plugin::Show" : {
          "file" : "lib/App/Netdisco/Worker/Plugin/Show.pm"
@@ -947,6 +956,6 @@
       "x_IRC" : "irc://irc.libera.chat/#netdisco",
       "x_MailingList" : "https://lists.sourceforge.net/lists/listinfo/netdisco-users"
    },
-   "version" : "2.065002",
+   "version" : "2.067002",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

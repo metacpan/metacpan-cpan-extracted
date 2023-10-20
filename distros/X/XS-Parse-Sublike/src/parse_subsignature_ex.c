@@ -18,14 +18,13 @@
 /* Also need KEY_sigvar */
 #include "keywords.h"
 
-#include "make_argcheck_aux.c.inc"
-
-#include "LOGOP_ANY.c.inc"
-
 #include "parse_subsignature_ex.h"
 
 #include "lexer-additions.c.inc"
 
+#include "LOGOP_ANY.c.inc"
+#include "croak_from_caller.c.inc"
+#include "make_argcheck_aux.c.inc"
 #include "newSV_with_free.c.inc"
 
 #define newSVpvx(ptr)  S_newSVpvx(aTHX_ ptr)
@@ -146,7 +145,7 @@ static OP *pp_namedargdefelem(pTHX)
   if(cLOGOP->op_other)
     return cLOGOP->op_other;
 
-  croak("Missing argument '%" SVf "' for subroutine %" SVf,
+  croak_from_caller("Missing argument '%" SVf "' for subroutine %" SVf,
     SVfARG(keysv), SVfARG(S_find_runcv_name(aTHX)));
 }
 
@@ -171,7 +170,7 @@ static OP *pp_checknomorenamed(pTHX)
   while((he = hv_iternext(slurpy_hv)))
     sv_catpvf(keynames, ", '%" SVf "'", SVfARG(HeSVKEY_force(he))), nkeys++;
 
-  croak("Unrecognised %s %" SVf " for subroutine %" SVf,
+  croak_from_caller("Unrecognised %s %" SVf " for subroutine %" SVf,
     nkeys > 1 ? "arguments" : "argument",
     SVfARG(keynames), SVfARG(S_find_runcv_name(aTHX)));
 }
@@ -280,7 +279,7 @@ static OP *S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags)
   /* Consume sigil */
   lex_read_unichar(0);
 
-  char *lexname_end;
+  char *lexname_end = NULL;
 
   if(isIDFIRST_uni(lex_peek_unichar(0))) {
     lex_read_unichar(0);
@@ -349,7 +348,7 @@ static OP *S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags)
   }
 
   if(c == '$') {
-    SV *argname;
+    SV *argname = NULL;
 
     if(paramctx.is_named) {
       parser->sig_slurpy = '+';
@@ -449,8 +448,6 @@ OP *XPS_parse_subsignature_ex(pTHX_ int flags)
    */
   yy_parser *parser = PL_parser;
   struct SignatureParsingContext ctx = {};
-
-  bool permit_named_params = flags & PARSE_SUBSIGNATURE_NAMED_PARAMS;
 
   assert((flags & ~(PARSE_SUBSIGNATURE_NAMED_PARAMS|PARSE_SUBSIGNATURE_PARAM_ATTRIBUTES)) == 0);
 

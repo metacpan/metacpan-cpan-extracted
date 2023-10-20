@@ -27,12 +27,12 @@ sub maths {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tr = Term::Form::ReadLine->new( $sf->{i}{tr_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my ( $num, $op ) = ( '[number]', '[operator]' );
-    my @pre = ( undef, $sf->{i}{ok}, $sf->{i}{menu_addition}, $op , $num);
+    my ( $num, $op ) = ( '[num]', '[op]' );
+    my @pre = ( undef, $sf->{i}{ok}, $sf->{i}{menu_addition}, $num, $op );
     my $menu = [ @pre, @$qt_cols ];
     my $info = $opt->{info} // $ax->get_sql_info( $sql );
     my $items = [];
-    my $prompt = $opt->{prompt} // 'Your choice:';
+    my $prompt = $opt->{prompt} // 'Math:';
     my @bu;
 
     COLUMNS: while ( 1 ) { ##
@@ -52,7 +52,6 @@ sub maths {
             }
             return;
         }
-        push @bu, [ @$items ];
         if ( $menu->[$idx] eq $sf->{i}{ok} ) {
             if ( ! @$items ) {
                 return;
@@ -60,7 +59,7 @@ sub maths {
             my $result = join ' ', @$items;
             $result =~ s/\(\s/(/g;
             $result =~ s/\s\)/)/g;
-            return $result;
+            return '(' . $result . ')';
         }
         elsif ( $menu->[$idx] eq $sf->{i}{menu_addition} ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -71,6 +70,7 @@ sub maths {
             if ( ! defined $complex_col ) {
                 next COLUMNS;
             }
+            push @bu, [ @$items ];
             push @$items, $complex_col;
         }
         elsif ( $menu->[$idx] eq $op ) {
@@ -81,8 +81,8 @@ sub maths {
             );
             if ( ! defined $operator ) {
                 next COLUMNS;
-                return;
             }
+            push @bu, [ @$items ];
             push @$items, $operator =~ s/^\s+|\s+\z//gr;
         }
         elsif ( $menu->[$idx] eq $num ) {
@@ -90,12 +90,14 @@ sub maths {
                 'Number: ',
                 { info => $tmp_info . "\n" . $prompt }
             );
-            if ( ! defined $number ) {
+            if ( ! length $number ) {
                 next COLUMNS;
             }
+            push @bu, [ @$items ];
             push @$items, $number;
         }
         else {
+            push @bu, [ @$items ];
             push @$items, $menu->[$idx];
         }
     }

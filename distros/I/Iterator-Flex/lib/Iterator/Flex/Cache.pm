@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental qw( signatures postderef );
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use parent 'Iterator::Flex::Base';
 use Iterator::Flex::Utils qw( STATE :IterAttrs :IterStates throw_failure );
@@ -74,6 +74,15 @@ sub new ( $class, $iterable, $pars = {} ) {
     );
 }
 
+
+
+
+
+
+
+
+
+
 sub construct ( $class, $state ) {
 
     $class->_throw( parameter => "state must be a HASH reference" )
@@ -125,7 +134,7 @@ sub construct ( $class, $state ) {
 
         ( +METHODS ) => {
             at => sub ( $, $at ) {
-                $cache->[ ( $at - $idx ) % $capacity ];
+                $cache->[ ( $idx - $at ) % $capacity ];
             },
         },
 
@@ -174,7 +183,7 @@ Iterator::Flex::Cache - Cache Iterator Class
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 METHODS
 
@@ -215,6 +224,13 @@ The returned iterator supports the following capabilities:
 =item freeze
 
 =back
+
+=head2 at
+
+   $value = $iter->at( $idx );
+
+Returns the cache value at $idx.  The most recent value is at C<$idx = 0>,
+and the last value is at C<$idx = $capacity - 1>.
 
 =head1 INTERNALS
 

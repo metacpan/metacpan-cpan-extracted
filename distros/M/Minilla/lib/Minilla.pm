@@ -2,7 +2,7 @@ package Minilla;
 use strict;
 use warnings;
 use 5.010001;
-use version; our $VERSION = version->declare("v3.1.22");
+use version; our $VERSION = version->declare("v3.1.23");
 
 our $DEBUG;
 our $AUTO_INSTALL;
@@ -170,6 +170,12 @@ But, you can write configurations to I<minil.toml> file in L<TOML|https://github
 =item name
 
 You can write 'name' instead of automatically detecting project name out of the directory name.
+
+=item module_maker
+
+Minilla supports three module building mechanisms. Module::Build::Tiny is the default one and Module::Build or ExtUtils::MakeMaker are the alternatives. See also L<FAQ|/"#FAQ"> section in this document.
+
+    module_maker="ModuleBuild"
 
 =item readme_from
 

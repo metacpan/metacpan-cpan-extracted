@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Wae - Package for language Walser
 
 =cut
 
 package Locale::CLDR::Locales::Wae;
-# This file auto generated from Data/common/main/wae.xml
-#	on Mon 11 Apr  5:41:10 pm GMT
+# This file auto generated from Data\common\main\wae.xml
+#	on Fri 13 Oct  9:48:14 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

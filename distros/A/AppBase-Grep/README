@@ -2,8 +2,8 @@ NAME
     AppBase::Grep - A base for grep-like CLI utilities
 
 VERSION
-    This document describes version 0.010 of AppBase::Grep (from Perl
-    distribution AppBase-Grep), released on 2022-11-04.
+    This document describes version 0.011 of AppBase::Grep (from Perl
+    distribution AppBase-Grep), released on 2023-07-22.
 
 FUNCTIONS
   grep
@@ -149,7 +149,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2020, 2018 by perlancar
+    This software is copyright (c) 2023, 2022, 2021, 2020, 2018 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

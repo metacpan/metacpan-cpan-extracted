@@ -1,6 +1,10 @@
 Revision history for Perl extension UI-Various
 
-0.42 2023-09-01T08:44:23Z
+0.43 2023-09-16T12:46:13Z
+
+0.43 2023-09-16T12:45:31Z
+
+    - fixed bug when stty output returns values BEFORE keywords rows/columns
 
 0.42 2023-09-01T08:43:51Z
 

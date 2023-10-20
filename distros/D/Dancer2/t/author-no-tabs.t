@@ -304,6 +304,7 @@ my @files = (
     't/redirect.t',
     't/request.t',
     't/request_make_forward_to.t',
+    't/request_multipart_formdata.t',
     't/request_upload.t',
     't/response.t',
     't/roles/hook.t',

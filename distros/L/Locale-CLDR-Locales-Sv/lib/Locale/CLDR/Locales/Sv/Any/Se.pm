@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Sv::Any::Se - Package for language Swedish
 
 =cut
 
 package Locale::CLDR::Locales::Sv::Any::Se;
-# This file auto generated from Data/common/main/sv_SE.xml
-#	on Mon 11 Apr  5:38:52 pm GMT
+# This file auto generated from Data\common\main\sv_SE.xml
+#	on Fri 13 Oct  9:42:48 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents the options of saving .txt file.',
                                   class => 'TxtSaveOptions',
                                   required => [], # TODO
 }                                 );
@@ -128,28 +128,28 @@ __PACKAGE__->method_documentation({
      'quote_type' => {
      	datatype => 'string',
      	base_name => 'QuoteType',
-     	description => '',
+     	description => 'Gets or sets how to quote values in the exported text file.',
      	format => '',
      	read_only => '',
      		},
      'separator' => {
      	datatype => 'string',
      	base_name => 'Separator',
-     	description => '',
+     	description => 'Gets and sets char Delimiter of text file.',
      	format => '',
      	read_only => '',
      		},
      'separator_string' => {
      	datatype => 'string',
      	base_name => 'SeparatorString',
-     	description => '',
+     	description => 'Gets and sets the a string value as separator.',
      	format => '',
      	read_only => '',
      		},
      'always_quoted' => {
      	datatype => 'boolean',
      	base_name => 'AlwaysQuoted',
-     	description => '',
+     	description => 'Indicates whether always adding `"` for each field. If true then all values will be quoted; If false then values will only be quoted when needed(for example, when values contain special characters such as `"` , `\n` or separator character). Default is false.',
      	format => '',
      	read_only => '',
      		},

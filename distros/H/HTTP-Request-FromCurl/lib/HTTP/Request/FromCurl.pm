@@ -18,7 +18,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 =head1 NAME
 
@@ -123,6 +123,8 @@ The following C<curl> options are recognized but largely ignored:
 
 =over 4
 
+=item C< --disable >
+
 =item C< --dump-header >
 
 =item C< --include >
@@ -180,6 +182,7 @@ our @option_spec = (
     'data-raw=s@',
     'data-urlencode=s@',
     'digest',
+    'disable|q!',        # ignored
     'dump-header|D=s',   # ignored
     'referrer|e=s',
     'form|F=s@',
@@ -189,8 +192,11 @@ our @option_spec = (
     'head|I',
     'header|H=s@',
     'include|i',         # ignored
+    'interface=s',
     'insecure|k',
+    'json=s@',
     'location|L',        # ignored, we always follow redirects
+    'max-filesize=s',
     'max-time|m=s',
     'ntlm',
     'keepalive!',
@@ -346,7 +352,6 @@ sub _maybe_read_upload_file( $self, $read_files, $data ) {
 
 sub _build_request( $self, $uri, $options, %build_options ) {
     my $body;
-
     my @headers = @{ $options->{header} || []};
     my $method = $options->{request};
     # Ideally, we shouldn't sort the data but process it in-order
@@ -358,6 +363,7 @@ sub _build_request( $self, $uri, $options, %build_options ) {
                     ;
     my @post_urlencode_data = @{ $options->{'data-urlencode'} || [] };
     my @post_binary_data = @{ $options->{'data-binary'} || [] };
+    my @post_json_data = @{ $options->{'json'} || [] };
 
     my @form_args;
     if( $options->{form}) {
@@ -378,6 +384,16 @@ sub _build_request( $self, $uri, $options, %build_options ) {
         @uris = map { $_->{url} } generate_requests( pattern => shift @uris, limit => $build_options{ limit } );
     }
 
+    if( $options->{'max-filesize'}
+        and $options->{'max-filesize'} =~ m/^(\d+)([kmg])$/i ) {
+        my $mult = {
+            'k' => 1024,
+            'g' => 1024*1024*1024,
+            'm' => 1024*1024,
+        }->{ $2 };
+        $options->{'max-filesize'} = $1 * $mult;
+    }
+
     my @res;
     for my $uri (@uris) {
         $uri = URI->new( $uri );
@@ -393,6 +409,10 @@ sub _build_request( $self, $uri, $options, %build_options ) {
         @post_binary_data = map {
             $self->_maybe_read_data_file( $build_options{ read_files }, $_ );
         } @post_binary_data;
+
+        @post_json_data = map {
+            $self->_maybe_read_data_file( $build_options{ read_files }, $_ );
+        } @post_json_data;
 
         @post_read_data = map {
             my $v = $self->_maybe_read_data_file( $build_options{ read_files }, $_ );
@@ -430,7 +450,9 @@ sub _build_request( $self, $uri, $options, %build_options ) {
                 @post_raw_data,
                 @post_urlencode_data
                 ;
-        };
+        } elsif( @post_json_data ) {
+            $data = join '', @post_json_data;
+        }
 
         if( @form_args) {
             $method //= 'POST';
@@ -463,7 +485,14 @@ sub _build_request( $self, $uri, $options, %build_options ) {
         } elsif( defined $data ) {
             $method //= 'POST';
             $body = $data;
-            $request_default_headers{ 'Content-Type' } = 'application/x-www-form-urlencoded';
+
+            if( @post_json_data ) {
+                $request_default_headers{ 'Content-Type' } = "application/json";
+                $request_default_headers{ 'Accept' } = "application/json";
+
+             } else {
+                $request_default_headers{ 'Content-Type' } = 'application/x-www-form-urlencoded';
+            };
 
         } else {
             $method ||= 'GET';
@@ -570,9 +599,11 @@ sub _build_request( $self, $uri, $options, %build_options ) {
             maybe cookie_jar => $options->{'cookie-jar'},
             maybe cookie_jar_options => $options->{'cookie-jar-options'},
             maybe insecure => $options->{'insecure'},
+            maybe max_filesize => $options->{'max-filesize'},
             maybe show_error => $options->{'show-error'},
             maybe fail => $options->{'fail'},
             maybe unix_socket => $options->{'unix-socket'},
+            maybe local_address => $options->{'interface'},
             maybe form_args => scalar @form_args ? \@form_args : undef,
         });
     }
@@ -662,6 +693,8 @@ of C<< ->as_curl >> than this module.
 
 L<https://github.com/NickCarneiro/curlconverter> - a converter for multiple
 target languages
+
+L<The cURL manpage|https://curl.se/docs/manpage.html>
 
 =head1 REPOSITORY
 

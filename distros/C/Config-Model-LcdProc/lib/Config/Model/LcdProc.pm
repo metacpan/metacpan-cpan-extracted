@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2021 by Dominique Dumont.
+# This software is Copyright (c) 2013-2023 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::LcdProc;
-$Config::Model::LcdProc::VERSION = '2.054';
+$Config::Model::LcdProc::VERSION = '2.055';
 use 5.10.1;
 
 use Config::Model 2.022;
@@ -29,7 +29,7 @@ Config::Model::LcdProc - Edit and validate LcdProc configuration file
 
 =head1 VERSION
 
-version 2.054
+version 2.055
 
 =head1 SYNOPSIS
 
@@ -94,7 +94,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013-2021 by Dominique Dumont.
+This software is Copyright (c) 2013-2023 by Dominique Dumont.
 
 This is free software, licensed under:
 

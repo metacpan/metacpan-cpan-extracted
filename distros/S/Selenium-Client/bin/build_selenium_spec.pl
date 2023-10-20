@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 package Bin::build_selenium_spec;
-$Bin::build_selenium_spec::VERSION = '1.05';
+$Bin::build_selenium_spec::VERSION = '1.06';
 #ABSTRACT: Convenience script to fetch the selenium specification from WC3
 
 use strict;
@@ -45,7 +45,7 @@ Bin::build_selenium_spec - Convenience script to fetch the selenium specificatio
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 build_selenium_spec.pl
 
@@ -80,7 +80,7 @@ George S. Baugh <george@troglodyne.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by George S. Baugh.
+This software is Copyright (c) 2023 by George S. Baugh.
 
 This is free software, licensed under:
 

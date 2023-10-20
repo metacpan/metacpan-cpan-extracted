@@ -211,13 +211,13 @@ X<SQL Commands>
        or
        order_by => col_alias,		# (default is SQL_SIMPLE_ORDER_ASC)
        or
-       order_by => { col_alias => SQL_SIMPLE_ORDER_ASC | USERSOPTS_ORDER_DESC },
+       order_by => { col_alias => SQL_SIMPLE_ORDER_ASC | SQL_SIMPLE_ORDER_DESC },
        or
        order_by => [ col1_alias, col2_alias, ... ],
        or
        order_by => [
-          { col1_alias => SQL_SIMPLE_ORDER_ASC | USERSOPTS_ORDER_DESC },
-          { col2_alias => SQL_SIMPLE_ORDER_ASC | USERSOPTS_ORDER_DESC },
+          { col1_alias => SQL_SIMPLE_ORDER_ASC | SQL_SIMPLE_ORDER_DESC },
+          { col2_alias => SQL_SIMPLE_ORDER_ASC | SQL_SIMPLE_ORDER_DESC },
           ...
        ],
 
@@ -225,6 +225,10 @@ X<SQL Commands>
 
        buffer => hash_ref | array_ref | scalar_ref | callback_ref,
        buffer_options => hash_ref | array_ref | scalar_ref | value_ref,
+       buffer_hashkey => column_name,
+       or
+       buffer_hashkey => [col1,col2,...]
+       buffer_arrayref => 0 | 1,		# (default: 1)
 
        # generic options
 
@@ -309,6 +313,10 @@ X<Call SQL>
 
        buffer => hash_ref | array_ref | scalar_ref | callback_ref,
        buffer_options => any_ref_type,
+       buffer_hashkey => column_name,
+       or
+       buffer_hashkey => [col1,col2,...],
+       buffer_arrayref => 0 | 1,		# (default: 1)
 
        # options
 
@@ -367,6 +375,9 @@ X<General Methods>
 
        buffer => scalar_ref,
     );
+
+ setDumper
+    $state = SQL::SimpleOps->setDumper( false | true );	(default: false)
 
 =head1 DESCRIPTION
 X<CARLOS CELSO>
@@ -503,7 +514,42 @@ you must need use only the mandatory options for your application.
 
 B<REMEMBER:> The JSON format does not allow comma at the end of last field in braces.
 
-=head3 Loading Data into Applications
+=head3 Supported Arguments Format
+
+The C<table> and C<fields> can be configured using the following formats:
+
+  select( table => "table_name", ... );
+
+  select( table => [ "table_name1", ... ], ... );
+
+  my $table = "table_name";
+  select( table => $table, ... );
+
+  my $table = [ "table_name1", ... ];
+  select( table => $table, ... );
+
+  my @table = [ "table_name", ... ];
+  select( table => @table, ... );
+
+  my @table = ( "table_name", ... );
+  select( table => \@table, ... );
+
+The C<where>, C<order_by> and C<group_by> can be configured using the following formats:
+
+  select( where => [ where1, ... ], ... );
+
+  my $where = [ where1, ... ];
+  select( where => $where, ... );
+
+  my @where = [ where1, ... ];
+  select( where => @where, ... );
+
+  my @where = ( where1, ...  );
+  select( where => \@where, ... );
+
+=head3 Loading Data into Applications (C<buffer>, C<buffer_options>, C<buffer_hashkey> and C<buffer_arrayref> options)
+X<Loading Data into Applicatons>
+=head3 Loading Data into Applications (C<buffer>, C<buffer_options>, C<buffer_hashkey> and C<buffer_arrayref> options)
 X<Loading Data into Applicatons>
 
 Exists two different process to manipulate the application data with the module.
@@ -576,22 +622,74 @@ B<Example4:>
 
   SQL::SimpleOps->Select( buffer => \@my_buffer, ... );
 
-  my $line=0;
   foreach my $ref(@my_buffer)
   {
      foreach my $id(sort(keys(%{$my_buffer{$ref}})))
      {
-        print $line." -- id=".$id." -- value=".$my_buffer{$ref}->{$id}."\n";
+        print "id=".$id." -- value=".$my_buffer{$ref}->{$id}."\n";
      }
-     $line++;
   } 
+
+=item B<Extracting Multiple Rows as Single List>
+
+The Single List consists in queries that return an unique field and multiple rows.
+The best typ of C<buffer> is the C<array_ref> with C<buffer_arrayref> swtiched to OFF (C<buffer_arrayref=0>).
+
+B<Example5:>
+
+  SQL::SimpleOps->Select( buffer => \@my_buffer, buffer_arrayref => 0, ... );
+
+  print "values=".join(", ",@my_buffer)."\n";
+
+=item B<Extracting Multiple Rows using field as index>
+
+The Multiple Extraction consists in queries that return tow or more rows.
+The best type of C<buffer> is the C<hash_ref> with C<buffer_hashkey> option, where each line will be indexed by the value of field key.
+
+B<Example6:>
+
+  SQL::SimpleOps->Select( buffer => \%my_buffer, buffer_hashkey => "id", fields => [ "id", ... ], ... );
+
+  foreach my $id(sort(keys(%my_buffer)))
+  {
+     foreach my $field(sort(keys(%{$my_buffer{$id}})))
+     {
+        print "id=".$id." -- ".$field."=".$my_buffer{$id}{$field}."\n";
+     }
+  } 
+
+B<NOTE:> The C<buffer_hashkey> value must be in the command field list.
+
+B<NOTE:> The C<buffer_hashkey> will not be found in the field list results.
+
+B<REMEMBER:> Using 'hash buffers' the ordering is compromised.
+Hash tables are not ordered and the c<order_by> option does not make sense in this case.
+
+B<Example7:>
+
+  SQL::SimpleOps->Select( buffer => \%my_buffer, buffer_hashkey => ["key1","key2"], fields => [ "key1"," key2", ... ], ... );
+
+  foreach my $key1(sort(keys(%my_buffer)))
+  {
+     foreach my $key2(sort(keys(%{$my_buffer{$key1})))
+     {
+        foreach my $field(sort(keys(%{$my_buffer{$key1}{$key2}})))
+        {
+           ...
+        }
+     }
+  }
+
+B<NOTE:> The C<buffer_hashkey> value must be in the command field list.
+
+B<NOTE:> The C<buffer_hashkey> will not be found in the field list results.
 
 =item B<Extracting Specfic Column in Single Row>
 
 The Single Extraction for specific Column in queries that return only one row/column. 
 The best type of C<buffer> is the C<scalar_ref>, where the column will be stored.
 
-B<Example5:>
+B<Example8:>
 
   SQL::SimpleOps->Select( buffer => \$my_scalar, ... );
 
@@ -604,7 +702,7 @@ B<BEWARE:> Only the last value will be returned for queries with multiple rows.
 The most case you need provide a lot number of process before select the rows.
 The C<callback> will be executed for each extracted rows and depending on the return code, the lines will buffered or ignored (no stored).
 
-B<Example6:>
+B<Example9:>
 
   my @any_info;
 
@@ -709,6 +807,7 @@ Results:
 B<NOTE:> The '*' option will not assign alias names in the SQL Command.
 
 =head2 Escape or Backslash
+X<Escape or Backslash>
 
 The C<escape> operand (or C<backslash>) is the format to force the methods to ignore the translating data as arguments.
 The data with escape information will passed to SQL command without check or decode.
@@ -2002,6 +2101,38 @@ Results:
   My #1 Where is [ (_no = 1 or _no IN (2,3)) and _text = 'myname' ]
   My #2 Where is [ _no BETWEEN (1,3) and _text = 'myname' ]
     
+=head2 setDumper
+X<setDumper>
+
+Consists of the method to enable/disable the previous argument list for each call method.
+This option can be used for debug propose only to certify the list of arguments in your call.
+The arguments will be written on C<Data::Dumper> format in the STDERR.
+
+B<REMEMBER:> Do not use this option in production. You will have to force to disable if it no longer needed.
+
+  $state = SQL::SimpleOps->setDumper ( 0 | 1 );	# use '1' to enable the shown
+
+B<Example1:>
+
+  use SQL::SimpleOps;
+  ...
+  my $mymod = SQL::SimpleOps->new ( ... );
+
+  $mymod->setDumper(1);		# use '1' to enable the show
+
+  $mymod->Select( ... );
+  print "mySQL: ".$mymod->getLastSQL()."\n";
+
+  $mymod->setDumper(0);		# use '0' to disable the show
+  ...
+
+Results:
+
+  select = {
+      ...		# your select arguments
+  }
+  mySQL: SELECT ....	# your create SQL command
+
 =head1 CONSTANTS
 X<CONSTANS>
 
@@ -2135,6 +2266,9 @@ They are not mandatory, however is available to use. It is can apply over:
   Select Method
   SelectCursor Method
   Update Method
+  PreFetch Method
+
+B<NOTE:> The methods are not required. If they are omitted, the module will ignore them.
 
 Create in your plugin Methods using same name above. The module will check it before trying to run.
 
@@ -2150,6 +2284,10 @@ The plugin must return the following termination code:
 
 B<BEWARE:> Do not make changes on currents plugins.
 
+=head2 PreFetch Method
+
+This method is called before the 'prepare operations'. It's can be used to provide the last changes or checks before the SQL call.
+
 =head2 Plugin Constructor Method
 
 The Plugin Constructor will receive the address of control data.
@@ -2162,8 +2300,7 @@ The constructor must be:
   sub new()
   {
      my $class = shift; $class = ref($class) || $class || 'SQL::SimpleOps::[interface]::[driver]';
-     my $self = {};
-     $self->{argv} = {@_};	# <-- sql_simple as argument
+     my $self = {@};	# <-- sql_simple as argument
      bless($self,$class);
   }
 
@@ -2179,10 +2316,10 @@ This plugins embeded and establish the C<dsname> data, C<argument #1> from C<DBI
      my $self = shift;
      my $argv = shift;
      my @options;
-     push(@options,"database=".$self->{argv}{sql_simple}->{argv}{db}) if (defined($self->{argv}{sql_simple}->{argv}{db}) && $self->{argv}{sql_simple}->{argv}{db}ne "");
-     push(@options,"host=".$self->{argv}{sql_simple}->{argv}{server}) if (defined($self->{argv}{sql_simple}->{argv}{server}) && $self->{argv}{sql_simple}->{argv}{server} ne "");
-     push(@options,$self->{argv}{sql_simple}->{argv}{port}) if (defined($self->{argv}{sql_simple}->{argv}{port}) && $self->{argv}{sql_simple}->{argv}{port} ne "");
-     $self->{argv}{sql_simple}->{argv}{dsname} = "DBI:mysql:".join(';',@options);
+     push(@options,"database=".$self->{sql_simple}->{argv}{db}) if (defined($self->{sql_simple}->{argv}{db}) && $self->{sql_simple}->{argv}{db}ne "");
+     push(@options,"host=".$self->{sql_simple}->{argv}{server}) if (defined($self->{sql_simple}->{argv}{server}) && $self->{sql_simple}->{argv}{server} ne "");
+     push(@options,$self->{sql_simple}->{argv}{port}) if (defined($self->{sql_simple}->{argv}{port}) && $self->{sql_simple}->{argv}{port} ne "");
+     $self->{sql_simple}->{argv}{dsname} = "DBI:mysql:".join(';',@options);
      return 0;
   }
 
@@ -2200,10 +2337,10 @@ This plugins embeded and establish the C<dsname> data, C<argument #1> from C<DBI
      my $self = shift;
      my $argv = shift;
      my @options;
-     push(@options,"dbname=".$self->{argv}{sql_simple}->{argv}{db}) if (defined($self->{argv}{sql_simple}->{argv}{db}) && $self->{argv}{sql_simple}->{argv}{db} ne "");
-     push(@options,"host=".$self->{argv}{sql_simple}->{argv}{server}) if (defined($self->{argv}{sql_simple}->{argv}{server}) && $self->{argv}{sql_simple}->{argv}{server} ne "");
-     push(@options,$self->{argv}{sql_simple}->{argv}{port}) if (defined($self->{argv}{sql_simple}->{argv}{port}) && $self->{argv}{sql_simple}->{argv}{port} ne "");
-     $self->{argv}{sql_simple}->{argv}{dsname} = "DBI:Pg:".join(';',@options);
+     push(@options,"dbname=".$self->{sql_simple}->{argv}{db}) if (defined($self->{sql_simple}->{argv}{db}) && $self->{sql_simple}->{argv}{db} ne "");
+     push(@options,"host=".$self->{sql_simple}->{argv}{server}) if (defined($self->{sql_simple}->{argv}{server}) && $self->{sql_simple}->{argv}{server} ne "");
+     push(@options,$self->{sql_simple}->{argv}{port}) if (defined($self->{sql_simple}->{argv}{port}) && $self->{sql_simple}->{argv}{port} ne "");
+     $self->{sql_simple}->{argv}{dsname} = "DBI:Pg:".join(';',@options);
      return 0;
   }
 
@@ -2220,8 +2357,8 @@ This plugins embeded and establish the C<dsname> data, C<argument #1> from C<DBI
   {
      my $self = shift;
      my $argv = shift;
-     $self->{argv}{sql_simple}->{argv}{dbfile} = $self->{argv}{sql_simple}->{argv}{db}.".db" if (!defined($self->{argv}{sql_simple}->{argv}{dbfile}) || $self->{argv}{sql_simple}->{argv}{dbfile} eq "");
-     $self->{argv}{sql_simple}->{argv}{dsname} = "DBI:SQLite:dbname=$self->{argv}{sql_simple}->{argv}{dbfile}";
+     $self->{sql_simple}->{argv}{dbfile} = $self->{sql_simple}->{argv}{db}.".db" if (!defined($self->{sql_simple}->{argv}{dbfile}) || $self->{sql_simple}->{argv}{dbfile} eq "");
+     $self->{sql_simple}->{argv}{dsname} = "DBI:SQLite:dbname=$self->{sql_simple}->{argv}{dbfile}";
      return 0;
   }
 
@@ -2233,7 +2370,7 @@ X<Plugin Custom>
 This sample show a simple struct to be create to support your addon.
 
   ## The "Open" method must initialize the "dsname" environment.
-  #
+ 
   ## The "dsname" will be used as the first argument on the "DBI->connect"
   #
   ## rc < 0 - syntax error and abort
@@ -2256,9 +2393,7 @@ This sample show a simple struct to be create to support your addon.
   sub new()
   {
      my $class = shift; $class = ref($class) || $class || 'SQL::SimpleOps::[interface]::[driver]';
-     my $self = {};
-
-     $self->{argv} = {@_};
+     my $self = {@_};
 
      bless($self,$class);
   }
@@ -3247,6 +3382,82 @@ B<Command:> SelectCursor
 
 =back
 
+=head2 044E Buffer hashkey invalid, buffer is not hashref
+X<044E>
+
+=over
+
+=item *
+
+B<Error:> The buffer_hashkey option should only be used with buffer hashref
+
+=item *
+
+B<Action:> Check the C<buffer> option.
+
+=item *
+
+B<Command:> Select and SelectCursor
+
+=back
+
+=head2 045E Buffer hashkey not mapped
+X<045E>
+
+=over
+
+=item *
+
+B<Error:> The C<buffer_hashkey> value does not exist as an index key in the field list.
+
+=item *
+
+B<Action:> Check the field list or buffer_hashkey value.
+
+=item *
+
+B<Command:> Select and SelectCursor
+
+=back
+
+=head2 046E Buffer hashkey must be scalaref or arrayref
+X<046E>
+
+=over
+
+=item *
+
+B<Error:> The C<buffer_hashkey> support only scalaref or arrayref.
+
+=item *
+
+B<Action:> Check the buffer_hashkey option.
+
+=item *
+
+B<Command:> Select and SelectCursor
+
+=back
+
+=head2 047E Buffer arrayref Off not allowed for multiple field list
+X<046E>
+
+=over
+
+=item *
+
+B<Error:> The C<buffer_arrayref> only supports single fields in the selection.
+
+=item *
+
+B<Action:> Check the list of fields in selection.
+
+=item *
+
+B<Command:> Select and SelectCursor
+
+=back
+
 =head2 099S [I<command>] I<dbh-interface-message>
 X<099S>
 
@@ -3690,14 +3901,14 @@ To test you need:
 
 =head1 SEE ALSO
 
-L<DBD::mysql>, L<DBD::Pg>, L<DBD::SQLite>, L<DBI>, L<Date::Calc>, L<File::Path>, L<File::Spec>, L<JSON>, L<Sys::Syslog>
+L<DBD::mysql>, L<DBD::Pg>, L<DBD::SQLite>, L<DBI>
 
 =head1 EXTERNAL REFERENCES
 X<EXTERNAL REFERENCES>
 
 L<MySQL|https://www.mysql.com/>,
 L<MariaDB|https://www.mariadb.org/>,
-L<Postgres|https://www.postgresql.org>,
+L<Postgres|https://www.postgresql.org/>,
 L<SQLite|https://www.sqlite.org/>,
 L<SQL Wiki|https://en.wikipedia.org/wiki/SQL>,
 L<W3C|https://www.w3schools.com/sql/>

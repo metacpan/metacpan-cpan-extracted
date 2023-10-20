@@ -1,5 +1,5 @@
 package Template::Liquid::Tag::For;
-our $VERSION = '1.0.22';
+our $VERSION = '1.0.23';
 use strict;
 use warnings;
 require Template::Liquid::Error;
@@ -109,7 +109,18 @@ sub render {
             $a =~ m[^\d+$] && $b =~ m[^\d+$] ? ($a <=> $b) : ($a cmp $b)
         } @$list;
     }
-    if (!defined $list || !$list || !@$list) {
+    if (!eval { \@$list }) {
+
+        # list is a string
+        $list = [$list];
+    }
+    elsif (ref($list) eq 'ARRAY' && !@$list) {
+
+        # empty array
+        $_undef_list = 1;
+        $list        = [1];
+    }
+    elsif (!defined $list || !$list) {
         $_undef_list = 1;
         $list        = [1];
     }
@@ -359,7 +370,7 @@ CPAN ID: SANKO
 
 =head1 License and Legal
 
-Copyright (C) 2009-2022 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+Copyright (C) 2009-2023 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of L<The Artistic License

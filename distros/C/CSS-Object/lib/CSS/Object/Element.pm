@@ -56,7 +56,6 @@ sub format
 	{
 	    # $format = $self->_set_get_object( 'format', 'CSS::Object::Format', @_ ) || return;
         my $val = shift( @_ );
-        # $self->message( 3, "Setting new formatter '$val' for our class '", $self->class, "'." );
         my $format;
         if( $self->_is_a( $val, 'CSS::Object::Format' ) )
         {
@@ -65,7 +64,6 @@ sub format
             if( $self->format )
             {
                 my( $p, $f, $l ) = caller();
-                # $self->message( 3, "New formatter provided for our class '", $self->class, "' called from package $p at line $l in file $f to set indent from '", $self->format->indent->scalar, "' to '", $clone->indent->scalar, "'." );
                 $clone->copy_parameters_from( $self->format );
             }
             $format = $self->_set_get_object( 'format', 'CSS::Object::Format', $clone ) || 

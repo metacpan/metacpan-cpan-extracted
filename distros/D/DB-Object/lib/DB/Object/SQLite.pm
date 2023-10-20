@@ -20,6 +20,7 @@ BEGIN
     use vars qw(
         $VERSION $CACHE_QUERIES $CACHE_SIZE $CACHE_TABLE $CONNECT_VIA $DB_ERRSTR $ERROR $DEBUG
         $USE_BIND $USE_CACHE $MOD_PERL @DBH
+        $PLACEHOLDER_REGEXP $DATATYPES
     );
     use DBI qw( :sql_types );
     eval { require DBD::SQLite; };
@@ -30,8 +31,8 @@ BEGIN
     use DateTime::TimeZone;
     use DateTime::Format::Strptime;
     use Module::Generic::File qw( sys_tmpdir );
-    use Nice::Try;
-    $VERSION     = 'v0.400.10';
+    our $PLACEHOLDER_REGEXP = qr/\?(?<index>\d+)/;
+    our $VERSION = 'v0.400.10';
     use Devel::Confess;
 };
 
@@ -39,23 +40,26 @@ use strict;
 use warnings;
 # require DB::Object::SQLite::Statement;
 # require DB::Object::SQLite::Tables;
-$DB_ERRSTR     = '';
-$DEBUG         = 0;
-$CACHE_QUERIES = [];
-$CACHE_SIZE    = 10;
+our $DB_ERRSTR     = '';
+our $DEBUG         = 0;
+our $CACHE_QUERIES = [];
+our $CACHE_SIZE    = 10;
 # The purpose of this cache is to store table object and avoid the penalty of reloading the structure of a table for every object generated.
 # Thus CACHE_TABLE is in no way an exhaustive list of existing table, but existing table object.
-$CACHE_TABLE   = {};
-$USE_BIND      = 0;
-$USE_CACHE     = 0;
-$MOD_PERL      = 0;
-@DBH           = ();
+our $CACHE_TABLE   = {};
+our $USE_BIND      = 0;
+our $USE_CACHE     = 0;
+our $MOD_PERL      = 0;
+our @DBH           = ();
 if( $INC{ 'Apache/DBI.pm' } && 
     substr( $ENV{GATEWAY_INTERFACE}|| '', 0, 8 ) eq 'CGI-Perl' )
 {
     $CONNECT_VIA = "Apache::DBI::connect";
     $MOD_PERL++;
 }
+
+# Actually the one in DB::Object is used, because DBD::SQLite has no datatype constants of its own
+# our $DATATYPES = {};
 
 our $PRIVATE_FUNCTIONS =
 {
@@ -280,6 +284,8 @@ sub connect
     return( $that->SUPER::connect( $param ) );
 }
 
+# NOTE: sub constant_to_datatype is inherited
+
 # sub copy
 
 # sub create_table($;%)
@@ -305,14 +311,17 @@ sub databases
     # There should not be a live user and database just to check what databases there are.
     if( !$self->{dbh} )
     {
-        try
+        # try-catch
+        local $@;
+        $dbh = eval
         {
-            $dbh = $self->connect( @_ ) || return( $self->pass_error );
-        }
-        catch( $e )
+            $self->connect( @_ );
+        };
+        if( $@ )
         {
-            return;
+            return( $self->error( "Error trying to connect to the SQLite database file: $@" ) );
         }
+        $dbh or return( $self->pass_error );
     }
     else
     {
@@ -322,6 +331,8 @@ sub databases
     my @dbases = map( $_->{name}, @$temp );
     return( @dbases );
 }
+
+# NOTE: sub datatype_to_constant is inherited
 
 sub func
 {
@@ -425,7 +436,7 @@ sub replace
     %arg = @arg if( @arg );
     my $table   = $self->{table} ||
     return( $self->error( "No table was provided to replace data." ) );
-    my $structure = $self->structure();
+    my $structure = $self->structure || return( $self->pass_error );
     my $null      = $self->null();
     my @avoid     = ();
     foreach my $field ( keys( %$structure ) )
@@ -708,7 +719,7 @@ sub _dbi_connect
     my $self = shift( @_ );
     my $dbh  = $self->{dbh} = $self->SUPER::_dbi_connect( @_ );
     # my $func = $self->{_func};
-    my $func = $self->{ '_func' };
+    my $func = $self->{_func};
     foreach my $k ( sort( keys( %$PRIVATE_FUNCTIONS ) ) )
     {
         my $this = $PRIVATE_FUNCTIONS->{ $k };
@@ -750,12 +761,13 @@ sub _parse_timestamp
     my $str  = shift( @_ );
     # No value was actually provided
     return if( !length( $str ) );
-    my $tz;
-    try
+    # try-catch
+    local $@;
+    my $tz = eval
     {
-        $tz = DateTime::TimeZone->new( name => 'local' );
-    }
-    catch( $e )
+        return( DateTime::TimeZone->new( name => 'local' ) );
+    };
+    if( $@ )
     {
         $tz = DateTime::TimeZone->new( name => 'UTC' );
     }
@@ -833,12 +845,14 @@ sub _curdate
 {
     my $self = shift( @_ );
     my @args = @_;
-    my $tz;
-    try
+    
+    # try-catch
+    local $@;
+    my $tz = eval
     {
-        $tz = DateTime::TimeZone->new( name => 'local' );
-    }
-    catch( $e )
+        return( DateTime::TimeZone->new( name => 'local' ) );
+    };
+    if( $@ )
     {
         $tz = DateTime::TimeZone->new( name => 'UTC' );
     }
@@ -850,12 +864,13 @@ sub _curtime
 {
     my $self = shift( @_ );
     my @args = @_;
-    my $tz;
-    try
+    # try-catch
+    local $@;
+    my $tz = eval
     {
-        $tz = DateTime::TimeZone->new( name => 'local' );
-    }
-    catch( $e )
+        return( DateTime::TimeZone->new( name => 'local' ) );
+    };
+    if( $@ )
     {
         $tz = DateTime::TimeZone->new( name => 'UTC' );
     }
@@ -915,12 +930,13 @@ sub _from_days
     my $self = shift( @_ );
     my @args = @_;
     my $from_days = $args[0];
-    my $tz;
-    try
+    # try-catch
+    local $@;
+    my $tz = eval
     {
-        $tz = DateTime::TimeZone->new( name => 'local' );
-    }
-    catch( $e )
+        return( DateTime::TimeZone->new( name => 'local' ) );
+    };
+    if( $@ )
     {
         $tz = DateTime::TimeZone->new( name => 'UTC' );
     }
@@ -946,12 +962,13 @@ sub _from_unixtime
     my $self = shift( @_ );
     my @args = @_;
     return if( $args[0] !~ /^\d+$/ );
-    my $tz;
-    try
+    # try-catch
+    local $@;
+    my $tz = eval
     {
-        $tz = DateTime::TimeZone->new( name => 'local' );
-    }
-    catch( $e )
+        return( DateTime::TimeZone->new( name => 'local' ) );
+    };
+    if( $@ )
     {
         $tz = DateTime::TimeZone->new( name => 'UTC' );
     }
@@ -1025,15 +1042,17 @@ sub _number_format
     my $self = shift( @_ );
     my @args = @_;
     my( $num, $tho, $dec, $prec ) = @args;
-    $self->_load_class( 'Number::Format' ) || return( $self->pass_error );
-    my $fmt = Number::Format->new(
-        -thousands_sep    => $tho,
-        -decimal_point    => $dec,
-        -decimal_digits    => $prec,
+    $self->_load_class( 'Module::Generic::Number' ) || return( $self->pass_error );
+    my $fmt = Module::Generic::Number->new( $num,
+        thousands   => $tho,
+        decimal     => $dec,
+        precision   => $prec,
     );
     # 1 means with trailing zeros
-    return( $fmt->format_number( $num, $prec, 1 ) );
+    return( $fmt->format( precision => $prec, decimal_fill => 1 ) );
 }
+
+sub _placeholder_regexp { return( $PLACEHOLDER_REGEXP ) }
 
 sub _power
 {
@@ -1115,12 +1134,13 @@ sub _to_days
     my $self = shift( @_ );
     my @args = @_;
     my $dt = $self->_parse_timestamp( $args[0] ) || return;
-    my $tz;
-    try
+    # try-catch
+    local $@;
+    my $tz = eval
     {
-        $tz = DateTime::TimeZone->new( name => 'local' );
-    }
-    catch( $e )
+        return( DateTime::TimeZone->new( name => 'local' ) );
+    };
+    if( $@ )
     {
         $tz = DateTime::TimeZone->new( name => 'UTC' );
     }
@@ -1215,14 +1235,6 @@ DESTROY
         }
     }
 }
-
-END
-{
-    # foreach my $dbh ( @DBH )
-    # {
-    #     $dbh->disconnect();
-    # }
-};
 
 1;
 

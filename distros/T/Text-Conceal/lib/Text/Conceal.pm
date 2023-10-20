@@ -1,6 +1,6 @@
 package Text::Conceal;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use v5.14;
 use warnings;
@@ -181,7 +181,7 @@ Text::Conceal - conceal and recover interface for text processing
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 
@@ -297,13 +297,12 @@ Use only printable characters.
 
 =back
 
-=begin comment
+=item B<ordered> => *bool*
 
-=item B<ordered>
-
-...
-
-=end comment
+Ensures that the parameters given and the order in which they appear in 
+the output do not change. The default is set to 1; if set to 0, it will 
+be handled correctly even if they appear in a different order, a 
+behavior that may lead to instability.
 
 =back
 
@@ -338,12 +337,12 @@ continuous missing is allowed.  Less characters, more confusion.
 
 =over 4
 
-=item L<Text::VisualPrintf>, L<https://github.com/kaz-utashiro/Text-VisualPrintf>
+=item L<Text::VisualPrintf>, L<https://github.com/tecolicom/Text-VisualPrintf>
 
 This module is originally implemented as a part of
 L<Text::VisualPrintf> module.
 
-=item L<Text::ANSI::Printf>, L<https://github.com/kaz-utashiro/Text-ANSI-Printf>
+=item L<Text::ANSI::Printf>, L<https://github.com/tecolicom/Text-ANSI-Printf>
 
 =back
 
@@ -353,7 +352,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2020-2022 Kazumasa Utashiro.
+Copyright 2020-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -4,8 +4,10 @@ use Dancer qw/:syntax :script/;
 use Dancer::Plugin::DBIC 'schema';
 use App::Netdisco::Util::Permission qw/acl_matches acl_matches_only/;
 
+use List::MoreUtils ();
 use File::Spec::Functions qw(catdir catfile);
 use File::Path 'make_path';
+use NetAddr::IP;
 
 use base 'Exporter';
 our @EXPORT = ();
@@ -17,6 +19,7 @@ our @EXPORT_OK = qw/
   is_discoverable is_discoverable_now
   is_arpnipable   is_arpnipable_now
   is_macsuckable  is_macsuckable_now
+  get_denied_actions
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
@@ -327,6 +330,68 @@ sub is_macsuckable_now {
   }
 
   return is_macsuckable(@_);
+}
+
+=head2 get_denied_actions( $device )
+
+Checks configured ACLs for the device on this backend and returns list
+of actions which are denied.
+
+=cut
+
+sub get_denied_actions {
+  my $device = shift;
+  my @badactions = ();
+  return @badactions unless $device;
+  $device = get_device($device); # might be no-op but is done in is_* anyway
+
+  if ($device->is_pseudo) {
+      # always let pseudo devices do contact|location|portname|snapshot
+      # and additionally if there's a snapshot cache, is_discoverable will let
+      # them do all other discover and high prio actions
+      push @badactions, ('discover', grep { $_ !~ m/^(?:contact|location|portname|snapshot)$/ }
+                                          @{ setting('job_prio')->{high} })
+        if not is_discoverable($device);
+  }
+  else {
+      push @badactions, ('discover', @{ setting('job_prio')->{high} })
+        if not is_discoverable($device);
+  }
+
+  push @badactions, (qw/macsuck nbtstat/)
+    if not is_macsuckable($device);
+
+  push @badactions, 'arpnip'
+    if not is_arpnipable($device);
+
+  # add pseudo-actions for schedule entries with ACLs
+  my $schedule = setting('schedule') || {};
+  foreach my $label (keys %$schedule) {
+      my $sched = $schedule->{$label} || next;
+      next unless $sched->{only} or $sched->{no};
+
+      my $action = $sched->{action} || $label;
+      my $pseudo_action = "scheduled-$label";
+
+      # if this action is denied in global config then schedule should not run
+      if (scalar grep {$_ eq $action} @badactions) {
+          push @badactions, $pseudo_action;
+          next;
+      }
+
+      my $net = NetAddr::IP->new($sched->{device});
+      next if ($sched->{device}
+        and (!$net or $net->num == 0 or $net->addr eq '0.0.0.0'));
+
+      push @badactions, $pseudo_action
+        if $sched->{device} and not acl_matches_only($device, $net->cidr);
+      push @badactions, $pseudo_action
+        if $sched->{no} and acl_matches($device, $sched->{no});
+      push @badactions, $pseudo_action
+        if $sched->{only} and not acl_matches_only($device, $sched->{only});
+  }
+
+  return List::MoreUtils::uniq @badactions;
 }
 
 1;

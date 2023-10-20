@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Log;
-$Lab::Moose::Instrument::Log::VERSION = '3.881';
+$Lab::Moose::Instrument::Log::VERSION = '3.901';
 #ABSTRACT: Role for Lab::Moose::Instrument connection logging.
 
 use v5.20;
@@ -114,7 +114,7 @@ Lab::Moose::Instrument::Log - Role for Lab::Moose::Instrument connection logging
 
 =head1 VERSION
 
-version 3.881
+version 3.901
 
 =head1 SYNOPSIS
 
@@ -140,7 +140,6 @@ This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
-            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -3,9 +3,9 @@
 package App::perlmv;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-30'; # DATE
+our $DATE = '2023-07-15'; # DATE
 our $DIST = 'App-perlmv'; # DIST
-our $VERSION = '0.607'; # VERSION
+our $VERSION = '0.608'; # VERSION
 
 use 5.010001;
 use strict;
@@ -100,6 +100,7 @@ sub parse_opts {
         'c|check'         => \$self->{ 'check'         },
         'D|delete=s'      => \$self->{ 'delete'        },
         'd|dry-run'       => \$self->{ 'dry_run'       },
+        'N|no-dry-run'    => sub { $self->{'dry_run'} = 0 },
         'e|eval=s'        =>  $self->{ 'codes'         },
         'h|help'          => sub { $self->print_help() },
         'l|list'          => \$self->{ 'list'          },
@@ -228,7 +229,7 @@ Usage:
  perlmv -s <name>
 
  # Delete scriptlet
- perlmv -d <name>
+ perlmv -D <name>
 
 Options:
 
@@ -244,6 +245,7 @@ Options:
      for rename (the same as mv but won't do cross devices), 'copy' or 'c' to
      copy instead of rename, 'symlink' or 's' to create a symbolic link, and
      'link' or 'l' to create a (hard) link.
+ -N  (--no-dry-run) Turn off dry-run
  -o  (--overwrite) Overwrite (by default, ".1", ".2", and so on will be appended
      to avoid overwriting existing files)
  -p  (--parents) Create intermediate directories
@@ -644,7 +646,7 @@ App::perlmv - Rename files using Perl code
 
 =head1 VERSION
 
-This document describes version 0.607 of App::perlmv (from Perl distribution App-perlmv), released on 2023-06-30.
+This document describes version 0.608 of App::perlmv (from Perl distribution App-perlmv), released on 2023-07-15.
 
 =for Pod::Coverage ^(.*)$
 

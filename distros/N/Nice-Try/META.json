@@ -4,7 +4,7 @@
       "Jacques Deguest (jack@deguest.jp)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
             "Exporter" : "5.73",
             "Filter::Util::Call" : "1.59",
             "List::Util" : "1.33",
-            "PPI" : "1.276",
+            "PPI" : "1.277",
             "PPI::XS" : "0.910",
             "Scalar::Util" : "1.50",
             "Want" : "0.29",
@@ -61,6 +61,6 @@
          "web" : "https://gitlab.com/jackdeguest/Nice-Try"
       }
    },
-   "version" : "v1.3.4",
+   "version" : "v1.3.5",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -71,7 +71,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_lock' } = { 
-    	summary => '',
+    	summary => 'Setting access password.',
         params => $params,
         returns => 'FilesResult',
     };

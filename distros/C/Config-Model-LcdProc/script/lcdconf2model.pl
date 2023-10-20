@@ -2,7 +2,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2021 by Dominique Dumont.
+# This software is Copyright (c) 2013-2023 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #

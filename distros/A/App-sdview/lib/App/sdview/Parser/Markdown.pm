@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.800;
 
-package App::sdview::Parser::Markdown 0.12;
+package App::sdview::Parser::Markdown 0.13;
 class App::sdview::Parser::Markdown
    :does(App::sdview::Parser)
    :strict(params);
@@ -19,6 +19,30 @@ use String::Tagged::Markdown;
 
 use constant format => "Markdown";
 use constant sort_order => 20;
+
+=head1 NAME
+
+C<App::sdview::Parser::Markdown> - parse Markdown files for L<App::sdview>
+
+=head1 SYNOPSIS
+
+   $ sdview README.md
+
+   $ sdview -f Markdown my-document
+
+=head1 DESCRIPTION
+
+This parser module adds to L<App::sdview> the ability to parse input text in
+Markdown formatting.
+
+It uses a custom in-built parser for the block-level parts of the formatting,
+able to handle comments, verbatim blocks, headings in both C<#>-prefixed and
+C<=>-underlined styles, bullet and numbered lists, and tables.
+
+It uses L<String::Tagged::Markdown> to parse the inline-level formatting,
+supporting bold, italic, strikethrough, and fixed-width styles, and links.
+
+=cut
 
 sub find_file ( $class, $name ) { return undef }
 
@@ -72,9 +96,10 @@ method parse_string ( $str )
       }
 
       if( $line =~ s/^\`\`\`// ) {
-         # Ignore the type specifier for now
+         my $language = $line =~ s/^\s+|\s+$//gr;
          push @_paragraphs, App::sdview::Para::Verbatim->new(
-            text => String::Tagged->new,
+            language => ( length $language ? $language : undef ),
+            text     => String::Tagged->new,
          );
          $in_verb++;
          next;
@@ -215,13 +240,19 @@ method _handle_spans ( $s )
    return String::Tagged::Markdown->parse_markdown( $s )
       ->clone(
          convert_tags => {
-            bold   => "B",
-            italic => "I",
-            fixed  => "C",
-            link   => sub ($t, $v) { return L => { target => $v } },
+            # bold, italic stay as they are
+            fixed  => "monospace",
+            strike => "strikethrough",
+            link   => sub ($t, $v) { return link => { target => $v } },
          },
-         only_tags => [qw( bold italic fixed link )],
+         only_tags => [qw( bold italic fixed strike link )],
       );
 }
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
 
 0x55AA;

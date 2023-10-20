@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.2.4
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.3.3
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2023/08/15
+## Modified 2023/10/10
 ## All rights reserved.
 ## 
 ## 
@@ -32,7 +32,7 @@ BEGIN
     use HTTP::Promise::Request;
     use HTTP::Promise::Response;
     use HTTP::Promise::Status qw( :all );
-    use Nice::Try;
+    # use Nice::Try;
     use Promise::Me;
     use Scalar::Util ();
     use URI;
@@ -59,7 +59,7 @@ BEGIN
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
     our $SERIALISER = $Promise::Me::SERIALISER;
-    our $VERSION = 'v0.2.4';
+    our $VERSION = 'v0.3.3';
 };
 
 use strict;
@@ -69,6 +69,7 @@ sub init
 {
     my $self = shift( @_ );
     $self->{accept_language}        = [];
+    $self->{accept_encoding}        = 'auto';
     $self->{agent}                  = qq{HTTP-Promise/$VERSION (perl; +https://metacpan.org/pod/HTTP::Promise)};
     $self->{auto_switch_https}      = 1;
     $self->{buffer_size}            = $BUFFER_SIZE;
@@ -128,6 +129,8 @@ sub init
 
 sub accept_language { return( shift->_set_get_array_as_object( 'accept_language', @_ ) ); }
 
+sub accept_encoding { return( shift->_set_get_scalar_as_object( 'accept_encoding', @_ ) ); }
+
 # NOTE: request parameter
 sub agent { return( shift->_set_get_scalar_as_object( 'agent', @_ ) ); }
 
@@ -143,6 +146,7 @@ sub clone
     {
         $new->{default_headers} = $self->{default_headers}->clone;
     }
+    $new->{_pool} = HTTP::Promise::Pool->new;
     return( $new );
 }
 
@@ -631,6 +635,15 @@ sub mirror
     }
 }
 
+sub new_headers
+{
+    my $self = shift( @_ );
+    $self->_load_class( 'HTTP::Promise::Headers' ) || return( $self->pass_error );
+    my $headers = HTTP::Promise::Headers->new( @_ ) ||
+        return( $self->pass_error( HTTP::Promise::Headers->error ) );
+    return( $headers );
+}
+
 # NOTE: request parameter
 sub no_proxy { return( shift->_set_get_array_as_object( 'no_proxy', @_ ) ); }
 
@@ -739,6 +752,14 @@ sub prepare_headers
         $req->protocol( $self->default_protocol || 'HTTP/1.1' );
     }
     
+    # Set default headers now
+    my $default_headers = $self->default_headers;
+    $default_headers->scan(sub
+    {
+        my( $name, $value ) = @_;
+        $h->header( $name => $value );
+    });
+    
     my $ua = $self->agent;
     if( defined( $ua ) && !$h->user_agent )
     {
@@ -750,10 +771,19 @@ sub prepare_headers
         $h->accept( 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.8' );
     }
     # Accept-Encoding: gzip, deflate, br
-    if( !$h->accept_encoding )
+    my $ae = $self->accept_encoding;
+    if( !$h->accept_encoding && $ae ne 'none' )
     {
         $self->_load_class( 'HTTP::Promise::Stream' ) || return( $self->pass_error );
-        my $decodables = HTTP::Promise::Stream->decodable( 'browser' );
+        my $decodables;
+        if( !$ae->is_empty && $ae ne 'all' && $ae ne 'auto' )
+        {
+            $decodables = HTTP::Promise::Stream->decodable( [split( /[[:blank:]\h]*\,[[:blank:]\h]*/, "$ae" )] );
+        }
+        else
+        {
+            $decodables = HTTP::Promise::Stream->decodable( 'browser' );
+        }
         $h->accept_encoding( $decodables->join( ',' )->scalar );
     }
     # Accept-Language: fr-FR,en-GB;q=0.8,fr;q=0.6,en;q=0.4,ja;q=0.2
@@ -914,7 +944,7 @@ sub send
     local $SIG{PIPE} = 'IGNORE';
     my $io;
     my $sock = $self->_pool->steal( @$p{qw( host port )} );
-    if( defined( $sock ) )
+    if( defined( $sock ) && Scalar::Util::openhandle( $sock ) )
     {
         $io = HTTP::Promise::IO->new( $sock, stop_if => $self->stop_if ) ||
             return( $self->pass_error( HTTP::Promise::IO->error ) );
@@ -1272,7 +1302,8 @@ sub send
     my $ent = HTTP::Promise::Entity->new(
         headers => $headers,
         ext_vary => $self->ext_vary,
-        debug => $self->debug
+        debug => $self->debug,
+        ( ( $headers->exists( 'Content-Encoding' ) && !$headers->content_encoding->is_empty ) ? ( is_encoded => 1 ) : () ),
     );
     $self->_load_class( 'HTTP::Promise::Response' ) || return( $self->pass_error );
     my $resp = HTTP::Promise::Response->new( @$def{qw( code status headers )}, {
@@ -1351,7 +1382,8 @@ sub send
             ) && ( defined( $content_length ) or $chunked ) )
         {
             my $sock = $io->filehandle;
-            $self->_pool->push( $uri->host, $uri->port, $sock );
+            $self->_pool->push( $uri->host, $uri->port, $sock ) ||
+                return( $self->pass_error );
         }
     }
     # explicitly close here, just after returning the socket to the pool,
@@ -1518,9 +1550,9 @@ sub _datetime
 # my $res = $prom->_make_request_data( 'post' => $url, \%form );
 # my $res = $prom->_make_request_data( 'post' => $url, \@form );
 # my $res = $prom->_make_request_data( 'post' => $url, \%form, $field_name => $value, ... );
-# my $res = $prom->_make_request_data( 'post' => $url, $field_name => $value, Content => \%form );
-# my $res = $prom->_make_request_data( 'post' => $url, $field_name => $value, Content => \@form );
-# my $res = $prom->_make_request_data( 'post' => $url, $field_name => $value, Content => $content );
+# my $res = $prom->_make_request_data( 'post' => $url, $field_name => $value, Content => \%form, Query => $escaped_string );
+# my $res = $prom->_make_request_data( 'post' => $url, $field_name => $value, Content => \@form, Query => $escaped_string );
+# my $res = $prom->_make_request_data( 'post' => $url, $field_name => $value, Content => $content, Query => $escaped_string );
 sub _make_request_data
 {
     my $self = shift( @_ );
@@ -1529,6 +1561,9 @@ sub _make_request_data
     my $req = HTTP::Promise::Request->new( $meth => $uri, { debug => $self->debug } ) ||
         return( $self->pass_error( HTTP::Promise::Request->error ) );
     $self->prepare_headers( $req );
+    # To set up a possible escaped query string for this POST/PUT request
+    my $u = $req->uri || 
+        return( $self->error( "No URL was provided for this HTTP query." ) );
     my $ent = $req->entity;
     my $content;
     # Maybe content is provided as the first argument?
@@ -1563,25 +1598,52 @@ sub _make_request_data
         {
             $content = $v;
         }
+        # Handle possible escaped query string for this POST/PUT request
+        elsif( lc( $k ) eq 'query' )
+        {
+            if( ref( $v ) eq 'HASH' || $self->_is_array( $v ) )
+            {
+                # try-catch
+                local $@;
+                eval
+                {
+                    $u->query_form( $v );
+                };
+                if( $@ )
+                {
+                    return( $self->error( "Error while setting query form key-value pairs: $@" ) );
+                }
+            }
+            elsif( !ref( $v ) || ( ref( $v ) && overload::Method( $v => '""' ) ) )
+            {
+                $u->query( "$v" );
+            }
+        }
         else
         {
-            $req->headers->push_header( $k, $v );
+            # $req->headers->push_header( $k, $v );
+            $req->headers->replace( $k, $v );
         }
     }
-    my $ct = $req->headers->header( 'Content-Type' );
+    my $orig_ct = $req->headers->header( 'Content-Type' );
+    my $ct = $orig_ct;
+    my( $obj, $type );
     # By default
-    if( !$ct )
+    if( !$ct && defined( $content ) )
     {
         $ct = 'application/x-www-form-urlencoded';
     }
-    elsif( $ct eq 'form-data' )
+    elsif( $ct && $ct eq 'form-data' )
     {
         $ct = 'multipart/form-data';
     }
 
-    my $obj = $req->headers->new_field( 'Content-Type' => "$ct" );
-    return( $self->pass_error( $req->headers->error ) ) if( !defined( $obj ) );
-    my $type = $obj->type;
+    if( defined( $ct ) && length( "$ct" ) )
+    {
+        $obj = $req->headers->new_field( 'Content-Type' => "$ct" );
+        return( $self->pass_error( $req->headers->error ) ) if( !defined( $obj ) );
+        $type = $obj->type;
+    }
     
     # $content can be an array reference, hash reference, an HTTP::Promise::Body::Form object, or an HTTP::Promise::Body::Form::Data object
     if( ref( $content ) )
@@ -1691,8 +1753,8 @@ sub _make_request_data
         $ent->body( $body );
     }
 
-    # might be redundant
-    $req->headers->content_type( "$obj" );
+    # Set Content-Type if needed
+    $req->headers->content_type( "$obj" ) if( defined( $obj ) && !$orig_ct );
     if( defined( $content ) )
     {
         # Make sure the content is encoded, if applicable, so we can get the proper content length.
@@ -1702,14 +1764,14 @@ sub _make_request_data
         }
         $req->content_length( $ent->body->length );
     }
-    else
+    # Set the Content-Length to 0 only if there is a Content-Type set
+    elsif( $ct )
     {
         $req->header( 'Content-Length' => 0 );
     }
     return( $req );
 }
 
-# TODO: _make_request_query should set a query string. Correct this
 sub _make_request_query
 {
     my $self = shift( @_ );
@@ -1723,27 +1785,34 @@ sub _make_request_query
     my( $k, $v );
     while( ( $k, $v ) = splice( @_, 0, 2 ) )
     {
-        if( lc( $k ) eq 'content' )
+        if( lc( $k ) eq 'content' || lc( $k ) eq 'query' )
         {
             if( ref( $v ) eq 'HASH' || $self->_is_array( $v ) )
             {
-                try
+                # try-catch
+                local $@;
+                eval
                 {
                     $u->query_form( $v );
-                }
-                catch( $e )
+                };
+                if( $@ )
                 {
-                    return( $self->error( "Error while setting query form key-value pairs: $e" ) );
+                    return( $self->error( "Error while setting query form key-value pairs: $@" ) );
                 }
+            }
+            elsif( !ref( $v ) || ( ref( $v ) && overload::Method( $v => '""' ) ) )
+            {
+                $u->query( "$v" );
             }
             else
             {
-                warn( "Option \"$k\" was provided, but no content is allowed for this type of HTTP query. Ignoring it.\n" ) if( $self->_warnings_is_enabled );
+                warn( "Option \"$k\" was provided, but no content data (", overload::StrVal( $v ), ") is allowed for this type of HTTP query. Ignoring it.\n" ) if( $self->_warnings_is_enabled );
             }
         }
         else
         {
-            $req->headers->push_header( $k, $v );
+            # $req->headers->push_header( $k, $v );
+            $req->headers->replace( $k, $v );
         }
     }
     return( $req );
@@ -2069,9 +2138,28 @@ sub _read_body_chunked
         my $total_bytes = 0;
         READ_CHUNK: while( $bytes = $reader->read( $buff, $chunk_size ) )
         {
-            # TODO: we should make sure that the bytes printed out are equal to the bytes we sent to syswrite
+            if( $ent->is_binary( $buff ) )
+            {
+                if( -t( STDIN ) )
+                {
+                    $self->message_colour( 5, '<green>[' . length( $buff ) . ' bytes of binary data not shown here]</>', { prefix => '<<<' } );
+                }
+                else
+                {
+                    $self->message_colour( 5, '[' . length( $buff ) . ' bytes of binary data not shown here]', { prefix => '<<<' } );
+                }
+            }
+            else
+            {
+            }
+
             my $bytes_out = $io->syswrite( $buff );
             return( $self->pass_error( $io->error ) ) if( !defined( $bytes_out ) );
+
+            if( $bytes_out != $bytes )
+            {
+                return( $self->error( "Error writing to body $body: bytes read ($bytes) do not equate to bytes writen ($bytes_out)" ) );
+            }
             $total_bytes += $bytes;
             last READ_CHUNK if( $total_bytes == $len );
             # We do not want to read more than we should
@@ -2113,6 +2201,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
     use HTTP::Promise;
     my $p = HTTP::Promise->new(
         agent => 'MyBot/1.0'
+        accept_encoding => 'auto', # set to 'none' to disable receiving compressed data
         accept_language => [qw( fr-FR fr en-GB en ja-JP )],
         auto_switch_https => 1,
         # For example, a Cookie::Jar object
@@ -2157,7 +2246,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.2.4
+    v0.3.3
 
 =head1 DESCRIPTION
 
@@ -2261,6 +2350,16 @@ Provided with some optional parameters, and this instantiates a new L<HTTP::Prom
 It accepts the following parameters. Each of those options have a corresponding method, so you can get or change its value later:
 
 =over 4
+
+=item * C<accept_encoding>
+
+String. This sets whether we should accept compressed data.
+
+You can set it to C<none> to disable it. By default, this is C<auto>, and it will set the C<Accept-Encoding> C<HTTP> header to all the supported encoding based on the availability of associated modules.
+
+You can also set this to a comma-separated list of known encoding, typically: C<bzip2,deflate,gzip,rawdeflate,brotli>
+
+See L<HTTP::Promise::Stream> for more details.
 
 =item * C<agent>
 
@@ -2385,6 +2484,18 @@ Boolean. When true, this will have L<HTTP::Promise> HTTP methods return a L<HTTP
 =head1 METHODS
 
 The following methods are available. This interface provides similar interface as L<LWP::UserAgent> while providing more granular control.
+
+=head2 accept_encoding
+
+String. Sets or gets whether we should accept compressed data.
+
+You can set it to C<none> to disable it. By default, this is C<auto>, and it will set the C<Accept-Encoding> C<HTTP> header to all the supported encoding based on the availability of associated modules.
+
+You can also set this to a comma-separated list of known encoding, typically: C<bzip2,deflate,gzip,rawdeflate,brotli>
+
+See L<HTTP::Promise::Stream> for more details.
+
+Returns a L<scalar object|Module::Generic::Scalar> of the current value.
 
 =head2 accept_language
 
@@ -2555,6 +2666,12 @@ It returns a L<promise|Promise::Me>, which can be used to call one or more L<the
         say( "Error code; ", $ex->code, " and message: ", $ex->message );
     });
 
+If you pass a special header name C<Content> or C<Query>, it will be used to set the query string of the L<URI>.
+
+The value can be an hash reference, and L<query_form|URI/query_form> will be called.
+
+If the value is a string or an object that stringifies, L<query|URI/query> will be called to set the value as-is. this option gives you direct control of the query string.
+
 However, if L</use_promise> is set to false, this will return an L<HTTP::Promise::Response> object directly.
 
 =head2 head
@@ -2663,6 +2780,14 @@ It can then be used to call one or more L<then|Promise::Me/then> and L<catch|Pro
 
 However, if L</use_promise> is set to false, this will return an L<HTTP::Promise::Response> object directly.
 
+=head2 new_headers
+
+    my $headers = $p->new_headers( Accept => 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.8' );
+
+This takes some key-value pairs as header name and value, and instantiate a new L<HTTP::Promise::Headers> object and returns it.
+
+If an error occurs, this set an L<error object|HTTP::Promise::Exception> and return C<undef> in scalar context or an empty list in list context.
+
 =head2 no_proxy
 
 Sets or gets a list of domain names for which the proxy will not apply. By default this is empty.
@@ -2700,15 +2825,18 @@ However, if L</use_promise> is set to false, this will return an L<HTTP::Promise
 
 Provided with an C<uri> and an optional hash of form data, followed by an hash of header name/value pairs and this will issue a C<PATCH> http request to the given C<uri>.
 
-If a special header name C<Content> is provided, its value will be used to create the key-value pairs form data.
+If a special header name C<Content> is provided, its value will be used to create the key-value pairs form data. That C<Content> value can either be an array reference, or an hash reference of key-value pairs. If if is just a string, it will be used as-is as the request body.
+
+If a special header name C<Query> is provided, its value will be used to set the C<URI> query string. The query string thus provided must already be escaped.
 
 It returns a L<promise|Promise::Me>, which can be used to call one or more L<then|Promise::Me/then> and L<catch|Promise::Me/catch>
 
-    # or $p->patch( $uri, \@form, $field1 => $value1, $field2 => $value2 )
-    # or $p->patch( $uri, \%form, $field1 => $value1, $field2 => $value2 )
-    # or $p->patch( $uri, $field1 => $value1, $field2 => $value2 )
-    # or $p->patch( $uri, $field1 => $value1, $field2 => $value2, Content => \@form )
-    # or $p->patch( $uri, $field1 => $value1, $field2 => $value2, Content => \%form )
+    # or $p->patch( $uri, \@form, $field1 => $value1, $field2 => $value2 );
+    # or $p->patch( $uri, \%form, $field1 => $value1, $field2 => $value2 );
+    # or $p->patch( $uri, $field1 => $value1, $field2 => $value2 );
+    # or $p->patch( $uri, $field1 => $value1, $field2 => $value2, Content => \@form, Query => $escaped_string );
+    # or $p->patch( $uri, $field1 => $value1, $field2 => $value2, Content => \%form, Query => $escaped_string );
+    # or $p->patch( $uri, $field1 => $value1, $field2 => $value2, Content => $content, Query => $escaped_string );
     $p->patch( $uri )->then(sub
     {
         my( $resolve, $reject ) = @$_;
@@ -2728,18 +2856,20 @@ However, if L</use_promise> is set to false, this will return an L<HTTP::Promise
 
 Provided with an C<uri> and an optional hash of form data, followed by an hash of header name/value pairs and this will issue a C<POST> http request to the given C<uri>.
 
-If a special header name C<Content> is provided, its value will be used to create the key-value pairs form data. THat C<Content> value can either be an array reference, or an hash reference of key-value pairs. If if is just a string, it will be used as-is as the request body.
+If a special header name C<Content> is provided, its value will be used to create the key-value pairs form data. That C<Content> value can either be an array reference, or an hash reference of key-value pairs. If if is just a string, it will be used as-is as the request body.
+
+If a special header name C<Query> is provided, its value will be used to set the C<URI> query string. The query string thus provided must already be escaped.
 
 How the form data is formatted depends on the C<Content-Type> set in the headers passed. If the C<Content-Type> header is C<form-data> or C<multipart/form-data>, the form data will be formatted as a C<multipart/form-data> post, otherwise they will be formatted as a C<application/x-www-form-urlencoded> post.
 
 It returns a L<promise|Promise::Me>, which can be used to call one or more L<then|Promise::Me/then> and L<catch|Promise::Me/catch>
 
-    # or $p->post( $uri, \@form, $field1 => $value1, $field2 => $value2 )
-    # or $p->post( $uri, \%form, $field1 => $value1, $field2 => $value2 )
-    # or $p->post( $uri, $field1 => $value1, $field2 => $value2 )
-    # or $p->post( $uri, $field1 => $value1, $field2 => $value2, Content => \@form )
-    # or $p->post( $uri, $field1 => $value1, $field2 => $value2, Content => \%form )
-    # or $p->post( $uri, $field1 => $value1, $field2 => $value2, Content => $content )
+    # or $p->post( $uri, \@form, $field1 => $value1, $field2 => $value2 );
+    # or $p->post( $uri, \%form, $field1 => $value1, $field2 => $value2 );
+    # or $p->post( $uri, $field1 => $value1, $field2 => $value2 );
+    # or $p->post( $uri, $field1 => $value1, $field2 => $value2, Content => \@form, Query => $escaped_string );
+    # or $p->post( $uri, $field1 => $value1, $field2 => $value2, Content => \%form, Query => $escaped_string );
+    # or $p->post( $uri, $field1 => $value1, $field2 => $value2, Content => $content, Query => $escaped_string );
     $p->post( $uri )->then(sub
     {
         my( $resolve, $reject ) = @$_;
@@ -2813,16 +2943,18 @@ Provided with an C<uri> and an optional hash of form data, followed by an hash o
 
 If a special header name C<Content> is provided, its value will be used to create the key-value pairs form data. THat C<Content> value can either be an array reference, or an hash reference of key-value pairs. If if is just a string, it will be used as-is as the request body.
 
+If a special header name C<Query> is provided, its value will be used to set the C<URI> query string. The query string thus provided must already be escaped.
+
 How the form data is formatted depends on the C<Content-Type> set in the headers passed. If the C<Content-Type> header is C<form-data> or C<multipart/form-data>, the form data will be formatted as a C<multipart/form-data> post, otherwise they will be formatted as a C<application/x-www-form-urlencoded> put.
 
 It returns a L<promise|Promise::Me>, which can be used to call one or more L<then|Promise::Me/then> and L<catch|Promise::Me/catch>
 
-    # or $p->put( $uri, \@form, $field1 => $value1, $field2 => $value2 )
-    # or $p->put( $uri, \%form, $field1 => $value1, $field2 => $value2 )
-    # or $p->put( $uri, $field1 => $value1, $field2 => $value2 )
-    # or $p->put( $uri, $field1 => $value1, $field2 => $value2, Content => \@form )
-    # or $p->put( $uri, $field1 => $value1, $field2 => $value2, Content => \%form )
-    # or $p->put( $uri, $field1 => $value1, $field2 => $value2, Content => $content )
+    # or $p->put( $uri, \@form, $field1 => $value1, $field2 => $value2 );
+    # or $p->put( $uri, \%form, $field1 => $value1, $field2 => $value2 );
+    # or $p->put( $uri, $field1 => $value1, $field2 => $value2 );
+    # or $p->put( $uri, $field1 => $value1, $field2 => $value2, Content => \@form, Query => $escaped_string );
+    # or $p->put( $uri, $field1 => $value1, $field2 => $value2, Content => \%form, Query => $escaped_string );
+    # or $p->put( $uri, $field1 => $value1, $field2 => $value2, Content => $content, Query => $escaped_string );
     $p->put( $uri )->then(sub
     {
         my( $resolve, $reject ) = @$_;
@@ -2840,7 +2972,7 @@ However, if L</use_promise> is set to false, this will return an L<HTTP::Promise
 
 =head2 request
 
-This method will issue the propre request in accordance with the request object provided. It will process redirects and authentication responses transparently. This means it may end up sending multiple request, up to the limit set with the object option L</max_redirect>
+This method will issue the proper request in accordance with the request object provided. It will process redirects and authentication responses transparently. This means it may end up sending multiple request, up to the limit set with the object option L</max_redirect>
 
 This method takes the following parameters:
 

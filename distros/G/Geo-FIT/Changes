@@ -1,5 +1,8 @@
 Revision history for Geo-FIT
 
+1.11 [2023-10-19]
+    Updated to FIT 21.115 profile
+
 1.10 [2023-05-07]
     Fix for backward compatibility with Perl versions prior to 5.20 in fields_list() method
 

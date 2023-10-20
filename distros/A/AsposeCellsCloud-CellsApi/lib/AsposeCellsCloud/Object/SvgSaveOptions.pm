@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents the options of saving .svg file.',
                                   class => 'SvgSaveOptions',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'sheet_index' => {
      	datatype => 'int',
      	base_name => 'SheetIndex',
-     	description => '',
+     	description => 'Gets and sets which worksheet should be exported.  If the value is -1, the                active worksheet will be exported.',
      	format => '',
      	read_only => '',
      		},

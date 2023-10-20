@@ -54,9 +54,9 @@ static void xs_init(pTHX) {
 }
 
 typedef struct mthread {
-	Promise* at_inc;
-	Promise* arguments;
-	Promise* output;
+	struct promise* at_inc;
+	struct promise* arguments;
+	struct promise* output;
 } mthread;
 
 
@@ -72,9 +72,9 @@ run_thread(void* arg) {
 	thread_count_inc();
 
 	mthread* thread = (mthread*)arg;
-	Promise* at_inc_promise = thread->at_inc;
-	Promise* arguments = thread->arguments;
-	Promise* output = thread->output;
+	struct promise* at_inc_promise = thread->at_inc;
+	struct promise* arguments = thread->arguments;
+	struct promise* output = thread->output;
 	free(thread);
 
 	PerlInterpreter* my_perl = perl_alloc();
@@ -95,6 +95,7 @@ run_thread(void* arg) {
 		load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("Thread::CSP"), NULL);
 
 		AV* to_run = (AV*)sv_2mortal(promise_get(arguments));
+		promise_refcount_dec(arguments);
 		SV* module = *av_fetch(to_run, 0, FALSE);
 		load_module(PERL_LOADMOD_NOIMPORT, SvREFCNT_inc(module), NULL);
 
@@ -126,15 +127,15 @@ run_thread(void* arg) {
 	return NULL;
 }
 
-Promise* S_thread_spawn(pTHX_ AV* to_run) {
+struct promise* S_thread_spawn(pTHX_ AV* to_run) {
 	static const size_t stack_size = 512 * 1024;
 
 	mthread* mthread = calloc(1, sizeof(*mthread));
-	Promise* at_inc = promise_alloc(2);
+	struct promise* at_inc = promise_alloc(2);
 	mthread->at_inc = at_inc;
-	Promise* arguments = promise_alloc(2);
+	struct promise* arguments = promise_alloc(2);
 	mthread->arguments = arguments;
-	Promise* output = promise_alloc(2);
+	struct promise* output = promise_alloc(2);
 	mthread->output = output;
 
 #ifdef WIN32

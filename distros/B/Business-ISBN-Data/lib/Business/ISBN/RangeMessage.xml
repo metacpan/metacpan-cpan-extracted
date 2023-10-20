@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>60fad3dc-040a-4af9-bc44-334dd04647c2</MessageSerialNumber>
-  <MessageDate>Thu, 7 Sep 2023 04:41:16 BST</MessageDate>
+  <MessageSerialNumber>9faadb17-b7ba-4d66-be7b-1eacf2552b21</MessageSerialNumber>
+  <MessageDate>Fri, 20 Oct 2023 04:41:15 BST</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -163,7 +163,15 @@
           <Length>5</Length>
         </Rule>
         <Rule>
-          <Range>9000000-9499999</Range>
+          <Range>9000000-9003709</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>9003710-9003719</Range>
+          <Length>7</Length>
+        </Rule>
+        <Rule>
+          <Range>9003720-9499999</Range>
           <Length>6</Length>
         </Rule>
         <Rule>
@@ -197,8 +205,16 @@
           <Length>3</Length>
         </Rule>
         <Rule>
-          <Range>0500000-0699999</Range>
+          <Range>0500000-0599999</Range>
           <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>0600000-0669999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>0670000-0699999</Range>
+          <Length>7</Length>
         </Rule>
         <Rule>
           <Range>0700000-0999999</Range>
@@ -921,8 +937,12 @@
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>4000000-5929999</Range>
+          <Range>4000000-5889999</Range>
           <Length>3</Length>
+        </Rule>
+        <Rule>
+          <Range>5890000-5929999</Range>
+          <Length>4</Length>
         </Rule>
         <Rule>
           <Range>5930000-5999999</Range>
@@ -1267,11 +1287,11 @@
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>1000000-1299999</Range>
+          <Range>1000000-1099999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>1300000-4999999</Range>
+          <Range>1100000-4999999</Range>
           <Length>3</Length>
         </Rule>
         <Rule>
@@ -3763,19 +3783,27 @@
       <Agency>Uzbekistan</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-7299999</Range>
+          <Range>0000000-0099999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>7300000-7499999</Range>
+          <Range>0100000-0599999</Range>
+          <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>0600000-7299999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>7300000-7999999</Range>
           <Length>3</Length>
         </Rule>
         <Rule>
-          <Range>7500000-9649999</Range>
+          <Range>8000000-9399999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>9650000-9999999</Range>
+          <Range>9400000-9999999</Range>
           <Length>4</Length>
         </Rule>
       </Rules>
@@ -3943,15 +3971,11 @@
           <Length>3</Length>
         </Rule>
         <Rule>
-          <Range>8000000-8499999</Range>
+          <Range>8000000-9199999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>8500000-8999999</Range>
-          <Length>3</Length>
-        </Rule>
-        <Rule>
-          <Range>9000000-9249999</Range>
+          <Range>9200000-9249999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
@@ -7533,19 +7557,19 @@
           <Length>1</Length>
         </Rule>
         <Rule>
-          <Range>1000000-4999999</Range>
+          <Range>1000000-3499999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>5000000-6999999</Range>
+          <Range>3500000-6999999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>7000000-9499999</Range>
+          <Range>7000000-8999999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>9500000-9999999</Range>
+          <Range>9000000-9999999</Range>
           <Length>3</Length>
         </Rule>
       </Rules>

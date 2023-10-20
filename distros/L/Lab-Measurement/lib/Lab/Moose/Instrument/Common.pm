@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::Common;
 #ABSTRACT: Role for common commands declared mandatory by IEEE 488.2
-$Lab::Moose::Instrument::Common::VERSION = '3.881';
+$Lab::Moose::Instrument::Common::VERSION = '3.901';
 use v5.20;
 
 use Moose::Role;
@@ -107,7 +107,7 @@ Lab::Moose::Instrument::Common - Role for common commands declared mandatory by 
 
 =head1 VERSION
 
-version 3.881
+version 3.901
 
 =head1 METHODS
 
@@ -163,7 +163,7 @@ This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
             2018       Andreas K. Huettel
-            2020       Andreas K. Huettel, Sam Bingner
+            2020       Sam Bingner
 
 
 This is free software; you can redistribute it and/or modify it under

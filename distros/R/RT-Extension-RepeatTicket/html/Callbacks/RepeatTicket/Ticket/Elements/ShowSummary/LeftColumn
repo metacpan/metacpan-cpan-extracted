@@ -24,7 +24,7 @@
 </&>
 <%args>
 $Ticket
-$InlineEdit
+$InlineEdit => 0
 </%args>
 <%init>
 my $can_modify = $Ticket->CurrentUserHasRight('ModifyTicket');

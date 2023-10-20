@@ -15,7 +15,6 @@ BEGIN
     use warnings;
     use parent qw( WebSocket::Handshake );
     use vars qw( $VERSION );
-    use Nice::Try;
     use WebSocket::Frame;
     use WebSocket::Request;
     use WebSocket::Response;
@@ -25,6 +24,7 @@ BEGIN
 sub init
 {
     my $self = shift( @_ );
+    $self->{_exception_class} = 'WebSocket::Exception' unless( defined( $self->{_exception_class} ) );
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     $self->{request}  ||= WebSocket::Request->new( debug => $self->debug );

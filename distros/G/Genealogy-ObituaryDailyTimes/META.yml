@@ -47,5 +47,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/Genealogy-ObituaryDailyTimes/issues
   homepage: https://sites.rootsweb.com/~obituary
   repository: git://github.com/nigelhorne/Genealogy-ObituaryDailyTimes.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

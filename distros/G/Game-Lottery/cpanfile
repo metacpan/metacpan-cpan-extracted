@@ -1,0 +1,9 @@
+CPAN::Meta
+ExtUtils::MakeMaker
+Getopt::Long::Descriptive
+Math::Random::Secure
+Path::Tiny
+Test2::Bundle::More
+Test2::Tools::Exception
+Test2::Tools::Tiny
+Test2::V0

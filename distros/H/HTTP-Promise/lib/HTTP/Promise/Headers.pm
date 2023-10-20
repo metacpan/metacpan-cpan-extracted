@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Headers.pm
-## Version v0.1.1
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/21
-## Modified 2022/07/17
+## Modified 2023/09/08
 ## All rights reserved.
 ## 
 ## 
@@ -25,7 +25,7 @@ BEGIN
     use HTTP::Promise::Exception;
     use HTTP::XSHeaders 0.400004;
     use IO::File;
-    use Nice::Try;
+    # use Nice::Try;
     use Scalar::Util;
     use URI::Escape::XS ();
     use Want;
@@ -48,7 +48,7 @@ BEGIN
     use constant HAS_THREADS  => ( $Config{useithreads} && $INC{'threads.pm'} );
     our $EXCEPTION_CLASS = 'HTTP::Promise::Exception';
     our $SUPPORTED = {};
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -100,13 +100,15 @@ sub new
     my $opts = {};
     $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
     my $self;
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $self = $this->SUPER::new( @_ );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $this->error( "Error instantiating an HTTP::Promise::Headers object: $e" ) );
+        return( $this->error( "Error instantiating an HTTP::Promise::Headers object: $@" ) );
     }
     $self->{default_type} = undef;
     $self->{_init_strict_use_sub} = 1;
@@ -635,14 +637,16 @@ sub error
         my $r;
         if( $MOD_PERL )
         {
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 $r = Apache2::RequestUtil->request;
                 $r->warn( $o->as_string ) if( $r );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                print( STDERR "Error trying to get the global Apache2::ApacheRec: $e\n" );
+                print( STDERR "Error trying to get the global Apache2::ApacheRec: $@\n" );
             }
         }
         
@@ -798,13 +802,15 @@ sub message
         my $r;
         if( $MOD_PERL )
         {
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 $r = Apache2::RequestUtil->request;
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                $stderr_raw->print( "Error trying to get the global Apache2::ApacheRec: $e\n" );
+                $stderr_raw->print( "Error trying to get the global Apache2::ApacheRec: $@\n" );
             }
         }
     
@@ -1504,13 +1510,15 @@ sub _date_header
         require DateTime::Format::Strptime;
         if( $this =~ /^\d+$/ )
         {
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 $this = Module::Generic::DateTime->from_epoch( epoch => $this, time_zone => $opts->{time_zone} );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                return( $self->error( "An error occurred while trying to get the DateTime object for epoch value '$this': $e" ) );
+                return( $self->error( "An error occurred while trying to get the DateTime object for epoch value '$this': $@" ) );
             }
         }
         elsif( Scalar::Util::blessed( $this ) && $this->isa( 'DateTime' ) )
@@ -1526,7 +1534,9 @@ sub _date_header
             return( $self->error( "I was expecting an integer representing a unix time or a DateTime object, but instead got '$this'." ) );
         }
         
-        try
+        # try-catch
+        local $@;
+        eval
         {
             $this->set_time_zone( 'GMT' );
             my $fmt = DateTime::Format::Strptime->new(
@@ -1536,12 +1546,12 @@ sub _date_header
             );
             $this->set_formatter( $fmt );
             $self->header( $f => $this );
-            return( $this );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "An error occurred while trying to format the datetime '$this': $e" ) );
+            return( $self->error( "An error occurred while trying to format the datetime '$this': $@" ) );
         }
+        return( $this );
     }
     else
     {
@@ -1558,7 +1568,9 @@ sub _date_header
             return( '' );
         }
         
-        try
+        # try-catch
+        local $@;
+        eval
         {
             unless( Scalar::Util::blessed( $v ) && $v->isa( 'Module::Generic::DateTime' ) )
             {
@@ -1575,12 +1587,12 @@ sub _date_header
                 $dt->set_formatter( $fmt );
                 $v = Module::Generic::DateTime->new( $dt );
             }
-            return( $v );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "An error occurred while parsing datetime '$v': $e" ) );
+            return( $self->error( "An error occurred while parsing datetime '$v': $@" ) );
         }
+        return( $v );
     }
 }
 
@@ -1670,13 +1682,15 @@ sub _header_set
         }
     }
     
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $self->header( @args );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error trying to set headers with values: $e" ) );
+        return( $self->error( "Error trying to set headers with values: $@" ) );
     }
     return( $self );
 }
@@ -1874,15 +1888,19 @@ sub _set_get_one_uri
     else
     {
         my $v = $self->header( "$f" );
-        try
+        my $uri;
+        # try-catch
+        local $@;
+        eval
         {
             require URI;
-            return( URI->new( $v ) );
-        }
-        catch( $e )
+            $uri = URI->new( $v );
+        };
+        if( $@ )
         {
-            return( $self->error( "Unable to create an URI object from the header value for \"$f\": $e" ) );
+            return( $self->error( "Unable to create an URI object from the header value for \"$f\": $@" ) );
         }
+        return( $uri );
     }
 }
 
@@ -2008,7 +2026,7 @@ HTTP::Promise::Headers - HTTP Headers Class
 
 =head1 VERSION
 
-    v0.1.1
+    v0.2.0
 
 =head1 DESCRIPTION
 

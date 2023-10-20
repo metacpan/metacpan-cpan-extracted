@@ -131,6 +131,7 @@ example/var/db.db
 example/var/sqitch.db
 lib/Catalyst/View/Valiant/HTMLBuilder.pm
 lib/Catalyst/View/Valiant/HTMLBuilder/Form.pm
+lib/Catalyst/View/Valiant/HTMLBuilder/Pager.pm
 lib/Catalyst/View/Valiant/JSONBuilder.pm
 lib/DBIx/Class/Valiant.pm
 lib/DBIx/Class/Valiant/Result.pm
@@ -167,17 +168,20 @@ lib/Valiant/Filters.pm
 lib/Valiant/HTML/FormBuilder.pm
 lib/Valiant/HTML/FormBuilder/Checkbox.pm
 lib/Valiant/HTML/FormBuilder/RadioButton.pm
+lib/Valiant/HTML/PagerBuilder.pm
 lib/Valiant/HTML/SafeString.pm
 lib/Valiant/HTML/Tag.pm
 lib/Valiant/HTML/Tag/Label.pm
 lib/Valiant/HTML/Util/Collection.pm
 lib/Valiant/HTML/Util/Form.pm
 lib/Valiant/HTML/Util/FormTags.pm
+lib/Valiant/HTML/Util/Pager.pm
 lib/Valiant/HTML/Util/TagBuilder.pm
 lib/Valiant/HTML/Util/View.pm
 lib/Valiant/HTML/locale/errors.pl
 lib/Valiant/I18N.pm
 lib/Valiant/JSON/JSONBuilder.pm
+lib/Valiant/JSON/Util.pm
 lib/Valiant/Naming.pm
 lib/Valiant/NestedError.pm
 lib/Valiant/Proxy.pm
@@ -229,6 +233,7 @@ t/dbic/create.t
 t/dbic/m2m.t
 t/dbic/nested.t
 t/dbic/nested2.t
+t/dbic/nested3.t
 t/dbic/new_result.t
 t/dbic/todo_tests.t
 t/dbic/update.t
@@ -249,6 +254,7 @@ t/filters/to_array.t
 t/filters/trim.t
 t/filters/with.t
 t/html/form-builder.t
+t/html/pager-builder.t
 t/html/safe-string.t
 t/html/tag.t
 t/html/util/form-tags.t
@@ -261,6 +267,7 @@ t/if.t
 t/instance.t
 t/json/builder.t
 t/json/pod.t
+t/json/util.t
 t/json/view.t
 t/lib/Example/HTML.pm
 t/lib/Example/HTML/Hello.pm
@@ -289,6 +296,8 @@ t/lib/Schema/Create/Result/Profile.pm
 t/lib/Schema/DefaultRS.pm
 t/lib/Schema/Nested.pm
 t/lib/Schema/Nested/Result/Child.pm
+t/lib/Schema/Nested/Result/Meeting.pm
+t/lib/Schema/Nested/Result/Meeting/Attendee.pm
 t/lib/Schema/Nested/Result/Might.pm
 t/lib/Schema/Nested/Result/Might2.pm
 t/lib/Schema/Nested/Result/Might3.pm

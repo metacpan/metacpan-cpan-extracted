@@ -2262,6 +2262,22 @@ separately.  Example:
 Supports using a template subroutine reference (like L</collection_radio_buttons>) when you need to be
 fussy about style and positioning.
 
+=head1 HELPERS
+
+The following methods don't make form controls but just useful methods to help you build your form.
+
+=head2 escape_javascript
+
+    $fb->escape_javascript($string);
+
+Escapes a string so it can be used in a javascript string.  This is a wrapper around
+The same method from L<Valiant::HTML::Util::TagBuilder/escape_javascript>.
+
+Basically this escapes ' and " and \ and newlines and a few other neaten up so that you can
+use a string as a javascript value.   Helps with injection attackes (but isn't everything
+you need).
+
+
 =head1 THEMING
 
 You can add a method called C<default_theme> to your custom form builder sub class to return a hashref of default

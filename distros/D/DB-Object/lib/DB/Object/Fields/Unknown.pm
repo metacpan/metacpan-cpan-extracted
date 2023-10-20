@@ -37,7 +37,7 @@ BEGIN
         '|'     => sub{ $_[0] },
         '=='    => sub{ $_[0] },
         fallback => 1,
-  );
+    );
     our $VERSION = 'v0.1.0';
 };
 

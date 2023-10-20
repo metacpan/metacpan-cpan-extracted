@@ -6,6 +6,11 @@ use warnings;
 sub TIEHASH {
         my ($class, $obj) = @_;
         my $self = bless $obj || {}, $class;
+	$self->set_value(
+		$_,
+		$self->{properties}->{$_}->{value},
+		$self->{properties}->{$_}
+	) for keys %{$self->{properties}};
 	$self->compile();
 	return $self;
 }
@@ -18,16 +23,36 @@ sub compile {
 	} grep { $self->{properties}->{$_}->{enumerable} } keys %{$self->{properties}}];
 	return $self;
 }
+
+sub set_value {
+	my ($self, $key, $value, $spec) = @_;
+	if (defined $value) {
+		if ($spec->{type}) {
+			$value = eval {
+				 $spec->{type}->($value);
+			};
+			if ($@ || ! defined $value) {
+				my @caller = caller(1);
+				if ($caller[0] eq 'Rope::Object') {
+					die sprintf("Failed to instantiate object (%s) property (%s) failed type validation. %s", $self->{name}, $key, $@);
+				}
+				die sprintf("Cannot set property (%s) in object (%s) failed type validation on line %s file %s: %s", $key, $self->{name}, $caller[2], $caller[1], $@);
+			}
+		}
+		$spec->{value} = $value;
+	}
+	return $spec->{value};
+}
  
 sub STORE {
         my ($self, $key, $value) = @_;
         my $k = $self->{properties}->{$key};
         if ($k) {
-		if ($k->{writable}) {
-                	$k->{value} = $value;
+		if ($k->{writeable}) {
+			$self->set_value($key, $value, $k);
 		} elsif ($k->{configurable}) {
 			if ((ref($value) || "") eq (ref($k->{value}) || "")) {
-				$k->{value} = $value;
+				$self->set_value($key, $value, $k);
 			} else {
 				die "Cannot change Object ($self->{name}) property ($key) type";
 			}

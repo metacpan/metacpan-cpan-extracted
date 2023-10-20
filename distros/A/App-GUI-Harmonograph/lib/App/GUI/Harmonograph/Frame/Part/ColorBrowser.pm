@@ -8,14 +8,17 @@ use App::GUI::Harmonograph::Widget::SliderCombo;
 use App::GUI::Harmonograph::Widget::ColorDisplay;
 use Graphics::Toolkit::Color;
 
+my $RGB = Graphics::Toolkit::Color::Space::Hub::get_space('RGB');
+my $HSL = Graphics::Toolkit::Color::Space::Hub::get_space('HSL');
+
 sub new {
     my ( $class, $parent, $type, $init  ) = @_;
     return unless ref $init eq 'HASH' and exists $init->{'red'}and exists $init->{'green'}and exists $init->{'blue'};
-    
+
     my $self = $class->SUPER::new( $parent, -1);
 
     $self->{'init'} = $init;
-    
+
     $self->{'red'}   =  App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 100, ' R  ', "red part of $type color",    0, 255,  0);
     $self->{'green'} =  App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 100, ' G  ', "green part of $type color",  0, 255,  0);
     $self->{'blue'}  =  App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 100, ' B  ', "blue part of $type color",   0, 255,  0);
@@ -24,18 +27,22 @@ sub new {
     $self->{'light'} =  App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 100, ' L  ', "lightness of $type color",   0, 100,  0);
     $self->{'display'}= App::GUI::Harmonograph::Widget::ColorDisplay->new( $self, 25, 10, $init);
     $self->{'display'}->SetToolTip("$type color monitor");
-    
+
     my $rgb2hsl = sub {
         my @rgb = ($self->{'red'}->GetValue, $self->{'green'}->GetValue, $self->{'blue'}->GetValue);
-        my @hsl = Graphics::Toolkit::Color::Value::hsl_from_rgb( @rgb );
+        my @hsl = $HSL->deconvert( [$RGB->normalize( \@rgb )], 'RGB');
+        @hsl = $HSL->denormalize( \@hsl );
+
         $self->{'hue'}->SetValue( $hsl[0], 1 );
         $self->{'sat'}->SetValue( $hsl[1], 1 );
         $self->{'light'}->SetValue( $hsl[2], 1 );
         $self->{'display'}->set_color( { red => $rgb[0], green => $rgb[1], blue => $rgb[2] } );
     };
     my $hsl2rgb = sub {
-        my @rgb = Graphics::Toolkit::Color::Value::rgb_from_hsl( 
-            $self->{'hue'}->GetValue,  $self->{'sat'}->GetValue, $self->{'light'}->GetValue );
+        my @hsl = ($self->{'hue'}->GetValue, $self->{'sat'}->GetValue, $self->{'light'}->GetValue);
+        my @rgb = $HSL->convert( [$HSL->normalize( \@hsl )], 'RGB');
+        @rgb = $RGB->denormalize( \@rgb );
+
         $self->{'red'}->SetValue( $rgb[0], 1 );
         $self->{'green'}->SetValue( $rgb[1], 1 );
         $self->{'blue'}->SetValue( $rgb[2], 1 );
@@ -78,13 +85,13 @@ sub new {
 sub init {
     my ($self) = @_;
     $self->set_data( $self->{'init'} );
-}    
+}
 
 sub get_data { $_[0]->{'display'}->get_color( ) }
 
 sub set_data {
     my ( $self, $data ) = @_;
-    return unless ref $data eq 'HASH' 
+    return unless ref $data eq 'HASH'
         and exists $data->{'red'} and exists $data->{'green'} and exists $data->{'blue'};
     $self->{'red'}->SetValue( $data->{'red'}, 1);
     $self->{'green'}->SetValue( $data->{'green'}, 1);

@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 lib/Future/IO.pm
@@ -21,4 +22,5 @@ t/10sleep+sysread.t
 t/20impl-override.t
 t/21impl-before-load.t
 t/30system.t
+t/90rt150117.t
 t/99pod.t

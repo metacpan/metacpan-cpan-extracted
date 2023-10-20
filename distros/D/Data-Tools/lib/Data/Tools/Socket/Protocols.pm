@@ -129,7 +129,7 @@ sub load_protocol
   my $req = $PROTOCOL_TYPES{ $ptype }{ 'require' };
   if( $req )
     {
-    eval { require perl_package_to_file( $req ); };
+    eval { my $fn = perl_package_to_file( $req ); require $fn; };
     confess "cannot load PROTOCOL_TYPE [$ptype] error: $@" if $@;
     }  
   $PROTOCOL_LOADED{ $ptype }++;

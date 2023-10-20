@@ -648,12 +648,16 @@ and more examples in the tests directory.  In particular this example doesn't re
 ins and outs of deleting.  An overall tutorial is in the works but example submission or questions
 (that could eventually lead to a FAQ) are very welcomed.
 
-=head1 WARNINGS
+=head1 WARNINGS & GOTCHAs
 
-Besides the fact that nested is still considered beta code please be aware that you must
-be careful with how you expose a deeply nested interface.   If you simply pass fields from a web
-form you are potentially opening yourself to SQL injection and similar types of attacks.  I 
+You must be careful with how you expose a deeply nested interface.   If you simply pass fields 
+from a web form you are potentially opening yourself to SQL injection and similar types of attacks.  I 
 recommend being very careful to sanitize incoming parameters, especially any related keys.
+
+B<NOTE>Be careful when reusing a result that has deeply nested values after you create or update.
+In order to keep data consistent, DBIC will blow away any prefetch caches after create or update.
+So that means if you try to reuse a result you may encounter errors that cause following
+creates or inserts to fails, especially if you have constraints on the related data, such as SetSize.
 
 =head2 Many to Many
 

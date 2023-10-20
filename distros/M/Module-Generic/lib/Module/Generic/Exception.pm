@@ -174,6 +174,11 @@ sub as_string
     my $self = shift( @_ );
     return( $self->{_cache} ) if( $self->{_cache} );
     my $str = $self->message;
+    if( $self->_can_overload( $str => '""' ) )
+    {
+        use overloading;
+        $str = "$str";
+    }
     $str =~ s/\r?\n$//g;
     $str .= sprintf( " within package %s at line %d in file %s\n%s", $self->package, $self->line, $self->file, $self->trace->as_string );
     $self->{_cache} = $str;

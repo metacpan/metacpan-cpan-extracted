@@ -6,9 +6,9 @@ with 'Pod::Weaver::Role::AddTextToSection';
 with 'Pod::Weaver::Role::Section';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-16'; # DATE
+our $DATE = '2023-07-15'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Sah-Schemas'; # DIST
-our $VERSION = '0.073'; # VERSION
+our $VERSION = '0.074'; # VERSION
 
 sub weave_section {
     no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
@@ -163,7 +163,7 @@ To check data against this schema (requires L<Data::Sah>):
  my \$validator = gen_validator("$sch_name*");
  say \$validator->(\$data) ? "valid" : "INVALID!";
 
-The above schema returns a boolean result (true if data is valid, false if
+The above validator returns a boolean result (true if data is valid, false if
 otherwise). To return an error message string instead (empty string if data is
 valid, a non-empty error message otherwise):
 
@@ -187,9 +187,9 @@ _
 
                     push @pod, <<"_";
 
-Often a schema has coercion rule or default value, so after validation the
-validated value is different. To return the validated (set-as-default, coerced,
-prefiltered) value:
+Often a schema has coercion rule or default value rules, so after validation the
+validated value will be different from the original. To return the validated
+(set-as-default, coerced, prefiltered) value:
 
  my \$validator = gen_validator("$sch_name", {return_type=>'str_errmsg+val'});
  my \$res = \$validator->(\$data); # [\$errmsg, \$validated_val]
@@ -291,7 +291,8 @@ _
 
 =head2 Using with Type::Tiny
 
-To create a type constraint and type library from a schema:
+To create a type constraint and type library from a schema (requires
+L<Type::Tiny> as well as L<Type::FromSah>):
 
  package My::Types {
      use Type::Library -base;
@@ -366,7 +367,7 @@ Pod::Weaver::Plugin::Sah::Schemas - Plugin to use when building Sah::Schemas::* 
 
 =head1 VERSION
 
-This document describes version 0.073 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2023-02-16.
+This document describes version 0.074 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2023-07-15.
 
 =head1 SYNOPSIS
 

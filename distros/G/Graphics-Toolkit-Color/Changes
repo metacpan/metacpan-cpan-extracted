@@ -1,7 +1,24 @@
+1.71     2023-09-21    lichtkind
+-------
+    * = doc fixes
+    * ? typos mispellings, boken sentence
+    * ? added range def explanation
+    * ? simplified HEADINGS
+    * ? removed doc of deprecated methods
+
+1.70     2023-09-20    lichtkind
+-------
+    * = mid level improvements, completed API change
+    * + changed method complement to named arguments
+    * + none linear complement circles by setting delta hue value
+    * + select saturation and lightness change axis in complement
+    * ~ renamed distance argument : metric => select
+    * ? rewrote some main module documentation
+
 1.61     2023-09-12    lichtkind
 -------
     * = fix tests
-    * + renamed complementary method => complement
+    * ~ renamed complementary method => complement
     * - deprecated complementary, will be removed at 2.0
 
 1.60     2023-09-11    lichtkind
@@ -52,7 +69,6 @@
     * & new getter API
     * & keep complex names like 'SVG:green' to be returned by getter: ->name
     * ? rewritten large part of documentation
-
 
 1.09    2023-07-17    lichtkind
 -------
@@ -119,3 +135,7 @@
     * \ created own distro
     * ~ small POD fixes
 
+
+    * = new feature release
+    * * added color set method: bowl
+    * + added color spaces: XYZ, LAB

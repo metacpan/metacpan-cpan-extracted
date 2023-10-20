@@ -1,6 +1,6 @@
 package Dancer2::Template::Tiny;
 # ABSTRACT: Template::Tiny engine for Dancer2
-$Dancer2::Template::Tiny::VERSION = '0.400001';
+$Dancer2::Template::Tiny::VERSION = '1.0.0';
 use Moo;
 use Carp qw/croak/;
 use Dancer2::Core::Types;
@@ -50,7 +50,7 @@ Dancer2::Template::Tiny - Template::Tiny engine for Dancer2
 
 =head1 VERSION
 
-version 0.400001
+version 1.0.0
 
 =head1 SYNOPSIS
 

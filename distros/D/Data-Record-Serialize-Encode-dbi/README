@@ -1,0 +1,78 @@
+Data::Record::Serialize::Encode::dbi
+
+Data::Record::Serialize::Encode::dbi writes a record to a database using
+DBI.
+
+It performs both the Data::Record::Serialize::Role::Encode and
+Data::Record::Serialize::Role::Sink roles.
+
+You cannot construct this directly. You must use "new" in
+Data::Record::Serialize.
+
+  Types
+
+Field types are recognized and converted to SQL types via the following
+map:
+
+  S => 'text'
+  N => 'real'
+  I => 'integer'
+
+For Postgres, "B => 'boolean'". For other databases, "B => 'integer'".
+This encoder handles transformation of the input "truthy" Boolean value
+into a form appropriate for the database to ingest.
+
+  NULL values
+
+By default numeric fields are set to "NULL" if they are empty. This can
+be changed by setting the "nullify" attribute.
+
+  Performance
+
+Records are by default written to the database in batches (see the
+"batch" attribute) to improve performance. Each batch is performed as a
+single transaction. If there is an error during the transaction, record
+insertions during the transaction are *not* rolled back.
+
+  Errors
+
+Transaction errors result in an exception in the
+"Data::Record::Serialize::Error::Encode::dbi::insert" class. See
+Data::Record::Serialize::Error for more information on exception
+objects.
+
+  Compatibility
+
+This module has been tested on SQLite, PostgreSQL, and Sybase. See
+t/encoders/dbi.t for more information on how to test against non-SQLite
+databases.
+
+SQL::Translator is used to generate the DDL; unfortunately its Sybase
+DDL producer has some issues/bugs and is temporarily monkey-patched to
+work around them.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

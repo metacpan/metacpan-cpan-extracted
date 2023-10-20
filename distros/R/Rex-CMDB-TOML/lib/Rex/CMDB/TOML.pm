@@ -1,4 +1,3 @@
-#
 # (c) Jan Gehring <jan.gehring@gmail.com>
 # (c) Zane C. Bowers-Hadley
 
@@ -8,7 +7,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '0.0.1';    # VERSION
+our $VERSION = '0.0.2';    # VERSION
 
 use base qw(Rex::CMDB::Base);
 
@@ -70,7 +69,7 @@ sub new {
 
 	# set the default role path ro 'cmdb/roles'
 	if ( !defined( $self->{roles_path} ) ) {
-		$self->{roles_path} = 'cmdb/roles';
+		$self->{roles_path} = File::Spec->join( $self->{path},'roles');
 	}
 
 	# if parsing failure should be fatal
@@ -415,6 +414,8 @@ will over write anything in the roles with the default merge_behavior
 settings.
 
 =head1 ROLES
+
+NOTE: Currently only compatible with scalar value for paths.
 
 If use_roles has been set to true, when loading a config file, it will check for
 value 'roles' and if that value is a array, it will then go through and look foreach

@@ -33,6 +33,7 @@ $m->submit_form_ok(
             'repeat-type'                                          => 'daily',
             'repeat-details-daily'                                 => 'day',
             'repeat-details-daily-day'                             => 1,
+            'repeat-create-on-recurring-date'                      => 0,
         },
         button => 'SubmitTicket',
     },

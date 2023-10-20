@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Changes file management - ~/lib/Changes/Release.pm
-## Version v0.2.1
+## Version v0.2.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/11/23
-## Modified 2022/12/18
+## Modified 2023/09/19
 ## All rights reserved
 ## 
 ## 
@@ -22,11 +22,11 @@ BEGIN
     use Changes::Group;
     use Changes::Version;
     use DateTime;
-    use Nice::Try;
+    # use Nice::Try;
     use Want;
     our $VERSION_CLASS = 'Changes::Version';
     our $DEFAULT_DATETIME_FORMAT = '%FT%T%z';
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.2';
 };
 
 use strict;
@@ -154,13 +154,15 @@ sub as_string
     my $code = $self->datetime_formatter;
     if( defined( $code ) && ref( $code ) eq 'CODE' )
     {
-        try
+        # try-catch
+        local $@;
+        $dt = eval
         {
-            $dt = $code->( defined( $dt ) ? $dt : () );
-        }
-        catch( $e )
+            $code->( defined( $dt ) ? $dt : () );
+        };
+        if( $@ )
         {
-            warn( "Warning only: error with datetime formatter calback: $e\n" ) if( $self->_warnings_is_enabled( 'Changes' ) );
+            warn( "Warning only: error with datetime formatter calback: $@\n" ) if( $self->_warnings_is_enabled( 'Changes' ) );
         }
     }
     if( !defined( $dt ) || !length( "$dt" ) )
@@ -180,19 +182,23 @@ sub as_string
     }
     if( defined( $tz ) )
     {
-        try
+        # try-catch
+        local $@;
+        eval
         {
             $dt->set_time_zone( $tz );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            warn( "Warning only: error trying to set the time zone '", $tz->name, "' (", overload::StrVal( $tz ), ") to DateTime object: $e\n" ) if( $self->_warnings_is_enabled( 'Changes' ) );
+            warn( "Warning only: error trying to set the time zone '", $tz->name, "' (", overload::StrVal( $tz ), ") to DateTime object: $@\n" ) if( $self->_warnings_is_enabled( 'Changes' ) );
         }
     }
     if( defined( $fmt_pattern ) && 
         length( "$fmt_pattern" ) )
     {
-        try
+        # try-catch
+        local $@;
+        eval
         {
             require DateTime::Format::Strptime;
             my $dt_fmt = DateTime::Format::Strptime->new(
@@ -200,10 +206,10 @@ sub as_string
                 locale => 'en_GB',
             );
             $dt->set_formatter( $dt_fmt );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "Error trying to set formatter for format '${fmt_pattern}': $e" ) );
+            return( $self->error( "Error trying to set formatter for format '${fmt_pattern}': $@" ) );
         }
     }
     my $nl = $self->nl;
@@ -459,15 +465,17 @@ sub time_zone
         }
         else
         {
-            try
+            $self->_load_class( 'DateTime::TimeZone' ) || return( $self->pass_error );
+            # try-catch
+            local $@;
+            eval
             {
-                $self->_load_class( 'DateTime::TimeZone' ) || return( $self->pass_error );
                 my $tz = DateTime::TimeZone->new( name => "$v" );
                 $self->{time_zone} = $tz;
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                return( $self->error( "Error setting time zone for '$v': $e" ) );
+                return( $self->error( "Error setting time zone for '$v': $@" ) );
             }
         }
         $self->reset(1);
@@ -540,7 +548,7 @@ Changes::Release - Release object class
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.2
 
 =head1 DESCRIPTION
 

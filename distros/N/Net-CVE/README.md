@@ -34,19 +34,19 @@ $ make install
 ```
 
 Recent changes can be (re)viewed in the public GIT repository at
-https://github.com/Tux/Net-CVE
+https://github.com/CPAN-Security/Net-CVE
 
 Feel free to clone your own copy:
 
 ```
-$ git clone https://github.com/Tux/Net-CVE Net-CVE
+$ git clone https://github.com/CPAN-Security/Net-CVE Net-CVE
 ```
 
 or get it as a tgz:
 
 ```
 $ wget --output-document=Net-CVE-git.tgz \
-        https://github.com/Tux/Net-CVE/archive/main.tar.gz
+        https://github.com/CPAN-Security/Net-CVE/archive/main.tar.gz
 ```
 
 ### Contibuting

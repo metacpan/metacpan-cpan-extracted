@@ -19,8 +19,8 @@ BEGIN
     use warnings;
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
-    our $VERSION = 'v0.300.1';
     use Devel::Confess;
+    our $VERSION = 'v0.300.1';
 };
 
 use strict;

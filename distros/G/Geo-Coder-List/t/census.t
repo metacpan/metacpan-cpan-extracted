@@ -2,8 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 9;
-use Test::NoWarnings;
+use Test::Most tests => 8;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 

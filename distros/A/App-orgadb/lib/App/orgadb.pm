@@ -8,9 +8,9 @@ use Log::ger;
 use App::orgadb::Common;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2023-08-05'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 our %SPEC;
 
@@ -45,6 +45,7 @@ sub _select_single {
     my @parsed_field_value_formatter_rules;
 
     my $field_value_formatter_from_args;
+    my $field_value_formatter_filters_from_args;
   SET_FIELD_VALUE_FORMATTERS_FROM_ARGS:
     {
         last if $args{no_field_value_formatters};
@@ -67,6 +68,7 @@ sub _select_single {
             }
             push @filter_names, $f;
         }
+        $field_value_formatter_filters_from_args = \@filter_names;
         require Data::Sah::Filter;
         $field_value_formatter_from_args = Data::Sah::Filter::gen_filter(
             filter_names => \@filter_names,
@@ -242,12 +244,14 @@ sub _select_single {
                     }
 
                     my $field_value_formatter_from_rules;
+                    my $field_value_formatter_filters_from_rules;
                   SET_FIELD_VALUE_FORMATTERS_FROM_RULES:
                     {
                         last if $args{no_field_value_formatters};
                         last if $field_value_formatter_from_args;
                         last unless $args{field_value_formatter_rules} && @{ $args{field_value_formatter_rules} };
 
+                        $field_value_formatter_filters_from_rules = [];
                         my $field_value_formatters_from_rules = [];
                         unless (@parsed_field_value_formatter_rules) {
                             my $i = -1;
@@ -291,6 +295,7 @@ sub _select_single {
                                         filter_names => \@filter_names,
                                         return_type => 'str_errmsg+val',
                                     );
+                                    push @{ $field_value_formatter_filters_from_rules }, \@filter_names;
                                 } else {
                                     die "Field value formatting rules [$i] does not have non-empty formatters: %s", $r;
                                 }
@@ -342,10 +347,18 @@ sub _select_single {
 
                     my $field_value0 = $field->children_as_string;
                     my ($prefix, $field_value, $suffix) = $field_value0 =~ /\A(\s+)(.*?)(\s*)\z/s;
-                    if ($field_value_formatter_from_args || $field_value_formatter_from_rules) {
-                        my ($ferr, $fres) = @{ ($field_value_formatter_from_args || $field_value_formatter_from_rules)->($field_value) };
+                    my ($field_value_formatter, $field_value_formatter_filters);
+                    if ($field_value_formatter_from_args) {
+                        $field_value_formatter = $field_value_formatter_from_args;
+                        $field_value_formatter_filters = $field_value_formatter_filters_from_args;
+                    } elsif ($field_value_formatter_from_rules) {
+                        $field_value_formatter = $field_value_formatter_from_rules;
+                        $field_value_formatter_filters = $field_value_formatter_filters_from_rules;
+                    }
+                    if ($field_value_formatter) {
+                        my ($ferr, $fres) = @{ $field_value_formatter->($field_value) };
                         if ($ferr) {
-                            log_warn "Field value formatting error: field value=%s, errmsg=%s", $field_value, $ferr;
+                            log_warn "Field value formatting error: formatter=%s, field value=%s, errmsg=%s", $field_value_formatter_filters, $field_value, $ferr;
                             $field_value = "$field_value # CAN'T FORMAT: $ferr";
                         } else {
                             $field_value = $fres;
@@ -478,7 +491,7 @@ App::orgadb - An opinionated Org addressbook toolset
 
 =head1 VERSION
 
-This document describes version 0.016 of App::orgadb (from Perl distribution App-orgadb), released on 2023-01-19.
+This document describes version 0.017 of App::orgadb (from Perl distribution App-orgadb), released on 2023-08-05.
 
 =head1 SYNOPSIS
 

@@ -44,15 +44,6 @@ const struct ltc_cipher_descriptor rijndael_desc =
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 };
 
-const struct ltc_cipher_descriptor aes_desc =
-{
-    "aes",
-    6,
-    16, 32, 16, 10,
-    SETUP, ECB_ENC, ECB_DEC, ECB_TEST, ECB_DONE, ECB_KS,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
-};
-
 #else
 
 #define SETUP    rijndael_enc_setup
@@ -63,15 +54,6 @@ const struct ltc_cipher_descriptor aes_desc =
 const struct ltc_cipher_descriptor rijndael_enc_desc =
 {
     "rijndael",
-    6,
-    16, 32, 16, 10,
-    SETUP, ECB_ENC, NULL, NULL, ECB_DONE, ECB_KS,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
-};
-
-const struct ltc_cipher_descriptor aes_enc_desc =
-{
-    "aes",
     6,
     16, 32, 16, 10,
     SETUP, ECB_ENC, NULL, NULL, ECB_DONE, ECB_KS,
@@ -114,6 +96,7 @@ static ulong32 setup_mix2(ulong32 temp)
 int SETUP(const unsigned char *key, int keylen, int num_rounds, symmetric_key *skey)
 {
     int i;
+    unsigned char *K;
     ulong32 temp, *rk;
 #ifndef ENCRYPT_ONLY
     ulong32 *rrk;
@@ -130,6 +113,10 @@ int SETUP(const unsigned char *key, int keylen, int num_rounds, symmetric_key *s
     }
 
     skey->rijndael.Nr = 10 + ((keylen/8)-2)*2;
+    K = (void*)((((size_t)&skey->rijndael.K[15]) >> 4) << 4);
+    skey->rijndael.eK = (ulong32*)K;
+    K += (60 * sizeof(ulong32));
+    skey->rijndael.dK = (ulong32*)K;
 
     /* setup the forward key */
     i                 = 0;
@@ -741,4 +728,3 @@ int ECB_KS(int *keysize)
 }
 
 #endif
-

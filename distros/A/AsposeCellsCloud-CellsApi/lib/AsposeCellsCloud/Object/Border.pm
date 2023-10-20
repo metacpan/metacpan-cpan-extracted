@@ -129,14 +129,14 @@ __PACKAGE__->method_documentation({
      'line_style' => {
      	datatype => 'string',
      	base_name => 'LineStyle',
-     	description => '',
+     	description => 'Gets or sets the cell border type. ',
      	format => '',
      	read_only => '',
      		},
      'color' => {
      	datatype => 'Color',
      	base_name => 'Color',
-     	description => '',
+     	description => 'Gets or sets the  of the border. ',
      	format => '',
      	read_only => '',
      		},
@@ -150,14 +150,14 @@ __PACKAGE__->method_documentation({
      'theme_color' => {
      	datatype => 'ThemeColor',
      	base_name => 'ThemeColor',
-     	description => '',
+     	description => 'Gets and sets the theme color of the border. ',
      	format => '',
      	read_only => '',
      		},
      'argb_color' => {
      	datatype => 'int',
      	base_name => 'ArgbColor',
-     	description => '',
+     	description => 'Gets and sets the color with a 32-bit ARGB value. ',
      	format => '',
      	read_only => '',
      		},    

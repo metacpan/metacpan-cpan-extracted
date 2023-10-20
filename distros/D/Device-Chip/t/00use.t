@@ -1,15 +1,16 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'Device::Chip' );
-use_ok( 'Device::Chip::Adapter' );
+require Device::Chip;
+require Device::Chip::Adapter;
 
-use_ok( 'Device::Chip::ProtocolBase::SPI' );
+require Device::Chip::ProtocolBase::SPI;
 
-use_ok( 'Device::Chip::Sensor' );
+require Device::Chip::Sensor;
 
+pass( 'Modules loaded' );
 done_testing;

@@ -6,7 +6,7 @@ use B::Hooks::EndOfScope 'on_scope_end';
 use Carp;
 
 # ABSTRACT: Sugar methods for declaring DBIx::Class::Result data definitions
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 
 our $CALLER; # can be used localized to wrap caller context into an anonymous sub
@@ -477,7 +477,6 @@ sub expand_col_options {
 			and _settings_for_package($pkg)->{retrieve_defaults};
 	return $opts;
 }
-
 
 sub expand_relationship_params {
 	my ($pkg, $reltype, $relname, $maybe_colmap)= splice(@_, 0, 4);
@@ -964,48 +963,47 @@ Shortcut for __PACKAGE__->set_primary_key(@cols)
 
 Shortucut for __PACKAGE__->add_unique_constraint($name? \@cols)
 
-=head2 belongs_to
+=head1 EXPORTED RELATIONSHIP FUNCTIONS
 
-  belongs_to $rel_name, $peer_class, $condition, @attr_list;
-  belongs_to $rel_name, { colname => "$ResultClass.$colname" }, @attr_list;
-  belongs_to $rel_name, <<'SQL', @attr_list;
-    JOIN $ResultClass $alias ON $sql_expression
-  SQL
-  # becomes...
-  __PACKAGE__->belongs_to($rel_name, $peer_class, $condition, { @attr_list });
+In each of the native DBIC relationship-declaring functions, the parameters are
 
-Note that the normal DBIC belongs_to requires conditions to be of the form
+  $package->$rel_type($name, $peer_class, $condition, \%attributes);
 
-  { "foreign.$their_col" => "self.$my_col" }
+These sugar functions for each relationship type allow two additional notations:
 
-but all these sugar functions allow it to be written the other way around, and use a
-Result Class name in place of "foreign.".  The Result Class may be a fully qualified
-package name, or just the final component if it is in the same parent package namespace
-as the current package.
+  $rel_type $name => { $my_col => "$peer_class.$their_col" }, @attrs;
+  $rel_type $name => "JOIN $peer_class $alias ON $sql_template", @attrs;
 
-In the third case, this module identifies the C<< "JOIN $ResultClass $x ON $y" >>
-notation and parses that as a template to create the very awkward DBIC coderef system of:
+The first differs from a normal DBIC C<< \%condition >> in that the local
+columns come first.  In DBIC, it is C<< { "foreign.$their_col" => "self.$my_col" } >>
+but these functions allow C<< { $my_col => "$peer_class.$their_col" } >>.  It saves
+a little bit of typing and this order seems more logical to me.
+
+The second one is a shortcut for creating the coderef-based DBIC joins.  Normal DBIC
+would use a condition of:
 
   sub {
-    my ($us, $them)= @{$_[0]}{'self_alias','foreign_alias'};
-    my $literal_sql= $sql_template->($us, $them);
+    my $literal_sql= "... $_[0]{self_alias} ... $_[0]{foreign_alias} ...";
     return \$literal_sql;
   }
 
-To write the template, start with 'JOIN' or 'LEFT JOIN' followed by the full or partial
-name of the related Result Class (not actual table name).  Optionally include an alias
-after that, and then the word 'ON'.  Everything else will be used as the template's SQL.
-All occurrences of the result class name (or alias, if you used one) will be replaced by
-a variable, and every occurrence of C<< self. >> will be replaced by a variable.  These
-variables get substituted with the aliases provided by DBIC during the construction of
-the resultset.
+These methods allow the simpler notation of:
+
+  "JOIN $peer_class ON ... self.$my_col ... $peer_class.$their_col ..."
+  "JOIN $peer_class alias ON ... self.$my_col ... alias.$their_col ..."
+  "(LEFT|INNER) JOIN $peer_class x ON ... self.$my_col ... x.$their_col ..."
+
+To write the template, start with 'JOIN' or 'LEFT JOIN' or 'INNER JOIN' followed by the
+full or partial name of the related Result Class (not actual table name).
+Optionally include an alias after that, and then the word 'ON'.  Everything else will be
+used as the template's SQL. All occurrences of the result class name (or alias, if you
+used one) will be replaced by a variable, and every occurrence of C<< self. >> will be
+replaced by a variable.  These variables get substituted with the aliases provided by DBIC
+during the construction of the resultset.
 
 Examples:
 
-  might_have example1 => <<'SQL';
-    LEFT JOIN MyApp::Result::Example
-      ON MyApp::Result::Example.id = self.example_id
-  SQL
+  might_have example1 => 'JOIN Example e ON e.id = self.example_id';
   
   might_have example2 => <<'SQL';
     JOIN MyApp::Result::Example foreign
@@ -1023,24 +1021,35 @@ When writing the SQL, you need to ensure that "self." and whatever alias you cho
 don't occur anywhere that you didn't intend; This module does not actually parse the
 SQL, it just performs blind text substitution.
 
+=head2 belongs_to
+
+  belongs_to $name => $peer_class, $condition, @attr_list;
+  belongs_to $name => { colname => "$ResultClass.$colname" }, @attr_list;
+  belongs_to $name => 'JOIN $peer_class ON $sql', @attr_list;
+  # becomes...
+  __PACKAGE__->belongs_to($rel_name, $peer_class, $condition, { @attr_list });
+
 =head2 might_have
 
-  might_have $rel_name, $peer_class, $condition, @attr_list;
-  might_have $rel_name, { colname => "$ResultClass.$colname" }, @attr_list;
+  might_have $name => $peer_class, $condition, @attr_list;
+  might_have $name => { colname => "$ResultClass.$colname" }, @attr_list;
+  might_have $name => 'JOIN $peer_class ON $sql', @attr_list;
   # becomes...
   __PACKAGE__->might_have($rel_name, $peer_class, $condition, { @attr_list });
 
 =head2 has_one
 
-  has_one $rel_name, $peer_class, $condition, @attr_list;
-  has_one $rel_name, { colname => "$ResultClass.$colname" }, @attr_list;
+  has_one $name => $peer_class, $condition, @attr_list;
+  has_one $name => { colname => "$ResultClass.$colname" }, @attr_list;
+  has_one $name => 'JOIN $peer_class ON $sql', @attr_list;
   # becomes...
   __PACKAGE__->has_one($rel_name, $peer_class, $condition, { @attr_list });
 
 =head2 has_many
 
-  has_many $rel_name, $peer_class, $condition, @attr_list;
-  has_many $rel_name, { colname => "$ResultClass.$colname" }, @attr_list;
+  has_many $name => $peer_class, $condition, @attr_list;
+  has_many $name => { colname => "$ResultClass.$colname" }, @attr_list;
+  has_many $name => 'JOIN $peer_class ON $sql', @attr_list;
   # becomes...
   __PACKAGE__->has_many($rel_name, $peer_class, $condition, { @attr_list });
 
@@ -1059,8 +1068,9 @@ your schema did not have a cascading foreign key.  This DBIC feature is controll
 C<cascading_delete> option, and using this sugar function to set up the relation defaults that
 feature to "off".
 
-  rel_one $rel_name, $peer_class, $condition, @attr_list;
-  rel_one $rel_name, { $mycol => "$ResultClass.$fcol", ... }, @attr_list;
+  rel_one $name => $peer_class, $condition, @attr_list;
+  rel_one $name => { $mycol => "$ResultClass.$fcol", ... }, @attr_list;
+  rel_one $name => 'JOIN $peer_class ON $sql', @attr_list;
   # becomes...
   __PACKAGE__->add_relationship(
     $rel_name, $peer_class, { "foreign.$fcol" => "self.$mycol" },
@@ -1077,7 +1087,8 @@ feature to "off".
 
 =head2 rel_many
 
-  rel_many $name => { $my_col => "$class.$col", ... }, @options;
+  rel_many $name => { $my_col => "$class.$col", ... }, @attr_list;
+  rel_many $name => 'JOIN $peer_class ON $sql', @attr_list;
 
 Same as L</rel_one>, but generates a one-to-many relation with a multi-accessor.
 
@@ -1114,7 +1125,7 @@ Makes the current resultsource into a view. This is used instead of
 'table'. Takes two options, 'is_virtual', to make this into a
 virtual view, and  'depends' to list tables this view depends on.
 
-Is the equivalent of
+It is the equivalent of
 
   __PACKAGE__->table_class('DBIx::Class::ResultSource::View');
   __PACKAGE__->table($view_name);
@@ -1154,7 +1165,7 @@ See notes above about the generated C<sqlt_deploy_hook>.
 
 This is sugar for sqlt_add_index.  It translates to
 
-  sqlt_add_index( name => $index_name, fields => \@fields, options => \%options, (type => ?) );
+  sqlt_add_index( name => $index_name, fields => \@fields, options => \%options, type => $options{type} );
 
 where the C<%options> are the L<SQL::Translator::Schema::Index/options>, except if
 one of the keys is C<type>, then that key/value gets pulled out and used as
@@ -1164,7 +1175,7 @@ L<SQL::Translator::Schema::Index/type>.
 
 Alias for L</create_index>; lines up nicely with 'col'.
 
-=head1 UTILITY FUNCTION
+=head1 UTILITY FUNCTIONS
 
 These are not exported, but might be useful for integrating with this module:
 
@@ -1188,8 +1199,6 @@ the functions above, and returns the normal positional parameters for the DBIC
 relationship functions.
 
 =back
-
-=head2 expand_relationship_params
 
 =head1 MISSING FUNCTIONALITY
 
@@ -1216,7 +1225,7 @@ Veesh Goldman <rabbiveesh@gmail.com>
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 COPYRIGHT AND LICENSE
 

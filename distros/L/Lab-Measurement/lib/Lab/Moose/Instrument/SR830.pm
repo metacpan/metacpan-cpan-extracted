@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SR830;
-$Lab::Moose::Instrument::SR830::VERSION = '3.881';
+$Lab::Moose::Instrument::SR830::VERSION = '3.901';
 #ABSTRACT: Stanford Research SR830 Lock-In Amplifier
 
 use v5.20;
@@ -469,7 +469,7 @@ Lab::Moose::Instrument::SR830 - Stanford Research SR830 Lock-In Amplifier
 
 =head1 VERSION
 
-version 3.881
+version 3.901
 
 =head1 SYNOPSIS
 
@@ -818,7 +818,8 @@ This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
             2018       Simon Reinhardt
-            2020-2021  Andreas K. Huettel, Simon Reinhardt
+            2020       Simon Reinhardt
+            2021       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

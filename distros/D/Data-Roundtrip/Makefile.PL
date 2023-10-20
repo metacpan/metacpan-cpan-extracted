@@ -36,6 +36,9 @@ my %WriteMakefileArgs = (
 	'Test2::Plugin::UTF8' => '0', # rids of the Wide Character in TAP message!
 	'File::Spec' => '0',
 	'File::Temp' => '0',
+	'YAML' => '0',
+	'YAML::PP' => '0',
+	'YAML::XS' => '0',
 
         'Benchmark' => '0',
 	# WARNING (30.06.2023): CPAN tests fail when
@@ -49,7 +52,7 @@ my %WriteMakefileArgs = (
 	'Encode' => '3.0',
 	'JSON' => '4.0',
 	'Unicode::Escape' => '0.0.2',
-	'YAML' => '1.28',
+	'YAML::PP' => '0.0.36',
 	'Data::Dumper' => '0',
 	'Data::Dump' => '0',
 	'Data::Dump::Filtered' => '0',
@@ -57,7 +60,9 @@ my %WriteMakefileArgs = (
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Data-Roundtrip-*' },
     postamble => {
-        BENCHMARK_FILES => 'xt/benchmarks/*.b' },
+        DEFICIENCIES_FILES => 'xt/deficiencies/*.t',
+        BENCHMARK_FILES => 'xt/benchmarks/*.b',
+    },
 	# Thanks to marto @ Perlmonks.org
 	# see https://perlmonks.org/?displaytype=displaycode;node_id=359256;part=1;abspart=1
         META_MERGE => {
@@ -102,10 +107,14 @@ sub MY::postamble {
     my (undef,%h) = @_;
     # require Data::Dumper; print STDERR Data::Dumper->Dump([\%h], [qw(mm_args{postamble})]);
     return "BENCHMARK_FILES=$h{BENCHMARK_FILES}\n"
+	 . "DEFICIENCIES_FILES=$h{DEFICIENCIES_FILES}\n"
 	. <<'POSTAMBLE';
 TEST_D = $(ABSPERLRUN) -MExtUtils::Command -e test_d --
 
 benchmarks :: $(BENCHMARK_FILES)
+	prove --blib $(INST_LIB) --blib $(INST_ARCHLIB) --verbose $^
+
+deficiencies :: $(DEFICIENCIES_FILES)
 	prove --blib $(INST_LIB) --blib $(INST_ARCHLIB) --verbose $^
 POSTAMBLE
 }

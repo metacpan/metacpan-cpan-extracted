@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Signature in file.            ',
                                   class => 'DigitalSignature',
                                   required => [], # TODO
 }                                 );
@@ -128,56 +128,56 @@ __PACKAGE__->method_documentation({
      'comments' => {
      	datatype => 'string',
      	base_name => 'Comments',
-     	description => '',
+     	description => 'The purpose to signature.',
      	format => '',
      	read_only => '',
      		},
      'sign_time' => {
      	datatype => 'string',
      	base_name => 'SignTime',
-     	description => '',
+     	description => 'The time when the document was signed.',
      	format => '',
      	read_only => '',
      		},
      'id' => {
      	datatype => 'string',
      	base_name => 'Id',
-     	description => '',
+     	description => 'Specifies a GUID which can be cross-referenced with the GUID of the signature line stored in the document content. Default value is Empty (all zeroes) Guid.',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'Password',
-     	description => '',
+     	description => 'Specifies the text of actual signature in the digital signature. Default value is Empty.            ',
      	format => '',
      	read_only => '',
      		},
      'image' => {
      	datatype => 'ARRAY[byte?]',
      	base_name => 'Image',
-     	description => '',
+     	description => 'Specifies an image for the digital signature. Default value is null.',
      	format => '',
      	read_only => '',
      		},
      'provider_id' => {
      	datatype => 'string',
      	base_name => 'ProviderId',
-     	description => '',
+     	description => 'Specifies the class ID of the signature provider. Default value is Empty (all zeroes) Guid.            ',
      	format => '',
      	read_only => '',
      		},
      'is_valid' => {
      	datatype => 'boolean',
      	base_name => 'IsValid',
-     	description => '',
+     	description => 'If this digital signature is valid and the document has not been tampered with, this value will be true.',
      	format => '',
      	read_only => '',
      		},
      'x_ad_es_type' => {
      	datatype => 'string',
      	base_name => 'XAdESType',
-     	description => '',
+     	description => 'XAdES type. Default value is None(XAdES is off).',
      	format => '',
      	read_only => '',
      		},    

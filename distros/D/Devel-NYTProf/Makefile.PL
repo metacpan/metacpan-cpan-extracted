@@ -33,7 +33,6 @@ if ($ENV{PERL_CORE}) {
         'bin/nytprofcsv'  => '$(INST_MAN1DIR)/nytprofcsv.1',
         'bin/nytprofcalls'=> '$(INST_MAN1DIR)/nytprofcalls.1',
         'bin/nytprofcg'   => '$(INST_MAN1DIR)/nytprofcg.1',
-        'bin/nytprofpf'   => '$(INST_MAN1DIR)/nytprofpf.1'
     } );
 }
 
@@ -164,7 +163,6 @@ if (my $gccversion = $Config{gccversion}) {    # ask gcc to be more pedantic
     print "Your perl was compiled with gcc (version $Config{gccversion}), okay.\n";
     $gccversion =~ s/[^\d\.]//g;               # just a number please
     $mm_opts{DEFINE} .= ' -W -Wall -Wpointer-arith';
-    $mm_opts{DEFINE} .= ' -Wbad-function-cast' unless $Config{d_cplusplus};
     $mm_opts{DEFINE} .= ' -Wno-comment -Wno-sign-compare -Wno-cast-qual';
     $mm_opts{DEFINE} .= ' -Wmissing-noreturn -Wno-unused-parameter' if $gccversion ge "3.0";
     if ($is_developer && $opt_g) {
@@ -184,7 +182,7 @@ WriteMakefile(
     LIBS      => [join ' ', @libs],
     OBJECT    => q/$(O_FILES)/,
     FUNCLIST => ['boot_Devel__NYTProf', 'boot_Devel__NYTProf__FileHandle'],
-    EXE_FILES => ['bin/nytprofhtml', 'bin/flamegraph.pl', 'bin/nytprofcsv', 'bin/nytprofcalls', 'bin/nytprofcg', 'bin/nytprofmerge', 'bin/nytprofpf'],
+    EXE_FILES => ['bin/nytprofhtml', 'bin/flamegraph.pl', 'bin/nytprofcsv', 'bin/nytprofcalls', 'bin/nytprofcg', 'bin/nytprofmerge'],
     @man,
     INC   => $INCLUDE,
     clean => {

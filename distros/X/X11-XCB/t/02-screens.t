@@ -16,7 +16,7 @@ my $x;
 SKIP: {
     eval { $x = X11::XCB::Connection->new; };
 
-    skip "Could not setup X11 connection", 4 if $@;
+    skip "Could not setup X11 connection", 4 if $@ or $x->has_error();
 
     my $screens = $x->screens;
     my $first = first { 1 } @{$screens};

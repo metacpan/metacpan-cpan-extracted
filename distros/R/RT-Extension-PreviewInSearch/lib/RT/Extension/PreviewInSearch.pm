@@ -4,7 +4,7 @@ use warnings;
 
 package RT::Extension::PreviewInSearch;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -29,7 +29,7 @@ at the bottom of the page.
 
 =head1 RT VERSIONS
 
-Works with RT 4.2.
+Works with RT 4.2, 4.4, 5.0
 
 =head1 INSTALLATION
 
@@ -88,7 +88,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2007-2014 by Best Practical Solutions, LLC
+This software is Copyright (c) 2007-2023 by Best Practical Solutions, LLC
 
 This is free software, licensed under:
 

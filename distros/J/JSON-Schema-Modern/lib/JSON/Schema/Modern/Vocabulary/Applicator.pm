@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Applicator;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Applicator vocabulary
 
-our $VERSION = '0.570';
+our $VERSION = '0.572';
 
 use 5.020;
 use Moo;
@@ -214,7 +214,7 @@ sub _eval_keyword_dependencies ($self, $data, $schema, $state) {
       # as in dependentRequired
       if (my @missing = grep !exists($data->{$_}), $schema->{dependencies}{$property}->@*) {
         $valid = E({ %$state, _schema_path_suffix => $property },
-          'missing propert%s: %s', @missing > 1 ? 'ies' : 'y', join(', ', @missing));
+          'object is missing propert%s: %s', @missing > 1 ? 'ies' : 'y', join(', ', @missing));
       }
     }
     else {
@@ -514,7 +514,7 @@ JSON::Schema::Modern::Vocabulary::Applicator - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.570
+version 0.572
 
 =head1 DESCRIPTION
 

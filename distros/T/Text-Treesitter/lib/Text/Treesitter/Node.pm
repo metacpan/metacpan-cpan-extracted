@@ -5,9 +5,9 @@
 
 use v5.26;
 use warnings;
-use Object::Pad 0.70;
+use Object::Pad 0.800;
 
-package Text::Treesitter::Node 0.10;
+package Text::Treesitter::Node 0.11;
 class Text::Treesitter::Node
    :strict(params);
 
@@ -126,10 +126,32 @@ characters.
 
 =head2 end_point
 
-   ( $line, $col ) = $node->start_point;
+   ( $row, $col ) = $node->start_point;
 
 Returns the position in the input text just past where this node's extent
-finishes, split into a line and column number (both 0-based).
+finishes, split into a row (line) and column number (both 0-based).
+
+=head2 start_row
+
+=head2 start_column
+
+=head2 end_row
+
+=head2 end_column
+
+   $row = $node->start_row;
+   $row = $node->end_row;
+
+   $col = $node->start_column;
+   $col = $node->end_column;
+
+I<Since version 0.11.>
+
+Returns individual fields of the start or end position of the node's extent,
+all as 0-based indexes.
+
+These are more efficient if you only need the row or column; use
+L</start_point> or L</end_point> if you need both.
 
 =head2 is_named
 
@@ -239,6 +261,7 @@ BEGIN {
 
    foreach my $meth (qw(
          type start_byte end_byte start_point end_point
+         start_row start_column end_row end_column
          is_named is_missing is_extra has_error child_count
       )) {
 

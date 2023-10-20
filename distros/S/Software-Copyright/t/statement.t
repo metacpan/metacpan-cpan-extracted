@@ -110,8 +110,9 @@ subtest "add years" => sub {
 };
 
 subtest "handle garbage" => sub {
-    my $statement = new_st('**b <= a and (c+1)**b > a');
-    is($statement.'',"","handle C code with (c)");
+    my $statement = new_st('(c)**b <= a and (c+1)**b > a');
+    # garbage in, garbage out
+    is($statement.'',"b <= a and (c+1)**b > a","handle C code with (c)");
 };
 
 subtest "handle No Copyright given by licensecheck" => sub {
@@ -163,11 +164,19 @@ subtest "clean copyright" => sub {
         [
             '(c) 2003--2005 Alexej Kryukov <basileia@yandex.ru>.',
             '2003-2005, Alexej Kryukov <basileia@yandex.ru>.',
-        ]
+        ],
+        [
+            # see https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1052168
+            '@copyright{} 2001--2023 Free Software Foundation, Inc.',
+            '2001-2023, Free Software Foundation, Inc.',
+        ],
+        [
+            'protection under copyright law or other applicable laws.'
+        ],
     );
     foreach my $t (@tests) {
         my ($str, $expect) = $t->@*;
-        is(new_st($str), $expect, "check «$str»");
+        is(new_st($str), $expect // $str, "check «$str»");
     }
 };
 

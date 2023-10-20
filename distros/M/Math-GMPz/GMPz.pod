@@ -527,8 +527,14 @@
     pass are considered probably prime.
 
    Rmpz_nextprime($rop, $op);
-    This function uses a probabilistic algorithm to identify
-    primes. For practical purposes it's adequate, the chance
+   $ui = Rmpz_prevprime($rop, $op);
+    NEXT: Set $rop to the smallest prime > $op
+    PREV: Set $rop to the biggest  prime < $op
+    Rmpz_prevprime returns 1 if $rop is probably prime and 2 if
+    $rop is definitely prime. If a previous prime doesn't exist
+    (i.e. $op < 3), Rmpz_prevprime returns 0 without altering $rop.
+    These functions use a probabilistic algorithm to identify
+    primes. For practical purposes it's adequate; the chance
     of a composite passing will be extremely small.
 
    Rmpz_gcd($rop, $op1, $op2);

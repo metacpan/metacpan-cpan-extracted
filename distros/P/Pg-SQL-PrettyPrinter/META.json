@@ -4,7 +4,7 @@
       "hubert depesz lubaczewski <depesz@depesz.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "bsd"
    ],
@@ -38,7 +38,7 @@
    "provides" : {
       "Pg::SQL::PrettyPrinter" : {
          "file" : "lib/Pg/SQL/PrettyPrinter.pm",
-         "version" : "0.7"
+         "version" : "0.11"
       },
       "Pg::SQL::PrettyPrinter::Node" : {
          "file" : "lib/Pg/SQL/PrettyPrinter/Node.pm"
@@ -212,6 +212,6 @@
          "web" : "https://gitlab.com/depesz/pg-sql-prettyprinter"
       }
    },
-   "version" : "0.7",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

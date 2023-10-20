@@ -37,6 +37,10 @@
  * either the BSD or the GPL.
  */
 
+#pragma clang diagnostic ignored "-Wunused-value"
+#pragma clang diagnostic ignored "-Wcomment"
+#pragma clang diagnostic ignored "-Wextern-initializer"
+
 /* this big block deduces configuration from config.h */
 #ifndef EV_STANDALONE
 # ifdef EV_CONFIG_H
@@ -493,10 +497,10 @@
 
 #if EV_USE_IOURING
 # include <sys/syscall.h>
-# if !SYS_io_uring_setup && __linux && !__alpha
-#  define SYS_io_uring_setup     425
-#  define SYS_io_uring_enter     426
-#  define SYS_io_uring_wregister 427
+# if !SYS_io_uring_register && __linux && !__alpha
+#  define SYS_io_uring_setup    425
+#  define SYS_io_uring_enter    426
+#  define SYS_io_uring_register 427
 # endif
 # if SYS_io_uring_setup && EV_USE_EPOLL /* iouring backend requires epoll backend */
 #  define EV_NEED_SYSCALL 1
@@ -2394,7 +2398,7 @@ fd_reify (EV_P)
 {
   int i;
 
-  /* most backends do not modify the fdchanges list in backend_modfiy.
+  /* most backends do not modify the fdchanges list in backend_modify.
    * except io_uring, which has fixed-size buffers which might force us
    * to handle events in backend_modify, causing fdchanges to be amended,
    * which could result in an endless loop.
@@ -3167,7 +3171,7 @@ ev_recommended_backends (void) EV_NOEXCEPT
 #if !EV_RECOMMEND_LINUXAIO
   flags &= ~EVBACKEND_LINUXAIO;
 #endif
-  /* TODO: linuxaio is super experimental */
+  /* TODO: iouring is super experimental */
 #if !EV_RECOMMEND_IOURING
   flags &= ~EVBACKEND_IOURING;
 #endif
@@ -3506,7 +3510,7 @@ loop_fork (EV_P)
   if (postfork != 2)
     {
       #if EV_USE_SIGNALFD
-        /* surprisingly, nothing needs to be done for signalfd, accoridng to docs, it does the right thing on fork */
+        /* surprisingly, nothing needs to be done for signalfd, according to docs, it does the right thing on fork */
       #endif
       
       #if EV_USE_TIMERFD
@@ -4094,16 +4098,20 @@ ev_run (EV_P_ int flags)
           {
             waittime = EV_TS_CONST (MAX_BLOCKTIME);
 
+#if EV_USE_MONOTONIC
+            if (ecb_expect_true (have_monotonic))
+              {
 #if EV_USE_TIMERFD
-            /* sleep a lot longer when we can reliably detect timejumps */
-            if (ecb_expect_true (timerfd >= 0))
-              waittime = EV_TS_CONST (MAX_BLOCKTIME2);
+                /* sleep a lot longer when we can reliably detect timejumps */
+                if (ecb_expect_true (timerfd != -1))
+                  waittime = EV_TS_CONST (MAX_BLOCKTIME2);
 #endif
 #if !EV_PERIODIC_ENABLE
-            /* without periodics but with monotonic clock there is no need */
-            /* for any time jump detection, so sleep longer */
-            if (ecb_expect_true (have_monotonic))
-              waittime = EV_TS_CONST (MAX_BLOCKTIME2);
+                /* without periodics but with monotonic clock there is no need */
+                /* for any time jump detection, so sleep longer */
+                waittime = EV_TS_CONST (MAX_BLOCKTIME2);
+#endif
+              }
 #endif
 
             if (timercnt)

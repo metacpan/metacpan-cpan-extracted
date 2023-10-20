@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.19",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "perl_5"
    ],
@@ -55,26 +55,26 @@
    "provides" : {
       "Text::Conceal" : {
          "file" : "lib/Text/Conceal.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/kaz-utashiro/Text-Conceal/issues"
+         "web" : "https://github.com/tecolicom/Text-Conceal/issues"
       },
-      "homepage" : "https://github.com/kaz-utashiro/Text-Conceal",
+      "homepage" : "https://github.com/tecolicom/Text-Conceal",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/kaz-utashiro/Text-Conceal.git",
-         "web" : "https://github.com/kaz-utashiro/Text-Conceal"
+         "url" : "https://github.com/tecolicom/Text-Conceal.git",
+         "web" : "https://github.com/tecolicom/Text-Conceal"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.12",
    "x_static_install" : 1
 }

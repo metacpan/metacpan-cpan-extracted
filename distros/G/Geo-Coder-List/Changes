@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-List
 
+0.32	Sat Oct  7 10:07:45 EDT 2023
+	Set "geocoder" to "cached" when the values have been retrieved from the L2 cache
+
 0.31	Thu Jun 29 09:23:17 EDT 2023
 	Change the croaks to carps
 	Fix test when Geo::Coder::Free is not installed

@@ -2,7 +2,7 @@ package Resource::Silo::Container;
 
 use strict;
 use warnings;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -23,9 +23,11 @@ as well as a doorway into a fine-grained control interface.
 
 =cut
 
+use Moo;
 use Carp;
 use Scalar::Util qw( blessed refaddr reftype weaken );
 use Module::Load qw( load );
+use namespace::clean;
 
 my $ID_REX = qr/^[a-z][a-z_0-9]*$/i;
 
@@ -42,30 +44,23 @@ L</override> method (see below).
 # please make sure all internal fields start with a hyphen ("-").
 
 my %active_instances;
-my $not_once = \%Resource::Silo::metadata; # avoid once warning
 
-sub new {
-    my $class = shift;
-    $class = ref $class if blessed $class;
+sub BUILD {
+    my ($self, $args) = @_;
 
-    my $spec = $Resource::Silo::metadata{$class}
-        or croak "Failed to locate \$Resource::Silo::metadata for class $class";
+    my $spec = $Resource::Silo::metadata{ref $self}
+        // _silo_find_metaclass($self);
 
-    my $self = bless {
-        -pid  => $$,
-        -spec => $spec,
-    }, $class;
-    if (@_) {
-        croak "Odd number of additional arguments in new()"
-            if @_ % 2;
-        $self->_override_resources({ @_ });
-    };
+    $self->{-spec} = $spec;
+    $self->{-pid} = $$;
+
+    $self->_silo_do_override($args);
+
     $active_instances{ refaddr $self } = $self;
     weaken $active_instances{ refaddr $self };
-    return $self;
 };
 
-sub DESTROY {
+sub DEMOLISH {
     my $self = shift;
     delete $active_instances{ refaddr $self };
     $self->ctl->cleanup;
@@ -118,7 +113,7 @@ sub ctl {
 
 # Instantiate resource $name with argument $argument.
 # This is what a silo->resource_name calls after checking the cache.
-sub _instantiate_resource {
+sub _silo_instantiate_res {
     my ($self, $name, $arg) = @_;
 
     croak "Illegal resource name '$name'"
@@ -141,7 +136,7 @@ sub _instantiate_resource {
             and !$spec->{derived}
             and !$self->{-override}{$name};
 
-    self->_unexpected_dependency($name)
+    self->_silo_unexpected_dep($name)
         if ($self->{-allow} && !$self->{-allow}{$name});
 
     # Detect circular dependencies
@@ -167,7 +162,7 @@ sub _instantiate_resource {
 };
 
 # use instead of delete $self->{-cache}{$name}
-sub _cleanup_resource {
+sub _silo_cleanup_res {
     my ($self, $name, @list) = @_;
 
     # TODO Do we need to validate arguments here?
@@ -197,13 +192,13 @@ sub _cleanup_resource {
 # We must create resource accessors in this package
 #   so that errors get attributed correctly
 #   (+ This way no other classes need to know our internal structure)
-sub _make_resource_accessor {
+sub _silo_make_accessor {
     my ($name, $spec) = @_;
 
     if ($spec->{ignore_cache}) {
         return sub {
             my ($self, $arg) = @_;
-            return $self->_instantiate_resource($name, $arg);
+            return $self->_silo_instantiate_res($name, $arg);
         };
     };
 
@@ -217,17 +212,17 @@ sub _make_resource_accessor {
         };
 
         # We must check dependencies even before going to the cache
-        $self->_unexpected_dependency($name)
+        $self->_silo_unexpected_dep($name)
             if ($self->{-allow} && !$self->{-allow}{$name});
 
-        # Stringify $arg ASAP, we'll validate it inside _instantiate_resource().
+        # Stringify $arg ASAP, we'll validate it inside _silo_instantiate_res().
         # The cache entry for an invalid argument will never get populated.
         my $key = defined $arg && !ref $arg ? $arg : '';
-        $self->{-cache}{$name}{$key} //= $self->_instantiate_resource($name, $arg);
+        $self->{-cache}{$name}{$key} //= $self->_silo_instantiate_res($name, $arg);
     };
 };
 
-sub _check_overrides {
+sub _silo_check_overrides {
     my ($self, $subst) = @_;
 
     my $known = $self->{-spec}{resource};
@@ -237,7 +232,7 @@ sub _check_overrides {
             if @bad;
 };
 
-sub _override_resources {
+sub _silo_do_override {
     my ($self, $subst) = @_;
 
     my $known = $self->{-spec}{resource};
@@ -249,7 +244,7 @@ sub _override_resources {
 
         # Finalize existing values in cache, just in case
         # BEFORE setting up override
-        $self->_cleanup_resource($name);
+        $self->_silo_cleanup_res($name);
 
         if (defined $init) {
             $self->{-override}{$name} = (reftype $init // '') eq 'CODE'
@@ -261,7 +256,7 @@ sub _override_resources {
     };
 }
 
-sub _unexpected_dependency {
+sub _silo_unexpected_dep {
     my ($self, $name) = @_;
     my $spec = $self->{-spec}{resource}{$name};
 
@@ -271,6 +266,21 @@ sub _unexpected_dependency {
     croak "Resource '$name' was unexpectedly required by"
         ." '$self->{-onbehalf}'$explain";
 }
+
+sub _silo_find_metaclass {
+    my $self = shift;
+    my $class = ref $self;
+
+    my @queue = $class;
+    while (defined( my $next = shift @queue )) {
+        my $meta = $Resource::Silo::metadata{$next};
+        return $meta if $meta;
+        no strict 'refs'; ## no critic strictures
+        push @queue, @{ "${next}::ISA" };
+    };
+
+    croak "Failed to locate \$Resource::Silo::metadata for class $class";
+};
 
 =head1 CONTROL INTERFACE
 
@@ -315,8 +325,8 @@ for the affected resources.
 sub override {
     my ($self, %subst) = @_;
 
-    $$self->_check_overrides(\%subst);
-    $$self->_override_resources(\%subst);
+    $$self->_silo_check_overrides(\%subst);
+    $$self->_silo_do_override(\%subst);
 
     return $self;
 }
@@ -402,7 +412,7 @@ sub cleanup {
             # We cannot afford to die here as if we do
             #    a resource that causes exceptions in cleanup
             #    would be stuck in cache forever
-            $self->_cleanup_resource($name);
+            $self->_silo_cleanup_res($name);
             1;
         } or do {
             my $err = $@;
@@ -430,7 +440,7 @@ architectural problem.
 =cut
 
 sub fresh {
-    return ${+shift}->_instantiate_resource(@_);
+    return ${+shift}->_silo_instantiate_res(@_);
 };
 
 =head2 meta

@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents the paste special options.            ',
                                   class => 'PasteOptions',
                                   required => [], # TODO
 }                                 );
@@ -128,28 +128,28 @@ __PACKAGE__->method_documentation({
      'only_visible_cells' => {
      	datatype => 'boolean',
      	base_name => 'OnlyVisibleCells',
-     	description => '',
+     	description => 'True means only copying visible cells. ',
      	format => '',
      	read_only => '',
      		},
      'paste_type' => {
      	datatype => 'string',
      	base_name => 'PasteType',
-     	description => '',
+     	description => 'The paste special type. ',
      	format => '',
      	read_only => '',
      		},
      'skip_blanks' => {
      	datatype => 'boolean',
      	base_name => 'SkipBlanks',
-     	description => '',
+     	description => 'Indicates whether skips blank cells. ',
      	format => '',
      	read_only => '',
      		},
      'transpose' => {
      	datatype => 'boolean',
      	base_name => 'Transpose',
-     	description => '',
+     	description => 'True to transpose rows and columns when the range is pasted. The default value is False. ',
      	format => '',
      	read_only => '',
      		},    

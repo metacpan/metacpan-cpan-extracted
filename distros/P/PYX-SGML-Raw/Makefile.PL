@@ -21,8 +21,7 @@ requires 'Class::Utils' => 0.05;
 requires 'PYX::Parser' => 0.01;
 requires 'PYX::Utils' => 0.01;
 requires 'perl' => '5.6.2';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=PYX-SGML-Raw';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/PYX-SGML-Raw/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/PYX-SGML-Raw';
 resources 'repository' => 'git://github.com/michal-josef-spacek/PYX-SGML-Raw';
 test_requires 'File::Object' => 0.07;
@@ -30,7 +29,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 1.02;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

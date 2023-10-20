@@ -1,3 +1,8 @@
+0.052		2023-10-14	T. R. Wyant
+    Document the first_tle() Template array method.
+
+    Fix pass() --almanac for evening passes.
+
 0.051		2023-09-11	T. R. Wyant
     Without DateTime, ParseTime::ISO8601 now accepts any zone. These are
     handled by setting $ENV{TZ} before the conversion and hoping for the

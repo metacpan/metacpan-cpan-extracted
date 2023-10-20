@@ -12,8 +12,8 @@ warn "# CFLAGS are ", Math::GMPf::__GMP_CFLAGS, "\n" if defined Math::GMPf::__GM
 warn "# GMP_LIMB_BITS is ", Math::GMPf::GMP_LIMB_BITS, "\n" if defined Math::GMPf::GMP_LIMB_BITS;
 warn "# GMP_NAIL_BITS is ", Math::GMPf::GMP_NAIL_BITS, "\n" if defined Math::GMPf::GMP_NAIL_BITS;
 
-if($Math::GMPf::VERSION eq '0.51' && $Math::GMPf::Random::VERSION eq '0.51' &&
-   $Math::GMPf::V::VERSION eq '0.51' &&
+if($Math::GMPf::VERSION eq '0.52' && $Math::GMPf::Random::VERSION eq '0.52' &&
+   $Math::GMPf::V::VERSION eq '0.52' &&
    Math::GMPf::_get_xs_version() eq $Math::GMPf::VERSION) {print "ok 1\n"}
 else {
   warn "$Math::GMPf::VERSION $Math::GMPf::Random::VERSION $Math::GMPf::V::VERSION ",
@@ -56,6 +56,7 @@ print $version_num < 262659 ? !defined(Math::GMPf::__GMP_CC) ? "ok 8\n" : "not o
 
 print $version_num < 262659 ? !defined(Math::GMPf::__GMP_CFLAGS) ? "ok 9\n" : "not ok 9\n"
                             :  defined(Math::GMPf::__GMP_CFLAGS) ? "ok 9\n" : "not ok 9\n";
+
 
 sub version_num {
     return ($_[0] << 16) | ($_[1] << 8) | $_[2];

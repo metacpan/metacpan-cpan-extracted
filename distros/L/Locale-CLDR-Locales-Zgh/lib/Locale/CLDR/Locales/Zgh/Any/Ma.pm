@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Zgh::Any::Ma - Package for language Standard Moroccan Tamazight
 
 =cut
 
 package Locale::CLDR::Locales::Zgh::Any::Ma;
-# This file auto generated from Data/common/main/zgh_MA.xml
-#	on Mon 11 Apr  5:41:36 pm GMT
+# This file auto generated from Data\common\main\zgh_MA.xml
+#	on Fri 13 Oct  9:49:17 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

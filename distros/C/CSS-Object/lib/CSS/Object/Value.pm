@@ -33,7 +33,6 @@ sub init
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ );
     $self->value( $val ) if( defined( $val ) );
-    # $self->message( 3, "Returning value object for value '", $self->value, "'." );
     return( $self );
 }
 
@@ -90,14 +89,12 @@ sub value
         {
             while( $val =~ s/^[[:blank:]\h]*\/\*[[:blank:]\h]*(.*?)[[:blank:]\h]*\*\///s )
             {
-                $self->message( 3, "Adding comment found before value: '$1'." );
                 my $cmt = CSS::Object::Comment->new( [split( /\r\n/, $1 )] ) ||
                     return( $self->error( "Cannot create comment object: ", CSS::Object::Comment->error ) );
                 $self->comment_before->push( $cmt );
             }
             while( $val =~ s/[[:blank:]\h]*\/\*[[:blank:]\h]*(.*?)[[:blank:]\h]*\*\/$//s )
             {
-                $self->message( 3, "Adding comment found after value: '$1'." );
                 my $cmt = CSS::Object::Comment->new( [split( /\r\n/, $1 )] ) ||
                     return( $self->error( "Cannot create comment object: ", CSS::Object::Comment->error ) );
                 $self->comment_after->push( $cmt );

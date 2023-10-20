@@ -6,7 +6,7 @@ use v5.20;
 
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.11';
 
 use Hash::Fold ();
 
@@ -83,7 +83,7 @@ CXC::Form::Tiny::Plugin::OptArgs2::Class - Class role for OptArgs2
 
 =head1 VERSION
 
-version 0.08
+version 0.11
 
 =head1 DESCRIPTION
 

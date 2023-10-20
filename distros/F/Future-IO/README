@@ -40,6 +40,10 @@ DESCRIPTION
     problematic on MSWin32, depending on what type of filehandle is
     involved.
 
+    If select() is not being used then the default implementation will
+    temporarily set filehandles into blocking mode (by switching off the
+    O_NONBLOCK flag) while performing IO on them.
+
     For cases where multiple filehandles are required, or for doing more
     involved IO operations, a real implementation based on an actual event
     loop should be provided. The following are known to exist; CPAN may
@@ -130,7 +134,7 @@ METHODS
 
  sysread_until_eof
 
-       $f = Future::IO->sysread_until_eof( $fh )
+       $f = Future::IO->sysread_until_eof( $fh );
 
     Since version 0.12.
 

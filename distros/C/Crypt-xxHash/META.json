@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Crypt-xxHash",
    "prereqs" : {
@@ -18,6 +18,7 @@
          "requires" : {
             "ExtUtils::CBuilder" : "0.280225",
             "File::Which" : "1.21",
+            "IPC::Run" : "20200505.0",
             "Math::Int64" : "0.54",
             "Test::More" : "1.302171"
          }
@@ -31,7 +32,7 @@
    "provides" : {
       "Crypt::xxHash" : {
          "file" : "lib/Crypt/xxHash.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -46,6 +47,6 @@
          "url" : "https://github.com/KalessinD/perl_crypt_xxhash"
       }
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

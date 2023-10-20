@@ -9,7 +9,7 @@ WriteMakefile(
     VERSION_FROM => 'lib/Parse/PlainConfig.pm',
     PREREQ_PM    => {
         'Class::EHierarchy' => 2.00,
-        'Paranoid'          => 2.05,
+        'Paranoid'          => 2.10,
         'Text::ParseWords'  => 0,
         'Text::Tabs'        => 0,
         }, (

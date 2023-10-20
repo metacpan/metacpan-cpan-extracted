@@ -7,7 +7,7 @@ extends 'App::Sandy::CLI::Command';
 
 with 'App::Sandy::Role::Digest';
 
-our $VERSION = '0.24'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 sub default_opt {
 	'paired-end-id'     => '%i.%U:%c %U',
@@ -52,7 +52,7 @@ App::Sandy::Command::Transcriptome - simulate command class. Simulate transcript
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 SYNOPSIS
 

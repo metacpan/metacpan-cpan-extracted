@@ -69,6 +69,7 @@ sub function_with_col_and_arg {
     }
     elsif ( $func =~ /^EXTRACT\z/i ) {
         if ( $driver eq 'SQLite' ) {
+            return "CEILING(strftime('%m',$col)/3.00)" if $arg eq 'QUARTER';
             my %map = ( YEAR => '%Y', MONTH => '%m', WEEK => '%W', DAY => '%d', HOUR => '%H', MINUTE => '%M', SECOND => '%S',
                         DAY_OF_YEAR => '%j', DAY_OF_WEEK => '%w',
             );
@@ -77,11 +78,17 @@ sub function_with_col_and_arg {
             }
             return "strftime($arg,$col)";
         }
+        elsif ( $arg eq 'QUARTER' ) {
+            return "QUARTER($col)"              if $driver =~ /^(?:mysql|MariaDB|DB2|Informix)\z/;
+            return "EXTRACT(QUARTER FROM $col)" if $driver eq 'Pg';
+            return "to_char($col,'Q')"          if $driver eq 'Oracle';
+            return "CEILING(EXTRACT(MONTH FROM $col)/3.00)"
+        }
         elsif ( $arg eq 'WEEK' ) {
             return "to_char($col,'WI')" if $driver eq 'Oracle'; # WW
             return "EXTRACT($arg FROM $col)";
         }
-        elsif ( $arg eq 'day_of_week' ) {
+        elsif ( $arg eq 'DAY_OF_WEEK' ) {
             # SQLite: '%w': 0 = Sunday
 
             # mysql: WEEKDAY:   0 = Monday
@@ -106,7 +113,7 @@ sub function_with_col_and_arg {
             return "WEEKDAY($col)"              if $driver eq 'Informix';
             return "to_char($col,'D')"          if $driver eq 'Oracle';
         }
-        elsif ( $arg eq 'day_of_year' ) {
+        elsif ( $arg eq 'DAY_OF_YEAR' ) {
             return "DAYOFYEAR($col)"            if $driver =~ /^(?:mysql|MariaDB)\z/;
             return "EXTRACT(DOY FROM $col)"     if $driver eq 'Pg';
             return "EXTRACT(YEARDAY FROM $col)" if $driver eq 'Firebird';

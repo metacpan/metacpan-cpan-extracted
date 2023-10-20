@@ -3,52 +3,66 @@ NAME
 
 SYNOPSIS
      use PYX::XMLNorm;
+
      my $obj = PYX::XMLNorm->new(%parameters);
      $obj->parse($pyx, $out);
      $obj->parse_file($input_file, $out);
-     $obj->parse_handle($input_file_handler, $out);
+     $obj->parse_handler($input_file_handler, $out);
 
 METHODS
-    "new(%parameters)"
-             Constructor.
+  "new(%parameters)"
+     my $obj = PYX::XMLNorm->new(%parameters);
 
-            *       "flush_stack"
+    Constructor.
 
-                     Flush stack on finalization.
-                     Default value is 0.
+    *       "flush_stack"
 
-            *       "output_handler"
+            Flush stack on finalization.
 
-                     Output handler.
-                     Default value is \*STDOUT.
+            Default value is 0.
 
-            *       "rules"
+    *       "output_handler"
 
-                     XML normalization rules.
-                     Parameter is required.
-                     Format of rules is:
-                     Outer element => list of inner elements.
-                     e.g.
-                     {
-                             'middle' => ['end'],
-                     },
-                     Outer element can be '*'.
-                     Default value is {}.
+            Output handler.
 
-    "parse($pyx[, $out])"
-             Parse PYX text or array of PYX text.
-             If $out not present, use 'output_handler'.
-             Returns undef.
+            Default value is \*STDOUT.
 
-    "parse_file($input_file[, $out])"
-             Parse file with PYX data.
-             If $out not present, use 'output_handler'.
-             Returns undef.
+    *       "rules"
 
-    "parse_handler($input_file_handler[, $out])"
-             Parse PYX handler.
-             If $out not present, use 'output_handler'.
-             Returns undef.
+            XML normalization rules. Parameter is required. Format of rules
+            is: Outer element => list of inner elements. e.g.
+
+             {
+                     'middle' => ['end'],
+             },
+
+            Outer element can be '*'.
+
+            Default value is {}.
+
+    Returns instance of object.
+
+  "parse($pyx[, $out])"
+     $obj->parse($pyx, $out);
+
+    Parse PYX text or array of PYX text. If $out not present, use
+    'output_handler'.
+
+    Returns undef.
+
+  "parse_file($input_file[, $out])"
+     $obj->parse_file($input_file, $out);
+
+    Parse file with PYX data. If $out not present, use 'output_handler'.
+
+    Returns undef.
+
+  "parse_handler($input_file_handler[, $out])"
+     $obj->parse_handler($input_file_handler, $out);
+
+    Parse PYX handler. If $out not present, use 'output_handler'.
+
+    Returns undef.
 
 ERRORS
      new():
@@ -57,11 +71,9 @@ ERRORS
                      Unknown parameter '%s'.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use PYX::XMLNorm;
 
      # Example data.
@@ -103,15 +115,16 @@ SEE ALSO
         Install the PYX modules.
 
 REPOSITORY
-    <https://github.com/tupinek/PYX-XMLNorm>
+    <https://github.com/michal-josef-spacek/PYX-XMLNorm>
 
 AUTHOR
-    Michal Špaček skim@cpan.org.
+    Michal Josef Špaček skim@cpan.org.
 
 LICENSE AND COPYRIGHT
-     © 2011-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2011-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

@@ -55,6 +55,7 @@
 		getDBH getMessage getRC getRows
 		getLastCursor getLastSQL getLastSave getWhere
 		getAliasTable getAliasCols
+		setDumper
 
 		SQL_SIMPLE_CURSOR_BACK
 		SQL_SIMPLE_CURSOR_NEXT
@@ -85,7 +86,7 @@
 		$err
 	);
 
-	our $VERSION = "2023.221.1";
+	our $VERSION = "2023.274.1";
 
 	our @EXPORT_OK = @EXPORT;
 
@@ -93,10 +94,6 @@
 
 ################################################################################
 ## literals initialization
-
-	use constant SQL_SIMPLE_DB_PG => 1;		# engine postgres
-	use constant SQL_SIMPLE_DB_MARIADB => 2;	# engine mariadb/mysql
-	use constant SQL_SIMPLE_DB_SQLLITE3 => 3;	# engine sqlite3
 
 	use constant SQL_SIMPLE_CURSOR_TOP => 1;	# page first
 	use constant SQL_SIMPLE_CURSOR_BACK => 2;	# page backward
@@ -167,11 +164,15 @@
 		"036" => { T=>"S", M=>"[%s] Interface '%s::%s' load error" },
 		"037" => { T=>"S", M=>"[%s] Interface '%s::%s' aborted, %s" },
 		"038" => { T=>"E", M=>"[%s] Syslog Facility invalid, must be 'local0' to 'local7'" },
-		"038" => { T=>"E", M=>"[%s] Syslog Service invalid, must contains 'alphanumeric' characters" },
+		"039" => { T=>"E", M=>"[%s] Syslog Service invalid, must contains 'alphanumeric' characters" },
 		"040" => { T=>"E", M=>"[%s] Log File invalid, must contains 'alphanumeric' characters" },
 		"041" => { T=>"E", M=>"[%s] Values Format error, must be arrayref" },
 		"042" => { T=>"E", M=>"[%s] Conflict/Duplicate Format error, must be hashref" },
 		"043" => { T=>"E", M=>"[%s] Limit is missing" },
+		"044" => { T=>"E", M=>"[%s] Buffer hashkey invalid, buffer is not hashref" },
+		"045" => { T=>"E", M=>"[%s] Buffer hashkey not mapped" },
+		"046" => { T=>"E", M=>"[%s] Buffer hashkey must be scalaref or arrayref" },
+		"047" => { T=>"E", M=>"[%s] Buffer arrayref Off not allowed for multiple field list" },
 		"099" => { T=>"S", M=>"[%s] %s" },
 	);
 
@@ -219,50 +220,27 @@ sub new()
 	$self->{argv}{message_log} = SQL_SIMPLE_LOG_STD if (!defined($self->{argv}{message_log}));
 	$self->{argv}{port} = "" if (!defined($self->{argv}{port}));
 
-	## mandatory itens
-    if (!grep(/^$self->{argv}{interface}$/i,"dbi"))
+	## check interfaces
+	if (!grep(/^$self->{argv}{interface}$/i,"dbi"))
 	{
 		&setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"003");
-	       	return undef;
-       	}
-	## check interface/driver(plugin)
-	if (!defined($self->{argv}{driver}))
+		return undef;
+	}
+
+	## check driver
+	if (!defined($self->{argv}{driver}) || $self->{argv}{driver} eq "")
 	{
 		&setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"004");
 		return undef;
 	}
-	elsif (grep(/^$self->{argv}{driver}$/i,"pg","postgres","postsql","pgsql"))
-	{
-		return undef if (!&_newTestServer($self));
 
-		$self->{init}{driver_id} = SQL_SIMPLE_DB_PG;
-		$self->{init}{plugin_id} = "PG";
-		$self->{init}{schema} = 1;
-	}
-	elsif (grep(/^$self->{argv}{driver}$/i,"mysql","mariadb"))
+	## check database
+	if (!defined($self->{argv}{db}) || $self->{argv}{db} eq "")
 	{
-		return undef if (!&_newTestServer($self));
-
-		$self->{init}{driver_id} = SQL_SIMPLE_DB_MARIADB;
-		$self->{init}{plugin_id} = "MySQL";
-		$self->{init}{schema} = 0;
-	}
-	elsif (grep(/^$self->{argv}{driver}$/i,"sqlite","sqlite3"))
-	{
-		if ($self->{argv}{db} eq "" && $self->{argv}{dbfile} eq "")
-		{
-			&setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"001");
-			return undef;
-		}
-		$self->{init}{driver_id} = SQL_SIMPLE_DB_SQLLITE3;
-		$self->{init}{plugin_id} = "SQLite";
-		$self->{init}{schema} = 0;
-	}
-	else
-	{
-		&setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"004");
+		&setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"001");
 		return undef;
 	}
+
 	## check aliases table
 	if (defined($self->{argv}{tables}))
 	{
@@ -296,6 +274,7 @@ sub new()
 			}
 		}
 	}
+
 	## check syslog options
 	if (defined($self->{argv}{message_syslog_facility}) && !($self->{argv}{message_syslog_facility} =~ /^local[0-7]$/i))
 	{
@@ -312,46 +291,60 @@ sub new()
 		&setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"040",$self->{argv}{sql_save_name});
 		return undef;
 	}
-	## load interface type
-       	if ($self->{argv}{interface} =~ /^dbi$/i)
-	{
-		$self->{argv}{interface} = "DBI";
-		$self->{argv}{interface_options}{RaiseError} = 0 if (!defined($self->{argv}{interface_options}{RaiseError}));
-		$self->{argv}{interface_options}{PrintError} = 0 if (!defined($self->{argv}{interface_options}{PrintError}));
-	}
-	else { return undef; }
+
+	## interface defaults values
+	$self->{argv}{interface} = uc($self->{argv}{interface});
+	$self->{argv}{interface_options}{RaiseError} = 0 if (!defined($self->{argv}{interface_options}{RaiseError}));
+	$self->{argv}{interface_options}{PrintError} = 0 if (!defined($self->{argv}{interface_options}{PrintError}));
+
+	## standards plugins
+	if	(grep(/^$self->{argv}{driver}$/i,"mysql","mariadb"))			{$self->{init}{plugin_id} = "MySQL";}
+	elsif	(grep(/^$self->{argv}{driver}$/i,"pg","postgres","postsql","pgsql"))	{$self->{init}{plugin_id} = "PG";}
+	elsif	(grep(/^$self->{argv}{driver}$/i,"sqlite","sqlite3"))			{$self->{init}{plugin_id} = "SQLite";}
+	else										{$self->{init}{plugin_id} = $self->{argv}{driver};}
 
 	## load pluging
-	## making: dsname option and more
-	if (defined($self->{init}{plugin_id}) && $self->{init}{plugin_id} ne "")
+	my $fn;
+	my $plugin = $SQL_SIMPLE_CLASS."::".$self->{argv}{interface}."::".$self->{init}{plugin_id};
+	foreach my $dir(@INC)
 	{
-		my $fn;
+		$fn = File::Spec->catdir($dir,split(/::/,$plugin)).".pm";
+		last if (stat($fn));
+		$fn = "";
+	}
+	if ($fn eq "")
+	{
+		&setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"019",$self->{argv}{interface},$self->{init}{plugin_id});
+		return undef;
+	}
+	eval { require $fn; };
+	if ($@)
+	{
+		&setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"035",$self->{argv}{interface},$self->{init}{plugin_id},$@);
+		return undef;
+	}
+	$self->{init}{plugin_fh} = $plugin->new(sql_simple => $self);
+	if (!defined($self->{init}{plugin_fh}))
+	{
+		&setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"035",$self->{argv}{interface},$self->{init}{plugin_id},$@);
+		return undef;
+	}
 
-		my $plugin = $SQL_SIMPLE_CLASS."::".$self->{argv}{interface}."::".$self->{init}{plugin_id};
-		foreach my $dir(@INC)
+	## test server, the 'test_server' env must be defined on plugin
+	if ($self->{init}{test_server})
+	{
+		if ($self->{argv}{server} eq "")
 		{
-			$fn = File::Spec->catdir($dir,split(/::/,$plugin)).".pm";
-			last if (stat($fn));
-			$fn = "";
-		}
-		if ($fn eq "")
-		{
-			&setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"019",$self->{argv}{interface},$self->{init}{plugin_id});
+			&setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"002");
 			return undef;
 		}
-		eval { require $fn; };
-		if ($@)
+		if ($self->{argv}{port} ne "" && (($self->{argv}{port} =~ /^\D+$/) || ($self->{argv}{port} < 1 || $self->{argv}{port} > 65535)))
 		{
-			&setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"035",$self->{argv}{interface},$self->{init}{plugin_id},$@);
-			return undef;
-		}
-		$self->{init}{plugin_fh} = $plugin->new(sql_simple => $self);
-		if (!defined($self->{init}{plugin_fh}))
-		{
-			&setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"035",$self->{argv}{interface},$self->{init}{plugin_id},$@);
+			&setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"029");
 			return undef;
 		}
 	}
+
 	## new object
 	my $bless = bless($self,$class);
 	return undef if (!defined($bless));
@@ -360,28 +353,7 @@ sub new()
 	return undef if ($self->{argv}{connect} && $self->Open());
 
 	## successful
-	$bless;
-}
-
-################################################################################
-## action: test server/tcpport for remote databases
-##	rc=0	syntax error
-##	rc=1	successful
-#
-sub _newTestServer()
-{
-	my $self = shift;
-	if ($self->{argv}{server} eq "")
-	{
-		&setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"002");
-		return undef;
-	}
-	if ($self->{argv}{port} ne "" && (($self->{argv}{port} =~ /^\D+$/) || ($self->{argv}{port} < 1 || $self->{argv}{port} > 65535)))
-	{
-		&setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"029");
-		return undef;
-	}
-	return 1;
+	return $bless;
 }
 
 ################################################################################
@@ -423,6 +395,7 @@ sub SelectCursor()
 	my $self = shift;
 	my $argv = {@_};
 
+	$self->_Dumper("selectcursor",$argv);
 	$self->setLastSQL("");
 	$self->Open() if (!defined($self->{init}{dbh}));
 
@@ -585,6 +558,7 @@ sub Select()
 	my $self = shift;
 	my $argv = {@_};
 
+	$self->_Dumper("select",$argv);
 	$self->setLastSQL("");
 	$self->Open() if (!defined($self->{init}{dbh}));
 
@@ -635,8 +609,8 @@ sub _Select()
 			}
 			$tables_tmp{$table}=1;
 		}
-	    @tables_work = @{$argv->{table}};
-    }
+		@tables_work = @{$argv->{table}};
+	}
 	else
 	{
 		$self->setMessage("select",SQL_SIMPLE_RC_SYNTAX,"006");
@@ -646,26 +620,29 @@ sub _Select()
 	my %fields_distinct;
 	my %fields_aliases;
 	if (defined($argv->{fields}))
-        {
-		if (ref($argv->{fields}) ne "ARRAY")
+	{
+		my $fields_argv;
+		if	(ref($argv->{fields}) eq "ARRAY") { $fields_argv = $argv->{fields}; }
+		elsif	(ref($argv->{fields}) eq "") { $fields_argv = [ $argv->{fields} ]; }
+		else
 		{
 			$self->setMessage("select",SQL_SIMPLE_RC_SYNTAX,"007");
 			return SQL_SIMPLE_RC_SYNTAX;
 		}
-		for (my $ix=0; $ix < @{$argv->{fields}}; $ix++)
+		for (my $ix=0; $ix < @{$fields_argv}; $ix++)
 		{
-			my $field = $argv->{fields}[$ix];
+			my $field = $fields_argv->[$ix];
 			my $distinct;
 			my $alias;
 			if (ref($field) eq "HASH")
 			{
 				$alias = $field;
-				($fields_aliases{$alias}{f},$fields_aliases{$alias}{a}) = each(%{$field});
+				($fields_aliases{$alias}{f},$fields_aliases{$alias}{a}) = %{$field};
 				$field = $fields_aliases{$alias}{f};
 			}
 			if ($field =~ /^distinct$/i)
 			{
-				$field = $argv->{fields}[++$ix];
+				$field = $fields_argv->[++$ix];
 				$distinct = 1;
 			}
 			elsif ($field =~ /^distinct\s+(.*)/i)
@@ -742,7 +719,7 @@ sub _Select()
 		}
 	}
 	## making fields
-	my $middle = ($self->{init}{driver_id} == SQL_SIMPLE_DB_PG) ? " AS " : " ";
+	my $middle = ($self->{init}{alias_with_as}) ? " AS " : " ";
 	my @fields;
 	my $table = $tables_work[0];
 	if (@fields_work)
@@ -761,7 +738,7 @@ sub _Select()
 			if ($field =~ /^\\(.*)/)
 			{
 				($alias) ?
-					push(@fields,$distinct.$1." ".$alias) :
+					push(@fields,$distinct.$1.$middle.$alias) :
 					push(@fields,$distinct.$1);
 				next;
 			}
@@ -769,7 +746,7 @@ sub _Select()
 			my $field_a;
 			my $field_b;
 			if ($field =~ /^(.*?)\((.*?)\,(.*)\)/)
-		        {
+			{
 				$field_a = $1."(";
 				$field = $2;
 				$field_b = ",".$3.")";
@@ -792,7 +769,7 @@ sub _Select()
 				my $field = $2;
 				my $realn = $self->getAliasCols($table,$field);
 				($alias) ?
-					push(@fields,$distinct.$field_a.$table.".".$realn.$field_b." ".$alias) :
+					push(@fields,$distinct.$field_a.$table.".".$realn.$field_b.$middle.$alias) :
 				($field ne $realn) ?
 					push(@fields,$distinct.$field_a.$table.".".$realn.$field_b." ".$table."_".$field) :
 					push(@fields,$distinct.$field_a.$table.".".$realn.$field_b);
@@ -803,7 +780,7 @@ sub _Select()
 				{
 					my $realn = $self->getAliasCols($table,$field);
 					($alias) ?
-						push(@fields,$distinct.$field_a.$realn.$field_b." ".$alias) :
+						push(@fields,$distinct.$field_a.$realn.$field_b.$middle.$alias) :
 					($field ne $realn) ?
 						push(@fields,$distinct.$field_a.$realn.$field_b." ".$field) :
 						push(@fields,$distinct.$field_a.$field.$field_b);
@@ -811,7 +788,7 @@ sub _Select()
 				else
 				{
 					($alias) ?
-						push(@fields,$distinct.$field." ".$alias):
+						push(@fields,$distinct.$field.$middle.$alias):
 						push(@fields,$distinct.$field);
 			     	}
 			}
@@ -859,6 +836,9 @@ sub _Select()
 		command_type => 0,			# (ZERO is read)
 		buffer => $argv->{buffer},
 		buffer_options => $argv->{buffer_options},
+		buffer_hashkey => $argv->{buffer_hashkey},
+		buffer_arrayref => $argv->{buffer_arrayref},
+		buffer_fields => @fields+0,
 		make_only => $argv->{make_only},
 		flush => $argv->{flush},
 		sql_save => $argv->{sql_save},
@@ -907,6 +887,7 @@ sub Delete()
 	my $self = shift;
 	my $argv = {@_};
 
+	$self->_Dumper("delete",$argv);
 	$self->setLastSQL("");
 	$self->Open() if (!defined($self->{init}{dbh}));
 
@@ -962,6 +943,8 @@ sub _Delete()
 		command_type => 1,			# (NOT_ZERO is update)
 		buffer => $argv->{buffer},
 		buffer_options => $argv->{buffer_options},
+		buffer_hashkey => $argv->{buffer_hashkey},
+		buffer_arrayref => $argv->{buffer_arrayref},
 		make_only => $argv->{make_only},
 		flush => $argv->{flush},
 		sql_save => $argv->{sql_save},
@@ -988,6 +971,7 @@ sub Insert()
 	my $self = shift;
 	my $argv = {@_};
 
+	$self->_Dumper("insert",$argv);
 	$self->setLastSQL("");
 	$self->Open() if (!defined($self->{init}{dbh}));
 
@@ -1124,6 +1108,8 @@ sub _Insert()
 		command_type => 1,			# (NOT_ZERO is update)
 		buffer => $argv->{buffer},
 		buffer_options => $argv->{buffer_options},
+		buffer_hashkey => $argv->{buffer_hashkey},
+		buffer_arrayref => $argv->{buffer_arrayref},
 		make_only => $argv->{make_only},
 		flush => $argv->{flush},
 		sql_save => $argv->{sql_save},
@@ -1144,6 +1130,7 @@ sub Update()
 	my $self = shift;
 	my $argv = {@_};
 
+	$self->_Dumper("update",$argv);
 	$self->setLastSQL("");
 	$self->Open() if (!defined($self->{init}{dbh}));
 
@@ -1219,6 +1206,8 @@ sub _Update()
 		command_type => 1,			# (NOT_ZERO is update)
 		buffer => $argv->{buffer},
 		buffer_options => $argv->{buffer_options},
+		buffer_hashkey => $argv->{buffer_hashkey},
+		buffer_arrayref => $argv->{buffer_arrayref},
 		make_only => $argv->{make_only},
 		flush => $argv->{flush},
 		sql_save => $argv->{sql_save},
@@ -1243,6 +1232,8 @@ sub Wait()
 {
 	my $self = shift;
 	my $argv= {@_};
+
+	$self->_Dumper("wait",$argv);
 
 	my $count = 1 if (!defined($argv->{count}));
 	my $sleep = 5 if (!defined($argv->{interval}));
@@ -1280,6 +1271,7 @@ sub Call()
 	my $self = shift;
 	my $argv = {@_};
 
+	$self->_Dumper("call",$argv);
 	$self->setLastSQL("");
 	$self->Open() if (!defined($self->{init}{dbh}));
 
@@ -1335,16 +1327,59 @@ sub _Call()
 	}
 	my $flush_buffer = (!defined($argv->{flush}) || $argv->{flush}) ? 1 : 0;
 	my $type;
-	if	(!defined($argv->{buffer}))		{}
-	elsif	(ref($argv->{buffer}) eq "HASH")	{ $type=1; undef(%{$argv->{buffer}}) if ($flush_buffer); }
-	elsif	(ref($argv->{buffer}) eq "ARRAY")	{ $type=2; undef(@{$argv->{buffer}}) if ($flush_buffer); }
-	elsif	(ref($argv->{buffer}) eq "CODE")	{ $type=3; }
-	elsif	(ref($argv->{buffer}) eq "SCALAR")	{ $type=4; }
+	if	(!defined($argv->{buffer}))	 {}
+	elsif	(ref($argv->{buffer}) eq "HASH")
+	{
+		if (!defined($argv->{buffer_hashkey})) { $type=1; }
+		elsif (ref($argv->{buffer_hashkey}) eq "ARRAY") { $type=6; }
+		elsif (ref($argv->{buffer_hashkey}) eq "SCALAR") { $type=5; }
+		elsif (ref($argv->{buffer_hashkey}) eq "") { $type=5; }
+		else
+		{
+			$self->setMessage("call",SQL_SIMPLE_RC_SYNTAX,"046");
+			return SQL_SIMPLE_RC_SYNTAX;
+		}
+		undef(%{$argv->{buffer}}) if ($flush_buffer);
+	}
 	else
 	{
-		$self->setMessage("call",SQL_SIMPLE_RC_SYNTAX,"024");
+		if	(ref($argv->{buffer}) eq "ARRAY")
+		{
+			if (defined($argv->{buffer_arrayref}) && !$argv->{buffer_arrayref})
+			{
+				if ($argv->{buffer_fields} != 1)
+				{
+					$self->setMessage("call",SQL_SIMPLE_RC_SYNTAX,"047");
+					return SQL_SIMPLE_RC_SYNTAX;
+				}
+				$type=7;
+			}
+			else { $type=2; }
+			undef(@{$argv->{buffer}}) if ($flush_buffer);
+		}
+		elsif	(ref($argv->{buffer}) eq "CODE")	{ $type=3; }
+		elsif	(ref($argv->{buffer}) eq "SCALAR")	{ $type=4; }
+		else
+		{
+			$self->setMessage("call",SQL_SIMPLE_RC_SYNTAX,"024");
+			return SQL_SIMPLE_RC_SYNTAX;
+		}
+
+		## test buffer_hashkey
+		if (defined($argv->{buffer_hashkey}))
+		{
+			$self->setMessage("call",SQL_SIMPLE_RC_SYNTAX,"044");
+			return SQL_SIMPLE_RC_SYNTAX;
+		}
+	}
+
+	## run-PreFetch if exists
+	if ($self->{init}{plugin_fh}->can('PreFetch') && $self->{init}{plugin_fh}->PreFetch($argv))
+	{
+		$self->setMessage("prefetch",SQL_SIMPLE_RC_SYNTAX,"037",$self->{argv}{interface},$self->{argv}{driver},$self->getMessage());
 		return SQL_SIMPLE_RC_SYNTAX;
 	}
+
 	## prepare command
 	$argv->{command} =~ s/^\s+|\s+$//;
 	my $sth = $self->{init}{dbh}->prepare($argv->{command}.( ($argv->{command} =~ /\;$/) ? "":";") );
@@ -1366,6 +1401,38 @@ sub _Call()
 					elsif	($type == 2) { push(@{$argv->{buffer}},$ref); }
 					elsif	($type == 3) { last if (&{$argv->{buffer}}($ref,$argv->{buffer_options})); }
 					elsif	($type == 4) { foreach my $id(keys(%{$ref})) { ${$argv->{buffer}} = $ref->{$id}; }}
+					elsif	($type == 5)
+					{
+						if (!defined($ref->{ $argv->{buffer_hashkey} }))
+						{
+							$self->setMessage("call",SQL_SIMPLE_RC_SYNTAX,"045");
+							return SQL_SIMPLE_RC_SYNTAX;
+						}
+						my $val = $ref->{$argv->{buffer_hashkey}};
+						delete($ref->{$argv->{buffer_hashkey}});
+						$argv->{buffer}->{ $val } = ($argv->{buffer_fields} != 2) ? $ref : $ref->{ each(%{$ref}) };
+					}
+					elsif	($type == 6)
+					{
+						my $addr = $argv->{buffer};
+						foreach my $key(@{$argv->{buffer_hashkey}})
+						{
+							if (!defined($ref->{$key}))
+							{
+								$self->setMessage("call",SQL_SIMPLE_RC_SYNTAX,"045");
+								return SQL_SIMPLE_RC_SYNTAX;
+							}
+							$addr->{$ref->{$key}} = {} if (!defined($addr->{$ref->{$key}}));
+							$addr = $addr->{$ref->{$key}};
+							delete($ref->{$key});
+						}
+						%{$addr} = (keys(%{$ref}) != 1) ? %{$ref} : $ref->{ each(%{$ref}) };
+					}
+					elsif	($type == 7)
+					{
+						my @key = keys(%{$ref});
+						push(@{$argv->{buffer}},$ref->{ $key[0] });
+					}
 				}
 			}
 		}
@@ -1381,7 +1448,7 @@ sub _Call()
 	undef($sth);
 
 	## force commit if required
-	$self->Commit(%{$argv}) if ($self->{argv}->{commit} && $argv->{command_type});
+	$self->_Commit(%{$argv}) if ($self->{argv}->{commit} && $argv->{command_type});
 	return $self->getRC();
 }
 
@@ -1396,12 +1463,21 @@ sub Commit()
 	my $self = shift;
 	my $argv = {@_};
 
+	$self->_Dumper("commit",$argv);
 	$self->setLastSQL("");
 
 	return SQL_SIMPLE_RC_OK if (!defined($self->{init}{dbh}));
+	return $self->_Commit(%{$argv});
+}
+
+sub _Commit()
+{
+	my $self = shift;
+	my $argv = {@_};
+
 	return $self->_Call(
 		command => "commit",
-	       	command_type => 0,		# (ZERO to eliminate the LOOP)
+		command_type => 0,		# (ZERO to eliminate the LOOP)
 		make_only => $argv->{make_only},
 		flush => $argv->{flush},
 		sql_save => $argv->{sql_save},
@@ -1440,6 +1516,7 @@ sub Save()
 	my $self = shift;
 	my @sqls = @_;
 
+	$self->_Dumper("save",\@sqls);
 	$self->{init}{sql_save_ix} = 0 if (!defined($self->{init}{sql_save_ix}));
 	$self->{init}{sql_save_name} = "sql" if (!defined($self->{init}{sql_save_name}));
 	$self->{init}{sql_save_dir} =
@@ -1945,6 +2022,34 @@ sub setMessage()
 		}
 	}
 	return $err;
+}
+
+################################################################################
+## action: enable/disable show dumper data at each call
+## note: used for debug mode only.
+
+sub setDumper()
+{
+	my $self = shift;
+	return $self->{init}{dumper} = shift;
+}
+
+sub _Dumper()
+{
+	my $self = shift;
+	my $call = shift;
+	my $argv = shift;
+
+	return if (!$self->{init}{dumper});
+
+	require Data::Dumper;
+	$Data::Dumper::Sortkeys = \sub { my ($hash) = @_; return [ (sort keys %$hash) ]; };
+
+	my $dumper = new Data::Dumper([$argv]);
+
+	$dumper->Terse(1);
+
+	print STDERR $call." = ".$dumper->Dump;
 }
 
 __END__

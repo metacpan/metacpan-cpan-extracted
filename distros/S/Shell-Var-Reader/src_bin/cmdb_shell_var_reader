@@ -1,0 +1,160 @@
+#!perl
+
+use strict;
+use warnings;
+use Shell::Var::Reader::CMDB;
+use Getopt::Long qw(:config pass_through);
+
+my $version = '0.1.1';
+
+my $action;
+my $version_flag;
+my $help;
+my $dir;
+my $exists_okay;
+my $verbose;
+my $init_group_slug;
+
+GetOptions(
+		   'a=s'=>\$action,
+		   'd=s'=>\$dir,
+		   'eo=s'=>\$exists_okay,
+		   'verbose=s'=>\$verbose,
+		   'group=s'=>\$init_group_slug,
+		   'version' => \$version_flag,
+		   'help' => \$help,
+		   );
+
+if ($version_flag) {
+        print 'cmdb_shell_var_reader v. ' . $version . "\n";
+        exit 255;
+}
+
+if ($help) {
+	print 'cmdb_shell_var_reader v. ' . $version . '
+
+
+-a <action>       The action to perform.
+                  Default :: undef
+
+--verbose <0/1>   A boolean value for if it should be verbose or not.
+                  Default :: 1
+
+-d <dir>          The directory to operate on.
+                  Default :: undef
+
+--eo <0/1>        If it is okay if stuff already exists when doing the init
+                  action. This just means it wont die if the directory
+                  already exists. It wont overwrite anything.
+                  Default :: 1
+
+--group <group>   The name to use example system group to use for with the init action.
+                  Default :: example
+
+ACTIONS
+init :: Creates the directory structure and files it with some example files.
+update :: Looks for system group directories and processes each system config found under it.
+';
+	exit 255;
+}
+
+if (!defined($action)) {
+	die('Nothing specified for -a');
+}
+
+if ($action eq 'init') {
+	Shell::Var::Reader::CMDB->init(
+								   dir=>$dir,
+                                   exists_okay=>$exists_okay,
+                                   verbose=>$verbose,
+                                   init_group_slug=>$init_group_slug,
+								   );
+	exit 0;
+}
+
+if ($action eq 'update') {
+	Shell::Var::Reader::CMDB->update(
+								   dir=>$dir,
+                                   verbose=>$verbose,
+								   );
+	exit 0;
+}
+
+die('"'.$action.'" is not a known action');
+
+=head1 NAME
+
+shell_var_reader - Read/run a shell script and return set variable in it.
+
+=head1 SYNOPSIS
+
+
+
+=head1 FLAGS
+
+=head2 -a <action>
+
+The action to perform.
+
+Default :: undef
+
+=head2 --verbose <0/1>
+
+A boolean value for if it should be verbose or not.
+
+Default :: 1
+
+=head2 -d <dir>
+
+The directory to operate on.
+
+=head2 --eo <0/1>
+
+If it is okay if stuff already exists when doing the init
+action. This just means it won't die if the directory
+already exists. It won't overwrite anything.
+
+=head2 --group <group>
+
+The name to use example system group to use for with
+the init action.
+
+Default :: example
+
+=head1 ACTIONS
+
+=head2 init
+
+Creates the directory structure and files it with some example files.
+
+=head2 update
+
+Looks for system group directories and processes each system config found under it.
+
+=head1 LAYOUT & WORKFLOW
+
+Specifically named files.
+
+    - .shell_var_reader :: Marks the base directory as being for a shell_var_reader CMDB.
+
+Specifically named directories.
+
+    - cmdb :: The TOML CMDB directory.
+    - json_confs :: Generated JSON confs.
+    - shell_confs :: Generated shell confs.
+    - toml_confs :: Generated TOML confs.
+    - yaml_confs :: Generated YAML confs.
+
+Other directories that that don't start with a '.' or contiain a file named '.not_a_system_group'
+will be processed as system groups.
+
+These directories will be searched for files directly below them for files ending in '.sh' and not
+starting with either a '_' or a '.'. The name used for a system is the name of the file minus the ending
+'.sh', so 'foo.bar.sh' would generate a config for a system named 'foo.bar'.
+
+When it finds a file to use as a system config, it will point shell_var_reader at it with TOML CMDB enabled
+and with the name of that system set the hostname to use with the TOML CMDB. That name will also be saved as
+the variable 'SYSTEM_NAME', provided that variable is not defined already. If a 'munger.pl' exists, that file
+is used as the munger file. shell_var_reader will be ran four times, once to generate each config type.
+
+=cut

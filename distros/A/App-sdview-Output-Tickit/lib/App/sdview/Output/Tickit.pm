@@ -10,14 +10,14 @@ use utf8;
 use Object::Pad 0.800;
 use Object::Pad ':experimental(adjust_params)';
 
-package App::sdview::Output::Tickit 0.03;
+package App::sdview::Output::Tickit 0.04;
 class App::sdview::Output::Tickit
    :strict(params);
 
 use constant format => "tickit";
 
 use App::sdview::Style 0.12;
-use String::Tagged 0.17; # ->join method
+use String::Tagged 0.21; # safe to ->delete_tag during ->iter_extents
 
 =head1 NAME
 
@@ -75,6 +75,10 @@ C<End> - scroll to bottom
 
 C<F9> - open the outline view popup. See Below.
 
+=item *
+
+C</> - start a regexp search in the document body. See Below.
+
 =item
 
 C<q> - exit
@@ -93,6 +97,15 @@ Typing text with the outline view open will filter it to just those headings
 matching the typed text. Pressing the C<< <Enter> >> key will jump directly to
 the first highlighted heading, again dismissing the view.
 
+=head2 Regexp Searching
+
+Typing into the main search box enters text that forms a (perl) regexp pattern
+to be tested against the body text of the document. Each paragraph is tested
+individually and all matches are highlighted. Pressing C<< <Enter> >> will
+select the first match. Use the C<< <n> >> and C<< <p> >> keys to jump between
+them. Press C<< <Escape> >> to clear the highlights. Press C<< <Alt-i> >> to
+toggle case-insensitivity.
+
 =cut
 
 # Override default output format
@@ -100,9 +113,26 @@ require App::sdview;
 $App::sdview::DEFAULT_OUTPUT = "tickit"
    if $App::sdview::DEFAULT_OUTPUT eq "terminal" and -t STDOUT;
 
+my @HIGHLIGHT_PEN = (
+   fg => 16, # avoid bold-black
+   bg => "magenta",
+   b  => 1,
+);
+
+my @SELECT_PEN = (
+   bg => "green",
+);
+
 field $t;
 field $scroller;
 field $outlinetree;
+field @items;
+
+# Related to searching
+field $matchposstatic;
+field $matchidx;
+field @matches;
+
 ADJUST
 {
    # Lazy load all the Tickit modules in here
@@ -116,7 +146,7 @@ ADJUST
    $t->bind_key( q => sub { $t->stop; } );
 
    require Tickit::Widget::Scroller;
-   Tickit::Widget::Scroller->VERSION( '0.31' );
+   Tickit::Widget::Scroller->VERSION( '0.32' );
    $scroller = Tickit::Widget::Scroller->new;
 
    $scroller->set_gen_bottom_indicator(
@@ -141,7 +171,7 @@ ADJUST
 
 method output ( @paragraphs )
 {
-   require Tickit::Widget::Scroller::Item::RichText;
+   require Tickit::Widget::Scroller::Item::Text;
 
    foreach my $para ( @paragraphs ) {
       my $code = $self->can( "output_" . ( $para->type =~ s/-/_/gr ) )
@@ -178,8 +208,112 @@ method output ( @paragraphs )
       $outlinefloat->hide;
    } );
 
+   require Tickit::Widget::Static;
+
+   $matchposstatic = Tickit::Widget::Static->new(
+      text => "",
+      style => {
+         rv => 1,
+         fg => "green",
+      },
+   );
+   my $matchposfloat = $fb->add_float(
+      child => $matchposstatic,
+      hidden => 1,
+      top => -2, bottom => -1,
+      left => 0, right => 10,
+   );
+
+   my $searchbox = App::sdview::Output::Tickit::_SearchBox->new(
+      on_incremental => sub ( $searchbox, $searchre ) {
+         my @hlmatches;
+         foreach my $item ( @items ) {
+            push @hlmatches, $item->apply_highlight( $searchre );
+         }
+         foreach my $match ( @hlmatches ) {
+            my ( $item, $e ) = @$match;
+            my $startline = $item->line_for_char( $e->start );
+            my $where = ( $scroller->item2line( $item, $startline ) )[1] // "";
+
+            next if $where eq "above";
+
+            $scroller->scroll_to( 2, $item, $startline ) if $where eq "below";
+            last;
+         }
+         $scroller->redraw;
+         $searchbox->set_matchcount( scalar @hlmatches );
+      },
+      on_enter => sub ( $searchbox, $searchre ) {
+         $matchposfloat->show;
+
+         undef @matches;
+         foreach my $item ( @items ) {
+            push @matches, $item->apply_highlight( $searchre );
+         }
+         $self->select_and_jump( 0 ); # TODO pick the first one visible
+         $scroller->redraw;
+      },
+   );
+
+   my $searchfloat = $fb->add_float(
+      child => $searchbox,
+      hidden => 1,
+      top => -2, bottom => -1,
+      left => 0, right => -1,
+   );
+
+   $searchbox->set_float( $searchfloat );
+
+   # TODO: use ->bind_keys of Tickit 0.75 once released
+   $t->bind_key(
+      '/' => sub { $searchbox->show },
+   );
+   $t->bind_key(
+      'n' => sub {
+         @matches or return;
+         $self->select_and_jump( ( $matchidx + 1 ) % @matches );
+      },
+   );
+   $t->bind_key(
+      'p' => sub {
+         @matches or return;
+         $self->select_and_jump( ( $matchidx - 1 ) % @matches );
+      },
+   );
+   $t->bind_key(
+      'Escape' => sub {
+         $matchposfloat->hide;
+         foreach my $item ( @items ) {
+            $item->apply_highlight( undef );
+         }
+         $self->select_and_jump( undef );
+         undef @matches;
+         $scroller->redraw;
+      },
+   );
 
    $t->run;
+}
+
+method select_and_jump ( $new_idx )
+{
+   if( defined $matchidx ) {
+      $matches[$matchidx][2] = 0;
+   }
+
+   $matchidx = $new_idx;
+
+   if( defined $matchidx ) {
+      $matches[$matchidx][2] = 1;
+
+      $matchposstatic->set_text( sprintf "%d of %d", $matchidx+1, scalar @matches );
+
+      my ( $item, $e ) = $matches[$matchidx]->@*;
+      my $startline = $item->line_for_char( $e->start );
+      $scroller->scroll_to( 2, $item, $startline );
+
+      $scroller->redraw; # to adjust highlights
+   }
 }
 
 # Most paragraphs are handled in a uniform way
@@ -260,7 +394,8 @@ method _output_para ( $para, %opts )
       );
    }
    else {
-      $item = Tickit::Widget::Scroller::Item::RichText->new_from_formatting( $text,
+      $item = App::sdview::Output::Tickit::_ParagraphItem->new(
+         text         => $text,
          indent       => $indent,
          margin_left  => $margin,
          margin_right => 1,
@@ -274,6 +409,7 @@ method _output_para ( $para, %opts )
       $outlinetree->add_item( "$lines[0]", $level, $itemidx );
    }
 
+   push @items, $item;
    $scroller->push( $item );
 
    $_nextblank = !!$parastyle{blank_after};
@@ -325,26 +461,228 @@ method _output_list ( $listtype, $para, %opts )
    }
 }
 
+class App::sdview::Output::Tickit::_ParagraphItem
+   :strict(params)
+{
+   use Tickit::Utils qw( textwidth );
+
+   field $_pen          :param = undef;
+   field $_margin_left  :param = 0;
+   field $_margin_right :param = 0;
+   field $_indent       :param = 0;
+
+   # Logic kindof stolen from T:W:Scroller::Item::(Rich)Text but modified
+
+   sub _convert_color_tag ($n, $v)
+   {
+      return $n => $v->as_xterm->index;
+   }
+
+   my %convert_tags = (
+      bold      => "b",
+      under     => "u",
+      italic    => "i",
+      strike    => "strike",
+      blink     => "blink",
+      monospace => sub ($, $v) { "af" => ( $v ? 1 : 0 ) },
+      reverse   => "rv",
+      fg        => \&_convert_color_tag,
+      bg        => \&_convert_color_tag,
+   );
+
+   field $_text;
+   field @_chunks; # => [ $start, $end, $width, $is_softhyphen ]
+   ADJUST :params ( :$text )
+   {
+      $_text = String::Tagged->new( "" );
+
+      my $textplain = "$text";
+      pos( $textplain ) = 0;
+
+      while( pos( $textplain ) < length $textplain ) {
+         $textplain =~ m/\G\s+/gc and next; # skip whitespace
+         $textplain =~ m/\G\xAD/gc and
+            $_chunks[-1][3] = 1, next;
+
+         my $chunkstart = pos( $textplain );
+         # Find the next chunk by ignoring NBSP
+         $textplain =~ m/\G(?[ \S & !\xAD + \xA0 ])+/gc or last;
+         my $chunklen = pos( $textplain ) - $chunkstart;
+
+         $_text .= " " if @_chunks and !$_chunks[-1][3];
+
+         my $chunk = $text->substr( $chunkstart, $chunklen )
+            ->clone( convert_tags => \%convert_tags );
+         my $chunkwidth = textwidth $chunk;
+
+         my $pos = length $_text;
+
+         # Convert NBSP to regular space since it's now been used
+         foreach my $e ( $chunk->match_extents( qr/\xA0/ ) ) {
+            $chunk->set_substr( $e->start, $e->length, " " );
+         }
+
+         $_text .= $chunk;
+         push @_chunks, [ $pos, $pos + $chunklen, $chunkwidth ];
+      }
+   }
+
+   field @_lineruns;
+   method _pushline ( $start, $end, $is_softhyphen )
+   {
+      push @_lineruns, [ $start, $end, $is_softhyphen ];
+   }
+
+   method line_for_char ( $char )
+   {
+      my $line = 0;
+      $line++ while $line < $#_lineruns and $_lineruns[$line][1] < $char;
+      return $line;
+   }
+
+   field $_cached_width;
+   method height_for_width ( $width )
+   {
+      $_cached_width = $width;
+
+      $width -= $_margin_left + $_margin_right;
+
+      @_lineruns = ();
+
+      # Operate on pos() within textplain as a proxy for the position within
+      # the String::Tagged instance
+      my $textplain = "$_text";
+      pos( $textplain ) = 0;
+
+      my $linestart = 0;
+      my $lineend   = 0;
+      my $linewidth = 0;
+      my $was_softhyphen;
+
+      foreach my $chunk ( @_chunks ) {
+         my ( $startpos, $endpos, $chunkwidth, $is_softhyphen ) = @$chunk;
+
+         $linewidth += 1 if $linewidth;
+
+         if( $linewidth + $chunkwidth > $width ) {
+            $self->_pushline( $linestart, $lineend, $was_softhyphen // 0 );
+            $linestart = $startpos;
+            $linewidth = 0;
+         }
+
+         $linewidth += $chunkwidth;
+         $lineend = $endpos;
+         $was_softhyphen = $is_softhyphen;
+      }
+
+      $self->_pushline( $linestart, $lineend, 0 ) if $linewidth;
+   }
+
+   method render ( $rb, %args )
+   {
+      my $width = $args{width};
+
+      $self->height_for_width( $width ) if $width != $_cached_width;
+
+      foreach my $line ( $args{firstline} .. $args{lastline} ) {
+         my $indent = ( $line && $_indent ) ? $_indent : 0;
+
+         $rb->goto( $line, 0 );
+         $rb->erase( $_margin_left ) if $_margin_left;
+
+         if( $_pen ) {
+            $rb->savepen;
+            $rb->setpen( $_pen );
+         }
+
+         $rb->erase( $indent ) if $indent;
+
+         my ( $start, $end, $is_softhyphen ) = $_lineruns[$line]->@*;
+         $_text->iter_substr_nooverlap(
+            sub ( $substr, %tags )
+            {
+               if( exists $tags{highlight} ) {
+                  %tags = ( %tags, @HIGHLIGHT_PEN );
+                  %tags = ( %tags, @SELECT_PEN ) if $tags{highlight}->$*;
+               }
+               my $pen = Tickit::Pen::Immutable->new_from_attrs( \%tags );
+               $rb->text( $substr, $pen );
+            },
+            start => $start,
+            end   => $end,
+         );
+         $rb->text( "-" ) if $is_softhyphen;
+
+         if( $_pen ) {
+            $rb->erase_to( $width - $_margin_right );
+            $rb->restore;
+            $rb->erase_to( $width ) if $_margin_right;
+         }
+         else {
+            $rb->erase_to( $width );
+         }
+      }
+   }
+
+   method apply_highlight ( $re )
+   {
+      my $redraw_needed;
+
+      $_text->iter_extents(
+         sub ( $e, $t, $v ) {
+            $_text->delete_tag( $e, $t );
+            $redraw_needed++;
+         },
+         only => [qw( highlight )],
+      );
+
+      my @ret;
+
+      if( defined $re ) {
+         foreach my $e ( $_text->match_extents( $re ) ) {
+            push @ret, [ $self, $e, 0 ];
+            $_text->apply_tag( $e, highlight => \$ret[-1][2] );
+         }
+      }
+
+      return @ret;
+   }
+}
+
 class App::sdview::Output::Tickit::_FixedWidthItem
    :strict(params)
 {
    use Tickit::Utils qw( textwidth );
 
-   field @_lines;
+   field $_text;
+   field @_lineruns;
    field $_maxwidth;
    ADJUST :params (
       :$text,
    ) {
-      @_lines = split m/\n/, $text;
+      $_text = $text;
+
+      my $start = 0;
+      while( $text =~ m/\n|$/g ) {
+         push @_lineruns, [ $start, $-[0] ];
+         $start = $+[0];
+      }
       $_maxwidth = 0;
-      $_ > $_maxwidth and $_maxwidth = $_ for map { textwidth($_) } @_lines;
+      $_ > $_maxwidth and $_maxwidth = $_ for map { textwidth(substr($text, $_->[0], $_->[1]-$_->[0])) } @_lineruns;
    }
 
    field $_pen          :param = undef;
    field $_margin_left  :param = 0;
    field $_margin_right :param = 0;
 
-   method height_for_width ( $ ) { return scalar @_lines; }
+   method height_for_width ( $ ) { return scalar @_lineruns; }
+
+   method line_for_char ( $char )
+   {
+      my $line = 0;
+      $line++ while $line < $#_lineruns and $_lineruns[$line][1] < $char;
+      return $line;
+   }
 
    method render ( $rb, %args )
    {
@@ -361,7 +699,21 @@ class App::sdview::Output::Tickit::_FixedWidthItem
 
          # TODO: truncation if text wider than margin
 
-         $rb->text( $_lines[$lineidx] );
+         my ( $start, $end, $is_softhyphen ) = $_lineruns[$lineidx]->@*;
+         $_text->iter_substr_nooverlap(
+            sub ( $substr, %tags )
+            {
+               if( exists $tags{highlight} ) {
+                  %tags = ( %tags, @HIGHLIGHT_PEN );
+                  %tags = ( %tags, @SELECT_PEN ) if $tags{highlight}->$*;
+               }
+               my $pen = Tickit::Pen::Immutable->new_from_attrs( \%tags );
+               $rb->text( $substr, $pen );
+            },
+            start => $start,
+            end   => $end,
+            only  => [qw( highlight )],
+         );
          $rb->erase_to( $_maxwidth + $_margin_left );
 
          if( $_pen ) {
@@ -370,6 +722,27 @@ class App::sdview::Output::Tickit::_FixedWidthItem
 
          $rb->erase_to( $cols );
       }
+   }
+
+   method apply_highlight ( $re )
+   {
+      $_text->iter_extents(
+         sub ( $e, $t, $v ) {
+            $_text->delete_tag( $e, $t );
+         },
+         only => [qw( highlight )],
+      );
+
+      my @ret;
+
+      if( defined $re ) {
+         foreach my $e ( $_text->match_extents( $re ) ) {
+            push @ret, [ $self, $e, 0 ];
+            $_text->apply_tag( $e, highlight => \$ret[-1][2] );
+         }
+      }
+
+      return @ret;
    }
 }
 
@@ -566,13 +939,130 @@ class App::sdview::Output::Tickit::_OutlineTree
    }
 }
 
+class App::sdview::Output::Tickit::_SearchBox
+   :isa(Tickit::Widget)
+{
+   use constant WIDGET_PEN_FROM_STYLE => 1;
+
+   use constant CAN_FOCUS => 1;
+
+   use Tickit::Style;
+   style_definition base =>
+      bg => "grey",
+      fg => 16, # colour 16 is black but doesn't become grey on bold
+      b  => 1,
+
+      bad_fg => 1;
+
+   method lines { 1 }
+   method cols  { 1 }
+
+   field $float :writer;
+
+   field $leader = "Search: ";
+   field $text = "";
+
+   field $is_ignorecase;
+
+   field $ok = 1;
+
+   field $matchcount = 0;
+   method set_matchcount ( $_count ) { $matchcount = $_count; $self->redraw; }
+
+   field $searchre;
+
+   field $on_incremental :param;
+   field $on_enter       :param;
+
+   method show ()
+   {
+      $text = "";
+      $float->show;
+      $self->window->cursor_at( 0, length($leader) );
+      $self->take_focus;
+   }
+
+   method dismiss ()
+   {
+      $float->hide;
+   }
+
+   method render_to_rb ( $rb, $rect )
+   {
+      $rb->eraserect( $rect );
+
+      $rb->goto( 0, 0 );
+      $rb->text( $leader );
+
+      $rb->text( $text, $ok ? undef : $self->get_style_pen( "bad" ) );
+      $self->window->cursor_at( 0, length($leader) + length($text) );
+
+      my $counttext = sprintf " (%d)", $matchcount;
+      if( $is_ignorecase ) {
+         $rb->goto( 0, $self->window->right - 2 - length $counttext );
+         $rb->text( "/i" );
+      }
+      $rb->goto( 0, $self->window->right - length $counttext );
+      $rb->text( $counttext );
+   }
+
+   method on_key ( $ev )
+   {
+      if( $ev->type eq "text" ) {
+         $text .= $ev->str;
+         $self->_update_pattern;
+         $self->redraw;
+         return 1;
+      }
+
+      my $key = $ev->str;
+      if( $key eq "Backspace" ) {
+         substr( $text, -1, 1 ) = "";
+         $self->_update_pattern;
+         $self->redraw;
+      }
+      elsif( $key eq "Escape" ) {
+         undef $text;
+         $self->_update_pattern;
+         $self->dismiss;
+      }
+      elsif( $key eq "Enter" ) {
+         $on_enter->( $self, $searchre ) if $on_enter;
+         $self->dismiss;
+      }
+      elsif( $key eq "M-i" ) {
+         $is_ignorecase = !$is_ignorecase;
+         $self->_update_pattern;
+         $self->redraw;
+      }
+      else {
+         return 0;
+      }
+
+      return 1;
+   }
+
+   method _update_pattern ()
+   {
+      my $patternok = 0;
+      if( defined $text and length $text ) {
+         # Compiling the pattern might not succeed; if not just keep the previous
+         eval { $searchre = $is_ignorecase ? qr/$text/i : qr/$text/; $patternok = 1 };
+      }
+
+      $self->redraw if $patternok != $ok; $ok = $patternok;
+
+      $on_incremental->( $self, $searchre ) if $on_incremental;
+   }
+}
+
 =head1 TODO
 
 =over 4
 
 =item *
 
-Search behaviours
+Line-editing and history in the C</> search entry box.
 
 =item *
 

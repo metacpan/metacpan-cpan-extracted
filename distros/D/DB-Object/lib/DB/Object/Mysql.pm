@@ -20,13 +20,13 @@ BEGIN
     use parent qw( DB::Object );
     use vars qw(
         $VERSION $CACHE_QUERIES $CACHE_SIZE $CACHE_TABLE $CONNECT_VIA $DB_ERRSTR @DBH 
-        $DEBUG $ERROR $MOD_PERL $USE_BIND $USE_CACHE 
+        $DEBUG $ERROR $MOD_PERL $USE_BIND $USE_CACHE $PLACEHOLDER_REGEXP $DATATYPES
     );
     eval{ require DBD::mysql; };
     die( $@ ) if( $@ );
-    use Nice::Try;
-    # DBI->trace( 5 );
-    $VERSION = 'v0.3.7';
+    # DBI->trace(5);
+    our $PLACEHOLDER_REGEXP = qr/\b\?\b/;
+    our $VERSION = 'v0.3.7';
     use Devel::Confess;
 };
 
@@ -48,6 +48,8 @@ if( $INC{ 'Apache/DBI.pm' } &&
     $CONNECT_VIA = "Apache::DBI::connect";
     $MOD_PERL++;
 }
+# Actually the one in DB::Object is used, because DBD::mysql has no datatype constants of its own
+# our $DATATYPES = {};
 
 sub init
 {
@@ -145,6 +147,8 @@ sub connect
     return( $that->SUPER::connect( $param ) );
 }
 
+# NOTE: sub constant_to_datatype is inherited
+
 sub create_db
 {
     my $self = shift( @_ );
@@ -162,17 +166,38 @@ sub create_db
     }
     my $dbh = $self->{dbh} || return( $self->error( "Could not find database handler." ) );
     my( $sth, $rc );
-    try
+    # try-catch
+    local $@;
+    $sth = eval
     {
-        $sth = $dbh->prepare( $sql ) || return( $self->error( "An error occured while prepareing sql query to create database: ", $dbh->errstr ) );
-        $rc = $sth->execute || return( $self->error( "An error occured while executing sql query to create database: ", $sth->errstr ) );
-        $sth->finish;
+        $dbh->prepare( $sql );
+    };
+    if( $@ )
+    {
+        return( $self->error( "An error occured while prepareing SQL query to create database: ", $@ ) );
     }
-    catch( $e )
+    $sth or return( $self->error( "An error occured while prepareing SQL query to create database: ", $dbh->errstr ) );
+    
+    $rc = eval
+    {
+        $dbh->prepare( $sql );
+    };
+    if( $@ )
+    {
+        return( $self->error( "An error occured while prepareing SQL query to create database: ", $@ ) );
+    }
+    $rc or return( $self->error( "An error occured while prepareing SQL query to create database: ", $dbh->errstr ) );
+
+    # try-catch
+    eval
     {
         $sth->finish;
-        return( $self->error( "An unexpected error occurred while trying to execute the sql query to create database: ", $sth->error, "\n$sql" ) );
+    };
+    if( $@ )
+    {
+        return( $self->error( "An unexpected error occurred while trying to finish the SQL query to create database: ", $@, "\n$sql" ) );
     }
+
     my $ref = {};
     my @keys = qw( host port login passwd opt debug );
     @$ref{ @keys } = @$self{ @keys };
@@ -203,14 +228,18 @@ sub databases
         {
             @$con{ qw( host login passwd ) } = @_;
         }
-        try
+        
+        # try-catch
+        local $@;
+        $dbh = eval
         {
-            $dbh = $self->connect( $con ) || return;
-        }
-        catch( $e )
+            $self->connect( $con );
+        };
+        if( $@ )
         {
-            return;
+            return( $self->error( "Error trying to connect to the MySQL server: $@" ) );
         }
+        $dbh or return( $self->pass_error );
     }
     else
     {
@@ -220,6 +249,8 @@ sub databases
     my @dbases = map( $_->[0], @$temp );
     return( @dbases );
 }
+
+# NOTE: sub datatype_to_constant is inherited
 
 # Specific to Mysql (Postgres also uses it)
 sub having
@@ -464,6 +495,8 @@ sub _dsn
     push( @params, sprintf( 'mysql_read_default_file=%s', $self->{mysql_read_default_file} ) ) if( $self->{mysql_read_default_file} );
     return( join( ';', @params ) );
 }
+
+sub _placeholder_regexp { return( $PLACEHOLDER_REGEXP ) }
 
 DESTROY
 {

@@ -19,11 +19,11 @@ Geo::Coder::List - Call many Geo-Coders
 
 =head1 VERSION
 
-Version 0.31
+Version 0.32
 
 =cut
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 our %locations;	# L1 cache, always used
 
 =head1 SYNOPSIS
@@ -167,7 +167,8 @@ sub geocode {
 				line => $call_details[2],
 				location => $location,
 				timetaken => 0,
-				wantarray => wantarray,
+				gecoder => 'cached',
+				wantarray => 0,
 				result => $rc
 			};
 			CORE::push @{$self->{'log'}}, $log;
@@ -195,6 +196,7 @@ sub geocode {
 				line => $call_details[2],
 				location => $location,
 				timetaken => 0,
+				gecoder => 'cached',
 				wantarray => wantarray,
 				result => \@rc
 			};

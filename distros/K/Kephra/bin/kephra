@@ -7,5 +7,5 @@ use Kephra;
 
 my $file = shift;
 my $app = Kephra->new( );
-$app->{'win'}->read_file( $file ) if defined $file and -r $file;
+$app->{'window'}->read_file( $file ) if defined $file and -r $file;
 $app->MainLoop();

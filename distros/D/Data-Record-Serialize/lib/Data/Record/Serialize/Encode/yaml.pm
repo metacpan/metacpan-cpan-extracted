@@ -2,26 +2,27 @@ package Data::Record::Serialize::Encode::yaml;
 
 # ABSTRACT: encode a record as YAML
 
+use v5.12;
 use Moo::Role;
 
-use Data::Record::Serialize::Error { errors => [ 'yaml_backend' ] }, -all;
+use Data::Record::Serialize::Error { errors => ['yaml_backend'] }, -all;
 use Types::Standard qw[ Enum ];
 
-use JSON::PP; # needed for JSON::PP::true/false
+use JSON::PP;    # needed for JSON::PP::true/false
 
 use namespace::clean;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 BEGIN {
     my $YAML_XS_VERSION = 0.67;
 
-    if ( eval { require YAML::XS; YAML::XS->VERSION( $YAML_XS_VERSION ); 1; } )
-    {
+    if ( eval { require YAML::XS; YAML::XS->VERSION( $YAML_XS_VERSION ); 1; } ) {
         *encode = sub {
+            ## no critic (Variables::ProhibitPackageVars)
             local $YAML::XS::Boolean = 'JSON::PP';
             YAML::XS::Dump( $_[1] );
-          }
+        };
     }
     elsif ( eval { require YAML::PP } ) {
         my $processor = YAML::PP->new( boolean => 'JSON::PP' );
@@ -29,12 +30,11 @@ BEGIN {
     }
     else {
         error( 'yaml_backend',
-            "can't find either YAML::XS (>= $YAML_XS_VERSION) or YAML::PP. Please install one of them"
-        );
+            "can't find either YAML::XS (>= $YAML_XS_VERSION) or YAML::PP. Please install one of them" );
     }
 }
 
-has '+numify' => ( is => 'ro', default => 1 );
+has '+numify'    => ( is => 'ro', default => 1 );
 has '+stringify' => ( is => 'ro', default => 1 );
 
 sub _needs_eol { 1 }
@@ -80,7 +80,7 @@ Data::Record::Serialize::Encode::yaml - encode a record as YAML
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 
@@ -104,6 +104,8 @@ It performs the L<Data::Record::Serialize::Role::Encode> role.
 
 Convert a truthy value to something that the YAML encoders will recognize as a boolean.
 
+=head1 INTERNALS
+
 =for Pod::Coverage encode
 
 =for Pod::Coverage numify
@@ -123,7 +125,7 @@ Optional. Which YAML backend to use.  If not specified, searches for one of the 
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>
 
 =head2 Source
 

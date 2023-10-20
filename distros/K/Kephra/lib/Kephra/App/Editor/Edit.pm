@@ -16,13 +16,13 @@ sub cut {
     my ($start_pos, $end_pos) = $self->GetSelection;
     $start_pos == $end_pos ? $self->LineCut : $self->Cut;
 }
-    
+
 sub duplicate {
     my $self = shift;
     my ($start_pos, $end_pos) = $self->GetSelection;
     $start_pos == $end_pos ? $self->LineDuplicate : $self->SelectionDuplicate;
 }
-    
+
 sub replace {
     my $self = shift;
     my $sel = $self->GetSelectedText();
@@ -50,7 +50,34 @@ sub insert_text {
 
 sub delete_line {
     my ($self) = @_;
-    $self->LineDelete;    
+    $self->LineDelete;
 }
+
+sub fast_undo {
+    my ($self) = @_;
+    for (1..5){
+        last unless $self->CanUndo;
+        $self->Undo;
+    }
+}
+
+sub fast_redo {
+    my ($self) = @_;
+    for (1..5){
+        last unless $self->CanRedo;
+        $self->Redo;
+    }
+}
+
+sub total_undo {
+    my ($self) = @_;
+    $self->Undo while $self->CanUndo;
+}
+
+sub total_redo {
+    my ($self) = @_;
+    $self->Redo while $self->CanRedo;
+}
+
 
 1;

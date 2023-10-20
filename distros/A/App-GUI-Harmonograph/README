@@ -138,7 +138,7 @@ GUI
     basically a little more than the a cosine function to the time variable.
     Here you can change that to sine, tangent or other trigonometric
     functions. Same goes for Y and Z. R is a function of an rotation matrix.
-    Here you can change every of its four elements (with next version).
+    Here you can change every of its four elements.
 
   Line
     The last tab on the right contains the visual properties (of the pen).
@@ -221,13 +221,15 @@ GUI
     information.
 
 SEE ALSO
-    App::GUI::Chaosgraph
-
     App::GUI::Cellgraph
+
+    App::GUI::Chaosgraph
 
     App::GUI::Dynagraph
 
-    App::GUI::Sierpingaph
+    App::GUI::Sierpingraph
+
+    App::GUI::Tangraph
 
 AUTHOR
     Herbert Breunung (lichtkind@cpan.org)

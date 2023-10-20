@@ -5,7 +5,7 @@
       "Inspired by L<Ryu::Buffer> by Tom Molesworth <TEAM@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -23,11 +23,12 @@
       "runtime" : {
          "requires" : {
             "Future" : "0",
-            "perl" : "5.010"
+            "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
+            "Test2::V0" : "0",
             "Test::More" : "0.88"
          }
       }
@@ -35,7 +36,7 @@
    "provides" : {
       "Future::Buffer" : {
          "file" : "lib/Future/Buffer.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -44,6 +45,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

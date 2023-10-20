@@ -2,7 +2,7 @@ package App::Yath::Command::watch;
 use strict;
 use warnings;
 
-our $VERSION = '1.000152';
+our $VERSION = '1.000155';
 
 use Time::HiRes qw/sleep/;
 
@@ -31,7 +31,8 @@ sub run {
 
     my $args     = $self->args;
     shift @$args if @$args && $args->[0] eq '--';
-    my $stop = 1 if @$args && $args->[0] eq 'STOP';
+    my $stop;
+    $stop = 1 if @$args && $args->[0] eq 'STOP';
 
     my $pfile = find_pfile($self->settings, no_fatal => 1)
         or die "No persistent harness was found for the current path.\n";

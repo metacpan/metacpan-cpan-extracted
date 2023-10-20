@@ -3,29 +3,21 @@ use 5.008;
 use strict;
 use warnings;
 
-use utf8;
-
-our $VERSION='0.18';
-
-binmode STDERR, ':encoding(UTF-8)';
-binmode STDOUT, ':encoding(UTF-8)';
-binmode STDIN,  ':encoding(UTF-8)';
-# to avoid wide character in TAP output
-# do this before loading Test* modules
-use open ':std', ':encoding(utf8)';
+our $VERSION='0.24';
 
 use Test::More;
+use Test2::Plugin::UTF8;
 use Test::Pod;
 use File::Spec;
 use File::Basename;
 
 my %SCRIPTS = (
-	'script/json2json.pl' => 't-data/test.json',
-	'script/json2perl.pl' => 't-data/test.json',
-	'script/json2yaml.pl' => 't-data/test.json',
-	'script/perl2json.pl' => 't-data/test.pl',
-	'script/yaml2json.pl' => 't-data/test.yaml',
-	'script/yaml2perl.pl' => 't-data/test.yaml',
+	'script/json2json.pl' => 't-data/succeeding/test.json',
+	'script/json2perl.pl' => 't-data/succeeding/test.json',
+	'script/json2yaml.pl' => 't-data/succeeding/test.json',
+	'script/perl2json.pl' => 't-data/succeeding/test.pl',
+	'script/yaml2json.pl' => 't-data/succeeding/test.yaml',
+	'script/yaml2perl.pl' => 't-data/succeeding/test.yaml',
 );
 
 #### nothing to change below

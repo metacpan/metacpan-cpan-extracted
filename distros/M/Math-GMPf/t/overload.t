@@ -1,9 +1,10 @@
 use strict;
 use warnings;
+use Config;
 use Math::GMPf qw(:mpf);
 use Math::BigInt; # for some error checking
 
-print "1..103\n";
+print "1..106\n";
 
 print "# Using gmp version ", Math::GMPf::gmp_v(), "\n";
 
@@ -23,6 +24,10 @@ Rmpf_set_ui($p, 1234);
 Rmpf_set_si($q, -5678);
 
 my $ok = '';
+my $expected_refcnt = 1;
+
+$expected_refcnt++
+  if $Config{ccflags} =~ /\-DPERL_RC_STACK/;
 
 my $z = $p * $q;
 if(Rmpf_get_str($z, 10,0) eq '-0.7006652e7'
@@ -57,9 +62,9 @@ $z = $p * $posi;
 if($z == 1527692) {$ok .= 'g'}
 
 if($ok eq 'abcdefg'
-   && Math::GMPf::get_refcnt($z) == 1
-   && Math::GMPf::get_refcnt($p) == 1
-   && Math::GMPf::get_refcnt($q) == 1) {print "ok 1\n"}
+   && Math::GMPf::get_refcnt($z) == $expected_refcnt
+   && Math::GMPf::get_refcnt($p) == $expected_refcnt
+   && Math::GMPf::get_refcnt($q) == $expected_refcnt) {print "ok 1\n"}
 else {print "not ok 1 $ok\n"}
 
 $ok = '';
@@ -103,7 +108,7 @@ if($p == 1527692) {$ok .= 'g'}
 Rmpf_set_ui($p, 1234);
 
 if($ok eq 'abcdefg'
-   && Math::GMPf::get_refcnt($p) == 1) {print "ok 2\n"}
+   && Math::GMPf::get_refcnt($p) == $expected_refcnt) {print "ok 2\n"}
 else {print "not ok 2 $ok\n"}
 
 $ok = '';
@@ -140,8 +145,8 @@ $z = $p + $posi;
 if($z == 2472) {$ok .= 'g'}
 
 if($ok eq 'abcdefg'
-   && Math::GMPf::get_refcnt($p) == 1
-   && Math::GMPf::get_refcnt($z) == 1) {print "ok 3\n"}
+   && Math::GMPf::get_refcnt($p) == $expected_refcnt
+   && Math::GMPf::get_refcnt($z) == $expected_refcnt) {print "ok 3\n"}
 else {print "not ok 3 $ok\n"}
 
 $ok = '';
@@ -185,7 +190,7 @@ if($p == 2472) {$ok .= 'g'}
 Rmpf_set_ui($p, 1234);
 
 if($ok eq 'abcdefg'
-   && Math::GMPf::get_refcnt($p) == 1) {print "ok 4\n"}
+   && Math::GMPf::get_refcnt($p) == $expected_refcnt) {print "ok 4\n"}
 else {print "not ok 4 $ok\n"}
 
 $ok = '';
@@ -233,8 +238,8 @@ $z *= $posi / $p;
 if($z > 0.999 && $z < 1.001) {$ok .= '7'}
 
 if($ok eq 'a1b2c3d4e5f6g7'
-   && Math::GMPf::get_refcnt($p) == 1
-   && Math::GMPf::get_refcnt($z) == 1) {print "ok 5\n"}
+   && Math::GMPf::get_refcnt($p) == $expected_refcnt
+   && Math::GMPf::get_refcnt($z) == $expected_refcnt) {print "ok 5\n"}
 else {print "not ok 5 $ok\n"}
 
 $ok = '';
@@ -268,7 +273,7 @@ $p /= $posi;
 if($p < 1234.0001 && $p > 1233.9999) {$ok .= 'g'}
 
 if($ok eq 'abcdefg'
-   && Math::GMPf::get_refcnt($p) == 1) {print "ok 6\n"}
+   && Math::GMPf::get_refcnt($p) == $expected_refcnt) {print "ok 6\n"}
 else {print "not ok 6 $ok\n"}
 
 my $c = $p;
@@ -276,14 +281,14 @@ if("$c" eq '0.1234e4'
    && "$c" eq "$p"
    && $c == $p
    && $c != $q
-   && Math::GMPf::get_refcnt($p) == 1
-   && Math::GMPf::get_refcnt($c) == 1
-   && Math::GMPf::get_refcnt($q) == 1) {print "ok 7\n"}
+   && Math::GMPf::get_refcnt($p) == $expected_refcnt
+   && Math::GMPf::get_refcnt($c) == $expected_refcnt
+   && Math::GMPf::get_refcnt($q) == $expected_refcnt) {print "ok 7\n"}
 else {print "not ok 7\n"}
 
 $c *= -1;
 if(Rmpf_get_str(abs($c), 10, 0) eq '0.1234e4'
-   && Math::GMPf::get_refcnt($c) == 1) {print "ok 8\n"}
+   && Math::GMPf::get_refcnt($c) == $expected_refcnt) {print "ok 8\n"}
 else {print "not ok 8\n"}
 
 $ok = ($p!=$ui).($p==$ui).($p>$ui).($p>=$ui).($p<$ui).($p<=$ui).($p<=>$ui);
@@ -351,7 +356,7 @@ else {
 
 $ok = ($frac!=$p).($frac==$p).($frac>$p).($frac>=$p).($frac<$p).($frac<=$p).($frac<=>$p);
 if($ok eq '100011-1'
-   && Math::GMPf::get_refcnt($p) == 1) {print "ok 18\n"}
+   && Math::GMPf::get_refcnt($p) == $expected_refcnt) {print "ok 18\n"}
 else {
   warn "\$ok: $ok\n";
   print "not ok 18\n";
@@ -359,23 +364,23 @@ else {
 
 Rmpf_set_ui($q, 0);
 
-if($p && Math::GMPf::get_refcnt($p) == 1) {print "ok 19\n"}
+if($p && Math::GMPf::get_refcnt($p) == $expected_refcnt) {print "ok 19\n"}
 else {print "not ok 19\n"}
 
-if(!$q && Math::GMPf::get_refcnt($q) == 1) {print "ok 20\n"}
+if(!$q && Math::GMPf::get_refcnt($q) == $expected_refcnt) {print "ok 20\n"}
 else {print "not ok 20\n"}
 
-if(not($q) && Math::GMPf::get_refcnt($q) == 1) {print "ok 21\n"}
+if(not($q) && Math::GMPf::get_refcnt($q) == $expected_refcnt) {print "ok 21\n"}
 else {print "not ok 21\n"}
 
-unless($q || Math::GMPf::get_refcnt($q) != 1) {print "ok 22\n"}
+unless($q || Math::GMPf::get_refcnt($q) != $expected_refcnt) {print "ok 22\n"}
 else {print "not ok 22\n"}
 
 $z = $c;
 $z *= -1;
 if($z == -$c
-   && Math::GMPf::get_refcnt($z) == 1
-   && Math::GMPf::get_refcnt($c) == 1) {print "ok 23\n"}
+   && Math::GMPf::get_refcnt($z) == $expected_refcnt
+   && Math::GMPf::get_refcnt($c) == $expected_refcnt) {print "ok 23\n"}
 else {print "not ok 23\n"}
 
 $ok = '';
@@ -409,8 +414,8 @@ $z += $posi;
 if($z == $p) {$ok .= 'g'}
 
 if($ok eq 'abcdefg'
-   && Math::GMPf::get_refcnt($z) == 1
-   && Math::GMPf::get_refcnt($p) == 1) {print "ok 24\n"}
+   && Math::GMPf::get_refcnt($z) ==$expected_refcnt
+   && Math::GMPf::get_refcnt($p) == $expected_refcnt) {print "ok 24\n"}
 else {print "not ok 24 $ok\n"}
 
 $ok = '';
@@ -444,8 +449,8 @@ $z -= $posi;
 if($z == $p) {$ok .= 'g'}
 
 if($ok eq 'abcdefg'
-   && Math::GMPf::get_refcnt($z) == 1
-   && Math::GMPf::get_refcnt($p) == 1) {print "ok 25\n"}
+   && Math::GMPf::get_refcnt($z) == $expected_refcnt
+   && Math::GMPf::get_refcnt($p) == $expected_refcnt) {print "ok 25\n"}
 else {print "not ok 25 $ok\n"}
 
 $ok = '';
@@ -479,8 +484,8 @@ $z -= $posi;
 if($z == -$p) {$ok .= 'g'}
 
 if($ok eq 'abcdefg'
-   && Math::GMPf::get_refcnt($z) == 1
-   && Math::GMPf::get_refcnt($p) == 1) {print "ok 26\n"}
+   && Math::GMPf::get_refcnt($z) == $expected_refcnt
+   && Math::GMPf::get_refcnt($p) == $expected_refcnt) {print "ok 26\n"}
 else {print "not ok 26 $ok\n"}
 
 $ok = '';
@@ -514,13 +519,13 @@ $z -= $posi;
 if($z == $p) {$ok .= 'g'}
 
 if($ok eq 'abcdefg'
-   && Math::GMPf::get_refcnt($z) == 1
-   && Math::GMPf::get_refcnt($p) == 1) {print "ok 27\n"}
+   && Math::GMPf::get_refcnt($z) == $expected_refcnt
+   && Math::GMPf::get_refcnt($p) == $expected_refcnt) {print "ok 27\n"}
 else {print "not ok 27 $ok\n"}
 
 $ok = ($posi!=$p).($posi==$p).($posi>$p).($posi>=$p).($posi<$p).($posi<=$p).($posi<=>$p);
 if($ok eq '1011001'
-   && Math::GMPf::get_refcnt($p) == 1) {print "ok 28\n"}
+   && Math::GMPf::get_refcnt($p) == $expected_refcnt) {print "ok 28\n"}
 else {print "not ok 28\n"}
 
 $ok = ($p!=$posi).($p==$posi).($p>$posi).($p>=$posi).($p<$posi).($p<=$posi).($p<=>$posi);
@@ -531,8 +536,8 @@ Rmpf_set_ui($z, 2);
 
 my $root = sqrt($z);
 if($root > 1.414 && $root < 1.415
-   && Math::GMPf::get_refcnt($z) == 1
-   && Math::GMPf::get_refcnt($root) == 1) {print "ok 30\n"}
+   && Math::GMPf::get_refcnt($z) == $expected_refcnt
+   && Math::GMPf::get_refcnt($root) == $expected_refcnt) {print "ok 30\n"}
 else {print "not ok 30\n"}
 
 my $root_copy = $root;
@@ -542,8 +547,8 @@ $root_copy **= 2;
 
 if($root_copy > 1.99999 && $root_copy < 2.00000001
    && $root > 1.99999 && $root < 2.00000001
-   && Math::GMPf::get_refcnt($root) == 1
-   && Math::GMPf::get_refcnt($root_copy) == 1) {print "ok 31\n"}
+   && Math::GMPf::get_refcnt($root) == $expected_refcnt
+   && Math::GMPf::get_refcnt($root_copy) == $expected_refcnt) {print "ok 31\n"}
 else {print "not ok 31\n"}
 
 
@@ -554,8 +559,8 @@ if($] >= 5.008) {
   if($z > 2.1111 && $z < 2.1112
      && $root == 2
      && int($z) == 2
-     && Math::GMPf::get_refcnt($z) == 1
-     && Math::GMPf::get_refcnt($root) == 1) {print "ok 32\n"}
+     && Math::GMPf::get_refcnt($z) == $expected_refcnt
+     && Math::GMPf::get_refcnt($root) == $expected_refcnt) {print "ok 32\n"}
   else {print "not ok 32\n"}
   }
 
@@ -651,8 +656,8 @@ $q = $p * $mbi;
 $p = $q / $mbi;
 
 if($p > 1233.999 && $p < 1234.001
-   && Math::GMPf::get_refcnt($p) == 1
-   && Math::GMPf::get_refcnt($q) == 1) {print "ok 35\n"}
+   && Math::GMPf::get_refcnt($p) == $expected_refcnt
+   && Math::GMPf::get_refcnt($q) == $expected_refcnt) {print "ok 35\n"}
 else {print "not ok 35\n"}
 
 $p *= $mbi;
@@ -661,16 +666,16 @@ $p += $mbi;
 $p -= $mbi;
 
 if($p > 1233.999 && $p < 1234.001
-   && Math::GMPf::get_refcnt($p) == 1
-   && Math::GMPf::get_refcnt($q) == 1) {print "ok 36\n"}
+   && Math::GMPf::get_refcnt($p) == $expected_refcnt
+   && Math::GMPf::get_refcnt($q) == $expected_refcnt) {print "ok 36\n"}
 else {print "not ok 36\n"}
 
 $q = $mbi + $p;
 $p = $mbi - $q;
 
 if($p > -1234.001 && $p < -1233.999
-   && Math::GMPf::get_refcnt($p) == 1
-   && Math::GMPf::get_refcnt($q) == 1) {print "ok 37\n"}
+   && Math::GMPf::get_refcnt($p) == $expected_refcnt
+   && Math::GMPf::get_refcnt($q) == $expected_refcnt) {print "ok 37\n"}
 else {print "not ok 37\n"}
 
 
@@ -678,8 +683,8 @@ $q = $mbi * $p;
 $p = $mbi / $q;
 
 if($p < -0.00081 && $p > -0.000811
-   && Math::GMPf::get_refcnt($p) == 1
-   && Math::GMPf::get_refcnt($q) == 1) {print "ok 38\n"}
+   && Math::GMPf::get_refcnt($p) == $expected_refcnt
+   && Math::GMPf::get_refcnt($q) == $expected_refcnt) {print "ok 38\n"}
 else {print "not ok 38\n"}
 
 Rmpf_set_str($p, "1234567${dp}123", 10);
@@ -692,7 +697,7 @@ if($p > $mbi &&
    ($mbi <=> $p) < 0 &&
    $p != $mbi &&
    !($p == $mbi) &&
-   Math::GMPf::get_refcnt($p) == 1) {print "ok 39\n"}
+   Math::GMPf::get_refcnt($p) == $expected_refcnt) {print "ok 39\n"}
 else {print "not ok 39\n"}
 
 $mbi = \$p;
@@ -1202,5 +1207,27 @@ else {
   print "skipping tests 102 and 103\n";
   print "ok 102\n";
   print "ok 103\n";
+}
+
+my $obj0 = Math::GMPf->new(sqrt 2);
+my $obj1 = $obj0++;
+
+if($obj1 - $obj0 == -1) {print "ok 104\n"}
+else {
+  warn "$obj1 is not 1 less than $obj0\n";
+  print "not ok 104\n";
+}
+
+my $obj2 = ++$obj0;
+if($obj2 == $obj0) {print "ok 105\n"}
+else {
+  warn "$obj2 != $obj0\n";
+  print "not ok 105\n";
+}
+
+if($obj2 - $obj1 == 2) {print "ok 106\n"}
+else {
+  warn "$obj2 is not 2 greater than $obj1\n";
+  print "not ok 106\n";
 }
 

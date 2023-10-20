@@ -1,0 +1,211 @@
+#! /usr/bin/env perl
+# PODNAME: cpppp
+our $VERSION = '0.001'; # VERSION
+# ABSTRACT: Command line tool to process cpppp templates
+use v5.20;
+use warnings;
+use experimental 'signatures';
+use CodeGen::Cpppp;
+use autouse 'Pod::Usage' => 'pod2usage';
+use Getopt::Long;
+
+
+my %param;
+GetOptions(
+   '--param|p=s'             => sub { set_param(split /=/, $_[1], 2) },
+   '--features=s'            => sub { set_feature($_) for split ',', $_[1] },
+   '--dump-pl'               => \my $opt_dump_pl,
+   '--out|o=s'               => \(my $opt_out= '-'),
+   '--section-out=s'         => \my @opt_section_out,
+   '--list-sections'         => \my $opt_list_sections,
+   '--help'                  => sub { pod2usage(1) },
+   '--version'               => sub { say CodeGen::Cpppp->VERSION; exit 0 },
+) or pod2usage(2);
+
+sub set_param($var, $value) {
+   $var =~ /^( [\$\@\%]? ) [\w_]+ $/x
+      or die "Parameter name '$var' is not valid\n";
+   if ($1) {
+      my $expr= $1 eq '$'? '$param{$var}='.$value
+         : $1 eq '@'? '$param{$var}=['.$value.']'
+         : '$param{$var}={'.$value.'}';
+      # Automatically require modules mentioned in the expression
+      while (/\b([A-Za-z][\w_]+(::[A-Za-z0-9][\w_]+)+)\b/) {
+         my $fname= $1 . '.pm';
+         $fname =~ s,::,/,g;
+         eval { require $fname };
+      }
+      eval "use strict; use warnings; $expr; 1"
+         or die "Error evaluating parameter '$var': $@\n";
+   } else {
+      $param{'$'.$var} //= $value;
+      $param{'@'.$var} //= [ split ',', $value ]
+         if $value =~ /,/;
+      my ($k, $v);
+      $param{'%'.$var} //= { map +(($k,$v)=split('=',$_,2)), split ',', $value }
+         if $value =~ /=/;
+   }
+}
+sub set_feature($expr) {
+   my ($k, $v)= split '=', $expr, 2;
+   set_param("feature_$k", $v // 1);
+}
+
+my $cpppp= CodeGen::Cpppp->new(
+);
+
+sub dump_template_perl(@input_args) {
+   my $parse= $cpppp->parse_cpppp(@input_args);
+   my $code= $cpppp->_gen_perl_template_package($parse, with_data => 1);
+   my $sec= $input_args[1] // $input_args[0];
+   $cpppp->output->declare_section($sec);
+   $cpppp->output->append($sec, $code)
+}
+
+sub render(@input_args) {
+   my $tpl_class= $cpppp->compile_cpppp(@input_args);
+   my $tpl_params= $tpl_class->coerce_parameters(\%param);
+   $cpppp->new_template($tpl_class, $tpl_params)->flush;
+}
+
+my $action= $opt_dump_pl? \&dump_template_perl : \&render;
+if (@ARGV) {
+   $action->($_) for @ARGV;
+} else {
+   $action->(\*STDIN, 'stdin');
+}
+
+if ($opt_list_sections) {
+   say "name\tline_count";
+   for my $s ($cpppp->output->section_list) {
+      my $line_count= ()= $cpppp->output->get($s) =~ /\n/g;
+      say "$s\t$line_count";
+   }
+   exit 0;
+}
+
+sub print_sections($slist, $filespec) {
+   if ($filespec eq '-' || !length $filespec) {
+      print $cpppp->output->get($slist);
+   } else {
+      $cpppp->write_sections_to_file($slist, split('@', $filespec, 2));
+   }
+}
+
+my %seen;
+for (@opt_section_out) {
+   my ($sections, $file)= split '=', $_, 2;
+   my @s= $cpppp->output->expand_section_selector($sections);
+   $seen{$_}++ for @s;
+   print_sections(\@s, $file) if @s;
+}
+my @remaining= grep !$seen{$_}, $cpppp->output->section_list;
+print_sections(\@remaining, $opt_out) if @remaining;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpppp - Command line tool to process cpppp templates
+
+=head1 VERSION
+
+version 0.001
+
+=head1 USAGE
+
+  cpppp [OPTIONS] [TEMPLATE_FILES] > file.c
+  cpppp [OPTIONS] [TEMPLATE_FILES] --list-sections
+  cpppp --version
+  
+  Common Options:  (see --help for more)
+    -p --param NAME=VALUE
+       --features ENABLE1,ENABLE2,DISABLE=0
+    -o --out FILE[@MARK]
+       --section-out SEC_LIST=FILE[@MARK]
+
+Transform perl+C source into C.  See --help for a list of options.
+
+Warning: this evaluates arbitrary perl from the template files.
+
+=head1 OPTIONS
+
+=over
+
+=item C<-p>
+
+=item C<--param NAME=VALUE>
+
+Specify a parameter to the template.  If NAME includes the Perl sigil, the
+value will be evaluated as a perl expression.  If NAME lacks a sigil, the VALUE
+will be parsed with a more convenient syntax:
+
+  cpppp -p '$type="int"'
+  cpppp -p type=int
+  cpppp -p '@types=qw( int float char )'
+  cpppp -p types=int,float,char
+  cpppp -p '%typemap={int => "int32",float => "double"}'
+  cpppp -p typemap=int=int32,float=double
+
+=item C<--features LIST>
+
+This is a shorthand to specify lots of --param options for parameters whose
+names start with "feature_".  The bare name is equivalent to "=1", which would
+generally enable some feature.
+
+  # (there are no standard features; these would need declared in the template)
+  cpppp -p feature_debug=1 -p feature_assert=1 -p feature_comments=0
+  cpppp --features 'debug,assert,comments=0'
+
+=item C<-o>
+
+=item C<--out FILENAME>
+
+Write output to FILENAME instead of C<stdout> (unless FILENAME is "-" then do
+still write C<stdout> )  A backup of FILENAME will be created if it exists.
+
+FILENAME may contain a '@marker' suffix.  In this case, the content will be
+written within the existing content of file file between lines that match
+C<< BEGIN marker >> and C<< END marker >>.  If those lines are not found, the
+operations aborts.
+
+=item C<--section-out SECTION=FILENAME>
+
+This option diverts the contents of the named output section to a different
+FILENAME than the C<-o> option.  (the FILENAME may also contain an '@' marker)
+
+The SECTION is either the name of one section, or a comma-delimited list of
+section names, or a range C<A..B> of section names.
+All sections diverted to this FILENAME will be omitted from the regular output.
+
+=item C<--list-sections>
+
+List the sections of output (in order they would be written) and exit without
+writing any files.  The output is TSV.  More columns may be added in the future.
+
+=item C<--dump-pl>
+
+Output the generated perl sourcecode for the top-level perl script and don't
+execute it.
+
+=back
+
+eventually it will support many that C<cpp> has, for defining things and parsing
+headers to discover existing types.
+
+=head1 AUTHOR
+
+Michael Conrad <mike@nrdvana.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by Michael Conrad.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

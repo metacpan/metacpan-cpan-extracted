@@ -2,9 +2,9 @@
 package ColorTheme;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-02'; # DATE
+our $DATE = '2023-07-14'; # DATE
 our $DIST = 'ColorTheme'; # DIST
-our $VERSION = '2.1.3'; # VERSION
+our $VERSION = '2.1.4'; # VERSION
 
 1;
 # ABSTRACT: Color themes
@@ -25,7 +25,7 @@ ColorTheme - Color themes
 
 =head1 VERSION
 
-This document describes version 2.1.3 of ColorTheme (from Perl distribution ColorTheme), released on 2023-07-02.
+This document describes version 2.1.4 of ColorTheme (from Perl distribution ColorTheme), released on 2023-07-14.
 
 =head1 DESCRIPTION
 
@@ -243,6 +243,9 @@ Source repository is at L<https://github.com/perlancar/perl-ColorTheme>.
 =head1 SEE ALSO
 
 L<DefHash>
+
+Somewhat related: L<BorderStyle> specification, because they are often used
+together in an application.
 
 =head1 HISTORY
 

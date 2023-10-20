@@ -16,7 +16,7 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_indexes(SPVM_ENV* env, SPVM_
   
   void** env_array = (void**)env;
   
-  if ((void*)&env->compiler != &env_array[0]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->reserved0 != &env_array[0]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->runtime != &env_array[1]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->api != &env_array[2]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->new_env != &env_array[3]) { stack[0].ival = 0; return 0; }
@@ -53,7 +53,7 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_indexes(SPVM_ENV* env, SPVM_
   if ((void*)&env->set_class_var_double != &env_array[34]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->set_class_var_object != &env_array[35]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->set_class_var_string != &env_array[36]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->get_class_var_object_address != &env_array[37]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->get_class_var_object_ref != &env_array[37]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->get_class_var_byte_by_name != &env_array[38]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->get_class_var_short_by_name != &env_array[39]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->get_class_var_int_by_name != &env_array[40]) { stack[0].ival = 0; return 0; }
@@ -204,7 +204,6 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_indexes(SPVM_ENV* env, SPVM_
   if ((void*)&env->enter_scope != &env_array[185]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->leave_scope != &env_array[186]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->push_mortal != &env_array[187]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->remove_mortal != &env_array[188]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->weaken != &env_array[189]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->isweak != &env_array[190]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->unweaken != &env_array[191]) { stack[0].ival = 0; return 0; }
@@ -212,18 +211,15 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_indexes(SPVM_ENV* env, SPVM_
   if ((void*)&env->strerror_string_nolen != &env_array[193]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->strerror != &env_array[194]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->strerror_nolen != &env_array[195]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->allocator != &env_array[196]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->new_memory_env != &env_array[197]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->free_memory_env != &env_array[198]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->get_memory_blocks_count_env != &env_array[199]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->reserved196 != &env_array[196]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->reserved197 != &env_array[197]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->reserved198 != &env_array[198]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->reserved199 != &env_array[199]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->new_memory_stack != &env_array[200]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->free_memory_stack != &env_array[201]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->get_memory_blocks_count_stack != &env_array[202]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->new_stack != &env_array[203]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->free_stack != &env_array[204]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->get_ref_count != &env_array[205]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->inc_ref_count != &env_array[206]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->dec_ref_count != &env_array[207]) { stack[0].ival = 0; return 0; }
     
   stack[0].ival = 1;
 
@@ -1345,37 +1341,37 @@ int32_t SPVM__TestCase__NativeAPI__mortal_api(SPVM_ENV* env, SPVM_VALUE* stack) 
   // 1
   {
     void* obj_values = env->new_byte_array(env, stack, length);
-    ref_count += env->get_ref_count(env, stack, obj_values);
+    ref_count += env->api->internal->get_ref_count(env, stack, obj_values);
   }
   // 2
   {
     void* obj_values = env->new_short_array(env, stack, length);
-    ref_count += env->get_ref_count(env, stack, obj_values);
+    ref_count += env->api->internal->get_ref_count(env, stack, obj_values);
   }
   // 3
   {
     void* obj_values = env->new_int_array(env, stack, length);
-    ref_count += env->get_ref_count(env, stack, obj_values);
+    ref_count += env->api->internal->get_ref_count(env, stack, obj_values);
   }
   // 4
   {
     void* obj_values = env->new_long_array(env, stack, length);
-    ref_count += env->get_ref_count(env, stack, obj_values);
+    ref_count += env->api->internal->get_ref_count(env, stack, obj_values);
   }
   // 5
   {
     void* obj_values = env->new_float_array(env, stack, length);
-    ref_count += env->get_ref_count(env, stack, obj_values);
+    ref_count += env->api->internal->get_ref_count(env, stack, obj_values);
   }
   // 6
   {
     void* obj_values = env->new_long_array(env, stack, length);
-    ref_count += env->get_ref_count(env, stack, obj_values);
+    ref_count += env->api->internal->get_ref_count(env, stack, obj_values);
   }
   // 7
   {
     void* obj_values = env->new_string(env, stack, "foo", (int32_t)strlen("foo"));
-    ref_count += env->get_ref_count(env, stack, obj_values);
+    ref_count += env->api->internal->get_ref_count(env, stack, obj_values);
   }
   // 8
   {
@@ -1384,7 +1380,7 @@ int32_t SPVM__TestCase__NativeAPI__mortal_api(SPVM_ENV* env, SPVM_VALUE* stack) 
       return 1;
     }
     void* obj_object = env->new_object(env, stack, basic_type);
-    ref_count += env->get_ref_count(env, stack, obj_object);
+    ref_count += env->api->internal->get_ref_count(env, stack, obj_object);
   }
   // 9
   {
@@ -1393,7 +1389,7 @@ int32_t SPVM__TestCase__NativeAPI__mortal_api(SPVM_ENV* env, SPVM_VALUE* stack) 
       return 1;
     }
     void* obj_objects = env->new_object_array(env, stack, basic_type, 3);
-    ref_count += env->get_ref_count(env, stack, obj_objects);
+    ref_count += env->api->internal->get_ref_count(env, stack, obj_objects);
   }
   // 10
   {
@@ -1402,7 +1398,7 @@ int32_t SPVM__TestCase__NativeAPI__mortal_api(SPVM_ENV* env, SPVM_VALUE* stack) 
       return 1;
     }
     void* obj_objects = env->new_object_array(env, stack, basic_type, 3);
-    ref_count += env->get_ref_count(env, stack, obj_objects);
+    ref_count += env->api->internal->get_ref_count(env, stack, obj_objects);
   }
   // 11
   {
@@ -1411,7 +1407,7 @@ int32_t SPVM__TestCase__NativeAPI__mortal_api(SPVM_ENV* env, SPVM_VALUE* stack) 
       return 1;
     }
     void* obj_objects = env->new_pointer_object(env, stack, basic_type, NULL);
-    ref_count += env->get_ref_count(env, stack, obj_objects);
+    ref_count += env->api->internal->get_ref_count(env, stack, obj_objects);
   }
   
   if (ref_count == 11) {
@@ -1427,10 +1423,10 @@ int32_t SPVM__TestCase__NativeAPI__mortal_api(SPVM_ENV* env, SPVM_VALUE* stack) 
 int32_t SPVM__TestCase__NativeAPI__enter_scope_leave_scope(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t length = 10;
-  int32_t start_memory_blocks_count = env->get_memory_blocks_count_env(env);
+  int32_t start_memory_blocks_count = env->get_memory_blocks_count(env, stack);
   env->new_int_array(env, stack, length);
   env->new_int_array(env, stack, length);
-  int32_t before_enter_memory_blocks_count = env->get_memory_blocks_count_env(env);
+  int32_t before_enter_memory_blocks_count = env->get_memory_blocks_count(env, stack);
   int32_t before_leave_memory_blocks_count;
   {
     int32_t scope_id = env->enter_scope(env, stack);
@@ -1439,11 +1435,11 @@ int32_t SPVM__TestCase__NativeAPI__enter_scope_leave_scope(SPVM_ENV* env, SPVM_V
     env->new_int_array(env, stack, length);
     env->new_int_array(env, stack, length);
     
-    before_leave_memory_blocks_count = env->get_memory_blocks_count_env(env);
+    before_leave_memory_blocks_count = env->get_memory_blocks_count(env, stack);
     env->leave_scope(env, stack, scope_id);
   }
   
-  int32_t after_leave_memory_blocks_counts = env->get_memory_blocks_count_env(env);
+  int32_t after_leave_memory_blocks_counts = env->get_memory_blocks_count(env, stack);
   
   stack[0].ival = 0;
   if ((before_enter_memory_blocks_count - start_memory_blocks_count) == 2) {
@@ -1716,28 +1712,36 @@ int32_t SPVM__TestCase__NativeAPI__new_string_no_mortal(SPVM_ENV* env, SPVM_VALU
     int32_t string_type_dimension = env->get_object_type_dimension(env, stack, string);
     if (!(strcmp(string_basic_type_name, "string") == 0 && string_type_dimension == 0)) {
       stack[0].ival = 0;
-      env->inc_ref_count(env, stack, string);
-      env->dec_ref_count(env, stack, string);
+      // Assign and destroy
+      void* referent = NULL;
+      env->assign_object(env, stack, &referent, string);
+      env->assign_object(env, stack, &referent, NULL);
       return 0;
     }
 
     if (env->length(env, stack, string) != 3) {
       stack[0].ival = 0;
-      env->inc_ref_count(env, stack, string);
-      env->dec_ref_count(env, stack, string);
+      // Assign and destroy
+      void* referent = NULL;
+      env->assign_object(env, stack, &referent, string);
+      env->assign_object(env, stack, &referent, NULL);
       return 0;
     }
     
     const char* string_chars = env->get_chars(env, stack, string);
     if (strcmp(string_chars, "abc") != 0) {
       stack[0].ival = 0;
-      env->inc_ref_count(env, stack, string);
-      env->dec_ref_count(env, stack, string);
+      // Assign and destroy
+      void* referent = NULL;
+      env->assign_object(env, stack, &referent, string);
+      env->assign_object(env, stack, &referent, NULL);
       return 0;
     }
     
-    env->inc_ref_count(env, stack, string);
-    env->dec_ref_count(env, stack, string);
+    // Assign and destroy
+    void* referent = NULL;
+    env->assign_object(env, stack, &referent, string);
+    env->assign_object(env, stack, &referent, NULL);
   }
 
   // Length is shorten than the string
@@ -1746,21 +1750,27 @@ int32_t SPVM__TestCase__NativeAPI__new_string_no_mortal(SPVM_ENV* env, SPVM_VALU
 
     if (env->length(env, stack, string) != 1) {
       stack[0].ival = 0;
-      env->inc_ref_count(env, stack, string);
-      env->dec_ref_count(env, stack, string);
+      // Assign and destroy
+      void* referent = NULL;
+      env->assign_object(env, stack, &referent, string);
+      env->assign_object(env, stack, &referent, NULL);
       return 0;
     }
     
     const char* string_chars = env->get_chars(env, stack, string);
     if (strcmp(string_chars, "a") != 0) {
       stack[0].ival = 0;
-      env->inc_ref_count(env, stack, string);
-      env->dec_ref_count(env, stack, string);
+      // Assign and destroy
+      void* referent = NULL;
+      env->assign_object(env, stack, &referent, string);
+      env->assign_object(env, stack, &referent, NULL);
       return 0;
     }
     
-    env->inc_ref_count(env, stack, string);
-    env->dec_ref_count(env, stack, string);
+    // Assign and destroy
+    void* referent = NULL;
+    env->assign_object(env, stack, &referent, string);
+    env->assign_object(env, stack, &referent, NULL);
   }
 
   // Length is shorten than the string 0
@@ -1769,21 +1779,27 @@ int32_t SPVM__TestCase__NativeAPI__new_string_no_mortal(SPVM_ENV* env, SPVM_VALU
 
     if (env->length(env, stack, string) != 0) {
       stack[0].ival = 0;
-      env->inc_ref_count(env, stack, string);
-      env->dec_ref_count(env, stack, string);
+      // Assign and destroy
+      void* referent = NULL;
+      env->assign_object(env, stack, &referent, string);
+      env->assign_object(env, stack, &referent, NULL);
       return 0;
     }
     
     const char* string_chars = env->get_chars(env, stack, string);
     if (strcmp(string_chars, "") != 0) {
       stack[0].ival = 0;
-      env->inc_ref_count(env, stack, string);
-      env->dec_ref_count(env, stack, string);
+      // Assign and destroy
+      void* referent = NULL;
+      env->assign_object(env, stack, &referent, string);
+      env->assign_object(env, stack, &referent, NULL);
       return 0;
     }
     
-    env->inc_ref_count(env, stack, string);
-    env->dec_ref_count(env, stack, string);
+    // Assign and destroy
+    void* referent = NULL;
+    env->assign_object(env, stack, &referent, string);
+    env->assign_object(env, stack, &referent, NULL);
   }
 
   // Length is longer than the string
@@ -1792,21 +1808,27 @@ int32_t SPVM__TestCase__NativeAPI__new_string_no_mortal(SPVM_ENV* env, SPVM_VALU
 
     if (env->length(env, stack, string) != 4) {
       stack[0].ival = 0;
-      env->inc_ref_count(env, stack, string);
-      env->dec_ref_count(env, stack, string);
+      // Assign and destroy
+      void* referent = NULL;
+      env->assign_object(env, stack, &referent, string);
+      env->assign_object(env, stack, &referent, NULL);
       return 0;
     }
     
     const char* string_chars = env->get_chars(env, stack, string);
     if (strncmp(string_chars, "abc\0\0", 5) != 0) {
       stack[0].ival = 0;
-      env->inc_ref_count(env, stack, string);
-      env->dec_ref_count(env, stack, string);
+      // Assign and destroy
+      void* referent = NULL;
+      env->assign_object(env, stack, &referent, string);
+      env->assign_object(env, stack, &referent, NULL);
       return 0;
     }
     
-    env->inc_ref_count(env, stack, string);
-    env->dec_ref_count(env, stack, string);
+    // Assign and destroy
+    void* referent = NULL;
+    env->assign_object(env, stack, &referent, string);
+    env->assign_object(env, stack, &referent, NULL);
   }
 
   // NULL
@@ -1815,21 +1837,27 @@ int32_t SPVM__TestCase__NativeAPI__new_string_no_mortal(SPVM_ENV* env, SPVM_VALU
 
     if (env->length(env, stack, string) != 4) {
       stack[0].ival = 0;
-      env->inc_ref_count(env, stack, string);
-      env->dec_ref_count(env, stack, string);
+      // Assign and destroy
+      void* referent = NULL;
+      env->assign_object(env, stack, &referent, string);
+      env->assign_object(env, stack, &referent, NULL);
       return 0;
     }
     
     const char* string_chars = env->get_chars(env, stack, string);
     if (strncmp(string_chars, "\0\0\0\0\0", 5) != 0) {
       stack[0].ival = 0;
-      env->inc_ref_count(env, stack, string);
-      env->dec_ref_count(env, stack, string);
+      // Assign and destroy
+      void* referent = NULL;
+      env->assign_object(env, stack, &referent, string);
+      env->assign_object(env, stack, &referent, NULL);
       return 0;
     }
     
-    env->inc_ref_count(env, stack, string);
-    env->dec_ref_count(env, stack, string);
+    // Assign and destroy
+    void* referent = NULL;
+    env->assign_object(env, stack, &referent, string);
+    env->assign_object(env, stack, &referent, NULL);
   }
 
   // NULL 0
@@ -1838,21 +1866,27 @@ int32_t SPVM__TestCase__NativeAPI__new_string_no_mortal(SPVM_ENV* env, SPVM_VALU
 
     if (env->length(env, stack, string) != 0) {
       stack[0].ival = 0;
-      env->inc_ref_count(env, stack, string);
-      env->dec_ref_count(env, stack, string);
+      // Assign and destroy
+      void* referent = NULL;
+      env->assign_object(env, stack, &referent, string);
+      env->assign_object(env, stack, &referent, NULL);
       return 0;
     }
     
     const char* string_chars = env->get_chars(env, stack, string);
     if (strncmp(string_chars, "\0", 1) != 0) {
       stack[0].ival = 0;
-      env->inc_ref_count(env, stack, string);
-      env->dec_ref_count(env, stack, string);
+      // Assign and destroy
+      void* referent = NULL;
+      env->assign_object(env, stack, &referent, string);
+      env->assign_object(env, stack, &referent, NULL);
       return 0;
     }
     
-    env->inc_ref_count(env, stack, string);
-    env->dec_ref_count(env, stack, string);
+    // Assign and destroy
+    void* referent = NULL;
+    env->assign_object(env, stack, &referent, string);
+    env->assign_object(env, stack, &referent, NULL);
   }
 
 
@@ -1985,28 +2019,36 @@ int32_t SPVM__TestCase__NativeAPI__new_string_nolen_no_mortal(SPVM_ENV* env, SPV
     int32_t string_type_dimension = env->get_object_type_dimension(env, stack, string);
     if (!(strcmp(string_basic_type_name, "string") == 0 && string_type_dimension == 0)) {
       stack[0].ival = 0;
-      env->inc_ref_count(env, stack, string);
-      env->dec_ref_count(env, stack, string);
+      // Assign and destroy
+      void* referent = NULL;
+      env->assign_object(env, stack, &referent, string);
+      env->assign_object(env, stack, &referent, NULL);
       return 0;
     }
 
     if (env->length(env, stack, string) != 3) {
       stack[0].ival = 0;
-      env->inc_ref_count(env, stack, string);
-      env->dec_ref_count(env, stack, string);
+      // Assign and destroy
+      void* referent = NULL;
+      env->assign_object(env, stack, &referent, string);
+      env->assign_object(env, stack, &referent, NULL);
       return 0;
     }
     
     const char* string_chars = env->get_chars(env, stack, string);
     if (strcmp(string_chars, "abc") != 0) {
       stack[0].ival = 0;
-      env->inc_ref_count(env, stack, string);
-      env->dec_ref_count(env, stack, string);
+      // Assign and destroy
+      void* referent = NULL;
+      env->assign_object(env, stack, &referent, string);
+      env->assign_object(env, stack, &referent, NULL);
       return 0;
     }
     
-    env->inc_ref_count(env, stack, string);
-    env->dec_ref_count(env, stack, string);
+    // Assign and destroy
+    void* referent = NULL;
+    env->assign_object(env, stack, &referent, string);
+    env->assign_object(env, stack, &referent, NULL);
   }
 
   // ""
@@ -2015,21 +2057,27 @@ int32_t SPVM__TestCase__NativeAPI__new_string_nolen_no_mortal(SPVM_ENV* env, SPV
 
     if (env->length(env, stack, string) != 0) {
       stack[0].ival = 0;
-      env->inc_ref_count(env, stack, string);
-      env->dec_ref_count(env, stack, string);
+      // Assign and destroy
+      void* referent = NULL;
+      env->assign_object(env, stack, &referent, string);
+      env->assign_object(env, stack, &referent, NULL);
       return 0;
     }
     
     const char* string_chars = env->get_chars(env, stack, string);
     if (strcmp(string_chars, "") != 0) {
       stack[0].ival = 0;
-      env->inc_ref_count(env, stack, string);
-      env->dec_ref_count(env, stack, string);
+      // Assign and destroy
+      void* referent = NULL;
+      env->assign_object(env, stack, &referent, string);
+      env->assign_object(env, stack, &referent, NULL);
       return 0;
     }
     
-    env->inc_ref_count(env, stack, string);
-    env->dec_ref_count(env, stack, string);
+    // Assign and destroy
+    void* referent = NULL;
+    env->assign_object(env, stack, &referent, string);
+    env->assign_object(env, stack, &referent, NULL);
   }
 
   stack[0].ival = 1;
@@ -2229,18 +2277,18 @@ int32_t SPVM__TestCase__NativeAPI__new_memory_apis(SPVM_ENV* env, SPVM_VALUE* st
   int32_t error = 0;
   
   {
-    int32_t memory_blocks_count_env_start = env->get_memory_blocks_count_env(env);
+    int32_t memory_blocks_count_start = env->get_memory_blocks_count(env, stack);
     
-    void* memory_block = env->new_memory_env(env, sizeof(SPVM_ENV));
+    void* memory_block = env->new_memory_block(env, stack, sizeof(SPVM_ENV));
     
-    if (!(env->get_memory_blocks_count_env(env) == memory_blocks_count_env_start + 1)) {
+    if (!(env->get_memory_blocks_count(env, stack) == memory_blocks_count_start + 1)) {
       stack[0].ival = 0;
       return 0;
     }
     
-    env->free_memory_env(env, memory_block);
+    env->free_memory_block(env, stack, memory_block);
     
-    if (!(env->get_memory_blocks_count_env(env) == memory_blocks_count_env_start)) {
+    if (!(env->get_memory_blocks_count(env, stack) == memory_blocks_count_start)) {
       stack[0].ival = 0;
       return 0;
     }
@@ -2250,52 +2298,32 @@ int32_t SPVM__TestCase__NativeAPI__new_memory_apis(SPVM_ENV* env, SPVM_VALUE* st
     void* new_stack = env->new_stack(env);
     env->free_stack(env, new_stack);
   }
-
+  
   {
     void* new_stack = env->new_stack(env);
-
-    int32_t memory_blocks_count_env_start = env->get_memory_blocks_count_env(env);
     
-    int32_t memory_blocks_count_stack_start = env->get_memory_blocks_count_stack(env, stack);
-    int32_t memory_blocks_count_new_stack_start = env->get_memory_blocks_count_stack(env, new_stack);
+    int32_t memory_blocks_count_start_stack = env->get_memory_blocks_count(env, stack);
+    int32_t memory_blocks_count_start_new_stack = env->get_memory_blocks_count(env, new_stack);
     
-    void* memory_block_stack = env->new_memory_stack(env, stack, sizeof(SPVM_ENV));
-    void* memory_block_new_stack = env->new_memory_stack(env, new_stack, sizeof(SPVM_ENV));
-
-    if (!(env->get_memory_blocks_count_env(env) == memory_blocks_count_env_start + 2)) {
+    void* memory_block_new_stack = env->new_memory_block(env, new_stack, 8);
+    
+    if (!(env->get_memory_blocks_count(env, new_stack) == memory_blocks_count_start_new_stack + 1)) {
       stack[0].ival = 0;
       return 0;
     }
     
-    if (!(env->get_memory_blocks_count_stack(env, stack) == memory_blocks_count_stack_start + 1)) {
-      stack[0].ival = 0;
-      return 0;
-    }
-
-    if (!(env->get_memory_blocks_count_stack(env, new_stack) == memory_blocks_count_new_stack_start + 1)) {
+    if (!(env->get_memory_blocks_count(env, stack) == memory_blocks_count_start_stack)) {
       stack[0].ival = 0;
       return 0;
     }
     
+    env->free_memory_block(env, new_stack, memory_block_new_stack);
     
-    env->free_memory_stack(env, stack, memory_block_stack);
-    env->free_memory_stack(env, new_stack, memory_block_new_stack);
-
-    if (!(env->get_memory_blocks_count_env(env) == memory_blocks_count_env_start)) {
+    if (!(env->get_memory_blocks_count(env, new_stack) == memory_blocks_count_start_new_stack)) {
       stack[0].ival = 0;
       return 0;
     }
-    
-    if (!(env->get_memory_blocks_count_stack(env, stack) == memory_blocks_count_stack_start)) {
-      stack[0].ival = 0;
-      return 0;
-    }
-    
-    if (!(env->get_memory_blocks_count_stack(env, new_stack) == memory_blocks_count_new_stack_start)) {
-      stack[0].ival = 0;
-      return 0;
-    }
-    
+   
     env->free_stack(env, new_stack);
   }
   
@@ -2384,7 +2412,7 @@ int32_t SPVM__TestCase__NativeAPI__new_object_array_no_mortal(SPVM_ENV* env, SPV
     return 0;
   }
   
-  if (!(env->get_ref_count(env, stack, obj_object_array) == 0)) {
+  if (!(env->api->internal->get_ref_count(env, stack, obj_object_array) == 0)) {
     stack[0].ival = 0;
     return 0;
   }
@@ -2394,11 +2422,13 @@ int32_t SPVM__TestCase__NativeAPI__new_object_array_no_mortal(SPVM_ENV* env, SPV
     return 0;
   }
   
-  // Free
-  env->inc_ref_count(env, stack, obj_object_array);
-  env->dec_ref_count(env, stack, obj_object_array);
+  // Assign and destroy
+  void* referent = NULL;
+  env->assign_object(env, stack, &referent, obj_object_array);
+  env->assign_object(env, stack, &referent, NULL);
   
   stack[0].ival = 1;
+  
   return 0;
 }
 
@@ -2411,7 +2441,7 @@ int32_t SPVM__TestCase__NativeAPI__new_object_array(SPVM_ENV* env, SPVM_VALUE* s
     return 0;
   }
   
-  if (!(env->get_ref_count(env, stack, obj_object_array) == 1)) {
+  if (!(env->api->internal->get_ref_count(env, stack, obj_object_array) == 1)) {
     stack[0].ival = 0;
     return 0;
   }
@@ -2434,7 +2464,7 @@ int32_t SPVM__TestCase__NativeAPI__new_string_array(SPVM_ENV* env, SPVM_VALUE* s
     return 0;
   }
   
-  if (!(env->get_ref_count(env, stack, obj_string_array) == 1)) {
+  if (!(env->api->internal->get_ref_count(env, stack, obj_string_array) == 1)) {
     stack[0].ival = 0;
     return 0;
   }
@@ -2629,22 +2659,29 @@ int32_t SPVM__TestCase__NativeAPI__dumpc(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__TestCase__NativeAPI__check_stdin_stdout_stderr_binary_mode(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32  
-  int32_t stdin_old_mode = _setmode(0, _O_BINARY);
+int32_t SPVM__TestCase__NativeAPI__check_stdio_binary_mode(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  FILE* spvm_stdin = env->api->runtime->get_spvm_stdin(env->runtime);
+  
+  FILE* spvm_stdout = env->api->runtime->get_spvm_stdout(env->runtime);
+  
+  FILE* spvm_stderr = env->api->runtime->get_spvm_stderr(env->runtime);
+  
+#if defined(_WIN32)  
+  int32_t stdin_old_mode = setmode(fileno(spvm_stdin), _O_BINARY);
   
   if (!(stdin_old_mode == _O_BINARY)) {
     stack[0].ival = 0;
     return 0;
   }
   
-  int32_t stdout_old_mode = _setmode(1, _O_BINARY);
+  int32_t stdout_old_mode = setmode(fileno(spvm_stdout), _O_BINARY);
   if (!(stdout_old_mode == _O_BINARY)) {
     stack[0].ival = 0;
     return 0;
   }
   
-  int32_t stderr_old_mode = _setmode(2, _O_BINARY);
+  int32_t stderr_old_mode = setmode(fileno(spvm_stderr), _O_BINARY);
   if (!(stderr_old_mode == _O_BINARY)) {
     stack[0].ival = 0;
     return 0;
@@ -2851,3 +2888,137 @@ int32_t SPVM__TestCase__NativeAPI__get_object_basic_type_name(SPVM_ENV* env, SPV
   
   return 0;
 }
+
+int32_t SPVM__TestCase__NativeAPI__save_stdout_windows_binary_mode(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error = 0;
+  
+#if defined(_WIN32)
+  int32_t stdout_mode_current = setmode(fileno(stdout), _O_BINARY);
+  if (!(stdout_mode_current == _O_BINARY)) {
+    return env->die(env, stack, "stdout mode must be _O_BINARY.");
+  }
+  
+  env->set_class_var_int_by_name(env, stack, "TestCase::NativeAPI", "$STDOUT_WINDOWS_BINARY_MODE", stdout_mode_current, &error, __func__, FILE_NAME, __LINE__);
+  if (error) { return error; }
+  
+#endif
+  
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__save_stderr_windows_binary_mode(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error = 0;
+  
+#if defined(_WIN32)
+  int32_t stderr_mode_current = setmode(fileno(stderr), _O_BINARY);
+  if (!(stderr_mode_current == _O_BINARY)) {
+    return env->die(env, stack, "stderr mode must be _O_BINARY.");
+  }
+  
+  env->set_class_var_int_by_name(env, stack, "TestCase::NativeAPI", "$STDERR_WINDOWS_BINARY_MODE", stderr_mode_current, &error, __func__, FILE_NAME, __LINE__);
+  if (error) { return error; }
+  
+#endif
+  
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__save_stdin_windows_binary_mode(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error = 0;
+  
+#if defined(_WIN32)
+  int32_t stdin_mode_current = setmode(fileno(stdin), _O_BINARY);
+  if (!(stdin_mode_current == _O_BINARY)) {
+    return env->die(env, stack, "stdin mode must be _O_BINARY.");
+  }
+  
+  env->set_class_var_int_by_name(env, stack, "TestCase::NativeAPI", "$STDIN_WINDOWS_BINARY_MODE", stdin_mode_current, &error, __func__, FILE_NAME, __LINE__);
+  if (error) { return error; }
+  
+#endif
+  
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__freopen_stdout(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error = 0;
+  
+  void* obj_path = stack[0].oval;
+  
+  if (!obj_path) {
+    return env->die(env, stack, "$path must be defined.");
+  }
+  
+  const char* path = env->get_chars(env, stack, obj_path);
+  
+  FILE* fp = freopen(path, "w", stdout);
+  
+  if (!fp) {
+    return env->die(env, stack, "freopen failed.");
+  }
+  
+#if defined(_WIN32)
+  int32_t stdout_mode_current = env->get_class_var_int_by_name(env, stack, "TestCase::NativeAPI", "$STDOUT_WINDOWS_BINARY_MODE", &error, __func__, FILE_NAME, __LINE__);
+  if (error) { return error; }
+  setmode(fileno(fp), stdout_mode_current);
+#endif
+  
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__close_stdout(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error = 0;
+  
+  int32_t status = fclose(stdout);
+  
+  if (!(status == 0)) {
+    return env->die(env, stack, "fclose failed.");
+  }
+  
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__freopen_stderr(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error = 0;
+  
+  void* obj_path = stack[0].oval;
+  
+  if (!obj_path) {
+    return env->die(env, stack, "$path must be defined.");
+  }
+  
+  const char* path = env->get_chars(env, stack, obj_path);
+  
+  FILE* fp = freopen(path, "w", stderr);
+  
+  if (!fp) {
+    return env->die(env, stack, "freopen failed.");
+  }
+  
+#if defined(_WIN32)
+  int32_t stderr_mode_current = env->get_class_var_int_by_name(env, stack, "TestCase::NativeAPI", "$STDERR_WINDOWS_BINARY_MODE", &error, __func__, FILE_NAME, __LINE__);
+  setmode(fileno(fp), stderr_mode_current);
+#endif
+  
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__close_stderr(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error = 0;
+  
+  int32_t status = fclose(stderr);
+  
+  if (!(status == 0)) {
+    return env->die(env, stack, "fclose failed.");
+  }
+  
+  return 0;
+}
+

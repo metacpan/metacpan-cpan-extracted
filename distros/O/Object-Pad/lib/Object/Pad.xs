@@ -37,16 +37,6 @@
 #  define HAVE_UNOP_AUX_PV
 #endif
 
-#ifdef HAVE_UNOP_AUX
-#  define METHSTART_CONTAINS_FIELD_BINDINGS
-
-/* We'll reserve the top two bits of a UV for storing the `type` value for a
- * fieldpad operation; the remainder stores the fieldix itself */
-#  define UVBITS (UVSIZE*8)
-#  define FIELDIX_TYPE_SHIFT  (UVBITS-2)
-#  define FIELDIX_MASK        ((1LL<<FIELDIX_TYPE_SHIFT)-1)
-#endif
-
 #include "object_pad.h"
 #include "class.h"
 #include "field.h"
@@ -84,9 +74,9 @@ void ObjectPad_extend_pad_vars(pTHX_ const ClassMeta *meta)
     croak("ARGH: Expected that padix[$self] = 1");
 
   /* Give it a name that isn't valid as a Perl variable so it can't collide */
-  padix = pad_add_name_pvs("@(Object::Pad/slots)", 0, NULL, NULL);
-  if(padix != PADIX_SLOTS)
-    croak("ARGH: Expected that padix[@slots] = 2");
+  padix = pad_add_name_pvs("@(Object::Pad/fields)", 0, NULL, NULL);
+  if(padix != PADIX_FIELDS)
+    croak("ARGH: Expected that padix[@fields] = 2");
 
   if(meta->type == METATYPE_ROLE) {
     /* Don't give this a padname or Future::AsyncAwait will break it (RT137649) */
@@ -169,38 +159,25 @@ static OP *pp_methstart(pTHX)
   save_clearsv(&PAD_SVl(PADIX_SELF));
   sv_setsv(PAD_SVl(PADIX_SELF), self);
 
-  AV *backingav;
+  SV *fieldstore;
 
   if(is_role) {
     if(embedding == &ObjectPad__embedding_standalone) {
-      backingav = NULL;
+      fieldstore = NULL;
     }
     else {
-      SV *instancedata = get_obj_backingav(self, embedding->classmeta->repr, create);
-
-      if(create) {
-        backingav = (AV *)instancedata;
-        SvREFCNT_inc((SV *)backingav);
-      }
-      else {
-        backingav = newAV();
-        /* MASSIVE CHEAT */
-        AvARRAY(backingav) = AvARRAY(instancedata) + offset;
-        AvFILLp(backingav) = AvFILLp(instancedata) - offset;
-        AvREAL_off(backingav);
-      }
+      fieldstore = get_obj_fieldstore(self, embedding->classmeta->repr, create);
     }
   }
   else {
     /* op_private contains the repr type so we can extract backing */
-    backingav = (AV *)get_obj_backingav(self, PL_op->op_private, create);
-    SvREFCNT_inc(backingav);
+    fieldstore = get_obj_fieldstore(self, PL_op->op_private, create);
   }
 
-  if(backingav) {
-    SAVESPTR(PAD_SVl(PADIX_SLOTS));
-    PAD_SVl(PADIX_SLOTS) = (SV *)backingav;
-    save_freesv((SV *)backingav);
+  if(fieldstore) {
+    SAVESPTR(PAD_SVl(PADIX_FIELDS));
+    PAD_SVl(PADIX_FIELDS) = SvREFCNT_inc(fieldstore);
+    save_freesv(fieldstore);
   }
 
 #ifdef METHSTART_CONTAINS_FIELD_BINDINGS
@@ -208,14 +185,14 @@ static OP *pp_methstart(pTHX)
   if(aux) {
     U32 fieldcount  = (aux++)->uv;
     U32 max_fieldix = (aux++)->uv;
-    SV **fieldsvs = AvARRAY(backingav);
+    SV **fieldsvs = fieldstore_fields(fieldstore);
 
-    if(max_fieldix > av_top_index(backingav))
+    if(max_fieldix + offset > fieldstore_maxfield(fieldstore))
       croak("ARGH: instance does not have a field at index %ld", (long int)max_fieldix);
 
     while(fieldcount) {
       PADOFFSET padix   = (aux++)->uv;
-      UV        fieldix = (aux++)->uv;
+      UV        fieldix = (aux++)->uv + offset;
 
       U8 private = fieldix >> FIELDIX_TYPE_SHIFT;
       fieldix &= FIELDIX_MASK;
@@ -225,6 +202,8 @@ static OP *pp_methstart(pTHX)
       fieldcount--;
     }
   }
+#else
+  PERL_UNUSED_VAR(offset);
 #endif
 
   return PL_op->op_next;
@@ -274,17 +253,23 @@ static OP *pp_fieldpad(pTHX)
   UNOP_with_IV *op = (UNOP_with_IV *)PL_op;
   FIELDOFFSET fieldix = op->iv;
 #endif
-  PADOFFSET targ = PL_op->op_targ;
+  PADOFFSET padix = PL_op->op_targ;
 
-  if(SvTYPE(PAD_SV(PADIX_SLOTS)) != SVt_PVAV)
-    croak("ARGH: expected ARRAY of slots at PADIX_SLOTS");
+  if(PL_op->op_flags & OPf_SPECIAL) {
+    RoleEmbedding *embedding = get_embedding_from_pad();
 
-  AV *backingav = (AV *)PAD_SV(PADIX_SLOTS);
+    if(embedding && embedding != &ObjectPad__embedding_standalone) {
+      fieldix += embedding->offset;
+    }
+  }
 
-  if(fieldix > av_top_index(backingav))
+  SV *fieldstore = PAD_SV(PADIX_FIELDS);
+
+  SV **fieldsvs = fieldstore_fields(fieldstore);
+  if(fieldix > fieldstore_maxfield(fieldstore))
     croak("ARGH: instance does not have a field at index %ld", (long int)fieldix);
 
-  bind_field_to_pad(AvARRAY(backingav)[fieldix], fieldix, PL_op->op_private, targ);
+  bind_field_to_pad(fieldsvs[fieldix], fieldix, PL_op->op_private, padix);
 
   return PL_op->op_next;
 }
@@ -1832,8 +1817,8 @@ void ObjectPad__need_PLparser(pTHX)
 }
 
 /* used by XSUB deconstruct_object */
-#define deconstruct_object_class(av, classmeta, offset)  S_deconstruct_object_class(aTHX_ av, classmeta, offset)
-static U32 S_deconstruct_object_class(pTHX_ AV *backingav, ClassMeta *classmeta, FIELDOFFSET offset)
+#define deconstruct_object_class(fieldstore, classmeta, offset)  S_deconstruct_object_class(aTHX_ fieldstore, classmeta, offset)
+static U32 S_deconstruct_object_class(pTHX_ SV *fieldstore, ClassMeta *classmeta, FIELDOFFSET offset)
 {
   dSP;
   U32 retcount = 0;
@@ -1842,6 +1827,8 @@ static U32 S_deconstruct_object_class(pTHX_ AV *backingav, ClassMeta *classmeta,
 
   EXTEND(SP, nfields * 2);
 
+  SV **fieldsvs = fieldstore_fields(fieldstore);
+
   FIELDOFFSET i;
   for(i = 0; i < nfields; i++) {
     FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
@@ -1849,7 +1836,7 @@ static U32 S_deconstruct_object_class(pTHX_ AV *backingav, ClassMeta *classmeta,
     mPUSHs(newSVpvf("%" SVf ".%" SVf,
         SVfARG(classmeta->name), SVfARG(fieldmeta->name)));
 
-    SV *value = AvARRAY(backingav)[offset + fieldmeta->fieldix];
+    SV *value = fieldsvs[fieldmeta->fieldix + offset];
     switch(SvPV_nolen(fieldmeta->name)[0]) {
       case '$':
         value = newSVsv(value);
@@ -1875,8 +1862,8 @@ static U32 S_deconstruct_object_class(pTHX_ AV *backingav, ClassMeta *classmeta,
 }
 
 /* used by XSUB ref_field */
-#define ref_field_class(want_fieldname, backingav, classmeta, offset)  S_ref_field_class(aTHX_ want_fieldname, backingav, classmeta, offset)
-static SV *S_ref_field_class(pTHX_ SV *want_fieldname, AV *backingav, ClassMeta *classmeta, FIELDOFFSET offset)
+#define ref_field_class(want_fieldname, fieldstore, classmeta, offset)  S_ref_field_class(aTHX_ want_fieldname, fieldstore, classmeta, offset)
+static SV *S_ref_field_class(pTHX_ SV *want_fieldname, SV *fieldstore, ClassMeta *classmeta, FIELDOFFSET offset)
 {
   AV *fields = classmeta->direct_fields;
   U32 nfields = av_count(fields);
@@ -1889,7 +1876,7 @@ static SV *S_ref_field_class(pTHX_ SV *want_fieldname, AV *backingav, ClassMeta 
       continue;
 
     /* found it */
-    SV *sv = AvARRAY(backingav)[offset + fieldmeta->fieldix];
+    SV *sv = fieldstore_fields(fieldstore)[fieldmeta->fieldix + offset];
     switch(SvPV_nolen(fieldmeta->name)[0]) {
       case '$':
         return newRV_inc(sv);
@@ -1991,7 +1978,7 @@ deconstruct_object(SV *obj)
 
     ClassMeta *classmeta = mop_get_class_for_stash(SvSTASH(SvRV(obj)));
 
-    AV *backingav = (AV *)get_obj_backingav(obj, classmeta->repr, true);
+    SV *fieldstore = get_obj_fieldstore(obj, classmeta->repr, true);
 
     U32 retcount = 0;
 
@@ -2001,14 +1988,14 @@ deconstruct_object(SV *obj)
     PUTBACK;
 
     while(classmeta) {
-      retcount += deconstruct_object_class(backingav, classmeta, 0);
+      retcount += deconstruct_object_class(fieldstore, classmeta, 0);
 
       AV *roles = classmeta->cls.direct_roles;
       U32 nroles = av_count(roles);
       for(U32 i = 0; i < nroles; i++) {
         RoleEmbedding *embedding = (RoleEmbedding *)AvARRAY(roles)[i];
 
-        retcount += deconstruct_object_class(backingav, embedding->rolemeta, embedding->offset);
+        retcount += deconstruct_object_class(fieldstore, embedding->rolemeta, embedding->offset);
       }
 
       classmeta = classmeta->cls.supermeta;
@@ -2045,11 +2032,11 @@ ref_field(SV *fieldname, SV *obj)
 
     ClassMeta *classmeta = mop_get_class_for_stash(SvSTASH(SvRV(obj)));
 
-    AV *backingav = (AV *)get_obj_backingav(obj, classmeta->repr, true);
+    SV *fieldstore = get_obj_fieldstore(obj, classmeta->repr, true);
 
     while(classmeta) {
       if(!want_classname || sv_eq(want_classname, classmeta->name)) {
-        RETVAL = ref_field_class(want_fieldname, backingav, classmeta, 0);
+        RETVAL = ref_field_class(want_fieldname, fieldstore, classmeta, 0);
         if(RETVAL)
           goto done;
       }
@@ -2060,7 +2047,7 @@ ref_field(SV *fieldname, SV *obj)
         RoleEmbedding *embedding = (RoleEmbedding *)AvARRAY(roles)[i];
 
         if(!want_classname || sv_eq(want_classname, embedding->rolemeta->name)) {
-          RETVAL = ref_field_class(want_fieldname, backingav, embedding->rolemeta, embedding->offset);
+          RETVAL = ref_field_class(want_fieldname, fieldstore, embedding->rolemeta, embedding->offset);
           if(RETVAL)
             goto done;
         }

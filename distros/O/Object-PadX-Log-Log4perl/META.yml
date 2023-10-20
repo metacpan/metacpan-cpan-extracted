@@ -22,14 +22,14 @@ name: Object-PadX-Log-Log4perl
 provides:
   Object::PadX::Log::Log4perl:
     file: lib/Object/PadX/Log/Log4perl.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Log::Log4perl: '0'
-  Object::Pad: '0'
+  Object::Pad: '0.66'
   perl: v5.26.0
 resources:
   repository: git://gitlab.com/waterkip/object-padx-log-log4perl.git
-version: '0.001'
+version: '0.002'
 x_contributors:
   - 'Wesley Schwengle <waterkip@cpan.org>'
 x_generated_by_perl: v5.36.0

@@ -29,6 +29,7 @@ lib/App/Oozie/Constants.pm
 lib/App/Oozie/Date.pm
 lib/App/Oozie/Deploy.pm
 lib/App/Oozie/Deploy/Template.pm
+lib/App/Oozie/Deploy/Template/ttree.pm
 lib/App/Oozie/Deploy/Validate/DAG/Vertex.pm
 lib/App/Oozie/Deploy/Validate/DAG/Workflow.pm
 lib/App/Oozie/Deploy/Validate/Meta.pm
@@ -47,6 +48,7 @@ lib/App/Oozie/Deploy/ttlib/workflow_parameters_xml_end
 lib/App/Oozie/Deploy/ttlib/workflow_parameters_xml_start
 lib/App/Oozie/Deploy/ttlib/workflow_sla_xml
 lib/App/Oozie/Deploy/ttlib/workflow_xmlns
+lib/App/Oozie/Forked/Template/ttree.pm
 lib/App/Oozie/Rerun.pm
 lib/App/Oozie/Role/Fields/Common.pm
 lib/App/Oozie/Role/Fields/Generic.pm

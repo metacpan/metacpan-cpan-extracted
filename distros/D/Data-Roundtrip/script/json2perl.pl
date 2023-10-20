@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.18';
+our $VERSION = '0.24';
 
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
@@ -37,7 +37,7 @@ if( ! Getopt::Long::GetOptions(
   'o=s' => \$OUTPUT_FILE,
   'terse|t!' => \$params{'terse'},
   'indent|t!' => \$params{'indent'},
-  'escape-unicode|e!' => \$params{'dont-bloody-escape-unicode'},
+  'escape-unicode|e!' => sub { $params{'dont-bloody-escape-unicode'} = $_[1] ? 0 : 1 },
 ) ){ die usage() }
 
 if( defined $INPUT_FILE ){
@@ -71,7 +71,7 @@ json2perl.pl : convert JSON data to a Perl variable (dump) which can be parsed o
 
 =head1 VERSION
 
-Version 0.18
+Version 0.24
 
 =head1 SYNOPSIS
 

@@ -234,6 +234,9 @@ sub new_from_header
     return( $obj );
 }
 
+# This class does not convert to an HASH
+sub as_hash { return( $_[0] ); }
+
 sub as_string
 {
     my $self = shift( @_ );

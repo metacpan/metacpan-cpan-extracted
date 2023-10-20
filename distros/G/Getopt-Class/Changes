@@ -1,5 +1,11 @@
 Revision history for Perl module Getopt::Class
 
+v0.104.2 2023-10-11T16:58:23+0900
+    - Corrected malformed signature for distribution release
+
+v0.104.1 2023-09-26T00:51:23+0900
+    - Correcting a bug whereby debug or verbose would not work in Getopt::Class::Values
+
 v0.104.0 2023-05-24T14:57:14+0900
     - Improved this already stable module, by automatically enabling mirror options such as enable-something when disable-something is defined or without-something when with-something is defined in the dictionary.
 

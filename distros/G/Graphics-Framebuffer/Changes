@@ -1279,338 +1279,375 @@ Revision history for Graphics-Framebuffer
        screens).  Someone asked if the module was capable of working in
        single bit monochrome, and currently it does not, but will be soon!
 
-6.12  Jan 08, 2019
+6.12   Jan 08, 2019
 
-      Ok, the last version was a fiasco.  Far too many changes, and they broke
-      everything.  I'll proceed a bit more carefully from now on.  The codebase
-      is restored back to the 6.10 state.
+       Ok, the last version was a fiasco.  Far too many changes, and they broke
+       everything.  I'll proceed a bit more carefully from now on.  The codebase
+       is restored back to the 6.10 state.
 
-      Actual changes are the example scripts.  While finding the issues with
-      6.11, I noticed that the example scripts did not support double-buffering.
-      They do now, and should better run on Raspberry Pi machines if still in
-      16 bit color mode.
+       Actual changes are the example scripts.  While finding the issues with
+       6.11, I noticed that the example scripts did not support double-buffering.
+       They do now, and should better run on Raspberry Pi machines if still in
+       16 bit color mode.
 
-6.13  Jan 10, 2019
+6.13   Jan 10, 2019
 
-      Changes to the splash screen.
+       Changes to the splash screen.
 
-      Changes to the C plotting routines to make way for 1 bit graphics (not
-      yet implemented).
+       Changes to the C plotting routines to make way for 1 bit graphics (not
+       yet implemented).
 
-6.14  Jan 15, 2019
+6.14   Jan 15, 2019
 
-      Stopped using "Sys::Mmap" and switched to the more stable "File::Map"
-      which is very thread friendly.  No need to allocate a separate object for
-      each thread now.  One will do it for all just fine as the
-      "threaded_slideshow.pl" example script shows.
+       Stopped using "Sys::Mmap" and switched to the more stable "File::Map"
+       which is very thread friendly.  No need to allocate a separate object for
+       each thread now.  One will do it for all just fine as the
+       "threaded_slideshow.pl" example script shows.
 
-      Which brings us to a new example script "threaded_slideshow.pl".  It is
-      similar in how you run it as the single threaded "slideshow.pl", but it
-      has the unique ability to divide the screen up by how many threads you
-      request and dedicate a thread to that region and have a slide show
-      managed by as many threads as requested.  Quite interesting to watch.
-      It doesn't have the "--full" switch as it doesn't apply for how it works.
+       Which brings us to a new example script "threaded_slideshow.pl".  It is
+       similar in how you run it as the single threaded "slideshow.pl", but it
+       has the unique ability to divide the screen up by how many threads you
+       request and dedicate a thread to that region and have a slide show
+       managed by as many threads as requested.  Quite interesting to watch.
+       It doesn't have the "--full" switch as it doesn't apply for how it works.
 
-      "Makefile.PL" has undergone an overhaul.  It has a friendlier output and
-      no longer throws a weird licensing error.
+       "Makefile.PL" has undergone an overhaul.  It has a friendlier output and
+       no longer throws a weird licensing error.
 
-      The test scripts have been culled of all but the necessary, and the main
-      test script given double buffering for 16 bit displays.  This doesn't
-      affect 32 bit displays.
+       The test scripts have been culled of all but the necessary, and the main
+       test script given double buffering for 16 bit displays.  This doesn't
+       affect 32 bit displays.
 
-6.15 Jan 20, 2019
+6.15   Jan 20, 2019
 
-      Minor changes to the Splash module.  Turned off alpha output for
-      Nouveau framebuffer devices, and alpha appears to be slow for anything
-      but one way writing.  This allows the logo to show much more quickly on
-      Nouveau devices.
+       Minor changes to the Splash module.  Turned off alpha output for
+       Nouveau framebuffer devices, and alpha appears to be slow for anything
+       but one way writing.  This allows the logo to show much more quickly on
+       Nouveau devices.
 
-      Minor changes to the double buffer setup of the test scripts.
+       Minor changes to the double buffer setup of the test scripts.
 
-6.16  Jan 30, 2019
+6.16   Jan 30, 2019
 
-      Improvements to image animation in the module and in the examples
-      scripts.  Some errors were accounted for.
+       Improvements to image animation in the module and in the examples
+       scripts.  Some errors were accounted for.
 
-6.17  Jan 30, 2019
+6.17   Jan 30, 2019
 
-      Completely removed the double buffer feature.  The 16 bit drawing is
-      sufficiently speedy now with the C acceleration code.  Besides, it was
-      more trouble than it was worth.
+       Completely removed the double buffer feature.  The 16 bit drawing is
+       sufficiently speedy now with the C acceleration code.  Besides, it was
+       more trouble than it was worth.
 
-      Color mapping optimized and corrected for some modes.
+       Color mapping optimized and corrected for some modes.
 
-      'blit_flip' now does nothing, and was only for the double buffering.
+       'blit_flip' now does nothing, and was only for the double buffering.
 
-      The splash screen has been corrected.  Now the "coin" displays correctly.
-      The same screen is displayed for all resolutions.  If your screen is too
-      small to read the splash screen, then just disable it.
+       The splash screen has been corrected.  Now the "coin" displays correctly.
+       The same screen is displayed for all resolutions.  If your screen is too
+       small to read the splash screen, then just disable it.
 
-      All sample scripts have been modified to accommodate the new changes,
-      including the template script.
+       All sample scripts have been modified to accommodate the new changes,
+       including the template script.
 
-6.18  Jan 30, 2019
+6.18   Jan 30, 2019
 
-      Holy smokes!  The META files weren't updating.  No wonder some people
-      were having prerequisite issues.
+       Holy smokes!  The META files weren't updating.  No wonder some people
+       were having prerequisite issues.
 
-6.19  Feb 09, 2019
+6.19   Feb 09, 2019
 
-      Consolidated and improved some internal code.
+       Consolidated and improved some internal code.
 
-      Fixed up the examples scripts.
+       Fixed up the examples scripts.
 
-      Added the new mode method shortcuts.
+       Added the new mode method shortcuts.
 
-      This release is mostly an optimizing and clean up release.
+       This release is mostly an optimizing and clean up release.
 
-      Downgraded the testing requirements a bit.
+       Downgraded the testing requirements a bit.
 
-6.20  Feb 10, 2019
+6.20   Feb 10, 2019
 
-      Fixed a code typo and updated the module's POD.
+       Fixed a code typo and updated the module's POD.
 
-6.21  Feb 20, 2019
+6.21   Feb 20, 2019
 
-      Fixed MakeMaker issues "Kwalitee" brought up.
+       Fixed MakeMaker issues "Kwalitee" brought up.
 
-      Fixed license labeling format in POD.
+       Fixed license labeling format in POD.
 
-      Adjusted "_flush_screen" for updating the STDERR buffer as well.
+       Adjusted "_flush_screen" for updating the STDERR buffer as well.
  
-      Made some tweaks to the "examples" scripts, especially the
-      "threaded_slideshow.pl" script.
+       Made some tweaks to the "examples" scripts, especially the
+       "threaded_slideshow.pl" script.
 
-      Fixed greyscale image loading conversion.  No more weird yellow images.
+       Fixed greyscale image loading conversion.  No more weird yellow images.
 
-      Fixes to the Imager based rotate routines.
+       Fixes to the Imager based rotate routines.
 
-      Fixes to compensate for the incorrect Imager compass coordinates for
-      pies.  Imager was skewing them by 90 degrees for some reason.
+       Fixes to compensate for the incorrect Imager compass coordinates for
+       pies.  Imager was skewing them by 90 degrees for some reason.
 
-6.22  Feb 20, 2019
+6.22   Feb 20, 2019
 
-      Added new method "ttf_paragraph".  It enables more conventional printing
-      a TrueType display, and even word wraps the text.
+       Added new method "ttf_paragraph".  It enables more conventional printing
+       a TrueType display, and even word wraps the text.
 
-      Fixed the cancel issue in the "examples/primitives.pl" script, as well as
-      added the "ttf_paragraph" test to it.
+       Fixed the cancel issue in the "examples/primitives.pl" script, as well as
+       added the "ttf_paragraph" test to it.
 
-      Updated some documentation.
+       Updated some documentation.
 
-      Some issues still with 16 bit mode on texture or patterned filled
-      objects.  Temporarily turning off C acceleration for those may minimize
-      some of the issues.
+       Some issues still with 16 bit mode on texture or patterned filled
+       objects.  Temporarily turning off C acceleration for those may minimize
+       some of the issues.
 
-6.23  Feb 28, 2019
+6.23   Feb 28, 2019
 
-      Numerous bug fixes and optimizations for 16 bit color mode.
+       Numerous bug fixes and optimizations for 16 bit color mode.
 
-      Fills are now handled properly in 16 bit mode.
+       Fills are now handled properly in 16 bit mode.
 
-      Example scripts have been adapted to handle the fixes in 16 bit mode.
-      Previously broken 16 bit code was bypassed, but now it works just like
-      the 24/32 bit routines.
+       Example scripts have been adapted to handle the fixes in 16 bit mode.
+       Previously broken 16 bit code was bypassed, but now it works just like
+       the 24/32 bit routines.
 
-6.24  Mar 13, 2019
+6.24   Mar 13, 2019
 
-      Some minor changes to the C routines to make stack operations more
-      efficient.  Also fixed the order of the functions to prevent warning
-      messages in compilation.
+       Some minor changes to the C routines to make stack operations more
+       efficient.  Also fixed the order of the functions to prevent warning
+       messages in compilation.
 
-      Re-instantiated the previously depreciated active console identification
-      methods.  Unlike the previous ways they were implemented, by being
-      built into the module, they are now left to the user to exploit.
+       Re-instantiated the previously depreciated active console identification
+       methods.  Unlike the previous ways they were implemented, by being
+       built into the module, they are now left to the user to exploit.
 
-      The Makefile.PL was updated.
+       The Makefile.PL was updated.
 
-6.25  Mar 14, 2019
+6.25   Mar 14, 2019
 
-      Made improvements to the "examples/threaded_slideshow.pl" script.  It
-      now waits on the splash screen correctly.  It also loads images while
-      waiting to display the current one.
+       Made improvements to the "examples/threaded_slideshow.pl" script.  It
+       now waits on the splash screen correctly.  It also loads images while
+       waiting to display the current one.
 
-      Added alternate spelling for CENTER constants to allow for CENTRE as
-      well (to keep the British and Canadian folks smiling).
+       Added alternate spelling for CENTER constants to allow for CENTRE as
+       well (to keep the British and Canadian folks smiling).
 
-      Updated the "examples/template.pl" script.
+       Updated the "examples/template.pl" script.
 
-      Fixed the unable to exit bug for some of the "examples/" scripts.  I
-      have no idea why they weren't exiting, but I force an exit with signal
-      handlers that fix the problem (square peg, round role).
+       Fixed the unable to exit bug for some of the "examples/" scripts.  I
+       have no idea why they weren't exiting, but I force an exit with signal
+       handlers that fix the problem (square peg, round role).
 
-      Other bug fixes and improvements to the "examples/" scripts.
+       Other bug fixes and improvements to the "examples/" scripts.
 
-      Added rudimentary mouse handling routines.  This handler uses the
-      "alarm" call of Perl to do mouse polling and drawing.  If you know how
-      to do threads, then I suggest using your own thread that loops and
-      updates shared variables based on the mouse status, rather than these
-      routines.  However, these are here if you need them.
+       Added rudimentary mouse handling routines.  This handler uses the
+       "alarm" call of Perl to do mouse polling and drawing.  If you know how
+       to do threads, then I suggest using your own thread that loops and
+       updates shared variables based on the mouse status, rather than these
+       routines.  However, these are here if you need them.
 
-      Added a new "examples/mouse.pl" script to demonstrate the mouse.  Like I
-      said, it is rudimentary.
+       Added a new "examples/mouse.pl" script to demonstrate the mouse.  Like I
+       said, it is rudimentary.
 
-6.26  Mar 15, 2019
+6.26   Mar 15, 2019
 
-      Made some improvements to the slideshow example scripts.  These scripts
-      now use the current path as the default, if none is passed to them.
+       Made some improvements to the slideshow example scripts.  These scripts
+       now use the current path as the default, if none is passed to them.
 
-      Also made attempts at making the "_console" methods workable... they're
-      flakey still.
+       Also made attempts at making the "_console" methods workable... they're
+       flakey still.
 
-6.27  Apr 27, 2019
+6.27   Apr 27, 2019
 
-      Moved get_pixel and pixel to a more logical location for documentation
+       Moved get_pixel and pixel to a more logical location for documentation
 
-6.28  May 1, 2019
+6.28   May 1, 2019
 
-      Fixed an error in get_pixel and pixel methods.  "replace_color" was
-      having issues and this was the cause.
+       Fixed an error in get_pixel and pixel methods.  "replace_color" was
+       having issues and this was the cause.
 
-6.29  July 17, 2019
+6.29   July 17, 2019
 
-      Fixed the threaded slideshow example script, as well as enabled the
-      ability to show the filename.
+       Fixed the threaded slideshow example script, as well as enabled the
+       ability to show the filename.
 
-6.30  Aug 11, 2019
+6.30   Aug 11, 2019
 
-      Many changes to the example scripts and documentation.
+       Many changes to the example scripts and documentation.
 
-6.31  Aug 24, 2019
+6.31   Aug 24, 2019
 
-      Added "text_mode" and "graphics_mode" methods to make sure text does not
-      interfere with display.
+       Added "text_mode" and "graphics_mode" methods to make sure text does not
+       interfere with display.
 
-      Edited all examples scripts to behave better.
+       Edited all examples scripts to behave better.
 
-      Added a "threaded_template.pl" for those wanting to use threaded
-      graphics.
+       Added a "threaded_template.pl" for those wanting to use threaded
+       graphics.
 
-      The Makefile.PL script has been improved, and now exits where there are
-      missing prerequisites.
+       The Makefile.PL script has been improved, and now exits where there are
+       missing prerequisites.
 
-6.32  Aug 25, 2019
+6.32   Aug 25, 2019
 
-      Adjusted the version numbers of the modules.
+       Adjusted the version numbers of the modules.
 
-6.33  Sept 9, 2019
+6.33   Sept 9, 2019
 
-      RECALLED
-      Fixed an issue with File::Map (thank you Mario Roy).
+       RECALLED
+       Fixed an issue with File::Map (thank you Mario Roy).
 
-      Some documentation fixes.
+       Some documentation fixes.
 
-      README.md and README updated.
+       README.md and README updated.
 
-6.34  Sept 9, 2019
+6.34   Sept 9, 2019
 
-      Issues with different versions of File::Map and exporting unmap.  The
-      above changes incorporated, but an alternate method of unmap used.
+       Issues with different versions of File::Map and exporting unmap.  The
+       above changes incorporated, but an alternate method of unmap used.
 
-6.35  Sept 9, 2019
+6.35   Sept 9, 2019
 
-      Yet another adventure in File::Map.  Now using the ":map" tag to import.
+       Yet another adventure in File::Map.  Now using the ":map" tag to import.
 
-6.36  Oct 7, 2019
+6.36   Oct 7, 2019
 
-      $VERSION is no longer exported.  This caused issues with other modules.
+       $VERSION is no longer exported.  This caused issues with other modules.
       
-      Multiprocesssing examples now have been moved to their own directory in
-      examples.
+       Multiprocesssing examples now have been moved to their own directory in
+       examples.
 
-6.37  Oct 22, 2019
+6.37   Oct 22, 2019
 
-      Because $VERSION is no longer exported by default, the example scripts
-      got hosed.  They have been fixed.  Note, the MCE examples have been
-      given the same fix, if needed.
+       Because $VERSION is no longer exported by default, the example scripts
+       got hosed.  They have been fixed.  Note, the MCE examples have been
+       given the same fix, if needed.
 
-      "pixel" and "get_pixel" return an additional "hex" field for hexadecimal
-      color values.
+       "pixel" and "get_pixel" return an additional "hex" field for hexadecimal
+       color values.
 
-      Removed a lot of "garbage" from the object that is created.
+       Removed a lot of "garbage" from the object that is created.
 
-6.38  Nov 2, 2019
+6.38   Nov 2, 2019
 
-      Added the "GARBAGE" parameter to the "new" method.  It forces it to
-      include extra garbage information in the object that typically just
-      takes up memory and isn't normally used.
+       Added the "GARBAGE" parameter to the "new" method.  It forces it to
+       include extra garbage information in the object that typically just
+       takes up memory and isn't normally used.
 
-      Changed some hidden internal variables.  If you were naughty and used
-      them instead of the proper method call, then your code may break.
+       Changed some hidden internal variables.  If you were naughty and used
+       them instead of the proper method call, then your code may break.
 
-      Changed how Splash and Mouse are exported.
+       Changed how Splash and Mouse are exported.
 
-6.39  Nov 3, 2019
+6.39   Nov 3, 2019
 
-      Fixed a bug in anti-aliased lines introduced in 6.38
+       Fixed a bug in anti-aliased lines introduced in 6.38
 
-6.40  Nov 4, 2019
+6.40   Nov 4, 2019
 
-      Fixed some installation documentation related to installing.
+       Fixed some installation documentation related to installing.
 
-6.41  Nov 30, 2019
+6.41   Nov 30, 2019
 
-      CentOS/Redhat 8 has an empty fonts bug.  This fix accounts for it.
+       CentOS/Redhat 8 has an empty fonts bug.  This fix accounts for it.
 
-      The "examples/multiprocessing/threaded-primitives.pl" had a CPU hog bug,
-      it's now fixed.
+       The "examples/multiprocessing/threaded-primitives.pl" had a CPU hog bug,
+       it's now fixed.
 
-      Thank you Mario Roy for the heads-up on these issues.
+       Thank you Mario Roy for the heads-up on these issues.
 
-6.42  Dec 1, 2019
+6.42   Dec 1, 2019
 
-      Apparently the CentOS/Redhat issue was not quite fixed.  This update
-      addresses that.
+       Apparently the CentOS/Redhat issue was not quite fixed.  This update
+       addresses that.
 
-6.43  Dec 3, 2019
+6.43   Dec 3, 2019
 
-      Made some documentation updates and fixed some examples
+       Made some documentation updates and fixed some examples
 
-6.45  Dec 9, 2019
+6.45   Dec 9, 2019
 
-      More documentation updates and improved the installation instructions.
+       More documentation updates and improved the installation instructions.
 
-6.46  Dec 10, 2019
+6.46   Dec 10, 2019
 
-      Fixed the prerequisite installation scripts.
+       Fixed the prerequisite installation scripts.
 
-6.47  Apr 13, 2020
+6.47   Apr 13, 2020
 
-      Slight change to the example scripts.  Added a new "screensaver.pl"
-      example script.
+       Slight change to the example scripts.  Added a new "screensaver.pl"
+       example script.
 
-6.48  Apr 14, 2020
+6.48   Apr 14, 2020
 
-      Pause was whining about the Makefile.PL script.  So it has been fixed
-      to accommodate the whining.
+       Pause was whining about the Makefile.PL script.  So it has been fixed
+       to accommodate the whining.
 
-6.49  Jun 04, 2021
+6.49   Jun 04, 2021
 
-      Documentation modified to bring up-to-date.
+       Documentation modified to bring up-to-date.
 
-      Bugs in Perl specific ARC routines fixed to match the degree start point
-      as the C accelerated routines.
+       Bugs in Perl specific ARC routines fixed to match the degree start point
+       as the C accelerated routines.
 
-      Sped up the Splash screen for Perl only drawing.
+       Sped up the Splash screen for Perl only drawing.
 
-6.51  Apr 11, 2023
+6.51   Apr 11, 2023
 
-      Fixed a clipping width/height bug in clip_reset
+       Fixed a clipping width/height bug in clip_reset
 
-      Added new parameter to ignore X-Windows check
-	  ( IGNORE_X_WINDOWS => TRUE )
+       Added new parameter to ignore X-Windows check
+	   ( IGNORE_X_WINDOWS => TRUE )
 
-      Fixed YouTube link and description in documentation
+       Fixed YouTube link and description in documentation
 
-6.52  Jul 12, 2023
+6.52   Jul 12, 2023
 
-      Terminfo method has changed and tput call needed to be changed for
-	  turning the cursor on and off.
+       Terminfo method has changed and tput call needed to be changed for
+       turning the cursor on and off.
 
-      Examples given extra option to ignore the X-Windows check
-	  " --ignore-x-windows "
+       Examples given extra option to ignore the X-Windows check
+       " --ignore-x-windows "
 
-6.54  Aug 29, 2023
+6.54   Aug 29, 2023
 
-      Update to "Makefile.PL" for easier to read output.  Also improved
-	  pre-processing.
+       Update to "Makefile.PL" for easier to read output.  Also improved
+       pre-processing.
+
+6.55   Sep 11, 2023
+
+       Eliminated META.* files in the MANIFEST to avoid versioning issues.
+
+       Made additions and corrections to all external text files and
+       documentation.
+
+6.56   Oct 08, 2023
+
+       Loading very small videos is supported, IF ffmpeg is installed.  The
+	   voodoo is to convert to an animated GIF file via ffmpeg, then load
+	   that file, and then show it.  Yes, there is a time penalty, but it
+	   does work.  There is NO SOUND, but you see the video.  FPS is hard
+	   set to 15 FPS.
+
+       When viewing a video, it creates the file "/tmp/output.gif", loads
+	   that file, then deletes that file once loaded.
+
+       It loads the video in its entirety, as an animated GIF.  Therefore,
+	   load only small videos.
+
+       Example scripts full-screen logic has been reversed.  Full screen is
+	   now the default.
+
+       Splash screen is off by default on the example scripts.  You still
+	   need to set "SPLASH" to zero for disabling it in your code.
+
+       Included animated GIF example changed to a much smaller one.
+
+       "dump.pl" improved to be even more helpful for diagnostics.
+
+       Versioning added to the example scripts.
+
+       "slideshow.pl" and "viewpic.pl" added the option "--small" to make it
+	   easy to diagnose bus errors.  It sets an artificial 320x200 screen.
+	   It's a shortcut for "--x=320 --y=200".

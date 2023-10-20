@@ -16,7 +16,7 @@ Otogiri - A lightweight medicine for using database
     
     my @rows = $db->select(book => sql_ge(price => 500));
     
-    ### or non-strict mode
+    # or non-strict mode
     my @rows = $db->select(book => {price => {'>=' => 500}});
 
     for my $r (@rows) {
@@ -28,12 +28,31 @@ Otogiri - A lightweight medicine for using database
     while (my $row = $iter->next) {
         printf "Title: %s \nPrice: %s yen\n", $row->{title}, $row->{price};
     }
+
+    # If you using perl 5.38 or later, you can use class feature.
+    class Book {
+        field $id :param;
+        field $title :param;
+        field $author :param;
+        field $price :param;
+        field $created_at :param;
+        field $updated_at :param;
+
+        method title {
+            return $title;
+        }
+    };
+    my $book = $db->row_class('Book')->single(book => {id => 1}); # $book is Book object.
+    say $book->title; # => say book title.
+    
+    my $hash = $db->no_row_class->single(book => {id => 1}); # $hash is HASH reference.
+    say $hash->{title}; # => say book title.
     
     $db->update(book => [author => 'oreore'], {author => 'me'});
     
     $db->delete(book => {author => 'me'});
     
-    ### using transaction
+    # using transaction
     do {
         my $txn = $db->txn_scope;
         $db->insert(book => ...);

@@ -8,7 +8,7 @@
 
 package Mail::Message::Field;
 use vars '$VERSION';
-$VERSION = '3.013';
+$VERSION = '3.014';
 
 use base 'Mail::Reporter';
 
@@ -444,25 +444,29 @@ sub fold($$;$)
     $line    =~ s/\n(\s)/$1/gms;            # Remove accidental folding
     return " \n" unless CORE::length($line);  # empty field
 
+    my $lname = CORE::length($name);
+    $lname <= $wrap -5  # Cannot find a real limit in the spec
+       or $thing->log(ERROR => "Field name too long (max ".($wrap-5)."), in '$name'");
+
     my @folded;
     while(1)
-    {  my $max = $wrap - (@folded ? 1 : CORE::length($name) + 2);
-       my $min = $max >> 2;
-       last if CORE::length($line) < $max;
+    {   my $max = $wrap - (@folded ? 1 : $lname + 2);
+        my $min = $max >> 2;
+        last if CORE::length($line) < $max;
 
-          $line =~ s/^ ( .{$min,$max}   # $max to 30 chars
-                        [;,]            # followed at a ; or ,
-                       )[ \t]           # and then a WSP
-                    //x
-       || $line =~ s/^ ( .{$min,$max} ) # $max to 30 chars
-                       [ \t]            # followed by a WSP
-                    //x
-       || $line =~ s/^ ( .{$max,}? )    # longer, but minimal chars
-                       [ \t]            # followed by a WSP
-                    //x
-       || $line =~ s/^ (.*) //x;        # everything
+           $line =~ s/^ ( .{$min,$max}   # $max to 30 chars
+                         [;,]            # followed at a ; or ,
+                        )[ \t]           # and then a WSP
+                     //x
+        || $line =~ s/^ ( .{$min,$max} ) # $max to 30 chars
+                        [ \t]            # followed by a WSP
+                     //x
+        || $line =~ s/^ ( .{$max,}? )    # longer, but minimal chars
+                        [ \t]            # followed by a WSP
+                     //x
+        || $line =~ s/^ (.*) //x;        # everything
 
-       push @folded, " $1\n";
+        push @folded, " $1\n";
     }
 
     push @folded, " $line\n" if CORE::length($line);

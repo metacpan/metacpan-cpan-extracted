@@ -9,7 +9,7 @@ use SOAP::Lite; # +trace => 'debug';
 use warnings;
 use strict;
 
-$VMware::API::LabManager::VERSION = '2.11';
+$VMware::API::LabManager::VERSION = '2.12';
 
 ### External methods
 
@@ -1575,6 +1575,12 @@ Lab Manager is a product created by VMware that provides development and test
 teams with a virtual environment to deploy systems and networks of systems in a
 short period of a time.
 
+=head1 END OF LIFE NOTICE:
+
+VMware ended support for Lab Manager on May 31, 2014.
+
+Correspondingly, this module will likely see no further development.
+
 =head1 RETURNED VALUES
 
 Many of the methods return hash references or arrays of hash references that
@@ -2856,11 +2862,11 @@ Boy would this make my life easier to debug issues quickly.
 
 =head1 VERSION
 
-	VMware::API::LabManager v2.11 (2015/06/08)
+	VMware::API::LabManager v2.12 (2023/09/18)
 
 =head1 COPYRIGHT
 
-    (c) 2004-2015, Phillip Pollard <bennie@cpan.org>
+    (c) 2004-2023, Phillip Pollard <bennie@cpan.org>
 
 =head1 LICENSE
 

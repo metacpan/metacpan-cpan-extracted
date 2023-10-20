@@ -12,7 +12,7 @@ with qw{
 	App::Sandy::Role::Template::Sam
 };
 
-our $VERSION = '0.24'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 has 'format' => (
 	is         => 'ro',
@@ -255,7 +255,7 @@ App::Sandy::Seq - Base class to simulate seq entries
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 AUTHORS
 

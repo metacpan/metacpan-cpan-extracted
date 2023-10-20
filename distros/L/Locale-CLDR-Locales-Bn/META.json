@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "DateTime" : "0.72",
-            "Locale::CLDR" : "v0.34.1",
+            "Locale::CLDR" : "v0.34.2",
             "Moo" : "2",
             "MooX::ClassAttribute" : "0.011",
             "Type::Tiny" : "0",
@@ -46,19 +46,19 @@
    "provides" : {
       "Locale::CLDR::Locales::Bn" : {
          "file" : "lib/Locale/CLDR/Locales/Bn.pm",
-         "version" : "v0.34.1"
+         "version" : "v0.34.2"
       },
       "Locale::CLDR::Locales::Bn::Any" : {
          "file" : "lib/Locale/CLDR/Locales/Bn/Any.pm",
-         "version" : "v0.34.1"
+         "version" : "v0.34.2"
       },
       "Locale::CLDR::Locales::Bn::Any::Bd" : {
          "file" : "lib/Locale/CLDR/Locales/Bn/Any/Bd.pm",
-         "version" : "v0.34.1"
+         "version" : "v0.34.2"
       },
       "Locale::CLDR::Locales::Bn::Any::In" : {
          "file" : "lib/Locale/CLDR/Locales/Bn/Any/In.pm",
-         "version" : "v0.34.1"
+         "version" : "v0.34.2"
       }
    },
    "release_status" : "stable",
@@ -71,6 +71,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.34.1",
+   "version" : "v0.34.2",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

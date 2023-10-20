@@ -201,7 +201,7 @@ FASTX::ReaderPaired - Warning, Experimental Paired-End FASTQ files reader, based
 
 =head1 VERSION
 
-version 1.11.0
+version 1.12.0
 
 =head1 SYNOPSIS
 
@@ -216,6 +216,14 @@ version 1.11.0
     print $seq->{name}, "\t", $seq->{seq1}, "\t", $seq->{qual1}, "\n";
     print $seq->{name}, "\t", $seq->{seq2}, "\t", $seq->{qual2}, "\n";
   }
+
+=head1 NAME
+
+FASTX::ReaderPaired - Warning, Experimental Paired-End FASTQ files reader, based on FASTX::Reader.
+
+=head1 VERSION
+
+version 1.11.0
 
 =head1 METHODS
 
@@ -276,6 +284,18 @@ quality for the first and the second pair, respectively
 The FASTA/FASTQ parser this module is based on.
 
 =back
+
+=head1 AUTHOR
+
+Andrea Telatin <andrea@telatin.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =head1 AUTHOR
 

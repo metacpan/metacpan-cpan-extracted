@@ -1,10 +1,10 @@
 {
-   "abstract" : "Contract ABI utilities",
+   "abstract" : "ABI utility for encoding/decoding ethereum contract arguments",
    "author" : [
       "Reginaldo Costa <refeco@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -13,21 +13,26 @@
       "version" : 2
    },
    "name" : "Blockchain-Ethereum-ABI",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
+      "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
       },
-      "configure" : {
+      "develop" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "7.70"
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::PluginBundle::Author::REFECO" : "0",
+            "Software::License::MIT" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::DistManifest" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Portability::Files" : "0",
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -37,23 +42,32 @@
             "Module::Load" : "0.36",
             "Object::Pad" : "0.79",
             "Scalar::Util" : "1.63",
-            "perl" : "5.026000"
+            "perl" : "v5.26.0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Fatal" : "0.016"
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::More" : "0.94"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "homepage" : "https://github.com/refeco/Blockchain-Ethereum-ABI",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/refeco/perl-ABI.git",
-         "web" : "https://github.com/refeco/perl-ABI"
+         "url" : "https://github.com/refeco/Blockchain-Ethereum-ABI.git",
+         "web" : "https://github.com/refeco/Blockchain-Ethereum-ABI"
       }
    },
-   "version" : "0.012",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.013",
+   "x_authority" : "cpan:REFECO",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "MIT"
 }
+

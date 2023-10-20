@@ -134,6 +134,10 @@ joined together).
 Given a string return a boolean indicating if its marked safe or not.  Since C<safe> and C<raw> never
 double the escapulations / escaping, you probably never need this but saw no reason to not expose it.
 
+=head2 escape_html
+
+A wrapper on L<HTML::Escape> just to make your life a bit easier
+
 =head1 CLASS METHODS
 
 This package exposes the folllowing class methods

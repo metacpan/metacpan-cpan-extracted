@@ -1,0 +1,3 @@
+#pragma once
+
+#define UID2_SDK_VERSION "@PROJECT_VERSION@"

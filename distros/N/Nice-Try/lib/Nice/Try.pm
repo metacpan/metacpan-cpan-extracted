@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v1.3.4
+## Version v1.3.5
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2023/05/06
+## Modified 2023/09/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -23,12 +23,12 @@ BEGIN
     );
     # XXX Only for debugging
     # use Devel::Confess;
-    use PPI;
+    use PPI 1.277;
     use Filter::Util::Call;
     use Scalar::Util ();
     use List::Util ();
     use Want ();
-    our $VERSION = 'v1.3.4';
+    our $VERSION = 'v1.3.5';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -113,11 +113,6 @@ sub filter
             return( $status );
         }
         $line++;
-#         if( /^__(?:DATA|END)__/ )
-#         {
-#             $last_line = $_;
-#             last;
-#         }
         $code .= $_;
         $_ = '';
     }
@@ -128,25 +123,34 @@ sub filter
         # 2021-06-05 (Jacques): fixes the issue No. 3 <https://gitlab.com/jackdeguest/Nice-Try/issues/3>
         # Make sure there is at least a space at the beginning
         $code = ' ' . $code;
-        $self->_message( 4, "Processing $line lines of code." ) if( $self->{debug} >= 4 );
-        my $doc = PPI::Document->new( \$code, readonly => 1 ) || die( "Unable to parse: ", PPI::Document->errstr, "\n$code\n" );
-        # Remove pod
-        # $doc->prune('PPI::Token::Pod');
-        $self->_browse( $doc ) if( $self->{debug_dump} );
-        if( $doc = $self->_parse( $doc ) )
+        if( index( $code, 'try' ) != -1 )
         {
-            $_ = $doc->serialize;
-            # $doc->save( "./dev/debug-parsed.pl" );
-            # $status = 1;
+            $self->_message( 4, "Processing $line lines of code." ) if( $self->{debug} >= 4 );
+            my $doc = PPI::Document->new( \$code, readonly => 1 ) || die( "Unable to parse: ", PPI::Document->errstr, "\n$code\n" );
+            # Remove pod
+            # $doc->prune('PPI::Token::Pod');
+            $self->_browse( $doc ) if( $self->{debug_dump} );
+            if( $doc = $self->_parse( $doc ) )
+            {
+                $_ = $doc->serialize;
+                # $doc->save( "./dev/debug-parsed.pl" );
+                # $status = 1;
+            }
+            # Rollback
+            else
+            {
+                # $self->_message( 5, "Nothing found, restoring code to '$code'" );
+                $_ = $code;
+    #             $status = -1;
+    #             filter_del();
+            }
         }
-        # Rollback
         else
         {
-            # $self->_message( 5, "Nothing found, restoring code to '$code'" );
+            $self->_message( 4, "There does not seem to be any try block in this code, so skipping." );
             $_ = $code;
-#             $status = -1;
-#             filter_del();
         }
+        
         if( CORE::length( $last_line ) )
         {
             $_ .= $last_line;
@@ -668,11 +672,13 @@ sub _parse
         
         my $has_catch_clause = scalar( @$catch_def ) > 0 ? 1 : 0;
         
+        # NOTE: processing finally block
         # Prepare the finally block, if any, and add it below at the appropriate place
         my $fin_block = '';
         if( scalar( @$fin_block_ref ) )
         {
             my $fin_def = $fin_block_ref->[0];
+            $self->_process_sub_token( $fin_def->{block} );
             $self->_process_caller( finally => $fin_def->{block} );
             ## my $finally_block = $fin_def->{block}->content;
             my $finally_block = $self->_serialize( $fin_def->{block} );
@@ -700,6 +706,7 @@ EOT
             }
         }
 
+        # NOTE: processing try blocks
         # Found any try block at all?
         if( scalar( @$try_block_ref ) )
         {
@@ -722,6 +729,8 @@ EOT
             }
             
             $self->_process_loop_breaks( $try_def->{block} );
+            # NOTE: process, in try block, __SUB__ which reference current sub since perl v5.16
+            $self->_process_sub_token( $try_def->{block} );
             $self->_process_caller( try => $try_def->{block} );
             
             ## my $try_block = $try_def->{block}->content;
@@ -785,6 +794,15 @@ EOT
     CORE::local \$\@;
     CORE::eval 
     {
+EOT
+            if( $] >= 5.036000 )
+            {
+                $try_sub .= <<EOT;
+        no warnings 'experimental::args_array_with_signatures';
+EOT
+            }
+
+            $try_sub .= <<EOT;
         if( CORE::defined( \$Nice::Try::WANT ) && CORE::length( \$Nice::Try::WANT ) )
         {
             if( \$Nice::Try::WANT eq 'OBJECT' )
@@ -889,12 +907,19 @@ EOT
             next;
         }
         
+        # NOTE: processing catch block
         my $if_start = <<EOT;
 if( \$Nice::Try::DIED ) 
 {
     if( \$Nice::Try::HAS_CATCH ) 
     {
 EOT
+        if( $] >= 5.036000 )
+        {
+            $if_start .= <<EOT;
+        no warnings 'experimental::args_array_with_signatures';
+EOT
+        }
         $if_start =~ s/\n/ /gs unless( $self->{debug_code} );
         push( @$catch_repl, $if_start );
         if( scalar( @$catch_def ) )
@@ -912,6 +937,8 @@ EOT
                 {
                     $cdef->{block} = $emb;
                 }
+                # NOTE: process, in catch block, __SUB__ which reference current sub since perl v5.16
+                $self->_process_sub_token( $cdef->{block} );
                 
                 if( $cdef->{var} )
                 {
@@ -981,6 +1008,7 @@ EOT
                 # $self->_message( 3, "\$i = $i, \$total_catch = $total_catch and cond = '$cond'" );
                 # my $block = $cdef->{block}->content;
                 $self->_process_loop_breaks( $cdef->{block} );
+                $self->_process_sub_token( $cdef->{block} );
                 $self->_process_caller( catch => $cdef->{block} );
                 my $block = $self->_serialize( $cdef->{block} );
                 $block =~ s/^\{[[:blank:]]*|[[:blank:]]*\}$//gs;
@@ -1228,6 +1256,15 @@ if( ( CORE::defined( \$Nice::Try::WANTARRAY ) || ( defined( \$Nice::Try::BREAK )
       ( Scalar::Util::blessed( \$Nice::Try::RETVAL[0] ) && !\$Nice::Try::RETVAL[0]->isa( 'Nice::Try::SENTINEL' ) ) 
     ) ) 
 {
+EOT
+        if( CORE::scalar( CORE::keys( %warnings:: ) ) && 
+            CORE::exists( $warnings::Bits{args_array_with_signatures} ) )
+        {
+            $last_return_block .= <<EOT;
+    no warnings 'experimental::args_array_with_signatures';
+EOT
+        }
+        $last_return_block .= <<EOT;
     if( !CORE::defined( \$Nice::Try::BREAK ) || \$Nice::Try::BREAK eq 'return' )
     {
         if( CORE::defined( \$Nice::Try::WANT ) && CORE::length( \$Nice::Try::WANT ) )
@@ -1399,7 +1436,18 @@ sub _process_loop_breaks
     my $elem = shift( @_ ) || return( '' );
     no warnings 'uninitialized';
     return( $elem ) if( !$elem->children );
-    $self->_message( 5, "Checking ", scalar( $elem->elements ), " elements for '$elem'" ) if( $self->{debug} >= 5 );
+    my $ct = "$elem";
+    # There is nothing to do
+    if( index( $ct, 'last' ) == -1 &&
+        index( $ct, 'next' ) == -1 &&
+        index( $ct, 'redo' ) == -1 &&
+        index( $ct, 'goto' ) == -1 &&
+        index( $ct, 'return' ) == -1 )
+    {
+        $self->_message( 4, "There is nothing to be done. Key words last, next, redo or goto are not found." );
+        return( '' );
+    }
+    $self->_message( 5, "Checking loop breaks in ", scalar( $elem->elements ), " elements for '$elem'" ) if( $self->{debug} >= 5 );
     foreach my $e ( $elem->elements )
     {
         my $content = $e->content // '';
@@ -1494,6 +1542,141 @@ sub _process_loop_breaks
     # $self->_message( 5, "Element now is: '", sub{ $elem->content }, "'" );
     # $self->_message( 5, "Element now is: '$elem'" );
     # $self->_browse( $elem );
+    return( $elem );
+}
+
+sub _process_sub_token
+{
+    my $self = shift( @_ );
+    my $elem = shift( @_ ) || return( '' );
+    # token __SUB__ is only available since perl v5.16
+    return( '' ) unless( $] >= 5.016000 );
+    if( index( "$elem", '__SUB__' ) == -1 )
+    {
+        $self->_message( 5, "No __SUB__ token found in ", scalar( $elem->elements ), " elements for '$elem'" ) if( $self->{debug} >= 5 );
+        return( '' );
+    }
+    no warnings 'uninitialized';
+    return( $elem ) if( !$elem->children );
+    $self->_message( 5, "Checking __SUB__ token in ", scalar( $elem->elements ), " elements for '$elem'" ) if( $self->{debug} >= 5 );
+    # Look for parent, and if we can find a sub, or an anonymous sub
+    # my $sub = sub{} -> PPI::Token::Word 'sub', PPI::Structure::Block '{'
+    # sub mysub {} -> PPI::Statement::Sub -> PPI::Token::Word 'sub', PPI::Token::Word 'mysub', PPI::Structure::Block '{'
+    my $find_closest_sub;
+    $find_closest_sub = sub
+    {
+        my $e = shift( @_ );
+        return if( !defined( $e ) );
+        my $parent = $e->parent;
+        return if( !$parent );
+        # Keep going up until we find a block
+        while( $parent )
+        {
+            $self->_message( 5, "Checking parent element of class ", $parent->class, " and value $parent" ) if( $self->{debug} >= 5 );
+            if( $parent->class eq 'PPI::Structure::Block' )
+            {
+                my $sub_name;
+                my $prev = $parent->sprevious_sibling;
+                while( $prev )
+                {
+                    if( $prev->content eq 'sub' )
+                    {
+                        return({ element => $parent, name => $sub_name });
+                    }
+                
+                    if( $prev->class eq 'PPI::Token::Word' )
+                    {
+                        if( CORE::defined( $sub_name ) )
+                        {
+                            warn( "Found some redefinition of a subroutine's name at line ", $prev->line_number, " for subroutine '${sub_name}'\n" ) if( warnings::enabled() );
+                        }
+                        $sub_name = $prev->content;
+                    }
+                    $prev = $prev->sprevious_sibling;
+                }
+            }
+            $parent = $parent->parent;
+        }
+        return;
+    };
+    my $def = $find_closest_sub->( $elem );
+    if( $def )
+    {
+        my $block = $def->{element};
+        $self->_message( 5, "Found a sub block at line ", $block->line_number, " of class ", $block->class, " with name '", ( $def->{name} // 'anonymous' ), "'" ) if( $self->{debug} >= 5 );
+        my $sub_token_code = <<'PERL';
+CORE::local $Nice::Try::SUB_TOKEN;
+{
+    use feature 'current_sub';
+    no warnings 'experimental';
+    $Nice::Try::SUB_TOKEN = __SUB__;
+}
+PERL
+        $sub_token_code =~ s/\n//gs;
+#         $sub_token_code .= $block;
+        my $sub_token_doc = PPI::Document->new( \$sub_token_code, readonly => 1 );
+        my @new_elems = $sub_token_doc->elements;
+        # my $new_elem = $sub_token_doc;
+        # $self->_browse( $new_elem );
+        # $new_elem->remove;
+        $_->remove for( @new_elems );
+        $self->_message( 5, "New elements is object '", sub{ join( ', ', map( overload::StrVal( $_ ), @new_elems ) ) }, "' -> $_" ) if( $self->{debug} >= 5 );
+        # $block->replace( $new_elem );
+        # $self->_message( 5, "New element is a PPI::Element ? -> ", ( $new_elem->isa( 'PPI::Element' ) ? 'yes' : 'no' ) );
+        # Not yet implemented as of 2021-05-11 dixit PPI, so we use a hack to make it available anyhow
+        my $rv;
+        my @children = $block->children;
+        if( scalar( @children ) )
+        {
+            my $last = $children[0];
+            for( reverse( @new_elems ) )
+            {
+                $rv = $last->__insert_before( $_ );
+                $self->_message( 5, "Element successfully inserted? ", ( defined( $rv ) ? ( $rv ? 'yes' : 'no' ) : 'no. element provided was not an PPI::Element.' ) ) if( $self->{debug} >= 5 );
+                $last = $_;
+            }
+        }
+        else
+        {
+            for( @new_elems )
+            {
+                $rv = $block->add_element( $_ );
+                $self->_message( 5, "Element successfully inserted? ", ( defined( $rv ) ? ( ref( $rv ) eq 'PPI::Element' ? 'ok' : 'returned value is not an PPI::Element (' . ref( $rv ) . ')' ) : 'no' ) ) if( $self->{debug} >= 5 );
+            }
+        }
+        $self->_message( 5, "Updated block now is '$block' for class '", $block->class, "'." ) if( $self->{debug} >= 5 );
+    }
+    else
+    {
+        $self->_message( 5, "No subroutine found! This is a try-catch block outside of a subroutine." ) if( $self->{debug} >= 5 );
+    }
+    
+    my $crawl;
+    $crawl = sub
+    {
+        my $this = shift( @_ );
+        foreach my $e ( $this->elements )
+        {
+            $self->_message( 5, "Checking element ", overload::StrVal( $e ), " of class ", $e->class, " for token __SUB__" ) if( $self->{debug} >= 5 );
+            if( $e->content eq '__SUB__' )
+            {
+                $self->_message( 5, "Found token __SUB__" ) if( $self->{debug} >= 5 );
+                my $new_ct = '$Nice::Try::SUB_TOKEN';
+                my $new_ct_doc = PPI::Document->new( \$new_ct, readonly => 1 );
+                my $new_token = $new_ct_doc->first_element;
+                $new_token->remove;
+                $e->replace( $new_token );
+            }
+            elsif( $e->can( 'elements' ) &&
+                scalar( $e->elements ) && 
+                index( "$e", '__SUB__' ) != -1 )
+            {
+                $crawl->( $e );
+            }
+        }
+    };
+    $crawl->( $elem );
+    $self->_message( 5, "After processing __SUB__ tokens, try-catch block is now:\n$elem" ) if( $self->{debug} >= 5 );
     return( $elem );
 }
 
@@ -1713,7 +1896,7 @@ sub _serialize
 
 1;
 
-# XXX POD
+# NOTE POD
 __END__
 
 =encoding utf-8
@@ -1857,7 +2040,7 @@ And you also have granular power in the catch block to filter which exception to
 
 =head1 VERSION
 
-    v1.3.4
+    v1.3.5
 
 =head1 DESCRIPTION
 
@@ -2164,7 +2347,7 @@ In group 3, L<TryCatch> was working wonderfully, but was relying on L<Devel::Dec
 
 L<TryCatch> does not support any C<finally> block.
 
-In group 4, there is L<Syntax::Keyword::Try>, which is a great alternative if you do not care about exception class filter (it supports variable assignment since 2020-08-01 with version 0.18).
+In group 4, there is L<Syntax::Keyword::Try>, which is a great alternative if you do not care about exception class filter (it supports class exception since 2020-07-21 with version 0.15 and variable assignment since 2020-08-01 with version 0.18).
 
 Although, the following script would not work under L<Syntax::Keyword::Try> :
 
@@ -2209,7 +2392,7 @@ Since L<perl version 5.33.7|https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exc
 
     use feature 'try'; # will emit a warning this is experimental
 
-This new feature supports try-catch block and variable assignment, but no exception class, nor support for C<finally> block, so you can do:
+This new feature supports try-catch block and variable assignment, but no exception class, nor support for C<finally> block until version L<perl 5.36 released on 2022-05-28|https://perldoc.perl.org/5.36.0/perldelta> of perl, so you can do:
 
     try
     {
@@ -2232,17 +2415,19 @@ But B<you cannot do>:
     {
         return( $self->error( "Something went awry with MyException: $oh_well" ) );
     }
-    # No support for 'finally' yet in perl version 5.33.7
+    # Support for 'finally' has been implemented in perl 5.36 released on 2022-05-28
     finally
     {
         # do some cleanup here
     }
 
+An update as of 2022-05-28, L<perl-v5.36|https://perldoc.perl.org/5.36.0/perldelta#try/catch-can-now-have-a-finally-block-(experimental)> now supports the experimental C<finally> block.
+
 Also, the C<use feature 'try'> expression must be in the relevant block where you use C<try-catch>. You cannot just put it in your C<BEGIN> block at the beginning of your script. If you have 3 subroutines using C<try-catch>, you need to put C<use feature 'try'> in each of them. See L<perl documentation on lexical effect|https://perldoc.perl.org/feature#Lexical-effect> for more explanation on this.
 
 It is probably a matter of time until this is fully implemented in perl as a regular non-experimental feature.
 
-See more information about perl's featured implementation of try-catch in L<perlsyn|https://perldoc.perl.org/5.34.0/perlsyn#Try-Catch-Exception-Handling>
+See more information about perl's featured implementation of try-catch in L<perlsyn|https://perldoc.perl.org/perlsyn#Try-Catch-Exception-Handling>
 
 So, L<Nice::Try> is quite unique and fills the missing features, and since it uses XS modules for a one-time filtering, it is quite fast.
 
@@ -2617,7 +2802,7 @@ The use of L<Want> is also automatically disabled when running under a package t
 
 =head1 LIMITATIONS
 
-Currently, the only known limitation is when one use experimental subroutine attributes inside a try-catch block on an anonymous subroutine. For example:
+Before version C<v1.3.5>, there was a limitation on using signature on a subroutine, but since version C<v1.3.5>, it has been fixed and there is no more any limitation. Thus the following works nicely too.
 
     use strict;
     use warnings;
@@ -2638,27 +2823,30 @@ Currently, the only known limitation is when one use experimental subroutine att
 
     __END__
 
-instead, do not use experimental subroutine attributes inside try-catch block:
+=head1 PERFORMANCE
 
+C<Nice::Try> is quite fast, but as with any class implementing a C<try-catch> block, it is of course a bit slower than the natural C<eval> block.
+
+Because C<Nice::Try> relies on L<PPI> for parsing the perl code, if your code is very long, there will be an execution time penalty.
+
+If you use framework such as L<mod_perl2>, then it will only affect the first time the code is run, since afterward, the code will be loaded in memory.
+
+Still, if you use perl version C<v5.34> or higher, and have simple need of C<try-catch>, then simply use instead perl experimental implementation, such as:
+
+    use v5.34;
     use strict;
     use warnings;
-    use experimental 'signatures';
-    use Nice::Try;
+    use feature 'try';
+    no warnings 'experimental';
 
-    sub test { 1 }
-
-    sub foo ($f = test()) { 1 }
-
-    try {
-        my $k = sub {}; # <-- Now it works normally
-        print( "worked\n" );
+    try
+    {
+        # do something
     }
-    catch($e) {
-        warn "caught: $e";
+    catch( $e )
+    {
+        # catch fatal error here
     }
-
-    __END__
-
 
 =head1 DEBUGGING
 

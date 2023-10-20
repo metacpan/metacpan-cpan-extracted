@@ -71,7 +71,7 @@
 [37;40m      [0m[37;1mreturn[0m[37;40m ([0m[94;1m$index[0m[37;40m, [0m[94;1m$index[0m[37;40m + [0m[96mlength[0m[37;40m([0m[94;1m$txt[0m[37;40m))[0m
 [37;40m   } [0m[37;1melse[0m[37;40m {[0m
 [37;40m      carp [0m[32m"[0m[31;103mCall '[0m[94;1m$call[0m[32m'[0m[31;103m is not a remove type[0m[32m"[0m[37;40m;[0m
-[37;40m      [0m[37;1mreturn[0m[37;40m undef[0m
+[37;40m      [0m[37;1mreturn[0m[37;40m [0m[96mundef[0m
 [37;40m   }[0m
 [37;40m}[0m
 
@@ -81,7 +81,7 @@
 [37;40m      [0m[37;1mreturn[0m[37;40m ([0m[94;1m$index[0m[37;40m, [0m[94;1m$index[0m[37;40m + [0m[96mlength[0m[37;40m([0m[94;1m$old[0m[37;40m), [0m[94;1m$txt[0m[37;40m)[0m
 [37;40m   } [0m[37;1melse[0m[37;40m {[0m
 [37;40m      carp [0m[32m"[0m[31;103mCall '[0m[94;1m$call[0m[32m'[0m[31;103m is not a replace type[0m[32m"[0m[37;40m;[0m
-[37;40m      [0m[37;1mreturn[0m[37;40m undef[0m
+[37;40m      [0m[37;1mreturn[0m[37;40m [0m[96mundef[0m
 [37;40m   }[0m
 [37;40m}[0m
 
@@ -91,7 +91,7 @@
 [37;40m      [0m[37;1mreturn[0m[37;40m [0m[94;1m$txt[0m
 [37;40m   } [0m[37;1melse[0m[37;40m {[0m
 [37;40m      carp [0m[32m"[0m[31;103mCall '[0m[94;1m$call[0m[32m'[0m[31;103m is not a write type[0m[32m"[0m[37;40m;[0m
-[37;40m      [0m[37;1mreturn[0m[37;40m undef[0m
+[37;40m      [0m[37;1mreturn[0m[37;40m [0m[96mundef[0m
 [37;40m   }[0m
 [37;40m}[0m
 

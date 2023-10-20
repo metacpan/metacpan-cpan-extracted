@@ -1,0 +1,60 @@
+---
+abstract: 'Meta CPAN API'
+author:
+  - 'Jacques Deguest (jack@deguest.jp)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.302162'
+  Test::Pod: '1.52'
+  Test::Time: '0.092'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-API-CPAN
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Changes: v0.3.1
+  Clone: '0.46'
+  Data::Pretty: v0.1.7
+  DateTime: '1.59'
+  DateTime::Format::Strptime: '1.79'
+  Email::Address::XS: '1.05'
+  Encode: '3.19'
+  Getopt::Class: v0.104.1
+  HTTP::Promise: v0.3.0
+  IO::Handle: '1.51'
+  JSON: '4.10'
+  Module::Generic: v0.32.3
+  POSIX: '0'
+  Pod::Usage: '2.01'
+  Scalar::Util: '0'
+  Socket: '2.036'
+  Term::ANSIColor::Simple: '0.10'
+  Term::Prompt: '1.04'
+  Term::ReadKey: '2.38'
+  URI: '5.21'
+  URI::git: '0.02'
+  Want: '0.29'
+  constant: '0'
+  curry: '0'
+  open: '0'
+  parent: '0'
+  perl: '5.016000'
+  strict: '0'
+  utf8: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://gitlab.com/jackdeguest/Net-API-CPAN/issues
+  repository: https://gitlab.com/jackdeguest/Net-API-CPAN
+version: v0.1.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

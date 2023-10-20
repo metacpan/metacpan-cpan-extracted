@@ -1,6 +1,8 @@
-FROM madduci/docker-cpp-env:latest
-RUN apk add libressl-dev
-RUN apk add gtest-dev
-COPY . /uid2client
-RUN rm -rf /uid2client/build; mkdir -p /uid2client/build; cd /uid2client/build; cmake .. && make && make test && make install
-ENTRYPOINT ["/uid2client/build/app/example"]
+FROM ubuntu:22.04 as cpp-devtools
+COPY --chmod=755 ./tools/install-ubuntu-devtools.sh .
+
+RUN ./install-ubuntu-devtools.sh
+
+FROM cpp-devtools
+COPY ./tools/install-ubuntu-deps.sh .
+RUN ./install-ubuntu-deps.sh

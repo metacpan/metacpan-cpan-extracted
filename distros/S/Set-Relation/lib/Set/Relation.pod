@@ -4,12 +4,11 @@
 
 =head1 NAME
 
-Set::Relation -
-Relation data type for Perl
+Set::Relation - A relation data type
 
 =head1 VERSION
 
-This document describes Set::Relation version 0.13.2 for Perl.
+This document describes Set::Relation version 0.13.4 for Perl.
 
 =head1 SYNOPSIS
 
@@ -51,30 +50,14 @@ I<This documentation is pending.>
 Set::Relation provides a simple Perl-native facility for an application to
 organize and process information using the relational model of data,
 without having to employ a separate DBMS, and without having to employ a
-whole separate sub-/language (such as L<Muldis::D::RefEng>
+whole separate sub-/language (such as B<Muldis Data Engine Reference>
 does).  Rather, it is integrated a lot more into the Perl way of doing
 things, and you use it much like a Perl array or hash, or like some other
 third-party Set:: modules available for Perl.  This module defines a Perl
-object role that represents a L<Muldis D|Muldis::D> relation value,
-whose methods implement all the Muldis D relational operators.  Or more
+object role that represents a B<Muldis Data Language> relation value,
+whose methods implement all the B<Muldis Data Language> relational operators.  Or more
 specifically, it defines several such roles (immutable and mutable
 variants) and there are several bundled implementing Perl classes.
-
-B<WARNING:  This module is still experimental and may change in
-incompatible ways between releases.  While the module is considered feature
-complete, and is fully documented, and a review of its code makes it look
-correct, most features have in fact not yet been tested in running code and
-so might actually be broken.  This module might in fact work for you now,
-but it is officially alpha quality.  Please use it with caution.>
-
-B<If you want to help out with this module's development, generally the
-most helpful thing you can do to start out is to flesh out the test suite.
-I suggest looking at the test suites of other Set:: modules as well as
-various database related modules as inspiration or a source for copying.>
-
-B<That being said, Set::Relation is several years out of date on its
-tracking of the Muldis D language, so there is limited value in spending a
-lot of time on it before Muldis::D::RefEng has nailed the spec down.>
 
 Loosely speaking, a Set::Relation object is a wrapper over a set of hash
 refs, where all the hash refs in the set have the same number of elements
@@ -101,15 +84,24 @@ this class' objects are functionally set-like collection values.
 
 I<This documentation is pending.>
 
+B<IMPORTANT:  The original author does not intend to make any further major
+updates to this module and any further maintenance will just be minor, such
+as to fix bugs that are reported.  The author intends to replace it with a
+different relation type implementation later.  While the module is
+considered feature complete, and fully documented, and a review of its code
+makes it look correct, most features have not yet been tested in running
+code and so might actually be broken.  This module might work for you now,
+but it is officially alpha quality.  Please use it with caution.>
+
 =head2 Appropriate Uses For Set::Relation
 
 Set::Relation I<is> intended to be used in production environments
-I<(except for the fact it is mostly untested at the moment)>.  It has
+I<(except for the fact it is mostly untested as of this writing)>.  It has
 been developed according to a rigorously thought out API and behaviour
 specification, and it should be easy to learn, to install and use, and to
-extend.  It is expected to be maintained and supported by the original
-author over the long term, either standalone or by the author providing an
-effective migration path to a suitable replacement.
+extend.  I<However, development of this module has also ceased, but for
+fixing of reported bugs, as it is intended to be replaced by some other
+solution that the original author develops afterwards.>
 
 At the same time, the primary design goal of Set::Relation is to be simple.
 
@@ -130,7 +122,7 @@ of magnitude, slower than a hand-rolled task-specific solution.  If your
 primary concern is execution performance, you will most likely not want to
 use Set::Relation but rather hand-code what it does specifically for your
 task with your specific data, or alternately employ some other dependency
-to do the work for you (or even, if necessary, write the task in C).
+to do the work for you (or even, if necessary, write the task in something like C).
 
 Set::Relation is best used in situations where you either want to just get
 some correct solution up and working quickly (conserving developer time),
@@ -199,8 +191,7 @@ Set::Relation is complementary to the things you do with Perl's built-in
 Array and Hash types, including 'map' and 'grep' operations.  It is useful
 when you want to do miscellaneous combining or filtering of lists of data
 against other lists, particularly multi-dimensional ones, or helping in
-summarizing lists of data for reports.  Maybe helping with some tasks that
-are easier in Raku than in Perl, when you're using Perl.
+summarizing lists of data for reports.
 
 =back
 
@@ -208,28 +199,28 @@ Of course, like any generic tool, Set::Relation should be widely applicable
 in many different situations.
 
 Now, another situation where you may not want to use Set::Relation is when
-its sibling project L<Muldis::D::RefEng> would serve you
+its sibling project B<Muldis Data Engine Reference> would serve you
 better.  In contrast to Set::Relation, which is standalone and intended to
-integrate closely with Perl, Muldis::D::RefEng implements a whole programming
-language distinct from Perl, L<Muldis D|Muldis::D>, and presents a superior
+integrate closely with Perl, B<Muldis Data Engine Reference> implements a whole programming
+language distinct from Perl, B<Muldis Data Language>, and presents a superior
 environment at large for working with the relational model of data; you use
 it sort of like how you use L<DBI> to talk to a SQL DBMS, as a separate
-thing walled off from Perl.  The benefits of using Muldis::D::RefEng over
+thing walled off from Perl.  The benefits of using B<Muldis Data Engine Reference> over
 Set::Relation are multiple, including much better performance and
 scalability, and that it can directly persist data as you'd expect a DBMS
 to do, as well as provide easy access to many other relational model
 features like stronger typing and arbitrary database constraints, and
 nested transactions, as well as access to full powered DBMS engines like
 PostgreSQL and Oracle and SQLite (though you don't have to use those and
-Muldis::D::RefEng can be used purely implemented in Perl).
+B<Muldis Data Engine Reference> can be used purely implemented in Perl).
 
 I<That all said, Set::Relation is actually implemented and works today,
-while Muldis::D::RefEng is still under construction and you can't use it yet.>
+while B<Muldis Data Engine Reference> is still under construction and you can't use it yet.>
 
 That brings out another important reason why Set::Relation exists now; it
-also serves as a proof of concept for a main part of Muldis D and
-Muldis::D::RefEng, or for a so-called "truly relational DBMSs" in general.
-It demonstrates ideal features and behaviour for relational operators, in a
+also serves as a proof of concept for a main part of B<Muldis Data Language> and
+B<Muldis Data Engine Reference>, or for a so-called "truly relational DBMSs" in general.
+It demonstrates a semblance of ideal features and behaviour for relational operators, in a
 functioning form that users can experiment with right now.  Set::Relation
 is also meant to serve as inspiration for similar projects, and better
 illustrate features that would be nice for modern programming languages to
@@ -238,27 +229,14 @@ associative arrays and one-dimensional sets and bags built-in.  It I<is>
 reasonable for standard equipment to not just be plain set operators but
 the other relational model operators too, such as relational join.
 
-I<Note:  Assistance is appreciated in making Set::Relation perform better,
-such that some of its present-day caveats can disappear, keeping in mind
-its general design goals.  But generally first we will need to have a
-complete test suite to confirm correct behaviour, and correct any
-outstanding API issues, and preferably also a benchmark suite.  That way,
-when the likely extensive changes are made for performance, we can actually
-measure their effect and know we didn't break the behaviour.  Also if the
-behaviour/API is nailed first, then new benchmarks we make along the way
-will be backwards compatible with previous baseline versions.  But keep in
-mind that only some kinds of improvements are suitable; some others may be
-inordinately complex and may better be relegated to Muldis::D::RefEng or other
-overlapping solutions instead; the distinction can be discussed
-case-by-case as solutions are proposed.>
-
 =head2 Matters of Value Identity
 
 The relational model of data fundamentally involves values as being
 immutable and distinct values having distinct identities, and the type of a
 value is part of its identity.
 
-The relational model has 3 kinds of types and values, called scalar
+For the purposes of this documentation,
+the relational model has 3 kinds of types and values, called scalar
 types/values, tuple types/values, and relation types/values; the 3 are all
 mutually disjoint and no value in one kind can be identical to a value in
 another.  A Set::Relation-doing class treats the objects of all
@@ -323,10 +301,6 @@ convention can be devised like Set::Relation's own 'which' convention)>.
 If you want a Hash-ref/tuple or Set::Relation object to be treated as a
 reference type, then pass it around using another layer of reference
 indirection, such as by adding a scalar-ref up front.
-
-I<Note: Were this Raku, we would basically just use the standard C<WHICH>
-method or C<===> comparison operator to determine identity; but Perl
-doesn't have that so we do the aforementioned instead.>
 
 =head2 Matters of Correctness
 
@@ -453,8 +427,8 @@ object, representing a single relation value, that is initialized primarily
 using the multi-dimensional Perl data structure given in its C<$members>
 argument, which defines the member attributes and tuples of the new
 relation.  The allowed formats of a C<$members> argument mostly are those
-defined by the Muldis D language dialect
-L<HDMD_Perl_STD|Muldis::D::Dialect::HDMD_Perl_STD> for a C<Relation>
+defined by the B<Muldis Data Language> dialect
+L<HDMD_Perl_STD> for a C<Relation>
 value literal node payload, except that attribute values are just ordinary
 Perl values and not HDMD_Perl_STD value literal nodes.  Examples are:
 
@@ -592,8 +566,7 @@ serialization of all the invocant's attribute names and tuple values, all
 of which are encoded and sorted in such a way that any 2 Set::Relation
 values having the same attributes and tuples are guaranteed to have the
 same value identity, and any 2 with different attributes or tuples are
-guaranteed to have different ones.  This method is analogous to the special
-C<WHICH> method of Raku and lets you treat Set::Relation as a "value
+guaranteed to have different ones.  This method lets you treat Set::Relation as a "value
 type".  That all being said, currently the details of the serialization
 format are implementation dependent, and it is assumed that an application
 will exclusively use a single Set::Relation implementation in any
@@ -1728,29 +1701,27 @@ None reported.
 
 =head1 SEE ALSO
 
-The separate all-documentation distribution L<Muldis::D> is the formal
-definition of the Muldis D language, a portion of which Set::Relation is
-mainly based on.  The Muldis D language in turn has as a primary influence
-the work of Chris Date (C.J. Date) and Hugh Darwen whose home website is
-L<http://www.thethirdmanifesto.com/>.
-
 These Perl packages that are in the current distribution are classes that
 implement the Set::Relation roles: L<Set::Relation::V1>,
 L<Set::Relation::V2>.
 
-These other Raku packages: L<Muldis::D::RefEng>, L<Set>.
+These other Perl packages: L<Set::Object>, L<Set::Scalar>.
 
-These other Perl packages: L<Muldis::D::RefEng>, L<Set::Object>,
-L<Set::Scalar>.
+The separate all-documentation project B<Muldis Data Language> is the formal
+definition of the B<Muldis Data Language>, a portion of which Set::Relation is
+mainly based on.  That language definition is a living document hosted on
+GitHub at L<https://github.com/muldis>; as of this writing, that definition
+is years out of date and will be rewritten.
+
+The more modern B<Muldis Object Notation> is the first installment of that
+rewrite and as of this writing is completely up to date; it provides the
+concrete syntax which the rewritten B<Muldis Data Langauge> will use.
+
+The B<Muldis Data Language> in turn has as a primary influence
+the work of Chris Date (C.J. Date) and Hugh Darwen whose home website is
+L<http://thethirdmanifesto.com>.
 
 =head1 BUGS AND LIMITATIONS
-
-The Set::Relation library for Perl does not make explicit attempts in
-code to enforce privacy of the library's internals, besides not documenting
-them as part of the public API.  (The Set::Relation library for Raku is
-different.)  That said, you should still respect that privacy and just use
-the public API that Set::Relation provides.  If you bypass the public API
-anyway, as Perl allows, you do so at your own peril.
 
 I<This documentation is pending.>
 
@@ -1760,7 +1731,7 @@ Darren Duncan (C<darren@DarrenDuncan.net>)
 
 =head1 LICENSE AND COPYRIGHT
 
-Set::Relation is Copyright © 2006-2019, Muldis Data Systems, Inc.
+Set::Relation is Copyright © 2006-2023, Muldis Data Systems, Inc.
 
 L<https://muldis.com>
 
@@ -1796,57 +1767,6 @@ providing files for the test suite, and giving other constructive input.
 
 =head1 FORUMS
 
-Several public email-based forums exist whose main topic is
-the L<Muldis D|Muldis::D> language and its implementations, especially
-the L<Muldis::D::RefEng> reference implementation, but also
-the L<Set::Relation> module.  They exist so that users of Muldis D or
-Muldis::D::RefEng can help each other, or so that help coming from the
-projects' developers can be said once to many people, rather than
-necessarily to each individually.  All of these you can reach via
-L<http://mm.darrenduncan.net/mailman/listinfo>; go there to manage your
-subscriptions to, or view the archives of, the following:
-
-=over
-
-=item C<muldis-db-announce@mm.darrenduncan.net>
-
-This low-volume list is mainly for official announcements from Muldis D
-language or implementation developers, though developers of related projects
-can also post their announcements here.  This is not a discussion list.
-
-=item C<muldis-db-users@mm.darrenduncan.net>
-
-This list is for general discussion among people who are using Muldis D or
-any of its implementations, especially the Muldis::D::RefEng reference
-implementation.  This is the best place to ask for basic help in getting
-Muldis::D::RefEng installed on your machine or to make it do what you want.
-If you are in doubt on which list to use, then use this one by default.
-You could also submit feature requests for Muldis D projects or report
-perceived bugs here, if you don't want to use CPAN's RT system.
-
-=item C<muldis-d-language@mm.darrenduncan.net>
-
-This list is mainly for discussion among people who are designing the
-Muldis D language specification, or who are implementing or adapting Muldis
-D in some form, or who are writing Muldis D documentation, tests, or
-examples.  It is not the main forum for any Muldis D implementations, nor
-is it the place for non-implementers to get help in using said.
-
-=item C<muldis-db-devel@mm.darrenduncan.net>
-
-This list is for discussion among people who are designing or implementing
-Muldis::D::RefEng, or other Muldis D implementations,
-or who are writing Muldis::D::RefEng core documentation,
-tests, or examples.  It is not the main forum for the Muldis D language
-itself, nor is it the place for non-implementers to get help in using said.
-
-=back
-
-An official IRC channel for Muldis D and its implementations is also
-intended, but not yet started.
-
-Alternately, you can purchase more advanced commercial support for various
-Muldis D implementations, particularly Muldis::D::RefEng, from its author by
-way of Muldis Data Systems; see L<https://muldis.com> for details.
+I<This documentation is pending.>
 
 =cut

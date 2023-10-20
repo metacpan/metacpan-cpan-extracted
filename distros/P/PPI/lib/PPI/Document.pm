@@ -75,7 +75,7 @@ use PPI::Node                     ();
 use overload 'bool' => \&PPI::Util::TRUE;
 use overload '""'   => 'content';
 
-our $VERSION = '1.276';
+our $VERSION = '1.277';
 
 our ( $errstr, @ISA ) = ( "", "PPI::Node" );
 
@@ -914,7 +914,7 @@ Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 SEE ALSO
 
-L<PPI>, L<http://ali.as/>
+L<PPI>, L<https://web.archive.org/web/20230911221703/http://ali.as/>
 
 =head1 COPYRIGHT
 

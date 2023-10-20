@@ -22,7 +22,7 @@ name: Bundle-Locale-CLDR-Centralamerica
 provides:
   Bundle::Locale::CLDR::Centralamerica:
     file: lib/Bundle/Locale/CLDR/Centralamerica.pm
-    version: v0.34.1
+    version: v0.34.2
 requires:
   DateTime: '0.72'
   Moo: '2'
@@ -34,5 +34,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.34.1
+version: v0.34.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

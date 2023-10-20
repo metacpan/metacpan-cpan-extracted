@@ -10,19 +10,19 @@ use URI::PackageURL;
 # OO-interface
 
 # Encode components in PackageURL string
-$purl = URI::PackageURL->new(type => cpan, namespace => 'GDT', name => 'URI-PackageURL', version => '2.00');
+$purl = URI::PackageURL->new(type => cpan, namespace => 'GDT', name => 'URI-PackageURL', version => '2.02');
 
-say $purl; # pkg:cpan/GDT/URI-PackageURL@2.00
+say $purl; # pkg:cpan/GDT/URI-PackageURL@2.02
 
 # Parse PackageURL string
-$purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.00');
+$purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.02');
 
 # exported funtions
 
-$purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.00');
+$purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.02');
 say $purl->type;  # cpan
 
-$purl_string = encode_purl(type => cpan, namespace => 'GDT', name => 'URI::PackageURL', version => '2.00');
+$purl_string = encode_purl(type => cpan, namespace => 'GDT', name => 'URI::PackageURL', version => '2.02');
 ```
 
 ## Install

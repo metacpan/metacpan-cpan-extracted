@@ -26,6 +26,13 @@ use constant TEST_DIR => catdir(dirname(__FILE__), 'test-data');
   is($obj->tab_elems,  undef, 'tab_elems()');
   is($obj->eq_ids,     undef, 'eq_ids()');
 
+  is($obj->matrix(dup => 1), undef, 'matrix()');
+
+  is($obj->elems(1),      undef, 'elems(1)');
+  is($obj->elem_ids(1),   undef, 'elem_ids(1)');
+  is($obj->tab_elems(1),  undef, 'tab_elems(1)');
+  is($obj->eq_ids(1),     undef, 'eq_ids(1)');
+
   is($obj->matrix_named,             undef, 'matrix_named()');
   is($obj->matrix_named(bless => 1), undef, 'matrix_named(bless => 1)');
 

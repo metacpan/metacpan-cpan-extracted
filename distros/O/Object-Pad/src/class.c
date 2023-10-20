@@ -5,12 +5,6 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include "object_pad.h"
-#include "class.h"
-#include "field.h"
-
-#undef register_class_attribute
-
 #ifdef HAVE_DMD_HELPER
 #  define WANT_DMD_API_044
 #  include "DMD_helper.h"
@@ -25,6 +19,12 @@
 #include "optree-additions.c.inc"
 #include "newOP_CUSTOM.c.inc"
 #include "cv_copy_flags.c.inc"
+
+#include "object_pad.h"
+#include "class.h"
+#include "field.h"
+
+#undef register_class_attribute
 
 #ifdef DEBUGGING
 #  define DEBUG_OVERRIDE_PLCURCOP
@@ -259,8 +259,8 @@ SV *ObjectPad_mop_class_get_name(pTHX_ ClassMeta *class)
   return class->name;
 }
 
-#define make_instance_fields(classmeta, backingav, roleoffset)  S_make_instance_fields(aTHX_ classmeta, backingav, roleoffset)
-static void S_make_instance_fields(pTHX_ const ClassMeta *classmeta, AV *backingav, FIELDOFFSET roleoffset)
+#define make_instance_fields(classmeta, fieldstore, roleoffset)  S_make_instance_fields(aTHX_ classmeta, fieldstore, roleoffset)
+static void S_make_instance_fields(pTHX_ const ClassMeta *classmeta, SV *fieldstore, FIELDOFFSET roleoffset)
 {
   assert(classmeta->type == METATYPE_ROLE || roleoffset == 0);
 
@@ -269,32 +269,47 @@ static void S_make_instance_fields(pTHX_ const ClassMeta *classmeta, AV *backing
     assert(classmeta->type == METATYPE_CLASS);
     assert(classmeta->cls.supermeta->sealed);
 
-    make_instance_fields(classmeta->cls.supermeta, backingav, 0);
+    make_instance_fields(classmeta->cls.supermeta, fieldstore, 0);
   }
 
   AV *fields = classmeta->direct_fields;
   I32 nfields = av_count(fields);
 
-  av_extend(backingav, classmeta->next_fieldix - 1 + roleoffset);
+  if(SvTYPE(fieldstore) == SVt_PVAV)
+    av_extend((AV *)fieldstore, classmeta->next_fieldix - 1 + roleoffset);
 
   I32 i;
   for(i = 0; i < nfields; i++) {
     FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
     char sigil = SvPV_nolen(fieldmeta->name)[0];
 
-    assert(av_count(backingav) == fieldmeta->fieldix + roleoffset);
+    FIELDOFFSET fieldix = fieldmeta->fieldix + roleoffset;
+
+    /* We can't av_push() because REPR_KEYS would break here */
+    SV **svp;
+#ifdef HAVE_SVt_PVOBJ
+    if(SvTYPE(fieldstore) == SVt_PVOBJ) {
+      svp = &ObjectFIELDS(fieldstore)[fieldix];
+      *svp = newSV(0);
+    }
+    else
+#endif
+    {
+      svp = av_fetch_simple((AV *)fieldstore, fieldix, TRUE);
+    }
+    assert(svp);
 
     switch(sigil) {
       case '$':
-        av_push(backingav, newSV(0));
+        /* simply fetching will create the SV */
         break;
 
       case '@':
-        av_push(backingav, newRV_noinc((SV *)newAV()));
+        sv_setrv_noinc(*svp, (SV *)newAV());
         break;
 
       case '%':
-        av_push(backingav, newRV_noinc((SV *)newHV()));
+        sv_setrv_noinc(*svp, (SV *)newHV());
         break;
 
       default:
@@ -314,12 +329,33 @@ static void S_make_instance_fields(pTHX_ const ClassMeta *classmeta, AV *backing
 
       assert(rolemeta->sealed);
 
-      make_instance_fields(rolemeta, backingav, embedding->offset);
+      make_instance_fields(rolemeta, fieldstore, embedding->offset);
     }
   }
 }
 
-SV *ObjectPad_get_obj_backingav(pTHX_ SV *self, enum ReprType repr, bool create)
+#define alias_fieldkeys_into_av(classmeta, hv, backingav)  S_alias_fieldkeys_into_av(aTHX_ classmeta, hv, backingav)
+static void S_alias_fieldkeys_into_av(pTHX_ ClassMeta *classmeta, HV *hv, AV *backingav)
+{
+  if(classmeta->cls.supermeta)
+    alias_fieldkeys_into_av(classmeta->cls.supermeta, hv, backingav);
+
+  AV *fields = classmeta->direct_fields;
+  I32 nfields = av_count(fields);
+
+  I32 i;
+  for(i = 0; i < nfields; i++) {
+    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+
+    SV *fieldkey = newSVpvf("%" SVf "/%" SVf, classmeta->name, fieldmeta->name);
+    HE *he = hv_fetch_ent(hv, fieldkey, 1, 0);
+    SvREFCNT_dec(fieldkey);
+
+    av_store(backingav, fieldmeta->fieldix, SvREFCNT_inc(HeVAL(he)));
+  }
+}
+
+SV *ObjectPad_get_obj_fieldstore(pTHX_ SV *self, enum ReprType repr, bool create)
 {
   SV *rv = SvRV(self);
 
@@ -346,12 +382,12 @@ SV *ObjectPad_get_obj_backingav(pTHX_ SV *self, enum ReprType repr, bool create)
        */
       if(!backingsvp) {
         struct ClassMeta *classmeta = mop_get_class_for_stash(SvSTASH(rv));
-        AV *backingav = newAV();
+        SV *fieldstore = (SV *)newAV();
 
-        make_instance_fields(classmeta, backingav, 0);
+        make_instance_fields(classmeta, fieldstore, 0);
 
         backingsvp = hv_fetchs((HV *)rv, "Object::Pad/slots", TRUE);
-        sv_setrv_noinc(*backingsvp, (SV *)backingav);
+        sv_setrv_noinc(*backingsvp, fieldstore);
       }
       if(!SvROK(*backingsvp) || SvTYPE(SvRV(*backingsvp)) != SVt_PVAV)
         croak("Expected $self->{\"Object::Pad/slots\"} to be an ARRAY reference");
@@ -373,9 +409,40 @@ SV *ObjectPad_get_obj_backingav(pTHX_ SV *self, enum ReprType repr, bool create)
       if(SvTYPE(rv) == SVt_PVHV)
         goto case_REPR_HASH;
       goto case_REPR_MAGIC;
+
+    case REPR_KEYS:
+    {
+      /* TODO: This representation is going to be sloooooow
+       */
+      if(SvTYPE(rv) != SVt_PVHV)
+        croak("Not a HASH reference");
+      HV *hv = (HV *)rv;
+      AV *backingav = newAV();
+      SAVEFREESV((SV *)backingav);
+      alias_fieldkeys_into_av(mop_get_class_for_stash(SvSTASH(rv)), hv, backingav);
+      return (SV *)backingav;
+    }
+
+    case REPR_PVOBJ:
+#ifdef HAVE_SVt_PVOBJ
+      if(SvTYPE(rv) != SVt_PVOBJ)
+        croak("ARGH not an SVt_PVOBJ");
+
+      return rv;
+#else
+      croak("ARGH cannot SVt_PVOBJ on this version of perl");
+#endif
   }
 
   croak("ARGH unhandled repr type");
+}
+
+SV *ObjectPad_get_obj_backingav(pTHX_ SV *self, enum ReprType repr, bool create)
+{
+  if(repr == REPR_PVOBJ)
+    croak("ARGH cannot get_obj_backingav for REPR_PVOBJ because it isn't an AV");
+  else
+    return get_obj_fieldstore(self, repr, create);
 }
 
 #define embed_cv(cv, embedding)  S_embed_cv(aTHX_ cv, embedding)
@@ -396,6 +463,18 @@ static CV *S_embed_cv(pTHX_ CV *cv, RoleEmbedding *embedding)
   PadARRAY(pad1)[PADIX_EMBEDDING] = SvREFCNT_inc(embeddingsv);
 
   return embedded_cv;
+}
+
+RoleEmbedding *ObjectPad__get_embedding_from_pad(pTHX)
+{
+  /* Embedding info is stored in pad1; PAD_SVl() will look at CvDEPTH. We'll
+   * have to grab it manually */
+  PAD *pad1 = PadlistARRAY(CvPADLIST(find_runcv(0)))[1];
+  SV *embeddingsv = PadARRAY(pad1)[PADIX_EMBEDDING];
+  if(embeddingsv && embeddingsv != &PL_sv_undef)
+    return (RoleEmbedding *)SvPVX(embeddingsv);
+  else
+    return NULL;
 }
 
 RoleEmbedding **ObjectPad_mop_class_get_direct_roles(pTHX_ const ClassMeta *meta, U32 *nroles)
@@ -548,6 +627,7 @@ OP *ObjectPad__finish_method_parse(pTHX_ ClassMeta *meta, bool is_common, OP *bo
   I32 nfields = av_count(meta->direct_fields);
   PADNAME **snames = PadnamelistARRAY(fieldnames);
   PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
+  U8 opf_special_if_role = (meta->type == METATYPE_ROLE) ? OPf_SPECIAL : 0;
 
   /* If we have no body that means this was a bodyless method
    * declaration; a required method for a role
@@ -628,6 +708,7 @@ OP *ObjectPad__finish_method_parse(pTHX_ ClassMeta *meta, bool is_common, OP *bo
       }
 
 #ifdef METHSTART_CONTAINS_FIELD_BINDINGS
+      PERL_UNUSED_VAR(opf_special_if_role);
       assert((fieldix & ~FIELDIX_MASK) == 0);
       av_store(fieldmap, padix, newSVuv(((UV)private << FIELDIX_TYPE_SHIFT) | fieldix));
       fieldcount++;
@@ -636,7 +717,7 @@ OP *ObjectPad__finish_method_parse(pTHX_ ClassMeta *meta, bool is_common, OP *bo
 #else
       fieldops = op_append_list(OP_LINESEQ, fieldops,
         /* alias the padix from the field */
-        newFIELDPADOP(private << 8, padix, fieldix));
+        newFIELDPADOP(private << 8 | opf_special_if_role, padix, fieldix));
 #endif
 
 #if HAVE_PERL_VERSION(5, 22, 0)
@@ -1243,17 +1324,13 @@ static void S_generate_initfields_method(pTHX_ ClassMeta *meta)
     ops = op_append_list(OP_LINESEQ, ops,
       newSTATEOP(0, NULL, NULL));
 
-    /* Build an OP_ENTERSUB for supermeta's initfields */
-    OP *op = NULL;
-    op = op_append_list(OP_LIST, op,
-      newPADxVOP(OP_PADSV, 0, PADIX_SELF));
-    op = op_append_list(OP_LIST, op,
-      newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS));
-    op = op_append_list(OP_LIST, op,
-      newSVOP(OP_CONST, 0, (SV *)supermeta->initfields));
-
     ops = op_append_list(OP_LINESEQ, ops,
-      op_convert_list(OP_ENTERSUB, OPf_WANT_VOID|OPf_STACKED, op));
+      /* Build an OP_ENTERSUB for supermeta's initfields */
+      newLISTOPn(OP_ENTERSUB, OPf_WANT_VOID|OPf_STACKED,
+        newPADxVOP(OP_PADSV, 0, PADIX_SELF),
+        newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
+        newSVOP(OP_CONST, 0, (SV *)supermeta->initfields),
+        NULL));
   }
 
   if(meta->initfields_lines) {
@@ -1280,16 +1357,12 @@ static void S_generate_initfields_method(pTHX_ ClassMeta *meta)
       ops = op_append_list(OP_LINESEQ, ops,
         newSTATEOP(0, NULL, NULL));
 
-      OP *op = NULL;
-      op = op_append_list(OP_LIST, op,
-        newPADxVOP(OP_PADSV, 0, PADIX_SELF));
-      op = op_append_list(OP_LIST, op,
-        newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS));
-      op = op_append_list(OP_LIST, op,
-        newSVOP(OP_CONST, 0, (SV *)embed_cv(rolemeta->initfields, embedding)));
-
       ops = op_append_list(OP_LINESEQ, ops,
-        op_convert_list(OP_ENTERSUB, OPf_WANT_VOID|OPf_STACKED, op));
+        newLISTOPn(OP_ENTERSUB, OPf_WANT_VOID|OPf_STACKED,
+          newPADxVOP(OP_PADSV, 0, PADIX_SELF),
+          newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
+          newSVOP(OP_CONST, 0, (SV *)embed_cv(rolemeta->initfields, embedding)),
+          NULL));
     }
   }
 
@@ -1343,6 +1416,10 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
       croak("Class %" SVf " does not provide a required method named '%" SVf "'",
         SVfARG(meta->name), SVfARG(mname));
     }
+
+    GV *gv = gv_fetchmeth_pvs(meta->stash, "BUILDARGS", -1, 0);
+    if(GvSTASH(gv) != gv_stashpvs("Object::Pad::UNIVERSAL", 0))
+      meta->has_buildargs = true;
   }
 
   if(meta->strict_params && meta->buildblocks)
@@ -1441,9 +1518,10 @@ XS_INTERNAL(injected_constructor)
    * This does not include $self
    */
   AV *args = newAV();
+  I32 nargs = 0;
   SAVEFREESV(args);
 
-  {
+  if(meta->has_buildargs) {
     /* @args = $class->BUILDARGS(@_) */
     ENTER;
     SAVETMPS;
@@ -1467,15 +1545,22 @@ XS_INTERNAL(injected_constructor)
     SP++;
     PUTBACK;
 
-    I32 nargs = call_method("BUILDARGS", G_ARRAY);
+    nargs = call_method("BUILDARGS", G_ARRAY);
 
     SPAGAIN;
 
     for(svp = SP - nargs + 1; svp <= SP; svp++)
-      av_push(args, SvREFCNT_inc(*svp));
+      av_push_simple(args, SvREFCNT_inc(*svp));
 
     FREETMPS;
     LEAVE;
+  }
+  else {
+    nargs = items - 1;
+
+    SV **svp;
+    for(svp = SP - nargs + 1; svp <= SP; svp++)
+      av_push_simple(args, SvREFCNT_inc(*svp));
   }
 
   bool need_makefields = true;
@@ -1494,9 +1579,28 @@ XS_INTERNAL(injected_constructor)
         break;
 
       case REPR_HASH:
+      case REPR_KEYS:
         DEBUG_SET_CURCOP_LINE(__LINE__);
         self = sv_2mortal(newRV_noinc((SV *)newHV()));
         sv_bless(self, stash);
+        break;
+
+      case REPR_PVOBJ:
+#ifdef HAVE_SVt_PVOBJ
+        {
+          DEBUG_SET_CURCOP_LINE(__LINE__);
+          /* TODO: Perl needs to export newSVobject() */
+          U32 fieldcount = meta->next_fieldix;
+          SV *obj = newSV_type(SVt_PVOBJ);
+          Newx(ObjectFIELDS(obj), fieldcount, SV *);
+          ObjectMAXFIELD(obj) = fieldcount - 1;
+          Zero(ObjectFIELDS(obj), fieldcount, SV *);
+          self = sv_2mortal(newRV_noinc(obj));
+          sv_bless(self, stash);
+        }
+#else
+        croak("ARGH cannot SVt_PVOBJ on this version of perl");
+#endif
         break;
 
       case REPR_MAGIC:
@@ -1512,9 +1616,9 @@ XS_INTERNAL(injected_constructor)
       SAVETMPS;
 
       PUSHMARK(SP);
-      EXTEND(SP, 1 + AvFILL(args));
+      EXTEND(SP, nargs);
 
-      SV **argstart = SP - AvFILL(args) - 1;
+      SV **argstart = SP - nargs;
       SV **argtop = SP;
       SV **svp;
 
@@ -1553,9 +1657,12 @@ XS_INTERNAL(injected_constructor)
     switch(meta->repr) {
       case REPR_NATIVE:
         croak("ARGH shouldn't ever have REPR_NATIVE with foreign_new");
+      case REPR_PVOBJ:
+        croak("ARGH shouldn't ever have REPR_PVOBJ with foreign_new");
 
       case REPR_HASH:
       case_REPR_HASH:
+      case REPR_KEYS:
         if(SvTYPE(rv) != SVt_PVHV) {
 #ifdef DEBUG_OVERRIDE_PLCURCOP
           PL_curcop = prevcop;
@@ -1582,28 +1689,28 @@ XS_INTERNAL(injected_constructor)
     sv_2mortal(self);
   }
 
-  AV *backingav;
+  SV *fieldstore;
 
   if(need_makefields) {
-    backingav = (AV *)get_obj_backingav(self, meta->repr, TRUE);
-    make_instance_fields(meta, backingav, 0);
+    fieldstore = get_obj_fieldstore(self, meta->repr, TRUE);
+    make_instance_fields(meta, fieldstore, 0);
   }
   else {
-    backingav = (AV *)get_obj_backingav(self, meta->repr, FALSE);
+    fieldstore = get_obj_fieldstore(self, meta->repr, FALSE);
   }
 
-  SV **fieldsvs = AvARRAY(backingav);
+  SV **fieldsvs = fieldstore_fields(fieldstore);
 
   if(meta->fieldhooks_makefield || meta->fieldhooks_construct) {
-    /* We need to set up a fake pad so these hooks can still get PADIX_SELF / PADIX_SLOTS */
+    /* We need to set up a fake pad so these hooks can still get PADIX_SELF / PADIX_FIELDS */
 
     /* This MVP is just sufficient enough to let PAD_SVl(PADIX_SELF) work */
     SAVEVPTR(PL_curpad);
     Newx(PL_curpad, 3, SV *);
     SAVEFREEPV(PL_curpad);
 
-    PAD_SVl(PADIX_SELF)  = self;
-    PAD_SVl(PADIX_SLOTS) = (SV *)backingav;
+    PAD_SVl(PADIX_SELF)   = self;
+    PAD_SVl(PADIX_FIELDS) = fieldstore;
   }
 
   if(meta->fieldhooks_makefield) {
@@ -1625,16 +1732,16 @@ XS_INTERNAL(injected_constructor)
     paramhv = newHV();
     SAVEFREESV((SV *)paramhv);
 
-    if(av_count(args) % 2)
+    if(nargs % 2)
       warn("Odd-length list passed to %" SVf " constructor", class);
 
     /* TODO: I'm sure there's an newHV_from_AV() around somewhere */
     SV **argsv = AvARRAY(args);
 
     IV idx;
-    for(idx = 0; idx < av_count(args); idx += 2) {
+    for(idx = 0; idx < nargs; idx += 2) {
       SV *name  = argsv[idx];
-      SV *value = idx < av_count(args)-1 ? argsv[idx+1] : &PL_sv_undef;
+      SV *value = idx < nargs-1 ? argsv[idx+1] : &PL_sv_undef;
 
       hv_store_ent(paramhv, name, SvREFCNT_inc(value), 0);
     }
@@ -1676,14 +1783,14 @@ XS_INTERNAL(injected_constructor)
       SAVETMPS;
       SPAGAIN;
 
-      EXTEND(SP, 1 + AvFILL(args));
+      EXTEND(SP, nargs);
 
       PUSHMARK(SP);
 
       PUSHs(self);
 
       int argi;
-      for(argi = 0; argi <= AvFILL(args); argi++)
+      for(argi = 0; argi < nargs; argi++)
         PUSHs(argsvs[argi]);
       PUTBACK;
 
@@ -2231,6 +2338,17 @@ static bool classhook_repr_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **att
     if(classmeta->type != METATYPE_CLASS || !classmeta->cls.foreign_new)
       croak("Cannot switch to :repr(magic) without a foreign superclass");
     classmeta->repr = REPR_MAGIC;
+  }
+  else if(strEQ(val, "keys"))
+    classmeta->repr = REPR_KEYS;
+  else if(strEQ(val, "pvobj")) {
+    if(classmeta->type == METATYPE_CLASS && classmeta->cls.foreign_new)
+      croak("Cannot switch a subclass of a foreign superclass type to :repr(pvobj)");
+#ifdef HAVE_SVt_PVOBJ
+    classmeta->repr = REPR_PVOBJ;
+#else
+    croak("Cannot switch to :repr(pvobj) on Perl " PERL_VERSION_STRING);
+#endif
   }
   else if(strEQ(val, "default") || strEQ(val, "autoselect"))
     classmeta->repr = REPR_AUTOSELECT;

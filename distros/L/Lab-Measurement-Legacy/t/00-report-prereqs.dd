@@ -1,0 +1,67 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Class::ISA' => '0',
+                                      'Class::Method::Modifiers' => '0',
+                                      'Clone' => '0',
+                                      'Data::Dumper' => '0',
+                                      'English' => '0',
+                                      'Exception::Class' => '0',
+                                      'Exporter' => '0',
+                                      'File::Copy' => '0',
+                                      'File::Path' => '0',
+                                      'File::Which' => '0',
+                                      'Getopt::Long' => '0',
+                                      'Hook::LexWrap' => '0',
+                                      'IO::File' => '0',
+                                      'IO::Select' => '0',
+                                      'IO::Socket' => '0',
+                                      'IO::Socket::INET' => '0',
+                                      'List::MoreUtils' => '0',
+                                      'Math::Complex' => '0',
+                                      'Math::Trig' => '0',
+                                      'Module::Load' => '0',
+                                      'POSIX' => '0',
+                                      'Role::Tiny' => '0',
+                                      'Role::Tiny::With' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Socket' => '0',
+                                      'Statistics::Descriptive' => '0',
+                                      'Storable' => '0',
+                                      'Term::ReadKey' => '0',
+                                      'Thread::Semaphore' => '0',
+                                      'Tie::Hash' => '0',
+                                      'Time::HiRes' => '0',
+                                      'Try::Tiny' => '0',
+                                      'YAML::XS' => '0',
+                                      'autodie' => '0',
+                                      'bytes' => '0',
+                                      'constant' => '0',
+                                      'feature' => '0',
+                                      'parent' => '0',
+                                      'perl' => '5.020',
+                                      'sigtrap' => '0',
+                                      'strict' => '0',
+                                      'vars' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

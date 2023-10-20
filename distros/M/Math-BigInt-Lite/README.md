@@ -99,25 +99,21 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-- GitHub
+- GitHub Source Repository
 
-    [https://github.com/pjacklam/p5-Math-BigInt](https://github.com/pjacklam/p5-Math-BigInt)
+    [https://github.com/pjacklam/p5-Math-BigInt-Lite](https://github.com/pjacklam/p5-Math-BigInt-Lite)
 
 - RT: CPAN's request tracker
 
-    [https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt](https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt)
+    [https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigInt-Lite](https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigInt-Lite)
 
 - MetaCPAN
 
-    [https://metacpan.org/release/Math-BigInt](https://metacpan.org/release/Math-BigInt)
+    [https://metacpan.org/release/Math-BigInt-Lite](https://metacpan.org/release/Math-BigInt-Lite)
 
 - CPAN Testers Matrix
 
-    [http://matrix.cpantesters.org/?dist=Math-BigInt](http://matrix.cpantesters.org/?dist=Math-BigInt)
-
-- CPAN Ratings
-
-    [https://cpanratings.perl.org/dist/Math-BigInt](https://cpanratings.perl.org/dist/Math-BigInt)
+    [http://matrix.cpantesters.org/?dist=Math-BigInt-Lite](http://matrix.cpantesters.org/?dist=Math-BigInt-Lite)
 
 # LICENSE
 

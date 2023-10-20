@@ -81,9 +81,10 @@ sub _locale_path_from_module {
 
 sub _lookup_translation_by_count {
   my ($self, $count, $original, $translated, %args) = @_;
-  $translated = $translated->{zero} if $count == 0 and $translated->{zero};
-  $translated = $translated->{one} if $count == 1 and $translated->{one};
-  $translated = $translated->{other} if $count > 1 and $translated->{other};
+  $translated = $translated->{zero} if $count == 0 and exists $translated->{zero};
+  $translated = $translated->{one} if $count == 1 and  exists $translated->{one};
+  $translated = $translated->{other} if $count > 1 and exists $translated->{other};
+  $translated = $translated->{many} if $count > 1 and ref($translated) and exists $translated->{many};  
 
   throw_exception('MissingCountKey', tag=>$original, count=>$count) if ref $translated;
 
@@ -117,8 +118,6 @@ sub translate {
   $key = "${scope}.${key}" if $scope;
 
   debug 1 , "Trying to translate '$key' with defaults: [@{[ join ',', @defaults]}]";
-  
-  debug 1, "Trying to translate: '$key'";
   my $translated = $self->dl->localize($key, \%args);
 
   # If $translated is a hashref that means we need to apply the $count

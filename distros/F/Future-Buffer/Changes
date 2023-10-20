@@ -1,5 +1,13 @@
 Revision history for Future-Buffer
 
+0.04    2023-10-17
+        [CHANGES]
+         * Support end-of-file condition
+         * Various module style updates:
+            + use Perl 5.14
+            + swap unit tests to Test2::V0
+            + documentation style in minisynopsis lines
+
 0.03    2022-09-30
         [CHANGES]
          * Added ->unread

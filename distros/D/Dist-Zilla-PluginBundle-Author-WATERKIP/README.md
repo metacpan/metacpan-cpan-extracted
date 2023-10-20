@@ -46,7 +46,12 @@ following `dist.ini`:
     filename = CONTRIBUTORS
 
     [AutoPrereqs]
-    skip = ^perl$, utf8, warnings, strict, overload
+    skip = ^perl$
+    skip = ^utf8$
+    skip = ^warnings$
+    skip = ^strict$
+    skip = ^overload$
+    skip = ^vars$
 
     [Prereqs::AuthorDeps]
     [MinimumPerl]

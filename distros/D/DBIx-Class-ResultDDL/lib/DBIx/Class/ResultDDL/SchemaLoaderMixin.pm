@@ -9,7 +9,7 @@ sub deparse_hashkey;
 use namespace::clean;
 
 # ABSTRACT: Modify Schema Loader to generate ResultDDL notation
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 
 #sub _write_classfile {
@@ -152,8 +152,9 @@ sub generate_relationship_attr_sugar {
 my %rel_methods= map +($_ => 1), qw( belongs_to might_have has_one has_many );
 sub _dbic_stmt {
 	my ($self, $class, $method)= splice(@_, 0, 3);
-	$self->{_MyLoader_use_resultddl}{$class}++
-		or $self->_raw_stmt($class, $self->generate_resultddl_import_line);
+	# The first time we generate anything for each class, inject the 'use' line.
+	$self->_raw_stmt($class, $self->generate_resultddl_import_line($class))
+		unless $self->{_ResultDDL_SchemaLoader}{$class}{use_line}++;
 	if ($method eq 'table') {
 		$self->_raw_stmt($class, q|table |.deparse(@_).';');
 	}
@@ -174,9 +175,12 @@ sub _dbic_stmt {
 			for @col_defs;
 	}
 	elsif ($method eq 'set_primary_key') {
-		$self->_raw_stmt($class, q|primary_key |.deparse(@_).';');
+		$self->_raw_stmt($class, q|primary_key |.deparse(@_).";");
 	}
 	elsif ($rel_methods{$method} && @_ == 4) {
+		# Add a linebreak before the relationships, for readability.
+		$self->_raw_stmt($class, "\n")
+			unless $self->{_ResultDDL_SchemaLoader}{$class}{relation_linebreak}++;
 		$self->_raw_stmt($class, $self->generate_relationship_sugar($class, $method, @_));
 	}
 	else {
@@ -200,7 +204,7 @@ my %data_type_sugar= (
 				return $type;
 			}
 		}
-	} qw( integer float real numeric decimal varchar char )),
+	} qw( integer float real numeric decimal varchar nvarchar char nchar binary varbinary )),
 	(map {
 		my $type= $_;
 		$type => sub { my ($col_info, $class_settings)= @_;
@@ -250,6 +254,7 @@ sub _get_data_type_sugar {
 }
 
 sub _deparse_scalar {
+	return 'undef' unless defined;
 	return $_ if /^(0|[1-9][0-9]*)$/;
 	my $x= $_;
 	$x =~ s/\\/\\\\/g;
@@ -289,7 +294,7 @@ our %per_class_check_namespace;
 sub _get_class_check_namespace {
 	my ($self, $class)= @_;
 	return ($per_class_check_namespace{$class} ||= do {
-		my $use_line= $self->generate_resultddl_import_line;
+		my $use_line= $self->generate_resultddl_import_line($class);
 		local $DBIx::Class::ResultDDL::DISABLE_AUTOCLEAN= 1;
 		my $pkg= 'DBIx::Class::ResultDDL_check' . scalar keys %per_class_check_namespace;
 		my $perl= "package $pkg; $use_line 1";
@@ -375,6 +380,8 @@ The following methods are public so that you can override them:
 
 =head2 generate_resultddl_import_line
 
+  $perl_stmt= $loader->generate_resultddl_import_line($class);
+
 This should return a string like C<< "use DBIx::Class::ResultDDL qw/ -V2 /;\n" >>.
 Don't forget the trailing semicolon.
 
@@ -424,7 +431,7 @@ Michael Conrad <mconrad@intellitree.com>
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 COPYRIGHT AND LICENSE
 

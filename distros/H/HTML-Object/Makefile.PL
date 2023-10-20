@@ -2,6 +2,18 @@ use ExtUtils::MakeMaker;
 use strict;
 use warnings;
 
+sub MY::distsignature
+{
+    return << 'EOT';
+distsignature : distmeta
+	$(NOECHO) ./dev/cleanup.pl
+	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) }' \
+	  -e '	  or die "Could not add SIGNATURE to MANIFEST: $${'\''@'\''}"' --
+	$(NOECHO) cd $(DISTVNAME) && $(TOUCH) SIGNATURE
+	cd $(DISTVNAME) && cpansign -s
+EOT
+}
+
 my %WriteMakefileArgs = (
     NAME                => 'HTML::Object',
     AUTHOR              => 'Jacques Deguest (jack@deguest.jp)',
@@ -31,10 +43,10 @@ my %WriteMakefileArgs = (
         'HTML::Selector::XPath' => '0.26',
         'JSON'                  => '4.05',
         'List::Util'            => '1.56',
-        'Module::Generic'       => 'v0.30.3',
+        'Module::Generic'       => 'v0.32.4',
         'Nice::Try'             => 'v1.3.4',
         'POSIX'                 => 0,
-        'Promise::Me'           => 'v0.4.5',
+        'Promise::Me'           => 'v0.4.7',
         'Scalar::Util'          => '1.60',
         'Time::HiRes'           => '1.9764',
         'URI'                   => '5.10',
@@ -53,7 +65,7 @@ my %WriteMakefileArgs = (
     LICENSE             => 'perl_5',
     MIN_PERL_VERSION    => 'v5.26.1',
     (MM->can('signature_target') ? (SIGN => 1) : ()),
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', PREOP => './dev/cleanup.pl' },
+    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp' },
     clean               => { FILES => 'HTML-Object-*' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },

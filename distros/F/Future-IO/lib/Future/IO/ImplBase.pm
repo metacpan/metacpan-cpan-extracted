@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
 
-package Future::IO::ImplBase 0.14;
+package Future::IO::ImplBase 0.15;
 
 use v5.14;
 use warnings;
@@ -143,28 +143,40 @@ ready for reading.
 
 =cut
 
-sub sysread
+sub _sysread1
 {
    my $self = shift;
-   my ( $fh, $length ) = @_;
+   my ( $f, $fh, $length ) = @_;
 
-   $self->ready_for_read( $fh )->then( sub {
+   my $waitf = $self->ready_for_read( $fh )->on_done( sub {
       my $ret = $fh->sysread( my $buf, $length );
       if( $ret ) {
-         return Future->done( $buf );
+         $f->done( $buf );
       }
       elsif( defined $ret ) {
          # EOF
-         return Future->done();
+         $f->done();
       }
       elsif( $! == EAGAIN or $! == EWOULDBLOCK ) {
          # Try again
-         return $self->sysread( $fh, $length );
+         $self->_sysread1( $f, $fh, $length );
       }
       else {
-         return Future->fail( "sysread: $!\n", sysread => $fh, $! );
+         $f->fail( "sysread: $!\n", sysread => $fh, $! );
       }
    });
+
+   $f //= $waitf->new;
+
+   $f->on_cancel( $waitf );
+
+   return $f;
+}
+
+sub sysread
+{
+   my $self = shift;
+   return $self->_sysread1( undef, @_ );
 }
 
 =head2 syswrite
@@ -178,24 +190,36 @@ ready for writing.
 
 =cut
 
-sub syswrite
+sub _syswrite1
 {
    my $self = shift;
-   my ( $fh, $data ) = @_;
+   my ( $f, $fh, $data ) = @_;
 
-   return $self->ready_for_write( $fh )->then( sub {
+   my $waitf = $self->ready_for_write( $fh )->on_done( sub {
       my $len = $fh->syswrite( $data );
       if( defined $len ) {
-         return Future->done( $len );
+         $f->done( $len );
       }
       elsif( $! == EAGAIN or $! == EWOULDBLOCK ) {
          # Try again
-         return $self->syswrite( $fh, $data );
+         $self->_syswrite1( $f, $fh, $data );
       }
       else {
-         return Future->fail( "syswrite: $!\n", syswrite => $fh, $! );
+         $f->fail( "syswrite: $!\n", syswrite => $fh, $! );
       }
    });
+
+   $f //= $waitf->new;
+
+   $f->on_cancel( $waitf );
+
+   return $f;
+}
+
+sub syswrite
+{
+   my $self = shift;
+   return $self->_syswrite1( undef, @_ );
 }
 
 =head1 AUTHOR

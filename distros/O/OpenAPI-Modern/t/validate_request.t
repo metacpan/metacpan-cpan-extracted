@@ -187,7 +187,7 @@ YAML
           instanceLocation => '/request/uri/path/foo_id',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} get parameters 0 content application/json schema required)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get parameters 0 content application/json schema required)))->to_string,
-          error => 'missing property: key',
+          error => 'object is missing property: key',
         },
       ],
     },
@@ -537,7 +537,8 @@ YAML
     'after adding wildcard support, this parameter can be parsed',
   );
 
-  $request = request('POST', 'http://example.com/foo?alpha=1&epsilon={"foo":42}', [ Alpha => 1 ]);
+  $request = request('POST', 'http://example.com/foo', [ Alpha => 1 ]);
+  query_params($request, [alpha => 1, epsilon => '{"foo":42}']);
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
     {
@@ -628,8 +629,8 @@ paths:
               required: ['key']
 YAML
 
-  $request = request('GET', 'http://example.com/foo?query1={corrupt json',  # } to mollify vim
-    [ 'Header1' => '{corrupt json' ]);
+  $request = request('GET', 'http://example.com/foo', [ 'Header1' => '{corrupt json' ]); # } for vim
+  query_params($request, [query1 => '{corrupt json']); # } for vim
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
     {
@@ -652,8 +653,8 @@ YAML
     'errors during media-type decoding are detected',
   );
 
-  $request = request('GET', 'http://example.com/foo?query1={"hello":"there"}',
-    [ 'Header1' => '{"hello":"there"}' ]);
+  $request = request('GET', 'http://example.com/foo', [ 'Header1' => '{"hello":"there"}' ]);
+  query_params($request, [query1 => '{"hello":"there"}']);
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
     {
@@ -663,13 +664,13 @@ YAML
           instanceLocation => '/request/uri/query/query1',
           keywordLocation => jsonp(qw(/paths /foo get parameters 0 content application/json schema required)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 0 content application/json schema required)))->to_string,
-          error => 'missing property: key',
+          error => 'object is missing property: key',
         },
         {
           instanceLocation => '/request/header/Header1',
           keywordLocation => jsonp(qw(/paths /foo get parameters 1 content application/json schema required)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 1 content application/json schema required)))->to_string,
-          error => 'missing property: key',
+          error => 'object is missing property: key',
         },
       ],
     },
@@ -837,6 +838,29 @@ YAML
     },
     'request body is missing',
   );
+
+  TODO: {
+    local $TODO = 'mojo will strip the content body when parsing a request without Content-Length'
+      if $::TYPE eq 'lwp';
+    $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ], 'éclair');
+    $request->headers->${$request->isa('Mojo::Message::Request') ? \'remove' : \'remove_header'}('Content-Length');
+
+    cmp_deeply(
+      ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+      {
+        valid => false,
+        errors => [
+          {
+            instanceLocation => '/request/header',
+            keywordLocation => jsonp(qw(/paths /foo post)),
+            absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post)))->to_string,
+            error => 'missing header: Content-Length',
+          },
+        ],
+      },
+      'Content-Length is required in requests with a message body',
+    );
+  }
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/bloop' ], 'plain text');
   cmp_deeply(
@@ -1211,6 +1235,66 @@ YAML
     },
     'duplicate query parameters in operation section',
   );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => '/api',
+    openapi_schema => $yamlpp->load_string(<<YAML));
+$openapi_preamble
+paths:
+  /foo:
+    post:
+      requestBody:
+        required: false
+        content:
+          text/plain:
+            schema:
+              minLength: 10
+YAML
+
+  # bypass auto-initialization of Content-Length, Content-Type
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Length' => 1 ], '!');
+  cmp_deeply(
+    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/header/Content-Type',
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content)))->to_string,
+          error => 'missing header: Content-Type',
+        },
+      ],
+    },
+    'missing Content-Type does not cause an exception',
+  );
+
+  # bypass auto-initialization of Content-Length, Content-Type; leave Content-Length empty
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ], '!');
+  cmp_deeply(
+    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/body',
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content text/plain schema minLength)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content text/plain schema minLength)))->to_string,
+          error => 'length is less than 10',
+        },
+      ],
+    },
+    'missing Content-Length does not prevent the request body from being checked',
+  );
+
+
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ]);
+  cmp_deeply(
+    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    { valid => true },
+    'request body is missing but not required',
+  );
 };
 
 subtest 'type handling of values for evaluation' => sub {
@@ -1289,150 +1373,299 @@ YAML
     openapi_schema => $yamlpp->load_string(<<YAML));
 $openapi_preamble
 paths:
-  /foo/{foo_id}:
+  /foo/{path_plain}/bar/{path_encoded}:
     parameters:
-    - name: foo_id
+    - name: path_plain
       in: path
       required: true
       schema:
-        type: number
+        type: integer
         maximum: 10
+    - name: path_encoded
+      in: path
+      required: true
+      content:
+        text/plain:
+          schema:
+            type: integer
+            maximum: 10
     post:
       parameters:
-      - name: bar
+      - name: query_plain
         in: query
         required: false
         schema:
           type: integer
           maximum: 10
-      - name: Foo-Bar
+      - name: query_encoded
+        in: query
+        required: false
+        content:
+          text/plain:
+            schema:
+              type: integer
+              maximum: 10
+      - name: Header-Plain
         in: header
         required: false
         schema:
-          type: number
+          type: integer
           maximum: 10
+      - name: Header-Encoded
+        in: header
+        required: false
+        content:
+          text/plain:
+            schema:
+              type: integer
+              maximum: 10
       requestBody:
         required: true
         content:
           text/plain:
             schema:
-              type: number
+              type: integer
               maximum: 10
 YAML
 
+  $request = request('POST', 'http://example.com/foo/11/bar/12?query_plain=13&query_encoded=14',
+    [ 'Header-Plain' => 15, 'Header-Encoded' => 16, 'Content-Type' => 'text/plain' ], 17);
   cmp_deeply(
-    ($result = $openapi->validate_request($request,
-      { path_template => '/foo/{foo_id}', path_captures => { foo_id => 123 } }))->TO_JSON,
+    ($result = $openapi->validate_request($request, { path_template => '/foo/{path_plain}/bar/{path_encoded}', path_captures => { path_plain => 11, path_encoded => 12 } }))->TO_JSON,
     {
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/uri/query/bar',
-          keywordLocation => jsonp('/paths', '/foo/{foo_id}', qw(post parameters 0 schema maximum)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{foo_id}', qw(post parameters 0 schema maximum)))->to_string,
+          instanceLocation => '/request/uri/query/query_plain',
+          keywordLocation => jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(post parameters 0 schema maximum)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(post parameters 0 schema maximum)))->to_string,
           error => 'value is larger than 10',
         },
         {
-          instanceLocation => '/request/header/Foo-Bar',
-          keywordLocation => jsonp('/paths', '/foo/{foo_id}', qw(post parameters 1 schema maximum)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{foo_id}', qw(post parameters 1 schema maximum)))->to_string,
+          instanceLocation => '/request/uri/query/query_encoded',
+          keywordLocation => jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(post parameters 1 content text/plain schema type)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(post parameters 1 content text/plain schema type)))->to_string,
+          error => 'got string, not integer',
+        },
+        {
+          instanceLocation => '/request/header/Header-Plain',
+          keywordLocation => jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(post parameters 2 schema maximum)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(post parameters 2 schema maximum)))->to_string,
           error => 'value is larger than 10',
         },
         {
-          instanceLocation => '/request/uri/path/foo_id',
-          keywordLocation => jsonp('/paths', '/foo/{foo_id}', qw(parameters 0 schema maximum)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{foo_id}', qw(parameters 0 schema maximum)))->to_string,
+          instanceLocation => '/request/header/Header-Encoded',
+          keywordLocation => jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(post parameters 3 content text/plain schema type)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(post parameters 3 content text/plain schema type)))->to_string,
+          error => 'got string, not integer',
+        },
+        {
+          instanceLocation => '/request/uri/path/path_plain',
+          keywordLocation => jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(parameters 0 schema maximum)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(parameters 0 schema maximum)))->to_string,
           error => 'value is larger than 10',
+        },
+        {
+          instanceLocation => '/request/uri/path/path_encoded',
+          keywordLocation => jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(parameters 1 content text/plain schema type)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(parameters 1 content text/plain schema type)))->to_string,
+          error => 'got string, not integer',
         },
         {
           instanceLocation => '/request/body',
-          keywordLocation => jsonp('/paths', '/foo/{foo_id}', qw(post requestBody content text/plain schema maximum)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{foo_id}', qw(post requestBody content text/plain schema maximum)))->to_string,
-          error => 'value is larger than 10',
+          keywordLocation => jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(post requestBody content text/plain schema type)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(post requestBody content text/plain schema type)))->to_string,
+          error => 'got string, not integer',
         },
       ],
     },
-    'numeric values are treated as numbers when explicitly type-checked as numbers',
+    'numeric values are treated as numbers when explicitly type-checked as numbers, but only when not encoded',
   );
 
 
   my $val = 20; my $str = sprintf("%s\n", $val);
-  $request = request('POST', 'http://example.com/foo/9', [ 'Content-Type' => 'text/plain' ], $val);
+  $request = request('POST', 'http://example.com/foo/20/bar/hi', [ 'Content-Type' => 'text/plain' ], $val);
   cmp_deeply(
     ($result = $openapi->validate_request($request,
-      { path_template => '/foo/{foo_id}', path_captures => { foo_id => 9 } }))->TO_JSON,
+      { path_template => '/foo/{path_plain}/bar/{path_encoded}', path_captures => { path_plain => $val, path_encoded => 'hi' } }))->TO_JSON,
     {
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body',
-          keywordLocation => jsonp('/paths', '/foo/{foo_id}', qw(post requestBody content text/plain schema maximum)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{foo_id}', qw(post requestBody content text/plain schema maximum)))->to_string,
+          instanceLocation => '/request/uri/path/path_plain',
+          keywordLocation => jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(parameters 0 schema maximum)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(parameters 0 schema maximum)))->to_string,
           error => 'value is larger than 10',
+        },
+        {
+          instanceLocation => '/request/uri/path/path_encoded',
+          keywordLocation => jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(parameters 1 content text/plain schema type)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(parameters 1 content text/plain schema type)))->to_string,
+          error => 'got string, not integer',
+        },
+        {
+          instanceLocation => '/request/body',
+          keywordLocation => jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(post requestBody content text/plain schema type)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{path_plain}/bar/{path_encoded}', qw(post requestBody content text/plain schema type)))->to_string,
+          error => 'got string, not integer',
         },
       ],
     },
     'ambiguously-typed numbers are still handled gracefully',
   );
+};
 
-
-  $openapi = OpenAPI::Modern->new(
+subtest 'parameter parsing' => sub {
+  my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => $yamlpp->load_string(<<YAML));
 $openapi_preamble
 paths:
   /foo:
-    post:
-      requestBody:
-        required: false
-        content:
-          text/plain:
-            schema:
-              minLength: 10
+    get:
+      parameters:
+      - name: SingleValue
+        in: header
+        schema:
+          const: mystring
+      - name: MultipleValuesAsString
+        in: header
+        schema:
+          const: 'one, two, three'
+      - name: MultipleValuesAsArray
+        in: header
+        schema:
+          type: array
+          uniqueItems: true
+          minItems: 3
+          maxItems: 3
+          items:
+            enum: [one, two, three]
+      - name: MultipleValuesAsObjectExplodeFalse
+        in: header
+        schema:
+          type: object
+          minProperties: 3
+          maxProperties: 3
+          properties:
+            R:
+              const: '100'
+            G:
+              type: integer
+            B:
+              maximum: 300
+              minimum: 300
+      - name: MultipleValuesAsObjectExplodeTrue
+        in: header
+        explode: true
+        schema:
+          type: object
+          minProperties: 3
+          maxProperties: 3
+          properties:
+            R:
+              const: '100'
+            G:
+              type: integer
+            B:
+              maximum: 300
+              minimum: 300
+      - name: ArrayWithRef
+        in: header
+        schema:
+          \$ref: '#/paths/~1foo/get/parameters/2/schema'
+      - name: ArrayWithRefAndOtherKeywords
+        in: header
+        schema:
+          \$ref: '#/paths/~1foo/get/parameters/2/schema'
+          not: true
+      - name: ArrayWithBrokenRef
+        in: header
+        schema:
+          \$ref: '#/components/schemas/i_do_not_exist'
 YAML
 
-  # bypass auto-initialization of Content-Length, Content-Type
-  $request = request('POST', 'http://example.com/foo', [ 'Content-Length' => 1 ], '!');
+  my $request = request('GET', 'http://example.com/foo', [ SingleValue => '  mystring  ']);
   cmp_deeply(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request/header/Content-Type',
-          keywordLocation => jsonp(qw(/paths /foo post requestBody content)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content)))->to_string,
-          error => 'missing header: Content-Type',
-        },
-      ],
-    },
-    'missing Content-Type does not cause an exception',
+    (my $result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    { valid => true },
+    'a single header value has its leading and trailing whitespace stripped',
   );
 
-  # bypass auto-initialization of Content-Length, Content-Type; leave Content-Length empty
-  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ], '!');
-  cmp_deeply(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request/body',
-          keywordLocation => jsonp(qw(/paths /foo post requestBody content text/plain schema minLength)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content text/plain schema minLength)))->to_string,
-          error => 'length is less than 10',
-        },
-      ],
-    },
-    'missing Content-Length does not prevent the request body from being checked',
-  );
-
-
-  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ]);
+  $request = request('GET', 'http://example.com/foo', [ MultipleValuesAsString => '  one , two  , three  ']);
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
     { valid => true },
-    'request body is missing but not required',
+    'multiple values in a single header are validated as a string, with leading and trailing whitespace stripped',
+  );
+
+  $request = request('GET', 'http://example.com/foo', [
+      MultipleValuesAsString => '  one ',
+      MultipleValuesAsString => ' two  ',
+      MultipleValuesAsString => 'three  ',
+    ]);
+  cmp_deeply(
+    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    { valid => true },
+    'multiple headers on separate lines are validated as a string, with leading and trailing whitespace stripped',
+  );
+
+  $request = request('GET', 'http://example.com/foo', [ MultipleValuesAsArray => '  one, two, three  ']);
+  cmp_deeply(
+    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    { valid => true },
+    'headers can be parsed into an array in order to test multiple values without sorting',
+  );
+
+  $request = request('GET', 'http://example.com/foo', [
+      MultipleValuesAsObjectExplodeFalse => ' R, 100 ',
+      MultipleValuesAsObjectExplodeFalse => ' B, 300,  G , 200 ',
+      MultipleValuesAsObjectExplodeTrue => ' R=100  , B=300 ',
+      MultipleValuesAsObjectExplodeTrue => '  G=200 ',
+    ]);
+  cmp_deeply(
+    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    { valid => true },
+    'headers can be parsed into an object, represented in two ways depending on explode value',
+  );
+
+  $request = request('GET', 'http://example.com/foo', [
+      ArrayWithRef => 'one, one, three',
+      ArrayWithRefAndOtherKeywords => 'one, one, three',
+      ArrayWithBrokenRef => 'hi',
+    ]);
+  cmp_deeply(
+    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/header/ArrayWithRef',
+          keywordLocation => jsonp('/paths', '/foo', qw(get parameters 5 schema $ref uniqueItems)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo', qw(get parameters 2 schema uniqueItems)))->to_string,
+          error => 'items at indices 0 and 1 are not unique',
+        },
+        {
+          instanceLocation => '/request/header/ArrayWithRefAndOtherKeywords',
+          keywordLocation => jsonp('/paths', '/foo', qw(get parameters 6 schema $ref uniqueItems)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo', qw(get parameters 2 schema uniqueItems)))->to_string,
+          error => 'items at indices 0 and 1 are not unique',
+        },
+        {
+          instanceLocation => '/request/header/ArrayWithRefAndOtherKeywords',
+          keywordLocation => jsonp('/paths', '/foo', qw(get parameters 6 schema not)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo', qw(get parameters 6 schema not)))->to_string,
+          error => 'subschema is valid',
+        },
+        {
+          instanceLocation => '/request/header/ArrayWithBrokenRef',
+          keywordLocation => jsonp('/paths', '/foo', qw(get parameters 7 schema $ref)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo', qw(get parameters 7 schema $ref)))->to_string,
+          error => 'EXCEPTION: unable to find resource /api#/components/schemas/i_do_not_exist',
+        },
+      ],
+    },
+    'header schemas can use a $ref and we follow it correctly, updating locations, and respect adjacent keywords',
   );
 };
 

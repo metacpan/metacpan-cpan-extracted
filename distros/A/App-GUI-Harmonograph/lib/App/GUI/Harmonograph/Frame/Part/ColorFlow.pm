@@ -26,7 +26,7 @@ sub new {
 
 
     my $cf_attr = &Wx::wxLEFT|&Wx::wxALIGN_LEFT|&Wx::wxALIGN_CENTER_VERTICAL;
-    
+
     my $row_sizer = Wx::BoxSizer->new(&Wx::wxHORIZONTAL);
     $row_sizer->Add( $flow_label,           0, $cf_attr,  20);
     $row_sizer->Add( $self->{'type'},       0, $cf_attr,  10);
@@ -67,8 +67,8 @@ sub get_data {
 sub set_data {
     my ( $self, $data ) = @_;
     return unless ref $data eq 'HASH';
-    $self->{$_}->SetValue( $data->{$_} ) for qw/type stepsize period/, 
-    $self->{ 'dynamic' }->SetValue( $data->{'dynamic'} < 1 ? 1 / $data->{'dynamic'} : $data->{'dynamic'} );
+    $self->{$_}->SetValue( $data->{$_} ) for qw/type stepsize period/,
+    $self->{ 'dynamic' }->SetValue( $data->{'dynamic'} < 1 ? -$data->{'dynamic'} : $data->{'dynamic'} );
     $self->{ 'direction' }->SetValue( $data->{'dynamic'} < 1 );
     $self->update_enable( );
 }

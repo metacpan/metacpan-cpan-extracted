@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Pt::Any::Mz - Package for language Portuguese
 
 =cut
 
 package Locale::CLDR::Locales::Pt::Any::Mz;
-# This file auto generated from Data/common/main/pt_MZ.xml
-#	on Mon 11 Apr  5:36:40 pm GMT
+# This file auto generated from Data\common\main\pt_MZ.xml
+#	on Fri 13 Oct  9:34:22 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

@@ -19,7 +19,7 @@ name: Acme-CPANModules-CountryCodes
 provides:
   Acme::CPANModules::CountryCodes:
     file: lib/Acme/CPANModules/CountryCodes.pm
-    version: '0.001'
+    version: '0.004'
 requires:
   Acme::CPANModulesUtil::Misc: '0'
   strict: '0'
@@ -27,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-CountryCodes
   homepage: https://metacpan.org/release/Acme-CPANModules-CountryCodes
   repository: git://github.com/perlancar/perl-Acme-CPANModules-CountryCodes.git
-version: '0.001'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.038000'

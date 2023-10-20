@@ -1,5 +1,15 @@
 Revision history for Perl module Changes
 
+v0.3.5 2023-10-11T16:32:50+0900
+    - Corrected malformed signature for distribution release
+
+v0.3.4 2023-09-19T07:06:33+0900
+    - Improved code
+    - Corrected a bug when numifying leaving the version unchanged
+
+v0.3.3 2023-08-22T23:05:33+0900
+    - Correcting a formatting pattern and adding %n
+
 v0.3.2 2023-08-20T10:45:48+0900
     - Corrected a bug for stringification of dotted decimal versions
     - Added better handling of version decrease

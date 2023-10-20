@@ -744,7 +744,7 @@ EV_API_DECL void ev_resume  (EV_P) EV_NOEXCEPT;
 # define ev_set_cb(ev,cb_)                   (ev_cb_ (ev) = (cb_), memmove (&((ev_watcher *)(ev))->cb, &ev_cb_ (ev), sizeof (ev_cb_ (ev))))
 #endif
 
-/* stopping (enabling, adding) a watcher does nothing if it is already running */
+/* starting (enabling, adding) a watcher does nothing if it is already running */
 /* stopping (disabling, deleting) a watcher does nothing unless it's already running */
 #if EV_PROTOTYPES
 

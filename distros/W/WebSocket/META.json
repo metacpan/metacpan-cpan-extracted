@@ -4,7 +4,7 @@
       "Jacques Deguest (jack@deguest.jp)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -46,7 +46,7 @@
             "JSON" : "4.03",
             "List::Util" : "1.56",
             "MIME::Base64" : "3.16",
-            "Module::Generic" : "v0.16.4",
+            "Module::Generic" : "v0.32.4",
             "Nice::Try" : "v1.1.2",
             "POSIX" : "1.53_01",
             "Regexp::IPv6" : "0",
@@ -85,6 +85,6 @@
          "web" : "https://gitlab.com/jackdeguest/WebSocket"
       }
    },
-   "version" : "v0.1.6",
+   "version" : "v0.2.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

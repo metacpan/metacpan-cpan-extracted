@@ -6,7 +6,7 @@ use App::Sandy::Read::PairedEnd;
 
 extends 'App::Sandy::Seq';
 
-our $VERSION = '0.24'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 has 'fragment_mean' => (
 	is         => 'ro',
@@ -176,7 +176,7 @@ App::Sandy::Seq::PairedEnd - App::Sandy::Seq subclass for simulate paired-end en
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 AUTHORS
 

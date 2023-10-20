@@ -50,6 +50,6 @@
          "url" : "https://github.com/shawnlaffan/perl-List-Unique-DeterministicOrder"
       }
    },
-   "version" : 0.003,
+   "version" : 0.004,
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

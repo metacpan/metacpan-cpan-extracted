@@ -1,3 +1,5 @@
+package Tk::CodeText::TagsEditor;
+
 package MyColorEntry;
 
 use strict;
@@ -40,7 +42,7 @@ Tk:CodeText::TagsEditor - Edit highlighting tags for L<Tk::CodeText>
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.40';
+$VERSION = '0.44';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -378,3 +380,5 @@ Unknown. If you find any, please contact the author.
 1;
 
 __END__
+
+

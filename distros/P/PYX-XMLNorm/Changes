@@ -1,3 +1,16 @@
+0.05 2023-10-19T11:13:30+02:00
+ - Fix typo in doc.
+ - Fix use lib '.' in Makefile.PL.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move bugtracker to github.
+ - Rename example file to better name.
+ - Rewrite doc to use =head2.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.04 2015-10-22T11:41:11+02:00
  - Improve SEE ALSO section in doc.
  - Improve doc.

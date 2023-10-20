@@ -4,7 +4,7 @@
       "Bartosz Jarzyna <bbrtj.pro@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -28,9 +28,11 @@
          "requires" : {
             "Bitcoin::BIP39" : "0.002",
             "CryptX" : "0.074",
-            "Math::BigInt" : "1.999808",
+            "Math::BigInt" : "1.999831",
             "Moo" : "2.003004",
-            "Type::Tiny" : "1.004000",
+            "Mooish::AttributeBuilder" : "1.001",
+            "Try::Tiny" : "0",
+            "Type::Tiny" : "2",
             "namespace::clean" : "0.27",
             "perl" : "5.010"
          }
@@ -53,9 +55,9 @@
          "web" : "https://github.com/bbrtj/perl-bitcoin-crypto"
       }
    },
-   "version" : "1.008",
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
+   "version" : "2.001",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Lib::FFIType::Variant::PackableMaybeArrayRef;
 # ABSTRACT: Maybe[ArrayRef] to pack()'ed scalar argument with size argument (as int) (size is -1 if undef)
-$AI::TensorFlow::Libtensorflow::Lib::FFIType::Variant::PackableMaybeArrayRef::VERSION = '0.0.6';
+$AI::TensorFlow::Libtensorflow::Lib::FFIType::Variant::PackableMaybeArrayRef::VERSION = '0.0.7';
 use strict;
 use warnings;
 use FFI::Platypus::Buffer qw(scalar_to_buffer buffer_to_scalar);

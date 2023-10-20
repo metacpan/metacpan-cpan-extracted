@@ -89,6 +89,10 @@ formatted I<Matrix> message body to and from this format.
 
 =item *
 
+L<String::Tagged::HTML> - build HTML fragments by converting from this format
+
+=item *
+
 L<String::Tagged::IRC> - parse or build IRC formatted messages and convert
 bidirectionally to this format.
 

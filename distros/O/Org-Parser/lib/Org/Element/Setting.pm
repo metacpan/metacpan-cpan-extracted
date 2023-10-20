@@ -9,9 +9,9 @@ with 'Org::ElementRole';
 with 'Org::ElementRole::Block';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-12'; # DATE
+our $DATE = '2023-08-05'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.559'; # VERSION
+our $VERSION = '0.560'; # VERSION
 
 our @known_settings = qw(
 ARCHIVE
@@ -133,7 +133,7 @@ sub BUILD {
         if ($pass == 1) {
             no warnings 'once';
             $args->[0] =~ /^$Org::Document::tags_re$/ or
-                die "Invalid argument for FILETAGS: $args->[0]";
+                $self->die("Invalid argument for FILETAGS: $args->[0]");
             for my $tag (split /:/, $args->[0]) {
                 next unless length $tag;
                 push @{ $doc->tags }, $tag
@@ -148,7 +148,7 @@ sub BUILD {
         }
     } elsif ($name eq 'PROPERTY') {
         if ($pass == 1) {
-            @$args >= 2 or die "Not enough argument for PROPERTY, minimum 2";
+            @$args >= 2 or $self->die("Not enough argument for PROPERTY, minimum 2");
             my $name = shift @$args;
             $doc->properties->{$name} = @$args > 1 ? [@$args] : $args->[0];
         }
@@ -165,7 +165,7 @@ sub BUILD {
         }
     } else {
         unless ($self->document->ignore_unknown_settings) {
-            die "Unknown setting $name" unless grep { $_ eq $name } @known_settings;
+            $self->die("Unknown setting $name") unless grep { $_ eq $name } @known_settings;
         }
     }
 }
@@ -196,7 +196,7 @@ Org::Element::Setting - Represent Org in-buffer settings
 
 =head1 VERSION
 
-This document describes version 0.559 of Org::Element::Setting (from Perl distribution Org-Parser), released on 2023-07-12.
+This document describes version 0.560 of Org::Element::Setting (from Perl distribution Org-Parser), released on 2023-08-05.
 
 =head1 DESCRIPTION
 

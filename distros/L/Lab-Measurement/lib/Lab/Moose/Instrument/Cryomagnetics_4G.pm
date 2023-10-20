@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Cryomagnetics_4G;
-$Lab::Moose::Instrument::Cryomagnetics_4G::VERSION = '3.881';
+$Lab::Moose::Instrument::Cryomagnetics_4G::VERSION = '3.901';
 #ABSTRACT: Cryomagnetics 4G superconducting magnet power supply
 
 use v5.20;
@@ -227,7 +227,7 @@ sub get_rate {
 
 
 sub set_sweep {
-    my ( $self, $value, %args ) = validated_getter(
+    my ( $self, $value, %args ) = validated_setter(
         \@_,
         value => {
             isa => enum(
@@ -246,7 +246,7 @@ sub get_sweep {
 
 
 sub set_ulim {
-    my ( $self, $value, %args ) = validated_getter(
+    my ( $self, $value, %args ) = validated_setter(
         \@_,
         value => { isa => 'Num' },
     );
@@ -263,7 +263,7 @@ sub get_ulim {
 cache units => ( getter => 'get_units' );
 
 sub set_units {
-    my ( $self, $value, %args ) = validated_getter(
+    my ( $self, $value, %args ) = validated_setter(
         \@_,
         value => { isa => enum( [qw/A G/] ) },
     );
@@ -277,7 +277,7 @@ sub get_units {
 
 
 sub set_vlim {
-    my ( $self, $value, %args ) = validated_getter(
+    my ( $self, $value, %args ) = validated_setter(
         \@_,
         value => { isa => 'Num' },
     );
@@ -319,7 +319,7 @@ Lab::Moose::Instrument::Cryomagnetics_4G - Cryomagnetics 4G superconducting magn
 
 =head1 VERSION
 
-version 3.881
+version 3.901
 
 =head1 SYNOPSIS
 
@@ -435,7 +435,7 @@ This driver consumes the following roles:
 
 This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
-  Copyright 2022       Simon Reinhardt
+  Copyright 2022-2023  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -2,9 +2,9 @@
 package Task::BeLike::PERLANCAR::Used;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-07'; # DATE
+our $DATE = '2023-07-31'; # DATE
 our $DIST = 'Task-BeLike-PERLANCAR-Used'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: All my modules which I currently use and install on a new perl installation
@@ -21,7 +21,7 @@ Task::BeLike::PERLANCAR::Used - All my modules which I currently use and install
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -35,7 +35,8 @@ C<perlbrew install>):
 
 =head2 Included modules
 
-=head3 L<Acme::CM::Get> 0
+cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm in @INC (you may need to install the Acme::CPANModules::PERLANCAR::Unused module) (@INC entries checked: /home/u1/perl5/perlbrew/perls/perl-5.38.0/lib/site_perl/5.38.0/x86_64-linux /home/u1/perl5/perlbrew/perls/perl-5.38.0/lib/site_perl/5.38.0 /home/u1/perl5/perlbrew/perls/perl-5.38.0/lib/5.38.0/x86_64-linux /home/u1/perl5/perlbrew/perls/perl-5.38.0/lib/5.38.0) at /home/u1/perl5/perlbrew/perls/perl-5.38.0/lib/site_perl/5.38.0/App/cpanmodules.pm line 148.
+=pkg Acme::CM::Get 0
 
 =head3 L<Acme::CPAN::Testers::DevelCheckOS> 0
 
@@ -95,6 +96,8 @@ C<perlbrew install>):
 
 =head3 L<Acme::CPANModules::CreatingPaletteOfVisuallyDistinctColors> 0
 
+=head3 L<Acme::CPANModules::CryptingPassword> 0
+
 =head3 L<Acme::CPANModules::CryptoExchange::API> 0
 
 =head3 L<Acme::CPANModules::CustomCPAN> 0
@@ -153,6 +156,8 @@ C<perlbrew install>):
 
 =head3 L<Acme::CPANModules::LocalCPANMirror> 0
 
+=head3 L<Acme::CPANModules::MIMETypes> 0
+
 =head3 L<Acme::CPANModules::MagicVariableTechnique> 0
 
 =head3 L<Acme::CPANModules::ManagingMultipleRepositories> 0
@@ -191,9 +196,13 @@ C<perlbrew install>):
 
 =head3 L<Acme::CPANModules::PERLANCAR::InfoFromCPANTesters> 0
 
+=head3 L<Acme::CPANModules::PERLANCAR::PluginSystem> 0
+
 =head3 L<Acme::CPANModules::PERLANCAR::RsyncEnhancements> 0
 
 =head3 L<Acme::CPANModules::PERLANCAR::Temp::Plus> 0
+
+=head3 L<Acme::CPANModules::PERLANCAR::Unused> 0
 
 =head3 L<Acme::CPANModules::Parse::HumanDate> 0
 
@@ -367,13 +376,19 @@ C<perlbrew install>):
 
 =head3 L<Acme::LastWords> 0
 
+=head3 L<Acme::MetaSyntactic::3rd_rock> 0
+
 =head3 L<Acme::MetaSyntactic::WordList> 0
 
 =head3 L<Acme::MetaSyntactic::boboiboy> 0
 
+=head3 L<Acme::MetaSyntactic::breaking_bad> 0
+
 =head3 L<Acme::MetaSyntactic::chinese_zodiac> 0
 
 =head3 L<Acme::MetaSyntactic::christmas> 0
+
+=head3 L<Acme::MetaSyntactic::corner_gas> 0
 
 =head3 L<Acme::MetaSyntactic::countries> 0
 
@@ -397,9 +412,43 @@ C<perlbrew install>):
 
 =head3 L<Acme::MetaSyntactic::ozark> 0
 
+=head3 L<Acme::MetaSyntactic::schitts_creek> 0
+
 =head3 L<Acme::MetaSyntactic::seinfeld> 0
 
 =head3 L<Acme::MetaSyntactic::unyil> 0
+
+=head3 L<Acme::PERLANCAR::Dummy> 0
+
+=head3 L<Acme::PERLANCAR::Dummy::POD> 0
+
+=head3 L<Acme::PERLANCAR::DumpImportArgs> 0
+
+=head3 L<Acme::PERLANCAR::Prime> 0
+
+=head3 L<Acme::PERLANCAR::Test::Dependency::One> 0
+
+=head3 L<Acme::PERLANCAR::Test::Dependency::Three> 0
+
+=head3 L<Acme::PERLANCAR::Test::Dependency::Two> 0
+
+=head3 L<Acme::PERLANCAR::Test::Images> 0
+
+=head3 L<Acme::PERLANCAR::Test::MetaCPAN::HTML> 0
+
+=head3 L<Acme::PERLANCAR::Test::Misc> 0
+
+=head3 L<Acme::PERLANCAR::Test::SameRelease> 0
+
+=head3 L<Acme::PERLANCAR::Test::Versioning> 0
+
+=head3 L<Acme::Test::LocaleTextDomain> 0
+
+=head3 L<Acme::Test::LocaleTextDomainIfEnv> 0
+
+=head3 L<Acme::Test::LocaleTextDomainUTF8IfEnv> 0
+
+=head3 L<Acme::Test::crypt> 0
 
 =head3 L<Algorithm::Backoff> 0.006
 
@@ -530,6 +579,8 @@ C<perlbrew install>):
 =head3 L<App::DAVThis> 0
 
 =head3 L<App::DBIUtils> 0
+
+=head3 L<App::DGIPUtils> 0
 
 =head3 L<App::DNSZoneUtils> 0
 
@@ -1809,6 +1860,10 @@ C<perlbrew install>):
 
 =head3 L<Bencher::Scenarios::Data::ModeMerge> 0
 
+=head3 L<Bencher::Scenarios::Data::Sah> 0
+
+=head3 L<Bencher::Scenarios::Data::Sah::Resolve> 0
+
 =head3 L<Bencher::Scenarios::Data::Walk::More> 0
 
 =head3 L<Bencher::Scenarios::DataCSel> 0
@@ -1832,6 +1887,12 @@ C<perlbrew install>):
 =head3 L<Bencher::Scenarios::DataSahVSTypeTiny> 0
 
 =head3 L<Bencher::Scenarios::DateModules> 0
+
+=head3 L<Bencher::Scenarios::DateTime::Format::Duration::ISO8601> 0
+
+=head3 L<Bencher::Scenarios::DateTime::Format::ISO8601> 0
+
+=head3 L<Bencher::Scenarios::DateTime::Format::ISO8601::Format> 0
 
 =head3 L<Bencher::Scenarios::DateTimeFormatAlami> 0
 
@@ -2853,7 +2914,7 @@ C<perlbrew install>):
 
 =head3 L<File::Trash::EmptyFiles::Undoable> 0
 
-=head3 L<File::Trash::FreeDesktop> 0
+=head3 L<File::Trash::FreeDesktop> 0.204
 
 =head3 L<File::Trash::Undoable> 0.230
 
@@ -2952,6 +3013,8 @@ C<perlbrew install>):
 =head3 L<Gen::Test::Rinci::FuncResult> 0
 
 =head3 L<Generic::ColorTheme::Kuler> 0
+
+=head3 L<Gepok> 0
 
 =head3 L<Getopt::Long::Any> 0
 
@@ -3513,6 +3576,8 @@ C<perlbrew install>):
 
 =head3 L<Parse::CommandLine::Regexp> 0
 
+=head3 L<Parse::Date::Month::EN> 0
+
 =head3 L<Parse::Date::Month::ID> 0
 
 =head3 L<Parse::FireDiamond> 0.004
@@ -3633,7 +3698,7 @@ C<perlbrew install>):
 
 =head3 L<Perinci::Easy> 0
 
-=head3 L<Perinci::Examples> 0.822
+=head3 L<Perinci::Examples> 0.824
 
 =head3 L<Perinci::Examples::Bin::Any> 0
 
@@ -3842,6 +3907,8 @@ C<perlbrew install>):
 =head3 L<Pipe::Find> 0
 
 =head3 L<Plack::App::dbi2http> 0
+
+=head3 L<Plugin::System> 0
 
 =head3 L<Pod::Cookbook> 0
 
@@ -4173,6 +4240,8 @@ C<perlbrew install>):
 
 =head3 L<Sah::Schemas::CPANModules> 0
 
+=head3 L<Sah::Schemas::Calendar::Dates> 0
+
 =head3 L<Sah::Schemas::Chrome> 0
 
 =head3 L<Sah::Schemas::Collection> 0
@@ -4431,6 +4500,12 @@ C<perlbrew install>):
 
 =head3 L<TableData> 0.2.0
 
+=head3 L<TableData::Acme::CPANAuthors> 0
+
+=head3 L<TableData::Acme::CPANModules> 0
+
+=head3 L<TableData::Calendar::Date::Holiday::ID> 0
+
 =head3 L<TableData::Locale::US::State> 0
 
 =head3 L<TableData::Perl::CPAN::Release::Static::2022> 0
@@ -4438,6 +4513,8 @@ C<perlbrew install>):
 =head3 L<TableData::Quote::JamesFT> 0
 
 =head3 L<TableData::Size::DisplayResolution> 0
+
+=head3 L<TableData::Size::Mattress> 0
 
 =head3 L<TableDataBundle::Business::ID::BBIA> 0
 

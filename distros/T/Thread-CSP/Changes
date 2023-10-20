@@ -1,5 +1,10 @@
 Revision history for Thread-CSP
 
+0.011     2023-10-08 14:38:14+02:00 Europe/Brussels
+          - Add fallback refcount implementations
+          - Use Magic typemap
+          - Destroy arguments promise after use
+
 0.010     2023-05-09 15:08:24+02:00 Europe/Amsterdam
           - Rename Thread::Csp to Thread::CSP
 

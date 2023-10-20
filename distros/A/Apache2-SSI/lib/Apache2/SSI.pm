@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI.pm
-## Version v0.2.7
+## Version v0.2.8
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/12/17
-## Modified 2022/10/23
+## Modified 2023/10/11
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -67,7 +67,7 @@ BEGIN
     use Scalar::Util ();
     use URI;
     use version;
-    our $VERSION = 'v0.2.7';
+    our $VERSION = 'v0.2.8';
     use constant PERLIO_IS_ENABLED => $Config{useperlio};
     # As of Apache 2.4.41 and mod perl 2.0.11 Apache2::SubProcess::spawn_proc_prog() is not working
     use constant MOD_PERL_SPAWN_PROC_PROG_WORKING => 0;

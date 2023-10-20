@@ -120,10 +120,6 @@ You can also look for information at:
 
     [http://matrix.cpantesters.org/?dist=Math-BigInt-GMPz](http://matrix.cpantesters.org/?dist=Math-BigInt-GMPz)
 
-- CPAN Ratings
-
-    [https://cpanratings.perl.org/dist/Math-BigInt-GMPz](https://cpanratings.perl.org/dist/Math-BigInt-GMPz)
-
 # LICENSE
 
 This program is free software; you may redistribute it and/or modify it under

@@ -24,7 +24,7 @@ my %args = (
 
     requires => {
         'IPC::SharedMem' => '0',
-        'Mojolicious' => '0',
+        'Mojolicious' => '9.34',
     },
 
     recommends => {

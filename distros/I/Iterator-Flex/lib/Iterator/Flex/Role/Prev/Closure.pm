@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Prev::Closure;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Iterator::Flex::Utils qw( :default ITERATOR PREV );
 use Role::Tiny;
@@ -52,7 +52,7 @@ Iterator::Flex::Role::Prev::Closure - Implement C<prev> as a closure stored in t
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 METHODS
 

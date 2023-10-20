@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Object::PadX::Log::Log4perl",
   "PREREQ_PM" => {
     "Log::Log4perl" => 0,
-    "Object::Pad" => 0
+    "Object::Pad" => "0.66"
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,7 +40,7 @@ my %FallbackPrereqs = (
   "IO::Scalar" => 0,
   "IPC::Open3" => 0,
   "Log::Log4perl" => 0,
-  "Object::Pad" => 0,
+  "Object::Pad" => "0.66",
   "Test::More" => "0.96"
 );
 

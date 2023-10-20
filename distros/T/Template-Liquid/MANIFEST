@@ -57,4 +57,5 @@ t/0500_bugs/05002_issue_7.t
 t/0500_bugs/05004_case_conditions.t
 t/0500_bugs/05005_filter_with_metachars.t
 t/0500_bugs/05006_single_literal_zero_issue.t
+t/0500_bugs/05007_less_than_condition.t
 META.yml

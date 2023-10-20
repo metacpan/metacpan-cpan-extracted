@@ -28,8 +28,11 @@ sub new {
 sub vsp0 {
     my ( $self, $elt, $ps ) = @_;
     $ps->{fonts}->{diagram}->{size} * $ps->{spacing}->{diagramchords}
-      + 0.40 * $ps->{diagrams}->{width}
-	+ $ps->{diagrams}->{vcells} * $ps->{diagrams}->{height};
+      + ( $ps->{diagrams}->{nutwidth} * ($ps->{diagrams}->{linewidth} || 0.10) + 0.40 )
+       * $ps->{diagrams}->{width}
+       + $ps->{diagrams}->{vcells} * $ps->{diagrams}->{height}
+       + ( $ps->{diagrams}->{fingers} eq "below" ? $ps->{fonts}->{diagram}->{size} : 0 )
+       ;
 }
 
 # The advance height.
@@ -62,8 +65,6 @@ sub hsp {
     $self->hsp0( $elt, $ps ) + $self->hsp1( $elt, $ps );
 }
 
-# my @Roman = qw( I II III IV V VI VI VII VIII IX X XI XII );
-
 sub font_bl {
     goto &ChordPro::Output::PDF::font_bl;
 }
@@ -74,11 +75,17 @@ sub draw {
     return unless $info;
 
     my $x0 = $x;
+    my $y0 = $y;
 
-    my $gw = $ps->{diagrams}->{width};
-    my $gh = $ps->{diagrams}->{height};
-    my $dot = 0.80 * $gw;
-    my $lw  = ($ps->{diagrams}->{linewidth} || 0.10) * $gw;
+    my $gw   = $ps->{diagrams}->{width};
+    my $gh   = $ps->{diagrams}->{height};
+    my $dot  = $ps->{diagrams}->{dotsize} * $gw;
+    my $bsz  = $ps->{diagrams}->{barwidth} * $dot;
+    my $lw   = ($ps->{diagrams}->{linewidth} || 0.10) * $gw;
+    my $bflw = $ps->{diagrams}->{nutwidth} * $lw;
+    my $fsh  = $ps->{diagrams}->{fingers}; # t / f / below
+    my $bfy  = $bflw/3;
+
     my $pr = $ps->{pr};
 
     my $fg = $info->{diagram} // $config->{pdf}->{theme}->{foreground};
@@ -87,6 +94,7 @@ sub draw {
 
     # Draw font name.
     my $font = $ps->{fonts}->{diagram};
+    my $fasc = $font->{fd}->{font}->ascender/1000;
     $pr->setfont($font);
     my $name = $info->chord_display;
     # $name .= "*"
@@ -97,11 +105,10 @@ sub draw {
     $pr->text( $name, $x + ($w - $pr->strwidth($name))/2, $y - font_bl($font) );
     $y -= $font->{size} * $ps->{spacing}->{diagramchords} + $dot/2 + $lw;
     if ( $info->{base} + $info->{baselabeloffset} > 1 ) {
-	# my $i = @Roman[$info->{base}] . "  ";
 	my $i = sprintf("%d  ", $info->{base} + $info->{baselabeloffset});
 	$pr->setfont( $ps->{fonts}->{diagram_base}, $gh );
 	$pr->text( $i, $x-$pr->strwidth($i),
-		   $y-($info->{baselabeloffset}*$gh)-0.85*$gh,
+		   $y-$bfy - $bflw/2 - ($info->{baselabeloffset}*$gh)-0.85*$gh,
 		   $ps->{fonts}->{diagram_base}, $ps->{spacing}->{diagramchords}*$gh );
 	$pr->setfont($font);
     }
@@ -109,8 +116,9 @@ sub draw {
     my $v = $ps->{diagrams}->{vcells};
     my $h = $strings;
 
+    my $basefretno = $info->{base} + $info->{baselabeloffset};
     # Draw the grid.
-    my $xo = $self->grid_xo( $ps, $fg );
+    my $xo = $self->grid_xo( $ps, $basefretno, $fg );
 
     my $crosshairs = sub {
 	my ( $x, $y, $col ) = @_;
@@ -128,7 +136,7 @@ sub draw {
 	}
     };
 
-    $pr->{pdfgfx}->formimage( $xo, $x, $y-$v*$gh, 1 );
+    $pr->{pdfgfx}->formimage( $xo, $x, $y-$bfy-$v*$gh, 1 );
 
     # The numbercolor property of the chordfingers is used for the
     # background of the underlying dot (the numbers are transparent).
@@ -138,7 +146,7 @@ sub draw {
     $fbg = "white" if $fbg eq "none";
 
     my $fingers;
-    $fingers = $info->{fingers} if $ps->{diagrams}->{fingers};
+    $fingers = $info->{fingers} if $fsh;
 
     # Bar detection.
     my $bar;
@@ -167,15 +175,15 @@ sub draw {
 		    next;
 		}
 		# Print the bar line. Need linecap 0.
-		$pr->hline( $x+$bi[2]*$gw, $y-$bi[1]*$gh+$gh/2,
+		$pr->hline( $x+$bi[2]*$gw, $y-$bfy -$bflw/2 -$bi[1]*$gh+$gh/2,
 			    ($bi[3]-$bi[2])*$gw,
-			    $dot, $fg, 0 );
+			    $bsz, $fg, 0 );
 	    }
 	}
     }
 
     # Process the strings and fingers.
-    $x -= $gw/2;
+#    $x -= $gw/2;
     my $oflo;			# to detect out of range frets
 
     my $g_none = "/";		# unnumbered
@@ -186,6 +194,7 @@ sub draw {
     # To get it vertically centered we must lower it by 455 (1000/2-55).
     $pr->setfont($fcf,$dot);
     my $g_width = $pr->strwidth("1");
+    $x -= 0.65 * $g_width;
     my $g_lower = -0.455*$g_width;
 #    warn("GW dot=$dot, width=$g_width, lower=$g_lower\n");
 #    my $e = $fcf->{fd}->{font}->extents("1",10);
@@ -198,8 +207,17 @@ sub draw {
 
 	# For bars, only the first and last finger.
 	if ( $fing && $bar && $bar->{$fing} ) {
-	    next unless $sx == $bar->{$fing}->[2]
-	      || $sx == $bar->{$fing}->[3];
+	    unless ( $sx == $bar->{$fing}->[2] || $sx == $bar->{$fing}->[3] ) {
+		if ( $fsh eq "below" && $fing =~ /^[A-Z0-9]$/ ){
+		    $pr->setfont( $font, $dot );
+		    my $w = $pr->strwidth($fing);
+		    $pr->text( $fing,
+			       $x + 0.65*$g_width -$w/2,
+			       $y - $bfy - $bflw/2-($v+0.3)*$gh - $dot*1.4*$fasc,
+			       $font, $dot*1.4 );
+		}
+		next;
+	    }
 	}
 
 	if ( $fret > 0 ) {
@@ -209,7 +227,7 @@ sub draw {
 	    }
 
 	    my $glyph;
-	    if ( $fbg eq $fg ) {
+	    if ( $fbg eq $fg || $fsh eq "below" ) {
 		$glyph = $g_none;
 	    }
 	    elsif ( $fing =~ /^[A-Z0-9]$/ ) {
@@ -227,26 +245,32 @@ sub draw {
 
 	    # The glyphs are open, so we need am explicit
 	    # background circle to prevent the grid peeping through.
-	    # OTOH, for the unnumbered dot, we need a foreground circle.
-	    $pr->circle( $x+$gw/2, $y-$fret*$gh+$gh/2, $dot/2.2, 1,
-			 $glyph eq $g_none ? $fg : $fbg,
-			 "none");
+	    $pr->circle( $x+$gw/2, $y-$bfy-$bflw/2-$fret*$gh+$gh/2, $dot/2.2, 1,
+			 $fbg, "none") unless $glyph eq $g_none;
 
 	    $pr->setfont( $fcf, $dot );
 	    $glyph = "<span color='$fg'>$glyph</span>"
 	      if $info->{diagram};
 	    $pr->text( $glyph,
-			$x,
-			$y - $fret*$gh + $gh/2 + $g_lower,
-			$fcf, $dot/0.8 );
+		       $x,
+		       $y - $bfy - $bflw/2-$fret*$gh + $gh/2 + $g_lower,
+		       $fcf, $dot/0.8 );
+
+	    if ( $fsh eq "below" && $fing =~ /^[A-Z0-9]$/ ){
+		$pr->setfont( $font, $dot*1.4 );
+		my $w = $pr->strwidth($fing);
+		$pr->text( $fing,
+			   $x + 0.65*$g_width -$w/2,
+			   $y - $bfy - $bflw/2-($v+0.3)*$gh - $dot*1.4*$fasc,
+			   $font, $dot*1.4 );
+	    }
+
 	}
 	elsif ( $fret < 0 ) {
-	    $pr->cross( $x+$gw/2, $y+$lw+$gh/3, $dot/3, $lw,
-			$fg );
+	    $pr->cross( $x+$gw/2, $y+$lw+$gh/3, $dot/3, $lw, $fg );
 	}
 	elsif ( $info->{base} > 0 ) {
-	    $pr->circle( $x+$gw/2, $y+$lw+$gh/3, $dot/3, $lw,
-			 undef, $fg );
+	    $pr->circle( $x+$gw/2, $y+$lw+$gh/3, $dot/3, $lw, undef, $fg );
 	}
     }
     continue {
@@ -257,15 +281,17 @@ sub draw {
 }
 
 sub grid_xo {
-    my ( $self, $ps, $fg ) = @_;
+    my ( $self, $ps, $basefretno, $fg ) = @_;
 
     my $gw = $ps->{diagrams}->{width};
     my $gh = $ps->{diagrams}->{height};
     my $lw  = ($ps->{diagrams}->{linewidth} || 0.10) * $gw;
+    my $bflw = $ps->{diagrams}->{nutwidth} * $lw;
+    my $bfno = $basefretno;
     my $v = $ps->{diagrams}->{vcells};
     my $strings = $config->diagram_strings;
 
-    return $self->{grids}->{$gw,$gh,$lw,$v,$strings,$fg} //= do
+    return $self->{grids}->{$gw,$gh,$lw, $bflw, $bfno, $fg, $v,$strings} //= do
       {
 	my $w = $gw * ($strings - 1);
 	my $h = $strings;
@@ -273,18 +299,26 @@ sub grid_xo {
 	my $form = $ps->{pr}->{pdf}->xo_form;
 
 	# Bounding box must take linewidth into account.
-	my @bb = ( -$lw/2, -$lw/2, ($h-1)*$gw+$lw/2, $v*$gh+$lw/2 );
+	my @bb = ( -$lw/2, -$lw/2 - $bflw/2,
+		   ($h-1)*$gw+$lw/2, $v*$gh+$lw/2 + $bflw/2.5 );
 	$form->bbox(@bb);
 
 	# Pseudo-object to access low level drawing routines.
-	my $dc = bless { pdfgfx => $form } =>
-	  ChordPro::Output::PDF::Writer::;
+	my $dc = bless { pdfgfx => $form } => ChordPro::Output::PDF::Writer::;
 
 	# Draw the grid.
 	$dc->rectxy( @bb, 0, 'red' ) if 0;
 	my $color = $fg;
-	$dc->hline( 0, ($v-$_)*$gh, $w, $lw, $color ) for 0..$v;
-	$dc->vline( $_*$gw, $v*$gh, $gh*$v, $lw, $color) for 0..$h-1;
+	for ( 0 .. $v ) {
+	    if ( $bfno <= 1 && $_== 0 ) {
+		$dc->hline( 0, ($v-$_)*$gh, $w, $bflw, $color );
+	    }
+	    else {
+		$dc->hline( 0, ($v-$_)*$gh-$bflw/2, $w, $lw, $color );
+	    }
+	}
+
+	$dc->vline( $_*$gw, $v*$gh+$bflw/4, $gh*$v+$bflw/1.5, $lw, $color) for 0..$h-1;
 
 	$form;
       };

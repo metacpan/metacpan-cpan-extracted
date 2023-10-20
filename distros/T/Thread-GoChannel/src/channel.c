@@ -29,8 +29,8 @@ struct channel {
 	Notification write_notification;
 };
 
-Channel* S_channel_alloc(pTHX_ UV refcount) {
-	Channel* ret = calloc(1, sizeof(Channel));
+struct channel* S_channel_alloc(pTHX_ UV refcount) {
+	struct channel* ret = calloc(1, sizeof(struct channel));
 	MUTEX_INIT(&ret->data_mutex);
 	MUTEX_INIT(&ret->reader_mutex);
 	MUTEX_INIT(&ret->writer_mutex);
@@ -41,7 +41,7 @@ Channel* S_channel_alloc(pTHX_ UV refcount) {
 	return ret;
 }
 
-void channel_send(Channel* channel, SV* message) {
+void channel_send(struct channel* channel, SV* message) {
 	MUTEX_LOCK(&channel->writer_mutex);
 	MUTEX_LOCK(&channel->data_mutex);
 
@@ -63,7 +63,7 @@ void channel_send(Channel* channel, SV* message) {
 	MUTEX_UNLOCK(&channel->writer_mutex);
 }
 
-SV* S_channel_receive(pTHX_ Channel* channel) {
+SV* S_channel_receive(pTHX_ struct channel* channel) {
 	MUTEX_LOCK(&channel->reader_mutex);
 	MUTEX_LOCK(&channel->data_mutex);
 
@@ -93,7 +93,7 @@ SV* S_channel_receive(pTHX_ Channel* channel) {
 	return result;
 }
 
-SV* S_channel_receive_ready_fh(pTHX_ Channel* channel) {
+SV* S_channel_receive_ready_fh(pTHX_ struct channel* channel) {
 	MUTEX_LOCK(&channel->data_mutex);
 
 	SV* result = notification_create(&channel->write_notification);
@@ -105,7 +105,7 @@ SV* S_channel_receive_ready_fh(pTHX_ Channel* channel) {
 	return result;
 }
 
-SV* S_channel_send_ready_fh(pTHX_ Channel* channel) {
+SV* S_channel_send_ready_fh(pTHX_ struct channel* channel) {
 	MUTEX_LOCK(&channel->data_mutex);
 
 	SV* result = notification_create(&channel->write_notification);
@@ -117,7 +117,7 @@ SV* S_channel_send_ready_fh(pTHX_ Channel* channel) {
 	return result;
 }
 
-void channel_close(Channel* channel) {
+void channel_close(struct channel* channel) {
 	MUTEX_LOCK(&channel->data_mutex);
 
 	notification_unset(&channel->read_notification);
@@ -127,7 +127,7 @@ void channel_close(Channel* channel) {
 	MUTEX_UNLOCK(&channel->data_mutex);
 }
 
-void S_channel_refcount_dec(pTHX_ Channel* channel) {
+void S_channel_refcount_dec(pTHX_ struct channel* channel) {
 	if (refcount_dec(&channel->refcount) == 1) {
 		notification_unset(&channel->read_notification);
 		notification_unset(&channel->write_notification);
@@ -140,22 +140,14 @@ void S_channel_refcount_dec(pTHX_ Channel* channel) {
 }
 
 static int channel_magic_destroy(pTHX_ SV* sv, MAGIC* magic) {
-	channel_refcount_dec((Channel*)magic->mg_ptr);
+	channel_refcount_dec((struct channel*)magic->mg_ptr);
 	return 0;
 }
 
 static int channel_magic_dup(pTHX_ MAGIC* magic, CLONE_PARAMS* param) {
-	Channel* channel = (Channel*)magic->mg_ptr;
+	struct channel* channel = (struct channel*)magic->mg_ptr;
 	refcount_inc(&channel->refcount);
 	return 0;
 }
 
-static const MGVTBL channel_magic = { 0, 0, 0, 0, channel_magic_destroy, 0, channel_magic_dup };
-
-SV* S_channel_to_sv(pTHX_ Channel* channel, SV* stash_name) {
-	object_to_sv(channel, gv_stashsv(stash_name, 0), &channel_magic, MGf_DUP);
-}
-
-Channel* S_sv_to_channel(pTHX_ SV* sv) {
-	return sv_to_object(sv, "Thread::GoChannel", &channel_magic);
-}
+const MGVTBL Thread__GoChannel_magic = { 0, 0, 0, 0, channel_magic_destroy, 0, channel_magic_dup };

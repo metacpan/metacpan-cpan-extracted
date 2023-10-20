@@ -126,5 +126,26 @@ sub screens {
     return \@result;
 }
 
+# Implemented in XCB.xs
+
+=head2 get_keymap
+
+Returns intrinsically created array with X11 Keymap:
+
+  [
+    undef, # index in array is a key's scan code: 0
+    ...
+    [0x31, 0x21, 0x31, 0x21, 0x0, 0x0, 0x0], # key symbol codes. scan code 10 represents key '1'
+    ...
+  ]
+
+=head2 get_query_tree_children
+
+Returns intrinsically created array with children windows identifiers for specified window:
+
+  [ id1, id2, id3 ]
+
+=cut
+
 1
 # vim:ts=4:sw=4:expandtab

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Changes file management - ~/lib/Changes.pm
-## Version v0.3.2
+## Version v0.3.5
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/12/09
-## Modified 2023/08/20
+## Modified 2023/10/11
 ## All rights reserved
 ## 
 ## 
@@ -22,7 +22,7 @@ BEGIN
     use Changes::Release;
     use Changes::Group;
     use Changes::Change;
-    use Nice::Try;
+    # use Nice::Try;
     # From version::regex
     our $VERSION_LAX_REGEX = qr/(?^x: (?^x:
         (?<has_v>v) (?<ver>(?^:[0-9]+) (?: (?^:\.[0-9]+)+ (?^:_[0-9]+)? )?)
@@ -49,7 +49,7 @@ BEGIN
     (?<r_tz_space>[[:blank:]\h]+)
     (?<r_tz>\S+)
     /x;
-    our $VERSION = 'v0.3.2';
+    our $VERSION = 'v0.3.5';
 };
 
 use strict;
@@ -406,37 +406,44 @@ sub parse
             $self->_load_class( 'DateTime::TimeZone' ) || return( $self->pass_error );
             $self->_load_class( 'DateTime::Format::Strptime' ) || return( $self->pass_error );
             my( $dt, $tz, $fmt );
-            try
+            # try-catch
+            local $@;
+            $tz = eval
             {
-                $tz = DateTime::TimeZone->new( name => $re->{r_tz} );
-            }
-            catch( $e where { /The[[:blank:]\h]+timezone[[:blank:]\h]+'(?:.*?)'[[:blank:]\h]+could[[:blank:]\h]+not[[:blank:]\h]+be[[:blank:]\h]+loaded/i } )
+                DateTime::TimeZone->new( name => $re->{r_tz} );
+            };
+            if( $@ )
             {
-                warn( "Warning only: invalid time zone '$re->{r_tz}' specified in release at line ", ( $i + 1 ), "\n" ) if( $self->_warnings_is_enabled );
-                $tz = DateTime::TimeZone->new( name => 'UTC' );
-            }
-            catch( $e )
-            {
-                warn( "Warning only: error trying to instantiate a new DateTime::TimeZone object with time zone '$re->{r_tz}': $e\n" ) if( $self->_warnings_is_enabled );
-                $tz = DateTime::TimeZone->new( name => 'UTC' );
+                if( $@ =~ /The[[:blank:]\h]+timezone[[:blank:]\h]+'(?:.*?)'[[:blank:]\h]+could[[:blank:]\h]+not[[:blank:]\h]+be[[:blank:]\h]+loaded/i )
+                {
+                    warn( "Warning only: invalid time zone '$re->{r_tz}' specified in release at line ", ( $i + 1 ), "\n" ) if( $self->_warnings_is_enabled );
+                    $tz = DateTime::TimeZone->new( name => 'UTC' );
+                }
+                else
+                {
+                    warn( "Warning only: error trying to instantiate a new DateTime::TimeZone object with time zone '$re->{r_tz}': $@\n" ) if( $self->_warnings_is_enabled );
+                    $tz = DateTime::TimeZone->new( name => 'UTC' );
+                }
             }
             
             
-            try
+            # try-catch
+            $fmt = eval
             {
-                $fmt = DateTime::Format::Strptime->new(
+                DateTime::Format::Strptime->new(
                     pattern => "%F$re->{r_dt_space}%T$re->{r_tz_space}%O",
                 );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                warn( "Error only: failed to create a DateTime::Format::Strptime with pattern '%F$re->{r_dt_space}%T$re->{r_tz_space}%Z': $e\n" ) if( $self->_warnings_is_enabled );
+                warn( "Error only: failed to create a DateTime::Format::Strptime with pattern '%F$re->{r_dt_space}%T$re->{r_tz_space}%Z': $@\n" ) if( $self->_warnings_is_enabled );
                 $fmt = DateTime::Format::Strptime->new(
                     pattern => "%F %T %O",
                 );
             }
             
-            try
+            # try-catch
+            eval
             {
                 $dt = DateTime->new(
                     year => $re->{r_year},
@@ -448,10 +455,10 @@ sub parse
                     time_zone => $tz,
                 );
                 $dt->set_formatter( $fmt );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                warn( "Warning only: error trying to instantiate a DateTime value based on the date and time of the release at line ", ( $i + 1 ), ": $e\n" ) if( $self->_warnings_is_enabled );
+                warn( "Warning only: error trying to instantiate a DateTime value based on the date and time of the release at line ", ( $i + 1 ), ": $@\n" ) if( $self->_warnings_is_enabled );
                 $dt = DateTime->now( time_zone => $tz );
             }
             
@@ -887,15 +894,17 @@ sub time_zone
         }
         else
         {
-            try
+            $self->_load_class( 'DateTime::TimeZone' ) || return( $self->pass_error );
+            # try-catch
+            local $@;
+            eval
             {
-                $self->_load_class( 'DateTime::TimeZone' ) || return( $self->pass_error );
                 my $tz = DateTime::TimeZone->new( name => "$v" );
                 $self->{time_zone} = $tz;
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                return( $self->error( "Error setting time zone for '$v': $e" ) );
+                return( $self->error( "Error setting time zone for '$v': $@" ) );
             }
         }
         # $self->reset(1);
@@ -983,7 +992,7 @@ Changes - Changes file management
 
 =head1 VERSION
 
-    v0.3.2
+    v0.3.5
 
 =head1 DESCRIPTION
 

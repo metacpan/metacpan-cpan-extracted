@@ -1,6 +1,7 @@
 use strict;
+use warnings;
 
-my $perl = `which perl`;
+my $perl = $ENV{_};
 
 chomp $perl;
 

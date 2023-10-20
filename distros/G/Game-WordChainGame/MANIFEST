@@ -1,0 +1,11 @@
+Changes
+lib/Game/WordChainGame.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-basic_init.t
+t/02-validate_word.t
+t/03-play_turn.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

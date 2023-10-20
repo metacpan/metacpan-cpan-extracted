@@ -1,5 +1,20 @@
 Revision history for OpenAPI-Modern
 
+0.048     2023-10-04 05:34:44Z
+          - now validating all headers of a given name, not just the first,
+          when provided on the request/response as separate lines
+          - multiple headers of the same name can be validated as an array or
+          object as per deserialization rules in the OpenAPI v3.1
+          specification.
+
+0.047     2023-09-19 04:29:16Z
+          - strings are now treated as numbers without requiring the "type"
+            keyword, and only from parameters, not message bodies, and only
+            when no media type is provided
+          - new "recursive_get" method on
+            JSON::Schema::Modern::Document::OpenAPI for fetching a
+            specification at a json pointer and following any $refs
+
 0.046     2023-06-24 21:56:39Z
           - extra validation for Transfer-Encoding response header
 

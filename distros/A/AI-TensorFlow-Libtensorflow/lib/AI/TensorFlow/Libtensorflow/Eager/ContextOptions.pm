@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Eager::ContextOptions;
 # ABSTRACT: Eager context options
-$AI::TensorFlow::Libtensorflow::Eager::ContextOptions::VERSION = '0.0.6';
+$AI::TensorFlow::Libtensorflow::Eager::ContextOptions::VERSION = '0.0.7';
 use strict;
 use warnings;
 use AI::TensorFlow::Libtensorflow::Lib qw(arg);

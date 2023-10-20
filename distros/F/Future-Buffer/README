@@ -23,7 +23,7 @@ SYNOPSIS
           }
        }
     
-       print_lines()->get;
+       await print_lines();
 
 DESCRIPTION
 
@@ -46,11 +46,16 @@ DESCRIPTION
     Thus, any call to the write method to provide more data can potentially
     result in multiple futures becoming ready.
 
+    Since version 0.04 the buffer supports an end-of-file condition. The
+    "close" method or a fill callback future yielding an empty result will
+    mark that the buffer is now closed. Once it has exhausted the remaining
+    stored data any further read futures will yield empty.
+
 CONSTRUCTOR
 
  new
 
-       $buffer = Future::Buffer->new( %args )
+       $buffer = Future::Buffer->new( %args );
 
     Returns a new Future::Buffer instance.
 
@@ -58,9 +63,7 @@ CONSTRUCTOR
 
     fill => CODE
 
-         $f = $fill->()
-      
-            $data = $f->get
+         $data = await $fill->();
 
       Optional callback which the buffer will invoke when it needs more
       data.
@@ -69,11 +72,14 @@ CONSTRUCTOR
       by using the fill future as a prototype, ensuring they have the
       correct type.
 
+      If the result is an empty list this will be treated as an end-of-file
+      notification and the buffer is closed.
+
 METHODS
 
  length
 
-       $len = $buffer->length
+       $len = $buffer->length;
 
     Returns the length of the currently-stored data; that is, data that has
     been provided by write calls or the fill callback but not yet consumed
@@ -81,13 +87,13 @@ METHODS
 
  is_empty
 
-       $empty = $buffer->is_empty
+       $empty = $buffer->is_empty;
 
     Returns true if the stored length is zero.
 
  write
 
-       $f = $buffer->write( $data )
+       $f = $buffer->write( $data );
 
     Appends to the stored data, invoking any pending read futures that are
     outstanding and can now complete.
@@ -98,36 +104,47 @@ METHODS
     it is safe for the caller to ignore the return value, but it may become
     not so.
 
+ close
+
+       $buffer->close;
+
+    Marks that the buffer is now at EOF condition. Once any remaining
+    buffered content is consumed, any further read futures will all yield
+    EOF condition.
+
  read_atmost
 
-       $f = $buffer->read_atmost( $len )
-    
-          $data = $f->get
+       $data = await $buffer->read_atmost( $len );
 
     Returns a future which will complete when there is some data available
     in the buffer and will yield up too the given length. Note that,
     analogous to calling the read IO method on a filehandle, this can still
     complete and yield a shorter length if less is currently available.
 
+    If the stream is closed and there is no remaining data, the returned
+    future will yield empty.
+
  read_exactly
 
-       $f = $buffer->read_exactly( $len )
-    
-          $data = $f->get
+       $data = await $buffer->read_exactly( $len );
 
     Returns a future which will complete when there is enough data
     available in the buffer to yield exactly the length given.
 
+    If the stream is closed and there is no remaining data, the returned
+    future will yield empty.
+
  read_until
 
-       $f = $buffer->read_until( $pattern )
-    
-          $data = $f->get
+       $data = await $buffer->read_until( $pattern );
 
     Returns a future which will complete when the buffer contains a match
     for the given pattern (which may either be a plain string or a compiled
     Regexp). The future will yield the contents of the buffer up to and
     including this match.
+
+    If the stream is closed and there is no remaining data, the returned
+    future will yield empty.
 
     For example, a readline-like operation can be performed by
 
@@ -135,9 +152,7 @@ METHODS
 
  read_unpacked
 
-       $f = $buffer->read_unpacked( $pack_format )
-    
-          @fields = $f->get
+       $data = await $buffer->read_unpacked( $pack_format );
 
     Since version 0.03.
 
@@ -146,13 +161,16 @@ METHODS
     format. The future will yield a list of all the fields extracted by the
     format.
 
+    If the stream is closed and there is no remaining data, the returned
+    future will yield empty.
+
     Note that because the implementation is shamelessly stolen from
     IO::Handle::Packable the same limitations on what pack formats are
     recognized will apply.
 
  unread
 
-       $buffer->unread( $data )
+       $buffer->unread( $data );
 
     Since version 0.03.
 
@@ -185,10 +203,6 @@ TODO
       situations. This may require building a shared CPAN module for doing
       streaming-unpack along with IO::Handle::Packable and other
       situations.
-
-      * Consider what happens at EOF. Add a close method for producers to
-      call. Understand what fill would do there. Have all the pending read
-      futures yield an empty list maybe?
 
 AUTHOR
 

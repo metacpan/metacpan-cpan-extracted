@@ -3,6 +3,11 @@ Revision history for Perl extension EV
 Changes marked with (libev) are changes in libev, and might have more
 documentation in the libev Changes file.
 
+4.34 Sun 08 Oct 2023 23:45:11 CEST
+	- the EV::stat->path method errornously freed the result, causing
+          corruption (testcase by Carsten Witt).
+        - new functino EV::Child::reinit.
+
 4.33 Wed Mar 18 13:31:12 CET 2020
 	- the enable assertion makefile question failed to enable
           assertions due to a typo.

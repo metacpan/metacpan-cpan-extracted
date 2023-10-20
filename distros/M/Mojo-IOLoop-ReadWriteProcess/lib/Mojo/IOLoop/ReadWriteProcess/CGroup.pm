@@ -72,7 +72,7 @@ sub _contains {
 
 sub _setget {
   $_[2]
-    ? shift->_cgroup->child($_[0])->spurt($_[1])
+    ? shift->_cgroup->child($_[0])->spew($_[1])
     : shift->_cgroup->child($_[0])->slurp;
 }
 

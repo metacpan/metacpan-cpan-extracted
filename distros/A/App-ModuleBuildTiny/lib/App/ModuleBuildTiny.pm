@@ -2,7 +2,7 @@ package App::ModuleBuildTiny;
 
 use 5.014;
 use warnings;
-our $VERSION = '0.042';
+our $VERSION = '0.043';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -158,12 +158,17 @@ my %prompt_for = (
 );
 
 my @config_items = (
-	[ 'author'   , 'What is the author\'s name?', 'open' ],
-	[ 'email'    , 'What is the author\'s email?', 'open',  ],
-	[ 'license'  , 'What license do you want to use?', 'open', 'Perl_5' ],
-	[ 'auto_git' , 'Do you want mbtiny to automatically handle git for you?', 'yn', !!1 ],
-	[ 'auto_bump', 'Do you want mbtiny to automatically bump on regenerate for you?', 'yn', !!1 ],
-	[ 'auto_scan', 'Do you want mbtiny to automatically scan dependencies for you?', 'yn', !!1 ],
+	[ 'author'       , 'What is the author\'s name?', 'open' ],
+	[ 'email'        , 'What is the author\'s email?', 'open',  ],
+	[ 'license'      , 'What license do you want to use?', 'open', 'Perl_5' ],
+
+	[ 'write_build'  , 'Do you want to write your build files to your repository?', 'yn', !!1],
+	[ 'write_license', 'Do you want to write your LICENSE file to your repository?', 'yn', !!1],
+	[ 'write_readme' , 'Do you want to write your README file to your repository?', 'yn', !!1],
+
+	[ 'auto_git'     , 'Do you want mbtiny to automatically handle git for you?', 'yn', !!1 ],
+	[ 'auto_bump'    , 'Do you want mbtiny to automatically bump on regenerate for you?', 'yn', !!1 ],
+	[ 'auto_scan'    , 'Do you want mbtiny to automatically scan dependencies for you?', 'yn', !!1 ],
 );
 
 sub ask {
@@ -191,9 +196,13 @@ sub get_settings_file {
 }
 
 my %default_settings = (
-	auto_bump => 1,
-	auto_git  => 1,
-	auto_scan => 1,
+	auto_bump     => 1,
+	auto_git      => 1,
+	auto_scan     => 1,
+
+	write_build   => 1,
+	write_license => 1,
+	write_readme  => 1,
 );
 
 sub get_settings {
@@ -233,7 +242,16 @@ sub extra_tests {
 	return grep -e, @dirs;
 }
 
-my @regenerate_files = qw/Build.PL META.json META.yml MANIFEST LICENSE README/;
+my @build_files = qw/Build.PL META.json META.yml MANIFEST/;
+
+sub regenerate_files {
+	my $config = shift;
+	my @result;
+	push @result, @build_files if $config->{write_build}   // 1;
+	push @result, 'LICENSE'    if $config->{write_license} // 1;
+	push @result, 'README'     if $config->{write_readme}  // 1;
+	return @result;
+}
 
 my %actions = (
 	dist => sub {
@@ -356,7 +374,7 @@ my %actions = (
 		my $config = get_config;
 		my %opts;
 		GetOptionsFromArray(\@arguments, \%opts, qw/trial bump! version=s verbose dry_run|dry-run commit! scan! message=s/) or return 2;
-		my @files = @arguments ? @arguments : @regenerate_files;
+		my @files = @arguments ? @arguments : regenerate_files($config);
 		if (!@arguments) {
 			$opts{bump}   //= $config->{auto_bump};
 			$opts{commit} //= $config->{auto_git};
@@ -464,14 +482,16 @@ my %actions = (
 			init_git => $settings->{auto_git},
 		);
 		my %config;
-		GetOptionsFromArray(\@arguments, \%args, qw/author=s email=s license=s version=s abstract=s dirname=s init_git|init-git/) or return 2;
+		my @options = qw/version=s abstract=s dirname=s init_git|init-git/;
+		push @options, map { "$_->[0]|" . ($_->[0] =~ s/_/-/gr) . ($_->[2] eq 'yn' ? '!' : '=s') } @config_items;
+		GetOptionsFromArray(\@arguments, \%args, @options) or return 2;
 		for my $item (@config_items) {
 			my ($key, $description, $type, $default) = @{$item};
 			if ($type eq 'open') {
 				$args{$key} //= prompt($description, $default);
 			}
 			else {
-				$config{$key} = $settings->{$key} // prompt($description, $default);
+				$config{$key} = $args{$key} // $settings->{$key} // prompt_yn($description, $default);
 			}
 		}
 
@@ -490,6 +510,7 @@ my %actions = (
 
 		write_json('metamerge.json', { name => $distname }) if $distname ne $args{dirname};
 
+		my @regenerate_files = regenerate_files(\%config);
 		regenerate(\@regenerate_files, \%args, scan => $config{auto_scan});
 
 		if ($args{init_git}) {

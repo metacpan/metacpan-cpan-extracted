@@ -1,4 +1,5 @@
 bin/create_db.PL
+bin/translate.PL
 Changes
 lib/Locale/Places.pm
 lib/Locale/Places/DB.pm
@@ -27,6 +28,7 @@ t/noopentickets.t
 t/noplan.t
 t/pod-cm.t
 t/pod-spelling.t
+t/pod-synopsis.t
 t/pod.t
 t/port.t
 t/snippets.t

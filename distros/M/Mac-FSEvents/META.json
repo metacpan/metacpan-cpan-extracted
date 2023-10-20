@@ -33,7 +33,7 @@
    "provides" : {
       "Mac::FSEvents" : {
          "file" : "lib/Mac/FSEvents.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "Mac::FSEvents::Event" : {
          "file" : "lib/Mac/FSEvents/Event.pm"
@@ -51,7 +51,7 @@
          "web" : "https://github.com/skaji/Mac-FSEvents"
       }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_contributors" : [
       "Doug Bell <madcityzen@gmail.com>",
       "Fayland Lam <fayland@gmail.com>",

@@ -1,7 +1,9 @@
-use Test::More tests => 23;
+use Test2::V0;
 use PGObject::Type::JSON;
 
 use Carp::Always;
+
+plan 25;
 
 use strict;
 use warnings;
@@ -11,11 +13,15 @@ my $undeftest = undef;
 my $hashtest = '{"foo": 1, "bar": 2}';
 my $hashtest2 = '{"bar": 2, "foo": 1}';
 my $arraytest = '[1,2,3]';
-my $literaltest = '123';
-my ($undef, $null, $hash, $array, $literal);
+my $literaltest = 'a123abc"\u0000"';
+my $inttest = 123;
+my ($undef, $null, $hash, $array, $literal, $int);
+
+# not allowing coderefs
+ok(dies { PGObject::Type::JSON->new( sub { 1 } ) }, 'dies on coderef');
 
 # string 'null', should serialize as 'null', not the same as db null
-ok($null = PGObject::Type::JSON->from_db($nulltest), 'Instantiate null');
+ok($null = PGObject::Type::JSON->new(PGObject::Type::JSON->from_db($nulltest)), 'Instantiate null');
 ok($null->isa('PGObject::Type::JSON'), "Null is a JSON object");
 is($null->reftype, 'SCALAR', 'Null is a scalar');
 is($null->to_db, 'null', 'Serializes to db as null');
@@ -39,11 +45,13 @@ is($hash->{bar}, 2, 'Hash bar element is 2');
 #arrayref should serialize as it is
 ok($array = PGObject::Type::JSON->from_db($arraytest), 'Instantiate arrayref');
 is($array->reftype, 'ARRAY', 'Array is ARRAY');
-is_deeply($array, [1, 2, 3], 'Array is correct array');
+is($array, [1, 2, 3], 'Array is correct array');
 is($array->to_db, $arraytest, 'Array serializes to db correctly');
 
+#int ref, should be a scalar ref, serializing as it is
+is(PGObject::Type::JSON->from_db($inttest), $inttest,
+     'Instantiate literal int');
+is(PGObject::Type::JSON->new($inttest)->to_db, qq($inttest), 'Literal serializes correctly');
 #literal ref, should be a scalar ref, serializing as it is
-ok($literal = PGObject::Type::JSON->from_db($literaltest), 
-     'Instantiate literal');
-is($literal->reftype, 'SCALAR', 'Literal is SCALAR');
-is($literal->to_db, '"123"', 'Literal serializes correctly');
+is(PGObject::Type::JSON->new($literaltest)->to_db, '"a123abc\"\\\\u0000\""', 'Serialization test');
+ok($literal = PGObject::Type::JSON->from_db(PGObject::Type::JSON->new($literaltest)->to_db), $literaltest, 'basic round trip for complex literal');

@@ -31,7 +31,6 @@ has 'unnamespaced' => (
     my $ns = $self->namespace;
     $class =~s/^${ns}:://;
     return $class;
-    return lc decamelize($class);
   },
 );
 
@@ -45,7 +44,8 @@ has 'singular' => (
     my $class = $self->class;
     $class = decamelize($class);
     $class =~ s/::/_/g;
-    return lc noun($class)->singular; 
+    #return lc noun($self->human)->singular; 
+    return lc noun($class)->singular;
   },
 );
 
@@ -128,26 +128,38 @@ has param_key => (
 sub human {
   my ($self, %options) = @_;
 
-  return $self->_human unless $self->class->can('i18n_scope'); # Don't waste time if there's no lookup scope
+  # if no scope then skip 
+  unless($self->class->can('i18n_scope')) {
+    return (exists($options{count}) && ($options{count} > 1)) ?
+      noun($self->_human)->plural :
+      $self->_human;
+  }
+
+  my $scope = $self->class->i18n_scope . '.models';
 
   my @defaults = map {
-    $_->model_name->i18n_key;
+    bless \"${scope}.@{[ $_->model_name->i18n_key ]}", 'Valiant::I18N::Tag';
   } $self->class->i18n_lookup if $self->class->can('i18n_lookup');
 
-  return $self->_human unless @defaults; # If $self doesn't do i18n_lookup then there's no tags to attempt translations
-  
-  push @defaults, delete $options{default} if exists $options{default};
-  push @defaults, $self->_human; # The guessed named used by looking at the package name is the ultimate default
+  # If $self doesn't do i18n_lookup then there's no tags to attempt translations
+  unless(@defaults) {
+    return (exists($options{count}) && ($options{count} > 1)) ?
+      noun($self->_human)->plural :
+      $self->_human;
+  }
 
+  push @defaults, delete $options{default} if exists $options{default};
+  push @defaults, (exists($options{count}) && ($options{count} > 1)) ?
+      noun($self->_human)->plural :
+      $self->_human; # The guessed named used by looking at the package name is the ultimate default
 
   %options = (
-    scope => [$self->class->i18n_scope, 'models'],
-    count => 1,
     default => \@defaults,
     %options,
   );
 
-  $self->i18n->translate(shift(@defaults), %options);
+  my $translated = $self->i18n->translate(shift(@defaults), %options);
+  return $translated if $translated;
 }
 
 package Valiant::Naming;
@@ -163,7 +175,8 @@ sub model_name {
 
   return $_model_name{$class} ||= do {
     my %args = $self->prepare_model_name_args;
-    Module::Runtime::use_module($self->name_class)->new(%args);
+    my $naming = Module::Runtime::use_module($self->name_class)->new(%args);
+    return $naming;
   };
 }
 
@@ -213,6 +226,11 @@ An instance of L<Valiant::Name>.  This object exposes the following attributes:
 
 A human readable name for your object.  This will either be inferred from the package 
 name of the object or if C<i18n_scope> is defined will be looked up in translations.
+
+You can get the pluralized version of this name by passing a C<count> argument greater
+than 1.  Example:
+
+    $model->model_name->human(count=>2); # returns 'People'
 
 =head2 singular
 

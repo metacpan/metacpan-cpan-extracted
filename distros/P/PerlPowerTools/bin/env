@@ -18,15 +18,24 @@ License: perl
 
 use strict;
 
+use File::Basename qw(basename);
+
+my $Program = basename($0);
+
 while ( @ARGV && $ARGV[0] =~ /^-/ ) {
 	my $arg = shift;
 
 	if ( $arg eq '-i' ) {
-		delete $ENV{$_} for keys %ENV;
+		%ENV = ();
 	} elsif ( $arg =~ /^-u(.*)/ ) {
-		delete $ENV{ length($1) ? $1 : shift };
+		my $val = length $1 ? $1 : shift;
+		if ($val =~ m/=/) {
+			warn "$Program: bad unset argument: '$val'\n";
+			exit 2;
+		}
+		delete $ENV{$val};
 	} else {
-		print "$0: invalid option -- $arg\n";
+		warn "$Program: invalid option -- $arg\n";
 		exit 2;
 	}
 }
@@ -44,7 +53,11 @@ if ( !@ARGV ) {
 	exit 0;
 }
 
-exec(shift, @ARGV) or exit 127;
+my $cmd = $ARGV[0];
+unless (exec {$cmd} @ARGV) {
+	warn "$Program: failed to exec '$cmd': $!\n";
+	exit 127;
+}
 
 __END__
 
@@ -77,6 +90,7 @@ Clears the environment, passing only the values specifed to the command.
 =item B<-u> I<name>
 
 Clears the environment variable I<name> if it exists.
+The value must not include the '=' character.
 
 =back
 

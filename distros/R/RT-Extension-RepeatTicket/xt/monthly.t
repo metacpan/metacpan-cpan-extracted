@@ -30,6 +30,7 @@ $m->submit_form_ok(
             'repeat-type'                      => 'monthly',
             'repeat-details-monthly-day-day'   => $day->day,
             'repeat-details-monthly-day-month' => 1,
+            'repeat-create-on-recurring-date'  => 0,
         },
         button => 'SubmitTicket',
     },

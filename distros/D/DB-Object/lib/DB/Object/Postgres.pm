@@ -21,7 +21,9 @@ BEGIN
     use version;
     use vars qw(
         $VERSION $CACHE_QUERIES $CACHE_SIZE $CACHE_TABLE $CONNECT_VIA $DB_ERRSTR 
-        @DBH $DEBUG $ERROR $MOD_PERL $USE_BIND $USE_CACHE );
+        @DBH $DEBUG $ERROR $MOD_PERL $USE_BIND $USE_CACHE
+        $PLACEHOLDER_REGEXP $DATATYPES
+    );
     use DBI;
     eval
     {
@@ -32,8 +34,8 @@ BEGIN
     use DateTime;
     use DateTime::Format::Strptime;
     use Module::Generic::DateTime;
-    use Nice::Try;
-    $VERSION     = 'v0.5.0';
+    our $PLACEHOLDER_REGEXP = qr/(?:\?|\$(?<index>\d+))/;
+    our $VERSION = 'v0.5.0';
     use Devel::Confess;
 };
 
@@ -42,30 +44,31 @@ use warnings;
 # require DB::Object::Postgres::Statement;
 # require DB::Object::Postgres::Tables;
 # require DB::Object::Postgres::Lo;
-$DB_ERRSTR     = '';
-$DEBUG         = 0;
-$CACHE_QUERIES = [];
-$CACHE_SIZE    = 10;
+our $DB_ERRSTR     = '';
+our $DEBUG         = 0;
+our $CACHE_QUERIES = [];
+our $CACHE_SIZE    = 10;
 # The purpose of this cache is to store table object and avoid the penalty of reloading the structure of a table for every object generated.
 # Thus CACHE_TABLE is in no way an exhaustive list of existing table, but existing table object.
-$CACHE_TABLE   = {};
-$USE_BIND      = 0;
-$USE_CACHE     = 0;
-$MOD_PERL      = 0;
-@DBH           = ();
+our $CACHE_TABLE   = {};
+our $USE_BIND      = 0;
+our $USE_CACHE     = 0;
+our $MOD_PERL      = 0;
+our @DBH           = ();
 if( $INC{ 'Apache/DBI.pm' } && 
     substr( $ENV{ 'GATEWAY_INTERFACE' }|| '', 0, 8 ) eq 'CGI-Perl' )
 {
     $CONNECT_VIA = "Apache::DBI::connect";
     $MOD_PERL++;
 }
+our $DATATYPES = {};
 
 # sub new is inherited from DB::Object
 sub init
 {
     my $self = shift( @_ );
-    $self->SUPER::init( @_ );
-    $self->{ 'driver' } = 'Pg';
+    $self->SUPER::init( @_ ) || return( $self->pass_error );
+    $self->{driver} = 'Pg';
     return( $self );
 }
 
@@ -221,6 +224,12 @@ sub connect
 
 # sub copy
 
+# See also datatype_to_constant()
+# NOTE: sub constant_to_datatype is inherited from DB::Object
+
+# See also constant_to_datatype()
+# NOTE: sub datatype_to_constant is inherited from DB::Object
+
 sub create_db
 {
     my $self = shift( @_ );
@@ -245,17 +254,39 @@ sub create_db
     }
     my $dbh = $self->{dbh} || return( $self->error( "Could not find database handler." ) );
     my( $sth, $rc );
-    try
+    # try-catch
+    local $@;
+    $sth = eval
     {
-        $sth = $dbh->prepare( $sql ) || return( $self->error( "An error occured while prepareing sql query to create database: ", $dbh->errstr ) );
-        $rc = $sth->execute || return( $self->error( "An error occured while executing sql query to create database: ", $sth->errstr ) );
-        $sth->finish;
+        $dbh->prepare( $sql );
+    };
+    if( $@ )
+    {
+        return( $self->error( "An error occured while preparing SQL query to create database: ", $@ ) );
     }
-    catch( $e )
+    $sth or return( $self->error( "An error occured while preparing SQL query to create database: ", $dbh->errstr ) );
+    
+    # try-catch
+    $rc = eval
+    {
+        $sth->execute;
+    };
+    if( $@ )
+    {
+        return( $self->error( "An error occured while executing SQL query to create database: ", $@ ) );
+    }
+    $rc or return( $self->error( "An error occured while executing SQL query to create database: ", $sth->errstr ) );
+
+    # try-catch
+    eval
     {
         $sth->finish;
-        return( $self->error( "An unexpected error occurred while trying to execute the sql query to create database: ", $sth->error, "\n$sql" ) );
+    };
+    if( $@ )
+    {
+        return( $self->error( "An unexpected error occurred while trying to finish the SQL query to create database: ", $@, "\n$sql" ) );
     }
+
     my $ref = {};
     my @keys = qw( host port login passwd schema opt debug );
     @$ref{ @keys } = @$self{ @keys };
@@ -288,6 +319,26 @@ sub create_table
 
 # sub data_type
 
+sub datatypes
+{
+    my $self = shift( @_ );
+    unless( scalar( keys( %$DATATYPES ) ) )
+    {
+        my $keys = $DBD::Pg::EXPORT_TAGS{pg_types};
+        foreach my $c ( @$keys )
+        {
+            if( $c =~ /^PG_(\w+)$/ )
+            {
+                my $type = $1;
+                my $code = \&{"DBD::Pg::$c"};
+                my $val = $code->();
+                $DATATYPES->{ $type } = $val;
+            }
+        }
+    }
+    return( $DATATYPES );
+}
+
 # sub database
 
 sub databases
@@ -299,14 +350,17 @@ sub databases
     # There should not be a live user and database just to check what databases there are.
     if( !$self->{dbh} )
     {
-        try
+        # try-catch
+        local $@;
+        $dbh = eval
         {
-            $dbh = $self->connect || return;
-        }
-        catch( $e )
+            $self->connect;
+        };
+        if( $@ )
         {
-            return;
+            return( $self->error( "Error trying to connect to the PostgreSQL server: $@" ) );
         }
+        $dbh or return( $self->pass_error );
     }
     else
     {
@@ -1038,11 +1092,13 @@ sub _convert_datetime2object
     my $pg_types = $sth->{pg_type};
     my $mode = ref( $data );
     my $tz;
-    try
+    # try-catch
+    local $@;
+    $tz = eval
     {
-        $tz = DateTime::TimeZone->new( name => 'local' );
-    }
-    catch( $e )
+        DateTime::TimeZone->new( name => 'local' );
+    };
+    if( $@ )
     {
         $tz = DateTime::TimeZone->new( name => 'UTC' );
     }
@@ -1064,7 +1120,9 @@ sub _convert_datetime2object
             }
             $hash->{time_zone} = $tz->name;
 
-            try
+            # try-catch
+            local $@;
+            my $this = eval
             {
                 my $dt = DateTime->new( %$hash );
                 my $fmt = DateTime::Format::Strptime->new(
@@ -1075,11 +1133,12 @@ sub _convert_datetime2object
                 $dt->set_formatter( $fmt );
                 # To enable extra features
                 return( Module::Generic::DateTime->new( $dt ) );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                $self->error( "Error converting the date or timestamp \"", $str, "\" to a datetime object: $e" );
+                $self->error( "Error converting the date or timestamp \"", $str, "\" to a datetime object: $@" );
             }
+            return( $this );
         }
         else
         {
@@ -1170,20 +1229,22 @@ sub _dsn
     return( join( ';', @params ) );
 }
 
-# See DB::Object
+# NOTE: _cache_this -> See DB::Object
 # sub _cache_this
 
-# See DB::Object
+# NOTE _clean_statement -> DB::Object
 # sub _clean_statement
 
-# See DB::Object
+# NOTE _cleanup -> DB::Object
 # sub _cleanup
 
-# See DB::Object
+# NOTE _dbi_connect -> DB::Object
 # sub _dbi_connect
 
-# See DB::Object
+# NOTE _make_sth -> DB::Object
 # sub _make_sth
+
+sub _placeholder_regexp { return( $PLACEHOLDER_REGEXP ) }
 
 # Moved to DB::Object::Postgres::Query
 # sub _query_components
@@ -1794,6 +1855,14 @@ The sql script is executed using L<DB::Object/do> and the returned value is retu
 =head2 databases
 
 Returns a list of all available databases.
+
+=head2 datatypes
+
+    my $types = $dbh->datatypes;
+
+Returns an hash reference of data types to their respective values.
+
+It will return the PostgreSQL's constants.
 
 =head2 func
 

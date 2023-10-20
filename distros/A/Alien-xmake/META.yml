@@ -1,0 +1,50 @@
+---
+X_No_Archive: Yes
+abstract: 'Locate, Download, or Build and Install xmake'
+author:
+  - 'Sanko Robinson <sanko@cpan.org>'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  File::Basename: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  File::Which: '0'
+  HTTP::Tiny: '0'
+  Module::Build: '0.4005'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.22, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-xmake
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Alien::xmake:
+    file: lib/Alien/xmake.pm
+    version: '0.01'
+requires:
+  File::ShareDir: '0'
+  File::Which: '0'
+  Module::Build: '0'
+  perl: '5.020000'
+resources:
+  bugtracker: https://github.com/sanko/Alien-xmake/issues
+  homepage: https://github.com/sanko/Alien-xmake
+  repository: https://github.com/sanko/Alien-xmake.git
+version: '0.01'
+x_authority: cpan:SANKO
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

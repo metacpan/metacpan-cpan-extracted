@@ -1,5 +1,19 @@
 Revision history for Perl module WebSocket
 
+v0.2.0 2023-10-06T10:36:30+0900
+    - Improved documentation and code
+    - Corrected a missing module requirement (WebSocket::Response) in WebSocket::Connection
+    - Corrected a call to 'versions' instead of 'server->versions' in WebSocket::Connection::http_error()
+    - Change the method helper for method ip in WebSocket::Connection
+    - Added warning if WebSocket::Server cannot accept a client connection if warnings are enabled
+    - Now, if connect callback in WebSocket::Server returns a defined, but false value, this will drop the connection
+    - Improved method disconnect in WebSocket::Server to first shutdown the TCP connection before closing the filehandle
+    - Added some security considerations to the documentation
+    - Added method metadata to WebSocket::Connection
+    - Added the 'cookie_jar' method in WebSocket::Request
+    - Added the constructor parameter and associated method 'connection_class' in WebSocket::Server
+    - Added the method 'stop' as an alias to 'shutdown' in WebSocket::Server
+
 v0.1.6 2023-04-17T12:07:12+0900
     - Minor corrections and improvements in both code and documentation
     - Corrected error in _watch method

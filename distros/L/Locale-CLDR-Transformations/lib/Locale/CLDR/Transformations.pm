@@ -1,11 +1,13 @@
 package Locale::CLDR::Transformations;
 
-=head1 Locale::CLDR::Transformations - Dummy base class to keep CPAN happy
+=head1 NAME
+
+Locale::CLDR::Transformations - Dummy base class to keep CPAN happy
 
 =cut
 
 use version;
 
-our VERSION = version->declare('v0.34.1');
+our VERSION = version->declare('v0.34.2');
 
 1;

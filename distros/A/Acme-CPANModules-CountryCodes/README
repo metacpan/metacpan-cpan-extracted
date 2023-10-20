@@ -3,7 +3,7 @@ NAME
     codes
 
 VERSION
-    This document describes version 0.001 of Acme::CPANModules::CountryCodes
+    This document describes version 0.004 of Acme::CPANModules::CountryCodes
     (from Perl distribution Acme-CPANModules-CountryCodes), released on
     2023-08-06.
 
@@ -28,13 +28,16 @@ DESCRIPTION
 
   Types
     Sah: Sah::Schema::country::code, Sah::Schema::country::code::alpha2,
-    Sah::Schema::country::code::alpha2.
+    Sah::Schema::country::code::alpha3.
 
     Moose: MooseX::Types::Locale::Country,
     MooseX::Types::Locale::Country::Fast.
 
-  Other utilities
-    Locale::Util::Country
+  Other modules
+  CLI utilities
+    App::ListCountries
+
+    App::LocaleCodesUtils
 
 ACME::CPANMODULES ENTRIES
     Locale::Country
@@ -61,13 +64,20 @@ ACME::CPANMODULES ENTRIES
     Sah::Schema::country::code::alpha2
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
+    Sah::Schema::country::code::alpha3
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
     MooseX::Types::Locale::Country
         Author: MORIYA <https://metacpan.org/author/MORIYA>
 
     MooseX::Types::Locale::Country::Fast
         Author: MORIYA <https://metacpan.org/author/MORIYA>
 
-    Locale::Util::Country
+    App::ListCountries
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    App::LocaleCodesUtils
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -111,6 +121,8 @@ SOURCE
     <https://github.com/perlancar/perl-Acme-CPANModules-CountryCodes>.
 
 SEE ALSO
+    Related lists: Acme::CPANModules::LanguageCodes
+
     Acme::CPANModules - about the Acme::CPANModules namespace
 
     cpanmodules - CLI tool to let you browse/view the lists

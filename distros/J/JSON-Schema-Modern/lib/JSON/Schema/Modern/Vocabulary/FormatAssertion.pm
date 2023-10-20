@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.570';
+our $VERSION = '0.572';
 
 use 5.020;
 use Moo;
@@ -150,8 +150,33 @@ sub keywords {
     'uri-template' => sub { 1 },
   };
 
-  sub _get_default_format_validation ($self, $format) {
-    return $formats->{$format};
+  my %formats_by_spec_version = (
+    draft7 => [qw(
+      date-time
+      date
+      time
+      email
+      idn-email
+      hostname
+      idn-hostname
+      ipv4
+      ipv6
+      uri
+      uri-reference
+      iri
+      json-pointer
+      relative-json-pointer
+      regex
+      iri-reference
+      uri-template
+    )],
+  );
+  $formats_by_spec_version{'draft2019-09'} =
+  $formats_by_spec_version{'draft2020-12'} = [$formats_by_spec_version{draft7}->@*, qw(duration uuid)];
+
+  sub _get_default_format_validation ($self, $state, $format) {
+    return $formats->{$format}
+      if grep $format eq $_, $formats_by_spec_version{$state->{spec_version}}->@*;
   }
 }
 
@@ -171,21 +196,25 @@ sub _eval_keyword_format ($self, $data, $schema, $state) {
     elsif ($schema->{format} eq 'email' or $schema->{format} eq 'idn-email') {
       require Email::Address::XS; Email::Address::XS->VERSION(1.04);
     }
+    # FIXME:
+    # draft7 hostname uses RFC1034
+    # draft2019-09+ hostname uses RFC1123
     elsif ($schema->{format} eq 'hostname' or $schema->{format} eq 'idn-hostname') {
       require Data::Validate::Domain;
     }
-    elsif ($schema->{format} eq 'idn-hostname') {
+
+    if ($schema->{format} eq 'idn-hostname') {
       require Net::IDN::Encode;
     }
   }
   catch ($e) {
-    abort($state, 'EXCEPTION: cannot validate format "%s": %s', $schema->{format}, $e);
+    abort($state, 'EXCEPTION: cannot validate with format "%s": %s', $schema->{format}, $e);
   }
 
-  # first check the subrefs from JSON::Schema::Modern->new(format_evaluations => { ... })
-  # and add in the type if needed
+  # first check the subrefs from JSON::Schema::Modern->new(format_validations => { ... })
+  # and fall back to the default formats, which are all defined only for strings
   my $evaluator_spec = $state->{evaluator}->_get_format_validation($schema->{format});
-  my $default_spec = $self->_get_default_format_validation($schema->{format});
+  my $default_spec = $self->_get_default_format_validation($state, $schema->{format});
 
   my $spec =
     $evaluator_spec ? ($default_spec ? +{ type => 'string', sub => $evaluator_spec } : $evaluator_spec)
@@ -213,7 +242,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.570
+version 0.572
 
 =head1 DESCRIPTION
 

@@ -34,12 +34,14 @@ dotest "Formatting", <<"EOMARKDOWN";
 `code` `code_with_unders`
 
 [link](target://)
+
+~~strikethrough~~
 EOMARKDOWN
 
 dotest "Verbatim", <<"EOMARKDOWN";
 # EXAMPLE
 
-```
+```perl
 use v5.14;
 use warnings;
 say "Hello, world";

@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Jgo::Any::Cm - Package for language Ngomba
 
 =cut
 
 package Locale::CLDR::Locales::Jgo::Any::Cm;
-# This file auto generated from Data/common/main/jgo_CM.xml
-#	on Mon 11 Apr  5:31:05 pm GMT
+# This file auto generated from Data\common\main\jgo_CM.xml
+#	on Fri 13 Oct  9:22:21 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

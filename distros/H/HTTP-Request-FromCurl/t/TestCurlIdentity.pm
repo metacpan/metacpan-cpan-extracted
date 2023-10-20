@@ -2,7 +2,7 @@ package # hide from CPAN
     TestCurlIdentity;
 use strict;
 use HTTP::Request::FromCurl;
-use Test::More;
+use Test2::V0;
 use Data::Dumper;
 use Capture::Tiny 'capture';
 use Test::HTTP::LocalServer;
@@ -219,7 +219,7 @@ sub identical_headers_ok( $code, $expected_request, $name,
         };
     };
 
-    my $res = is_deeply \@log, \@exp, $name;
+    $res = is \@log, \@exp, $name;
     if(! $res) {
         diag "Expected:";
         diag $expected_request;
@@ -316,7 +316,7 @@ sub request_logs_identical_ok( $test, $name, $r, $res ) {
             $res->{headers}->{ 'User-Agent' } =~ s!^(curl/7\.19\.7)\b.+!$1!;
         };
 
-        is_deeply \%got, $res->{headers}, $name
+        is \%got, $res->{headers}, $name
             or diag Dumper [\%got, $res->{headers}];
 
         # Now, also check that our HTTP::Request looks similar
@@ -334,9 +334,17 @@ sub request_logs_identical_ok( $test, $name, $r, $res ) {
 }
 
 sub request_identical_ok( $test ) {
-    local $TODO = $test->{todo};
-    local $TODO = "curl $test->{version} required, we have $cmp_version"
-        if $test->{version} and $cmp_version < $test->{version};
+    my $todo;
+
+    if( $test->{todo} ) {
+        $todo = todo($test->{todo});
+    } elsif( $test->{version} and $cmp_version < $test->{version} ) {
+        SKIP: {
+            $todo = skip("curl $test->{version} required, we have $cmp_version", 10)
+        };
+        return
+    };
+
     my $name = $test->{name} || (join " ", @{ $test->{cmd}});
     my $cmd = [ @{ $test->{cmd} }];
 
@@ -489,7 +497,7 @@ sub request_identical_ok( $test ) {
                 delete @{$copy->{headers}}{ @{ $h }};
             };
 
-            if( !is_deeply $reconstructed[$i], $copy, "$name (reconstructed)" ) {
+            if( !is $reconstructed[$i], $copy, "$name (reconstructed)" ) {
                 diag "Original command:";
                 diag Dumper $test->{cmd};
                 diag "Original request:";

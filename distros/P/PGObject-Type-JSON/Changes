@@ -1,5 +1,19 @@
 Revision history for PGObject-Type-JSON
 
+2.1.1   2023-10-11
+        Subclassing now supported and tested
+
+2.1.0   2023-10-18
+        Fixes for db vs json nulls
+        We now throw an error if unserializable reference types are passed into
+           new() on the top level.
+
+2.0.3   2023-10-16
+        Comprehensive fixes for scalars serialized to json
+
+2.0.2   2023-10-16
+        Some fixes for scalars serialized to JSON
+
 2.0.0	2017-05-15
 	Perl 5.8 support removed
 	PGObject 2.x supported

@@ -21,6 +21,7 @@ BEGIN
     use MIME::Base64 ();
     use Nice::Try;
     use Scalar::Util qw( readonly );
+    use Want;
     use WebSocket::Extension;
     use WebSocket::Headers;
     use WebSocket::Version;
@@ -146,6 +147,33 @@ sub as_string
 }
 
 sub connection { return( shift->headers->header( 'Connection', @_ ) ); }
+
+sub cookie_jar
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        $self->{cookie_jar} = shift( @_ );
+    }
+    elsif( !$self->{cookie_jar} )
+    {
+        my $jar;
+        if( $self->_load_class( 'Cookie::Jar' ) )
+        {
+            $jar = Cookie::Jar->new;
+            $jar->fetch( request => $self ) || return( $self->pass_error( $jar->error ) );
+            $self->{cookie_jar} = $jar;
+        }
+    }
+    
+    if( !$self->{cookie_jar} && Want::want( 'OBJECT' ) )
+    {
+        require Module::Generic::Null;
+        my $null = Module::Generic::Null->new( '', { debug => $self->{debug} });
+        return( $null );
+    }
+    return( $self->{cookie_jar} );
+}
 
 sub cookies { return( shift->_set_get_scalar_as_object( 'cookies', @_ ) ); }
 
@@ -646,7 +674,17 @@ If no checksum is provided, it will compute one based on the value of L</number1
 
 =head2 connection
 
-Set or get the C<Connection> header value, which should typically be C<Upgrade>. 
+Set or get the C<Connection> header value, which should typically be C<Upgrade>.
+
+=head2 cookie_jar
+
+This method serves to contain a cookie jar object of client-sent cookies, i.e. the ones returned by the web browser.
+
+You can set whatever class object you want.
+
+If no class object is provided, then this will try to load L<Cookie::Jar> if it is installed and will load into it all cookies found in the current request.
+
+It returns the current value set, and if no cookie jar object was set, but this method is called in object context (such as chaining), then this will return a L<Module::Generic::Null> object to avoid a perl error.
 
 =head2 cookies
 
@@ -700,7 +738,7 @@ This is a default method to store a number used for the checksum challenge sent 
 
 Set or get the C<Origin> header value.
 
-See L<rfc6455 section 1.3for more information|https://datatracker.ietf.org/doc/html/rfc6455#section-1.3> and L<section 4.1, paragraph 8|https://datatracker.ietf.org/doc/html/rfc6455#section-4.1>
+See L<rfc6455 section 1.3 for more information|https://datatracker.ietf.org/doc/html/rfc6455#section-1.3> and L<section 4.1, paragraph 8|https://datatracker.ietf.org/doc/html/rfc6455#section-4.1>
 
 =head2 parse
 

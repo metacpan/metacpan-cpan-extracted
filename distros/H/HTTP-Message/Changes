@@ -1,5 +1,11 @@
 Revision history for HTTP-Message
 
+6.45      2023-09-27 14:27:31Z
+    - Allow for file ownership conflicts with Docker and GitHub Actions
+      (GH#193) (Olaf Alders)
+    - Add the 'status_code' function for getting all status codes as hash
+      (GH#194) (Dai Okabayashi)
+
 6.44      2022-10-26 20:49:00Z
     - Made the Clone module a hard requirement, so we don't have to
       provide a fallback function for HTTP::Headers::clone().

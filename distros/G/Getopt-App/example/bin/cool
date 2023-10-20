@@ -29,7 +29,7 @@ run(
     my ($app, @args) = @_;
     return print generate_completion_script() if $app->{'completion-script'};
     return print extract_usage()              if $app->{h};
-    say __FILE__;
+    say join '|', $Getopt::App::DEPTH, __FILE__;
     return 10;
   }
 );

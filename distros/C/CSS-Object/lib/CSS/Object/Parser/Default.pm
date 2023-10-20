@@ -44,7 +44,6 @@ sub add_rule
     my $contents = shift( @_ );
     my $css = $self->css || return( $self->error( "Our css object is gone!" ) );
     
-    # $self->message( 3, "Passing the format object (", $self->format, ") to new CSS::Object::Rule." );
     # my $rule = CSS::Object::Rule->new(
     my $rule = $css->new_rule(
         # format => $self->format,
@@ -54,7 +53,6 @@ sub add_rule
     ## parse the selectors
     for my $name ( split( /[[:blank:]\h]*,[[:blank:]\h]*/, $style ) )
     {
-        # $self->message( 3, "Adding new selector with name '$name'." );
         ## my $sel = CSS::Object::Selector->new({
         my $sel = $css->new_selector(
             name   => $name,
@@ -65,27 +63,22 @@ sub add_rule
     }
 
     ## parse the properties
-    # $self->message( 3, "Rule content is (before comment processing): '$contents'" );
     ## Check possible comments and replace any ';' inside so they do not mess up this parsing here
     $contents =~ s{\/\*[[:blank:]\h]*(.*?)[[:blank:]\h]*\*\/}
     {
         my $cmt = $1;
         $cmt =~ s/\;/__SEMI_COLON__/gs;
         $cmt =~ s/\:/__COLON__/gs;
-        # $self->message( 3, "Found comment, now modified to '$cmt'" );
         "/* $cmt */";
     }sex;
-    # $self->message( 3, "Rule content is (after comment processing): '$contents'" );
     foreach( grep{ /\S/ } split( /\;/, $contents ) )
     {
-        # $self->message( 3, "Processing rule property '$_'" );
         ## Found one or more comments before the property
         while( s/^[[:blank:]\h]*\/\*[[:blank:]\h]*(.*?)[[:blank:]\h]*\*\///s )
         {
             my $txt = $1;
             $txt =~ s/__SEMI_COLON__/\;/gs;
             $txt =~ s/__COLON__/\:/gs;
-            $self->message( 3, "Adding comment element '$txt'." );
             my $cmt = $css->new_comment( [split( /\r?\n/, $txt )] ) || return( $self->error( "Unable to create a new CSS::Object::Comment object: ", CSS::Object::Comment->error ) );
             $rule->add_element( $cmt ) || return( $self->error( "Unable to add comment element to our rule: ", $rule->error ) );
         }
@@ -97,14 +90,12 @@ sub add_rule
         ## Put back the colon we temporarily substituted to avoid confusion in the parser
         $+{value} =~ s/__COLON__/\:/gs;
         # my( $prop_name, $prop_val ) = @+{qw(name value)};
-        $self->message( 3, "Adding new property with name '$+{name}', and value '$+{value}'." );
         my $prop = CSS::Object::Property->new({
             debug       => $self->debug,
             name        => $+{name},
             value       => $+{value},
             # format      => $rule->format,
         }) || return( $self->error( "Unable to create a new CSS::Object::Property object: ", CSS::Object::Property->error ) );
-        $self->message( 3, "An error occurred while trying to instantiate a CSS::Object::Property object: ", CSS::Object::Property->error ) if( !defined( $prop ) );
         $rule->add_property( $prop ) || return( $self->error( "Unable to add property name '$+{name}' to rule: ", $rule->error ) );
     }
     # push( @{$self->{parent}->{styles}}, $rule );
@@ -115,7 +106,6 @@ sub parse_string
 {
     my $self = shift( @_ );
     my $string = shift( @_ );
-    $self->message( 3, "Parsing string '$string'." );
 
     $string =~ s/\r\n|\r|\n/ /g;
     
@@ -127,7 +117,6 @@ sub parse_string
         {
             return( $self->error( "Invalid or unexpected style data '$_'" ) );
         }
-        # $self->message( 3, "Adding rule object for \$1 = '$1' and \$2 = '$2'." );
         my $rule = $self->add_rule( $1, $2 ) || return( $self->pass_error );
         $rules->push( $rule );
     }   

@@ -9,7 +9,7 @@ use PYX::Parser;
 use PYX::Utils;
 use Tags::Output::Raw;
 
-our $VERSION = 0.08;
+our $VERSION = 0.10;
 
 # Constructor.
 sub new {
@@ -183,7 +183,7 @@ PYX::SGML::Tags - Processing PYX data or file and write as SGML via Tags.
  my $obj = PYX::SGML::Tags->new(%parameters);
  $obj->parse($pyx, $out);
  $obj->parse_file($input_file, $out);
- $obj->parse_handle($input_file_handler, $out);
+ $obj->parse_handler($input_file_handler, $out);
  $obj->finalize;
 
 =head1 METHODS
@@ -193,8 +193,6 @@ PYX::SGML::Tags - Processing PYX data or file and write as SGML via Tags.
  my $obj = PYX::SGML::Tags->new(%parameters);
 
 Constructor.
-
-Returns instance of class.
 
 =over 8
 
@@ -226,6 +224,8 @@ It's required.
 
 =back
 
+Returns instance of class.
+
 =head2 C<parse>
 
  $obj->parse($pyx, $out);
@@ -249,7 +249,7 @@ Returns undef.
 
 =head2 C<parse_handler>
 
- $obj->parse_handle($input_file_handler, $out);
+ $obj->parse_handler($input_file_handler, $out);
 
 Parse PYX handler.
 C<$input_file_handler> handler is decoded by 'input_encoding'.
@@ -294,6 +294,8 @@ Returns undef.
 
 =head1 EXAMPLE1
 
+=for comment filename=simple_element_raw.pl
+
  use strict;
  use warnings;
 
@@ -317,6 +319,8 @@ Returns undef.
  # <element>data</element>
 
 =head1 EXAMPLE2
+
+=for comment filename=simple_element_indent.pl
 
  use strict;
  use warnings;
@@ -346,6 +350,8 @@ Returns undef.
  # <element>data</element>
 
 =head1 EXAMPLE3
+
+=for comment filename=simple_element_callback.pl
 
  use strict;
  use warnings;
@@ -409,12 +415,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2011-2021 Michal Josef Špaček
+© 2011-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.10
 
 =cut

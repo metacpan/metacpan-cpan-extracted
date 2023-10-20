@@ -1,0 +1,10 @@
+Changes
+lib/CrowdSec/Client.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README.md
+t/CrowdSec-Client.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

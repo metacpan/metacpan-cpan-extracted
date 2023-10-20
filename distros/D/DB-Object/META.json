@@ -4,7 +4,7 @@
       "Jacques Deguest (jack@deguest.jp)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -41,10 +41,8 @@
             "Fcntl" : "0",
             "JSON" : "4.10",
             "JSON::XS" : "4.03",
-            "Module::Generic" : "v0.30.5",
+            "Module::Generic" : "v0.32.3",
             "Net::IP" : "1.26",
-            "Nice::Try" : "v1.3.4",
-            "Number::Format" : "1.75",
             "POSIX" : "1.53_01",
             "Promise::Me" : "v0.4.7",
             "Regexp::Common" : "2017060201",
@@ -76,6 +74,6 @@
          "web" : "https://gitlab.com/jackdeguest/DB-Object"
       }
    },
-   "version" : "v0.11.6",
+   "version" : "v0.11.9",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -2,66 +2,112 @@
 # MIT License
 
 class Digest::SHA {
-  version "0.061";
+  version "0.061001";
   
   use Digest::SHA::State;
+  
+  # Fields
   has state : Digest::SHA::State;
-
-  # Field methods
-  native method hashsize : int ();
-  native method algorithm : int ();
   
   # Class methods
   native static method sha1 : string ($data : string);
+  
   native static method sha1_hex : string ($data : string);
+  
   native static method sha1_base64 : string ($data : string);
+  
   native static method sha224 : string ($data : string);
+  
   native static method sha224_hex : string ($data : string);
+  
   native static method sha224_base64 : string ($data : string);
+  
   native static method sha256 : string ($data : string);
+  
   native static method sha256_hex : string ($data : string);
+  
   native static method sha256_base64 : string ($data : string);
+  
   native static method sha384 : string ($data : string);
+  
   native static method sha384_hex : string ($data : string);
+  
   native static method sha384_base64 : string ($data : string);
+  
   native static method sha512 : string ($data : string);
+  
   native static method sha512_hex : string ($data : string);
+  
   native static method sha512_base64 : string ($data : string);
+  
   native static method sha512224 : string ($data : string);
+  
   native static method sha512224_hex : string ($data : string);
+  
   native static method sha512224_base64 : string ($data : string);
+  
   native static method sha512256 : string ($data : string);
+  
   native static method sha512256_hex : string ($data : string);
+  
   native static method sha512256_base64 : string ($data : string);
   
   native static method hmac_sha1 : string ($data : string, $key : string);
+  
   native static method hmac_sha1_hex : string ($data : string, $key : string);
+  
   native static method hmac_sha1_base64 : string ($data : string, $key : string);
+  
   native static method hmac_sha224 : string ($data : string, $key : string);
+  
   native static method hmac_sha224_hex : string ($data : string, $key : string);
+  
   native static method hmac_sha224_base64 : string ($data : string, $key : string);
+  
   native static method hmac_sha256 : string ($data : string, $key : string);
+  
   native static method hmac_sha256_hex : string ($data : string, $key : string);
+  
   native static method hmac_sha256_base64 : string ($data : string, $key : string);
+  
   native static method hmac_sha384 : string ($data : string, $key : string);
+  
   native static method hmac_sha384_hex : string ($data : string, $key : string);
+  
   native static method hmac_sha384_base64 : string ($data : string, $key : string);
+  
   native static method hmac_sha512 : string ($data : string, $key : string);
+  
   native static method hmac_sha512_hex : string ($data : string, $key : string);
+  
   native static method hmac_sha512_base64 : string ($data : string, $key : string);
+  
   native static method hmac_sha512224 : string ($data : string, $key : string);
+  
   native static method hmac_sha512224_hex : string ($data : string, $key : string);
+  
   native static method hmac_sha512224_base64 : string ($data : string, $key : string);
+  
   native static method hmac_sha512256 : string ($data : string, $key : string);
+  
   native static method hmac_sha512256_hex : string ($data : string, $key : string);
+  
   native static method hmac_sha512256_base64 : string ($data : string, $key : string);
   
   native static method new : Digest::SHA ($alg : int);
   
   # Instance methods
+  native method hashsize : int ();
+  
+  native method algorithm : int ();
+  
   native method add : void ($date : string);
+  
   native method digest : string ();
+  
   native method hexdigest : string ();
+  
   native method b64digest : string ();
+  
   native method clone : Digest::SHA ();
 }

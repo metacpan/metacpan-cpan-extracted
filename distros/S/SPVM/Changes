@@ -1,3 +1,156 @@
+0.989051 2023-10-11
+  [New Feature]
+    * Add the Callback class.
+    * Add the defer method to the Fn class.
+    * Add the SPVM_NATIVE_GET_POINTER macro function to the Native APIs.
+    * Add the SPVM_NATIVE_SET_POINTER macro function to the Native APIs.
+
+  [Incompatible Changes]
+    * The handler field in the Scope::Guard class is renamed to the callback field.
+    * Remove the Scope::Guard::Handler.
+    * Change the definition of the new method in the Scope::Guard class.
+      [before]
+        static method new : Scope::Guard ($handler : Scope::Guard::Handler);
+      
+      [after]
+        static method new : Scope::Guard ($callback : Callback);
+    * Remove the Native::MethodCall::Callback class.
+    * Change the definition of the new method in the Scope::Guard class.
+      [before]
+        static method call_callback : void ($callback : Native::MethodCall::Callback, $error_id : int*, $stack : Native::Stack = undef);
+      
+      [after]
+        static method call_callback : void ($callback : Callback, $error_id : int*, $stack : Native::Stack = undef);
+    
+    * Rename the SPVM_API_new_env function in spvm_native.h to SPVM_NATIVE_new_env. This is undocumented function.
+    * Remove the SPVM_API_free_env function. This is undocumented function.
+  [Internal Changes]
+    * The pointer member is moved to the beginning of spvm_object structure.
+0.989050 2023-10-04
+  [Incompatible Changes]
+    * Rename the Mutex class to the Sync::Mutex class.
+    
+0.989049 2023-10-04
+  [New Features]
+    * Add the mutex native APIs.
+    * Add the Mutex class.
+    
+0.989048 2023-10-03
+  [Internal Changes]
+    * The warn operator does not call fflush function in the C language.
+    * The print operator uses the print native API.
+    * The say operator uses the say native API.
+    * The say operator uses the warn native API.
+  [Incompatible Changes]
+    * The print native API outputs to SPVM stdout instead of the C language stdout.
+    * The print_stderr native API outputs to SPVM stderr instead of the C language stderr.
+  [New Feature]
+    * The say native API is added.
+    * The warn native API is added.
+0.989047 2023-09-30
+  [New Features]
+    * SPVM has own stdin, stdout, stderr.
+    
+    * Add the following runtime native APIs
+    
+      FILE* (*get_spvm_stdin)(void* runtime);
+      
+      FILE* (*get_spvm_stdout)(void* runtime);
+      FILE* (*get_spvm_stderr)(void* runtime);
+  [Bug Fix]
+    * Fix bugs that SPVM stdio does not work well on latest Windows 2022 Server.
+
+0.989046 2023-09-28
+  [Internal Changes]
+    * Use setmode instead of _setmode because _setmode fails in latest MinGW.
+  [Incompatible Changes]
+    * Remove the leave_scope_local native API.
+    * Remove the compiler field from the Native::Env class.
+    * Remove the compiler Native API.
+    * The get_memory_blocks_count method in the ExchangeAPI class returns the count of the memory blocks allocated by the current call stack,
+      instead of the current environment.
+    * The new_memory_stack method do not increment the memory blocks count allocated by the runtime allocator.
+    * The free_memory_stack method do not decrement the memory blocks count allocated by the runtime allocator.
+    * Remove the new_memory_env native API.
+    * Remove the free_memory_env native API.
+    * Remove the get_memory_blocks_count_env native API.
+    * Remove the allocator native API.
+    
+  [New Features]
+    * Add the following runtime native APIs
+    
+      void* (*get_compiler)(void* runtime);
+      
+      void (*set_compiler)(void* runtime, void* compiler);
+    * Add the get_compiler method to the Native::Runtime class.
+    * Add the following Native APIs.
+    
+      void* (*new_memory_block)(SPVM_ENV* env, SPVM_VALUE* stack, size_t size);
+      void (*free_memory_block)(SPVM_ENV* env, SPVM_VALUE* stack, void* block);
+      int32_t (*get_memory_blocks_count)(SPVM_ENV* env, SPVM_VALUE* stack);
+
+  [Deprecations]
+    * Deprecate the following Native APIs.
+    
+      void* (*new_memory_stack)(SPVM_ENV* env, SPVM_VALUE* stack, size_t size);
+      void (*free_memory_stack)(SPVM_ENV* env, SPVM_VALUE* stack, void* block);
+      int32_t (*get_memory_blocks_count_stack)(SPVM_ENV* env, SPVM_VALUE* stack);
+    
+0.989045 2023-09-26
+  [New Features]
+    * Make SPVM Language thread-safe logically. The tests are not done.
+    
+0.989044 2023-09-18
+  [Internal Changes]
+    * A blessed object has SV* object instead of the reference to SV* object
+  [New Features]
+    * Add the following Native APIs.
+    
+      void* (*new_string_array_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
+    * Add internal native APIs.
+  [Changes]
+    * The unweaken operator and the unweaken native API becomes thread safe.
+    * The weaken operator and the weaken native API becomes thread safe.
+    
+  [Incompatible Changes]
+    * The following native APIs are removed.
+    
+      -  void (*dec_ref_count)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+      -  void (*dec_ref_count_only)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+      -  void (*inc_ref_count)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+      -  int32_t (*get_ref_count)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+    
+0.989043 2023-09-18
+  [New Features]
+    * Add the following native APIs.
+    
+      void (*dec_ref_count_only)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+      void (*leave_scope_local)(SPVM_ENV* env, SPVM_VALUE* stack, void** object_vars, int32_t* mortal_stack, int32_t* mortal_stack_top_ptr, int32_t original_mortal_stack_top);
+      void (*assign_object)(SPVM_ENV* env, SPVM_VALUE* stack, void** dist_address, void* src_object);
+  [Changes]
+    * SPVM object have a mutex data.
+  
+  [Internal Changes]
+    * Assignability symbol table becomes thread safe.
+    * compile becomes thread safe.
+
+  [Incompatible Changes]
+    
+    * The following native APIs are renamed.
+    
+      -  void** (*get_class_var_object_address)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var);
+      +  void** (*get_class_var_object_ref)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var);
+      
+      -  void** (*get_field_object_address)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field);
+      +  void** (*get_field_object_ref)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field);
+      
+      -  void** (*get_field_object_address_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* field_name, int32_t* error_id, const char* func_name, const char* file, int32_t line);
+      +  void** (*get_field_object_ref_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* field_name, int32_t* error_id, const char* func_name, const char* file, int32_t line);
+    
+    * The following native APIs are removed.
+      
+      int32_t (*remove_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t scope_id, void* remove_object);
+
 0.989042 2023-09-12
   [Incompatible Changes]
     * The create_default_config function in the SPVM::Builder::Util module return gnu99 instead of c99.

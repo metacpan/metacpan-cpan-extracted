@@ -6,7 +6,7 @@ use warnings;
 package Graphics::Toolkit::Color::Space::Hub;
 use Carp;
 our $base_package = 'RGB';
-my @space_packages = ($base_package, qw/CMY CMYK HSL HSV HSB HWB YIQ/); # search order # HCL LAB LUV XYZ Ncol ?
+my @space_packages = ($base_package, qw/CMY CMYK HSL HSV HSB HWB YIQ /); # search order # HCL LUV Ncol ?XYZ LAB
 my %space_obj = map { $_ => require "Graphics/Toolkit/Color/Space/Instance/$_.pm" } @space_packages;
 
 sub get_space { $space_obj{ uc $_[0] } if exists $space_obj{ uc $_[0] } }

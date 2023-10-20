@@ -3,46 +3,61 @@ NAME
 
 SYNOPSIS
      use PYX::Stack;
+
      my $obj = PYX::Stack->new(%parameters);
      $obj->parse($pyx, $out);
      $obj->parse_file($input_file, $out);
-     $obj->parse_handle($input_file_handler, $out);
+     $obj->parse_handler($input_file_handler, $out);
 
 METHODS
-    "new(%parameters)"
-             Constructor.
+  "new"
+     my $obj = PYX::Stack->new(%parameters);
 
-            *       "bad_end"
+    Constructor.
 
-                     Check bad end of element.
-                     If set, print error on unopened end of element.
-                     Default value is 0.
+    *       "bad_end"
 
-            *       "output_handler"
+            Check bad end of element. If set, print error on unopened end of
+            element.
 
-                     Output handler.
-                     Default value is \*STDOUT.
+            Default value is 0.
 
-            *       "verbose"
+    *       "output_handler"
 
-                     Verbose flag.
-                     If set, each start element prints information to 'output_handler'.
-                     Default value is 0.
+            Output handler.
 
-    "parse($pyx[, $out])"
-             Parse PYX text or array of PYX text.
-             If $out not present, use 'output_handler'.
-             Returns undef.
+            Default value is \*STDOUT.
 
-    "parse_file($input_file[, $out])"
-             Parse file with PYX data.
-             If $out not present, use 'output_handler'.
-             Returns undef.
+    *       "verbose"
 
-    "parse_handler($input_file_handler[, $out])"
-             Parse PYX handler.
-             If $out not present, use 'output_handler'.
-             Returns undef.
+            Verbose flag. If set, each start element prints information to
+            'output_handler'.
+
+            Default value is 0.
+
+    Returns instance of object.
+
+  "parse"
+     $obj->parse($pyx, $out);
+
+    Parse PYX text or array of PYX text. If $out not present, use
+    'output_handler'.
+
+    Returns undef.
+
+  "parse_file"
+     $obj->parse_file($input_file, $out);
+
+    Parse file with PYX data. If $out not present, use 'output_handler'.
+
+    Returns undef.
+
+  "parse_handler"
+     $obj->parse_handler($input_file_handler, $out);
+
+    Parse PYX defined by handler. If $out not present, use 'output_handler'.
+
+    Returns undef.
 
 ERRORS
      new():
@@ -65,11 +80,9 @@ ERRORS
              Stack has some elements.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use PYX::Stack;
 
      # Example data.
@@ -99,11 +112,9 @@ EXAMPLE1
      # begin
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Error::Pure;
      use PYX::Stack;
 
@@ -130,11 +141,9 @@ EXAMPLE2
      # PYX::Stack: Stack has some elements.
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Error::Pure;
      use PYX::Stack;
 
@@ -171,17 +180,18 @@ SEE ALSO
         Install the PYX modules.
 
 REPOSITORY
-    <https://github.com/tupinek/PYX-Stack>
+    <https://github.com/michal-josef-spacek/PYX-Stack>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2011-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2011-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.04
+    0.06
 

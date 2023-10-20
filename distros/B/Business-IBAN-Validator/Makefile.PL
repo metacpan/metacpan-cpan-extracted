@@ -4,6 +4,9 @@ use 5.008;
 
 use ExtUtils::MakeMaker 6.55_01;
 
+my $testfiles = 't/*.t';
+$testfiles = "xt/*.t $testfiles" if $ENV{AUTHOR_TESTING};
+
 WriteMakefile(
     NAME          => 'Business::IBAN::Validator',
     VERSION_FROM  => 'lib/Business/IBAN/Validator.pm',
@@ -33,12 +36,14 @@ WriteMakefile(
         'resources' => {
             repository => {
                 type => 'git',
-                url  => 'git@github.com:abeltje/Business-IBAN-Validator.git',
+                url  => 'https://github.com/abeltje/Business-IBAN-Validator.git',
                 web  => 'https://github.com/abeltje/Business-IBAN-Validator',
             },
-        },
-        bugtracker => {
-            web => 'https://github.com/abeltje/Business-IBAN-Validator/issues',
+            bugtracker => {
+                web => 'https://github.com/abeltje/Business-IBAN-Validator/issues',
+            },
         },
     },
+
+    test => { TESTS => $testfiles },
 );

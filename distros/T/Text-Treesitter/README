@@ -139,6 +139,24 @@ METHODS
 
       The start and end position within the string, in byte counts.
 
+    start_row
+
+    start_column
+
+      Since version 0.11.
+
+      Optionally, the logical position within the original source that
+      corresponds to the start byte. These values don't affect parsing as
+      such, but will be reflected in the position offsets of the nodes in
+      the returned tree.
+
+    node
+
+      Since version 0.11.
+
+      Alternative to specifying the four values given above, where they are
+      all taken from the given Text::Treesitter::Node instance directly.
+
  load_query_string
 
        $query = $ts->load_query_string( $str );

@@ -1,3 +1,14 @@
+0.52 2023-09-15
+    * Switch test suite to Test2::V0
+    * Suppress trivial Content-Length headers in ->as_curl
+    * --disable is a boolean option
+    * Add support for --json
+    * Add support for --max-filesize
+      The behaviour is slightly different from cURL. --max-filesize looks at
+      the size of the body, not at the Content-Length header.
+    * Add support for --interface (only IP addresses, not interface names)
+    * Fix Mojolicious snippet generation with local address
+
 0.51 2023-07-21
     * Various test suite and build updates, no code changes, no need to upgrade
 

@@ -1,15 +1,21 @@
 Revision history for String-IRC
 
+0.05      2023-09-27 04:03:19+00:00 UTC
+    [BUG FIXES]
+        - Fix unable to construct string with input "0". https://rt.cpan.org/Public/Bug/Display.html?id=149898
+
 0.04  2008-11-13
-  * always using two-digit color codes.
-    http://rt.cpan.org/Ticket/Display.html?id=40736
+    [BUG FIXES]
+        - always using two-digit color codes. http://rt.cpan.org/Ticket/Display.html?id=40736
 
 0.03  2008-10-18
-  * typo fixed.
-    http://rt.cpan.org/Public/Bug/Display.html?id=40039
+    [DOCUMENTATION]
+        - typo fixed. http://rt.cpan.org/Public/Bug/Display.html?id=40039
 
 0.02  2007-02-23
-  * build require Test::Base.
+    [BUG FIXES]
+        - build require Test::Base.
 
 0.01  2007-02-15
-  * Initial release.
+    [NEW FEATURES]
+      - Initial release.

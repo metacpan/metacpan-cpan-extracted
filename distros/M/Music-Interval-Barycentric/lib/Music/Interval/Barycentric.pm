@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.0400';
+our $VERSION = '0.0401';
 
 use List::Util qw( min );
 
@@ -104,7 +104,7 @@ Music::Interval::Barycentric - Compute barycentric musical interval space
 
 =head1 VERSION
 
-version 0.0400
+version 0.0401
 
 =head1 SYNOPSIS
 
@@ -208,6 +208,8 @@ This function takes an array reference representing a chord.
 
 =head1 SEE ALSO
 
+L<List::Util>
+
 The F<t/01-functions.t> and F<eg/*> programs in this distribution.
 
 L<http://www.amazon.com/Geometry-Musical-Chords-Interval-Representation/dp/145022797X>
@@ -219,7 +221,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gene Boggs.
+This software is copyright (c) 2014-2023 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -17,7 +17,6 @@ BEGIN
     use parent qw( Module::Generic );
     use vars qw( $VERSION $IETF_VERSIONS );
     use Module::Generic::Number ();
-    use Nice::Try;
     use overload (
         '""'    => \&as_string,
         '0+'    => \&numify,
@@ -144,6 +143,7 @@ sub init
     my $self = shift( @_ );
     my $this = shift( @_ );
     return( $self->error( "No version numeric or string was provided." ) ) if( !defined( $this ) || !length( $this ) );
+    $self->{_exception_class} = 'WebSocket::Exception' unless( defined( $self->{_exception_class} ) );
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     my $dict;

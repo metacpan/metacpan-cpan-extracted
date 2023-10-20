@@ -8,14 +8,17 @@ use Carp         qw(croak);
 use Getopt::Long ();
 use List::Util   qw(first);
 
-our $VERSION = '0.13';
+use constant DEBUG => $ENV{GETOPT_APP_DEBUG} || 0;
 
-our ($OPT_COMMENT_RE, $OPTIONS, $SUBCOMMAND, $SUBCOMMANDS, %APPS) = (qr{\s+\#\s+});
+our $VERSION = '1.00';
+
+our ($DEPTH, $OPT_COMMENT_RE, $OPTIONS, $SUBCOMMAND, $SUBCOMMANDS, %APPS) = (-1, qr{\s+\#\s+});
 
 our $call_maybe = sub {
   my ($app, $m) = (shift, shift);
-  local $Getopt::App::APP_CLASS;
-  $m = $app->can($m) || __PACKAGE__->can("_$m");
+  my $pkg = !DEBUG ? '' : $app->can($m) ? $app : __PACKAGE__->can($m) ? __PACKAGE__ : 'SKIP';
+  warn sprintf "[getopt::app] %s::%s()\n", $pkg, $m if DEBUG;
+  $m = $app->can($m) || __PACKAGE__->can($m);
   return $m ? $app->$m(@_) : undef;
 };
 
@@ -25,11 +28,14 @@ sub bundle {
 
   open my $SCRIPT, '<', $script or croak "Can't read $script: $!";
   while (my $line = readline $SCRIPT) {
-    if ($line =~ m!^\s*package\s+\S+\s*;!) {    # look for app class name
+    if ($line =~ /\bDEBUG\b/) {
+      next;
+    }
+    elsif ($line =~ m!^\s*package\s+\S+\s*;!) {    # look for app class name
       $package .= $line;
       last;
     }
-    elsif ($. == 1) {                           # look for hashbang
+    elsif ($. == 1) {                              # look for hashbang
       $line =~ m/^#!/ ? print {$OUT} $line : do { print {$OUT} "#!$^X\n"; push @script, $line };
     }
     else {
@@ -118,6 +124,38 @@ sub extract_usage {
   return join '', $usage, _usage_for_subcommands($SUBCOMMANDS || []), _usage_for_options($OPTIONS || []);
 }
 
+sub getopt_complete_reply { Getopt::App::Complete::complete_reply(@_) }
+
+sub getopt_configure {qw(bundling no_auto_abbrev no_ignore_case pass_through require_order)}
+
+sub getopt_load_subcommand {
+  my ($app, $subcommand, $argv) = @_;
+  return $subcommand->[1] if ref $subcommand->[1] eq 'CODE';
+
+  my $method      = $subcommand->[1] =~ /^\w+$/ && $app->can($subcommand->[1]);
+  my @option_spec = @$OPTIONS;
+  return sub { _run($app, [@option_spec], $_[0], $method) }
+    if $method;
+
+  ($@, $!) = ('', 0);
+  croak "Unable to load subcommand $subcommand->[0]: $@ ($!)" unless my $code = do $subcommand->[1];
+  return $code;
+}
+
+sub getopt_post_process_argv {
+  my ($app, $argv, $state) = @_;
+  return unless $state->{valid};
+  return unless $argv->[0] and $argv->[0] =~ m!^-!;
+  $! = 1;
+  die "Invalid argument or argument order: @$argv\n";
+}
+
+sub getopt_unknown_subcommand {
+  my ($app, $argv) = @_;
+  $! = 2;
+  die "Unknown subcommand: $argv->[0]\n";
+}
+
 sub import {
   my ($class, @flags) = @_;
   my $caller = caller;
@@ -160,51 +198,10 @@ sub new {
 }
 
 sub run {
-  my @rules = @_;
-  my $class = $Getopt::App::APP_CLASS || caller;
-  return sub { local $Getopt::App::APP_CLASS = $class; run(@_, @rules) }
-    if !$Getopt::App::APP_CLASS and defined wantarray;
-
-  my $cb   = pop @rules;
-  my $argv = ref $rules[0] eq 'ARRAY' ? shift @rules : [@ARGV];
-  local $OPTIONS = [@rules];
-
-  my $app = $class->new;
-  return $app->$call_maybe('getopt_complete_reply') if defined $ENV{COMP_POINT} and defined $ENV{COMP_LINE};
-
-  $app->$call_maybe(getopt_pre_process_argv => $argv);
-
-  local $SUBCOMMANDS = $app->$call_maybe('getopt_subcommands');
-  my $exit_value = $SUBCOMMANDS ? _subcommand_run_maybe($app, $SUBCOMMANDS, $argv) : undef;
-  return _exit($app, $exit_value) if defined $exit_value;
-  return _run($app, \@rules, $argv, $cb);
-}
-
-sub _getopt_complete_reply { Getopt::App::Complete::complete_reply(@_) }
-
-sub _getopt_configure {qw(bundling no_auto_abbrev no_ignore_case pass_through require_order)}
-
-sub _getopt_load_subcommand {
-  my ($app, $subcommand, $argv) = @_;
-  return $subcommand->[1] if ref $subcommand->[1] eq 'CODE';
-
-  ($@, $!) = ('', 0);
-  croak "Unable to load subcommand $subcommand->[0]: $@ ($!)" unless my $code = do $subcommand->[1];
-  return $code;
-}
-
-sub _getopt_post_process_argv {
-  my ($app, $argv, $state) = @_;
-  return unless $state->{valid};
-  return unless $argv->[0] and $argv->[0] =~ m!^-!;
-  $! = 1;
-  die "Invalid argument or argument order: @$argv\n";
-}
-
-sub _getopt_unknown_subcommand {
-  my ($app, $argv) = @_;
-  $! = 2;
-  die "Unknown subcommand: $argv->[0]\n";
+  my ($cb, @option_spec) = (pop, @_);
+  my $class = caller;
+  exit _run($class->new, [@option_spec], [@ARGV], $cb) unless defined wantarray;
+  return sub { _run($class->new, [@option_spec], $_[0], $cb) };
 }
 
 sub _exit {
@@ -212,51 +209,51 @@ sub _exit {
   $exit_value = $app->$call_maybe(getopt_post_process_exit_value => $exit_value) // $exit_value;
   $exit_value = 0   unless $exit_value and $exit_value =~ m!^\d{1,3}$!;
   $exit_value = 255 unless $exit_value < 255;
-  exit $exit_value unless $Getopt::App::APP_CLASS;
   return $exit_value;
 }
 
 sub _run {
-  my ($app, $rules, $argv, $cb) = @_;
-  s!$OPT_COMMENT_RE.*$!! for @$rules;
+  my ($app, $option_spec, $argv, $cb) = @_;
+  $argv ||= [@ARGV];
+
+  local $OPTIONS = [@$option_spec];
+  local $DEPTH   = $DEPTH + 1;
+  return $app->$call_maybe('getopt_complete_reply') if defined $ENV{COMP_POINT} and defined $ENV{COMP_LINE};
+
+  $app->$call_maybe(getopt_pre_process_argv => $argv);
+  local $SUBCOMMANDS = $app->$call_maybe('getopt_subcommands');
+  my $exit_value = $SUBCOMMANDS ? _subcommand_run_maybe($app, $SUBCOMMANDS, $argv) : undef;
+  return _exit($app, $exit_value) if defined $exit_value;
+
+  s!$OPT_COMMENT_RE.*$!! for @$option_spec;
 
   my @configure = $app->$call_maybe('getopt_configure');
   my $prev      = Getopt::Long::Configure(@configure);
-  my $valid     = Getopt::Long::GetOptionsFromArray($argv, $app, @$rules) ? 1 : 0;
+  my $valid     = Getopt::Long::GetOptionsFromArray($argv, $app, @$option_spec) ? 1 : 0;
   Getopt::Long::Configure($prev);
   $app->$call_maybe(getopt_post_process_argv => $argv, {valid => $valid});
   return _exit($app, $valid ? $app->$cb(@$argv) : 1);
 }
 
-sub _subcommand_run {
-  my ($app, $subcommand, $argv) = @_;
-  local $Getopt::App::SUBCOMMAND = $subcommand;
-
-  my $method = $app->can($subcommand->[1]);
-  return _run($app, [@$OPTIONS], [@$argv[1 .. $#$argv]], $method) if $method;
-
-  unless ($APPS{$subcommand->[1]}) {
-    $APPS{$subcommand->[1]} = $app->$call_maybe(getopt_load_subcommand => $subcommand, $argv);
-    croak "$subcommand->[0] did not return a code ref" unless ref $APPS{$subcommand->[1]} eq 'CODE';
-  }
-
-  return $APPS{$subcommand->[1]}->([@$argv[1 .. $#$argv]]);
-}
-
 sub _subcommand_run_maybe {
   my ($app, $subcommands, $argv) = @_;
   return undef unless $argv->[0] and $argv->[0] =~ m!^\w!;
+
+  local $SUBCOMMAND;
   return $app->$call_maybe(getopt_unknown_subcommand => $argv)
-    unless my $subcommand = first { $_->[0] eq $argv->[0] } @$subcommands;
-  return _subcommand_run($app, $subcommand, $argv);
+    unless $SUBCOMMAND = first { $_->[0] eq $argv->[0] } @$subcommands;
+
+  my $cb = $APPS{$SUBCOMMAND->[1]} ||= $app->$call_maybe(getopt_load_subcommand => $SUBCOMMAND, $argv);
+  croak "$SUBCOMMAND->[0] did not return a code ref" unless ref $cb eq 'CODE';
+  return $cb->([@$argv[1 .. $#$argv]]);
 }
 
 sub _usage_for_options {
-  my ($rules) = @_;
-  return '' unless @$rules;
+  my ($option_spec) = @_;
+  return '' unless @$option_spec;
 
   my ($len, @options) = (0);
-  for (@$rules) {
+  for (@$option_spec) {
     my @o = split $OPT_COMMENT_RE, $_, 2;
     $o[0] =~ s/(=[si][@%]?|\!|\+)$//;
     $o[0] = join ', ', map { length($_) == 1 ? "-$_" : "--$_" } sort { length($b) <=> length($a) } split /\|/, $o[0];
@@ -390,10 +387,38 @@ L<Getopt::App> also supports infinite nested L<subcommands|/getopt_subcommands>
 and a method for L<bundling|/bundle> this module with your script to prevent
 depending on a module from CPAN.
 
+=head1 VARIABLES
+
+=head2 DEPTH
+
+C<$Getopt::App::DEPTH> will be increased for each sub command and will be C<0>
+for the first L</run>.
+
+=head2 SUBCOMMAND
+
+C<$Getopt::App::SUBCOMMAND> will be set to the active sub command element. See
+also L</getopt_subcommands>.
+
 =head1 APPLICATION METHODS
 
 These methods are optional, but can be defined in your script to override the
 default behavior.
+
+Order of how the methods are called:
+
+  run(@option_spec, $cb)
+    -> getopt_pre_process_argv(\@argv)
+    -> getopt_configure()
+    -> getopt_post_process_argv(\@argv, \%state)
+    -> $cb
+
+  run(@option_spec, $cb)
+    -> getopt_pre_process_argv(\@argv)
+    -> getopt_subcommands()
+      -> getopt_load_subcommand($subcommand, \@argv)
+        -> getopt_configure()
+        -> getopt_post_process_argv(\@argv, \%state)
+        -> $cb
 
 =head2 getopt_complete_reply
 
@@ -482,20 +507,10 @@ array-refs like this:
   [["subname", "/abs/path/to/sub-command-script", "help text"], ...]
 
 The first element in each array-ref "subname" will be matched against the first
-argument passed to the script, and when matched the "sub-command-script" will
-be sourced and run inside the same perl process. The sub command script must
-also use L<Getopt::App> for this to work properly.
-
-The sub-command will have C<$Getopt::App::SUBCOMMAND> set to the item found in
-the list.
-
-Instead of specifying a path, it is also possible to specify a method name, in
-case you want to include the sub commands inside the current script. Example:
-
-  [["foo", "command_foo", "help text"], ...]
-
-See L<https://github.com/jhthorsen/getopt-app/tree/main/example> for a working
-example.
+command line option, and when matched, the given subcommand item will be passed
+on to L</getopt_load_subcommand> which must return a code-ref, preferably from
+L</run>. The sub command will have C<$Getopt::App::SUBCOMMAND> set to the item
+found in the list.
 
 =head2 getopt_unknown_subcommand
 
@@ -554,8 +569,8 @@ exists in the script.
 
 =head2 new
 
-  my $obj = new($class, %args);
-  my $obj = new($class, \%args);
+  my $app = new($class, %args);
+  my $app = new($class, \%args);
 
 This function is exported into the caller package so we can construct a new
 object:
@@ -568,21 +583,21 @@ exists in the script.
 =head2 run
 
   # Run a code block on valid @ARGV
-  run(@rules, sub ($app, @extra) { ... });
+  run(@option_spec, sub ($app, @extra) { ... });
 
   # For testing
-  my $cb = run(@rules, sub ($app, @extra) { ... });
+  my $cb = run(@option_spec, sub ($app, @extra) { ... });
   my $exit_value = $cb->([@ARGV]);
 
-L</run> can be used to call a callback when valid command line options is
-provided. On invalid arguments, warnings will be issued and the program exit
-with C<$?> set to 1.
+L</run> can be used to call a callback when valid command line options are
+provided. On invalid arguments, warnings will be issued and the program will
+exit with C<$?> set to 1.
 
 C<$app> inside the callback is a hash blessed to the caller package. The keys
 in the hash are the parsed command line options, while C<@extra> is the extra
 unparsed command line options.
 
-C<@rules> are the same options as L<Getopt::Long> can take. Example:
+C<@option_spec> are the same options as L<Getopt::Long> can take. Example:
 
   # app.pl -vv --name superwoman -o OptX cool beans
   run(qw(h|help v+ name=s o=s@), sub ($app, @extra) {

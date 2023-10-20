@@ -1,3 +1,7 @@
+1.07
+
+- Eliminating more stuff from the feed item extracts.
+
 1.06
 
 - atom:published takes precedence over atom:updated

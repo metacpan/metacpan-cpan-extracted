@@ -20,12 +20,16 @@ t/07-perl2dump-escape-unicode-permanently.t
 t/10-scripts.t
 t/11-scripts-pod.t
 t/12-from-file.t
+t/13-yaml-tricky-cases.t
 t/20-synopsis.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-t/t-data/test.json
-t/t-data/test.pl
-t/t-data/test.yaml
+t/t-data/failing/test.json
+t/t-data/failing/test.pl
+t/t-data/failing/test.yaml
+t/t-data/succeeding/test.json
+t/t-data/succeeding/test.pl
+t/t-data/succeeding/test.yaml
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

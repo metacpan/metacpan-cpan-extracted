@@ -29,13 +29,17 @@ sub defaults {
             operators            => [ "REGEXP", "REGEXP_i", " = ", " != ", " < ", " > ", "IS NULL", "IS NOT NULL" ],
             plugins              => [ 'SQLite' ],
             qualified_table_name => 0,
-            quote_identifiers    => 1,
+            quote_tables         => 1,
+            quote_columns        => 1,
+            quote_aliases        => 0,
             db2_encoding         => 'utf8',
         },
         alias => {
-            select_func_sq => 0,
-            join           => 0,
-            table          => 0,
+            select_complex_col => 0,
+            join_table         => 0,
+            join_columns       => 0,
+            derived_table      => 0,
+            table              => 0,
         },
         enable => {
             create_table => 0,
@@ -49,15 +53,20 @@ sub defaults {
 
             extended_cols   => 0,
             extended_values => 0,
+            extended_args   => 0,
 
             m_derived   => 0,
+            m_cte       => 0,
             join        => 0,
             union       => 0,
             db_settings => 0,
 
             j_derived  => 0,
+            j_cte      => 0,
+
 
             u_derived     => 0,
+            u_cte         => 0,
             u_where       => 0,
             u_parentheses => 0,
         },

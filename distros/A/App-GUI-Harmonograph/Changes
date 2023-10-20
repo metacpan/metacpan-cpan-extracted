@@ -1,3 +1,15 @@
+0.66  2023-10-08  lichtkind
+-------
+    * = mid feature release
+    * configurable R pendulum rotation matrix
+    * configurable computation variables for all major ops in mod matrix
+    + introdus radius damping for pendulum R
+
+0.61  2023-09-30  lichtkind
+-------
+    * = bug fix
+    * adopt code to new GTC API
+
 0.60  2023-07-08  lichtkind
 -------
     * = bug fix

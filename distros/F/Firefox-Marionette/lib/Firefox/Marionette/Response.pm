@@ -8,7 +8,7 @@ use Firefox::Marionette::Exception::StaleElement();
 use Firefox::Marionette::Exception::InsecureCertificate();
 use Firefox::Marionette::Exception::Response();
 
-our $VERSION = '1.44';
+our $VERSION = '1.46';
 
 sub _TYPE_INDEX            { return 0 }
 sub _MESSAGE_ID_INDEX      { return 1 }
@@ -46,15 +46,10 @@ sub new {
             if ( !defined $error->{error} ) {
                 $error->{error} = q[];
             }
-            if ( defined $error->{message} ) {
-                if (   ( ref $error->{message} )
-                    && ( ref $error->{message} eq 'HASH' )
-                    && ( scalar keys %{ $error->{message} } == 0 ) )
-                {
-                    $error->{message} = q[];
-                }
-            }
-            else {
+            if (   ( ref $error->{message} )
+                && ( ref $error->{message} eq 'HASH' )
+                && ( scalar keys %{ $error->{message} } == 0 ) )
+            {
                 $error->{message} = q[];
             }
             $response = bless {
@@ -152,7 +147,7 @@ Firefox::Marionette::Response - Represents a Marionette protocol response
 
 =head1 VERSION
 
-Version 1.44
+Version 1.46
 
 =head1 SYNOPSIS
 

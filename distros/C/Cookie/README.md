@@ -114,7 +114,7 @@ Cookie::Jar - Cookie Jar Class for Server & Client
 
 # VERSION
 
-    v0.3.0
+    v0.3.1
 
 # DESCRIPTION
 
@@ -428,6 +428,10 @@ If no host is provided, the key is just the cookie, otherwise the resulting key 
 
 You should not need to use this method as it is used internally only.
 
+## length
+
+Read-only. Returns the size of the Cookie repository as a [number object](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ANumber)
+
 ## load
 
     $jar->load( '/home/joe/cookies.json' ) || die( $jar->error );
@@ -445,21 +449,21 @@ Give a json cookie file, and an hash or hash reference of options, and this will
 
 Supported options are:
 
-- _algo_ string
+- `algo` string
 
     Algorithm to use to decrypt the cookie file.
 
     It can be any of [AES](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AAES), [Anubis](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AAnubis), [Blowfish](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ABlowfish), [CAST5](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ACAST5), [Camellia](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ACamellia), [DES](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ADES), [DES\_EDE](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ADES_EDE), [KASUMI](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AKASUMI), [Khazad](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AKhazad), [MULTI2](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AMULTI2), [Noekeon](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ANoekeon), [RC2](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ARC2), [RC5](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ARC5), [RC6](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ARC6), [SAFERP](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFERP), [SAFER\_K128](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_K128), [SAFER\_K64](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_K64), [SAFER\_SK128](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_SK128), [SAFER\_SK64](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_SK64), [SEED](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASEED), [Skipjack](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASkipjack), [Twofish](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ATwofish), [XTEA](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AXTEA), [IDEA](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AIDEA), [Serpent](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASerpent) or simply any <NAME> for which there exists Crypt::Cipher::<NAME>
 
-- _decrypt_ boolean
+- `decrypt` boolean
 
     Must be set to true to enable decryption.
 
-- _iv_ string
+- `iv` string
 
     Set the [Initialisation Vector](https://en.wikipedia.org/wiki/Initialization_vector) used for file encryption and decryption. This must be the same value used for encryption. See ["save"](#save)
 
-- _key_ string
+- `key` string
 
     Set the encryption key used to decrypt the cookies file.
 
@@ -583,13 +587,13 @@ If the cookie objects passed to the anonymous code in this method, are not [Cook
 
 This method also takes an hash or hash reference of options:
 
-- _die_ boolean
+- `die` boolean
 
     If true, the anonymous code passed to the `do` method called, will die upon error. Default to false.
 
     By default, if an error occurs, `undef` is returned and the [error](https://metacpan.org/pod/Module%3A%3AGeneric#error) is set.
 
-- _overwrite_ boolean
+- `overwrite` boolean
 
     If true, when an existing cookie is found it will be overwritten by the new one. Default to false.
 
@@ -666,17 +670,17 @@ It returns the current object. If an error occurred, it will return `undef` and 
 
 Supported options are:
 
-- _algo_ string
+- `algo` string
 
     Algorithm to use to encrypt the cookie file.
 
     It can be any of [AES](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AAES), [Anubis](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AAnubis), [Blowfish](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ABlowfish), [CAST5](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ACAST5), [Camellia](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ACamellia), [DES](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ADES), [DES\_EDE](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ADES_EDE), [KASUMI](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AKASUMI), [Khazad](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AKhazad), [MULTI2](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AMULTI2), [Noekeon](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ANoekeon), [RC2](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ARC2), [RC5](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ARC5), [RC6](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ARC6), [SAFERP](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFERP), [SAFER\_K128](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_K128), [SAFER\_K64](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_K64), [SAFER\_SK128](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_SK128), [SAFER\_SK64](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASAFER_SK64), [SEED](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASEED), [Skipjack](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASkipjack), [Twofish](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ATwofish), [XTEA](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AXTEA), [IDEA](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3AIDEA), [Serpent](https://metacpan.org/pod/Crypt%3A%3ACipher%3A%3ASerpent) or simply any <NAME> for which there exists Crypt::Cipher::<NAME>
 
-- _encrypt_ boolean
+- `encrypt` boolean
 
     Must be set to true to enable encryption.
 
-- _iv_ string
+- `iv` string
 
     Set the [Initialisation Vector](https://en.wikipedia.org/wiki/Initialization_vector) used for file encryption. If you do not provide one, it will be automatically generated. If you want to provide your own, make sure the size meets the encryption algorithm size requirement. You also need to keep this to decrypt the cookies file.
 
@@ -686,7 +690,7 @@ Supported options are:
 
     which would yield `16`
 
-- _key_ string
+- `key` string
 
     Set the encryption key used to encrypt the cookies file.
 

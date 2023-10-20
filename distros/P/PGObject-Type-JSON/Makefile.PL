@@ -17,7 +17,7 @@ WriteMakefile(
         'JSON'       => 0,
     },
     BUILD_REQUIRES => {
-        'Test::More' => 0,
+        'Test2::V0'    => 0,
         'Carp::Always' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

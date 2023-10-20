@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 30;
+use Test::Most tests => 34;
 use Test::NoWarnings;
 use Data::Dumper;
 use lib 't/lib';
@@ -100,4 +100,11 @@ ROBOT: {
 	]);
 	$i->set_logger(MyLogger->new());
 	ok($i->is_robot() == 1);
+	cmp_ok($i->status(), '==', 200, 'Default HTTP status is 200');
+
+	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; zh) AppleWebKit/522.11.3 (KHTML, like Gecko) Version/3.0 Safari/522.11.3\") OR EXTRACTVALUE(2534,CONCAT(0x5c,0x7170767871,(SELECT (ELT(2534=2534,1))),0x716b627171)) AND (\"OqXr\"=\"OqXr';
+	delete $ENV{'HTTP_REFERER'};
+	$i = new_ok('CGI::Info');
+	ok($i->is_robot());
+	cmp_ok($i->status(), '==', 403, 'Check HTTP_USER_AGENT SQL Injection is blocked');
 }

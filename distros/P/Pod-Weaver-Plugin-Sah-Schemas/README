@@ -5,9 +5,9 @@
      my \$validator = gen_validator("$sch_name*");
      say \$validator->(\$data) ? "valid" : "INVALID!";
 
-    The above schema returns a boolean result (true if data is valid, false
-    if otherwise). To return an error message string instead (empty string
-    if data is valid, a non-empty error message otherwise):
+    The above validator returns a boolean result (true if data is valid,
+    false if otherwise). To return an error message string instead (empty
+    string if data is valid, a non-empty error message otherwise):
 
      my \$validator = gen_validator("$sch_name", {return_type=>'str_errmsg'});
      my \$errmsg = \$validator->(\$data);
@@ -29,9 +29,9 @@
 
                         push @pod, <<"_";
 
-    Often a schema has coercion rule or default value, so after validation
-    the validated value is different. To return the validated
-    (set-as-default, coerced, prefiltered) value:
+    Often a schema has coercion rule or default value rules, so after
+    validation the validated value will be different from the original. To
+    return the validated (set-as-default, coerced, prefiltered) value:
 
      my \$validator = gen_validator("$sch_name", {return_type=>'str_errmsg+val'});
      my \$res = \$validator->(\$data); # [\$errmsg, \$validated_val]
@@ -130,7 +130,8 @@
                         push @pod, <<"_";
 
   Using with Type::Tiny
-    To create a type constraint and type library from a schema:
+    To create a type constraint and type library from a schema (requires
+    Type::Tiny as well as Type::FromSah):
 
      package My::Types {
          use Type::Library -base;
@@ -198,9 +199,9 @@ NAME
     Sah::Schemas::* distribution
 
 VERSION
-    This document describes version 0.073 of
+    This document describes version 0.074 of
     Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution
-    Pod-Weaver-Plugin-Sah-Schemas), released on 2023-02-16.
+    Pod-Weaver-Plugin-Sah-Schemas), released on 2023-07-15.
 
 SYNOPSIS
     In your weaver.ini:

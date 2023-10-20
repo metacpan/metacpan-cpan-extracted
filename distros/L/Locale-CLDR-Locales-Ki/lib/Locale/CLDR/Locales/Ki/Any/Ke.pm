@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Ki::Any::Ke - Package for language Kikuyu
 
 =cut
 
 package Locale::CLDR::Locales::Ki::Any::Ke;
-# This file auto generated from Data/common/main/ki_KE.xml
-#	on Mon 11 Apr  5:31:33 pm GMT
+# This file auto generated from Data\common\main\ki_KE.xml
+#	on Fri 13 Oct  9:23:20 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

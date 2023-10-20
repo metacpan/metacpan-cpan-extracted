@@ -1,0 +1,6 @@
+0.003     2023-10-15 23:39:20-03:00 America/Sao_Paulo
+    - Fix readme and include perlcritic and perltidy to build
+0.002     2023-10-14 22:04:48-03:00 America/Sao_Paulo
+    - MANIFEST.SKIP
+0.001     2023-10-14 12:08:14-03:00 America/Sao_Paulo
+    - Initial release

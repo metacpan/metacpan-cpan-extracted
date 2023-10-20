@@ -16,7 +16,7 @@ my $x;
 SKIP: {
     eval { $x = X11::XCB::Connection->new; };
 
-    skip "Could not setup X11 connection", 2 if $@;
+    skip "Could not setup X11 connection", 2 if $@ or $x->has_error();
 
     my $color = $x->color(hexcode => 'C0C0C0');
     is($color->pixel, 12632256, 'grey colorpixel matches');

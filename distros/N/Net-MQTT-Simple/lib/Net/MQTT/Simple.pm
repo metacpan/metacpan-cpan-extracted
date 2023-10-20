@@ -5,7 +5,7 @@ use warnings;
 
 use IO::Socket::IP;
 
-our $VERSION = '1.28';
+our $VERSION = '1.29';
 
 # Please note that these are not documented and are subject to change:
 our $KEEPALIVE_INTERVAL = 60;
@@ -720,9 +720,16 @@ C<utf8::encode($message);>.
 
 =head1 LICENSE
 
-Pick your favourite OSI approved license :)
+This software may be redistributed under the terms of the GPL, LGPL, modified
+BSD, or Artistic license, or any of the other OSI approved licenses listed at
+http://www.opensource.org/licenses/alphabetical. Distribution is allowed under
+all of these these licenses, or any smaller subset of multiple or just one of
+these licenses.
 
-http://www.opensource.org/licenses/alphabetical
+When using a packaged version, please refer to the package metadata to see
+under which license terms it was distributed. Alternatively, a distributor may
+choose to replace the LICENSE section of the documentation and/or include a
+LICENSE file to reflect the license(s) they chose to redistribute under.
 
 =head1 AUTHOR
 

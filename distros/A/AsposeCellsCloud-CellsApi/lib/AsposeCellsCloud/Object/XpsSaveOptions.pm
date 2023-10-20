@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents the options of saving .xps file.',
                                   class => 'XpsSaveOptions',
                                   required => [], # TODO
 }                                 );

@@ -28,6 +28,7 @@ $m->submit_form_ok(
             'repeat-type'                     => 'yearly',
             'repeat-details-yearly-day-month' => $day->month,
             'repeat-details-yearly-day-day'   => $day->day,
+            'repeat-create-on-recurring-date' => 0,
         },
         button => 'SubmitTicket',
     },

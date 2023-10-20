@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Lb - Package for language Luxembourgish
 
 =cut
 
 package Locale::CLDR::Locales::Lb;
-# This file auto generated from Data/common/main/lb.xml
-#	on Mon 11 Apr  5:32:26 pm GMT
+# This file auto generated from Data\common\main\lb.xml
+#	on Fri 13 Oct  9:25:14 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';
@@ -36,7 +36,7 @@ has 'algorithmic_number_format_data' => (
 	isa => HashRef,
 	init_arg => undef,
 	default => sub { 
-		use bignum;
+		use bigfloat;
 		return {
 		'ord-M-fem' => {
 			'private' => {
@@ -461,10 +461,6 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(null),
 				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(=%spellout-cardinal-masculine=),
-				},
 				'1' => {
 					base_value => q(1),
 					divisor => q(1),
@@ -528,9 +524,13 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(net eng Nummer),
 				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=%spellout-cardinal-masculine=),
+				},
 				'max' => {
 					divisor => q(1),
-					rule => q(net eng Nummer),
+					rule => q(=%spellout-cardinal-masculine=),
 				},
 			},
 		},
@@ -802,6 +802,10 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(nullten),
 				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=#,##0.0=.),
+				},
 				'1' => {
 					base_value => q(1),
 					divisor => q(1),
@@ -905,13 +909,9 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(net eng Nummer),
 				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(=#,##0.0=.),
-				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=#,##0.0=.),
+					rule => q(net eng Nummer),
 				},
 			},
 		},

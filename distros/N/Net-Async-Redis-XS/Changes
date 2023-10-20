@@ -1,10 +1,20 @@
 Revision history for Net-Async-Redis-XS
 
+0.012     2023-09-21 06:45:29+08:00 Asia/Singapore
+    [Bugs fixed]
+
+    - node config was not being passed in bootstrap, potentially leading to inconsistent
+    results compared to other discovered nodes
+
 0.011     2023-06-29 12:21:07+08:00 Asia/Singapore
     [Bugs fixed]
-    - Net::Async::Redis::Cluster::XS `->bootstrap` needs to load Syntax::Keyword::Try
+
     - Ensure all nodes in the cluster are using the ::XS version, some requests were
     still going through plain Perl
+
+0.010     2023-03-20 08:51:30+08:00 Asia/Singapore
+    [Bugs fixed]
+    - Net::Async::Redis::Cluster::XS `->bootstrap` needs to load Syntax::Keyword::Try
 
 0.009     2023-02-10 18:11:54+08:00 Asia/Singapore
     [Dependencies]

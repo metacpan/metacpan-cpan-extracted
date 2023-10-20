@@ -5,12 +5,15 @@ use Otogiri;
 
 use Test::Requires 'Test::PostgreSQL';
 
-my $pg = Test::PostgreSQL->new(
-    my_cnf => {
-        'skip-networking' => '',
-    }
-) or plan skip_all => $Test::PostgreSQL::errstr;
-
+my $pg = undef;
+eval {
+    $pg = Test::PostgreSQL->new(
+        my_cnf => {
+            'skip-networking' => '',
+        }
+    );
+};
+plan skip_all => $Test::PostgreSQL::errstr if $@;
 
 my $db = Otogiri->new( connect_info => [$pg->dsn(dbname => 'test'), '', '', { RaiseError => 1, PrintError => 0 }] );
 

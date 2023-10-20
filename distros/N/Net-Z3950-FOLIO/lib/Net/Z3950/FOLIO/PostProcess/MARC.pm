@@ -15,16 +15,21 @@ sub postProcessMARCRecord {
     my $newMarc = new MARC::Record();
     $newMarc->leader($marc->leader());
 
-    my $getFieldFromRecord = sub {
-	my($fieldname) = @_;
-	return (marcFieldOrSubfield($newMarc, $fieldname) ||
-		marcFieldOrSubfield($marc, $fieldname) ||
-		'');
-    };
-
     my @fields = gatherMarcFields($marc, $cfg);
+    my %fieldCountByTag = ();
     foreach my $field (@fields) {
 	my $tag = $field->tag();
+	my $fieldCount = $fieldCountByTag{$tag} || 0;
+	$fieldCountByTag{$tag} = $fieldCount+1;
+
+	my $getFieldFromRecord = sub {
+	    my($fieldname) = @_;
+
+	    # Use the $fieldCount'th instance of field $tag only if substituting from the same field
+	    return (marcFieldOrSubfield($newMarc, $fieldname, $fieldCount, $tag) ||
+		    marcFieldOrSubfield($marc, $fieldname, $fieldCount, $tag) ||
+		    '');
+	};
 
 	my $newField;
 	if ($field->is_control_field())	{
@@ -95,15 +100,14 @@ sub gatherMarcFields {
 
 
 sub marcFieldOrSubfield {
-    my($marc, $fieldname) = @_;
+    my($marc, $fieldname, $index, $useIndexIfmatchTag) = @_;
 
     my($tag, $subtag) = ($fieldname =~ /(\d+)\$?(.*)/);
-    if ($subtag) {
-	return $marc->subfield($tag, $subtag);
-    } else {
-	my $field = $marc->field($tag);
-	return $field ? $field->data() : undef;
-    }
+    $index = 0 if defined $useIndexIfmatchTag && $tag ne $useIndexIfmatchTag;
+    my @fields = $marc->field($tag);
+    my $field = $fields[$index || 0];
+    return undef if !$field;
+    return $subtag ? $field->subfield($subtag) : $field->data();
 }
 
 

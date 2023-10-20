@@ -13,7 +13,7 @@ Dancer2::Tutorial - An example to get you dancing
 
 =head1 VERSION
 
-version 0.400001
+version 1.0.0
 
 =head1 Tutorial Overview
 

@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::En::Any::Ms - Package for language English
 
 =cut
 
 package Locale::CLDR::Locales::En::Any::Ms;
-# This file auto generated from Data/common/main/en_MS.xml
-#	on Mon 11 Apr  5:27:06 pm GMT
+# This file auto generated from Data\common\main\en_MS.xml
+#	on Fri 13 Oct  9:13:25 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

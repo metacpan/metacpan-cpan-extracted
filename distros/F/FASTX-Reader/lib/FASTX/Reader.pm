@@ -7,7 +7,7 @@ use PerlIO::encoding;
 $Data::Dumper::Sortkeys = 1;
 use FASTX::Seq;
 use File::Basename;
-$FASTX::Reader::VERSION = '1.11.0';
+$FASTX::Reader::VERSION = '1.12.0';
 require Exporter;
 our @ISA = qw(Exporter);
 
@@ -483,7 +483,7 @@ FASTX::Reader - A simple module to parse FASTA and FASTQ files, supporting compr
 
 =head1 VERSION
 
-version 1.11.0
+version 1.12.0
 
 =head1 SYNOPSIS
 
@@ -495,6 +495,14 @@ version 1.11.0
   while (my $seq = $fasta_reader->getRead() ) {
     print $seq->{name}, "\t", $seq->{seq}, "\t", $seq->{qual}, "\n";
   }
+
+=head1 NAME
+
+FASTX::Reader - A simple module to parse FASTA and FASTQ files, supporting compressed files and paired-ends.
+
+=head1 VERSION
+
+version 1.11.0
 
 =head1 BUILD TEST
 
@@ -625,6 +633,18 @@ has contributed to the prototyping of this module
 The module I would have used if it was available when I started working on this. The .gz reader implementation comes from this module.
 
 =back
+
+=head1 AUTHOR
+
+Andrea Telatin <andrea@telatin.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =head1 AUTHOR
 

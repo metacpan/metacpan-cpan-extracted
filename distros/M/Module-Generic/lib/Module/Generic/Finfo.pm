@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Finfo.pm
-## Version v0.3.3
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.4.0
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2023/08/17
+## Modified 2023/09/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,10 +19,11 @@ BEGIN
     use parent qw( Module::Generic );
     use vars qw( $VERSION $HAS_LOCAL_TZ $HAS_FILE_MMAGIC_XS );
     use File::Basename ();
+    local $@;
     eval( "use File::MMagic::XS 0.09008" );
     our $HAS_FILE_MMAGIC_XS = $@ ? 0 : 1;
     use Module::Generic::Null;
-    use Nice::Try;
+    # use Nice::Try;
     use Want;
     use overload (
         q{""}    => sub    { $_[0]->{filepath} },
@@ -64,7 +65,7 @@ BEGIN
     };
     our %EXPORT_TAGS = ( all => [qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE )] );
     our @EXPORT_OK = qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE );
-    our $VERSION = 'v0.3.3';
+    our $VERSION = 'v0.4.0';
 };
 
 use strict;
@@ -80,6 +81,9 @@ sub init
     $self->{_data} = [CORE::stat( $file )];
     return( $self );
 }
+
+# This class does not convert to an HASH, but the TO_JSON method will convert to a string
+sub as_hash { return( $_[0] ); }
 
 sub atime
 {
@@ -240,24 +244,28 @@ sub mime_type
 {
     my $self = shift( @_ );
     my $file = $self->filepath;
-    try
+    my $rv;
+    # try-catch
+    local $@;
+    eval
     {
         if( $HAS_FILE_MMAGIC_XS )
         {
             my $m = File::MMagic::XS->new;
-            return( $self->new_scalar( $m->get_mime( $file ) ) );
+            $rv = $self->new_scalar( $m->get_mime( $file ) );
         }
         else
         {
             require File::MMagic;
             my $m = File::MMagic->new;
-            return( $self->new_scalar( $m->checktype_filename( $file ) ) );
+            $rv = $self->new_scalar( $m->checktype_filename( $file ) );
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to get the mime type for file \"", $self->filepath, "\": $e" ) );
+        return( $self->error( "An error occurred while trying to get the mime type for file \"", $self->filepath, "\": $@" ) );
     }
+    return( $rv );
 }
 
 sub mode
@@ -397,51 +405,58 @@ sub _datetime
     return( $self->error( "No epoch time was provided." ) ) if( !length( $t ) );
     return( $self->error( "Invalid epoch time provided \"$t\"." ) ) if( $t !~ /^\d+$/ );
     my $class = ref( $self ) || $self;
-    try
+    $self->_load_class( 'DateTime' ) || return( $self->pass_error );
+    $self->_load_class( 'DateTime::Format::Strptime' ) || return( $self->pass_error );
+    $self->_load_class( 'Module::Generic::DateTime' ) || return( $self->pass_error );
+    my $dt;
+    if( !defined( $HAS_LOCAL_TZ ) )
     {
-        require DateTime;
-        require DateTime::Format::Strptime;
-        require Module::Generic::DateTime;
-        my $dt;
-        if( !defined( $HAS_LOCAL_TZ ) )
+        # try-catch
+        local $@;
+        eval
         {
-            try
-            {
-                $dt = DateTime->from_epoch( epoch => $t, time_zone => 'local' );
-                $HAS_LOCAL_TZ = 1;
-            }
-            catch( $e )
-            {
-                $HAS_LOCAL_TZ = 0;
-                warn( "Your system is missing key timezone components. ${class}::_datetime is reverting to UTC instead of local time zone.\n" );
-                $dt = DateTime->from_epoch( epoch => $t, time_zone => 'UTC' );
-            }
-        }
-        else
+            $dt = DateTime->from_epoch( epoch => $t, time_zone => 'local' );
+            $HAS_LOCAL_TZ = 1;
+        };
+        if( $@ )
         {
-            try
-            {
-                $dt = DateTime->from_epoch( epoch => $t, time_zone => ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) );
-            }
-            catch( $e )
-            {
-                warn( "Error trying to set a DateTime object using ", ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ), " time zone\n" );
-                $dt = DateTime->from_epoch( epoch => $t, time_zone => 'UTC' );
-            }
+            $HAS_LOCAL_TZ = 0;
+            warn( "Your system is missing key timezone components. ${class}::_datetime is reverting to UTC instead of local time zone.\n" );
+            $dt = DateTime->from_epoch( epoch => $t, time_zone => 'UTC' );
         }
-        
+    }
+    else
+    {
+        # try-catch
+        local $@;
+        eval
+        {
+            $dt = DateTime->from_epoch( epoch => $t, time_zone => ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) );
+        };
+        if( $@ )
+        {
+            warn( "Error trying to set a DateTime object using ", ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ), " time zone\n" );
+            $dt = DateTime->from_epoch( epoch => $t, time_zone => 'UTC' );
+        }
+    }
+    
+    # try-catch
+    local $@;
+    my $o;
+    eval
+    {
         my $fmt = DateTime::Format::Strptime->new(
             pattern => '%s',
         );
         $dt->set_formatter( $fmt );
-        my $o = Module::Generic::DateTime->new( $dt ) ||
+        $o = Module::Generic::DateTime->new( $dt ) ||
             return( $self->pass_error( Module::Generic::DateTime->error ) );
-        return( $o );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Unable to get the datetime object for \"$t\": $e" ) );
+        return( $self->error( "Unable to get the datetime object for \"$t\": $@" ) );
     }
+    return( $o );
 }
 
 # Credits: IPC::SysV <https://metacpan.org/release/JACKS/IPC_SysV>
@@ -578,7 +593,7 @@ Module::Generic::Finfo - File Info Object Class
 
 =head1 VERSION
 
-    v0.3.3
+    v0.4.0
 
 =head1 DESCRIPTION
 

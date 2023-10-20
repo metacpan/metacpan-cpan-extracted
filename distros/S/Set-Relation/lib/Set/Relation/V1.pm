@@ -7,7 +7,7 @@ use warnings;
 ###########################################################################
 
 { package Set::Relation::V1; # class
-    our $VERSION = '0.013002';
+    our $VERSION = '0.013004';
     $VERSION = eval $VERSION;
 
     use Carp 'confess';

@@ -9,7 +9,7 @@ ABOUT
                 http://lists.schmorp.de/cgi-bin/mailman/listinfo/libev
    Library Documentation: http://pod.tst.eu/http://cvs.schmorp.de/libev/ev.pod
 
-   Libev is modelled (very losely) after libevent and the Event perl
+   Libev is modelled (very loosely) after libevent and the Event perl
    module, but is faster, scales better and is more correct, and also more
    featureful. And also smaller. Yay.
 
@@ -38,10 +38,10 @@ ABOUT
    - support for other languages (multiple C++ interfaces, D, Ruby,
      Python) available from third-parties.
 
-   Examples of programs that embed libev: the EV perl module, node.js,
-   auditd, rxvt-unicode, gvpe (GNU Virtual Private Ethernet), the
-   Deliantra MMORPG server (http://www.deliantra.net/), Rubinius (a
-   next-generation Ruby VM), the Ebb web server, the Rev event toolkit.
+   Examples of programs that embed libev: the EV perl module, auditd,
+   rxvt-unicode, gvpe (GNU Virtual Private Ethernet), the Deliantra MMORPG
+   server (http://www.deliantra.net/), Rubinius (a next-generation Ruby
+   VM), the Ebb web server, the Rev event toolkit.
 
 
 CONTRIBUTORS

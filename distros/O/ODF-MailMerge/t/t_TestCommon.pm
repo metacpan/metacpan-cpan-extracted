@@ -236,10 +236,10 @@ sub string_to_tempfile($@) {
 # override that.   I'm forcing LC_ALL=C so things like date and number
 # formats will be predictable for testing.
 #
-# This is usually enclosed in Tiny::Capture::capture { ... }
+# This is usually enclosed in Capture::Tiny::capture { ... }
 #
 #    ==> IMPORTANT: Be sure STDOUT/ERR has :encoding(...) set beforehand
-#        because Tiny::Capture will decode captured output the same way.
+#        because Capture::Tiny will decode captured output the same way.
 #        Otherwise wide chars will be corrupted
 #
 #

@@ -3,19 +3,11 @@ package main;
 use strict;
 use warnings;
 
-my ( $mock_time );
+use Test::More 0.88;	# Because of done_testing()
+
+my $mock_time;
 
 BEGIN {
-    eval {
-	require Test::More;
-	Test::More->VERSION( 0.88 );	# Because of done_testing()
-	Test::More->import();
-	1;
-    } or do {
-	print "1..0 # skip Test::More 0.88 required for test.\n";
-	exit;
-    };
-
     $mock_time = eval {
 	require Test::MockTime;
 	Test::MockTime->import( qw{ set_fixed_time restore_time } );

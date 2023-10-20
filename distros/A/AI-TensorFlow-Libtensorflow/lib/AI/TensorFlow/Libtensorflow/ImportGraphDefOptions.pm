@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::ImportGraphDefOptions;
 # ABSTRACT: Holds options that can be passed to ::Graph::ImportGraphDef
-$AI::TensorFlow::Libtensorflow::ImportGraphDefOptions::VERSION = '0.0.6';
+$AI::TensorFlow::Libtensorflow::ImportGraphDefOptions::VERSION = '0.0.7';
 use strict;
 use warnings;
 use namespace::autoclean;

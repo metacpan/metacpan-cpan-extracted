@@ -1,5 +1,9 @@
 # Revision history for Resource::Silo
 
+- 0.11    Wed Oct 04 2023
+    - Use namespace::clean to remove unneeded imports from the container class
+    - Use Moo internally, enforce Moo/Moose compatibility
+
 - 0.10    Fri Sep 01 2023
     - [api] Add meta->show(name) method to inspect resource definitions
     - [bug] default cleanup_order for literals = inf

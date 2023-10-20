@@ -39,6 +39,8 @@ share/remotes/different-id-ref-string.json
 share/remotes/draft-next/baseUriChange/folderInteger.json
 share/remotes/draft-next/baseUriChangeFolder/folderInteger.json
 share/remotes/draft-next/baseUriChangeFolderInSubschema/folderInteger.json
+share/remotes/draft-next/detached-dynamicref.json
+share/remotes/draft-next/detached-ref.json
 share/remotes/draft-next/extendible-dynamic-ref.json
 share/remotes/draft-next/format-assertion-false.json
 share/remotes/draft-next/format-assertion-true.json
@@ -57,6 +59,7 @@ share/remotes/draft2019-09/baseUriChange/folderInteger.json
 share/remotes/draft2019-09/baseUriChangeFolder/folderInteger.json
 share/remotes/draft2019-09/baseUriChangeFolderInSubschema/folderInteger.json
 share/remotes/draft2019-09/dependentRequired.json
+share/remotes/draft2019-09/detached-ref.json
 share/remotes/draft2019-09/extendible-dynamic-ref.json
 share/remotes/draft2019-09/ignore-prefixItems.json
 share/remotes/draft2019-09/integer.json
@@ -73,6 +76,8 @@ share/remotes/draft2019-09/tree.json
 share/remotes/draft2020-12/baseUriChange/folderInteger.json
 share/remotes/draft2020-12/baseUriChangeFolder/folderInteger.json
 share/remotes/draft2020-12/baseUriChangeFolderInSubschema/folderInteger.json
+share/remotes/draft2020-12/detached-dynamicref.json
+share/remotes/draft2020-12/detached-ref.json
 share/remotes/draft2020-12/extendible-dynamic-ref.json
 share/remotes/draft2020-12/format-assertion-false.json
 share/remotes/draft2020-12/format-assertion-true.json
@@ -88,6 +93,8 @@ share/remotes/draft2020-12/ref-and-defs.json
 share/remotes/draft2020-12/subSchemas-defs.json
 share/remotes/draft2020-12/subSchemas.json
 share/remotes/draft2020-12/tree.json
+share/remotes/draft6/detached-ref.json
+share/remotes/draft7/detached-ref.json
 share/remotes/draft7/ignore-dependentRequired.json
 share/remotes/extendible-dynamic-ref.json
 share/remotes/folder/folderInteger.json
@@ -565,6 +572,9 @@ t/16-skip_dir.t
 t/99-sanity.t
 t/lib/SchemaParser.pm
 t/tests/add_resource/foo.json
+t/tests/add_resource/remotes/draft2019-09/remote4.json
+t/tests/add_resource/remotes/draft2020-12/remote3.json
+t/tests/add_resource/remotes/draft6/remote5.json
 t/tests/add_resource/remotes/remote1.json
 t/tests/add_resource/remotes/subfolder/remote2.json
 t/tests/bad/invalid-schema.json

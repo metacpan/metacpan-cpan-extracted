@@ -5,7 +5,7 @@ use warnings;
 
 use Class::Accessor::Lite (
     ro => [qw/connect_info strict/],
-    rw => [qw/maker owner_pid/],
+    rw => [qw/maker owner_pid row_class_schema/],
     new => 0,
 );
 
@@ -26,6 +26,20 @@ sub new {
     $self->{dbh}   = DBIx::Sunny->connect(@{$self->{connect_info}});
     $self->{maker} = SQL::Maker->new(driver => $self->{dsn}{driver}, strict => $strict);
     $self->owner_pid($$);
+    return $self;
+}
+
+sub row_class {
+    my ($self, $class_name) = @_;
+    if ($class_name) {
+        $self->row_class_schema($class_name);
+    }
+    return $self;
+}
+
+sub no_row_class {
+    my ($self) = @_;
+    delete $self->{row_class_schema};
     return $self;
 }
 
@@ -62,14 +76,18 @@ sub search_by_sql {
     ) unless wantarray;
 
     my @binds = @{$binds_aref || []};
-    my $rtn = $self->dbh->select_all($sql, @binds);
+    my $dbh = $self->dbh;
+    my $row_class = $self->row_class_schema;
+    my $rtn = $row_class ? $dbh->select_all_as($row_class, $sql, @binds) : $dbh->select_all($sql, @binds);
     $rtn ? $self->_inflate_rows($table, @$rtn) : ();
 }
 
 sub single {
     my ($self, $table, $param, @opts) = @_;
     my ($sql, @binds) = $self->maker->select($table, ['*'], $param, @opts);
-    my $row = $self->dbh->select_row($sql, @binds);
+    my $dbh = $self->dbh;
+    my $row_class = $self->row_class_schema;
+    my $row = $row_class ? $dbh->select_row_as($row_class, $sql, @binds) : $dbh->select_row($sql, @binds);
     $self->{inflate} ? $self->_inflate_rows($table, $row) : $row;
 }
 
@@ -191,7 +209,26 @@ DBIx::Otogiri - Core of Otogiri
     for my $r (@rows) {
         printf "Title: %s \nPrice: %s yen\n", $r->{title}, $r->{price};
     }
+
+    # If you using perl 5.38 or later, you can use class feature.
+    class Book {
+        field $id :param;
+        field $title :param;
+        field $author :param;
+        field $price :param;
+        field $created_at :param;
+        field $updated_at :param;
+
+        method title {
+            return $title;
+        }
+    };
+    my $book = $db->row_class('Book')->single(book => {id => 1}); # $book is Book object.
+    say $book->title; # => say book title.
     
+    my $hash = $db->no_row_class->single(book => {id => 1}); # $hash is HASH reference.
+    say $hash->{title}; # => say book title.
+
     $db->update(book => [author => 'oreore'], {author => 'me'});
     
     $db->delete(book => {author => 'me'});
@@ -303,6 +340,31 @@ Select from specified table. Then, returns first of matched rows.
     my @rows = $db->search_by_sql($sql, \@bind_vals [, $table_name]);
 
 Select by specified SQL. Then, returns matched rows as array. $table_name is optional and used for inflate parameter.
+
+=head2 row_class
+
+    class Book {
+        field $id :param;
+        field $title :param;
+        field $author :param;
+        field $price :param;
+        field $created_at :param;
+        field $updated_at :param;
+
+        method title {
+            return $title;
+        }
+    };
+
+    my $db = $db->row_class($class_name);
+
+Set row class name. If you set row class name, you can receive result as row class object.
+
+=head2 no_row_class
+
+    my $db = $db->no_row_class;
+
+Unset row class name. If you unset row class name, you can receive result as HASH reference.
 
 =head2 update
 

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package OpenAPI::Modern; # git description: v0.045-9-g275a796
+package OpenAPI::Modern; # git description: v0.047-11-g728a0bf
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.046';
+our $VERSION = '0.048';
 
 use 5.020;
 use utf8;
@@ -25,10 +25,9 @@ use Scalar::Util 'looks_like_number';
 use Feature::Compat::Try;
 use Encode 2.89;
 use URI::Escape ();
-use JSON::Schema::Modern 0.557;
+use JSON::Schema::Modern 0.560;
 use JSON::Schema::Modern::Utilities 0.531 qw(jsonp unjsonp canonical_uri E abort is_equal is_elements_unique);
 use JSON::Schema::Modern::Document::OpenAPI;
-use MooX::HandlesVia;
 use MooX::TypeTiny 0.002002;
 use Types::Standard 'InstanceOf';
 use constant { true => JSON::PP::true, false => JSON::PP::false };
@@ -83,6 +82,9 @@ around BUILDARGS => sub ($orig, $class, @args) {
 };
 
 sub validate_request ($self, $request, $options = {}) {
+  croak '$request and $options->{request} are inconsistent'
+    if $request and $options->{request} and $request != $options->{request};
+
   my $state = {
     data_path => '/request',
     initial_schema_uri => $self->openapi_uri,   # the canonical URI as of the start or last $id, or the last traversed $ref
@@ -93,8 +95,6 @@ sub validate_request ($self, $request, $options = {}) {
   };
 
   try {
-    croak '$request and $options->{request} are inconsistent'
-      if $request and $options->{request} and $request != $options->{request};
     $options->{request} //= $request;
     my $path_ok = $self->find_path($options);
     $request = $options->{request};   # now guaranteed to be a Mojo::Message::Request
@@ -136,7 +136,7 @@ sub validate_request ($self, $request, $options = {}) {
         my $valid =
             $param_obj->{in} eq 'path' ? $self->_validate_path_parameter($state, $param_obj, $path_captures)
           : $param_obj->{in} eq 'query' ? $self->_validate_query_parameter($state, $param_obj, $request->url)
-          : $param_obj->{in} eq 'header' ? $self->_validate_header_parameter($state, $param_obj->{name}, $param_obj, [ $request->headers->header($param_obj->{name}) // () ])
+          : $param_obj->{in} eq 'header' ? $self->_validate_header_parameter($state, $param_obj->{name}, $param_obj, $request->headers->header($param_obj->{name}))
           : $param_obj->{in} eq 'cookie' ? $self->_validate_cookie_parameter($state, $param_obj, $request)
           : abort($state, 'unrecognized "in" value "%s"', $param_obj->{in});
       }
@@ -153,8 +153,19 @@ sub validate_request ($self, $request, $options = {}) {
         if not exists $request_parameters_processed->{path}{$path_name};
     }
 
-    $state->{data_path} = jsonp($state->{data_path}, 'body');
     $state->{schema_path} = jsonp($state->{schema_path}, $method);
+
+    ()= E({ %$state, data_path => jsonp($state->{data_path}, 'header') },
+        'RFC9112 §6.2-2: A sender MUST NOT send a Content-Length header field in any message that contains a Transfer-Encoding header field')
+      if defined $request->headers->content_length and $request->content->is_chunked;
+
+    # RFC9112 §6.3-7: A user agent that sends a request that contains a message body MUST send
+    # either a valid Content-Length header field or use the chunked transfer coding.
+    ()= E({ %$state, data_path => jsonp($state->{data_path}, 'header') }, 'missing header: Content-Length')
+      if $request->body_size and not $request->headers->content_length
+        and not $request->content->is_chunked;
+
+    $state->{data_path} = jsonp($state->{data_path}, 'body');
 
     if (my $body_obj = $operation->{requestBody}) {
       $state->{schema_path} = jsonp($state->{schema_path}, 'requestBody');
@@ -163,7 +174,7 @@ sub validate_request ($self, $request, $options = {}) {
         $body_obj = $self->_resolve_ref('request-body', $ref, $state);
       }
 
-      if ($request->headers->content_length // $request->body_size) {
+      if ($request->body_size) {
         $self->_validate_body_content($state, $body_obj->{content}, $request);
       }
       elsif ($body_obj->{required}) {
@@ -171,6 +182,7 @@ sub validate_request ($self, $request, $options = {}) {
       }
     }
     else {
+      # we presume that no body specification for GET and HEAD requests -> no body is expected
       ()= E($state, 'unspecified body is present in %s request', uc $method)
         if ($method eq 'get' or $method eq 'head')
           and $request->headers->content_length // $request->body_size;
@@ -225,7 +237,7 @@ sub validate_response ($self, $response, $options = {}) {
     $response = _convert_response($response);   # now guaranteed to be a Mojo::Message::Response
 
     if (my $error = $response->error) {
-      ()= E($state, $response->error->{message});
+      ()= E($state, $error->{message});
       return $self->_result($state, 1);
     }
 
@@ -239,6 +251,10 @@ sub validate_response ($self, $response, $options = {}) {
         'RFC9112 §6.1-10: A server MUST NOT send a Transfer-Encoding header field in any 2xx (Successful) response to a CONNECT request')
         if $response->is_success and $method eq 'connect';
     }
+
+    ()= E({ %$state, data_path => jsonp($state->{data_path}, 'header') },
+        'RFC9112 §6.2-2: A sender MUST NOT send a Content-Length header field in any message that contains a Transfer-Encoding header field')
+      if defined $response->headers->content_length and $response->content->is_chunked;
 
     my $response_name = first { exists $operation->{responses}{$_} }
       $response->code, substr(sprintf('%03s', $response->code), 0, -2).'XX', 'default';
@@ -264,7 +280,7 @@ sub validate_response ($self, $response, $options = {}) {
 
       ()= $self->_validate_header_parameter({ %$state,
           data_path => jsonp($state->{data_path}, 'header', $header_name) },
-        $header_name, $header_obj, [ $response->headers->header($header_name) // () ]);
+        $header_name, $header_obj, $response->headers->header($header_name));
     }
 
     $self->_validate_body_content({ %$state, data_path => jsonp($state->{data_path}, 'body') },
@@ -300,7 +316,7 @@ sub find_path ($self, $options) {
   };
 
   if ($options->{request} and my $error = $options->{request}->error) {
-    ()= E({ %$state, data_path => '/request' }, $options->{request}->error->{message});
+    ()= E({ %$state, data_path => '/request' }, $error->{message});
     return $self->_result($state, 1);
   }
 
@@ -446,17 +462,24 @@ sub _validate_path_parameter ($self, $state, $param_obj, $path_captures) {
   return E({ %$state, keyword => 'required' }, 'missing path parameter: %s', $param_obj->{name})
     if not exists $path_captures->{$param_obj->{name}};
 
-  $self->_validate_parameter_content($state, $param_obj, \ $path_captures->{$param_obj->{name}});
+  return $self->_validate_parameter_content($state, $param_obj, \ $path_captures->{$param_obj->{name}})
+    if exists $param_obj->{content};
+
+  return E({ %$state, keyword => 'style' }, 'only style: simple is supported in path parameters')
+    if ($param_obj->{style}//'simple') ne 'simple';
+
+  my $types = $self->_type_in_schema($param_obj->{schema}, { %$state, schema_path => jsonp($state->{schema_path}) });
+  if (grep $_ eq 'array', @$types or grep $_ eq 'object', @$types) {
+    return E($state, 'deserializing to non-primitive types is not yet supported in path parameters');
+  }
+
+  $state = { %$state, schema_path => jsonp($state->{schema_path}, 'schema'), stringy_numbers => 1 };
+  $self->_evaluate_subschema(\ $path_captures->{$param_obj->{name}}, $param_obj->{schema}, $state);
 }
 
 sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
   # parse the query parameters out of uri
   my $query_params = +{ $uri->query->pairs->@* };
-
-  # TODO: support different styles.
-  # for now, we only support style=form and do not allow for multiple values per
-  # property (i.e. 'explode' is not checked at all.)
-  # (other possible style values: spaceDelimited, pipeDelimited, deepObject)
 
   if (not exists $query_params->{$param_obj->{name}}) {
     return E({ %$state, keyword => 'required' }, 'missing query parameter: %s', $param_obj->{name})
@@ -464,27 +487,74 @@ sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
     return 1;
   }
 
-  # TODO: check 'allowReserved': if true, do not use percent-decoding
-  return E({ %$state, keyword => 'allowReserved' }, 'allowReserved: true is not yet supported')
-    if $param_obj->{allowReserved} // 0;
+  # TODO: check 'allowEmptyValue'; difficult to do without access to the raw request string
 
-  $self->_validate_parameter_content($state, $param_obj, \ $query_params->{$param_obj->{name}});
+  return $self->_validate_parameter_content($state, $param_obj, \ $query_params->{$param_obj->{name}})
+    if exists $param_obj->{content};
+
+  # TODO: check 'allowReserved'; difficult to do without access to the raw request string
+
+  # TODO: support different styles.
+  # for now, we only support style=form and do not allow for multiple values per
+  # property (i.e. 'explode' is not checked at all.)
+  # (other possible style values: spaceDelimited, pipeDelimited, deepObject)
+
+  return E({ %$state, keyword => 'style' }, 'only style: form is supported in query parameters')
+    if ($param_obj->{style}//'form') ne 'form';
+
+  my $types = $self->_type_in_schema($param_obj->{schema}, { %$state, schema_path => jsonp($state->{schema_path}) });
+  if (grep $_ eq 'array', @$types or grep $_ eq 'object', @$types) {
+    return E($state, 'deserializing to non-primitive types is not yet supported in query parameters');
+  }
+
+  $state = { %$state, schema_path => jsonp($state->{schema_path}, 'schema'), stringy_numbers => 1 };
+  $self->_evaluate_subschema(\ $query_params->{$param_obj->{name}}, $param_obj->{schema}, $state);
 }
 
 # validates a header, from either the request or the response
-sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $headers) {
+sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $header_string) {
   return 1 if grep fc $header_name eq fc $_, qw(Accept Content-Type Authorization);
 
-  # NOTE: for now, we will only support a single header value.
-  @$headers = map s/^\s*//r =~ s/\s*$//r, @$headers;
-
-  if (not @$headers) {
+  if (not defined $header_string) {
     return E({ %$state, keyword => 'required' }, 'missing header: %s', $header_name)
       if $header_obj->{required};
     return 1;
   }
 
-  $self->_validate_parameter_content($state, $header_obj, \ $headers->[0]);
+  return $self->_validate_parameter_content($state, $header_obj, \ $header_string)
+    if exists $header_obj->{content};
+
+  # "The field value does not include any leading or trailing whitespace: OWS occurring before the
+  # first non-whitespace octet of the field value or after the last non-whitespace octet of the
+  # field value ought to be excluded by parsers when extracting the field value from a header field."
+  $header_string =~ s/^\s*//;
+  $header_string =~ s/\s*$//;
+
+  my $types = $self->_type_in_schema($header_obj->{schema}, { %$state, schema_path => jsonp($state->{schema_path}, 'schema') });
+
+  # all deserialization follows the spec: https://spec.openapis.org/oas/v3.1.0#style-examples
+  # We strip leading and trailing whitespace between fields, as per RFC9112§5.1-3
+  my $data;
+  if (grep $_ eq 'array', @$types) {
+    # style=simple, explode=false or true: "blue,black,brown" -> ["blue","black","brown"]
+    $data = [ split /\s*,\s*/, $header_string ];
+  }
+  elsif (grep $_ eq 'object', @$types) {
+    if ($header_obj->{explode}//false) {
+      # style=simple, explode=true: "R=100,G=200,B=150" -> { "R": 100, "G": 200, "B": 150 }
+      $data = +{ map m/^([^=]*)=?(.*)$/g, split(/\s*,\s*/, $header_string) };
+    }
+    else {
+      # style=simple, explode=false: "R,100,G,200,B,150" -> { "R": 100, "G": 200, "B": 150 }
+      $data = +{ split /\s*,\s*/, $header_string };
+    }
+  }
+  else {
+    $data = join(', ', split(/\s*,\s*/, $header_string));
+  }
+
+  $state = { %$state, schema_path => jsonp($state->{schema_path}, 'schema'), stringy_numbers => 1 };
+  $self->_evaluate_subschema(\ $data, $header_obj->{schema}, $state);
 }
 
 sub _validate_cookie_parameter ($self, $state, $param_obj, $request) {
@@ -492,35 +562,30 @@ sub _validate_cookie_parameter ($self, $state, $param_obj, $request) {
 }
 
 sub _validate_parameter_content ($self, $state, $param_obj, $content_ref) {
-  if (exists $param_obj->{content}) {
-    abort({ %$state, keyword => 'content' }, 'more than one media type entry present')
-      if keys $param_obj->{content}->%* > 1;  # TODO: remove, when the spec schema is updated
-    my ($media_type) = keys $param_obj->{content}->%*;  # there can only be one key
-    my $schema = $param_obj->{content}{$media_type}{schema};
+  abort({ %$state, keyword => 'content' }, 'more than one media type entry present')
+    if keys $param_obj->{content}->%* > 1;  # TODO: remove, when the spec schema is updated
+  my ($media_type) = keys $param_obj->{content}->%*;  # there can only be one key
+  my $schema = $param_obj->{content}{$media_type}{schema};
 
-    my $media_type_decoder = $self->get_media_type($media_type);  # case-insensitive, wildcard lookup
-    if (not $media_type_decoder) {
-      # don't fail if the schema would pass on any input
-      return if is_plain_hashref($schema) ? !keys %$schema : $schema;
+  my $media_type_decoder = $self->get_media_type($media_type);  # case-insensitive, wildcard lookup
+  if (not $media_type_decoder) {
+    # don't fail if the schema would pass on any input
+    return if is_plain_hashref($schema) ? !keys %$schema : $schema;
 
-      abort({ %$state, keyword => 'content', _schema_path_suffix => $media_type},
-        'EXCEPTION: unsupported media type "%s": add support with $openapi->add_media_type(...)', $media_type)
-    }
-
-    try {
-      $content_ref = $media_type_decoder->($content_ref);
-    }
-    catch ($e) {
-      return E({ %$state, keyword => 'content', _schema_path_suffix => $media_type },
-        'could not decode content as %s: %s', $media_type, $e =~ s/^(.*)\n/$1/r);
-    }
-
-    $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type, 'schema') };
-    return $self->_evaluate_subschema($content_ref->$*, $schema, $state);
+    abort({ %$state, keyword => 'content', _schema_path_suffix => $media_type},
+      'EXCEPTION: unsupported media type "%s": add support with $openapi->add_media_type(...)', $media_type);
   }
 
-  $state = { %$state, schema_path => jsonp($state->{schema_path}, 'schema') };
-  $self->_evaluate_subschema($content_ref->$*, $param_obj->{schema}, $state);
+  try {
+    $content_ref = $media_type_decoder->($content_ref);
+  }
+  catch ($e) {
+    return E({ %$state, keyword => 'content', _schema_path_suffix => $media_type },
+      'could not decode content as %s: %s', $media_type, $e =~ s/^(.*)\n/$1/r);
+  }
+
+  $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type, 'schema') };
+  $self->_evaluate_subschema($content_ref, $schema, $state);
 }
 
 sub _validate_body_content ($self, $state, $content_obj, $message) {
@@ -591,7 +656,7 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
   return if not defined $schema;
 
   $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type, 'schema') };
-  $self->_evaluate_subschema($content_ref->$*, $schema, $state);
+  $self->_evaluate_subschema($content_ref, $schema, $state);
 }
 
 # wrap a result object around the errors
@@ -626,8 +691,21 @@ sub _resolve_ref ($self, $entity_type, $ref, $state) {
   return $schema_info->{schema};
 }
 
+# determines the type(s) requested in a schema, and the new schema.
+sub _type_in_schema ($self, $schema, $state) {
+  return [] if not is_plain_hashref($schema);
+
+  while (my $ref = $schema->{'$ref'}) {
+    $schema = $self->_resolve_ref('schema', $ref, $state);
+  }
+  my $types = is_plain_hashref($schema) ? $schema->{type}//[] : [];
+  $types = [ $types ] if not is_plain_arrayref($types);
+
+  return $types;
+}
+
 # evaluates data against the subschema at the current state location
-sub _evaluate_subschema ($self, $data, $schema, $state) {
+sub _evaluate_subschema ($self, $dataref, $schema, $state) {
   # boolean schema
   if (not is_plain_hashref($schema)) {
     return 1 if $schema;
@@ -644,25 +722,14 @@ sub _evaluate_subschema ($self, $data, $schema, $state) {
 
   return 1 if !keys(%$schema);  # schema is {}
 
-  # treat numeric-looking data as a string, unless "type" explicitly requests number or integer.
-  if (is_plain_hashref($schema) and exists $schema->{type} and not is_plain_arrayref($schema->{type})
-      and grep $schema->{type} eq $_, qw(number integer) and looks_like_number($data)) {
-    $data = $data+0;
-  }
-  elsif (defined $data and not is_ref($data)) {
-    $data = $data.'';
-  }
-
-  # TODO: also handle multi-valued elements like headers and query parameters, when type=array requested
-  # (and possibly coerce their numeric-looking elements as well)
-
   my $result = $self->evaluator->evaluate(
-    $data, canonical_uri($state),
+    $dataref->$*, canonical_uri($state),
     {
       data_path => $state->{data_path},
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path},
       effective_base_uri => $state->{effective_base_uri},
       collect_annotations => 1,
+      $state->{stringy_numbers} ? ( stringy_numbers => 1 ) : (),
     },
   );
 
@@ -716,7 +783,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.046
+version 0.048
 
 =head1 SYNOPSIS
 
@@ -879,6 +946,16 @@ The data structure describing the OpenAPI document. See L<the specification/http
 The L<JSON::Schema::Modern::Document::OpenAPI> document that holds the OpenAPI information to be
 used for validation.
 
+=head2 document_get
+
+  my $parameter_data = $openapi->document_get('/paths/~1foo~1{foo_id}/get/parameters/0');
+
+Fetches the subschema at the provided JSON pointer.
+Proxies to L<JSON::Schema::Modern::Document::OpenAPI/get>.
+This is not recursive (does not follow C<$ref> chains) -- for that, use
+C<< $openapi->openapi_document->recursive_get($json_pointer) >>, in
+L<JSON::Schema::Modern::Document::OpenAPI/recursive_get>.
+
 =head2 evaluator
 
 The L<JSON::Schema::Modern> object to use for all URI resolution and JSON Schema evaluation.
@@ -1032,23 +1109,15 @@ Only certain permutations of OpenAPI documents are supported at this time:
 
 =item *
 
-for all parameter types, only C<explode: true> is supported
+for path parameters, only C<style: simple> and C<explode: false> is supported
 
 =item *
 
-for path parameters, only C<style: simple> is supported
-
-=item *
-
-for query parameters, only C<style: form> is supported
+for query parameters, only C<style: form> and C<explode: true> is supported, only the first value of each parameter name is considered, and C<allowEmptyValue> and C<allowReserved> are not checked
 
 =item *
 
 cookie parameters are not checked at all yet
-
-=item *
-
-for query and header parameters, only the first value of each name is considered
 
 =back
 

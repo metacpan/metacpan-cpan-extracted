@@ -18,6 +18,7 @@ t/14-static_functional_cached.t
 t/16-scan_line.t
 t/17-private_methods.t
 t/18-findbin.t
+t/19-autosplit.t
 t/2-static_functional_interface_fake.t
 t/3-static_oo_interface_real.t
 t/4-static_functional_interface_options_fake.t
@@ -26,6 +27,10 @@ t/6-file-glob.t
 t/7-check-dynaloader.t
 t/8-check_duplicated_entries.t
 t/9-check_path_to_inc_name.t
+t/data/autosplit/auto/Foo/autosplit.ix
+t/data/autosplit/auto/Foo/barnie.al
+t/data/autosplit/auto/Foo/fred.al
+t/data/autosplit/Foo.pm
 t/data/case-insensitive-keys/Foo.pm
 t/data/case-insensitive-keys/Foo2.pm
 t/data/case-insensitive-keys/that_case.pl

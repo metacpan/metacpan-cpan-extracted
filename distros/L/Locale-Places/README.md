@@ -4,7 +4,7 @@ Locale::Places - Translate places between different languages using http://downl
 
 # VERSION
 
-Version 0.07
+Version 0.08
 
 # SYNOPSIS
 
@@ -51,7 +51,16 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 
 Only supports towns and cities in GB at the moment.
 
+Canterbury no longer translates to Cantorbéry in French.
+This is a problem with the data, which has this line:
+
+    16324587    2653877 fr      Canterbury      1
+
+which overrides the translation by setting the 'isPreferredName' flag
+
 # SEE ALSO
+
+[Locale::Country::Multilingual](https://metacpan.org/pod/Locale%3A%3ACountry%3A%3AMultilingual) to translate country names.
 
 # SUPPORT
 
@@ -77,10 +86,6 @@ You can also look for information at:
 
     [http://matrix.cpantesters.org/?dist=Locale-Places](http://matrix.cpantesters.org/?dist=Locale-Places)
 
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/Locale-Places](http://cpanratings.perl.org/d/Locale-Places)
-
 - CPAN Testers Dependencies
 
     [http://deps.cpantesters.org/?module=Locale::Places](http://deps.cpantesters.org/?module=Locale::Places)
@@ -91,7 +96,7 @@ You can also look for information at:
 
 # LICENCE AND COPYRIGHT
 
-Copyright 2020-2022 Nigel Horne.
+Copyright 2020-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

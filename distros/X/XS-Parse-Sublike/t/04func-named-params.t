@@ -27,8 +27,9 @@ BEGIN { $^H{"t::func/nfunc"}++ }
    withx( x => 1, y => 2 );
    is( \%was_rest, { y => 2 }, 'other params still visible in %rest' );
 
+   my $LINE = __LINE__+1;
    like( dies { withx() },
-      qr/^Missing argument 'x' for subroutine main::withx /,
+      qr/^Missing argument 'x' for subroutine main::withx at \S+ line $LINE\./,
       'complaint from missing named param' );
 
    nfunc with2x(:$x1, :$x2) { return "x1=$x1 x2=$x2"; }
@@ -50,8 +51,9 @@ BEGIN { $^H{"t::func/nfunc"}++ }
 
    is( withz( z => 789 ), 789, 'named param without slurpy' );
 
+   my $LINE = __LINE__+1;
    like( dies { withz( z => 1, w => 1 ); 1 },
-      qr/^Unrecognised argument 'w' for subroutine main::withz /,
+      qr/^Unrecognised argument 'w' for subroutine main::withz at \S+ line $LINE\./,
       'complaint from unknown param' );
 }
 

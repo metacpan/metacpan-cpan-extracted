@@ -2,7 +2,7 @@ package CLASS;
 
 use 5.004;
 
-$VERSION = 'v1.1.7';
+$VERSION = 'v1.1.8';
 
 BEGIN { 
     # Faster than 'use constant'.  Load time critical.

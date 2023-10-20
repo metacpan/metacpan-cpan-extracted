@@ -403,6 +403,82 @@ HELP
     }
 }
 
+sub create_completion_tree {
+    scalar {
+            table       => {},
+            special_key => "\0",
+           };
+}
+
+sub add_tree_entry {
+    my ($tree, $key, $value) = @_;
+
+    my $ref = $tree->{table};
+
+    foreach my $item (@$key) {
+        $ref = $ref->{$item} //= {};
+        undef $ref->{$tree->{special_key}}{$value};
+    }
+
+    $tree;
+}
+
+sub search_tree {
+    my ($tree, $prefix) = @_;
+
+    my $ref = $tree->{table};
+
+    foreach my $item (@$prefix) {
+        if (exists $ref->{$item}) {
+            $ref = $ref->{$item};
+        }
+        else {
+            return;
+        }
+    }
+
+    sort keys %{$ref->{$tree->{special_key}} // {}};
+}
+
+sub add_class_methods_to_completion {
+    my ($tree) = @_;
+
+    my $modules_count = scalar(keys %INC);
+
+    state %seen;
+    state $included_modules = $modules_count - 1;
+
+    if ($modules_count == $included_modules) {
+        return 1;
+    }
+
+    foreach my $module (keys %INC) {
+
+        next if $seen{$module}++;
+
+        my $class = $module =~ s{\.pm\z}{}r =~ s{\W+}{::}gr;
+        $class =~ /^Sidef::Types::/ or next;
+
+        foreach my $method_name (keys %{$class->methods}) {
+            add_tree_entry($tree, [split(//, $method_name)], $method_name);
+        }
+    }
+
+    $included_modules = $modules_count;
+    return 1;
+}
+
+sub add_words_to_completion {
+    my ($tree, $string) = @_;
+
+    while ($string =~ /(\w+)/g) {
+        my $word = $1;
+        add_tree_entry($tree, [split(//, $word)], $word);
+    }
+
+    return 1;
+}
+
 sub code_interactive {
 
     require Encode;
@@ -487,6 +563,7 @@ EOT
     my $valid_lines = '';
     my ($vars, $ref_vars_refs);
 
+    my $completion_tree;
     my $history_support = $term->can('ReadHistory') && $term->can('Attribs');
     my $history_file    = File::Spec->catfile($sidef->get_sidef_config_dir(), 'sidef_history.txt');
 
@@ -496,8 +573,31 @@ EOT
             open my $fh, '>', $history_file;
         }
 
+        $completion_tree = create_completion_tree();
+
         my $attr = $term->Attribs;
-        $attr->{inhibit_completion} = 1;
+
+        $attr->{basic_quote_characters} = q{};
+
+        add_class_methods_to_completion($completion_tree);
+
+        my @results;
+        $attr->{completion_entry_function} = sub {
+            my ($prefix, $state) = @_;
+
+            my $root = '';
+            if ($prefix !~ /^\w+\z/ and $prefix =~ /^(.*)\b(\w+)\z/) {
+                $root   = $1;
+                $prefix = $2;
+            }
+
+            if ($state == 0) {
+                @results = search_tree($completion_tree, [split(//, $prefix)]);
+            }
+
+            @results || return undef;
+            $root . shift(@results);
+        };
 
         $term->ReadHistory($history_file);
     }
@@ -632,6 +732,7 @@ EOT
                 $term->addhistory($line =~ s/\R/\r/gr);
             }
             $term->append_history(1, $history_file);
+            add_words_to_completion($completion_tree, $line);
         }
 
         if (defined($args{r}) or defined($args{R})) {
@@ -667,6 +768,10 @@ EOT
               };
 
             say "#" . scalar(@values) . " = $dump";
+
+            if ($history_support) {
+                add_class_methods_to_completion($completion_tree);
+            }
         }
         redo;
     }
@@ -905,7 +1010,7 @@ Outputs:
 The interactive mode (a.k.a. REPL) is available by simply executing the C<sidef> command, or by specifying the C<-i> command-line switch:
 
     $ sidef -i
-    Sidef 23.08, running on Linux, using Perl v5.38.0.
+    Sidef 23.10, running on Linux, using Perl v5.38.0.
     Type "help", "copyright" or "license" for more information.
     > n = 41
     #1 = 41
@@ -969,9 +1074,11 @@ The C<-N> option can be used for changing the class-variables in the Number clas
     sidef -N 'ROUND = 0'                # rounding mode for floating-point numbers
     sidef -N 'VERBOSE = false'          # true to enable verbose/debug mode
     sidef -N 'USE_YAFU = false'         # true to use YAFU for factoring large integers
+    sidef -N 'USE_PARI_GP = false'      # true to use PARI/GP in several methods
     sidef -N 'USE_FACTORDB = false'     # true to use factordb.com for factoring large integers
     sidef -N 'USE_PRIMESUM = false'     # true to use Kim Walisch's primesum in prime_sum(n)
     sidef -N 'USE_PRIMECOUNT = false'   # true to use Kim Walisch's primecount in prime_count(n)
+    sidef -N 'USE_CONJECTURES = false'  # true to use conjectured methods for better performance
     sidef -N 'SPECIAL_FACTORS = true'   # true to try to find factors of special form in factor(n)
 
 Multiple options can be separated with C<;>, as in:

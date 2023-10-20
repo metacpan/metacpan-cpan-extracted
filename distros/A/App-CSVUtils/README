@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 1.030 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2023-07-25.
+    This document describes version 1.031 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2023-08-06.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -128,13 +128,13 @@ FUNCTIONS
         Called before an input CSV file is about to be opened, including for
         stdin ("-"). You can use this hook e.g. to check/preprocess input
         file. Flow control is available by setting "$r->{wants_skip_files}"
-        to skip reading all the input file and go directly to the
+        to skip reading all the input files and go directly to the
         "after_read_input" hook.
 
     *   before_open_input_file
 
-        Called before an input CSV file is about to be opened, including for
-        stdin ("-"). For the first file, called after
+        Called before each input CSV file is about to be opened, including
+        for stdin ("-"). For the first file, called after
         "before_open_input_file" hook. You can use this hook e.g. to
         check/preprocess input file. Flow control is available by setting
         "$r->{wants_skip_file}" to skip reading a single input file and go

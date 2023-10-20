@@ -1,5 +1,13 @@
 Revision history for Perl extension PPI
 
+1.277   2023-09-22 09:12:48Z
+	Summary:
+	- Parse prototypes as literal quotes, enables parens and newlines in protos
+	- Fix false positive detection of labels (GH#289) (Dan Church)
+
+	Details:
+	- Wrapped most Document->new calls in tests with automatic checks
+
 1.276   2022-07-19 21:43:50Z
 	Summary:
 	- Implement Replace Method (GH#274) (Renee and Olaf Alders)

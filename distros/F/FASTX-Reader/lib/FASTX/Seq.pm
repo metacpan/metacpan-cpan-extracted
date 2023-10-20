@@ -20,7 +20,9 @@ our @ISA = qw(Exporter);
 sub new {
     my $class = shift @_;
     my ($seq, $name, $comment, $qual, $offset, $line_len, $default_quality);
-
+    if (not defined $_[0]) {
+        confess "ERROR FASTX::Seq: Sequence missing, record cannot be created.\n";
+    }
     # Descriptive instantiation with parameters -param => value
     if (substr($_[0], 0, 1) eq '-') {
         my %data = @_;
@@ -490,7 +492,7 @@ FASTX::Seq - A class for representing a sequence for FASTX::Reader
 
 =head1 VERSION
 
-version 1.11.0
+version 1.12.0
 
 =head1 SYNOPSIS
 
@@ -542,6 +544,14 @@ Stored in each record as C<line_len>.
 
 Default quality offset. Default is 33, which is the standard for Sanger/Illumina 1.8+.
 Stored in each record as C<offset>.
+
+=head1 NAME
+
+FASTX::Seq - A class for representing a sequence for FASTX::Reader
+
+=head1 VERSION
+
+version 1.11.0
 
 =head1 MAIN METHODS 
 
@@ -647,6 +657,19 @@ The change is not in place, will return a new object.
 
     my $slice = $fastq->slice(0, 200);
 
+=head2 translate([genetic_code])
+
+Return the sequence as translated protein sequence.
+Optional artument is the NCBI Genetic code:
+
+    my $seq = FASTX::Seq->new(
+        -seq => 'ATGATG',
+        -id => 'seq1',
+    );
+    my $orf = $seq->translate(11);
+
+    say $orf->seq();
+
 =head1 QUALITY
 
 =head2 char2qual(char, [offset]])
@@ -692,19 +715,6 @@ Trim the record in place after the first base with a quality score lower or equa
 Trim the record B<in place up to the the first base with a quality score higher or equal than the provided integer>.
 
     $fastq->trim_until(20);
-
-=head2 translate([genetic_code])
-
-Return the sequence as translated protein sequence.
-Optional artument is the NCBI Genetic code:
-
-    my $seq = FASTX::Seq->new(
-        -seq => 'ATGATG',
-        -id => 'seq1',
-    );
-    my $orf = $seq->translate(11);
-
-    say $orf->seq();
 
 =head1 VALIDATION AND STRING GENERATION
 
@@ -758,6 +768,18 @@ Return true if the record has a quality value stored (FASTQ)
     if ( $seq->is_fastq() ) {
         ...
     }
+
+=head1 AUTHOR
+
+Andrea Telatin <andrea@telatin.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =head1 AUTHOR
 

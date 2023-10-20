@@ -17,11 +17,11 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object::Query );
-    use vars qw( $VERSION $DEBUG $VERBOSE );
+    use vars qw( $VERSION $DEBUG );
     use Devel::Confess;
-    $VERSION = 'v0.3.7';
-    $DEBUG = 0;
-    $VERBOSE = 0;
+    use Want;
+    our $DEBUG = 0;
+    our $VERSION = 'v0.3.7';
 };
 
 use strict;
@@ -77,30 +77,28 @@ sub having { return( shift->_where_having( 'having', 'having', @_ ) ); }
 sub limit
 {
     my $self  = shift( @_ );
-    my $limit = $self->_process_limit( @_ );
-    if( CORE::length( $limit->metadata->limit ) )
+    my $limit = $self->{limit};
+    if( @_ )
     {
-        $limit->generic( CORE::length( $limit->metadata->offset ) ? 'LIMIT ?, ?' : 'LIMIT ?' );
-        # User is managing the binding of value
-        if( (
-                $limit->metadata->offset eq '?' &&
-                $limit->metadata->limit eq '?'
-            ) || $limit->metadata->limit eq '?' )
+        # Returns a DB::Object::Query::Clause
+        $limit = $self->_process_limit( @_ ) ||
+            return( $self->pass_error );
+    
+        if( CORE::length( $limit->metadata->limit // '' ) )
         {
+            $limit->generic( CORE::length( $limit->metadata->offset // '' ) ? 'LIMIT ?, ?' : 'LIMIT ?' );
+            # %s works for integer, and also for numbered placeholders like $1 or ?1, or regular placeholder like ?
             $limit->value(
-                CORE::length( $limit->metadata->offset )
-                ?  'LIMIT ?, ?'
-                : 'LIMIT ?'
+                CORE::length( $limit->metadata->offset // '' )
+                    ? CORE::sprintf( 'LIMIT %s, %s', $limit->metadata->offset, $limit->metadata->limit )
+                    : CORE::sprintf( 'LIMIT %s', $limit->metadata->limit )
             );
         }
-        else
-        { 
-            $limit->value(
-                CORE::length( $limit->metadata->offset )
-                ? CORE::sprintf( 'LIMIT %d, %d', $limit->metadata->offset, $limit->metadata->limit )
-                : CORE::sprintf( 'LIMIT %d', $limit->metadata->limit )
-            );
-        }
+    }
+
+    if( !$limit && want( 'OBJECT' ) )
+    {
+        return( $self->new_null( type => 'object' ) );
     }
     return( $limit );
 }
@@ -118,14 +116,14 @@ sub replace
     }
     elsif( $data && $self->_is_object( $data ) && $data->isa( 'DB::Object::Statement' ) )
     {
-        $select = $data->as_string();
+        $select = $data->as_string;
     }
     %arg = @arg if( @arg );
     my $tbl_o = $self->table_object || return( $self->error( "No table object is set." ) );
     my $table   = $tbl_o->name ||
     return( $self->error( "No table was provided to replace data." ) );
-    my $structure = $tbl_o->structure();
-    my $null      = $tbl_o->null();
+    my $structure = $tbl_o->structure || return( $self->pass_error( $tbl_o->error ) );
+    my $null      = $tbl_o->null;
     my @avoid     = ();
     foreach my $field ( keys( %$structure ) )
     {

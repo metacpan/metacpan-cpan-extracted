@@ -1,0 +1,5 @@
+*.pl linguist-language=Perl
+*.pm linguist-language=Perl
+*.t linguist-language=Perl
+nb/** linguist-vendored
+~                          

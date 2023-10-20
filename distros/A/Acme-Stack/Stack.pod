@@ -1,0 +1,74 @@
+=pod
+
+=head1 NAME
+
+  Acme::Stack - examine a curious stack handling event.
+
+=head1 DISCUSSION
+
+  This module demonstrates (more simply) the behaviour that resulted in
+  https://github.com/sisyphus/math-gmpz/issues/5.
+  The t/test1.t script is expected to fail tests 6 and 7. This doesn't really
+  matter as this module doesn't do anything useful - apart from demonstrating
+  the puzzling behaviour.
+
+  The t/test2.t script is a rewrite of t/test1.t, but is expected to pass all
+  tests. The first 4 tests are exactly as written in t/test2.t and therefore
+  it's no surprise that they pass.
+  The remaining 3 tests in t/test2.t differ from their respective counterparts
+  in t/test1.t only in that a perl scalar is used to save an intermediate
+  result, before that intermediate result is passed on.
+  One question is therefore "How does that avoid the test failures that occur
+  with, t/test1.t ?"
+
+  There are 3 (unexported) XSubs in this module, namely abc(), def() and ghi().
+  They all do the same thing - ie they do nothing other than check that they have
+  been passed 4 arguments.
+  If they have been passed other than 4 arguments, then they report the
+  number of arguments they've received, print out the stringification of the
+  first argument, and croak.
+  In the test scripts, they're always called explicitly with 4 arguments, so
+  it's a bit of a surprise when, under specific conditions, 2 of them will see 5
+  5 arguments.
+
+  As best I can tell:
+  When perl calls abc(), PL_markstack_ptr is explicitly incremented BEFORE the
+  abc() function is actually executed;
+  When perl calls def(), PL_markstack_ptr is explicitly incremented just prior
+  to the termination of def();
+  When perl calls ghi(); PL_markstack_ptr is not explicitly incremented at all.
+
+  Those are the only differences between the 3 functions.
+  I conclude that abc() is the one that has been correctly formulated because
+  never croaks.
+  But I don't really understand how both def() and ghi() manage to see 5 args.
+  And I don't understand how it is that, in test1.t, def() and ghi() pass tests
+  3 and 4 (respectively), yet fail tests 6 and 7 respectively.
+
+  I guess it has something to do with being inside another separate package
+  (named Number) via method calls.
+  BTW, when 5 arguments are detected, the first one is a Number object - with the
+  four IV args that are given explicitly being tacked on behind it.
+
+  I'm pretty weak on understanding the finer points of stack manipulation.
+  I can usually get by via trial-and-error - which is what I've done here.
+  But if someone can pass on some words of explanation then maybe enough
+  pennies will drop as to allow me to better comprehend the docs on this.
+
+  Is it possible to create a simpler demo of this behaviour - eg by not having
+  to involve the extra package ("package Number;") in the test scripts ?
+
+  Is there any illegitimacy in the way that the problematic functions are being
+  accessed by the perl code in the test scripts ?
+
+ =head1 LICENSE
+
+  This program is free software; you may redistribute it and/or modify it
+  under the same terms as Perl itself.
+  Copyright 20223, Sisyphus
+
+=head1 AUTHOR
+
+  Sisyphus <sisyphus at(@) cpan dot (.) org>
+
+=cut

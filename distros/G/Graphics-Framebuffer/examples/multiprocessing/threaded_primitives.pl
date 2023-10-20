@@ -23,10 +23,14 @@ use Sys::CPU;
 
 # use Data::Dumper::Simple;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
 
+BEGIN {
+	our $VERSION = '2.00';
+};
+
 my $dev      = 0;
 my $psize    = 1;
 my $noaccel  = FALSE;
-my $nosplash = FALSE;
+my $nosplash = TRUE;
 our $ignore_x : shared = FALSE;
 my $delay    = 3;
 my $threads  = Sys::CPU::cpu_count();
@@ -64,6 +68,8 @@ closedir($DIR);
 our $RUNNING : shared = TRUE;
 our @IMAGES;
 our $STAMP = sprintf('%.1', time);
+
+print "Images loaded\nRunning $threads threads\n";
 
 my $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => FALSE, 'IGNORE_X_WINDOWS' => $ignore_x);
 

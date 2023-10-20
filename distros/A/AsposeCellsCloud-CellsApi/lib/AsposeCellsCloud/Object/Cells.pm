@@ -129,14 +129,14 @@ __PACKAGE__->method_documentation({
      'max_row' => {
      	datatype => 'int',
      	base_name => 'MaxRow',
-     	description => '',
+     	description => 'Maximum row index of cell which contains data or style.',
      	format => '',
      	read_only => '',
      		},
      'max_column' => {
      	datatype => 'int',
      	base_name => 'MaxColumn',
-     	description => '',
+     	description => 'Maximum column index of those cells that have been instantiated in the collection(does not include the column                        where style is defined for the whole column but no cell has been instantiated in it).',
      	format => '',
      	read_only => '',
      		},
@@ -150,14 +150,14 @@ __PACKAGE__->method_documentation({
      'rows' => {
      	datatype => 'LinkElement',
      	base_name => 'Rows',
-     	description => '',
+     	description => 'Gets the collection of  objects that represents the individual rows in this worksheet.',
      	format => '',
      	read_only => '',
      		},
      'columns' => {
      	datatype => 'LinkElement',
      	base_name => 'Columns',
-     	description => '',
+     	description => 'Gets the collection of  objects that represents the individual columns in this worksheet.',
      	format => '',
      	read_only => '',
      		},

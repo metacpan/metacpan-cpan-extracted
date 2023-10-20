@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Device::Chip::Adapter;
 
@@ -18,22 +18,22 @@ use Device::Chip::Adapter;
    }
 }
 
-is_deeply(
+is(
    Device::Chip::Adapter->new_from_description( "ForTesting" ),
    [ "Device::Chip::Adapter::ForTesting" ],
    'Optionless constructor' );
 
-is_deeply(
+is(
    Device::Chip::Adapter->new_from_description( "ForTesting:" ),
    [ "Device::Chip::Adapter::ForTesting" ],
    'Optionless constructor with colon' );
 
-is_deeply(
+is(
    Device::Chip::Adapter->new_from_description( "ForTesting:one=1,two=2" ),
    [ "Device::Chip::Adapter::ForTesting", one => 1, two => 2 ],
    'Constructor with options' );
 
-is_deeply(
+is(
    Device::Chip::Adapter->new_from_description( "ForTesting:yes,no=0" ),
    [ "Device::Chip::Adapter::ForTesting", yes => 1, no => 0 ],
    'Constructor with options' );

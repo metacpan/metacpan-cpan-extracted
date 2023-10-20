@@ -8,6 +8,8 @@ README
 cpanfile
 lib/PerlX/ScopeFunction.pm
 t/I_have_these_things.t
+t/dollar-also.t
+t/dollar-tap.t
 t/imports.t
 t/let-parse-assignments.t
 t/let-rewrite.t

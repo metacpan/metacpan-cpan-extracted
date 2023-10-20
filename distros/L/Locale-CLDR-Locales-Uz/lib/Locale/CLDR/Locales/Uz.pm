@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Uz - Package for language Uzbek
 
 =cut
 
 package Locale::CLDR::Locales::Uz;
-# This file auto generated from Data/common/main/uz.xml
-#	on Mon 11 Apr  5:40:50 pm GMT
+# This file auto generated from Data\common\main\uz.xml
+#	on Fri 13 Oct  9:47:25 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

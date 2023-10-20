@@ -69,11 +69,13 @@ BEGIN
 1;
 
 EOT
+        local $@;
         my $rc = eval( $perl );
         die( "Unable to dynamically create module $new_class: $@" ) if( $@ );
         return( $new_class, $clean_field );
     };
     
+    local $@;
     foreach my $k ( sort( keys( %$hash ) ) )
     {
         if( ref( $hash->{ $k } ) eq 'HASH' )
@@ -199,7 +201,7 @@ sub TO_JSON
     CORE::return( $ref );
 }
 
-AUTOLOAD
+sub AUTOLOAD
 {
     my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
     # my( $class, $method ) = our $AUTOLOAD =~ /^(.*?)::([^\:]+)$/;

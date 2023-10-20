@@ -3,7 +3,6 @@ package Calendar::Indonesia::Holiday;
 use 5.010001;
 use strict;
 use warnings;
-use experimental 'smartmatch';
 #use Log::ger;
 
 use DateTime;
@@ -14,9 +13,9 @@ use Perinci::Sub::Util qw(err gen_modified_sub);
 require Exporter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-20'; # DATE
+our $DATE = '2023-07-11'; # DATE
 our $DIST = 'Calendar-Indonesia-Holiday'; # DIST
-our $VERSION = '0.350'; # VERSION
+our $VERSION = '0.351'; # VERSION
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = (
@@ -293,7 +292,7 @@ sub _jointlv {
 # can operate on a single holiday or multiple ones
 sub _make_tentative {
     for my $arg (@_) {
-        push @{ $arg->{tags} }, 'tentative' unless $arg->{tags} ~~ 'tentative';
+        push @{ $arg->{tags} }, 'tentative' unless grep { $_ eq 'tentative' } @{ $arg->{tags} };
     }
     @_;
 }
@@ -1525,7 +1524,7 @@ sub list_idn_workdays {
         next if $dt->day_of_week == 6 && !$work_saturdays;
         last if DateTime->compare($dt, $end_date) > 0;
         my $ymd = $dt->ymd;
-        next if $ymd ~~ @{$res->[2]};
+        next if grep { $_ eq $ymd } @{$res->[2]};
         push @wd, $ymd;
     }
 
@@ -1663,7 +1662,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.350 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2023-06-20.
+This document describes version 0.351 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2023-07-11.
 
 =head1 SYNOPSIS
 

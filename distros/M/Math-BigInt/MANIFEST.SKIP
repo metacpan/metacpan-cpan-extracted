@@ -110,5 +110,8 @@
 \.lrz$
 \.lzh$
 
+# Avoid development stuff.
+^dev(el)?/
+
 # Avoid distribution-specific stuff.
 ^Math-BigInt-[0-9]

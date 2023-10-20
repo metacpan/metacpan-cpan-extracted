@@ -1,3 +1,6 @@
+v1.021 - Addressed Windows issue. Now using Path::Tiny
+v1.020 - Tweak --help test to not fail with cp850
+v1.019 - Update used module version dependencies
 v1.017 - Add example of 'native' output to the documentation; test tweaks.
 v1.015 - Update import required version of Spreadsheet::Edit to 1000.001
 v1.011 - Add required versions for some imports

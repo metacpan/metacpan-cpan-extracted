@@ -1,28 +1,12 @@
 use v5.26;
 use Object::Pad;
+# ABSTRACT: Ethereum RLP encoding/decoding utility
 
-package Blockchain::Ethereum::RLP 0.007;
+package Blockchain::Ethereum::RLP;
 class Blockchain::Ethereum::RLP;
 
-=encoding utf8
-
-=head1 NAME
-
-Blockchain::Ethereum::RLP - Ethereum RLP encoding/decoding utility
-
-=head1 SYNOPSIS
-
-Allow RLP encoding and decoding
-
-    my $rlp = Blockchain::Ethereum::RLP->new();
-
-    my $tx_params  = ['0x9', '0x4a817c800', '0x5208', '0x3535353535353535353535353535353535353535', '0xde0b6b3a7640000', '0x', '0x1', '0x', '0x'];
-    my $encoded = $rlp->encode($params); #ec098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a764000080018080
-
-    my $encoded_tx_params = 'ec098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a764000080018080';
-    my $decoded = $rlp->decode(pack "H*", $encoded_tx_params); #['0x9', '0x4a817c800', '0x5208', '0x3535353535353535353535353535353535353535', '0xde0b6b3a7640000', '0x', '0x1', '0x', '0x']
-
-=cut
+our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
+our $VERSION   = '0.009';          # VERSION
 
 use Carp;
 
@@ -37,24 +21,6 @@ use constant {
     BYTE_LENGTH_DELIMITER   => 55,
     INPUT_LENGTH_DELIMITER  => 256,
 };
-
-=head2 encode
-
-Encodes the given input to RLP
-
-Usage:
-
-    encode(hex string /  hex array reference) ->  encoded bytes
-
-=over 4
-
-=item * C<$input> hexadecimal string or reference to an hexadecimal string array
-
-=back
-
-Return the encoded bytes
-
-=cut
 
 method encode ($input) {
 
@@ -103,24 +69,6 @@ method _to_binary ($x) {
     return '' unless $x;
     return $self->_to_binary(int($x / INPUT_LENGTH_DELIMITER)) . chr($x % INPUT_LENGTH_DELIMITER);
 }
-
-=head2 decode
-
-Decode the given input from RLP to the specific return type
-
-Usage:
-
-    decode(RLP encoded bytes) -> hexadecimal string / array reference
-
-=over 4
-
-=item * C<$input> RLP encoded bytes
-
-=back
-
-Returns an hexadecimals string or an array reference in case of multiple items
-
-=cut
 
 method decode ($input) {
 
@@ -206,20 +154,66 @@ method _to_integer ($b) {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Blockchain::Ethereum::RLP - Ethereum RLP encoding/decoding utility
+
+=head1 VERSION
+
+version 0.009
+
+=head1 SYNOPSIS
+
+Allow RLP encoding and decoding
+
+    my $rlp = Blockchain::Ethereum::RLP->new();
+
+    my $tx_params  = ['0x9', '0x4a817c800', '0x5208', '0x3535353535353535353535353535353535353535', '0xde0b6b3a7640000', '0x', '0x1', '0x', '0x'];
+    my $encoded = $rlp->encode($params); #ec098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a764000080018080
+
+    my $encoded_tx_params = 'ec098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a764000080018080';
+    my $decoded = $rlp->decode(pack "H*", $encoded_tx_params); #['0x9', '0x4a817c800', '0x5208', '0x3535353535353535353535353535353535353535', '0xde0b6b3a7640000', '0x', '0x1', '0x', '0x']
+
+=head1 METHODS
+
+=head2 encode
+
+Encodes the given input to RLP
+
+=over 4
+
+=item * C<$input> hexadecimal string or reference to an hexadecimal string array
+
+=back
+
+Return the encoded bytes
+
+=head2 decode
+
+Decode the given input from RLP to the specific return type
+
+=over 4
+
+=item * C<$input> RLP encoded bytes
+
+=back
+
+Returns an hexadecimals string or an array reference in case of multiple items
+
 =head1 AUTHOR
 
-Reginaldo Costa, C<< <refeco at cpan.org> >>
+Reginaldo Costa <refeco@cpan.org>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to L<https://github.com/refeco/perl-RPL>
-
-=head1 LICENSE AND COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2023 by REFECO.
 
 This is free software, licensed under:
 
-  The MIT License
+  The MIT (X11) License
 
 =cut

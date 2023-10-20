@@ -8,7 +8,39 @@ dkbench - DKbench Perl Benchmark launch script
 
 This is the benchmarking script, part of the L<Benchmark::DKbench> distribution.
 
-See POD on the main module for info.
+See POD on the main module for info:
+
+ perldoc Benchmark::DKbench
+
+=head1 SYNOPSIS
+
+ dkbench [options]
+
+ Options:
+ --threads <i>, -j <i> : Number of benchmark threads (default is 1).
+ --multi,       -m     : Multi-threaded using all your CPU cores/threads.
+ --max_threads <i>     : Override the cpu detection to specify max cpu threads.
+ --iter <i>,    -i <i> : Number of suite iterations (with min/max/avg at the end).
+ --stdev               : Show relative standard deviation (for iter > 1).
+ --include <regex>     : Run only benchmarks that match regex.
+ --exclude <regex>     : Do not run benchmarks that match regex.
+ --time,        -t     : Report time (sec) instead of score.
+ --quick,       -q     : Quick benchmark run (implies -t).
+ --no_mce              : Do not run under MCE::Loop (implies -j 1).
+ --scale <i>,   -s <i> : Scale the bench workload by x times (incompatible with -q).
+ --skip_bio            : Skip BioPerl benchmarks.
+ --skip_prove          : Skip Moose prove benchmark.
+ --time_piece          : Run optional Time::Piece benchmark (see benchmark details).
+ --bio_codons          : Run optional BioPerl Codons benchmark (does not scale well).
+ --sleep <i>           : Sleep for <i> secs after each benchmark.
+ --setup               : Download the Genbank data to enable the BioPerl tests.
+ --datapath <path>     : Override the path where the expected benchmark data is found.
+ --ver <num>           : Skip benchmarks added after the specified version.
+ --help         -h     : Show basic help and exit.
+
+The default run (no options) will run all the benchmarks both single-threaded and
+multi-threaded (using all detected CPU cores/hyperthreads) and show you scores and
+multi vs single threaded scalability.
 
 =cut
 
@@ -23,13 +55,14 @@ use Benchmark::DKbench::Setup;
 use File::Spec::Functions;
 use FindBin;
 use Getopt::Long;
+use Pod::Usage;
 
 my %opt = ();
 GetOptions (
     \%opt,
     'skip_bio',
-    'skip_timep',
     'skip_prove',
+    'time_piece',
     'bio_codons',
     'quick|q',
     'time|t',
@@ -39,17 +72,21 @@ GetOptions (
     'max_threads=i',
     'include=s',
     'exclude=s',
-    'repeat|r=i',
+    'scale|s=i',
     'no_mce|n',
     'sleep=i',
+    'stdev',
     'ver=s',
     'setup',
     'datapath=s',
+    'help|h',
 );
 
-$opt{iter} ||= 1;
-$opt{repeat} ||= 1;
-$opt{time} = 1 if $opt{quick} || $opt{repeat} > 1;
+pod2usage({ -verbose => 1, -output => \*STDOUT, -noperldoc => 1}) if $opt{help};
+
+$opt{iter}  ||= 1;
+$opt{scale} ||= 1;
+($opt{time}, $opt{scale}) = (1, 1) if $opt{quick};
 
 Benchmark::DKbench::Setup::fetch_genbank($opt{datapath}) if $opt{setup};
 
@@ -78,7 +115,7 @@ if ($opt{threads} || !$max_threads || $max_threads == 1) {
 }
 
 sub check_kit {
-    warn "! Perl version v5.36.0 recommended as a comparison base\n"
+    warn "! Perl version v5.36 recommended as a comparison base\n"
         unless $^V =~ /v5.36.\d/;
 
     my %mod_ver = Benchmark::DKbench::Setup::cpan_versions();
@@ -89,7 +126,7 @@ sub check_kit {
         my $ver = eval "\$${module}::VERSION" || 'none';
         unless ($ver eq $mod_ver{$module}) {
             my $msg = "! $module $mod_ver{$module} recommended as a comparison base ($ver found).";
-            $msg .= " Older installed versions may cause issues to benchmarks."
+            $msg .= " Older versions may show benchmark failures."
                 if $mod_ver{$module} cmp $ver; # $ver is less
             if ($module =~ /^Bio/ && $ver eq 'none') {
                 $opt{skip_bio}   = 1;
@@ -113,8 +150,8 @@ sub check_kit {
         warn "!! gbbct5.seq missing, applying --skip_bio. Use --setup to fetch (or setup_dkbench).\n";
     }
 
-    if (!$opt{skip_timep} && $^O =~ /darwin/ && !$opt{no_mce}) {
-        $opt{skip_timep} = 1;
-        warn "!! Running localtime forked on MacOS is extremely slow, applying --skip_timep. You may run it with --no_mce.\n"
+    if ($opt{time_piece} && $^O =~ /darwin/ && !$opt{no_mce}) {
+        $opt{time_piece} = 0;
+        warn "!! Running localtime forked on MacOS is extremely slow, disabling Time::Piece. You may run it with --no_mce.\n"
     }
 }

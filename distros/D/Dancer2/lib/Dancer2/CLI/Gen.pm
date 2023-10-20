@@ -1,6 +1,6 @@
 package Dancer2::CLI::Gen;
 # ABSTRACT: Create new Dancer2 application
-$Dancer2::CLI::Gen::VERSION = '0.400001';
+$Dancer2::CLI::Gen::VERSION = '1.0.0';
 use Moo;
 use URI;
 use HTTP::Tiny;
@@ -154,7 +154,7 @@ sub run {
 
     my $vars = {
         appname          => $app_name,
-        appfile          => $app_file,
+        appfile          => $app_file->stringify,
         apppath          => $app_path,
         appdir           => File::Spec->rel2abs( $app_path ),
         apppath          => $app_path,
@@ -461,7 +461,7 @@ Dancer2::CLI::Gen - Create new Dancer2 application
 
 =head1 VERSION
 
-version 0.400001
+version 1.0.0
 
 =head1 AUTHOR
 

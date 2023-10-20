@@ -23,7 +23,7 @@ name: App-Netdisco
 provides:
   App::Netdisco:
     file: lib/App/Netdisco.pm
-    version: '2.065002'
+    version: '2.067002'
   App::Netdisco::AnyEvent::Nbtstat:
     file: lib/App/Netdisco/AnyEvent/Nbtstat.pm
   App::Netdisco::Backend::Job:
@@ -497,6 +497,8 @@ provides:
     file: lib/App/Netdisco/Worker/Plugin/Hook/Exec.pm
   App::Netdisco::Worker::Plugin::Hook::HTTP:
     file: lib/App/Netdisco/Worker/Plugin/Hook/HTTP.pm
+  App::Netdisco::Worker::Plugin::Internal::BackendFQDN:
+    file: lib/App/Netdisco/Worker/Plugin/Internal/BackendFQDN.pm
   App::Netdisco::Worker::Plugin::Internal::SNMPFastDiscover:
     file: lib/App/Netdisco/Worker/Plugin/Internal/SNMPFastDiscover.pm
   App::Netdisco::Worker::Plugin::LoadMIBs:
@@ -531,10 +533,14 @@ provides:
     file: lib/App/Netdisco/Worker/Plugin/PortName.pm
   App::Netdisco::Worker::Plugin::Power:
     file: lib/App/Netdisco/Worker/Plugin/Power.pm
+  App::Netdisco::Worker::Plugin::PrimeSkiplist:
+    file: lib/App/Netdisco/Worker/Plugin/PrimeSkiplist.pm
   App::Netdisco::Worker::Plugin::Psql:
     file: lib/App/Netdisco/Worker/Plugin/Psql.pm
   App::Netdisco::Worker::Plugin::Renumber:
     file: lib/App/Netdisco/Worker/Plugin/Renumber.pm
+  App::Netdisco::Worker::Plugin::Scheduler:
+    file: lib/App/Netdisco/Worker/Plugin/Scheduler.pm
   App::Netdisco::Worker::Plugin::Show:
     file: lib/App/Netdisco/Worker/Plugin/Show.pm
   App::Netdisco::Worker::Plugin::Snapshot:
@@ -653,5 +659,5 @@ resources:
   homepage: http://netdisco.org/
   license: http://opensource.org/licenses/BSD-3-Clause
   repository: https://github.com/netdisco/netdisco
-version: '2.065002'
+version: '2.067002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

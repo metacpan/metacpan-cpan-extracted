@@ -47,6 +47,18 @@ my $tdir = Path::Tiny->tempdir();
 my $scriptpath     = path($Bin)->child("../share/examples/Ex_Famnames.pl");
 my $ref_txt_gzpath = path($Bin)->child("../tlib/Ex_Famnames_output.txt.gz");
 
+###################################
+# HOW TO UPDATE Ex_Famnames_output.txt.gz
+# (1) cd share/examples
+# (2) ./Ex_Famnames.pl --txt
+# (3) mv ./Ex_Famnames_output.txt ../../tlib/
+# (4) cd ../../tlib/
+# (4) rm -f Ex_Famnames_output.txt.gz
+#     gzip Ex_Famnames_output.txt
+#
+# (The reason it is gzip'd is so git white-space-error checks won't complain)
+###################################
+
 my $ref_octets;
 gunzip $ref_txt_gzpath->canonpath => \$ref_octets or die "gunzip: $GunzipError";
 my $ref_text = decode("UTF-8", $ref_octets);

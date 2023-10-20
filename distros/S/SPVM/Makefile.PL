@@ -156,6 +156,7 @@ sub MY::postamble {
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Array');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Hash');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Format');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sync::Mutex');
     
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Native');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Native::Compiler');
@@ -207,24 +208,6 @@ sub MY::postamble {
   }
   
   return $make_rule;
-}
-
-sub get_spvm_version_string {
-  my ($spvm_api_header_file) = @_;
-  
-  open my $spvm_class_fh, '<', $spvm_api_header_file or die "Can't open the file \"$spvm_api_header_file\": $!";
-  local $/;
-  my $content = <$spvm_class_fh>;
-  my $version_string;
-  if ($content =~ /#define\s+SPVM_VERSION\s*"([\d\._]+)"/) {
-    $version_string = $1;
-  }
-  
-  unless (defined $version_string) {
-    die "The version string can't be find in the $spvm_api_header_file file";
-  }
-  
-  return $version_string;
 }
 
 1;

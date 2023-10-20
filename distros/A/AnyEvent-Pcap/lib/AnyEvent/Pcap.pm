@@ -7,7 +7,7 @@ use AnyEvent::Pcap::Utils;
 use Net::Pcap;
 use base qw(Class::Accessor::Fast);
 
-our $VERSION = '0.00004';
+our $VERSION = '0.00005';
 
 __PACKAGE__->mk_accessors($_) for qw(utils device filter packet_handler fd timeout);
 
@@ -107,6 +107,8 @@ sub run {
 1;
 __END__
 
+=encoding utf-8
+
 =head1 NAME
 
 AnyEvent::Pcap - Net::Pcap wrapper with AnyEvent
@@ -143,10 +145,9 @@ AnyEvent::Pcap - Net::Pcap wrapper with AnyEvent
 
 =head1 DESCRIPTION
 
-AnyEvent::Pcap is a Net::Pcap wrapper with AnyEvent.
+AnyEvent::Pcap is a Net::Pcap wrapper on top of AnyEvent.
 
 Also you can use its utils to get NetPacket::IP or NetPacket::TCP object.
-
 
 =head1 METHODS
 
@@ -156,41 +157,43 @@ Also you can use its utils to get NetPacket::IP or NetPacket::TCP object.
 
   my %args = (
   
-      # It will be filled up Net::Pcap::pcap_lookupdev() by default
+      # Default device is selected with Net::Pcap::pcap_lookupdev()
       device => "eth0",
 
-      # It also could be "file:/path/to/file" to load from a saved dump
-      device => "samples/ping-ietf-20pk-le.dmp",
+      # It also could be "file:/path/to/file" to load a saved dump
+      device => "file:samples/ping-ietf-20pk-le.dmp",
   
-      # Default is NULL
+      # Default filter is NULL
       filter => "tcp port 80",
   
-      # How much time to wait before flushing pcap buffer
+      # How much milliseconds to wait before flushing pcap buffer
       # Default is 0 (unlimited)
       timeout => 1000,
   
-      # set your coderef
+      # Reference to your callback
       packet_handler => sub {
+          # The last item is AE::io handler
           my $io     = pop;
 
-          # get first pair....
-          my $header = shift;
-          my $packet = shift;
-  
-          # do something....
+          # Other items are pairs of ($header, $packet)
+          while (@_) {
+              my $header = shift;
+              my $packet = shift;
+              ...
+          }
       }
   );
   
   my $a_pcap = AnyEvent::Pcap->new(%args);
 
-Cteate and return new AnyEvent::Pcap object .
+Create and return new AnyEvent::Pcap object.
 
 =item utils()
 
   my $a_pcap = AnyEvent::Pcap->new;
   my $utils  = $a_pcap->utils;
     
-You can get an utilty for packet handling. See L<AnyEvent::Pcap::Utils>.
+You can get a utilty for packet handling. See L<AnyEvent::Pcap::Utils>.
 
 =item run()
 

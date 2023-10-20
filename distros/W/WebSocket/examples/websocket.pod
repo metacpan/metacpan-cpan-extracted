@@ -17,9 +17,9 @@ WebSocket - WebSocket Javascript Class
         {
             console.log( "Reached maximum retry to connect to the WebSocket server." );
         },
-        onmessage: function(event)
+        onmessage: function(json, event)
         {
-            console.log( "WebSocket message received:" + event );
+            console.log( "WebSocket message received: " + JSON.stringify(json, null, 4) );
         },
         onopen: function(event)
         {
@@ -302,7 +302,7 @@ See for more information: L<https://developer.mozilla.org/en-US/docs/Web/API/Web
 
 =head2 getCsrf()
 
-Takes no arguments and returns the current csrf token stored in local storage, if any, otherwise returns C<undefined>
+Takes no arguments and returns the current csrf token, here in our example named C<csrf_token>, stored in local storage, if any, otherwise returns C<undefined>
 
 =head2 isClosed()
 

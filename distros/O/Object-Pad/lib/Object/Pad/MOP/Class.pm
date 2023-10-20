@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Class 0.802;
+package Object::Pad::MOP::Class 0.804;
 
 use v5.14;
 use warnings;
@@ -58,7 +58,7 @@ sub import_into
 
 =head2 for_class
 
-   $metaclass = Object::Pad::MOP::Class->for_class( $class )
+   $metaclass = Object::Pad::MOP::Class->for_class( $class );
 
 I<Since version 0.38.>
 
@@ -109,7 +109,7 @@ sub for_caller
 
 =head2 create_class
 
-   my $metaclass = Object::Pad::MOP::Class->create_class( $name, %args )
+   my $metaclass = Object::Pad::MOP::Class->create_class( $name, %args );
 
 I<Since version 0.61.>
 
@@ -134,7 +134,7 @@ it can be used to actually construct object instances.
 
 =head2 create_role
 
-   my $metaclass = Object::Pad::MOP::Class->create_role( $name, %args )
+   my $metaclass = Object::Pad::MOP::Class->create_role( $name, %args );
 
 I<Since version 0.61.>
 
@@ -148,7 +148,7 @@ sub create_role  { shift->_create_role ( shift, @_ ); }
 =head2 begin_class
 
    BEGIN {
-      my $metaclass = Object::Pad::MOP::Class->begin_class( $name, %args )
+      my $metaclass = Object::Pad::MOP::Class->begin_class( $name, %args );
       ...
    }
 
@@ -181,21 +181,21 @@ sub begin_role  { shift->_create_role ( shift, _set_compclassmeta => 1, @_ ); }
 
 =head2 is_role
 
-   $bool = $metaclass->is_class
-   $bool = $metaclass->is_role
+   $bool = $metaclass->is_class;
+   $bool = $metaclass->is_role;
 
 Exactly one of these methods will return true, depending on whether this
 metaclass instance represents a true C<class>, or a C<role>.
 
 =head2 name
 
-   $name = $metaclass->name
+   $name = $metaclass->name;
 
 Returns the name of the class, as a plain string.
 
 =head2 superclasses
 
-   @classes = $metaclass->superclasses
+   @classes = $metaclass->superclasses;
 
 Returns a list of superclasses, as L<Object::Pad::MOP::Class> instances.
 
@@ -204,7 +204,7 @@ contain at most one item.
 
 =head2 direct_roles
 
-   @roles = $metaclass->direct_roles
+   @roles = $metaclass->direct_roles;
 
 Returns a list of the roles introduced by this class (i.e. added by `does`
 declarations but not inherited from the superclass), as
@@ -214,7 +214,7 @@ This method is also aliased as C<roles>.
 
 =head2 all_roles
 
-   @roles = $metaclass->all_roles
+   @roles = $metaclass->all_roles;
 
 I<Since version 0.56.>
 
@@ -223,8 +223,8 @@ those inherited from the superclass), as L<Object::Pad::MOP::Class> instances.
 
 =head2 add_role
 
-   $metaclass->add_role( $rolename )
-   $metaclass->add_role( $rolemeta )
+   $metaclass->add_role( $rolename );
+   $metaclass->add_role( $rolemeta );
 
 I<Since version 0.56.>
 
@@ -237,13 +237,13 @@ Before version 0.56 this was called C<compose_role>.
 
 =head2 add_BUILD
 
-   $metaclass->add_BUILD( $code )
+   $metaclass->add_BUILD( $code );
 
 Adds a new C<BUILD> block to the class, as a CODE reference.
 
 =head2 add_method
 
-   $metamethod = $metaclass->add_method( $name, %args, $code )
+   $metamethod = $metaclass->add_method( $name, %args, $code );
 
 Adds a new named method to the class under the given name, as CODE reference.
 
@@ -263,7 +263,7 @@ If true, the method is a class-common method.
 
 =head2 get_direct_method
 
-   $metamethod = $metaclass->get_direct_method( $name )
+   $metamethod = $metaclass->get_direct_method( $name );
 
 Returns an instance of L<Object::Pad::MOP::Method> to represent the method of
 the given name, if one exists. If not an exception is thrown.
@@ -278,7 +278,7 @@ L<MOP::Class> interface.
 
 =head2 get_method
 
-   $metamethod = $metaclass->get_method( $name )
+   $metamethod = $metaclass->get_method( $name );
 
 I<Since version 0.57.>
 
@@ -290,7 +290,7 @@ to a parent class.
 
 =head2 direct_methods
 
-   @metamethods = $metaclass->direct_methods
+   @metamethods = $metaclass->direct_methods;
 
 I<Since version 0.57.>
 
@@ -299,7 +299,7 @@ direct methods of the class. This list may be empty.
 
 =head2 all_methods
 
-   @metamethods = $metaclass->all_methods
+   @metamethods = $metaclass->all_methods;
 
 I<Since version 0.57.>
 
@@ -309,7 +309,7 @@ may be empty.
 
 =head2 add_field
 
-   $metafield = $metaclass->add_field( $name, %args )
+   $metafield = $metaclass->add_field( $name, %args );
 
 I<since version 0.60.>
 
@@ -368,7 +368,7 @@ Returns an instance of L<Object::Pad::MOP::Field> to represent it.
 
 =head2 add_slot
 
-   $metafield = $metaclass->add_slot( $name, %args )
+   $metafield = $metaclass->add_slot( $name, %args );
 
 I<Now deprecated.>
 
@@ -385,7 +385,7 @@ sub add_slot
 
 =head2 get_field
 
-   $metafield = $metaclass->get_field( $name )
+   $metafield = $metaclass->get_field( $name );
 
 I<Since version 0.60.>
 
@@ -394,7 +394,7 @@ the given name, if one exists. If not an exception is thrown.
 
 =head2 get_slot
 
-   $metafield = $metaclass->get_slot( $name )
+   $metafield = $metaclass->get_slot( $name );
 
 I<Now deprecated.>
 
@@ -411,7 +411,7 @@ sub get_slot
 
 =head2 fields
 
-   @metafields = $metaclass->fields
+   @metafields = $metaclass->fields;
 
 I<Since version 0.60.>
 
@@ -420,7 +420,7 @@ fields of the class. This list may be empty.
 
 =head2 slots
 
-   @metafields = $metaclass->slots
+   @metafields = $metaclass->slots;
 
 I<Since version 0.42; now deprecated.>
 
@@ -441,7 +441,7 @@ sub slots
 
 =head2 add_required_method
 
-   $metaclass->add_required_method( $name )
+   $metaclass->add_required_method( $name );
 
 I<Since version 0.61.>
 
@@ -454,7 +454,7 @@ required method with. Currently extra parameters are not permitted.
 
 =head2 required_method_names
 
-   @names = $metaclass->required_method_names
+   @names = $metaclass->required_method_names;
 
 I<Since version 0.61.>
 
@@ -468,7 +468,7 @@ type may be defined and a C<required_methods> method will be added.
 
 =head2 seal
 
-   $metaclass->seal
+   $metaclass->seal;
 
 I<Since version 0.61.>
 

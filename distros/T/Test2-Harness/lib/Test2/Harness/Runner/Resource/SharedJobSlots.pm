@@ -2,7 +2,7 @@ package Test2::Harness::Runner::Resource::SharedJobSlots;
 use strict;
 use warnings;
 
-our $VERSION = '1.000152';
+our $VERSION = '1.000155';
 
 use YAML::Tiny;
 use Test2::Harness::Runner::Resource::SharedJobSlots::State;
@@ -42,7 +42,8 @@ sub init {
     die "Could not find shared jobs config.\n"
         unless $sconf;
 
-    my $runner_id  = $self->{+RUNNER_ID}  //= $settings->runner->runner_id if $settings->check_prefix('runner');
+    my $runner_id;
+    $runner_id = $self->{+RUNNER_ID} //= $settings->runner->runner_id if $settings->check_prefix('runner');
     my $runner_pid = $self->{+RUNNER_PID} //= $Test2::Harness::Runner::RUNNER_PID // $App::Yath::Command::runner::RUNNER_PID;
 
     my $prefix = $settings->debug->procname_prefix // '';

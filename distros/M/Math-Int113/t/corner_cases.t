@@ -38,4 +38,22 @@ if($nan != $nan) {
   like ($@, qr/overflows 113 bits/, 'NaN overflows');
 }
 
+require Math::BigInt;
+my $v1 = Math::BigInt->new(18446744073709551615) ** 2;
+my $v2 = Math::Int113->new(111);
+
+cmp_ok($v1, '==', Math::BigInt->new('340282366920938463426481119284349108225'), "Math::BigInt object assigned correctly");
+my $mbi = $v1 + $v2;
+cmp_ok(ref($mbi), 'eq', 'Math::BigInt', "Math::BigInt object as expected");
+cmp_ok($mbi, '==', Math::BigInt->new('340282366920938463426481119284349108336'), "Math::BigInt + Math::Int113 ok");
+
+eval { my $x = $v2 + $v1;};
+like ($@, qr/given to overloaded addition/, 'Math::Int113 + Math::BigInt overflows as expected');
+
+my $mi113 = $v2 + Math::BigInt->new(12345678);
+cmp_ok(ref($mi113), 'eq', 'Math::Int113', "Math::Int113 object as expected");
+cmp_ok($mi113, '==', Math::Int113->new(12345789), "Math::Int113 + Math::BigInt ok");
+
+
+
 done_testing();

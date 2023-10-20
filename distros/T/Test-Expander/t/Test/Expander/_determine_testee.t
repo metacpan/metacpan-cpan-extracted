@@ -5,8 +5,8 @@ use warnings
 
 use Test::Expander -method => undef;
 
+plan( 3 );
+
 ok(  exists( $main::{ CLASS  } ),   'class determined' );
 ok( !exists( $main::{ METHOD } ),   'no method determined' );
 ok( !exists( $ENV{ NEW_ENV_VAR } ), 'environment variable unset due to undefined value from .env file' );
-
-done_testing();

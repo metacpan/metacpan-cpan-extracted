@@ -9,8 +9,8 @@ use Test2::V0;
 
 # We don't have a "HTML" input, but we can input from POD or Markdown and test
 # that we get some expected output
-use App::sdview::Parser::Pod;
-use App::sdview::Parser::Markdown;
+use App::sdview::Parser::Pod 0.13;
+use App::sdview::Parser::Markdown 0.13;
 use App::sdview::Output::HTML;
 
 sub dotest ( $name, $format, $in, $out_html )
@@ -36,7 +36,7 @@ EOPOD
 <p>Contents here</p>
 EOHTML
 
-dotest "Formatting", pod => <<"EOPOD",
+dotest "Formatting (from Pod)", pod => <<"EOPOD",
 =pod
 
 B<bold> B<< <bold> >>
@@ -46,12 +46,23 @@ I<italic>
 C<code> C<< code->with->arrows >>
 
 L<link|target://> L<Module::Here>
+
+U<underline>
 EOPOD
 <<"EOHTML";
 <p><strong>bold</strong> <strong>&lt;bold&gt;</strong></p>
 <p><em>italic</em></p>
 <p><tt>code</tt> <tt>code-&gt;with-&gt;arrows</tt></p>
 <p><a href="target://">link</a> <a href="https://metacpan.org/pod/Module::Here">Module::Here</a></p>
+<p><u>underline</u></p>
+EOHTML
+
+# POD can't do strikethrough so we'll ask Markdown
+dotest "Formatting (from Markdown)", markdown => <<"EOMARKDOWN",
+~~strikethrough~~
+EOMARKDOWN
+<<"EOHTML";
+<p><s>strikethrough</s></p>
 EOHTML
 
 dotest "Verbatim", pod => <<"EOPOD",

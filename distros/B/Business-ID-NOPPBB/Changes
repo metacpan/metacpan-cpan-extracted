@@ -1,3 +1,9 @@
+0.091   2023-10-04  Released-By: PERLANCAR; Urgency: high
+
+        - Update to latest version of Locale::ID::Province (renamed
+          functions).
+
+
 0.090   2019-11-21  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
 
 	- [incompatible change] No longer export validate_nop_pbb() by
@@ -19,7 +25,7 @@
 	  dependencies on our dist.
 
 
-0.06     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.06     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          - [build] CLI scripts are now generated automatically using
            Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
@@ -55,3 +61,4 @@
 0.01    2011-12-14  Released-By: SHARYANTO
 
         - First release.
+

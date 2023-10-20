@@ -17,3 +17,6 @@ Revision history for Perl extension MailboxValidator::SingleValidation.
 
 1.11  20th September 2018
       Fixed make issue
+
+2.00  27th September 2023
+      Updated to call MailboxValidator v2 APIs

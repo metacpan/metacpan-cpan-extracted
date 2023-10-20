@@ -8,27 +8,73 @@ use feature qw(say);
 use FindBin qw($RealBin);
 use Getopt::Long;
 use Pod::Usage;
+use NBI::Slurm;
+use Term::ANSIColor qw(:constants );
+$Term::ANSIColor::AUTORESET = 1;
+my $home_dir = $ENV{HOME};
+my $config_file = "$home_dir/.nbislurm.config";
+
 GetOptions(
+    'c|config=s'  => \$config_file,
     'help' => sub { pod2usage() },
 );
-my $home_dir = $ENV{HOME};
-if (-e "$home_dir/.nbislurm.config") {
-    say STDERR "Configuration file already exists at $home_dir/.nbislurm.config";
+
+say STDERR BOLD, "CHECKING: $config_file", RESET;
+if (-e "$config_file") {
+    say STDERR "[OK] Configuration file already exists at $config_file";
 } else {
     my $system_tmp_dir = $ENV{TMPDIR} || '/tmp';
-    say STDERR "Creating configuration file at $home_dir/.nbislurm.config";
-    open(my $fh, ">", "$home_dir/.nbislurm.config") or die "Can't open $home_dir/.nbislurm.config for writing: $!";
+    say STDERR "[..] Creating configuration file at $config_file";
+    open(my $fh, ">", "$config_file") or die "[--] Can't open $config_file for writing: $!";
     say $fh <<"END";
 
 # Default configuration file for NBI::Slurm tools
 # This file is in key=value format, and can be edited manually.
-# 
+
+# Temporary directory 
 tmpdir=$system_tmp_dir
+
 # Email address to use for job submission
 email=your.email\@domain.com
+
 # When to be notified about job status changes: none, end, fail, all
 email_type=end,fail
+
+# Other custom defaults you can set:
+# queue=
+# time=
+
+# INTERACTIVE SESSION
+
+# A string of parameters to be used for all interactive sessions
+# session=
+
+# A string of parameters to be used for interactive sessions when --special is specified
+# special_session=--constraint=intel
+
+# Default memory for session
+session_memory=2000
+session_cpus=2
+session_hours=12
+
+# IMAGES FOR HPC
+
+# Default destination when --move an image
+default_dest=/qib/platforms/Informatics/transfer/outgoing/singularity/core/
+
+# Where to place the package
+packages_dir=/nbi/software/testing/bin/
+
+# Where to place the binaries
+packages_basepath=/nbi/software/testing/
+
 END
+}
+
+my $conf = NBI::Slurm::load_config($config_file);
+
+for my $key (sort keys %$conf) {
+    say STDERR "$key=",  GREEN ON_BLACK, $conf->{$key}, RESET;
 }
 
 __END__
@@ -43,7 +89,17 @@ configuration_file_info - How to make your configuration file for NBI::Slurm too
 
 =head1 VERSION
 
-version 0.6.1
+version 0.8.1
+
+=head1 SYNOPSIS
+
+This program generates a new configuration file from a template, or prints the
+content of the configuration file found in place, if any.
+
+  configuration [-c|--config <file>]
+
+Note that if you provide a different config file, it will be read, but all the
+programs will still load it from the default location (see below)
 
 =head1 LOCATION
 
@@ -53,9 +109,6 @@ At the moment there is no central use of the file, and it's just provided
 as a convenient shortcut for some of the options.
 
 The configuration file is located at C<~/.nbislurm.config>.
-
-    # Create a configuration file
-    $ touch ~/.nbislurm.config
 
 =head1 CONFIGURATION
 
@@ -112,6 +165,48 @@ A string of parameters to be used for B<all> interactive sessions.
 A string of parameters to be used for interactive sessions when C<--special> is specified.
 
 =back
+
+=head1 EXAMPLE TEMPLATE
+
+  # Default configuration file for NBI::Slurm tools
+  # This file is in key=value format, and can be edited manually.
+
+  # Temporary directory 
+  tmpdir=/tmp
+
+  # Email address to use for job submission
+  email=your.email@domain.com
+
+  # When to be notified about job status changes: none, end, fail, all
+  email_type=end,fail
+
+  # Other custom defaults you can set:
+  # queue=
+  # time=
+
+  # INTERACTIVE SESSION
+
+  # A string of parameters to be used for all interactive sessions
+  # session=
+
+  # A string of parameters to be used for interactive sessions when --special is specified
+  # special_session=--constraint=intel
+
+  # Default memory for session
+  session_memory=2000
+  session_cpus=2
+  session_hours=12
+
+  # IMAGES FOR HPC
+
+  # Default destination when --move an image
+  default_dest=/qib/platforms/Informatics/transfer/outgoing/singularity/core/
+
+  # Where to place the package
+  packages_dir=/nbi/software/testing/bin/
+
+  # Where to place the binaries
+  packages_basepath=/nbi/software/testing/
 
 =head1 AUTHOR
 

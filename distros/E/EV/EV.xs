@@ -1272,6 +1272,11 @@ MODULE = EV		PACKAGE = EV::Child	PREFIX = ev_child_
 
 #if EV_CHILD_ENABLE
 
+void ev_child_reinit ()
+	CODE:
+        ev_signal_stop  (evapi.default_loop, &childev);
+        ev_signal_start (evapi.default_loop, &childev);
+
 void ev_child_start (ev_child *w)
 	CODE:
         START (child, w);
@@ -1327,11 +1332,11 @@ void set (ev_stat *w, SV *path, NV interval)
 SV *path (ev_stat *w, SV *new_path = NO_INIT)
 	CODE:
 {
-        RETVAL = e_fh (w) ? e_fh (w) : &PL_sv_undef;
+        RETVAL = e_fh (w) ? newSVsv (e_fh (w)) : &PL_sv_undef;
 
         if (items > 1)
           {
-            sv_2mortal (RETVAL);
+            sv_2mortal (e_fh (w));
             e_fh (w) = newSVsv (new_path);
             RESET (stat, w, (w, SvPVbyte_nolen (e_fh (w)), w->interval));
           }

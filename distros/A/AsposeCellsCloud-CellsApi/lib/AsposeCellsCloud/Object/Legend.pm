@@ -132,14 +132,14 @@ __PACKAGE__->method_documentation({
      'position' => {
      	datatype => 'string',
      	base_name => 'Position',
-     	description => '',
+     	description => 'Gets or sets the legend position type.',
      	format => '',
      	read_only => '',
      		},
      'legend_entries' => {
      	datatype => 'LinkElement',
      	base_name => 'LegendEntries',
-     	description => '',
+     	description => 'Gets a collection of all the LegendEntry objects in the specified chart legend.                        Setting the legend entries of the surface chart is not supported.                        So it will return null if the chart type is surface chart type.',
      	format => '',
      	read_only => '',
      		},

@@ -24,8 +24,8 @@ struct promise {
 	Notification notification;
 };
 
-Promise* promise_alloc(UV refcount) {
-	Promise* result = calloc(1, sizeof(Promise));
+struct promise* S_promise_alloc(pTHX_ UV refcount) {
+	struct promise* result = calloc(1, sizeof(struct promise));
 	MUTEX_INIT(&result->mutex);
 	COND_INIT(&result->condvar);
 	refcount_init(&result->refcount, refcount);
@@ -33,7 +33,7 @@ Promise* promise_alloc(UV refcount) {
 	return result;
 }
 
-SV* S_promise_get(pTHX_ Promise* promise) {
+SV* S_promise_get(pTHX_ struct promise* promise) {
 	MUTEX_LOCK(&promise->mutex);
 
 	SV* result;
@@ -65,7 +65,7 @@ SV* S_promise_get(pTHX_ Promise* promise) {
 		return result;
 }
 
-static void promise_set(Promise* promise, SV* value, enum value_type type) {
+static void promise_set(struct promise* promise, SV* value, enum value_type type) {
 	MUTEX_LOCK(&promise->mutex);
 
 	if (promise->state != DONE && promise->state != ABANDONED) {
@@ -88,21 +88,21 @@ static void promise_set(Promise* promise, SV* value, enum value_type type) {
 	MUTEX_UNLOCK(&promise->mutex);
 }
 
-void promise_set_value(Promise* promise, SV* value) {
+void promise_set_value(struct promise* promise, SV* value) {
 	promise_set(promise, value, VALUE);
 }
-void promise_set_exception(Promise* promise, SV* value) {
+void promise_set_exception(struct promise* promise, SV* value) {
 	promise_set(promise, value, EXCEPTION);
 }
 
-bool promise_is_finished(Promise* promise) {
+bool promise_is_finished(struct promise* promise) {
 	MUTEX_LOCK(&promise->mutex);
 	bool result = promise->state == DONE || promise->state == HAS_WRITER;
 	MUTEX_UNLOCK(&promise->mutex);
 	return result;
 }
 
-void promise_refcount_dec(Promise* promise) {
+void S_promise_refcount_dec(pTHX_ struct promise* promise) {
 	if (refcount_dec(&promise->refcount) == 1) {
 		COND_DESTROY(&promise->condvar);
 		MUTEX_DESTROY(&promise->mutex);
@@ -112,7 +112,7 @@ void promise_refcount_dec(Promise* promise) {
 }
 
 static int promise_destroy(pTHX_ SV* sv, MAGIC* magic) {
-	Promise* promise = (Promise*)magic->mg_ptr;
+	struct promise* promise = (struct promise*)magic->mg_ptr;
 	MUTEX_LOCK(&promise->mutex);
 	notification_unset(&promise->notification);
 	if (promise->owner == aTHX) {
@@ -135,7 +135,7 @@ static int promise_destroy(pTHX_ SV* sv, MAGIC* magic) {
 	return 0;
 }
 
-static const MGVTBL promise_magic = { 0, 0, 0, 0, promise_destroy };
+const MGVTBL Thread__CSP__Promise_magic = { 0, 0, 0, 0, promise_destroy };
 
 static PerlIO* S_sv_to_handle(pTHX_ SV* handle) {
 	if (!SvROK(handle) || SvTYPE(SvRV(handle)) != SVt_PVGV)
@@ -145,7 +145,7 @@ static PerlIO* S_sv_to_handle(pTHX_ SV* handle) {
 }
 #define sv_to_handle(handle) S_sv_to_handle(aTHX_ handle)
 
-SV* S_promise_finished_fh(pTHX_ Promise* promise) {
+SV* S_promise_finished_fh(pTHX_ struct promise* promise) {
 	MUTEX_LOCK(&promise->mutex);
 
 	if (!promise->notifier) {
@@ -157,12 +157,4 @@ SV* S_promise_finished_fh(pTHX_ Promise* promise) {
 	MUTEX_UNLOCK(&promise->mutex);
 
 	return promise->notifier;
-}
-
-SV* S_promise_to_sv(pTHX_ Promise* promise) {
-	return object_to_sv(promise, gv_stashpvs("Thread::CSP::Promise", 0), &promise_magic, 0);
-}
-
-Promise* S_sv_to_promise(pTHX_ SV* sv) {
-	return sv_to_object(sv, "Thread::CSP::Promise", &promise_magic);
 }

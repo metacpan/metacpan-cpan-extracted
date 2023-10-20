@@ -1,3 +1,17 @@
+0.06 2023-10-19T10:12:48+02:00
+ - Fix Makefile.PL which fails with no '.' in @INC.
+
+0.05 2023-10-19T10:09:18+02:00
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve METHODS section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move bugtracker to github.
+ - Rename example to better name.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.04 2015-10-29T21:44:46+01:00
  - Fix warning in length(undef).
 

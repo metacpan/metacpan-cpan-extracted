@@ -1,6 +1,6 @@
 package Test::Expander::Constants;
 
-our $VERSION = '2.1.5';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '2.2.0';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use strict;
 use warnings
@@ -25,6 +25,7 @@ const our $FALSE                       => 0;
 const our $FMT_INVALID_DIRECTORY       => "Invalid directory name / expression '%s' supplied with option '-lib'%s\n";
 const our $FMT_INVALID_ENV_ENTRY       => "Erroneous line %d of '%s' containing '%s': %s\n";
 const our $FMT_INVALID_VALUE           => "Option '%s' passed along with invalid value '%s'\n";
+const our $FMT_INVALID_SUBTEST_NUMBER  => "\nInvalid subtest number: '%s'\n";
 const our $FMT_KEEP_ENV_VAR            => "Keep environment variable '%s' containing '%s' because it is not reassigned in file '%s'";
 const our $FMT_NEW_FAILED              => '%s->new died.%s';
 const our $FMT_NEW_SUCCEEDED           => "An object of class '%s' isa '%s'";

@@ -1,17 +1,19 @@
 package App::Oozie::Update::Coordinator;
-$App::Oozie::Update::Coordinator::VERSION = '0.006';
-use 5.010;
+$App::Oozie::Update::Coordinator::VERSION = '0.010';
+use 5.014;
 use strict;
 use warnings;
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
 use App::Oozie::Types::Common qw( IsCOORDID );
+use App::Oozie::Util::Misc qw( resolve_tmp_dir );
+
 use Config::General qw( ParseConfig );
 use Cwd;
 use Date::Format ();
 use Date::Parse  ();
 use File::Spec::Functions qw( catfile );
-use File::Temp;
+use File::Temp ();
 use Getopt::Long;
 use IPC::Cmd ();
 use Ref::Util       qw( is_ref );
@@ -415,7 +417,10 @@ sub _modify_xml {
 sub _dump_twig_to_temp_file {
     my $self = shift;
     my $twig = shift;
-    my $tmp  = File::Temp->new( SUFFIX => '.xml' );
+    my $tmp  = File::Temp->new(
+                    DIR    => resolve_tmp_dir(),
+                    SUFFIX => '.xml',
+                );
 
     $twig->set_xml_version('1.0');
     $twig->set_pretty_print('indented');
@@ -461,7 +466,7 @@ App::Oozie::Update::Coordinator
 
 =head1 VERSION
 
-version 0.006
+version 0.010
 
 =head1 SYNOPSIS
 

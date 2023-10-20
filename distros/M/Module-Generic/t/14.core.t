@@ -9,7 +9,7 @@ BEGIN
     # 2021-11-01T08:12:10
     use Test::Time time => 1635754330;
     use DateTime;
-    use Nice::Try;
+    # use Nice::Try;
     use Scalar::Util;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
@@ -53,7 +53,7 @@ if( $DEBUG )
     }
 }
 
-my $o2 = $o->clone;
+my $o2 = $o->clone || die( $o->error );
 ok( $o2->name eq $o->name && $o2->value eq $o->value, 'clone' );
 
 $o->error( "Oopsie" );
@@ -70,7 +70,7 @@ $ex = $o->error;
 isa_ok( $ex, 'MyOtherException', 'error->class' );
 is( $ex->message, 'Mince !' );
 
-try
+if( !eval
 {
     $o->fatal(1);
     $o->error({ message => "Oh no!" });
@@ -78,16 +78,18 @@ try
 #     my $ex = $o->error;
 #     die( $ex );
     fail( "Should not have gotten here." );
-}
-catch( MyException $e )
+})
 {
-    pass( "fatal triggered a die" );
-    is( $e->message, 'Oh no!' );
-}
-catch( $e )
-{
-    diag( "\$e is '$e' (", overload::StrVal( $e ), "). Is it undef ? ", ( defined( $e ) ? 'no' : 'yes' ) );
-    fail( "Should not have gotten here." );
+    if( Scalar::Util::blessed( $@ ) && $@->isa( 'MyException' ) )
+    {
+        pass( "fatal triggered a die" );
+        is( $@->message, 'Oh no!' );
+    }
+    else
+    {
+        diag( "\$e is '$@' (", overload::StrVal( $@ ), "). Is it undef ? ", ( defined( $@ ) ? 'no' : 'yes' ) );
+        fail( "Should not have gotten here." );
+    }
 }
 
 $o->fatal(0);
@@ -156,7 +158,9 @@ $dt->set_time_zone( 'UTC' );
 isa_ok( $dt, 'DateTime', '_set_get_datetime as lvalue' );
 SKIP:
 {
-    try
+    # try-catch
+    local $@;
+    if( !eval
     {
         my $dt2 = DateTime->from_epoch( epoch => $now, time_zone => $dt->time_zone );
         diag( "created is '", $dt->iso8601, "' vs '", $dt2->iso8601, "'" ) if( $DEBUG );
@@ -168,10 +172,12 @@ SKIP:
         $dt3->truncate( to => 'minute' );
         isa_ok( $dt3, 'DateTime', '_set_get_datetime' );
         is( $dt3->iso8601, $dt4->iso8601, '_set_get_datetime value' );
-    }
-    catch( $e where { /Invalid local time for date in time zone/i } )
+    })
     {
-        skip( "Invalid time when changing time zone", 3 );
+        if( $@ =~ /Invalid local time for date in time zone/i )
+        {
+            skip( "Invalid time when changing time zone", 3 );
+        }
     }
 };
 
@@ -281,23 +287,23 @@ $o->datetime = { dt => 'nope' };
 is( $o->datetime, undef, 'lvalue->set wrong value -> error' );
 is( $o->error->message, 'Value provided is not a datetime.', 'error message' );
 $o->fatal(1);
-try
+# try-catch
+if( !eval
 {
     $o->datetime = "plop";
-}
-catch( $e )
+})
 {
-    is( $e->message, 'Value provided is not a datetime.', 'lvalue -> fatal error' );
+    is( $@->message, 'Value provided is not a datetime.', 'lvalue -> fatal error' );
 }
 
 $now = DateTime->now;
-try
+# try-catch
+if( !eval
 {
     $o->datetime = $now;
-}
-catch( $e )
+})
 {
-    fail( "proper assignment failed: $e" );
+    fail( "proper assignment failed: $@" );
 }
 $o->fatal(0);
 my $dt2 = $o->datetime;
@@ -609,6 +615,60 @@ subtest "serialisation" => sub
     };
 };
 
+# NOTE: on demand
+subtest "on demand" => sub
+{
+    unless( scalar( keys( %$Module::Generic::AUTOLOAD_SUBS ) ) )
+    {
+        &Module::Generic::_autoload_subs();
+    }
+    
+#     mkdir( 'dev/on_demand', 0755 ) if( !-e( 'dev/on_demand' ) );
+    foreach my $sub ( sort( keys( %$Module::Generic::AUTOLOAD_SUBS ) ) )
+    {
+#         unless( -e( "dev/on_demand/$sub.pl" ) &&
+#             !-z( "dev/on_demand/$sub.pl" ) )
+#         {
+#             my $fh = IO::File->new( ">dev/on_demand/$sub.pl" ) ||
+#                 die( "Unable to write to file 'dev/on_demand/$sub.pl': $!" );
+#             $fh->binmode( ':utf-8' );
+#             $fh->print( $Module::Generic::AUTOLOAD_SUBS->{ $sub } ) ||
+#                 die( "Unable to write to file 'dev/on_demand/$sub.pl': $!" );
+#             $fh->close;
+#         }
+        my $code = "package Module::Generic;\n" . $Module::Generic::AUTOLOAD_SUBS->{ $sub };
+        local $@;
+        no warnings 'redefine';
+        eval( $code );
+        ok( !$@, $sub );
+        diag( "sub $sub -> $@" ) if( $@ );
+    }
+};
+
+subtest "symbols" => sub
+{
+    my $obj = MyObject->new;
+    foreach my $n ( qw( array array_object callback created datetime file hash id io ip metadata name setget setget_assign trigger_error type total uri user_id value version ) )
+    {
+        ok( $obj->_has_symbol( '&' . $n ), "MyObject has symbol $n" );
+    }
+    ok( !$obj->_has_symbol( '$NOT_EXISTS' ), 'MyObject does not have symbol $NOT_EXISTS' );
+    my $vers = $obj->_get_symbol( '$VERSION' );
+    ok( defined( $vers ), '_get_symbol' );
+    is( $$vers, 'v0.1.0' );
+    my @all = sort( grep( !/^message$/, grep( /^[a-z]/, $obj->_list_symbols ) ) );
+#     require Data::Pretty;
+#     diag( Data::Pretty::dump( [sort( @all )] ) );
+    is_deeply( \@all => [qw(
+        array array_object as_hash callback can clone created
+        datetime debug deserialise error error_handler fatal
+        file hash id init io ip isa metadata name new
+        new_array new_file new_hash new_number new_scalar
+        new_tempfile pass_error serialise setget setget_assign
+        total trigger_error type uri user_id value version
+    )], '_list_symbols' );
+};
+
 done_testing();
 
 # NOTE: Fake class MyObject
@@ -619,6 +679,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    our $VERSION = 'v0.1.0';
 };
 
 sub init
@@ -693,7 +754,9 @@ sub value : lvalue { return( shift->_set_get_scalar_as_object( 'value', @_ ) ); 
 
 sub version : lvalue { return( shift->_set_get_version( 'version', @_ ) ); }
 
-package MyException;
+# NOTE: class MyException
+package
+    MyException;
 BEGIN
 {
     use strict;
@@ -701,7 +764,9 @@ BEGIN
     use parent qw( Module::Generic::Exception );
 };
 
-package MyOtherException;
+# NOTE: class MyOtherException
+package
+    MyOtherException;
 BEGIN
 {
     use strict;

@@ -1,4 +1,10 @@
-0.002   2018-04-08 (PERLANCAR)
+0.003   2023-10-04  Released-By: PERLANCAR; Urgency: high
+
+        - Update to newer Locale::ID::Locality & Locale::ID::Province
+          (renamed functions).
+
+
+0.002   2018-04-08  Released-By: PERLANCAR
 
 	- Remove dependency to Data::Clean::JSON.
 
@@ -6,6 +12,6 @@
 	  DateTime object.
 
 
-0.001   2018-04-08 (PERLANCAR)
+0.001   2018-04-08  Released-By: PERLANCAR
 
         - First release.

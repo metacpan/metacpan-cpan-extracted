@@ -15,18 +15,21 @@ if ($joined =~ /(\d+)/) {
     $device = $1;
 }
 
-my $fb = Graphics::Framebuffer->new('SPLASH' => 1, 'SHOW_ERRORS' => 1, 'FB_DEVICE' => "/dev/fb$device");    # ,'SIMULATED_X'=>1280,'SIMULATED_Y'=>720);
+my $fb = Graphics::Framebuffer->new('SPLASH' => 0, 'SHOW_ERRORS' => 1, 'FB_DEVICE' => "/dev/fb$device");    # ,'SIMULATED_X'=>1280,'SIMULATED_Y'=>720);
 
 $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'HUP'} = $SIG{'KILL'} = $SIG{'TERM'} = sub { exec('reset'); };
 
-my $xadj = $fb->{'XRES'} / 1920;
-my $yadj = $fb->{'YRES'} / 1080;
+my $xadj = $fb->{'XRES'} / 3840;
+my $yadj = $fb->{'YRES'} / 2160;
 
 $fb->cls('OFF') unless ($dump);
 
 # $fb->or_mode();
 
-foreach my $font (sort(keys %{ $fb->{'FONTS'} })) {
+my @fonts = sort(keys %{ $fb->{'FONTS'} });
+my $count = scalar(@fonts);
+
+foreach my $font (@fonts) {
     unless ($dump) {
         $fb->cls();
         my $tprint = {
@@ -36,15 +39,15 @@ foreach my $font (sort(keys %{ $fb->{'FONTS'} })) {
             'text'         => $font,
             'font_path'    => $fb->{'FONTS'}->{$font}->{'path'},
             'color'        => 'FFFFFFFF',
-            'height'       => 150 * $yadj,
+            'height'       => 300 * $yadj,
             'antialias'    => 1
         };
         my $smprint = {
             'bounding_box' => 1,
-            'text'         => $font,
+            'text'         => "$count - $font",
             'color'        => '99FF99FF',
-            'height'       => 72 * $yadj,
-            'y'            => 78 * $yadj,
+            'height'       => 144 * $yadj,
+            'y'            => 156 * $yadj,
             'antialias'    => 1
         };
         $fb->ttf_print($fb->ttf_print($tprint));
@@ -53,6 +56,7 @@ foreach my $font (sort(keys %{ $fb->{'FONTS'} })) {
         if ($wait) {
             sleep $wait;
         }
+		$count--;
     } else {
         print STDOUT "$font\n";
     }

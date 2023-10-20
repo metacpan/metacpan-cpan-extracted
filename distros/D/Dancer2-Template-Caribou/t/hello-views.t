@@ -3,7 +3,9 @@ package MyApp;
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test2::V0;
+
+plan 8;
 
 use Dancer2;
 use Test::WWW::Mechanize::PSGI;

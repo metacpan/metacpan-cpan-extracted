@@ -19,6 +19,10 @@ AI::TensorFlow::Libtensorflow::Manual - Index of manual
 
 Start here to get an overview of the library.
 
+=item L<AI::TensorFlow::Libtensorflow::Manual::GPU>
+
+GPU-specific installation and usage information.
+
 =item L<AI::TensorFlow::Libtensorflow::Manual::CAPI>
 
 Appendix of all C API functions with their signatures. These are linked from

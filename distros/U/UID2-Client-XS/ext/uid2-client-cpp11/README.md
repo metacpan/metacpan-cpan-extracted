@@ -1,26 +1,57 @@
-# UID2 Client
+# UID2 SDK for C++
 
-UID2 Client for C++11
+The UID 2 Project is subject to Tech Lab IPR’s Policy and is managed by the IAB Tech Lab Addressability Working Group and Privacy & Rearc Commit Group. Please review [the governance rules](https://github.com/IABTechLab/uid2-core/blob/master/Software%20Development%20and%20Release%20Procedures.md).
 
-See `Dockerfile` for installation example
-
-See `app/example.cpp` for example usage.
+This SDK simplifies integration with UID2 for those using C++.
 
 ## Dependencies
 
+This SDK requires C++ version 11.
+
+Supported platforms:
+
+ - Linux (tested on Ubuntu 22.04)
+ - MacOS (tested on macOS 12 Monterey and macOS 13 Ventura)
+
+Supported compilers:
+
+ - clang (tested on versions 12 and 14)
+ - gcc (tested on version 11)
+
+Your mileage may vary with other compilers and versions.
+
+Other dependencies:
+
+ - CMake 3.12+
+ - OpenSSL 1.1.1+
+ - GoogleTest
+
+To set up dependencies on Ubuntu 22.04:
+
 ```
-CMake 3.12+
-
-OpenSSL 1.1.1+
-on Alpine: apk add libressl-dev
-on Ubuntu: apt-get install libssl-dev
-
-GTest
-on Alpine: apk add gtest-dev
-on Ubuntu: apt-get install libgtest-dev
+sudo ./tools/install-ubuntu-devtools.sh
+sudo ./tools/install-ubuntu-deps.sh
 ```
 
-## Install
+To set up dependencies on macOS, make sure you have latest xcode installed, then:
+
+```
+./tools/install-macos-deps.sh
+```
+
+If you want to have clang-14 installed on Mac, run these additional commands:
+
+```
+brew install llvm@14
+sudo ln -s $(brew --prefix llvm@14)/bin/clang /usr/local/bin/clang-14
+sudo ln -s $(brew --prefix llvm@14)/bin/clang++ /usr/local/bin/clang++-14
+sudo ln -s $(brew --prefix llvm@14)/bin/clang-format /usr/local/bin/clang-format-14
+sudo ln -s $(brew --prefix llvm@14)/bin/clang-tidy /usr/local/bin/clang-tidy-14
+```
+
+## Build, Test, Install
+
+To build, run unit tests, and install under the default prefix (`/usr/local`):
 
 ```
 cd <this directory>
@@ -29,53 +60,52 @@ cd build
 cmake ..
 make
 make test
-make install
+sudo make install
 ```
 
-## Running the example
+You can build a docker image containing the necessary tools and dependencies and then use that to build and test the SDK.
 
 ```
-docker build . -t uid2_client_cpp
-# docker run -it uid2_client_cpp <base-url> <api-key> <secret-key> <advertising-token>
-# For example:
-docker run -it uid2_client_cpp https://integ.uidapi.com test-id-reader-key your-secret-key \
-	AgAAAANzUr8B6CCM+WBKichZGU8iyDBSI83LXiXa1SW2i4LaVQPzlBtOhjoeUUc3Nv+aOPLwiVol0rnxwdNkJNgm710I4lKAp8kpjqZO6evjN6mVZalwzQA5Y4usQVEtwBkYr3V3MbYR1eI3n0Bc7/KVeanfBXUF4odpHNBEWTAL+YgSCA==
+docker build -t uid2_client_cpp_devenv .
+docker run -it --rm -v "$PWD:$PWD" -u $(id -u ${USER}):$(id -g ${USER}) -w "$PWD" uid2_client_cpp_devenv ./tools/build.sh
+# or
+./tools/devenv.sh ./tools/build.sh
 ```
 
 ## Usage
 
-Use `UID2ClientFactory::Create` to create a uid2 client instance.
+To create a UID2 client instance, use `UID2ClientFactory::Create`. For an EUID client instance, use `EUIDClientFactory::Create`.
 
  - `client->Refresh()` to fetch the latest keys
- - `client->Decrypt()` to decrypt an advertising token
- - `client->EncryptData()` to encrypt arbitrary data
- - `client->DecryptData()` to decrypt data encrypted with `EncryptData()`
+ - `client->Decrypt()` to decrypt a UID2 or EUID token
+ - `client->Encrypt()` to encrypt a raw UID2 or EUID into a token
 
-Also see `app/example.cpp`.
-
-## License
+For an example, see [app/example.cpp](app/example.cpp). To run the example application:
 
 ```
-   Copyright (c) 2021 The Trade Desk, Inc
+# ./build/app/example <base-url> <api-key> <secret-key> <advertising-token>
+# For example:
+./build/app/example https://operator-integ.uidapi.com test-id-reader-key your-secret-key "AgAAAANz...YgSCA=="
+```
 
-   Redistribution and use in source and binary forms, with or without
-   modification, are permitted provided that the following conditions are met:
+## Working on codebase
 
-   1. Redistributions of source code must retain the above copyright notice,
-      this list of conditions and the following disclaimer.
-   2. Redistributions in binary form must reproduce the above copyright notice,
-      this list of conditions and the following disclaimer in the documentation
-      and/or other materials provided with the distribution.
+The code is expected to be formatted according to clang-format rules specified at the root of the project.
+Most modern IDEs should pick that up automatically. To reformat all the code, run (requires docker):
 
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-   ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-   POSSIBILITY OF SUCH DAMAGE.
+```
+./tools/devenv.sh ./tools/format.sh --fix
+```
+
+By default, compiler warnings are treated as errors. To temporarily disable this behavior, set CMake `WARNING_AS_ERROR` option to `OFF`. For example:
+
+```
+cmake -DWARNING_AS_ERROR=OFF
+```
+
+Additionally the codebase is subject to clang-tidy checks. Some IDEs can pick that up automatically. Otherwise
+you can run the checks by running (requires docker):
+
+```
+./tools/devenv.sh ./tools/build.sh clang-tidy
 ```

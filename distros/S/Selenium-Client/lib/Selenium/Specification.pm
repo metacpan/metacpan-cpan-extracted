@@ -1,5 +1,5 @@
 package Selenium::Specification;
-$Selenium::Specification::VERSION = '1.05';
+$Selenium::Specification::VERSION = '1.06';
 # ABSTRACT: Module for building a machine readable specification for Selenium
 
 use strict;
@@ -8,7 +8,7 @@ use warnings;
 use v5.28;
 
 no warnings 'experimental';
-use feature qw/signatures unicode_strings/;
+use feature qw/signatures state unicode_strings/;
 
 use List::Util qw{uniq};
 use HTML::Parser();
@@ -46,12 +46,19 @@ my $parse = [];
 our $method = {};
 
 
-sub read($client_dir, $type='stable', $nofetch=1) {
-    my $dir = File::Spec->catdir( $client_dir,"specs" );
-    my $file =  File::Spec->catfile( "$dir","$type.json");
-    fetch( once => $nofetch, dir => $dir );
-    die "could not write $file: $@" unless -f $file;
-    my $buf = File::Slurper::read_binary($file);
+sub read($client_dir, $type='stable', $nofetch=1, $hardcode=1) {
+    my $buf;
+    state $static;
+    if (!$hardcode) {
+        my $dir = File::Spec->catdir( $client_dir,"specs" );
+        my $file =  File::Spec->catfile( "$dir","$type.json");
+        fetch( once => $nofetch, dir => $dir );
+        die "could not write $file: $@" unless -f $file;
+        $buf = File::Slurper::read_binary($file);
+    } else {
+        $static = readline(DATA) unless $static;
+        $buf = $static;
+    }
     my $array = JSON::MaybeXS->new()->utf8()->decode($buf);
     my %hash;
     @hash{map { $_->{name} } @$array} = @$array;
@@ -246,8 +253,6 @@ sub _endpoint_text($text) {
 
 1;
 
-__END__
-
 =pod
 
 =encoding UTF-8
@@ -258,13 +263,15 @@ Selenium::Specification - Module for building a machine readable specification f
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 SUBROUTINES
 
-=head2 read($type STRING, $nofetch BOOL)
+=head2 read($client_dir STRING, $type STRING, $nofetch BOOL, $hardcoe BOOL)
 
 Reads the copy of the provided spec type, and fetches it if a cached version is not available.
+
+If hardcode is passed we use the JSON in the DATA section below.
 
 =head2 fetch(%OPTIONS HASH)
 
@@ -276,10 +283,13 @@ George S. Baugh <george@troglodyne.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by George S. Baugh.
+This software is Copyright (c) 2023 by George S. Baugh.
 
 This is free software, licensed under:
 
   The MIT (X11) License
 
 =cut
+
+__DATA__
+[{"output_params":["capabilities","sessionId"],"href":"https://www.w3.org/TR/webdriver1/#dfn-creating-a-new-session","uri":"/session","name":"NewSession","method":"POST"},{"href":"https://www.w3.org/TR/webdriver1/#dfn-delete-session","output_params":[],"uri":"/session/{sessionid}","method":"DELETE","name":"DeleteSession"},{"method":"GET","name":"Status","uri":"/status","href":"https://www.w3.org/TR/webdriver1/#dfn-status","output_params":["ready"]},{"method":"GET","name":"GetTimeouts","uri":"/session/{sessionid}/timeouts","output_params":["script"],"href":"https://www.w3.org/TR/webdriver1/#dfn-get-timeouts"},{"output_params":["script"],"href":"https://www.w3.org/TR/webdriver1/#dfn-timeouts","name":"SetTimeouts","method":"POST","uri":"/session/{sessionid}/timeouts"},{"method":"POST","name":"NavigateTo","uri":"/session/{sessionid}/url","href":"https://www.w3.org/TR/webdriver1/#dfn-navigate-to","output_params":["https://example.com"]},{"href":"https://www.w3.org/TR/webdriver1/#dfn-get-current-url","output_params":[],"method":"GET","name":"GetCurrentURL","uri":"/session/{sessionid}/url"},{"href":"https://www.w3.org/TR/webdriver1/#dfn-back","output_params":["window.history.back"],"uri":"/session/{sessionid}/back","method":"POST","name":"Back"},{"output_params":["pageHide"],"href":"https://www.w3.org/TR/webdriver1/#dfn-forward","name":"Forward","method":"POST","uri":"/session/{sessionid}/forward"},{"output_params":["file"],"href":"https://www.w3.org/TR/webdriver1/#dfn-refresh","method":"POST","name":"Refresh","uri":"/session/{sessionid}/refresh"},{"href":"https://www.w3.org/TR/webdriver1/#dfn-get-title","output_params":["document.title"],"uri":"/session/{sessionid}/title","name":"GetTitle","method":"GET"},{"method":"GET","name":"GetWindowHandle","uri":"/session/{sessionid}/window","href":"https://www.w3.org/TR/webdriver1/#dfn-get-window-handle","output_params":[]},{"output_params":[],"href":"https://www.w3.org/TR/webdriver1/#dfn-close-window","name":"CloseWindow","method":"DELETE","uri":"/session/{sessionid}/window"},{"name":"SwitchToWindow","method":"POST","uri":"/session/{sessionid}/window","output_params":["handle"],"href":"https://www.w3.org/TR/webdriver1/#dfn-switch-to-window"},{"uri":"/session/{sessionid}/window/handles","name":"GetWindowHandles","method":"GET","output_params":[],"href":"https://www.w3.org/TR/webdriver1/#dfn-get-window-handles"},{"name":"SwitchToFrame","method":"POST","uri":"/session/{sessionid}/frame","output_params":["id"],"href":"https://www.w3.org/TR/webdriver1/#dfn-switch-to-frame"},{"uri":"/session/{sessionid}/frame/parent","name":"SwitchToParentFrame","method":"POST","href":"https://www.w3.org/TR/webdriver1/#dfn-switch-to-parent-frame","output_params":[]},{"uri":"/session/{sessionid}/window/rect","method":"GET","name":"GetWindowRect","output_params":[],"href":"https://www.w3.org/TR/webdriver1/#dfn-get-window-rect"},{"href":"https://www.w3.org/TR/webdriver1/#dfn-set-window-rect","output_params":["width"],"name":"SetWindowRect","method":"POST","uri":"/session/{sessionid}/window/rect"},{"uri":"/session/{sessionid}/window/maximize","method":"POST","name":"MaximizeWindow","href":"https://www.w3.org/TR/webdriver1/#dfn-maximize-window","output_params":[]},{"output_params":[],"href":"https://www.w3.org/TR/webdriver1/#dfn-minimize-window","name":"MinimizeWindow","method":"POST","uri":"/session/{sessionid}/window/minimize"},{"method":"POST","name":"FullscreenWindow","uri":"/session/{sessionid}/window/fullscreen","href":"https://www.w3.org/TR/webdriver1/#dfn-fullscreen-window","output_params":[]},{"uri":"/session/{sessionid}/element/active","method":"GET","name":"GetActiveElement","href":"https://www.w3.org/TR/webdriver1/#dfn-get-active-element","output_params":[]},{"output_params":["#toremove"],"href":"https://www.w3.org/TR/webdriver1/#dfn-find-element","uri":"/session/{sessionid}/element","method":"POST","name":"FindElement"},{"href":"https://www.w3.org/TR/webdriver1/#dfn-find-elements","output_params":["using"],"name":"FindElements","method":"POST","uri":"/session/{sessionid}/elements"},{"uri":"/session/{sessionid}/element/{elementid}/element","name":"FindElementFromElement","method":"POST","href":"https://www.w3.org/TR/webdriver1/#dfn-find-element-from-element","output_params":["using"]},{"method":"POST","name":"FindElementsFromElement","uri":"/session/{sessionid}/element/{elementid}/elements","output_params":["using"],"href":"https://www.w3.org/TR/webdriver1/#dfn-find-elements-from-element"},{"href":"https://www.w3.org/TR/webdriver1/#dfn-is-element-selected","output_params":["input"],"uri":"/session/{sessionid}/element/{elementid}/selected","name":"IsElementSelected","method":"GET"},{"output_params":[],"href":"https://www.w3.org/TR/webdriver1/#dfn-get-element-attribute","method":"GET","name":"GetElementAttribute","uri":"/session/{sessionid}/element/{elementid}/attribute/{name}"},{"href":"https://www.w3.org/TR/webdriver1/#dfn-get-element-property","output_params":[],"uri":"/session/{sessionid}/element/{elementid}/property/{name}","name":"GetElementProperty","method":"GET"},{"name":"GetElementCSSValue","method":"GET","uri":"/session/{sessionid}/element/{elementid}/css/{propertyname}","href":"https://www.w3.org/TR/webdriver1/#dfn-get-element-css-value","output_params":["xml"]},{"name":"GetElementText","method":"GET","uri":"/session/{sessionid}/element/{elementid}/text","href":"https://www.w3.org/TR/webdriver1/#dfn-get-element-text","output_params":["a"]},{"uri":"/session/{sessionid}/element/{elementid}/name","name":"GetElementTagName","method":"GET","output_params":[],"href":"https://www.w3.org/TR/webdriver1/#dfn-get-element-tag-name"},{"method":"GET","name":"GetElementRect","uri":"/session/{sessionid}/element/{elementid}/rect","href":"https://www.w3.org/TR/webdriver1/#dfn-get-element-rect","output_params":["x"]},{"method":"GET","name":"IsElementEnabled","uri":"/session/{sessionid}/element/{elementid}/enabled","href":"https://www.w3.org/TR/webdriver1/#dfn-is-element-enabled","output_params":["xml"]},{"output_params":["input"],"href":"https://www.w3.org/TR/webdriver1/#dfn-element-click","uri":"/session/{sessionid}/element/{elementid}/click","method":"POST","name":"ElementClick"},{"uri":"/session/{sessionid}/element/{elementid}/clear","name":"ElementClear","method":"POST","output_params":["innerHTML"],"href":"https://www.w3.org/TR/webdriver1/#dfn-element-clear"},{"method":"POST","name":"ElementSendKeys","uri":"/session/{sessionid}/element/{elementid}/value","href":"https://www.w3.org/TR/webdriver1/#dfn-element-send-keys","output_params":["type"]},{"href":"https://www.w3.org/TR/webdriver1/#dfn-get-page-source","output_params":["true"],"uri":"/session/{sessionid}/source","method":"GET","name":"GetPageSource"},{"method":"POST","name":"ExecuteScript","uri":"/session/{sessionid}/execute/sync","href":"https://www.w3.org/TR/webdriver1/#dfn-execute-script","output_params":[]},{"uri":"/session/{sessionid}/execute/async","name":"ExecuteAsyncScript","method":"POST","output_params":["unset"],"href":"https://www.w3.org/TR/webdriver1/#dfn-execute-async-script"},{"method":"GET","name":"GetAllCookies","uri":"/session/{sessionid}/cookie","href":"https://www.w3.org/TR/webdriver1/#dfn-get-all-cookies","output_params":[]},{"uri":"/session/{sessionid}/cookie/{name}","name":"GetNamedCookie","method":"GET","output_params":[],"href":"https://www.w3.org/TR/webdriver1/#dfn-get-named-cookie"},{"href":"https://www.w3.org/TR/webdriver1/#dfn-adding-a-cookie","output_params":["cookie"],"method":"POST","name":"AddCookie","uri":"/session/{sessionid}/cookie"},{"uri":"/session/{sessionid}/cookie/{name}","name":"DeleteCookie","method":"DELETE","href":"https://www.w3.org/TR/webdriver1/#dfn-delete-cookie","output_params":[]},{"uri":"/session/{sessionid}/cookie","name":"DeleteAllCookies","method":"DELETE","output_params":[],"href":"https://www.w3.org/TR/webdriver1/#dfn-delete-all-cookies"},{"uri":"/session/{sessionid}/actions","name":"PerformActions","method":"POST","output_params":[],"href":"https://www.w3.org/TR/webdriver1/#dfn-perform-actions"},{"href":"https://www.w3.org/TR/webdriver1/#dfn-release-actions","output_params":[],"name":"ReleaseActions","method":"DELETE","uri":"/session/{sessionid}/actions"},{"href":"https://www.w3.org/TR/webdriver1/#dfn-dismiss-alert","output_params":[],"uri":"/session/{sessionid}/alert/dismiss","name":"DismissAlert","method":"POST"},{"output_params":[],"href":"https://www.w3.org/TR/webdriver1/#dfn-accept-alert","uri":"/session/{sessionid}/alert/accept","method":"POST","name":"AcceptAlert"},{"output_params":[],"href":"https://www.w3.org/TR/webdriver1/#dfn-get-alert-text","uri":"/session/{sessionid}/alert/text","name":"GetAlertText","method":"GET"},{"href":"https://www.w3.org/TR/webdriver1/#dfn-send-alert-text","output_params":["prompt"],"uri":"/session/{sessionid}/alert/text","method":"POST","name":"SendAlertText"},{"href":"https://www.w3.org/TR/webdriver1/#dfn-take-screenshot","output_params":["canvas"],"uri":"/session/{sessionid}/screenshot","name":"TakeScreenshot","method":"GET"},{"href":"https://www.w3.org/TR/webdriver1/#dfn-error-code","output_params":["error"],"uri":"/session/{sessionid}/element/{elementid}/screenshot","method":"GET","name":"TakeElementScreenshot"}]

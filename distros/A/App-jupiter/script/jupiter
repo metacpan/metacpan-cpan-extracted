@@ -405,6 +405,7 @@ sub load_feed_metadata {
     my $data = decode_json read_binary("$filename.json");
     for my $feed (@$feeds) {
       my $url = $feed->{url};
+      next unless $url;
       # don't overwrite title and htmlUrl from OPML file
       $feed->{title} = $data->{$url}->{title} if $data->{$url}->{title};
       $feed->{link} ||= $data->{$url}->{link};
@@ -445,7 +446,7 @@ sub existing_files {
   my $feeds = shift;
   my @files;
   for my $dir (uniq map { $_->{cache_dir} } @$feeds) {
-    push(@files, <"$dir/*">);
+    push(@files, <"$dir/*">) if $dir and -d $dir;
   }
   return \@files;
 }
@@ -459,7 +460,7 @@ sub cache_files {
 sub make_directories {
   my $feeds = shift;
   for my $dir (uniq map { $_->{cache_dir} } @$feeds) {
-    if (not -d $dir) {
+    if ($dir and not -d $dir) {
       mkdir $dir;
     }
   }
@@ -566,20 +567,20 @@ sub read_opml {
     my $doc = XML::LibXML->load_xml(location => $file); # this better have no errors!
     my @nodes = $doc->findnodes('//outline[./@xmlUrl]');
     my ($name, $path) = fileparse($file, '.opml', '.xml');
-    push @feeds, map {
-      my $title = xml_escape $_->getAttribute('title');
-      my $url = xml_escape $_->getAttribute('xmlUrl');
+    for my $node (@nodes) {
+      my $title = xml_escape $node->getAttribute('title');
+      my $url = xml_escape $node->getAttribute('xmlUrl');
       next if @filters > 0 and not grep { $url =~ /$_/ or $title =~ /$_/ } @filters;
-      my $link = xml_escape $_->getAttribute('htmlUrl');
-      {
-	title => $title,    # title in the OPML file
-	url => $url,        # feed URL in the OPML file
-	link => $link,      # web URL in the OPML file
-	opml_file => $file,
-	cache_dir => "$path/$name",
-	cache_file => "$path/$name/" . slugify($url),
-      }
-    } @nodes;
+      my $link = xml_escape $node->getAttribute('htmlUrl');
+      push @feeds, {
+        title => $title,    # title in the OPML file
+        url => $url,        # feed URL in the OPML file
+        link => $link,      # web URL in the OPML file
+        opml_file => $file,
+        cache_dir => "$path/$name",
+        cache_file => "$path/$name/" . slugify($url),
+      };
+    }
     warn "No feeds found in the OPML file $file\n" unless @nodes;
     push @files, { file => $file, path => $path, name => $name };
   }
@@ -812,10 +813,11 @@ sub excerpt {
   return '(no excerpt)' unless $content;
   my $doc = eval { XML::LibXML->load_html(recover => 2, string => $content) };
   my $separator = "¶";
-  for my $node ($doc->findnodes('//style')) {
+  for my $node ($doc->findnodes('//style | //script | //time | //*[contains(@class, "post-header")] | //*[contains(@class, "post-share-buttons")] | //*[contains(@class, "post-footer")] | //*[contains(@class, "comments")]'),
+      ){
     $node->parentNode->removeChild($node);
   }
-  for my $node ($doc->findnodes('//p | //br | //blockquote | //li | //td | //th | //div')) {
+  for my $node ($doc->findnodes('//p | //br | //blockquote | //li | //td | //th | //div | //h1 | //h2 | //h3 | //h4 | //h5 | //h6')) {
     $node->appendTextNode($separator);
   }
   my $text = strip_html($doc->textContent());

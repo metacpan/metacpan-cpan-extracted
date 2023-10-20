@@ -1,5 +1,11 @@
 Changes file for Test::Differences
 
+0.71   2023-10-12
+
+    - Document and test different behaviour regarding Booleans in perl
+      5.38.0 compared to earlier versions.
+      See https://github.com/DrHyde/perl-modules-Test-Differences/issues/21
+
 0.70   2023-07-07
     - Stop pointless use of taint-mode in tests, so tests pass when perl is
       built without taint support

@@ -1,3 +1,0 @@
-[PerlTidy]
-select = {lib,t,xt,bin}/**/*.{pl,pm,t}
-select = Makefile.PL

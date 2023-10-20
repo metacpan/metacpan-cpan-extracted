@@ -5,7 +5,7 @@ use warnings;
 use Shell::Var::Reader;
 use TOML         qw(to_toml from_toml);
 use JSON         qw(to_json decode_json);
-use YAML         qw(Load);
+use YAML::XS     qw(Load Dump);
 use Getopt::Long qw(:config pass_through);
 use Data::Dumper;
 use String::ShellQuote;
@@ -19,7 +19,7 @@ use Hash::Flatten;
 # prevents Rex from printing out rex is exiting after the script ends
 $::QUIET = 2;
 
-my $version = '0.4.0';
+my $version = '0.5.0';
 
 my $to_read;
 my $format = 'json';
@@ -33,6 +33,8 @@ my $cmdb_host;
 my $host_vars = "HOSTNAME,REX_NAME,REX_HOSTNAME,ANSIBLE_HOSTNAME,ANSIBLE_NAME,NAME";
 my $use_roles = 1;
 my $munger_file;
+my $cmdb_env;
+my $env_vars = 'SYSTEM_ENV';
 GetOptions(
 	'r=s'         => \$to_read,
 	'o=s'         => \$format,
@@ -47,6 +49,8 @@ GetOptions(
 	'cmdb_host=s' => \$cmdb_host,
 	'host_vars=s' => \$host_vars,
 	'use_roles=s' => \$use_roles,
+	'cmdb_env=s'  => \$cmdb_env,
+	'env_vars=s'  => \$env_vars,
 	'm=s'         => \$munger_file,
 );
 
@@ -68,6 +72,12 @@ if ($help) {
 -m <munger>   File containing code to use for munging data prior to output.
 
 --tcmdb <dir>       Optionally include data from a Rex TOML CMDB.
+--cmdb_env <env>    Environment name to use with the CMDB.
+                    Default :: undef
+--env_var <vars>    If --cmdb_env is undef, check this comma seperated
+                    list JSON Paths in the currently found/included vars
+                    for the first possible hit.
+                    Default :: SYSTEM_ENV
 --cmdb_host <host>  Hostname to use when querying the CMDB.
                     Default :: undef
 --host_vars <vars>  If --cmdb_host is undef, check this comma seperated
@@ -190,6 +200,31 @@ if ( defined($tcmdb) ) {
 		}
 	} ## end if ( !defined($cmdb_host) )
 
+	# try to get the cmdb env if possible
+	if ( !defined($cmdb_env) ) {
+		# some basic cleanup of the env_vars vars string
+		# to make sure we don't have anything empty for it
+		$env_vars =~ s/,[\ \t]*,/, /g;
+		$env_vars =~ s/^[\ \t]*,//g;
+		$env_vars =~ s/,[\ \t]*$//g;
+		if ( $env_vars eq '' ) {
+			die('--env_vars can not be set to ""');
+		}
+		foreach my $env_var ( split( /,/, $env_vars ) ) {
+			my $jpath = JSON::Path->new($env_var);
+			my $env   = $jpath->get($found_vars);
+			# if we found something not blank and have not set it already, set it
+			if ( defined($env) && $env ne '' && !defined($cmdb_env) ) {
+				$cmdb_env = $env;
+			}
+		}
+	} ## end if ( !defined($cmdb_env) )
+
+	# setup the env if we have a name for it and hostname
+	if ( defined($cmdb_env) && defined($cmdb_host) ) {
+		Rex::Config->set_environment($cmdb_env);
+	}
+
 	set cmdb => {
 		type           => 'TOML',
 		path           => $tcmdb,
@@ -201,6 +236,10 @@ if ( defined($tcmdb) ) {
 
 	my %tmp_hash = %{ $merger->merge( $found_vars, $cmdb_vars ) };
 	$found_vars = \%tmp_hash;
+
+	if ( defined($cmdb_host) && !defined( $found_vars->{SYSTEM_NAME} ) ) {
+		$found_vars->{SYSTEM_NAME} = $cmdb_host;
+	}
 } ## end if ( defined($tcmdb) )
 
 ##
@@ -218,7 +257,7 @@ if ( defined($munger_file) ) {
 	eval {
 		$munger = read_file($munger_file);
 		if ( !defined($munger) ) {
-			die( 'rea_file("' . $munger_file . '") returned undef' );
+			die( 'read_file("' . $munger_file . '") returned undef' );
 		}
 	};
 	if ($@) {
@@ -378,6 +417,19 @@ Includes data from a CMDB and merge it in. Will overwrite everything previous.
 
 Optionally include data from a Rex TOML CMDB. See L<Rex::CMDB::YAML> for more information
 on that.
+
+=head2 --cmdb_env <env>
+
+Environment name to use with the CMDB.
+
+Default :: undef
+
+=head2 --env_var <vars>
+
+If --cmdb_env is undef, check this comma seperated list JSON Paths in the
+currently found/included vars for the first possible hit.
+
+Default :: SYSTEM_ENV
 
 =head2 --cmdb_host <host>
 

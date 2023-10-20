@@ -1,0 +1,45 @@
+---
+abstract: 'utilities for filesystem: read, write, find, replace files, etc'
+author:
+  - 'Yaroslav O. Kosmina LL<mailto:dart@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Aion-Fs
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Aion::Fs:
+    file: lib/Aion/Fs.pm
+    version: v0.0.3
+requires:
+  Time::HiRes: '0'
+  common::sense: '0'
+  config: '1.3'
+  perl: v5.22.0
+resources:
+  bugtracker: https://github.com/darviarush/perl-aion-fs/issues
+  homepage: https://github.com/darviarush/perl-aion-fs
+  repository: https://github.com/darviarush/perl-aion-fs.git
+version: 0.0.3
+x_authority: cpan:DART
+x_contributors:
+  - 'Yaroslav O. Kosmina <dart@cpan.org>'
+  - 'Yaroslav O. Kosmina <darviarush@mail.ru>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

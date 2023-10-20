@@ -1,19 +1,20 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.35;
+use warnings;
+use Object::Pad 0.800;
 
-package Device::Chip::Adapter 0.25;
+package Device::Chip::Adapter 0.26;
 role Device::Chip::Adapter :repr(HASH) :compat(invokable);
+
+use experimental 'signatures';
 
 use utf8;
 
 use Carp;
-
-use Struct::Dumb qw( readonly_struct );
 
 require Device::Chip;
 
@@ -93,11 +94,8 @@ variable C<DEVICE_CHIP_ADAPTER>, if defined. If not, an exception is thrown.
 
 =cut
 
-sub new_from_description
+sub new_from_description ( $, $description = undef )
 {
-   shift;
-   my ( $description ) = @_;
-
    defined( $description //= $ENV{DEVICE_CHIP_ADAPTER} ) or
       croak "Undefined Device::Chip adapter description";
 
@@ -154,10 +152,8 @@ adapter is only capable of one kind of protocol.
 
 # A default implementation that uses some reflection to simplify
 # implementations
-method make_protocol
+method make_protocol ( $pname )
 {
-   my ( $pname ) = @_;
-
    if( my $code = $self->can( "make_protocol_$pname" ) ) {
       return $code->( $self );
    }
@@ -257,13 +253,25 @@ by a false value.
 
 =back
 
-Adapter implementations may wish to use a L<Struct::Dumb> definition provided
-by this package, called L<Device::Chip::Adapter::GPIODefinition> to implement
-these.
+Adapter implementations may wish to use a helper class definition provided
+by this package by calling L<Device::Chip::Adapter::GPIODefinition> to
+implement these.
+
+   $def = GPIODefinition( $name, $dir, $invert );
 
 =cut
 
-readonly_struct GPIODefinition => [qw( name dir invert )];
+use Object::Pad::ClassAttr::Struct 0.05;
+
+# This used to be Struct::Dumb-driven
+class Device::Chip::Adapter::_GPIODefinition :Struct(readonly) {
+   field $name;
+   field $dir;
+   field $invert;
+}
+sub GPIODefinition {
+   return Device::Chip::Adapter::_GPIODefinition->new_values( @_ );
+}
 
 =head2 write_gpios
 

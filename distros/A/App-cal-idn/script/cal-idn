@@ -1,10 +1,5 @@
 #!perl
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-03'; # DATE
-our $DIST = 'App-cal-idn'; # DIST
-our $VERSION = '0.136'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -13,6 +8,11 @@ use warnings;
 use App::cal::idn;
 use DateTime;
 use Getopt::Long qw(:config auto_help auto_version);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-07-11'; # DATE
+our $DIST = 'App-cal-idn'; # DIST
+our $VERSION = '0.137'; # VERSION
 
 my %args = (months => 1);
 
@@ -65,7 +65,7 @@ cal-idn - Display Indonesian calendar on the command-line
 
 =head1 VERSION
 
-This document describes version 0.136 of cal-idn (from Perl distribution App-cal-idn), released on 2021-05-03.
+This document describes version 0.137 of cal-idn (from Perl distribution App-cal-idn), released on 2023-07-11.
 
 =head1 SYNOPSIS
 
@@ -128,14 +128,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-cal-id
 
 Source repository is at L<https://github.com/perlancar/perl-App-cal-idn>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-cal-idn/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 Unix command B<cal>
@@ -148,11 +140,37 @@ L<dateseq-idn> from L<App::dateseq::idn>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2019, 2017, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2021, 2019, 2017, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-cal-idn>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

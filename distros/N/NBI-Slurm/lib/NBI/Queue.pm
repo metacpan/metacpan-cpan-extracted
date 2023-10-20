@@ -160,7 +160,7 @@ NBI::Queue - NBI::Queue, to filter jobs in the queue
 
 =head1 VERSION
 
-version 0.6.1
+version 0.8.1
 
 =head1 SYNOPSIS
 

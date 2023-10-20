@@ -15,7 +15,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.27.1";
+our $VERSION = "v6.28.0";
 
 1;
 __END__
@@ -61,7 +61,7 @@ The documentation in this POD applies to all three adapter modules as well.
 This module is an implementation of L<Reactive Extensions|http://reactivex.io/> in Perl. It replicates the
 behavior of L<rxjs 6|https://www.npmjs.com/package/rxjs> which is the JavaScript implementation of ReactiveX.
 
-Currently 100 of the more than 100 operators in rxjs are implemented in this module.
+Currently 99 of the more than 100 operators in rxjs are implemented in this module.
 
 =head1 EXPORTABLE FUNCTIONS
 
@@ -801,33 +801,6 @@ L<https://rxjs.dev/api/operators/first>
         op_first(),
     )->subscribe($observer);
 
-=item op_group_by
-
-L<https://rxjs.dev/api/operators/groupBy>
-
-    # [0, 2, 4], [1, 3], complete
-    rx_interval(0.7)->pipe(
-        op_take(5),
-        op_group_by(sub { $_[0] % 2 }), # can also use $_ here
-        op_merge_map(sub ($g, @) {
-            return $g->pipe(
-                op_reduce(sub ($acc, $cur) { [@$acc, $cur] }, []),
-            );
-        ),
-    )->subscribe($observer);
-
-I<Note:> This implementation of this operator is a little bit buggy, and may result in
-resource leaks. For example, this will keep running forever:
-
-    my $subscription = rx_interval(0.7)->pipe(
-        op_group_by(sub { $_ % 2 }),
-    );
-
-    Mojo::IOLoop->timer(5, sub {
-        say "timer expired";
-        $subscription->unsubscribe;
-    });
-
 =item op_ignore_elements
 
 L<https://rxjs.dev/api/operators/ignoreElements>
@@ -1362,7 +1335,7 @@ L<https://rxjs.dev/api/operators/zipWith>
 
 These functions return a promise or a future, and require the existence of a user-selectable
 promise library which is automatically loaded in runtime. The functions are borrowed from
-rxjs 7, and remain experimental until rxjs 7 is finalized.
+rxjs 7.
 
 You can optionally set the type of promises returned by these functions with the
 C<< RxPerl::AnyEvent->set_promise_class($promise_class) >> class method, unless you're using

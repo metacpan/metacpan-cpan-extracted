@@ -5351,7 +5351,7 @@ sub create_special_slide_portion {
 # @param string $name Document name. (required)
 # @param int $slide_index Parent slide index. (required)
 # @param string $slide_type Slide type (master, layout or notes). (required)
-# @param ShapeBase $dto Shape DTO. (optional)
+# @param ShapeBase $dto Shape DTO. (required)
 # @param int $shape_to_clone Optional index for clone shape instead of adding a new one. (optional)
 # @param int $position Position of the new shape in the list. Default is at the end of the list. (optional)
 # @param string $password Document password. (optional)
@@ -5378,7 +5378,7 @@ sub create_special_slide_portion {
     'dto' => {
         data_type => 'ShapeBase',
         description => 'Shape DTO.',
-        required => '0',
+        required => '1',
     },
     'shape_to_clone' => {
         data_type => 'int',
@@ -5440,6 +5440,11 @@ sub create_special_slide_shape {
     # verify enum value
     if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
       croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling create_special_slide_shape");
     }
 
     # parse inputs
@@ -9493,7 +9498,7 @@ sub delete_protection {
 # Resets all presentation protection settings. 
 # 
 # @param File $document Document data. (required)
-# @param string $password Presentation password. (required)
+# @param string $password Presentation password. (optional)
 {
     my $params = {
     'document' => {
@@ -9504,7 +9509,7 @@ sub delete_protection {
     'password' => {
         data_type => 'string',
         description => 'Presentation password.',
-        required => '1',
+        required => '0',
     },
     };
     __PACKAGE__->method_documentation->{ 'delete_protection_online' } = { 
@@ -9521,11 +9526,6 @@ sub delete_protection_online {
     # verify the required parameter 'document' is set
     unless (exists $args{'document'} && $args{'document'}) {
       croak("Missing the required parameter 'document' when calling delete_protection_online");
-    }
-
-    # verify the required parameter 'password' is set
-    unless (exists $args{'password'} && $args{'password'}) {
-      croak("Missing the required parameter 'password' when calling delete_protection_online");
     }
 
     # parse inputs
@@ -26966,6 +26966,226 @@ sub replace_font_online {
     my $files = [];
     if ( exists $args{'document'} && $args{'document'}) {
         push(@$files, $args{'document'});
+    }
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# replace_image
+#
+# Replaces image by the specified index.
+# 
+# @param string $name Document name. (required)
+# @param int $image_index Image index. (required)
+# @param File $image Image data. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'image_index' => {
+        data_type => 'int',
+        description => 'Image index.',
+        required => '1',
+    },
+    'image' => {
+        data_type => 'File',
+        description => 'Image data.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'replace_image' } = { 
+    	summary => 'Replaces image by the specified index.',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub replace_image {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling replace_image");
+    }
+
+    # verify the required parameter 'image_index' is set
+    unless (exists $args{'image_index'}) {
+      croak("Missing the required parameter 'image_index' when calling replace_image");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/images/{imageIndex}/replace';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'image_index'}) {
+        my $_base_variable = "{" . "imageIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'image_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'image'} && $args{'image'}) {
+        push(@$files, $args{'image'});
+    }
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    return;
+}
+
+#
+# replace_image_online
+#
+# Replaces image by the specified index and returns updated document. 
+# 
+# @param File $document Document data. (required)
+# @param int $image_index Image index. (required)
+# @param File $image Image data. (optional)
+# @param string $password Password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'image_index' => {
+        data_type => 'int',
+        description => 'Image index.',
+        required => '1',
+    },
+    'image' => {
+        data_type => 'File',
+        description => 'Image data.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'replace_image_online' } = { 
+    	summary => 'Replaces image by the specified index and returns updated document. ',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub replace_image_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling replace_image_online");
+    }
+
+    # verify the required parameter 'image_index' is set
+    unless (exists $args{'image_index'}) {
+      croak("Missing the required parameter 'image_index' when calling replace_image_online");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/images/{imageIndex}/replace';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'image_index'}) {
+        my $_base_variable = "{" . "imageIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'image_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
+    }
+    if ( exists $args{'image'} && $args{'image'}) {
+        push(@$files, $args{'image'});
     }
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,

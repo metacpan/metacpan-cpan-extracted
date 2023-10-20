@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 9e725b71c005a5c8b479e8a921e25fbcb98cc6f3f44b1b8cb1491bb992feb095 Build.PL
+SHA256 88962416a44e35f9d0e6dd8450029dd07e8ea3373b0851bd0c0e76df6c487a7f Changes
+SHA256 db739608563af2d9f1763883315451cc38032cb67bdd42a443bfcc7eef1a49b2 LICENSE
+SHA256 f127e88aca0643d70da0ef68578e67f50e833576a43c02c86e84169e8a76f0e7 MANIFEST
+SHA256 27e0a2271ab34c4f70e365fa21e09d72b65bb723373bb6d502b9312252893557 META.json
+SHA256 6f026ad93d02c3c241cb82d5f2ad3bb6c6b8e54fa4800f7c6051d3ab1b36ce79 META.yml
+SHA256 e4e7c43d2b490050ee07a5bf22d3ecd9eb546421c21fd1f04360e9b4a2b1cd2a README
+SHA256 b7b9d543c5c3bfaed6df2e1702bdade45651007b369dbd9a66628ec4a4c99bde eg/marimba-madness
+SHA256 476222eb68cd6e72644fccf65cbcdaff863b492b79a7294792c17a6b3883ef3e eg/syop
+SHA256 29a17f561c1d45e376e28265ca9ef58f7b0ce4d2079da080d55acc52d75eec4d lib/Music/Factory.pm
+SHA256 169b4cb56f5f1c4fdbd3b0622f58f333c0b79cc463b577ebd1fcd21625eb5bbc marimba-madness.midi
+SHA256 887976bc32aa53128ec2dbccebe4c1809df1a8bff87a60130b54ef9b48b7aacb t/00-load.t
+SHA256 b49a515ee0d5a30b28baacbf6bc8ff9a0d10d1d5bdc4eff1fc93b4a52174f658 t/10-factory.t
+SHA256 df3a4a3a65feb422edb47255e4ccb5ff23410ccf537222bd3634ab81b6bd49b8 t/20-badgen.t
+SHA256 eb2320b749aeea85b2738e3df178e744e4a97e98a578b21403977d06447d0c20 t/pod-coverage.t
+SHA256 39d4efa36d3549b633ab1051b43b815abccde472e8448ccd1e89598d8c948083 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEElPO2YAAs9b/plKLEs1lvXE/ryKcFAmUvHYoACgkQs1lvXE/r
+yKfh/Qv/eSsT4TNXjeHbq1RUBGi2dCU5M4SdfvG466kTm7kimLzlFMFYibh0I86L
++RCbhZX1F51mSSazwSANefEB9Q//Rk77XusTxgVb8VpivK/p/TRN+anGyHvm8eML
+9RPmHufgmJHf6e+8iQ2ax6mt+cL6niRGiWL5zchltOoOSKO7DwX4EDdDnScYnmhn
+22hnbFRqLGCBRnioS6oQG85v/KJ7zUCumCIgP2GKJysfLIcqb29qlHzL/KV4UUv5
+gCRE/5/TE9vuzjCkqoPwnmRiWOigwF3zoFMFr4YdJZBRMIHxaNkA6e/ZkY2vOlw6
+YQKfHj4UDFRgS5J/IVf1hc3LRADT/cqZfJA4Rrhr6ZT9jZQbH7OPtpO3khtgiP9n
+rdwrpX3CS0fWWG+eWTAu2Rtae+JvX/kPLUbvbhRZQ4gEcho7rHd6qU0DE45srel3
+QZk52e/7RcTCYQu5s9GcBcy4uWgo13mHZFhOhw7jyczUErt8MYcVgEuYNFPyXMCd
+lVulqdjm
+=V4fd
+-----END PGP SIGNATURE-----

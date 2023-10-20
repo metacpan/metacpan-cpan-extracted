@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::ExtensionBuilder 0.802;
+package Object::Pad::ExtensionBuilder 0.804;
 
 use v5.14;
 use warnings;
@@ -45,7 +45,7 @@ require Object::Pad::ExtensionBuilder_data;
 
 =head2 write_object_pad_h
 
-   Object::Pad::ExtensionBuilder->write_object_pad_h
+   Object::Pad::ExtensionBuilder->write_object_pad_h;
 
 Writes the F<object_pad.h> file to the current working directory. To cause
 the compiler to actually find this file, see L</extra_compiler_flags>.
@@ -64,7 +64,7 @@ sub write_object_pad_h
 
 =head2 extra_compiler_flags
 
-   @flags = Object::Pad::ExtensionBuilder->extra_compiler_flags
+   @flags = Object::Pad::ExtensionBuilder->extra_compiler_flags;
 
 Returns a list of extra flags that the build scripts should add to the
 compiler invocation. This enables the C compiler to find the
@@ -80,7 +80,7 @@ sub extra_compiler_flags
 
 =head2 extend_module_build
 
-   Object::Pad::ExtensionBuilder->extend_module_build( $build )
+   Object::Pad::ExtensionBuilder->extend_module_build( $build );
 
 A convenient shortcut for performing all the tasks necessary to make a
 L<Module::Build>-based distribution use the helper.

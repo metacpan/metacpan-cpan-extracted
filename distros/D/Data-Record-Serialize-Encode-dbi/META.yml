@@ -1,0 +1,58 @@
+---
+abstract: 'store a record in a database'
+author:
+  - 'Diab Jerius <djerius@cpan.org>'
+build_requires:
+  Data::Record::Serialize: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::Tools::AfterSubtest: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+  Test::TempDir::Tiny: '0.010'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Record-Serialize-Encode-dbi
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Data::Record::Serialize::Encode::dbi:
+    file: lib/Data/Record/Serialize/Encode/dbi.pm
+    version: '1.05'
+recommends:
+  DBD::SQLite: '1.31'
+requires:
+  DBI: '0'
+  Data::Record::Serialize: '0'
+  Data::Record::Serialize::Error: '0'
+  List::Util: '1.33'
+  Monkey::Patch: '0'
+  Moo::Role: '2.003004'
+  SQL::Translator: '0'
+  SQL::Translator::Schema: '0'
+  Types::Common::String: '0'
+  Types::Standard: '1.010003'
+  namespace::clean: '0'
+  perl: '5.012'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize-Encode-dbi
+  repository: https://gitlab.com/djerius/data-record-serialize-encode-dbi.git
+version: '1.05'
+x_generated_by_perl: v5.36.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: GPL-3.0-only

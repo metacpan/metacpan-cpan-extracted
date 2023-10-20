@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Animation;
-$Telegram::Bot::Object::Animation::VERSION = '0.023';
+$Telegram::Bot::Object::Animation::VERSION = '0.024';
 # ABSTRACT: The base class for Telegram message 'Animation' type.
 
 
@@ -37,7 +37,7 @@ Telegram::Bot::Object::Animation - The base class for Telegram message 'Animatio
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 DESCRIPTION
 

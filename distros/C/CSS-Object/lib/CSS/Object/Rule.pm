@@ -41,7 +41,6 @@ sub add_element
 	my $self = shift( @_ );
 	my $elem = shift( @_ ) || return( $self->error( "No element object was provided to add to this rule." ) );
 	return( $self->error( "Element object provided ($elem) is not a CSS::Object::Element object." ) ) if( !$self->_is_a( $elem, 'CSS::Object::Element' ) );
-	# $self->message( 3, "Adding element object '$elem'." );
 	# $elem->format( $self->format );
 	$elem->debug( $self->debug );
 	# $self->properties->push( $prop );
@@ -54,7 +53,6 @@ sub add_property
 	my $self = shift( @_ );
 	my $prop = shift( @_ ) || return( $self->error( "No property object was provided to add to this rule." ) );
 	return( $self->error( "Property object provided ($prop) is not a CSS::Object::Property object." ) ) if( !$self->_is_a( $prop, 'CSS::Object::Property' ) );
-	# $self->message( 3, "Adding property object '$prop'." );
 	# $prop->format( $self->format );
 	$prop->debug( $self->debug );
 	# $self->properties->push( $prop );
@@ -79,10 +77,8 @@ sub add_to
     # no overloading;
     my $css  = shift( @_ ) || return( $self->error( "No css object was provided to add our rule to it." ) );
     # my $caller = ( split( /\::/, (caller(1))[3] ) )[-1];
-    # $self->message( 3, "Called from '$caller' and css object is '$css'." );
     return( $self->error( "CSS object provided (", overload::StrVal( $css ), ") is not actually a CSS::Object object." ) ) if( !$self->_is_a( $css, 'CSS::Object' ) );
     defined( $css->add_rule( $self ) ) || return( $self->error( "Unable to add our css rule object (", overload::StrVal( $self ), ") to main css object elements stack: ", $css->error ) );
-    # $self->message( 3, "Returning our rule object '", overload::StrVal( $self ), "'." );
     return( $self );
 }
 
@@ -90,7 +86,6 @@ sub as_string
 {
 	my $self = shift( @_ );
 	# my( $p, $f, $l ) = caller;
-	# $self->message( 3, "Stringifying rule called from package $p at line $l in file $f" );
 	my $format = $self->format || return( $self->error( "No formatter set to format this rule as string." ) );
 	return( $format->rule_as_string( $self ) );
 }
@@ -115,9 +110,7 @@ sub format
 	if( @_ )
 	{
         # my( $p, $f, $l ) = caller;
-        # $self->message( 3, "Rule format called in package $p at line $l in file $f" );
 	    my $format = $self->SUPER::format( @_ ) || return( $self->pass_error );
-	    # $self->message( 3, "New format set: '$format'." );
 	    $self->selectors->foreach(sub
 	    {
 	        shift->format( $format ) || return;
@@ -136,13 +129,10 @@ sub get_property_by_name
     my( $self, $prop_name ) = @_;
     # my $props = $self->properties;
     my $arr = Module::Generic::Array->new;
-    # $self->messagef( 3, "There are %d elements in this rule.", $self->elements->length );
     $self->elements->foreach(sub
     {
         my $elem = shift( @_ );
-        # $self->message( 3, "Checking this element '$elem'." );
         next if( !$elem->isa( 'CSS::Object::Property' ) );
-        # $self->message( 3, "This element is a property with name \"", $elem->name, "\" and does it match our target \"$prop_name\" ?" );
         if( $elem->name eq $prop_name )
         {
             $arr->push( $elem );
@@ -182,7 +172,6 @@ sub remove_from
     my $self = shift( @_ );
     my $css  = shift( @_ ) || return( $self->error( "No css object was provided to remove our rule from it." ) );
     # my $caller = ( split( /\::/, (caller(1))[3] ) )[-1];
-    # $self->message( 3, "Called from '$caller' and css object is '$css'." );
     return( $self->error( "CSS object provided (", overload::StrVal( $css ), ") is not actually a CSS::Object object." ) ) if( !$self->_is_a( $css, 'CSS::Object' ) );
     $css->remove_rule( $self );
     return( $self );

@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Ne::Any::Np - Package for language Nepali
 
 =cut
 
 package Locale::CLDR::Locales::Ne::Any::Np;
-# This file auto generated from Data/common/main/ne_NP.xml
-#	on Mon 11 Apr  5:34:56 pm GMT
+# This file auto generated from Data\common\main\ne_NP.xml
+#	on Fri 13 Oct  9:30:27 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

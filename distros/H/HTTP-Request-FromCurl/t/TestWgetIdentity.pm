@@ -2,7 +2,7 @@ package # hide from CPAN
     TestWgetIdentity;
 use strict;
 use HTTP::Request::FromWget;
-use Test::More;
+use Test2::V0;
 use Data::Dumper;
 use Capture::Tiny 'capture';
 use Test::HTTP::LocalServer;
@@ -198,7 +198,7 @@ sub identical_headers_ok( $code, $expected_request, $name,
     my @log = split /\n/, $log;
     my @exp = split /\n/, $expected_request;
 
-    my $res = is_deeply \@log, \@exp, $name;
+    my $res = is \@log, \@exp, $name;
     if(! $res) {
         diag "Expected:";
         diag $expected_request;
@@ -208,7 +208,7 @@ sub identical_headers_ok( $code, $expected_request, $name,
     return $res
 }
 
-my $version = wget_version( $wget );
+my $version = wget_version( $wget ) // '';
 #$version = '1.2.3';
 my $cmp_version = sprintf "%03d%03d%03d", split /\./, $version;
 if( ! $version) {
@@ -282,7 +282,7 @@ sub request_logs_identical_ok( $test, $name, $r, $res ) {
             $got{Accept} = delete $got{accept};
         };
 
-        is_deeply \%got, $res->{headers}, $name
+        is \%got, $res->{headers}, $name
             or diag Dumper [\%got, $res->{headers}];
 
         # Now, also check that our HTTP::Request looks similar
@@ -294,9 +294,16 @@ sub request_logs_identical_ok( $test, $name, $r, $res ) {
 }
 
 sub request_identical_ok( $test ) {
-    local $TODO = $test->{todo};
-    local $TODO = "wget $test->{version} required, we have $cmp_version"
-        if $test->{version} and $cmp_version < $test->{version};
+    my $todo;
+
+    if( $test->{todo} ) {
+        $todo = todo($test->{todo});
+    } elsif( $test->{version} and $cmp_version < $test->{version} ) {
+        SKIP: {
+            $todo = skip("wget $test->{version} required, we have $cmp_version", 10)
+        };
+        return
+    };
     my $name = $test->{name} || (join " ", @{ $test->{cmd}});
     my $cmd = [ @{ $test->{cmd} }];
 
@@ -434,7 +441,7 @@ sub request_identical_ok( $test ) {
                 delete @{$copy->{headers}}{ @{ $h }};
             };
 
-            if( !is_deeply $reconstructed[$i], $copy, "$name (reconstructed)" ) {
+            if( !is $reconstructed[$i], $copy, "$name (reconstructed)" ) {
                 diag "Original command:";
                 diag Dumper $test->{cmd};
                 diag "Original request:";

@@ -10,7 +10,7 @@ use FileHandle;
 use constant EXPECTED => qq/{foo => 'bar'},\n/;
 
 sub read_text {
-    File::Slurper::read_text ( shift, undef, 'auto' );
+    File::Slurper::read_text( shift, undef, 'auto' );
 }
 
 sub config {
@@ -46,9 +46,10 @@ sub serialize {
             ) or do { bail_out( $@ ) };
 
             my ( $stdout, $stderr, $exit ) = eval {
-                capture { $s->send( { foo => 'bar' } );
-                          $s->close;
-                      }
+                capture {
+                    $s->send( { foo => 'bar' } );
+                    $s->close;
+                }
             };
 
             bail_out( $@ ) if $@ ne '';
@@ -72,8 +73,8 @@ serialize(
 
 serialize(
     'IO::File' => sub { IO::File->new( 'ddump.pl', '>' ) },
-          sub { $_[0]->close; read_text( 'ddump.pl' ) },
-         );
+    sub { $_[0]->close; read_text( 'ddump.pl' ) },
+);
 
 serialize(
     filename => 'ddump.pl',

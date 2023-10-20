@@ -1,8 +1,8 @@
 # Parse::PlainConfig -- Parsing Engine for Parse::PlainConfig
 #
-# (c) 2002 - 2016, Arthur Corliss <corliss@digitalmages.com>,
+# (c) 2002 - 2023, Arthur Corliss <corliss@digitalmages.com>,
 #
-# $Id: lib/Parse/PlainConfig.pm, 3.05 2017/02/06 10:36:37 acorliss Exp $
+# $Id: lib/Parse/PlainConfig.pm, 3.06 2023/09/23 19:24:20 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -23,7 +23,7 @@ use strict;
 use warnings;
 use vars qw($VERSION);
 
-($VERSION) = ( q$Revision: 3.05 $ =~ /(\d+(?:\.(\d+))+)/sm );
+($VERSION) = ( q$Revision: 3.06 $ =~ /(\d+(?:\.(\d+))+)/sm );
 
 use Class::EHierarchy qw(:all);
 use Parse::PlainConfig::Constants qw(:all);
@@ -48,6 +48,45 @@ use vars qw(@_properties @_methods %_parameters %_prototypes);
 #
 #####################################################################
 
+sub _findAllClasses {
+
+    # Purpose:  Returns a list of all parent class names
+    # Returns:  Array of scalars
+    # Usage:    @pclasses = _findAllClasses(ref $obj);
+
+    my $class = shift;
+    my ( @classes, %c, $c, @rv );
+
+    subPreamble( PPCDLEVEL3, '$', $class );
+
+    # Pull all parent class and recursively loop
+    {
+        no strict 'refs';
+
+        if ( defined *{"${class}::ISA"}{ARRAY} ) {
+
+            foreach $c ( @{ *{"${class}::ISA"}{ARRAY} } ) {
+                push @classes, _findAllClasses($c);
+            }
+
+            push @classes, $class
+                if scalar @classes
+                    or grep { $_ eq __PACKAGE__ }
+                    @{ *{"${class}::ISA"}{ARRAY} };
+        }
+    }
+
+    # Consolidate redundant entries
+    foreach $c (@classes) {
+        push @rv, $c unless exists $c{$c};
+        $c{$c} = 1;
+    }
+
+    subPostamble( PPCDLEVEL3, '@', @rv );
+
+    return @rv;
+}
+
 sub _initialize {
 
     # Purpose:  Initialize config object and loads class defaults
@@ -57,107 +96,115 @@ sub _initialize {
     my $obj   = shift;
     my $class = ref $obj;
     my $rv    = 1;
-    my ( $settings, %_globals, %_parameters, %_prototypes );
+    my ( @classes, $settings, %new, %_globals, %_parameters, %_prototypes );
 
-    pdebug( 'entering w/%s', PPCDLEVEL1, $obj );
-    pIn();
+    subPreamble( PPCDLEVEL1, '$$', $obj, $class );
 
     # Create & adopt the settings object
     $settings = new Parse::PlainConfig::Settings;
     $obj->adopt($settings);
     $settings->alias('settings');
 
+    # Get a list of all parent classes
+    @classes = ( _findAllClasses($class) );
+
     # Read in class global settings
     unless ( __PACKAGE__ eq $class ) {
-        pdebug( 'loading globals from %s', PPCDLEVEL2, $class );
 
-        {
-            no strict 'refs';
+        foreach $class (@classes) {
+            if ( defined *{"${class}::_globals"} ) {
+                pdebug( 'loading globals from %s', PPCDLEVEL2, $class );
 
-            %_globals = %{ *{"${class}::_globals"}{HASH} }
-                if defined *{"${class}::_globals"};
-        }
+                {
+                    no strict 'refs';
 
-        if ( scalar keys %_globals ) {
-            foreach ( keys %_globals ) {
-                pdebug( 'overriding %s with (%s)',
-                    PPCDLEVEL3, $_, $_globals{$_} );
-                $rv = 0 unless $settings->set( $_, $_globals{$_} );
-            }
-        }
-    }
-
-    # Read in class parameters
-    unless ( __PACKAGE__ eq $class ) {
-        pdebug( 'loading parameters from %s', PPCDLEVEL2, $class );
-
-        {
-            no strict 'refs';
-
-            %_parameters = %{ *{"${class}::_parameters"}{HASH} }
-                if defined *{"${class}::_parameters"};
-        }
-
-        if ( scalar keys %_parameters ) {
-            $settings->set( 'property types', %_parameters );
-            foreach ( keys %_parameters ) {
-
-                pdebug( 'creating property %s', PPCDLEVEL3, $_ );
-                unless (
-                    _declProperty(
-                        $obj,
-                        $_,
-                        CEH_PUB | (
-                            $_parameters{$_} == PPC_HDOC
-                            ? PPC_SCALAR
-                            : $_parameters{$_}
-                            ),
-                    )
-                    ) {
-                    $rv = 0;
-                    last;
+                    %new = %{ *{"${class}::_globals"}{HASH} };
                 }
 
-                # merge property regex
-                $settings->merge(
-                    'property regexes',
-                    $_,
-                    qr#(\s*)(\Q$_\E)\s*\Q@{[ $settings->delimiter ]}\E\s*(.*)#s
-                    );
+                if ( scalar keys %new ) {
+                    foreach ( keys %new ) {
+                        $_globals{$_} = $new{$_};
+                        pdebug( 'overriding %s with (%s)',
+                            PPCDLEVEL3, $_, $_globals{$_} );
+                        $rv = 0 unless $settings->set( $_, $_globals{$_} );
+                    }
+                }
+            }
+        }
+
+        foreach $class (@classes) {
+            if ( defined *{"${class}::_parameters"} ) {
+                pdebug( 'loading parameters from %s', PPCDLEVEL2, $class );
+
+                {
+                    no strict 'refs';
+
+                    %new = %{ *{"${class}::_parameters"}{HASH} };
+                }
+
+                if ( scalar keys %new ) {
+                    %_parameters = ( %_parameters, %new );
+                    $settings->set( 'property types', %_parameters );
+                    foreach ( keys %new ) {
+
+                        pdebug( 'creating property %s', PPCDLEVEL3, $_ );
+                        unless (
+                            _declProperty(
+                                $obj, $_,
+                                CEH_PUB | (
+                                    $_parameters{$_} == PPC_HDOC
+                                    ? PPC_SCALAR
+                                    : $_parameters{$_}
+                                    ),
+                            )
+                            ) {
+                            $rv = 0;
+                            last;
+                        }
+
+                        # merge property regex
+                        $settings->merge(
+                            'property regexes',
+                            $_,
+                            qr#(\s*)(\Q$_\E)\s*\Q@{[ $settings->delimiter ]}\E\s*(.*)#s
+                            );
+                    }
+                }
+            }
+
+            if ( defined *{"${class}::_prototypes"} ) {
+                pdebug( 'loading prototypes from %s', PPCDLEVEL2, $class );
+
+                {
+                    no strict 'refs';
+
+                    %new = %{ *{"${class}::_prototypes"}{HASH} };
+                }
+
+                if ( scalar keys %new ) {
+                    %_prototypes = ( %_prototypes, %new );
+                    $settings->set( 'prototypes', %_prototypes );
+                    foreach ( keys %new ) {
+
+                        # merge property meta-data
+                        $settings->merge(
+                            'prototype regexes',
+                            $_,
+                            qr#(\s*)(\Q$_\E)\s+(\S+)\s*\Q@{[ $settings->delimiter ]}\E\s*(.*)#s
+                            );
+                    }
+                }
             }
         }
     }
 
-    # Read in class prototypes
-    unless ( __PACKAGE__ eq $class ) {
-        pdebug( 'loading prototypes from %s', PPCDLEVEL2, $class );
+    # Store all parent classes
+    $settings->set( '_ppcClasses', @classes );
 
-        {
-            no strict 'refs';
-
-            %_prototypes = %{ *{"${class}::_prototypes"}{HASH} }
-                if defined *{"${class}::_prototypes"};
-        }
-
-        if ( scalar keys %_prototypes ) {
-            $settings->set( 'prototypes', %_prototypes );
-            foreach ( keys %_prototypes ) {
-
-                # merge property meta-data
-                $settings->merge(
-                    'prototype regexes',
-                    $_,
-                    qr#(\s*)(\Q$_\E)\s+(\S+)\s*\Q@{[ $settings->delimiter ]}\E\s*(.*)#s
-                    );
-            }
-        }
-    }
-
-    # Read in defaults from DATA
+    # Load the defaults
     $rv = $obj->parse( $obj->default );
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PPCDLEVEL1, $rv );
+    subPostamble( PPCDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -173,18 +220,17 @@ sub settings {
     return $obj->getByAlias('settings');
 }
 
-sub default {
+sub _default {
 
     # Purpose:  Returns the DATA block from the calling
     # Returns:  Array
-    # Usage:    @lines = $obj->_getData;
+    # Usage:    @lines = $obj->_default;
 
     my $obj   = shift;
-    my $class = ref $obj;
+    my $class = shift;
     my ( $fn, @chunk, @lines );
 
-    pdebug( 'entering', PPCDLEVEL2 );
-    pIn();
+    subPreamble( PPCDLEVEL2, '$', $obj );
 
     $class =~ s#::#/#sg;
     $class .= '.pm';
@@ -212,10 +258,32 @@ sub default {
         pseek( $fn, 0, SEEK_SET );
     }
 
-    pOut();
-    pdebug( 'leaving w/%s lines', PPCDLEVEL2, scalar @lines );
+    subPostamble( PPCDLEVEL2, '@', @lines );
 
     return wantarray ? @lines : join '', @lines;
+}
+
+sub default {
+
+    # Purpose:  Returns the DATA block from the specified class,
+    #           or the object class if not specified
+    # Returns:  Array
+    # Usage:    @lines = $obj->default;
+    # Usage:    @lines = $obj->default($class);
+
+    my $obj     = shift;
+    my @classes = $obj->getByAlias('settings')->get('_ppcClasses');
+    my ( $class, @rv );
+
+    subPreamble( PPCDLEVEL1, '$', $obj );
+
+    foreach $class (@classes) {
+        push @rv, $obj->_default($class);
+    }
+
+    subPostamble( PPCDLEVEL1, '@', @rv );
+
+    return @rv;
 }
 
 sub get {
@@ -228,8 +296,7 @@ sub get {
     my $p   = shift;
     my $valp;
 
-    pdebug( 'entering w/%s', PPCDLEVEL1, $p );
-    pIn();
+    subPreamble( PPCDLEVEL1, '$$', $obj, $p );
 
     if ( defined $p ) {
         $valp = scalar grep /^\Q$p\E$/s, $obj->properties;
@@ -238,8 +305,7 @@ sub get {
         pdebug( 'specified invalid parameter name: %s', PPCDLEVEL1, $p ) )
         unless $valp;
 
-    pOut();
-    pdebug( 'leaving', PPCDLEVEL1 );
+    subPostamble( PPCDLEVEL1, '' );
 
     return $valp ? $obj->SUPER::get($p) : undef;
 }
@@ -256,8 +322,7 @@ sub set {
     my %propTypes = $obj->settings->propertyTypes;
     my ( $valp, $rv );
 
-    pdebug( 'entering w/(%s)(%s)', PPCDLEVEL1, $p, @vals );
-    pIn();
+    subPreamble( PPCDLEVEL1, '$$@', $obj, $p, @vals );
 
     if ( defined $p ) {
         $valp = scalar grep /^\Q$p\E$/s, $obj->properties;
@@ -274,8 +339,8 @@ sub set {
         } else {
 
             # Assume that no values means empty/undef
-            if ( $propTypes{$p} == PPC_SCALAR or $propTypes{$p} == PPC_HDOC )
-            {
+            if (   $propTypes{$p} == PPC_SCALAR
+                or $propTypes{$p} == PPC_HDOC ) {
                 $rv = $obj->SUPER::set( $p, undef );
             } else {
                 $rv = $obj->empty($p);
@@ -283,8 +348,7 @@ sub set {
         }
     }
 
-    pOut();
-    pdebug( 'leaving', PPCDLEVEL1 );
+    subPostamble( PPCDLEVEL1, '$', $valp ? $rv : undef );
 
     return $valp ? $rv : undef;
 }
@@ -308,8 +372,7 @@ sub _snarfBlock (\@\$\$$) {
     my $subi       = $settings->subindentation;
     my ( $rv, $indent, $prop, $proto, $trailer, $iwidth, $line, $preg );
 
-    pdebug( 'entering', PPCDLEVEL2 );
-    pIn();
+    subPreamble( PPCDLEVEL2, '$$$$', $lref, $pref, $vref, $settings );
 
     # Match line to a property/prototype declaration
     #
@@ -371,14 +434,13 @@ sub _snarfBlock (\@\$\$$) {
                         PPCDLEVEL3, $proto, $prop );
 
                     $rv = _declProperty(
-                        $obj,
-                        $prop,
+                        $obj, $prop,
                         CEH_PUB | (
                             $prototypes{$proto} == PPC_HDOC
                             ? PPC_SCALAR
                             : $prototypes{$proto}
                             ),
-                        );
+                            );
 
                     # Record the prop type
                     if ($rv) {
@@ -462,8 +524,7 @@ sub _snarfBlock (\@\$\$$) {
         pdebug( 'extracted value for %s: %s', PPCDLEVEL3, $prop, $trailer );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PPCDLEVEL2, $rv );
+    subPostamble( PPCDLEVEL2, '$', $rv );
 
     return $rv;
 }
@@ -485,8 +546,7 @@ sub _snarfProp {
     my $rv        = 1;
     my @elements;
 
-    pdebug( 'entering w/(%s)(%s)', PPCDLEVEL2, $prop, $val );
-    pIn();
+    subPreamble( PPCDLEVEL2, '$$$', $obj, $prop, $val );
 
     if (   $propTypes{$prop} == PPC_HDOC
         or $propTypes{$prop} == PPC_SCALAR ) {
@@ -517,8 +577,7 @@ sub _snarfProp {
         $obj->SUPER::set( $prop, @elements );
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PPCDLEVEL2, $rv );
+    subPostamble( PPCDLEVEL2, '$', $rv );
 
     return $rv;
 }
@@ -537,8 +596,7 @@ sub parse {
     my $rv       = 1;
     my ( $text, $prop, $value, $glob );
 
-    pdebug( 'entering', PPCDLEVEL1 );
-    pIn();
+    subPreamble( PPCDLEVEL1, '$@', $obj, @lines );
 
     # Some preprocessing of lines
     if (@lines) {
@@ -583,8 +641,7 @@ sub parse {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PPCDLEVEL1, $rv );
+    subPostamble( PPCDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -599,8 +656,7 @@ sub read {
     my $source = shift;
     my ( $rv, @lines );
 
-    pdebug( 'entering w/%s', PPCDLEVEL1, $source );
-    pIn();
+    subPreamble( PPCDLEVEL1, '$$', $obj, $source );
 
     if (@_) {
 
@@ -641,8 +697,7 @@ sub read {
         }
     }
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PPCDLEVEL1, $rv );
+    subPostamble( PPCDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -658,8 +713,7 @@ sub reset {
     my %propTypes = $settings->propertyTypes;
     my $rv;
 
-    pdebug( 'entering', PPCDLEVEL1 );
-    pIn();
+    subPreamble( PPCDLEVEL1, '$', $obj );
 
     # empty all property values
     foreach ( keys %propTypes ) {
@@ -672,8 +726,7 @@ sub reset {
     }
     $rv = $obj->parse( $obj->default );
 
-    pOut();
-    pdebug( 'leaving w/rv: %s', PPCDLEVEL1, $rv );
+    subPostamble( PPCDLEVEL1, '$', $rv );
 
     return $rv;
 }
@@ -684,13 +737,13 @@ sub prototyped {
     #           prototypes
     # Returns:  Array
     # Usage:    @protos = $obj->prototyped;
+    # Usage:    @protos = $obj->prototyped($proto);
 
     my $obj   = shift;
     my $proto = shift;
     my ( %preg, @prval );
 
-    pdebug( 'entering w/%s', PPCDLEVEL1, $proto );
-    pIn();
+    subPreamble( PPCDLEVEL1, '$$', $obj, $proto );
 
     %preg = $obj->settings->get('prototype registry');
 
@@ -706,8 +759,7 @@ sub prototyped {
         foreach ( keys %preg ) { push @prval, @{ $preg{$_} } }
     }
 
-    pOut();
-    pdebug( 'leaving w/%s', PPCDLEVEL1, @prval );
+    subPostamble( PPCDLEVEL1, '@', @prval );
 
     return @prval;
 }
@@ -741,7 +793,7 @@ Parse::PlainConfig - Configuration file class
 
 =head1 VERSION
 
-$Id: lib/Parse/PlainConfig.pm, 3.05 2017/02/06 10:36:37 acorliss Exp $
+$Id: lib/Parse/PlainConfig.pm, 3.06 2023/09/23 19:24:20 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -930,7 +982,7 @@ each line up to the value given to B<$_globals{subindentation}>.
 =head2 %_prototypes
 
 B<%_prototypes> exist to allow for user-defined parameters that fall outside
-of the formal parameterss in B<%_parameters>.  ACLs, for instance, are often
+of the formal parameters in B<%_parameters>.  ACLs, for instance, are often
 of indeterminate number and naming, which is a perfect use-case for
 prototypes.
 
@@ -951,6 +1003,27 @@ Once parsed those ACL parameters can then be accessed simply by their unique
 token:
 
     @localnets = $config->get('localnet');
+
+=head2 NOTES ON SUBCLASSING
+
+The above section provided the rudimentaries of subclassing
+L<Parse::PlainConfig>, but this module also subclassing your config modules as
+well, including multiple inheritance.  This can allow you to have a single
+config that can consolidate multiple configurations in a single file.  There's
+only a few rules to observe:
+
+=over
+
+=item * All configs must use the same global parsing parameters
+
+=item * Each property and prototype should use be declared in one specific class
+to avoid conflicts with data types and potential defaults in the DATA block
+
+=item * Defaults from each class will be applied from the top down, and left to 
+right.  This means that the top level parent class'es data block will be
+parsed first, then each subsequent child class, and the final subclass, last.
+
+=back
 
 =head1 CONFIG FILE FORMAT RULES
 
@@ -1066,7 +1139,7 @@ empty arrays and hashes.
   $rv = $config->parse($text);
   $rv = $config->parse(@lines);
 
-This will parse and set any parameters or protoypes found in the content.  It
+This will parse and set any parameters or prototypes found in the content.  It
 will return false if any parsing errors are found (spurious text, etc.) but
 will extract everything of intelligible value it can.
 
@@ -1179,7 +1252,7 @@ L<Text::Tabs>
 =head1 DIAGNOSTICS 
 
 Through the use of B<Paranoid::Debug> this module will produce internal
-diagnostic output to STDERR.  It begins logging at log level 7.  To enable
+diagnostic output to STDERR.  It begins logging at log level 6.  To enable
 debugging output please see the pod for L<Paranoid::Debug>.
 
 =head1 BUGS AND LIMITATIONS 
@@ -1193,5 +1266,5 @@ Arthur Corliss (corliss@digitalmages.com)
 This software is licensed under the same terms as Perl, itself. 
 Please see http://dev.perl.org/licenses/ for more information.
 
-(c) 2002 - 2016, Arthur Corliss (corliss@digitalmages.com)
+(c) 2002 - 2023, Arthur Corliss (corliss@digitalmages.com)
 

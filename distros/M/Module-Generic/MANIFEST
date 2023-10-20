@@ -67,6 +67,7 @@ t/19.serialise_cbor.t
 t/20.mmap.t
 t/21.serialise_cbor_free.t
 t/22.parse_timestamp.t
+t/23.tiehash.t
 t/90.coverage.t
 t/91.signature.t
 t/99.kwalitee.t

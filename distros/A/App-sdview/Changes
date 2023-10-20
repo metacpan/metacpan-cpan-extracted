@@ -1,5 +1,15 @@
 Revision history for App-sdview
 
+0.13    2023-09-22
+        [CHANGES]
+         * Allow overriding of inline format styles in App::sdview::Style
+           config file
+         * Use format-agnostic tag names "bold", "italic", etc.. rather than
+           POD-inspired "B", "I", etc..
+         * Support Markdown's ~~strikethrough~~ format
+         * Preserve the language name in Markdown code fences
+         * Recognise and emit U<underline> formatting as a POD extension
+
 0.12    2023-08-30
         [CHANGES]
          * Neater interaction between `margin` and `indent` style keys

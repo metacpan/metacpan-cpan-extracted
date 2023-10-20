@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::As::Any::In - Package for language Assamese
 
 =cut
 
 package Locale::CLDR::Locales::As::Any::In;
-# This file auto generated from Data/common/main/as_IN.xml
-#	on Mon 11 Apr  5:23:46 pm GMT
+# This file auto generated from Data\common\main\as_IN.xml
+#	on Fri 13 Oct  9:05:48 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

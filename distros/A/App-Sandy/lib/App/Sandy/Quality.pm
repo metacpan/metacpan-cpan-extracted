@@ -5,7 +5,7 @@ use App::Sandy::Base 'class';
 
 with 'App::Sandy::Role::Counter';
 
-our $VERSION = '0.24'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 has 'quality_profile' => (
 	is         => 'ro',
@@ -174,7 +174,7 @@ App::Sandy::Quality - Class to simulate quality entries
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 AUTHORS
 

@@ -1,0 +1,39 @@
+=head1 NAME
+
+term-datamatrix - Generate terminal-based Data Matrix 2D barcodes
+
+=head1 SYNOPSIS
+
+B<term-datamatrix> [I<TEXT>]
+
+I<TEXT> is the content of the Data Matrix barcode.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --help
+
+Show a help message and exit.
+
+=item --version
+
+Show version information and exit.
+
+=back
+
+=head1 AUTHOR
+
+Dan Church E<lt>h3xx [a] gmx <d> comE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=head1 AVAILABILITY
+
+The latest version of this library is likely to be available from CPAN as well
+as:
+
+L<https://codeberg.org/h3xx/perl-Term-DataMatrix>

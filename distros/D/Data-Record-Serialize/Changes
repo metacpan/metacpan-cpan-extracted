@@ -1,3 +1,10 @@
+1.05      2023-09-26 16:36:38-04:00 America/New_York
+
+  [PACKAGING]
+
+    * Data::Record::Serialize::Encode::dbi has been moved into its own distribution.
+
+
 1.04      2022-09-06 06:18:25-04:00 America/New_York
 
     * No changes.  Promote to production.
@@ -22,7 +29,7 @@
   [TESTS]
 
     * don't check for actual value of round-tripped JSON and YAML
-      booleans, just if it's true/false.
+      booleans, just if it's true/false.  SREZIC++.
 
     * fix Americanized spelling of Types::Serialiser::Boolean
 

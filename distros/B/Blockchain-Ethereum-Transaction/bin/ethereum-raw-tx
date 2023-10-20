@@ -1,35 +1,9 @@
 #!/usr/bin/env perl
+# PODNAME: ethereum-raw-tx
+# ABSTRACT: Command line raw transaction creation and signing
 
-=head1 NAME
-
-ethereum-raw-tx
-
-=head1 SYNOPSIS
-
-ethereum-raw-tx [options]
-
-Options:
-
-    --txtype=legacy/eip1559 (Required)
-    --chain-id (Required, if not give default is 1)
-    --nonce (Required)
-    --max-fee-per-gas (Required for eip1559 transactions)
-    --max-priority-fee-per-gas (Required for eip1559 transactions)
-    --gas-price (Required for legacy transactions)
-    --gas-limit (Required)
-    --to (Optional, for contract deployment transactions)
-    --value (Optional)
-    --data (Optional)
-
-Example:
-
-    ethereum-raw-tx --tx-type=legacy --chain-id=0x1 --nonce=0x9 --gas-price=0x4A817C800 --gas-limit=0x5208 --to=0x3535353535353535353535353535353535353535 --value=0xDE0B6B3A7640000 --pk=0x4646464646464646464646464646464646464646464646464646464646464646
-
-=head1 DESCRIPTION
-
-Standalone version for decoding and encoding RLP
-
-=cut
+our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
+our $VERSION   = '0.009';          # VERSION
 
 use strict;
 use warnings;
@@ -92,3 +66,56 @@ my $key = Blockchain::Ethereum::Keystore::Key->new(
 $key->sign_transaction($tx);
 
 printf("%s\n", unpack("H*", $tx->serialize));
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ethereum-raw-tx - Command line raw transaction creation and signing
+
+=head1 VERSION
+
+version 0.009
+
+=head1 SYNOPSIS
+
+ethereum-raw-tx [options]
+
+Options:
+
+    --txtype=legacy/eip1559 (Required)
+    --chain-id (Required, if not give default is 1)
+    --nonce (Required)
+    --max-fee-per-gas (Required for eip1559 transactions)
+    --max-priority-fee-per-gas (Required for eip1559 transactions)
+    --gas-price (Required for legacy transactions)
+    --gas-limit (Required)
+    --to (Optional, for contract deployment transactions)
+    --value (Optional)
+    --data (Optional)
+
+Example:
+
+    ethereum-raw-tx --tx-type=legacy --chain-id=0x1 --nonce=0x9 --gas-price=0x4A817C800 --gas-limit=0x5208 --to=0x3535353535353535353535353535353535353535 --value=0xDE0B6B3A7640000 --pk=0x4646464646464646464646464646464646464646464646464646464646464646
+
+=head1 DESCRIPTION
+
+Standalone version for decoding and encoding RLP
+
+=head1 AUTHOR
+
+Reginaldo Costa <refeco@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023 by REFECO.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

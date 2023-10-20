@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Session;
 # ABSTRACT: Session for driving ::Graph execution
-$AI::TensorFlow::Libtensorflow::Session::VERSION = '0.0.6';
+$AI::TensorFlow::Libtensorflow::Session::VERSION = '0.0.7';
 use strict;
 use warnings;
 use namespace::autoclean;

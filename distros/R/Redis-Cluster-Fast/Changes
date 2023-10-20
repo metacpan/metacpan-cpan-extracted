@@ -1,5 +1,12 @@
 Revision history for Perl extension Redis-Cluster-Fast
 
+0.089 2023-09-26T10:49:21Z
+
+    - Fix tests.
+    - Use system libevent.
+    - Fix startup_nodes validation.
+    - Some chores.
+
 0.088 2023-04-19T17:56:38Z
 
     - Fix for future maintainability.

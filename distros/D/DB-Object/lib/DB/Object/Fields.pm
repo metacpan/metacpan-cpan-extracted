@@ -20,7 +20,7 @@ BEGIN
     use vars qw( $VERSION );
     use DB::Object::Fields::Field;
     use Devel::Confess;
-    our( $VERSION ) = 'v1.1.1';
+    our $VERSION = 'v1.1.1';
 };
 
 use strict;
@@ -30,7 +30,7 @@ sub init
 {
     my $self = shift( @_ );
     $self->{prefixed} = 0;
-    $self->{query_object} = '';
+    # Property 'query_object' not used anymore. Instead, we use table_object->query_object
     $self->{table_object} = '';
     # $self->{fatal} = 1;
     $self->{_init_strict_use_sub} = 1;
@@ -74,12 +74,15 @@ sub _initiate_field_object
     my $self = shift( @_ );
     my $field = shift( @_ ) || return( $self->error( "No field was provided to get its object." ) );
     my $class = ref( $self ) || $self;
-    my $fields = $self->table_object->fields;
-    return( $self->error( "Table ", $self->table_object->name, " has no such field \"$field\"." ) ) if( !CORE::exists( $fields->{ $field } ) );
-    # eval( "package ${class}; sub ${field} { return( shift->_set_get_object( '$field', 'DB::Object::Fields::Field', \@_ ) ); }" );
-    my $def   = $self->table_object->default;
-    my $types = $self->table_object->types;
-    my $const = $self->table_object->types_const;
+    my $tbl = $self->table_object;
+    $self->messagec( 5, "Instantiating field {green}${field}{/} object for class {green}${class}{/} and table {green}", $tbl->name, "{/} having alias of {green}", ( $tbl->as // 'undef' ), "{/} ({green}", $self->{prefixed}, "{/})" );
+    my $fields = $tbl->fields;
+    return( $self->error( "Table ", $tbl->name, " has no such field \"$field\"." ) ) if( !CORE::exists( $fields->{ $field } ) );
+    my $qo    = $tbl->query_object;
+    my $def   = $tbl->default;
+    my $types = $tbl->types;
+    my $const = $tbl->types_const;
+    my $debug = $self->debug;
     $const->{ $field }->{constant} //= q{''};
     $const->{ $field }->{name} //= '';
     $const->{ $field }->{type} //= '';
@@ -92,8 +95,8 @@ sub _initiate_field_object
     pos          => ( $fields->{ $field } // '' ),
     const        => $const->{ $field },
     prefixed     => $self->{prefixed},
-    query_object => $self->query_object,
-    table_object => $self->table_object,
+    query_object => $qo,
+    table_object => $tbl,
     };
     my $perl = <<EOT;
 package ${class};
@@ -103,14 +106,14 @@ sub ${field}
     unless( \$self->{$field} )
     {
         \$self->{$field} = DB::Object::Fields::Field->new(
-            debug => ( \$self->debug || 0 ),
+            debug => ( \$self->debug // 0 ),
             name => '$field',
             type => '$hash->{type}',
             default => '$hash->{default}',
             pos => $hash->{pos},
             constant => { constant => $hash->{const}->{constant}, name => '$hash->{const}->{name}', type => '$hash->{const}->{type}' },
             prefixed => \$self->{prefixed},
-            query_object => \$self->query_object,
+            query_object => \$self->table_object->query_object,
             table_object => \$self->table_object,
         );
     }
@@ -125,6 +128,7 @@ EOT
     return( $o );
 }
 
+# NOTE: AUTOLOAD
 AUTOLOAD
 {
     my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
@@ -132,13 +136,14 @@ AUTOLOAD
     no overloading;
     my $self = shift( @_ );
     my $fields = $self->table_object->fields;
-    # $self->debug(3);
+    $self->messagec( 5, "Called for method {green}${method}{/}" );
     if( my $code = $self->can( $method ) )
     {
         return( $code->( $self, @_ ) );
     }
     elsif( exists( $fields->{ $method } ) )
     {
+        $self->messagec( 5, "Instantiating a new field object for {green}${method}{/}" );
         return( $self->_initiate_field_object( $method ) );
     }
     else
@@ -169,7 +174,7 @@ AUTOLOAD
                 error => $exception,
                 field => $method,
             ) || die( "${error}, and I could not instantiate a new instance of the module DB::Object::Fields::Unknown: ", DB::Object::Fields::Unknown->error );
-            warn( "Table ", $self->table_object->name, " has no such field \"$method\".\n" );
+            warn( "Table ", $self->table_object->name, " has no such field \"$method\".\n" ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
             # return( $self->error( "Table ", $self->table_object->name, " has no such field \"$method\"." ) );
             #die( "Table ", $self->table_object->name, " has no such field \"$method\".\n" );
             return( $unknown );

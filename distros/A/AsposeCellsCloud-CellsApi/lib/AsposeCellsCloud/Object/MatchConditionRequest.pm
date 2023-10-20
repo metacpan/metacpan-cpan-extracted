@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Indicates the match condition that needs to be processed for the file name.',
                                   class => 'MatchConditionRequest',
                                   required => [], # TODO
 }                                 );
@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'regex_pattern' => {
      	datatype => 'string',
      	base_name => 'RegexPattern',
-     	description => '',
+     	description => 'Regex Pattern.',
      	format => '',
      	read_only => '',
      		},
      'full_match_conditions' => {
      	datatype => 'ARRAY[string]',
      	base_name => 'FullMatchConditions',
-     	description => '',
+     	description => 'Name list.',
      	format => '',
      	read_only => '',
      		},    

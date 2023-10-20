@@ -1,3 +1,4 @@
+use lib '.';
 use strict;
 use warnings;
 
@@ -33,7 +34,7 @@ test_requires 'Test::Pod' => 0;
 test_requires 'Test::Pod::Coverage' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.04';
+version '0.06';
 
 # Run.
 WriteAll();

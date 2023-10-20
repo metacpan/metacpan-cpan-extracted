@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie/Domain.pm
-## Version v0.1.3
+## Version v0.1.4
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2022/11/06
+## Modified 2023/09/19
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -21,7 +21,6 @@ BEGIN
     use Module::Generic::File qw( tempfile );
     use JSON;
     use Net::IDN::Encode ();
-    use Nice::Try;
     use Want;
     use constant URL => 'https://publicsuffix.org/list/effective_tld_names.dat';
     # Properly formed domain name according to rfc1123
@@ -41,7 +40,7 @@ BEGIN
             )*
         )
     $/x;
-    our $VERSION = 'v0.1.3';
+    our $VERSION = 'v0.1.4';
 };
 
 use strict;
@@ -139,73 +138,85 @@ sub cron_fetch
         }
     }
     
-    try
+    # try-catch
+    local $@;
+    my $resp = eval
     {
-        my $resp = $ua->get( URL, %$req_headers );
-        my $code = $resp->code;
-        my $data = $resp->decoded_content( default_charset => 'utf-8', alt_charset => 'utf-8' );
-        my $last_mod = $resp->header( 'Last-Modified' );
+        $ua->get( URL, %$req_headers );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error trying to perform an HTTP GET request to ", URL, ": $@" ) );
+    }
+    my $code = $resp->code;
+    # try-catch
+    my $data = eval
+    {
+        $resp->decoded_content( default_charset => 'utf-8', alt_charset => 'utf-8' );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error decoding response content: $@" ) );
+    }
+    my $last_mod = $resp->header( 'Last-Modified' );
 
-        my $tz;
-        # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
-        # "Cannot determine local time zone"
-        try
-        {
-            $tz = DateTime::TimeZone->new( name => 'local' );
-        }
-        catch( $e )
-        {
-            $tz = DateTime::TimeZone->new( name => 'UTC' );
-        }
-        
-        if( $last_mod )
-        {
-            $last_mod = $self->_parse_timestamp( $last_mod )->set_time_zone( $tz );
-        }
-        else
-        {
-            $last_mod = DateTime->now( time_zone => $tz );
-        }
-        my $epoch = $last_mod->epoch;
-        if( $resp->header( 'etag' ) )
-        {
-            $dont_have_etag = $resp->header( 'etag' ) eq ( $meta->{etag} // '' ) ? 0 : 1;
-            $meta->{etag} = $resp->header( 'etag' );
-            $meta->{etag} =~ s/^\"([^"]+)\"$/$1/;
-        }
-        
-        if( $code == 304 || 
-            ( !$file->is_empty && $mtime && $mtime == $epoch ) )
-        {
-            if( !$self->suffixes->length )
-            {
-                $self->load_public_suffix || return( $self->pass_error );
-            }
-            # Did not have an etag, but I do have one now
-            if( $dont_have_etag && $meta->{etag} )
-            {
-                $self->save_as_json || return( $self->pass_error );
-            }
-            return( $self );
-        }
-        elsif( $code ne 200 )
-        {
-            return( $self->error( "Failed to get the remote public domain list. Server responded with code '$code': ", $resp->as_string ) );
-        }
-        elsif( !length( $data ) )
-        {
-            return( $self->error( "Remote server returned no data." ) );
-        }
-        $file->unload_utf8( $data, { lock => 1 } ) || return( $self->error( "Unable to open public suffix data file \"$file\" in write mode: ", $file->error ) );
-        $file->unlock;
-        $file->utime( $epoch, $epoch );
-        $self->load_public_suffix || return( $self->pass_error );
-        $self->save_as_json || return( $self->pass_error );
-    }
-    catch( $e )
+    my $tz;
+    # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
+    # "Cannot determine local time zone"
+    # try-catch
+    $tz = eval
     {
-        return( $self->error( "An error occurred while trying to get the latest version of the public domain list: $e" ) );
+        DateTime::TimeZone->new( name => 'local' );
+    };
+    if( $@ )
+    {
+        $tz = DateTime::TimeZone->new( name => 'UTC' );
     }
+    
+    if( $last_mod )
+    {
+        $last_mod = $self->_parse_timestamp( $last_mod )->set_time_zone( $tz );
+    }
+    else
+    {
+        $last_mod = DateTime->now( time_zone => $tz );
+    }
+    my $epoch = $last_mod->epoch;
+    if( $resp->header( 'etag' ) )
+    {
+        $dont_have_etag = $resp->header( 'etag' ) eq ( $meta->{etag} // '' ) ? 0 : 1;
+        $meta->{etag} = $resp->header( 'etag' );
+        $meta->{etag} =~ s/^\"([^"]+)\"$/$1/;
+    }
+    
+    if( $code == 304 || 
+        ( !$file->is_empty && $mtime && $mtime == $epoch ) )
+    {
+        if( !$self->suffixes->length )
+        {
+            $self->load_public_suffix || return( $self->pass_error );
+        }
+        # Did not have an etag, but I do have one now
+        if( $dont_have_etag && $meta->{etag} )
+        {
+            $self->save_as_json || return( $self->pass_error );
+        }
+        return( $self );
+    }
+    elsif( $code ne 200 )
+    {
+        return( $self->error( "Failed to get the remote public domain list. Server responded with code '$code': ", $resp->as_string ) );
+    }
+    elsif( !length( $data ) )
+    {
+        return( $self->error( "Remote server returned no data." ) );
+    }
+    $file->unload_utf8( $data, { lock => 1 } ) || return( $self->error( "Unable to open public suffix data file \"$file\" in write mode: ", $file->error ) );
+    $file->unlock;
+    $file->utime( $epoch, $epoch );
+    $self->load_public_suffix || return( $self->pass_error );
+    $self->save_as_json || return( $self->pass_error );
+
     return( $self );
 }
 
@@ -214,14 +225,17 @@ sub decode
     my $self = shift( @_ );
     my $name = shift( @_ );
     return( '' ) if( !length( $name ) );
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         return( Net::IDN::Encode::domain_to_ascii( $name ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An unexpected error occurred while decoding a domain name: $e" ) );
+        return( $self->error( "An unexpected error occurred while decoding a domain name: $@" ) );
     }
+    return( $rv );
 }
 
 sub encode
@@ -229,14 +243,17 @@ sub encode
     my $self = shift( @_ );
     my $name = shift( @_ );
     return( '' ) if( !length( $name ) );
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         return( Net::IDN::Encode::domain_to_unicode( $name ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An unexpected error occurred while encoding a domain name: $e" ) );
+        return( $self->error( "An unexpected error occurred while encoding a domain name: $@" ) );
     }
+    return( $rv );
 }
 
 sub file { return( shift->_set_get_object_without_init( 'file', 'Module::Generic::File', @_ ) ); }
@@ -305,23 +322,25 @@ sub load_json
     my $json = $file->load_utf8;
     return( $self->error( "Unable to open the public suffix json data file in read mode: $!" ) ) if( !defined( $json ) );
     return( $self->error( "No data found from public domain json file \"$file\"." ) ) if( !CORE::length( $json ) );
-    try
+    # try-catch
+    local $@;
+    my $ref = eval
     {
         my $j = JSON->new->relaxed;
-        my $ref = $j->decode( $json );
-        if( ref( $ref->{suffixes} ) eq 'HASH' )
-        {
-            $PUBLIC_SUFFIX_DATA = $ref->{suffixes};
-            $self->suffixes( $ref->{suffixes} );
-        }
-        $ref->{meta} = {} if( ref( $ref->{meta} ) ne 'HASH' );
-        $self->meta( $ref->{metadata} );
-        return( $self );
-    }
-    catch( $e )
+        return( $j->decode( $json ) );
+    };
+    if( $@ )
     {
-        return( $self->error( "An unexpected error occurred while trying to load json data of public suffixes: $e" ) );
+        return( $self->error( "An unexpected error occurred while trying to load json data of public suffixes: $@" ) );
     }
+    if( ref( $ref->{suffixes} ) eq 'HASH' )
+    {
+        $PUBLIC_SUFFIX_DATA = $ref->{suffixes};
+        $self->suffixes( $ref->{suffixes} );
+    }
+    $ref->{meta} = {} if( ref( $ref->{meta} ) ne 'HASH' );
+    $self->meta( $ref->{metadata} );
+    return( $self );
 }
 
 sub load_public_suffix
@@ -344,36 +363,39 @@ sub load_public_suffix
     }
     $file->open( '<', { binmode => 'utf-8' }) || return( $self->error( "Unable to open the public suffix data file in read mode: ", $file->error ) );
     my $ref = {};
-    try
+    $file->line(sub
     {
-        $file->line(sub
+        my $l = shift( @_ );
+        chomp( $l );
+        $l =~ s,//.*$,,;
+        $l =~ s,[[:blank:]\h]+$,,g;
+        return(1) if( !CORE::length( $l ) );
+        my $orig;
+        if( $l !~ /^[\x00-\x7f]*$/ )
         {
-            my $l = shift( @_ );
-            chomp( $l );
-            $l =~ s,//.*$,,;
-            $l =~ s,[[:blank:]\h]+$,,g;
-            return(1) if( !CORE::length( $l ) );
-            my $orig;
-            if( $l !~ /^[\x00-\x7f]*$/ )
+            $orig = $l;
+            # try-catch
+            local $@;
+            $l = eval
             {
-                $orig = $l;
-                $l = Net::IDN::Encode::domain_to_ascii( $l );
-            }
-            my $is_neg = $l =~ s,^\!,,;
-            my @labels = split( /\./, $l );
-            my $h = $ref;
-            foreach my $label ( reverse( @labels ) )
+                Net::IDN::Encode::domain_to_ascii( $l );
+            };
+            if( $@ )
             {
-                $h = $h->{ $label } ||= {};
+                return( $self->error( "An unexpected error occurred while parsing the public suffix data file content: $@" ) );
             }
-            $h->{_is_neg} = $is_neg if( $is_neg );
-            $h->{_original} = $orig if( defined( $orig ) );
-        });
-    }
-    catch( $e )
-    {
-        return( $self->error( "An unexpected error occurred while parsing the public suffix data file content: $e" ) );
-    }
+        }
+        my $is_neg = $l =~ s,^\!,,;
+        my @labels = split( /\./, $l );
+        my $h = $ref;
+        foreach my $label ( reverse( @labels ) )
+        {
+            $h = $h->{ $label } ||= {};
+        }
+        $h->{_is_neg} = $is_neg if( $is_neg );
+        $h->{_original} = $orig if( defined( $orig ) );
+    });
+
     $file->close;
     $self->suffixes( $ref );
     $PUBLIC_SUFFIX_DATA = $ref;
@@ -395,11 +417,13 @@ sub save_as_json
     my $tz;
     # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
     # "Cannot determine local time zone"
-    try
+    # try-catch
+    local $@;
+    $tz = eval
     {
-        $tz = DateTime::TimeZone->new( name => 'local' );
-    }
-    catch( $e )
+        DateTime::TimeZone->new( name => 'local' );
+    };
+    if( $@ )
     {
         $tz = DateTime::TimeZone->new( name => 'UTC' );
     }
@@ -422,17 +446,18 @@ sub save_as_json
         suffixes => $data
     };
     my $j = JSON->new->canonical->pretty->convert_blessed;
-    try
+    # try-catch
+    my $json = eval
     {
-        my $json = $j->encode( $ref );
-        $file->unload_utf8( $json ) || 
-            return( $self->error( "Unable to write json data to file \"$file\": ", $file->error ) );
-        return( $self );
-    }
-    catch( $e )
+        $j->encode( $ref );
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to save data to json file \"$file\": $e" ) );
+        return( $self->error( "An error occurred while trying to save data to json file \"$file\": $@" ) );
     }
+    $file->unload_utf8( $json ) || 
+        return( $self->error( "Unable to write json data to file \"$file\": ", $file->error ) );
+    return( $self );
 }
 
 sub stat
@@ -635,7 +660,7 @@ Cookie::Domain - Domain Name Public Suffix Query Interface
 
 =head1 VERSION
 
-    v0.1.3
+    v0.1.4
 
 =head1 DESCRIPTION
 
@@ -661,27 +686,27 @@ This initiates the package and take the following parameters either as an hash o
 
 =over 4
 
-=item I<debug>
+=item * C<debug>
 
 Optional. If set with a positive integer, this will activate verbose debugging message
 
-=item I<file>
+=item * C<file>
 
 Specify the location of the Public Suffix data file. The default one is under the same directory as this module with the file name C<public_suffix_list.txt>
 
 You can download a different (new) version and specify with this parameter where it will be found.
 
-=item I<json_file>
+=item * C<json_file>
 
 Specify the location of the json cache data file. The default location is set using L<Module::Generic::File> to get the system temporary directory and the file name C<public_suffix.json>.
 
 This json file is created once upon initiating an object and if it does not already exist. See the L</json_file> method for more information.
 
-=item I<min_suffix>
+=item * C<min_suffix>
 
 Sets the minimum suffix length required. Default to 0.
 
-=item I<no_load>
+=item * C<no_load>
 
 If this is set to true, this will prevent the object instantiation method from loading the public suffix file upon object instantiation. Normally you would not want to do that, unless you want to control when the file is loaded before you call L</stat>. This is primarily used by L</cron_fetch>
 

@@ -53,9 +53,9 @@
          "web" : "http://github.com/dod38fr/config-model-lcdproc"
       }
    },
-   "version" : "2.054",
+   "version" : "2.055",
    "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "LGPL-2.1"
 }
 

@@ -9,7 +9,7 @@ use Carp;
 
 # The following must be on the same line to ensure that $VERSION is read
 # correctly by PAUSE and installer tools. See docu of 'version'.
-use version 0.77; our $VERSION = version->declare("v2.2.6");
+use version 0.77; our $VERSION = version->declare("v2.3.0");
 
 
 sub new {
@@ -198,6 +198,19 @@ sub _parse_header_f {
 }
 
 
+
+#
+# _ret_hash(HASHREF [, BOOL])
+#
+# Returns a duplicate of HASHREF if BOOL is true. Otherwise return HASHREF.
+#
+sub _ret_hash {
+  return undef if !$_[0];
+  return $_[1] ? {%{$_[0]}} : $_[0];
+}
+
+
+
 my $_parse_row = sub {
   my $self = shift;
   my $row = shift;
@@ -368,10 +381,43 @@ sub get {
 sub inc         {croak("Unexpected argument(s)") if @_ > 1; $_[0]->{inc};}
 sub noinc       {croak("Unexpected argument(s)") if @_ > 1; $_[0]->{noinc};}
 sub prespec     {croak("Unexpected argument(s)") if @_ > 1; $_[0]->{prespec};}
-sub elems       {croak("Unexpected argument(s)") if @_ > 1; $_[0]->{elems};}
-sub elem_ids    {croak("Unexpected argument(s)") if @_ > 1; $_[0]->{elem_ids};}
-sub tab_elems   {croak("Unexpected argument(s)") if @_ > 1; $_[0]->{tab_elems};}
-sub eq_ids      {croak("Unexpected argument(s)") if @_ > 1; $_[0]->{eq_ids};}
+
+
+sub elems {
+  croak("Unexpected argument(s)") if @_ > 2;
+
+  if ($_[1]) {
+    return defined($_[0]->{elems}) ? [@{$_[0]->{elems}}] : undef;
+  } else {
+    return $_[0]->{elems};
+  }
+}
+
+
+sub elem_ids {
+  croak("Unexpected argument(s)") if @_ > 2;
+  _ret_hash($_[0]->{elem_ids}, $_[1]);
+}
+
+
+sub tab_elems {
+  croak("Unexpected argument(s)") if @_ > 2;
+  _ret_hash($_[0]->{tab_elems}, $_[1]);
+}
+
+
+ #hash of array refs
+sub eq_ids {
+  croak("Unexpected argument(s)") if @_ > 2;
+
+  my ($self, $dup) = @_;
+  if ($dup) {
+    return undef if !$self->{eq_ids};
+    return {map {$_ => [@{$self->{eq_ids}{$_}}]} keys(%{$self->{eq_ids}})};
+  } else {
+    return $self->{eq_ids};
+  }
+}
 
 
 sub matrix {
@@ -379,10 +425,19 @@ sub matrix {
   croak("Odd number of arguments") if @_ % 2;
   my %args = @_;
   my $bless = delete $args{bless};
+  my $dup   = delete $args{dup};
   croak("Unexpected argument(s)") if %args;
   return if !$self->{matrix};
-  bless($self->{matrix}, "Text::Table::Read::RelationOn::Tiny::_Relation_Matrix") if $bless;
-  return $self->{matrix};
+  my $matrix;
+  if ($dup) {
+    while (my ($key, $value) = each(%{$self->{matrix}})) {
+      $matrix->{$key} = {%$value}
+    }
+  } else {
+    $matrix = $self->{matrix};
+  }
+  bless($matrix, "Text::Table::Read::RelationOn::Tiny::_Relation_Matrix") if $bless;
+  return $matrix;
 }
 
 
@@ -429,7 +484,7 @@ Text::Table::Read::RelationOn::Tiny - Read binary "relation on (over) a set" fro
 
 =head1 VERSION
 
-Version v2.2.6
+Version v2.3.0
 
 
 =head1 SYNOPSIS
@@ -648,7 +703,7 @@ The method reads and parses a table. It takes the following named arguments:
 =item C<src>
 
 Mandatory. The source from which the table is to be read. May be either a file
-name, an array reference or a string containing newline characters. 
+name, an array reference or a string containing newline characters.
 
 =over
 
@@ -673,6 +728,9 @@ that file.
 Optional. Takes a boolean value. If I<true>, then rows and columns need not to
 be equal and may contain a subset of the relation's base set only. This way
 you can omit rows and columns not containing any incidences.
+
+Default is I<false>.
+
 
 =item C<pedantic>
 
@@ -790,38 +848,47 @@ Returns 1 (true) if you specified constructor argument C<set> when calling the
 constructor, otherwise it returns an empty string (false).
 
 
-=head3 C<elems>
+=head3 C<elems [I<DUP>]>
 
 Returns a reference to the array of elements (names from the table's header
 line), or C<undef> if you did neither call C<get> for the current object nor
 specified option C<set> when calling the constructor. See description of
 C<get> and C<new>.
 
-B<Note>: This returns a reference to an internal member, so don't change the
-content!
+If optinal scalar argument I<DUP> has a true value, then a reference to a
+clone of this array is returned. Default is false.
+
+B<Note>: Without passing a true value via I<DUP> this returns a reference to
+an internal member, so don't change the content in this case!
 
 
-=head3 C<elem_ids>
+=head3 C<elem_ids [I<DUP>]>
 
 Returns a reference to a hash mapping elements to ids (indices in array
 returned by C<elems>), or C<undef> if you did neither call C<get> for the
 current object nor specified argument C<set> when calling the constructor.
 
-B<Note>: This returns a reference to an internal member, so don't change the
-content!
+If optinal scalar argument I<DUP> has a true value, then a reference to a
+clone of this hash is returned. Default is false.
+
+B<Note>: Without passing a true value via I<DUP> this returns a reference to
+an internal member, so don't change the content in this case!
 
 
-=head3 C<tab_elems>
+=head3 C<tab_elems [I<DUP>]>
 
 Returns a reference to a hash whose keys are the elements that may appear in
 the table. If you did not specify equivalent elements (see description of
 C<new>), then the contents of this hash is identical with C<elem_ids>.
 
-B<Note>: This returns a reference to an internal member, so do not change the
-contents!
+If optinal scalar argument I<DUP> has a true value, then a reference to a
+clone of this hash is returned. Default is false.
+
+B<Note>: Without passing a true value via I<DUP> this returns a reference to
+an internal member, so don't change the content in this case!
 
 
-=head3 C<eq_ids>
+=head3 C<eq_ids [I<DUP>]>
 
 Returns a reference to a hash. If you specified equivalent elements (see
 description of C<new>), then the keys are the indices (see C<elem_ids> and
@@ -832,8 +899,11 @@ If you did not specify equivalent elements, the this method return C<undef>
 after the constructor call, but the first call to C<get> sets it to an empty
 hash.
 
-B<Note>: This returns a reference to an internal member, so don't change the
-content!
+If optinal scalar argument I<DUP> has a true value, then a reference to a
+clone of this hash is returned. Default is false.
+
+B<Note>: Without passing a true value via I<DUP> this returns a reference to
+an internal member, so don't change the content in this case!
 
 
 =head3 C<matrix>
@@ -842,8 +912,13 @@ Returns the incidence matrix (reference to a hash of hashes) produced by the
 most recent call of C<get>, or C<undef> if you did not yet call C<get> for the
 current object. See description of C<get>.
 
-It takes a single optional boolean named argument C<bless>. If true, then the
-matrix is blessed with
+This method takes the following optional named scalar arguments:
+
+=over
+
+=item C<bless>
+
+Boolean. If true, then the matrix is blessed with
 C<Text::Table::Read::RelationOn::Tiny::_Relation_Matrix> Then you can use the
 matrix as an object having exactly one method named C<related>. This method
 again takes two arguments (integers) and check if these are related with
@@ -857,8 +932,17 @@ Example:
     # ...
   }
 
-B<Note>: This returns a reference to an internal member, so don't change the
-content!
+Default is false.
+
+=item C<dup>
+
+Boolean. If this has a true value, then a reference to a clone of the matrix
+is returned. Default is false.
+
+=back
+
+B<Note>: Without setting I<dup> to true this returns a reference to an
+internal member, so don't change the content!
 
 
 =head3 C<matrix_named>

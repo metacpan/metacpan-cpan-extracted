@@ -40,7 +40,7 @@ foreach my $version (3,4,6,7) {
 foreach my $version ('a', 2, 'foo') {
   like(
     exception { Test::JSON::Schema::Acceptance->new($version) },
-    qr/test_dir does not exist: .*draft$version/,
+    qr/Value "draft$version" did not pass type constraint/,
     'does not accept version = '.$version,
   );
 }

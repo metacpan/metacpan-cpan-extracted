@@ -1,6 +1,6 @@
 package App::Oozie::Role::NameNode;
-$App::Oozie::Role::NameNode::VERSION = '0.006';
-use 5.010;
+$App::Oozie::Role::NameNode::VERSION = '0.010';
+use 5.014;
 use strict;
 use warnings;
 use namespace::autoclean -except => [qw/_options_data _options_config/];
@@ -52,7 +52,7 @@ App::Oozie::Role::NameNode
 
 =head1 VERSION
 
-version 0.006
+version 0.010
 
 =head1 SYNOPSIS
 

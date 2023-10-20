@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.028, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,9 +19,8 @@ name: Task-BeLike-PERLANCAR-Used
 provides:
   Task::BeLike::PERLANCAR::Used:
     file: lib/Task/BeLike/PERLANCAR/Used.pm
-    version: '0.002'
+    version: '0.003'
 requires:
-  Acme::CM::Get: '0'
   Acme::CPAN::Testers::DevelCheckOS: '0'
   Acme::CPANAuthors::CPAN::MostScripts: '0'
   Acme::CPANAuthors::CPAN::TopDepended: '0'
@@ -51,6 +50,7 @@ requires:
   Acme::CPANModules::ConvertingRadix: '0'
   Acme::CPANModules::ConvertingToRegex: '0'
   Acme::CPANModules::CreatingPaletteOfVisuallyDistinctColors: '0'
+  Acme::CPANModules::CryptingPassword: '0'
   Acme::CPANModules::CryptoExchange::API: '0'
   Acme::CPANModules::CustomCPAN: '0'
   Acme::CPANModules::DataStructureWalker: '0'
@@ -80,6 +80,7 @@ requires:
   Acme::CPANModules::ListsOfWordsAndNames: '0'
   Acme::CPANModules::LocalCPANIndex: '0'
   Acme::CPANModules::LocalCPANMirror: '0'
+  Acme::CPANModules::MIMETypes: '0'
   Acme::CPANModules::MagicVariableTechnique: '0'
   Acme::CPANModules::ManagingMultipleRepositories: '0'
   Acme::CPANModules::MockModules: '0'
@@ -99,8 +100,10 @@ requires:
   Acme::CPANModules::PERLANCAR::Dummy: '0'
   Acme::CPANModules::PERLANCAR::Forked: '0'
   Acme::CPANModules::PERLANCAR::InfoFromCPANTesters: '0'
+  Acme::CPANModules::PERLANCAR::PluginSystem: '0'
   Acme::CPANModules::PERLANCAR::RsyncEnhancements: '0'
   Acme::CPANModules::PERLANCAR::Temp::Plus: '0'
+  Acme::CPANModules::PERLANCAR::Unused: '0'
   Acme::CPANModules::Parse::HumanDate: '0'
   Acme::CPANModules::Parse::UnixCommands: '0'
   Acme::CPANModules::Parse::UnixConfigs: '0'
@@ -187,10 +190,13 @@ requires:
   Acme::CPANRatings: '0'
   Acme::ID::CompanyName: '0'
   Acme::LastWords: '0'
+  Acme::MetaSyntactic::3rd_rock: '0'
   Acme::MetaSyntactic::WordList: '0'
   Acme::MetaSyntactic::boboiboy: '0'
+  Acme::MetaSyntactic::breaking_bad: '0'
   Acme::MetaSyntactic::chinese_zodiac: '0'
   Acme::MetaSyntactic::christmas: '0'
+  Acme::MetaSyntactic::corner_gas: '0'
   Acme::MetaSyntactic::countries: '0'
   Acme::MetaSyntactic::dangdut: '0'
   Acme::MetaSyntactic::display_resolution: '0'
@@ -202,8 +208,25 @@ requires:
   Acme::MetaSyntactic::metal_heroes: '0'
   Acme::MetaSyntactic::newsradio: '0'
   Acme::MetaSyntactic::ozark: '0'
+  Acme::MetaSyntactic::schitts_creek: '0'
   Acme::MetaSyntactic::seinfeld: '0'
   Acme::MetaSyntactic::unyil: '0'
+  Acme::PERLANCAR::Dummy: '0'
+  Acme::PERLANCAR::Dummy::POD: '0'
+  Acme::PERLANCAR::DumpImportArgs: '0'
+  Acme::PERLANCAR::Prime: '0'
+  Acme::PERLANCAR::Test::Dependency::One: '0'
+  Acme::PERLANCAR::Test::Dependency::Three: '0'
+  Acme::PERLANCAR::Test::Dependency::Two: '0'
+  Acme::PERLANCAR::Test::Images: '0'
+  Acme::PERLANCAR::Test::MetaCPAN::HTML: '0'
+  Acme::PERLANCAR::Test::Misc: '0'
+  Acme::PERLANCAR::Test::SameRelease: '0'
+  Acme::PERLANCAR::Test::Versioning: '0'
+  Acme::Test::LocaleTextDomain: '0'
+  Acme::Test::LocaleTextDomainIfEnv: '0'
+  Acme::Test::LocaleTextDomainUTF8IfEnv: '0'
+  Acme::Test::crypt: '0'
   Algorithm::Backoff: '0.006'
   Algorithm::History::Levels: '0'
   Android::Releases: '0'
@@ -269,6 +292,7 @@ requires:
   App::CryptoCurrencyUtils: '0'
   App::DAVThis: '0'
   App::DBIUtils: '0'
+  App::DGIPUtils: '0'
   App::DNSZoneUtils: '0'
   App::DataDirUtils: '0'
   App::DataPackUtils: '0'
@@ -908,6 +932,8 @@ requires:
   Bencher::Scenarios::Data::CSel::WrapStruct: '0'
   Bencher::Scenarios::Data::Dmp: '0'
   Bencher::Scenarios::Data::ModeMerge: '0'
+  Bencher::Scenarios::Data::Sah: '0'
+  Bencher::Scenarios::Data::Sah::Resolve: '0'
   Bencher::Scenarios::Data::Walk::More: '0'
   Bencher::Scenarios::DataCSel: '0'
   Bencher::Scenarios::DataCSelWrapStruct: '0'
@@ -920,6 +946,9 @@ requires:
   Bencher::Scenarios::DataSahResolve: '0'
   Bencher::Scenarios::DataSahVSTypeTiny: '0'
   Bencher::Scenarios::DateModules: '0'
+  Bencher::Scenarios::DateTime::Format::Duration::ISO8601: '0'
+  Bencher::Scenarios::DateTime::Format::ISO8601: '0'
+  Bencher::Scenarios::DateTime::Format::ISO8601::Format: '0'
   Bencher::Scenarios::DateTimeFormatAlami: '0'
   Bencher::Scenarios::DateTimeFormatDurationISO8601: '0'
   Bencher::Scenarios::DateTimeFormatISO8601: '0'
@@ -1430,7 +1459,7 @@ requires:
   File::Temp::Patch::VarOptions: '0'
   File::Temp::VarOptions: '0'
   File::Trash::EmptyFiles::Undoable: '0'
-  File::Trash::FreeDesktop: '0'
+  File::Trash::FreeDesktop: '0.204'
   File::Trash::Undoable: '0.230'
   File::Truncate::Undoable: '0'
   File::Unsaved: '0'
@@ -1480,6 +1509,7 @@ requires:
   Games::Word::Phraselist::Proverb::TWW: '0'
   Gen::Test::Rinci::FuncResult: '0'
   Generic::ColorTheme::Kuler: '0'
+  Gepok: '0'
   Getopt::Long::Any: '0'
   Getopt::Long::Complete: '0'
   Getopt::Long::Descriptive::Dump: '0'
@@ -1760,6 +1790,7 @@ requires:
   Package::Util::Lite: '0'
   Params::Sah: '0.071'
   Parse::CommandLine::Regexp: '0'
+  Parse::Date::Month::EN: '0'
   Parse::Date::Month::ID: '0'
   Parse::FireDiamond: '0.004'
   Parse::Hosts: '0'
@@ -1820,7 +1851,7 @@ requires:
   Perinci::CmdLineX::CommonOptions::SelfUpgrade: '0.003'
   Perinci::Declare: '0'
   Perinci::Easy: '0'
-  Perinci::Examples: '0.822'
+  Perinci::Examples: '0.824'
   Perinci::Examples::Bin::Any: '0'
   Perinci::Examples::Bin::Any::ArgsAs: '0'
   Perinci::Examples::Bin::Any::Completion: '0'
@@ -1925,6 +1956,7 @@ requires:
   Permute::Named::Iter: '0'
   Pipe::Find: '0'
   Plack::App::dbi2http: '0'
+  Plugin::System: '0'
   Pod::Cookbook: '0'
   Pod::Elide: '0.003'
   Pod::From::Acme::CPANModules: '0.012'
@@ -2090,6 +2122,7 @@ requires:
   Sah::Schemas::CPAN: '0'
   Sah::Schemas::CPANMeta: '0'
   Sah::Schemas::CPANModules: '0'
+  Sah::Schemas::Calendar::Dates: '0'
   Sah::Schemas::Chrome: '0'
   Sah::Schemas::Collection: '0'
   Sah::Schemas::Color: '0'
@@ -2219,10 +2252,14 @@ requires:
   TOML::Examples: '0'
   TSV::Examples: '0'
   TableData: v0.2.0
+  TableData::Acme::CPANAuthors: '0'
+  TableData::Acme::CPANModules: '0'
+  TableData::Calendar::Date::Holiday::ID: '0'
   TableData::Locale::US::State: '0'
   TableData::Perl::CPAN::Release::Static::2022: '0'
   TableData::Quote::JamesFT: '0'
   TableData::Size::DisplayResolution: '0'
+  TableData::Size::Mattress: '0'
   TableDataBundle::Business::ID::BBIA: '0'
   TableDataBundle::Business::ID::BPOM: '0'
   TableDataBundle::Business::ID::DGIP: '0'
@@ -2482,15 +2519,19 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Task-BeLike-PERLANCAR-Used
   homepage: https://metacpan.org/release/Task-BeLike-PERLANCAR-Used
   repository: git://github.com/perlancar/perl-Task-BeLike-PERLANCAR-Used.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
-    version: '5.034000'
+    version: '5.038000'
   plugins:
     -
       class: Dist::Zilla::Plugin::InsertCodeOutput
       name: InsertCodeOutput
       version: '0.045'
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: 'PruneFiles additional'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR::Task/@Filter/PERLANCAR::CheckPendingRelease'
@@ -2507,54 +2548,54 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/GatherDir'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/PruneCruft'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/ManifestSkip'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/MetaYAML'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/License'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/ExtraTests'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/ExecDir'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/ShareDir'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/MakeMaker'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/Manifest'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::PERLANCAR::Task/@Filter/@Filter/ConfirmRelease'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR::Task/@Filter/ExecDir script'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR::Task/@Filter/PERLANCAR::BeforeBuild'
@@ -2616,15 +2657,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR::Task/@Filter/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR::Task/@Filter/MetaJSON'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::PERLANCAR::Task/@Filter/MetaConfig'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -2633,13 +2674,13 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Author::PERLANCAR::Task/@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.028'
+              version: '6.030'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
-          inherit_missing: '1'
-          inherit_version: '1'
-          meta_noindex: '1'
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000037'
           version: '0.006'
@@ -2664,7 +2705,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: '@Author::PERLANCAR::Task/@Filter/PruneFiles'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Pod2Readme
       name: '@Author::PERLANCAR::Task/@Filter/Pod2Readme'
@@ -2689,7 +2730,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
-          bail_out_on_fail: '0'
+          bail_out_on_fail: 0
           fail_on_warning: author
           fake_home: 0
           filename: t/00-compile.t
@@ -2728,7 +2769,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Acme::CPANModules::Blacklist
       name: '@Author::PERLANCAR::Task/@Filter/Acme::CPANModules::Blacklist'
-      version: '0.001'
+      version: '0.002'
     -
       class: Dist::Zilla::Plugin::Prereqs::EnsureVersion
       name: '@Author::PERLANCAR::Task/@Filter/Prereqs::EnsureVersion'
@@ -2740,7 +2781,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TaskWeaver
       name: '@Author::PERLANCAR::Task/TaskWeaver'
-      version: '0.101628'
+      version: '0.101629'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -2748,58 +2789,58 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.028'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Author::PERLANCAR::Task/@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.028'
+      version: '6.030'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: '0'
-    version: '6.028'
+      is_trial: 0
+    version: '6.030'
 x_authority: cpan:PERLANCAR
-x_generated_by_perl: v5.34.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.24';
 
 # import params is just one 'no-unicode-escape-permanently'
 # if set, then unicode escaping will not happen at
@@ -16,7 +16,14 @@ our $VERSION = '0.18';
 use Encode qw/encode_utf8 decode_utf8/;
 use JSON qw/decode_json encode_json/;
 use Unicode::Escape qw/escape unescape/;
-use YAML;
+# YAML v1.30 fails for {"\"aaa'bbb" => "aaa","bbb" => 1,}
+# while YAML::PP and YAML::XS both succeed
+# YAML::PP is less restrictive so using this
+#use YAML;
+use YAML::PP qw/Load Dump/;
+# this also works with tricky cases but needs compilation
+# on M$ systems and that can be tricky :(
+#use YAML::XS;
 use Data::Dumper qw/Dumper/;
 use Data::Dump qw/pp/;
 use Data::Dump::Filtered;
@@ -125,25 +132,31 @@ sub	perl2json {
 		? $params->{'escape-unicode'} : 0
 	;
 	my $json_string;
+	# below we check $json_string after each time it is set because of eval{} and
+	# don't want to loose $@
 	if( $escape_unicode ){
 		if( $pretty_printing ){
-			$json_string = JSON->new->utf8(1)->pretty->encode($pv);
+			$json_string = eval { JSON->new->utf8(1)->pretty->encode($pv) };
+			if( $@ || ! defined($json_string) ){ warn "error, call to ".'JSON->new->utf8(1)->pretty->encode()'." has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
 		} else { $json_string = JSON->new->utf8(1)->encode($pv) }
 		if ( _has_utf8($json_string) ){
 			$json_string = Unicode::Escape::escape($json_string, 'utf8');
+			if( ! defined($json_string) ){ warn "error, call to ".'Unicode::Escape::escape()'." has failed."; return undef }
 		}
 	} else {
 		if( $pretty_printing ){
-			$json_string = JSON->new->utf8(0)->pretty->encode($pv);
+			$json_string = eval { JSON->new->utf8(0)->pretty->encode($pv) };
+			if( $@ || ! defined($json_string) ){ warn "error, call to ".'JSON->new->utf8(0)->pretty->encode()'." has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
 		} else {
 # cpan testers report:
 # https://www.cpantesters.org/cpan/report/1fba88ee-6bfa-1014-8b5d-8080f52666f1
 # cannot encode reference to scalar at C:\strawberry163\cpan\build\Data-Roundtrip-0.11-0\blib\lib/Data/Roundtrip.pm line 138.
-# following is line 138:
-			$json_string = JSON->new->utf8(0)->encode($pv);
+# following was line 138:
+			$json_string = eval { JSON->new->utf8(0)->encode($pv) };
+			if( $@ || ! defined($json_string) ){ warn "error, call to ".'JSON->new->utf8(0)->encode()'." has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
 		}
 	}
-	if( ! $json_string ){ warn "perl2json() : error, no json produced from perl variable"; return undef }
+	# succeeded here
 	return $json_string
 }
 sub	perl2yaml {
@@ -162,14 +175,14 @@ sub	perl2yaml {
 	if( $escape_unicode ){
 		#if( $pretty_printing ){
 			# it's here just for historic purposes, this is not supported and a warning is issued
-			#$yaml_string = eval { YAML::Dump($pv) };
-			#if( $@ ){ warn "error, call to ".'YAML::Dump()'." has failed with this exception:\n".$@; return undef }
+			#$yaml_string = eval { YAML::PP::Dump($pv) };
+			#if( $@ ){ warn "error, call to ".'YAML::PP::Dump()'." has failed with this exception:\n".$@; return undef }
 			# this does not work :( no pretty printing for yaml
 			#$yaml_string = Data::Format::Pretty::YAML::format_pretty($pv);
 		#} else {
 			# intercepting a die by wrapping in an eval
-			$yaml_string = eval { YAML::Dump($pv) };
-			if( $@ || ! defined($yaml_string) ){ warn "error, call to ".'YAML::Dump()'." has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
+			$yaml_string = eval { YAML::PP::Dump($pv) };
+			if( $@ || ! defined($yaml_string) ){ warn "error, call to ".'YAML::PP::Dump()'." has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
 		#}
 		if( ! $yaml_string ){ warn "perl2yaml() : error, no yaml produced from perl variable"; return undef }
 		if( _has_utf8($yaml_string) ){
@@ -181,8 +194,8 @@ sub	perl2yaml {
 			# it's here just for historic purposes, this is not supported and a warning is issued
 			#$yaml_string = Data::Format::Pretty::YAML::format_pretty($pv);
 		#} else {
-			$yaml_string = YAML::Dump($pv);
-			if( $@ || ! defined($yaml_string) ){ warn "error, call to ".'YAML::Dump()'." has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
+			$yaml_string = eval { YAML::PP::Dump($pv) };
+			if( $@ || ! defined($yaml_string) ){ warn "error, call to ".'YAML::PP::Dump()'." has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
 		#}
 		if( ! $yaml_string ){ warn "perl2yaml() : error, no yaml produced from perl variable"; return undef }
 	}
@@ -192,8 +205,12 @@ sub	yaml2perl {
 	my $yaml_string = $_[0];
 	#my $params = defined($_[1]) ? $_[1] : {};
 	# intercepting a die by wrapping in an eval
-	my $pv = eval { YAML::Load($yaml_string) };
-	if( $@ || ! defined($pv) ){ warn "yaml2perl() : error, call to YAML::Load() has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
+	# Untainting YAML::PP string input because of a bug that causes it to bomb
+	# see https://perlmonks.org/?node_id=11154911
+	# untaint recipe by ysth, see https://www.perlmonks.org/?node_id=516862
+	($yaml_string) = each %{{$yaml_string,0}};
+	my $pv = eval { YAML::PP::Load($yaml_string) };
+	if( $@ || ! defined($pv) ){ warn "yaml2perl() : error, call to YAML::PP::Load() has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
 	return $pv
 }
 sub	yamlfile2perl {
@@ -617,7 +634,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 =head1 VERSION
 
-Version 0.18
+Version 0.24
 
 =head1 SYNOPSIS
 
@@ -693,6 +710,13 @@ format (not spaces, indendation or line breaks).
     # have its unicode content escaped:
     my $json_with_unicode_escaped =
           json2json($jsonstr, {'escape-unicode'=>1});
+
+    # With version 0.18 and up two more exported-on-demand
+    # subs were added to read JSON or YAML directly from a file:
+    # jsonfile2perl() and yamlfile2perl()
+    my $perldata = jsonfile2perl("file.json");
+    my $perldata = yamlfile2perl("file.yaml");
+    die "failed" unless defined $perldata;
 
     # For some of the above functions there exist command-line scripts:
     perl2json.pl -i "perl-data-structure.pl" -o "output.json" --pretty
@@ -929,7 +953,7 @@ Return value:
 
 Given an input C<$yamlstring> as a string, it will return
 the equivalent Perl data structure using
-C<YAML::Load($yamlstring)>
+C<YAML::PP::Load($yamlstring)>
 
 Returns the Perl data structure on success or C<undef> on failure.
 
@@ -1424,7 +1448,7 @@ C<json2perl.pl>, C<perl2json.pl>, C<yaml2perl.pl>
 
 =head1 CAVEATS
 
-A valid Perl variable may kill L<YAML::Load> because
+A valid Perl variable may kill L<YAML::PP::Load> because
 of escapes and quotes. For example this:
 
     my $yamlstr = <<'EOS';
@@ -1432,7 +1456,7 @@ of escapes and quotes. For example this:
     - 682224
     - "\"w": 1
     EOS
-    my $pv = eval { YAML::Load($yamlstr) };
+    my $pv = eval { YAML::PP::Load($yamlstr) };
     if( $@ ){ die "failed(1): ". $@ }
     # it's dead
 
@@ -1445,7 +1469,7 @@ Strangely, there is no problem for this:
     EOS
     # this is OK also:
     # - \"w: 1
-    my $pv = eval { YAML::Load($yamlstr) };
+    my $pv = eval { YAML::PP::Load($yamlstr) };
     if( $@ ){ die "failed(1): ". $@ }
     # it's OK! still alive.
 

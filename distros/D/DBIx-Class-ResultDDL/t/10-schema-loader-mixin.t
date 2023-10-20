@@ -146,6 +146,7 @@ PL
 	table 'artist';
 	col name => varchar(100);
 	primary_key 'name';
+	
 	has_many albums => { name => 'Album.artist_name' }, dbic_cascade(0);
 PL
 	verify_contains_lines( $album_src, <<'PL', 'Result::Album.pm' ) or diag "Unexpected sourcecode:\n$album_src";
@@ -154,6 +155,7 @@ PL
 	col album_name   => varchar(255);
 	col release_date => datetime;
 	primary_key 'artist_name', 'album_name';
+	
 	belongs_to artist_name => { artist_name => 'Artist.name' }, ddl_cascade, is_deferrable => 1;
 PL
 };

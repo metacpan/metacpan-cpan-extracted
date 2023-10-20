@@ -26,5 +26,5 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-List-Unique-DeterministicOrder/issues/
   repository: https://github.com/shawnlaffan/perl-List-Unique-DeterministicOrder
-version: 0.003
+version: 0.004
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

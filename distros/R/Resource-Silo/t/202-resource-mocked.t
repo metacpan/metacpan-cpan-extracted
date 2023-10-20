@@ -26,7 +26,7 @@ throws_ok {
 } qr(Foo unimplemented), 'missing resource = no go';
 
 lives_and {
-    my $inst = My::Project->silo->new(foo => 41);
+    my $inst = (ref My::Project->silo)->new(foo => 41);
     is $inst->bar, 42, 'supplied resource = works';
 };
 

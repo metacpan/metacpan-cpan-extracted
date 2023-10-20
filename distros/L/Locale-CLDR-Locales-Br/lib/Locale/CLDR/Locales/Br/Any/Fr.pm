@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Br::Any::Fr - Package for language Breton
 
 =cut
 
 package Locale::CLDR::Locales::Br::Any::Fr;
-# This file auto generated from Data/common/main/br_FR.xml
-#	on Mon 11 Apr  5:24:44 pm GMT
+# This file auto generated from Data\common\main\br_FR.xml
+#	on Fri 13 Oct  9:08:03 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

@@ -1,3 +1,18 @@
+0.06 2023-10-19T10:59:23+02:00
+ - Fix typo in doc.
+ - Improve SYNOPSIS section in doc.
+ - Rename example files to better names.
+ - Rewrite doc to use =head2.
+
+0.05 2023-10-15T17:00:40+02:00
+ - Fix INFO file.
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Move bugtracker to github.
+ - Update Module::Install to 1.21 version.
+ - Update author name.
+ - Update copyright years.
+ - Update github author name.
+
 0.04 2015-10-13T15:29:21+02:00
  - Add PYX::Sort to SEE ALSO section in doc.
  - Fix dependencies.

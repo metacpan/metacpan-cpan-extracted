@@ -276,6 +276,7 @@ sub set_options {
                 my $prompt = 'Extend Tables Menu:';
                 my $sub_menu = [
                     [ 'm_derived',   "- Add Derived",     [ $no, $yes ] ],
+                    [ 'm_cte',       "- Add CTE",         [ $no, $yes ] ],
                     [ 'join',        "- Add Join",        [ $no, $yes ] ],
                     [ 'union',       "- Add Union",       [ $no, $yes ] ],
                     [ 'db_settings', "- Add DB settings", [ $no, $yes ] ],
@@ -286,13 +287,15 @@ sub set_options {
                 my $prompt = 'Extend Join Menu:';
                 my $sub_menu = [
                     [ 'j_derived', "- Add Derived", [ $no, $yes ] ],
+                    [ 'j_cte',     "- Add CTE",     [ $no, $yes ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_e_union' ) {
                 my $prompt = 'Extend Union Menu:';
                 my $sub_menu = [
-                    [ 'u_derived',     "- Derived",     [ $no, $yes ] ],
+                    [ 'u_derived',     "- Add Derived", [ $no, $yes ] ],
+                    [ 'u_cte',         "- Add CTE",     [ $no, $yes ] ],
                     [ 'u_where',       "- Where",       [ $no, $yes ] ],
                     [ 'u_parentheses', "- Parentheses", [ $no, $yes ] ],
                 ];
@@ -301,8 +304,9 @@ sub set_options {
             elsif ( $opt eq '_e_expressions' ) {
                 my $prompt = 'Extended expressions:';
                 my $sub_menu = [
-                    [ 'extended_cols',   "- Exdented Columns", [ $no, $yes ] ],
-                    [ 'extended_values', "- Exdented Values",  [ $no, $yes ] ],
+                    [ 'extended_cols',   "- Exdented Columns",    [ $no, $yes ] ],
+                    [ 'extended_values', "- Exdented Values",     [ $no, $yes ] ],
+                    [ 'extended_args',   "- Exdented Arguments",  [ $no, $yes ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -334,9 +338,11 @@ sub set_options {
             elsif ( $opt eq '_alias' ) {
                 my $prompt = 'Enable alias for:';
                 my $sub_menu = [
-                    [ 'select_func_sq', "- Functions/Subqueries in SELECT",  [ $no, 'ASK' ] ],
-                    [ 'join',           "- JOIN",                            [ 'AUTO', 'ASK' ] ],
-                    [ 'table',          "- Derived table",                   [ 'AUTO', 'ASK' ] ],
+                    [ 'select_complex_col', "- Functions/Subqueries in SELECT",  [ $no, 'ASK'    ] ],
+                    [ 'join_table',         "- Tables in join",                  [ 'AUTO', 'ASK' ] ],
+                    [ 'join_columns',       "- Non-unique columns in join",      [ $no, 'AUTO'   ] ],
+                    [ 'derived_table',      "- Derived table",                   [ 'AUTO', 'ASK' ] ],
+                    [ 'table',              "- Ordinary table",                  [ $no, 'AUTO'   ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -344,7 +350,9 @@ sub set_options {
                 my $prompt = 'Your choice: ';
                 my $sub_menu = [
                     [ 'qualified_table_name', "- Qualified table names", [ $no, $yes ] ],
-                    [ 'quote_identifiers',    "- Quote identifiers",     [ $no, $yes ] ],
+                    [ 'quote_tables',         "- Quote table names",     [ $no, $yes ] ],
+                    [ 'quote_columns',        "- Quote column names",    [ $no, $yes ] ],
+                    [ 'quote_aliases',        "- Quote aliases",         [ $no, $yes ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

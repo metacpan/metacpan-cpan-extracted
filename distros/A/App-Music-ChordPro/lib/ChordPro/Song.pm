@@ -396,11 +396,13 @@ sub parse_song {
 		$self->{assets}->{$id} =
 		  { data => $data, type => $info->{file_ext},
 		    width => $info->{width}, height => $info->{height},
+		    $kv->{persist} ? ( persist => 1 ) : (),
 		  };
 
 		if ( $config->{debug}->{images} ) {
 		    warn("asset[$id] ", length($data), " bytes, ",
 			 "width=$info->{width}, height=$info->{height}",
+			 $kv->{persist} ? ", persist" : "",
 			 "\n");
 		}
 		next;
@@ -456,11 +458,17 @@ sub parse_song {
 	}
 
 	if ( exists $config->{delegates}->{$in_context} ) {
-
 	    # 'open' indicates open.
 	    if ( /^\s*\{(?:end_of_\Q$in_context\E)\}\s*$/ ) {
-		delete $self->{body}->[-1]->{open};
-		# A subsequent {start_of_XXX} will reopen a new item
+		if ( $config->{delegates}->{$in_context}->{omit} ) {
+		}
+		else {
+		    delete $self->{body}->[-1]->{open};
+		    # A subsequent {start_of_XXX} will reopen a new item
+		}
+	    }
+	    elsif ( $config->{delegates}->{$in_context}->{omit} ) {
+		next;
 	    }
 	    else {
 		# Add to an open item.
@@ -1270,7 +1278,7 @@ sub directive {
 		$id = $v;
 	    }
 	    elsif ( $k =~ /^(anchor)$/i
-		    && $v =~ /^(paper|page|column|line)$/ ) {
+		    && $v =~ /^(paper|page|column|float|line)$/ ) {
 		$opts{lc($k)} = lc($v);
 	    }
 	    elsif ( $uri ) {
@@ -1286,7 +1294,7 @@ sub directive {
 	# If the image name does not have a directory, look it up
 	# next to the song, and then in the images folder of the
 	# CHORDPRO_LIB.
-	if ( $uri && $uri !~ m;/\\; ) { # basename
+	if ( $uri && $uri !~ m;^([a-z]:)?[/\\];i ) { # not abs
 	    use File::Basename qw(dirname);
 	    L: for ( dirname($diag->{file}) ) {
 		$uri = "$_/$uri", last if -s "$_/$uri";
@@ -1510,7 +1518,7 @@ sub directive {
 		my $key = $m->{key}->[-1];
 		my $xp = $xpose;
 		$xp += $capo if $capo;
-		my $xpk = $self->{chordsinfo}->{$key}->transpose($xp);
+		my $xpk = $self->{chordsinfo}->{$key}->transpose($xp, $xp <=> 0);
 		$self->{chordsinfo}->{$xpk->name} = $xpk;
 		$m->{key_from} = [ $m->{key_actual}->[0] ];
 		$m->{key_actual} = [ $xpk->name ];
@@ -1616,64 +1624,20 @@ sub directive {
 	return 1;
     }
 
-    # Formatting.
-    if ( $dir =~ /^(text|chord|tab|grid|diagrams|title|footer|toc)(font|size|colou?r)$/ ) {
+    # Formatting. {chordsize XX} and such.
+    if ( $dir =~ m/ ^( text | chord | chorus | tab | grid | diagrams
+		       | title | footer | toc )
+		     ( font | size | colou?r )
+		     $/x ) {
 	my $item = $1;
 	my $prop = $2;
-	my $value = $arg;
 
-	$prop = "color" if $prop eq "colour";
-	my $name = "$item-$prop";
-	$propstack{$name} //= [];
+	$self->propset( $item, $prop, $arg );
 
-	if ( $value eq "" ) {
-	    # Pop current value from stack.
-	    if ( @{ $propstack{$name} } ) {
-		pop( @{ $propstack{$name} } );
-	    }
-	    # Use new current value, if any.
-	    if ( @{ $propstack{$name} } ) {
-		$value = $propstack{$name}->[-1]
-	    }
-	    else {
-		# do_warn("No saved value for property $item$prop\n" );
-		$value = undef;
-	    }
-	    $self->add( type  => "control",
-			name  => $name,
-			value => $value );
-	    return 1;
-	}
+	# Derived props.
+	$self->propset( "chorus", $prop, $arg ) if $item eq "text";
 
-	if ( $prop eq "size" ) {
-	    unless ( $value =~ /^\d+(?:\.\d+)?\%?$/ ) {
-		do_warn("Illegal value \"$value\" for $item$prop\n");
-		return 1;
-	    }
-	}
-	if ( $prop =~ /^colou?r$/  ) {
-	    my $v;
-	    unless ( $v = get_color($value) ) {
-		do_warn("Illegal value \"$value\" for $item$prop\n");
-		return 1;
-	    }
-	    $value = $v;
-	}
-	$value = $prop eq 'font' ? $value : lc($value);
-	$self->add( type  => "control",
-		    name  => $name,
-		    value => $value );
-	push( @{ $propstack{$name} }, $value );
-
-	# A trailing number after a font directive is an implisit size
-	# directive.
-	if ( $prop eq 'font' && $value =~ /\s(\d+(?:\.\d+)?)$/ ) {
-	    $self->add( type  => "control",
-			name  => "$item-size",
-			value => $1 );
-	    push( @{ $propstack{"$item-size"} }, $1 );
-	}
-
+	#::dump( { %propstack, line => $diag->{line} } );
 	return 1;
     }
 
@@ -1692,6 +1656,68 @@ sub directive {
     do_warn("Unknown directive: $d\n")
       if $config->{settings}->{strict} && $d !~ /^x_/;
     return;
+}
+
+sub propset {
+    my ( $self, $item, $prop, $value ) = @_;
+    $prop = "color" if $prop eq "colour";
+    my $name = "$item-$prop";
+    $propstack{$name} //= [];
+
+    if ( $value eq "" ) {
+	# Pop current value from stack.
+	if ( @{ $propstack{$name} } ) {
+	    my $old = pop( @{ $propstack{$name} } );
+	    # A trailing number after a font directive means there
+	    # was also a size saved. Pop it.
+	    if ( $prop eq "font" && $old =~ /\s(\d+(?:\.\d+)?)$/ ) {
+		pop( @{ $propstack{"$item-size"} } );
+	    }
+	}
+	else {
+	    do_warn("No saved value for property $item$prop\n" )
+	}
+	# Use new current value, if any.
+	if ( @{ $propstack{$name} } ) {
+	    $value = $propstack{$name}->[-1]
+	}
+	else {
+	    $value = undef;
+	}
+	$self->add( type  => "control",
+		    name  => $name,
+		    value => $value );
+	return 1;
+    }
+
+    if ( $prop eq "size" ) {
+	unless ( $value =~ /^\d+(?:\.\d+)?\%?$/ ) {
+	    do_warn("Illegal value \"$value\" for $item$prop\n");
+	    return 1;
+	}
+    }
+    if ( $prop eq "color" ) {
+	my $v;
+	unless ( $v = get_color($value) ) {
+	    do_warn("Illegal value \"$value\" for $item$prop\n");
+	    return 1;
+	}
+	$value = $v;
+    }
+    $value = $prop eq "font" ? $value : lc($value);
+    $self->add( type  => "control",
+		name  => $name,
+		value => $value );
+    push( @{ $propstack{$name} }, $value );
+
+    # A trailing number after a font directive is an implicit size
+    # directive.
+    if ( $prop eq 'font' && $value =~ /\s(\d+(?:\.\d+)?)$/ ) {
+	$self->add( type  => "control",
+		    name  => "$item-size",
+		    value => $1 );
+	push( @{ $propstack{"$item-size"} }, $1 );
+    }
 }
 
 sub add_chord {
@@ -2052,8 +2078,11 @@ sub parse_chord {
 
     if ( $xp && $info ) {
 	# For transpose/transcode, chord must be wellformed.
-	$info = $info->transpose( $xp,
+	my $i = $info->transpose( $xp,
 				  $xpose_dir // $global_dir);
+	# Prevent self-references.
+	$i->{xp} = $info unless $i eq $info;
+	$info = $i;
 	warn( "Parsing chord: \"$chord\" transposed ",
 	      sprintf("%+d", $xp), " to \"",
 	      $info->name, "\"\n" ) if $debug > 1;
@@ -2066,7 +2095,10 @@ sub parse_chord {
 	    warn( "Parsing chord: \"$chord\" found ",
 		  $i->name, " for ", $info->name,
 		  " in ", $i->{_via}, "\n" ) if $debug > 1;
-	    $info = $i->new({ %$i, name => $info->name }) ;
+	    $info = $i->new({ %$i, name => $info->name,
+			      $info->{xp} ? ( xp => $info->{xp} ) : (),
+			      $info->{xc} ? ( xc => $info->{xc} ) : (),
+			    }) ;
 	    $unk = 0;
 	}
 	elsif ( $config->{instrument}->{type} eq 'keyboard'
@@ -2092,7 +2124,10 @@ sub parse_chord {
 	    do_warn("Warning: Transcoding to $xc without key may yield unexpected results\n");
 	    undef $xcmov;
 	}
-	$info = $info->transcode( $xc, $key_ord );
+	my $i = $info->transcode( $xc, $key_ord );
+	# Prevent self-references.
+	$i->{xc} = $info unless $i eq $info;
+	$info = $i;
 	warn( "Parsing chord: \"$chord\" transcoded to ",
 	      $info->name,
 	      " (", $info->{system}, ")",

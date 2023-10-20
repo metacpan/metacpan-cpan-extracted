@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'text' => {
      	datatype => 'string',
      	base_name => 'Text',
-     	description => '',
+     	description => 'The text value in a "text contains" conditional formatting rule. Valid only                for type = containsText, notContainsText, beginsWith and endsWith.  The default                value is null.',
      	format => '',
      	read_only => '',
      		},

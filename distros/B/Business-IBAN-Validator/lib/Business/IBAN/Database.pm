@@ -2,7 +2,7 @@ package Business::IBAN::Database;
 use warnings;
 use strict;
 
-our $VERSION = 0.093; # Release of the document
+our $VERSION = 0.095; # Release of the document
 
 use Business::IBAN::Util qw/numify_iban mod97/;
 use Hash::Util 'lock_hash';
@@ -178,6 +178,13 @@ my %iban_db = (
     'iban_structure' => 'FI[0-9]{2}[0-9]{3}[0-9]{11}',
     'is_sepa' => 1,
     'pattern' => 'FI2!n3!n11!n'
+  },
+  'FK' => {
+    'country' => 'Falkland Islands',
+    'iban_length' => '18',
+    'iban_structure' => 'FK[0-9]{2}[A-Z]{2}[0-9]{12}',
+    'is_sepa' => 0,
+    'pattern' => 'FK2!n2!a12!n'
   },
   'FO' => {
     'country' => 'Faroe Islands',
@@ -382,6 +389,13 @@ my %iban_db = (
     'is_sepa' => 0,
     'pattern' => 'MK2!n3!n10!c2!n'
   },
+  'MN' => {
+    'country' => 'Mongolia',
+    'iban_length' => '20',
+    'iban_structure' => 'MN[0-9]{2}[0-9]{4}[0-9]{12}',
+    'is_sepa' => 0,
+    'pattern' => 'MN2!n4!n12!n'
+  },
   'MR' => {
     'country' => 'Mauritania',
     'iban_length' => '27',
@@ -402,6 +416,13 @@ my %iban_db = (
     'iban_structure' => 'MU[0-9]{2}[A-Z]{4}[0-9]{2}[0-9]{2}[0-9]{12}[0-9]{3}[A-Z]{3}',
     'is_sepa' => 0,
     'pattern' => 'MU2!n4!a2!n2!n12!n3!n3!a'
+  },
+  'NI' => {
+    'country' => 'Nicaragua',
+    'iban_length' => '28',
+    'iban_structure' => 'NI[0-9]{2}[A-Z]{4}[0-9]{20}',
+    'is_sepa' => 0,
+    'pattern' => 'NI2!n4!a20!n'
   },
   'NL' => {
     'country' => 'Netherlands (The)',

@@ -130,7 +130,7 @@ __PACKAGE__->method_documentation({
      'shadow' => {
      	datatype => 'boolean',
      	base_name => 'Shadow',
-     	description => '',
+     	description => 'Indicates whether the groupbox has shadow.',
      	format => '',
      	read_only => '',
      		},

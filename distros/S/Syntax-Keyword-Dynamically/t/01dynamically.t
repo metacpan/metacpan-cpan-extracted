@@ -114,4 +114,12 @@ subtest "lvalue accessor" => sub {
    is( $value, "old", 'value restored after block leave' );
 };
 
+{
+   no Syntax::Keyword::Dynamically;
+
+   sub dynamically { return "normal function" }
+
+   is( dynamically, "normal function", 'dynamically() parses as a normal function call' );
+}
+
 done_testing;

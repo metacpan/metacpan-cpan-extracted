@@ -1,4 +1,6 @@
-=head1
+=encoding utf8
+
+=head1 NAME
 
 Locale::CLDR::Locales::Twq - Package for language Tasawaq
 
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Twq - Package for language Tasawaq
 
 package Locale::CLDR::Locales::Twq;
 # This file auto generated from Data\common\main\twq.xml
-#	on Sun  5 Aug  6:26:30 pm GMT
+#	on Fri 13 Oct  9:46:29 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';
@@ -875,12 +877,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'pm' => q{Zaarikay b},
 					'am' => q{Subbaahi},
+					'pm' => q{Zaarikay b},
 				},
 				'wide' => {
-					'pm' => q{Zaarikay b},
 					'am' => q{Subbaahi},
+					'pm' => q{Zaarikay b},
 				},
 			},
 		},
@@ -960,7 +962,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -984,7 +986,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},

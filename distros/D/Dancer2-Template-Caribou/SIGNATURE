@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.88.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,40 +12,41 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 8f70b070e6590c5d771c94a979ce258bcbfe4ecb AUTHOR_PLEDGE
-SHA1 9c0606b214f2cadd4d7572d39fc8e8efb646e725 CONTRIBUTORS
-SHA1 3111b7ac6c41debed73c78b1aff67a3e7d2a2b92 Changes
-SHA1 7415b42c1be938eb51368064ddddc1dab64e91e6 INSTALL
-SHA1 769557ae7e699664d9c0bba4a6e3e7f7ac31c0ae LICENSE
-SHA1 b965fadf0c37d6301d2bbe9ef977bcbd24901805 MANIFEST
-SHA1 b443733ad640c3c0f291efc38e61585ff8e6ee63 META.json
-SHA1 493e523f6364c5e7a78db77900f06ab49523d3cc META.yml
-SHA1 f5226815f40960b11096f26bebc2bebe767dd1f2 Makefile.PL
-SHA1 be18da2b526188dc677bd267f428fb09f782df85 README.mkdn
-SHA1 01b10888e6eae027846bbd1fe79913fcac155a21 cpanfile
-SHA1 c2255bdcf6252331c5dfa97b28fca8d80e6d0cac doap.xml
-SHA1 ccadf1e0de59332f845f261ad66de5ceb68f0b45 lib/Dancer2/Template/Caribou.pm
-SHA1 4a54de8649b9ba7d4cf30a2d548e2592a217ef3e lib/Dancer2/Template/Caribou/DancerVariables.pm
-SHA1 3542602ec10d5f0bd07640e34864a8c024d18e34 t/00-compile.t
-SHA1 1c150194467fbec654f5cc2c85199404c13ef14b t/00-report-prereqs.dd
-SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
-SHA1 26629cc7b3e82ce1ba66a86da146b0bf94ad2fa3 t/hello-views.t
-SHA1 11186870b415acd2fdd96436fb405bec0f5e46ad t/simple.t
-SHA1 1f83284338fc14a2156496d06300a744f7e67d98 t/variables.t
-SHA1 c9e7b518d2fd5d8525685f6bc8d503ae8ac23a84 t/views/dancer_variables/bou
-SHA1 c7889f58c18dc01960e630a7957d23e1ed854efa t/views/howdie/bou
-SHA1 48bec84fcb4f3b5cf8f3a94797e07169b1d2134c t/views/howdie/page.bou
-SHA1 c7889f58c18dc01960e630a7957d23e1ed854efa t/views/hullo/bou
-SHA1 428ed6eb66c8df3374826d0f04878ce46bedd284 t/views/hullo/inner_template.bou
-SHA1 202dccf52a60cd96cca92170bc979586e33f3c71 t/views/layouts/main/bou
-SHA1 950c77472e6f6cd948b2b510994ef8a417efecaa t/views/layouts/main/page.bou
-SHA1 b4b6971b642256cd59cca1a2043f57159e4dac5d t/views/welcome/bou
-SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+SHA256 d3045580e0c0c18e803fab3c03df53159994fc2dc424c07584c570dbe08ca6a9 AUTHOR_PLEDGE
+SHA256 fbefec9c8c9fb05ac207d6e036268aa1eb0d991c14eaba1e0ef329b05cf5eb1e CODE_OF_CONDUCT.md
+SHA256 6c4d9fc48141bcdd23d41002e8686d6052c82909bd17d8e7ea9bcc5ebad310a8 CONTRIBUTORS
+SHA256 6f7f1656dbe89785425c61bc14a0e55f02ffa22b4091db7b45b8f469ebceecc9 Changes
+SHA256 bb3bc893f5c809b836cf6ee6153e0f4bbd931d1554e404605b149eb43f33c189 INSTALL
+SHA256 08a65f64b584f97c72f0cd60dcb71909d145d643bd7f86d41a574fae876d30f9 LICENSE
+SHA256 39aa646de3e86055aae497c11a91c9efa68322d05700cc51863fd953dade7965 MANIFEST
+SHA256 1eda6481c3f994cc18bc724340175bc7a299f9b9741ac072295315795053c548 META.json
+SHA256 c894824006b3dc1c4eccf54e632e2da7346b7727b880d39618012782837be593 META.yml
+SHA256 31ae07a0b2ca02928bb79361c3b49f4880c8fc5a56b834103f66a47c0f75fee1 Makefile.PL
+SHA256 7be341911cefc5c0e6ac6d15875eda8ea93f3902c6e249f0af9c95b91611275c README.mkdn
+SHA256 a948ea518729607f2118f382b53d5d4133fb36b86c42628b73276fd957b4123c cpanfile
+SHA256 edbaf48b81a70960cb63af4643896779490439d0f3b4a6d76127178d33e557ec doap.xml
+SHA256 e26b8457708507ebd20979d15055d868f698684d4c316435a058b08d8bc09fdf lib/Dancer2/Template/Caribou.pm
+SHA256 22d850ec2e84cb618a5cecb16405d4dfb78b1a4894f2359839c2201663371b8d lib/Dancer2/Template/Caribou/DancerVariables.pm
+SHA256 76ceb25ec662a4af42e181f13802b4edfee5b223bd646c1d8920df1fac647222 t/00-compile.t
+SHA256 58be952ccd3d033c892128e66bc5317001cac72a34a09f36c1dc52792a484d92 t/00-report-prereqs.dd
+SHA256 5996417e8ae9973f82860dcf6d5f180d285d5c4b046e0346d06ed22802a3452b t/00-report-prereqs.t
+SHA256 1ce5c2712604273dad4214630291cc5f0110c0965c82fd9cafbc536d940248ee t/hello-views.t
+SHA256 7f2bca36ac3a1fb5381224f6edc6d87d514c3653aa68e47093fa99ea6082e097 t/simple.t
+SHA256 822a31a615b513345b911e4db0392e90f48966d28129aa7a60829b0eba169286 t/variables.t
+SHA256 02511c82c136262cfea61e65ab31afa05b50d3326744b9399558dd132a041b7d t/views/dancer_variables/bou
+SHA256 f39e6094c9c1e232dc038261b4d5b09b063acd45b874c05c8006dc6e143f4d41 t/views/howdie/bou
+SHA256 3f2088223d64e625ada9f4fa1306f00b774846f01976de653350f4b79732ecdb t/views/howdie/page.bou
+SHA256 f39e6094c9c1e232dc038261b4d5b09b063acd45b874c05c8006dc6e143f4d41 t/views/hullo/bou
+SHA256 11c117fc45fdbef62e9db7d829e4eb1a1e10303d439f41e841e8ec31b50f3379 t/views/hullo/inner_template.bou
+SHA256 e7319f83b98b3e658cf6e079b2efd5c22a0678fbf5321dc99e8849de16e12827 t/views/layouts/main/bou
+SHA256 0507b2f53a83c3b4edd67fdde21b3c3238a82fc262036a0ae6912e96d47c5ebc t/views/layouts/main/page.bou
+SHA256 2a88f6dd508e420a333f2aa951f391bbb35f09ed2cdacf875c184f8d12cf74e0 t/views/welcome/bou
+SHA256 d34f839d8340478663bd6ae59c72760d7e1a2b7a2d4879ad1ec97db1a2271b2f xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAliyP7YACgkQ34Hwf+GwC4yRzACffPcsEweWIPvQeat45rnlKuMI
-U0oAoPJGGkzL3+kQWy4vlcfdDjt2QXty
-=Ff3O
+iF0EAREDAB0WIQS4RMr2LZlyA/IlbHHfgfB/4bALjAUCZTKmGAAKCRDfgfB/4bAL
+jK/WAKCQshJE0BgyNuH5hZ86dcNVcynnlACaAtB+1Qda6BDEVz0mLZOeJ35p1ro=
+=DWH2
 -----END PGP SIGNATURE-----

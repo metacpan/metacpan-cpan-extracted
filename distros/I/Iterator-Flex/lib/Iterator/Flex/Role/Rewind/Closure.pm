@@ -5,9 +5,9 @@ package Iterator::Flex::Role::Rewind::Closure;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
-use Iterator::Flex::Base ();
+use Iterator::Flex::Base  ();
 use Iterator::Flex::Utils qw( :default ITERATOR REWIND );
 use Role::Tiny;
 use experimental 'signatures';
@@ -62,7 +62,7 @@ Iterator::Flex::Role::Rewind::Closure - Implement C<rewind> as a closure stored 
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 METHODS
 

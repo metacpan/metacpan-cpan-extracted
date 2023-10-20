@@ -50,6 +50,14 @@ static PADNAME *S_newPADNAMEpvn(pTHX_ const char *pv, STRLEN n)
 #  define av_count(av)           (AvFILL(av) + 1)
 #endif
 
+#ifndef av_fetch_simple
+#  define av_fetch_simple(av, idx, lval)  av_fetch(av, idx, lval)
+#endif
+
+#ifndef av_push_simple
+#  define av_push_simple(av, sv)  av_push(av, sv)
+#endif
+
 #ifndef av_top_index
 #  define av_top_index(av)       AvFILL(av)
 #endif

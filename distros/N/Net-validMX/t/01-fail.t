@@ -3,7 +3,7 @@
 use lib 'lib';
 
 use Test::More;
-plan tests => 11;
+plan tests => 12;
 
 use Net::validMX;
 
@@ -14,6 +14,16 @@ sub test {
   ($rv, $reason) = Net::validMX::check_valid_mx($email);
   print Net::validMX::get_output_result($email, $rv, $reason);
  
+  return $rv;
+}
+
+sub test_email_validity {
+  my ($email) = @_;
+  my ($rv, $reason);
+
+  $rv = Net::validMX::check_email_validity($email);
+  print Net::validMX::get_output_result($email, $rv, '');
+
   return $rv;
 }
 
@@ -52,4 +62,6 @@ is ( test('test@test17.peregrinehw.com'), 0, 'Resolves to a link-local ipv6 addr
 
 is( test('test@test2.peregrinehw.com'), 0, 'Test for use of crazy things like 192.168.0.1. as the host name in DNS - Should FAIL EVEN if $allow_ip_address_as_mx = 1 because they are privatized not because of the name');
 
-is( test(''), 0, 'Blank email addresses should fail');
+is( test_email_validity(''), 0, 'Blank email addresses should fail');
+
+is( test_email_validity('foo\"@bar.org'), 0, 'Email addresses with double quotes should fail');

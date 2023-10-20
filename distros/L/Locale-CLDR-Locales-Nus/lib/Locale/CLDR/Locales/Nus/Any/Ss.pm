@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Nus::Any::Ss - Package for language Nuer
 
 =cut
 
 package Locale::CLDR::Locales::Nus::Any::Ss;
-# This file auto generated from Data/common/main/nus_SS.xml
-#	on Mon 11 Apr  5:35:54 pm GMT
+# This file auto generated from Data\common\main\nus_SS.xml
+#	on Fri 13 Oct  9:32:28 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

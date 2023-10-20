@@ -72,6 +72,12 @@ subtest 'sslmaker sign example.com.csr.pem' => sub {
   my $index = $home->child('index.txt')->slurp;
   like $index, qr{^V.*CN=client1\.example\.com$}m, 'index.txt has V client1.example.com';
   like $index, qr{^V.*CN=client2\.example\.com$}m, 'index.txt has V client2.example.com';
+
+  my ($csr, $crt);
+  App::sslmaker::openssl(qw(req -noout -text -in)  => 'client1.example.com.csr.pem',  sub { $csr = pop });
+  App::sslmaker::openssl(qw(x509 -noout -text -in) => 'client1.example.com.cert.pem', sub { $crt = pop });
+  like $csr, qr{DNS:client1.example.com}, 'csr subjectAltName';
+  like $crt, qr{DNS:client1.example.com}, 'crt subjectAltName';
 };
 
 subtest 'sslmaker revoke example.com' => sub {

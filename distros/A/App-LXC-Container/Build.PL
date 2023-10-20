@@ -31,7 +31,7 @@ my %args = (
 
     requires => {
         'Text::Diff' => '1.37',
-        'UI::Various' => '0.41',
+        'UI::Various' => '0.43',
         'indirect' => '0.36',
         'multidimensional' => '0.011',
         'perl' => 'v5.14.0',

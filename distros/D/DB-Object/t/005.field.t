@@ -3,6 +3,7 @@ BEGIN
 {
 	use strict;
 	use warnings;
+	use vars qw( $DEBUG );
 	use lib './lib';
     use Test::More qw( no_plan );
     select(($|=1,select(STDERR),$|=1)[1]);

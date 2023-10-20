@@ -2,228 +2,349 @@
 # MIT License
 
 class Errno {
-  version "0.090002";
+  version "0.090003";
+  
   native static method errno : int ();
+  
   native static method set_errno : void ($errno : int);
-
+  
   native static method E2BIG : int ();
+  
   native static method EACCES : int ();
+  
   native static method EADDRINUSE : int ();
+  
   native static method EADDRNOTAVAIL : int ();
+  
   native static method EAFNOSUPPORT : int ();
+  
   native static method EAGAIN : int ();
+  
   native static method EALREADY : int ();
+  
   native static method EBADE : int ();
+  
   native static method EBADF : int ();
+  
   native static method EBADFD : int ();
+  
   native static method EBADMSG : int ();
+  
   native static method EBADR : int ();
+  
   native static method EBADRQC : int ();
+  
   native static method EBADSLT : int ();
+  
   native static method EBUSY : int ();
+  
   native static method ECANCELED : int ();
+  
   native static method ECHILD : int ();
+  
   native static method ECHRNG : int ();
+  
   native static method ECOMM : int ();
+  
   native static method ECONNABORTED : int ();
+  
   native static method ECONNREFUSED : int ();
+  
   native static method ECONNRESET : int ();
+  
   native static method EDEADLK : int ();
+  
   native static method EDEADLOCK : int ();
+  
   native static method EDESTADDRREQ : int ();
+  
   native static method EDOM : int ();
+  
   native static method EDQUOT : int ();
+  
   native static method EEXIST : int ();
+  
   native static method EFAULT : int ();
+  
   native static method EFBIG : int ();
+  
   native static method EHOSTDOWN : int ();
+  
   native static method EHOSTUNREACH : int ();
+  
   native static method EIDRM : int ();
+  
   native static method EILSEQ : int ();
+  
   native static method EINPROGRESS : int ();
+  
   native static method EINTR : int ();
+  
   native static method EINVAL : int ();
+  
   native static method EIO : int ();
+  
   native static method EISCONN : int ();
+  
   native static method EISDIR : int ();
+  
   native static method EISNAM : int ();
+  
   native static method EKEYEXPIRED : int ();
+  
   native static method EKEYREJECTED : int ();
+  
   native static method EKEYREVOKED : int ();
+  
   native static method EL2HLT : int ();
+  
   native static method EL2NSYNC : int ();
+  
   native static method EL3HLT : int ();
+  
   native static method EL3RST : int ();
+  
   native static method ELIBACC : int ();
+  
   native static method ELIBBAD : int ();
+  
   native static method ELIBMAX : int ();
+  
   native static method ELIBSCN : int ();
+  
   native static method ELIBEXEC : int ();
+  
   native static method ELOOP : int ();
+  
   native static method EMEDIUMTYPE : int ();
+  
   native static method EMFILE : int ();
+  
   native static method EMLINK : int ();
+  
   native static method EMSGSIZE : int ();
+  
   native static method EMULTIHOP : int ();
+  
   native static method ENAMETOOLONG : int ();
+  
   native static method ENETDOWN : int ();
+  
   native static method ENETRESET : int ();
+  
   native static method ENETUNREACH : int ();
+  
   native static method ENFILE : int ();
+  
   native static method ENOBUFS : int ();
+  
   native static method ENODATA : int ();
+  
   native static method ENODEV : int ();
+  
   native static method ENOENT : int ();
+  
   native static method ENOEXEC : int ();
+  
   native static method ENOKEY : int ();
+  
   native static method ENOLCK : int ();
+  
   native static method ENOLINK : int ();
+  
   native static method ENOMEDIUM : int ();
+  
   native static method ENOMEM : int ();
+  
   native static method ENOMSG : int ();
+  
   native static method ENONET : int ();
+  
   native static method ENOPKG : int ();
+  
   native static method ENOPROTOOPT : int ();
+  
   native static method ENOSPC : int ();
+  
   native static method ENOSR : int ();
+  
   native static method ENOSTR : int ();
+  
   native static method ENOSYS : int ();
+  
   native static method ENOTBLK : int ();
+  
   native static method ENOTCONN : int ();
+  
   native static method ENOTDIR : int ();
+  
   native static method ENOTEMPTY : int ();
+  
   native static method ENOTSOCK : int ();
+  
   native static method ENOTSUP : int ();
+  
   native static method ENOTTY : int ();
+  
   native static method ENOTUNIQ : int ();
+  
   native static method ENXIO : int ();
+  
   native static method EOPNOTSUPP : int ();
+  
   native static method EOVERFLOW : int ();
+  
   native static method EPERM : int ();
+  
   native static method EPFNOSUPPORT : int ();
+  
   native static method EPIPE : int ();
+  
   native static method EPROTO : int ();
+  
   native static method EPROTONOSUPPORT : int ();
+  
   native static method EPROTOTYPE : int ();
+  
   native static method ERANGE : int ();
+  
   native static method EREMCHG : int ();
+  
   native static method EREMOTE : int ();
+  
   native static method EREMOTEIO : int ();
+  
   native static method ERESTART : int ();
+  
   native static method EROFS : int ();
+  
   native static method ESHUTDOWN : int ();
+  
   native static method ESPIPE : int ();
+  
   native static method ESOCKTNOSUPPORT : int ();
+  
   native static method ESRCH : int ();
+  
   native static method ESTALE : int ();
+  
   native static method ESTRPIPE : int ();
+  
   native static method ETIME : int ();
+  
   native static method ETIMEDOUT : int ();
+  
   native static method ETXTBSY : int ();
+  
   native static method EUCLEAN : int ();
+  
   native static method EUNATCH : int ();
+  
   native static method EUSERS : int ();
+  
   native static method EWOULDBLOCK : int ();
+  
   native static method EXDEV : int ();
+  
   native static method EXFULL : int ();
-
+  
   native static method WSAEACCES : int ();
-
+  
   native static method WSAEADDRINUSE : int ();
-
+  
   native static method WSAEADDRNOTAVAIL : int ();
-
+  
   native static method WSAEAFNOSUPPORT : int ();
-
+  
   native static method WSAEALREADY : int ();
-
+  
   native static method WSAEBADF : int ();
-
+  
   native static method WSAECANCELLED : int ();
-
+  
   native static method WSAECONNABORTED : int ();
-
+  
   native static method WSAECONNREFUSED : int ();
-
+  
   native static method WSAECONNRESET : int ();
-
+  
   native static method WSAEDESTADDRREQ : int ();
-
+  
   native static method WSAEDISCON : int ();
-
+  
   native static method WSAEDQUOT : int ();
-
+  
   native static method WSAEFAULT : int ();
-
+  
   native static method WSAEHOSTDOWN : int ();
-
+  
   native static method WSAEHOSTUNREACH : int ();
-
+  
   native static method WSAEINPROGRESS : int ();
-
+  
   native static method WSAEINTR : int ();
-
+  
   native static method WSAEINVAL : int ();
-
+  
   native static method WSAEINVALIDPROCTABLE : int ();
-
+  
   native static method WSAEINVALIDPROVIDER : int ();
-
+  
   native static method WSAEISCONN : int ();
-
+  
   native static method WSAELOOP : int ();
-
+  
   native static method WSAEMFILE : int ();
-
+  
   native static method WSAEMSGSIZE : int ();
-
+  
   native static method WSAENAMETOOLONG : int ();
-
+  
   native static method WSAENETDOWN : int ();
-
+  
   native static method WSAENETRESET : int ();
-
+  
   native static method WSAENETUNREACH : int ();
-
+  
   native static method WSAENOBUFS : int ();
-
+  
   native static method WSAENOMORE : int ();
-
+  
   native static method WSAENOPROTOOPT : int ();
-
+  
   native static method WSAENOTCONN : int ();
-
+  
   native static method WSAENOTEMPTY : int ();
-
+  
   native static method WSAENOTSOCK : int ();
-
+  
   native static method WSAEOPNOTSUPP : int ();
-
+  
   native static method WSAEPFNOSUPPORT : int ();
-
+  
   native static method WSAEPROCLIM : int ();
-
+  
   native static method WSAEPROTONOSUPPORT : int ();
-
+  
   native static method WSAEPROTOTYPE : int ();
-
+  
   native static method WSAEPROVIDERFAILEDINIT : int ();
-
+  
   native static method WSAEREFUSED : int ();
-
+  
   native static method WSAEREMOTE : int ();
-
+  
   native static method WSAESHUTDOWN : int ();
-
+  
   native static method WSAESOCKTNOSUPPORT : int ();
-
+  
   native static method WSAESTALE : int ();
-
+  
   native static method WSAETIMEDOUT : int ();
-
+  
   native static method WSAETOOMANYREFS : int ();
-
+  
   native static method WSAEUSERS : int ();
-
+  
   native static method WSAEWOULDBLOCK : int ();
-  }
+}

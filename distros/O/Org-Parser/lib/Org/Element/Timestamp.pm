@@ -10,9 +10,9 @@ with 'Org::ElementRole';
 with 'Org::ElementRole::Inline';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-12'; # DATE
+our $DATE = '2023-08-05'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.559'; # VERSION
+our $VERSION = '0.560'; # VERSION
 
 my @attrs = (qw/datetime has_time event_duration recurrence is_active/);
 for (@attrs) {
@@ -123,15 +123,15 @@ sub _parse_timestamp {
              )?
              \s* (?<close_bracket> \]|>)
              $/x
-                 or die "Can't parse timestamp string: $str";
+                 or $self->die("Can't parse timestamp string: $str");
     # just for sanity. usually doesn't happen though because Document gives us
     # either "[...]" or "<...>"
-    die "Mismatch open/close brackets in timestamp: $str"
+    $self->die("Mismatch open/close brackets in timestamp: $str")
         if $+{open_bracket} eq '<' && $+{close_bracket} eq ']' ||
             $+{open_bracket} eq '[' && $+{close_bracket} eq '>';
-    die "Duration not allowed in timestamp: $str"
+    $self->die("Duration not allowed in timestamp: $str")
         if !$opts->{allow_event_duration} && $+{event_duration};
-    die "Repeater ($+{repeater}) not allowed in timestamp: $str"
+    $self->die("Repeater ($+{repeater}) not allowed in timestamp: $str")
         if !$opts->{allow_repeater} && $+{repeater};
 
     $self->is_active($+{open_bracket} eq '<' ? 1:0)
@@ -175,7 +175,7 @@ sub _parse_timestamp {
             $r = DateTime::Event::Recurrence->yearly(
                 interval=>$i, start=>$dt);
         } else {
-            die "BUG: Unknown repeater unit $u in timestamp $str";
+            $self->die("BUG: Unknown repeater unit $u in timestamp $str");
         }
         $self->recurrence($r);
         $self->_repeater($+{repeater});
@@ -189,7 +189,7 @@ sub _parse_timestamp {
         } elsif ($u eq 'm') {
         } elsif ($u eq 'y') {
         } else {
-            die "BUG: Unknown warning period unit $u in timestamp $str";
+            $self->die("BUG: Unknown warning period unit $u in timestamp $str");
         }
         $self->_warning_period($+{warning_period});
     }
@@ -213,7 +213,7 @@ Org::Element::Timestamp - Represent Org timestamp
 
 =head1 VERSION
 
-This document describes version 0.559 of Org::Element::Timestamp (from Perl distribution Org-Parser), released on 2023-07-12.
+This document describes version 0.560 of Org::Element::Timestamp (from Perl distribution Org-Parser), released on 2023-08-05.
 
 =head1 DESCRIPTION
 

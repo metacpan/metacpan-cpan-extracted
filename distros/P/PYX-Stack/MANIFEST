@@ -1,7 +1,7 @@
 Changes
-examples/ex1.pl
-examples/ex2.pl
-examples/ex3.pl
+examples/error1.pl
+examples/error2.pl
+examples/print_stack.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

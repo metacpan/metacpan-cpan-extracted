@@ -1,3 +1,14 @@
+0.10 2023-10-19T10:46:09+02:00
+ - Fix typo in doc.
+ - Improve constructor doc.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
+0.09 2022-11-02T23:25:09+01:00
+ - Fix minimal versions of Tags::Output:: for tests. There was warning.
+ - Rename examples to better names.
+ - Update copyright years.
+
 0.08 2021-02-22T17:51:23+01:00
  - Change api of parse(): Don't decode utf-8 string via 'input_encoding'.
 

@@ -1,17 +1,17 @@
 package Bitcoin::Crypto::Key::Private;
-$Bitcoin::Crypto::Key::Private::VERSION = '1.008';
+$Bitcoin::Crypto::Key::Private::VERSION = '2.001';
 use v5.10;
 use strict;
 use warnings;
 use Moo;
-use Types::Standard qw(Str);
 use Crypt::PK::ECC;
 use Bitcoin::BIP39 qw(bip39_mnemonic_to_entropy entropy_to_bip39_mnemonic);
-use List::Util qw(first);
+use Type::Params -sigs;
 
 use Bitcoin::Crypto::Key::Public;
 use Bitcoin::Crypto::Base58 qw(encode_base58check decode_base58check);
-use Bitcoin::Crypto::Config;
+use Bitcoin::Crypto::Types qw(Object Str Maybe);
+use Bitcoin::Crypto::Constants;
 use Bitcoin::Crypto::Network;
 use Bitcoin::Crypto::Util qw(validate_wif);
 use Bitcoin::Crypto::Helpers qw(ensure_length);
@@ -19,40 +19,50 @@ use Bitcoin::Crypto::Exception;
 
 use namespace::clean;
 
-with "Bitcoin::Crypto::Role::BasicKey";
+with qw(Bitcoin::Crypto::Role::BasicKey);
 
 sub _is_private { 1 }
+
+signature_for to_wif => (
+	method => Object,
+	positional => [],
+);
 
 sub to_wif
 {
 	my ($self) = @_;
-	my $bytes = $self->to_bytes();
+	my $bytes = $self->to_serialized();
 
 	# wif network - 1B
 	my $wifdata = $self->network->wif_byte;
 
 	# key entropy - 32B
-	$wifdata .= ensure_length $bytes, Bitcoin::Crypto::Config::key_max_length;
+	$wifdata .= ensure_length $bytes, Bitcoin::Crypto::Constants::key_max_length;
 
 	# additional byte for compressed key - 1B
-	$wifdata .= Bitcoin::Crypto::Config::wif_compressed_byte if $self->compressed;
+	$wifdata .= Bitcoin::Crypto::Constants::wif_compressed_byte if $self->compressed;
 
 	return encode_base58check($wifdata);
 }
+
+signature_for from_wif => (
+	method => Str,
+	positional => [Str, Maybe [Str], {optional => 1}],
+);
 
 sub from_wif
 {
 	my ($class, $wif, $network) = @_;
 
 	Bitcoin::Crypto::Exception::KeyCreate->raise(
-		"base58 string is not valid WIF"
+		'base58 string is not valid WIF'
 	) unless validate_wif($wif);
 
 	my $decoded = decode_base58check($wif);
 	my $private = substr $decoded, 1;
 
 	my $compressed = 0;
-	if (length($private) > Bitcoin::Crypto::Config::key_max_length) {
+	if (length($private) > Bitcoin::Crypto::Constants::key_max_length) {
 		chop $private;
 		$compressed = 1;
 	}
@@ -60,12 +70,11 @@ sub from_wif
 	my $wif_network_byte = substr $decoded, 0, 1;
 	my @found_networks =
 		Bitcoin::Crypto::Network->find(sub { shift->wif_byte eq $wif_network_byte });
-	@found_networks = first { $_ eq $network }
-		@found_networks
+	@found_networks = grep { $_ eq $network } @found_networks
 		if defined $network;
 
 	Bitcoin::Crypto::Exception::KeyCreate->raise(
-		"found multiple networks possible for given WIF"
+		'found multiple networks possible for given WIF'
 	) if @found_networks > 1;
 
 	Bitcoin::Crypto::Exception::KeyCreate->raise(
@@ -76,20 +85,27 @@ sub from_wif
 		"couldn't find network for WIF byte $wif_network_byte"
 	) if @found_networks == 0;
 
-	my $instance = $class->from_bytes($private);
+	my $instance = $class->from_serialized($private);
 	$instance->set_compressed($compressed);
 	$instance->set_network(@found_networks);
 	return $instance;
 }
 
+signature_for get_public_key => (
+	method => Object,
+	positional => [],
+);
+
 sub get_public_key
 {
 	my ($self) = @_;
 
-	my $public = Bitcoin::Crypto::Key::Public->new($self->raw_key("public"));
-	$public->set_compressed($self->compressed);
-	$public->set_network($self->network);
-	$public->set_purpose($self->purpose);
+	my $public = Bitcoin::Crypto::Key::Public->new(
+		key_instance => $self->raw_key('public'),
+		compressed => $self->compressed,
+		network => $self->network,
+		purpose => $self->purpose,
+	);
 
 	return $public;
 }
@@ -109,18 +125,23 @@ Bitcoin::Crypto::Key::Private - Bitcoin private keys
 
 	my $pub = $priv->get_public_key();
 
-	# create signature using private key (sha256 of string byte representation)
+	# automatically sign standard transactions
 
-	my $sig = $priv->sign_message("Hello world");
+	$priv->sign_transaction($tx, signing_index => $n);
+
+	# create signature for custom message (hash256)
+
+	my $sig = $priv->sign_message('Hello world');
 
 	# signature is returned as byte string
-	# use unpack to get the representation you need
+	# use to_format to get the representation you need
 
-	my $sig_hex = unpack "H*", $sig;
+	use Bitcoin::Crypto::Util qw(to_format);
+	my $sig_hex =  to_format [hex => $sig];
 
 	# signature verification
 
-	$priv->verify_message("Hello world", $sig);
+	$priv->verify_message('Hello world', $sig);
 
 =head1 DESCRIPTION
 
@@ -138,45 +159,47 @@ You can use a private key to:
 
 Please note that any keys generated are by default compressed.
 
-see L<Bitcoin::Crypto::Network> if you want to work with other networks than Bitcoin Mainnet.
+see L<Bitcoin::Crypto::Network> if you want to work with other networks than
+Bitcoin Mainnet.
 
 =head1 METHODS
 
-=head2 from_bytes
-
-	$key_object = $class->from_bytes($data)
-
-Use this method to create a PrivateKey instance from a byte string.
-Data C<$data> will be used as a private key entropy.
-
-Returns class instance.
-
 =head2 new
 
-	$key_object = $class->new($data)
+Constructor is reserved for internal and advanced use only. Use L</from_serialized>
+or L</from_wif> instead.
 
-This works exactly the same as from_bytes
+=head2 from_serialized
+
+	$key_object = $class->from_serialized($serialized)
+
+This creates a new key from string data. Argument C<$serialized> is a
+formatable bytestring containing the private key entropy.
+
+Returns a new key object instance.
+
+=head2 to_serialized
+
+	$serialized = $key_object->to_serialized()
+
+This returns a private key as a sequence of bytes. The result is a bytestring
+which can be further formated with C<to_format> utility.
+
+=head2 from_bytes
+
+Deprecated. Use C<< $class->from_serialized($data) >> instead.
 
 =head2 to_bytes
 
-	$bytestring = $object->to_bytes()
-
-Does the opposite of from_bytes on a target object
+Deprecated. Use C<< $key->to_serialized($data) >> instead.
 
 =head2 from_hex
 
-	$key_object = $class->from_hex($hex)
-
-Use this method to create a PrivateKey instance from a hexadecimal number.
-Number C<$hex> will be used as a private key entropy.
-
-Returns class instance.
+Deprecated. Use C<< $class->from_serialized([hex => $data]) >> instead.
 
 =head2 to_hex
 
-	$hex_string = $object->to_hex()
-
-Does the opposite of from_hex on a target object
+Deprecated. Use C<< to_format [hex => $key->to_serialized($data)] >> instead.
 
 =head2 from_wif
 
@@ -184,9 +207,11 @@ Does the opposite of from_hex on a target object
 
 Creates a new private key from Wallet Import Format string.
 
-Takes an additional optional argument, which is network name. It may be useful if you use many networks and some have the same WIF byte.
+Takes an additional optional argument, which is network name. It may be useful
+if you use many networks and some have the same WIF byte.
 
-This method will change compression and network states of the created private key, as this data is included in WIF format.
+This method will change compression and network states of the created private
+key, as this data is included in WIF format.
 
 Returns class instance.
 
@@ -200,9 +225,9 @@ Does the opposite of from_wif on a target object
 
 	$key_object = $object->set_compressed($val)
 
-Change key's compression state to C<$val> (1/0). This will change the WIF generated by
-toWif() method and also enable creation of uncompressed public keys.
-If C<$val> is omitted it is set to 1.
+Change key's compression state to C<$val> (1/0). This will change the WIF
+generated by to_wif() method and also enable creation of uncompressed public
+keys. If C<$val> is omitted it is set to C<1>.
 
 Returns current key instance.
 
@@ -210,7 +235,8 @@ Returns current key instance.
 
 	$key_object = $object->set_network($val)
 
-Change key's network state to C<$val>. It can be either network name present in Bitcoin::Crypto::Network package or an instance of this class.
+Change key's network state to C<$val>. It can be either network name present in
+Bitcoin::Crypto::Network package or an instance of this class.
 
 Returns current key instance.
 
@@ -218,47 +244,107 @@ Returns current key instance.
 
 	$public_key_object = $object->get_public_key()
 
-Returns instance of L<Bitcoin::Crypto::Key::Public> generated from the private key.
+Returns instance of L<Bitcoin::Crypto::Key::Public> generated from the private
+key.
 
 =head2 sign_message
 
-	$signature = $object->sign_message($message, $algo = "sha256")
+	$signature = $object->sign_message($message)
 
-Signs a digest of C<$message> (using C<$algo> digest algorithm) with a private key.
-
-C<$algo> must be available in L<Digest> package.
+Signs a digest of C<$message> (digesting it with double sha256) with a private
+key.
 
 Returns a byte string containing signature.
 
-Character encoding note: C<$message> should be encoded in the proper encoding before passing it to this method. Passing Unicode string will cause the function to fail. You can encode like this (for UTF-8):
+Character encoding note: C<$message> should be encoded in the proper encoding
+before passing it to this method. Passing Unicode string will cause the
+function to fail. You can encode like this (for UTF-8):
 
 	use Encode qw(encode);
 	$message = encode('UTF-8', $message);
 
-Caution: libtomcrypt cryptographic package that is generating signatures does not currently offer a deterministic mechanism. For this reason the sign_message method will complain with a warning. You should install an optional L<Crypt::Perl> package, which supports deterministic signatures, which will disable the warning. Non-deterministic signatures can lead to leaking private keys if the random number generator's entropy is insufficient.
+Caution: libtomcrypt cryptographic package that is generating signatures does
+not currently offer a deterministic mechanism. For this reason the sign_message
+method will complain with a warning. You should install an optional
+L<Crypt::Perl> package, which supports deterministic signatures, which will
+disable the warning. Non-deterministic signatures can lead to leaking private
+keys if the random number generator's entropy is insufficient.
+
+=head2 sign_transaction
+
+	$object->sign_transaction($tx, %params)
+
+Signs the transaction C<$tx> using this private key. This automatic signing
+only works for standard script types, if your script is non-standard then you
+will have to sign manually.
+
+Returns nothing - the result of the function is the modification of transaction
+C<$tx>.
+
+C<%params> can contain:
+
+=over
+
+=item * C<signing_index>
+
+This non-negative integer is the index of the input being signed. Required.
+
+=item * C<redeem_script>
+
+A L<Bitcoin::Crypto::Script> instance or something which can be turned into a
+script, used for specifying a payout script when redeeming P2SH and P2WSH
+outputs.
+
+=item * C<multisig>
+
+A representation of the multisig signing stage. It is an array reference with
+exactly two elements. The first element is the number (1-based, not the index!)
+of the currently signed multisig. The second element is the total number of
+signatures required for the multisig. For example, signing 2-out-of-3 multisig
+can look like this (taken from C<ex/tx/multisig_redeem.pl> example):
+
+	# sign using the private key belonging to the first pubkey
+	btc_prv->from_wif('cScAuqNfiNR7mq61QGW3LtokKAwzBzs4rbCz4Uff1NA15ysEij2i')
+		->sign_transaction($tx, signing_index => 0, redeem_script => $redeem_script, multisig => [1, 2]);
+
+	# sign using the private key belonging to the third pubkey
+	btc_prv->from_wif('cQsSKWrBLXNY1oSZbLcJf4HF5vnKGgKko533LnkTmqRdS9Fx4SGH')
+		->sign_transaction($tx, signing_index => 0, redeem_script => $redeem_script, multisig => [2, 2]);
+
+=item * C<sighash>
+
+The sighash which should be used for the signature. By default C<SIGHASH_ALL>
+is used.
+
+=back
 
 =head2 verify_message
 
-	$signature_valid = $object->verify_message($message, $signature, $algo = "sha256")
+	$signature_valid = $object->verify_message($message, $signature)
 
-Verifies C<$signature> against digest of C<$message> (with C<$algo> digest algorithm) using private key.
-
-C<$algo> must be available in Digest package.
+Verifies C<$signature> against digest of C<$message> (digesting it with double
+sha256) using private key.
 
 Returns boolean.
 
-Character encoding note: C<$message> should be encoded in the proper encoding before passing it to this method. Passing Unicode string will cause the function to fail. You can encode like this (for UTF-8):
+Character encoding note: C<$message> should be encoded in the proper encoding
+before passing it to this method. Passing Unicode string will cause the
+function to fail. You can encode like this (for UTF-8):
 
 	use Encode qw(encode);
 	$message = encode('UTF-8', $message);
 
 =head1 EXCEPTIONS
 
-This module throws an instance of L<Bitcoin::Crypto::Exception> if it encounters an error. It can produce the following error types from the L<Bitcoin::Crypto::Exception> namespace:
+This module throws an instance of L<Bitcoin::Crypto::Exception> if it
+encounters an error. It can produce the following error types from the
+L<Bitcoin::Crypto::Exception> namespace:
 
 =over 2
 
 =item * Sign - couldn't sign the message correctly
+
+=item * ScriptType - couldn't automatically sign the given script type
 
 =item * Verify - couldn't verify the message correctly
 

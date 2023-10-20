@@ -31,7 +31,7 @@ SYMOPSIS
         $c->write || die( $c->error );
 
 VERSION
-        v0.3.2
+        v0.3.3
 
 DESCRIPTION
     This module is designed to read and update "Changes" files that are

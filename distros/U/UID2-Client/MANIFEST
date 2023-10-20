@@ -5,8 +5,9 @@ META.json
 README.md
 cpanfile
 lib/UID2/Client.pm
-lib/UID2/Client/Decryption.pm
+lib/UID2/Client/AdvertisingTokenVersion.pm
 lib/UID2/Client/DecryptionStatus.pm
+lib/UID2/Client/Encryption.pm
 lib/UID2/Client/EncryptionStatus.pm
 lib/UID2/Client/IdentityScope.pm
 lib/UID2/Client/IdentityType.pm
@@ -16,9 +17,10 @@ lib/UID2/Client/Timestamp.pm
 minil.toml
 t/00_compile.t
 t/01_key.t
-t/02_decrypt.t
-t/03_decrypt_v2.t
-t/04_timestamp.t
+t/02_token_v2.t
+t/03_token_v3.t
+t/04_token_v4.t
+t/05_timestamp.t
 t/TestUtils.pm
 META.yml
 MANIFEST

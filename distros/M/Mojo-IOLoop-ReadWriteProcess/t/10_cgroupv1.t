@@ -87,7 +87,7 @@ subtest mock => sub {
 
 sub mockwrite {
   my $c = shift;
-  $c->cgroup->_cgroup->child(shift)->spurt(shift);
+  $c->cgroup->_cgroup->child(shift)->spew(shift);
 }
 
 subtest dev_freez_pid_rdma_controller => sub {

@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Shi::Tfng::Ma - Package for language Tachelhit
 
 =cut
 
 package Locale::CLDR::Locales::Shi::Tfng::Ma;
-# This file auto generated from Data/common/main/shi_Tfng_MA.xml
-#	on Mon 11 Apr  5:37:38 pm GMT
+# This file auto generated from Data\common\main\shi_Tfng_MA.xml
+#	on Fri 13 Oct  9:37:09 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

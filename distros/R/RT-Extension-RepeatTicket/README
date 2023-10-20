@@ -50,8 +50,36 @@ INSTALLATION
     Add bin/rt-repeat-ticket to the daily cron job.
     Restart your webserver
 
+MODES
+  Simple Mode VS Concurrent Tickets Mode
+    This extension supports two different modes for the repeat ticket
+    configurations. The extension originally only supported Concurrent
+    Tickets Mode but many users found the logic counter intuitive.
+
+    Any existing repeat ticket configurations from previous versions will be
+    in Concurrent Tickets Mode unless the definition is changed.
+
+    The default for new repeat ticket configurations is Simple Mode.
+
+   Simple Mode
+    In this mode tickets are created and start on the recurring date. If the
+    lead time field is filled out the ticket will be due that many days
+    after the recurring date. There is no check for existing active tickets
+    and if the rt-repeat-ticket script is run multiple times for the same
+    day it will create a new ticket for each run.
+
+   Concurrent Tickets Mode
+    In this mode the tickets are created with the due date as the recurring
+    date. The tickets start on the due date minus the lead time. You can
+    specify the max number of concurrent active tickets. If the
+    rt-repeat-ticket script is run multiple times for the same day it will
+    only create new tickets if there are fewer active tickets than the max
+    number of concurrent active tickets.
+
 CONFIGURATION
   $RepeatTicketCoexistentNumber
+    Only used in Concurrent Tickets Mode.
+
     The $RepeatTicketCoexistentNumber determines how many tickets can be in
     an active status for a recurrence at any time. A value of 1 means one
     ticket at a time can be active. New tickets will not be created until
@@ -60,15 +88,24 @@ CONFIGURATION
     config value. The extension default is 1 ticket.
 
   $RepeatTicketLeadTime
-    The $RepeatTicketLeadTime becomes the ticket Starts value and sets how
-    far in advance of a ticket's Due date you want the ticket to be created.
-    This essentially is how long you want to give people to work on the
-    ticket.
+    When in Simple Mode the $RepeatTicketLeadTime is the number of days to
+    add to the recurring date for the Due date of the ticket.
+
+    When in Concurrent Tickets Mode the $RepeatTicketLeadTime becomes the
+    ticket Starts value and sets how far in advance of a ticket's Due date
+    you want the ticket to be created. This essentially is how long you want
+    to give people to work on the ticket.
 
     For example, if you create a weekly recurrence scheduled on Mondays and
     set the lead time to 7 days, each Monday a ticket will be created with
     the Starts date set to that Monday and a Due date of the following
     Monday.
+
+    When in Concurrent Tickets Mode, with a number of concurrent active
+    tickets greater than 1, if you set the lead time to be larger than the
+    interval between recurring tickets it can result in strange behavior. It
+    is recommended that the ticket lead time be smaller or equal to the
+    interval between tickets.
 
     The value you set in RT_SiteConfig.pm becomes the system default, but
     you can set this value on each ticket as well. The extension default is
@@ -95,6 +132,16 @@ CONFIGURATION
     columns available in the Display Columns portlet on the RT ticket search
     page.
 
+  $RepeatTicketPreviewNumber
+    By default, the Recurrence Preview will show the next 5 tickets that
+    will be created. You can modify the number of tickets to show by setting
+    the $RepeatTicketPreviewNumber option:
+
+        Set($RepeatTicketPreviewNumber, 10);
+
+    Set the $RepeatTicketPreviewNumber option to 0 to hide the Recurrence
+    Preview.
+
   rt-repeat-ticket
     The rt-repeat-ticket utility evaluates all of your repeating tickets and
     creates any new tickets that are needed. With no parameters, it runs for
@@ -108,6 +155,11 @@ CONFIGURATION
     and run the script for the days you missed. You can also pass dates in
     the future which might be handy if you want to experiment with
     recurrences in a test environment.
+
+   WARNING
+    If you run the script multiple times for the same day then it is
+    possible multiple tickets will be created for the same repeat ticket
+    configuration.
 
 USAGE
   Initial Tickets
@@ -148,11 +200,13 @@ FAQ
 
         *   Do you have rt-repeat-tickets scheduled in cron? Is it running?
 
-        *   Do you have previous tickets still in an active state? Resolve
-            those tickets or increase the concurrent active tickets value.
+        *   If the repeat configuration is in Concurrent Tickets Mode do you
+            have previous tickets still in an active state? Resolve those
+            tickets or increase the concurrent active tickets value.
 
-        *   Is it the right day? Remember to subtract the lead time value to
-            determine the day new tickets should be created.
+        *   Is it the right day? If the repeat configuration is in
+            Concurrent Tickets Mode remember to subtract the lead time value
+            to determine the day new tickets should be created.
 
         *   If you set a start date and another criteria like day of the
             week, the new ticket will be created on the first time that day
@@ -166,6 +220,15 @@ FAQ
     some users can't see or use this feature successfully.
         Make sure those users have "SeeCustomField" and "ModifyCusotmField"
         rights granted for "Original Ticket" custom field.
+
+SEARCHING
+    To search for tickets that have recurrence enabled use the following in
+    a Ticket Search:
+
+        HasAttribute = 'RepeatTicketSettings'
+
+    This will need to be added on the Advanced tab so build the rest of your
+    search as desired and then add the clause on the Advanced tab.
 
 METHODS
   Run( RT::Attribute $attr, DateTime $checkday )

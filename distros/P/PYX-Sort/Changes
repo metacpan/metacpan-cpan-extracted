@@ -1,3 +1,7 @@
+0.05 2023-10-19T10:51:00+02:00
+ - Fix typo in doc.
+ - Rewrite doc to use =head2. Improve doc.
+
 0.04 2023-09-11T18:14:08+02:00
  - Fix bugtracker.
  - Fix sense of example in doc.

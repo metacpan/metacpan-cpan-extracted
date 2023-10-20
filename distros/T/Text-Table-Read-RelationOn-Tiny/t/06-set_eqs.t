@@ -123,28 +123,58 @@ EOT
   is_deeply($obj->elem_ids, $elem_ids_expected, 'elem_ids() not changed');
   is_deeply($obj->tab_elems, $tab_elems_expected, 'tab_elems() not changed');
 
-  is_deeply($obj->matrix, {
-                           0 => {
-                                 0 => undef, 1 => undef, 2 => undef, 3 => undef,
-                                 4 => undef,
-                                 5 => undef, 6 => undef,
-                                 7 => undef
-                                },
-                           4 => {
-                                 4 => undef,
-                                 5 => undef, 6 => undef,
-                                 7 => undef
-                                  },
-                           5 => {
-                                 5 => undef, 6 => undef,
-                                 7 => undef
-                                  },
-                           7 => {
-                                 7 => undef
-                                }
-                          },
-            'matrix'
-           );
+  my $matrix_expected = {
+                         0 => {
+                               0 => undef, 1 => undef, 2 => undef, 3 => undef,
+                               4 => undef,
+                               5 => undef, 6 => undef,
+                               7 => undef
+                              },
+                         4 => {
+                               4 => undef,
+                               5 => undef, 6 => undef,
+                               7 => undef
+                              },
+                         5 => {
+                               5 => undef, 6 => undef,
+                               7 => undef
+                              },
+                         7 => {
+                               7 => undef
+                              }
+                        };
+  is_deeply($obj->matrix, $matrix_expected, 'matrix');
+
+  {
+    note("\tduplicates");
+    my ($dup_elems, $elems) = ($obj->elems(1), $obj->elems());
+    isnt($dup_elems, $elems, 'references: dup_elems != elems');
+    is_deeply($dup_elems, $elems, 'content: dup_elems == elems');
+
+    my ($dup_elem_ids, $elem_ids) = ($obj->elem_ids(1), $obj->elem_ids);
+    isnt($dup_elem_ids, $elem_ids, 'references: dup_elem_ids != elem_ids');
+    is_deeply($dup_elem_ids, $elem_ids, 'content: dup_elem_ids == elem_ids');
+
+    my ($dup_tab_elems, $tab_elems) = ($obj->tab_elems(1), $obj->tab_elems);
+    isnt($dup_tab_elems, $tab_elems, 'references: dup_tab_elems != tab_elems');
+    is_deeply($dup_tab_elems, $tab_elems, 'content: dup_tab_elems == tab_elems');
+
+    my ($dup_eq_ids, $eq_ids) = ($obj->eq_ids(1), $obj->eq_ids);
+    isnt($dup_eq_ids, $elem_ids, 'references: dup_eq_ids != eq_ids');
+    is_deeply($dup_eq_ids, $eq_ids, 'content: dup_eq_ids == eq_ids');
+    foreach my $key (keys(%$eq_ids)) {
+      isnt($dup_eq_ids->{$key}, $eq_ids->{$key}, "$key: refs are different");
+    }
+
+    my ($dup_matrix, $matrix) = ($obj->matrix(dup => 1), $obj->matrix);
+    isnt($dup_matrix, $matrix, 'references: dup_matrix != matrix');
+    is_deeply($dup_matrix, $matrix, 'content: dup_matrix == matrix');
+    foreach my $key (keys(%{$matrix})) {
+      isnt($dup_matrix->{$key}, $matrix->{$key}, "$key: refs are different");
+    }
+
+    note("\tEND duplicates");
+  }
 
   note("allow_subset");
   $obj->get(src => ["|  *  | a |",

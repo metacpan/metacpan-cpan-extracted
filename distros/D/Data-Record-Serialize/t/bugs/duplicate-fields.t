@@ -8,7 +8,7 @@ like(
         my $drs = Data::Record::Serialize->new(
             fields => [ 'a', 'b', 'b' ],
             encode => 'null'
-                                              );
+        );
         $drs->send( { a => 1, b => 2 } );
     },
     qr/duplicate output field/

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp 'croak';
 
-our $VERSION = "0.088";
+our $VERSION = "0.089";
 
 use constant {
     DEFAULT_COMMAND_TIMEOUT => 1.0,
@@ -21,7 +21,7 @@ sub new {
 
     $self->__set_debug($args{debug} ? 1 : 0);
 
-    croak 'need startup_nodes' unless defined $args{startup_nodes};
+    croak 'need startup_nodes' unless defined $args{startup_nodes} && @{$args{startup_nodes}};
     if (my $servers = join(',', @{$args{startup_nodes}})) {
         $self->__set_servers($servers);
     }
@@ -130,7 +130,7 @@ Redis::Cluster::Fast - A fast perl binding for Redis Cluster
 
 Redis::Cluster::Fast is like L<Redis::Fast|https://github.com/shogo82148/Redis-Fast> but support Redis Cluster by L<hiredis-cluster|https://github.com/Nordix/hiredis-cluster>.
 
-To build this module you need at least autoconf, automake, libtool, pkg-config are installed on your system.
+To build and use this module you need libevent-dev >= 2.x is installed on your system.
 
 Recommend Redis 6 or higher.
 

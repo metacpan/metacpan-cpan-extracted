@@ -599,49 +599,29 @@ check_both('ABCDEFGHIJKL');
 }
 
 # Verify error checks
-foreach ([f => 0], [flt => 0, f => 1, flt => undef], [lt => $#rows],
-        )
-{
-  my @pairs = @$_;
-  my @saved = ($first_data_rx, $last_data_rx, $title_rx);
-  scope_guard {
-    first_data_rx $saved[0];
-    last_data_rx  $saved[1];
-    title_rx      $saved[2];
-  };
+# (Varying title_rx may be pointless now that first/last_data_rx are gone...)
+foreach my $trx_val (0,1,undef,$#rows) {
+  my $saved_title_rx = $title_rx;
+  scope_guard { title_rx $saved_title_rx; };
 
-  while (@pairs) {
-    my ($key,$val) = @pairs[0,1]; @pairs = @pairs[2..$#pairs];
-    if ($key =~ s/f//) {
-      first_data_rx $val;
-      die 'bug:first_data_rx as getter' unless u(first_data_rx) eq u($val);
-    }
-    if ($key =~ s/l//) {
-      last_data_rx $val;
-      die 'bug:last_data_rx as getter' unless u(last_data_rx) eq u($val);
-    }
-    if ($key =~ s/t//) {
-      title_rx $val;
-      die 'bug:title_rx as getter' unless u(title_rx) eq u($val);
-    }
-    die "BUG $key" if $key ne "";
+  title_rx $trx_val;
+  die 'bug:title_rx as getter' unless u(title_rx) eq u($trx_val);
 
-    # rx out of range
-    eval { apply_torx {  } [0..$#rows+1]; }; verif_eval_err;
-    eval { apply_torx {  } [-1..$#rows]; }; verif_eval_err;
-    eval { apply_exceptrx {  } [0..$#rows+1]; }; verif_eval_err;
-    eval { apply_exceptrx {  } [-1..$#rows]; }; verif_eval_err;
+  # rx out of range
+  eval { apply_torx {  } [0..$#rows+1]; }; verif_eval_err;
+  eval { apply_torx {  } [-1..$#rows]; }; verif_eval_err;
+  eval { apply_exceptrx {  } [0..$#rows+1]; }; verif_eval_err;
+  eval { apply_exceptrx {  } [-1..$#rows]; }; verif_eval_err;
 
-    # Attempt to modify read-only sheet variables
-    eval { $num_cols = 33 }; verif_eval_err;
-    eval { $title_rx = 33 }; verif_eval_err;
+  # Attempt to modify read-only sheet variables
+  eval { $num_cols = 33 }; verif_eval_err;
+  eval { $title_rx = 33 }; verif_eval_err;
 
-    # Access apply-related sheet vars outside apply
-    eval { my $i = $rx }; verif_eval_err;
-    eval { my $i = $crow[0] }; verif_eval_err;
-    eval { my $i = $linenum }; verif_eval_err;
-    eval { my $i = $crow{A} }; verif_eval_err;
-  }
+  # Access apply-related sheet vars outside apply
+  eval { my $i = $rx }; verif_eval_err;
+  eval { my $i = $crow[0] }; verif_eval_err;
+  eval { my $i = $linenum }; verif_eval_err;
+  eval { my $i = $crow{A} }; verif_eval_err;
 }
 
 # Flavors of apply
@@ -675,29 +655,6 @@ foreach ([f => 0], [flt => 0, f => 1, flt => undef], [lt => $#rows],
       }
     }
     apply { $visited{$rx}++; ck_applyargs(0,\@_); } ; ck_apply(2..6);
-
-    first_data_rx 3;
-    apply { $visited{$rx}++; ck_applyargs(0,\@_); } ; ck_apply(3..6);
-    first_data_rx undef;
-    apply { $visited{$rx}++; ck_applyargs(0,\@_); } ; ck_apply(2..6);
-
-    last_data_rx 4;
-    apply { $visited{$rx}++; ck_applyargs(0,\@_); } ; ck_apply(2..4);
-    last_data_rx undef;
-    apply { $visited{$rx}++; ck_applyargs(0,\@_); } ; ck_apply(2..6);
-
-    first_data_rx 0;  # no-op for apply() because <= title_rx
-    apply { $visited{$rx}++; ck_applyargs(0,\@_); } ; ck_apply(2..6);
-    last_data_rx 4;
-    apply { $visited{$rx}++; ck_applyargs(0,\@_); } ; ck_apply(2..4);
-    apply_all { $visited{$rx}++; ck_applyargs(0,\@_); } ; ck_apply(0..6);
-    first_data_rx undef;
-    last_data_rx undef;
-    apply { $visited{$rx}++; ck_applyargs(0,\@_); } ; ck_apply(2..6);
-
-    last_data_rx 0; # less than title_rx+1
-    apply { $visited{$rx}++; ck_applyargs(0,\@_); } ; ck_apply();
-    last_data_rx undef;
 
     apply_all { $visited{$rx}++; ck_applyargs(0,\@_); } ; ck_apply(0..6);
     foreach my $i (0..6) {
@@ -807,6 +764,12 @@ foreach ([f => 0], [flt => 0, f => 1, flt => undef], [lt => $#rows],
     insert_cols '>$', qw(Otitle); apply { $Otitle = "O$rx" };
     check_both('ABCDEFGHIJKLMNO');
     apply_torx { bug unless $Gtitle eq "G$rx" } 3;
+
+    # Check that clash with existing is diagnosed
+    eval { insert_cols '>$', qw(Otitle) }; verif_eval_err(qr/clash/);
+
+    # Check that non-unique new titles are detected
+    eval { insert_cols '>$', qw(Foo Foo) }; verif_eval_err(qr/more than once/);
 
 # only_cols
 

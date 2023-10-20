@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetAutoshapeWithFormatRequest.name :   ,
-# GetWorksheetAutoshapeWithFormatRequest.sheetName :   ,
-# GetWorksheetAutoshapeWithFormatRequest.autoshapeNumber :   ,
-# GetWorksheetAutoshapeWithFormatRequest.format :   ,
-# GetWorksheetAutoshapeWithFormatRequest.folder :   ,
-# GetWorksheetAutoshapeWithFormatRequest.storageName :    
+# GetWorksheetAutoshapeWithFormatRequest.name : The workbook name.  ,
+# GetWorksheetAutoshapeWithFormatRequest.sheetName : Worksheet name.  ,
+# GetWorksheetAutoshapeWithFormatRequest.autoshapeNumber : The autoshape number.  ,
+# GetWorksheetAutoshapeWithFormatRequest.format : Autoshape conversion format.  ,
+# GetWorksheetAutoshapeWithFormatRequest.folder : The document folder.  ,
+# GetWorksheetAutoshapeWithFormatRequest.storageName : Storage name.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_autoshape_with_format' } = { 
-    	summary => '',
+    	summary => 'Get autoshape description in some format.',
         params => $params,
         returns => 'string',
     };
@@ -142,42 +142,42 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The workbook name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'Worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'autoshape_number' => {
      	datatype => 'int',
      	base_name => 'autoshapeNumber',
-     	description => '',
+     	description => 'The autoshape number.',
      	format => '',
      	read_only => '',
      		},
      'format' => {
      	datatype => 'string',
      	base_name => 'format',
-     	description => '',
+     	description => 'Autoshape conversion format.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'The document folder.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'Storage name.',
      	format => '',
      	read_only => '',
      		},    

@@ -1,0 +1,10 @@
+0.0.1	07/23/2023 11:56:00 PM EST
+      - first trial release with initial macro support
+
+0.0.2   09/15/2023 03:45:00 AM EST
+      - applying patch provided by NERDVANA (thank you!)
+      - updated example that was broken
+
+0.0.3   09/20/2023 03:45:00 AM EST
+      - no change, updated dist.ini to remove ./releases
+        directory

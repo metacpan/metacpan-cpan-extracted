@@ -1,3 +1,8 @@
+0.08 2023-10-19T10:19:44+02:00
+ - Fix typo in doc.
+ - Improve constructor doc.
+ - Update Module::Install to 1.21 version.
+
 0.07 2023-03-30T15:48:16+02:00
  - Move bugtracker to github.
  - Regen META.yml file.

@@ -101,12 +101,16 @@ enum ReprType {
   REPR_MAGIC,        /* instances store backing AV via magic; superconstructor must be foreign */
 
   REPR_AUTOSELECT,   /* pick one of the above depending on foreign_new and SvTYPE()==SVt_PVHV */
+
+  REPR_KEYS,         /* instances are blessed HASHes, each field lives in an individually-named key */
+
+  REPR_PVOBJ,        /* instances are SVt_PVOBJ on perl 5.38+ */
 };
 
 /* Special pad indexes within `method` CVs */
 enum {
   PADIX_SELF = 1,
-  PADIX_SLOTS = 2,
+  PADIX_FIELDS = 2,
 
   /* for role methods */
   PADIX_EMBEDDING = 3,
@@ -139,8 +143,15 @@ enum {
 #define newFIELDPADOP(flags, padix, fieldix)  ObjectPad_newFIELDPADOP(aTHX_ flags, padix, fieldix)
 OP *ObjectPad_newFIELDPADOP(pTHX_ U32 flags, PADOFFSET padix, FIELDOFFSET fieldix);
 
+/* Deprecated */
 #define get_obj_backingav(self, repr, create)  ObjectPad_get_obj_backingav(aTHX_ self, repr, create)
 SV *ObjectPad_get_obj_backingav(pTHX_ SV *self, enum ReprType repr, bool create);
+
+#define get_obj_fieldstore(self, repr, create)  ObjectPad_get_obj_fieldstore(aTHX_ self, repr, create)
+SV *ObjectPad_get_obj_fieldstore(pTHX_ SV *self, enum ReprType repr, bool create);
+
+#define get_obj_fieldsv(self, classmeta, fieldmeta)  ObjectPad_get_obj_fieldsv(aTHX_ self, classmeta, fieldmeta)
+SV *ObjectPad_get_obj_fieldsv(pTHX_ SV *self, ClassMeta *classmeta, FieldMeta *fieldmeta);
 
 /* Class API */
 #define mop_create_class(type, name)  ObjectPad_mop_create_class(aTHX_ type, name)

@@ -12,6 +12,13 @@ my $MIN_PERL = '5.014';  # pluggable keywords, XOP
 # platforms. I have no idea why.
 $MIN_PERL = '5.022' if $^O eq "MSWin32";
 
+my @extra_compiler_flags = qw( -Ihax );
+
+# MSWin32 needs NO_XSLOCKS to make longjmp work.
+if( $^O eq "MSWin32" ) {
+   push @extra_compiler_flags, "-DNO_XSLOCKS=1";
+}
+
 my $build = Module::Build->new(
    module_name => "Syntax::Keyword::Defer",
    test_requires => {
@@ -25,6 +32,7 @@ my $build = Module::Build->new(
       'perl' => $MIN_PERL,
       'XS::Parse::Keyword' => '0.13',
    },
+   extra_compiler_flags => \@extra_compiler_flags,
    license => 'perl',
    create_license => 1,
    create_readme  => 1,
@@ -33,8 +41,6 @@ my $build = Module::Build->new(
          x_IRC => "irc://irc.perl.org/#io-async",
       },
    },
-
-   extra_compiler_flags => [qw( -Ihax )],
 );
 
 XS::Parse::Keyword::Builder->extend_module_build( $build );

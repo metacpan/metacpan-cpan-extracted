@@ -4,11 +4,11 @@ use strict;
 use warnings;
 use 5.013002;
 
-our $VERSION = '0.300003';
+our $VERSION = '0.300004';
 
 1;
 
-# ABSTRACT: Create MaxMind DB database files
+# ABSTRACT: DEPRECATED Create MaxMind DB database files
 
 __END__
 
@@ -18,11 +18,11 @@ __END__
 
 =head1 NAME
 
-MaxMind::DB::Writer - Create MaxMind DB database files
+MaxMind::DB::Writer - DEPRECATED Create MaxMind DB database files
 
 =head1 VERSION
 
-version 0.300003
+version 0.300004
 
 =head1 SYNOPSIS
 
@@ -60,6 +60,12 @@ version 0.300003
 This distribution contains the code necessary to write L<MaxMind DB database
 files|http://maxmind.github.io/MaxMind-DB/>. See L<MaxMind::DB::Writer::Tree>
 for API docs.
+
+=head1 DEPRECATED
+
+This code is no longer maintained. We recommend using the Go
+L<mmdbwriter package|https://github.com/maxmind/mmdbwriter> to write
+MMDB files.
 
 =head1 MAC OS X SUPPORT
 
@@ -109,9 +115,13 @@ Mark Fowler <mfowler@maxmind.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Florian Ragwitz Ilya Melamed Jan Bieron Narsimham Chelluri Thomas J Mather William Storey
+=for stopwords Colin Watson Florian Ragwitz Ilya Melamed Jan Bieron José Joaquín Atria Mark R Narsimham Chelluri Nick Logan Thomas J Mather William Storey
 
 =over 4
+
+=item *
+
+Colin Watson <cjwatson@debian.org>
 
 =item *
 
@@ -127,7 +137,19 @@ Jan Bieron <jbieron+github@gmail.com>
 
 =item *
 
+José Joaquín Atria <jjatria@gmail.com>
+
+=item *
+
+Mark R <github@mark.org.il>
+
+=item *
+
 Narsimham Chelluri <nchelluri@users.noreply.github.com>
+
+=item *
+
+Nick Logan <nlogan@maxmind.com>
 
 =item *
 
@@ -141,7 +163,7 @@ William Storey <wstorey@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by MaxMind, Inc.
+This software is copyright (c) 2023 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

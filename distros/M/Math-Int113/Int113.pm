@@ -3,7 +3,10 @@ use strict;
 use warnings;
 use Config;
 
-$Math::Int113::VERSION = '0.02';
+require Exporter;
+*import = \&Exporter::import;
+
+$Math::Int113::VERSION = '0.03';
 
 use constant IVSIZE_IS_8  => $Config{ivsize} == 8 ? 1 : 0;
 
@@ -16,6 +19,7 @@ use overload
 '-'    => \&oload_sub,
 '*'    => \&oload_mul,
 '/'    => \&oload_div,
+'%'    => \&oload_mod,
 '**'   => \&oload_pow,
 '++'   => \&oload_inc,
 '--'   => \&oload_dec,
@@ -33,6 +37,17 @@ use overload
 '>>'   => \&oload_rshift,
 '<<'   => \&oload_lshift,
 ;
+
+##############################################
+my @tagged = qw(
+    coverage
+    );
+
+@Math::Int113::EXPORT = ();
+@Math::Int113::EXPORT_OK = @tagged;
+
+%Math::Int113::EXPORT_TAGS = (all => \@tagged);
+#############################################
 
 if($Config{nvtype} ne '__float128') {
    if($Config{nvtype} ne 'long double' &&
@@ -54,7 +69,7 @@ sub new {
   my $v = shift;
     if(overflows($v)) {
     my($package, $filename, $line) = caller;
-    warn "overlow in package $package, file $filename, at line $line\n";
+    warn "overflow in package $package, file $filename, at line $line\n";
     die "Arg (", sprintf("%.36g", $v), "), given to new(), overflows 113 bits";
     }
   my %h = ('val' => int($v));
@@ -120,6 +135,22 @@ sub oload_div {
   return Math::Int113->new(int(int($_2) / $_1->{val}))
     if $_3;
   return Math::Int113->new(int($_1->{val} / int($_2)));
+}
+
+sub oload_mod {
+  my($_1, $_2, $_3) = (shift, shift, shift);
+  if(ref($_2) eq 'Math::Int113') {
+    return Math::Int113->new($_2->{val} % $_1->{val})
+      if $_3;
+    return Math::Int113->new($_1->{val} % $_2->{val})
+  }
+
+  die "Overflow in arg (", sprintf("%.36g", $_2), ") given to overloaded modulus"
+    if overflows(int($_2));
+
+  return Math::Int113->new(int($_2) % $_1->{val})
+    if $_3;
+  return Math::Int113->new($_1->{val} % int($_2));
 }
 
 sub oload_pow {
@@ -210,6 +241,8 @@ sub oload_rshift {
     if $_1 < 0;
   die "Cannot right shift by a negative amount ($_2)"
     if $_2 < 0;
+  die "Specified right shift amount ($_2) exceeds 112"
+    if $_2 >= 113;
 
   if(ref($_2) eq 'Math::Int113') {
     return $_1 / (2 ** ($_2->{val}));
@@ -227,6 +260,9 @@ sub oload_lshift {
     if $_1 < 0;
   die "Cannot left shift by a negative amount ($_2)"
     if $_2 < 0;
+  die "Specified left shift amount ($_2) exceeds 112"
+    if $_2 >= 113;
+
 
   if(ref($_2) eq 'Math::Int113') {
     return $_1 * (2 ** ($_2->{val}));
@@ -432,5 +468,28 @@ sub hi_lo {
     return ($hi, $m1, $m2, $lo);
   }
 }
+
+sub coverage {
+  my($iv_bits, $nv_prec, $max_prec) = (shift, shift, shift);
+  return ( (2**$iv_bits)-1, 0 ) if $iv_bits >= $max_prec;
+
+  my $integer_max = (2**$max_prec) - 1;
+  $max_prec--;
+
+  my $rep = (2**$iv_bits) - 1; # All values in 1..(2**$iv_bits)-1 are
+                               # representable - though this might not be
+                               # so for the range -((2**$iv_bits)-1..-1.
+
+  for my $v($iv_bits..$max_prec) { $rep += (2 ** _min($v,$nv_prec)) }
+  my $unrep = $integer_max - $rep;
+  return ( sprintf("%.36g", $rep), sprintf("%.36g", $unrep) );
+}
+
+sub _min {
+  my($v1, $v2) = (shift, shift);
+  return $v1 if $v1 <= $v2;
+  return $v2;
+}
+
 1;
 

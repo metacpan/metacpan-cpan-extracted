@@ -876,28 +876,28 @@ package Sidef::Types::Array::Array {
 
     sub lt {
         my ($self, $array) = @_;
-        Math::GMPz::Rmpz_sgn(${$self->cmp($array)}) < 0
+        $self->cmp($array)->lt(Sidef::Types::Number::Number::ZERO)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub le {
         my ($self, $array) = @_;
-        Math::GMPz::Rmpz_sgn(${$self->cmp($array)}) <= 0
+        $self->cmp($array)->le(Sidef::Types::Number::Number::ZERO)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub gt {
         my ($self, $array) = @_;
-        Math::GMPz::Rmpz_sgn(${$self->cmp($array)}) > 0
+        $self->cmp($array)->gt(Sidef::Types::Number::Number::ZERO)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub ge {
         my ($self, $array) = @_;
-        Math::GMPz::Rmpz_sgn(${$self->cmp($array)}) >= 0
+        $self->cmp($array)->ge(Sidef::Types::Number::Number::ZERO)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -1035,9 +1035,7 @@ package Sidef::Types::Array::Array {
 
     sub sum_kv {
         my ($self, $block) = @_;
-        $self->_reduce_by('sum',
-                          Sidef::Types::Number::Number::ZERO,
-                          sub { $block->run(Sidef::Types::Number::Number::_set_int($_[0]), $_[1]) });
+        $self->_reduce_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run(Sidef::Types::Number::Number::_set_int($_[0]), $_[1]) });
     }
 
     sub sum_2d {
@@ -1083,9 +1081,7 @@ package Sidef::Types::Array::Array {
 
     sub prod_kv {
         my ($self, $block) = @_;
-        $self->_reduce_by('prod',
-                          Sidef::Types::Number::Number::ONE,
-                          sub { $block->run(Sidef::Types::Number::Number::_set_int($_[0]), $_[1]) });
+        $self->_reduce_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run(Sidef::Types::Number::Number::_set_int($_[0]), $_[1]) });
     }
 
     sub prod {
@@ -2171,6 +2167,122 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Number::Number::_set_int($middle);
     }
 
+    sub bindex_min_by {
+        my ($self, $block) = @_;
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        while ($left < $right) {
+
+            $middle = (($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = CORE::int($block->run($item));
+
+            if ($cmp < 0) {
+                $left = $middle + 1;
+            }
+            else {
+                $right = $middle;
+            }
+        }
+
+        Sidef::Types::Number::Number::_set_int($left);
+    }
+
+    sub bindex_min {
+        my ($self, $obj) = @_;
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+            goto &bindex_min_by;
+        }
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        while ($left < $right) {
+
+            $middle = (($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = CORE::int($item cmp $obj);
+
+            if ($cmp < 0) {
+                $left = $middle + 1;
+            }
+            else {
+                $right = $middle;
+            }
+        }
+
+        Sidef::Types::Number::Number::_set_int($left);
+    }
+
+    sub bindex_max_by {
+        my ($self, $block) = @_;
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        while ($left < $right) {
+
+            $middle = 1 + (($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = CORE::int($block->run($item));
+
+            if ($cmp > 0) {
+                $right = $middle - 1;
+            }
+            else {
+                $left = $middle;
+            }
+        }
+
+        Sidef::Types::Number::Number::_set_int($right);
+    }
+
+    sub bindex_max {
+        my ($self, $obj) = @_;
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+            goto &bindex_max_by;
+        }
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        while ($left < $right) {
+
+            $middle = 1 + (($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = CORE::int($item cmp $obj);
+
+            if ($cmp > 0) {
+                $right = $middle - 1;
+            }
+            else {
+                $left = $middle;
+            }
+        }
+
+        Sidef::Types::Number::Number::_set_int($right);
+    }
+
+    sub bsearch_min {
+        my ($self, $obj) = @_;
+        my $index = $self->bindex_min($obj);
+        $index->is_mone ? undef : $self->[CORE::int($index)];
+    }
+
+    sub bsearch_max {
+        my ($self, $obj) = @_;
+        my $index = $self->bindex_max($obj);
+        $index->is_mone ? undef : $self->[CORE::int($index)];
+    }
+
     sub bsearch_le {
         my ($self, $obj) = @_;
         my $index = $self->bindex_le($obj);
@@ -2474,8 +2586,7 @@ package Sidef::Types::Array::Array {
                 my $fc = Sidef::Types::Number::Polynomial->new(map { @$_ } @cf)->div($d->neg)->coeffs;
 
                 my %lookup = (map { @$_ } @$fc);
-                return Sidef::Types::Array::Array->new(
-                                  [map { $lookup{$_} // Sidef::Types::Number::Number::ZERO } CORE::reverse(0 .. $degree - 1)]);
+                return Sidef::Types::Array::Array->new([map { $lookup{$_} // Sidef::Types::Number::Number::ZERO } CORE::reverse(0 .. $degree - 1)]);
             }
 
             @A = @B;
@@ -3243,6 +3354,35 @@ package Sidef::Types::Array::Array {
         bless \@result;
     }
 
+    sub ordered_partitions {
+        my ($self, $k, $block) = @_;
+
+        require Algorithm::Combinatorics;
+
+        if (not defined($block) and ref($k) eq 'Sidef::Types::Block::Block') {
+            ($block, $k) = ($k, undef);
+        }
+
+        my $iter = do {
+            local $SIG{__WARN__} = sub { };
+            Algorithm::Combinatorics::subsets([0 .. $#{$self} - 1], (defined($k) ? (CORE::int($k) - 1) : ()));
+        };
+
+        if (defined($block)) {
+            while (defined(my $indices = $iter->next)) {
+                $block->run(@{$self->segment(@$indices)});
+            }
+            return $self;
+        }
+
+        my @result;
+        while (defined(my $indices = $iter->next)) {
+            push @result, $self->segment(@$indices);
+        }
+
+        bless \@result;
+    }
+
     sub nth_permutation {
         my ($self, $n) = @_;
 
@@ -3348,8 +3488,7 @@ package Sidef::Types::Array::Array {
 
     sub perm2num {
         my ($self) = @_;
-        Sidef::Types::Number::Number::_set_int(Math::Prime::Util::GMP::permtonum([map { CORE::int($_) } @$self])
-                                               // return undef);
+        Sidef::Types::Number::Number::_set_int(Math::Prime::Util::GMP::permtonum([map { CORE::int($_) } @$self]) // return undef);
     }
 
     sub det_bareiss {
@@ -3933,8 +4072,7 @@ package Sidef::Types::Array::Array {
 
             my $s;
 
-            '['
-              . CORE::join(', ', map { ref($_) && ($s = UNIVERSAL::can($_, 'dump')) ? $s->($_) : ($_ // 'nil') } @$obj) . ']';
+            '[' . CORE::join(', ', map { ref($_) && ($s = UNIVERSAL::can($_, 'dump')) ? $s->($_) : ($_ // 'nil') } @$obj) . ']';
         };
 
         no warnings 'redefine';

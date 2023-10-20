@@ -9,7 +9,7 @@ use List::Util qw(uniq any first);
 use Moose::Util::TypeConstraints qw(enum subtype where);
 use namespace::autoclean;
 
-our $VERSION = '3.2';
+our $VERSION = '3.3';
 
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
@@ -240,22 +240,25 @@ sub configure {
         qw(ExecDir ShareDir MakeMaker Manifest
             TestRelease PodWeaver),
 
-        ['Git::Contributors' => { order_by => 'commits' }],
+        ['Git::Contributors' => { order_by => 'commits', include_authors => 1 }],
         ['ContributorsFile'  => { filename => 'CONTRIBUTORS' }],
 
         [
             'AutoPrereqs' => {
                 skip => [
-                    qw(^perl$
-                        utf8
-                        warnings
-                        strict
-                        overload
-                        feature
+                    map { "^$_\$" } qw(
+                        Data::Dumper
+                        Exporter
                         autodie
                         base
                         constant
-                        Exporter
+                        feature
+                        overload
+                        perl
+                        strict
+                        utf8
+                        vars
+                        warnings
                     )
                 ]
             }
@@ -378,7 +381,7 @@ Dist::Zilla::PluginBundle::Author::WATERKIP - An plugin bundle for all distribut
 
 =head1 VERSION
 
-version 3.2
+version 3.3
 
 =head1 SYNOPSIS
 
@@ -428,7 +431,12 @@ following F<dist.ini>:
     filename = CONTRIBUTORS
 
     [AutoPrereqs]
-    skip = ^perl$, utf8, warnings, strict, overload
+    skip = ^perl$
+    skip = ^utf8$
+    skip = ^warnings$
+    skip = ^strict$
+    skip = ^overload$
+    skip = ^vars$
 
     [Prereqs::AuthorDeps]
     [MinimumPerl]

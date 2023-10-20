@@ -6,81 +6,156 @@ use v5.12;
 use warnings;
 use Getopt::Long qw(:config no_ignore_case);
 use Pod::Usage;
+use Term::ANSIColor qw(:constants);
+use NBI::Slurm;
 
+my $config = NBI::Slurm::load_config("$USER/.nbislurm.config");
 my $output  = undef;
 my $move   = 0;
 my $def_file = undef;
-my $dest = '/qib/platforms/Informatics/transfer/outgoing/singularity/core/';
-
+my $dest = $config->{'default_dest'} // '/qib/platforms/Informatics/transfer/outgoing/singularity/core/';
+my $temporary_directory = $config->{'tmpdir'} // $ENV{TMPDIR} // '/tmp';
+my $verbose = 0;
+my $dry = 0;
 GetOptions(
     'o|output=s'  => \$output,
     'd|def=s'     => \$def_file,
+    'dest=s'      => \$dest,
     'm|move'      => \$move,
+    'd|dry'       => \$dry,
+    'v|verbose'   => \$verbose,
 );
-my ($package, $version) = @ARGV;
 
-if ( ! -d $dest ) {
-    die "Destination directory $dest does not exist.\n";
-}
-if (not defined $package) {
+my $packages = '';
+if (scalar @ARGV == 0) {
+    say STDERR "No package provided." if $verbose;
     pod2usage(-verbose => 1);
 }
 
-$version = last_ver($package) if not defined $version;
+say STDERR BOLD, GREEN, "Make image from Bioconda
+============================================================", RESET;
 
-if (not defined $output) {
-    $output = $package . '__' . $version . '.simg';
+say STDERR "Preparing definition for ", scalar @ARGV, " packages." if $verbose;
+for my $package_str (@ARGV) {
+    my $package = '';
+    my $version = '';
+    my $requirement = '';
+
+    if ($package_str =~ /(.*)(=|>|>=)(.*)/) {
+        # Package with version requirement
+        $package = $1;
+        $requirement = $2;
+        $version = "$3";
+        say STDERR "- Adding package ", BOLD, $package, RESET, ", version [$requirement] $version" if $verbose;
+
+    } else {
+        # Package without version requirement. Get last version if only one package is provided
+        $package = $package_str;
+        my $v = last_ver($package);
+        if ($v eq '') {
+            die "Error retrieving last version for $package.\n";
+        }
+        if (scalar @ARGV == 1) {
+            $version = "$v";
+            $requirement = '=';
+            say STDERR " - Package $package will default to last ver $v" if $verbose;
+        } else {
+            say STDERR " - Package $package has no version requirement" if $verbose;
+        }
+        say "- Adding package ", BOLD, $package, RESET, ", last version would be $v" if $verbose;
+    }
+
+    if (not defined $output) {
+            die "Package name not defined.\n" if $package eq '';
+            my $v = $version ne '' ? $version : 'last';
+            $output = $package . '__' . $v. '.simg';
+            say STDERR "- Setting output file to $output (first package)" if $verbose;  
+    }
+    $packages .= qq("${package}${requirement}${version}" );
+
 }
 
-say STDERR "
-Package:     $package
-Version:     $version
-Output:      $output
-Destination: $dest/$output
-";
+
+if ( ! -d $dest ) {
+    say STDERR RED, "[ERROR]", RESET;
+    die "Destination directory $dest does not exist.\n";
+}
+
+
+
+
+say STDERR GREEN, "
+============================================================", RESET, "
+Package(s):  $packages
+Output:      $output";
+print STDERR "Destination: $dest" if $move;
+print STDERR GREEN, "\n============================================================
+", RESET;
 
 if ( ! connected() ) {
     say STDERR "[WARNING] Not connected to the internet, are you in the software node?";
 }
 
-if ( -e $def_file) {
+if ( defined $def_file and -e $def_file) {
     # Use the provided definition file
+    say STDERR "Using provided definition file $def_file. [EXPERIMENTAL]";
 } else {
-    my $def = template();
-    $def =~ s/\{package\}/$package/g;
-    $def =~ s/\{version\}/$version/g;
-
-    my $tmp_file = $ENV{TMPDIR} // '/tmp' . '/' . $package . '.def';
+    my $def_template = template();
+    my $data = {
+        'packages' => $packages,
+    };
+    my $def = fill_template($def_template, $data);
+    my $rand_str = rand_string(38);
+    my $tmp_file = $temporary_directory . '/' . $output . '_' . $rand_str . '.def';
+    say STDERR "Creating temporary definition file at $tmp_file." if $verbose;
     open(my $fh, ">", $tmp_file);
     print $fh $def;
     close $fh;
 
     $def_file = $tmp_file;
+    say STDERR "Definition file created at $def_file.";
 }
 
-my $cmd = "sudo singularity build $output $def_file";
+my $cmd = "sudo singularity build \"$output\" \"$def_file\" 2>&1 > \"$def_file.log\"";
 
+if ($dry) {
+    say STDERR "Dry run, not executing command.";
+    say STDERR $cmd;
+    exit;
+}
+# Execute cmd redirecting STDERR to STDOUT and STDOUT to a file
+# This is to avoid the error message from micromamba
+# "WARNING: apt does not have a stable CLI interface. Use with caution in scripts."
 if (system($cmd) != 0) {
     die "Error building image.\n";
 } 
 
 if ($move) {
-    my $mv_cmd = "mv $output $dest";
+    my $mv_cmd = "mv \"$output\" \"$dest\"";
     if (system($mv_cmd) != 0) {
         die "Error moving image to $dest.\n";
     }
 }
+
+print STDERR "Output: $dest\n";
+print STDERR "Log:    $def_file.log\n";
+
 sub last_ver {
     my $channel = 'bioconda';
     my $package = shift;
     my $answer = `curl --silent -X GET --header 'Accept: application/json' 'https://api.anaconda.org/package/$channel/$package'| grep latest_version | cut -f4 -d\\"`;
+    # Check if the answer is a version number
+    if ($answer !~ /\d/) {
+        say STDERR RED, "Error", RESET, ": retrieving last version for $package: $answer";
+        return '';
+    }
     chomp($answer);
     return $answer;
 
 }
 
 sub connected {
-    my $cmd = "curl ifconfig.me";
+    my $cmd = "curl --silent ifconfig.me";
     my $ip = `$cmd`;
     if ($ip =~/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/) {
         return 1;
@@ -88,20 +163,87 @@ sub connected {
         return 0;
     }
 }
+sub fill_template {
+    my ($template, $data) = @_;
+
+    # Regular expression to match variables like {name:=customer}
+    while ($template =~ /\{([^}]+)\}/g) {
+        my $variable = $1;
+
+        # Split variable into name and default value
+        my ($name, $default) = split /:=/, $variable, 2;
+
+        # If the variable exists in the data hash, replace it
+        if (exists $data->{$name}) {
+            $template =~ s/\{$variable\}/$data->{$name}/g;
+        } elsif (defined $default) {
+            # If there's a default value, use it
+            $template =~ s/\{$variable\}/$default/g;
+        } else {
+            die "Variable '$variable' is unsubstituted and has no default value.";
+        }
+    }
+
+    return $template;
+}
+
+
 sub template {
 my $template =<<'EOF';
 Bootstrap: docker
 From: mambaorg/micromamba:latest
 
 %post
-    micromamba create --quiet -y -n package_env -c conda-forge -c bioconda -c defaults {package}={version}
+    #Preparing container for: {packages} 
+    # Core Bioinformatics, using NBI::Slurm
+    echo  "[1] Create environment"
+    micromamba create --yes -p /opt/conda/envs/package_env/
+
+    # echo -e in BOLD "ciao" then reset color
+    echo  "[2] Install package dependencies"
+    micromamba install --yes --only-deps --prefix /opt/conda/envs/package_env/ -c conda-forge -c bioconda -c defaults {packages}
+    touch /list_deps.txt
+    if [[ -e /opt/conda/envs/package_env/bin ]]; then
+      ls /opt/conda/envs/package_env/bin > /list_deps.txt
+    fi
+      
+    echo  "[3] Install package"
+    micromamba install --yes --prefix /opt/conda/envs/package_env/ -c conda-forge -c bioconda -c defaults {packages}
+    touch  /list_all.txt
+    if [[ -d "/opt/conda/envs/package_env/bin" ]]; then
+      ls /opt/conda/envs/package_env/bin > /list_all.txt
+    fi
+
+    echo  "[4] Clean environment"
     micromamba clean --all --yes
+    echo  "[5] Create binaries list: /etc/binaries.txt"
+    sort /list_all.txt > /tmp/list_all.txt
+    sort /list_deps.txt > /tmp/list_deps.txt
+    comm /tmp/list_all.txt /tmp/list_deps.txt -2 -3 | sort > /etc/binaries.txt
+    rm /list_all.txt /list_deps.txt
+    rm /tmp/*txt
+    echo  "[6] Finalize: list"
+    cat /etc/binaries.txt
+    {post:=#Nothing to add}
 
 %environment
     export PATH=/opt/conda/envs/package_env/bin:$PATH
+
 EOF
 
 return $template;
+}
+
+sub rand_string {
+    my $valid_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    my $length = shift;
+    my $random_string = "";
+    my $num_chars = length($valid_chars);
+    for (my $i = 0; $i < $length; $i++) {
+        my $random_position = int(rand($num_chars));
+        $random_string .= substr($valid_chars, $random_position, 1);
+    }
+    return $random_string;
 }
 
 __END__
@@ -116,15 +258,17 @@ make_image_from_bioconda - Create a Singularity/Apptainer image from micromamba
 
 =head1 VERSION
 
-version 0.6.1
+version 0.8.1
 
 =head1 SYNOPSIS
 
-    make_image [options] package_name package_version
+    make_image_from_bioconda [options] packageName=version ...
 
 =head1 DESCRIPTION
 
-Create a Singularity/Apptainer image from a single micromamba package
+Create a Singularity/Apptainer image from a single micromamba package.
+
+Multiple packages can be provided, but it's recommended to decide a sensible output name in that case.
 
 =head1 OPTIONS
 
@@ -132,15 +276,26 @@ Create a Singularity/Apptainer image from a single micromamba package
 
 =item B<-o, --output> I<FILENAME>
 
-The name of the output image file. Default: singularity.simg
+The name of the output image file. Default: package__version.simg
 
 =item B<-d, --def> I<FILENAME>
 
-The name of the definition file [optional]
+The name of the definition file [optional, experimental]
 
 =item B<-m, --move>
 
-Move to the Core Bioinformatics repository
+Move to the Core Bioinformatics repository after building.
+See the C<--dest> option.
+
+=item B<--dest> I<PATH>
+
+The destination directory for the image file. 
+Default: /qib/platforms/Informatics/transfer/outgoing/singularity/core/,
+or C<default_dest> in the configuration.
+
+=item B<-v, --verbose>
+
+Verbose output
 
 =back
 

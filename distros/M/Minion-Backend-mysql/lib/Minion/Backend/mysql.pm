@@ -15,7 +15,7 @@ use Time::Piece ();
 has 'mysql';
 has 'no_txn' => sub { 0 };
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 # The dequeue system has a couple limitations:
 # 1. There is no way to directly notify a sleeping worker of an incoming
@@ -1192,7 +1192,7 @@ Minion::Backend::mysql
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 
@@ -1800,3 +1800,9 @@ DROP TABLE IF EXISTS minion_notes;
 DROP TABLE IF EXISTS minion_jobs_depends;
 DROP TABLE IF EXISTS minion_jobs;
 DROP FUNCTION minion_lock;
+
+-- 14 up
+ALTER TABLE minion_jobs ADD CONSTRAINT minion_jobs_pk_id PRIMARY KEY (id), ALGORITHM=INPLACE, LOCK=NONE;
+
+-- 14 down
+ALTER TABLE minion_jobs DROP PRIMARY KEY;

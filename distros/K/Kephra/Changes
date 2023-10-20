@@ -1,5 +1,15 @@
 
-0.404  2022-11-25    lichtkind
+0.405  2023-10-14    lichtkind
+-------
+    * = more settings
+    * * config under ~/.config/kephra/main-recent.yaml stores most intern vars
+    * + document menu with 4 items: soft tabs, tab size, EOL
+    * + toggle caret line visibility
+    * ! expand selection can handle touching brace pairs
+    * ! cursor pos in status bar shows correct line nr now
+    * ! can cancel file dialogs
+
+0.404  2022-12-09    lichtkind
 -------
     * = flexible optics
     * + delete line (Alt+Del)
@@ -30,4 +40,9 @@
     * + rich editing capabilities
 
 
-    * + shrink selection (Ctrl+Shift+A)
+
+TODO:
+
+#    * * Syntax modes for RAKU, RUST, C, Ruby, Python, bash, YAML, JSON, Markdown
+#    * + shrink selection (Ctrl+Shift+A)
+#    * multi doc

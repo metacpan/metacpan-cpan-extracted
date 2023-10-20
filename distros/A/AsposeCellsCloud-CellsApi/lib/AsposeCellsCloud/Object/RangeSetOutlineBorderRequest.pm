@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Indicates range set outline border request.',
                                   class => 'RangeSetOutlineBorderRequest',
                                   required => [], # TODO
 }                                 );
@@ -129,28 +129,28 @@ __PACKAGE__->method_documentation({
      'range' => {
      	datatype => 'Range',
      	base_name => 'Range',
-     	description => '',
+     	description => 'Encapsulates the object that represents a range of cells within a spreadsheet.',
      	format => '',
      	read_only => '',
      		},
      'border_edge' => {
      	datatype => 'string',
      	base_name => 'borderEdge',
-     	description => '',
+     	description => 'LeftBorder, RightBorder, TopBorder, BottomBorder, DiagonalDown, DiagonalUp, Vertical and Horizontal.',
      	format => '',
      	read_only => '',
      		},
      'border_style' => {
      	datatype => 'string',
      	base_name => 'borderStyle',
-     	description => '',
+     	description => 'None, Thin, Medium, Dashed, Dotted, Thick, Double, Hair, MediumDashed, DashDot, MediumDashDot, DashDotDot, MediumDashDotDot and SlantedDashDot.',
      	format => '',
      	read_only => '',
      		},
      'border_color' => {
      	datatype => 'Color',
      	base_name => 'borderColor',
-     	description => '',
+     	description => 'Border color.',
      	format => '',
      	read_only => '',
      		},    

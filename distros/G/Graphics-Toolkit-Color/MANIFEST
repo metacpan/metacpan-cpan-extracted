@@ -21,7 +21,9 @@ lib/Graphics/Toolkit/Color/Space/Instance/HSB.pm
 lib/Graphics/Toolkit/Color/Space/Instance/HSL.pm
 lib/Graphics/Toolkit/Color/Space/Instance/HSV.pm
 lib/Graphics/Toolkit/Color/Space/Instance/HWB.pm
+lib/Graphics/Toolkit/Color/Space/Instance/LAB.pm
 lib/Graphics/Toolkit/Color/Space/Instance/RGB.pm
+lib/Graphics/Toolkit/Color/Space/Instance/XYZ.pm
 lib/Graphics/Toolkit/Color/Space/Instance/YIQ.pm
 lib/Graphics/Toolkit/Color/Space/Shape.pm
 lib/Graphics/Toolkit/Color/Space/Util.pm
@@ -38,6 +40,8 @@ t/14_space_hsv.t
 t/15_space_hsb.t
 t/16_space_hwb.t
 t/17_space_yiq.t
+t/18_space_lab.t
+t/19_space_xyz.t
 t/30_space_hub.t
 t/40_values.t
 t/41_name.t

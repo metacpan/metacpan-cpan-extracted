@@ -1,0 +1,8 @@
+package Module::Install::RTx;
+
+@remove_files = (
+    'html/Callbacks/RT-Extension-PreviewInSearch/Search/Results.html/BeforeResults',
+);
+
+1;
+

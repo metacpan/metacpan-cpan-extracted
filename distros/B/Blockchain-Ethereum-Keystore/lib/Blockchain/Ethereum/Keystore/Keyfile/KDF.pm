@@ -1,8 +1,11 @@
 use v5.26;
 use Object::Pad;
 
-package Blockchain::Ethereum::Keystore::Keyfile::KDF 0.005;
+package Blockchain::Ethereum::Keystore::Keyfile::KDF;
 class Blockchain::Ethereum::Keystore::Keyfile::KDF;
+
+our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
+our $VERSION   = '0.009';          # VERSION
 
 use Crypt::KeyDerivation qw(pbkdf2);
 use Crypt::ScryptKDF     qw(scrypt_raw);
@@ -44,3 +47,31 @@ method _decode_kdf_scrypt ($password) {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Blockchain::Ethereum::Keystore::Keyfile::KDF
+
+=head1 VERSION
+
+version 0.009
+
+=head1 AUTHOR
+
+Reginaldo Costa <refeco@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023 by REFECO.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.20, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   App::ansiecho:
     file: lib/App/ansiecho.pm
-    version: '1.04'
+    version: '1.05'
 requires:
   Encode: '0'
   Getopt::EX: v2.1.1
@@ -35,13 +35,13 @@ requires:
   List::Util: '0'
   Pod::Usage: '0'
   Term::ANSIColor::Concise: '2.01'
-  Text::ANSI::Printf: '2.01'
+  Text::ANSI::Printf: '2.02'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/tecolicom/App-ansiecho/issues
   homepage: https://github.com/tecolicom/App-ansiecho
   repository: https://github.com/tecolicom/App-ansiecho.git
-version: '1.04'
+version: '1.05'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

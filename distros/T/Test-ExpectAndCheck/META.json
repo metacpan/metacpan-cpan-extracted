@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -24,24 +24,25 @@
             "List::Util" : "0",
             "Test::Builder" : "1.302",
             "Test::Deep" : "0",
-            "Test::Future::Deferred" : "0"
+            "Test::Future::Deferred" : "0",
+            "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Builder::Tester" : "0",
-            "Test::More" : "0.88"
+            "Test2::V0" : "0",
+            "Test::Builder::Tester" : "0"
          }
       }
    },
    "provides" : {
       "Test::ExpectAndCheck" : {
          "file" : "lib/Test/ExpectAndCheck.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Test::ExpectAndCheck::Future" : {
          "file" : "lib/Test/ExpectAndCheck/Future.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -50,6 +51,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

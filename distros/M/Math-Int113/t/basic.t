@@ -5,7 +5,7 @@ use Config;
 
 use Test::More;
 
-cmp_ok($Math::Int113::VERSION, 'eq', '0.02', "version number is as expected");
+cmp_ok($Math::Int113::VERSION, 'eq', '0.03', "version number is as expected");
 
 my $obj1 = Math::Int113->new(~0);
 
@@ -62,5 +62,35 @@ cmp_ok($obj2, '>=', 120892581960759230028842188800, "overload '>=' ok with equiv
 }
 cmp_ok(Math::Int113->new(0.9999), '==', 0, "0.9999 treated as 0");
 cmp_ok(Math::Int113->new('0.9999' . ('9' x 60)), '==', 1, "'0.9999' . ('9' x 60) treated as 1");
+
+my $num = 1.0384503717069655257060992658440192e34;
+my $div = 1.0384593717069655257060992658440192e30;
+my $mnum = Math::Int113->new($num);
+my $mdiv = Math::Int113->new($div);
+
+my $rem = $mnum % $div;
+cmp_ok($rem, '==', Math::Int113->new(948459371706965525706099266036), "overload '%' with NV divisor ok");
+
+$rem = $num % $mdiv;
+cmp_ok($rem, '==', Math::Int113->new(948459371706965525706099266036), "overload '%' NV numerator ok");
+
+$rem = $mnum % $mdiv;
+cmp_ok($rem, '==', Math::Int113->new(948459371706965525706099266036), "overload '%' ok");
+
+$mnum %= $div;
+cmp_ok($mnum, '==', $rem, "overload '%=' with NV divisor ok");
+
+$num %= $mdiv;
+cmp_ok(ref($num), 'eq', 'Math::Int113', "overloaded '%=' converts NV to Math::Int113 object");
+cmp_ok($num, '==', $rem, "overload '%=' with NV numerator ok");
+
+$num %= Math::Int113->new(9384593717069655257060992660);
+cmp_ok($num, '==', 615406282930344742939007376, "overload '%=' ok");
+
+eval { my $x = Math::Int113->new(42) >> 113;};
+like ($@, qr/exceeds 112/, ">> 113 disallowed");
+
+eval { my $x = Math::Int113->new(42) << 113;};
+like ($@, qr/exceeds 112/, "<< 113 disallowed");
 
 done_testing();

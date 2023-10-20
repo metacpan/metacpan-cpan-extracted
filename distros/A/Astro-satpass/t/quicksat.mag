@@ -2,6 +2,9 @@
 # and physical dimenstions data as downloaded from
 # http://www.prismnet.com/~mmccants/programs/qsmag.zip on March 7 2014 at 4:25
 # GMT. The Last-Modified header on this data was Mon, 06 Jan 2014 10:10:38 GMT
+# Note that these data are now found at
+# https://www.mmccants.org/programs/qsmag.zip, though the latest version is
+# Septemner 14 2020.
 
 00001 d Desig...  Name.......... Mag.  Sz1 Sz2 Sz3 RCS Comments 39486
 20580   90 37B    HST             1.5 13.3 4.3 0.0  29 occ flare to -4

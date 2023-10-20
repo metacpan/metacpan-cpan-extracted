@@ -15,7 +15,7 @@ use List::Compare;
 use List::MoreUtils qw(none uniq lastval);
 use Scalar::Util    qw(weaken);
 
-our $VERSION = '1.89';
+our $VERSION = '1.90';
 
 Travel::Status::DE::IRIS::Result->mk_ro_accessors(
 	qw(arrival arrival_delay arrival_has_realtime arrival_is_additional arrival_is_cancelled arrival_hidden
@@ -466,6 +466,8 @@ sub set_unscheduled {
 	my ( $self, $unscheduled ) = @_;
 
 	$self->{is_unscheduled} = $unscheduled;
+
+	return $self;
 }
 
 sub add_arrival_wingref {
@@ -476,7 +478,7 @@ sub add_arrival_wingref {
 	weaken($ref);
 	weaken($backref);
 	$ref->{is_wing} = 1;
-	$ref->{wing_of} = $self;
+	$ref->{wing_of} = $backref;
 	push( @{ $self->{arrival_wings} }, $ref );
 	return $self;
 }
@@ -489,7 +491,7 @@ sub add_departure_wingref {
 	weaken($ref);
 	weaken($backref);
 	$ref->{is_wing} = 1;
-	$ref->{wing_of} = $self;
+	$ref->{wing_of} = $backref;
 	push( @{ $self->{departure_wings} }, $ref );
 	return $self;
 }
@@ -876,13 +878,35 @@ sub TO_JSON {
 	my ($self) = @_;
 
 	my %copy = %{$self};
-	delete $copy{arrival_wings};
-	delete $copy{departure_wings};
 	delete $copy{realtime_xml};
-	delete $copy{replaced_by};
-	delete $copy{replacement_for};
 	delete $copy{strptime_obj};
+
+	for my $ref_key (
+		qw(arrival_wings departure_wings replaced_by replacement_for))
+	{
+		delete $copy{$ref_key};
+		for my $train_ref ( @{ $self->{$ref_key} // [] } ) {
+			push(
+				@{ $copy{$ref_key} },
+				{
+					raw_id   => $train_ref->raw_id,
+					train    => $train_ref->train,
+					train_no => $train_ref->train_no,
+					type     => $train_ref->type,
+				}
+			);
+		}
+	}
+
 	delete $copy{wing_of};
+	if ( my $train_ref = $self->wing_of ) {
+		$copy{wing_of} = {
+			raw_id   => $train_ref->raw_id,
+			train    => $train_ref->train,
+			train_no => $train_ref->train_no,
+			type     => $train_ref->type,
+		};
+	}
 
 	for my $datetime_key (
 		qw(arrival departure sched_arrival sched_departure start datetime))
@@ -920,7 +944,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.89
+version 1.90
 
 =head1 DESCRIPTION
 
@@ -1182,15 +1206,15 @@ This is a developer option. It may be removed without prior warning.
 
 =item $result->replaced_by
 
-Returns a list of references to Travel::Status::DE::IRIS::Result(3pm) objects
-which replace the (usually cancelled) arrival/departure of this train.
+Returns a list of weakened references to Travel::Status::DE::IRIS::Result(3pm)
+objects which replace the (usually cancelled) arrival/departure of this train.
 Returns nothing (false / empty list) otherwise.
 
 =item $result->replacement_for
 
-Returns a list of references to Travel::Status::DE::IRIS::Result(3pm) objects
-which this (usually unplanned) train is meant to replace.
-Returns nothing (false / empty list) otherwise.
+Returns a list of weakened references to Travel::Status::DE::IRIS::Result(3pm)
+objects which this (usually unplanned) train is meant to replace.  Returns
+nothing (false / empty list) otherwise.
 
 =item $result->route
 

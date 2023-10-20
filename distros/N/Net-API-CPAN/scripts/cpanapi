@@ -1,0 +1,4171 @@
+#!/usr/local/bin/perl
+##----------------------------------------------------------------------------
+## Meta CPAN API - ~/lib//mnt/src/perl/Net-API-CPAN/scripts/cpanapi
+## Version v0.1.2
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
+## Created 2023/07/25
+## Modified 2023/09/30
+## All rights reserved
+## 
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
+use v5.36;
+use strict;
+use warnings;
+use lib './lib';
+use open ':std' => ':utf8';
+use vars qw(
+    $VERSION $DEBUG $VERBOSE $LOG_LEVEL $PROG_NAME
+    $opt $opts $out $err
+    $CHARS_WIDTH $CHARS_HEIGHT $PIXEL_WIDTH $PIXEL_HEIGHT
+);
+use Module::Generic::File qw( file cwd stdout stderr );
+use Data::Pretty qw( dump );
+use Encode ();
+use Getopt::Class v0.102.6;
+use Net::API::CPAN;
+use Net::API::CPAN::Filter;
+use Pod::Usage;
+use POSIX ();
+use Scalar::Util;
+use Term::ANSIColor::Simple;
+use Term::Prompt;
+use Term::ReadKey ();
+use URI;
+use constant {
+    OPEN_STREET_MAP_URL => 'https://www.openstreetmap.org/search',
+};
+our $VERSION = 'v0.1.2';
+
+our $LOG_LEVEL = 0;
+our $DEBUG = 0;
+our $VERBOSE = 0;
+our $PROG_NAME = file(__FILE__)->basename( '.pl' );
+
+$SIG{INT} = $SIG{TERM} = \&_signal_handler;
+
+our $out = stdout( binmode => 'utf-8', autoflush => 1 );
+our $err = stderr( binmode => 'utf-8', autoflush => 1 );
+@ARGV = map( Encode::decode_utf8( $_ ), @ARGV );
+
+# NOTE: options dictionary
+my $dict =
+{
+    # Show release activity by author, release, module or lastest
+    activity                => { type => 'boolean', action => 1 },
+    agg                     => { type => 'array', alias => [qw( aggregate )] },
+    # Used by show-release
+    all                     => { type => 'string' },
+    as_html                 => { type => 'boolean', default => 0 },
+    as_markdown             => { type => 'boolean', default => 0 },
+    as_pod                  => { type => 'boolean', default => 0 },
+    as_text                 => { type => 'boolean', default => 0 },
+    author                  => { type => 'array' },
+    autocomplete            => { type => 'boolean', action => 1 },
+    by_version              => { type => 'boolean' },
+    cache_file              => { type => 'file' },
+    changes                 => { type => 'boolean', action => 1 },
+    contributor             => { type => 'boolean', action => 1 },
+    # Used by --show-release
+    contributors            => { type => 'boolean' },
+    cover                   => { type => 'boolean', action => 1 },
+    # Used with download_url to indicate development release
+    dev                     => { type => 'boolean' },
+    diff                    => { type => 'boolean', action => 1 },
+    # Used in --show-file
+    dir                     => { type => 'string' },
+    # Used with show_activity()
+    distribution            => { type => 'string' },
+    # Should it rather be show_download_url ?
+    download_url            => { type => 'boolean', action => 1 },
+    # The filepath to a JSON file containing the details of the ElasticSearch
+    es                      => { type => 'file' },
+    favorite                => { type => 'boolean', action => 1 },
+    # A file ID or file IDs. Used by diff() to compare given files by their ID
+    file_id                 => { type => 'array' },
+    # Used by --show-release
+    files                   => { type => 'boolean' },
+    first                   => { type => 'boolean', action => 1 },
+    history                 => { type => 'boolean', action => 1 },
+    id                      => { type => 'array' },
+    # Used by --show-release
+    interesting_files       => { type => 'boolean' },
+    # Used to get the release activity in show_activity()
+    interval                => { type => 'string', re => qr/^\d+(?:y|M|w|d||h|m|s)$/, default => '1M' },
+    # Used with --show-module
+    'join'                  => { type => 'array' },
+    # Used by --show-release
+    latest                  => { type => 'boolean' },
+    # Used with --favorite
+    leaderboard             => { type => 'boolean' },
+    # Used to set how many lines of Changes file to show in changes()
+    max                     => { type => 'integer', default => 7 },
+    # Used in show_activity()
+    module                  => { type => 'array' },
+    # Used by --show-release
+    modules                 => { type => 'boolean' },
+    # Used to get the new release activity in show_activity()
+    new                     => { type => 'boolean' },
+    # Sort order ('asc' or 'desc')
+    order                   => { type => 'string' },
+    # Are we to overwrite existing file? This is used with --save
+    overwrite               => { type => 'boolean' },
+    # Page No starting from 1
+    page                    => { type => 'integer' },
+    # Used in --show-file
+    path                    => { type => 'string' },
+    permission              => { type => 'boolean', action => 1 },
+    pod                     => { type => 'boolean', action => 1 },
+    # Used for search_author
+    prefix                  => { type => 'string' },
+    # Simple search
+    query                   => { type => 'string' },
+    range                   => { type => 'string', re => qr/^(?:all|weekly|monthly|yearly)$/ },
+    # Used with --favorite and --show-release
+    recent                  => { type => 'boolean' },
+    # Search regular expression, which will trigger an ElasticSearch
+    regexp                  => { type => 'string' },
+    release                 => { type => 'array' },
+    # Used by --pod
+    render                  => { type => 'string' },
+    'reverse'               => { type => 'boolean', action => 1 },
+    # Save result data to the specified file
+    save                    => { type => 'file', alias => [qw( export save-as )] },
+    # Simple or advanced author search
+    search_author           => { type => 'boolean', action => 1 },
+    # Simple or advanced distribution search
+    search_distribution     => { type => 'boolean', action => 1 },
+    search_file             => { type => 'boolean', action => 1 },
+    search_package          => { type => 'boolean', action => 1 },
+    search_permission       => { type => 'boolean', action => 1 },
+    # Enables or disables the formatted output of data on STDOUT. Defaults to true.
+    show                    => { type => 'boolean' },
+    # Show one or more author. To be used in conjonction with --id
+    show_author             => { type => 'boolean', action => 1 },
+    # Show a distribution. To be used in conjonction with --distribution
+    show_distribution       => { type => 'boolean', action => 1 },
+    show_file               => { type => 'boolean', action => 1 },
+    show_mirror             => { type => 'boolean', action => 1 },
+    show_module             => { type => 'boolean', action => 1 },
+    show_package            => { type => 'boolean', action => 1 },
+    show_release            => { type => 'boolean', action => 1 },
+    # Result page size
+    size                    => { type => 'integer' },
+    # Sort search result by the specified field name
+    sort                    => { type => 'string' },
+    source                  => { type => 'boolean', action => 1 },
+    # ElasticSearch JSON data in a file or with the sign '-', from the STDIN
+    stdin                   => { type => 'boolean' },
+    suggest                 => { type => 'boolean', action => 1 },
+    top_uploaders           => { type => 'boolean', alias => [qw( top )], action => 1 },
+    # Used with --history
+    type                    => { type => 'string', re => qr/^(doc|documentation|file|module)$/ },
+    # A MetaCPAN user
+    user                    => { type => 'array' },
+    version                 => { type => 'string' },
+    # Used by --show-release
+    versions                => { type => 'array' },
+    web                     => { type => 'boolean', action => 1 },
+    
+    # Generic options
+    debug                   => { type => 'integer', alias => [qw(d)], default => \$DEBUG },
+    help                    => { type => 'code', alias => [qw(?)], code => sub{ pod2usage( -exitstatus => 1, -verbose => 99, -sections => [qw( NAME SYNOPSIS DESCRIPTION COMMANDS OPTIONS AUTHOR COPYRIGHT )] ); }, action => 1 },
+    log_level               => { type => 'integer', default => \$LOG_LEVEL },
+    man                     => { type => 'code', code => sub{ pod2usage( -exitstatus => 0, -verbose => 2 ); }, action => 1 },
+    quiet                   => { type => 'boolean', default => 0 },
+    verbose                 => { type => 'integer', default => \$VERBOSE },
+    v                       => { type => 'code', code => sub{ $out->print( $VERSION, "\n" ); exit(0) }, action => 1 },
+};
+
+our $opt = Getopt::Class->new({ dictionary => $dict }) ||
+    die( "Error instantiating Getopt::Class object: ", Getopt::Class->error, "\n" );
+$opt->usage( sub{ pod2usage(2) } );
+our $opts = $opt->exec || die( "An error occurred executing Getopt::Class: ", $opt->error, "\n" );
+my @errors = ();
+my $opt_errors = $opt->configure_errors;
+push( @errors, @$opt_errors ) if( $opt_errors->length );
+if( $opts->{quiet} )
+{
+    $DEBUG = $VERBOSE = 0;
+}
+
+# NOTE: SIGDIE
+local $SIG{__DIE__} = sub
+{
+    my $trace = $opt->_get_stack_trace;
+    my $stack_trace = join( "\n    ", split( /\n/, $trace->as_string ) );
+    $err->print( "Error: ", @_, "\n", $stack_trace );
+    &_cleanup_and_exit(1);
+};
+# NOTE: SIGWARN
+local $SIG{__WARN__} = sub
+{
+    $out->print( "Perl warning only: ", @_, "\n" ) if( $LOG_LEVEL >= 5 );
+};
+
+# Unless the log level has been set directly with a command line option
+unless( $LOG_LEVEL )
+{
+    $LOG_LEVEL = 1 if( $VERBOSE );
+    $LOG_LEVEL = ( 1 + $DEBUG ) if( $DEBUG );
+}
+
+# NOTE: Find out what action to take
+my $action_found = '';
+my @actions = grep{ exists( $dict->{ $_ }->{action} ) } keys( %$opts );
+foreach my $action ( @actions )
+{
+    $action =~ tr/-/_/;
+    next if( ref( $opts->{ $action } ) eq 'CODE' );
+    if( $opts->{ $action } && $action_found && $action_found ne $action )
+    {
+        push( @errors, "You have opted for \"$action\", but \"$action_found\" is already selected." );
+    }
+    elsif( $opts->{ $action } && !length( $action_found ) )
+    {
+        $action_found = $action;
+        die( "Unable to find a subroutne for '$action'" ) if( !main->can( $action ) );
+    }
+}
+
+if( !$action_found )
+{
+    # pod2usage( -exitval => 2, -message => "No action was selected" );
+    $action_found = 'help';
+}
+
+if( @errors )
+{
+    my $error = join( "\n", map{ "\t* $_" } @errors );
+    substr( $error, 0, 0, "\n\tThe following arguments are mandatory and missing.\n" );
+    if( !$opts->{quiet} )
+    {
+        $err->print( <<EOT );
+$error
+Please, use option '-h' or '--help' to find out and properly call
+this program in interactive mode:
+
+$PROG_NAME -h
+EOT
+    }
+    exit(1);
+}
+
+my $coderef = ( exists( $dict->{ $action_found }->{code} ) && ref( $dict->{ $action_found }->{code} ) eq 'CODE' )
+    ? $dict->{ $action_found }->{code}
+    : main->can( $action_found );
+if( !defined( $coderef ) )
+{
+    die( "There is no sub for action \"$action_found\"\n" );
+}
+# exit( $coderef->() ? 0 : 1 );
+&_cleanup_and_exit( $coderef->() ? 0 : 1 );
+
+sub activity
+{
+    my $cpan = _api();
+    my $author = $opts->{author};
+    my $dist = $opts->{distribution};
+    my $module = $opts->{module};
+    my $new = $opts->{new};
+    my $interval = $opts->{interval};
+    my $obj;
+    if( !$author->is_empty )
+    {
+        $obj = $cpan->activity(
+            author => uc( $author->first ),
+            (
+                ( $interval ? ( interval => $interval ) : () ),
+                ( $new ? ( new => 1 ) : () ),
+            ),
+        ) || bailout( $cpan->error );
+        $out->print( "Release activity for author ",  color( uc( $author->first ) )->green, "\n" );
+    }
+    elsif( length( $dist // '' ) )
+    {
+        $obj = $cpan->activity(
+            distribution => $dist,
+            (
+                $interval ? ( interval => $interval ) : (),
+            ),
+        ) || bailout( $cpan->error );
+        $out->print( "Release activity for distribution ", color( $dist )->green, "\n" );
+    }
+    elsif( !$module->is_empty )
+    {
+        $obj = $cpan->activity(
+            module => $module->first,
+            (
+                $interval ? ( interval => $interval ) : (),
+            ),
+        ) || bailout( $cpan->error );
+        $out->print( "Release activity for module ", color( $module->first )->green, "\n" );
+    }
+    elsif( length( $new // '' ) )
+    {
+        $obj = $cpan->activity(
+            new => 1,
+            (
+                $interval ? ( interval => $interval ) : (),
+            ),
+        ) || bailout( $cpan->error );
+        $out->print( "Release activity for new releases\n" );
+    }
+    else
+    {
+        bailout( "No proper option was provided. See help with --help" );
+    }
+    _message( 4, "Object $obj has ", $obj->activity->length, " elements within." );
+    
+    # User wants to save the data
+    if( my $f = $opts->{save} )
+    {
+        my $data = $cpan->http_response->decoded_content;
+        &_save_to_file( $data => $f );
+        return(1) if( !$opts->{show} );
+    }
+
+    my $data = [];
+    $obj->activity->foreach(sub
+    {
+        my $ref = shift( @_ );
+        push( @$data, [$ref->{dt}->strftime( '%b %Y' ), $ref->{value}] );
+    });
+    &_show_chart( $data );
+    return(1);
+}
+
+sub autocomplete
+{
+    my $cpan = _api();
+    my $query = $opts->{query};
+    unless( length( $query // '' ) )
+    {
+        bailout( "No query was provided for autocomplete." );
+    }
+    my $list = $cpan->autocomplete( $query ) || bailout( $cpan->error );
+    
+    # User wants to save the data
+    if( my $f = $opts->{save} )
+    {
+        my $data = $cpan->http_response->decoded_content;
+        &_save_to_file( $data => $f );
+        return(1) if( !$opts->{show} );
+    }
+
+    &_show_list(
+        type => 'file',
+        list => $list,
+        callback => \&_show_autocomplete,
+    );
+    return(1);
+}
+
+sub bailout
+{
+    my $err = join( '', @_ );
+    _message( '<red>', $err, '</>' );
+    die( $err );
+}
+
+sub changes
+{
+    my $cpan = _api();
+    my $author = $opts->{author};
+    my $rel = $opts->{release};
+    if( $opts->{distribution} )
+    {
+        my $obj = $cpan->changes( distribution => $opts->{distribution} ) ||
+            bailout( $cpan->error );
+        # User wants to save the data
+        if( my $f = $opts->{save} )
+        {
+            my $data = $cpan->http_response->decoded_content;
+            &_save_to_file( $data => $f );
+            return(1) if( !$opts->{show} );
+        }
+        &_show_changes( $obj );
+    }
+    elsif( !$author->is_empty && !$rel->is_empty )
+    {
+        # /changes/by_releases
+        if( $author->length > 1 && $rel->length > 1 )
+        {
+            if( $author->length != $rel->length )
+            {
+                bailout( "You must provide the same amount of author and release. You provided ", $author->length, " author(s) and ", $rel->length, " release(s)." );
+            }
+            
+            $author->foreach(sub
+            {
+                $_ = uc( $_ );
+            });
+            
+            my $list = $cpan->changes(
+                author => $author,
+                release => $rel,
+            ) || bailout( $cpan->error );
+
+            # User wants to save the data
+            if( my $f = $opts->{save} )
+            {
+                my $data = $cpan->http_response->decoded_content;
+                &_save_to_file( $data => $f );
+                return(1) if( !$opts->{show} );
+            }
+
+            &_show_list( list => $list, callback => \&_show_changes_by_release );
+        }
+        # /changes/{author}/{release}
+        else
+        {
+            my $a = $author->first || bailout( "You have not provided any author." );
+            my $r = $rel->first || bailout( "You have not provided any release." );
+            $a = uc( $a );
+            my $change_obj = $cpan->changes(
+                author => $a,
+                release => $r,
+            ) || bailout( $cpan->error );
+
+            # User wants to save the data
+            if( my $f = $opts->{save} )
+            {
+                my $data = $cpan->http_response->decoded_content;
+                &_save_to_file( $data => $f );
+                return(1) if( !$opts->{show} );
+            }
+
+            &_show_changes( $change_obj );
+        }
+    }
+    elsif( !$rel->is_empty )
+    {
+        for( my $i = 0; $i < scalar( @$rel ); $i++ )
+        {
+            if( index( $rel->[$i], '/' ) == -1 )
+            {
+                bailout( "Illegal format for the lone option 'release' (", $rel->[$i], "). I was expecting an author ID and a release name separated by a slash (/)." );
+            }
+            # Maybe the author is in lower case? We make it upper case then.
+            my $ord;
+            if( ( $ord = ord( substr( $rel->[$i], 0, 1 ) ) ) &&
+                # a..z
+                $ord >= 97 && $ord <= 122 )
+            {
+                my( $author, $release ) = split( /\//, $rel->[$i], 2 );
+                $rel->[$i] = join( '/', uc( $author ), $release );
+            }
+        }
+        
+        # As an array this will hit /changes/by_releases, but as a string /changes/{author}/{release}
+        if( $rel->length > 1 )
+        {
+            my $list = $cpan->changes(
+                release => $rel,
+            ) || bailout( $cpan->error );
+            
+            # User wants to save the data
+            if( my $f = $opts->{save} )
+            {
+                my $data = $cpan->http_response->decoded_content;
+                &_save_to_file( $data => $f );
+                return(1) if( !$opts->{show} );
+            }
+
+            &_show_list( list => $list, callback => \&_show_changes_by_release );
+        }
+        else
+        {
+            my $change_obj = $cpan->changes(
+                release => $rel->first,
+            ) || bailout( $cpan->error );
+            
+            # User wants to save the data
+            if( my $f = $opts->{save} )
+            {
+                my $data = $cpan->http_response->decoded_content;
+                &_save_to_file( $data => $f );
+                return(1) if( !$opts->{show} );
+            }
+
+            &_show_changes( $change_obj );
+        }
+    }
+    else
+    {
+        bailout( "Missing options distribution, release, or author and release." );
+    }
+    return(1);
+}
+
+sub contributor
+{
+    my $cpan = _api();
+    my $list;
+    if( !$opts->{author}->is_empty && !$opts->{release}->is_empty )
+    {
+        my $author = $opts->{author}->first;
+        $author = uc( $author );
+        $list = $cpan->contributor(
+            author => $author,
+            release => $opts->{release}->first,
+        ) || bailout( $cpan->error );
+    }
+    elsif( !$opts->{author}->is_empty )
+    {
+        my $author = $opts->{author}->first;
+        $author = uc( $author );
+        $list = $cpan->contributor(
+            author => $author,
+        ) || bailout( $cpan->error );
+    }
+    else
+    {
+        bailout( "Missing option author, or author and release." );
+    }
+
+    # User wants to save the data
+    if( my $f = $opts->{save} )
+    {
+        my $data = $cpan->http_response->decoded_content;
+        &_save_to_file( $data => $f );
+        return(1) if( !$opts->{show} );
+    }
+
+    # Returns by default all elements
+    $list->page_size( $opts->{size} || 10 );
+    &_show_list( list => $list, callback => \&_show_contributor );
+    return(1);
+}
+
+sub cover
+{
+    my $cpan = _api();
+    if( !$opts->{release}->is_empty )
+    {
+        if( $opts->{release}->length > 1 )
+        {
+            bailout( "I was expecting only 1 release name, but got ", $opts->{release}->length, " release names!" );
+        }
+        my $cover = $cpan->cover( release => $opts->{release}->first ) ||
+            bailout( $cpan->error );
+
+        # User wants to save the data
+        if( my $f = $opts->{save} )
+        {
+            my $data = $cpan->http_response->decoded_content;
+            &_save_to_file( $data => $f );
+            return(1) if( !$opts->{show} );
+        }
+
+        &_show_cover( $cover );
+    }
+    else
+    {
+        bailout( "Missing option release." );
+    }
+    return(1);
+}
+
+sub diff
+{
+    my $cpan = _api();
+    my $diff_obj;
+    if( !$opts->{file_id}->is_empty )
+    {
+        if( $opts->{file_id}->length != 2 )
+        {
+            bailout( "I was expecting 2 file IDs, but you provided ", $opts->{file_id}->length );
+        }
+        $diff_obj = $cpan->diff(
+            file1 => $opts->{file_id}->first,
+            file2 => $opts->{file_id}->second,
+            accept => ( $opts->{as_text} ? 'text/plain' : 'application/json' ),
+        ) || bailout( $cpan->error );
+    }
+    elsif( !$opts->{author}->is_empty && !$opts->{release}->is_empty )
+    {
+        if( $opts->{release}->length != 2 )
+        {
+            bailout( "I was expecting 2 release, but you provided ", $opts->{release}->length );
+        }
+        $diff_obj = $cpan->diff(
+            author1 => uc( $opts->{author}->first ),
+            author2 => ( $opts->{author}->length > 1 ? uc( $opts->{author}->second ) : uc( $opts->{author}->first ) ),
+            release1 => $opts->{release}->first,
+            release2 => $opts->{release}->second,
+            accept => ( $opts->{as_text} ? 'text/plain' : 'application/json' ),
+        ) || bailout( $cpan->error );
+    }
+    elsif( $opts->{distribution} )
+    {
+        $diff_obj = $cpan->diff(
+            distribution => $opts->{distribution},
+            accept => ( $opts->{as_text} ? 'text/plain' : 'application/json' ),
+        ) || bailout( $cpan->error );
+    }
+    else
+    {
+        bailout( "No proper option was provided. See help with --help" );
+    }
+    
+    # User wants to save the data
+    if( my $f = $opts->{save} )
+    {
+        my $data = $cpan->http_response->decoded_content;
+        &_save_to_file( $data => $f );
+        return(1) if( !$opts->{show} );
+    }
+
+    if( $opts->{as_text} )
+    {
+        $out->print( $diff_obj );
+    }
+    else
+    {
+        &_show_diff( $diff_obj );
+    }
+    return(1);
+}
+
+sub download_url
+{
+    my $cpan = _api();
+    my $mod = $opts->{module};
+    my $dev = $opts->{dev};
+    my $vers = $opts->{version};
+    if( $mod->is_empty )
+    {
+        bailout( "No module was provided to retrieve its download URL information details." );
+    }
+    elsif( length( $vers // '' ) )
+    {
+        my @ops = $vers =~ /([=!<>]+)/g;
+        _message( 4, "Operators used are -> ", dump( \@ops ) );
+        foreach my $op ( @ops )
+        {
+            if( defined( $op ) &&
+                $op ne '==' &&
+                $op ne '!=' &&
+                $op ne '<=' &&
+                $op ne '>=' &&
+                $op ne '>' &&
+                $op ne '<' &&
+                $op ne '!' )
+            {
+                bailout( "Invalid operator used ($op). You can use any of ==, !=, <=. >=. <. > or !" );
+            }
+        }
+    }
+    
+    my $dl_obj = $cpan->download_url( $mod->first,
+        ( $dev ? ( dev => 1 ) : () ),
+        ( length( $vers // '' ) ? ( version => $vers ) : () ),
+    ) || bailout( $cpan->error );
+    # User wants to save the data
+    if( my $f = $opts->{save} )
+    {
+        my $data = $cpan->http_response->decoded_content;
+        &_save_to_file( $data => $f );
+        return(1) if( !$opts->{show} );
+    }
+
+    &_show_download_url( $dl_obj );
+    return(1);
+}
+
+sub favorite
+{
+    my $cpan = _api();
+    my $agg  = $opts->{agg};
+    my $dist = $opts->{distribution};
+    my $user = $opts->{user};
+    my $lead = $opts->{leaderboard};
+    my $recent = $opts->{recent};
+    my $callback = \&_show_favorite;
+    
+    my $list;
+    
+    my $save = sub
+    {
+        # User wants to save the data
+        if( my $f = $opts->{save} )
+        {
+            my $data = $cpan->http_response->decoded_content;
+            &_save_to_file( $data => $f );
+            return(1) if( !$opts->{show} );
+        }
+        return(0);
+    };
+    
+    if( !$agg->is_empty )
+    {
+        my $favorites = $cpan->favorite(
+            agg => $agg,
+        ) || bailout( $cpan->error );
+        
+        # Data is, for example:
+        # {
+        #    "favorites" : {
+        #       "HTTP-Message" : 63
+        #    },
+        #    "myfavorites" : {},
+        #    "took" : 3
+        # }
+
+        # User wants to save the data
+        $save->() && return(1);
+
+        if( !scalar( keys( %$favorites ) ) )
+        {
+            $out->print( "No data was returned by MetaCPAN API.\n" );
+            return(1);
+        }
+
+        my $data = [];
+        # Descending order
+        foreach my $module ( sort{ $favorites->{ $b } <=> $favorites->{ $a } } keys( %$favorites ) )
+        {
+            push( @$data, [ $module => $favorites->{ $module } ] );
+        }
+        
+        &_show_chart( $data );
+        return(1);
+    }
+    # Sample result:
+    # {
+    #    "users" : [
+    #       "AXkrlCtUjAh5eovnLqQB",
+    #       "AYg3MCRNnGUGgndNgmvg",
+    #       "AXMuc06IyboIZjsbsuqz",
+    #       "AWy7nkLUCPp-_c8iCe6G",
+    #       "AWKf9cZW714gJnwUgcEm",
+    #       "AYdwdopVnGUGgndNgmHY",
+    #       "EeYVl0kIQ--XLVDfDzALdw",
+    #       "527JYEcAQF2n8_Jg8LMw7w",
+    #       "AXP94PVwyboIZjsbsur5"
+    #    ]
+    # }
+    # endpoint -> /favorite/users_by_distribution/HTTP-Message
+    elsif( length( $dist // '' ) )
+    {
+        my $users = $cpan->favorite(
+            distribution => $dist,
+        ) || bailout( $cpan->error );
+
+        # User wants to save the data
+        $save->() && return(1);
+
+        my $total = scalar( @$users );
+        $out->print( color( $total )->green, " users favorited ", color( $dist )->green, "\n" );
+        for( my $i = 0; $i < $total; $i++ )
+        {
+            $out->print( color( $i + 1 )->green, ' / ', color( $total )->green, ' ', $users->[$i], "\n" );
+        }
+        return(1);
+    }
+    # endpoint -> /favorite/by_user/q_15sjOkRminDY93g9DuZQ
+    elsif( !$user->is_empty )
+    {
+        $list = $cpan->favorite(
+            user => $user->first,
+        ) || bailout( $cpan->error );
+        $callback = sub{ return( &_show_simple( shift( @_ ), [qw( author date distribution )] ) ); };
+    }
+    # Sample result:
+    # {
+    #    "leaderboard" : [
+    #       {
+    #          "key" : "Mojolicious",
+    #          "doc_count" : 484
+    #       },
+    #    ],
+    #    "took" : 22,
+    #    "total" : null
+    # }
+    # endpoint -> /favorite/leaderboard
+    elsif( $lead )
+    {
+        my $leaderboard = $cpan->favorite(
+            leaderboard => $lead,
+        ) || bailout( $cpan->error );
+
+        # User wants to save the data
+        $save->() && return(1);
+
+        if( !scalar( @$leaderboard ) )
+        {
+            $out->print( "No data was returned by MetaCPAN API.\n" );
+            return(1);
+        }
+
+        my $data = [];
+        # Descending order
+        foreach my $this ( @$leaderboard )
+        {
+            push( @$data, [ @$this{qw( key doc_count )} ] );
+        }
+        
+        &_show_chart( $data );
+        return(1);
+    }
+    elsif( $recent )
+    {
+        $list = $cpan->favorite(
+            recent => $recent,
+        ) || bailout( $cpan->error );
+        # The API returns 100, but we artificially split it into pages of 10
+        $list->page_size(10);
+    }
+    else
+    {
+        bailout( "Missing option agg, aggregate, distribution, user, leaderboard or recent." );
+    }
+    
+    # User wants to save the data
+    if( my $f = $opts->{save} )
+    {
+        my $data = $cpan->http_response->decoded_content;
+        &_save_to_file( $data => $f );
+        return(1) if( !$opts->{show} );
+    }
+
+    &_show_list( list => $list, callback => $callback );
+    return(1);
+}
+
+sub first
+{
+    my $cpan = _api();
+    my $query = $opts->{query};
+    if( $opt->_is_empty( $query ) )
+    {
+        bailout( "No search query was provided." );
+    }
+    my $obj = $cpan->first( $query ) ||
+        bailout( $cpan->error );
+
+    # User wants to save the data
+    if( my $f = $opts->{save} )
+    {
+        my $data = $cpan->http_response->decoded_content;
+        &_save_to_file( $data => $f );
+        return(1) if( !$opts->{show} );
+    }
+    
+    &_show_module( $obj, [qw(
+        abstract author authorized date description dist_fav_count distribution
+        documentation id indexed path pod_lines release status
+    )] );
+    return(1);
+}
+
+sub history
+{
+    my $cpan = _api();
+    my $mod = $opts->{module};
+    my $dist = $opts->{distribution};
+    my $path = $opts->{path};
+    my $type = $opts->{type};
+    my $list;
+    if( !$opt->_is_empty( $dist ) &&
+        !$opt->_is_empty( $path ) )
+    {
+        $list = $cpan->history(
+            type => 'file',
+            distribution => $dist,
+            path => $path,
+        ) || bailout( $cpan->error );
+    }
+    elsif( !$mod->is_empty &&
+        !$opt->_is_empty( $path ) )
+    {
+        my $type = $opt->_is_empty( $type ) ? 'module' : $type;
+        $type = 'documentation' if( $type eq 'doc' );
+        $list = $cpan->history(
+            type => $type,
+            module => $mod->first,
+            path => $path,
+        ) || bailout( $cpan->error );
+    }
+    else
+    {
+        bailout( "No proper option was provided. See help with --help" );
+    }
+
+    # User wants to save the data
+    if( my $f = $opts->{save} )
+    {
+        my $data = $cpan->http_response->decoded_content;
+        &_save_to_file( $data => $f );
+        return(1) if( !$opts->{show} );
+    }
+    
+    &_show_list( list => $list, callback => \&_show_module );
+    return(1);
+}
+
+sub permission
+{
+    my $cpan = _api();
+    # An array object
+    my $auth = $opts->{author};
+    # A string
+    my $mod = $opts->{module};
+    my $list;
+    if( !$auth->is_empty )
+    {
+        $list = $cpan->permission(
+            author => uc( $auth->first ),
+            (
+                length( $opts->{page} // '' ) ? ( from => &_page_to_from( page => $opts->{page}, size => $opts->{size} ) ) : (),
+                length( $opts->{size} // '' ) ? ( size => $opts->{size} ) : (),
+            ),
+        ) || bailout( $cpan->error );
+        # This query can return in one lump hundreds of entries in an 'permissions' array,
+        # so we tell Net::API::CPAN::List to break down result by chunks of 20
+        $list->page_size( $opts->{size} || 20 );
+    }
+    elsif( !$mod->is_empty )
+    {
+        if( $mod->length > 1 )
+        {
+            $list = $cpan->permission(
+                module => $mod,
+            ) || bailout( $cpan->error );
+        }
+        else
+        {
+            my $obj = $cpan->permission(
+                module => $mod->first,
+            ) || bailout( $cpan->error );
+
+            # User wants to save the data
+            if( my $f = $opts->{save} )
+            {
+                my $data = $cpan->http_response->decoded_content;
+                &_save_to_file( $data => $f );
+                return(1) if( !$opts->{show} );
+            }
+
+            &_show_permission( $obj );
+            return(1);
+        }
+    }
+    else
+    {
+        bailout( "No proper option was provided. See help with --help" );
+    }
+
+    # User wants to save the data
+    if( my $f = $opts->{save} )
+    {
+        my $data = $cpan->http_response->decoded_content;
+        &_save_to_file( $data => $f );
+        return(1) if( !$opts->{show} );
+    }
+    
+    &_show_list( list => $list, callback => \&_show_permission );
+    return(1);
+}
+
+sub pod
+{
+    my $cpan = _api();
+    my $author = $opts->{author};
+    my $rel = $opts->{release};
+    my $path = $opts->{path};
+    my $mod = $opts->{module};
+    my $need_html = $opts->{as_html};
+    my $need_markdown = $opts->{as_markdown};
+    my $need_pod = $opts->{as_pod};
+    my $need_text = $opts->{as_text};
+    my $render = $opts->{render};
+    my $accept;
+    if( $opts->{as_html} )
+    {
+        $accept = 'text/html';
+    }
+    elsif( $opts->{as_text} )
+    {
+        $accept = 'text/plain';
+    }
+    elsif( $opts->{as_markdown} )
+    {
+        $accept = 'text/x-markdown';
+    }
+    elsif( $opts->{as_pod} )
+    {
+        $accept = 'text/x-pod';
+    }
+    my $data;
+    if( !$author->is_empty &&
+        !$rel->is_empty &&
+        length( $path // '' ) )
+    {
+        $data = $cpan->pod(
+            author => uc( $author->first ),
+            release => $rel->first,
+            path => $path,
+            (
+                $accept ? ( accept => $accept ) : (),
+            ),
+        ) || bailout( $cpan->error );
+    }
+    elsif( !$mod->is_empty )
+    {
+        $data = $cpan->pod(
+            module => $mod->first,
+            (
+                $accept ? ( accept => $accept ) : (),
+            ),
+        ) || bailout( $cpan->error );
+    }
+    elsif( length( $render // '' ) )
+    {
+        my $str = "$render";
+        my $map =
+        {
+        'n' => "\n",
+        'r' => "\r",
+        't' => "\t",
+        };
+        $str =~ s/\\(n|r|s|t)/$map->{ $1 }/gs;
+        $data = $cpan->pod(
+            render => $str,
+        ) || bailout( $cpan->error );
+    }
+    else
+    {
+        bailout( "No proper option was provided. See help with --help" );
+    }
+
+    # User wants to save the data
+    if( my $f = $opts->{save} )
+    {
+        &_save_to_file( $data => $f );
+        return(1) if( !$opts->{show} );
+    }
+    $out->print( $data );
+    return(1);
+}
+
+sub reverse
+{
+    my $cpan = _api();
+    # string
+    my $dist = $opts->{distribution};
+    # array
+    my $mod = $opts->{module};
+    my $list;
+    if( length( $dist // '' ) )
+    {
+        $list = $cpan->reverse(
+            distribution => $dist,
+            ( $opts->{page} ? ( page => $opts->{page} ) : () ),
+            ( $opts->{size} ? ( size => $opts->{size} ) : () ),
+            ( $opts->{sort} ? ( sort => $opts->{sort} ) : () ),
+        ) || bailout( $cpan->error );
+    }
+    elsif( !$mod->is_empty )
+    {
+        $list = $cpan->reverse(
+            module => $mod->first,
+            ( $opts->{page} ? ( page => $opts->{page} ) : () ),
+            ( $opts->{size} ? ( size => $opts->{size} ) : () ),
+            ( $opts->{sort} ? ( sort => $opts->{sort} ) : () ),
+        ) || bailout( $cpan->error );
+    }
+    else
+    {
+        bailout( "No proper option was provided. See help with --help" );
+    }
+
+    # User wants to save the data
+    if( my $f = $opts->{save} )
+    {
+        my $data = $cpan->http_response->decoded_content;
+        &_save_to_file( $data => $f );
+        return(1) if( !$opts->{show} );
+    }
+    &_show_list( list => $list, callback => \&_show_release );
+    return(1);
+}
+
+sub search_author
+{
+    my $cpan = _api();
+    my $query = $opts->{query};
+    my $regexp = $opts->{regexp};
+    my $prefix = $opts->{prefix};
+    my $stdin = $opts->{stdin};
+    if( length( $query // '' ) ||
+        length( $regexp // '' ) ||
+        $stdin ||
+        $opts->{es} )
+    {
+        return( &_search(
+            type => 'author',
+            fields => [qw( name asciiname pauseid email city )],
+            callback => \&_show_author,
+        ) );
+    }
+    elsif( length( $prefix // '' ) )
+    {
+        my $list = $cpan->author( prefix => $prefix ) || bailout( $cpan->error );
+        # User wants to save the data
+        if( my $f = $opts->{save} )
+        {
+            my $data = $cpan->http_response->decoded_content;
+            &_save_to_file( $data => $f );
+            return(1) if( !$opts->{show} );
+        }
+    
+        &_show_list(
+            type => 'author',
+            list => $list,
+            callback => \&_show_author,
+        );
+        return(1);
+    }
+    else
+    {
+        bailout( "No proper option was provided. See help with --help" );
+    }
+}
+
+sub search_distribution
+{
+    return( &_search(
+        type => 'distribution',
+        fields => [qw( name )],
+        callback => \&_show_distribution,
+    ) );
+}
+
+sub search_favorite
+{
+    return( &_search(
+        type => 'favorite',
+        fields => [qw( name )],
+        callback => \&_show_favorite,
+    ) );
+}
+
+sub search_file
+{
+    return( &_search(
+        type => 'file',
+        fields => [qw( documentation name path )],
+        callback => \&_show_file,
+    ) );
+}
+
+sub search_module
+{
+    return( &_search(
+        type => 'module',
+        fields => [qw( documentation name path )],
+        callback => \&_show_module,
+    ) );
+}
+
+sub search_package
+{
+    return( &_search(
+        type => 'package',
+        fields => [qw( author distribution file module_name version )],
+        callback => \&_show_package,
+    ) );
+}
+
+sub search_permission
+{
+    return( &_search(
+        type => 'permission',
+        fields => [qw( owner module_name co_maintainers )],
+        callback => \&_show_permission,
+    ) );
+}
+
+sub search_release
+{
+    return( &_search(
+        type => 'release',
+        fields => [qw( abstract author distribution  )],
+        callback => \&_show_permission,
+    ) );
+}
+
+sub show_author
+{
+    my $cpan = _api();
+    my $ids = $opts->{id};
+    my $users = $opts->{user};
+    $ids->length || $users->length || bailout( "No author or user ID was provided." );
+    if( !$ids->is_empty )
+    {
+        $ids->foreach(sub
+        {
+            $_ = uc( $_ );
+        });
+        if( $ids->length == 1 )
+        {
+            my $obj = $cpan->author( $ids->first ) || bailout( $cpan->error );
+
+            # User wants to save the data
+            if( my $f = $opts->{save} )
+            {
+                my $data = $cpan->http_response->decoded_content;
+                &_save_to_file( $data => $f );
+                return(1) if( !$opts->{show} );
+            }
+
+            &_show_author( $obj );
+        }
+        else
+        {
+            my $list = $cpan->author( $ids ) || bailout( $cpan->error );
+
+            # User wants to save the data
+            if( my $f = $opts->{save} )
+            {
+                my $data = $cpan->http_response->decoded_content;
+                &_save_to_file( $data => $f );
+                return(1) if( !$opts->{show} );
+            }
+
+            # $out->print( dump( $obj ) );
+            my $total = $list->total;
+            _message( "<green>$total</> authors found." );
+            my $n = 0;
+            while( my $obj = $list->next )
+            {
+                &_show_author( $obj );
+                $out->print( "-" x 20, "\n" ) if( $n++ < $total );
+            }
+        }
+    }
+    elsif( !$users->is_empty )
+    {
+        my $list = $cpan->author( user => $users ) || bailout( $cpan->error );
+
+        # User wants to save the data
+        if( my $f = $opts->{save} )
+        {
+            my $data = $cpan->http_response->decoded_content;
+            &_save_to_file( $data => $f );
+            return(1) if( !$opts->{show} );
+        }
+
+        my $total = $list->total;
+        _message( "<green>$total</> users found." );
+        my $n = 0;
+        while( my $obj = $list->next )
+        {
+            &_show_author( $obj );
+            $out->print( "-" x 20, "\n" ) if( $n++ < $total );
+        }
+    }
+    else
+    {
+        bailout( "No proper option was provided. See help with --help" );
+    }
+    return(1);
+}
+
+sub show_distribution
+{
+    my $cpan = _api();
+    my $dist = $opts->{distribution};
+    if( $dist->is_empty )
+    {
+        bailout( "No distribution name was provided." );
+    }
+    my $dist_obj = $cpan->distribution( $dist ) ||
+        bailout( $cpan->error );
+
+    # User wants to save the data
+    if( my $f = $opts->{save} )
+    {
+        my $data = $cpan->http_response->decoded_content;
+        &_save_to_file( $data => $f );
+        return(1) if( !$opts->{show} );
+    }
+
+    &_show_distribution( $dist_obj );
+    return(1);
+}
+
+sub show_file
+{
+    my $cpan = _api();
+    my $author = $opts->{author};
+    my $rel = $opts->{release};
+    my $dir = $opts->{dir};
+    my $path = $opts->{path};
+    
+    if( $author->is_empty )
+    {
+        bailout( "No author was provided." );
+    }
+    elsif( $rel->is_empty )
+    {
+        bailout( "No release was provided." );
+    }
+    
+    if( length( $dir // '' ) )
+    {
+        my $list = $cpan->file(
+            author => uc( $author->first ),
+            release => $rel->first,
+            dir => $dir,
+        ) || bailout( $cpan->error );
+
+        # User wants to save the data
+        if( my $f = $opts->{save} )
+        {
+            my $data = $cpan->http_response->decoded_content;
+            &_save_to_file( $data => $f );
+            return(1) if( !$opts->{show} );
+        }
+
+        _message( 4, "Got here just before calling _show_list" );
+        &_show_list(
+            type => 'file',
+            list => $list,
+            callback => sub{ return( &_show_file( @_, fields => [qw( directory documentation mime name path slop stat )] ) ); },
+        );
+    }
+    elsif( length( $path // '' ) )
+    {
+        my $file_obj = $cpan->file(
+            author => uc( $author->first ),
+            release => $rel->first,
+            path => $path,
+        ) || bailout( $cpan->error );
+
+        # User wants to save the data
+        if( my $f = $opts->{save} )
+        {
+            my $data = $cpan->http_response->decoded_content;
+            &_save_to_file( $data => $f );
+            return(1) if( !$opts->{show} );
+        }
+
+        &_show_file( $file_obj );
+    }
+    return(1);
+}
+
+sub show_mirror
+{
+    my $cpan = _api();
+    my $list = $cpan->mirror ||
+        bailout( $cpan->error );
+    &_show_list( list => $list, callback => \&_show_mirror );
+    return(1);
+}
+
+sub show_module
+{
+    my $cpan = _api();
+    my $join = $opts->{join};
+    my $mod = $opts->{module};
+    if( $mod->is_empty )
+    {
+        bailout( "No module was provided." );
+    }
+    my $obj = $cpan->module(
+        module => $mod->first,
+        ( !$join->is_empty ? ( join => $join ) : () ),
+    ) || bailout( $cpan->error );
+    &_show_module( $obj );
+    return(1);
+}
+
+sub show_package
+{
+    my $cpan = _api();
+    if( length( $opts->{distribution} // '' ) )
+    {
+        my $array = $cpan->package( distribution => $opts->{distribution} ) ||
+            die( $cpan->error );
+
+        # User wants to save the data
+        if( my $f = $opts->{save} )
+        {
+            my $data = $cpan->http_response->decoded_content;
+            &_save_to_file( $data => $f );
+            return(1) if( !$opts->{show} );
+        }
+    
+        my $total = $array->length;
+        $out->print( color( $total )->green, " modules found in distribution ", $opts->{distribution}, "\n" );
+        $array->sort->for(sub
+        {
+            my( $i, $mod ) = @_;
+            $out->print( "[", color( $i + 1 )->green, ' / ', color( $total )->green, "] $mod\n" );
+        });
+        return(1);
+    }
+    elsif( !$opts->{module}->is_empty )
+    {
+        my $pack_obj = $cpan->package( $opts->{module}->first ) ||
+            bailout( $cpan->error );
+
+        # User wants to save the data
+        if( my $f = $opts->{save} )
+        {
+            my $data = $cpan->http_response->decoded_content;
+            &_save_to_file( $data => $f );
+            return(1) if( !$opts->{show} );
+        }
+    
+        &_show_package( $pack_obj );
+    }
+    else
+    {
+        bailout( "No distribution or module provided." );
+    }
+    return(1);
+}
+
+sub show_release
+{
+    my $cpan = _api();
+    # An author
+    my $all = $opts->{all};
+    my $author = $opts->{author};
+    my $rel = $opts->{release};
+    my $dist = $opts->{distribution};
+    my $recent = $opts->{recent};
+    my $versions = $opts->{versions};
+    my $callback = \&_show_release;
+    my $list;
+    # NOTE: all
+    if( length( $all // '' ) )
+    {
+        $list = $cpan->release(
+            all => uc( "$all" ),
+            (
+                # Default to the first page, because we need to have a query string set for Net::API::CPAN::List to work correctly on the follow-on HTTP queries
+                length( $opts->{page} // '' ) ? ( page => $opts->{page} ) : ( page => 1 ),
+                # Default is 100 per page, which is quite daunting, so we reduce it to chunks of 10, by default
+                length( $opts->{size} // '' ) ? ( size => $opts->{size} ) : ( size => 10 ),
+            ),
+        ) || bailout( $cpan->error );
+        $callback = sub{ return( &_show_release( @_, fields => [qw( abstract author authorized date distribution download_url maturity name status version )] ) ); };
+    }
+    elsif( !$author->is_empty && !$rel->is_empty )
+    {
+        # NOTE: author, release, contributors
+        if( $opts->{contributors} )
+        {
+            $list = $cpan->release(
+                author => uc( $author->first ),
+                release => $rel->first,
+                contributors => 1,
+            ) || bailout( $cpan->error );
+            $callback = sub
+            {
+                return( \&_show_author( @_, fields => [qw( email gravatar_url name pauseid )] ) );
+            };
+            # There is no 'size' or 'page_size' option available for this endpoint, and unfortunately we can endpoint with an important list, so we create one ourself 
+            $list->page_size( $opts->{size} || 10 );
+        }
+        # NOTE: author, release, files
+        elsif( $opts->{files} )
+        {
+            my $hash = $cpan->release(
+                author => uc( $author->first ),
+                release => $rel->first,
+                files => 1,
+            ) || bailout( $cpan->error );
+
+            # User wants to save the data
+            if( my $f = $opts->{save} )
+            {
+                my $data = $cpan->http_response->decoded_content;
+                &_save_to_file( $data => $f );
+                return(1) if( !$opts->{show} );
+            }
+            
+            &_show_release_files( data => $hash, release => $rel->first );
+            return(1);
+        }
+        # NOTE: author, release, interesting_files
+        elsif( $opts->{interesting_files} )
+        {
+            $list = $cpan->release(
+                author => uc( $author->first ),
+                release => $rel->first,
+                interesting_files => 1,
+            ) || bailout( $cpan->error );
+
+            # User wants to save the data
+            if( my $f = $opts->{save} )
+            {
+                my $data = $cpan->http_response->decoded_content;
+                &_save_to_file( $data => $f );
+                return(1) if( !$opts->{show} );
+            }
+            
+            $callback = sub
+            {
+                return( &_show_file( @_, fields => [qw( category author distribution name path pod_lines release status )] ) );
+            };
+        }
+        # NOTE: author, release, modules
+        elsif( $opts->{modules} )
+        {
+            $list = $cpan->release(
+                author => uc( $author->first ),
+                release => $rel->first,
+                modules => 1,
+            ) || bailout( $cpan->error );
+            $callback = sub
+            {
+                return( \&_show_release( @_, fields => [qw( abstract author authorized distribution documentation indexed module path pod_lines release status )] ) );
+            };
+        }
+        else
+        {
+            # NOTE: author, release
+            my $obj = $cpan->release(
+                author => uc( $author->first ),
+                release => $rel->first,
+            ) || bailout( $cpan->error );
+
+            # User wants to save the data
+            if( my $f = $opts->{save} )
+            {
+                my $data = $cpan->http_response->decoded_content;
+                &_save_to_file( $data => $f );
+                return(1) if( !$opts->{show} );
+            }
+
+            &_show_release( $obj );
+            return(1);
+        }
+    }
+    elsif( length( $dist // '' ) )
+    {
+        # NOTE: distribution, latest
+        if( $opts->{latest} )
+        {
+            my $obj = $cpan->release(
+                distribution => $dist,
+                latest => 1,
+            ) || bailout( $cpan->error );
+
+            # User wants to save the data
+            if( my $f = $opts->{save} )
+            {
+                my $data = $cpan->http_response->decoded_content;
+                &_save_to_file( $data => $f );
+                return(1) if( !$opts->{show} );
+            }
+
+            &_show_release( $obj );
+            return(1);
+        }
+        # NOTE: distribution, versions
+        elsif( !$opts->{versions}->is_empty || $opts->{by_version} )
+        {
+            my $vers = $opts->{versions};
+            my $need_text = $opts->{as_text};
+            if( $vers->length == 1 )
+            {
+                $vers = $opt->new_array( [split( /[[:blank:]\h]*,[[:blank:]\h]*/, $vers->first )] );
+            }
+            my $this = $cpan->release(
+                distribution => $dist,
+                # Even if no value for --version is provided, we need to pass 'versions' with an empty value so this is mapped correctly to the right endpoint by Net::API::CPAN
+                ( !$vers->is_empty ? ( versions => $vers ) : ( versions => '' ) ),
+                ( $need_text ? ( plain => 1 ) : () ),
+            ) || bailout( $cpan->error );
+            if( $need_text )
+            {
+                # User wants to save the data
+                if( my $f = $opts->{save} )
+                {
+                    my $data = $cpan->http_response->decoded_content;
+                    &_save_to_file( $data => $f );
+                    return(1) if( !$opts->{show} );
+                }
+                my @lines = split( /\r?\n/, $this );
+                my $n = scalar( @lines );
+                $out->print( color( $n )->green, " release(s) found.\n" );
+                for( my $i = 0; $i < scalar( @lines ); $i++ )
+                {
+                    my( $v, $url ) = split( /[[:blank:]\h]+/, $lines[$i], 2 );
+                    $out->print( "[", color( $i + 1 )->green, ' / ', color( $n )->green, "] $v -> $url\n" );
+                }
+                return(1);
+            }
+            else
+            {
+                $list = $this;
+                $list->page_size( $opts->{size} || 10 );
+                $callback = sub
+                {
+                    return( &_show_release( @_, fields => [qw( author authorized date download_url maturity name status version )] ) );
+                };
+            }
+        }
+        # NOTE: distribution
+        else
+        {
+            my $obj = $cpan->release(
+                distribution => $dist,
+            ) || bailout( $cpan->error );
+
+            # User wants to save the data
+            if( my $f = $opts->{save} )
+            {
+                my $data = $cpan->http_response->decoded_content;
+                &_save_to_file( $data => $f );
+                return(1) if( !$opts->{show} );
+            }
+
+            &_show_release( $obj );
+            return(1);
+        }
+    }
+    elsif( !$author->is_empty )
+    {
+        # NOTE: author, latest
+        if( $opts->{latest} )
+        {
+            $list = $cpan->release(
+                author => uc( $author->first ),
+                latest => 1,
+            ) || bailout( $cpan->error );
+            $list->page_size( $opts->{size} || 10 );
+            $callback = sub{ return( &_show_release( @_, fields => [qw( abstract author date distribution status )] ) ); };
+        }
+        # NOTE: author
+        else
+        {
+            $list = $cpan->release(
+                author => uc( $author->first ),
+                length( $opts->{page} // '' ) ? ( page => $opts->{page} ) : ( page => 1 ),
+                # Default is 100 per page, which is quite daunting, so we reduce it to chunks of 10, by default
+                length( $opts->{size} // '' ) ? ( size => $opts->{size} ) : ( size => 10 ),
+            ) || bailout( $cpan->error );
+            $callback = sub{ return( &_show_release( @_, fields => [qw( abstract author authorized date distribution license resources status tests version )] ) ); };
+        }
+    }
+    # NOTE: recent
+    elsif( $opts->{recent} )
+    {
+        $list = $cpan->release(
+            recent => 1,
+            length( $opts->{page} // '' ) ? ( page => $opts->{page} ) : ( page => 1 ),
+            # Default is 100 per page, which is quite daunting, so we reduce it to chunks of 10, by default
+            length( $opts->{size} // '' ) ? ( size => $opts->{size} ) : ( size => 10 ),
+        ) || bailout( $cpan->error );
+        $callback = sub
+        {
+            return( &_show_release( @_, fields => [qw( author date name distribution abstract status )] ) );
+        };
+    }
+    else
+    {
+        bailout( "No proper option was provided. See help with --help" );
+    }
+    
+    # User wants to save the data
+    if( my $f = $opts->{save} )
+    {
+        my $data = $cpan->http_response->decoded_content;
+        &_save_to_file( $data => $f );
+        return(1) if( !$opts->{show} );
+    }
+
+    &_show_list( list => $list, callback => $callback );
+    return(1);
+}
+
+sub source
+{
+    my $cpan = _api();
+    # an array reference
+    my $author = $opts->{author};
+    # an array reference
+    my $rel = $opts->{release};
+    my $path = $opts->{path};
+    # an array reference
+    my $mod = $opts->{module};
+    my $data;
+    if( !$author->is_empty &&
+        !$rel->is_empty &&
+        length( $path // '' ) )
+    {
+        $data = $cpan->source(
+            author => uc( $author->first ),
+            release => $rel->first,
+            path => $path,
+        ) || bailout( $cpan->error );
+    }
+    elsif( !$mod->is_empty )
+    {
+        $data = $cpan->source(
+            module => $mod->first,
+        ) || bailout( $cpan->error );
+    }
+
+    # User wants to save the dataa
+    if( my $f = $opts->{save} )
+    {
+        &_save_to_file( $data => $f );
+        return(1) if( !$opts->{show} );
+    }
+
+    $out->print( $data );
+    return(1);
+}
+
+sub suggest
+{
+    return( &_search(
+        type => 'release_suggest',
+        method => 'suggest',
+        fields => [qw( name )],
+        callback => \&_show_simple,
+        size => 10,
+    ) );
+}
+
+sub top_uploaders
+{
+    my $cpan = _api();
+    my $hash = $cpan->top_uploaders(
+        ( $opts->{range} ? ( range => $opts->{range} ) : () ),
+        ( $opts->{size} ? ( size => $opts->{size} ) : () ),
+    ) || bailout( $cpan->error );
+
+    # User wants to save the dataa
+    if( my $f = $opts->{save} )
+    {
+        my $data = $cpan->http_response->decoded_content;
+        &_save_to_file( $data => $f );
+        return(1) if( !$opts->{show} );
+    }
+
+    my $data = [];
+    foreach my $author ( sort{ $hash->{ $b } <=> $hash->{ $a } } keys( %$hash ) )
+    {
+        push( @$data, [ $author => $hash->{ $author } ] );
+    }
+    &_show_chart( $data );
+    return(1);
+}
+
+sub web
+{
+    my $cpan = _api();
+    my $query = $opts->{query};
+    if( $opt->_is_empty( $query ) )
+    {
+        bailout( "No query was provided." );
+    }
+    my $list = $cpan->web(
+        query => $query,
+        ( $opts->{collapsed} ? ( collapsed => $opts->{collapsed} ) : () ),
+        ( length( $opts->{from} ) ? ( from => $opts->{from} ) : ( from => 0 ) ),
+        ( length( $opts->{size} ) ? ( size => $opts->{size} ) : ( size => 20 ) ),
+    ) || bailout( $cpan->error );
+
+    # User wants to save the data
+    if( my $f = $opts->{save} )
+    {
+        my $data = $cpan->http_response->decoded_content;
+        &_save_to_file( $data => $f );
+        return(1) if( !$opts->{show} );
+    }
+
+    &_show_list( list => $list, callback => \&_show_web );    
+}
+
+sub _api
+{
+    return( Net::API::CPAN->new(
+        debug => $LOG_LEVEL,
+        ( $opts->{cache_file} ? ( cache_file => $opts->{cache_file} ) : () ),
+    ) );
+}
+
+sub _cleanup_and_exit
+{
+    my $exit = shift( @_ );
+    $exit = 0 if( !length( $exit // '' ) || $exit !~ /^\d+$/ );
+    exit($exit);
+}
+
+# Get file containing ElasticSearch query in JSON format
+sub _get_file
+{
+    my $f = shift( @_ );
+    if( !$f->exists )
+    {
+        bailout( "ElasticSearch JSON query file $f does not exist." );
+    }
+    elsif( !$f->is_file )
+    {
+        bailout( "ElasticSearch JSON query file $f is not a regular file." );
+    }
+    elsif( $f->is_empty )
+    {
+        bailout( "ElasticSearch JSON query file $f is empty." );
+    }
+    elsif( !$f->can_read )
+    {
+        bailout( "ElasticSearch JSON query file $f lacks read permission." );
+    }
+    my $es = $f->load_json || bailout( $f->error );
+    return( $es );
+}
+
+# Build the ElasticSearch query for regexp
+# &_get_regexp(
+#     fields => [qw( name documentation )],
+#     ordrr => 'asc',
+#     sort => $field,
+#     page => $integer,
+#     size => $integer,
+# );
+sub _get_regexp
+{
+    my $args = $opt->_get_args_as_hash( @_ );
+    my $cpan = $args->{api} || bailout( "api argument is mising." );
+    my $regexp = $args->{regexp} || bailout( "regexp argument is mising." );
+    my $fields = $args->{fields} || bailout( "fields argument is mising." );
+    bailout( "fields argument is not an array reference." ) if( ref( $fields ) ne 'ARRAY' );
+    $args->{order} //= 'asc' if( defined( $args->{sort} ) );
+    my $filter = $cpan->new_filter(
+        debug => $cpan->debug,
+        query => {
+            bool =>
+            {
+                should => [ map( { regexp => { $_ => "$regexp" } }, @$fields ) ],
+            },
+        },
+        (
+            length( $args->{page} // '' )
+                ? ( from => &_page_to_from( page => $args->{page}, size => $args->{size} ) )
+                : (),
+        ),
+        (
+            length( $args->{size} // '' )
+                ? ( size => $args->{size} )
+                : (),
+        ),
+        (
+            length( $args->{sort} // '' )
+                ? ( sort => [{ $args->{sort} => { order => $args->{order} } }] )
+                : (),
+        ),
+    ) || bailout( $cpan->error );
+    _message( 5, "Built filter object ", overload::StrVal( $filter ) );
+    return( $filter );
+}
+
+# Get the ElasticSearch JSON query from STDIN
+sub _get_stdin
+{
+    $out->print( "Enter the JSON data below and type ctrl-D when finished:\n" ) if( &_is_tty );
+    my $json = '';
+    $json .= $_ while( <STDIN> );
+    $json =~ s/(\r?\n)+$//gs;
+    _message( 4, "JSON received is '$json'" );
+    my $j = $opt->new_json;
+    my $es = eval
+    {
+        $j->utf8->decode( $json );
+    };
+    if( $@ )
+    {
+        bailout( $@ );
+    }
+    return( $es );
+}
+
+sub _is_boolean
+{
+    return(1) if( $opt->_is_a( $_[0] => [qw( Module::Generic::Boolean JSON::Boolean )] ) );
+    return(1) if( $opt->_is_object( $_[0] ) && ref( $_[0] ) =~ /\bboolean\b/i );
+    return(0);
+}
+
+# Taken from ExtUtils::MakeMaker
+sub _is_tty
+{
+    return( -t( STDIN ) && ( -t( STDOUT ) || !( -f STDOUT || -c STDOUT ) ) );
+}
+
+sub _message
+{
+    my $required_level;
+    if( $_[0] =~ /^\d{1,2}$/ )
+    {
+        $required_level = shift( @_ );
+    }
+    else
+    {
+        $required_level = 0;
+    }
+    return if( !$LOG_LEVEL || $LOG_LEVEL < $required_level );
+    my $msg = join( '', map( ref( $_ ) eq 'CODE' ? $_->() : $_, @_ ) );
+    if( index( $msg, '</>' ) != -1 )
+    {
+        $msg =~ s
+        {
+            <([^\>]+)>(.*?)<\/>
+        }
+        {
+            my $colour = $1;
+            my $txt = $2;
+            my $obj = color( $txt );
+            my $code = $obj->can( $colour ) ||
+                die( "Colour '$colour' is unsupported by Term::ANSIColor::Simple" );
+            $code->( $obj );
+        }gexs;
+    }
+    my $frame = 0;
+    my $sub_pack = (caller(1))[3] || '';
+    my( $pkg, $file, $line ) = caller( $frame );
+    my $sub = ( caller( $frame + 1 ) )[3] // '';
+    my $sub2;
+    if( length( $sub ) )
+    {
+        $sub2 = substr( $sub, rindex( $sub, '::' ) + 2 );
+    }
+    else
+    {
+        $sub2 = 'main';
+    }
+    return( $err->print( "${pkg}::${sub2}() [$line]: $msg\n" ) );
+}
+
+sub _page_to_from
+{
+    my $p = $opt->_get_args_as_hash( @_ );
+    $p->{size} //= &Net::API::CPAN::List::DEFAULT_PAGE_SIZE;
+    my $page = $p->{page} || bailout( "No page value was provided." );
+    # page 1 -> 0 * 10 -> offset 0
+    # page 2 -> 1 * 10 -> offset 10
+    # etc.
+    # See POD in Net::API::CPAN::Filter
+    return( ( $page - 1 ) * $p->{size} );
+}
+
+sub _save_to_file
+{
+    my $data = shift( @_ );
+    my $f = shift( @_ );
+    if( $f->exists )
+    {
+        if( $f->is_file )
+        {
+            if( !$opts->{overwrite} )
+            {
+                bailout( "Another file of the same name exists at $f. Please use option --overwrite to allow overwriting it." );
+            }
+        }
+        else
+        {
+            bailout( "Another file exists at $f and is not a file." );
+        }
+    }
+    $f->unload( $data, { autoflush => 1 } ) || bailout( $f->error );
+    _message( 4, "Data saved to file $f" );
+    return(1);
+}
+
+sub _search
+{
+    my $args = $opt->_get_args_as_hash( @_ );
+    my $type = $args->{type} || bailout( "No search object type was provided." );
+    my $fields = $args->{fields} || [qw( name )];
+    my $callback = $args->{callback} || bailout( "No callback was provided." );
+    # The Net::API::CPAN method to use to perform the search query. Default to the object type name
+    my $method = $args->{method} || $type;
+    if( !$opt->_is_array( $fields ) )
+    {
+        bailout( "The Parameter 'fields' provided is not an array reference. It is a ", ( ref( $fields ) || 'string' ) );
+    }
+    if( !$opt->_is_code( $callback ) )
+    {
+        bailout( "The Parameter 'callback' provided is not an anonymous subroutine or a reference to a subroutine. It is a ", ( ref( $callback ) || 'string' ) );
+    }
+    
+    my $cpan = _api();
+    my $meth_ref = $cpan->can( $method ) || bailout( "The method \"${method}\" does not exist in package Net::API::CPAN" );
+
+    my $query = $opts->{query};
+    my $regexp = $opts->{regexp};
+    my $stdin = $opts->{stdin};
+    my $filter;
+    unless( length( $query // '' ) || 
+            length( $regexp // '' ) ||
+            $stdin ||
+            $opts->{es} )
+    {
+        bailout( "No query was provided to search ${type}s." );
+    }
+    
+    if( $stdin )
+    {
+        _message( 5, "Getting the ElasticSearch JSON data from STDIN..." );
+        my $es = &_get_stdin();
+        $filter = $cpan->new_filter->new(
+            debug => $cpan->debug,
+            es => $es,
+        ) || bailout( $cpan->error );
+    }
+    elsif( my $f = $opts->{es} )
+    {
+        _message( 5, "Getting the ElasticSearch JSON data from the specified file $f..." );
+        my $es = &_get_file( $f );
+        $filter = $cpan->new_filter->new(
+            debug => $cpan->debug,
+            es => $es,
+        ) || bailout( $cpan->error );
+    }
+    elsif( length( $regexp // '' ) )
+    {
+        _message( 5, "Building the ElasticSearch JSON data from the regexp query '$regexp'..." );
+        $opts->{order} //= 'asc' if( defined( $opts->{sort} ) );
+        $filter = &_get_regexp( %$opts,
+            fields => $fields,
+            api => $cpan,
+            regexp => $regexp,
+        );
+    }
+    
+    my $list;
+    if( defined( $filter ) )
+    {
+        _message( 5, "Using the ElasticSearch filter ", overload::StrVal( $filter ) );
+        if( $LOG_LEVEL >= 5 )
+        {
+            my $filter_json = $filter->as_json( pretty => 1, sort => 1 );
+            _message( 5, "ElasticSearch JSON data is: ", $filter_json );
+        }
+        $list = $meth_ref->( $cpan, $filter ) || bailout( $cpan->error );
+    }
+    else
+    {
+        $list = $meth_ref->( $cpan,
+            query => $query,
+            (
+                length( $opts->{page} // '' ) ? ( from => &_page_to_from( page => $opts->{page}, size => $opts->{size} ) ) : (),
+                length( $opts->{size} // '' ) ? ( size => $opts->{size} ) : (),
+            ),
+        ) || bailout( $cpan->error );
+    }
+    
+    # User wants to save the data
+    if( my $f = $opts->{save} )
+    {
+        my $data = $cpan->http_response->decoded_content;
+        &_save_to_file( $data => $f );
+        return(1) if( !$opts->{show} );
+    }
+    
+    $list->page_size( $args->{size} ) if( exists( $args->{size} ) && $args->{size} );
+    
+    &_show_list(
+        type => $type,
+        list => $list,
+        callback => $callback,
+    );
+    return(1);
+}
+
+sub _show_author
+{
+    my $obj = shift( @_ );
+    my $args = $opt->_get_args_as_hash( @_ );
+    my $prefix = $args->{indent} ? ( ' ' x $args->{indent} ) : '';
+    my $fields = ( $args->{fields} && $opt->_is_array( $args->{fields} ) )
+        ? $args->{fields}
+        : $obj->fields;
+    my $max = 0;
+    for( @$fields )
+    {
+        $max = length( $_ ) if( length( $_ ) > $max );
+    }
+    $max++;
+    $max *= -1;
+    foreach my $f ( @$fields )
+    {
+        my $v = $obj->$f;
+        if( $f eq 'blog' )
+        {
+            $out->printf( "${prefix}%*s:\n", $max, $f );
+            $v->for(sub
+            {
+                my( $i, $this ) = @_;
+                if( $this->feed )
+                {
+                    $out->print( "${prefix}\t[", color( $i )->green, "] Feed: ", $this->feed, "\n" );
+                }
+                if( $this->url )
+                {
+                    $out->print( "${prefix}\t[", color( $i )->green, "] URL: ", $this->url, "\n" );
+                }
+            });
+            next;
+        }
+        elsif( $f eq 'donation'  )
+        {
+            $out->printf( "${prefix}%*s:\n", $max, $f );
+            $v->for(sub
+            {
+                my( $i, $this ) = @_;
+                $out->print( "${prefix}\t[", color( $i )->green, "] ", $this->name, ": ", $this->id, "\n" );
+            });
+            next;
+        }
+        elsif( $f eq 'perlmongers' )
+        {
+            $out->printf( "${prefix}%*s:\n", $max, $f );
+            $v->for(sub
+            {
+                my( $i, $this ) = @_;
+                $out->print( "${prefix}\t[", color( $i )->green, "] ", $this->name, ": ", $this->url, "\n" );
+            });
+            next;
+        }
+        elsif( $f eq 'profile' )
+        {
+            $out->printf( "${prefix}%*s:\n", $max, $f );
+            $v->for(sub
+            {
+                my( $i, $this ) = @_;
+                $out->print( "${prefix}\t[", color( $i )->green, "] ", $this->name, ": ", $this->id, "\n" );
+            });
+            next;
+        }
+        elsif( $opt->_is_array( $v ) )
+        {
+            $v = $v->join( ', ' );
+        }
+        elsif( $opt->_is_object( $v ) && index( ref( $v ), 'Net::API::CPAN' ) == 0 )
+        {
+            $out->printf( "${prefix}%*s:\n", $max, $f );
+            my $ref = $v->as_hash;
+            my $max2 = 0;
+            for( keys( %$ref ) )
+            {
+                $max2 = length( $_ ) if( length( $_ ) > $max2 );
+            }
+            $max2++;
+            $max2 *= -1;
+            foreach my $k ( sort( keys( %$ref ) ) )
+            {
+                $out->printf( "${prefix}\t%*s: %s\n", $max2, $k, ( defined( $ref->{ $k } ) && length( $ref->{ $k } ) ) ? color( $ref->{ $k } )->green : 'undef' );
+            }
+            next;
+        }
+        
+        if( &_is_boolean( $v ) )
+        {
+            $v = $v ? 'True' : 'False';
+        }
+        my $supp = '';
+        if( $f eq 'city' && !$obj->country->is_empty )
+        {
+            my $osm = URI->new( OPEN_STREET_MAP_URL );
+            $osm->query_form( query => join( ', ', $v, ( $obj->region ? $obj->region : () ), $obj->country ) );
+            $supp = " ($osm)";
+        }
+        $out->printf( "${prefix}%*s: %s${supp}\n", $max, $f, ( defined( $v ) && length( $v ) ) ? color( $v )->green : 'undef' );
+    }
+}
+
+sub _show_autocomplete
+{
+    my $obj = shift( @_ );
+    $out->printf( "author        : %s\n", $obj->author );
+    $out->printf( "distribution  : %s\n", $obj->distribution );
+    $out->printf( "release       : %s\n", $obj->release );
+    $out->printf( "documentation : %s\n", $obj->documentation ) if( $obj->documentation->length );
+}
+
+sub _show_changes
+{
+    my $obj = shift( @_ );
+    my $fields = $obj->fields;
+    my $max_lines = $opts->{max};
+    my $max = 0;
+    for( @$fields )
+    {
+        $max = length( $_ ) if( length( $_ ) > $max );
+    }
+    $max++;
+    $max *= -1;
+    foreach my $f ( @$fields )
+    {
+        my $v = $obj->$f;
+        if( $f eq 'content' )
+        {
+            $out->printf( "%*s:\n", $max, $f );
+            if( $max_lines < 0 )
+            {
+                $out->print( $v );
+            }
+            else
+            {
+                my $lines = $v->split( qr/\n/ );
+                if( $lines->length > $max_lines )
+                {
+                    $out->printf( "# Showing the ${max_lines} first lines (%.2f%%) only out of %d lines.\n", ( $lines->length > 0 ? ( ( $max_lines / $lines->length ) * 100 ) : 0 ), $lines->length ) if( $lines->length > 3 );
+                    $out->print( $lines->offset( 0, $max_lines )->join( "\n" ), "\n" );
+                }
+                else
+                {
+                    $out->printf( "# Showing all %d lines.\n", $lines->length );
+                    $out->print( $v );
+                }
+            }
+            next;
+        }
+        elsif( $opt->_is_array( $v ) )
+        {
+            $v = $v->join( ', ' );
+        }
+        elsif( $opt->_is_object( $v ) && index( ref( $v ), 'Net::API::CPAN' ) == 0 )
+        {
+            $out->printf( "%*s:\n", $max, $f );
+            my $ref = $v->as_hash( convert_array => 0 );
+            my $max2 = 0;
+            for( keys( %$ref ) )
+            {
+                $max2 = length( $_ ) if( length( $_ ) > $max2 );
+            }
+            $max2++;
+            $max2 *= -1;
+            foreach my $k ( sort( keys( %$ref ) ) )
+            {
+                my $supp = '';
+                my $v;
+                $v = $ref->{ $k } if( defined( $ref->{ $k } ) && length( $ref->{ $k } ) );
+                if( $k eq 'mtime' && $opt->_is_a( $ref->{ $k } => 'DateTime' ) )
+                {
+                    $supp = ' (' . $ref->{ $k }->iso8601 . ')';
+                }
+                elsif( $k eq 'mode' )
+                {
+                    my $n = $ref->{ $k }->scalar;
+                    my $mode = '';
+                    $mode .= ( $n & 00400 ) ? 'r' : '-';
+                    $mode .= ( $n & 00200 ) ? 'w' : '-';
+                    $mode .= ( $n & 00100 ) ? 'x' : '-';
+                    $mode .= ( $n & 00040 ) ? 'r' : '-';
+                    $mode .= ( $n & 00020 ) ? 'w' : '-';
+                    $mode .= ( $n & 00010 ) ? 'w' : '-';
+                    $mode .= ( $n & 00004 ) ? 'r' : '-';
+                    $mode .= ( $n & 00002 ) ? 'w' : '-';
+                    $mode .= ( $n & 00001 ) ? 'w' : '-';
+                    $supp = ' (' . $mode . ')';
+                }
+                elsif( $k eq 'size' )
+                {
+                    $supp = ' (' . $ref->{ $k }->format_bytes . ')';
+                }
+                elsif( $k eq 'input' )
+                {
+                    $v = join( ', ', @{$ref->{ $k }} );
+                }
+                elsif( $opt->_is_array( $ref->{ $k } ) )
+                {
+                    $v = dump( [@{$ref->{ $k }}] );
+                }
+                elsif( $k eq 'payload' )
+                {
+                    # $v = join( ', ', values( %{$ref->{ $k }} ) );
+                    # $v = dump( $ref->{ $k } );
+                    $v = $ref->{ $k }->{doc_name};
+                }
+                $out->printf( ( ' ' x ( abs( $max ) - abs( $max2 ) ) ) . "%*s: %s${supp}\n", $max2, $k, defined( $v ) ? color( $v )->green : 'undef' );
+            }
+            next;
+        }
+        
+        if( &_is_boolean( $v ) )
+        {
+            $v = $v ? 'True' : 'False';
+        }
+        my $supp = '';
+        $out->printf( "%*s: %s${supp}\n", $max, $f, ( defined( $v ) && length( $v ) ) ? color( $v )->green : 'undef' );
+    }
+}
+
+sub _show_changes_by_release
+{
+    my $obj = shift( @_ );
+    my $txt = $obj->changes_text;
+    my $max_lines = $opts->{max};
+    $out->printf( "author       : %s\n", $obj->author );
+    $out->printf( "changes_file : %s\n", $obj->changes_file );
+    $out->printf( "release      : %s\n", $obj->release );
+    $out->print( "changes_text :\n" );
+    if( $max_lines < 0 )
+    {
+        $out->print( $obj->changes_text );
+    }
+    else
+    {
+        my $lines = $obj->changes_text->split( qr/\n/ );
+        $out->printf( "# Showing the ${max_lines} first lines only out of %d lines.\n", $lines->length ) if( $lines->length > 3 );
+        $out->print( $lines->offset( 0, $max_lines )->join( "\n" ), "\n" );
+    }
+    return(1);
+}
+
+# Takes an array reference of array references containing [0] label, and [1] the value
+# Credits Shadkam Islam with his original idea from QuickTermChart::QuickTermChart
+sub _show_chart
+{
+    my $data = shift( @_ );
+    unless( defined( $CHARS_WIDTH ) &&
+        defined( $CHARS_HEIGHT ) &&
+        defined( $PIXEL_WIDTH ) &&
+        defined( $PIXEL_HEIGHT ) )
+    {
+        ( $CHARS_WIDTH, $CHARS_HEIGHT, $PIXEL_WIDTH, $PIXEL_HEIGHT ) = Term::ReadKey::GetTerminalSize();
+    }
+    my $col_width = POSIX::floor( ( $CHARS_WIDTH * 80 ) / ( 100 * 4 ) );
+    
+    if( !$opt->_is_array( $data ) )
+    {
+        bailout( "Data provided is not an array reference." );
+    }
+    my $max_val = 0;
+    my $max_len = 0;
+    for( my $i = 0; $i < scalar( @$data ); $i++ )
+    {
+        if( !$opt->_is_array( $data->[$i] ) )
+        {
+            bailout( "I was expecting an array reference, but data at offset $i of the array provided is actually a ", ( Scalar::Util::reftype( $data // '' ) || 'string' ), "." );
+        }
+        elsif( scalar( @{$data->[$i]} ) != 2 )
+        {
+            bailout( "I was expecting an array reference with 2 entries, but it actually has ", scalar( @{$data->[$i]} ), " elements." );
+        }
+        elsif( !defined( $data->[$i]->[0] ) ||
+            !length( $data->[$i]->[0] ) )
+        {
+            bailout( "Label at offset $i is empty." );
+        }
+        elsif( !defined( $data->[$i]->[1] ) ||
+            !length( $data->[$i]->[1] ) )
+        {
+            bailout( "Value at offset $i is empty." );
+        }
+        elsif( !$opt->_is_number( $data->[$i]->[1] ) )
+        {
+            bailout( "Value at offset $i is not a number." );
+        }
+        $max_val = $data->[$i]->[1] if( $data->[$i]->[1] > $max_val );
+        $max_len = length( $data->[$i]->[0] ) if( length( $data->[$i]->[0] ) > $max_len );
+    }
+
+    use utf8;
+    # See <https://en.wikipedia.org/wiki/Box-drawing_character>
+    for( my $i = 0; $i < scalar( @$data ); $i++ )
+    {
+        my $bar_width = sprintf( '%d', ( $data->[$i]->[1] * $col_width ) / ( $max_val || 1 ) );
+        $out->print( join( '',
+            sprintf( '%-' . $max_len . 's ', $data->[$i]->[0] ),
+            '.' x ( $col_width - $bar_width ),
+            $data->[$i]->[1] ? color( "\x{2582}" x ( $bar_width ) )->black->on_green : '',
+            sprintf( ' %' . $max_len . 's', $data->[$i]->[1] )
+        ), "\n" );
+    }
+}
+
+sub _show_contributor { return( &_show_simple( @_ ) ); }
+
+sub _show_download_url { return( &_show_simple( @_ ) ); }
+
+sub _show_cover
+{
+    my $obj = shift( @_ );
+    my $fields = $obj->fields;
+    my $max = 0;
+    for( @$fields )
+    {
+        $max = length( $_ ) if( length( $_ ) > $max );
+    }
+    $max++;
+    $max *= -1;
+    foreach my $f ( @$fields )
+    {
+        my $v = $obj->$f;
+        if( $opt->_is_object( $v ) && index( ref( $v ), 'Net::API::CPAN' ) == 0 )
+        {
+            $out->printf( "%*s:\n", $max, $f );
+            my $ref = $v->as_hash;
+            my $max2 = 0;
+            for( keys( %$ref ) )
+            {
+                $max2 = length( $_ ) if( length( $_ ) > $max2 );
+            }
+            $max2++;
+            $max2 *= -1;
+            foreach my $k ( sort( keys( %$ref ) ) )
+            {
+                $out->printf( "\t%*s: %s\n", $max2, $k, ( defined( $ref->{ $k } ) && length( $ref->{ $k } ) ) ? color( $ref->{ $k } )->green : 'undef' );
+            }
+            next;
+        }
+        
+        if( &_is_boolean( $v ) )
+        {
+            $v = $v ? 'True' : 'False';
+        }
+        $out->printf( "%*s: %s\n", $max, $f, ( defined( $v ) && length( $v ) ) ? color( $v )->green : 'undef' );
+    }
+}
+
+sub _show_diff
+{
+    my $obj = shift( @_ );
+    $out->printf( "source: %s\n", color( $obj->source )->green );
+    $out->printf( "target: %s\n", color( $obj->target )->green );
+    my $total = $obj->statistics->length;
+    $out->print( color( $total )->green, " file(s) diff.\n" );
+    my $n = 0;
+    $obj->statistics->foreach(sub
+    {
+        my $this = shift( @_ );
+        $out->print( "File ", color( ++$n )->green, "/", color( $total )->green, "\n" );
+        $out->printf( "source     : %s\n", color( $this->source )->green );
+        $out->printf( "target     : %s\n", color( $this->target )->green );
+        $out->printf( "insertions : %s\n", color( $this->insertions )->black->bold->on_green );
+        $out->printf( "deletions  : %s\n", color( $this->deletions )->white->bold->on_red );
+        $out->print( "diff       :\n", $this->diff, "\n" );
+        $out->print( "-" x 20, "\n" ) if( $n < $total );
+    });
+    return(1);
+}
+
+sub _show_distribution
+{
+    my $obj = shift( @_ );
+    my $fields = $obj->fields;
+    my $max = 0;
+    my $find_recurse;
+    $find_recurse = sub
+    {
+        my $ref = shift( @_ );
+        my $level = shift( @_ ) // 0;
+        foreach my $k ( keys( %$ref ) )
+        {
+            my $str = ( ' ' x ( ( 4 * ( $level ) ) + ( $level ? 5 : 4 ) ) ) . $k;
+            $max = length( $str ) if( length( $str ) > $max );
+            if( ref( $ref->{ $k } ) eq 'HASH' )
+            {
+                $find_recurse->( $ref->{ $k }, $level + 1 );
+            }
+        }
+    };
+    
+    for( @$fields )
+    {
+        $max = length( $_ ) if( length( $_ ) > $max );
+        my $v = $obj->$_;
+        if( $opt->_is_object( $v ) && index( ref( $v ), 'Net::API::CPAN' ) == 0 )
+        {
+            my $ref = $v->as_hash;
+            $find_recurse->( $ref );
+        }
+    }
+    $max++;
+    my $max_len = $max;
+    $max *= -1;
+    
+    _message( 4, "Maximum length is $max_len" );
+    my $crawl;
+    $crawl = sub
+    {
+        my $ref = shift( @_ );
+        my $level = shift( @_ ) // 0;
+        my $max2 = 0;
+        for( keys( %$ref ) )
+        {
+            $max2 = length( $_ ) if( length( $_ ) > $max2 );
+        }
+        $max2++;
+        $max2 *= -1;
+        foreach my $k ( sort( keys( %$ref ) ) )
+        {
+            # _message( 4, "Processing field $k with value ", overload::StrVal( $ref->{ $k } ) );
+            my $before = ( ' ' x ( ( 4 * ( $level ) ) + ( $level ? 1 : 0 ) ) );
+            # _message( 4, "Prefix size is ", length( $before ), ", field length is ", length( $k ), " total is ", ( length( $before ) + 4 + length( $k ) ) );
+            if( ref( $ref->{ $k } ) eq 'HASH' )
+            {
+                $out->printf( ( ' ' x ( ( 4 * ( $level ) ) + ( $level ? 1 : 0 ) ) ) . "\x{2520}" . ( "\x{2500}" x 2 ) . " %*s:\n", ( ( $max_len - ( length( $before ) + 4 ) ) * -1 ), $k );
+                $crawl->( $ref->{ $k }, $level + 1 );
+            }
+            else
+            {
+                $out->printf( ( ' ' x ( ( 4 * ( $level ) ) + ( $level ? 1 : 0 ) ) ) . "\x{2520}" . ( "\x{2500}" x 2 ) . " %*s: %s\n", ( ( $max_len - ( length( $before ) + 4 ) ) * -1 ), $k, ( defined( $ref->{ $k } ) && length( $ref->{ $k } ) ) ? color( $ref->{ $k } )->green : 'undef' );
+            }
+        }
+    };
+    
+    foreach my $f ( @$fields )
+    {
+        my $v = $obj->$f;
+
+        # _message( 4, "Processing field $f with value ", overload::StrVal( $v ) );
+        if( $opt->_is_object( $v ) && index( ref( $v ), 'Net::API::CPAN' ) == 0 )
+        {
+            $out->printf( "%*s:\n", $max, $f );
+            my $ref = $v->as_hash;
+            $crawl->( $ref );
+            next;
+        }
+        
+        if( &_is_boolean( $v ) )
+        {
+            $v = $v ? 'True' : 'False';
+        }
+        $out->printf( "%*s: %s\n", $max, $f, ( defined( $v ) && length( $v ) ) ? color( $v )->green : 'undef' );
+    }
+}
+
+sub _show_favorite { return( &_show_simple( @_ ) ); }
+
+sub _show_file
+{
+    my $obj = shift( @_ );
+    my $args = $opt->_get_args_as_hash( @_ );
+    my $fields = ( $args->{fields} && $opt->_is_array( $args->{fields} ) )
+        ? $args->{fields}
+        : $obj->fields;
+    my $max = 0;
+    for( @$fields )
+    {
+        $max = length( $_ ) if( length( $_ ) > $max );
+    }
+    $max++;
+    $max *= -1;
+    foreach my $f ( @$fields )
+    {
+        my $v = $obj->$f;
+        
+        # array of Net::API::CPAN::Module objects
+        # https://metacpan.org/release/OALDERS/HTTP-Message-6.42/view/lib/HTTP/Message.pm
+        if( $f eq 'module' )
+        {
+            $out->printf( "%*s:\n", $max, $f );
+            $v->for(sub
+            {
+                my( $i, $this ) = @_;
+                $out->print( ( ' ' x abs( $max ) ), "[", color( $i )->green, "]\n" );
+                # 16 is the maximum length of those properties, and we add 1
+                foreach my $prop ( qw( associated_pod authorized indexed name version version_numified ) )
+                {
+                    my $prop_val = $this->$prop;
+                    if( &_is_boolean( $prop_val ) )
+                    {
+                        $prop_val = $prop_val ? 'True' : 'False';
+                    }
+                    my $prop_suff = '';
+                    if( $prop eq 'name' )
+                    {
+                        my $pod = [split( '/', $this->associated_pod, 3 )]->[-1];
+                        $prop_suff = sprintf( ' (https://metacpan.org/release/%s/%s/view/%s)', $obj->author, $obj->release, $pod );
+                    }
+                    $out->printf( ( ' ' x ( abs( $max ) + 3 ) ) . "%-17s: %s${prop_suff}\n", $prop, $prop_val );
+                }
+            });
+            next;
+        }
+        elsif( $f eq 'author' && $opt->_is_a( $v => 'Net::API::CPAN::Author' ) )
+        {
+            $out->printf( "%*s:\n", $max, $f );
+            &_show_author( $v, indent => 4 );
+            next;
+        }
+        elsif( $f eq 'release' && $opt->_is_a( $v => 'Net::API::CPAN::Release' ) )
+        {
+            $out->printf( "%*s:\n", $max, $f );
+            &_show_release( $v, indent => 4 );
+            next;
+        }
+        elsif( $opt->_is_array( $v ) )
+        {
+            if( ref( $v->[0] ) )
+            {
+                my $rv = '';
+                for( @$v )
+                {
+                    $rv .= dump( $_ ) . "\n";
+                }
+                $v = $rv;
+            }
+            else
+            {
+                $v = join( ', ', @$v );
+            }
+        }
+        elsif( $opt->_is_object( $v ) && index( ref( $v ), 'Net::API::CPAN' ) == 0 )
+        {
+            $out->printf( "%*s:\n", $max, $f );
+            my $ref = $v->as_hash( convert_array => 0 );
+            my $max2 = 0;
+            for( keys( %$ref ) )
+            {
+                $max2 = length( $_ ) if( length( $_ ) > $max2 );
+            }
+            $max2++;
+            $max2 *= -1;
+            foreach my $k ( sort( keys( %$ref ) ) )
+            {
+                my $supp = '';
+                my $v;
+                $v = $ref->{ $k } if( defined( $ref->{ $k } ) && length( $ref->{ $k } ) );
+                if( $k eq 'mtime' && $opt->_is_a( $ref->{ $k } => 'DateTime' ) )
+                {
+                    $supp = ' (' . $ref->{ $k }->iso8601 . ')';
+                }
+                elsif( $k eq 'mode' )
+                {
+                    my $n = $ref->{ $k }->scalar;
+                    my $mode = '';
+                    $mode .= ( $n & 00400 ) ? 'r' : '-';
+                    $mode .= ( $n & 00200 ) ? 'w' : '-';
+                    $mode .= ( $n & 00100 ) ? 'x' : '-';
+                    $mode .= ( $n & 00040 ) ? 'r' : '-';
+                    $mode .= ( $n & 00020 ) ? 'w' : '-';
+                    $mode .= ( $n & 00010 ) ? 'w' : '-';
+                    $mode .= ( $n & 00004 ) ? 'r' : '-';
+                    $mode .= ( $n & 00002 ) ? 'w' : '-';
+                    $mode .= ( $n & 00001 ) ? 'w' : '-';
+                    $supp = ' (' . $mode . ')';
+                }
+                elsif( $k eq 'size' )
+                {
+                    $supp = ' (' . $ref->{ $k }->format_bytes . ')';
+                }
+                elsif( $k eq 'input' )
+                {
+                    $v = join( ', ', @{$ref->{ $k }} );
+                }
+                elsif( $opt->_is_array( $ref->{ $k } ) )
+                {
+                    $v = dump( [@{$ref->{ $k }}] );
+                }
+                elsif( $k eq 'payload' )
+                {
+                    # $v = join( ', ', values( %{$ref->{ $k }} ) );
+                    # $v = dump( $ref->{ $k } );
+                    $v = $ref->{ $k }->{doc_name};
+                }
+                $out->printf( ( ' ' x ( abs( $max ) - abs( $max2 ) ) ) . "%*s: %s${supp}\n", $max2, $k, defined( $v ) ? color( $v )->green : 'undef' );
+            }
+            next;
+        }
+        
+        if( &_is_boolean( $v ) )
+        {
+            $v = $v ? 'True' : 'False';
+        }
+        $out->printf( "%*s: %s\n", $max, $f, ( defined( $v ) && length( $v ) ) ? color( $v )->green : 'undef' );
+    }
+}
+
+# NOTE: _show_list( list => $list_obj, callback => \&_show_author );
+sub _show_list
+{
+    my $args = $opt->_get_args_as_hash( @_ );
+    my $list = $args->{list} || bailout( "No list object was provided." );
+    my $cb = $args->{callback} || bailout( "No callback was provided to handle each list object." );
+    my $type = $args->{type} || $list->type;
+    my $total = $list->total;
+    my $page_size = $list->page_size;
+    $args->{indent} //= 0;
+    my $prefix = $args->{indent} ? ( ' ' x $args->{indent} ) : '';
+    _message( "<green>$total</> ${type}s found." );
+    my $n = 0;
+    LOAD: while( my $obj = $list->next )
+    {
+        $out->print( "${prefix}Result No. ", color( ++$n )->green, "/", color( $total )->green, "\n" );
+        $cb->( $obj,
+            (
+                exists( $args->{indent} ) ? ( indent => $args->{indent} ) : (),
+            ),
+        );
+        $out->print( "-" x ( 20 + $args->{indent} ), "\n" ) if( $n < $total );
+        if( ( $page_size && !( $n % $page_size ) ) && $list->has_more )
+        {
+            # If we are not attached to a terminal, we exit the loop
+            last if( !&_is_tty );
+            _message( 4, "Prompting for more data." );
+            my $yesno = Term::Prompt::prompt( 'y', 'Should we load more data?', '', 'y' );
+            if( $yesno )
+            {
+                next LOAD;
+            }
+            else
+            {
+                last LOAD;
+            }
+        }
+    }
+    _message( 4, "No more data to show." );
+    return(1);
+}
+
+sub _show_metadata
+{
+    my $obj = shift( @_ );
+    my $args = $opt->_get_args_as_hash( @_ );
+    $args->{indent} //= 0;
+    my $prefix = $args->{indent} ? ( ' ' x $args->{indent} ) : '';
+    my $fields = ( scalar( @_ ) && $opt->_is_array( $_[0] ) )
+        ? shift( @_ )
+        : $obj->can( 'fields' )
+            ? $obj->fields
+            : $obj->can( '_fields' )
+                ? $obj->_fields
+                : [];
+    my $max = 0;
+    for( @$fields )
+    {
+        $max = length( $_ ) if( length( $_ ) > $max );
+    }
+    $max++;
+    $max *= -1;
+    foreach my $f ( @$fields )
+    {
+        my $v = $obj->$f;
+        if( $f eq 'stat' &&
+            $opt->_is_object( $v ) && 
+            index( ref( $v ), 'Net::API::CPAN' ) == 0 )
+        {
+            $out->printf( "${prefix}%*s:\n", $max, $f );
+            my $ref = $v->as_hash( convert_array => 0 );
+            my $max2 = 0;
+            for( keys( %$ref ) )
+            {
+                $max2 = length( $_ ) if( length( $_ ) > $max2 );
+            }
+            $max2++;
+            $max2 *= -1;
+            foreach my $k ( sort( keys( %$ref ) ) )
+            {
+                my $supp = '';
+                my $v;
+                $v = $ref->{ $k } if( defined( $ref->{ $k } ) && length( $ref->{ $k } ) );
+                if( $k eq 'mtime' && $opt->_is_a( $ref->{ $k } => 'DateTime' ) )
+                {
+                    $supp = ' (' . $ref->{ $k }->iso8601 . ')';
+                }
+                elsif( $k eq 'mode' )
+                {
+                    my $n = $ref->{ $k }->scalar;
+                    my $mode = '';
+                    $mode .= ( $n & 00400 ) ? 'r' : '-';
+                    $mode .= ( $n & 00200 ) ? 'w' : '-';
+                    $mode .= ( $n & 00100 ) ? 'x' : '-';
+                    $mode .= ( $n & 00040 ) ? 'r' : '-';
+                    $mode .= ( $n & 00020 ) ? 'w' : '-';
+                    $mode .= ( $n & 00010 ) ? 'w' : '-';
+                    $mode .= ( $n & 00004 ) ? 'r' : '-';
+                    $mode .= ( $n & 00002 ) ? 'w' : '-';
+                    $mode .= ( $n & 00001 ) ? 'w' : '-';
+                    $supp = ' (' . $mode . ')';
+                }
+                elsif( $k eq 'size' )
+                {
+                    $supp = ' (' . $ref->{ $k }->format_bytes . ')';
+                }
+                elsif( $k eq 'input' )
+                {
+                    $v = join( ', ', @{$ref->{ $k }} );
+                }
+                elsif( $opt->_is_array( $ref->{ $k } ) )
+                {
+                    $v = dump( [@{$ref->{ $k }}] );
+                }
+                elsif( $k eq 'payload' )
+                {
+                    # $v = join( ', ', values( %{$ref->{ $k }} ) );
+                    # $v = dump( $ref->{ $k } );
+                    $v = $ref->{ $k }->{doc_name};
+                }
+                $out->printf( $prefix . ( ' ' x ( abs( $max2 ) - $max ) ) . "%*s: %s${supp}\n", $max2, $k, defined( $v ) ? color( $v )->green : 'undef' );
+            }
+            next;
+        }
+        elsif( $opt->_is_object( $v ) && 
+            index( ref( $v ), 'Net::API::CPAN' ) == 0 )
+        {
+            $out->printf( "${prefix}%*s:\n", $max, $f );
+            &_show_metadata( $v, indent => ( $args->{indent} + 4 ) );
+            next;
+        }
+        elsif( $opt->_is_array( $v ) )
+        {
+            if( ref( $v->[0] ) )
+            {
+                my $rv = '';
+                for( @$v )
+                {
+                    $rv .= dump( $_ ) . "\n";
+                }
+                $v = $rv;
+            }
+            else
+            {
+                $v = join( ', ', @$v );
+            }
+        }
+        elsif( ref( $v ) eq 'HASH' || $opt->_is_a( $v => 'Module::Generic::Hash' ) )
+        {
+            $out->printf( "${prefix}%*s:\n", $max, $f );
+            foreach my $k ( sort( keys( %$v ) ) )
+            {
+                $out->printf( "${prefix}    %-30s: %s\n", $k, color( $v->{ $k } )->green );
+            }
+            next;
+        }
+        elsif( &_is_boolean( $v ) )
+        {
+            $v = $v ? 'True' : 'False';
+        }
+        $out->printf( "${prefix}%*s: %s\n", $max, $f, ( defined( $v ) && length( $v ) ) ? color( $v )->green : 'undef' );
+    }
+}
+
+sub _show_mirror
+{
+    my $obj = shift( @_ );
+    my $fields = ( scalar( @_ ) && $opt->_is_array( $_[0] ) )
+        ? shift( @_ )
+        : $obj->fields;
+    my $max = 0;
+    for( @$fields )
+    {
+        $max = length( $_ ) if( length( $_ ) > $max );
+    }
+    $max++;
+    $max *= -1;
+    foreach my $f ( @$fields )
+    {
+        my $v = $obj->$f;
+        if( $f eq 'contact' )
+        {
+            $out->printf( "%*s:\n", $max, $f );
+            $v->for(sub
+            {
+                my( $i, $this ) = @_;
+                $out->print( ( ' ' x abs( $max ) ), "[", color( $i )->green, "]\n" );
+                # 16 is the maximum length of those properties, and we add 1
+                foreach my $prop ( qw( contact_user contact_site ) )
+                {
+                    my $prop_val = $this->$prop;
+                    $out->printf( ( ' ' x ( abs( $max ) + 3 ) ) . "%-13s: %s\n", $prop, $prop_val );
+                }
+            });
+            next;
+        }
+        elsif( $opt->_is_array( $v ) )
+        {
+            if( ref( $v->first ) )
+            {
+                my $rv = '';
+                for( @$v )
+                {
+                    $rv .= dump( $_ ) . "\n";
+                }
+                $v = $rv;
+            }
+            else
+            {
+                $v = $v->join( ', ' );
+            }
+        }
+        elsif( &_is_boolean( $v ) )
+        {
+            $v = $v ? 'True' : 'False';
+        }
+        $out->printf( "%*s: %s\n", $max, $f, ( defined( $v ) && length( $v ) ) ? color( $v )->green : 'undef' );
+    }
+}
+
+sub _show_module
+{
+    return( &_show_file( @_ ) );
+}
+
+sub _show_package { return( &_show_simple( @_ ) ); }
+
+sub _show_permission { return( &_show_simple( @_ ) ); }
+
+sub _show_release
+{
+    my $obj = shift( @_ );
+    my $args = $opt->_get_args_as_hash( @_ );
+#     my $fields = ( scalar( @_ ) && $opt->_is_array( $_[0] ) )
+#         ? shift( @_ )
+#         : $obj->fields;
+    my $fields = ( $args->{fields} && $opt->_is_array( $args->{fields} ) )
+        ? $args->{fields}
+        : $obj->fields;
+    $args->{indent} //= 0;
+    my $prefix = $args->{indent} ? ( ' ' x $args->{indent} ) : '';
+    my $max = 0;
+    for( @$fields )
+    {
+        $max = length( $_ ) if( length( $_ ) > $max );
+    }
+    $max++;
+    $max *= -1;
+    foreach my $f ( @$fields )
+    {
+        my $v = $obj->$f;
+        if( $f eq 'dependency' )
+        {
+            $out->printf( "${prefix}%*s:\n", $max, $f );
+            $v->for(sub
+            {
+                my( $i, $this ) = @_;
+                $out->print( $prefix . ( ' ' x abs( $max ) ), "[", color( $i )->green, "]\n" );
+                # 16 is the maximum length of those properties, and we add 1
+                foreach my $prop ( qw( module phase relationship version ) )
+                {
+                    my $prop_val = $this->$prop;
+                    $out->printf( $prefix . ( ' ' x ( abs( $max ) + 3 ) ) . "%-13s: %s\n", $prop, color( $prop_val )->green );
+                }
+            });
+            next;
+        }
+        elsif( $f eq 'metadata' )
+        {
+            $out->printf( "${prefix}%*s:\n", $max, $f );
+            &_show_metadata( $v, indent => ( $args->{indent} + 4 ) );
+            next;
+        }
+        elsif( $f eq 'module' )
+        {
+            $out->printf( "${prefix}%*s:\n", $max, $f );
+            $v->for(sub
+            {
+                my( $i, $this ) = @_;
+                $out->print( $prefix . ( ' ' x abs( $max ) ), "[", color( $i )->green, "]\n" );
+                # 16 is the maximum length of those properties, and we add 1
+                foreach my $prop ( qw( name associated_pod authorized indexed version version_numified ) )
+                {
+                    my $prop_val = $this->$prop;
+                    if( &_is_boolean( $prop_val ) )
+                    {
+                        $prop_val = $prop_val ? 'True' : 'False';
+                    }
+                    $out->printf( $prefix . ( ' ' x ( abs( $max ) + 3 ) ) . "%-17s: %s\n", $prop, color( $prop_val )->green );
+                }
+            });
+            next;
+        }
+        elsif( $f eq 'resources' )
+        {
+            $out->printf( "${prefix}%*s:\n", $max, $f );
+            $out->printf( "    ${prefix}%-16s:\n", 'bugtracker' );
+            $out->printf( "        ${prefix}%-12s: %s\n", 'mailto', color( $v->bugtracker->mailto // '' )->green );
+            $out->printf( "        ${prefix}%-12s: %s\n", 'type', color( $v->bugtracker->type // '' )->green );
+            $out->printf( "        ${prefix}%-12s: %s\n", 'web', color( $v->bugtracker->web // '' )->green );
+
+            $out->printf( "    ${prefix}%-16s: %s\n", 'homepage', color( $v->homepage->web // '' )->green );
+
+            $out->printf( "    ${prefix}%-16s: %s\n", 'license', ( !$v->license->is_empty ? $v->license->map(sub{ color( $_ )->green })->join( ', ' ) : 'undef' ) );
+
+            $out->printf( "    ${prefix}%-16s:\n", 'repository' );
+            $out->printf( "        ${prefix}%-12s: %s\n", 'type', color( $v->repository->type // '' )->green );
+            $out->printf( "        ${prefix}%-12s: %s\n", 'url', color( $v->repository->url // '' )->green );
+            $out->printf( "        ${prefix}%-12s: %s\n", 'web', color( $v->repository->web // '' )->green );
+            next;
+        }
+        elsif( $f eq 'stat' &&
+            $opt->_is_object( $v ) && 
+            index( ref( $v ), 'Net::API::CPAN' ) == 0 )
+        {
+            $out->printf( "${prefix}%*s:\n", $max, $f );
+            my $ref = $v->as_hash( convert_array => 0 );
+            my $max2 = 0;
+            for( keys( %$ref ) )
+            {
+                $max2 = length( $_ ) if( length( $_ ) > $max2 );
+            }
+            $max2++;
+            $max2 *= -1;
+            foreach my $k ( sort( keys( %$ref ) ) )
+            {
+                my $supp = '';
+                my $v;
+                $v = $ref->{ $k } if( defined( $ref->{ $k } ) && length( $ref->{ $k } ) );
+                if( $k eq 'mtime' && $opt->_is_a( $ref->{ $k } => 'DateTime' ) )
+                {
+                    $supp = ' (' . $ref->{ $k }->iso8601 . ')';
+                }
+                elsif( $k eq 'mode' )
+                {
+                    my $n = $ref->{ $k }->scalar;
+                    my $mode = '';
+                    $mode .= ( $n & 00400 ) ? 'r' : '-';
+                    $mode .= ( $n & 00200 ) ? 'w' : '-';
+                    $mode .= ( $n & 00100 ) ? 'x' : '-';
+                    $mode .= ( $n & 00040 ) ? 'r' : '-';
+                    $mode .= ( $n & 00020 ) ? 'w' : '-';
+                    $mode .= ( $n & 00010 ) ? 'w' : '-';
+                    $mode .= ( $n & 00004 ) ? 'r' : '-';
+                    $mode .= ( $n & 00002 ) ? 'w' : '-';
+                    $mode .= ( $n & 00001 ) ? 'w' : '-';
+                    $supp = ' (' . $mode . ')';
+                }
+                elsif( $k eq 'size' )
+                {
+                    $supp = ' (' . $ref->{ $k }->format_bytes . ')';
+                }
+                elsif( $k eq 'input' )
+                {
+                    $v = join( ', ', @{$ref->{ $k }} );
+                }
+                elsif( $opt->_is_array( $ref->{ $k } ) )
+                {
+                    $v = dump( [@{$ref->{ $k }}] );
+                }
+                elsif( $k eq 'payload' )
+                {
+                    # $v = join( ', ', values( %{$ref->{ $k }} ) );
+                    # $v = dump( $ref->{ $k } );
+                    $v = $ref->{ $k }->{doc_name};
+                }
+                $out->printf( $prefix . ( ' ' x ( abs( $max2 ) - $max - $args->{indent} ) ) . "%*s: %s${supp}\n", $max2, $k, defined( $v ) ? color( $v )->green : 'undef' );
+            }
+            next;
+        }
+        elsif( $f eq 'tests' )
+        {
+            $out->printf( "${prefix}%*s:\n", $max, $f );
+            $out->printf( "    ${prefix}%*s: %s\n", ( $max + 4 ), 'fail', $v->fail );
+            $out->printf( "    ${prefix}%*s: %s\n", ( $max + 4 ), 'na', $v->na );
+            $out->printf( "    ${prefix}%*s: %s\n", ( $max + 4 ), 'pass', $v->pass );
+            $out->printf( "    ${prefix}%*s: %s\n", ( $max + 4 ), 'unknown', $v->unknown );
+            next;
+        }
+        elsif( $opt->_is_array( $v ) )
+        {
+            if( ref( $v->first ) )
+            {
+                my $rv = '';
+                for( @$v )
+                {
+                    $rv .= dump( $_ ) . "\n";
+                }
+                $v = $rv;
+            }
+            else
+            {
+                $v = $v->join( ', ' );
+            }
+        }
+        elsif( &_is_boolean( $v ) )
+        {
+            $v = $v ? 'True' : 'False';
+        }
+        $out->printf( "${prefix}%*s: %s\n", $max, $f, ( defined( $v ) && length( $v ) ) ? color( $v )->green : 'undef' );
+    }
+}
+
+sub _show_release_files
+{
+    my $args = $opt->_get_args_as_hash( @_ );
+    my $hash = $args->{data} || bailout( "No data was provided." );
+    my $rel  = $args->{release} || bailout( "No release name was provided." );
+    my $total = $hash->{total};
+    my $cats = $hash->{categories};
+    $opt->_load_class( 'Net::API::CPAN::File' ) || bailout( $opt->error );
+    $out->print( color( $total )->green, " key files found for the release ", color( $rel )->green, "\n" );
+    foreach my $cat ( sort( keys( %$cats ) ) )
+    {
+        my $files = $cats->{ $cat };
+        if( ref( $files ) ne 'ARRAY' )
+        {
+            bailout( "The data received for category \"$cat\" is not an array." );
+        }
+        my $n = scalar( @$files );
+        $out->print( "Category ", color( $cat )->green, " contains ", color( $n )->green, " file", ( $n > 1 ? 's' : '' ), ".\n" );
+        for( my $i = 0; $i < scalar( @$files ); $i++ )
+        {
+            $out->print( "File ", color( $i + 1 )->green, ' / ', color( $n )->green, "\n" );
+            my $ref = $files->[$i];
+            my $obj = Net::API::CPAN::File->new( %$ref, debug => $LOG_LEVEL ) ||
+                bailout( "Error instantiating an Net::API::CPAN::File object: ", Net::API::CPAN::File->error );
+            &_show_simple( $obj, [qw( category author distribution name path release status )], { indent => 4 } );
+        }
+        $out->print( '_' x 20, "\n" );
+    }
+    return(1);
+}
+
+# Helper method shared
+sub _show_simple
+{
+    my $obj = shift( @_ );
+    my $fields = ( scalar( @_ ) && $opt->_is_array( $_[0] ) )
+        ? shift( @_ )
+        : $obj->fields;
+    my $args = $opt->_get_args_as_hash( @_ );
+    $args->{indent} //= 0;
+    my $prefix = $args->{indent} ? ( ' ' x $args->{indent} ) : '';
+    my $max = 0;
+    for( @$fields )
+    {
+        $max = length( $_ ) if( length( $_ ) > $max );
+    }
+    $max++;
+    $max *= -1;
+    foreach my $f ( @$fields )
+    {
+        my $v = $obj->$f;
+        if( &_is_boolean( $v ) )
+        {
+            $v = $v ? 'True' : 'False';
+        }
+        elsif( $opt->_is_array( $v ) )
+        {
+            $out->printf( "${prefix}%*s: %s\n", $max, $f, $v->map(sub{ color( $_ )->green })->join( ', ' ) );
+            next;
+        }
+        $out->printf( "${prefix}%*s: %s\n", $max, $f, ( defined( $v ) && length( $v ) ) ? color( $v )->green : 'undef' );
+    }
+}
+
+sub _show_web
+{
+    # Net::API::CPAN::List::Web
+    my $obj = shift( @_ );
+    $out->print( color( $obj->distribution )->green, " -> ", color( $obj->total ), " file(s) found.\n" );
+    &_show_list(
+        list => $obj,
+        callback => \&_show_simple,
+        indent => 4,
+    );
+    return(1);
+}
+
+# Signal handler for SIG TERM or INT; we exit 1
+sub _signal_handler
+{
+    my( $sig ) = @_;
+    &_message( "Caught a $sig signal, terminating process $$" );
+    if( uc( $sig ) eq 'TERM' )
+    {
+        &_cleanup_and_exit(0);
+    }
+    else
+    {
+        &_cleanup_and_exit(1);
+    }
+}
+# NOTE: POD
+__END__
+
+=encoding utf-8
+
+=pod
+
+=head1 NAME cpanapi
+
+=head1 SYNOPSIS
+
+    cpanapi --debug 4 --show-author --id jdeguest --id oalders
+
+=head1 DESCRIPTION
+
+C<cpanapi> is a simple command line client to the MetaCPAN API.
+
+=head1 COMMANDS
+
+=head2 activity
+
+Display as a text chart on the terminal, the aggregate value of releases for the past 24 months.
+
+Default aggregation is 1 month (1M).
+
+For example:
+
+    cpanapi --activity --author oalders
+
+which will show the releases issued by author OALDERS
+
+    cpanapi --activity --author oalders --new
+
+Same as the previous one, but will only show the new distribution release
+
+    cpanapi --activity --distribution HTTP-Message
+
+which will show the releases for the distribution specified.
+
+    cpanapi --activity --module HTTP::Message
+
+which will show the releases that depend on the module specified.
+
+    cpanapi --activity --module HTTP::Message --new
+
+Same as the previous one, but only show new module release.
+
+    cpanapi --activity --new --interval 1M
+
+which will show the new distribution releases across all authors.
+
+=head2 autocomplete
+
+This will trigger an API query to the endpoint C</search/autocomplete> and will return a list of files.
+
+For example:
+
+    cpanapi --autocomplete --query HTTP
+
+=head2 changes
+
+This will trigger an API query to the endpoint C</changes> and will return a list of changes objects, or a change object.
+
+For example:
+
+    cpanapi --changes --distribution HTTP-Message
+
+which will retrieve the changes file information for the specified C<distribution>
+
+    cpanapi --changes --author oalders --release HTTP-Message-6.36
+
+or, you can also specify the C<author> and the C<release> by separating them with a forward slash:
+
+    cpanapi --changes --release oalders/HTTP-Message-6.36
+
+And you can specify more than one C<author> and C<release> combo:
+
+    cpanapi --changes --author oalders --release HTTP-Message-6.36 --author jdeguest --release Nice-Try-v1.3.4
+
+or, separating them with a forward slash:
+
+    cpanapi --changes --release oalders/HTTP-Message-6.36 --release jdeguest/Nice-Try-v1.3.4
+
+Note that the C<author> name is case insensitive.
+
+Possible options to use are:
+
+=over 4
+
+=item * C<max>
+
+Integer. This specifies the maximum number of lines, starting from the top, in the C<Changes> file to show. Defaults to 7.
+
+For example:
+
+    cpanapi --changes --author oalders --release HTTP-Message-6.36 --max 12
+
+=back
+
+=head2 contributor
+
+This will trigger an API query to the endpoint C</contributor> and will return a list of contributors and their contributed releases.
+
+For example:
+
+    cpanapi --contributor --author oalders
+
+which will retrieve a list of module contributed to by the specified C<author>.
+
+or
+
+    cpanapi --contributor --author oalders --release HTTP-Message-6.36
+
+which will retrieve a list of release contributors details.
+
+Possible options to use are:
+
+=over 4
+
+=item * C<size>
+
+Integer. This specifies the number of elements displayed per page. It defaults to 10.
+
+=back
+
+=head2 cover
+
+This will trigger an API query to the endpoint C</cover> and retrieve the release C<distribution> name, C<release> name, C<download_url> and C<version> number.
+
+For example:
+
+    cpanapi --cover --release HTTP-Message-6.36
+
+=head2 diff
+
+This will trigger an API query to the endpoint C</diff> and retrieve the C<diff> between 2 files ID, or between specific C<release>, or between the last and previous release version of a specified C<distribution>
+
+For example:
+
+    cpanapi --diff --file-id AcREzFgg3ExIrFTURa0QJfn8nto --file-id Ies7Ysw0GjCxUU6Wj_WzI9s8ysU
+
+which will retrieve a C<diff> between 2 files ID.
+
+    cpanapi --diff --author oalders --release HTTP-Message-6.35 --release HTTP-Message-6.36
+
+which will retrieve a C<diff> between the 2 specified releases of the C<author> C<OALDERS>. The author ID is case insensitive.
+
+    cpanapi --diff --distribution HTTP-Message
+
+which will retrieve a C<diff> between the latest and previous version of the C<distribution> C<HTTP-Message>
+
+Note that you can use the option C<as-text> to get the result as C<text/plain>. By default, it will retrieve the data as C<JSON>.
+
+Possible options to use are:
+
+=over 4
+
+=item * C<as-text>
+
+Boolean. When enabled, this will retrieve the diff as plain text.
+
+=back
+
+=head2 download-url
+
+This will trigger an API query to the endpoint C</download_url> and retrieve the download URL details.
+
+For example:
+
+    cpanapi --download-url --module HTTP::Message --version ">6.35"
+
+which will retrieve the latest download URL details for C<HTTP::Message> with version greater than C<6.35>
+
+or, using a range of versions:
+
+    cpanapi --download-url --module HTTP::Message --version ">6.30, <=6.36"
+
+which will retrieve the latest download URL details for C<HTTP::Message> with version greater than C<6.30>, but lower or equal to C<6.36>
+
+=head2 favorite
+
+This will trigger an API query to the endpoint C</favorite> and retrieve the distributions favorite counts.
+
+For example:
+
+    cpanapi --favorite --agg HTTP-Message --agg DBI
+
+which will retrieve favorites agregate by distributions.
+
+    cpanapi --favorite --distribution HTTP-Message
+
+which will retrieve the list of users who favorited a distribution.
+
+    cpanapi --favorite --user q_15sjOkRminDY93g9DuZQ
+
+which will retrieve user favorites information details.
+
+    cpanapi --favorite --leaderboard
+
+which will retrieve the top favorited distributions (leaderboard) as chart in terminal.
+
+    cpanapi --favorite --recent
+
+which will retrieve a list of recent favorited distributions.
+
+=head2 first
+
+This will trigger an API query to the endpoint C</search/first> and retrieve the abridged module information for the first search result.
+
+For example:
+
+    cpanapi --first --query HTTP
+
+=head2 history
+
+This will trigger an API query to the endpoint C</history> and retrieve the history of the specified module.
+
+For example:
+
+    cpanapi --history --module HTTP::Message --path lib/HTTP/Message.pm
+
+This will retrieve the history of the specified module.
+
+    cpanapi --history --module HTTP::Message --path lib/HTTP/Message.pm --type doc
+
+or, if you prefer to use the full word C<documentation> :)
+
+    cpanapi --history --module HTTP::Message --path lib/HTTP/Message.pm --type documentation
+
+Those previous two will retrieve the history of the specified module documentation.
+
+    cpanapi --history --distribution HTTP-Message --path lib/HTTP/Message.pm
+
+This will retrieve the history of the specified distribution file.
+
+The value for C<type> can be any one of C<doc>, C<documentation>, C<file>, or C<module>
+
+=head2 permission
+
+This will trigger an API query to the endpoint C</permission> and retrieve the owner and co-maintainers information of the specified module.
+
+For example:
+
+    cpanapi --permission --author oalders
+
+This will retrieve the list of all modules where the specified C<author> is either the owner or the co-maintainer.
+
+Note that the author is case insensitive.
+
+    cpanapi --permission --module HTTP::Message
+
+This will retrieve the owner and co-maintainers information for the specified module.
+
+or, for multiple modules
+
+    cpanapi --permission --module HTTP::Message --module Data::HexDump
+
+This will retrieve the B<list> of the specified C<module>s owner and co-maintainers.
+
+=head2 pod
+
+This will trigger an API query to the endpoint C</pod> and retrieve the POD, by default, as C<HTML> string of the specified C<author>, C<release>, C<path>, or of the specified C<module>
+
+Instead of a C<HTML>, you can request the returned data as C<markdown> by using the option C<--as-markdown>, text by using C<--as-text>, C<POD> by using C<--as-pod>. To explicitly request C<HTML>, use C<--as-html>
+
+For example:
+
+    cpanapi --pod --author oalders --release HTTP-Message-6.36 --path lib/HTTP/Message.pm
+
+which will return the module POD, as C<HTML>
+
+    cpanapi --pod --author oalders --release HTTP-Message-6.36 --path lib/HTTP/Message.pm --as-markdown
+
+which will return the module POD converted to C<markdown>.
+
+    cpanapi --pod --author oalders --release HTTP-Message-6.36 --path lib/HTTP/Message.pm --as-text
+
+which will return the module POD converted to plain text.
+
+    cpanapi --pod --author oalders --release HTTP-Message-6.36 --path lib/HTTP/Message.pm --as-pod
+
+which will return the module POD as POD.
+
+    cpanapi --pod --author oalders --release HTTP-Message-6.36 --path lib/HTTP/Message.pm --as-html
+
+which will return the module POD as C<HTML>, which is the default behaviour of the MetaCPAN API.
+
+Alternatively, you can specify a C<module>, such as:
+
+    cpanapi --pod --module HTTP::Message
+
+which will return the module POD for C<HTTP::Message>, or as C<markdown>:
+
+    cpanapi --pod --module HTTP::Message --as-markdown
+
+To get POD data rendered into HTML:
+
+    cpanapi --pod --render $'=encoding utf-8\n\n=head1 Hello World\n\nSomething here\n\n=cut\n'
+
+Note that in command line, passing characters like C<\n> will not turn them into a new line, bu as literals unless you surround your text properly to interpolate them.
+
+=head2 reverse
+
+This will trigger an API query to the endpoint C</reverse_dependencies> and retrieve the list of detailed releases that depend on the specified C<distribution> or C<module>
+
+For example:
+
+    cpanapi --reverse --distribution HTTP-Message --size 10 --page 1 --sort name
+
+which, will retrieve the list of all releases depending on the specified C<distribution> with C<10> results per page starting from page C<1> and sorting the result by C<release> name.
+
+    cpanapi --reverse --module HTTP::Message --size 10 --page 1 --sort name
+
+Sames as the previous one, except this uses the specified C<module>
+
+=head2 search-author
+
+This triggers a search for authors.
+
+For a simple search:
+
+    cpanapi --search-author --query "OA*"
+
+Using a regular expression:
+
+    cpanapi --search-author --regexp "OA.*"
+
+The later will trigger an ElasticSearch using the C<HTTP> C<POST> method.
+
+You can also use an ElasticSearch query stored in a file:
+
+    cpanapi --search-author --es /some/where.json
+
+or using ElasticSearch JSON query passed from STDIN:
+
+    cpanapi --search-author --stdin <<EOT
+    {
+       "query" : {
+          "regexp" : {
+             "pauseid" : "OA.*"
+          }
+       }
+    }
+    EOT
+
+=head2 search-distribution
+
+This triggers a search for distributions.
+
+For a simple search:
+
+    cpanapi --search-distribution --query "HTTP*"
+
+Using a regular expression:
+
+    cpanapi --search-distribution --regexp "HTTP.*"
+
+The later will trigger an ElasticSearch using the C<HTTP> C<POST> method.
+
+You can also use an ElasticSearch query stored in a file:
+
+    cpanapi --search-distribution --es /some/where.json
+
+or using ElasticSearch JSON query passed from STDIN:
+
+    cpanapi --search-distribution --stdin <<EOT
+    {
+       "query" : {
+          "regexp" : {
+             "name" : "HTTP.*"
+          }
+       }
+    }
+    EOT
+
+=head2 search-file
+
+This triggers a search for files.
+
+For a simple search:
+
+    cpanapi --search-file --query "HTTP*"
+
+Using a regular expression:
+
+    cpanapi --search-file --regexp "HTTP.*"
+
+The later will trigger an ElasticSearch using the C<HTTP> C<POST> method.
+
+You can also use an ElasticSearch query stored in a file:
+
+    cpanapi --search-file --es /some/where.json
+
+or using ElasticSearch JSON query passed from STDIN:
+
+    cpanapi --search-file --stdin <<EOT
+    {
+       "query" : {
+          "regexp" : {
+             "documentation" : "HTTP.*"
+             "name" : "HTTP.*"
+             "path" : "HTTP.*"
+          }
+       }
+    }
+    EOT
+
+=head2 search-package
+
+This triggers a search for packages.
+
+For a simple search:
+
+    cpanapi --search-package --query "HTTP*"
+
+Using a regular expression:
+
+    cpanapi --search-package --regexp "HTTP.*"
+
+The later will trigger an ElasticSearch using the C<HTTP> C<POST> method.
+
+You can also use an ElasticSearch query stored in a file:
+
+    cpanapi --search-package --es /some/where.json
+
+or using ElasticSearch JSON query passed from STDIN:
+
+    cpanapi --search-package --stdin <<EOT
+    {
+       "query" : {
+          "regexp" : {
+             "author" : "HTTP.*"
+             "distribution" : "HTTP.*"
+             "file" : "HTTP.*"
+             "module_name" : "HTTP.*"
+             "version" : "HTTP.*"
+          }
+       }
+    }
+    EOT
+
+=head2 search-permission
+
+This triggers a search for permissions.
+
+For a simple search:
+
+    cpanapi --search-permission --query "HTTP*"
+
+Using a regular expression:
+
+    cpanapi --search-permission --regexp "HTTP.*"
+
+The later will trigger an ElasticSearch using the C<HTTP> C<POST> method.
+
+You can also use an ElasticSearch query stored in a file:
+
+    cpanapi --search-permission --es /some/where.json
+
+or using ElasticSearch JSON query passed from STDIN:
+
+    cpanapi --search-permission --stdin <<EOT
+    {
+       "query" : {
+          "regexp" : {
+             "owner" : "OA.*"
+             "module_name" : "HTTP.*"
+          }
+       }
+    }
+    EOT
+
+=head2 show-author
+
+Show the information details for one or more author, a.k.a Pause account ID.
+
+For example:
+
+    cpanapi --show-author --id oalders --id jdeguest
+
+Note that the C<author> name is case insensitive.
+
+=head2 show-distribution
+
+Show the information details for the specified C<distribution>
+
+For example:
+
+    cpanapi --show-distribution --distribution HTTP-Message
+
+=head2 show-file
+
+Show the information details for the specified C<file> or directory path in a given C<release>.
+
+For example:
+
+    cpanapi --show-file --author oalders --release HTTP-Message-6.36 --dir lib/HTTP
+
+which will retrieve a list of all files within that specified C<release> directory.
+
+    cpanapi --show-file --author oalders --release HTTP-Message-6.36 --path lib/HTTP
+
+which will retrieve the specified C<file> information details.
+
+Note that the C<author> ID is case insensitive.
+
+=head2 show-package
+
+Show the package information details for the specified C<distribution> or C<module>.
+
+For example:
+
+    cpanapi --show-package --distribution HTTP-Message
+
+which, will retrieve a list of all packages matching the C<distribution> specified.
+
+    cpanapi --show-package --module HTTP::Message
+
+which, will retrieve a list of all packages matching the C<module> specified.
+
+=head2 show-release
+
+This will trigger an API query to the endpoint C</release>, and retrieve the C<release> information.
+
+    cpanapi --show-release --all oalders
+
+which, will retrieve a list of all releases for a given C<author>
+
+or
+
+    cpanapi --show-release --author oalders
+
+which, will retrieve a shorter list of all releases for a given C<author>
+
+or
+
+    cpanapi --show-release --author oalders --latest
+
+which, will retrieve the latest releases by the specified author
+
+    cpanapi --show-release --author oalders --release HTTP-Message-6.36
+
+which, will retrieve a release information details
+
+    cpanapi --show-release --distribution HTTP-Message
+
+which, will retrieve the latest distribution release information details
+
+or
+
+    cpanapi --show-release --distribution HTTP-Message --latest
+
+which, will retrieve the latest release for the specified distribution
+
+    cpanapi --show-release --author oalders --release HTTP-Message-6.36 --contributors
+
+which, will retrieve the list of contributors for the specified distributions
+
+    cpanapi --show-release --author oalders --release HTTP-Message-6.36 --files
+
+which, will retrieve the list of release key files by category
+
+    cpanapi --show-release --author oalders --release HTTP-Message-6.36 --interesting-files
+
+which, will retrieve the list of interesting files for the given release
+
+    cpanapi --show-release --author oalders --release HTTP-Message-6.36 --modules
+
+which, will retrieve the list of modules in the specified release
+
+    cpanapi --show-release --recent
+
+which, will retrieve the list of recent releases
+
+    cpanapi --show-release --distribution HTTP-Message --by-version
+
+which, will retrieve all releases by versions for the specified C<distribution>
+
+    cpanapi --show-release --distribution HTTP-Message --versions 6.35,6.34,6.36 --as-text
+
+which, will retrieve all releases by versions for the specified C<distribution> and for the specified version in text format.
+
+or, alternatively:
+
+    cpanapi --show-release --distribution HTTP-Message --versions 6.35 --versions 6.36 --as-text
+
+Note that the order of the versions specified is unimportant, because the MetaCPAN API will return the release in their version descending order.
+
+=head2 source
+
+This will trigger an API query to the endpoint C</source> and retrieve the source the element specified using either C<author>, C<release>, C<path>, or a specified C<module>
+
+For example:
+
+    cpanapi --source --author oalders --release HTTP-Message-6.36 --path lib/HTTP/Message.pm
+
+which, will retrieve the source of the element specified by the C<release> and C<path>
+
+    cpanapi --source --module HTTP::Message
+
+which, will retrieve the source of the element specified by the C<module>
+
+Note that the author ID is case insensitive.
+
+=head2 suggest
+
+This will trigger an API query to the endpoint C</search/autocomplete/suggest> and retrieve abridged release information.
+
+For example:
+
+    cpanapi --suggest --query HTTP
+
+=head2 top-uploaders
+
+This will trigger an API query to the endpoint C</release/top_uploaders> and retrieve the list of the most active authors and display it on the terminal as a chart.
+
+For example:
+
+    cpanapi --top-uploaders --range monthly
+
+Possible options to use are:
+
+=over 4
+
+=item * C<range>
+
+A string specifying the result range. Valid values are C<all>, C<weekly>, C<monthly> or C<yearly>. It defaults to C<weekly>
+
+=item * C<size>
+
+An integer to specify the size of the data returned.
+
+=back
+
+=head1 OPTIONS
+
+=head2 agg
+
+Array. This specifies an array of distributions. This is used with C<--favorite>
+
+For example:
+
+    cpanapi --favorite --agg HTTP-Message --agg DBI
+
+You can also use alternatively C<aggregate>:
+
+    cpanapi --favorite --aggregate HTTP-Message --aggregate DBI
+
+=head2 as-markdown
+
+Boolean. When enabled, the result, when applicable, will be returned as C<text/x-markdown>. Defaults to false.
+
+For example:
+
+    cpanapi --pod --author oalders --release HTTP-Message-6.36 --path lib/HTTP/Message.pm --as-markdown
+
+    cpanapi --pod --module HTTP::Message --as-markdown
+
+=head2 as-text
+
+Boolean. When enabled, the result, when applicable, will be returned as C<text/plain>. Defaults to false.
+
+For example:
+
+    cpanapi --diff --distribution HTTP-Message --as-text
+
+or
+
+    cpanapi --show-release --distribution HTTP-Message --versions v0.30.5,v0.31.0 --as-text
+
+=head2 author
+
+String. This specifies an C<author> or a Pause account ID, such as C<OALDERS>
+
+For example:
+
+    cpanapi --changes --author oalders --release HTTP-Message-6.36
+
+=head2 by-version
+
+Boolean. When used, this enables showing release by version with the MetaCPAN API endpoint C</release/versions>
+
+For example:
+
+    cpanapi --show-release --distribution HTTP-Message --by-version
+
+which, will return the list of all releases with its version for the specified C<distribution>
+
+See also C<--versions>
+
+=head2 cache-file
+
+File path. This specifies a file path to a C<JSON> file that will be used instead of issuing a live C<HTTP> request.
+
+For example:
+
+    cpanapi --show-module HTTP::Message --join author --join release --cache-file /some/where/module.json
+
+=head2 debug
+
+Integer. This specifies the level of verboseness and is used for debugging purposes.
+
+The higher, the more debugging information will be displayed.
+
+=head2 dev
+
+Boolean. When this option is enabled, it indicates development versions are acceptable.
+
+This is used in conjonction with C<--download-url>
+
+For example:
+
+    cpanapi --download-url --module HTTP::Message -dev --version ">6.30, <=6.36"
+
+=head2 dir
+
+String. This specifies a directory path relative to a given release.
+
+For example:
+
+    cpanapi --show-file --author oalders --release HTTP-Message-6.36 --dir lib/HTTP
+
+=head2 distribution
+
+String. This specifies a distribution name.
+
+For example:
+
+    cpanapi --activity --distribution HTTP-Message --interval 1M
+
+=head2 es
+
+The file path to a JSON file containing the details of an ElasticSearch query that will be used to send to the MetaCPAN REST API.
+
+For example:
+
+    cpanapi --search-author --es /some/where/es-author-search.json
+
+=head2 id
+
+String. This is used to specify an ID, such as a C<CPAN> ID a.k.a. an C<author> ID. Something like C<OALDERS>
+
+You can repeat it to specify more than one ID.
+
+For example:
+
+    cpanapi --show-author --id oalders --id jdeguest
+
+=head2 interval
+
+String. This is the interval used for aggregate value for release activity. See C<activity>
+
+Possible values are an integer directly followed by one of C<y> (year), C<M> (month), C<w> (week), C<d> (day), C<h> (hour), C<m> (minute), and C<s> (second).
+
+Default value is C<1M>, i.e. 1 month.
+
+For example:
+
+    cpanapi --activity --new --interval 1w
+
+which will show as a text chart the 1 week aggregate value for the new releases over the past 24 months.
+
+=head2 leaderboard
+
+Boolean. When enabled, this, in conjonction with C<--favorite>, will trigger a query to get the top most favorite distributions.
+
+    cpanapi --favorite --leaderboard
+
+which will display a chart on the terminal.
+
+=head2 max
+
+Integer. Specifies the maximum length to show. This is used to set the maximum number of lines for the Changes file.
+
+Set it to -1 to show all lines.
+
+For example:
+
+    cpanapi --changes --author oalders --release HTTP-Message-6.36 --max 12
+
+This will show the change object and only the first 12 lines of the Changes file content.
+
+=head2 module
+
+String, This specifies a module, such as C<HTTP::Message>
+
+For example:
+
+    cpanapi --activity --module HTTP::Message --interval 1M
+
+which will show as a text chart the 1 month aggregate value for the releases over the past 24 months that depend on the specified C<module>
+
+=head2 new
+
+Boolean. When enabled, this is used to get the new data only. This is currently used to get the new releases activity.
+
+For example:
+
+    cpanapi --activity --new --interval 1w
+
+which will show as a text chart the 1 week aggregate value for the new releases over the past 24 months.
+
+=head2 order
+
+String. This specifies the direction with which to sort the result.
+
+This can be either C<asc> or C<desc> and defaults to C<asc> when C<sort> is used with regular expression search. See L</regexp>
+
+For example:
+
+    cpanapi --search-author --regexp "OA.*" --sort name --order asc
+
+=head2 page
+
+Integer. This specifies the result page to return. This defaults to 1.
+
+=head2 path
+
+String. This specifies a file or directory path relative to a given release.
+
+For example:
+
+    cpanapi --show-file --author oalders --release HTTP-Message-6.36 --path lib/HTTP/Message.pm
+
+or, for a directory:
+
+    cpanapi --show-file --author oalders --release HTTP-Message-6.36 --path lib/HTTP
+
+=head2 prefix
+
+String. This specifies the initial characters to search for in a Pause account ID.
+
+For example:
+
+    cpanapi --search-author --prefix O
+
+This will retrieve all authors whose ID starts with the letter C<O>
+
+=head2 query
+
+String. A simple search query.
+
+For example:
+
+    cpanapi --search-author --query "OA*" --sort name --order asc
+
+=head2 range
+
+A string specifying the result range. Valid values are C<all>, C<weekly>, C<monthly> or C<yearly>. It defaults to C<weekly>
+
+For example:
+
+    cpanapi --top-uploaders --range weekly --size 20
+
+=head2 recent
+
+Boolean. When enabled, this will, in conjonction with C<--favorite>, trigger a query to show the most recently favorited distributions.
+
+For example:
+
+    cpanapi --favorite --recent
+
+=head2 regexp
+
+String. This specifies a regular expression to be used for searching.
+
+For example:
+
+    cpanapi --search-author --regexp "OA.*" --sort name --order asc
+
+This would issue an ElasticSearch query to the CPAN REST API.
+
+=head2 save
+
+String. This takes a file path where to save the C<JSON> payload received by the MetaCPAN REST API.
+
+This is useful for debugging or to take a peek.
+
+You can also use C<export> or C<save-as> instead of C<save>
+
+For example:
+
+    cpanapi --search-author --query "OA*" --save /some/where/cpan-author.json
+
+=head2 show or no-show
+
+Boolean. Enables or disables the output of formatted data on STDOUT. Defaults to true.
+
+Sometimes, you may want to not output the result of the query to the MetaCPAN API, such as when you just want to save the result to a file.
+
+Foe example:
+
+    cpanapi --search-author --query "OA*" --save /some/where/cpan-author.json --no-show
+
+=head2 size
+
+Integer. This specifies the number of elements returned in one page of results. Usually, this defaults to 10, but it depends on the endpoint.
+
+=head2 sort
+
+String. This specifies the field to sort the dataset with.
+
+For example:
+
+    cpanapi --search-author --regexp "OA.*" --sort name --order asc
+
+=head2 stdin
+
+Boolean. When used, this will enable receiving the ElasticSearch JSON data on the STDIN
+
+For example:
+
+    cat /some/where/es.json | cpanapi --search-author --stdin
+
+or
+
+    cpanapi --search-author --stdin
+
+then paste data, like:
+
+    {
+       "query" : {
+          "regexp" : {
+             "pauseid" : "OA.*"
+          }
+       }
+    }
+
+finally, enter ctrl-D
+
+=head2 type
+
+String. This specifies a type and is used in conjonction with C<--history>
+
+=head2 user
+
+String. This specifies a MetaCPAN user, such as C<FepgBJBZQ8u92eG_TcyIGQ>
+
+For example:
+
+    cpanapi --show-author --user FepgBJBZQ8u92eG_TcyIGQ
+
+or with multiple user IDs:
+
+    cpanapi --show-author --user FepgBJBZQ8u92eG_TcyIGQ --user 6ZuVfdMpQzy75_Mazx2_nw
+
+=head2 version
+
+String. This specifies a string, or one or more string range. Multiple ranges are separated by a comma.
+
+For example:
+
+    cpanapi --download-url --module HTTP::Message --version "6.36"
+
+    cpanapi --download-url --module HTTP::Message --version ">6.30, <=6.36"
+
+Possible operators are C<==>, C<!=>, C<< <= >>, C<< >= >>, C<< > >>, C<< < >>, C<!>
+
+=head2 versions
+
+Array. This specifies one or more versions for a C<distribution> for which all its releases will be retrieved. This is used in conjonction with C<--show-release>.
+
+For example:
+
+    cpanapi --show-release --distribution HTTP-Message --versions 6.35 --versions 6.34
+
+If you prefer, you can provide multiple version as a comma separated value, such as:
+
+    cpanapi --show-release --distribution HTTP-Message --versions 6.35,6.34
+
+or, even:
+
+    cpanapi --show-release --distribution HTTP-Message --versions "6.35,6.34"
+
+Note that the order of the versions specified is unimportant, because the MetaCPAN API will return the release in their version descending order.
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT
+
+Copyright(c) 2023 DEGUEST Pte. Ltd.
+
+All rights reserved
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

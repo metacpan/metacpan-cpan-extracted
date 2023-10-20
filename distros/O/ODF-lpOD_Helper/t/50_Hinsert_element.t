@@ -14,11 +14,9 @@ use t_TestCommon ':silent',
                  qw/bug tmpcopy_if_writeable $debug/;
 
 use ODF::lpOD;
-use ODF::lpOD_Helper;
+use ODF::lpOD_Helper qw/:DEFAULT Hr_MASK TEXTLEAF_FILTER PARA_FILTER/;
 BEGIN {
   *_abbrev_addrvis = *ODF::lpOD_Helper::_abbrev_addrvis;
-  *TEXTLEAF_FILTER   = *ODF::lpOD_Helper::TEXTLEAF_FILTER;
-  *PARA_FILTER       = *ODF::lpOD_Helper::PARA_FILTER;
   *__leaf2vtext    = *ODF::lpOD_Helper::__leaf2vtext;
 }
 

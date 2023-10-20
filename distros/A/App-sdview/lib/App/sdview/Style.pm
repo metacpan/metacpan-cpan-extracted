@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use experimental 'signatures';
 
-package App::sdview::Style 0.12;
+package App::sdview::Style 0.13;
 
 use Convert::Color;
 use Convert::Color::XTerm 0.06;
@@ -47,14 +47,26 @@ L<< Convert::Color->new >>:
    fg = vga:red
    bg = xterm:184
 
+Formatting for each kind of inline format is provided in a section called
+C<Inline $NAME>, using the same key names as paragraphs.
+
+   [Inline monospace]
+   fg = xterm:rgb(5,2,0)
+
+Note that the C<[Inline monospace]> style is automatically inherited by
+C<[Para verbatim]>.
+
 =cut
 
 my %FORMATSTYLES = (
-   B => { bold => 1 },
-   I => { italic => 1 },
-   F => { italic => 1, under => 1 },
-   C => { monospace => 1, bg => Convert::Color->new( "xterm:235" ) },
-   L => { under => 1, fg => Convert::Color->new( "xterm:rgb(3,3,5)" ) }, # light blue
+   bold          => { bold => 1 },
+   italic        => { italic => 1 },
+   monospace     => { monospace => 1, bg => Convert::Color->new( "xterm:235" ) },
+   underline     => { under => 1 },
+   strikethrough => { strike => 1 },
+
+   file => { italic => 1, under => 1 },
+   link => { under => 1, fg => Convert::Color->new( "xterm:rgb(3,3,5)" ) }, # light blue
 );
 
 sub convert_str ( $pkg, $s )
@@ -72,13 +84,29 @@ my %PARASTYLES = (
    head3    => { fg => Convert::Color->new( "vga:green" ), bold => 1, margin => 4 },
    head4    => { fg => Convert::Color->new( "xterm:217" ), under => 1, margin => 5 },
    plain    => { margin => 6, blank_after => 1 },
-   verbatim => { margin => 8, blank_after => 1, $FORMATSTYLES{C}->%* },
+   verbatim => { margin => 8, blank_after => 1, inherit => "monospace" },
    list     => { margin => 6 },
    item     => { blank_after => 1 },
    leader   => { bold => 1 },
    table    => { margin => 8 },
    "table-heading" => { bold => 1 },
 );
+
+sub _convert_val ( $stylekey, $val )
+{
+   if( $stylekey =~ m/^(fg|bg)$/ ) {
+      return Convert::Color->new( $val );
+   }
+   elsif( $stylekey =~ m/^(bold|italic|monospace|blank_after)$/ ) {
+      return !!$val;
+   }
+   elsif( $stylekey =~ m/^(under|margin)$/ ) {
+      return 0+$val;
+   }
+   else {
+      return undef;
+   }
+}
 
 sub load_config ( $pkg, $path )
 {
@@ -89,32 +117,34 @@ sub load_config ( $pkg, $path )
                               : Config::Tiny->read( $path );
 
    foreach my $section ( sort keys %$config ) {
-      if( $section =~ m/^Para (.*)$/ ) {
-         my $para = $1;
+      if( $section =~ m/^Inline (.*)$/ ) {
+         my $format = $1;
 
-         unless( $PARASTYLES{$para} ) {
-            warn "Unrecognised [Para $para] style in $path\n";
+         unless( $FORMATSTYLES{$format} ) {
+            warn "Unrecognised $section format in $path\n";
             next;
          }
 
          foreach my $stylekey ( sort keys $config->{$section}->%* ) {
-            my $val = $config->{$section}{$stylekey};
-            if( $stylekey =~ m/^(fg|bg)$/ ) {
-               $val = Convert::Color->new( $val );
-            }
-            elsif( $stylekey =~ m/^(bold|italic|monospace|blank_after)$/ ) {
-               $val = !!$val;
-            }
-            elsif( $stylekey =~ m/^(under|margin)$/ ) {
-               $val = 0+$val;
-            }
-            else {
-               warn "Unrecognised [Para $para] key $stylekey in $path\n";
-               next;
-            }
-
-            $PARASTYLES{$para}{$stylekey} = $val;
+            defined( $FORMATSTYLES{$format}{$stylekey} = _convert_val( $stylekey, $config->{$section}{$stylekey} ) )
+               or warn "Unrecognised $section key $stylekey in $path\n";
          }
+      }
+      elsif( $section =~ m/^Para (.*)$/ ) {
+         my $para = $1;
+
+         unless( $PARASTYLES{$para} ) {
+            warn "Unrecognised $section style in $path\n";
+            next;
+         }
+
+         foreach my $stylekey ( sort keys $config->{$section}->%* ) {
+            defined( $PARASTYLES{$para}{$stylekey} = _convert_val( $stylekey, $config->{$section}{$stylekey} ) )
+               or warn "Unrecognised $section key $stylekey in $path\n";
+         }
+      }
+      else {
+         warn "Unrecognised section $section in $path\n";
       }
    }
 }
@@ -124,7 +154,11 @@ sub para_style ( $pkg, $type )
    $PARASTYLES{$type} or
       die "Unrecognised paragraph style for $type";
 
-   return $PARASTYLES{$type};
+   my %style = $PARASTYLES{$type}->%*;
+   %style = ( %style, $FORMATSTYLES{delete $style{inherit}}->%* ) if defined $style{inherit};
+   defined $style{$_} or delete $style{$_} for keys %style;
+
+   return \%style;
 }
 
 =head1 AUTHOR

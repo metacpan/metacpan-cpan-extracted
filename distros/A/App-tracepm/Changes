@@ -1,3 +1,10 @@
+0.231   2023-07-11  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - Remove usage of smartmatch to avoid warning under perl 5.38.
+
+
 0.230   2020-04-08  Released-By: PERLANCAR; Urgency: medium
 
 	- [build] Rebuild, to update Sah coerce rule module names.

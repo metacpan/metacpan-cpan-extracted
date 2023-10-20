@@ -4,6 +4,12 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.901 2023-10-19
+  * Typo fixes and minor cleanups
+
+3.900 2023-10-14
+  * Remove legacy non-Moose code (deprecated since 3.800)
+
 3.881 2023-08-01
   * Fix manufacturer name of magnet power supply
 

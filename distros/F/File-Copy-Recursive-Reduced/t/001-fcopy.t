@@ -91,7 +91,8 @@ SKIP: {
     $stderr = capture_stderr { $rv = fcopy($xsymlink, $xnew); };
     ok(defined $rv, "fcopy() returned defined value when copying from symlink");
     ok($rv, "fcopy() returned true value when copying from symlink");
-    like($stderr, qr/Copying a symlink \($xsymlink\) whose target does not exist/,
+
+    like($stderr, qr/Copying a symlink \(\Q$xsymlink\E\) whose target does not exist/,
         "fcopy(): Got expected warning when copying from symlink whose target does not exist");
 }
 

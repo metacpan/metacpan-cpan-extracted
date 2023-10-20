@@ -2,14 +2,15 @@ package Data::Record::Serialize::Encode::rdb;
 
 # ABSTRACT: encoded a record as /rdb
 
+use v5.12;
 use Moo::Role;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use namespace::clean;
 
 sub _needs_eol { 1 }
-sub _map_types { { N => 'N', I => 'N', S => 'S'  } }
+sub _map_types { { N => 'N', I => 'N', S => 'S' } }
 
 
 
@@ -32,6 +33,7 @@ sub setup {
 sub encode {
     my $self = shift;
 
+    ## no critic (TestingAndDebugging::ProhibitNoWarnings)
     no warnings 'uninitialized';
     join( "\t", @{ $_[0] }{ @{ $self->output_fields } } );
 }
@@ -62,7 +64,7 @@ Data::Record::Serialize::Encode::rdb - encoded a record as /rdb
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 
@@ -79,6 +81,8 @@ L<RDB|http://compbio.soe.ucsc.edu/rdb>.
 
 It performs the L<Data::Record::Serialize::Role::Encode> role.
 
+=head1 INTERNALS
+
 =for Pod::Coverage setup
 
 =for Pod::Coverage encode
@@ -92,7 +96,7 @@ L<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>
 
 =head2 Source
 

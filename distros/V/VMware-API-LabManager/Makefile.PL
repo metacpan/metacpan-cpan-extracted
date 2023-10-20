@@ -5,12 +5,12 @@ WriteMakefile(
   AUTHOR   => 'Phil Pollard <bennie@cpan.org>',
   LICENSE  => 'artistic_2',
   NAME     => 'VMware::API::LabManager',
-  VERSION  => '2.11',
+  VERSION  => '2.12',
 
   PREREQ_PM => {
           'SOAP::Lite' => '0.71',
-          'Net::SSL' => 0,
-          'Data::Dumper' => 0
+          'Data::Dumper' => 0,
+          'Net::SSL' => 0
         },
 
   ( $ExtUtils::MakeMaker::VERSION < 6.46
@@ -22,8 +22,8 @@ WriteMakefile(
 
 	{
           'VMware::API::LabManager' => {
-                                         'version' => '2.11',
-                                         'file' => 'lib/VMware/API/LabManager.pm'
+                                         'file' => 'lib/VMware/API/LabManager.pm',
+                                         'version' => '2.12'
                                        }
         },
 

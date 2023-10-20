@@ -15,12 +15,12 @@ Module::Generic::Hash - Hash Manipulation Object Class
 
     # or
 
-    my $h = Module::Generic::Hash->new({
+    my $h = Module::Generic::Hash->new(
         first_name => 'John',
         last_name => 'Doe',
         age => 30,
         email => 'john.doe@example.com',
-    }, { debug => 2 });
+    );
 
     my $keys = $h->keys # Module::Generic::Array returned
     $h->keys->length # e.g. 10
@@ -103,28 +103,66 @@ Module::Generic::Hash - Hash Manipulation Object Class
         ref( $_[0] ) ? () : $_[0];
     }, { sort => 1 });
 
+    # Using reference as key is ok too.
+    my $h = Module::Generic::Hash->new;
+    # Enable the use of reference or objects as hash keys
+    $h->key_object(1);
+    # or
+    local $Module::Generic::Hash::KEY_OBJECT = 1;
+    my $h = Module::Generic::Hash->new;
+
+    # Now, we can use reference or object as hash keys
+    my $array = [qw( John Paul Jack Peter )];
+    my $ref = { name => 'John Doe' };
+    my $code = sub{1};
+    my $scalar = \'Hello'
+    my $glob = \*main;
+    my $foo = Foo::Bar->new;
+    $h->{ $array } = 'array';
+    $h->{ $ref } = 'hash';
+    $h->{ $code } = 'code';
+    $h->{ $scalar } = 'scalar';
+    $h->{ $glob } = 'glob';
+    $h->{ $foo } = 'object';
+
 =head1 VERSION
 
-    v1.3.0
+    v1.3.1
 
 =head1 DESCRIPTION
 
-The purpos of this class/package is to provide a lightweight object-oriented approach to hash manipulation.
+The purpos of this class/package is to provide a lightweight object-oriented approach to hash manipulation and to enable the use of any type of hash key, including regular string and reference, such as array reference, hash reference, anonymous subroutine, scalar reference, filehandle and objects.
+
+If you want to store keys as reference, just make sure to instantiate the object first and set the method C<key_object> to a true value, before adding keys as reference, because perl regular hash will transform any reference into a string to be used as a key.
+
+Thus the following would not work as you would expect:
+
+    my $ref = {};
+    my $array = [qw( John Paul Jack Peter )];
+    $ref->{ $array } = 'my array';
+    local $Module::Generic::Hash::KEY_OBJECT = 1;
+    my $h = Module::Generic::Hash->new( $ref );
+
+Instead, do either:
+
+    my $array = [qw( John Paul Jack Peter )];
+
+    my $h = Module::Generic::Hash->new;
+    $h->key_object(1);
+    # or
+    local $Module::Generic::Hash::KEY_OBJECT = 1;
+    my $h = Module::Generic::Hash->new;
+
+    # then
+    $h->{ $array } = 'my array';
+
+or:
+
+    my $array = [qw( John Paul Jack Peter )];
+    local $Module::Generic::Hash::KEY_OBJECT = 1;
+    my $h = Module::Generic::Hash->new( $array => 'my array' );
 
 This uses perl core functions only and L<Clone> for cloning. This module's methods act as a wrapper to them.
-
-The object is overloaded, so it returns the hash representation, as dumped by L<Data::Dumper> when used as a string.
-
-    print( "I have a nice $hash\n" );
-
-Would produce something like:
-
-    I have a nice {
-    "age" => 30,
-    "email" => "john.doe\@example.com",
-    "first_name" => "John",
-    "last_name" => "Doe"
-    }
 
 Because the object is overloaded, you can use the variable with comparison perl operators, such as :
 
@@ -296,6 +334,12 @@ When pretty is enabled, it will automatically also enable C<canonical>, C<indent
 For simplicity, you can also use, as alias to C<canonical>, C<sort>, C<sorted>, C<order> or C<ordered>
 
 It returns the JSON encoded data as a L<scalar object|Module::Generic::Scalar>
+
+=head2 key_object
+
+Sets or gets the boolean value as to whether this hash should allow the use of reference as keys. Default is false.
+
+When false, any reference used as key, will be converted to a string by perl, since perl natively does not recognise reference as keys.
 
 =head2 keys
 

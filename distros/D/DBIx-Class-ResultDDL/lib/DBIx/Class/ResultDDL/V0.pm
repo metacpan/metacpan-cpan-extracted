@@ -392,7 +392,7 @@ Michael Conrad <mconrad@intellitree.com>
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 COPYRIGHT AND LICENSE
 

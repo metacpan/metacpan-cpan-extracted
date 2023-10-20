@@ -1,42 +1,50 @@
 NAME
-    Graphics::Toolkit::Color - color palette creation helper
+    Graphics::Toolkit::Color - color palette constructor
 
 SYNOPSIS
         use Graphics::Toolkit::Color qw/color/;
 
         my $red = Graphics::Toolkit::Color->new('red'); # create color object
         say $red->add( 'blue' => 255 )->name;           # add blue value: 'fuchsia'
-        color( 0, 0, 255)->values('HSL');               # 240, 100, 50 = blue
-                                                        # mix blue with a little grey in HSL
-        $blue->blend( with => { H=> 0, S=> 0, L=> 80 }, pos => 0.1);
+        my $blue = color( 0, 0, 255)->values('HSL');    # 240, 100, 50 = blue
+        $blue->blend( with => [HSL => 0,0,80], pos => 0.1);# mix blue with a little grey in HSL
         $red->gradient( to => '#0000FF', steps => 10);  # 10 colors from red to blue
         $red->complement( 3 );                          # get fitting red green and blue
 
 DESCRIPTION
-    ATTENTION: deprecated methods of the old API will be removed on version
-    2.0.
+    ATTENTION: deprecated methods of the old API ( *string*, *rgb*, *red*,
+    *green*, *blue*, *rgb_hex*, *rgb_hash*, *hsl*, *hue*, *saturation*,
+    *lightness*, *hsl_hash*, *blend_with*, *gradient_to*, *rgb_gradient_to*,
+    *hsl_gradient_to*, *complementary*) will be removed on version 2.0.
 
     Graphics::Toolkit::Color, for short GTC, is the top level API of this
-    module. It is designed to get fast access to a set of related colors,
-    that serve your need. While it can understand and output many color
-    formats, its primary (internal) format is RGB, because this it is about
-    colors that can be shown on the screen.
+    module and the only one a regular user should be concerned with. Its
+    main purpose is the creation of sets of related colors, such as
+    gradients, complements and others.
+
+    GTC are read only color holding objects with no additional dependencies.
+    Create them in many different ways (see section "CONSTRUCTOR"). Access
+    its values via methods from section "GETTER". Measure differences with
+    the *distance* method. "SINGLE-COLOR" methods create one a object that
+    is related to the current one and "COLOR-SETS" methods will create a
+    host of color that are not only related to the current color but also
+    have relations between each other.
+
+    While this module can understand and output color values in many spaces,
+    such as YIQ, HSL and many more, RGB is the (internal) primal one,
+    because GTC is about colors that can be shown on the screen, and these
+    are usually encoded in RGB.
 
     Humans access colors on hardware level (eye) in RGB, on cognition level
     in HSL (brain) and on cultural level (language) with names. Having easy
     access to all three and some color math should enable you to get the
     color palette you desire quickly.
 
-    GTC are read only color holding objects with no additional dependencies.
-    Create them in many different ways (see section *CONSTRUCTOR*). Access
-    its values via methods from section *GETTER* or measure differences and
-    create related color objects via methods listed under *METHODS*.
-
 CONSTRUCTOR
     There are many options to create a color objects. In short you can
-    either use the name of a constant or provide values in several
-    "COLOR-SPACES" in Graphics::Toolkit::Color::Space::Hub and many formats
-    as described in this paragraph.
+    either use the name of a constant or provide values in one of several
+    "COLOR-SPACES" in Graphics::Toolkit::Color::Space::Hub, which also can
+    be formatted in many ways as described in this paragraph.
 
   new('name')
     Get a color by providing a name from the X11, HTML (CSS) or SVG standard
@@ -115,9 +123,8 @@ CONSTRUCTOR
         my $green = color('green');
         my $darkblue = color([20, 20, 250]);
 
-GETTER / ATTRIBUTES
-    are read only methods - giving access to different parts of the objects
-    data.
+GETTER
+    giving access to different parts of the objects data.
 
   name
     String with normalized name (lower case without *'_'*) of the color as
@@ -127,81 +134,43 @@ GETTER / ATTRIBUTES
     "NAMES" in Graphics::Toolkit::Color::Name::Constant (See als:
     "new('name')")
 
-  string
-    DEPRECATED: String that can be serialized back into a color an object
-    (recreated by Graphics::Toolkit::Color->new( $string )). It is either
-    the color "name" (if color has one) or result of "rgb_hex".
-
   values
-    Returns the values of the color in given color space and with given
-    format. In short any format acceptable by the constructor can also be
-    reproduce by a getter method and in most cases by this one.
+    Returns the values of the color in given color space and format. It
+    accepts three named, optional arguments.
 
-    First argument is the name of a color space (named argument "in"). The
-    options are to be found under: "COLOR-SPACES" in
-    Graphics::Toolkit::Color::Space::Hub This is the only argument where the
-    name can be left out.
+    First argument is the name of a color space (named argument "in"). All
+    options are under: "COLOR-SPACES" in
+    Graphics::Toolkit::Color::Space::Hub The order of named arguments is of
+    course chosen by the user, but I call it the first (most important)
+    argument, because if you give the method only one value, it is assumed
+    to be the color space.
 
-    Second argument is the format (named argument "as"). Not all formats are
-    available under all color spaces, but the alway present options are:
+    Second argument is the format (name: "as"). In short any SCALAR format
+    acceptable to the "CONSTRUCTOR" can also be reproduced by a getter
+    method and the numerical cases by this one. Not all formats are
+    available under all color spaces, but the always present options are:
     "list" (default), "hash", "char_hash" and "array".
 
-    Third named argument is the upper border of the range inide which the
-    numerical values have to be. RGB are normally between 0..255 and CMYK
-    between 0 .. 1. If you want to change that order a different range. Only
-    a range of 1 a.k.a. "normal" displays decimals.
+    Third named argument is the range inside which the numerical values have
+    to be. RGB are normally between 0 .. 255 and CMYK between 0 .. 1
+    ('normal'). Only a range of 1 a.k.a. 'normal' displays decimals. There
+    are three syntax option to set the ranges. One value will be understood
+    as upper limit of all dimensions and zero being the lower one. If you
+    want to set the upper limits of all dimensions separately, you have to
+    deliver an ARRAY ref with the 3 or 4 upper limits. To also define the
+    lower boundary, you replace the number with an ARRAY ref containing the
+    lower and then the upper limit.
 
-        $blue->values();                              # get list of rgb : 0, 0, 255
-        $blue->values( in => 'RGB', as => 'list');    # same call
-        $blue->values('RGB', as => 'hash');           # { red => 0. green => 0, blue => 255}
-        $blue->values('RGB', as =>'char_hash');       # { r => 0. g => 0, b => 255}
-        $blue->values('RGB', as => 'hex');            # '#00FFFF'
-        $color->values(in => 'HSL');                  # 240, 100, 50
-        $color->values(in => 'HSL', range => 1);      # 0.6666, 1, 0.5
-        $color->values(in => 'RGB', range => 16);     # values in RGB16
-        $color->values('HSB', as => 'hash')->{'hue'}; # how to get single values
-
-  hue
-    DEPRECATED: Integer between 0 .. 359 describing the angle (in degrees)
-    of the circular dimension in HSL space named hue. 0 approximates red, 30
-    - orange, 60 - yellow, 120 - green, 180 - cyan, 240 - blue, 270 -
-    violet, 300 - magenta, 330 - pink. 0 and 360 point to the same
-    coordinate. This module only outputs 0, even if accepting 360 as input.
-
-  saturation
-    DEPRECATED: Integer between 0 .. 100 describing percentage of saturation
-    in HSL space. 0 is grey and 100 the most colorful (except when lightness
-    is 0 or 100).
-
-  lightness
-    DEPRECATED: Integer between 0 .. 100 describing percentage of lightness
-    in HSL space. 0 is always black, 100 is always white and 50 the most
-    colorful (depending on "hue" value) (or grey - if saturation = 0).
-
-  rgb
-    DEPRECATED: List (no *ARRAY* reference) with values of "red", "green"
-    and "blue".
-
-  hsl
-    DEPRECATED: List (no *ARRAY* reference) with values of "hue",
-    "saturation" and "lightness".
-
-  rgb_hex
-    DEPRECATED: String starting with character '#', followed by six
-    hexadecimal lower case figures. Two digits for each of "red", "green"
-    and "blue" value - the format used in CSS (#rrggbb).
-
-  rgb_hash
-    DEPRECATED: Reference to a *HASH* containing the keys 'red', 'green' and
-    'blue' with their respective values as defined above.
-
-  hsl_hash
-    DEPRECATED: Reference to a *HASH* containing the keys 'hue',
-    'saturation' and 'lightness' with their respective values as defined
-    above.
-
-COLOR RELATION METHODS
-    create new, related color (objects) or compute similarity of colors
+        $blue->values();                               # get list in RGB: 0, 0, 255
+        $blue->values( in => 'RGB', as => 'list');     # same call
+        $blue->values( in => 'RGB', as => 'hash');     # { red => 0, green => 0, blue => 255}
+        $blue->values( in => 'RGB', as => 'char_hash');# { r => 0, g => 0, b => 255}
+        $blue->values( in => 'RGB', as => 'hex');      # '#00FFFF'
+        $color->values('HSL');                         # 240, 100, 50
+        $color->values( in => 'HSL', range => 1);      # 0.6666, 1, 0.5
+        $color->values( in => 'RGB', range => 2**16);  # values in RGB16
+        $color->values( in => 'HSB', as => 'hash')->{'hue'};  # how to get single values
+       ($color->values( 'HSB'))[0];                           # same, but shorter
 
   distance
     Is a floating point number that measures the Euclidean distance between
@@ -219,10 +188,13 @@ COLOR RELATION METHODS
     default ranges of the selected color space.
 
         my $d = $blue->distance( to => 'lapisblue' );              # how close is blue to lapis color?
-        $d = $blue->distance( to => 'airyblue', in => 'RGB', metric => 'Blue'); # same amount of blue?
-        $d = $color->distance( to => $c2, in => 'HSL', metric => 'hue' );                  # same hue?
+        $d = $blue->distance( to => 'airyblue', in => 'RGB', select => 'Blue'); # same amount of blue?
+        $d = $color->distance( to => $c2, in => 'HSL', select => 'hue' );                  # same hue?
         # compute distance when with all value ranges 0 .. 1
-        $d = $color->distance( to => $c2, in => 'HSL', metric => 'hue', range => 'normal' );
+        $d = $color->distance( to => $c2, in => 'HSL', select => 'hue', range => 'normal' );
+
+SINGLE COLOR
+    construct colors that are related to the current object.
 
   set
     Create a new object that differs in certain values defined in the
@@ -274,32 +246,34 @@ COLOR RELATION METHODS
         $color->blend({ with => 'silver', pos => 0.6 });             # works too!
         $blue->blend( with => {H => 240, S =>100, L => 50}, in => 'RGB' ); # teal
 
-COLOR SET CREATION METHODS
+COLOR SETS
+    construct many interrelated color objects at once.
+
   gradient
     Creates a gradient (a list of colors that build a transition) between
     current (C1) and a second, given color (C2) by named argument *to*.
 
     The only required argument you have to give under the name *to* is C2.
     Either as an Graphics::Toolkit::Color object or a scalar (name, hex,
-    hash or reference), which is acceptable to a "constructor". This is the
-    same behaviour as in "distance".
+    HASH or ARRAY), which is acceptable to a "CONSTRUCTOR". This is the same
+    behaviour as in "distance".
 
-    An optional argument under the name *steps* is the number of colors,
+    An optional argument under the name *steps* sets the number of colors,
     which make up the gradient (including C1 and C2). It defaults to 3.
-    Negative numbers will berectified by "abs". These 3 color objects: C1,
+    Negative numbers will be rectified by "abs". These 3 color objects: C1,
     C2 and a color in between, which is the same as the result of method
     "blend".
 
-    Another optional argument under the name *dynamic* is also a float
-    number, which defaults to zero. It defines the position of weight of the
-    transition between the two colors. If $dynamic == 0 you get a linear
-    transition, meaning the "distance" between neighbouring colors in the
-    gradient. If $dynamic > 0, the weight is moved toward C1 and vice versa.
-    The greater $dynamic, the slower the color change is in the beginning of
-    the gradient and faster at the end (C2).
+    Another optional argument under the name *dynamic* is a float number,
+    that defines the position of weight in the color transition from C1 to
+    C2. It defaults to zero which gives you a linear transition, meaning the
+    "distance" between neighbouring colors in the gradient is equal. If
+    $dynamic > 0, the weight is moved toward C1 and vice versa. The greater
+    $dynamic, the slower the color change is in the beginning of the
+    gradient and the faster at the end (C2).
 
-    The last optional argument names *in* defines the color space the
-    changes are computed in. It parallels the argument of the same name of
+    The last optional argument named *in* defines the color space the
+    changes are computed in. It parallels the argument of the same name from
     the method "blend" and "distance".
 
         # we turn to grey
@@ -308,29 +282,50 @@ COLOR SET CREATION METHODS
         @colors = $c1->gradient( to =>[14,10,222], steps => 10, dynamic => 3 );
 
   complement
-    Creates a set of complementary colors. It accepts 3 numerical arguments:
-    n, delta_S and delta_L.
+    Creates a set of complementary colors, which will be computed in *HSL*
+    color space. It accepts 4 optional, named arguments. Complementary
+    colors have a different *hue* value but same *saturation* and
+    *lightness*. Because they form a circle in HSL, they will be called in
+    this paragraph a circle.
 
-    Imagine an horizontal circle in HSL space, whith a center in the (grey)
-    center column. The saturation and lightness of all colors on that circle
-    is the same, they differ only in hue. The color of the current color
-    object ($self a.k.a C1) lies on that circle as well as C2, which is 180
-    degrees (half the circumference) apposed to C1.
+    If you provide no names (just a single argument), the value is
+    understood as *steps*. *steps* is the amount (count) of complementary
+    colors, which defaults to 1 (giving you then THE complementary color).
+    If more than one color is requested, the result will contain the calling
+    object as the first color.
 
-    This circle will be divided in $n (first argument) equal partitions,
-    creating $n equally distanced colors. All of them will be returned, as
-    objects, starting with C1. However, when $n is set to 1 (default), the
-    result is only C2, which is THE complementary color to C1.
+    The second optional argument is *hue_tilt*, in short *h*, which defaults
+    to zero. When zero, the hue distance between all resulting colors on the
+    circle is the same. When not zero, the *hue_tilt* gets added (see "add")
+    to THE complementary color. The so computed color divides the circle in
+    a shorter and longer part. Both of these parts will now contain an equal
+    amount of result colors. The distribution will be computed in a way,
+    that there will be a place on the circle where the distance between
+    colors is the highest (let's call it Dmax) and one where it is the
+    lowest (Dmin). The distance between two colors increases or decreases
+    steadily. When *hue_tilt* is zero, the axis through Dmax and Dmin and
+    the axis through $self and C2 are orthogonal.
 
-    The second argument moves C2 along the S axis (both directions), so that
-    the center of the circle is no longer in the HSL middle column and the
-    complementary colors differ in saturation. (C1 stays unmoved. )
+    The third optional argument *saturation_tilt*, or short *s*, which also
+    defaults to zero. If the value differs from zero it gets added the color
+    on Dmax (last paragraph), subtracted on Dmin, changed accordingly in
+    between, so that the circle gets moved in direction Dmin. If you want to
+    move the circle in any other direction you have to give
+    *saturation_tilt* a HASH reference with 2 keys. First is *saturation* or
+    *s*, which is the value as described. Secondly *hue* or *h* rotates the
+    direction in which the circle will be moved. Please not, this will not
+    change the position of Dmin and Dmax, because it just defines the angle
+    between the Dmin-Dmax axis and the direction where the circle is moved.
 
-    The third argument moves C2 along the L axis (vertical), which gives the
-    circle a tilt, so that the complementary colors will differ in
-    lightness.
+    The fourth optional argument is *lightness_tilt* or *l*m which works
+    analogously to *saturation_tilt*. Only difference is that it tilts the
+    circle in the up-down direction, which is in HSL color space lightness.
 
-        my @colors = $c->complement( 3, +20, -10 );
+        my @colors = $c->complement( 4 );    # $self + 3 compementary (square) colors
+        my @colors = $c->complement( steps => 3, s => 20, l => -10 );
+        my @colors = $c->complement( steps => 3, hue_tilt => -40,
+                                         saturation_tilt => {saturation => 300, hue => -50},
+                                         lightness_tilt => {l => -10, hue => 30} );
 
 SEE ALSO
     *   Color::Scheme

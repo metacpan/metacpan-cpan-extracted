@@ -1,9 +1,9 @@
 This archive contains the distribution MIDI-RtMidi-FFI,
-version 0.04:
+version 0.05:
 
   Bindings for librtmidi - Realtime MIDI library
 
-This software is copyright (c) 2021 by John Barrett.
+This software is copyright (c) 2023 by John Barrett.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

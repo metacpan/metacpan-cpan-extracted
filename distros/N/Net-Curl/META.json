@@ -57,7 +57,7 @@
          "url" : "git://github.com/sparky/perl-Net-Curl.git"
       }
    },
-   "version" : "0.54",
+   "version" : "0.55",
    "x_contributors" : [
       "Bálint Szilakszi",
       "David Geiger",

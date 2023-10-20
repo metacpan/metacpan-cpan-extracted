@@ -1,4 +1,15 @@
-# to use these testcases, activate a local FTP service and create $ENV{EAI_WRAP_CONFIG_PATH}."/Test/site.config with a user/pwd in the prefix ftp there and set env variable EAI_WRAP_AUTHORTEST.
+# to use these testcases, activate a local FTP service and create $ENV{EAI_WRAP_CONFIG_PATH}."/t/site.config with a user/pwd in the prefix ftp there and set env variable EAI_WRAP_AUTHORTEST.
+# following content of site.config is required:
+#%config = (
+#	sensitive => {ftp => {user => "yourSFTPUser", pwd => "yourSFTPUserPwd"}},
+#	folderEnvironmentMapping => {t => "t",},
+#	FTP => {
+#		port => yourPort,
+#		remoteHost => {ftp => "yourFTPHost"},
+#		maxConnectionTries => 5, # try at most to connect maxConnectionTries, then give up
+#	},
+#);
+
 use strict; use warnings;
 use EAI::FTP; use Test::File; use Test::More; use Data::Dumper; use File::Spec; use Text::Glob qw(match_glob);
 
@@ -15,13 +26,13 @@ print FH $filecontent;
 close FH;
 
 open (LOGCONF, ">log.config");
-print LOGCONF "log4perl.rootLogger = ERROR, SCREEN\nlog4perl.appender.SCREEN=Log::Log4perl::Appender::Screen\nlog4perl.appender.SCREEN.layout = PatternLayout\nlog4perl.appender.SCREEN.layout.ConversionPattern = %d	%P	%p	%M-%L	%m%n\n";
+print LOGCONF "log4perl.rootLogger = FATAL, SCREEN\nlog4perl.appender.SCREEN=Log::Log4perl::Appender::Screen\nlog4perl.appender.SCREEN.layout = PatternLayout\nlog4perl.appender.SCREEN.layout.ConversionPattern = %d	%P	%p	%M-%L	%m%n\n";
 close LOGCONF;
 Log::Log4perl::init("log.config"); 
 
 my %config;
 my $siteCONFIGFILE;
-open (CONFIGFILE, "<$ENV{EAI_WRAP_CONFIG_PATH}/Test/site.config") or die("couldn't open $ENV{EAI_WRAP_CONFIG_PATH}/Test/site.config");
+open (CONFIGFILE, "<$ENV{EAI_WRAP_CONFIG_PATH}/t/site.config") or die("couldn't open $ENV{EAI_WRAP_CONFIG_PATH}/t/site.config");
 {
 	local $/=undef;
 	$siteCONFIGFILE = <CONFIGFILE>;
@@ -35,14 +46,14 @@ unless (my $return = eval $siteCONFIGFILE) {
 
 # 1
 my ($ftpHandle, $ftpHost);
-login({remoteHost => {Prod => "unknown", Test => "unknown"},maxConnectionTries => 2,FTPdebugLevel => 0,user => "unknown", pwd => "unknown"},{env => "Test"});
+login({maxConnectionTries => 2,FTPdebugLevel => 0,user => "unknown", pwd => "unknown"},"unknown");
 ($ftpHandle, $ftpHost) = getHandle();
 ok(!defined($ftpHandle),"expected login failure");
 
 # 2
-login({remoteHost => {Prod => "127.0.0.1",Test => "127.0.0.1"},maxConnectionTries => 2,FTPdebugLevel => 0,user => $config{sensitive}{ftp}{user}, pwd => $config{sensitive}{ftp}{pwd}},{env => "Test"});
+login({maxConnectionTries => 2,FTPdebugLevel => 0,user => $config{sensitive}{ftp}{user}, pwd => $config{sensitive}{ftp}{pwd}},$config{FTP}{remoteHost}{ftp});
 ($ftpHandle, $ftpHost) = getHandle();
-ok(defined($ftpHandle) && $ftpHost eq "127.0.0.1","login success");
+ok(defined($ftpHandle) && $ftpHost eq $config{FTP}{remoteHost}{ftp},"login success");
 setHandle($ftpHandle) or print "error: $@";
 
 # create an archive dir
@@ -72,14 +83,14 @@ ok($fileMoved[0] eq "test.txt","test.txt renamed temp file");
 
 # 7
 my @retrieved;
-fetchFiles({remoteDir => "",localDir => "."},{retrievedFiles=>\@retrieved},{fileToRetrieve => "test.txt"});
+fetchFiles({remoteDir => "",localDir => "."},{fileToRetrieve => "test.txt",retrievedFiles=>\@retrieved});
 ok($retrieved[0] eq "test.txt","retrieved file in returned array");
 # 8
 file_contains_like("test.txt",qr/$filecontent/,"test.txt downloaded file");
 
 # 9
 my @retrieved2;
-fetchFiles({remoteDir => "",localDir => "."},{retrievedFiles=>\@retrieved2},{fileToRetrieve => "relativepath/*.txt"});
+fetchFiles({remoteDir => "",localDir => "."},{fileToRetrieve => "relativepath/*.txt",retrievedFiles=>\@retrieved2});
 ok($retrieved2[0] eq "temp.test.txt","retrieved file in returned array");
 # 10
 ok($retrieved2[1] eq "test.txt","retrieved file in returned array");

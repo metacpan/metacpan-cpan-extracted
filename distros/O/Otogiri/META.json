@@ -4,7 +4,7 @@
       "ytnobody <ytnobody@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.8",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "perl_5"
    ],
@@ -45,7 +45,7 @@
       "runtime" : {
          "requires" : {
             "Class::Accessor::Lite" : "0",
-            "DBIx::Sunny" : "0",
+            "DBIx::Sunny" : "0.9993",
             "SQL::Maker" : "1.16",
             "SQL::QueryMaker" : "0.02",
             "perl" : "5.008005"
@@ -73,7 +73,7 @@
       },
       "Otogiri" : {
          "file" : "lib/Otogiri.pm",
-         "version" : "0.19"
+         "version" : "0.21"
       }
    },
    "release_status" : "stable",
@@ -83,17 +83,18 @@
       },
       "homepage" : "https://github.com/ytnobody/Otogiri",
       "repository" : {
-         "url" : "git://github.com/ytnobody/Otogiri.git",
+         "type" : "git",
+         "url" : "https://github.com/ytnobody/Otogiri.git",
          "web" : "https://github.com/ytnobody/Otogiri"
       }
    },
-   "version" : "0.19",
+   "version" : "0.21",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Takuya Tsuchida <tsucchi@cpan.org>",
       "papix <mail@papix.net>",
       "ytnobody <ytnobody@ytnobody.net>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

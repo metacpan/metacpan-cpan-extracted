@@ -94,7 +94,7 @@ do { my $x = {
                                       'URI::Escape' => '0',
                                       'YAML' => '0.86',
                                       'parent' => '0',
-                                      'perl' => '5.012005'
+                                      'perl' => '5.014'
                                     },
                       'suggests' => {
                                       'Fcntl' => '0',

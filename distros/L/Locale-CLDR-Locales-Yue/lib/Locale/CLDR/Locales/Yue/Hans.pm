@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Yue::Hans - Package for language Cantonese
 
 =cut
 
 package Locale::CLDR::Locales::Yue::Hans;
-# This file auto generated from Data/common/main/yue_Hans.xml
-#	on Mon 11 Apr  5:41:25 pm GMT
+# This file auto generated from Data\common\main\yue_Hans.xml
+#	on Fri 13 Oct  9:48:49 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';
@@ -36,7 +36,7 @@ has 'algorithmic_number_format_data' => (
 	isa => HashRef,
 	init_arg => undef,
 	default => sub { 
-		use bignum;
+		use bigfloat;
 		return {
 		'cardinal-twenties' => {
 			'private' => {

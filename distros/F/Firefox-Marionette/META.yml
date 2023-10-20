@@ -46,7 +46,7 @@ requires:
   FileHandle: '0'
   IPC::Open3: '1.03'
   JSON: '0'
-  MIME::Base64: '0'
+  MIME::Base64: '3.11'
   POSIX: '0'
   Pod::Simple::Text: '0'
   Scalar::Util: '0'
@@ -66,5 +66,5 @@ requires:
 resources:
   bugtracker: https://github.com/david-dick/firefox-marionette/issues
   repository: https://github.com/david-dick/firefox-marionette
-version: '1.44'
+version: '1.46'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

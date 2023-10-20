@@ -81,6 +81,7 @@
             "if" : "0",
             "namespace::clean" : "0",
             "perl" : "5.020",
+            "stable" : "0.031",
             "strict" : "0",
             "strictures" : "2",
             "warnings" : "0"
@@ -200,7 +201,7 @@
    "provides" : {
       "Test::JSON::Schema::Acceptance" : {
          "file" : "lib/Test/JSON/Schema/Acceptance.pm",
-         "version" : "1.019"
+         "version" : "1.020"
       }
    },
    "release_status" : "stable",
@@ -215,10 +216,10 @@
          "web" : "https://github.com/karenetheridge/Test-JSON-Schema-Acceptance"
       }
    },
-   "version" : "1.019",
+   "version" : "1.020",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.037010"
+         "version" : "5.039002"
       },
       "plugins" : [
          {
@@ -231,11 +232,11 @@
                      "git submodule update --init --recursive",
                      "git submodule update --recursive"
                   ],
-                  "version" : "0.048"
+                  "version" : "0.049"
                }
             },
             "name" : "Run::BeforeBuild",
-            "version" : "0.048"
+            "version" : "0.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::Run::BeforeRelease",
@@ -247,11 +248,11 @@
                      "git submodule update --remote",
                      "if [[ -n $(git status --untracked --porcelain share) ]]; then echo -e '\\033[1;33m!!! submodule has changed! run './update-share' to commit updates to share/\\033[0m'; fi"
                   ],
-                  "version" : "0.048"
+                  "version" : "0.049"
                }
             },
             "name" : "Run::BeforeRelease",
-            "version" : "0.048"
+            "version" : "0.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::Run::AfterRelease",
@@ -265,11 +266,11 @@
                   ],
                   "fatal_errors" : 1,
                   "quiet" : 0,
-                  "version" : "0.048"
+                  "version" : "0.049"
                }
             },
             "name" : "Run::AfterRelease",
-            "version" : "0.048"
+            "version" : "0.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
@@ -328,7 +329,7 @@
                }
             },
             "name" : "@Author::ETHER/stale modules, build",
-            "version" : "0.057"
+            "version" : "0.058"
          },
          {
             "class" : "Dist::Zilla::Plugin::FileFinder::ByName",
@@ -410,7 +411,7 @@
             "class" : "Dist::Zilla::Plugin::InstallGuide",
             "config" : {
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000037",
+                  "Module::Metadata" : "1.000038",
                   "version" : "0.006"
                }
             },
@@ -777,7 +778,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000037",
+                  "Module::Metadata" : "1.000038",
                   "version" : "0.006"
                }
             },
@@ -838,7 +839,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.40.0",
+                  "git_version" : "2.42.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "commits",
@@ -878,7 +879,7 @@
                   ]
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000037",
+                  "Module::Metadata" : "1.000038",
                   "version" : "0.006"
                }
             },
@@ -894,11 +895,11 @@
                   "run" : [
                      "bash -c \"test -e .ackrc && grep -q -- '--ignore-dir=.latest' .ackrc || echo '--ignore-dir=.latest' >> .ackrc; if [[ `dirname '%d'` != .build ]]; then test -e .ackrc && grep -q -- '--ignore-dir=%d' .ackrc || echo '--ignore-dir=%d' >> .ackrc; fi\""
                   ],
-                  "version" : "0.048"
+                  "version" : "0.049"
                }
             },
             "name" : "@Author::ETHER/.ackrc",
-            "version" : "0.048"
+            "version" : "0.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::Run::AfterBuild",
@@ -909,11 +910,11 @@
                   ],
                   "fatal_errors" : 0,
                   "quiet" : 1,
-                  "version" : "0.048"
+                  "version" : "0.049"
                }
             },
             "name" : "@Author::ETHER/.latest",
-            "version" : "0.048"
+            "version" : "0.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckStrictVersion",
@@ -929,7 +930,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20230320"
+                  "Module::CoreList" : "5.20230820"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -948,7 +949,7 @@
                }
             },
             "name" : "@Author::ETHER/stale modules, release",
-            "version" : "0.057"
+            "version" : "0.058"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Check",
@@ -962,7 +963,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.40.0",
+                  "git_version" : "2.42.0",
                   "repo_root" : "."
                }
             },
@@ -973,7 +974,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.40.0",
+                  "git_version" : "2.42.0",
                   "repo_root" : "."
                }
             },
@@ -984,7 +985,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.40.0",
+                  "git_version" : "2.42.0",
                   "repo_root" : "."
                }
             },
@@ -1018,7 +1019,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.40.0",
+                  "git_version" : "2.42.0",
                   "repo_root" : "."
                }
             },
@@ -1130,7 +1131,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.40.0",
+                  "git_version" : "2.42.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1147,12 +1148,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.019",
+                  "tag" : "v1.020",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.40.0",
+                  "git_version" : "2.42.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1202,7 +1203,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.40.0",
+                  "git_version" : "2.42.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1233,7 +1234,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.40.0",
+                  "git_version" : "2.42.0",
                   "repo_root" : "."
                }
             },
@@ -1248,7 +1249,7 @@
                }
             },
             "name" : "@Author::ETHER/GitHub::Update",
-            "version" : "0.48"
+            "version" : "0.49"
          },
          {
             "class" : "Dist::Zilla::Plugin::Run::AfterRelease",
@@ -1259,11 +1260,11 @@
                   "run" : [
                      "REDACTED"
                   ],
-                  "version" : "0.048"
+                  "version" : "0.049"
                }
             },
             "name" : "@Author::ETHER/install release",
-            "version" : "0.048"
+            "version" : "0.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::Run::AfterRelease",
@@ -1274,11 +1275,11 @@
                   ],
                   "fatal_errors" : 1,
                   "quiet" : 1,
-                  "version" : "0.048"
+                  "version" : "0.049"
                }
             },
             "name" : "@Author::ETHER/release complete",
-            "version" : "0.048"
+            "version" : "0.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
@@ -1322,7 +1323,7 @@
             "class" : "Dist::Zilla::Plugin::DynamicPrereqs",
             "config" : {
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000037",
+                  "Module::Metadata" : "1.000038",
                   "version" : "0.006"
                }
             },
@@ -1408,8 +1409,8 @@
       "Karen Etheridge <ether@cpan.org>",
       "Daniel Perrett <dp13@sanger.ac.uk>"
    ],
-   "x_generated_by_perl" : "v5.37.10",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_generated_by_perl" : "v5.39.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "MIT",
    "x_static_install" : 0,
    "x_use_unsafe_inc" : 0

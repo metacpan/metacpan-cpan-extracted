@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4005'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.22, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,9 @@ no_index:
 provides:
   UID2::Client::XS:
     file: lib/UID2/Client/XS.pm
-    version: '0.01'
+    version: '0.02'
+  UID2::Client::XS::AdvertisingTokenVersion:
+    file: lib/UID2/Client/XS/AdvertisingTokenVersion.pm
   UID2::Client::XS::DecryptionStatus:
     file: lib/UID2/Client/XS/DecryptionStatus.pm
   UID2::Client::XS::EncryptionStatus:
@@ -48,6 +50,8 @@ resources:
   bugtracker: https://github.com/spiritloose/uid2-client-perlxs/issues
   homepage: https://github.com/spiritloose/uid2-client-perlxs
   repository: https://github.com/spiritloose/uid2-client-perlxs.git
-version: '0.01'
+version: '0.02'
+x_contributors:
+  - 'Jiro Nishiguchi <spiritloose@users.noreply.github.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

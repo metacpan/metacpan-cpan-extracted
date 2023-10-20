@@ -7,6 +7,7 @@ use Test::More 0.88;
 use Test::NoTabs;
 
 my @files = (
+    'bin/pod2asciidoctor',
     'lib/Pod/AsciiDoctor.pm',
     't/00-compile.t',
     't/00-load.t',

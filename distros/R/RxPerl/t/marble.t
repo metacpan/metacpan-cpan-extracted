@@ -806,18 +806,6 @@ subtest 'op_take_last' => sub {
     obs_is $o, ['(56)'];
 };
 
-subtest 'op_group_by' => sub {
-    my $o = rx_interval(1)->pipe(
-        op_take(5),
-        op_group_by(sub { $_ % 2 }),
-        op_merge_map(sub { $_->pipe( op_reduce(sub { [@{$_[0]}, $_[1]] }, []) ) }),
-    );
-    obs_is $o, ['-----(ab)', {
-        a => [ 0, 2, 4 ],
-        b => [ 1, 3 ],
-    }];
-};
-
 subtest 'op_audit' => sub {
     my $o = cold('-01-23-45')->pipe(
         op_audit(sub { cold('--1') }),

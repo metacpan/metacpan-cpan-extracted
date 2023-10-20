@@ -1,0 +1,197 @@
+#!/usr/bin/env perl
+#
+# marimba-madess - a Music::Factory example script
+#
+#     perl eg/marimba-madness out.midi
+#     ...
+#
+# it may require a few runs for rand() to behave nicely, as the
+# shuffle() might not result in anything good
+
+use 5.26.0;
+use List::Util 'shuffle';
+use MIDI;
+use Music::Factory;
+use Object::Pad;
+
+my $srand = time();
+srand $srand;
+
+my @pitchselect = (
+    [qw(51 52)], [qw(56 58)], [qw(59 63)], [qw(64 68)],
+    [qw(70 71)], [qw(75 76)], [qw(80 82)]
+);
+
+class DoubleBeat :isa(Music::Factory::Generator) {
+    field $chan :param = 0;    # MIDI channel
+    field $mul :param  = 1;
+    field $pitch :param;       # callback
+    field $velo :param;        # callback
+
+    method update ( $epoch, $maxlen ) {
+        my $p = $pitch->($epoch);
+        my $d = 96;
+        $epoch += $d;
+        if ( $epoch > $maxlen ) {
+            $d -= $epoch - $maxlen;
+            return $d, [ [ note_off => $d, $chan, 0, 0 ] ];
+        }
+        my $v = $velo->($epoch);
+        return 96,
+          [ [ note_on  => 0,  $chan, $p, $v ],
+            [ note_off => 32, $chan, $p, 0 ],
+            [ note_on  => 0,  $chan, $p, $v ],
+            [ note_off => 64, $chan, $p, 0 ],
+          ];
+    }
+}
+
+class Periodic :isa(Music::Factory::Generator) {
+    field $chan :param = 0;    # MIDI channel
+    field $mul :param  = 1;
+    field $pitch :param;       # callback
+    field $velo :param;        # callback
+    field $interval :param = 96;
+    method reset () { $interval = 32 * ( 1 + int rand 4 ) * $mul }
+
+    method update ( $epoch, $maxlen ) {
+        my $p = $pitch->($epoch);
+        my $d = $interval;
+        $epoch += $d;
+        if ( $epoch > $maxlen ) {
+            $d -= $epoch - $maxlen;
+            return $d, [ [ note_off => $d, $chan, 0, 0 ] ];
+        }
+        return $interval,
+          [ [ note_on  => 0,  $chan, $p, $velo->($epoch) ],
+            [ note_off => $d, $chan, $p, 0 ],
+          ];
+    }
+}
+
+class Random :isa(Music::Factory::Generator) {
+    field $chan :param = 0;    # MIDI channel
+    field $mul :param  = 1;
+    field $pitch :param;       # callback
+    field $velo :param;        # callback
+    field $rand :param = 96;
+
+    method update ( $epoch, $maxlen ) {
+        my $p = $pitch->($epoch);
+        my $d = ( 16 + int rand $rand ) * $mul;
+        $epoch += $d;
+        if ( $epoch > $maxlen ) {
+            $d -= $epoch - $maxlen;
+            #return $d, [ [ note_off => $d, $chan, 0, 0 ] ];
+            return $d;
+        }
+        return $d,
+          [ [ note_on  => 0,  $chan, $p, $velo->($epoch) ],
+            [ note_off => $d, $chan, $p, 0 ],
+          ];
+    }
+}
+
+# MIDI track header
+sub make_events {
+    my %param = @_;
+    $param{chan} //= 0;
+    my @events = (
+        [ track_name   => 0, $param{name} ],
+        [ set_tempo    => 0, 750_000 ],
+        [ patch_change => 0, $param{chan}, 12 ],
+    );
+    return \@events;
+}
+
+my @velo = qw( 105 75 75 75 );
+
+sub velonoise { int( rand 4 + rand 4 + rand 4 ) }
+
+sub makeatrack ( $name, $chan ) {
+    my $events = make_events( chan => $chan, name => $name );
+    my @makers = (
+        Music::Factory::AssemblyLine->new(
+            events => $events,
+            gen    => Music::Factory::Rest->new,
+            maxlen => 16,
+        ),
+        Music::Factory::AssemblyLine->new(
+            events => $events,
+            gen    => Music::Factory::Rest->new,
+            maxlen => 32,
+        ),
+        Music::Factory::AssemblyLine->new(
+            events => $events,
+            gen    => DoubleBeat->new(
+                chan  => $chan,
+                pitch => sub ($epoch) {
+                    state $index  = 0;
+                    state $switch = 4;
+                    if ( $switch == 0 ) {
+                        $switch = 4;
+                        $index ^= 1;
+                    } else {
+                        $switch--;
+                    }
+                    $pitchselect[$chan][$index];
+                },
+                velo => sub ($epoch) { 85 + velonoise() },
+            ),
+            maxlen => 672,
+        ),
+        Music::Factory::AssemblyLine->new(
+            events => $events,
+            gen    => Periodic->new(
+                chan  => $chan,
+                pitch => sub ($epoch) {
+                    state $index  = 0;
+                    state $switch = 4;
+                    if ( $switch == 0 ) {
+                        $switch = 4;
+                        $index ^= 1;
+                    } else {
+                        $switch--;
+                    }
+                    $pitchselect[$chan][$index];
+                },
+                velo => sub ($epoch) {
+                    state $i = 0;
+                    $i = 0 if $epoch == 0;
+                    my $v = $velo[$i];
+                    $i = ( $i + 1 ) % @velo;
+                    $v + velonoise();
+                },
+            ),
+            maxlen => 1152,
+        ),
+    );
+
+    for ( 1 .. 16 ) {
+        @makers = shuffle @makers;
+        $_->update for @makers;
+    }
+    MIDI::Track->new( { events => $events } );
+}
+
+sub onefile ($file) {
+    my @tracks;
+    for my $i ( 1 .. 6 ) {
+        my $chan  = $i - 1;
+        my $track = sprintf "Track %03d $srand", $i;
+        push @tracks, makeatrack( $track, $chan );
+    }
+    MIDI::Opus->new( { tracks => \@tracks } )->write_to_file($file);
+}
+
+sub manyfiles {
+    for my $i ( 1 .. 6 ) {
+        my $chan  = $i - 1;
+        my $file  = sprintf 'out%03d.midi',      $i;
+        my $track = sprintf "Track %03d $srand", $i;
+        MIDI::Opus->new( { tracks => [ makeatrack( $track, $chan ) ] } )
+          ->write_to_file($file);
+    }
+}
+
+onefile(shift // 'out.midi');

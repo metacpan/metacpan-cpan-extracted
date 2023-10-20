@@ -1,5 +1,13 @@
 Revision history for RT-Extension-RepeatTicket
 
+2.02 2023-09-26
+ - Fix display issue with selectpicker controls
+
+2.01 2023-09-20
+
+ - Add new simple mode
+ - Add repeat ticket preview mode
+
 2.00 2021-04-20
  - Add RT 5 Support(RT 4 users need to use 1.* versions)
 

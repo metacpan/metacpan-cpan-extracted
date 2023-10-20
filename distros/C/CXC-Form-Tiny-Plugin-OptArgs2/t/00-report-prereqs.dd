@@ -73,6 +73,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Clone' => '0.46',
                                       'Form::Tiny' => '2.17',
                                       'Hash::Fold' => '1.00',
                                       'List::Util' => '1.29',
@@ -98,10 +99,12 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'List::Util' => '1.29',
                                    'Package::Variant' => '0',
+                                   'Path::Tiny' => '0.144',
                                    'Ref::Util' => '0',
                                    'Test2::V0' => '0',
                                    'Test::Lib' => '0',
-                                   'Test::More' => '0'
+                                   'Test::More' => '0',
+                                   'Types::Path::Tiny' => '0'
                                  }
                  }
      };

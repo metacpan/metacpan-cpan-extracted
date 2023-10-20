@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Typemap
 
+0.005     2023-10-08 13:59:04+02:00 Europe/Brussels
+          - Allow a + prefex in module names
+
 0.004     2023-09-02 20:39:54+02:00 Europe/Brussels
           - Only call minimum_pxs if supported
 

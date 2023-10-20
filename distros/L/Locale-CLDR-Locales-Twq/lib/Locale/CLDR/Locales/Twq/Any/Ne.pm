@@ -1,4 +1,6 @@
-=head1
+=encoding utf8
+
+=head1 NAME
 
 Locale::CLDR::Locales::Twq::Any::Ne - Package for language Tasawaq
 
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Twq::Any::Ne - Package for language Tasawaq
 
 package Locale::CLDR::Locales::Twq::Any::Ne;
 # This file auto generated from Data\common\main\twq_NE.xml
-#	on Sun  5 Aug  6:26:31 pm GMT
+#	on Fri 13 Oct  9:46:30 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

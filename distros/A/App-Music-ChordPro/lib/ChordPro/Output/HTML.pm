@@ -79,7 +79,9 @@ sub generate_song {
 
     push(@s, "") if $tidy;
 
-    foreach my $elt ( @{$s->{body}} ) {
+    my @elts = @{$s->{body}};
+    while ( @elts ) {
+	my $elt = shift(@elts);
 
 	if ( $elt->{type} eq "empty" ) {
 	    push(@s, "***SHOULD NOT HAPPEN***");
@@ -115,7 +117,9 @@ sub generate_song {
 
 	if ( exists $elt->{body} ) {
 	    push( @s, '<div class="' . $elt->{type} . '">' );
-	    foreach my $e ( @{$elt->{body}} ) {
+	    my @elts = @{$elt->{body}};
+	    while ( @elts ) {
+		my $e = shift(@elts);
 		if ( $e->{type} eq "empty" ) {
 		    push( @s, "<!-- ***SHOULD NOT HAPPEN*** -->" );
 		    next;
@@ -136,6 +140,27 @@ sub generate_song {
 			);
 		    next;
 		}
+		if ( $e->{type} eq "delegate"
+		     && $e->{subtype} =~ /^image(?:-(\w+))?$/ ) {
+		    my $delegate = $1 // $e->{delegate};
+		    my $pkg = __PACKAGE__;
+		    $pkg =~ s/::Output::\w+$/::Delegate::$delegate/;
+		    eval "require $pkg" || die($@);
+		    my $hd = $pkg->can($e->{handler}) //
+		      die("HTML: Missing delegate handler ${pkg}::$e->{handler}\n");
+		    my $res = $hd->( $s, 0, $e );
+		    next unless $res; # assume errors have been given
+		    unshift( @elts, @$res );
+		    next;
+		}
+		if ( $e->{type} eq "svg" ) {
+		    push( @s, '<div class="' . $e->{type} . '">' );
+		    push( @s, File::LoadLines::loadlines( $e->{uri} ) );
+		    push( @s, "</div>" );
+		    push( @s, "" ) if $tidy;
+		    next;
+		}
+
 
 	    }
 	    push( @s, '</div>' );
@@ -164,7 +189,7 @@ sub generate_song {
 		  "@args" . "/>" .
 		  '</div>' );
 	    push( @s, "" ) if $tidy;
-
+	    next;
 	}
 
 	if ( $elt->{type} eq "control" ) {
@@ -229,6 +254,68 @@ sub songline {
 	     '  </tr>',
 	     '</table>' );
 }
+
+=for later
+
+sub gridline {
+}
+
+<style>
+div.grid_2_4x4_1 {
+    display: grid;
+    grid-template-columns: 5.263% 5.263% 5.263% 5.263% 5.263% 5.263% 5.263% 5.263% 5.263% 5.263% 5.263% 5.263% 5.263% 5.263% 5.263% 5.263% 5.263% 5.263% 5.263%;
+}
+div.grid_2_4x4_1 div   { padding: 4px }
+div.grid_2_4x4_1 div.A { grid-column: span 2 }
+div.grid_2_4x4_1 div.L { border-left: 1px solid black   }
+div.grid_2_4x4_1 div.M { border-left: 1px solid #e0e0e0 }
+div.grid_2_4x4_1 div.R { border-right: 1px solid black  }
+div.grid_2_4x4_1 div.Z { grid-column: span 1 }
+</style>
+
+<div class="grid_2_4x4_1">
+
+  <div class="A">intro</div>
+  <div class="L">a1</div>
+  <div class="M">a2</div>
+  <div class="M">a3</div>
+  <div class="M">a4</div>
+  <div class="L">b1</div>
+  <div class="M">b2</div>
+  <div class="M">b3</div>
+  <div class="M">b4</div>
+  <div class="L">c1</div>
+  <div class="M">c2</div>
+  <div class="M">c3</div>
+  <div class="M">c4</div>
+  <div class="L">d1</div>
+  <div class="M">d2</div>
+  <div class="M">d3</div>
+  <div class="M R">d4 d4</div>
+  <div class="Z"></div>
+
+  <div class="A"></div>
+  <div class="L">a1</div>
+  <div class="M">a2</div>
+  <div class="M">a3</div>
+  <div class="M">a4</div>
+  <div class="L">b1</div>
+  <div class="M">b2</div>
+  <div class="M">b3</div>
+  <div class="M">b4</div>
+  <div class="L">c1</div>
+  <div class="M">c2</div>
+  <div class="M">c3</div>
+  <div class="M">c4</div>
+  <div class="L">d1</div>
+  <div class="M">d2</div>
+  <div class="M">d3</div>
+  <div class="M R">d4</div>
+  <div class="Z">2x</div>
+
+</div>
+
+=cut
 
 sub nhtml {
     return unless defined $_[0];

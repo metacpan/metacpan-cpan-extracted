@@ -1,5 +1,9 @@
 Revision history for Perl extension AnyEvent::Pcap
 
+0.00005  2023/09/20
+        - fix control flow precedence issue in Test::Builder.
+        - fix POD issues.
+
 0.00004  2023/09/6
         - add offline mode (file:) support.
         - improve compatibility with old versions of Net::Pcap.

@@ -11,12 +11,13 @@ my $build = Module::Build->new(
       'Object::Pad' => '0.800',
 
       'App::sdview::Style' => '0.12',
-      'String::Tagged' => '0.17',
+      'String::Tagged' => '0.21',
       'Tickit' => 0,
       'Tickit::Style' => 0,
       'Tickit::Widget::FloatBox' => 0,
-      'Tickit::Widget::Scroller' => '0.31',
+      'Tickit::Widget::Scroller' => '0.32',
       'Tickit::Widget::Scroller::Item::RichText' => 0,
+      'Tickit::Widget::Static' => 0,
    },
    test_requires => {
       'Test2::V0' => 0,

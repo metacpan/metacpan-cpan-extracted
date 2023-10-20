@@ -1,5 +1,8 @@
 use strict;
 use warnings;
+use Test::More;
+
+use Math::BigInt;
 
 BEGIN{
  if($] < 5.022) {
@@ -14,30 +17,38 @@ use feature 'bitwise';
 use Math::GMPz qw(:mpz);
 no warnings 'experimental::bitwise';
 
-print "1..6\n";
+warn "# Using gmp version ", Math::GMPz::gmp_v(), "\n";
 
-print "# Using gmp version ", Math::GMPz::gmp_v(), "\n";
+my $x = Math::GMPz->new(1231);
+my $y = Math::GMPz->new(119);
+my $mbix = Math::BigInt->new(1231);
+my $mbiy = Math::BigInt->new(119);
 
-my $x = Math::GMPz->new(2);
-my $y = Math::GMPz->new(3);
+cmp_ok(71, '==',   $x & $y, "TEST 1");
+cmp_ok(1279, '==', $x | $y, "TEST 2");
+cmp_ok(1208, '==', $x ^ $y, "TEST 3");
+cmp_ok($x - (~$x), '==', 2463, "TEST 4");
+cmp_ok($y - (~$y), '==', 239, "TEST 5");
 
-if(2 == ($x & $y)) {print "ok 1\n"}
-else {print "not ok 1\n"}
-
-if(3 == ($x | $y)) {print "ok 2\n"}
-else {print "not ok 2\n"}
-
-if(1 == ($x ^ $y)) {print "ok 3\n"}
-else {print "not ok 3\n"}
-
-$x &= 4;
-if($x == 0) {print "ok 4\n"}
-else {print "not ok 4\n"}
+$x &= 124;
+cmp_ok($x, '==', 76, "TEST 6");
 
 $x |= $y;
-if($x == 3) {print "ok 5\n"}
-else {print "not ok 5\n"}
+cmp_ok($x, '==', 127, "TEST 7");
 
-$x ^= 2;
-if($x == 1) {print "ok 6\n"}
-else {print "not ok 6\n"}
+$x ^= 12;
+cmp_ok($x, '==', 115, "TEST 8");
+
+Rmpz_set_ui($x, 1231); # restore to original value
+
+cmp_ok(71, '==',   $x & $mbiy, "TEST 9");
+cmp_ok(1279, '==', $x | $mbiy, "TEST 10");
+cmp_ok(1208, '==', $x ^ $mbiy, "TEST 11");
+cmp_ok($x - (~$mbix), '==', 2463, "TEST 4");
+cmp_ok($y - (~$mbiy), '==', 239, "TEST 5");
+
+
+
+
+done_testing();
+

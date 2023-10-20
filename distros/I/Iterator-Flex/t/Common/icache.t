@@ -155,4 +155,24 @@ subtest "freeze" => sub {
 
 };
 
+subtest "at" => sub {
+
+    my $iter = icache( iarray( [ 0 .. 20 ] ), { capacity => 5 } );
+
+    # expected cache, new values get pushed, old values get
+    # shifted, so $expect[-1] is always the latest value.
+    my @expect = ( undef, undef, undef, undef, undef );
+
+    while ( defined( my $value = $iter->next ) ) {
+        shift @expect;
+        push @expect, $value;
+
+        my @got = map { $iter->at( $_ ) } reverse 0 .. 4;
+
+        is( \@got, \@expect, $value );
+    }
+
+};
+
+
 done_testing;

@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.66;  # field
+use warnings;
+use Object::Pad 0.800;
 
-package Test::Device::Chip::Adapter 0.25;
+package Test::Device::Chip::Adapter 0.26;
 class Test::Device::Chip::Adapter
    :does(Device::Chip::Adapter);
 
@@ -99,6 +100,20 @@ method configure ( % )
    Test::Future::Deferred->done_later;
 }
 
+field $_read_buffer;
+
+method use_read_buffer
+{
+   require Future::Buffer;
+   $_read_buffer = Future::Buffer->new;
+}
+
+method write_read_buffer ( $data )
+{
+   ( $_read_buffer or croak "Read buffer is not enabled" )
+      ->write( $data );
+}
+
 =head1 EXPECTATIONS
 
 Each of the actual methods to be used by the L<Device::Chip> under test has an
@@ -132,13 +147,31 @@ following additional methods:
 
 As a lot of existing unit tests may have already been written to the API shape
 provided by C<Test::ExpectAndCheck::Future> version 0.03, the expectation
-object also recognises the C<return> method as an alias to C<will_done>.
+object also recognises the C<returns> method as an alias to C<will_done>.
 
    $exp->returns( $bytes_in );
 
 This wrapper should be considered as a I<temporary> back-compatibility measure
-however; it will eventually print a warning and perhaps then removed entirely.
-You should avoid using it in new code; just call C<will_done> directly.
+however. It now prints a warning and perhaps will be removed entirely in a
+later version. You should avoid using it in new code; just call C<will_done>
+directly.
+
+=head2 Read Buffering
+
+I<Since version 0.26.>
+
+Testing with exact C<read> calls can be fragile; especially with UART-based
+protocols, as it relies on exact ordering, buffer sizes, and so on. A more
+flexible approach that leads to less brittle tests is to use a buffer.
+
+This first has to be enabled:
+
+   $adapter->use_read_buffer;
+
+At this point, no C<read> method call will consume an expectation. Instead, it
+will attempt to consume data from the read buffer. This can be provided by:
+
+   $adapter->write_read_buffer( $data );
 
 =cut
 
@@ -170,7 +203,7 @@ BEGIN {
                            [qw( SPI )] ],
    );
 
-   use Object::Pad ':experimental(mop)';
+   use Object::Pad 0.800 ':experimental(mop)';
    my $meta = Object::Pad::MOP::Class->for_caller;
 
    foreach my $method ( keys %METHODS ) {
@@ -193,6 +226,11 @@ BEGIN {
 
             any { $_ eq $_protocol } @$allowed_protos or
                croak "Method ->$method not allowed in $_protocol protocol";
+
+            if( $method eq "read" and $_read_buffer ) {
+               my ( $len ) = @args;
+               return $_read_buffer->read_exactly( $len );
+            }
 
             return $_obj->$method( @args );
          }
@@ -265,8 +303,8 @@ package # hide
 
    sub returns ( $self, @result )
    {
-      # warnings::warnif deprecated =>
-      #    "Calling ->returns on a Test::Device::Chip::Adapter expectation is now deprecated; use ->will_done instead";
+      warnings::warnif deprecated =>
+         "Calling ->returns on a Test::Device::Chip::Adapter expectation is now deprecated; use ->will_done instead";
       $self->will_done( @result );
    }
 }

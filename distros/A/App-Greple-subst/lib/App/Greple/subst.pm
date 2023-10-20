@@ -6,7 +6,7 @@ subst - Greple module for text search and substitution
 
 =head1 VERSION
 
-Version 2.3104
+Version 2.3301
 
 =head1 SYNOPSIS
 
@@ -360,7 +360,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2017-2022 Kazumasa Utashiro.
+Copyright 2017-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -371,7 +371,7 @@ it under the same terms as Perl itself.
 use v5.14;
 package App::Greple::subst;
 
-our $VERSION = '2.3104';
+our $VERSION = '2.3301';
 
 use warnings;
 use utf8;
@@ -382,7 +382,6 @@ our @EXPORT      = qw(
     &subst_initialize
     &subst_begin
     &subst_diff
-    &subst_divert
     &subst_update
     &subst_show_stat
     &subst_search
@@ -482,28 +481,6 @@ sub subst_begin {
     my %arg = @_;
     $current_file = delete $arg{&FILELABEL} or die;
     $contents = $_ if $remember_data;
-}
-
-#
-# define &divert_stdout and &recover_stdout
-#
-{
-    my $diverted = 0;
-    my $buffer;
-
-    sub divert_stdout {
-	$buffer = @_ ? shift : '/dev/null';
-	$diverted = $diverted == 0 ? 1 : return;
-	open  SUBST_STDOUT, '>&', \*STDOUT or die "open: $!";
-	close STDOUT;
-	open  STDOUT, '>', $buffer or die "open: $!";
-    }
-
-    sub recover_stdout {
-	$diverted = $diverted == 1 ? 0 : return;
-	close STDOUT;
-	open  STDOUT, '>&', \*SUBST_STDOUT or die "open: $!";
-    }
 }
 
 use Text::VisualWidth::PP;
@@ -697,16 +674,6 @@ sub subst_search {
     grep $effective[$_->[2]], @matched;
 }
 
-my $divert_buffer;
-
-sub subst_divert {
-    my %arg = @_;
-    my $filename = delete $arg{&FILELABEL};
-
-    $divert_buffer = '';
-    divert_stdout(\$divert_buffer);
-}
-
 1;
 
 __DATA__
@@ -735,19 +702,22 @@ option default \
 	--le +&subst_search --no-regioncolor
 
 ##
-## Now these options are implemented by -Mudpate module
+## Now these options are implemented by -Mupdate module
 ## --diffcmd, -U are built-in options
 ##
-autoload -Mupdate --update::diff --update::create --update::update
+autoload -Mupdate \
+	--update::diff   \
+	--update::create \
+	--update::update \
+	--update::discard
+
 option --diff      --subst --update::diff
 option --create    --subst --update::create
 option --replace   --subst --update::update --with-backup
 option --overwrite --subst --update::update
 
-option --divert-stdout --prologue __PACKAGE__::divert_stdout \
-		       --epilogue __PACKAGE__::recover_stdout
-option --with-stat     --epilogue subst_show_stat
-option --stat          --divert-stdout --with-stat
+option --with-stat --epilogue subst_show_stat
+option --stat      --update::discard --with-stat
 
 autoload -Msubst::dyncmap --dyncmap
 

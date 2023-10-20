@@ -23,7 +23,7 @@ DESCRIPTION
       (.... following 150_000 (!) such lines of code)
 
     Loads and debugs within 4 sec - i.e. breakpoints, expressions in such
-    a huge file - runs just like usual file. 10_000 line files start
+    a huge file - runs just like usual file. 10_000 line files starts
     instantly.
 
 
@@ -67,5 +67,5 @@ LICENSE
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
    the GNU General Public License or the Artistic License for more details.
 
-      Copyright 1998, 2003 by Andrew E. Page, 2010, 2011 Vadim Konovalov.
+      Copyright 1998, 2003 by Andrew E. Page, 2010, 2011, 2023 Vadim Konovalov.
         All rights reserved.

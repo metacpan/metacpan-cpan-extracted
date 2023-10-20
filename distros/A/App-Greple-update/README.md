@@ -13,11 +13,13 @@ Options:
     --with-backup  make backup files
 
     --diff         produce diff output
-    --U#           specify unified diff context length
+    -U#            specify unified diff context length
+
+    --discard      simply discard the output
 
 # VERSION
 
-Version 0.03
+Version 1.01
 
 # DESCRIPTION
 
@@ -60,6 +62,11 @@ Consult it for more practical use case.
     given, it is used as a suffix string.  If the file exists, `.bak_1`,
     `.bak_2` ... are used.
 
+- **--discard**
+- **--update::discard**
+
+    Simply discard the command output without updating file.
+
 - **--diff**
 - **--update::diff**
 
@@ -92,7 +99,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2022 Kazumasa Utashiro.
+Copyright 2022-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

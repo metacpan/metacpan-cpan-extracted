@@ -4,7 +4,7 @@
       "Max Maischein <corion@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -59,8 +59,8 @@
             "IO::Socket::SSL" : "0",
             "LWP::UserAgent" : "0",
             "Path::Tiny" : "0",
+            "Test2::V0" : "0",
             "Test::HTTP::LocalServer" : "0.67",
-            "Test::More" : "0.88",
             "WWW::Mechanize" : "0"
          }
       }
@@ -79,7 +79,7 @@
          "web" : "https://github.com/Corion/HTTP-Request-FromCurl"
       }
    },
-   "version" : "0.51",
-   "x_serialization_backend" : "JSON::PP version 4.11",
+   "version" : "0.52",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

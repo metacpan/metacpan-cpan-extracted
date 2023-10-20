@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.800;
 
-package App::sdview::Parser::Pod 0.12;
+package App::sdview::Parser::Pod 0.13;
 class App::sdview::Parser::Pod
    :isa(Pod::Simple)
    :does(App::sdview::Parser)
@@ -21,6 +21,28 @@ use String::Tagged;
 
 use constant format => "POD";
 use constant sort_order => 10;
+
+=head1 NAME
+
+C<App::sdview::Parser::Pod> - parse POD files for L<App::sdview>
+
+=head1 SYNOPSIS
+
+   $ sdview README.pod
+
+   $ sdview -f POD my-document
+
+=head1 DESCRIPTION
+
+This parser module adds to L<App::sdview> the ability to parse input text in
+POD formatting.
+
+It uses L<Pod::Simple> as its driving parser.
+
+As an extension, it also supports the inline formatting code C<UE<lt>...E<gt>> to
+request underline formatting.
+
+=cut
 
 sub find_file ( $class, $name )
 {
@@ -38,6 +60,8 @@ sub can_parse_file ( $class, $file )
 ADJUST
 {
    $self->nix_X_codes( 1 );
+
+   $self->accept_codes(qw( U ));
 }
 
 field @_indentstack;
@@ -66,7 +90,15 @@ my %PARA_TYPES = (
    Para     => "App::sdview::Para::Plain",
    Verbatim => "App::sdview::Para::Verbatim",
 );
-my @FORMAT_TYPES = qw( B I F C L );
+my %FORMAT_TYPES = (
+   B => "bold",
+   I => "italic",
+   U => "underline",
+   C => "monospace",
+
+   F => "file",
+   L => "link",
+);
 
 method _handle_element_start ( $type, $attrs )
 {
@@ -97,10 +129,10 @@ method _handle_element_start ( $type, $attrs )
       if( defined $target and $target !~ m(^\w+://) ) {
          $target = "https://metacpan.org/pod/$target";
       }
-      $_curtags{L} = { target => $target };
+      $_curtags{link} = { target => $target };
    }
-   elsif( any { $type eq $_ } @FORMAT_TYPES ) {
-      ++$_curtags{$type};
+   elsif( my $tag = $FORMAT_TYPES{$type} ) {
+      ++$_curtags{$tag};
    }
    elsif( $type eq "over-block" ) {
       push @_indentstack, $_indentstack[-1] + $attrs->{indent};
@@ -143,8 +175,8 @@ method _handle_element_end ( $type, @ )
       $type eq "Verbatim" and
          $_parastack[-1][-1] = $self->trim_leading_whitespace( $_parastack[-1][-1] );
    }
-   elsif( any { $type eq $_ } @FORMAT_TYPES ) {
-      delete $_curtags{$type};
+   elsif( my $tag = $FORMAT_TYPES{$type} ) {
+      delete $_curtags{$tag};
    }
    elsif( $type eq "over-block" ) {
       pop @_indentstack;
@@ -187,5 +219,11 @@ method trim_leading_whitespace ( $para )
       text => $text,
    );
 }
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
 
 0x55AA;

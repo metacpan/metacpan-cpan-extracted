@@ -28,7 +28,7 @@
 
 	our @EXPORT = qw(new Open $VERSION);
 
-	our $VERSION = "2023.106.1";
+	our $VERSION = "2023.274.1";
 
 	our @EXPORT_OK = @EXPORT;
 
@@ -41,9 +41,17 @@
 sub new()
 {
 	my $class = shift; $class = ref($class) || $class || 'SQL::SimpleOps::DBI::SQLite';
-	my $self = {};
+	my $self = {@_};
 
-	$self->{argv} = {@_};
+	if ($self->{sql_simple}->{argv}{db} eq "" && $self->{sql_simple}->{argv}{dbfile} eq "")
+	{
+		$self->{sql_simple}->setMessage($self,"new",-1,"001");
+		return undef;
+	}
+	$self->{sql_simple}->{init}{plugin_id} = "SQLite";
+	$self->{sql_simple}->{init}{schema} = 0;
+	$self->{sql_simple}->{init}{test_server} = 0;
+	$self->{sql_simple}->{init}{alias_with_as} = 0;
 
 	bless($self,$class);
 }
@@ -66,8 +74,8 @@ sub Open()
 	my $argv = shift;
 
 	## sets the dsnam here
-	$self->{argv}{sql_simple}->{argv}{dbfile} = $self->{argv}{sql_simple}->{argv}{db}.".db" if (!defined($self->{argv}{sql_simple}->{argv}{dbfile}) || $self->{argv}{sql_simple}->{argv}{dbfile} eq "");
-	$self->{argv}{sql_simple}->{argv}{dsname} = "DBI:SQLite:dbname=$self->{argv}{sql_simple}->{argv}{dbfile}";
+	$self->{sql_simple}->{argv}{dbfile} = $self->{sql_simple}->{argv}{db}.".db" if (!defined($self->{sql_simple}->{argv}{dbfile}) || $self->{sql_simple}->{argv}{dbfile} eq "");
+	$self->{sql_simple}->{argv}{dsname} = "DBI:SQLite:dbname=$self->{sql_simple}->{argv}{dbfile}";
 
 	return 0;
 }

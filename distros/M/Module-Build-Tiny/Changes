@@ -1,5 +1,8 @@
 Revision history for Module::Build::Tiny
 
+0.047     2023-09-28 17:53:41+02:00 Europe/Brussels
+          - Avoid using empty regex for backwards compatability
+
 0.046     2023-06-01 19:31:21+02:00 Europe/Amsterdam
           - Add src/ to include paths
 

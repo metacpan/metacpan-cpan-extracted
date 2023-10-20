@@ -1,9 +1,10 @@
 package App::Bitcoin::PaperWallet;
-$App::Bitcoin::PaperWallet::VERSION = '1.10';
+$App::Bitcoin::PaperWallet::VERSION = '1.11';
 use v5.12;
 use warnings;
 
 use Bitcoin::Crypto qw(btc_extprv);
+use Bitcoin::Crypto::Util qw(generate_mnemonic mnemonic_from_entropy);
 use Digest::SHA qw(sha256);
 use Encode qw(encode);
 
@@ -29,11 +30,10 @@ sub get_addresses
 sub generate
 {
 	my ($class, $entropy, $pass, $address_count) = @_;
-	$entropy = encode 'UTF-8', $entropy;
 
 	my $mnemonic = defined $entropy
-		? btc_extprv->mnemonic_from_entropy(sha256($entropy))
-		: btc_extprv->generate_mnemonic(256)
+		? mnemonic_from_entropy(sha256(encode 'UTF-8', $entropy))
+		: generate_mnemonic(256)
 	;
 
 	my $key = btc_extprv->from_mnemonic($mnemonic, $pass);

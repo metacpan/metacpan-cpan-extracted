@@ -9,9 +9,9 @@ use Cwd;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-25'; # DATE
+our $DATE = '2023-08-06'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.030'; # VERSION
+our $VERSION = '1.031'; # VERSION
 
 our @EXPORT_OK = qw(
                        gen_csv_util
@@ -1069,11 +1069,11 @@ The order of the hooks, in processing chronological order:
   Called before an input CSV file is about to be opened, including for stdin
   (`-`). You can use this hook e.g. to check/preprocess input file. Flow control
   is available by setting `$r->{wants_skip_files}` to skip reading all the input
-  file and go directly to the `after_read_input` hook.
+  files and go directly to the `after_read_input` hook.
 
 * before_open_input_file
 
-  Called before an input CSV file is about to be opened, including for stdin
+  Called before each input CSV file is about to be opened, including for stdin
   (`-`). For the first file, called after `before_open_input_file` hook. You can
   use this hook e.g. to check/preprocess input file. Flow control is available
   by setting `$r->{wants_skip_file}` to skip reading a single input file and go
@@ -1985,7 +1985,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 1.030 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2023-07-25.
+This document describes version 1.031 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2023-08-06.
 
 =head1 DESCRIPTION
 
@@ -2178,11 +2178,11 @@ hook e.g. to set a custom C<input_filenames>.
 Called before an input CSV file is about to be opened, including for stdin
 (C<->). You can use this hook e.g. to check/preprocess input file. Flow control
 is available by setting C<< $r-E<gt>{wants_skip_files} >> to skip reading all the input
-file and go directly to the C<after_read_input> hook.
+files and go directly to the C<after_read_input> hook.
 
 =item * before_open_input_file
 
-Called before an input CSV file is about to be opened, including for stdin
+Called before each input CSV file is about to be opened, including for stdin
 (C<->). For the first file, called after C<before_open_input_file> hook. You can
 use this hook e.g. to check/preprocess input file. Flow control is available
 by setting C<< $r-E<gt>{wants_skip_file} >> to skip reading a single input file and go

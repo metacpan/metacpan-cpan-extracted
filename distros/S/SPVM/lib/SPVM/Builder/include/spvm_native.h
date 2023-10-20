@@ -9,13 +9,17 @@
 #include <string.h>
 #include <stdarg.h>
 
-#define SPVM_NATIVE_VERSION_NUMBER 0.989042
+#define SPVM_NATIVE_VERSION_NUMBER 0.989051
 
 #define SPVM_NATIVE_CREATE_VERSION_STRING_STRINGIFY(x) #x
 
 #define SPVM_NATIVE_CREATE_VERSION_STRING(x) SPVM_NATIVE_CREATE_VERSION_STRING_STRINGIFY(x)
 
 #define SPVM_NATIVE_VERSION_STRING SPVM_NATIVE_CREATE_VERSION_STRING(SPVM_NATIVE_VERSION_NUMBER);
+
+#define SPVM_NATIVE_GET_POINTER(object) (*(void**)object)
+
+#define SPVM_NATIVE_SET_POINTER(object, pointer) (*(void**)object = pointer)
 
 #define spvm_warn(format, ...) fprintf(stderr, format "\n", ##__VA_ARGS__)
 
@@ -60,6 +64,12 @@ typedef struct spvm_api_method SPVM_API_METHOD;
 struct spvm_api_arg;
 typedef struct spvm_api_arg SPVM_API_ARG;
 
+struct spvm_api_internal;
+typedef struct spvm_api_internal SPVM_API_INTERNAL;
+
+struct spvm_api_mutex;
+typedef struct spvm_api_mutex SPVM_API_MUTEX;
+
 union spvm_value {
   int8_t bval;
   int16_t sval;
@@ -93,14 +103,8 @@ union spvm_value {
 
 
 
-
-
-
-
-
-
 struct spvm_env {
-  void* compiler;
+  void* reserved0;
   void* runtime;
   SPVM_ENV_API* api;
   SPVM_ENV* (*new_env)(void);
@@ -137,7 +141,7 @@ struct spvm_env {
   void (*set_class_var_double)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var, double value);
   void (*set_class_var_object)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var, void* value);
   void (*set_class_var_string)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var, void* value);
-  void** (*get_class_var_object_address)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var);
+  void** (*get_class_var_object_ref)(SPVM_ENV* env, SPVM_VALUE* stack, void* class_var);
   int8_t (*get_class_var_byte_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* class_var_name, int32_t* error_id, const char* func_name, const char* file, int32_t line);
   int16_t (*get_class_var_short_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* class_var_name, int32_t* error_id, const char* func_name, const char* file, int32_t line);
   int32_t (*get_class_var_int_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, const char* class_var_name, int32_t* error_id, const char* func_name, const char* file, int32_t line);
@@ -288,7 +292,7 @@ struct spvm_env {
   int32_t (*enter_scope)(SPVM_ENV* env, SPVM_VALUE* stack);
   void (*leave_scope)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t scope_id);
   int32_t (*push_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
-  int32_t (*remove_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t scope_id, void* remove_object);
+  void* *reserved188;
   int32_t (*weaken)(SPVM_ENV* env, SPVM_VALUE* stack, void** object_address);
   int32_t (*isweak)(SPVM_ENV* env, SPVM_VALUE* stack, void** object);
   void (*unweaken)(SPVM_ENV* env, SPVM_VALUE* stack, void** object_address);
@@ -296,22 +300,37 @@ struct spvm_env {
   void* (*strerror_string_nolen)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value);
   const char* (*strerror)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value, int32_t length);
   const char* (*strerror_nolen)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value);
-  void* allocator;
-  void* (*new_memory_env)(SPVM_ENV* env, size_t size);
-  void (*free_memory_env)(SPVM_ENV* env, void* block);
-  int32_t (*get_memory_blocks_count_env)(SPVM_ENV* env);
+  void* reserved196;
+  void* reserved197;
+  void* reserved198;
+  void* reserved199;
   void* (*new_memory_stack)(SPVM_ENV* env, SPVM_VALUE* stack, size_t size);
   void (*free_memory_stack)(SPVM_ENV* env, SPVM_VALUE* stack, void* block);
   int32_t (*get_memory_blocks_count_stack)(SPVM_ENV* env, SPVM_VALUE* stack);
   SPVM_VALUE* (*new_stack)(SPVM_ENV* env);
   void (*free_stack)(SPVM_ENV* env, SPVM_VALUE* stack);
-  int32_t (*get_ref_count)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
-  void (*inc_ref_count)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
-  void (*dec_ref_count)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+  void* reserved205;
+  void* reserved206;
+  void* reserved207;
   void* (*get_field_object_defined_and_has_pointer_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* field_name, int32_t* error_id, const char* func_name, const char* file_name, int32_t line);
-  void** (*get_field_object_address)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field);
-  void** (*get_field_object_address_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* field_name, int32_t* error_id, const char* func_name, const char* file, int32_t line);
+  void** (*get_field_object_ref)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field);
+  void** (*get_field_object_ref_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* field_name, int32_t* error_id, const char* func_name, const char* file, int32_t line);
   int32_t (*check_stack_env)(SPVM_ENV* env, SPVM_VALUE* stack);
+  void* reserved212;
+  void* reserved213;
+  void (*assign_object)(SPVM_ENV* env, SPVM_VALUE* stack, void** dist_ref, void* object);
+  void* (*new_string_array_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
+  void* (*new_memory_block)(SPVM_ENV* env, SPVM_VALUE* stack, size_t size);
+  void (*free_memory_block)(SPVM_ENV* env, SPVM_VALUE* stack, void* block);
+  int32_t (*get_memory_blocks_count)(SPVM_ENV* env, SPVM_VALUE* stack);
+  void (*say)(SPVM_ENV* env, SPVM_VALUE* stack, void* string);
+  void (*warn)(SPVM_ENV* env, SPVM_VALUE* stack, void* string, const char* class_dir, const char* class_rel_file, int32_t line);
+  void* (*new_mutex)(SPVM_ENV* env, SPVM_VALUE* stack);
+  void (*free_mutex)(SPVM_ENV* env, SPVM_VALUE* stack, void* mutex);
+  int32_t (*lock)(SPVM_ENV* env, SPVM_VALUE* stack, void* mutex);
+  int32_t (*unlock)(SPVM_ENV* env, SPVM_VALUE* stack, void* mutex);
+  int32_t (*reader_lock)(SPVM_ENV* env, SPVM_VALUE* stack, void* mutex);
+  int32_t (*reader_unlock)(SPVM_ENV* env, SPVM_VALUE* stack, void* mutex);
 };
 
 struct spvm_env_api {
@@ -326,6 +345,8 @@ struct spvm_env_api {
   SPVM_API_METHOD* method;
   SPVM_API_ARG* arg;
   SPVM_API_TYPE* type;
+  SPVM_API_INTERNAL* internal;
+  SPVM_API_MUTEX* mutex;
 };
 
 struct spvm_api_allocator {
@@ -383,6 +404,11 @@ struct spvm_api_runtime {
   int32_t (*get_basic_types_length)(void* runtime);
   void (*build_precompile_module_source)(void* runtime, void* string_buffer, void* module_basic_type);
   void (*build_precompile_method_source)(void* runtime, void* string_buffer, void* method);
+  void* (*get_compiler)(void* runtime);
+  void (*set_compiler)(void* runtime, void* compiler);
+  FILE* (*get_spvm_stdin)(void* runtime);
+  FILE* (*get_spvm_stdout)(void* runtime);
+  FILE* (*get_spvm_stderr)(void* runtime);
 };
 
 struct spvm_api_basic_type {
@@ -479,9 +505,23 @@ struct spvm_api_arg {
   int32_t (*get_stack_index)(void* runtime, void* arg);
 };
 
-SPVM_ENV* SPVM_API_new_env(void);
+struct spvm_api_internal {
+  int32_t (*get_ref_count)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+  void (*inc_ref_count)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+  void (*dec_ref_count)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+  void (*leave_scope_local)(SPVM_ENV* env, SPVM_VALUE* stack, void** object_vars, int32_t* mortal_stack, int32_t* mortal_stack_top_ptr, int32_t original_mortal_stack_top);
+  void (*lock_object)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+  void (*unlock_object)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
+};
 
-void SPVM_API_free_env(SPVM_ENV* env);
+struct spvm_api_mutex {
+  void* (*new_instance)(SPVM_ENV* env, SPVM_VALUE* stack);
+  void (*free_instance)(SPVM_ENV* env, SPVM_VALUE* stack, void* mutex);
+  void (*lock)(SPVM_ENV* env, SPVM_VALUE* stack, void* mutex);
+  void (*unlock)(SPVM_ENV* env, SPVM_VALUE* stack, void* mutex);
+  void (*reader_lock)(SPVM_ENV* env, SPVM_VALUE* stack, void* mutex);
+  void (*reader_unlock)(SPVM_ENV* env, SPVM_VALUE* stack, void* mutex);
+};
 
 enum {
   SPVM_NATIVE_C_BASIC_TYPE_ID_UNKNOWN,
@@ -525,5 +565,9 @@ enum {
   SPVM_NATIVE_C_TYPE_FLAG_REF = 1,
   SPVM_NATIVE_C_TYPE_FLAG_MUTABLE = 2,
 };
+
+// These functions are linked only by SPVM itself,
+// so native classes cannot use these functions.
+SPVM_ENV* SPVM_NATIVE_new_env(void);
 
 #endif

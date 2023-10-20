@@ -39,10 +39,10 @@
 
 /* useful reading:
  *
- * http://bugs.opensolaris.org/view_bug.do?bug_id=6268715 (random results)
- * http://bugs.opensolaris.org/view_bug.do?bug_id=6455223 (just totally broken)
- * http://bugs.opensolaris.org/view_bug.do?bug_id=6873782 (manpage ETIME)
- * http://bugs.opensolaris.org/view_bug.do?bug_id=6874410 (implementation ETIME)
+ * https://archive.is/jN6Ck (random results)
+ * https://archive.is/bBikp (just totally broken)
+ * https://archive.is/eJhmu (manpage ETIME)
+ * https://archive.is/RbgYw (implementation ETIME)
  * http://www.mail-archive.com/networking-discuss@opensolaris.org/msg11898.html ETIME vs. nget
  * http://src.opensolaris.org/source/xref/onnv/onnv-gate/usr/src/lib/libc/port/gen/event_port.c (libc)
  * http://cvs.opensolaris.org/source/xref/onnv/onnv-gate/usr/src/uts/common/fs/portfs/port.c#1325 (kernel)
@@ -113,7 +113,7 @@ port_poll (EV_P_ ev_tstamp timeout)
   /* port_getn may or may not set nget on error */
   /* so we rely on port_events [0].portev_source not being updated */
   if (res == -1 && errno != ETIME && errno != EINTR)
-    ev_syserr ("(libev) port_getn (see http://bugs.opensolaris.org/view_bug.do?bug_id=6268715, try LIBEV_FLAGS=3 env variable)");
+    ev_syserr ("(libev) port_getn (see https://archive.is/jN6Ck, try LIBEV_FLAGS=3 env variable)");
 
   for (i = 0; i < nget; ++i)
     {

@@ -1,5 +1,8 @@
 Revision history for Perl module Promise::Me
 
+v0.4.8 2023-10-11T21:11:43+0900
+    - Corrected malformed signature for distribution release
+
 v0.4.7 2022-12-22T13:36:21+0900
     - Corrected the END block when a variable is undefined
 

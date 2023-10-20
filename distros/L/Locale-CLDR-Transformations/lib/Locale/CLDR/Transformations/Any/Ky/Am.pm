@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Ky::Am;
-# This file auto generated from Data/common/transforms/ky-am.xml
-#	on Mon 11 Apr  5:22:57 pm GMT
+# This file auto generated from Data\common\transforms\ky-am.xml
+#	on Fri 13 Oct  9:03:50 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';

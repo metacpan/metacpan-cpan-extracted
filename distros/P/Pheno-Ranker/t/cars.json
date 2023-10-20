@@ -1,0 +1,314 @@
+[
+  {
+    "brand": "acura",
+    "make_display": "Acura",
+    "make_is_common": "1",
+    "make_country": "USA"
+  },
+  {
+    "brand": "alpina",
+    "make_display": "Alpina",
+    "make_is_common": "0",
+    "make_country": "UK"
+  },
+  {
+    "brand": "aston-martin",
+    "make_display": "Aston Martin",
+    "make_is_common": "1",
+    "make_country": "UK"
+  },
+  {
+    "brand": "audi",
+    "make_display": "Audi",
+    "make_is_common": "1",
+    "make_country": "Germany"
+  },
+  {
+    "brand": "bentley",
+    "make_display": "Bentley",
+    "make_is_common": "1",
+    "make_country": "UK"
+  },
+  {
+    "brand": "bmw",
+    "make_display": "BMW",
+    "make_is_common": "1",
+    "make_country": "Germany"
+  },
+  {
+    "brand": "bugatti",
+    "make_display": "Bugatti",
+    "make_is_common": "1",
+    "make_country": "Italy"
+  },
+  {
+    "brand": "buick",
+    "make_display": "Buick",
+    "make_is_common": "1",
+    "make_country": "USA"
+  },
+  {
+    "brand": "cadillac",
+    "make_display": "Cadillac",
+    "make_is_common": "1",
+    "make_country": "USA"
+  },
+  {
+    "brand": "chevrolet",
+    "make_display": "Chevrolet",
+    "make_is_common": "1",
+    "make_country": "USA"
+  },
+  {
+    "brand": "chrysler",
+    "make_display": "Chrysler",
+    "make_is_common": "1",
+    "make_country": "USA"
+  },
+  {
+    "brand": "dodge",
+    "make_display": "Dodge",
+    "make_is_common": "1",
+    "make_country": "USA"
+  },
+  {
+    "brand": "ferrari",
+    "make_display": "Ferrari",
+    "make_is_common": "1",
+    "make_country": "Italy"
+  },
+  {
+    "brand": "ford",
+    "make_display": "Ford",
+    "make_is_common": "1",
+    "make_country": "USA"
+  },
+  {
+    "brand": "gmc",
+    "make_display": "GMC",
+    "make_is_common": "1",
+    "make_country": "USA"
+  },
+  {
+    "brand": "honda",
+    "make_display": "Honda",
+    "make_is_common": "1",
+    "make_country": "Japan"
+  },
+  {
+    "brand": "hummer",
+    "make_display": "Hummer",
+    "make_is_common": "1",
+    "make_country": "USA"
+  },
+  {
+    "brand": "hyundai",
+    "make_display": "Hyundai",
+    "make_is_common": "1",
+    "make_country": "South Korea"
+  },
+  {
+    "brand": "infiniti",
+    "make_display": "Infiniti",
+    "make_is_common": "1",
+    "make_country": "Japan"
+  },
+  {
+    "brand": "jaguar",
+    "make_display": "Jaguar",
+    "make_is_common": "1",
+    "make_country": "UK"
+  },
+  {
+    "brand": "jeep",
+    "make_display": "Jeep",
+    "make_is_common": "1",
+    "make_country": "USA"
+  },
+  {
+    "brand": "kia",
+    "make_display": "Kia",
+    "make_is_common": "1",
+    "make_country": "South Korea"
+  },
+  {
+    "brand": "koenigsegg",
+    "make_display": "Koenigsegg",
+    "make_is_common": "1",
+    "make_country": "Sweden"
+  },
+  {
+    "brand": "lamborghini",
+    "make_display": "Lamborghini",
+    "make_is_common": "1",
+    "make_country": "Italy"
+  },
+  {
+    "brand": "land-rover",
+    "make_display": "Land Rover",
+    "make_is_common": "1",
+    "make_country": "UK"
+  },
+  {
+    "brand": "lexus",
+    "make_display": "Lexus",
+    "make_is_common": "1",
+    "make_country": "Japan"
+  },
+  {
+    "brand": "lincoln",
+    "make_display": "Lincoln",
+    "make_is_common": "1",
+    "make_country": "USA"
+  },
+  {
+    "brand": "lotus",
+    "make_display": "Lotus",
+    "make_is_common": "1",
+    "make_country": "UK"
+  },
+  {
+    "brand": "maserati",
+    "make_display": "Maserati",
+    "make_is_common": "1",
+    "make_country": "Italy"
+  },
+  {
+    "brand": "maybach",
+    "make_display": "Maybach",
+    "make_is_common": "1",
+    "make_country": "Germany"
+  },
+  {
+    "brand": "mazda",
+    "make_display": "Mazda",
+    "make_is_common": "1",
+    "make_country": "Japan"
+  },
+  {
+    "brand": "mercedes-benz",
+    "make_display": "Mercedes-Benz",
+    "make_is_common": "1",
+    "make_country": "Germany"
+  },
+  {
+    "brand": "mercury",
+    "make_display": "Mercury",
+    "make_is_common": "1",
+    "make_country": "USA"
+  },
+  {
+    "brand": "mini",
+    "make_display": "Mini",
+    "make_is_common": "1",
+    "make_country": "UK"
+  },
+  {
+    "brand": "mitsubishi",
+    "make_display": "Mitsubishi",
+    "make_is_common": "1",
+    "make_country": "Japan"
+  },
+  {
+    "brand": "nissan",
+    "make_display": "Nissan",
+    "make_is_common": "1",
+    "make_country": "Japan"
+  },
+  {
+    "brand": "pagani",
+    "make_display": "Pagani",
+    "make_is_common": "1",
+    "make_country": "Italy"
+  },
+  {
+    "brand": "pontiac",
+    "make_display": "Pontiac",
+    "make_is_common": "1",
+    "make_country": "USA"
+  },
+  {
+    "brand": "porsche",
+    "make_display": "Porsche",
+    "make_is_common": "1",
+    "make_country": "Germany"
+  },
+  {
+    "brand": "rolls-royce",
+    "make_display": "Rolls-Royce",
+    "make_is_common": "1",
+    "make_country": "UK"
+  },
+  {
+    "brand": "saab",
+    "make_display": "Saab",
+    "make_is_common": "1",
+    "make_country": "Sweden"
+  },
+  {
+    "brand": "saturn",
+    "make_display": "Saturn",
+    "make_is_common": "1",
+    "make_country": "USA"
+  },
+  {
+    "brand": "scion",
+    "make_display": "Scion",
+    "make_is_common": "1",
+    "make_country": "Japan"
+  },
+  {
+    "brand": "smart",
+    "make_display": "Smart",
+    "make_is_common": "1",
+    "make_country": "France"
+  },
+  {
+    "brand": "ssc",
+    "make_display": "SSC",
+    "make_is_common": "1",
+    "make_country": "USA"
+  },
+  {
+    "brand": "subaru",
+    "make_display": "Subaru",
+    "make_is_common": "1",
+    "make_country": "Japan"
+  },
+  {
+    "brand": "suzuki",
+    "make_display": "Suzuki",
+    "make_is_common": "1",
+    "make_country": "Japan"
+  },
+  {
+    "brand": "tesla",
+    "make_display": "Tesla",
+    "make_is_common": "1",
+    "make_country": "USA"
+  },
+  {
+    "brand": "toyota",
+    "make_display": "Toyota",
+    "make_is_common": "1",
+    "make_country": "Japan"
+  },
+  {
+    "brand": "volkswagen",
+    "make_display": "Volkswagen",
+    "make_is_common": "1",
+    "make_country": "Germany"
+  },
+  {
+    "brand": "volvo",
+    "make_display": "Volvo",
+    "make_is_common": "1",
+    "make_country": "Sweden"
+  },
+  {
+    "brand": "zenvo",
+    "make_display": "Zenvo",
+    "make_is_common": "0",
+    "make_country": "Denmark"
+  }
+]

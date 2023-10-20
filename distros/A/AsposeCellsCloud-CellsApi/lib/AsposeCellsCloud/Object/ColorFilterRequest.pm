@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Indicates color filter request',
                                   class => 'ColorFilterRequest',
                                   required => [], # TODO
 }                                 );
@@ -128,21 +128,21 @@ __PACKAGE__->method_documentation({
      'pattern' => {
      	datatype => 'string',
      	base_name => 'Pattern',
-     	description => '',
+     	description => 'Gets or sets the fill pattern type',
      	format => '',
      	read_only => '',
      		},
      'foreground_color' => {
      	datatype => 'CellsColor',
      	base_name => 'ForegroundColor',
-     	description => '',
+     	description => 'Foreground color',
      	format => '',
      	read_only => '',
      		},
      'background_color' => {
      	datatype => 'CellsColor',
      	base_name => 'BackgroundColor',
-     	description => '',
+     	description => 'Background color',
      	format => '',
      	read_only => '',
      		},    

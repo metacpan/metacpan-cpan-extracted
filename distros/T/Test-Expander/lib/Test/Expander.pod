@@ -101,13 +101,130 @@ B<Test::Expander>.
 
 =item
 
-Last but not least. To provide a really environment-independent testing, we might need a possibility to run our tests in
+To provide a really environment-independent testing, we might need a possibility to run our tests in
 a clean environment, where only explicitly mentioned environment variables are set and environment variables from the
 "outside world" cannot affect the execution of tests.
 This can also be achieved manually by manipulation of B<%ENV> hash at the very beginning of tests.
 However, even ignoring the test code inflation, this might be (in fact - is) necessary in many tests belonging to one
 and the same module, so that a possibility to outsource the definition of test environment provided by B<Test::Expander>
 makes tests smaller, more maintainable, and much more reliable.
+
+=item
+
+Last but not least. I stole the idea of subtest selection from
+L<Test::Builder::SubtestSelection|https://metacpan.org/pod/Test::Builder::SubtestSelection>.
+That's why the subtest selection supported by B<Test::Expander> is partially compatible with the implementation provided
+by L<Test::Builder::SubtestSelection|https://metacpan.org/pod/Test::Builder::SubtestSelection>.
+The term "partially" means that the option C<--subtest> can only be applied to selection by name not by number.
+
+In general the subtest selection allows the execution of required subtests identified by their names and / or by their
+numbers before test running.
+At the command-line L<prove|https://metacpan.org/pod/prove> runs your test script and the subtest selection is based
+on the values given to the options C<--subtest_name> (alias C<--subtest> - in the
+L<Test::Builder::SubtestSelection|https://metacpan.org/pod/Test::Builder::SubtestSelection> style) and
+C<--subtest_number>. Both options can be applied repeatedly and mixed together so that some tests can be selected
+by names and other ones by numbers.
+
+In both cases the options have to be supplied as arguments to the test script.
+To do so separate the arguments from prove's own arguments with the arisdottle (C<::>).
+
+=over 2
+
+=item Selection by name
+
+The selection by name means that the value supplied along with C<--subtest_name> option is compared with all subtest
+names in your test and only those, which names match this value in terms of regular expression, will be executed.
+If this value cannot be treated as a valid regular expression, meta characters therein are properly quoted so that
+the RegEx match is in any case possible.
+
+Assuming the test script B<t/my_test.t> contains
+
+  use strict;
+  use warnings;
+
+  use Test::Expander;
+
+  plan( 3 );
+
+  subtest 'my higher level subtest without RegEx meta characters in name' => sub {
+    # some test function calls
+  };
+
+  subtest 'my next higher level subtest' => sub {
+    subtest 'my embedded subtest' => sub {
+      subtest 'my deepest subtest' => sub {
+        # some test function calls
+      };
+      # some test function calls
+    };
+    # some test function calls
+  };
+
+  # some test function calls
+
+  subtest 'my subtest with [' => sub {
+    # some test function calls
+  };
+
+Then, if the subtest B<my next higher level subtest> with all embedded subtests and the subtest B<my subtest with [>
+should be executed, the corresponding L<prove|https://metacpan.org/pod/prove> call
+can look like one of the following variants:
+
+  prove -v -b t/basic.t :: --subtest_name 'next|embedded|deepest' --subtest_name '['
+  prove -v -b t/basic.t :: --subtest_name 'next' --subtest_name 'embedded' --subtest_name 'deepest' --subtest_name '['
+
+This kind of subtest selection is pretty convenient but has a significant restriction:
+you cannot select an embedded subtest without its higher-level subtests.
+I.e. if you would try to run the following command
+
+  prove -v -b t/basic.t :: --subtest_name 'deepest' --subtest_name '['
+
+the subtest B<my next higher level subtest> including all embedded subtests will be skipped, so that even the subtest
+B<my deepest subtest> will not be executed although this was your goal.
+
+This restriction, however, can be avoided using the subset selection by number.
+
+=item Selection by number
+
+The selection by number means that the value supplied along with C<--subtest_number> option is the sequence of numbers
+representing required subtest in the test file.
+Let's add to the source code of B<t/my_test.t> some comments illustrating the numbers of each subtest:
+
+  use strict;
+  use warnings;
+
+  use Test::Expander;
+
+  plan( 3 );
+
+  subtest 'my higher level subtest without RegEx meta characters in name' => sub { # subtest No. 0
+    # some test function calls
+  };
+
+  subtest 'my next higher level subtest' => sub { # subtest No. 1
+    subtest 'my embedded subtest' => sub {        # subtest No. 0 in subtest No. 1
+      subtest 'my deepest subtest' => sub {       # subtest No. 0 in subtest No. 0 in subtest No. 1
+        # some test function calls
+      };
+      # some test function calls
+    };
+    # some test function calls
+  };
+
+  # some test function calls
+
+  subtest 'my subtest with [' => sub { # subtest No. 2
+    # some test function calls
+  };
+
+Taking this into consideration we can combine subtest numbers starting from the highest level and separate single levels
+by the slash sign to get the unique number of any subtest we intend to execute.
+Doing so, if we only want to execute the subtests B<my deepest subtest> (its number is B<1/0/0>) and
+B<my subtest with [> (its number is B<2>), this can easily be done with the following command:
+
+  prove -v -b t/basic.t :: --subtest_number '1/0/0' --subtest_number '2'
+
+=back
 
 =back
 

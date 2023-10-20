@@ -15,6 +15,7 @@
 #     AUTHOR => [q[Bodo (Hugo) Barwich <b.barwich@hotmail.com>]]
 #     BUILD_REQUIRES => { ExtUtils::MakeMaker=>q[6.46] }
 #     CONFIGURE_REQUIRES => {  }
+#     EXE_FILES => [q[bin/run_subprocess.pl]]
 #     LICENSE => q[perl]
 #     META_MERGE => { meta-spec=>{ version=>q[2] }, resources=>{ bugtracker=>{ web=>q[https://github.com/bodo-hugo-barwich/Process/issues] }, repository=>{ type=>q[git], url=>q[https://github.com/bodo-hugo-barwich/Process.git], web=>q[https://github.com/bodo-hugo-barwich/Process] } } }
 #     MIN_PERL_VERSION => q[5.010]
@@ -61,11 +62,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Process::SubProcess
 NAME_SYM = Process_SubProcess
-VERSION = 2.1.5
+VERSION = 2.1.9
 VERSION_MACRO = VERSION
-VERSION_SYM = 2_1_5
+VERSION_SYM = 2_1_9
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 2.1.5
+XS_VERSION = 2.1.9
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -166,7 +167,7 @@ XS_FILES =
 C_FILES  = 
 O_FILES  = 
 H_FILES  = 
-MAN1PODS = 
+MAN1PODS = bin/run_subprocess.pl
 MAN3PODS = lib/Process/SubProcess.pm \
 	lib/Process/SubProcess/Group.pm \
 	lib/Process/SubProcess/Pool.pm
@@ -266,7 +267,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Process-SubProcess
-DISTVNAME = Process-SubProcess-2.1.5
+DISTVNAME = Process-SubProcess-2.1.9
 
 
 # --- MakeMaker macro section:
@@ -423,9 +424,12 @@ POD2MAN = $(POD2MAN_EXE)
 
 
 manifypods : pure_all config  \
+	bin/run_subprocess.pl \
 	lib/Process/SubProcess.pm \
 	lib/Process/SubProcess/Group.pm \
 	lib/Process/SubProcess/Pool.pm
+	$(NOECHO) $(POD2MAN) --section=$(MAN1EXT) --perm_rw=$(PERM_RW) -u \
+	  bin/run_subprocess.pl $(INST_MAN1DIR)/run_subprocess.pl.$(MAN1EXT) 
 	$(NOECHO) $(POD2MAN) --section=$(MAN3EXT) --perm_rw=$(PERM_RW) -u \
 	  lib/Process/SubProcess.pm $(INST_MAN3DIR)/Process::SubProcess.$(MAN3EXT) \
 	  lib/Process/SubProcess/Group.pm $(INST_MAN3DIR)/Process::SubProcess::Group.$(MAN3EXT) \
@@ -438,6 +442,22 @@ manifypods : pure_all config  \
 
 
 # --- MakeMaker installbin section:
+
+EXE_FILES = bin/run_subprocess.pl
+
+pure_all :: $(INST_SCRIPT)/run_subprocess.pl
+	$(NOECHO) $(NOOP)
+
+realclean ::
+	$(RM_F) \
+	  $(INST_SCRIPT)/run_subprocess.pl 
+
+$(INST_SCRIPT)/run_subprocess.pl : bin/run_subprocess.pl $(FIRST_MAKEFILE) $(INST_SCRIPT)$(DFSEP).exists $(INST_BIN)$(DFSEP).exists
+	$(NOECHO) $(RM_F) $(INST_SCRIPT)/run_subprocess.pl
+	$(CP) bin/run_subprocess.pl $(INST_SCRIPT)/run_subprocess.pl
+	$(FIXIN) $(INST_SCRIPT)/run_subprocess.pl
+	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_SCRIPT)/run_subprocess.pl
+
 
 
 # --- MakeMaker subdirs section:
@@ -527,7 +547,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) 'resources:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  bugtracker: https://github.com/bodo-hugo-barwich/Process/issues' >> META_new.yml
 	$(NOECHO) $(ECHO) '  repository: https://github.com/bodo-hugo-barwich/Process.git' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: v2.1.5' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: v2.1.9' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.018'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
@@ -591,7 +611,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '         "web" : "https://github.com/bodo-hugo-barwich/Process"' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "v2.1.5",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "v2.1.9",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.02"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
@@ -877,7 +897,7 @@ testdb_static :: static pure_all
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Process-SubProcess" VERSION="2.1.5">' > Process-SubProcess.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Process-SubProcess" VERSION="2.1.9">' > Process-SubProcess.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>Library to manage Sub Processes as objects</ABSTRACT>' >> Process-SubProcess.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Bodo (Hugo) Barwich &lt;b.barwich@hotmail.com&gt;</AUTHOR>' >> Process-SubProcess.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> Process-SubProcess.ppd

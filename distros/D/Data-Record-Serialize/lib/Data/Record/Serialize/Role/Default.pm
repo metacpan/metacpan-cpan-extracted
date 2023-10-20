@@ -2,14 +2,15 @@ package Data::Record::Serialize::Role::Default;
 
 # ABSTRACT:  Default methods for Data::Record::Serialize
 
+use v5.12;
 use Moo::Role;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use Hash::Util qw[ hv_store ];
-use Ref::Util qw[ is_coderef ];
+use Ref::Util  qw[ is_coderef ];
 
-use Data::Record::Serialize::Error { errors => [ 'fields' ] }, -all;
+use Data::Record::Serialize::Error { errors => ['fields'] }, -all;
 
 use namespace::clean;
 
@@ -42,7 +43,7 @@ sub send {
 }
 
 # just in case they're not defined in preceding roles
-sub setup { }
+sub setup      { }
 sub _map_types { }
 sub _needs_eol { 1 }
 
@@ -55,7 +56,7 @@ around 'setup' => sub {
 
     # make sure there are no duplicate output fields
     my %dups;
-    $dups{$_}++ && error( fields => "duplicate output field: $_" ) for@{$self->fields};
+    $dups{$_}++ && error( fields => "duplicate output field: $_" ) for @{ $self->fields };
 
     if ( $self->has_default_type ) {
         $self->_set_types_from_default;
@@ -88,18 +89,15 @@ before 'send' => sub {
     # nullify fields (set to undef) those that are zero length
 
     if ( defined( my $fields = $self->_nullified ) ) {
-        $data->{$_} = undef
-          for grep { defined $data->{$_} && !length $data->{$_} } @$fields;
+        $data->{$_} = undef for grep { defined $data->{$_} && !length $data->{$_} } @$fields;
     }
 
     if ( defined( my $fields = $self->_numified ) ) {
-        $data->{$_} = ( $data->{$_} || 0 ) + 0
-          for grep { defined $data->{$_} } @{$fields};
+        $data->{$_} = ( $data->{$_} || 0 ) +0 for grep { defined $data->{$_} } @{$fields};
     }
 
     if ( defined( my $fields = $self->_stringified ) ) {
-        $data->{$_} = "@{[ $data->{$_}]}"
-          for grep { defined $data->{$_} } @{$fields};
+        $data->{$_} = "@{[ $data->{$_}]}" for grep { defined $data->{$_} } @{$fields};
     }
 
     if ( my $format = $self->_format ) {
@@ -171,7 +169,7 @@ Data::Record::Serialize::Role::Default - Default methods for Data::Record::Seria
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 DESCRIPTION
 
@@ -190,6 +188,8 @@ Encode and send the record to the associated sink.
 B<WARNING>: the passed hash is modified.  If you need the original
 contents, pass in a copy.
 
+=head1 INTERNALS
+
 =for Pod::Coverage cleanup
  send
  setup
@@ -199,7 +199,7 @@ contents, pass in a copy.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>
 
 =head2 Source
 

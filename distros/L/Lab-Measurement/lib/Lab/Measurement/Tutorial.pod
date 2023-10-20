@@ -14,7 +14,7 @@ Lab::Measurement::Tutorial - Lab::Measurement tutorial
 
 =head1 VERSION
 
-version 3.881
+version 3.901
 
 =head1 How to read the documentation
 
@@ -40,12 +40,6 @@ The table of contents referencing all manual pages.
 This tutorial.
 
 =back
-
-A separate tutorial for the historical interfaces L<Lab::Instrument> and
-L<Lab::XPRESS> is provided in L<Lab::Measurement::Legacy::Tutorial>. These
-interfaces as well as the tutorial are not updated anymore, and included for
-compatibility with existing measurement scripts. They will be removed with
-Lab::Measurement release 4.
 
 =head1 Quickstart
 
@@ -1070,6 +1064,7 @@ This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
             2018       Andreas K. Huettel, Simon Reinhardt
             2019-2020  Simon Reinhardt
             2021       Fabian Weinelt, Simon Reinhardt
+            2023       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -6,13 +6,14 @@ sub INIT {
 		plan skip_all => "tests not automatic in non-author environment";
 	}
 }
-# to use these testcases, activate a local SFTP service and create $ENV{EAI_WRAP_CONFIG_PATH}."/Test/site.config with a user/pwd in the prefix sftp there and set env variable EAI_WRAP_AUTHORTEST.
+# to use these testcases, activate a local SFTP service and create $ENV{EAI_WRAP_CONFIG_PATH}."/t/site.config with a user/pwd in the prefix sftp there and set env variable EAI_WRAP_AUTHORTEST.
 # following content of site.config is required:
 #%config = (
-#	sensitive => {sftp => {user => "yourSFTPUser", pwd => "yourSFTPUserPwd"},},
+#	sensitive => {sftp => {user => "yourSFTPUser", pwd => "yourSFTPUserPwd", privKey=>'yourPrivateKeyFileIfNeeded', hostkey=>'yourHostKeyIfNeeded'},},
 #	checkLookup => {"3b_Wrap_Integration.tAddSuffix" => {errmailaddress => "foundEmailAddress"}},
 #	executeOnInit => '$execute{addToScriptName} = "AddSuffix";',
-#	folderEnvironmentMapping => {t => "Test",},
+#	or executeOnInit => sub {$execute{addToScriptName} = "AddSuffix";'},
+#	folderEnvironmentMapping => {t => "t",},
 #	errmailaddress => 'yourMailAddress',
 #	errmailsubject => "No errMailSubject defined",
 #	fromaddress => 'yourMailAddress',
@@ -31,12 +32,14 @@ sub INIT {
 #		skipHolidaysDefault => "AT",
 #	},
 #	DB => {
-#		server => {Test => "yourDBServer"},
-#		database => "yourDBServerDatabase(e.g. pubs)",
-#		DSN => 'driver={SQL Server};Server=$DB->{server}{$execute->{env}};database=$DB->{database};TrustedConnection=Yes;',
+#		server => {t => "yourDBServer(e.g. localhost)"},
+#		database => "yourDBServerDatabase(e.g. testDB)",
+#		DSN => 'driver={SQL Server};Server=$DB->{server}{$execute{env}};database=$DB->{database};TrustedConnection=Yes;',
 #		schemaName => "dbo", # default schema name (especially important for MS SQL Server)
 #	},
 #	FTP => {
+#		port => yourPort,
+#		remoteHost => {t => "yourFTPHost"},
 #		maxConnectionTries => 5, # try at most to connect maxConnectionTries, then give up
 #		sshInstallationPath => "yourPathToPLINK.EXE", # path to external ssh executable for NET::SFTP::Foreign
 #	},
@@ -49,17 +52,18 @@ chdir "./t";
 
 # set up EAI::Wrap definitions
 %common = (
-	DB => {longreadlen => 1024,schemaName => "dbo",DSN => 'driver={SQL Server};Server=.;database=$DB->{database};TrustedConnection=Yes;',database => "testDB",primkey => "col1 = ?",tablename => "theTestTable",},
+	DB => {longreadlen => 1024,schemaName => "dbo",DSN => 'driver={SQL Server};Server='.$config{DB}{server}{t}.';database='.$config{DB}{database}.';TrustedConnection=Yes;',primkey => "col1 = ?",tablename => "theTestTable",},
 );
-@loads = ({
-	File => {localFilesystemPath => ".",dontKeepHistory => 1,filename => "test.zip",extract => 1,format_sep => "\t",format_skip => 1,format_header => "col1	col2	col3",},
-	},{
-	DB => {query => "select * from theTestTable"},
-	FTP => {remoteDir=>"",remoteHost=>{Test => "localhost"},FTPdebugLevel=>0,privKey=>"",prefix=>"sftp",dontUseTempFile=>1,fileToRemove=>1},
-	File => {filename => "testTarget.txt",dontKeepHistory => 1,format_sep => "\t",format_skip => 2,format_header => "col1	col2	col3",},
+@loads = (
+	{
+		File => {localFilesystemPath => ".",dontKeepHistory => 1,filename => "test.zip",extract => 1,format_sep => "\t",format_skip => 1,format_header => "col1	col2	col3",},
+	},
+	{
+		DB => {query => "select * from theTestTable"},
+		FTP => {remoteDir=>"",FTPdebugLevel=>0,prefix=>"sftp",dontUseTempFile=>1,fileToRemove=>1,SFTP=>1},
+		File => {filename => "testTarget.txt",dontKeepHistory => 1,format_sep => "\t",format_skip => 2,format_header => "col1	col2	col3",},
 	},
 );
-$execute{env}="Test";
 setupEAIWrap();
 
 # set up DB environment for tests
@@ -68,8 +72,8 @@ my ($dbHandle, $DSN) = getConn();
 # 1
 is(ref($dbHandle),"DBI::db","\$dbHandle set as expected");
 # 2
-is($DSN,'driver={SQL Server};Server=.;database=testDB;TrustedConnection=Yes;','$DSN set as expected');
-doInDB({doString => "DROP TABLE [dbo].[theTestTable];"});
+is($DSN,'driver={SQL Server};Server='.$common{DB}{server}{$execute{env}}.';database='.$common{DB}{database}.';TrustedConnection=Yes;','$DSN set as expected');
+doInDB({doString => "IF OBJECT_ID('dbo.theTestTable', 'U') IS NOT NULL DROP TABLE [dbo].[theTestTable];"});
 my $createStmt = "CREATE TABLE [dbo].[theTestTable]([col1] [varchar](5) NOT NULL,[col2] [varchar](5) NOT NULL,[col3] [varchar](5) NOT NULL, CONSTRAINT [PK_theTestTable] PRIMARY KEY CLUSTERED (col1 ASC)) ON [PRIMARY]";
 # 3
 is(doInDB({doString => $createStmt}),1,'doInDB');
@@ -127,4 +131,5 @@ is($config{checkLookup}{"3b_Wrap_Integration.tAddSuffix"}{"errmailaddress"},"fou
 
 unlink "test.zip";
 unlink "testContent.txt";
+unlink "3b_Wrap_Integration.t.log";
 done_testing();

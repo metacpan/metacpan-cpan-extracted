@@ -1,5 +1,8 @@
 Revision history for Perl extension App-Gimei
 
+v0.2.2 2023-09-21T18:50:38Z
+    - parse once
+	
 v0.2.1 2023-09-04T18:13:42Z
 
     - update dependencies

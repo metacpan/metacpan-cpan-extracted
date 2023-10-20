@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Sublike::Builder 0.20;
+package XS::Parse::Sublike::Builder 0.21;
 
 use v5.14;
 use warnings;
@@ -46,7 +46,7 @@ require XS::Parse::Sublike::Builder_data;
 
 =head2 write_XSParseSublike_h
 
-   XS::Parse::Sublike::Builder->write_XSParseSublike_h
+   XS::Parse::Sublike::Builder->write_XSParseSublike_h;
 
 Writes the F<XSParseSublike.h> file to the current working directory. To cause
 the compiler to actually find this file, see L</extra_compiler_flags>.
@@ -65,7 +65,7 @@ sub write_XSParseSublike_h
 
 =head2 extra_compiler_flags
 
-   @flags = XS::Parse::Sublike::Builder->extra_compiler_flags
+   @flags = XS::Parse::Sublike::Builder->extra_compiler_flags;
 
 Returns a list of extra flags that the build scripts should add to the
 compiler invocation. This enables the C compiler to find the
@@ -81,7 +81,7 @@ sub extra_compiler_flags
 
 =head2 extend_module_build
 
-   XS::Parse::Sublike::Builder->extend_module_build( $build )
+   XS::Parse::Sublike::Builder->extend_module_build( $build );
 
 A convenient shortcut for performing all the tasks necessary to make a
 L<Module::Build>-based distribution use the helper.

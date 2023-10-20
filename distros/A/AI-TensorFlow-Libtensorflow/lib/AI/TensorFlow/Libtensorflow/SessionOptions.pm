@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::SessionOptions;
 # ABSTRACT: Holds options that can be passed during session creation
-$AI::TensorFlow::Libtensorflow::SessionOptions::VERSION = '0.0.6';
+$AI::TensorFlow::Libtensorflow::SessionOptions::VERSION = '0.0.7';
 use strict;
 use warnings;
 use namespace::autoclean;

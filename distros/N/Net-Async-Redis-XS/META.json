@@ -74,19 +74,19 @@
    "provides" : {
       "Net::Async::Redis::Cluster::Node::XS" : {
          "file" : "lib/Net/Async/Redis/Cluster/Node/XS.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Net::Async::Redis::Cluster::XS" : {
          "file" : "lib/Net/Async/Redis/Cluster/XS.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Net::Async::Redis::Protocol::XS" : {
          "file" : "lib/Net/Async/Redis/XS.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Net::Async::Redis::XS" : {
          "file" : "lib/Net/Async/Redis/XS.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
@@ -101,13 +101,13 @@
          "web" : "https://github.com/team-at-cpan/Net-Async-Redis-XS"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Gabor Szabo <gabor@szabgab.com>"
    ],
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -142,6 +142,8 @@ sub init {
     $font->SetPointSize($self->{prefs_editsize});
     $self->{t_source}->SetFont($font);
 
+    $self->setup_tasks();
+
     # Disable menu items if we cannot.
     $self->{main_menubar}->FindItem(wxID_UNDO)
       ->Enable($self->{t_source}->CanUndo);
@@ -210,6 +212,56 @@ sub notationlist {
     return $notationlist;
 }
 
+my @tasks;
+
+sub setup_tasks {
+    my ( $self ) = @_;
+    my $dir = $self->{prefs_customlib};
+    return unless $dir && -d $dir;
+    $dir .= "/tasks";
+    return unless $dir && -d $dir;
+
+    use File::Glob 'bsd_glob';
+    use File::Basename;
+
+    my @files = glob( "$dir/*.{json,prp}" );
+    return unless @files;
+
+    my $menu = $self->{main_menubar}->FindMenu("Tasks");
+    $menu = $self->{main_menubar}->GetMenu($menu);
+
+    my $did;
+    foreach my $file ( @files ) {
+	next unless -s $file;
+
+	# Tentative title (description).
+	( my $desc = basename( $file, ".json", ".prp" ) ) =~ s/_/ /g;
+
+	# Peek in the first line.
+	my $line;
+	my $fd;
+	open( $fd, '<:utf8', $file ) and
+	  $line = <$fd> and
+	  close($fd);
+	if ( $line =~ m;(?://|\#)\s*(?:chordpro\s*)?task:\s*(.*);i ) {
+	    $desc = $1;
+	}
+
+	# Append to the menu, first a separator if needed.
+	$menu->AppendSeparator unless $did++;
+	my $id = Wx::NewId();
+	$menu->Append( $id, $desc, _T("Custom task: ").$desc );
+	Wx::Event::EVT_MENU
+	    ( $self, $id,
+	      sub {
+		  my ( $self, $event ) = @_;
+		  $self->preview( "--config", $file );
+	      } );
+	push( @tasks, [ $desc, $file ] );
+    }
+}
+
+sub tasks { \@tasks }
 sub fonts { \@fonts }
 
 sub opendialog {
@@ -315,7 +367,7 @@ sub _die {
 }
 
 sub preview {
-    my ( $self ) = @_;
+    my ( $self, @opts ) = @_;
 
     # We can not unlink temps because we do not know when the viewer
     # is ready. So the best we can do is reuse the files.
@@ -375,6 +427,7 @@ sub preview {
     push( @ARGV, '--transpose', $self->{prefs_xpose} )
       if $self->{prefs_xpose};
 
+    push( @ARGV, @opts ) if @opts;
     push( @ARGV, $preview_cho );
 
     if ( $self->{_trace} || $self->{_debug}
@@ -392,6 +445,8 @@ sub preview {
     $options->{trace} = $self->{_trace} || 0;
     $options->{debug} = $self->{_debug} || $self->{_debuginfo};
     $options->{diagformat} = 'Line %n, %m';
+    # Actual file name.
+    $options->{filesource} = $self->{_currentfile};
     $options->{silent} = 1;
 
     eval {
@@ -597,7 +652,19 @@ sub OnSave {
 
 sub OnPreview {
     my ( $self, $event ) = @_;
-    $self->preview;
+    $self->preview();
+}
+
+sub OnPreviewNoChords {
+    my ( $self, $event ) = @_;
+    $self->preview("--no-chord-grids");
+}
+
+sub OnPreviewLyricsOnly {
+    my ( $self, $event ) = @_;
+    $self->preview( "--lyrics-only",
+		    "--define=delegates.abc.omit=1",
+		    "--define=delegates.ly.omit=1" );
 }
 
 sub OnClose {
@@ -683,6 +750,53 @@ sub OnPreferences {
     $self->{d_prefs} ||= ChordPro::Wx::PreferencesDialog->new($self, -1, "Preferences");
     my $ret = $self->{d_prefs}->ShowModal;
     $self->SavePreferences if $ret == wxID_OK;
+}
+
+#               C      D      E  F      G      A        B C
+my @xpmap = qw( 0 1  1 2 3  3 4  5 6  6 7 8  8 9 10 10 11 12 );
+my @sfmap = qw( 0 7 -5 2 9 -3 4 -1 6 -6 1 8 -4 3 10 -2  5 0  );
+
+sub OnPreviewMore {
+    my ($self, $event) = @_;
+
+    use ChordPro::Wx::RenderDialog;
+    my $d = $self->{d_render} ||= ChordPro::Wx::RenderDialog->new($self, -1, "Tasks");
+    my $ret = $d->ShowModal;
+    return unless $ret == wxID_OK;
+    my @args;
+    if ( $d->{cb_task_no_diagrams}->IsChecked ) {
+	push( @args, "--no-chord-grids" );
+    }
+    if ( $d->{cb_task_lyrics_only}->IsChecked ) {
+	push( @args, "--lyrics-only",
+	      "--define=delegates.abc.omit=1",
+	      "--define=delegates.ly.omit=1" );
+    }
+    if ( $d->{cb_task_decapo}->IsChecked ) {
+	push( @args, "--decapo" );
+    }
+
+    # Transpose.
+    my $xpose_from = $xpmap[$d->{ch_xpose_from}->GetSelection];
+    my $xpose_to   = $xpmap[$d->{ch_xpose_to  }->GetSelection];
+    my $xpose_acc  = $d->{ch_acc}->GetSelection;
+    my $n = $xpose_to - $xpose_from;
+    $n += 12 if $n < 0;
+    $n += 12 if $xpose_acc == 1; # sharps
+    $n -= 12 if $xpose_acc == 2; # flats
+
+    push( @args, "--transpose=$n" );
+
+
+
+    my $i = 0;
+    for ( @tasks ) {
+	if ( $d->{"cb_customtask_$i"}->IsChecked ) {
+	    push( @args, "--config", $_->[1] );
+	}
+	$i++;
+    }
+    $self->preview( @args );
 }
 
 sub OnText {

@@ -2,13 +2,19 @@ use strict;
 use warnings;
 package RT::Extension::DynamicWebPath;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
+
+my $post_load_check_ran;
 
 use RT::Config;
 $RT::Config::META{DynamicWebPath} = {
     Immutable     => 1,
     Type          => 'HASH',
     PostLoadCheck => sub {
+        return if $post_load_check_ran;
+
+        $post_load_check_ran = 1;
+
         my $config = shift;
         my $paths  = $config->Get('DynamicWebPath') || {};
 

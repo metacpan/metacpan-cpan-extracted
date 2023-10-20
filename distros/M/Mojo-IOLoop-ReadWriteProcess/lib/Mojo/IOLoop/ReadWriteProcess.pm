@@ -1,6 +1,6 @@
 package Mojo::IOLoop::ReadWriteProcess;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::File 'path';
@@ -297,13 +297,16 @@ sub _fork {
       $stdin = $input_pipe->reader() if $input_pipe;
       open STDERR, ">&", $stderr
         or !!$internal_err->write($!)
-        or $self->_diag($!);
+        or $self->_diag($!)
+        if $stderr;
       open STDOUT, ">&", $stdout
         or !!$internal_err->write($!)
-        or $self->_diag($!);
+        or $self->_diag($!)
+        if $stdout;
       open STDIN, ">&", $stdin
         or !!$internal_err->write($!)
-        or $self->_diag($!);
+        or $self->_diag($!)
+        if $stdin;
 
       $self->read_stream($stdin);
       $self->error_stream($stderr);
@@ -409,7 +412,7 @@ sub write_pidfile {
   return unless $self->pid;
   return unless $self->pidfile;
 
-  path($self->pidfile)->spurt($self->pid);
+  path($self->pidfile)->spew($self->pid);
   return $self;
 }
 

@@ -1,27 +1,28 @@
 package Bitcoin::Crypto::Role::Compressed;
-$Bitcoin::Crypto::Role::Compressed::VERSION = '1.008';
+$Bitcoin::Crypto::Role::Compressed::VERSION = '2.001';
 use v5.10;
 use strict;
 use warnings;
-use Types::Standard qw(Bool);
+use Mooish::AttributeBuilder -standard;
+use Type::Params -sigs;
 
-use Bitcoin::Crypto::Config;
+use Bitcoin::Crypto::Types qw(Object Bool);
 use Moo::Role;
 
-has "compressed" => (
-	is => "rw",
-	isa => Bool,
-	coerce => 1,
-	default => Bitcoin::Crypto::Config::compress_public_point,
-	writer => "_set_compressed"
+has param 'compressed' => (
+	coerce => Bool,
+	default => !!1,
+	writer => -hidden,
+);
+
+signature_for set_compressed => (
+	method => Object,
+	positional => [Bool, {default => !!1}],
 );
 
 sub set_compressed
 {
 	my ($self, $state) = @_;
-
-	$state = 1
-		if @_ == 1;
 
 	$self->_set_compressed($state);
 	return $self;

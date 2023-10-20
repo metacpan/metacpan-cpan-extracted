@@ -4,7 +4,7 @@
       "Jacques Deguest <jack@deguest.jp>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -59,7 +59,6 @@
             "JSON::XS" : "4.03",
             "List::Util" : "1.56",
             "Module::Metadata" : "1.000037",
-            "Nice::Try" : "v1.3.4",
             "POSIX" : "1.53_01",
             "Regexp::Common" : "2017060201",
             "Scalar::Util" : "1.50",
@@ -107,6 +106,6 @@
          "web" : "https://gitlab.com/jackdeguest/Module-Generic"
       }
    },
-   "version" : "v0.31.1",
+   "version" : "v0.32.5",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

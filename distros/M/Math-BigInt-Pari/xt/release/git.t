@@ -6,6 +6,7 @@ use warnings;
 use IO::Pipe;
 use IO::File;
 use IO::Dir;
+
 use File::Which    qw< which >;
 use Sort::Versions qw< versioncmp >;
 
@@ -129,7 +130,18 @@ for (my $i = 0 ; $i <= $#files ; $i++) {
       or die "$filename: can't open file for reading: $!\n";
 
     while (defined(my $line = <$fh>)) {
-        push @vers, $1 if $line =~ /^(\S+)/;
+        if ($line =~ /^(\S+)/) {
+            my $verstr = $1;
+            if ($verstr =~ / ^ v? ( \d+ ( \. \d+ ( _ \d+ )* )? ) $ /ix) {
+                my $vernum = $1;
+                $vernum =~ tr/_//d;
+                push @vers, [ $verstr, $vernum ];
+                last;                   # only get the first one
+            } else {
+                printf STDERR "  Ignoring version number '%s' in %s line %u\n",
+                  $verstr, $filename, $.;
+            }
+        }
     }
 
     $fh -> close()
@@ -138,22 +150,18 @@ for (my $i = 0 ; $i <= $#files ; $i++) {
 
 # Sort the versions.
 
-@vers = sort { versioncmp($a, $b) } @vers;
+#@vers = sort { versioncmp($a, $b) } @vers;
 
 unless (@vers) {
     print "not ";
     $failno++;
 }
 print "ok ", ++$testno, " - found version number(s) in changelog file(s)";
-print " ('$vers[-1]')" if @vers;
+print " ('$vers[0][0]')" if @vers;
 print "\n";
 
-# Get most recent version (migth be undef).
-
-my $ver = $vers[-1];
-
 ################################################################################
-# Get the all the git tags.
+# Get the all the git tags that look like version numbers.
 ################################################################################
 
 my @tags;
@@ -162,28 +170,28 @@ my @tags;
     my @args = ('git', 'tag', '-l');
     $pipe -> reader(@args);
     while (defined(my $tag = <$pipe>)) {
-        next unless $tag =~ /^v?\d/;
         $tag =~ s/\s+\z//;
-        push @tags, $tag;
+        if ($tag =~ / ^ v? ( \d+ ( \. \d+ ( _ \d+ )* )? ) /ix) {
+            my $vernum = $1;
+            $vernum =~ tr/_//d;
+            push @tags, [ $tag, $vernum ];
+        }
     }
     $pipe -> close() or die "can't close pipe after reading: $!";
 }
 
 # Sort the tags.
 
-@tags = sort { versioncmp($a, $b) } @tags;
+#@tags = sort { versioncmp($b, $b) } @tags;
+@tags = sort { $b -> [1] <=> $a -> [1] } @tags;
 
 unless (@tags) {
     print "not ";
     $failno++;
 }
 print "ok ", ++$testno, " - found git tag(s)";
-print " ('$tags[-1]')" if @tags;
+print " ('", $tags[0][0], "')" if @tags;
 print "\n";
-
-# Get newest tag (might be undef).
-
-my $tag = $tags[-1];
 
 ################################################################################
 # Compare version number with git tag.
@@ -191,15 +199,15 @@ my $tag = $tags[-1];
 
 ++$testno;
 if (@vers and @tags) {
-    my $ok = versioncmp($ver, $tag) == 0;
+    my $ok = $vers[0][0] eq $tags[0][0];
     unless ($ok) {
         print "not ";
         $failno++;
     }
     print "ok ", $testno, " - changelog version matches git tag\n";
     print STDERR <<"EOF" unless $ok;
-#   latest version in changelog(s): $ver
-#                   latest git tag: $tag
+#   latest version in changelog(s): $vers[0][0]
+#                   latest git tag: $tags[0][0]
 EOF
 } else {
     print "ok ", $testno, " - skipped (missing version number or git tag)\n";
@@ -217,7 +225,7 @@ my $commit_tagged;
 ++$testno;
 if (@tags) {
     my $pipe = IO::Pipe -> new();
-    my @args = ('git', 'rev-parse', $tag);
+    my @args = ('git', 'rev-parse', $tags[0][0]);
     $pipe -> reader(@args);
     $commit_tagged = <$pipe>;
     chomp $commit_tagged if defined $commit_tagged;
@@ -226,7 +234,7 @@ if (@tags) {
         print "not ";
         $failno++;
     }
-    print "ok ", $testno, " - tag ('$tag') refers to a commit";
+    print "ok ", $testno, " - tag ('$tags[0][0]') refers to a commit";
     print " ('$commit_tagged')" if $commit_tagged;
     print "\n";
 } else {

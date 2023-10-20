@@ -3,7 +3,7 @@
 Thank you for considering contributing to this distribution.
 I welcome any contribution to CSS::Object, including, but not limited to bug reports, feature requests, general comments, and patches.
 
-Feel free to clone it from its gitlab repository at <https://git.deguest.jp/jack/CSS-Object> and issue a pull request.
+Feel free to clone it from its gitlab repository at <https://gitlab.com/jackdeguest/CSS-Object> and issue a pull request.
 
 I am very flexible to collaboration and always eager to learn from others.
 
@@ -11,7 +11,7 @@ All contributions are assumed to be provided under the terms of [perl5 license](
 
 ### Issues
 
-File [an issue on CPAN bug tracker](https://git.deguest.jp/jack/CSS-Object/issues) if you think you've found a bug. Please describe
+File [an issue on bug tracker](https://gitlab.com/jackdeguest/CSS-Object/issues) if you think you've found a bug. Please describe
 
 1. How can it be reproduced
 
@@ -39,11 +39,11 @@ You can reach me via e-mail <jdeguest@cpan.org>, or via [Telegram](https://t.me/
 
 ## Issue Tracking
 
-Issues are currently reported using CPAN [bug tracker](https://git.deguest.jp/jack/CSS-Object/issues)
+Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackdeguest/CSS-Object/issues)
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/CSS-Object-v0.1.4/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/CSS-Object-v0.1.5/README.md)
 
 ## Author
 

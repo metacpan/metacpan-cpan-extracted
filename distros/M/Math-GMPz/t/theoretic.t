@@ -15,7 +15,8 @@ my
 my $y = Rmpz_init_set_str($n1, 2);
 my $x = Rmpz_init_set_str( $n2, 2);
 my $z = Rmpz_init();
-my $q = Rmpz_init_set_str('113858109386036422141170669965214409511474201389', 10);
+my $zprev = Rmpz_init();
+my $q = Rmpz_init_set_str('113858109386036422141170669965214409511474201389', 10); # Not a prime
 my $r = Rmpz_init2(45);
 my $ret;
 my $ul = 1009;
@@ -26,10 +27,28 @@ else {print "not ok 1\n"}
 
 #$q => 113858109386036422141170669965214409511474201389
 
+my $ok = '';
 Rmpz_nextprime($z, $q);
 if(Rmpz_get_str($z, 10) eq '113858109386036422141170669965214409511474201407')
-     {print "ok 2\n"}
-else {print "not ok 2\n"}
+     {$ok .= 'a'}
+
+if(60300 <= Math::GMPz::__GNU_MP_RELEASE()) {
+     Rmpz_prevprime($zprev, $z);
+     $ok .= 'b' if $zprev == '113858109386036422141170669965214409511474201237';
+     $ok .= 'c' if Rmpz_probab_prime_p($zprev, 10);
+}
+else {
+     warn "Rmpz_prevprime() not available\n";
+     $ok .= 'bc';
+}
+
+if($ok eq 'abc') { print "ok 2\n" }
+else {
+     warn "2: Got '$ok'\n";
+     print "not ok 2\n";
+}
+
+$ok = '';
 
 Rmpz_set($q, $z);
 Rmpz_add_ui($q, $q, 2);
@@ -112,8 +131,7 @@ else {print "not ok 15\n"}
 Rmpz_set_str($z, '30414093201713378043612608166064768844377641568960512000000000000', 10);
 Rmpz_set_ui($q, 10);
 
-my
- $ok = Rmpz_remove($z, $z, $q);
+$ok = Rmpz_remove($z, $z, $q);
 if($ok == 12
    &&
    Rmpz_get_str($z, 10) eq '30414093201713378043612608166064768844377641568960512')

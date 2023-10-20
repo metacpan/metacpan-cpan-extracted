@@ -1,6 +1,6 @@
 use inc::Module::Install;
 
-RTx('RT-Extension-PreviewInSearch');
+RTx('RT-Extension-PreviewInSearch', { remove_files => 1 });
 
 requires_rt '4.0.0';
 

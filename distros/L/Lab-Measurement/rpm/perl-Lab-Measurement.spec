@@ -8,8 +8,6 @@ BuildArch: noarch
 URL: https://www.labmeasurement.de/
 Source: <% $archive %>
 BuildRoot: %{_tmppath}/%{name}-%{version}-BUILD
-## this isn't a 'package' so auto-provides doesn't work on it
-Provides: perl(Lab::XPRESS::Utilities::Utilities)
 
 
 %global __requires_exclude ^perl\\((Lab::Zhinst|USB::TMC|LinuxGpib|Lab::VISA|Lab::VXI11))

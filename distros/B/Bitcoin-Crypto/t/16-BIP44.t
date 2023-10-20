@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use Bitcoin::Crypto::Network;
 use Bitcoin::Crypto qw(btc_extprv);
-use Bitcoin::Crypto::Util qw(get_path_info);
+use Bitcoin::Crypto::Util qw(generate_mnemonic get_path_info to_format);
 
 BEGIN { use_ok('Bitcoin::Crypto::BIP44') }
 
@@ -31,8 +31,7 @@ subtest 'coin_type is a network' => sub {
 };
 
 subtest 'coin_type does network role' => sub {
-	my $mnemonic = btc_extprv->generate_mnemonic;
-	my $key = btc_extprv->from_mnemonic($mnemonic);
+	my $key = btc_extprv->from_mnemonic(generate_mnemonic);
 	$key->set_network('bitcoin_testnet');
 
 	my $bip44 = Bitcoin::Crypto::BIP44->new(
@@ -63,6 +62,16 @@ subtest 'get_path_info understands bip44' => sub {
 			100000,
 		],
 	};
+};
+
+subtest 'public derivation derives from account' => sub {
+	my $bip44 = Bitcoin::Crypto::BIP44->new(
+		change => 1,
+		index => 3,
+		public => 1,
+	);
+
+	is "$bip44", "M/1/3";
 };
 
 subtest 'bip44 can be used directly in key derivation' => sub {
@@ -116,7 +125,7 @@ subtest 'can derive account key' => sub {
 	);
 
 	my $derived = $key->derive_key_bip44(account => 3, get_account => 1);
-	is $derived->to_serialized_base58,
+	is to_format [base58 => $derived->to_serialized],
 		'xprv9yuRwketYqkKMDaaiJ9TmygWzquPJV8Bfw7cENzYtbgcnhg8ZFgjxDS9bQaXT5RcNfWf5QiwGD4573SvWnQpKvw8ZqCehftBSmHNkaM83cf';
 };
 
@@ -129,6 +138,33 @@ subtest 'can derive from account key' => sub {
 	my $derived2 = $derived1->derive_key_bip44(index => 4, get_from_account => 1);
 
 	is $derived2->get_basic_key->to_wif, 'L5CXRMnEVSZ7j23VJ22mib3e4UWnb7utEpkDQtfTPn8DL9EEtTQZ';
+};
+
+subtest 'deriving from account yields the same result' => sub {
+	my $key = btc_extprv->from_mnemonic(
+		'spawn impact body ask nothing warm farm novel host later basic subject point resist pilot'
+	);
+
+	my $derived1 = $key->derive_key_bip44(purpose => 84, account => 3, get_account => 1);
+	my $derived2 = $derived1->derive_key_bip44(index => 4, get_from_account => 1);
+
+	my $full_derived = $key->derive_key_bip44(purpose => 84, account => 3, index => 4);
+
+	is $derived2->get_basic_key->to_wif, $full_derived->get_basic_key->to_wif;
+};
+
+subtest 'can derive public key' => sub {
+	my $key = btc_extprv->from_mnemonic(
+		'spawn impact body ask nothing warm farm novel host later basic subject point resist pilot'
+	);
+
+	my $derived1 = $key->derive_key_bip44(purpose => 84, account => 3, get_account => 1);
+	my $public = $derived1->get_public_key;
+
+	my $derived2 = $public->derive_key_bip44(index => 4, public => 1);
+
+	is to_format [base58 => $derived2->to_serialized],
+		'zpub6vVTjHj2VYz8CjXyzC2NT94i1enJcx678vjo4MYBY76eYfye4NbT32eaxMhPrqvvt9v6sjGJwNrnUx1hdrBw9ymJeSxe9uqXzxtAHcx39iS';
 };
 
 done_testing;

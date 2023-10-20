@@ -35,7 +35,9 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
- 
+use AsposeCellsCloud::Object::AbstractCalculationEngine;
+use AsposeCellsCloud::Object::AbstractCalculationMonitor;
+use AsposeCellsCloud::Object::Workbook; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -128,28 +130,49 @@ __PACKAGE__->method_documentation({
      'calc_stack_size' => {
      	datatype => 'int',
      	base_name => 'CalcStackSize',
-     	description => '',
+     	description => 'Specifies the stack size for calculating cells recursively. ',
      	format => '',
      	read_only => '',
      		},
      'ignore_error' => {
      	datatype => 'boolean',
      	base_name => 'IgnoreError',
-     	description => '',
+     	description => 'Indicates whether errors encountered while calculating formulas should be ignored.            The error may be unsupported function, external links, etc.            The default value is true. ',
      	format => '',
      	read_only => '',
      		},
      'precision_strategy' => {
      	datatype => 'string',
      	base_name => 'PrecisionStrategy',
-     	description => '',
+     	description => 'Specifies the strategy for processing precision of calculation. ',
      	format => '',
      	read_only => '',
      		},
      'recursive' => {
      	datatype => 'boolean',
      	base_name => 'Recursive',
-     	description => '',
+     	description => 'Indicates whether calculate the dependent cells recursively when calculating one cell and it depends on other cells.            The default value is true. ',
+     	format => '',
+     	read_only => '',
+     		},
+     'custom_engine' => {
+     	datatype => 'AbstractCalculationEngine',
+     	base_name => 'CustomEngine',
+     	description => 'The custom formula calculation engine to extend the default calculation engine of Aspose.Cells. ',
+     	format => '',
+     	read_only => '',
+     		},
+     'calculation_monitor' => {
+     	datatype => 'AbstractCalculationMonitor',
+     	base_name => 'CalculationMonitor',
+     	description => 'The monitor for user to track the progress of formula calculation. ',
+     	format => '',
+     	read_only => '',
+     		},
+     'linked_data_sources' => {
+     	datatype => 'ARRAY[Workbook]',
+     	base_name => 'LinkedDataSources',
+     	description => 'Specifies the data sources for external links used in formulas. ',
      	format => '',
      	read_only => '',
      		},    
@@ -159,14 +182,20 @@ __PACKAGE__->swagger_types( {
     'calc_stack_size' => 'int',
     'ignore_error' => 'boolean',
     'precision_strategy' => 'string',
-    'recursive' => 'boolean' 
+    'recursive' => 'boolean',
+    'custom_engine' => 'AbstractCalculationEngine',
+    'calculation_monitor' => 'AbstractCalculationMonitor',
+    'linked_data_sources' => 'ARRAY[Workbook]' 
 } );
 
 __PACKAGE__->attribute_map( {
     'calc_stack_size' => 'CalcStackSize',
     'ignore_error' => 'IgnoreError',
     'precision_strategy' => 'PrecisionStrategy',
-    'recursive' => 'Recursive' 
+    'recursive' => 'Recursive',
+    'custom_engine' => 'CustomEngine',
+    'calculation_monitor' => 'CalculationMonitor',
+    'linked_data_sources' => 'LinkedDataSources' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

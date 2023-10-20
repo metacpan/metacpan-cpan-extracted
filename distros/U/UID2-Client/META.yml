@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.22, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,11 +27,13 @@ no_index:
 provides:
   UID2::Client:
     file: lib/UID2/Client.pm
-    version: '0.01'
-  UID2::Client::Decryption:
-    file: lib/UID2/Client/Decryption.pm
+    version: '0.02'
+  UID2::Client::AdvertisingTokenVersion:
+    file: lib/UID2/Client/AdvertisingTokenVersion.pm
   UID2::Client::DecryptionStatus:
     file: lib/UID2/Client/DecryptionStatus.pm
+  UID2::Client::Encryption:
+    file: lib/UID2/Client/Encryption.pm
   UID2::Client::EncryptionStatus:
     file: lib/UID2/Client/EncryptionStatus.pm
   UID2::Client::IdentityScope:
@@ -59,7 +61,9 @@ resources:
   bugtracker: https://github.com/spiritloose/uid2-client-perl/issues
   homepage: https://github.com/spiritloose/uid2-client-perl
   repository: https://github.com/spiritloose/uid2-client-perl.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:JIRO
+x_contributors:
+  - 'Jiro Nishiguchi <spiritloose@users.noreply.github.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -2,6 +2,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "ppport.h"
 
 static int int_set(pTHX_ SV* sv, MAGIC* magic) {
 	if (!SvIOK(sv))

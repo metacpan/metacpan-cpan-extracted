@@ -5,9 +5,9 @@
 
 use v5.26;
 use warnings;
-use Object::Pad 0.70 ':experimental(adjust_params)';
+use Object::Pad 0.800 ':experimental(adjust_params)';
 
-package Text::Treesitter 0.10;
+package Text::Treesitter 0.11;
 class Text::Treesitter
    :strict(params);
 
@@ -278,6 +278,23 @@ Takes the following named options:
 
 The start and end position within the string, in byte counts.
 
+=item start_row
+
+=item start_column
+
+I<Since version 0.11.>
+
+Optionally, the logical position within the original source that corresponds
+to the start byte. These values don't affect parsing as such, but will be
+reflected in the position offsets of the nodes in the returned tree.
+
+=item node
+
+I<Since version 0.11.>
+
+Alternative to specifying the four values given above, where they are all
+taken from the given L<Text::Treesitter::Node> instance directly.
+
 =back
 
 =cut
@@ -288,8 +305,19 @@ method parse_string_range ( $str, %options )
 
    $_parser->reset;
    if( defined $options{start_byte} ) {
-      $_parser->set_included_ranges( [ $options{start_byte}, $options{end_byte} ] ) or
+      $_parser->set_included_ranges( { %options{qw( start_byte end_byte start_row start_column )} } ) or
          croak "Invalid string range";
+   }
+   elsif( defined( my $node = $options{node} ) ) {
+      my ( $row, $col ) = $node->start_point;
+      $_parser->set_included_ranges(
+         {
+            start_byte   => $node->start_byte,
+            end_byte     => $node->end_byte,
+            start_row    => $row,
+            start_column => $col,
+         }
+      ) or croak "Invalid string range";
    }
    else {
       $_parser->set_included_ranges();

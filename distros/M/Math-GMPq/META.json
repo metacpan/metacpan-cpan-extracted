@@ -45,6 +45,6 @@
          "web" : "https://github.com/sisyphus/math-gmpq"
       }
    },
-   "version" : "0.55",
+   "version" : "0.56",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

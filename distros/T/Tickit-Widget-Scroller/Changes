@@ -1,5 +1,14 @@
 Revision history for Tickit-Widget-Scroller
 
+0.32    2023-10-02
+        [CHANGES]
+         * Allow items to be specified by index, reverse index, or direct
+           object reference
+         * Cache pens used in RichText items for reuse; saves a lot of memory
+           in big long-running programs
+         * Updated to Object::Pad v0.800
+         * Respect non-breaking spaces when word-wrapping
+
 0.31    2023-08-30
         [CHANGES]
          * Added `->items` accessor for querying the number of stored items

@@ -40,40 +40,7 @@ value(self, obj)
     if(!SvROK(obj) || !SvOBJECT(objrv = SvRV(obj)))
       croak("Cannot fetch field value of a non-instance");
 
-    AV *backingav;
-    FIELDOFFSET fieldix;
-
-    if(classmeta->type == METATYPE_ROLE) {
-      HV *objstash = SvSTASH(objrv);
-      const char *key = HvNAME(objstash);
-      STRLEN klen = HvNAMELEN(objstash);
-      if(HvNAMEUTF8(objstash))
-        klen = -klen;
-
-      assert(key);
-      SV **svp = hv_fetch(classmeta->role.applied_classes, key, klen, 0);
-      if(!svp)
-        croak("Cannot fetch role field value from a non-applied instance");
-
-      RoleEmbedding *embedding = (RoleEmbedding *)*svp;
-
-      backingav = (AV *)get_obj_backingav(obj, embedding->classmeta->repr, true);
-      fieldix = meta->fieldix + embedding->offset;
-    }
-    else {
-      const char *stashname = HvNAME(classmeta->stash);
-
-      if(!stashname || !sv_derived_from(obj, stashname))
-        croak("Cannot fetch field value from a non-derived instance");
-
-      backingav = (AV *)get_obj_backingav(obj, classmeta->repr, true);
-      fieldix = meta->fieldix;
-    }
-
-    if(fieldix > av_top_index(backingav))
-      croak("ARGH: instance does not have a field at index %ld", (long int)fieldix);
-
-    SV *value = AvARRAY(backingav)[fieldix];
+    SV *value = get_obj_fieldsv(obj, classmeta, meta);
 
     /* We must prevent caller from assigning to non-scalar fields, in case
      * they break the SvTYPE of the value. We can't cancel the CvLVALUE but we

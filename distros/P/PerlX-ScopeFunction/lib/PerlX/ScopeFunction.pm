@@ -1,13 +1,17 @@
 package PerlX::ScopeFunction;
 use v5.36;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
-use Const::Fast ();
+use Package::Stash;
+use Const::Fast qw( const );
 use Keyword::Simple;
 use PPR;
 
 our %STASH = ();
+
+const our $also => \&__also;
+const our $tap => \&__also;
 
 sub __parse_imports (@args) {
     my %import_as;
@@ -36,30 +40,69 @@ sub __parse_imports (@args) {
 }
 
 sub import ($class, @args) {
+    my $caller = (caller)[0];
     my %handler = (
-        'let' => \&__rewrite_let,
-        'with' => \&__rewrite_with,
+        'let' =>[
+            sub { __define_keyword( \&__rewrite_let, $_[0] ) },
+            sub { __undefine_keyword( $_[0] ) },
+        ],
+        'with' =>[
+            sub { __define_keyword( \&__rewrite_with, $_[0] ) },
+            sub { __undefine_keyword( $_[0] ) },
+        ],
+        '$also' => [
+            sub { __import_scalar_symbol(\\&__also, $_[0], $_[1]) },
+            sub { __unimport_scalar_symbol($_[0], $_[1]) },
+        ],
+        '$tap' => [
+            sub { __import_scalar_symbol(\\&__also, $_[0], $_[1]) },
+            sub { __unimport_scalar_symbol($_[0], $_[1]) },
+        ],
     );
 
     my %import_as = do {
         if (@args > 0) {
             %{ __parse_imports(@args) };
         } else {
-            map { $_ => $_ } keys %handler;
+            map { $_ => $_ } keys %handler
         }
     };
 
     for (keys %import_as) {
-        my $keyword = $import_as{$_};
-        Keyword::Simple::define $keyword, $handler{$_};
-        push @{ $STASH{$class} }, $keyword;
+        my ($importer, $unimporter) = @{$handler{$_}};
+        my $as = $import_as{$_};
+        $importer->($as, $caller);
+        push @{ $STASH{$caller} }, sub { $unimporter->($as, $caller) };
     }
 }
 
 sub unimport ($class) {
-    for my $keyword (@{ $STASH{$class} //[]}) {
-        Keyword::Simple::undefine $keyword;
+    my $caller = (caller)[0];
+    for my $unimporter (@{ $STASH{$caller} // []}) {
+        $unimporter->();
     }
+}
+
+sub __also {
+    my ($self, $code) = @_;
+    $self->$code();
+    return $self;
+}
+
+sub __import_scalar_symbol ($code, $symbol, $pkg) {
+    Package::Stash->new($pkg)->add_symbol($symbol, $code);
+}
+
+sub __unimport_scalar_symbol ($symbol, $pkg) {
+    Package::Stash->new($pkg)->remove_symbol($symbol);
+}
+
+sub __define_keyword ($code, $keyword) {
+    Keyword::Simple::define $keyword, $code;
+}
+
+sub __undefine_keyword ($keyword) {
+    Keyword::Simple::undefine $keyword;
 }
 
 my $GRAMMAR = qr{
@@ -193,9 +236,9 @@ PerlX::ScopeFunction - new keywords for creating scopes.
 Scope functions can be used to create small lexical scope, inside
 which the results of an given expression are used, but not outside.
 
-This module provide 2 extra keywords -- C<with> and C<let> -- for
-creating creating scopes that look a little bit better than just a
-bare code BLOCK.
+This module provide extra keywords / methods / symbols for creating
+scopes that help grouping related statements together, or generally
+help on making the code look more fluent.
 
 By C<use>-ing this module without a import list, all keywords are imported.
 To import only wanted keywords, specify them in the import list:
@@ -212,6 +255,8 @@ To import only wanted keywords, specify them in the import list:
 Imported keywords can be removed by a C<no> statement.
 
     no PerlX::ScopeFunction;
+
+=head1 Importable keywords / methods / symbols.
 
 =head2 C<with>
 
@@ -259,11 +304,12 @@ underlying library to make variables readonly is
 L<Const::Fast>. Variables created in the beginning of this list of can
 be used in the latter positions.
 
-If in the current scope, thee are variables with identical names as
-the ones in the DECLARATED, they are masked in the let-block.
+If in the current scope, there are variables with identical names as
+the ones in the DECLARATIONS, they are masked in the let-block.
 
-For example, these would creating 3 new variables in the let-block
-that mask the ones with identical names in the current scope.
+For example, in the following example code, 3 new variables are
+created in the let-block and they the ones with identical names
+outside of the let-block.
 
     my ($foo, $bar, $baz) = (10, 20, 30);
     let ($foo = 1; $bar = 2; $baz = $foo + $bar) {
@@ -277,6 +323,68 @@ Array and Hash can also be created:
         ...
     }
 
+=head2 C<$tap>, and C<$also>
+
+C<$tap> is a scalar with CodeRef inside that can be inserted of into a
+chain of method calls, do some side actions, then resume.
+
+C<$also> is an alternative name of C<$tap>. They are completely
+identical. Import and use which ever that is more comprehensible to
+you.
+
+Syntax-wise C<$tap> is supposed to used like these:
+
+    EXPR -> $tap(sub BLOCK)
+    EXPR -> $tap(sub BLOCK) -> EXPR
+
+For example, the following code would produce a warning message before
+calling C<send()> method on object C<$o>:
+
+    my $o = Example::Mail->new( body => $args{body}, to => $args{to} )
+        ->$tap(sub { warn "Mail sening to: " . $_->to ) })
+        ->send();
+
+In side the tap code block, C<$_> (and C<$_[0]>) refers to the object
+from the EXPR beforehand. The return value of tap code block is thrown
+away, and the C<$tap> itself always evaulates to the same object C<$_>
+it is called on. This makes it easier to do some side-effects in the
+middle of a call chain, but without having to rewrite the call chain
+as 2 separate statements. It can also be useful to work around methods
+with "inconvenient" return values, or to group a sequence of
+object-setup statements together, in a tighter scope:
+
+For example, here we construct an C<Example::Mail>, fill it a
+recipient and body, but we want to check some external factors before
+actully send it:
+
+    my $o = Example::Mail->new()
+        ->$tap(sub {
+            $_->set_body( $args{body} );
+            $_->set_to( $args{to} );
+
+            $_->ping_mail_server() or die "No internet";
+            $_->check_recipient_mood() or die "Bad timing";
+        })
+        ->send();
+
+The C<$tap> can be think as a method that can be invoked on any
+objects. But it would not work on plain scalar values, or anything you
+couldn't call methods on.
+
+Since it is just a scalar variable, it can also be copied to a lexical
+variable, under whatever more sensible names:
+
+    sub run ($self) {
+        my $byTheWay = $PerlX::ScopeFunction::tap;
+
+        $self->$byTheWay(sub { warn "Star running" })
+            ->do_run();
+    }
+
+See also the C<tap> method from L<Mojo::Base>. Or the scope function
+C<also> in Kotlin programming language: L<Kotlin Scope
+Function|https://kotlinlang.org/docs/scope-functions.html>
+
 =head1 Importing as different names
 
 Since the keywords provided in this module are commonly defined in
@@ -288,9 +396,9 @@ For example, to import C<with> as C<given_these>, you say:
 
     use PerlX::ScopeFunction "with" => { -as => "given_these" };
 
-Basically HashRef in import list becomes modifiers of the previous
-entry. However, This module supports only the modifier C<-as> but not
-other ones as seen in L<Sub::Exporter>.
+Basically HashRef in import list becomes modifiers of their previous
+entries. However, This module supports only the modifier C<-as> but
+not other ones as seen in L<Sub::Exporter>.
 
 =head1 CAVEATS
 

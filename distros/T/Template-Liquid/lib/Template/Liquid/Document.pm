@@ -1,5 +1,5 @@
 package Template::Liquid::Document;
-our $VERSION = '1.0.22';
+our $VERSION = '1.0.23';
 use strict;
 use warnings;
 use Template::Liquid::Variable;

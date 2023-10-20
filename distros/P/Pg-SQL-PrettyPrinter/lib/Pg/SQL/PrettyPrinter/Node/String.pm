@@ -42,13 +42,18 @@ local $SIG{ __WARN__ } = sub {
 
 use parent qw( Pg::SQL::PrettyPrinter::Node );
 
+sub string {
+    my $self = shift;
+    return $self->{ 'str' } // $self->{ 'sval' } // '';
+}
+
 sub as_text {
     my $self = shift;
-    return $self->quote_literal( $self->{ 'str' } // '' );
+    return $self->quote_literal( $self->string );
 }
 
 sub as_ident {
     my $self = shift;
-    return $self->quote_ident( $self->{ 'str' } // '' );
+    return $self->quote_ident( $self->string );
 }
 1;

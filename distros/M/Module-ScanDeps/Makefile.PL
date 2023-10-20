@@ -24,6 +24,7 @@ WriteMakefile1(
     TEST_REQUIRES   => {
       'Test::More'       => 0,
       'Test::Requires'   => 0,
+      'IPC::Run3'        => '0.048',
     },
 
     EXE_FILES       => [ 'script/scandeps.pl' ],

@@ -3,7 +3,7 @@ package Net::Async::Slack::Socket;
 use strict;
 use warnings;
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(IO::Async::Notifier);
@@ -120,6 +120,7 @@ use Net::Async::Slack::Event::ResourcesRemoved;
 use Net::Async::Slack::Event::ScopeDenied;
 use Net::Async::Slack::Event::ScopeGranted;
 use Net::Async::Slack::Event::Shortcut;
+use Net::Async::Slack::Event::SlashCommands;
 use Net::Async::Slack::Event::StarAdded;
 use Net::Async::Slack::Event::StarRemoved;
 use Net::Async::Slack::Event::SubteamCreated;
@@ -144,6 +145,7 @@ use Net::Async::Slack::Event::UserResourceGranted;
 use Net::Async::Slack::Event::UserResourceRemoved;
 use Net::Async::Slack::Event::UserTyping;
 use Net::Async::Slack::Event::ViewSubmission;
+use Net::Async::Slack::Event::WorkflowStepEdit;
 
 use List::Util qw(min);
 use Log::Any qw($log);
@@ -370,37 +372,82 @@ sub on_frame {
             $log->debugf('Received disconnection notification, reason: %s (debug info: %s)', $data->{reason}, $data->{debug_info});
             $self->trigger_reconnect_if_needed;
         }
-        if(my $env_id = $data->{envelope_id}) {
-            my $data = encode_json_utf8({
-                envelope_id => $env_id
-            });
-            $log->tracef(">> %s", $data);
-            $self->ws->send_frame(
-                buffer => $data,
-                masked => 1
-            )->retain;
+
+        my $pending;
+
+        my $env_id = $data->{envelope_id};
+        if($env_id) {
+            if($data->{accepts_response_payload}) {
+
+                # If the caller marks our future as done, send the result over as a payload
+                $pending = $self->loop->new_future->on_done($self->$curry::weak(sub {
+                    my ($self, $payload) = @_;
+                    $self->send_response($env_id, $payload)->retain;
+                    return;
+                }));
+                # ... but auto-acknowledge before the deadline if they don't, for back-compatibility
+                my $f = $self->loop->delay_future(
+                    after => 1.5
+                )->on_done($self->$curry::weak(sub {
+                    my ($self) = @_;
+                    $self->send_response($env_id)->retain;
+                    return;
+                }));
+                # Make sure only one of the actions completes
+                Future->wait_any($pending, $f)->retain;
+            } else {
+                $self->send_response($env_id)->retain;
+            }
         }
+
         if(my $type = $data->{payload}{type}) {
             if($type eq 'event_callback') {
                 my $ev = Net::Async::Slack::EventType->from_json(
                     $data->{payload}{event}
                 );
+                $ev->{envelope_id} = $env_id;
+                $ev->{response_future} = $pending if $pending;
                 $log->tracef("Have event [%s], emitting", $ev->type);
                 $self->events->emit($ev);
             } else {
                 if(my $ev = Net::Async::Slack::EventType->from_json(
                     $data->{payload}
                 )) {
+                    $ev->{envelope_id} = $env_id;
+                    $ev->{response_future} = $pending if $pending;
                     $log->tracef("Have event [%s], emitting", $ev->type);
                     $self->events->emit($ev);
                 } else {
                     $log->errorf('Failed to locate event type from payload %s', $data->{payload});
                 }
             }
+        } elsif($type = $data->{type}) {
+            $log->tracef("Have generic/unknown event [%s], emitting", $data);
+            if(my $ev = Net::Async::Slack::EventType->from_json(
+                $data
+            )) {
+                $self->events->emit($ev);
+            } else {
+                $log->errorf('Unable to find event type from %s', $data);
+            }
         }
     } catch ($e) {
         $log->errorf("Exception in websocket raw frame handling: %s (original text %s)", $e, $text);
     }
+}
+
+sub send_response {
+    my ($self, $env_id, $payload) = @_;
+    die 'need env_id' unless $env_id;
+    my $data = encode_json_utf8({
+        envelope_id => $env_id,
+        ($payload ? (payload => $payload) : ()),
+    });
+    $log->tracef(">> %s", $data);
+    return $self->ws->send_frame(
+        buffer => $data,
+        masked => 1
+    );
 }
 
 sub next_id {
@@ -508,5 +555,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2016-2022. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2016-2023. Licensed under the same terms as Perl itself.
 

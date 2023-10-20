@@ -1,2 +1,0 @@
-PGObject-Type-JSON
-==================

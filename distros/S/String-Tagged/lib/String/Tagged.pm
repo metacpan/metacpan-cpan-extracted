@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2008-2023 -- leonerd@leonerd.org.uk
 
-package String::Tagged 0.20;
+package String::Tagged 0.22;
 
 use v5.14;
 use warnings;
@@ -12,8 +12,12 @@ use Scalar::Util qw( blessed );
 
 require String::Tagged::Extent;
 
-use constant FLAG_ANCHOR_BEFORE => 0x01;
-use constant FLAG_ANCHOR_AFTER  => 0x02;
+use constant {
+   FLAG_ANCHOR_BEFORE => 0x01,
+   FLAG_ANCHOR_AFTER  => 0x02,
+   FLAG_ITERATING     => 0x04,
+   FLAG_DELETED       => 0x08,
+};
 
 use constant DEBUG => 0;
 
@@ -219,6 +223,24 @@ applied with its existing value.
 If C<only_tags> is being used too, then the source names of any tags to be
 converted must also be listed there, or they will not be copied.
 
+=item start => INT
+
+I<Since version 0.22.>
+
+Start at the given position; defaults to 0.
+
+=item end => INT
+
+I<Since version 0.22.>
+
+End after the given position; defaults to end of string. This option overrides
+C<len>.
+
+=item len => INT
+
+End after the given length beyond the start position; defaults to end of
+string. This option only applies if C<end> is not given.
+
 =back
 
 =head2 clone (instance)
@@ -247,13 +269,28 @@ sub clone
 
    my $convert = $opts{convert_tags};
 
-   my $new = $class->new( $orig->str );
+   my $origstr = $orig->str;
 
-   $orig->iter_extents( sub {
-      my ( $e, $tn, $tv ) = @_;
+   my $start = $opts{start} // 0;
+   my $end   = $opts{end}   //
+               ( defined $opts{len} ? $start + $opts{len}
+                                    : length $origstr );
 
-      return if $only and not $only->{$tn};
-      return if $except and $except->{$tn};
+   my $len = $end - $start;
+
+   my $new = $class->new( substr $origstr, $start, $end - $start );
+
+   my $tags = $orig->{tags};
+
+   # We know we're only looking
+   foreach my $t ( @$tags ) {
+      my ( $ts, $te, $tn, $tv, $tf ) = @$t;
+
+      next if $te < $start;
+      last if $ts >= $end;
+
+      next if $only and not $only->{$tn};
+      next if $except and $except->{$tn};
 
       my @tags;
       if( $convert and my $c = $convert->{$tn} ) {
@@ -268,10 +305,18 @@ sub clone
          @tags = ( $tn, $tv );
       }
 
+      $_ -= $start for $ts, $te;
+
+      my $tl = $te - ( $ts < 0 ? 0 : $ts );
+
+      next if $te <= 0;
+      $ts = -1 if $ts < 0 or $tf & FLAG_ANCHOR_BEFORE;
+      $tl = -1 if $te > $len or $tf & FLAG_ANCHOR_AFTER;
+
       while( @tags ) {
-         $new->apply_tag( $e, shift @tags, shift @tags );
+         $new->apply_tag( $ts, $tl, shift @tags, shift @tags );
       }
-   });
+   }
 
    return $new;
 }
@@ -487,28 +532,7 @@ sub substr
    my $self = shift;
    my ( $start, $len ) = @_;
 
-   my $end = $start + $len;
-
-   my $ret = ( ref $self )->new( CORE::substr( $self->{str}, $start, $len ) );
-
-   my $tags = $self->{tags};
-
-   foreach my $t ( @$tags ) {
-      my ( $ts, $te, $tn, $tv, $tf ) = @$t;
-
-      next if $te < $start;
-      last if $ts >= $end;
-
-      $_ -= $start for $ts, $te;
-      next if $te <= 0;
-
-      $ts = -1 if $ts < 0    or $tf & FLAG_ANCHOR_BEFORE;
-      $te = -1 if $te > $end or $tf & FLAG_ANCHOR_AFTER;
-
-      $ret->apply_tag( $ts, $te == -1 ? -1 : $te - $ts, $tn => $tv );
-   }
-
-   return $ret;
+   return $self->clone( start => $start, len => $len );
 }
 
 =head2 plain_substr
@@ -721,6 +745,14 @@ sub _remove_tag
 
    my ( $name ) = @_;
 
+   if( my $t = $self->{iterating} ) {
+      my ( $ts, $te, $tn ) = @$t;
+      if( $start == $ts and $end == $te and $name eq $tn ) {
+         $t->[4] |= FLAG_DELETED;
+         return;
+      }
+   }
+
    my $tags = $self->{tags};
 
    my $have_added = 0;
@@ -735,14 +767,18 @@ sub _remove_tag
       next if $tn ne $name;
 
       if( $keepends and $end < $te ) {
-         $self->_insert_tag( $end, $te, $tn, $tv, $tf & ~FLAG_ANCHOR_BEFORE );
+         $self->_insert_tag( $end, $te, $tn, $tv, $tf & ~(FLAG_ANCHOR_BEFORE|FLAG_ITERATING) );
          $have_added = 1;
+      }
+
+      if( $tf & FLAG_ITERATING ) {
+         die "ARGH encountered FLAG_ITERATING while walking the list of tags during ->_remove_tag";
       }
 
       splice @$tags, $i, 1;
 
       if( $keepends and $ts < $start ) {
-         $self->_insert_tag( $ts, $start, $tn, $tv, $tf & ~FLAG_ANCHOR_AFTER );
+         $self->_insert_tag( $ts, $start, $tn, $tv, $tf & ~(FLAG_ANCHOR_AFTER|FLAG_ITERATING) );
          $have_added = 1;
       }
       else {
@@ -799,6 +835,39 @@ sub delete_tag
 {
    my $self = shift;
    return $self->_remove_tag( 0, @_ );
+}
+
+=head2 delete_all_tag
+
+   $st->delete_all_tag( $name )
+
+I<Since version 0.21.>
+
+Deletes every tag with the given name. This is more efficient than calling
+C<iter_extents> to list the tags then C<delete_tag> on each one individually
+in the case of a simple name match.
+
+This method returns the C<$st> object.
+
+=cut
+
+sub delete_all_tag
+{
+   my $self = shift;
+   my ( $name ) = @_;
+
+   my $tags = $self->{tags};
+
+   for( my $i = 0; $i < @$tags; $i++ ) {
+      my ( $ts, $te, $tn, $tv, $tf ) = @{ $tags->[$i] };
+
+      next if $tn ne $name;
+
+      splice @$tags, $i, 1, ();
+      $i--;
+   }
+
+   return $self;
 }
 
 =head2 merge_tags
@@ -905,6 +974,17 @@ Select all the tags except those named in the given ARRAY reference.
 
 =back
 
+I<Since version 0.21> it is safe to call C<delete_tag> from within the
+callback function to remove the tag currently being iterated on. 
+
+   $str->iter_extents( sub {
+      my ( $e, $n, $v ) = @_;
+      $str->delete_tag( $e, $n ) if $n =~ m/^tmp_/;
+   } );
+
+Apart from this scenario, the tags in the string should not otherwise be added
+or removed while the iteration is occurring.
+
 =cut
 
 sub iter_extents
@@ -927,7 +1007,8 @@ sub iter_extents
 
    my $tags = $self->{tags};
 
-   foreach my $t ( @$tags ) {
+   for ( my $i = 0; $i < @$tags; $i++ ) {
+      my $t = $tags->[$i];
       my ( $ts, $te, $tn, $tv, $tf ) = @$t;
 
       next if $te < $start;
@@ -936,7 +1017,17 @@ sub iter_extents
       next if $only   and !$only->{$tn};
       next if $except and  $except->{$tn};
 
+      $t->[4] |= FLAG_ITERATING;
+      local $self->{iterating} = $t;
+
       $callback->( $self->_mkextent( $ts, $te, $tf ), $tn, $tv );
+
+      $t->[4] &= ~FLAG_ITERATING;
+
+      if( $t->[4] & FLAG_DELETED ) {
+         splice @$tags, $i, 1, ();
+         $i--;
+      }
    }
 }
 

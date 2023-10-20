@@ -2,7 +2,7 @@
 #
 use v5.12;
 use warnings;
-use Test::More tests => 44;
+use Test::More tests => 62;
 use Test::Warn;
 
 BEGIN { unshift @INC, 'lib', '../lib'}
@@ -30,51 +30,75 @@ is( $g[1]->name,                                     'gray75',  'grey75 is betwe
 @g = $red->gradient( to=>'#0000FF', steps => 3, in => 'RGB' );
 is( $g[1]->name,                                    'purple',   'purple is between red and blue in RGB');
 
-
 @g = $black->complement();
 is( int @g,                                                 1,   "default is one complementary color");
 is( $black->complementary()->name,                    'black',   "black has no complementary color");
 is( $white->complementary()->name,                    'white',   "white has no complementary color");
 is( $red->complementary()->name,                       'aqua',   "aqua is complementary to red");
 
-@g = $red->complement(3);
+@g = $red->complement(steps => 3);
 is( int @g,                                                 3,   "requested amount of complementary colors");
-is( $g[0]->saturation,                      $g[1]->saturation,   "saturation is equal on complementary circle");
-is( $g[1]->saturation,                      $g[2]->saturation,   "saturation is equal on complementary circle 2");
-is( $g[0]->lightness,                        $g[1]->lightness,   "lightness is equal on complementary circle");
-is( $g[1]->lightness,                        $g[2]->lightness,   "lightness is equal on complementary circle 2");
+is( ($g[0]->values('HSL'))[1],      ($g[1]->values('HSL'))[1],   "saturation is equal on complementary circle");
+is( ($g[1]->values('HSL'))[1],      ($g[2]->values('HSL'))[1],   "saturation is equal on complementary circle 2");
+is( ($g[0]->values('HSL'))[2],      ($g[1]->values('HSL'))[2],   "lightness is equal on complementary circle");
+is( ($g[1]->values('HSL'))[2],      ($g[2]->values('HSL'))[2],   "lightness is equal on complementary circle 2");
 is( $g[0]->name,                                        'red',   "complementary circle starts with C1");
 is( $g[1]->name,                                       'lime',   "complementary gos on to green");
 is( $g[2]->name,                                       'blue',   "complementary circle ends with blue");
 
-@g = Graphics::Toolkit::Color->new(15,12,13)->complement(3);
-is( $g[0]->saturation,                       $g[1]->saturation,  "saturation is equal on complementary circle of random color");
-is( $g[1]->saturation,                       $g[2]->saturation,  "saturation is equal on complementary circle 2");
-is( $g[0]->lightness,                        $g[1]->lightness,   "lightness is equal on complementary circle of random color");
-is( $g[1]->lightness,                        $g[2]->lightness,   "lightness is equal on complementary circle 2");
+@g = Graphics::Toolkit::Color->new(15,12,13)->complement( steps =>  3);
+my @hsl0 = $g[0]->values('HSL');
+my @hsl1 = $g[1]->values('HSL');
+my @hsl2 = $g[2]->values('HSL');
+is( $hsl0[1],                                $hsl1[1],   "saturation is equal on complementary circle of random color");
+is( $hsl1[1],                                $hsl2[1],   "saturation is equal on complementary circle 2");
+is( $hsl0[2],                                $hsl1[2],   "lightness is equal on complementary circle of random color");
+is( $hsl1[2],                                $hsl2[2],   "lightness is equal on complementary circle 2");
 
-@g = Graphics::Toolkit::Color->new(15,12,13)->complement(4, 12, 20);
+@g = Graphics::Toolkit::Color->new(15,12,13)->complement( steps => 4, s => 12, l => 20 );
+
 is( int @g,                                                 4,   "requested amount of complementary colors");
-is( $g[1]->saturation,                       $g[3]->saturation,  "saturation is equal on opposing sides of skewed circle");
-is( $g[1]->lightness,                        $g[3]->lightness,   "lightness is equal on opposing sides of skewed circle");
-is( $g[1]->saturation-6,                     $g[0]->saturation,  "saturation moves on skewed circle as predicted fore ");
-is( $g[1]->saturation+6,                     $g[2]->saturation,  "saturation moves on skewed circle as predicted back");
-is( $g[1]->lightness-10,                     $g[0]->lightness,   "lightness moves on skewed circle as predicted fore");
-is( $g[1]->lightness+10,                     $g[2]->lightness,   "lightness moves on skewed circle as predicted back");
+is( ($g[1]->values('HSL'))[0]+270,   ($g[0]->values('HSL'))[0],  "first hue value has expected 90 degree angle");
+is( ($g[2]->values('HSL'))[0]+180,   ($g[0]->values('HSL'))[0],  "second hue value has expected 180 degree angle");
+is( ($g[3]->values('HSL'))[0]+ 90,   ($g[0]->values('HSL'))[0],  "third hue value has expected 270 degree angle");
+is( ($g[0]->values('HSL'))[1],       ($g[2]->values('HSL'))[1],  "tilted saturation still undisturbed on positions 0 and 2");
+is( ($g[0]->values('HSL'))[2],       ($g[2]->values('HSL'))[2],  "tilted lightness still undisturbed on positions 0 and 2");
+is( ($g[1]->values('HSL'))[1]-12,    ($g[0]->values('HSL'))[1],  "saturation om Dmax has expected value");
+is( ($g[1]->values('HSL'))[2]-20,    ($g[0]->values('HSL'))[2],  "lightness om Dmax has expected value");
+is( ($g[3]->values('HSL'))[1],                               0,  "saturation om Dmin got to absolute minimum");
+is( ($g[3]->values('HSL'))[2],                               0,  "lightness om Dmin got to absolute minimum");
 
-@g = Graphics::Toolkit::Color->new(15,12,13)->complement(4, 512, 520);
-is( abs($g[0]->saturation-$g[2]->saturation) < 100,         1,   "cut too large saturnation skews");
-is( abs($g[0]->lightness-$g[2]->lightness) < 100,           1,   "cut too large lightness skews");
 
-@g = Graphics::Toolkit::Color->new(15,12,13)->complement(5, 10, 20);
-is( $g[1]->saturation,                      $g[4]->saturation,   "saturation is equal on opposing sides of odd and skewed circle 1");
-is( $g[2]->saturation,                      $g[3]->saturation,   "saturation is equal on opposing sides of odd and skewed circle 2");
-is( $g[1]->lightness,                       $g[4]->lightness,    "lightness is equal on opposing sides of odd and skewed circle 1");
-is( $g[2]->lightness,                       $g[3]->lightness,    "lightness is equal on opposing sides of odd and skewed circle 2");
-is( $g[1]->saturation-4,                    $g[0]->saturation,   "saturation moves on odd and skewed circle as predicted fore ");
-is( $g[1]->saturation+4,                    $g[2]->saturation,   "saturation moves on odd and skewed circle as predicted back");
-is( $g[1]->lightness -8,                    $g[0]->lightness,    "lightness moves on odd and skewed circle as predicted fore");
-is( $g[1]->lightness +8,                    $g[2]->lightness,    "lightness moves on odd and skewed circle as predicted back");
+@g = Graphics::Toolkit::Color->new(15,12,13)->complement( steps => 7, hue_tilt => 40,
+                                                                      saturation_tilt => { s => 5, h => -30 },
+                                                                      lightness_tilt => { l =>  20, h => 50 });
+is( int @g,                                                 7,   "requested amount of complementary colors");
+my @hsl = map {[$g[$_]->values('HSL')]} 0 .. 6;
+is( int @g,                                                 7,   "amount is right");
+is( $hsl[3][0] < 200,         1,   "first three colors are before Dmax");
+is( $hsl[4][0] > 200,         1,   "second three colors are after Dmax");
+is( $hsl[0][0],             340,   "C1 hue did not move");
+is( $hsl[1][0],              38,   "second color hue is correct");
+is( $hsl[2][0],             108,   "third color hue is correct");
+is( $hsl[3][0],             173,   "fourth color hue is correct");
+is( $hsl[4][0],             224,   "5. color hue is correct");
+is( $hsl[5][0],             262,   "6. color hue is correct");
+is( $hsl[6][0],             295,   "7. color hue is correct");
 
+is( $hsl[0][1],              13,   "saturation of 1. color");
+is( $hsl[1][1],              16,   "saturation of 2. color");
+is( $hsl[2][1],              14,   "saturation of 3. color");
+is( $hsl[3][1],              11,   "saturation of 4. color");
+is( $hsl[4][1],               8,   "saturation of 5. color");
+is( $hsl[5][1],               7,   "saturation of 6. color");
+is( $hsl[6][1],              10,   "saturation of 7. color");
+
+is( $hsl[0][2],               0,   "C1 hue did not move");
+is( $hsl[1][2],               5,   "second color hue is correct");
+is( $hsl[2][2],              17,   "third color hue is correct");
+is( $hsl[3][2],              22,   "fourth color hue is correct");
+is( $hsl[4][2],              10,   "5. color hue is correct");
+is( $hsl[5][2],               0,   "6. color hue is correct");
+is( $hsl[6][2],               0,   "7. color hue is correct");
 
 exit 0;

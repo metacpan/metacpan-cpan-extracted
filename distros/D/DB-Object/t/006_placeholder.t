@@ -3,6 +3,7 @@ BEGIN
 {
 	use strict;
 	use warnings;
+	use vars qw( $DEBUG );
 	use lib './lib';
 	use Scalar::Util ();
     use Test::More qw( no_plan );

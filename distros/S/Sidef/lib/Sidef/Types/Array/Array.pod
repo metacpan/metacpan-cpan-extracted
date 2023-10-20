@@ -442,6 +442,38 @@ Returns the
 
 =cut
 
+=head2 bindex_max
+
+    self.bindex_max(obj)
+
+Returns the
+
+=cut
+
+=head2 bindex_max_by
+
+    self.bindex_max_by(block)
+
+Returns the
+
+=cut
+
+=head2 bindex_min
+
+    self.bindex_min(obj)
+
+Returns the
+
+=cut
+
+=head2 bindex_min_by
+
+    self.bindex_min_by(block)
+
+Returns the
+
+=cut
+
 =head2 binsert
 
     arr.binsert(obj)
@@ -493,6 +525,22 @@ Aliases: I<bsearch_ge_by>
 Returns the
 
 Aliases: I<bsearch_le_by>
+
+=cut
+
+=head2 bsearch_max
+
+    self.bsearch_max(obj)
+
+Returns the
+
+=cut
+
+=head2 bsearch_min
+
+    self.bsearch_min(obj)
+
+Returns the
 
 =cut
 
@@ -1603,6 +1651,53 @@ Efficiently returns the n-th permuation of the self array.
     say nth_perm([0,1,2,3,4,5,6,7,8,9], 10**6)
 
 Aliases: I<nth_permutation>
+
+=cut
+
+=head2 ordered_partitions
+
+    arr.ordered_partitions
+    arr.ordered_partitions(k)
+    arr.ordered_partitions{|*a| ... }
+    arr.ordered_partitions(k, {|*a| ... })
+
+Iterates over the ordered partitions C<P> of C<arr>, such that C<P.flat == arr>.
+
+        [1,2,3,4,5].ordered_partitions(2, {|*a| say a })
+
+Outputs:
+
+        [[1], [2, 3, 4, 5]]
+        [[1, 2], [3, 4, 5]]
+        [[1, 2, 3], [4, 5]]
+        [[1, 2, 3, 4], [5]]
+
+When no block is given, it returns an array containing the ordered partitions (there are C<binomial(n-1, k-1)> ordered partitions, where C<n> is the size of the array):
+
+        say [1,2,3,4].ordered_partitions(2)
+
+Outputs:
+
+        [[[1], [2, 3, 4]], [[1, 2], [3, 4]], [[1, 2, 3], [4]]]
+
+Additionally, when the value for C<k> is ommited, it generates all the ordered partitions (there are C<2^(n-1)> ordered partitions, where C<n> is the size of the array):
+
+        [1,2,3,4].ordered_partitions{|*a| say a }
+
+Outputs:
+
+        [[1], [2], [3], [4]]
+        [[1, 2], [3], [4]]
+        [[1], [2, 3], [4]]
+        [[1, 2, 3], [4]]
+        [[1], [2], [3, 4]]
+        [[1, 2], [3, 4]]
+        [[1], [2, 3, 4]]
+        [[1, 2, 3, 4]]
+
+Up to the ordering, the method is equivalent with (but more efficient):
+
+        arr.partitions(k).grep { .flat == arr }
 
 =cut
 

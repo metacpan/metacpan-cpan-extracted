@@ -2,12 +2,13 @@ package Data::Record::Serialize::Role::Sink::Stream;
 
 # ABSTRACT: output encoded data to a stream.
 
+use v5.12;
 use Scalar::Util;
 use Moo::Role;
 
 use Data::Record::Serialize::Error { errors => [ '::create', '::parameter', '::internal' ] }, -all;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use IO::File;
 
@@ -44,24 +45,24 @@ use namespace::clean;
 
 has output => (
     is      => 'ro',
-    default => '-',
+    default => q{-},
     isa     => sub {
         defined $_[0]
-          or error( '::parameter', "'output' parameter must be defined" );
+          or error( '::parameter', q{'output' parameter must be defined} );
         my $ref = ref $_[0];
         return if $ref eq 'GLOB' or $ref eq 'SCALAR';
 
-        if ( $ref eq '' ) {
+        if ( $ref eq q{} ) {
             $ref = ref( \$_[0] );    # turn plain *STDOUT into \*STDOUT
             return if $ref eq 'GLOB';
             return if length $_[0];
-            error( '::parameter', "string 'output' parameter must not be empty" );
+            error( '::parameter', q{string 'output' parameter must not be empty} );
         }
 
         return
           if Scalar::Util::blessed $_[0]
           and $_[0]->isa( 'IO::Handle' ) || $_[0]->isa( 'FileHandle' );
-        error( '::parameter', "illegal value for 'output' parameter" );
+        error( '::parameter', q{illegal value for 'output' parameter} );
     },
 );
 
@@ -97,15 +98,14 @@ sub _build_fh {
     my $ref    = ref $output;
 
     # filename
-    if ( $ref eq '' ) {
+    if ( $ref eq q{} ) {
         return $output  if ref( \$output ) eq 'GLOB';
-        return \*STDOUT if $output eq '-';
+        return \*STDOUT if $output eq q{-};
 
         $self->_set__passed_fh( 0 );
         return (
             IO::File->new( $output, 'w' )
-                or error( '::create', "unable to create output file: '$output'" )
-        );
+              or error( '::create', "unable to create output file: '$output'" ) );
     }
 
     return $output
@@ -116,9 +116,9 @@ sub _build_fh {
     $self->_set__passed_fh( 0 );
     return (
         IO::File->new( $output, 'w' )
-          or error( '::create', "unable to open scalar for output" ) ) if $ref eq 'SCALAR';
+          or error( '::create', q{unable to open scalar for output} ) ) if $ref eq 'SCALAR';
 
-    error( '::internal', "can't get here" );
+    error( '::internal', q{can't get here} );
 }
 
 
@@ -184,7 +184,7 @@ Data::Record::Serialize::Role::Sink::Stream - output encoded data to a stream.
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 
@@ -196,14 +196,7 @@ A L<Moo::Role> which provides the underlying support for stream sinks.
 B<Data::Record::Serialize::Role::Sink::Stream> outputs encoded data to a
 file handle.
 
-=head1 CLASS METHODS
-
-=head2 new
-
-This role adds two named arguments to the constructor, L</output> and
-L</fh>, which mirror the added object attributes.
-
-=head1 ATTRIBUTES
+=head1 OBJECT ATTRIBUTES
 
 =head2 output
 
@@ -238,6 +231,13 @@ The file handle to which the data will be output
 
 Will be true if L</output> was not a file name.
 
+=head1 CLASS METHODS
+
+=head2 new
+
+This role adds two named arguments to the constructor, L</output> and
+L</fh>, which mirror the added object attributes.
+
 =head1 METHODS
 
 =head2 close
@@ -249,6 +249,8 @@ serializer will be closed.  If a filehandle, GLOB, or similar object
 is passed via the constructor's L</output> parameter L</close> method
 is called.
 
+=head1 INTERNALS
+
 =for Pod::Coverage close
  has_fh
  clear_fh
@@ -257,7 +259,7 @@ is called.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>
 
 =head2 Source
 

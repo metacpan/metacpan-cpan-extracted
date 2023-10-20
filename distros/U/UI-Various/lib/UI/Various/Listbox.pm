@@ -42,7 +42,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 use UI::Various::core;
 use UI::Various::widget;

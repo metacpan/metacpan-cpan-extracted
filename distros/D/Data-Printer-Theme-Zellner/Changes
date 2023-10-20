@@ -1,0 +1,19 @@
+0.03 2023-10-09T13:06:59+02:00 (3b0c2e7 => Abe Timmerman)
+ - (Abe Timmerman, Mon, 9 Oct 2023 13:06:59 +0200) Autocommit for
+   distribution Data-Printer-Theme-Zellner 0.03 (minor)
+
+0.02_00 2023-10-04T10:23:29+02:00 (c8cfa84 => Abe Timmerman)
+ - (Abe Timmerman, Wed, 4 Oct 2023 10:23:29 +0200) Autocommit for
+   distribution Data-Printer-Theme-Zellner 0.02_00 (test)
+
+0.00_00 2023-10-02T15:48:50+02:00 (3e1568b => Abe Timmerman)
+ - (Abe Timmerman, Mon, 2 Oct 2023 15:48:50 +0200) First attempt at a
+   colourschema for Data::Printer
+ -     The scheme uses colours from the vim schema "Zellner", which is good
+   for
+ -     light background
+ - (Abe Timmerman, Tue, 3 Oct 2023 15:27:27 +0200) Make it a Perl module
+ -     add Makefile.PL, MANIFEST, MANIFEST.SKIP, README.md
+ -     add POD and test
+ - (Abe Timmerman, Tue, 3 Oct 2023 15:50:30 +0200) add t::Test::abeltje
+   1.09

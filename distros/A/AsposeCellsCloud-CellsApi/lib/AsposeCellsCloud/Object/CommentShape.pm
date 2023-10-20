@@ -131,7 +131,7 @@ __PACKAGE__->method_documentation({
      'comment' => {
      	datatype => 'LinkElement',
      	base_name => 'Comment',
-     	description => '',
+     	description => 'Gets the comment object.',
      	format => '',
      	read_only => '',
      		},

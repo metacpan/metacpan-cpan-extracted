@@ -4,7 +4,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 # VERSION
 
-Version 0.18
+Version 0.24
 
 # SYNOPSIS
 
@@ -80,6 +80,13 @@ format (not spaces, indendation or line breaks).
     # have its unicode content escaped:
     my $json_with_unicode_escaped =
           json2json($jsonstr, {'escape-unicode'=>1});
+
+    # With version 0.18 and up two more exported-on-demand
+    # subs were added to read JSON or YAML directly from a file:
+    # jsonfile2perl() and yamlfile2perl()
+    my $perldata = jsonfile2perl("file.json");
+    my $perldata = yamlfile2perl("file.yaml");
+    die "failed" unless defined $perldata;
 
     # For some of the above functions there exist command-line scripts:
     perl2json.pl -i "perl-data-structure.pl" -o "output.json" --pretty
@@ -272,7 +279,7 @@ Return value:
 
 Given an input `$yamlstring` as a string, it will return
 the equivalent Perl data structure using
-`YAML::Load($yamlstring)`
+`YAML::PP::Load($yamlstring)`
 
 Returns the Perl data structure on success or `undef` on failure.
 
@@ -643,7 +650,7 @@ These are: `json2json.pl`,  `json2yaml.pl`,  `yaml2json.pl`,
 
 # CAVEATS
 
-A valid Perl variable may kill [YAML::Load](https://metacpan.org/pod/YAML%3A%3ALoad) because
+A valid Perl variable may kill [YAML::PP::Load](https://metacpan.org/pod/YAML%3A%3APP%3A%3ALoad) because
 of escapes and quotes. For example this:
 
     my $yamlstr = <<'EOS';
@@ -651,7 +658,7 @@ of escapes and quotes. For example this:
     - 682224
     - "\"w": 1
     EOS
-    my $pv = eval { YAML::Load($yamlstr) };
+    my $pv = eval { YAML::PP::Load($yamlstr) };
     if( $@ ){ die "failed(1): ". $@ }
     # it's dead
 
@@ -664,7 +671,7 @@ Strangely, there is no problem for this:
     EOS
     # this is OK also:
     # - \"w: 1
-    my $pv = eval { YAML::Load($yamlstr) };
+    my $pv = eval { YAML::PP::Load($yamlstr) };
     if( $@ ){ die "failed(1): ". $@ }
     # it's OK! still alive.
 

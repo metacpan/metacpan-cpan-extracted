@@ -55,8 +55,7 @@ subtest 'record does not require transformation' => sub {
     my $got;
 
     # read and make sure round trip types are correct
-    ok( lives { $got = $yaml->load_string( $output[-1] ) },
-        'deserialize record' )
+    ok( lives { $got = $yaml->load_string( $output[-1] ) }, 'deserialize record' )
       or diag $@;
 
     is(
@@ -96,8 +95,7 @@ subtest 'record requires transformation' => sub {
 
     my $got;
 
-    ok( lives { $got = $yaml->load_string( $output[-1] ) },
-        'deserialize record' )
+    ok( lives { $got = $yaml->load_string( $output[-1] ) }, 'deserialize record' )
       or diag $@;
 
     is(

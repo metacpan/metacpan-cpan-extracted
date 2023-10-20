@@ -60,7 +60,7 @@ sub new {
 
 # Run Operation Request
 # DeleteUnProtectWorkbookRequest.name : The workbook name.  ,
-# DeleteUnProtectWorkbookRequest.protection : Protection settings, only password can be specified.  ,
+# DeleteUnProtectWorkbookRequest.password : Protection settings, only password can be specified.  ,
 # DeleteUnProtectWorkbookRequest.folder : Original workbook folder.  ,
 # DeleteUnProtectWorkbookRequest.storageName : Storage name.   
 
@@ -103,6 +103,10 @@ sub run_http_request {
         my $_base_value = $client->to_path_value($self->name);
         $_resource_path =~ s/$_base_variable/$_base_value/g;        
     } 
+    if(defined $self->password){
+        $query_params->{'password'} = $client->to_query_value($self->password);      
+    }
+
     if(defined $self->folder){
         $query_params->{'folder'} = $client->to_query_value($self->folder);      
     }
@@ -111,12 +115,6 @@ sub run_http_request {
         $query_params->{'storageName'} = $client->to_query_value($self->storage_name);      
     } 
     my $_body_data;
-
-    # body params
-    if (defined $self->protection) {
-        #$_body_data = $self->protection;
-         $_body_data = JSON->new->convert_blessed->encode( $self->protection);
-    }
     # authentication setting, if any
     my $auth_settings = [qw()];
 
@@ -134,9 +132,9 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'protection' => {
-     	datatype => 'WorkbookProtectionRequest',
-     	base_name => 'protection',
+     'password' => {
+     	datatype => 'string',
+     	base_name => 'password',
      	description => 'Protection settings, only password can be specified.',
      	format => '',
      	read_only => '',
@@ -160,7 +158,7 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->attribute_map( {
     'name' => 'name',
-    'protection' => 'protection',
+    'password' => 'password',
     'folder' => 'folder',
     'storage_name' => 'storageName' 
 } );

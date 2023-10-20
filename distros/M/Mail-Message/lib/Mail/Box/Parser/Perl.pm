@@ -8,7 +8,7 @@
 
 package Mail::Box::Parser::Perl;
 use vars '$VERSION';
-$VERSION = '3.013';
+$VERSION = '3.014';
 
 use base 'Mail::Box::Parser';
 
@@ -173,7 +173,9 @@ sub _read_stripped_lines(;$$)
         }
 
         if(@$lines && $lines->[-1] =~ s/(\r?\n)\z//)
-        {   pop @$lines if @seps==1 && length($lines->[-1])==0;
+        {   # Keep an empty line to signal the existence of a preamble, but
+            # remove a second.
+            pop @$lines if @seps==1 && @$lines > 1 && length($lines->[-1])==0;
         }
     }
     else # File without separators.

@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe.pm
-## Version v2.0.2
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v2.0.4
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/07/19
-## Modified 2022/12/19
+## Modified 2023/10/11
 ## All rights reserved.
 ## 
 ## 
@@ -53,7 +53,7 @@ BEGIN
     use constant API_BASE => 'https://api.stripe.com/v1';
     use constant FILES_BASE => 'https://files.stripe.com/v1';
     use constant STRIPE_WEBHOOK_SOURCE_IP => [qw( 54.187.174.169 54.187.205.235 54.187.216.72 54.241.31.99 54.241.31.102 54.241.34.107 )];
-    our $VERSION = 'v2.0.2';
+    our $VERSION = 'v2.0.4';
     our $EXCEPTION_CLASS = 'Net::API::Stripe::Exception';
 };
 
@@ -8853,7 +8853,7 @@ sub payment_method_list_customer_payment_methods
         $self->_adjust_list_expandables( $args ) || CORE::return( $self->pass_error );
     }
     my $hash = $self->get( "customers/${customer}/payment_methods", $args ) || CORE::return( $self->pass_error );
-    CORE::return( $self->_response_to_object( 'Net::API::Stripe::Payment::Method', $hash ) );
+    CORE::return( $self->_response_to_object( 'Net::API::Stripe::List', $hash ) );
 }
 PERL
     # NOTE: payment_method_retrieve()
@@ -16752,14 +16752,18 @@ sub _make_request
                         exists( $hash->{error}->{message} ) )
                     {
                         $ref->{message} = $hash->{error}->{message};
-                        $ref->{type} = $hash->{error}->{type} if( exists( $hash->{error}->{type} ) );
-                        $ref->{request_log_url} = $hash->{error}->{request_log_url} if( exists( $hash->{error}->{request_log_url} ) );
+                        foreach my $prop ( qw( charge code decline_code doc_url param payment_intent payment_method payment_method_type request_log_url setup_intent source type ) )
+                        {
+                            $ref->{ $prop } = $hash->{error}->{ $prop } if( exists( $hash->{error}->{ $prop } ) );
+                        }
                     }
                 }
                 else
                 {
                     $ref = $hash;
                 }
+                $ref->{http_code} = $resp->code;
+                $ref->{http_headers} = $resp->headers;
                 CORE::return( $self->error( $ref ) );
             }
         }

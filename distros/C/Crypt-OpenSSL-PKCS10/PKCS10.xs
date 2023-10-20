@@ -13,6 +13,9 @@
 
 #include "ppport.h"
 
+#if OPENSSL_VERSION_NUMBER < 0x10000000L
+#define EVP_PKEY_base_id(pkey) EVP_PKEY_type((pkey)->type)
+#endif
 #if OPENSSL_VERSION_NUMBER < 0x10100000L || defined LIBRESSL_VERSION_NUMBER
 #define EVP_PKEY_get0_RSA(pkey) ((pkey)->pkey.rsa)
 #define EVP_PKEY_get0_DSA(pkey) ((pkey)->pkey.dsa)

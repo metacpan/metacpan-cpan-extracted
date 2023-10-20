@@ -28,6 +28,7 @@ no_index:
     - lib/ChordPro/Delegate
     - lib/ChordPro/Output
     - lib/ChordPro/Wx
+    - lib/ChordPro/lib
     - lib/ChordPro/res
     - pp
   file:
@@ -40,10 +41,10 @@ no_index:
 provides:
   App::Music::ChordPro:
     file: lib/ChordPro.pm
-    version: '6.020'
+    version: '6.030'
   chordpro:
     file: script/chordpro
-    version: '6.020'
+    version: '6.030'
 requires:
   App::Packager: '1.43'
   File::HomeDir: '1.004'
@@ -63,5 +64,5 @@ resources:
   homepage: https://www.chordpro.org
   license: https://dev.perl.org/licenses/
   repository: https://github.com/sciurius/chordpro
-version: '6.020'
+version: '6.030'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

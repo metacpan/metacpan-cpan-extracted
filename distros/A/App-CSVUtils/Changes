@@ -1,3 +1,11 @@
+1.031   2023-08-06  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli csv2vcf] [ux] Detect Indonesian words 'nama' and
+          'telepon'/'telefon' in column names.
+
+        - [doc] Grammar/wording.
+
+
 1.030   2023-07-25  Released-By: PERLANCAR; Urgency: medium
 
         - [cli csv-freqtable] Add option --with-data-rows.

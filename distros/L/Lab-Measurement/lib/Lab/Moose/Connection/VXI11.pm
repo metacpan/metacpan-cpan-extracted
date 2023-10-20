@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::VXI11;
-$Lab::Moose::Connection::VXI11::VERSION = '3.881';
+$Lab::Moose::Connection::VXI11::VERSION = '3.901';
 #ABSTRACT: Connection backend to VXI-11 (Lan/TCP)
 
 use v5.20;
@@ -205,7 +205,7 @@ Lab::Moose::Connection::VXI11 - Connection backend to VXI-11 (Lan/TCP)
 
 =head1 VERSION
 
-version 3.881
+version 3.901
 
 =head1 SYNOPSIS
 
@@ -226,7 +226,6 @@ Connection backend based on L<Lab::VXI11>.
 This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
-            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

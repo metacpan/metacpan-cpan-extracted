@@ -7,7 +7,7 @@ use 5.008001; # For the utf8 stuff.
 
 # Warning: There is another version line, in t/02.main.t.
 
-our $VERSION = '2.29';
+our $VERSION = '2.30';
 
 BEGIN {
 	$Config::Tiny::errstr  = '';
@@ -84,6 +84,14 @@ sub read_string
 
 		if ( /^\s*([^=]+?)\s*=\s*(.*?)\s*$/ )
 		{
+			if ( substr($1, -2) eq '[]' )
+			{
+				my $k = substr $1, 0, -2;
+				$self->{$ns}->{$k} ||= [];
+				return $self -> _error ("Can't mix arrays and scalars at line $counter" ) unless ref $self->{$ns}->{$k} eq 'ARRAY';
+				push @{$self->{$ns}->{$k}}, $2;
+				next;
+			}
 			$self->{$ns}->{$1} = $2;
 
 			next;
@@ -144,6 +152,13 @@ sub write_string
 		{
 			return $self->_error("Illegal newlines in property '$section.$property'") if $block->{$property} =~ /(?:\012|\015)/s;
 
+			if (ref $block->{$property} eq 'ARRAY') {
+				for my $element ( @{$block->{$property}} )
+				{
+					$contents .= "${property}[]=$element\n";
+				}
+				next;
+			}
 			$contents .= "$property=$block->{$property}\n";
 		}
 	}
@@ -174,8 +189,10 @@ Config::Tiny - Read/Write .ini style files with as little code as possible
 
 	[section]
 	one=twp
+	greetings[]=Hello
 	three= four
 	Foo =Bar
+	greetings[]=World!
 	empty=
 
 	# In your program
@@ -245,6 +262,8 @@ Files are the same format as for MS Windows C<*.ini> files. For example:
 	var1=value1
 	var2=value2
 
+But see also ARRAY SYNTAX just below.
+
 If a property is outside of a section at the beginning of a file, it will
 be assigned to the C<"root section">, available at C<$Config-E<gt>{_}>.
 
@@ -255,6 +274,95 @@ When writing back to the config file, all comments, custom whitespace,
 and the ordering of your config file elements are discarded. If you need
 to keep the human elements of a config when writing back, upgrade to
 something better, this module is not for you.
+
+=head1 ARRAY SYNTAX
+
+=head2 Basic Syntax
+
+As of V 2.30, this module supports the case of a key having an array of values.
+
+Sample data (copied from t/test.conf):
+
+	root=something
+
+	[section]
+	greetings[]=Hello
+	one=two
+	Foo=Bar
+	greetings[]=World!
+	this=Your Mother!
+	blank=
+
+	[Section Two]
+	something else=blah
+	 remove = whitespace
+
+Note specifically that the key name greetings has the empty bracket pair [] as a suffix.
+This tells the code that it is not to overwrite the 1st value with the 2nd value, but
+rather to push these values onto a stack called 'greetings'.
+
+Note also that you could have used:
+
+	[section]
+	greetings[]=Hello
+	greetings[]=World!
+	one=two
+	Foo=Bar
+	this=Your Mother!
+	blank=
+
+Clearly, the 2 lines using greetings[] do not have to be side-by-side.
+
+If you use e.g. Data::Dumper::Concise to give you a Dumper() function (not method), then
+'say Dumper($Config)' the output will look like:
+
+	bless( {
+	  "Section Two" => {
+	     remove => "whitespace",
+	     "something else" => "blah",
+	   },
+	   _ => {
+	     root => "something",
+	   },
+	   section => {
+	     Foo => "Bar",
+	     blank => "",
+	     greetings => [
+	       "Hello",
+	       "World!",
+	     ],
+	     one => "two",
+	     this => "Your Mother!",
+	   },
+	 }, 'Config::Tiny' )
+
+You can see this structure in t/02.main.t starting at line 45. Observe too that the key names are
+reported in alphabetical order (by the module Data::Dumper::Concise) despite the differing order
+in the setting of these keys, and that the array syntax result is that greetings has an array
+for a value.
+
+To access these values, use code like this:
+
+	Dumper($Config);
+	Dumper($Config->{section});
+	Dumper($Config->{section}->{greetings});
+	Dumper($Config->{section}->{greetings}->[0]);
+	Dumper($Config->{section}->{greetings}->[1]);
+	Dumper(ref $Config);
+
+=head2 Warning
+
+$Config is a blessed value, which means it is accessed differently than if it was
+a hash ref. The latter could be accessed as:
+
+	Dumper($$Config{section}{greetings}); # Don't do this for blessed values!
+
+Finally, if a hash ref rather than a blessed value, you could also use, as above:
+
+	Dumper($Config->{section}->{greetings}); # Don't do this for blessed values!
+
+My (Ron Savage) personal preference for hashrefs is the one without the gross '->' chars,
+but that requires you to double up the initial $ character (which I hope you noticed!).
 
 =head1 METHODS
 
@@ -324,9 +432,16 @@ Generates the file content for the object and returns it as a string.
 
 =head2 What happens if a key is repeated?
 
-The last value is retained, overwriting any previous values.
+Case 1: The last value is retained, overwriting any previous values.
 
-See t/06.repeat.key.t.
+See t/06.repeat.key.t for sample code.
+
+Case 2: However, by using the new array syntax, as of V 2.30, you can assign a set of
+values to a key.
+
+For details, see the L</ARRAY SYNTAX> section above for sample code.
+
+See t/test.conf for sample data.
 
 =head2 Why can't I put comments at the ends of lines?
 
@@ -489,3 +604,4 @@ The full text of the license can be found in the
 LICENSE file included with this module.
 
 =cut
+

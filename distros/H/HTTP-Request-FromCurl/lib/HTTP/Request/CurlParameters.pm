@@ -14,7 +14,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 =head1 NAME
 
@@ -281,6 +281,18 @@ Name of the output file
 =cut
 
 has output => (
+    is => 'ro',
+);
+
+=item *
+
+C<max_filesize>
+
+Maximum size (in bytes) of a file to download
+
+=cut
+
+has max_filesize => (
     is => 'ro',
 );
 
@@ -605,6 +617,7 @@ sub as_lwp_snippet( $self, %options ) {
                            $self->_pairlist([
                                      send_te => 0,
                                maybe local_address => $self->local_address,
+                               maybe max_size      => $self->max_filesize,
                                maybe timeout       => $self->timeout,
                                maybe cookie_jar    => $init_cookie_jar->{code},
                                maybe SSL_options   => keys %ssl_options ? \%ssl_options : undef,
@@ -712,6 +725,7 @@ sub as_http_tiny_snippet( $self, %options ) {
                                      @ssl,
                                maybe timeout       => $self->timeout,
                                maybe local_address => $self->local_address,
+                               maybe max_size      => $self->max_filesize,
                                maybe cookie_jar    => $init_cookie_jar->{code},
                                maybe SSL_options   => keys %ssl_options ? \%ssl_options : undef,
                            ], '')
@@ -803,9 +817,9 @@ sub as_mojolicious_snippet( $self, %options ) {
     my $constructor_args = join ",",
                            $self->_pairlist([
                                      @ssl,
-                                     keys %$socket_options ? $socket_options : (),
+                                     keys %$socket_options ? ( socket_options => $socket_options ) : (),
                                maybe request_timeout    => $self->timeout,
-                               maybe local_address => $self->local_address,
+                               maybe max_response_size  => $self->max_filesize,
                                maybe cookie_jar    => $init_cookie_jar->{code},
                                maybe SSL_options   => keys %ssl_options ? \%ssl_options : undef,
                            ], '')
@@ -909,11 +923,19 @@ sub as_curl($self,%options) {
             };
             for my $val (@$v) {
                 if( !defined $default or $val ne $default ) {
-
                     # also skip the Host: header if it derives from $uri
                     if( $h eq 'Host' and ($val eq $self->uri->host_port
                                           or $val eq $self->uri->host   )) {
                         # trivial host header
+
+                    # also skip the Content-Length header if it derives from the body
+                    } elsif( $h eq 'Content-Length' and
+                                (
+                                       ($self->post_data and $val == length $self->post_data)
+                                    or ($self->body  and $val == length $self->body)
+                                )) {
+                        # trivial content-length header
+
                     } elsif( $h eq 'User-Agent' ) {
                         push @request_commands,
                             $options{ long_options } ? '--user-agent' : '-A',

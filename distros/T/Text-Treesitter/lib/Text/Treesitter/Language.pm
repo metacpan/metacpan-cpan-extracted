@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Text::Treesitter::Language 0.10;
+package Text::Treesitter::Language 0.11;
 
 use v5.14;
 use warnings;

@@ -1,5 +1,11 @@
 Revision history for App-Git-Workflow-Command-Take
 
+0.8   2023-09-30
+        Updating for release of version 0.8
+        Updating travis (Ivan Wills)
+        Updated (Ivan Wills)
+        Fixing conflict resolution when "both added" (Ivan Wills)
+
 0.7   2019-05-08
         Updating for release of version 0.7
         Updated date (Ivan Wills)

@@ -1,5 +1,17 @@
 Revision history for Shell-Var-Reader
 
+0.5.2	 2023-10-17/16:15
+		 - Fix the name of the generated toml file so it no longer ends in .yaml
+
+0.5.1	 2023-10-13/23:45
+		 - munger now has the path properly called
+		 - add --help and --version to cmdb_shell_var_reader
+
+0.5.0	 2023-10-22/21:00
+		 - Add cmdb_shell_var_reader
+		 - Improve documentation.
+		 - The TOML CMDB now supports rex enviroment. Uses 'SYSTEM_ENV' for that.
+
 0.4.0	 2023-07-25/11:15
 		 - Add -m for munging support.
 

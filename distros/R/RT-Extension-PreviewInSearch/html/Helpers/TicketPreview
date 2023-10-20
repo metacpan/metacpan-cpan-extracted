@@ -12,6 +12,12 @@ my $web_path = RT->Config->Get('WebPath');
 <h2><a href="<% $web_path %>/Ticket/Display.html?id=<% $ticket->id %>">#<% $ticket->id %>: <% $ticket->Subject %></a></h2>
 </div>
 % $m->callback(CallbackName => 'BeforeHistory', ARGSRef => \%ARGS, Ticket => $ticket);
+% my $ShowHistory = RT->Config->Get("ShowHistory", $session{'CurrentUser'});
+% if ($ShowHistory eq "scroll") {
+    <& /Ticket/Elements/ScrollShowHistory,
+        Ticket => $ticket,
+    &>
+% } else {
 <& /Elements/ShowHistory,
     Object => $ticket,
     ShowDisplayModes => 0,
@@ -24,6 +30,7 @@ my $web_path = RT->Config->Get('WebPath');
     EmailRecordPath => "$web_path/Ticket/ShowEmailRecord.html",
     EncryptionPath  => "$web_path/Ticket/Crypt.html",
 &>
+% }
 <script type="text/javascript">ReplaceUserReferences()</script>
 % $m->callback(CallbackName => 'AfterHistory', ARGSRef => \%ARGS, Ticket => $ticket);
 % $m->abort();

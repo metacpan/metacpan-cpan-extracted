@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-25'; # DATE
+our $DATE = '2023-08-06'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '1.030'; # VERSION
+our $VERSION = '1.031'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_cmp/csv_cmp",
@@ -41,7 +41,7 @@ csv-cmp - Compare two CSV files value by value
 
 =head1 VERSION
 
-This document describes version 1.030 of csv-cmp (from Perl distribution App-CSVUtils), released on 2023-07-25.
+This document describes version 1.031 of csv-cmp (from Perl distribution App-CSVUtils), released on 2023-08-06.
 
 =head1 SYNOPSIS
 
@@ -177,17 +177,17 @@ Field names to include, takes precedence over --exclude-field-pat (JSON-encoded)
 
 See C<--include-field>.
 
-=item B<-A>
-
-Shortcut for --exclude-field-pat=.*, effectively excluding all fields.
-
-See C<--exclude-field-pat>.
-
 =item B<-a>
 
 Shortcut for --field-pat=.*, effectively selecting all fields.
 
 See C<--include-field-pat>.
+
+=item B<-A>
+
+Shortcut for --exclude-field-pat=.*, effectively excluding all fields.
+
+See C<--exclude-field-pat>.
 
 =back
 

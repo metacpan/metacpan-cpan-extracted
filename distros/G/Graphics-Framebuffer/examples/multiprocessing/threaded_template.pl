@@ -13,6 +13,10 @@ use Sys::CPU;              # Finds the number of cores your CPU has
 use Graphics::Framebuffer; # There are things to import, if you want, but they
                            # are usually not needed.
 
+BEGIN {
+	our $VERSION = '0.01';
+};
+
 ##############################################################################
 ## Initialize any global variables here ######################################
 
@@ -38,7 +42,7 @@ for (my $count=0;$count < $threads;$count++) {
 # $FB is your framebuffer object.  See the documentation, if you want to pass
 # any parameters when initializing the module, but no parameters should be
 # just fine to get started.
-my $FB = Graphics::Framebuffer->new();
+my $FB = Graphics::Framebuffer->new('SPLASH' => 0);
 
 $FB->cls('OFF'); # Turn off the console cursor
 

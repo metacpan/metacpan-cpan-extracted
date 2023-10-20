@@ -1,20 +1,20 @@
 =encoding utf8
 
-=head1
+=head1 NAME
 
 Locale::CLDR::Locales::Ewo - Package for language Ewondo
 
 =cut
 
 package Locale::CLDR::Locales::Ewo;
-# This file auto generated from Data/common/main/ewo.xml
-#	on Mon 11 Apr  5:27:43 pm GMT
+# This file auto generated from Data\common\main\ewo.xml
+#	on Fri 13 Oct  9:14:52 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.1');
+our $VERSION = version->declare('v0.34.2');
 
 use v5.10.1;
 use mro 'c3';
