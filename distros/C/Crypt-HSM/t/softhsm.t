@@ -28,7 +28,7 @@ for my $slot ( @slots ) {
 	note explain $tokenInfo;
 }
 
-my $session = $provider->open_session($slots[0]);
+my $session = $slots[0]->open_session;
 
 undef $provider;
 

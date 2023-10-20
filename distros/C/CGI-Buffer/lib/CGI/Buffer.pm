@@ -17,11 +17,11 @@ CGI::Buffer - Verify, Cache and Optimise CGI Output
 
 =head1 VERSION
 
-Version 0.84
+Version 0.85
 
 =cut
 
-our $VERSION = '0.84';
+our $VERSION = '0.85';
 
 =head1 SYNOPSIS
 
@@ -1260,10 +1260,6 @@ L<http://cpants.cpanauthors.org/dist/CGI-Buffer>
 =item * CPAN Testers' Matrix
 
 L<http://matrix.cpantesters.org/?dist=CGI-Buffer>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/CGI-Buffer>
 
 =item * CPAN Testers Dependencies
 

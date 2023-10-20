@@ -1,17 +1,10 @@
 package Crypt::HSM;
-$Crypt::HSM::VERSION = '0.013';
+$Crypt::HSM::VERSION = '0.014';
 use strict;
 use warnings;
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, __PACKAGE__->VERSION);
-
-#backwards compat
-sub open_session {
-	my ($self, $slot, @args) = @_;
-	my $object = ref($slot) ? $slot : $self->slot($slot);
-	return $object->open_session(@args);
-}
 
 1;
 
@@ -29,7 +22,7 @@ Crypt::HSM - A PKCS11 interface for Perl
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -49,23 +42,7 @@ This module interfaces with any PKCS11 library to use its cryptography.
 
 =head2 load($path)
 
-This loads the pkcs11 found a $path, and returns it as a new Crypt::HSM object.
-
-=head2 slots($available = 1)
-
-This lists the slots of this interface as L<Crypt::HSM::Slot|Crypt::HSM::Slot>. If C<$available> is true only slots with a token available will be listed.
-
-=head2 slot($identifier)
-
-This returns a L<Crypt::HSM::Slot|Crypt::HSM::Slot> for the slot with the given identifier.
-
-=head2 info()
-
-This returns a hash with information about the HSM.
-
-=head2 open_session($slot, $flags)
-
-This methods wraps around C<Crypt::HSM::Slot>'s C<open_session> method [depreciated].
+This loads the pkcs11 found a $path, and returns it as a new L<Crypt::HSM::Provider|Crypt::HSM::Provider> object.
 
 =head1 AUTHOR
 

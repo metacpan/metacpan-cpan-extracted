@@ -3,7 +3,9 @@
 [![Appveyor status](https://ci.appveyor.com/api/projects/status/2uhepmj5sd1nspjg?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-buffer)
 [![Coverage Status](https://coveralls.io/repos/github/nigelhorne/CGI-Buffer/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-Buffer?branch=master)
 [![CPAN](https://img.shields.io/cpan/v/CGI-Buffer.svg)](http://search.cpan.org/~nhorne/CGI-Buffer/)
+<!--
 [![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/5642353356298438/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/5642353356298438/heads/master/)
+-->
 [![Kwalitee](https://cpants.cpanauthors.org/dist/CGI-Buffer.png)](http://cpants.cpanauthors.org/dist/CGI-Buffer)
 
 # NAME
@@ -12,7 +14,7 @@ CGI::Buffer - Verify, Cache and Optimise CGI Output
 
 # VERSION
 
-Version 0.84
+Version 0.85
 
 # SYNOPSIS
 
@@ -233,10 +235,6 @@ You can also look for information at:
 - CPAN Testers' Matrix
 
     [http://matrix.cpantesters.org/?dist=CGI-Buffer](http://matrix.cpantesters.org/?dist=CGI-Buffer)
-
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/CGI-Buffer](http://cpanratings.perl.org/d/CGI-Buffer)
 
 - CPAN Testers Dependencies
 

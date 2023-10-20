@@ -1,5 +1,5 @@
 TYPEMAP
-Crypt::HSM	T_MAGICEXT
+Crypt::HSM::Provider	T_MAGICEXT
 Crypt::HSM::Slot	T_MAGICEXT
 Crypt::HSM::Mechanism	T_MAGICEXT
 Crypt::HSM::Session	T_MAGIC
@@ -36,6 +36,15 @@ T_MAGIC
 		Perl_croak(aTHX_ \"${ntype} object is lacking magic\");
 	}
 
+T_MAGICBUF
+	{
+	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, NULL) : NULL;
+	if (magic)
+		$var = (${type})magic->mg_ptr;
+	else
+		Perl_croak(aTHX_ \"${ntype} object is lacking magic\");
+	}
+
 T_MAGICEXT
 	{
 	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, &${type}_magic) : NULL;
@@ -49,6 +58,8 @@ T_MAGICEXT
 OUTPUT
 T_MAGIC
 	sv_magic(newSVrv($arg, \"${ntype}\"), NULL, PERL_MAGIC_ext, (const char*)$var, 0);
+T_MAGICBUF
+	sv_magic(newSVrv($arg, \"${ntype}\"), NULL, PERL_MAGIC_ext, (const char*)$var, sizeof(*$var));
 T_MAGICEXT
 	{
 	MAGIC* magic = sv_magicext(newSVrv($arg, \"${ntype}\"), NULL, PERL_MAGIC_ext, &${type}_magic, (const char*)$var, 0);

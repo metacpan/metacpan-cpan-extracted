@@ -1481,7 +1481,7 @@ struct Provider {
 	void* handle;
 	CK_FUNCTION_LIST* funcs;
 };
-typedef struct Provider* Crypt__HSM;
+typedef struct Provider* Crypt__HSM__Provider;
 
 static struct Provider* S_provider_refcount_increment(pTHX_ struct Provider* provider) {
 	refcount_inc(&provider->refcount);
@@ -1511,7 +1511,7 @@ static int provider_free(pTHX_ SV* sv, MAGIC* magic) {
 	return 0;
 }
 
-static const MGVTBL Crypt__HSM_magic = { NULL, NULL, NULL, NULL, provider_free, NULL, provider_dup, NULL };
+static const MGVTBL Crypt__HSM__Provider_magic = { NULL, NULL, NULL, NULL, provider_free, NULL, provider_dup, NULL };
 
 static int provider_ptr_dup(pTHX_ MAGIC* magic, CLONE_PARAMS* params) {
 	PERL_UNUSED_VAR(params);
@@ -1628,7 +1628,7 @@ typedef struct Stream* Crypt__HSM__Verify;
 
 #define CLONE_SKIP() 1
 
-MODULE = Crypt::HSM	 PACKAGE = Crypt::HSM		PREFIX = provider_
+MODULE = Crypt::HSM	 PACKAGE = Crypt::HSM
 
 PROTOTYPES: DISABLED
 
@@ -1642,7 +1642,7 @@ BOOT:
 	SvREFCNT_dec(stream);
 
 
-Crypt::HSM load(SV* class, const char* path)
+Crypt::HSM::Provider load(SV* class, const char* path)
 CODE:
 	PERL_UNUSED_VAR(class);
 	RETVAL = (struct Provider*) PerlMemShared_calloc(1, sizeof(struct Provider));
@@ -1670,8 +1670,9 @@ CODE:
 OUTPUT:
 	RETVAL
 
+MODULE = Crypt::HSM	 PACKAGE = Crypt::HSM::Provider
 
-HV* info(Crypt::HSM self)
+HV* info(Crypt::HSM::Provider self)
 CODE:
 	CK_INFO info;
 	CK_RV result = self->funcs->C_GetInfo(&info);
@@ -1688,7 +1689,7 @@ OUTPUT:
 	RETVAL
 
 
-void slots(Crypt::HSM self, CK_BBOOL tokenPresent = 1)
+void slots(Crypt::HSM::Provider self, CK_BBOOL tokenPresent = 1)
 PPCODE:
 	CK_ULONG count, i;
 
@@ -1696,7 +1697,7 @@ PPCODE:
 	if ( result != CKR_OK )
 		croak_with("Couldn't get slots", result);
 
-	EXTEND(SP, (int)count);
+		EXTEND(SP, (int)count);
 
 	CK_SLOT_ID_PTR slotList;
 	Newxz(slotList, count, CK_SLOT_ID);
@@ -1710,7 +1711,7 @@ PPCODE:
 		mPUSHs(new_slot(self, slotList[i]));
 
 
-SV* slot(Crypt::HSM self, CK_SLOT_ID slot)
+SV* slot(Crypt::HSM::Provider self, CK_SLOT_ID slot)
 CODE:
 	RETVAL = new_slot(self, slot);
 OUTPUT:
@@ -1910,7 +1911,7 @@ OUTPUT:
 	RETVAL
 
 
-Crypt::HSM provider(Crypt::HSM::Session self)
+Crypt::HSM::Provider provider(Crypt::HSM::Session self)
 CODE:
 	RETVAL = provider_refcount_increment(self->provider);
 OUTPUT:

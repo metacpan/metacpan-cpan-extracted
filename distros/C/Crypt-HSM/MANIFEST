@@ -19,6 +19,7 @@ lib/Crypt/HSM/Decrypt.pm
 lib/Crypt/HSM/Digest.pm
 lib/Crypt/HSM/Encrypt.pm
 lib/Crypt/HSM/Mechanism.pm
+lib/Crypt/HSM/Provider.pm
 lib/Crypt/HSM/Session.pm
 lib/Crypt/HSM/Sign.pm
 lib/Crypt/HSM/Slot.pm

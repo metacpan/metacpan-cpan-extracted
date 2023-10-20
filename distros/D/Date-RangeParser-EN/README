@@ -1,22 +1,329 @@
-Date::RangeParser::EN
-====================
+NAME
 
-INSTALLATION
+    Date::RangeParser::EN - Parse plain English date/time range strings
 
-To install this module, type the following:
+VERSION
 
-perl Makefile.pl
-make
-make test
-make install
+    version v1.0.0
+
+SYNOPSIS
+
+        use Date::RangeParser::EN;
+    
+        my $parser = Date::RangeParser::EN->new;
+        my ($begin, $end) = $parser->parse_range("this week");
+
+DESCRIPTION
+
+    Parses plain-English strings representing date/time ranges
+
+NAME
+
+    Date::RangeParser::EN - Parser for plain English date/time range
+    strings
+
+METHODS
+
+ new
+
+    Returns a new instance of Date::RangeParser::EN.
+
+    Takes an optional hash of parameters:
+
+      * datetime_class
+
+      By default, Date::RangeParser::EN returns two DateTime objects
+      representing the beginning and end of the range. If you use a
+      subclass of DateTime (or another module that implements the DateTime
+      API), you may pass the name of this class to use it instead.
+
+      At the very least, this given class must implement a new method that
+      accepts a hash of arguments, where the following keys will be set:
+
+        year
+        month
+        day
+        hour
+        minute
+        second
+
+      This gives you the freedom to set your time zones and such however
+      you need to.
+
+      * infinite_past_class =item * infinite_future_class
+
+      By default, Date::RangeParser::EN uses DateTime::Infinite::Past and
+      DateTime::Infinite::Future to create open-ended ranges (for example
+      "after today"). If you have extended these classes, you may pass the
+      corresponding names in.
+
+      The given classes must implement a new method that accepts no
+      arguments.
+
+      * now_callback
+
+      By default, Date::RangeParser::EN uses DateTime->now to determine the
+      current date/time for calculations. If you need to work with a
+      different time (for instance, if you need to adjust for time zones),
+      you may pass a callback (code reference) which returns a DateTime
+      object.
+
+ parse_range
+
+    Accepts a string representing a plain-English date range, for instance:
+
+      * today
+
+      * this week
+
+      * the past 2 months
+
+      * next Tuesday
+
+      * two weeks ago
+
+      * the next 3 hours
+
+      * the 3rd of next month
+
+      * the end of this month
+
+    More formally, this will parse the following kinds of date strings:
+
+      NUMBER : ordinary number (1)
+      PERIOD : one of: hour, day, week, month, quarter, or year (or the plural of these)
+      WEEKDAY : one of: Monday, Tuesday, Wedensday, Thursday, Friday, Saturday, or Sunday
+      CARDINAL : a cardinal number (21st) or the word for that number (twenty-first) or end
+      MONTH : a month name: January, Feburary, March, April, May, June, July August, 
+              September, October, November, or Decmeber or any 3-letter abbreviation
+      YEAR : a 4-digit year (2-digits will not work)
+      RANGE : any date range that can be parsed by parse_range
+      ELEMENT : any element of a date range that can be parsed by parse_range
+    
+      today                             : today, midnight to midnight
+    
+      this PERIOD                       : the current period, start to end
+      this month
+    
+      current PERIOD                    : the current period, start to end
+      current year
+    
+      this WEEKDAY                      : the WEEKDAY that is in the current week, midnight to midnight
+      this Monday
+    
+      NUMBER PERIOD ago                 : past date relative to now until now
+      3 days ago
+    
+      past NUMBER PERIOD                : past date relative to now until now
+      past 2 weeks
+    
+      last NUMBER PERIOD                : past date relative to now until now
+      last 6 hours
+    
+      past NUMBER WEEKDAY               : the weekday a number of weeks before now until now
+      past 4 Saturdays
+    
+      NUMBER WEEKDAY ago                : the weekday a number of weeks before now until now
+      3 Fridays ago
+    
+      yesterday                         : yesterday, midnight to midnight
+    
+      last WEEKDAY                      : the WEEKDAY that is in the week prior to this, midnight to midnight
+      last Wednesday
+    
+      previous WEEKDAY                  : the WEEKDAY that is in the week prior to this, midnight to midnight
+      previous Friday
+    
+      past WEEKDAY                      : the WEEKDAY that is in the week prior to this, midnight to midnight
+      past Tuesday
+    
+      this past WEEKDAY                 : the WEEKDAY that is in the week prior to this, midnight to midnight
+      this past Saturday
+    
+      coming WEEKDAY                    : the WEEKDAY that is in the week after this, midnight to midnight
+      coming Monday
+    
+      this coming WEEKDAY               : the WEEKDAY that is in the week after this, midnight to midnight
+      this coming Thursday
+    
+      NUMBER PERIOD hence               : now to a future date relative to now
+      4 months hence
+    
+      NUMBER PERIOD from now            : now to a future date relative to now
+      6 days from now
+    
+      next NUMBER PERIOD                : now to a future date relative to now
+      next 7 years
+    
+      tomorrow                          : tomorrow, midnight to midnight
+    
+      next NUMBER WEEKDAY               : the WEEKDAY that is in a number of weeks after this, midnight to midnight
+      next 4 Sundays
+    
+      CARDINAL of this month            : the specified day of the current month, midnight to midnight
+      14th of this month
+    
+      CARDINAL of last month            : the specified day of the previous month, midnight to midnight
+      31st of last month
+    
+      CARDINAL of next month            : the specified day of the month following this, midnight to midnight
+      3rd of next month
+    
+      CARDINAL of NUMBER months ago     : the specified day of a previous month, midnight to midnight
+      12th of 2 months ago
+    
+      CARDINAL of NUMBER months from now : the specified day of a following month, midnight to midnight
+      7th of 22 months from now
+    
+      CARDINAL of NUMBER months hence   : the specified day of a following month, midnight to midnight
+      22nd of 6 months hence
+    
+      MONTH                             : the named month of the current year, 1st to last day
+      August
+    
+      this MONTH                        : the named month of the current year, 1st to last day
+      this Sep
+    
+      last MONTH                        : the named month of the previous year, 1st to last day
+      last January
+    
+      next MONTH                        : the named month of the next year, 1st to last day
+      next Dec
+    
+      MONTH YEAR                        : the named month of the named year, 1st to last day
+      June 1969
+    
+      RANGE to RANGE                    : the very start of the first range to the very end of the second
+      Tuesday to Next Saturday
+    
+      RANGE thru RANGE                  : the very start of the first range to the very end of the second
+      2 hours ago thru the next 6 hours
+    
+      RANGE through RANGE               : the very start of the first range to the very end of the second
+      August through December
+    
+      RANGE - RANGE                     : the very start of the first range to the very end of the second
+      9-1-2012 - 9-30-2012
+    
+      RANGE-RANGE                       : the very start of the first range to the very end of the second
+      10/10-10/20                         (ranges must not contain hyphens, "-")
+    
+      before ELEMENT                    : all dates before the very start of the date specified in the ELEMENT
+           < ELEMENT
+      before today
+    
+      <= ELEMENT                        : all dates up to the very end of the date specified in the ELEMENT
+      <= today
+    
+      after ELEMENT                     : all dates after the very end of the date specified in the ELEMENT
+          > ELEMENT
+      after next Tuesday
+    
+      >= ELEMENT                        : the date specified in the ELEMENT to the end of forever
+      >= this Friday
+    
+      since ELEMENT                     : the date specified in the ELEMENT to the end of the current day
+      since last Sunday
+
+    Anything else is parsed by Date::Manip. If Date::Manip is unable to
+    parse the date given either, then the dates returned will be undefined.
+
+    Also, when parsing:
+
+      * The words "the" and "and" will always be ignored and can appear
+      anywhere.
+
+      * Cardinal numbers may be spelled out as words, i.e. "September
+      first" instead of "September 1st". Similarly, "two weeks ago" and "2
+      weeks ago" will be treated as the same
+
+      * Any plural or singular period shown above can be used with the
+      opposite.
+
+      * All dates are parsed relative to the parser's notion of now. You
+      can control this by setting the now_callback option on the
+      constructor.
+
+    Returns two DateTime objects, representing the beginning and end of the
+    range.
+
+ _convert_from_us_dashed
+
+    Converts a US date string in the format MM-DD-YYYY into a datetime
+    object.
+
+ _clean_units
+
+    Given a unit of measurement such as hours?, minutes?, seconds?, or
+    days?, we will return a string of the form hours, minutes, seconds, or
+    days.
+
+TO DO
+
+    There's a lot more that this module could handle. A few items that come
+    to mind:
+
+      * More testing to make sure certain date configurations are handled,
+      like start of week.
+
+      * Handle Unicode in places where such handling makes sense (like
+      hyphen detection)
+
+      * Allow full words instead of digits ("two weeks ago" vs "2 weeks
+      ago")
+
+      * Allow "between" for ranges ("between last February and this
+      Friday") in addition to "to/through" ranges
+
+      * This module is US English-centric (hence the "EN") and might do
+      some things wrong for other variants of English and a generic
+      Date::RangeParser interface could be made to allow for other
+      languages to be parsed this way.
+
+      * Depends on Date::Manip. This may or may not be a good thing.
 
 DEPENDENCIES
 
-This module requires these other modules and libraries:
+    DateTime, Date::Manip
 
-    DateTime
-    Date::Manip
+AUTHORS
+
+    This module was authored by Grant Street Group
+    (http://grantstreet.com), who were kind enough to give it back to the
+    Perl community.
+
+    The CPAN distribution is maintained by Grant Street Group
+    <developers@grantstreet.com>.
+
+THANK YOU
+
+    Sterling Hanenkamp, for adding support for explicit date ranges,
+    improved parsing, and improving the documentation.
+
+    Sam Varshavchik, for fixing a bug affecting the "[ordinal] of
+    [last/next] month" syntax.
+
+    Allan Noah and James Hammer, for adding support for times in addition
+    to dates and various bug fixes.
 
 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2014 Grant Street Group. All rights reserved.
+    Copyright (C) 2012-2023 Grant Street Group.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHORS
+
+      * Grant Street Group <developers@grantstreet.com>
+
+      * Michael Aquilina <aquilina@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2012 - 2023 by Grant Street Group.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

@@ -1,5 +1,8 @@
 Revision history for Crypt-HSM
 
+0.014     2023-10-21 00:17:19+02:00 Europe/Brussels
+          - Split Crypt::HSM::Provider out of Crypt::HSM namespace
+
 0.013     2023-09-02 17:52:03+02:00 Europe/Brussels
           - Refactor typemaps to use ExtUtils::Typemaps::Magic
 

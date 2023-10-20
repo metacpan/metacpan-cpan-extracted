@@ -14,7 +14,6 @@ use warnings;
 use Test::Most tests => 101;
 use Compress::Zlib;
 use Test::TempDir::Tiny;
-use IO::Uncompress::Brotli;
 use DateTime;
 use Test::HTML::Lint;
 # use Test::NoWarnings;	# HTML::Clean has them
@@ -124,7 +123,11 @@ OUTPUT: {
 	$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
 	$ENV{'HTTP_ACCEPT_ENCODING'} = undef;
 	# delete($ENV{'HTTP_ACCEPT_ENCODING'});
-	$ENV{'HTTP_TE'} = 'br,gzip';
+	if(($^O eq 'MSWin32') || ($^O eq 'openbsd')) {
+		$ENV{'HTTP_TE'} = 'gzip';
+	} else {
+		$ENV{'HTTP_TE'} = 'br,gzip';
+	}
 
 	$filename = tempdir() . 'test4';
 	open($tmp, '>', $filename);
@@ -156,15 +159,31 @@ OUTPUT: {
 	ok(defined($length));
 
 	($headers, $body) = split /\r?\n\r?\n/, $output, 2;
-	ok($headers =~ /^Content-Encoding: br/m);
 	ok($headers =~ /ETag: "[A-Za-z0-F0-f]{32}"/m);
 
-	ok(defined($body));
-	ok(length($body) eq $length);
-	$body = unbro($body, 1024);
-	ok(defined($body));
-	ok($body =~ /<HTML><HEAD><TITLE>Hello, world<\/TITLE><\/HEAD><BODY><P>The quick brown fox jumped over the lazy dog.<\/P><\/BODY><\/HTML>\n$/);
-	html_ok($body, 'HTML:Lint shows no errors');
+        ok(defined($body));
+        ok(length($body) eq $length);
+
+        if(($^O eq 'MSWin32') || ($^O eq 'openbsd')) {
+                TODO: {
+                        local $TODO = "IO::Compress::Brotli doesn't support Windows or OpenBSD";
+                        ok($headers =~ /^Content-Encoding: br/m);
+
+                        # $body = IO::Compress::Brotli::unbro($body, 1024);
+			ok(defined($body));
+                        ok($body =~ /<HTML><HEAD><TITLE>Hello, world<\/TITLE><\/HEAD><BODY><P>The quick brown fox jumped over the lazy dog.<\/P><\/BODY><\/HTML>\n$/);
+                        html_ok($body, 'HTML:Lint shows no errors');
+                }
+        } else {
+                ok($headers =~ /^Content-Encoding: br/m);
+		require IO::Compress::Brotli;
+		IO::Compress::Brotli->import();
+
+                $body = IO::Compress::Brotli::unbro($body, 1024);
+		ok(defined($body));
+                ok($body =~ /<HTML><HEAD><TITLE>Hello, world<\/TITLE><\/HEAD><BODY><P>The quick brown fox jumped over the lazy dog.<\/P><\/BODY><\/HTML>\n$/);
+                html_ok($body, 'HTML:Lint shows no errors');
+        }
 
 	#..........................................
 	delete $ENV{'SERVER_PROTOCOL'};
