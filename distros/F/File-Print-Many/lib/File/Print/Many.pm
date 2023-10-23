@@ -12,11 +12,11 @@ File::Print::Many - Print to more than one file descriptor at once
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 # our @ISA = ('Tie::Handle');
 
 =head1 SYNOPSIS
@@ -128,15 +128,11 @@ L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Print-Many>
 
 L<http://annocpan.org/dist/File-Print-Many>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/File-Print-Many>
-
 =back
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright 2018-2022 Nigel Horne.
+Copyright 2018-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

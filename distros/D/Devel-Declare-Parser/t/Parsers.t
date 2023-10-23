@@ -4,9 +4,9 @@ use warnings;
 use Test::More;
 
 BEGIN {
-    use_ok( 'Devel::Declare::Parser::Sublike', 'sl' );
-    use_ok( 'Devel::Declare::Parser::Codeblock', 'cb' );
-    use_ok( 'Devel::Declare::Parser::Method', 'mth' );
+    use_ok( 'Devel::Declare::Parser::Sublike' );
+    use_ok( 'Devel::Declare::Parser::Codeblock' );
+    use_ok( 'Devel::Declare::Parser::Method' );
     Devel::Declare::Interface::enhance( 'main', $_->[0], $_->[1] )
         for [ 'sl', 'sublike'   ],
             [ 'cb', 'codeblock' ],

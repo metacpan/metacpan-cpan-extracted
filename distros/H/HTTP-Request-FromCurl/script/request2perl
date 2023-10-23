@@ -1,16 +1,15 @@
 #!perl
-use strict;
+use 5.020;
 use Getopt::Long;
 
 use HTTP::Request::FromCurl;
 use HTTP::Request::FromFetch;
 use HTTP::Request::FromWget;
 
-use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.52';
+our $VERSION = '0.54';
 
 my $has_tidy;
 BEGIN { eval { require Perl::Tidy; $has_tidy = 1; } }

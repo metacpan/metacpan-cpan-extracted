@@ -58,7 +58,7 @@
          "url" : "http://github.com/Test-More/Test2-Suite/"
       }
    },
-   "version" : "0.000156",
+   "version" : "0.000158",
    "x_generated_by_perl" : "v5.36.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

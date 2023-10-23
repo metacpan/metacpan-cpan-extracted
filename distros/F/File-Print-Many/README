@@ -1,4 +1,4 @@
-File-Print-Many Version 0.02
+File-Print-Many Version 0.03
 
 INSTALLATION
 
@@ -24,9 +24,6 @@ You can also look for information at:
     AnnoCPAN, Annotated CPAN documentation
         http://annocpan.org/dist/File-Print-Many
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/File-Print-Many
-
     Search CPAN
         http://search.cpan.org/dist/File-Print-Many/
 
@@ -38,6 +35,6 @@ When filing a bug, please include a patch or pull request.
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018-2022 Nigel Horne
+Copyright (C) 2018-2023 Nigel Horne
 
 For personal use, this program is released under the following licence: GPL2

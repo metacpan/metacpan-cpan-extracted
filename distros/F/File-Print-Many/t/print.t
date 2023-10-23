@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use autodie;
+use Test::File::Contents;
 use Test::Most tests => 18;
 use Test::NoWarnings;
 use Test::TempDir::Tiny;
@@ -29,21 +30,8 @@ PRINT: {
 	close $fout1;
 	close $fout2;
 
-	open(my $fin, '<', $tmp1);
-	my $contents;
-	while(<$fin>) {
-		$contents .= $_;
-	}
-	close($fin);
-	ok($contents eq "hello, world!\n");
-
-	open($fin, '<', $tmp2);
-	$contents = undef;
-	while(<$fin>) {
-		$contents .= $_;
-	}
-	close($fin);
-	ok($contents eq "hello, world!\n");
+	file_contents_eq($tmp1, "hello, world!\n", 'basic test');
+	files_eq($tmp1, $tmp2);
 
 	open($fout1, '>', $tmp1);
 	open($fout2, '>', $tmp2);
@@ -56,21 +44,8 @@ PRINT: {
 	close $fout1;
 	close $fout2;
 
-	open($fin, '<', $tmp1);
-	$contents = undef;
-	while(<$fin>) {
-		$contents .= $_;
-	}
-	close($fin);
-	ok($contents eq "hello, world!\n");
-
-	open($fin, '<', $tmp2);
-	$contents = undef;
-	while(<$fin>) {
-		$contents .= $_;
-	}
-	close($fin);
-	ok($contents eq "hello, world!\n");
+	file_contents_eq($tmp1, "hello, world!\n", 'fds argument works');
+	files_eq($tmp1, $tmp2);
 
 	open($fout1, '>', $tmp1);
 	open($fout2, '>', $tmp2);
@@ -83,21 +58,8 @@ PRINT: {
 	close $fout1;
 	close $fout2;
 
-	open($fin, '<', $tmp1);
-	$contents = undef;
-	while(<$fin>) {
-		$contents .= $_;
-	}
-	close($fin);
-	ok($contents eq "hello, world!\n");
-
-	open($fin, '<', $tmp2);
-	$contents = undef;
-	while(<$fin>) {
-		$contents .= $_;
-	}
-	close($fin);
-	ok($contents eq "hello, world!\n");
+	file_contents_eq($tmp1, "hello, world!\n", 'hash ref argument works');
+	files_eq($tmp1, $tmp2);
 
 	open($fout1, '>', $tmp1);
 	open($fout2, '>', $tmp2);
@@ -109,21 +71,8 @@ PRINT: {
 	close $fout1;
 	close $fout2;
 
-	open($fin, '<', $tmp1);
-	$contents = undef;
-	while(<$fin>) {
-		$contents .= $_;
-	}
-	close($fin);
-	cmp_ok($contents, 'eq', "hello, world!\n", 'daisy chain works');
-
-	open($fin, '<', $tmp2);
-	$contents = undef;
-	while(<$fin>) {
-		$contents .= $_;
-	}
-	close($fin);
-	cmp_ok($contents, 'eq', "hello, world!\n", 'daisy chain works');
+	file_contents_eq($tmp1, "hello, world!\n", 'daisy chain works');
+	files_eq($tmp1, $tmp2);
 	unlink $tmp1;
 	unlink $tmp2;
 

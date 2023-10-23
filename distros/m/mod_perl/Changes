@@ -12,6 +12,15 @@ Also refer to the Apache::Test changes log file, at Apache-Test/Changes
 
 =over 3
 
+=item 2.0.13 October 21, 2023
+
+Use get_server_banner() instead of deprecated get_server_version() in
+Apache2::Status.  [Petr Písař <ppisar@redhat.com]
+
+Avoid generating APR precompiled headers. [Sam James <sam@gentoo.org>]
+
+Fix build for perl >= 5.37.1. [Jitka Plesnikova <jplesnik@redhat.com>]
+
 =item 2.0.12 January 30, 2022
 
 Add bug tracker information to README, and add CONTRIBUTING.md. [Steve Hay]

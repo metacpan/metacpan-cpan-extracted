@@ -1,18 +1,18 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/GnuplotUtils/xyplot
-# and generated automatically using Perinci::CmdLine::Gen version 0.499
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-02'; # DATE
-our $DIST = 'App-GnuplotUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-10-21'; # DATE
+our $DIST = 'App-GnuplotUtils'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/GnuplotUtils/xyplot",
@@ -38,57 +38,74 @@ xyplot - Plot XY dataset(s) using gnuplot
 
 =head1 VERSION
 
-This document describes version 0.003 of xyplot (from Perl distribution App-GnuplotUtils), released on 2021-07-02.
+This document describes version 0.005 of xyplot (from Perl distribution App-GnuplotUtils), released on 2023-10-21.
 
 =head1 SYNOPSIS
 
-Usage:
+B<xyplot> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
- % xyplot [-O] [--chart-title=s] [-d=s] [--dataset-data=s+]
-     [--dataset-datas-json=s] [--dataset-file=s+] [--dataset-files-json=s]
-     [--dataset-style=s+] [--dataset-styles-json=s] [--dataset-title=s+]
-     [--dataset-titles-json=s] [--field-delimiter=s] [--format=name]
-     [--json] [--(no)naked-res] [--no-overwrite] [--nooverwrite] [-o=s]
-     [--output-file=s] [--overwrite] [--page-result[=program]]
-     [--view-result[=program]] -- [dataset_file] ...
+B<xyplot> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<xyplot> [B<L<--chart-title|/"--chart-title=s">>=I<str>] [(B<L<--dataset-data|/"--dataset-datas-json=s">>=I<str>)+|B<L<--dataset-datas-json|/"--dataset-datas-json=s">>=I<json>] [(B<L<--dataset-file|/"--dataset-files-json=s">>=I<L<filename|Sah::Schema::filename>>)+|B<L<--dataset-files-json|/"--dataset-files-json=s">>=I<json>] [(B<L<--dataset-style|/"--dataset-styles-json=s">>=I<str>)+|B<L<--dataset-styles-json|/"--dataset-styles-json=s">>=I<json>] [(B<L<--dataset-title|/"--dataset-titles-json=s">>=I<str>)+|B<L<--dataset-titles-json|/"--dataset-titles-json=s">>=I<json>] [B<L<--field-delimiter|/"--field-delimiter=s, -d">>=I<str>|B<L<-d|/"--field-delimiter=s, -d">>=I<str>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--output-file|/"--output-file=s, -o">>=I<L<filename|Sah::Schema::filename>>|B<L<-o|/"--output-file=s, -o">>=I<L<filename|Sah::Schema::filename>>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<dataset_file|/"--dataset-files-json=s">>] ...
 
 =head1 DESCRIPTION
 
 This utility is a wrapper for gnuplot to quickly generate a graph from the
-command-line and view it using a browser or an image viewer program. You can
-specify the dataset to plot directly from the command-line or specify filename
-to read the dataset from.
+command-line and view it using an image viewer program or a browser.
 
-To plot directly from the command-line:
+B<Specifying dataset>
+
+You can specify the dataset to plot directly from the command-line or specify
+filename to read the dataset from.
+
+To plot directly from the command-line, specify comma-separated list of X & Y
+number pairs using C<--dataset-data> option:
 
  % xyplot --dataset-data '1,1, 2,3, 3,5.5, 4,7.9, 6,11.5' ; # whitespaces are optional
 
 To add more datasets, specify more C<--dataset-data> options:
 
  % xyplot --dataset-data '1,1, 2,3, 3,5.5, 4,7.9, 6,11.5' \
-          --dataset-data '1,4,2,4,3,2,4,9,5,3,6,6'
+          --dataset-data '1,4,2,4,3,2,4,9,5,3,6,6';         # will plot two lines
 
-To add a title to your chart and every dataset:
+To add a title to your chart and every dataset, use C<--dataset-title>:
 
  % xyplot --chart-title "my chart" \
           --dataset-title "foo" --dataset-data '1,1, 2,3, 3,5.5, 4,7.9, 6,11.5' \
           --dataset-title "bar" --dataset-data '1,4,2,4,3,2,4,9,5,3,6,6'
 
-To specify dataset from a file, use C<--dataset-file> option (or specify as
-arguments):
+To specify dataset from files, use one or more C<--dataset-file> options (or
+specify the filenames as arguments):
 
  % xyplot --dataset-file ds1.txt --dataset-file ds2.txt
  % xyplot ds1.txt ds2.txt
 
-C<ds1.txt> contains these lines:
+C<ds1.txt> should contain comma, or whitespace-separated list of X & Y numbers.
+You can put one number per line or more.
 
  1 1
  2 3
  3 5.5
  4 7.9
  6 11.5
+ 8
+ 13.5
+ 9 14.2 10 14.8
 
-Keywords: xychart, XY chart, XY plot
+To accept data from stdin, you can specify C<-> as the filename:
+
+ % tabulate-drug-concentration ... | xyplot -
+
+B<Seeing plot result>
+
+C<xyplot> uses L<Desktop::Open> to view the resulting plot. The module will
+first find a suitable application, and failing that will use the web browser. If
+you specify C<--output-file> (C<-o>), the plot is written to the specified image
+file.
+
+B<Keywords>
+
+xychart, XY chart, XY plot
 
 =head1 OPTIONS
 
@@ -99,6 +116,9 @@ C<*> marks required options.
 =over
 
 =item B<--chart-title>=I<s>
+
+(No description)
+
 
 =item B<--dataset-data>=I<s@>
 
@@ -170,6 +190,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -184,28 +210,43 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--output-file>=I<s>, B<-o>
 
+(No description)
+
+
 =item B<--overwrite>, B<-O>
+
+(No description)
+
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -265,6 +306,41 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Gnuplo
 
 Source repository is at L<https://github.com/perlancar/perl-App-GnuplotUtils>.
 
+=head1 SEE ALSO
+
+L<tchart>. From App::tchart Perl module, to quickly create ASCII chart, currently sparklines.
+
+L<asciichart>. From App::AsciiChart Perl module, to quickly create ASCII chart.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GnuplotUtils>
@@ -272,16 +348,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2018 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

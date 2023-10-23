@@ -6,6 +6,18 @@ Changes - Apache::Reload change logfile
 
 =over 1
 
+=item 0.14 August 06, 2023
+
+Fix unnecessary FAIL reports on CPAN Testers by checking for mod_perl or
+mod_perl2.
+[Andreas Koenig <ANDK@cpan.org>, CPAN RT#34316; Steve Hay]
+
+Fix spelling error.
+[<x.guimard@free.fr>, CPAN RT#127004]
+
+Fix Makefile.PL when Apache::Test is not present.
+[Nigel Gregoire, CPAN RT#113778]
+
 =item 0.13 May 09, 2015
 
 Fix reload.t. Reported in CPAN RT#96656.

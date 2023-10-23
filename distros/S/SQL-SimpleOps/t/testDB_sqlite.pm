@@ -34,7 +34,7 @@ sub SQLite_envfail()
 	diag("SQLite3 tests IGNORED");
 	diag("");
 	if (@_) { diag(@_); diag(""); }
-	diag("see: README.txt how to configure the SQLite3 tests");
+	diag("See text README how to configure the SQLite3 tests");
 	diag("");
 }
 

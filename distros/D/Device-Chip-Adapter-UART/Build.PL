@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -6,6 +7,9 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Device::Chip::Adapter::UART',
    requires => {
+      'perl' => '5.026',
+      'Object::Pad' => '0.70',
+
       'Device::Chip::Adapter' => 0,
       'Future' => 0,
       'Future::Buffer' => 0,
@@ -13,7 +17,9 @@ my $build = Module::Build->new(
       'IO::Termios' => 0,
    },
    test_requires => {
-      'Test::More' => '0.88',  # done_testing
+      'Future::AsyncAwait' => 0,
+      'Test::Future::IO' => '0.05',
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004',  # test_requires

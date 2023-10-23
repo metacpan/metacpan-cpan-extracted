@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Script::Runner;
-$Bitcoin::Crypto::Script::Runner::VERSION = '2.001';
+$Bitcoin::Crypto::Script::Runner::VERSION = '2.002';
 use v5.10;
 use strict;
 use warnings;

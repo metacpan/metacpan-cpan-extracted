@@ -1,6 +1,6 @@
 package Text::Conceal;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use v5.14;
 use warnings;
@@ -21,13 +21,14 @@ my %char_range = (
     );
 
 my %default = (
-    test    => undef,
-    length  => sub { length $_[0] },
-    match   => qr/.+/s,
-    except  => '',
-    max     => 0,
-    visible => 0,
-    ordered => 1,
+    test      => undef,
+    length    => sub { length $_[0] },
+    match     => qr/.+/s,
+    except    => '',
+    max       => 0,
+    visible   => 0,
+    ordered   => 1,
+    duplicate => 0,
 );
 
 sub new {
@@ -87,7 +88,9 @@ sub decode {
 	for my $i (0 .. $#replace) {
 	    my($regex, $orig, $len) = @{$replace[$i]};
 	    if (s/$regex/_replace(${^MATCH}, $orig, $len)/pe) {
-		if ($obj->{ordered}) {
+		if ($obj->{duplicate}) {
+		    ;
+		} elsif ($obj->{ordered}) {
 		    splice @replace, 0, $i + 1;
 		} else {
 		    splice @replace, $i, 1;
@@ -181,7 +184,7 @@ Text::Conceal - conceal and recover interface for text processing
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 DESCRIPTION
 
@@ -273,7 +276,7 @@ Text concealing is done by replacing text with different string which
 can not be found in any arguments.  This parameter gives additional
 string which also to be taken care of.
 
-=item B<visible> => I<number>
+=item B<visible> => I<number> (default 0)
 
 =over 4
 
@@ -297,12 +300,21 @@ Use only printable characters.
 
 =back
 
-=item B<ordered> => *bool*
+=item B<ordered> => I<bool> (default 1)
 
 Ensures that the parameters given and the order in which they appear in 
 the output do not change. The default is set to 1; if set to 0, it will 
 be handled correctly even if they appear in a different order, a 
 behavior that may lead to instability.
+
+=item B<duplicate> => I<bool> (default 0)
+
+It is assumed that the string before conversion appears only once
+after the process. Therefore, if the same string appears a second
+time, the conversion fails. By setting this parameter to 1, it is
+possible to allow a string to appear multiple times. However, doing so
+will increase the probability of failure if a large number of strings
+are attempted to be converted.
 
 =back
 
@@ -318,8 +330,12 @@ altered.
 =head1 LIMITATION
 
 All arguments given to B<encode> method have to appear in the same
-order in the pre-decode string.  Each argument can be shorter than the
-original, or it can even disappear.
+order in the pre-decode string.  If you want to convert unordered
+output, set the C<ordered> parameter to 0.  However, if a large number
+of short items are included, you may get unexpected results.
+
+Each argument can be shorter than the original, or it can even
+disappear.
 
 If an argument is trimmed down to single byte in a result, and it have
 to be recovered to wide character, it is replaced by single space.

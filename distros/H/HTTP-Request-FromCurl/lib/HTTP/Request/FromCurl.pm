@@ -1,6 +1,5 @@
-package HTTP::Request::FromCurl;
-use strict;
-use warnings;
+package HTTP::Request::FromCurl 0.54;
+use 5.020;
 use File::Basename 'basename';
 use HTTP::Request;
 use HTTP::Request::Common;
@@ -14,11 +13,8 @@ use PerlX::Maybe;
 use MIME::Base64 'encode_base64';
 use File::Basename 'basename';
 
-use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
-
-our $VERSION = '0.52';
 
 =head1 NAME
 
@@ -586,10 +582,10 @@ sub _build_request( $self, $uri, $options, %build_options ) {
         };
 
         push @res, HTTP::Request::CurlParameters->new({
-            method => $method,
-            uri    => $uri,
-            headers => \%headers,
-            body   => $body,
+                  method => $method,
+                  uri    => $uri,
+                  headers => \%headers,
+                  body   => $body,
             maybe auth => $auth,
             maybe cert => $options->{cert},
             maybe capath => $options->{capath},

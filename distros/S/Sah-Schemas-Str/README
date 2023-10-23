@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Str - Various string schemas
 
 VERSION
-    This document describes version 0.015 of Sah::Schemas::Str (from Perl
-    distribution Sah-Schemas-Str), released on 2023-09-03.
+    This document describes version 0.016 of Sah::Schemas::Str (from Perl
+    distribution Sah-Schemas-Str), released on 2023-10-23.
 
 SAH SCHEMAS
     The following schemas are included in this distribution:
@@ -49,6 +49,12 @@ SAH SCHEMAS
 
         A single latin uppercase letter, i.e. A-Z.
 
+    *   lowercase_str
+
+        String containing only zero or more lowercase letters.
+
+        Uppercase letters will be coerced to lowercase.
+
     *   non_empty_str
 
         A non-empty string (length >= 1) (alias for str1).
@@ -85,6 +91,9 @@ SAH SCHEMAS
         be rejected. Note that this means you accept arbitrary code from the
         user to execute! Please make sure first and foremost that this is
         acceptable in your case.
+
+        Currently string is eval'ed in the "main" package, without "use
+        strict" or "use warnings".
 
         This schema is handy if you want to accept string or coderef from
         the command-line.
@@ -128,6 +137,12 @@ SAH SCHEMAS
 
         This schema is handy if you want to accept string or regex or
         coderef from the command-line.
+
+    *   uppercase_str
+
+        String containing only zero or more uppercase letters.
+
+        Uppercase letters will be coerced to lowercase.
 
 HOMEPAGE
     Please visit the project's homepage at

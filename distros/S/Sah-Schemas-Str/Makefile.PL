@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010001;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Sah-Schemas-Str",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010001",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Sah::Schemas::Str",
   "PREREQ_PM" => {
     "Data::Sah::Coerce::perl::To_str::From_str::to_lower" => 0,
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.015",
+  "VERSION" => "0.016",
   "test" => {
     "TESTS" => "t/*.t"
   }

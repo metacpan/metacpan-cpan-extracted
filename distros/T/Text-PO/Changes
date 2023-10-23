@@ -1,5 +1,8 @@
 Revision history for Perl module Text::PO
 
+v0.6.3 2023-10-23T12:06:45+0900
+    - Improved documentation for Text::PO::Element
+
 v0.6.2 2023-10-15T16:24:13+0900
     - Minor correction of a bug due to a missing JavaScript function in scripts/gettext.js
 

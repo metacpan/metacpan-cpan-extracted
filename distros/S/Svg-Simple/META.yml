@@ -1,0 +1,30 @@
+---
+abstract: 'Write SVG using Perl syntax.'
+author:
+  - philiprbrenan@gmail.com
+build_requires: {}
+configure_requires:
+  Module::Build: '0.4224'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Svg-Simple
+provides:
+  Svg::Simple:
+    file: lib/Svg/Simple.pm
+    version: '20231021'
+requires:
+  Carp: '0'
+  Data::Table::Text: '20201029'
+  Test2::API: '0'
+  Test::More: '0'
+  perl: v5.34.0
+resources:
+  bugtracker: https://github.com/philiprbrenan/SvgSimple
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/philiprbrenan/SvgSimple
+version: '20231021'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

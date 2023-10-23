@@ -15,6 +15,11 @@ DESCRIPTION
     protocol adds access to the transmit and receive lines by adding the
     "write" and "read" methods.
 
+    As the Device::Chip interface is intended for hardware IO interfaces,
+    it does not support the concept that a serial stream might
+    spontaneously become disconnected. As such, an end-of-file condition on
+    the stream filehandle will be reported as a future failure.
+
 CONSTRUCTOR
 
  new

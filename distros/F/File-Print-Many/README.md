@@ -4,7 +4,7 @@ File::Print::Many - Print to more than one file descriptor at once
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 
@@ -57,12 +57,8 @@ You can also look for information at:
 
     [http://annocpan.org/dist/File-Print-Many](http://annocpan.org/dist/File-Print-Many)
 
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/File-Print-Many](http://cpanratings.perl.org/d/File-Print-Many)
-
 # LICENCE AND COPYRIGHT
 
-Copyright 2018-2022 Nigel Horne.
+Copyright 2018-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2

@@ -137,4 +137,37 @@ use Object::Pad ':experimental(adjust_params)';
       'return from ADJUST emits warning' );
 }
 
+use Object::Pad ':experimental(composed_adjust)';
+
+# class with composed ADJUST blocks
+{
+   class ComposedAdjust {
+      field $adjusted;
+
+      field $a = "a";
+      ADJUST { $adjusted .= $a; }
+      ADJUST { $adjusted .= "b"; }
+
+      field $c = "c";
+      ADJUST { $adjusted .= $c; }
+
+      method result { $adjusted }
+   }
+
+   is( ComposedAdjust->new->result, "abc", 'Composed ADJUST blocks still work' );
+}
+
+# ADJUST :params can also be composed
+{
+   class ComposedAdjustParams {
+      field $adjusted;
+      ADJUST { $adjusted .= "a"; }
+      ADJUST :params ( :$x ) { $adjusted .= $x; }
+      ADJUST { $adjusted .= "c"; }
+      method result { $adjusted }
+   }
+
+   is( ComposedAdjustParams->new( x => "X" )->result, "aXc", 'Composed ADJUST blocks permit :params' );
+}
+
 done_testing;

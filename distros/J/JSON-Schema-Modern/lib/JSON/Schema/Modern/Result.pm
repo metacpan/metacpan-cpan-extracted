@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.572';
+our $VERSION = '0.573';
 
 use 5.020;
 use Moo;
@@ -62,9 +62,9 @@ has $_.'s' => (
 ) foreach qw(error annotation);
 
 sub errors { ($_[0]->{errors}//[])->@* }
-sub error_count { scalar ($_[0]->{errors}//[])->@* }
+sub error_count { scalar(($_[0]->{errors}//[])->@*) }
 sub annotations { ($_[0]->{annotations}//[])->@* }
-sub annotation_count { scalar ($_[0]->{annotations}//[])->@* }
+sub annotation_count { scalar(($_[0]->{annotations}//[])->@*) }
 
 # strict_basic can only be used with draft2019-09.
 use constant OUTPUT_FORMATS => [qw(flag basic strict_basic detailed verbose terse data_only)];
@@ -217,7 +217,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.572
+version 0.573
 
 =head1 SYNOPSIS
 

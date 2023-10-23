@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Role::ExtendedKey;
-$Bitcoin::Crypto::Role::ExtendedKey::VERSION = '2.001';
+$Bitcoin::Crypto::Role::ExtendedKey::VERSION = '2.002';
 use v5.10;
 use strict;
 use warnings;

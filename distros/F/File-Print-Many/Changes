@@ -1,5 +1,8 @@
 Revision history for File-Print-Many
 
+0.03	Mon Oct 23 09:37:43 EDT 2023
+	Use Test::File::Contents for testing
+
 0.02	Mon Jun 20 11:28:28 EDT 2022
 	print() can now be daisy-chained
 

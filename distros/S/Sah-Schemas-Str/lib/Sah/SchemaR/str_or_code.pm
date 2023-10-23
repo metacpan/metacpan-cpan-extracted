@@ -1,10 +1,10 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::str_or_code;
 
-our $DATE = '2023-09-03'; # DATE
-our $VERSION = '0.015'; # VERSION
+our $DATE = '2023-10-23'; # DATE
+our $VERSION = '0.016'; # VERSION
 
-our $rschema = do{my$var={base=>"any",clsets_after_base=>[{description=>"\nEither string or coderef is accepted.\n\nIf string matches the regex `qr/\\Asub\\s*\\{.*\\}\\z/s`, then it will be eval'ed\ninto a coderef. If the code fails to compile, the value will be rejected. Note\nthat this means you accept arbitrary code from the user to execute! Please make\nsure first and foremost that this is acceptable in your case.\n\nThis schema is handy if you want to accept string or coderef from the\ncommand-line.\n\n",examples=>[{valid=>1,value=>""},{valid=>1,value=>"a"},{summary=>"Not a string",valid=>0,value=>{}},{code_validate=>sub{package Sah::Schema::str_or_code;use strict;ref $_[0] eq 'CODE' & !defined($_[0]->())},valid=>1,value=>"sub {}"},{code_validate=>sub{package Sah::Schema::str_or_code;use strict;$_[0]->() eq 'foo' if ref $_[0] eq 'CODE'},valid=>1,value=>"sub{\"foo\"}"},{summary=>"Becomes a string",valid=>1,value=>"sub {"},{summary=>"Code does not compile",valid=>0,value=>"sub {1=2}"}],of=>[["str"],["code"]],prefilters=>["Str::maybe_eval"],summary=>"String or coderef (if string is of the form `sub {...}`)"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["any"],type=>"any",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"any",clsets_after_base=>[{description=>"\nEither string or coderef is accepted.\n\nIf string matches the regex `qr/\\Asub\\s*\\{.*\\}\\z/s`, then it will be eval'ed\ninto a coderef. If the code fails to compile, the value will be rejected. Note\nthat this means you accept arbitrary code from the user to execute! Please make\nsure first and foremost that this is acceptable in your case.\n\nCurrently string is eval'ed in the `main` package, without `use strict` or `use\nwarnings`.\n\nThis schema is handy if you want to accept string or coderef from the\ncommand-line.\n\n",examples=>[{valid=>1,value=>""},{valid=>1,value=>"a"},{summary=>"Not a string",valid=>0,value=>{}},{code_validate=>sub{package Sah::Schema::str_or_code;use strict;ref $_[0] eq 'CODE' & !defined($_[0]->())},valid=>1,value=>"sub {}"},{code_validate=>sub{package Sah::Schema::str_or_code;use strict;$_[0]->() eq 'foo' if ref $_[0] eq 'CODE'},valid=>1,value=>"sub{\"foo\"}"},{summary=>"Becomes a string",valid=>1,value=>"sub {"},{summary=>"Code does not compile",valid=>0,value=>"sub {1=2}"}],of=>[["str"],["code"]],prefilters=>["Str::maybe_eval"],summary=>"String or coderef (if string is of the form `sub {...}`)"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["any"],type=>"any",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: String or coderef (if string is of the form `sub {...}`)
@@ -21,7 +21,7 @@ Sah::SchemaR::str_or_code - String or coderef (if string is of the form `sub {..
 
 =head1 VERSION
 
-This document describes version 0.015 of Sah::SchemaR::str_or_code (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
+This document describes version 0.016 of Sah::SchemaR::str_or_code (from Perl distribution Sah-Schemas-Str), released on 2023-10-23.
 
 =head1 DESCRIPTION
 

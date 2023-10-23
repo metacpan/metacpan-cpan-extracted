@@ -9,14 +9,13 @@ SQL::SimpleOps - SQL Simple Operations
 =head1 PREFACE
 X<PREFACE>
 
-This module was created for my personal projects and now, after standardization for CPAN Project, i released it for general use.
-
 This module is not a statement parser, contrariwise, it consists of an SQL command builder and executor.
 
 This documment do not will provide concepts about SQL Commands and Relational Database Services.
 We understand that the developer has adequate knowledge of these parameters and commands.
 
-Before any implementation, we recommend seeing the section B<DESCRIPTION> for considerations and restrictions.
+Before any implementation, we recommend seeing the section B<DESCRIPTION> for considerations/restrictions
+and the B<EXTENDED EXAMPLES> to see some I<use cases>.
 
 I wish it to be useful in the development of your applications.
 
@@ -225,14 +224,18 @@ X<SQL Commands>
 
        buffer => hash_ref | array_ref | scalar_ref | callback_ref,
        buffer_options => hash_ref | array_ref | scalar_ref | value_ref,
+	   ...
        buffer_hashkey => column_name,
        or
-       buffer_hashkey => [col1,col2,...]
+       buffer_hashkey => [col1,col2,...],
+	   ...
        buffer_arrayref => 0 | 1,		# (default: 1)
+	   buffer_hashindex => arrayref		# (must be arrayref)
 
        # generic options
 
-       limit => value_max_lines,		# (default: ulimited lines) 
+       subquery => 0 | 1,			# (default: 0)
+       limit => value_max_lines,		# (default: unlimited lines) 
        notfound => 0 | 1,			# (default: 0)
 
        message_log => 0 | 1,			# (default: global value)
@@ -258,20 +261,40 @@ X<SQL Commands>
        # cursor options
 
        cursor => current_cursor_key,				# (no defaults)
+	   ...
        cursor_key => col_alias,					# (no defaults)
+	   or
+	   cursor_ky => [ col_alias1, ... col_alias2 ],
+	   ...
        cursor_info = array_ref | hash_ref | scalar_ref>,	# (no defaults)
-       cursor_command =>					# (default: TOP)
-          SQL_SIMPLE_CURSOR_RELOAD |
-          SQL_SIMPLE_CURSOR_BACK | SQL_SIMPLE_CURSOR_NEXT |
-          SQL_SIMPLE_CURSOS_TOP | SQL_SIMPLE_CURSOR_LAST,
        ...
-       limit =>					# (default: no defaults)
+       cursor_command =>					# (default: TOP)
+          SQL_SIMPLE_CURSOS_TOP | 
+          SQL_SIMPLE_CURSOR_BACK |
+		  SQL_SIMPLE_CURSOR_NEXT |
+          SQL_SIMPLE_CURSOR_RELOAD |
+		  SQL_SIMPLE_CURSOR_LAST,
+       ...
+       limit =>							# (default: no defaults)
+    );
+
+ SelectSubQuery
+    $rc = SQL::SimpleOps->SelectSubQuery
+    (
+	# all fields valids for Select / SelectCursor
+	# see: Select and SelectCursor
     );
 
  Update
     $rc = SQL::SimpleOps->Update
     (
+       # list of tables
+
        table => table_alias_name,
+       or
+       table => [ table1_alias, table2_alias, ... ],
+
+       # fiels list
 
        fields =>				# (no defaults)
        {
@@ -313,10 +336,13 @@ X<Call SQL>
 
        buffer => hash_ref | array_ref | scalar_ref | callback_ref,
        buffer_options => any_ref_type,
+	   ...
        buffer_hashkey => column_name,
        or
        buffer_hashkey => [col1,col2,...],
+	   ...
        buffer_arrayref => 0 | 1,		# (default: 1)
+	   buffer_hashindex => arrayreaf	# (no defaults)
 
        # options
 
@@ -380,7 +406,7 @@ X<General Methods>
     $state = SQL::SimpleOps->setDumper( false | true );	(default: false)
 
 =head1 DESCRIPTION
-X<CARLOS CELSO>
+X<DESCRIPTION>
 
 This module was created to execute basic SQL commands in a database engine,
 where it proposes the most common and basic operations with low parameter complexity.
@@ -549,8 +575,6 @@ The C<where>, C<order_by> and C<group_by> can be configured using the following 
 
 =head3 Loading Data into Applications (C<buffer>, C<buffer_options>, C<buffer_hashkey> and C<buffer_arrayref> options)
 X<Loading Data into Applicatons>
-=head3 Loading Data into Applications (C<buffer>, C<buffer_options>, C<buffer_hashkey> and C<buffer_arrayref> options)
-X<Loading Data into Applicatons>
 
 Exists two different process to manipulate the application data with the module.
 The first update data into the database (C<Insert>, C<Delete> and C<Update>) and the second get data from the database (C<Select> and C<SelectCursor>).
@@ -697,12 +721,31 @@ B<Example8:>
 
 B<BEWARE:> Only the last value will be returned for queries with multiple rows.
 
+=item B<Extracting as HASH ordered>
+
+The HASH's extraction keys is not ordered and you can not scan in the real sequence in the table.
+Some cases you need scan in the sequence one HASH by the keys.
+The option C<buffer_hashindex> is an arraydef with the lists of hashkeys, where the 0 (zero) until 'max' is the correct sequence in the table.
+This option can be used with C<buffer=hashref> to index the real scan sequence of the table.
+
+B<Example9:>
+
+  SQL::SimpleOps->Select( buffer => \%my_hash, buffer_hashkey => 'id', buffer_hashindex => \@my_index, ... );
+
+  foreach my $key1(@my_index)
+  {
+	print "key: ".$key.", buffer: ".$my_hash{$key},"\n";
+
+  }
+
+B<REMEMBER:> You can use this option if your C<buffer> is a C<hashref>, otherwise, use the buffer's option C<arrayref>.
+
 =item B<Complex Extractions>
 
 The most case you need provide a lot number of process before select the rows.
 The C<callback> will be executed for each extracted rows and depending on the return code, the lines will buffered or ignored (no stored).
 
-B<Example9:>
+B<Example10:>
 
   my @any_info;
 
@@ -739,6 +782,32 @@ B<Example9:>
      push(@{any},$ref);		# putting the data into @any_info array
      return 0;
   };
+
+B<NOTE:> This example is not a real use case, it is simple sample for references.
+
+=item B<SubQueries>
+
+The subquery is a select into select, available to create on merged ou cross reference list of data.
+
+B<Example11:>
+
+  my @any_info;
+
+  my $mymod = new SQL::SimplesOps(...);
+
+  $mymod->SimpleOps->Select
+  (
+     table => table1,
+     where => [ id => $mymod->SelectSubQuery( table => "table2", field => "my_tb2_id", where => [ ... ] ) ],
+     buffer => @buffer,
+  );
+  ...
+
+The following SQL Command will be executed:
+
+  SELECT * FROM table1 WHERE id IN (SELECT my_tb2_id FROM table2 WHERE [ .... ] );
+
+The reults will be written into the arrayref (for this example).
 
 B<NOTE:> This example is not a real use case, it is simple sample for references.
 
@@ -877,7 +946,7 @@ We must remember that some engines explore the sequence in the I<Where Clause> t
 basd on this definition, the best choice is the C<array_ref> format.
 
 If any item (or sub-item) specifies C<hash_ref>, the process is aborted with C<SQL_SIMPLE_RC_SYNTAX> as the return code.
- 
+
 B<Operators:> The follow operators was been builtin:
 
   Operator	Description
@@ -943,6 +1012,11 @@ B<Example1:>
        fld121 => [ '^^', 'ab%de' ],			# ... fld121 LIKE 'ab%de'  		# use '%' if required
 
        fld130 => '\\concat(fld130,"xxxx")',		# ... fld130 = concat(fld130,"xxxx")  	# without quote
+
+       fld200 => '\\fld210',				# ... fld200 = fld210		# without quote
+
+       fld220 => [ "!", '\\fld230' ],			# ... fld220 != fld240		# without quote
+
      ],
 
   );
@@ -953,6 +1027,8 @@ B<BEWARE:> The operators (if used) must be the first field on the C<array_ref>.
 
 =head1 METHODS
 X<METHODS>
+
+B<NOTE:> See B<EXTENDED EXAMPLES> to see some I<use cases>.
 
 Following methods can be exported:
 
@@ -1070,6 +1146,7 @@ however some installations may modify the default port. The following defaul por
   Postgres:	5432/tcp
   SyBase:	5000/tcp
   SQLite:	not required
+  ...
 
 Defaults: The default value depend of database engine.
 
@@ -1098,7 +1175,7 @@ However, it is highly recommended that you use the Database Native Resource for 
 Examples: Archive Logs, Backup Mode, and Others.
 
 Defaults: The default value is C<SQL_SIMPLE_CMD_OFF>.
- 
+
 =item B<sql_save_bydate:>
 
 Sets enable/disable writing log files into distinct folders.
@@ -1197,7 +1274,7 @@ Notifications will be sent to the system messages file (in Linux the file F</var
 
 We recommended to use the "System Syslog Services" as standard in your applications and create rules to write in separeted log files. 
 For more information see the documentation related to the "Syslog Service" on your System.
- 
+
 B<Example3:> The database "my_db" writing SQL Log Files.
 
   my $mymod = SQL::SimpleOps->new
@@ -1435,7 +1512,8 @@ For security rasons the command does not perform removals if C<where> clause is 
   );
 
 B<NOTE:> If no match found the command will return the condition code C<SQL_SIMPLE_RC_EMPTY>,
-however, using the C<notfound> option will force to C<SQL_SIMPLE_RC_OK> if no matchs.
+however, using the C<notfound> option will force to C<SQL_SIMPLE_RC_OK> if no matchs,
+in this case, you must use the function C<getRows> to get the number of read rows.
 
 B<Example1:> Forcing remove all rows.
 
@@ -1457,7 +1535,8 @@ B<Example2:> Forcing no matchs removals completed successful
      notfound => 1,
   );
 
-B<NOTE:> This command force the return code to C<SQL_SIMPLE_RC_OK> if ther is no match, where without it the C<notfound> option must be C<SQL_SIMPLE_RC_EMPTY>.
+B<NOTE:> This command force the return code to C<SQL_SIMPLE_RC_OK> if ther is no match, 
+where without it the C<notfound> option must be C<SQL_SIMPLE_RC_EMPTY>.
 
 =head2 Insert
 X<Insert>
@@ -1577,8 +1656,9 @@ B<Example4:> Inserting classic format
   );
 
 =head2 Select
-
 X<Select>
+
+B<NOTE:> See L<Loading Data into Applicatons> how to get the data.
 
 This method extract the selected rows from a tables based the conditions in the C<where> clause.
 
@@ -1594,6 +1674,11 @@ This method extract the selected rows from a tables based the conditions in the 
      flush => 1 | 0,				# options, reset buffer before load
 						# default: buffer will be reseted
   );
+
+The option C<fields> is not mandatory, however:
+If you using L<Aliases Table> the module will written only defined fields defined in this item,
+to bypass you must use "*" in the field list. 
+If you does not using L<Aliases Table> the module will written as "*" (all fields) in the field list.
 
 B<Example1:> Extract all fields from the table without C<notfound> option.
 
@@ -1629,7 +1714,11 @@ B<Example3:> Extract and Order
 
   SQL::SimpleOps->Select
   (
-     order_by => [ col1 => SQL_SIMPLE_ORDER_ASC, col2 => SQL_SIMPLE_ORDER_DESC ],
+     order_by => 
+     [ 
+        {col1 => SQL_SIMPLE_ORDER_ASC},
+        {col2 => SQL_SIMPLE_ORDER_DESC}
+     ],
      ...
   );
 
@@ -1649,7 +1738,7 @@ B<Example5:> Extract with distinct columns
   (
      fields => [ "distinct", "col1" ],
      or
-     fields => [ "distinct" => "col1" ],
+     fields => [ "distinct" => "col1" ],	# see: without '{ ... }'
      ...
   );
 
@@ -1695,20 +1784,42 @@ B<Example7:> Assigning alias field for specific select command.
 
 B<NOTE:> Use 'alias1' as buffer reference to get field1 data.
 
+B<Example8:> Requesting all fields from table with L<Aliases Table> definition
+
+  SQL::SimpleOps->Select( fields => "*", ... );
+
+B<NOTE:> If you omitted the C<fieldlist> the module shown only defined fields of your C<Aliases Table>
+
+B<Exampl9:> Requesting all fields from table without L<Aliases Table> definition
+
+  SQL::SimpleOps->Select( ... );
+
+B<NOTE:> To list all fields you can omitte the C<fieldlist> or use the same option for L<Aliases Table> (I<fields => "*"). 
+
 =head2 SelectCursor
 X<SelectCursor>
 
 This method is the "Select Method" and was created to scan tables based on key and cursor on.
 For this case, some options must be specified and controls returned, items to create pagination concepts.
 
+The C<where> and C<order_by> are not required. The method will insert the conditions based on C<cursor_key> and C<cusor_info> information. 
+
   SQL::SimpleOps->SelectCursor
   (
      ...
-     cursor_command => SQL_SIMPLE_CURSOR_TOP | SQL_SIMPLE_CURSOR_LAST |
-                       SQL_SIMPLE_CURSOR_NEXT | SQL_SIMPLE_CURSOR_BACK |
-                       SQL_SIMPLE_CURSOR_RELOAD,
+     cursor_command =>
+         SQL_SIMPLE_CURSOR_TOP |	# read first page
+         SQL_SIMPLE_CURSOR_LAST |	# read last page
+         SQL_SIMPLE_CURSOR_NEXT |	# read forward page, based last pointer
+         SQL_SIMPLE_CURSOR_BACK |	# read backward page, based last pointer
+         SQL_SIMPLE_CURSOR_RELOAD,	# read current page, based last pointer
+     ...
      cursor => current_cursor_value,
+     ...
      cursor_key => col_1,
+	 or
+     cursor_key => [ col1, col2, ... ],
+     ...
      cursor_info => %cursor_info | @cursor_info | $cursor_info,
      ...
      limit => no_lines,
@@ -1753,22 +1864,24 @@ Will use the 'first' info on C<cursor_info> option.
 
 =back
 
-Defaults: C<SQL_SIMPLE_CURSOR_TOP>
+Defaults: C<SQL_SIMPLE_CURSOR_TOP>, to enforce the C<buffer_info> initialization.
 
 =item B<cursor:>
 
 Sets an specific starter cursor value for the search.
-This options is not mandatory.
+This options is not mandatory, if used must have the same number of itens as C<cursor_key>.
 
 The method use the C<cursor_info> option as base to scan the pages,
 however, the C<cursor> option have preference if presented.
 
 =item B<cursor_key:>
 
-Sets the key that will use to search.
-You must use only one key, multiple keys are not supported.
+Sets the keys that will use to search.
+You can use only one key or multiple keys based arrayref list.
 
 Defaults: no defaults
+
+The multiple keys will provide an C<arrayref> for C<first> and C<last> items in the C<cursor_info>.
 
 =item B<cursor_info:>
 
@@ -1777,6 +1890,12 @@ This informantion should be used in the paging process.
 
 We highly recommend using this option in the pagination process.
 At the end of each retrieve, the cursor of page will be saved in C<cursor_info> option.
+
+The paging process will use the first and last keys and scan the table using these values as starting pointer.
+The scanning depends on the command that to be executed.
+
+You doni't need make any changes in your retrieved C<cursor_info>,
+just save it and use as an arguments in your next C<SelectCursor> call.
 
 Defaults: no defaults, if omitted this information must be obtained by the C<getLastCursor> method.
 
@@ -1787,14 +1906,84 @@ The buffer reference can be C<hash_ref>, C<array_ref> or C<scalar_ref>, for each
 =item B<hash_ref:>
 
   hash_ref => { lines => no_lines, first => first_key, last => last_key, rc => rc };
+  or
+  hash_ref => { lines => no_lines, first => [last_arrayref], last => [last_arrayref], rc => rc };
+
+B<Example1:> Using single key:
+
+  %buffer_info =
+  {
+     rc => value,				# Single value
+     lines => value,				# Single value
+     first => value-first-key,			# Single value
+     last => value-last-key,			# Single value
+  };
+
+B<Example2:> Using multiple keys:
+
+  %buffer_info =
+  {
+     rc => value,				# Single value
+     lines => value,				# Single value
+     first => [ first1, ..., firstN, ],		# Array
+     last => [ first1, ..., firstN, ],		# Array
+  };
 
 =item B<array_ref:>
 
   array_ref => [ rc, no_lines, first_key, last_key ];
+  or
+  array_ref => [ rc, no_lines, [first_last_arrayref], [last_last_arrayref] ];
+
+B<Example1:> Using single key:
+
+  @buffer_info =
+  [
+     value,				# RC value, indexed by #0
+     value,				# Lines value, indexed by #4
+     value-first-key,			# First value, indexed by #1
+     value-last-key,			# Last value, indexed by #3
+  ];
+
+B<Example2:> Using multiple keys:
+
+  @buffer_info =
+  [
+     value,				# RC value, indexed by #0
+     value,				# Lines value, indexed by #1
+     [ first1, ..., firstN, ],		# First Array values, indexed by #2
+     [ first1, ..., firstN, ],		# Last Array values, indexed by #3
+  ];
 
 =item B<scalar_ref:>
 
   scalar_ref => "[rc] [no_lines] [first_key] [last_key]"
+  or
+  scalar_ref => "[rc] [no_lines] [first_key1] [first_key2] ... [last_key1] [last_key2] ..."
+
+B<Example1:> Using single key:
+
+  $buffer_info = "value value value value"	# separeted by spaces
+
+     # RC value, first word
+     # Lines value, second word
+     # First value, third word
+     # Last value, fourth word
+
+B<BEWARE:> This type of returns is not recommended for keys that have spaces or null values.
+
+B<Example2:> Using multiple keys:
+
+  $buffer_info = "value value first1 ... firstN last1 ... lastN"
+
+     # RC value, first word
+     # Lines value, second word
+     # First value, depends on the number of keys
+     # Last value, depends on the number of keys
+
+B<NOTE:> The number of C<first_keyX> and C<last_keyX> depends of number of keys in the C<cursor_key>.
+
+B<BEWARE:> This type of returns is not recommended for keys that have spaces or null values.
 
 =back
 
@@ -1820,8 +2009,6 @@ Consists the last key value.
 
 =back
 
-B<BEWARE:> For keys that use I<space values> do not use the I<scalar_ref> format to capture the C<first_key> and C<last_key>.
-
 =item B<limit:>
 
 Sets the maximum number of lines to retrieve.
@@ -1841,7 +2028,7 @@ B<NOTE:> The number of page is limited by C<limit> option.
   # at end of each retrieve the 'cursor_info' option is up to date.
   my %cursor_info;
 
-  # the scan will retrieve 'no_lines' lines into the 'buffer' options,
+  # the scan will retrieve 'number_of_lines' lines into the 'buffer' options,
   SQL::SimpleOps->SelectCursor
   (
      table => "my_table",
@@ -1851,11 +2038,11 @@ B<NOTE:> The number of page is limited by C<limit> option.
      cursor_info => \%cursor_info,
      buffer => array_ref,
      ...
-     limit => no_lines,
+     limit => number_of_lines,
   );
   ...
 
-  # the scan will retrieve the next 'no_lines' lines based in saved
+  # the scan will retrieve the next 'number_of_lines' lines based in saved
   SQL::SimpleOps->SelectCursor
   (
      table => "my_table",
@@ -1865,11 +2052,11 @@ B<NOTE:> The number of page is limited by C<limit> option.
      cursor_info => \%cursor_info,
      buffer => array_ref,
      ...
-     limit => no_lines,
+     limit => number_of_lines,
   );
   ...
 
-  # the scan jump at end of table and retrieve the next 'no_lines'
+  # the scan jump at end of table and retrieve the next 'number_of_lines'
   SQL::SimpleOps->SelectCursor
   (
      table => "my_table",
@@ -1879,7 +2066,7 @@ B<NOTE:> The number of page is limited by C<limit> option.
      cursor_info => \%cursor_info,
      ...
      buffer => array_ref,
-     limit => no_lines,
+     limit => number_of_lines,
   );
   ...
 
@@ -1893,8 +2080,30 @@ B<NOTE:> The number of page is limited by C<limit> option.
      cursor_info => \%cursor_info,
      ...
      buffer => array_ref,
-     limit => no_lines,
+     limit => number_of_lines,
   );
+
+=head2 SelectSubQuery
+X<SelectSubQuery>
+
+This method updates the selected to create C<select> into the C<select> as subqueries process.
+
+  SQL::SimpleOps->SelectSubQuery
+  (
+     ...			# see: Select options and format
+  );
+  or
+  SQL::SimpleOps->Select
+  (
+     ...			# see: Select options and format
+	 subquery => 1,
+  );
+
+The command returns the SQL command in the format:
+
+ \(SELECT ... )
+
+B<NOTE:> The I<backslash> and I<(...)> will be sent as I<escape caracter>, required in the C<where> clause.
 
 =head2 Update
 X<Update>
@@ -1906,11 +2115,15 @@ For security rasons the command does not perform updates if C<where> clause is o
   SQL::SimpleOps->Update
   (
      table => "my_table",
+	 or
+	 table => [ "mytab1", "mytab2", ... ],
+
      fields =>
      {
         col_1 => value,
         col_2 => value,
      },
+
      where =>
      [
         my_conditions
@@ -1966,7 +2179,24 @@ The method return the Column Arguments Value if the table or column argument doe
 
 B<NOTE:> This method can be used on B<PLUGINS> to translate the aliases names.
 
+  SQL::SimpleOps->getAliasCols
+  (
+	colname,
+	options
+  );
+
+The options define I<where> the field will be used and must be:
+
+  SQL_SIMPLE_ALIAS_INSERT - used as: INSERT INTO ... (field) ...
+  SQL_SIMPLE_ALIAS_UPDATE - used as: UPDATE ... SET field = ...
+  SQL_SIMPLE_ALIAS_DELETE - not applied
+  SQL_SIMPLE_ALIAS_SELECT - used as: SELECT field .... FROM ....
+  SQL_SIMPLE_ALIAS_WHERE - used as: ... WHERE field ....
+  SQL_SIMPLE_ALIAS_ORDERBY - used as: ... ORDER BY field ...
+  SQL_SIMPLE_ALIAS_GROUPBY - used as: ... GROUP BY fild ...
+
 =head2 getAliasTable
+X<getAliasTable>
 
 Consists of the method to get the realname for table mapped on L<Aliases Table>.
 
@@ -2053,6 +2283,8 @@ It was created as support tool to certify and test the syntax of the 'Where Clau
       where => [ condition1, ... ],		# see Where Clause
   );
 
+B<NOTE:> The method uses the L<Aliases Table> as a reference base for the translation.
+
 B<Example1:>
 
   use SQL::SimpleOps;
@@ -2100,7 +2332,7 @@ Results:
 
   My #1 Where is [ (_no = 1 or _no IN (2,3)) and _text = 'myname' ]
   My #2 Where is [ _no BETWEEN (1,3) and _text = 'myname' ]
-    
+
 =head2 setDumper
 X<setDumper>
 
@@ -2128,8 +2360,8 @@ B<Example1:>
 
 Results:
 
-  select = {
-      ...		# your select arguments
+  select = {	# this text will be sent in STDERR
+      ...		# your select command arguments
   }
   mySQL: SELECT ....	# your create SQL command
 
@@ -2249,6 +2481,20 @@ B<BEWARE:> In this case, you must validade the I<Number of Rows> (C<getRows> met
   }
   ...
 
+=item Command Alias Process
+
+This values are used with L<getAliasCols> to define how to translate the name to a real name, 
+where the translation depends on the action in question in the command,
+some parts of command the aliases is allowed and an others not.
+
+  SQL_SIMPLE_ALIAS_INSERT - used as: INSERT INTO ... (field) ...
+  SQL_SIMPLE_ALIAS_UPDATE - used as: UPDATE ... SET field = ...
+  SQL_SIMPLE_ALIAS_DELETE - not applied
+  SQL_SIMPLE_ALIAS_SELECT - used as: SELECT field .... FROM ....
+  SQL_SIMPLE_ALIAS_WHERE - used as: ... WHERE field ....
+  SQL_SIMPLE_ALIAS_ORDERBY - used as: ... ORDER BY field ...
+  SQL_SIMPLE_ALIAS_GROUPBY - used as: ... GROUP BY fild ...
+
 =back
 
 =head1 PLUGINS
@@ -2311,15 +2557,30 @@ This plugins embeded and establish the C<dsname> data, C<argument #1> from C<DBI
 
   SQL::SimpleOps::DBI::MySQL
 
+  sub new()
+  {
+	my $class = shift; $class = ref($class) || $class || 'SQL::SimpleOps::DBI::MySQL';
+	my $self = {@_};
+
+	$self->{sql_simple}->{init}{plugin_id} = "MySQL";
+	$self->{sql_simple}->{init}{schema} = 0;
+	$self->{sql_simple}->{init}{test_server} = 1;
+	$self->{sql_simple}->{init}{alias_with_as} = 0;
+
+	bless($self,$class);
+  }
+
   sub Open()
   {
      my $self = shift;
      my $argv = shift;
+
      my @options;
      push(@options,"database=".$self->{sql_simple}->{argv}{db}) if (defined($self->{sql_simple}->{argv}{db}) && $self->{sql_simple}->{argv}{db}ne "");
      push(@options,"host=".$self->{sql_simple}->{argv}{server}) if (defined($self->{sql_simple}->{argv}{server}) && $self->{sql_simple}->{argv}{server} ne "");
      push(@options,$self->{sql_simple}->{argv}{port}) if (defined($self->{sql_simple}->{argv}{port}) && $self->{sql_simple}->{argv}{port} ne "");
      $self->{sql_simple}->{argv}{dsname} = "DBI:mysql:".join(';',@options);
+
      return 0;
   }
 
@@ -2332,14 +2593,29 @@ This plugins embeded and establish the C<dsname> data, C<argument #1> from C<DBI
 
   SQL::SimpleOps::DBI::PG
 
+  sub new()
+  {
+ 	my $class = shift; $class = ref($class) || $class || 'SQL::SimpleOps::DBI::PG';
+ 	my $self = {@_};
+
+	$self->{sql_simple}->{init}{plugin_id} = "PG";
+	$self->{sql_simple}->{init}{schema} = 1;
+	$self->{sql_simple}->{init}{test_server} = 1;
+	$self->{sql_simple}->{init}{alias_with_as} = 1;
+
+	 bless($self,$class);
+  }
+
   sub Open()
   {
      my $self = shift;
      my $argv = shift;
+
      my @options;
      push(@options,"dbname=".$self->{sql_simple}->{argv}{db}) if (defined($self->{sql_simple}->{argv}{db}) && $self->{sql_simple}->{argv}{db} ne "");
      push(@options,"host=".$self->{sql_simple}->{argv}{server}) if (defined($self->{sql_simple}->{argv}{server}) && $self->{sql_simple}->{argv}{server} ne "");
      push(@options,$self->{sql_simple}->{argv}{port}) if (defined($self->{sql_simple}->{argv}{port}) && $self->{sql_simple}->{argv}{port} ne "");
+
      $self->{sql_simple}->{argv}{dsname} = "DBI:Pg:".join(';',@options);
      return 0;
   }
@@ -2353,12 +2629,32 @@ This plugins embeded and establish the C<dsname> data, C<argument #1> from C<DBI
 
   SQL::SimpleOps::DBI::SQLite
 
+  sub new()
+  {
+	my $class = shift; $class = ref($class) || $class || 'SQL::SimpleOps::DBI::SQLite';
+	my $self = {@_};
+
+	if ($self->{sql_simple}->{argv}{db} eq "" && $self->{sql_simple}->{argv}{dbfile} eq "")
+	{
+		$self->{sql_simple}->setMessage($self,"new",-1,"001");
+		return undef;
+	}
+	$self->{sql_simple}->{init}{plugin_id} = "SQLite";
+	$self->{sql_simple}->{init}{schema} = 0;
+	$self->{sql_simple}->{init}{test_server} = 0;
+	$self->{sql_simple}->{init}{alias_with_as} = 0;
+
+	bless($self,$class);
+  }
+
   sub Open()
   {
      my $self = shift;
      my $argv = shift;
+
      $self->{sql_simple}->{argv}{dbfile} = $self->{sql_simple}->{argv}{db}.".db" if (!defined($self->{sql_simple}->{argv}{dbfile}) || $self->{sql_simple}->{argv}{dbfile} eq "");
      $self->{sql_simple}->{argv}{dsname} = "DBI:SQLite:dbname=$self->{sql_simple}->{argv}{dbfile}";
+
      return 0;
   }
 
@@ -2369,8 +2665,10 @@ X<Plugin Custom>
 
 This sample show a simple struct to be create to support your addon.
 
+The function C<PreFetch> will be call befere the C<prepare> operations where specias adjusts can be done.
+
   ## The "Open" method must initialize the "dsname" environment.
- 
+
   ## The "dsname" will be used as the first argument on the "DBI->connect"
   #
   ## rc < 0 - syntax error and abort
@@ -2392,77 +2690,1278 @@ This sample show a simple struct to be create to support your addon.
 
   sub new()
   {
-     my $class = shift; $class = ref($class) || $class || 'SQL::SimpleOps::[interface]::[driver]';
-     my $self = {@_};
+	my $class = shift; $class = ref($class) || $class || 'SQL::SimpleOps::DBI::MyPlugin';
+	my $self = {@_};
 
-     bless($self,$class);
+	# give my plugin name
+	$self->{sql_simple}->{init}{plugin_id} = "MyPlugin";
+
+	# use '1' if your db have schema option format
+	$self->{sql_simple}->{init}{schema} = 1;
+
+	# use '1' if your args must have server/tcport values
+	$self->{sql_simple}->{init}{test_server} = 1;
+
+	# use '1' if between your field/alias infomation have 'as' value
+	$self->{sql_simple}->{init}{alias_with_as} = 0;
+
+	bless($self,$class);
   }
-  # the dsname must initialize here.
-  # rc=0 keep running
-  # rc<0 abort
+
   sub Open()
   {
-     my $self = shift;
-     my $argv = shift;
-     ...
-     return 0;			# rc=0 to continue
+	my $self = shift;
+	my $argv = shift;
+
+	## sets the dsnam here
+	## $self->{sql_simple}->{argv}{dsname} = ...
+
+	return 0;
   }
-  # this procedure must initialize the "dsname" enviroment.
-  # rc=0 keep running
-  # rc<0 abort
-  sub Delete()
-  {
-     my $self = shift;
-     my $argv = shift;
-     ...
-     return 0;			# rc=0 to continue
-  }
-  # rc=0 keep running
-  # rc<0 abort
+
   sub Select()
   {
-     my $self = shift;
-     my $argv = shift;
-     ...
-     return 0;			# rc=0 to continue
+	my $self = shift;
+	my $argv = shift;
+	return 0;
   }
-  # rc=0 keep running
-  # rc<0 abort
+
   sub SelectCursor()
   {
-     my $self = shift;
-     my $argv = shift;
-     ...
-     return 0;			# rc=0 to continue
+	my $self = shift;
+	my $argv = shift;
+	return 0;
   }
-  # rc=0 keep running
-  # rc<0 abort
-  sub Insert()
+
+  sub Delete()
   {
-     my $self = shift;
-     my $argv = shift;
-     ...
-     return 0;			# rc=0 to continue
+	my $self = shift;
+	my $argv = shift;
+	return 0;
   }
-  # rc=0 keep running
-  # rc<0 abort
+
   sub Update()
   {
-     my $self = shift;
-     my $argv = shift;
-     ...
-     return 0;			# rc=0 to continue
+	my $self = shift;
+	my $argv = shift;
+	return 0;
   }
-  # rc=0 keep running
-  # rc<0 abort
+
   sub Call()
   {
-     my $self = shift;
-     my $argv = shift;
-     ...
-     return 0;			# rc=0 to continue
+	my $self = shift;
+	my $argv = shift;
+	return 0;
   }
-  ##Ended
+
+  sub PreFetch()
+  {
+	my $self = shift;
+	my $argv = shift;
+	return 0;
+  }
+
+=head1 EXAMPLES
+X<EXAMPLES>
+
+The following example allow simple test between the SQLite, MySQL/MariaDB and Postgres Databases (see: I<t/testFirst.t>)
+
+NOTE: For more examples see test modules (I<t/testSQL.t>, I<t/testWhere.t> and I<t/testDB.t>) in source code.
+
+To test you need:
+
+ (a) Create a temporary database, as described below (SQLite, MySQL, MariaDB or Postgres);
+ (b) Copy/Past the Source Code and;
+ (c) Make the test.
+
+=head2 Create SQLite Database
+
+ # sqlite3 -batch -echo /tmp/test_db.db <<EOF
+
+ CREATE TABLE master (
+   i_m_id integer primary key autoincrement,
+   s_m_code text,
+   s_m_name text,
+   s_m_desc text
+ );
+
+ CREATE TABLE slave (
+   i_s_id integer primary key autoincrement,
+   s_m_code text,
+   s_s_code text,
+   s_s_name text,
+   s_s_desc text
+ );
+
+ EOF
+
+=head2 Create MySQL/MariaDB Database
+
+ # mysql -v <<EOF
+
+ CREATE SCHEMA IF NOT EXISTS test_db DEFAULT CHARACTER SET 'UTF8' ;
+
+ USE test_db ;
+
+ CREATE TABLE IF NOT EXISTS test_db.master
+ (
+   i_m_id int auto_increment unique,
+   s_m_code varchar(32),
+   s_m_name varchar(255),
+   s_m_desc varchar(255)
+ ) ENGINE = InnoDB;
+
+ CREATE TABLE IF NOT EXISTS test_db.slave
+ (
+   i_s_id int auto_increment unique,
+   s_m_code varchar(32),
+   s_s_code varchar(32),
+   s_s_name varchar(255),
+   s_s_desc varchar(255)
+ ) ENGINE = InnoDB;
+
+ CREATE USER 'user_read'@'localhost' IDENTIFIED BY 'password_read';
+ CREATE USER 'user_update'@'localhost' IDENTIFIED BY 'password_update';
+
+ GRANT SELECT ON test_db.* TO 'user_read'@'localhost';
+ GRANT SELECT,INSERT,UPDATE,DELETE ON test_db.* TO 'user_update'@'localhost';
+
+ EOF
+
+=head2 Create Postgres Database
+
+ # psql -U postgres <<EOF
+ CREATE DATABASE test_db ENCODING 'UTF8';
+ EOF
+
+ # psql -U postgres -b test_db <<EOF
+
+ CREATE SCHEMA IF NOT EXISTS test_schema ;
+
+ CREATE TABLE IF NOT EXISTS test_schema.master
+ (
+   i_m_id smallserial unique,
+   s_m_code varchar(32),
+   s_m_name varchar(255),
+   s_m_desc varchar(255)
+ );
+
+ CREATE TABLE IF NOT EXISTS test_schema.slave
+ (
+   i_s_id smallserial unique,
+   s_m_code varchar(32),
+   s_s_code varchar(32),
+   s_s_name varchar(255),
+   s_s_desc varchar(255)
+ );
+
+ CREATE ROLE user_read LOGIN PASSWORD 'password_read';
+ CREATE ROLE user_update LOGIN PASSWORD 'password_update';
+
+ GRANT SELECT ON TABLE
+   test_schema.master, test_schema.slave TO user_read;
+ GRANT SELECT,INSERT,UPDATE,DELETE ON TABLE
+   test_schema.master, test_schema.slave TO user_update;
+
+ EOF
+
+=head2 Source Code
+
+B<NOTE:> Copy and Paste the following lines, until I<__END__>:
+
+  #!/usr/bin/perl
+  #
+  ## file t/testFirst.t
+  #
+  ## CoryRight (C) - Carlos Celso
+  #
+
+  ## load external libs
+
+  use Getopt::Long;
+  use SQL::SimpleOps;
+  use Pod::Usage;
+  use Test::More;
+
+  ## defaults values
+
+  our $PARM_DB = "test_db";
+  our $PARM_DBFILE = "/tmp/test_db.db";	# for database im memory use: ":memory:" 
+  our $PARM_SCHEMA = "test_schema";
+  our $PARM_SERVER = "localhost";
+  our $PARM_USER = "user_update";
+  our $PARM_PASSWORD = "password_update";
+
+  ## help or doit
+
+  (@ARGV) ?
+	&my_init() :
+	note("$0 -drive=[driver] -db=[db] -schema=[sch] -server=[host] -port=[port] -user=[user] -password=[pwd]");
+
+  done_testing();	# test done
+  exit;
+
+  ## test starter
+
+  sub my_init()
+  {
+	  ## parsing options
+
+	  our $get = new Getopt::Long::Parser;
+	  $get->configure("pass_through");
+	  $get->getoptions
+	  (
+		 'driver=s' => \$PARM_DRIVER,
+		 'db=s' => \$PARM_DB,
+		 'dbfile=s' => \$PARM_DBFILE,
+		 'schema=s' => \$PARM_SCHEMA,
+		 'server=s' => \$PARM_SERVER,
+		 'port=s' => \$PARM_PORT,
+		 'user=s' => \$PARM_USER,
+		 'password=s' => \$PARM_PASSWORD,
+	  );
+
+	  ## loading SQL::SimpleOps module
+	  ## remember: the defauls values por RaiseError and PrintError is ZERO
+
+	  our $mymod = new SQL::SimpleOps
+	  (
+		 driver => $PARM_DRIVER,
+		 db => $PARM_DB,
+		 dbfile => $PARM_DBFILE,
+		 schema => $PARM_SCHEMA,
+		 server => $PARM_SERVER,
+		 port => $PARM_PORT,
+		 login => $PARM_USER,
+		 password => $PARM_PASSWORD,
+		 tables =>
+		 {
+			my_master =>	## sets aliases entries for master table
+			{
+			   name => "master",
+			   cols =>
+			   {
+				  my_i_m_id   => 'i_m_id',
+				  my_s_m_code => 's_m_code',
+				  my_s_m_name => 's_m_name',
+				  my_s_m_desc => 's_m_desc',
+			   },
+			},
+			my_slave =>	## sets aliases entries for slave table
+			{
+			   name => "slave",
+			   cols =>
+			   {
+				  my_i_s_id   => 'i_s_id',
+				  my_s_m_code => 's_m_code',
+				  my_s_s_code => 's_s_code',
+				  my_s_s_name => 's_s_name',
+				  my_s_s_desc => 's_s_desc',
+			   },
+			},
+		 }
+	  );
+
+	  ## do it
+
+	  &my_upload();		# initialize the tables
+	  &my_get_master();	# test master table
+	  &my_get_slave();	# test slave table
+	  &my_get_merge();	# test merge between master and slave
+
+	  ## finishing test
+
+	  $mymod->Close();	# do not forgot me
+  }
+
+  ## my upload data
+  ## remove previous data
+  ## creating dynamic data into the master and slave table
+
+  sub my_upload()
+  {
+      ## remove previous data
+
+      $mymod->Delete ( table => "my_master", force => 1, notfound => 1 );
+      $mymod->Delete ( table => "my_slave", force => 1, notfound => 1 );
+
+      ## initializing master/slave table
+
+      foreach my $code(0..9)
+      {
+          my $er=0;
+          my $ok=0;
+
+          ## inserting data into master
+
+          $code = sprintf("%04i",$code);
+          $mymod->Insert
+          (
+             table => "my_master",
+             fields =>
+             {
+                my_s_m_code => "master_".$code,
+                my_s_m_name => "name_".$code,
+                my_s_m_desc => "description_".$code,
+             }
+          );
+
+          ($mymod->getRC()) ? $er++ : $ok++;
+
+          ## inserting data into slave based master data
+
+          foreach my $subcode(10..19)
+          {
+             $subcode = sprintf("%04i",$subcode);
+             $mymod->Insert
+             (
+                table => "my_slave",
+                fields =>
+                {
+                   my_s_m_code => "master_".$code,
+                   my_s_s_code => "slave_".$subcode,
+                   my_s_s_name => "name_".$subcode,
+                   my_s_s_desc => "description_".$subcode,
+                }
+             );
+
+             ($mymod->getRC()) ? $er++ : $ok++;
+          }
+
+          ## shown counters
+
+          fail("Number of ".$er." errors (master+slave), Code ".$code) if ($er);
+          pass("Number of ".$ok." successful (master+slave), Code ".$code) if ($ok);
+      }
+  }
+
+  ## simple test of load master data
+  ## load all master data into buffer
+
+  sub my_get_master()
+  {
+      my @buffer;
+      $mymod->Select
+      (
+         table => "my_master",
+         buffer => \@buffer,
+         order_by => "my_i_m_id",
+      );
+
+      ## test number of loaded rows
+
+      ok($mymod->getRows()==10,"Master select, rows ".$mymod->getRows());
+  }
+
+  ## simple test of load slave data
+  ## load all slave data into buffer
+
+  sub my_get_slave()
+  {
+      my @buffer;
+      $mymod->Select
+      (
+         table => "my_slave",
+         buffer => \@buffer,
+         order_by => "my_i_s_id",
+      );
+
+      ## test number of loaded rows
+
+      ok($mymod->getRows()==100,"Slave select, rows ".$mymod->getRows());
+  }
+
+  ## simple test of merge between master and slave tables
+
+  sub my_get_merge()
+  {
+      my @buffer;
+
+      $mymod->Select
+      (
+         table => [ "my_master","my_slave" ],
+         buffer => \@buffer,
+         fields => [ "my_master.my_s_m_code", "my_slave.my_s_s_code" ],
+      );
+
+      ## test number of loaded rows
+
+      ok($mymod->getRows()==1000,"Master/Slave merge-1, rows ".$mymod->getRows());
+
+      $mymod->Select
+      (
+         table => [ "my_master","my_slave" ],
+         buffer => \@buffer,
+         fields => [ "my_master.my_s_m_code", "my_slave.my_s_s_code" ],
+         where =>
+         [
+            "my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+         ]
+      );
+
+      ## test number of loaded rows
+
+      ok($mymod->getRows()==100,"Master/Slave merge-2, rows ".$mymod->getRows());
+
+      $mymod->Select
+      (
+         table => [ "my_master","my_slave" ],
+         buffer => \@buffer,
+         fields => [ "my_master.my_s_m_code", "my_slave.my_s_s_code" ],
+         where =>
+         [
+            "my_master.my_s_m_code" => [ "!", "\\my_slave.my_s_m_code" ],
+         ]
+      );
+
+      ## test number of loaded rows
+
+      ok($mymod->getRows()==900,"Master/Slave merge-3, rows ".$mymod->getRows());
+  }
+
+  __END__
+
+=head2 Results
+
+ # perl /tmp/my_first_program.pl -driver=sqlite
+ ok 1 - Number of 11 successful (master+slave), Code 0000
+ ok 2 - Number of 11 successful (master+slave), Code 0001
+ ok 3 - Number of 11 successful (master+slave), Code 0002
+ ok 4 - Number of 11 successful (master+slave), Code 0003
+ ok 5 - Number of 11 successful (master+slave), Code 0004
+ ok 6 - Number of 11 successful (master+slave), Code 0005
+ ok 7 - Number of 11 successful (master+slave), Code 0006
+ ok 8 - Number of 11 successful (master+slave), Code 0007
+ ok 9 - Number of 11 successful (master+slave), Code 0008
+ ok 10 - Number of 11 successful (master+slave), Code 0009
+ ok 11 - Master select, rows 10
+ ok 12 - Slave select, rows 100
+ ok 13 - Master/Slave merge-1, rows 1000
+ ok 14 - Master/Slave merge-2, rows 100
+ ok 15 - Master/Slave merge-3, rows 900
+ 1..15
+
+ # perl /tmp/my_first_program.pl -driver=mysql
+ ok 1 - Number of 11 successful (master+slave), Code 0000
+ ok 2 - Number of 11 successful (master+slave), Code 0001
+ ok 3 - Number of 11 successful (master+slave), Code 0002
+ ok 4 - Number of 11 successful (master+slave), Code 0003
+ ok 5 - Number of 11 successful (master+slave), Code 0004
+ ok 6 - Number of 11 successful (master+slave), Code 0005
+ ok 7 - Number of 11 successful (master+slave), Code 0006
+ ok 8 - Number of 11 successful (master+slave), Code 0007
+ ok 9 - Number of 11 successful (master+slave), Code 0008
+ ok 10 - Number of 11 successful (master+slave), Code 0009
+ ok 11 - Master select, rows 10
+ ok 12 - Slave select, rows 100
+ ok 13 - Master/Slave merge-1, rows 1000
+ ok 14 - Master/Slave merge-2, rows 100
+ ok 15 - Master/Slave merge-3, rows 900
+ 1..15
+
+ # perl /tmp/my_first_program.pl -driver=postgres
+ ok 1 - Number of 11 successful (master+slave), Code 0000
+ ok 2 - Number of 11 successful (master+slave), Code 0001
+ ok 3 - Number of 11 successful (master+slave), Code 0002
+ ok 4 - Number of 11 successful (master+slave), Code 0003
+ ok 5 - Number of 11 successful (master+slave), Code 0004
+ ok 6 - Number of 11 successful (master+slave), Code 0005
+ ok 7 - Number of 11 successful (master+slave), Code 0006
+ ok 8 - Number of 11 successful (master+slave), Code 0007
+ ok 9 - Number of 11 successful (master+slave), Code 0008
+ ok 10 - Number of 11 successful (master+slave), Code 0009
+ ok 11 - Master select, rows 10
+ ok 12 - Slave select, rows 100
+ ok 13 - Master/Slave merge-1, rows 1000
+ ok 14 - Master/Slave merge-2, rows 100
+ ok 15 - Master/Slave merge-3, rows 900
+ 1..15
+
+=head1 EXTENDED EXAMPLES
+X<EXTENDED EXAMPLES>
+
+This data consists in the list of test in 't/testSQL.t'
+
+The test run two differnts context. The first use an L<Aliases Table> as contents tables.
+The second does not use an L<Aliases Table> (no aliases available).
+
+=head3 Glossary
+
+ fld_realX		Field's realname.
+ fld_aliasX		Field's alias name.
+ fld_noalias	Field without alias name.
+ tab_realX		Table's realname.
+ tab_aliasX		Table's alias name.
+ tab_noalias	Table without alias name.
+ bad_alias		Table without alias and not in table list.
+
+=head2 Tests with L<Aliases Table>
+
+=head3 Aliases Table Definition
+
+B<REMEMBER:> The translation depends of two information, the table name and the field name:
+Correct field name and wrong table name will not be translated.
+Correct table name and wrong field name will not be translated.
+
+	$mymod = new SQL::SimpleOps
+	(
+		...
+		tables =>
+		{
+			tab_alias1 =>
+			{
+				name => 'tab_real1',
+				cols =>
+				{
+					fld_alias1 => 'fld_real1',
+					fld_alias2 => 'fld_real2',
+					fld_aliasX => 'fld_realX',
+				},
+			},
+			tab_alias2 =>
+			{
+				name => 'tab_real2',
+				cols =>
+				{
+					fld_alias1 => 'fld_real1',
+					fld_alias2 => 'fld_real2',
+					fld_aliasY => 'fld_realY',
+				},
+			},
+			tab_alias3 =>
+			{
+				name => 'tab_real3',
+			},
+		},
+		...
+	);
+
+=head3 DELETE COMMANDS
+
+ Delete( table => "tab_noalias", force => 1 )
+ returns: DELETE FROM tab_noalias
+
+ Delete( table => "tab_alias1", force => 1 )
+ returns: DELETE FROM tab_real1
+
+ Delete( table => "tab_real1", force => 1 )
+ returns: DELETE FROM tab_real1
+
+ Delete( table => "tab_alias1", force => 1 )
+ returns: DELETE FROM tab_real1
+
+ Delete( table => "tab_noalias", where => [ "fld_alias1" => 1 ] )
+ returns: DELETE FROM tab_noalias WHERE fld_alias1 = '1'
+
+ Delete( table => "tab_alias1", where => [ "fld_alias1" => "value1" ] )
+ returns: DELETE FROM tab_real1 WHERE fld_real1 = 'value1'
+
+ Delete( table => "tab_real1", where => [ "fld_alias1" => "value1" ] )
+ returns: DELETE FROM tab_real1 WHERE fld_real1 = 'value1'
+
+ Delete( table => "tab_alias1", where => [ "fld_noalias1" => 1 ] )
+ returns: DELETE FROM tab_real1 WHERE fld_noalias1 = 'value1'
+
+ Delete( table => "tab_alias1", where => [ "fld_real1" => 1 ] )
+ returns: DELETE FROM tab_real1 WHERE fld_real1 = 'value1'
+
+ Delete( table => "tab_noalias", where => [ "tab_noalias.fld_alias1" => "value1" ] )
+ returns: DELETE FROM tab_noalias WHERE fld_alias1 = 'value1'
+
+ Delete( table => "tab_alias1", where => [ "tab_alias1.fld_alias1" => "value1" ] )
+ returns: DELETE FROM tab_real1 WHERE fld_real1 = 'value1'
+
+ Delete( table => "tab_real1", where => [ "tab_alias1.fld_alias1" => "value1" ] )
+ returns: DELETE FROM tab_real1 WHERE fld_real1 = 'value1'
+
+=head3 INSERT COMMANDS
+
+ Insert( table => "tab_noalias", fields => { "fld_alias1" => "value1" } )
+ returns: INSERT INTO tab_noalias (fld_alias1) VALUES ('value1')
+
+ Insert( table => "tab_noalias", fields => [ "fld_alias1" ], values => [ "value1" ]
+ returns: INSERT INTO tab_noalias (fld_alias1) VALUES ('value1')
+
+ Insert( table => "tab_noalias", fields => { "fld_alias1" => "value1", "fld_alias2" => "value2" } )
+ returns: INSERT INTO tab_noalias (fld_alias1,fld_alias2) VALUES ('value1','value2')
+
+ Insert( table => "tab_noalias", fields => [ "fld_alias1","fld_alias2" ], values => [ "value1","value2" ] )
+ returns: INSERT INTO tab_noalias (fld_alias1,fld_alias2) VALUES ('value1','value2')
+
+ Insert( table => "tab_noalias", fields => [ "fld_alias1" ], values => [ "value1","value2" ] )
+ returns: INSERT INTO tab_noalias (fld_alias1) VALUES ('value1'),('value2')
+
+ Insert( table => "tab_noalias", fields => [ "tab_noalias.fld_alias1" ], values => [ "value1" ] )
+ returns: INSERT INTO tab_noalias (fld_alias1) VALUES ('value1')
+
+ Insert( table => "tab_noalias", fields => [ "bad_table.fld_alias1" ], values => [ "value1" ] )
+ returns: INSERT INTO tab_noalias (bad_table.fld_alias1) VALUES ('value1')
+
+ Insert( table => "tab_alias1", fields => { "fld_alias1" => "value1" } )
+ returns: INSERT INTO tab_real1 (fld_real1) VALUES ('value1')
+
+ Insert( table => "tab_real1", fields => { "fld_alias1" => "value1" } )
+ returns: INSERT INTO tab_real1 (fld_real1) VALUES ('value1')
+
+ Insert( table => "tab_alias1", fields => { "tab_alias1.fld_alias1" => "value1" } )
+ returns: INSERT INTO tab_real1 (fld_real1) VALUES ('value1')
+
+ Insert( table => "tab_real1", fields => { "tab_real1.fld_alias1" => "value1" } )
+ returns: INSERT INTO tab_real1 (fld_real1) VALUES ('value1')
+
+ Insert( table => "tab_alias1", fields => { "tab_alias1.fld_real1" => "value1" } )
+ returns: INSERT INTO tab_real1 (fld_real1) VALUES ('value1')
+
+ Insert( table => "tab_real1", fields => { "tab_real1.fld_alias1" => "value1" } )
+ returns: INSERT INTO tab_real1 (fld_real1) VALUES ('value1')
+
+=head3 SELECT COMMAND
+X<SELECT COMMAND>
+
+ Select( table => "tab_noalias", fields => "fld_alias1" )
+ returns: SELECT fld_alias1 FROM tab_noalias
+
+ Select( table => "tab_noalias", fields => [ "fld_alias1" ] )
+ returns: SELECT fld_alias1 FROM tab_noalias
+
+ Select( table => "tab_alias1", fields => "fld_alias1" )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1
+
+ Select( table => "tab_alias1", fields => [ "fld_real1" ] )
+ returns: SELECT fld_real1 FROM tab_real1 tab_alias1
+
+ Select( table => "tab_real1", fields => [ "fld_real1" ] )
+ returns: SELECT fld_real1 FROM tab_real1 tab_alias1
+
+ Select( table => "tab_alias1", fields => [ "fld_noalias" ] )
+ returns: SELECT fld_noalias FROM tab_real1 tab_alias1
+
+ Select( table => "tab_real1", fields => [ "fld_noalias" ] )
+ returns: SELECT fld_noalias FROM tab_real1 tab_alias1
+
+ Select( table => "tab_noalias", fields => "tab_noalias.fld_alias1" )
+ returns: SELECT tab_noalias.fld_alias1 FROM tab_noalias
+
+ Select( table => "tab_alias1", fields => [ "tab_alias1.fld_alias1" ] )
+ returns: SELECT tab_alias1.fld_real1 fld_alias1 FROM tab_real1 tab_alias1
+
+ Select( table => "tab_alias1", fields => [ "tab_real1.fld_alias1" ] )
+ returns: SELECT tab_alias1.fld_real1 fld_alias1 FROM tab_real1 tab_alias1
+
+ Select( table => "tab_real1", fields => [ "tab_alias1.fld_alias1" ] )
+ returns: SELECT tab_alias1.fld_real1 fld_alias1 FROM tab_real1 tab_alias1
+
+ Select( table => "tab_real1", fields => [ "tab_real1.fld_alias1" ] )
+ returns: SELECT tab_alias1.fld_real1 fld_alias1 FROM tab_real1 tab_alias1
+
+ Select( table => "tab_real1", fields => [ "bad_alias1.fld_alias1" ] )
+ message: 010E [select] Field 'bad_alias1.fld_alias1' not mapped in table list
+ note: *** no SQL command returns -- invalid arguments ***
+
+ Select( table => "tab_noalias", fields => [ "bad_alias1.fld_alias1" ] )
+ message: 010E [select] Field 'bad_alias1.fld_alias1' not mapped in table list
+ note: *** no SQL command returns -- invalid arguments ***
+
+ Select( table => "tab_noalias", fields => [ "bad_real1.fld_alias1" ] )
+ message: 010E [select] Field 'bad_real1.fld_alias1' not mapped in table list
+ note: *** no SQL command returns -- invalid arguments ***
+
+ Select( table => ["tab_noalias1","tab_noalias2"], fields => "fld_alias1" )
+ returns: SELECT fld_alias1 FROM tab_noalias1, tab_noalias2
+
+ Select( table => ["tab_noalias1","tab_noalias2"], fields => [ "fld_alias1" ] )
+ returns: SELECT fld_alias1 FROM tab_noalias1, tab_noalias2
+
+ Select( table => ["tab_alias1","tab_alias2"], fields => "fld_alias1" )
+ note: The fld_alias1 defined in both tables, cannot translate, us: [table].[field]
+ returns: SELECT fld_alias1 FROM tab_real1 tab_alias1, tab_real2 tab_alias2
+
+ Select( table => ["tab_real1","tab_real2"], fields => "fld_alias1" )
+ note: The fld_alias1 defined in both tables, cannot translate, us: [table].[field]
+ returns: SELECT fld_alias1 FROM tab_real1 tab_alias1, tab_real2 tab_alias2
+
+ Select( table => ["tab_noalias1","tab_noalias2"], fields => "tab_noalias3.fld_alias1 )
+ message: 010E [select] Field 'tab_noalias3.fld_alias1' not mapped in table list
+ note: *** no SQL command returns -- invalid arguments ***
+
+ Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_alias1.fld_alias1" ] )
+ returns: SELECT tab_alias1.fld_real1 fld_alias1 FROM tab_real1 tab_alias1, tab_real2 tab_alias2
+
+ Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_real1.fld_alias1" ] )
+ returns: SELECT tab_alias1.fld_real1 fld_alias1 FROM tab_real1 tab_alias1, tab_real2 tab_alias2
+
+ Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_alias1.fld_alias1" ] )
+ returns: SELECT tab_alias1.fld_real1 fld_alias1 FROM tab_real1 tab_alias1, tab_real2 tab_alias2
+
+ Select( table => ["tab_real1","tab_real2"], fields => [ "tab_real1.fld_alias1" ] )
+ returns: SELECT tab_alias1.fld_real1 fld_alias1 FROM tab_real1 tab_alias1, tab_real2 tab_alias2
+
+ Select( table => ["tab_real1","tab_real2"], fields => [ "bad_alias1.fld_alias1" ] )
+ message: 010E [select] Field 'bad_alias1.fld_alias1' not mapped in table list
+ note: *** no SQL command returns -- invalid arguments ***
+
+ Select( table => ["tab_real1","tab_real2"], fields => [ "bad_real1.fld_alias1" ] )
+ message: 010E [select] Field 'bad_real1.fld_alias1' not mapped in table list
+ note: *** no SQL command returns -- invalid arguments ***
+
+ Select( table => ["tab_noalias1","tab_noalias2"], fields => [ "bad_alias1.fld_alias1" ] )
+ message: 010E [select] Field 'bad_alias1.fld_alias1' not mapped in table list
+ note: *** no SQL command returns -- invalid arguments ***
+
+ Select( table => ["tab_noalias1","tab_noalias2"], fields => [ "bad_real1.fld_alias1" ] )
+ message: 010E [select] Field 'bad_real1.fld_alias1' not mapped in table list
+ note: *** no SQL command returns -- invalid arguments ***
+
+ Select( table => "tab_noalias", fields => [ {"fld_alias1"=>"my1"} ] )
+ returns: SELECT fld_alias1 my1 FROM tab_noalias
+
+ Select( table => "tab_alias1", fields => [ {"fld_alias1"=>"my1"} ] )
+ returns: SELECT fld_real1 my1 FROM tab_real1 tab_alias1
+
+ Select( table => "tab_real1", fields => [ {"fld_alias1"=>"my1"} ] )
+ returns: SELECT fld_real1 my1 FROM tab_real1 tab_alias1
+
+ Select( table => "tab_alias1", fields => [ {"fld_real1"=>"my1"} ] )
+ returns: SELECT fld_real1 my1 FROM tab_real1 tab_alias1
+
+ Select( table => "tab_real1", fields => [ {"fld_real1"=>"my1"} ] )
+ returns: SELECT fld_real1 my1 FROM tab_real1 tab_alias1
+
+ Select( table => "tab_alias1", fields => [ {"fld_noalias"=>"my1} ] )
+ returns: SELECT fld_noalias my1 FROM tab_real1 tab_alias1
+
+ Select( table => "tab_real1", fields => [ {"fld_noalias"=>"my1"} ] )
+ returns: SELECT fld_noalias my1 FROM tab_real1 tab_alias1
+
+ Select( table => "tab_alias1", fields => [ {"tab_alias1.fld_alias1"=>"my1"} ] )
+ returns: SELECT tab_alias1.fld_real1 my1 FROM tab_real1 tab_alias1
+
+ Select( table => "tab_alias1", fields => [ {"tab_real1.fld_alias1"=>"my1"} ] )
+ returns: SELECT tab_alias1.fld_real1 my1 FROM tab_real1 tab_alias1
+
+ Select( table => "tab_real1", fields => [ {"tab_alias1.fld_alias1"=>"my1"} ] )
+ returns: SELECT tab_alias1.fld_real1 my1 FROM tab_real1 tab_alias1
+
+ Select( table => "tab_real1", fields => [ {"tab_real1.fld_alias1"=>"my1"} ] )
+ returns: SELECT tab_alias1.fld_real1 my1 FROM tab_real1 tab_alias1
+
+ Select( table => "tab_real1", fields => [ {"bad_alias1.fld_alias1"=>"my1"} ] )
+ message: 010E [select] Field 'bad_alias1.fld_alias1' not mapped in table list
+ note: *** no SQL command returns -- invalid arguments ***
+
+ Select( table => "tab_real1", fields => [ {"bad_real1.fld_alias1"=>"my1"} ] )
+ message: 010E [select] Field 'bad_real1.fld_alias1' not mapped in table list
+ note: *** no SQL command returns -- invalid arguments ***
+
+ Select( table => "tab_noalias", fields => [ {"bad_alias1.fld_alias1"=>"my1"} ] )
+ message: 010E [select] Field 'bad_alias1.fld_alias1' not mapped in table list
+ note: *** no SQL command returns -- invalid arguments ***
+
+ Select( table => "tab_noalias", fields => [ {"bad_real1.fld_alias1"=>"my1"} ] )
+ message: 010E [select] Field 'bad_real1.fld_alias1' not mapped in table list
+ note: *** no SQL command returns -- invalid arguments ***
+
+ Select( table => ["tab_noalias1","tab_noalias2"], fields => [ {"fld_alias1"=>"my1"} ] )
+ returns: SELECT fld_alias1 my1 FROM tab_noalias1, tab_noalias2
+
+ Select( table => ["tab_alias1","tab_alias2"], fields => [ {"fld_real1"=>"my1"} ] )
+ returns: SELECT fld_real1 my1 FROM tab_real1 tab_alias1, tab_real2 tab_alias2
+
+ Select( table => ["tab_real1","tab_real2"], fields => [ {"fld_real1"=>"my1"} ] )
+ returns: SELECT fld_real1 my1 FROM tab_real1 tab_alias1, tab_real2 tab_alias2
+
+ Select( table => ["tab_alias1","tab_alias2"], fields => [ {"fld_noalias"=>"my1"} ] )
+ returns: SELECT fld_noalias my1 FROM tab_real1 tab_alias1, tab_real2 tab_alias2
+
+ Select( table => "tab_real1", fields => [ {"fld_noalias"=>"my1"} ] )
+ returns: SELECT fld_noalias my1 FROM tab_real1 tab_alias1, tab_real2 tab_alias2
+
+ Select( table => ["tab_alias1","tab_alias2"], fields => [ {"tab_alias1.fld_alias1"=>"my1"} ] )
+ returns: SELECT tab_alias1.fld_real1 my1 FROM tab_real1 tab_alias1, tab_real2 tab_alias2
+
+ Select( table => ["tab_alias1","tab_alias2"], fields => [ {"tab_real1.fld_alias1"=>"my1"} ] )
+ returns: SELECT tab_alias1.fld_real1 my1 FROM tab_real1 tab_alias1, tab_real2 tab_alias2
+
+ Select( table => ["tab_alias1","tab_alias2"], fields => [ {"tab_alias1.fld_alias1"=>"my1"} ] )
+ returns: SELECT tab_alias1.fld_real1 my1 FROM tab_real1 tab_alias1, tab_real2 tab_alias2
+
+ Select( table => ["tab_real1","tab_real2"], fields => [ {"tab_real1.fld_alias1"=>"my1"} ] )
+ returns: SELECT tab_alias1.fld_real1 my1 FROM tab_real1 tab_alias1, tab_real2 tab_alias2
+
+ Select( table => ["tab_real1","tab_real2"], fields => [ {"bad_alias1.fld_alias1"=>"my1"} ] )
+ message: 010E [select] Field 'bad_alias1.fld_alias1' not mapped in table list
+ note: *** no SQL command returns -- invalid arguments ***
+
+ Select( table => ["tab_real1","tab_real2"], fields => [ {"bad_real1.fld_alias1"=>"my1"} ] )
+ message: 010E [select] Field 'bad_real1.fld_alias1' not mapped in table list
+ note: *** no SQL command returns -- invalid arguments ***
+
+ Select( table => ["tab_noalias1","tab_noalias2"], fields => [ {"bad_alias1.fld_alias1"=>"my1"} ] )
+ message: 010E [select] Field 'bad_alias1.fld_alias1' not mapped in table list
+ note: *** no SQL command returns -- invalid arguments ***
+
+ Select( table => ["tab_noalias1","tab_noalias2"], fields => [ {"bad_real1.fld_alias1"=>"my1"} ] )
+ message: 010E [select] Field 'bad_real1.fld_alias1' not mapped in table list
+ note: *** no SQL command returns -- invalid arguments ***
+
+ Select( table => "tab_noalias1" )
+ returns: SELECT * FROM tab_noalias1
+
+ Select( table => "tab_alias1" )
+ returns: SELECT fld_real1 fld_alias1, fld_real2 fld_alias2, fld_realX fld_aliasX FROM tab_real1 tab_alias1
+
+ Select( table => "tab_real1" )
+ returns: SELECT fld_real1 fld_alias1, fld_real2 fld_alias2, fld_realX fld_aliasX FROM tab_real1 tab_alias1
+
+ Select( table => "tab_alias1", fields => "*" )
+ returns: SELECT * FROM tab_real1 tab_alias1
+
+ Select( table => ["tab_alias1","tab_alias2"], fields => "*" )
+ returns: SELECT * FROM tab_real1 tab_alias1, tab_real2 tab_alias2
+
+ Select( table => ["tab_alias1","tab_noalias"], fields => "*" )
+ returns: SELECT * FROM tab_real1 tab_alias1, tab_noalias
+
+ Select( table => ["tab_noalias1","tab_noalias2"] )
+ returns: SELECT * FROM tab_noalias1, tab_noalias2
+
+=head3 SELECT AND GROUPBY COMMAND
+X<SELECT AND GROUPBY COMMAND>
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], group_by => [ "fld_alias1" ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 GROUP BY fld_real1
+
+ Select( table => "tab_alias1", fields => [ "fld_real1" ], group_by => [ "fld_real1" ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 GROUP BY fld_real1
+
+ Select( table => "tab_alias1", fields => [ "fld_real1" ], group_by => [ "fld_noalias" ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 GROUP BY fld_noalias
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], group_by => [ "fld_alias1","fld_alias2" ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 GROUP BY fld_real1, fld_real2
+
+ Select( table => "tab_alias1", fields => [ "fld_real1" ], group_by => [ "fld_real1","fld_real2" ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 GROUP BY fld_real1, fld_real2
+
+ Select( table => "tab_alias1", fields => [ "fld_real1" ], group_by => [ "fld_noalias1","fld_noalias2" ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 GROUP BY fld_noalias1, fld_noalias2
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], group_by => [ "tab_alias1.fld_alias1" ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 GROUP BY tab_alias1.fld_real1
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], group_by => [ "tab_alias1.fld_real1" ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 GROUP BY tab_alias1.fld_real1
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], group_by => [ "tab_real1.fld_alias1" ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 GROUP BY tab_alias1.fld_real1
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], group_by => [ "tab_real1.fld_real1" ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 GROUP BY tab_alias1.fld_real1
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], group_by => [ "tab_real1.fld_noalias1" ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 GROUP BY tab_alias1.fld_noalias1
+
+ Select( table => ["tab_alias1","tab_alias2"], fields => [ "fld_alias1","fld_alias2" ], group_by => [ "tab_real1.fld_alias1","tab_real2.fld_alias2" ] )
+ note: The fld_alias1 & fld_alias2 defined in both tables, cannot translate, us: [table].[field]
+ returns: SELECT fld_alias1, fld_alias2 FROM tab_real1 tab_alias1, tab_real2 tab_alias2 GROUP BY tab_alias1.fld_real1, tab_alias2.fld_real2
+
+ Select( table => ["tab_alias1","tab_alias2"], fields => [ "fld_alias1","fld_alias2" ], group_by => [ "tab_real1.fld_real1","tab_real2.fld_real2" ] )
+ note: The fld_alias1 & fld_alias2 defined in both tables, cannot translate, us: [table].[field]
+ returns: SELECT fld_alias1, fld_alias2 FROM tab_real1 tab_alias1, tab_real2 tab_alias2 GROUP BY tab_alias1.fld_real1, tab_alias2.fld_real2
+
+ Select( table => ["tab_alias1","tab_alias2"], fields => [ "fld_alias1","fld_alias2" ], group_by => [ "tab_real1.fld_noalias1","tab_real2.fld_noalias2" ] )
+ note: The fld_alias1 & fld_alias2 defined in both tables, cannot translate, us: [table].[field]
+ returns: SELECT fld_alias1, fld_alias2 FROM tab_real1 tab_alias1, tab_real2 tab_alias2 GROUP BY tab_alias1.fld_noalias1, tab_alias2.fld_noalias2
+
+ Select( table => ["tab_alias1","tab_alias2"], fields => [ {"fld_alias1"=>"my1"},{"fld_alias2"->"my2"} ], group_by => [ "tab_alias1.my1","tab_alias1.my2" ] )
+ warning: translate the table name 'tab_real1' but 'my2' is not assigned in same table -- DOT NOT USE
+ returns: SELECT fld_alias1 my1, fld_alias2 my2 FROM tab_real1 tab_alias1, tab_real2 tab_alias2 GROUP BY tab_alias1.my1, tab_alias1.my2
+
+=head3 SELECT AND ORDERBY COMMAND
+X<SELECT AND ORDERBY COMMAND>
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"fld_alias1"=>"asc"} ] )
+ note: lower case is supported
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 ORDER BY fld_real1 ASC
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"fld_alias1"=>"ASC"} ] )
+ note: upper case is supported
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 ORDER BY fld_real1 ASC
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"fld_alias1"=>"AsC"} ] )
+ note: mixed case is supported
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 ORDER BY fld_real1 ASC
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"fld_real1"=>"asc"} ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 ORDER BY fld_real1 ASC
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"fld_noalias1"=>"asc"} ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 ORDER BY fld_noalias1 ASC
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"fld_alias1"=>"desc"} ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 ORDER BY fld_real1 DESC
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"tab_alias1.fld_real1"=>"asc"} ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 ORDER BY tab_alias1.fld_real1 ASC
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"tab_real1.fld_real1"=>"desc"} ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 ORDER BY tab_alias1.fld_real1 DESC
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"tab_alias1.fld_real1"=>"desc"} ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 ORDER BY tab_alias1.fld_real1 DESC
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"tab_real1.fld_alias1"=>"desc"} ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 ORDER BY tab_alias1.fld_real1 DESC
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"tab_noalias.fld_noalias1"=>"asc"} ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 ORDER BY tab_noalias.fld_noalias1 ASC
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"tab_noalias.fld_alias1"=>"asc"} ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 ORDER BY tab_noalias.fld_alias1 ASC
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"tab_noalias.fld_real1"=>"asc"} ] )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 ORDER BY tab_noalias.fld_real1 ASC
+
+ Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_alias1.fld_alias1","tab_alias2.fld_alias2" ], order_by => [ {"tab_alias1.fld_alias1"=>"asc"},{"tab_alias2.fld_alias2"=>"asc"} ] )
+ returns: SELECT tab_alias1.fld_real1 fld_alias1, tab_alias2.fld_real2 fld_alias2 FROM tab_real1 tab_alias1, tab_real2 tab_alias2 ORDER BY tab_alias1.fld_real1 ASC, tab_alias2.fld_real2 ASC
+
+ Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_alias1.fld_alias1","tab_alias2.fld_alias2" ], order_by => [ {"tab_real1.fld_alias1"=>"asc"},{"tab_real2.fld_alias2"=>"asc"} ] )
+ returns: SELECT tab_alias1.fld_real1 fld_alias1, tab_alias2.fld_real2 fld_alias2 FROM tab_real1 tab_alias1, tab_real2 tab_alias2 ORDER BY tab_alias1.fld_real1 ASC, tab_alias2.fld_real2 ASC
+
+ Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_alias1.fld_alias1","tab_alias2.fld_alias2" ], order_by => [ "tab_real1.fld_alias1","tab_real2.fld_alias2" ] )
+ returns: SELECT tab_alias1.fld_real1 fld_alias1, tab_alias2.fld_real2 fld_alias2 FROM tab_real1 tab_alias1, tab_real2 tab_alias2 ORDER BY tab_alias1.fld_real1, tab_alias2.fld_real2
+
+ Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_alias1.fld_alias1","tab_alias2.fld_alias2" ], order_by => "tab_real1.fld_alias1" ] )
+ returns: SELECT tab_alias1.fld_real1 fld_alias1, tab_alias2.fld_real2 fld_alias2 FROM tab_real1 tab_alias1, tab_real2 tab_alias2 ORDER BY tab_alias1.fld_real1
+
+ Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_alias1.fld_alias1","tab_alias2.fld_alias2" ], order_by => {"tab_real1.fld_alias1"=>"desc"} )
+ returns: SELECT tab_alias1.fld_real1 fld_alias1, tab_alias2.fld_real2 fld_alias2 FROM tab_real1 tab_alias1, tab_real2 tab_alias2 ORDER BY tab_alias1.fld_real1 DESC
+
+=head3 SELECT AND SUBQUERY COMMAND
+X<SELECT AND SUBQUERY COMMAND>
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], where => [ "fld_alias1" => \$mymod->SelectSubQuery( table => "ta_alias2", fields => [ "fld_alias2" ], where => [ "fld_alias2" => "value2" ] ) } )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 WHERE fld_real1 IN (SELECT fld_real2 fld_alias2 FROM tab_real2 tab_alias2 WHERE fld_real2 = 'value2')
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], where => [ "fld_alias1" => [ "!", \$mymod->SelectSubQuery( table => "ta_alias2", fields => [ "fld_alias2" ], where => [ "fld_alias2" => "value2" ] ) ] } )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 WHERE fld_real1 NOT IN (SELECT fld_real2 fld_alias2 FROM tab_real2 tab_alias2 WHERE fld_real2 = 'value2')
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], where => [ "fld_alias1" => \$mymod->Select( table => "ta_alias2", fields => [ "fld_alias2" ], where => [ "fld_alias2" => "value2" ], subquery => 1 ) } )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 WHERE fld_real1 IN (SELECT fld_real2 fld_alias2 FROM tab_real2 tab_alias2 WHERE fld_real2 = 'value2')
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], where => [ "fld_alias1" => [ "!", \$mymod->SelectSubQuery( table => "ta_alias2", fields => [ "fld_alias2" ], where => [ "fld_alias2" => "value2" ] ) ] } )
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 WHERE fld_real1 NOT IN (SELECT fld_real2 fld_alias2 FROM tab_real2 tab_alias2 WHERE fld_real2 = 'value2')
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], where => [ "fld_alias1" => [ \$mymod->Select( table => "tab_alias2", fields => [ "fld_alias2" ], where => [ "fld_alias2" => "value2" ], subquery => 1 ), "..", \$mymod->Select( table => "tab_alias2", fields => [ "fld_alias2" ], where => [ "fld_alias2" => "value3" ], subquery => 1,), ], "fld_noalias1" => "value1" ] )
+ note: The option 'subquery=1' is mandatory for Select option, the SQL command results is string as return
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 WHERE fld_real1 BETWEEN ((SELECT fld_real2 fld_alias2 FROM tab_real2 tab_alias2 WHERE fld_real2 = 'value2'),(SELECT fld_real2 fld_alias2 FROM tab_real2 tab_alias2 WHERE fld_real2 = 'value3')) AND fld_noalias1 = 'value1'
+
+=head3 SELECTCURSOR COMMAND
+X<SELECTCURSOR COMMAND>
+
+ SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor , cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_NEXT, limit=>100 )
+ note: Command=NEXT, Cursor is first(1) and last(100)
+ returns: SELECT a, b, c FROM t1 WHERE a > '100' ORDER BY a ASC LIMIT 100
+
+ SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor , cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_BACK, limit=>100 )
+ note: Command=BACK, Cursor is first(101) and last(200)
+ returns: SELECT a, b, c FROM t1 WHERE a < '101' ORDER BY a DESC LIMIT 100
+
+ SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor , cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_RELOAD, limit=>100 )
+ note: Command=RELOAD, Cursor is first(1) and last(100)
+ returns: SELECT a, b, c FROM t1 WHERE a >= '1' ORDER BY a ASC LIMIT 100
+
+ SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor , cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_LAST, limit=>100 )
+ note: Command=LAST, Cursor is first(1) and last(100)
+ returns: SELECT a, b, c FROM t1 ORDER BY a DESC LIMIT 100
+
+ SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor , cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_TOP, limit=>0 )
+ note: Command=TOP, Limit is ZERO
+ returns: SELECT a, b, c FROM t1 ORDER BY a ASC
+
+ SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100 )
+ note: Option cursor_command is omited
+ returns: SELECT t1.a, t1.b, t2.c FROM t1, t2 WHERE ((t1.a > 'a') OR (t1.a = 'a' AND t2.c > '100')) ORDER BY t1.a ASC, t2.c ASC LIMIT 100
+
+ SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_TOP )
+ note: The cursor_info is ignored
+ returns: SELECT t1.a, t1.b, t2.c FROM t1, t2 ORDER BY t1.a ASC, t2.c ASC LIMIT 100
+
+ SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_NEXT )
+ returns: SELECT t1.a, t1.b, t2.c FROM t1, t2 WHERE ((t1.a > 'a') OR (t1.a = 'a' AND t2.c > '100')) ORDER BY t1.a ASC, t2.c ASC LIMIT 100
+
+ SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_BACK 
+ returns: SELECT t1.a, t1.b, t2.c FROM t1, t2 WHERE ((t1.a < 'a') OR (t1.a = 'a' AND t2.c < '1')) ORDER BY t1.a DESC, t2.c DESC LIMIT 100
+
+ SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_LAST )
+ returns: SELECT t1.a, t1.b, t2.c FROM t1, t2 ORDER BY t1.a DESC, t2.c DESC LIMIT 100
+
+ SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_RELOAD
+ returns: SELECT t1.a, t1.b, t2.c FROM t1, t2 WHERE ((t1.a >= 'a') OR (t1.a = 'a' AND t2.c >= '1')) ORDER BY t1.a ASC, t2.c ASC LIMIT 100
+
+ SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], where => ["t1.a" => "\t2.a"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100 )
+ note: Cursor command is omitted
+ returns: SELECT t1.a, t1.b, t2.c FROM t1, t2 WHERE t1.a = t2.a AND (((t1.a > 'a') OR (t1.a = 'a' AND t2.c > '100'))) ORDER BY t1.a ASC, t2.c ASC LIMIT 100
+
+ SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], where => ["t1.a" => "\t2.a"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], cursor_command=>SQL_SIMPLE_CURSOR_RELOAD, limit=>100 )
+ returns: SELECT t1.a, t1.b, t2.c FROM t1, t2 WHERE t1.a = t2.a AND (((t1.a >= 'a') OR (t1.a = 'a' AND t2.c >= '1'))) ORDER BY t1.a ASC, t2.c ASC LIMIT 100
+
+ SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor , cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_TOP, limit=>100 )
+ note: Command=TOP, Cursor is empty
+ returns: SELECT a, b, c FROM t1 ORDER BY a ASC LIMIT 100
+
+ SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor , cursor_key=>"a", limit=>100 )
+ note: Command=TOP, Cursor is empty
+ returns: SELECT a, b, c FROM t1 ORDER BY a ASC LIMIT 100
+
+ SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor , cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_NEXT, limit=>100 )
+ note: Command=NEXT, Cursor is empty
+ returns: SELECT a, b, c FROM t1 ORDER BY a ASC LIMIT 100
+
+ SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor , cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_BACK, limit=>100 )
+ note: Command=BACK, Cursor is empty
+ returns: SELECT a, b, c FROM t1 ORDER BY a DESC LIMIT 100
+
+=head3 UPDATE COMMANDS
+X<UPDATE COMMAND>
+
+ Update( table => "tab_noalias", fields => { "fld_alias1" => "value1" }, force => 1
+ returns: UPDATE tab_noalias SET fld_alias1 = 'value1'
+
+ Update( table => "tab_noalias", fields => { "fld_alias1" => "value1", "fld_alias2" => "value2" }, force => 1 )
+ returns: UPDATE tab_noalias SET fld_alias1 = 'value1', fld_alias2 = 'value2'
+
+ Update( table => "tab_alias1", fields => { "fld_alias1" => "value1" }, force => 1 )
+ returns: UPDATE tab_real1 SET fld_real1 = 'value1'
+
+ Update( table => "tab_real1", fields => { "fld_alias1" => "value1" }, force => 1 )
+ returns: UPDATE tab_real1 SET fld_real1 = 'value1'
+
+ Update( table => "tab_alias1", fields => { "fld_alias1" => "value1", "fld_alias2" => "value2", }, force => 1 )
+ returns: UPDATE tab_real1 SET fld_real1 = 'value1', fld_real2 = 'value2'
+
+ Update( table => "tab_real1", fields => { "fld_alias1" => "value1", "fld_alias2" => "value2", }, force => 1 )
+ returns: UPDATE tab_real1 SET fld_real1 = 'value1', fld_real2 = 'value2'
+
+ Update( table => "tab_alias1", fields => { "fld_noalias1" => "value1" }, force => 1 )
+ returns: UPDATE tab_real1 SET fld_noalias = 'value1'
+
+ Update( table => "tab_real1", fields => { "fld_noalias1" => "value1" }, force => 1 )
+ returns: UPDATE tab_real1 SET fld_noalias = 'value1'
+
+ Update( table => "tab_noalias", fields => { "tab_noalias.fld_alias1" => "value1" }, force => 1 )
+ returns: UPDATE tab_noalias SET fld_alias1 = 'value1'
+
+ Update( table => "tab_noalias", fields => { "tab_noalias.fld_alias1" => "value1", "tab_noalias.fld_alias2" => "value2" }, force => 1 )
+ returns: UPDATE tab_noalias SET fld_alias1 = 'value1', fld_alias2 = 'value2'
+
+ Update( table => "tab_alias1", fields => { "tab_alias1.fld_alias1" => "value1" }, force => 1 )
+ returns: UPDATE tab_real1 SET fld_real1 = 'value1'
+
+ Update( table => "tab_real1", fields => { "tab_real1.fld_alias1" => "value1" }, force => 1 )
+ returns: UPDATE tab_real1 SET fld_real1 = 'value1'
+
+ Update( table => "tab_alias1", fields => { "tab_alias1.fld_noalias" => "value1" }, force => 1 )
+ returns: UPDATE tab_real1 SET fld_noalias = 'value1'
+
+ Update( table => "tab_real1", fields => { "tab_real1.fld_noalias" => "value1" }, force => 1 )
+ returns: UPDATE tab_real1 SET fld_noalias = 'value1'
+
+ Update( table => "tab_alias1", fields => { "bad_alias1.fld_alias1" => "value1" }, force => 1 )
+ returns: UPDATE tab_real1 tab_alias1 SET bad_alias1.fld_alias1 = 'value1'
+
+ Update( table => "tab_real1", fields => { "bad_alias1.fld_alias1" => "value1" }, force => 1 )
+ returns: UPDATE tab_real1 tab_alias1 SET bad_alias1.fld_alias1 = 'value1'
+
+ Update( table => ["tab_noalias1","tab_noalias2"], fields => { "tab_noalias1.fld_alias1" => "value1", "tab_noalias2.fld_alias2" => "value2", }, force => 1 )
+ returns: UPDATE tab_noalias1, tab_noalias2 SET tab_noalias1.fld_alias1 = 'value1', tab_noalias2.fld_alias2 = 'value2'
+
+ Update( table => ["tab_alias1","tab_noalias2"], fields => { "bad_alias1.fld_alias1" => "value1" }, force => 1 )
+ returns: UPDATE tab_real1 tab_alias1, tab_noalias2 SET bad_alias1.fld_alias1 = 'value1'
+
+ Update( table => ["tab_alias1","tab_alias2"], fields => { "tab_alias1.fld_alias1" => "value1", "tab_real2.fld_alias2" => "value2" }, force => 1 )
+ returns: UPDATE tab_real1 tab_alias1, tab_real2 tab_alias2 SET tab_alias1.fld_real1 = 'value1', tab_alias2.fld_real2 = 'value2'
+
+ Update( table => ["tab_alias1","tab_real2"], fields => { "tab_alias1.fld_alias1" => "value1", "tab_alias2.fld_alias2" => "value2" }, force => 1 )
+ returns: UPDATE tab_real1 tab_alias1, tab_real2 tab_alias2 SET tab_alias1.fld_real1 = 'value1', tab_alias2.fld_real2 = 'value2'
+
+ Update( table => ["tab_alias1","tab_alias2"], fields => { "tab_alias1.fld_alias1" => "value1", "tab_real2.fld_alias2" => "value2" }, force => 1 )
+ returns: UPDATE tab_real1 tab_alias1, tab_real2 tab_alias2 SET tab_alias1.fld_real1 = 'value1', tab_alias2.fld_noalias = 'value2'
+
+ Update( table => ["tab_alias1","tab_real2"], fields => { "tab_alias1.fld_alias1" => "value1", "tab_alias2.fld_alias2" => "value2" }, force => 1 )
+ returns: UPDATE tab_real1 tab_alias1, tab_real2 tab_alias2 SET tab_alias1.fld_real1 = 'value1', tab_alias2.fld_noalias = 'value2'
+
+ Update( table => ["tab_alias1","tab_real2"], fields => { "bad_alias.fld_alias1" => "value1" }, force => 1 )
+ returns: UPDATE tab_real1 tab_alias1, tab_real2 tab_alias2 SET bad_alias.fld_alias1 = 'value1'
+
+ Update( table => ["tab_alias1","tab_real2"], fields => { "bad_alias.fld_alias1" => "value1", "tab_alias1.fld_alias1" => "value2" }, force => 1 )
+ returns: UPDATE tab_real1 tab_alias1, tab_real2 tab_alias2 SET bad_alias.fld_alias1 = 'value1', tab_alias1.fld_real1 = 'value2'
+
+ Update( table => "tab_noalias", fields => { "fld_alias1" => "value2" }, where => [ "fld_alias1" => "value1" ] )
+ returns: UPDATE tab_noalias SET fld_alias1 = 'value2' WHERE fld_alias1 = 'value1'
+
+ Update( table => "tab_alias1", fields => { "fld_alias1" => "value2" }, where => [ "fld_alias1" => "value1" ] )
+ returns: UPDATE tab_real1 SET fld_real1 = 'value2' WHERE fld_real1 = 'value1'
+
+ Update( table => "tab_real1", fields => { "fld_alias1" => "value2" }, where => [ "fld_alias1" => "value1" ] )
+ returns: UPDATE tab_real1 SET fld_real1 = 'value2' WHERE fld_real1 = 'value1'
+
+ Update( table => "tab_alias1", fields => { "fld_alias1" => "value2" }, where => [ "fld_noalias1" => "value1" ] )
+ returns: UPDATE tab_real1 SET fld_real1 = 'value2' WHERE fld_noalias1 = 'value1'
+
+ Update( table => "tab_alias1", fields => { "fld_alias1" => "value2" }, where => [ "fld_real1" => 1 ] )
+ returns: UPDATE tab_real1 SET fld_real1 = 'value2' WHERE fld_real1 = 'value1'
+
+ Update( table => "tab_noalias", fields => { "fld_alias1" => "value2" }, where => [ "tab_noalias.fld_alias1" => "value1" ] )
+ returns: UPDATE tab_noalias SET fld_alias1 = 'value2' WHERE fld_alias1 = 'value1'
+
+ Update( table => "tab_alias1", fields => { "fld_alias1" => "value2" }, where => [ "tab_alias1.fld_alias1" => "value1" ] )
+ returns: UPDATE tab_real1 SET fld_real1 = 'value2' WHERE fld_real1 = 'value1'
+
+ Update( table => "tab_real1", fields => { "fld_alias1" => "value2" }, where => [ "tab_alias1.fld_alias1" => "value1" ] )
+ returns: UPDATE tab_real1 SET fld_real1 = 'value2' WHERE fld_real1 = 'value1'
+
+ Update( table => ["tab_noalias1","tab_noalias2"], fields => { "tab_noalias1.fld_alias1" => "value2", "tab_noalias2.fld_alias2" => "value1" }, where => [ "tab_noalias1.fld_alias1" => "value1", "tab_noalias2.fld_alias2" => "value2" ] )
+ returns: UPDATE tab_noalias1, tab_noalias2 SET tab_noalias1.fld_alias1 = 'value2', tab_noalias2.fld_alias2 = 'value1' WHERE tab_noalias1.fld_alias1 = 'value1' AND tab_noalias2.fld_alias2 = 'value2'
+
+ Update( table => ["tab_alias1","tab_alias2"], fields => { "tab_alias1.fld_alias1" => "value2", "tab_alias2.fld_alias2" => "value1" }, where => [ "tab_alias1.fld_alias1" => "value1", "tab_alias2.fld_alias2" => "value2" ] )
+ returns: UPDATE tab_real1 tab_alias1, tab_real2 tab_alias2 SET tab_alias1.fld_real1 = 'value2', tab_alias2.fld_real2 = 'value1' WHERE tab_alias1.fld_real1 = 'value1' AND tab_alias2.fld_real2 = 'value2'
+
+ Update( table => ["tab_real1","tab_real2"], fields => { "tab_real1.fld_alias1" => "value2", "tab_real2.fld_alias2" => "value1" }, where => [ "tab_real1.fld_alias1" => "value1", "tab_real2.fld_alias2" => "value2" ] )
+ returns: UPDATE tab_real1 tab_alias1, tab_real2 tab_alias2 SET tab_alias1.fld_real1 = 'value2', tab_alias2.fld_real2 = 'value1' WHERE tab_alias1.fld_real1 = 'value1' AND tab_alias2.fld_real2 = 'value2'
+
+=head2 Tests without L<Aliases Table>
+
+=head3 DELETE COMMANDS
+X<DELETE COMMAND NO CONTENTS>
+
+ Delete( table=>"t1", where => [ fld => 123 ] )
+ returns: DELETE FROM t1 WHERE fld = '123'
+
+=head3 INSERT COMMANDS
+X<INSERT COMMAND NO CONTENTS>
+
+ Insert( table=>"t1", fields => { a => 1, b => 2, c => 3 } )
+ returns: INSERT INTO t1 (a,b,c) VALUES ('1','2','3')
+
+ Insert( table=>"t1", fields => [ "a","b","c" ], values => [ 1,2,3 ] )
+ returns: INSERT INTO t1 (a,b,c) VALUES ('1','2','3')
+
+=head3 SELECT COMMANDS
+X<SELECT COMMAND NO CONTENTS>
+
+ Select( table=>"t1", fields => [ "a","b","c"] )
+ returns: SELECT a, b, c FROM t1
+
+ Select( table=>"t1", fields => [ "a","b","c"], where => [ d=>4 ] )
+ returns: SELECT a, b, c FROM t1 WHERE d = '4'
+
+ Select( table=>"t1", fields => [ "a","b","c"], where => [ d=>4, e=>5 ] )
+ returns: SELECT a, b, c FROM t1 WHERE d = '4' AND e = '5'
+
+ Select( table=>"t1", fields => [ "a","b","c"], where => [ d=>'\substr(e,1,8)' ] )
+ returns: SELECT a, b, c FROM t1 WHERE d = substr(e,1,8)
+
+ Select( table=>["t1","t2"], fields => [ "t1.a","t2.b" ], where => [ "t1.a" => "\t2.b" ] )
+ returns: SELECT t1.a, t2.b FROM t1, t2 WHERE t1.a = t2.b
+
+ Select( table=>"t1", fields => [ {"a"=>"aa"} ], where => [ 'a' => '0' ] )
+ returns: SELECT a aa FROM t1 WHERE a = '0'
+
+ Select( table=>"t1", fields => [ {"t1.a"=>"aa"} ], where => [ 't1.a' => '0' ] )
+ returns: SELECT t1.a aa FROM t1 WHERE a = '0'
+
+ Select( table=>["t1","t2"], fields => [ {"t1.a"=>"aa"}, {"t2.b"=>"bb"} ], where => [ "t1.a" => "\t2.b" ] )
+ returns: SELECT t1.a aa, t2.b bb FROM t1, t2 WHERE t1.a = t2.b
+
+ Select( table=>"t1", fields => [ {"sum(a)"=>"a1"}, {"sum(t1.a)"=>"a2"}, {"\sum(a)"=>"a3"} ], where => [ 'a' => '0' ] )
+ returns: SELECT sum(a) a1, sum(t1.a) a2, sum(a) a3 FROM t1 WHERE a = '0'
+
+ Select( table=>"t1", fields => [ "distinct", "a" ] )
+ note: Select with DISTINCT array sequence
+ returns: SELECT DISTINCT a FROM t1
+
+ Select( table=>"t1", fields => [ "distinct" => "a" ] )
+ note: Select with DISTINCT based hash
+ returns: SELECT DISTINCT a FROM t1
+
+ Select( table=>"t1", fields => [ "count(*)" ] )
+ returns: SELECT count(*) FROM t1
+
+ Select( table=>"t1", fields => [ "max(t1.a)" ] )
+ returns: SELECT max(t1.a) FROM t1
+
+ Select( table=>"t1", fields => [ "max(a)" ] )
+ returns: SELECT max(a) FROM t1
+
+ Select( table=>"t1", fields => [ "substr(a,1,8)" ] )
+ returns: SELECT substr(a,1,8) FROM t1
+
+ Select( table=>"t1", fields => [ "\aaa.bbb.ccc" ] )
+ returns: SELECT aaa.bbb.ccc FROM t1
+
+ Select( table=>"t1", fields => [ "distinct","\aaa.bbb.ccc" ] )
+ returns: SELECT DISTINCT aaa.bbb.ccc FROM t1
+
+ Select( table=>["t1","t2"], fields => [ "t1.a","t2.b" ], where => [ 't1.a' => 't2.b' ], sql_save=>1 )
+ note: SQL_SAVE enabled
+ returns: SELECT t1.a, t2.b FROM t1, t2 WHERE t1.a = 't2.b'
+ savefile: /tmp/2023/202310/20231016/sql.teste.20231016.4352.1
+ savefile: removed
+
+ Select( table=>"t1", order_by => "t1.a" )
+ returns: SELECT * FROM t1 ORDER BY t1.a
+
+ Select( table=>"t1", order_by => [ {"t1.a" => "asc"} ] )
+ returns: SELECT * FROM t1 ORDER BY t1.a ASC
+
+ Select( table=>"t1", order_by => [ {"t1.a" => "desc"} ] )
+ returns: SELECT * FROM t1 ORDER BY t1.a DESC
+
+ Select( table=>"t1", order_by => [ "t1.a", "t1.b" ] )
+ returns: SELECT * FROM t1 ORDER BY t1.a, t1.b
+
+ Select( table=>"t1", order_by => [ {"t1.a" => "asc"}, "t1.b" ] )
+ returns: SELECT * FROM t1 ORDER BY t1.a ASC, t1.b
+
+ Select( table=>"t1", order_by => [ "t1.a", {"t1.b"=>"desc"} ] )
+ returns: SELECT * FROM t1 ORDER BY t1.a, t1.b DESC
+
+ Select( table=>"t1", order_by => {"t1.b"=>"desc"} )
+ returns: SELECT * FROM t1 ORDER BY t1.b DESC
+
+ Select( table=>"t1", fields => [{"t1.abc"=>"_abc"},"t1.cde",{"t1.fgh"=>"_fgh"}], where => [ "_abc" => 123 ] )
+ returns: SELECT t1.abc _abc, t1.cde, t1.fgh _fgh FROM t1 WHERE abc = '123'
+
+ Select( table=>"t1", fields => [{"t1.abc"=>"_abc"},"t1.cde",{"t1.fgh"=>"_fgh"}], where => [ "_abc" => 123, "cde" => 234, "t1.abc" => 345] )
+ returns: SELECT t1.abc _abc, t1.cde, t1.fgh _fgh FROM t1 WHERE abc = '123' AND cde = '234' AND abc = '345'
+
+ Select( table=>["t1","t2"], fields => [{"t1.abc"=>"_abc"},"t1.cde",{"t2.fgh"=>"_fgh"},"t2.ijk"], where => [ "_abc" => 123, "cde" => 234, "t1.abc" => 345, "ijk" => 456] )
+ returns: SELECT t1.abc _abc, t1.cde, t2.fgh _fgh, t2.ijk FROM t1, t2 WHERE t1.abc = '123' AND cde = '234' AND t1.abc = '345' AND ijk = '456'
+
+ Select( table=>"t1", fields => [{"t1.abc"=>"_a"}], where => [ "substr(_a,1,4)" => 1234 ] )
+ returns: SELECT t1.abc _a FROM t1 WHERE substr(abc,1,4) = '1234'
+
+ Select( table=>"t1", fields => [{"t1.abc"=>"_a"}], where => [ "concat(substr(_a,1,3),1)" => 1231 ] )
+ returns: SELECT t1.abc _a FROM t1 WHERE concat(substr(abc,1,4),1) = '1231'
+
+ Select( table=>"t1", fields => [{"t1.abc"=>"_a"}], where => [ "func1(func2(_a))" => 1231 ] )
+ returns: SELECT t1.abc _a FROM t1 WHERE func1(func2(abc)) = '1231'
+
+ Select( table=>"t1", fields => [{"t1.abc"=>"_a"}], where => [ "func1(_a)" => 123, "func1(t1.abc)" => 456 ] )
+ returns: SELECT t1.abc _a FROM t1 WHERE func1(abc) = '123' AND func1(t1.abc) = '456'
+
+=head3 UPDATE COMMANDS
+X<UPDATE COMMAND NO CONTENTS>
+
+ Update( table=>"t1", fields => { a => 1, b => 2 }, where => [ c => [ "!", 3 ] ] )
+ returns: UPDATE t1 SET a = '1', b = '2' WHERE c != '3'
+
+ Update( table=>"t1", fields => { a => '\concat(a,"xxxx")' }, force => 1 )
+ returns: UPDATE t1 SET a = concat(a,"xxxx")
 
 =head1 MESSAGES
 X<MESSAGES>
@@ -2556,22 +4055,22 @@ B<Command:> Constructor (method new)
 
 =back
 
-=head2 005E [I<command>] Table is missing
+=head2 005E [I<command>] Table is missing or invalid
 X<005E>
 
 =over
 
 =item *
 
-B<Error:> The table alias name omitted or empty.
+B<Error:> The table alias name omitted, empty or is not a single value.
 
 =item *
 
 B<Action:> Check the Command and validate the C<table> option.
-Remember: the you must specify the aliases table name assigned on contents table.
+The format depends of the command in use:
 
   SQL::SimpleOps->Select( table => aliases_table_name, ... );		# single select
-  or
+  ot
   SQL::SimpleOps->Select( table => [ table1, table2, ... ], ... );		# merged selected
 
 =item *
@@ -2673,28 +4172,31 @@ B<Command:> Select and SelectCursor
 
 =back
 
-=head2 010E [I<command>] Table/Field Index invalid
+=head2 010E [I<command>] Field '%s' not mapped in table list"
 X<010E>
 
 =over
 
 =item *
 
-B<Error:> The indexed field is using a non-valid table/field identifier.
+B<Error:> The field is using a non-valid table/field identifier.
 
 =item *
 
-B<Action:> The table must specified on the C<table> option. The C<fields> is omitted, have multiples tables on the C<table> option and one or more tables does not exists on the L<Aliases Table>. Check the aliases of the table names specified in the fields in use of the C<where> option.
+B<Action:> Check the field syntax, we can have:
+Fields with a table identifier where it is not in the L<Aliases Table> and is not in the command's table list.
+Fields without a table identifier that have the same L<Aliases Table> for multiple tables.
 
   SQL::SimpleOps->Select(
      table => [ t1, t2 ],
-     where => [ t1.id => t2.id, t3.name => "dummy" ],
+     where => [ t1.id => '\t2.id', t3.name => "dummy" ],
      ...
   );
 
   # The 't3' is not mapped on the Select Command. To fix you must:
   # a) Use be 't1' or 't2' as aliases on the field 'name' or;
   # b) Specify the 't3' on the 'table' option.
+  # c) Backslash is mandatory.
 
 =item *
 
@@ -2926,7 +4428,7 @@ B<Command:> Select, Delete, Insert and Update
 
 =back
 
-=head2 021E [I<command>] Field invalid, must be single-value or array
+=head2 021E [I<command>] Where invalid, must be single-value or array
 X<021E>
 
 =over
@@ -2984,7 +4486,7 @@ B<Error:> The SQL Command is omitted or empty.
 B<Action:> Check the SQL Command and validate the C<command> option on the Call Command.
 
   SQL::SimpleOps->Call( command => my-sql-command, ... );
- 
+
 =item *
 
 B<Command:> Call
@@ -3491,413 +4993,6 @@ B<Error:> The message code not found on the Table os Messages.
 B<Action:> Internal Module Error, open a issue.
 
 =back
-
-=head1 EXAMPLES
-X<EXAMPLES>
-
-NOTE: For more examples see test modules (I<t/testSQL.t>, I<t/testWhere.t> and I<t/testDB.t>) in source code.
-
-The following example allow simple test between the SQLite, MySQL/MariaDB and Postgres Databases.
-
-To test you need:
-
- (a) Create a temporary database, as described below (SQLite, MySQL, MariaDB or Postgres);
- (b) Copy/Past the Source Code and;
- (c) Make the test.
-
-=head2 Create SQLite Database
-
- # sqlite3 -batch -echo /tmp/test_db.db <<EOF
-
- CREATE TABLE master (
-   i_m_id integer primary key autoincrement,
-   s_m_code text,
-   s_m_name text,
-   s_m_desc text
- );
- 
- CREATE TABLE slave (
-   i_s_id integer primary key autoincrement,
-   s_m_code text,
-   s_s_code text,
-   s_s_name text,
-   s_s_desc text
- );
-
- EOF
- 
-=head2 Create MySQL/MariaDB Database
-
- # mysql -v <<EOF
-
- CREATE SCHEMA IF NOT EXISTS test_db DEFAULT CHARACTER SET 'UTF8' ;
- 
- USE test_db ;
- 
- CREATE TABLE IF NOT EXISTS test_db.master
- (
-   i_m_id int auto_increment unique,
-   s_m_code varchar(32),
-   s_m_name varchar(255),
-   s_m_desc varchar(255)
- ) ENGINE = InnoDB;
- 
- CREATE TABLE IF NOT EXISTS test_db.slave
- (
-   i_s_id int auto_increment unique,
-   s_m_code varchar(32),
-   s_s_code varchar(32),
-   s_s_name varchar(255),
-   s_s_desc varchar(255)
- ) ENGINE = InnoDB;
- 
- CREATE USER 'user_read'@'localhost' IDENTIFIED BY 'password_read';
- CREATE USER 'user_update'@'localhost' IDENTIFIED BY 'password_update';
- 
- GRANT SELECT ON test_db.* TO 'user_read'@'localhost';
- GRANT SELECT,INSERT,UPDATE,DELETE ON test_db.* TO 'user_update'@'localhost';
-
- EOF
- 
-=head2 Create Postgres Database
-
- # psql -U postgres <<EOF
- CREATE DATABASE test_db ENCODING 'UTF8';
- EOF
-
- # psql -U postgres -b test_db <<EOF
-
- CREATE SCHEMA IF NOT EXISTS test_schema ;
- 
- CREATE TABLE IF NOT EXISTS test_schema.master
- (
-   i_m_id smallserial unique,
-   s_m_code varchar(32),
-   s_m_name varchar(255),
-   s_m_desc varchar(255)
- );
- 
- CREATE TABLE IF NOT EXISTS test_schema.slave
- (
-   i_s_id smallserial unique,
-   s_m_code varchar(32),
-   s_s_code varchar(32),
-   s_s_name varchar(255),
-   s_s_desc varchar(255)
- );
- 
- CREATE ROLE user_read LOGIN PASSWORD 'password_read';
- CREATE ROLE user_update LOGIN PASSWORD 'password_update';
- 
- GRANT SELECT ON TABLE
-   test_schema.master, test_schema.slave TO user_read;
- GRANT SELECT,INSERT,UPDATE,DELETE ON TABLE
-   test_schema.master, test_schema.slave TO user_update;
-
- EOF
- 
-=head2 Source Code
-
-  #!/usr/bin/perl
-  #
-  ## file /tmp/my_first_program.pl
-  #
-  ## CoryRight (C) 2022 - Carlos Celso
-  #
-
-  ## load external libs
-
-  use Getopt::Long;
-  use SQL::SimpleOps;
-  use Pod::Usage;
-  use Test::More;
-
-  ## show my usage format
-
-  pod2usage("$0 -drive=[driver] -db=[db] -schema=[sch] -server=[host] -port=[port] -user=[user] -password=[pwd]") if (!@ARGV);
-
-  ## defaults values
-
-  my $PARM_DB = "test_db";
-  my $PARM_DBFILE = "/tmp/test_db.db";	# for database im memory use: ":memory:" 
-  my $PARM_SCHEMA = "test_schema";
-  my $PARM_SERVER = "localhost";
-  my $PARM_USER = "user_update";
-  my $PARM_PASSWORD = "password_update";
-
-  ## parsing options
-
-  my $get = new Getopt::Long::Parser;
-  $get->configure("pass_through");
-  $get->getoptions
-  (
-     'driver=s' => \$PARM_DRIVER,
-     'db=s' => \$PARM_DB,
-     'dbfile=s' => \$PARM_DBFILE,
-     'schema=s' => \$PARM_SCHEMA,
-     'server=s' => \$PARM_SERVER,
-     'port=s' => \$PARM_PORT,
-     'user=s' => \$PARM_USER,
-     'password=s' => \$PARM_PASSWORD,
-  );
-
-  ## loading SQL::SimpleOps module
-  ## remember: the defauls values por RaiseError and PrintError is ZERO
-
-  my $mymod = new SQL::SimpleOps
-  (
-     driver => $PARM_DRIVER,
-     db => $PARM_DB,
-     dbfile => $PARM_DBFILE,
-     schema => $PARM_SCHEMA,
-     server => $PARM_SERVER,
-     port => $PARM_PORT,
-     login => $PARM_USER,
-     password => $PARM_PASSWORD,
-     tables =>
-     {
-        my_master =>	## sets aliases entries for master table
-        {
-           name => "master",
-           cols =>
-           {
-              my_i_m_id   => 'i_m_id',
-              my_s_m_code => 's_m_code',
-              my_s_m_name => 's_m_name',
-              my_s_m_desc => 's_m_desc',
-           },
-        },
-        my_slave =>	## sets aliases entries for slave table
-        {
-           name => "slave",
-           cols =>
-           {
-              my_i_s_id   => 'i_s_id',
-              my_s_m_code => 's_m_code',
-              my_s_s_code => 's_s_code',
-              my_s_s_name => 's_s_name',
-              my_s_s_desc => 's_s_desc',
-           },
-        },
-     }
-  );
-  exit if (!defined($mymod));
-
-  ## my test
-
-  &my_upload();		# initialize the tables
-  &my_get_master();	# test master table
-  &my_get_slave();	# test slave table
-  &my_get_merge();	# test merge between master and slave
-
-  ## finishing test
-
-  $mymod->Close();	# do not forgot me
-  done_testing();	# test done
-  exit;
-
-  ## my upload data
-  ## remove previous data
-  ## creating dynamic data into the master and slave table
-
-  sub my_upload()
-  {
-      ## remove previous data
-
-      $mymod->Delete ( table => "my_master", force => 1 );
-      $mymod->Delete ( table => "my_slave", force => 1 );
-
-      ## initializing master/slave table
-
-      foreach my $code(0..9)
-      {
-          my $er=0;
-          my $ok=0;
-
-          ## inserting data into master
-
-          $code = sprintf("%04i",$code);
-          $mymod->Insert
-          (
-             table => "my_master",
-             fields =>
-             {
-                my_s_m_code => "master_".$code,
-                my_s_m_name => "name_".$code,
-                my_s_m_desc => "description_".$code,
-             }
-          );
-
-          ($mymod->getRC()) ? $er++ : $ok++;
-
-          ## inserting data into slave based master data
-
-          foreach my $subcode(10..19)
-          {
-             $subcode = sprintf("%04i",$subcode);
-             $mymod->Insert
-             (
-                table => "my_slave",
-                fields =>
-                {
-                   my_s_m_code => "master_".$code,
-                   my_s_s_code => "slave_".$subcode,
-                   my_s_s_name => "name_".$subcode,
-                   my_s_s_desc => "description_".$subcode,
-                }
-             );
-
-             ($mymod->getRC()) ? $er++ : $ok++;
-          }
-
-          ## shown counters
-
-          fail("Number of ".$er." errors (master+slave), Code ".$code) if ($er);
-          pass("Number of ".$ok." successful (master+slave), Code ".$code) if ($ok);
-      }
-  }
-
-  ## simple test of load master data
-  ## load all master data into buffer
-
-  sub my_get_master()
-  {
-      my @buffer;
-      $mymod->Select
-      (
-         table => "my_master",
-         buffer => \@buffer,
-         order_by => "my_i_m_id",
-      );
-
-      ## test number of loaded rows
-
-      ok($mymod->getRows()==10,"Master select, rows ".$mymod->getRows());
-  }
-
-  ## simple test of load slave data
-  ## load all slave data into buffer
-
-  sub my_get_slave()
-  {
-      my @buffer;
-      $mymod->Select
-      (
-         table => "my_slave",
-         buffer => \@buffer,
-         order_by => "my_i_s_id",
-      );
-
-      ## test number of loaded rows
-
-      ok($mymod->getRows()==100,"Slave select, rows ".$mymod->getRows());
-  }
-
-  ## simple test of merge between master and slave tables
-
-  sub my_get_merge()
-  {
-      my @buffer;
-
-      $mymod->Select
-      (
-         table => [ "my_master","my_slave" ],
-         buffer => \@buffer,
-         fields => [ "my_master.my_s_m_code", "my_slave.my_s_s_code" ],
-      );
-
-      ## test number of loaded rows
-
-      ok($mymod->getRows()==1000,"Master/Slave merge-1, rows ".$mymod->getRows());
-
-      $mymod->Select
-      (
-         table => [ "my_master","my_slave" ],
-         buffer => \@buffer,
-         fields => [ "my_master.my_s_m_code", "my_slave.my_s_s_code" ],
-         where =>
-         [
-            "my_master.my_s_m_code" => "my_slave.my_s_m_code"
-         ]
-      );
-
-      ## test number of loaded rows
-
-      ok($mymod->getRows()==100,"Master/Slave merge-2, rows ".$mymod->getRows());
-
-      $mymod->Select
-      (
-         table => [ "my_master","my_slave" ],
-         buffer => \@buffer,
-         fields => [ "my_master.my_s_m_code", "my_slave.my_s_s_code" ],
-         where =>
-         [
-            "my_master.my_s_m_code" => [ "!", "my_slave.my_s_m_code" ],
-         ]
-      );
-
-      ## test number of loaded rows
-
-      ok($mymod->getRows()==900,"Master/Slave merge-3, rows ".$mymod->getRows());
-  }
-
-  __END__
-
-=head2 Results
-
- # perl /tmp/my_first_program.pl -driver=sqlite
- ok 1 - Number of 11 successful (master+slave), Code 0000
- ok 2 - Number of 11 successful (master+slave), Code 0001
- ok 3 - Number of 11 successful (master+slave), Code 0002
- ok 4 - Number of 11 successful (master+slave), Code 0003
- ok 5 - Number of 11 successful (master+slave), Code 0004
- ok 6 - Number of 11 successful (master+slave), Code 0005
- ok 7 - Number of 11 successful (master+slave), Code 0006
- ok 8 - Number of 11 successful (master+slave), Code 0007
- ok 9 - Number of 11 successful (master+slave), Code 0008
- ok 10 - Number of 11 successful (master+slave), Code 0009
- ok 11 - Master select, rows 10
- ok 12 - Slave select, rows 100
- ok 13 - Master/Slave merge-1, rows 1000
- ok 14 - Master/Slave merge-2, rows 100
- ok 15 - Master/Slave merge-3, rows 900
- 1..15
-
- # perl /tmp/my_first_program.pl -driver=mysql
- ok 1 - Number of 11 successful (master+slave), Code 0000
- ok 2 - Number of 11 successful (master+slave), Code 0001
- ok 3 - Number of 11 successful (master+slave), Code 0002
- ok 4 - Number of 11 successful (master+slave), Code 0003
- ok 5 - Number of 11 successful (master+slave), Code 0004
- ok 6 - Number of 11 successful (master+slave), Code 0005
- ok 7 - Number of 11 successful (master+slave), Code 0006
- ok 8 - Number of 11 successful (master+slave), Code 0007
- ok 9 - Number of 11 successful (master+slave), Code 0008
- ok 10 - Number of 11 successful (master+slave), Code 0009
- ok 11 - Master select, rows 10
- ok 12 - Slave select, rows 100
- ok 13 - Master/Slave merge-1, rows 1000
- ok 14 - Master/Slave merge-2, rows 100
- ok 15 - Master/Slave merge-3, rows 900
- 1..15
-
- # perl /tmp/my_first_program.pl -driver=postgres
- ok 1 - Number of 11 successful (master+slave), Code 0000
- ok 2 - Number of 11 successful (master+slave), Code 0001
- ok 3 - Number of 11 successful (master+slave), Code 0002
- ok 4 - Number of 11 successful (master+slave), Code 0003
- ok 5 - Number of 11 successful (master+slave), Code 0004
- ok 6 - Number of 11 successful (master+slave), Code 0005
- ok 7 - Number of 11 successful (master+slave), Code 0006
- ok 8 - Number of 11 successful (master+slave), Code 0007
- ok 9 - Number of 11 successful (master+slave), Code 0008
- ok 10 - Number of 11 successful (master+slave), Code 0009
- ok 11 - Master select, rows 10
- ok 12 - Slave select, rows 100
- ok 13 - Master/Slave merge-1, rows 1000
- ok 14 - Master/Slave merge-2, rows 100
- ok 15 - Master/Slave merge-3, rows 900
- 1..15
 
 =head1 SEE ALSO
 

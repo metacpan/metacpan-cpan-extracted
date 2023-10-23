@@ -1,295 +1,52 @@
-# Tue Sep 20 19:17:20 -03 2022
+###############################################################################
+## use th following command to setup the database test
+## this README shown how to get the database commands to create de tables
+###############################################################################
 
+## Start
+
+############################################################
 ## step-01 create database for the tests
 
 ## you dont need expor all envs
 ## export only required engine for your test.
 
+## common envs for each database, mandatory.
+
 # export SQL_SIMPLE_DB_TEST_CREATE_ALLOWED=
 # export SQL_SIMPLE_DB_TEST_SKIP_CREATE=
 # export SQL_SIMPLE_DB_SHOW_CREATE="1"
+
+## envs to setup the MySQL test instances, required for this engine
 
 # export SQL_SIMPLE_MYSQL="1"
 # export SQL_SIMPLE_MYSQL_DB="test_db"
 # export SQL_SIMPLE_MYSQL_USER="user_update"
 # export SQL_SIMPLE_MYSQL_PASSWORD="password_update"
 
+## envs to setup the Postgres test instances, required for this engine
+#
 # export SQL_SIMPLE_PG="1"
 # export SQL_SIMPLE_PG_DB="test_db"
 # export SQL_SIMPLE_PG_SCHEMA="test_db"
 # export SQL_SIMPLE_PG_USER="user_update"
 # export SQL_SIMPLE_PG_PASSWORD="password_update"
 
+## envs to setup the SQLite test instances, required for this engine
+
 # export SQL_SIMPLE_SQLITE="1"
 
+############################################################
 ## step-02 show the sql commands for iteractive creation
 
 ## you must copy/paste the commands in your prefered database.
 ## this sample show all sql command for each supported database.
 
 # perl t/testDB.t
-ok 1 - use SQL::SimpleOps;
-# Disabled the Create/Drop Database, Schema, Tables
-# 
-# SQLite3 tests
-# 
-CREATE TABLE standard_notnull (
- i_integer integer not null,
- s_text text not null,
- s_blob blob not null,
- f_real real not null,
- i_numeric numeric not null
- );
-CREATE TABLE standard_null (
- i_integer integer null,
- s_text text null,
- s_blob blob null,
- f_real real null,
- i_numeric numeric null
- );
-CREATE TABLE standard_single (
- i_id integer
- );
-CREATE TABLE autoincrement_1 (
- i_id integer primary key autoincrement,
- i_no_1 integer signed not null,
- i_no_2 integer unsigned not null
- );
-CREATE TABLE standard_indexed (
- i_fld_1 integer,
- i_fld_2 integer
- );
-CREATE TABLE master (
- i_m_id integer primary key autoincrement,
- s_m_code text,
- s_m_name text,
- s_m_desc text
- );
-CREATE TABLE slave (
- i_s_id integer primary key autoincrement,
- s_m_code text,
- s_s_code text,
- s_s_name text,
- s_s_desc text
- );
-# SQLite3 done
-# 
-# MySQL/MariaDB tests
-# 
-DROP TABLE IF EXISTS `test_db`.`standard_notnull` ;
-DROP TABLE IF EXISTS `test_db`.`standard_null` ;
-DROP TABLE IF EXISTS `test_db`.`standard_single` ;
-DROP TABLE IF EXISTS `test_db`.`autoincrement_1` ;
-DROP TABLE IF EXISTS `test_db`.`standard_indexed` ;
-DROP TABLE IF EXISTS `test_db`.`master` ;
-DROP TABLE IF EXISTS `test_db`.`slave` ;
-DROP SCHEMA IF EXISTS `test_db` ;
-DROP USER IF EXISTS 'user_read'@'localhost';
-DROP USER IF EXISTS 'user_update'@'localhost';
-CREATE SCHEMA IF NOT EXISTS `test_db` DEFAULT CHARACTER SET utf8 ;
-USE `test_db` ;
-CREATE TABLE IF NOT EXISTS `test_db`.`standard_notnull` (
- b_binary binary not null,
- b_varbinary varbinary(1) not null,
- b_bool bool not null,
- b_boolean boolean not null,
- f_float float not null,
- f_double double not null,
- f_double_precision double precision not null,
- f_decimal decimal not null,
- f_dec dec not null,
- i_tinyint tinyint not null,
- i_smallint smallint not null,
- i_mediumint mediumint not null,
- i_int int not null,
- i_integer integer not null,
- i_bigint bigint not null,
- s_varchar varchar(4096) not null,
- s_tinyblob tinyblob not null,
- s_tinytext tinytext not null,
- s_text text not null,
- s_blob blob not null,
- s_mediumtext mediumtext not null,
- s_mediumblob mediumblob not null,
- s_longtext longtext not null,
- s_longblob longblob not null,
- t_date date not null,
- t_datetime datetime not null,
- t_timestamp timestamp not null,
- t_time time not null,
- t_year year not null
- ) ENGINE = InnoDB;
-CREATE TABLE IF NOT EXISTS `test_db`.`standard_null` (
- b_binary binary null,
- b_varbinary varbinary(1) null,
- b_bool bool null,
- b_boolean boolean null,
- f_float float null,
- f_double double null,
- f_double_precision double precision null,
- f_decimal decimal null,
- f_dec dec null,
- i_tinyint tinyint null,
- i_smallint smallint null,
- i_mediumint mediumint null,
- i_int int null,
- i_integer integer null,
- i_bigint bigint null,
- s_varchar varchar(4096) null,
- s_tinyblob tinyblob null,
- s_tinytext tinytext null,
- s_text text null,
- s_blob blob null,
- s_mediumtext mediumtext null,
- s_mediumblob mediumblob null,
- s_longtext longtext null,
- s_longblob longblob null,
- t_date date null,
- t_datetime datetime null,
- t_timestamp timestamp null,
- t_time time null,
- t_year year null
- ) ENGINE = InnoDB;
-CREATE TABLE IF NOT EXISTS `test_db`.`standard_single` (
- i_id int
- ) ENGINE = InnoDB;
-CREATE TABLE IF NOT EXISTS `test_db`.`autoincrement_1` (
- i_id int auto_increment unique,
- i_no_1 bigint signed not null,
- i_no_2 bigint unsigned not null
- ) ENGINE = InnoDB;
-CREATE TABLE IF NOT EXISTS `test_db`.`standard_indexed` (
- i_fld_1 int,
- i_fld_2 int
- ) ENGINE = InnoDB;
-CREATE TABLE IF NOT EXISTS `test_db`.`master` (
- i_m_id int auto_increment unique,
- s_m_code varchar(32),
- s_m_name varchar(255),
- s_m_desc varchar(255)
- ) ENGINE = InnoDB;
-CREATE TABLE IF NOT EXISTS `test_db`.`slave` (
- i_s_id int auto_increment unique,
- s_m_code varchar(32),
- s_s_code varchar(32),
- s_s_name varchar(255),
- s_s_desc varchar(255)
- ) ENGINE = InnoDB;
-CREATE USER 'user_read'@'localhost' IDENTIFIED BY 'password_read';
-CREATE USER 'user_update'@'localhost' IDENTIFIED BY 'password_update';
-GRANT SELECT ON `test_db`.* TO 'user_read'@'localhost';
-GRANT SELECT,INSERT,UPDATE,DELETE ON `test_db`.* TO 'user_update'@'localhost';
-# MySQL/MariaDB done
-# 
-# Postgres tests
-# 
-DROP TABLE IF EXISTS test_db.standard_notnull ;
-DROP TABLE IF EXISTS test_db.standard_null ;
-DROP TABLE IF EXISTS test_db.standard_single ;
-DROP TABLE IF EXISTS test_db.autoincrement_1 ;
-DROP TABLE IF EXISTS test_db.standard_indexed ;
-DROP TABLE IF EXISTS test_db.master ;
-DROP TABLE IF EXISTS test_db.slave ;
-DROP SCHEMA IF EXISTS test_db CASCADE ;
-DROP DATABASE IF EXISTS test_db ;
-DROP ROLE IF EXISTS user_read;
-DROP ROLE IF EXISTS user_update;
-CREATE DATABASE test_db ENCODING 'UTF8';
-CREATE SCHEMA IF NOT EXISTS test_db ;
-CREATE TABLE IF NOT EXISTS test_db.standard_notnull (
- i_smallint smallint not null,
- i_integer integer not null,
- i_bigint bigint not null,
- i_decimal decimal not null,
- i_numeric numeric not null,
- f_real real not null,
- f_double_precision double precision not null,
- f_money money not null,
- s_character_varying character varying(255) not null,
- s_varchar varchar(255) not null,
- s_char char(255) not null,
- s_text text not null,
- s_bytea bytea not null,
- t_timestamp timestamp not null,
- t_date date not null,
- t_time time not null,
- t_interval interval not null,
- b_boolean boolean not null
- );
-CREATE TABLE IF NOT EXISTS test_db.standard_null (
- i_smallint smallint null,
- i_integer integer null,
- i_bigint bigint null,
- i_decimal decimal null,
- i_numeric numeric null,
- f_real real null,
- f_double_precision double precision null,
- f_money money null,
- s_character_varying character varying(255) null,
- s_varchar varchar(255) null,
- s_char char(255) null,
- s_text text null,
- s_bytea bytea not null,
- t_timestamp timestamp null,
- t_date date null,
- t_time time null,
- t_interval interval null,
- b_boolean boolean null
- );
-CREATE TABLE IF NOT EXISTS test_db.standard_single (
- i_id integer
- );
-CREATE TABLE IF NOT EXISTS test_db.autoincrement_1 (
- i_id serial unique,
- i_no_1 bigint not null,
- i_no_2 bigint not null
- );
-CREATE TABLE IF NOT EXISTS test_db.standard_indexed (
- i_fld_1 integer,
- i_fld_2 integer
- );
-CREATE TABLE IF NOT EXISTS test_db.master (
- i_m_id smallserial unique,
- s_m_code varchar(32),
- s_m_name varchar(255),
- s_m_desc varchar(255)
- );
-CREATE TABLE IF NOT EXISTS test_db.slave (
- i_s_id smallserial unique,
- s_m_code varchar(32),
- s_s_code varchar(32),
- s_s_name varchar(255),
- s_s_desc varchar(255)
- );
-CREATE ROLE user_read LOGIN PASSWORD 'password_read';
-CREATE ROLE user_update LOGIN PASSWORD 'password_update';
-GRANT SELECT ON TABLE
- test_db.standard_notnull,
- test_db.standard_null,
- test_db.standard_single,
- test_db.autoincrement_1,
- test_db.standard_indexed,
- test_db.master,
- test_db.slave
- TO user_read;
-GRANT SELECT,INSERT,UPDATE,DELETE ON TABLE
- test_db.standard_notnull,
- test_db.standard_null,
- test_db.standard_single,
- test_db.autoincrement_1,
- test_db.standard_indexed,
- test_db.master,
- test_db.slave
- TO user_update;
 
-GRANT SELECT ON ALL TABLES IN SCHEMA test_db TO user_read;
-GRANT ALL ON ALL TABLES IN SCHEMA test_db TO user_update;
-GRANT SELECT ON DATABASE test_db TO user_read;
-GRANT ALL ON DATABASE test_db TO user_update;
-GRANT pg_read_all_data TO user_read;
-GRANT pg_write_all_data TO user_update;
+# see:	SAMPLE-01-PRECREATE-DB-MYSQL
+#	SAMPLE-01-PRECREATE-DB-PG
+#	SAMPLE-01-PRECREATE-DB-SQLITE
 
-# Postgres done
+## Ended
 
-============
-SAMPLE-ENDED

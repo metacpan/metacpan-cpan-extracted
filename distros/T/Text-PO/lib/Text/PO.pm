@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO.pm
-## Version v0.6.2
+## Version v0.6.3
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/06/21
-## Modified 2023/10/15
+## Modified 2023/10/23
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -29,7 +29,7 @@ BEGIN
     use Scalar::Util;
     use Text::PO::Element;
     use constant HAS_LOCAL_TZ => ( eval( qq{DateTime::TimeZone->new( name => 'local' );} ) ? 1 : 0 );
-    our $VERSION = 'v0.6.2';
+    our $VERSION = 'v0.6.3';
 };
 
 use strict;
@@ -506,7 +506,7 @@ sub parse
     else
     {
         $io = IO::File->new( "<$this" ) || return( $self->error( "Unable to open po file \"$this\" in read mode: $!" ) );
-        ## By default
+        # By default
         $self->source({ file => $this });
     }
     $io->binmode( ':utf8' );
@@ -541,17 +541,17 @@ sub parse
     }
     # Remove trailing blank lines from header
     $header =~ s/(^[[:blank:]\h]*\#[[:blank:]\h]*\n$)+\Z//gms;
-    ## Make sure to position ourself after the initial blank line if any, since blank lines are used as separators
-    ## Actually, no we don't care. Blocks are: maybe some comments, msgid then msgstr. That's how we delimit them
-    ## $_ = $io->getline while( /^[[:blank:]]*$/ && defined( $_ ) );
+    # Make sure to position ourself after the initial blank line if any, since blank lines are used as separators
+    # Actually, no we don't care. Blocks are: maybe some comments, msgid then msgstr. That's how we delimit them
+    # $_ = $io->getline while( /^[[:blank:]]*$/ && defined( $_ ) );
     $self->header( [ split( /\n/, $header ) ] ) if( length( $header ) );
     my $e = Text::PO::Element->new( po => $self );
     $e->debug( $self->debug );
-    ## What was the last seen element?
-    ## This is used for multi line buffer, so we know where to add it
+    # What was the last seen element?
+    # This is used for multi line buffer, so we know where to add it
     my $lastSeen = '';
     my $foundFirstLine = 0;
-    ## To keep track of the msgid found so we can skip duplicates
+    # To keep track of the msgid found so we can skip duplicates
     my $seen = {};
     while( defined( $_ = $io->getline ) )
     {
@@ -565,7 +565,7 @@ sub parse
         {
             if( $foundFirstLine )
             {
-                ## Case where msgid and msgstr are separated by a blank line
+                # Case where msgid and msgstr are separated by a blank line
                 if( scalar( @$elem ) > 1 &&
                     !length( $e->msgid ) && 
                     length( $e->msgstr ) &&
@@ -587,7 +587,7 @@ sub parse
                 $e->encoding( $self->encoding ) if( $self->encoding );
                 $e->debug( $self->debug );
             }
-            ## special treatment for first item that contains the meta information
+            # special treatment for first item that contains the meta information
             if( scalar( @$elem ) == 1 )
             {
                 my $this = $elem->[0];
@@ -631,22 +631,22 @@ sub parse
                 }
             }
         }
-        ## #. TRANSLATORS: A test phrase with all letters of the English alphabet.
-        ## #. Replace it with a sample text in your language, such that it is
-        ## #. representative of language's writing system.
+        # #. TRANSLATORS: A test phrase with all letters of the English alphabet.
+        # #. Replace it with a sample text in your language, such that it is
+        # #. representative of language's writing system.
         elsif( /^\#\.[[:blank:]]*(.*?)$/ )
         {
             my $c = $1;
             $e->add_auto_comment( $c );
         }
-        ## #: finddialog.cpp:38
-        ## #: colorscheme.cpp:79 skycomponents/equator.cpp:31
+        # #: finddialog.cpp:38
+        # #: colorscheme.cpp:79 skycomponents/equator.cpp:31
         elsif( /^\#\:[[:blank:]]+(.*?)$/ )
         {
             my $c = $1;
             $e->reference( $c );
         }
-        ## #, c-format
+        # #, c-format
         elsif( /^\#\,[[:blank:]]+(.*?)$/ )
         {
             my $c = $1;
@@ -669,28 +669,28 @@ sub parse
             $e->msgid( $self->unquote( $1 ) ) if( length( $1 ) );
             $lastSeen = 'msgid';
         }
-        ## #: mainwindow.cpp:127
-        ## #, kde-format
-        ## msgid "Time: %1 second"
-        ## msgid_plural "Time: %1 seconds"
-        ## msgstr[0] "Tiempo: %1 segundo"
-        ## msgstr[1] "Tiempo: %1 segundos"
+        # #: mainwindow.cpp:127
+        # #, kde-format
+        # msgid "Time: %1 second"
+        # msgid_plural "Time: %1 seconds"
+        # msgstr[0] "Tiempo: %1 segundo"
+        # msgstr[1] "Tiempo: %1 segundos"
         elsif( /^msgid_plural[[:blank:]]+"(.*?)"[[:blank:]]*$/ )
         {
             $e->msgid_plural( $self->unquote( $1 ) ) if( length( $1 ) );
             $e->plural(1);
             $lastSeen = 'msgid_plural';
         }
-        ## disambiguating context:
-        ## #: tools/observinglist.cpp:700
-        ## msgctxt "First letter in 'Scope'"
-        ## msgid "S"
-        ## msgstr ""
-        ## 
-        ## #: skycomponents/horizoncomponent.cpp:429
-        ## msgctxt "South"
-        ## msgid "S"
-        ## msgstr ""
+        # disambiguating context:
+        # #: tools/observinglist.cpp:700
+        # msgctxt "First letter in 'Scope'"
+        # msgid "S"
+        # msgstr ""
+        # 
+        # #: skycomponents/horizoncomponent.cpp:429
+        # msgctxt "South"
+        # msgid "S"
+        # msgstr ""
         elsif( /^msgctxt[[:blank:]]+"(.*?)"[[:blank:]]*$/ )
         {
             $e->context( $self->unquote( $1 ) ) if( length( $1 ) );
@@ -776,10 +776,10 @@ sub parse_header_value
         $frag =~ s/^[[:blank:]]+|[[:blank:]]+$//g;
         my( $attribute, $value ) = split( /[[:blank:]]*\=[[:blank:]]*/, $frag, 2 );
         $value =~ s/^\"|\"$//g;
-        ## Check character string and length. Should not be more than 255 characters
-        ## http://tools.ietf.org/html/rfc1341
-        ## http://www.iana.org/assignments/media-types/media-types.xhtml
-        ## Won't complain if this does not meet our requirement, but will discard it silently
+        # Check character string and length. Should not be more than 255 characters
+        # http://tools.ietf.org/html/rfc1341
+        # http://www.iana.org/assignments/media-types/media-types.xhtml
+        # Won't complain if this does not meet our requirement, but will discard it silently
         if( $attribute =~ /^[a-zA-Z][a-zA-Z0-9\_\-]+$/ && CORE::length( $attribute ) <= 255 )
         {
             if( $value =~ /^[a-zA-Z][a-zA-Z0-9\_\-]+$/ && CORE::length( $value ) <= 255 )
@@ -965,7 +965,7 @@ sub quote
     my $self = shift( @_ );
     my $str  = shift( @_ );
     return( '' ) if( !length( $str ) );
-    ## \t is a tab
+    # \t is a tab
     $str =~ s/(?<!\\)\\(?!t)/\\\\/g;
     $str =~ s/(?<!\\)"/\\"/g;
     $str =~ s/(?<!\\)\n/\\n/g;
@@ -1123,8 +1123,8 @@ sub unquote
 
 sub use_json { return( shift->_set_get_boolean( 'use_json', @_ ) ); }
 
-## https://stackoverflow.com/questions/3807231/how-can-i-test-if-i-can-write-to-a-filehandle
-## -> https://stackoverflow.com/a/3807381/4814971
+# https://stackoverflow.com/questions/3807231/how-can-i-test-if-i-can-write-to-a-filehandle
+# -> https://stackoverflow.com/a/3807381/4814971
 sub _can_write_fh
 {
     my $self = shift( @_ );
@@ -1340,7 +1340,7 @@ Text::PO - Read and write PO files
 
 =head1 VERSION
 
-    v0.6.2
+    v0.6.3
 
 =head1 DESCRIPTION
 

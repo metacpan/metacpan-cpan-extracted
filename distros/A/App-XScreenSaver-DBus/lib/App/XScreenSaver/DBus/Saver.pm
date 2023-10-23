@@ -7,7 +7,7 @@ use Log::Any;
 use Try::Tiny;
 use IPC::Run;
 use App::XScreenSaver::DBus::SaverProxy;
-our $VERSION = '1.0.3'; # VERSION
+our $VERSION = '1.0.4'; # VERSION
 # ABSTRACT: implements the "idle inhibition" protocol
 
 
@@ -46,22 +46,18 @@ has paths => (
 
 has log => ( is => 'lazy', builder => sub { Log::Any->get_logger } );
 
-has _impls => ( is => 'rw' );
+has _proxies => ( is => 'rw' );
 has _prod_id => ( is => 'rw' );
 has _inhibits => ( is => 'rw', default => sub { +{} } );
 
 
 sub start($self) {
-    my $inhibit_cb = $self->curry::weak::_inhibit;
-    my $uninhibit_cb = $self->curry::weak::_uninhibit;
-
     # export to dbus
-    $self->_impls([ map {
+    $self->_proxies([ map {
         App::XScreenSaver::DBus::SaverProxy->new(
             $self->service,
             $_,
-            $inhibit_cb,
-            $uninhibit_cb,
+            $self,
         )
     } $self->paths->@* ]);
 
@@ -83,13 +79,12 @@ sub start($self) {
     return;
 }
 
-sub _inhibit($self,$name,$reason,$message) {
+sub Inhibit($self,$name,$reason,$sender) {
     my $cookie;
     do {
         $cookie = int(rand(2**31))
     } until !exists $self->_inhibits->{$cookie};
 
-    my $sender = $message->get_sender;
     $self->_inhibits->{$cookie} = [ $name, $reason, $sender ];
 
     $self->log->debugf(
@@ -103,11 +98,10 @@ sub _inhibit($self,$name,$reason,$message) {
     return $cookie;
 }
 
-sub _uninhibit($self,$cookie,$message) {
+sub Uninhibit($self,$cookie,$this_sender) {
     my $inhibit = delete $self->_inhibits->{$cookie}
         or return;
     my ($name, $reason, $sender) = @$inhibit;
-    my $this_sender = $message->get_sender;
 
     $self->log->debugf(
         '<%s> (was %s, is %s) resumed screensaver for <%s> (cookie %d) - %d left',
@@ -172,7 +166,7 @@ App::XScreenSaver::DBus::Saver - implements the "idle inhibition" protocol
 
 =head1 VERSION
 
-version 1.0.3
+version 1.0.4
 
 =head1 SYNOPSIS
 

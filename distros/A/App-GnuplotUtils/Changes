@@ -1,3 +1,29 @@
+0.005   2023-10-21  Released-By: PERLANCAR; Urgency: medium
+
+        [cli xyplot]
+
+        - [ux] Allow one to multiple numbers (not just exactly 2) in each line
+          of dataset file.
+
+        - [ux] Check each number with Scalar::Util's looks_like_number().
+
+        - [doc] Tweak Synopsis.
+
+
+0.004   2023-10-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        [cli xyplot]
+
+        - [doc] Tweak description: describe how the plot will be
+          seen/saved.
+
+        - [doc][ux] Show how to accept data from stdin.
+
+        - [doc] Mention tchart & asciichart.
+
+
 0.003   2021-07-02  Released-By: PERLANCAR; Urgency: medium
 
         - [incompatible change] Rename --datasets to --dataset-datas

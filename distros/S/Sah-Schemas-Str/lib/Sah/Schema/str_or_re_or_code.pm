@@ -3,9 +3,9 @@ package Sah::Schema::str_or_re_or_code;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2023-10-23'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 our $schema = [any => {
     summary => 'String, or regex (if string is of the form `/.../`), or coderef (if string is in the form of `sub { ... }`)',
@@ -84,7 +84,7 @@ Sah::Schema::str_or_re_or_code - String, or regex (if string is of the form `/..
 
 =head1 VERSION
 
-This document describes version 0.015 of Sah::Schema::str_or_re_or_code (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
+This document describes version 0.016 of Sah::Schema::str_or_re_or_code (from Perl distribution Sah-Schemas-Str), released on 2023-10-23.
 
 =head1 SYNOPSIS
 
@@ -140,7 +140,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "qr(foo.*)";
+ $data = "sub{\"foo\"}";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
@@ -155,8 +155,8 @@ validated value will be different from the original. To return the validated
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "qr(foo.*)";
- my $res = $validator->($data); # => ["",qr(foo.*)]
+ $data = "sub{\"foo\"}";
+ my $res = $validator->($data); # => ["",sub{BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x51\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55"}use strict;no feature;use feature ':5.10';'foo'}]
  
  # a sample invalid data
  $data = {};

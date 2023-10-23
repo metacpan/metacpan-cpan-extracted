@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4212, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +17,7 @@ provides:
     file: lib/Devel/Declare/Interface.pm
   Devel::Declare::Parser:
     file: lib/Devel/Declare/Parser.pm
-    version: '0.020'
+    version: '0.021'
   Devel::Declare::Parser::Codeblock:
     file: lib/Devel/Declare/Parser/Codeblock.pm
   Devel::Declare::Parser::Emulate:
@@ -38,4 +38,4 @@ resources:
   bugtracker: http://github.com/exodist/Devel-Declare-Parser/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/exodist/Devel-Declare-Parser
-version: '0.020'
+version: '0.021'

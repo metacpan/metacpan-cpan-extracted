@@ -16,11 +16,12 @@ sub vsprintf { &sprintf(@_) }
 sub sprintf {
     my($format, @args) = @_;
     my $conceal = Text::Conceal->new(
-	except  => $format,
-	test    => qr/[\e\b\P{ASCII}]/,
-	length  => \&vwidth,
-	max     => int @args,
-	ordered => 0,
+	except    => $format,
+	test      => qr/[\e\b\P{ASCII}]/,
+	length    => \&vwidth,
+	max       => int @args,
+	ordered   => 0,
+	duplicate => 1,
 	);
     $conceal->encode(@args) if $conceal;
     my $s = CORE::sprintf $format, @args;

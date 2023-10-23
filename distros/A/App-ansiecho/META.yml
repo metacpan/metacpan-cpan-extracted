@@ -27,21 +27,21 @@ no_index:
 provides:
   App::ansiecho:
     file: lib/App/ansiecho.pm
-    version: '1.05'
+    version: '1.06'
 requires:
   Encode: '0'
   Getopt::EX: v2.1.1
   Getopt::EX::Hashed: '1.05'
   List::Util: '0'
   Pod::Usage: '0'
-  Term::ANSIColor::Concise: '2.01'
-  Text::ANSI::Printf: '2.02'
+  Term::ANSIColor::Concise: '2.05'
+  Text::ANSI::Printf: '2.03'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/tecolicom/App-ansiecho/issues
   homepage: https://github.com/tecolicom/App-ansiecho
   repository: https://github.com/tecolicom/App-ansiecho.git
-version: '1.05'
+version: '1.06'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

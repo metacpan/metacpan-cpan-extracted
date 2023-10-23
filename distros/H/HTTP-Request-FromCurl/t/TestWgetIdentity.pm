@@ -1,8 +1,8 @@
 package # hide from CPAN
     TestWgetIdentity;
-use strict;
+use 5.020;
 use HTTP::Request::FromWget;
-use Test2::V0;
+use Test2::V0 '-no_srand';
 use Data::Dumper;
 use Capture::Tiny 'capture';
 use Test::HTTP::LocalServer;
@@ -19,7 +19,6 @@ BEGIN {
     }
 }
 
-use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
@@ -40,13 +39,14 @@ my $wget = 'wget';
 my @erase;
 
 sub tempname($content='') {
-    my ($fh,$tempfile) = tempfile;
+    my( $fh, $tempname ) = tempfile('wget-XXXXXXXXXX', TMPDIR => 1 );
     if( $content ) {
         binmode $fh;
         print $fh $content;
         close $fh;
     };
-    $tempfile
+    push @erase, $tempname;
+    return $tempname
 };
 END { unlink @erase; }
 
@@ -132,7 +132,7 @@ sub wget_request( @args ) {
 }
 
 sub compiles_ok( $code, $name ) {
-    my( $fh, $tempname ) = tempfile( UNLINK => 1 );
+    my( $fh, $tempname ) = tempfile('wget-XXXXXXXXXX', UNLINK => 1, TMPDIR => 1 );
     binmode $fh, ':raw';
     print $fh $code;
     close $fh;

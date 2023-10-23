@@ -9,7 +9,7 @@ use HTTP::Request::Common;
     use Dancer2;
     use Dancer2::Plugin::Auth::HTTP::Basic::DWIW;
 
-    http_basic_auth_set_check_handler sub {
+    http_basic_auth_handler check_login => sub {
         my ( $user, $pass ) = @_;
         die 'foo';
         return $user eq 'foo' && $pass eq 'bar';

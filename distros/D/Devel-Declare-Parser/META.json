@@ -4,7 +4,7 @@
       "Chad Granum <exodist7@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4212",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -37,7 +37,7 @@
       },
       "Devel::Declare::Parser" : {
          "file" : "lib/Devel/Declare/Parser.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       },
       "Devel::Declare::Parser::Codeblock" : {
          "file" : "lib/Devel/Declare/Parser/Codeblock.pm"
@@ -64,5 +64,5 @@
          "url" : "http://github.com/exodist/Devel-Declare-Parser"
       }
    },
-   "version" : "0.020"
+   "version" : "0.021"
 }

@@ -17,7 +17,7 @@ configure_requires:
   Dist::CheckConflicts: '0.02'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,34 +26,34 @@ name: DateTime
 provides:
   DateTime:
     file: lib/DateTime.pm
-    version: '1.59'
+    version: '1.63'
   DateTime::Duration:
     file: lib/DateTime/Duration.pm
-    version: '1.59'
+    version: '1.63'
   DateTime::Helpers:
     file: lib/DateTime/Helpers.pm
-    version: '1.59'
+    version: '1.63'
   DateTime::Infinite:
     file: lib/DateTime/Infinite.pm
-    version: '1.59'
+    version: '1.63'
   DateTime::Infinite::Future:
     file: lib/DateTime/Infinite.pm
-    version: '1.59'
+    version: '1.63'
   DateTime::Infinite::Past:
     file: lib/DateTime/Infinite.pm
-    version: '1.59'
+    version: '1.63'
   DateTime::LeapSecond:
     file: lib/DateTime/LeapSecond.pm
-    version: '1.59'
+    version: '1.63'
   DateTime::PP:
     file: lib/DateTime/PP.pm
-    version: '1.59'
+    version: '1.63'
   DateTime::PPExtra:
     file: lib/DateTime/PPExtra.pm
-    version: '1.59'
+    version: '1.63'
   DateTime::Types:
     file: lib/DateTime/Types.pm
-    version: '1.59'
+    version: '1.63'
 requires:
   Carp: '0'
   DateTime::Locale: '1.06'
@@ -84,7 +84,7 @@ resources:
   bugtracker: https://github.com/houseabsolute/DateTime.pm/issues
   homepage: https://metacpan.org/release/DateTime
   repository: git://github.com/houseabsolute/DateTime.pm.git
-version: '1.59'
+version: '1.63'
 x_Dist_Zilla:
   perl:
     version: '5.032001'
@@ -92,7 +92,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: PruneCruft
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::DROLSKY::BundleAuthordep
       name: '@DROLSKY/DROLSKY::BundleAuthordep'
@@ -123,23 +123,23 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@DROLSKY/ManifestSkip'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::License
       name: '@DROLSKY/License'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@DROLSKY/ExecDir'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@DROLSKY/ShareDir'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@DROLSKY/Manifest'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::CheckVersionIncrement
       name: '@DROLSKY/CheckVersionIncrement'
@@ -147,15 +147,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@DROLSKY/TestRelease'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@DROLSKY/ConfirmRelease'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@DROLSKY/UploadToCPAN'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::VersionFromMainModule
       config:
@@ -171,7 +171,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@DROLSKY/AutoPrereqs'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: '@DROLSKY/CopyFilesFromBuild'
@@ -179,18 +179,18 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GitHub::Meta
       name: '@DROLSKY/GitHub::Meta'
-      version: '0.48'
+      version: '0.49'
     -
       class: Dist::Zilla::Plugin::GitHub::Update
       config:
         Dist::Zilla::Plugin::GitHub::Update:
           metacpan: 1
       name: '@DROLSKY/GitHub::Update'
-      version: '0.48'
+      version: '0.49'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@DROLSKY/MetaResources'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -199,7 +199,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@DROLSKY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.025'
+              version: '6.030'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -218,19 +218,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@DROLSKY/MetaConfig'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@DROLSKY/MetaJSON'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@DROLSKY/MetaYAML'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@DROLSKY/NextRelease'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -238,7 +238,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: '@DROLSKY/Test::More with subtest'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -246,7 +246,7 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: '@DROLSKY/Tools for use with precious'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -254,7 +254,7 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: '@DROLSKY/Test::Version which fixes https://github.com/plicease/Test-Version/issues/7'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -267,7 +267,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@DROLSKY/Dist::Zilla::PluginBundle::DROLSKY'
-      version: '0.057'
+      version: '0.058'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -289,7 +289,7 @@ x_Dist_Zilla:
             - Dist::Zilla::Plugin::DROLSKY::WeaverConfig
             - Pod::Weaver::PluginBundle::DROLSKY
       name: '@DROLSKY/PromptIfStale'
-      version: '0.057'
+      version: '0.058'
     -
       class: Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable
       name: '@DROLSKY/Test::Pod::Coverage::Configurable'
@@ -324,7 +324,6 @@ x_Dist_Zilla:
             - Glock
             - Hant
             - IEEE
-            - IEEE
             - LLL
             - LLLL
             - LLLLL
@@ -342,7 +341,6 @@ x_Dist_Zilla:
             - Postgres
             - QQQ
             - QQQQ
-            - Rata
             - Rata
             - Rolsky
             - "Rolsky's"
@@ -405,7 +403,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@DROLSKY/PodSyntaxTests'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MojibakeTests
       name: '@DROLSKY/MojibakeTests'
@@ -470,7 +468,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@DROLSKY/Test::ReportPrereqs'
-      version: '0.028'
+      version: '0.029'
     -
       class: Dist::Zilla::Plugin::Test::Version
       name: '@DROLSKY/Test::Version'
@@ -487,7 +485,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.38.1
+          git_version: 2.42.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -668,7 +666,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CPANFile
       name: '@DROLSKY/CPANFile'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::PPPort
       name: '@DROLSKY/PPPort'
@@ -695,12 +693,12 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: '@DROLSKY/CheckPrereqsIndexed'
-      version: '0.021'
+      version: '0.022'
     -
       class: Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.42.0
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
       version: '1.22'
@@ -712,7 +710,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.42.0
           repo_root: .
       name: '@DROLSKY/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -748,7 +746,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.42.0
           repo_root: .
       name: '@DROLSKY/Git::Check'
       version: '2.048'
@@ -774,7 +772,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.42.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -787,11 +785,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.59
+          tag: v1.63
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.42.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -805,7 +803,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.42.0
           repo_root: .
       name: '@DROLSKY/Git::Push'
       version: '2.048'
@@ -835,7 +833,7 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.42.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -849,7 +847,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.1
+          git_version: 2.42.0
           repo_root: .
       name: '@DROLSKY/Push version bump'
       version: '2.048'
@@ -858,12 +856,12 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::MakeMaker:
           make_path: make
-          version: '6.025'
+          version: '6.030'
         Dist::Zilla::Plugin::MakeMaker::Awesome:
           version: '0.49'
         Dist::Zilla::Role::TestRunner:
           default_jobs: '12'
-          version: '6.025'
+          version: '6.030'
       name: '@DROLSKY/DROLSKY::MakeMaker'
       version: '1.22'
     -
@@ -885,7 +883,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -893,7 +891,7 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: DevelopRequires
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::PurePerlTests
       name: PurePerlTests
@@ -901,7 +899,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Conflicts
       name: Conflicts
-      version: '0.19'
+      version: '0.20'
     -
       class: Dist::Zilla::Plugin::Test::CheckBreaks
       config:
@@ -917,52 +915,52 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.025'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@DROLSKY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.025'
+      version: '6.030'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.025'
+    version: '6.030'
 x_authority: cpan:DROLSKY
 x_breaks:
   DateTime::Format::Mail: '<= 0.402'

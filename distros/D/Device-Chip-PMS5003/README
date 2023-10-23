@@ -1,0 +1,60 @@
+NAME
+
+    Device::Chip::PMS5003 - chip driver for PMS5003
+
+SYNOPSIS
+
+       use Device::Chip::PMS5003;
+       use Future::AsyncAwait;
+    
+       my $chip = Device::Chip::PMS5003->new;
+       await $chip->mount( Device::Chip::Adapter::...->new );
+    
+       $chip->start;
+    
+       my $readings = await $chip->read_all;
+    
+       printf "Particulate matter readings are %d / %d / %d\n",
+          @{$readings->{concentration}}{qw( pm1 pm2_5 pm10 )};
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communication to a
+    PLANTOWER PMS5003 particle concentration sensor attached to a computer
+    via a UART adapter. (Though if the communication protocol is the same,
+    it is likely also useful for a variety of other related sensors too).
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+METHODS
+
+    The following methods documented in an await expression return Future
+    instances.
+
+ start
+
+       $chip->start;
+
+    Begins the UART reading loop. This must be called before you can use
+    "read_all".
+
+ read_all
+
+       $readings = await $chip->read_all;
+
+    Waits for the next report packet from the sensor, then returns the
+    readings contained in it. This is in the form of a two-level hash:
+
+       concentration => HASH # containing pm1, pm2_5, pm10
+    
+       atmost => HASH        # containing pm1, pm2_5, pm10
+    
+       particles => HASH     # containing pm0_3, pm0_5, pm1, pm2_5, pm5, pm10
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

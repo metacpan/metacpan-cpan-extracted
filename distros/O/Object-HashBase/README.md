@@ -110,7 +110,7 @@ You can then use the includes `Prefix::For::Module::HashBase` instead of
 You can re-run this script to regenerate the files, or upgrade them to newer
 versions.
 
-If the script was not installed, it can be found int he `scripts/` directory.
+If the script was not installed, it can be found in the `scripts/` directory.
 
 # METHODS
 
@@ -126,7 +126,7 @@ If the script was not installed, it can be found int he `scripts/` directory.
     packages inheritance chain.
 
     **If you do not want this method you can define your own** you just have to
-    declare it before loading [Object::HashBase](https://metacpan.org/pod/Object::HashBase).
+    declare it before loading [Object::HashBase](https://metacpan.org/pod/Object%3A%3AHashBase).
 
         package My::Package;
 

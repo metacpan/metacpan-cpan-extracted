@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO/Element.pm
-## Version v0.2.1
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.2
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/23
-## Modified 2023/06/14
+## Modified 2023/10/23
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,7 +18,7 @@ BEGIN
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
     use Text::Wrap ();
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.2';
     use open ':std' => ':utf8';
 };
 
@@ -196,7 +196,6 @@ sub msgid_plural_as_string
     return( $self->normalise( 'msgid_plural', $self->{msgid_plural} ) );
 }
 
-# sub msgstr { return( shift->_set_get( 'msgstr', @_ ) ); }
 sub msgstr
 {
     my $self = shift( @_ );
@@ -438,7 +437,7 @@ Text::PO::Element - PO Element
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.2
 
 =head1 DESCRIPTION
 
@@ -456,59 +455,59 @@ A C<Text::PO::Element> object has the following fields :
 
 =over 4
 
-=item I<msgid>
+=item * C<msgid>
 
 The localisation id
 
-=item I<msgstr>
+=item * C<msgstr>
 
 The localised string
 
-=item I<msgid_plural>
+=item * C<msgid_plural>
 
 The optional localised string in plural
 
-=item I<context>
+=item * C<context>
 
 The optional context.
 
-=item I<fuzzy>
+=item * C<fuzzy>
 
 The fuzzy flag set when the entry has been created but not yet translated
 
-=item I<comment>
+=item * C<comment>
 
 The optional comment that can be added to provide some explanations to the translator
 
-=item I<auto_comment>
+=item * C<auto_comment>
 
 The optional comment added automatically
 
-=item I<flags>
+=item * C<flags>
 
 An optional set of flags, stored as an array reference
 
-=item I<plural>
+=item * C<plural>
 
 Whether this has a plural form
 
-=item I<encoding>
+=item * C<encoding>
 
 The character encoding
 
-=item I<file>
+=item * C<file>
 
 The file in which this l10n string was found. This is set when automatic parsing was executed
 
-=item I<line>
+=item * C<line>
 
 The line at which this l10n was found. This is set when automatic parsing was executed
 
-=item I<po>
+=item * C<po>
 
 The parent C<Text::PO> object
 
-=item I<is_meta>
+=item * C<is_meta>
 
 An optional boolean value provided if this element represents a meta information
 
@@ -562,9 +561,21 @@ This only works if the element was added via L<Text::PO>, or else you need to ha
 
 Return the element as a string formatted for a po file.
 
+=head2 encoding
+
+Set or get the encoding for this element. This defaults to an empty string
+
+=head2 file
+
+Set or get the file path where this PO element was initially be found.
+
 =head2 flags
 
 Set or return the flags as array reference
+
+=head2 fuzzy
+
+Set or  gets whether this element has the C<fuzzy> flag. Default to false.
 
 =head2 id
 
@@ -576,6 +587,10 @@ Set or gets the flag that this element represents the meta information for this 
 
 Meta information for a po file is stored in a unique msgid whose value is null.
 
+=head2 line
+
+Set or get the line number at which this PO element was initially be found.
+
 =head2 merge( Text::PO::Element )
 
 Given a C<Text::PO::Element> object, it merge its content with our element object.
@@ -584,9 +599,15 @@ The merge will not overwrite existing fields.
 
 It returns the current object
 
-=head2 msgstr
+=head2 msgid
 
-Set or return the msgstr as a value without surrounding quote and without escaping.
+Sets or gets the C<msgid> for this element.
+
+In list context, this return the element as an array. Thus. if this element has multiple lines, it will return an array of lines. In scalar context, it returns this element as a string, or if it is a multi line element, it will return an array reference.
+
+=head2 msgid_plural
+
+Sets or gets the C<msgid> version for plural. This is typically a 2-elements array. The first one singular and the second one plural.
 
 =head2 msgid_as_string
 
@@ -596,6 +617,10 @@ This returns the msgid escaped and with surrounding quotes, suitable for L</dump
 
 Returns the C<msgid> property as a string when it has plural implemented.
 
+=head2 msgstr
+
+Set or return the msgstr as a value without surrounding quote and without escaping.
+
 =head2 msgstr_as_string
 
 This returns the msgstr escaped and with surrounding quotes, suitable for L</dump>
@@ -603,6 +628,10 @@ This returns the msgstr escaped and with surrounding quotes, suitable for L</dum
 =head2 normalise
 
 L</normalise> will return a string properly formatted with double quotes, multi lines if necessary, suitable for L</dump>
+
+=head2 plural
+
+Boolean. Sets or gets whether this element is an element with plural version of its C<msgid>
 
 =head2 po
 
@@ -630,7 +659,7 @@ L<https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2020-2021 DEGUEST Pte. Ltd.
+Copyright (c) 2020-2023 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 

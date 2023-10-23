@@ -5,7 +5,7 @@ Text::ANSI::Printf - printf function for string with ANSI sequence
 
 # VERSION
 
-Version 2.02
+Version 2.03
 
 # SYNOPSIS
 
@@ -58,6 +58,21 @@ Next code produces `[R] [G] [B]` in proper color.
 
     ansi_printf("[%.1s] [%.1s] [%.1s]\n",
            "\e[31mRed\e[m", "\e[32mGreen\e[m", "\e[34mBlue\e[m");
+
+# ARGUMENT REORDERING
+
+The original `printf` function has the ability to specify the
+arguments to be targeted by the position specifier, but by default
+this module assumes that the arguments will appear in the given order,
+so you will not get the expected result. If you wish to use it, set
+the variable `$REORDER` to 1.
+
+    $Text::ANSI::Printf::REORDER = 1;.
+
+By doing so, the order in which arguments appear can be changed and
+the same argument can be processed even if it appears more than once.
+
+This behavior is experimental and may change in the future.
 
 # FUNCTIONS
 

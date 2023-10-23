@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-06'; # DATE
+our $DATE = '2023-10-23'; # DATE
 our $DIST = 'Sort-Sub-by_spec'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 sub meta {
     return {
@@ -74,7 +74,7 @@ Sort::Sub::by_spec - Sort by spec
 
 =head1 VERSION
 
-This document describes version 0.002 of Sort::Sub::by_spec (from Perl distribution Sort-Sub-by_spec), released on 2023-09-06.
+This document describes version 0.003 of Sort::Sub::by_spec (from Perl distribution Sort-Sub-by_spec), released on 2023-10-23.
 
 =head1 SYNOPSIS
 

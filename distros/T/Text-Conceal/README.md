@@ -16,7 +16,7 @@ Text::Conceal - conceal and recover interface for text processing
 
 # VERSION
 
-Version 1.02
+Version 1.03
 
 # DESCRIPTION
 
@@ -104,7 +104,7 @@ into single chunk if possible.
         can not be found in any arguments.  This parameter gives additional
         string which also to be taken care of.
 
-    - **visible** => _number_
+    - **visible** => _number_ (default 0)
         - `0`
 
             With default value 0, this module uses characters in the range:
@@ -122,12 +122,21 @@ into single chunk if possible.
             Use only printable characters.
 
                 [0x21 => 0x7e]
-    - **ordered** => \*bool\*
+    - **ordered** => _bool_ (default 1)
 
         Ensures that the parameters given and the order in which they appear in 
         the output do not change. The default is set to 1; if set to 0, it will 
         be handled correctly even if they appear in a different order, a 
         behavior that may lead to instability.
+
+    - **duplicate** => _bool_ (default 0)
+
+        It is assumed that the string before conversion appears only once
+        after the process. Therefore, if the same string appears a second
+        time, the conversion fails. By setting this parameter to 1, it is
+        possible to allow a string to appear multiple times. However, doing so
+        will increase the probability of failure if a large number of strings
+        are attempted to be converted.
 
 - **encode**
 - **decode**
@@ -138,8 +147,12 @@ into single chunk if possible.
 # LIMITATION
 
 All arguments given to **encode** method have to appear in the same
-order in the pre-decode string.  Each argument can be shorter than the
-original, or it can even disappear.
+order in the pre-decode string.  If you want to convert unordered
+output, set the `ordered` parameter to 0.  However, if a large number
+of short items are included, you may get unexpected results.
+
+Each argument can be shorter than the original, or it can even
+disappear.
 
 If an argument is trimmed down to single byte in a result, and it have
 to be recovered to wide character, it is replaced by single space.

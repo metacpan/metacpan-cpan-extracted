@@ -20,7 +20,7 @@ name: Sort-Sub-by_spec
 provides:
   Sort::Sub::by_spec:
     file: lib/Sort/Sub/by_spec.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Sort::BySpec: '0.03'
   perl: '5.010001'
@@ -30,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sort-Sub-by_spec
   homepage: https://metacpan.org/release/Sort-Sub-by_spec
   repository: git://github.com/perlancar/perl-Sort-Sub-by_spec.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.038000'

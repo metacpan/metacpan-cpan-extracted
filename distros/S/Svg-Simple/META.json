@@ -1,0 +1,52 @@
+{
+   "abstract" : "Write SVG using Perl syntax.",
+   "author" : [
+      "philiprbrenan@gmail.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Svg-Simple",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4224"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Table::Text" : "20201029",
+            "Test2::API" : "0",
+            "Test::More" : "0",
+            "perl" : "v5.34.0"
+         }
+      }
+   },
+   "provides" : {
+      "Svg::Simple" : {
+         "file" : "lib/Svg/Simple.pm",
+         "version" : "20231021"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/philiprbrenan/SvgSimple"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/philiprbrenan/SvgSimple"
+      }
+   },
+   "version" : "20231021",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

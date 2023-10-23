@@ -1,0 +1,118 @@
+* Tk::ObjScanner
+  :PROPERTIES:
+  :CUSTOM_ID: tkobjscanner
+  :END:
+
+** What is Tk::ObjScanner
+
+Tk::ObjScanner is a Perl/Tk module that provides a GUI to scan any perl
+data including the attributes of an object.
+
+This module also provides =data-viewer=, a standalone script that
+opens a =Tk::ObjScanner= widget on a JSON or YAML file.
+
+For instance, this command =data-viewer /usr/share/nodejs/tar/package.json=
+creates the following widget:
+
+[[file:data-viewer.png]]
+
+** In more details
+
+The scanner is a composite widget made of a HList. This widget acts as a
+scanner to the object (or hash ref) passed with the 'caller' parameter.
+The scanner will retrieve all keys of the hash/object and insert them in
+the HList.
+
+When the user double clicks on a key, the corresponding value will be
+added in the HList. If the user use the middle button to open a tied
+item, the internals of the tied object will be displayed.
+
+If the value is a scalar, the scalar will be displayed in a popup text
+window.
+
+If the value is a code ref, the deparsed code will be displayed in a
+popup text window.
+
+This widget can be used as a regular widget in a Tk application or can
+be used as an autonomous popup widget that will display the content of a
+data structure. The latter is like a call to a graphical =Data::Dumper=.
+
+The scanner recognizes:
+- tied hashes arrays or scalars
+- weak reference (See weaken function of =Scalar::Util= for details)
+
+This module was tested with perl5.8.2 and Tk 804.025 (beta). But
+should work with older versions of perl (> 5.6.1) or Tk. On the other
+hand, =data-viewer= requires Perl 5.16.
+
+See the embedded documentation in the module for more details.
+
+*Note* that test program (in the 't' directory) can be run interactively
+this way :
+
+#+begin_example
+ perl t/xxx.t 1
+#+end_example
+
+*** Installation
+    :PROPERTIES:
+    :CUSTOM_ID: installation
+    :END:
+#+begin_example
+gunzip -c <dist_file>.tar.gz | tar xvf -
+cd <dist_directory>
+perl Makefile.PL
+make test          
+make install
+#+end_example
+
+From github, this module is built with *Dist::Zilla*.
+
+You must make sure that the following modules are installed:
+
+#+begin_example
+Dist::Zilla::Plugin::MetaResources
+Dist::Zilla::Plugin::Prepender
+Dist::Zilla::Plugin::Prereqs
+Dist::Zilla::PluginBundle::Filter
+#+end_example
+
+On debian or ubuntu, do:
+
+#+begin_example
+sudo aptitude install \
+     libdist-zilla-plugin-prepender-perl \
+     libdist-zilla-plugins-cjm-perl \
+     libdist-zilla-perl
+#+end_example
+
+Then run:
+
+#+begin_example
+dzil build 
+#+end_example
+
+or
+
+#+begin_example
+dzil test
+dzil build
+#+end_example
+
+--------------
+
+Comments and suggestions are always welcome.
+
+** Contributors
+   :PROPERTIES:
+   :CUSTOM_ID: contributors
+   :END:
+Many thanks to *Achim Bohnet* for all the tests, patches (and reports)
+he made. Many improvements were made thanks to his efforts.
+
+Thanks to *Rudi Farkas* for the 'watch' patch.
+
+Thanks to *heytitle* for the documentation fixes
+
+Thanks to *E. Choroba* for the retro compatibility patch
+

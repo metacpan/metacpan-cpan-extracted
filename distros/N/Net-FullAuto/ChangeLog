@@ -20,6 +20,13 @@
 #######################################################################
 
 
+
+2023-10-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000642 released
+
+        * connect_shell() works with Cygwin 
+
 2023-05-28  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000641 released

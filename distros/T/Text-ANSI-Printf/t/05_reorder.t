@@ -7,6 +7,8 @@ use Text::ANSI::Printf qw(ansi_printf ansi_sprintf);
 use Data::Dumper;
 use Test::More;
 
+$Text::ANSI::Printf::REORDER = 1;
+
 sub test {
     my $result = pop;
     my($format, @param) = @_;
@@ -43,5 +45,10 @@ test( '%10$.0s %9$.0s %8$.0s %7$.0s %6$.0s %5$.0s %4$.0s %3$.0s %2$.0s %1$s',
 test( '%10$s %9$.0s %8$.0s %7$.0s %6$.0s %5$.0s %4$.0s %3$.0s %2$.0s %1$.0s',
       split(//, "ｱｲｳｴｵｶｷｸｹｺ"),
       "ｺ         ");
+
+# duplicate
+
+test( '%2$s %s', "12", "34"    => "34 12");
+test( '%2$s %s %s', "12", "34" => "34 12 34");
 
 done_testing;

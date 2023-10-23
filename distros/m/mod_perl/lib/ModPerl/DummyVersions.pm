@@ -77,95 +77,95 @@ package APR::Util;
 $APR::Util::VERSION               = 0.009000;
 
 package Apache2::Access;
-$Apache2::Access::VERSION         = 2.000012;
+$Apache2::Access::VERSION         = 2.000013;
 
 package Apache2::CmdParms;
-$Apache2::CmdParms::VERSION       = 2.000012;
+$Apache2::CmdParms::VERSION       = 2.000013;
 
 package Apache2::Command;
-$Apache2::Command::VERSION        = 2.000012;
+$Apache2::Command::VERSION        = 2.000013;
 
 package Apache2::Connection;
-$Apache2::Connection::VERSION     = 2.000012;
+$Apache2::Connection::VERSION     = 2.000013;
 
 package Apache2::ConnectionUtil;
-$Apache2::ConnectionUtil::VERSION = 2.000012;
+$Apache2::ConnectionUtil::VERSION = 2.000013;
 
 package Apache2::Directive;
-$Apache2::Directive::VERSION      = 2.000012;
+$Apache2::Directive::VERSION      = 2.000013;
 
 package Apache2::Filter;
-$Apache2::Filter::VERSION         = 2.000012;
+$Apache2::Filter::VERSION         = 2.000013;
 
 package Apache2::FilterRec;
-$Apache2::FilterRec::VERSION      = 2.000012;
+$Apache2::FilterRec::VERSION      = 2.000013;
 
 package Apache2::HookRun;
-$Apache2::HookRun::VERSION        = 2.000012;
+$Apache2::HookRun::VERSION        = 2.000013;
 
 package Apache2::Log;
-$Apache2::Log::VERSION            = 2.000012;
+$Apache2::Log::VERSION            = 2.000013;
 
 package Apache2::MPM;
-$Apache2::MPM::VERSION            = 2.000012;
+$Apache2::MPM::VERSION            = 2.000013;
 
 package Apache2::Module;
-$Apache2::Module::VERSION         = 2.000012;
+$Apache2::Module::VERSION         = 2.000013;
 
 package Apache2::Process;
-$Apache2::Process::VERSION        = 2.000012;
+$Apache2::Process::VERSION        = 2.000013;
 
 package Apache2::Provider;
-$Apache2::Provider::VERSION       = 2.000012;
+$Apache2::Provider::VERSION       = 2.000013;
 
 package Apache2::RequestIO;
-$Apache2::RequestIO::VERSION      = 2.000012;
+$Apache2::RequestIO::VERSION      = 2.000013;
 
 package Apache2::RequestRec;
-$Apache2::RequestRec::VERSION     = 2.000012;
+$Apache2::RequestRec::VERSION     = 2.000013;
 
 package Apache2::RequestUtil;
-$Apache2::RequestUtil::VERSION    = 2.000012;
+$Apache2::RequestUtil::VERSION    = 2.000013;
 
 package Apache2::Response;
-$Apache2::Response::VERSION       = 2.000012;
+$Apache2::Response::VERSION       = 2.000013;
 
 package Apache2::ServerRec;
-$Apache2::ServerRec::VERSION      = 2.000012;
+$Apache2::ServerRec::VERSION      = 2.000013;
 
 package Apache2::ServerUtil;
-$Apache2::ServerUtil::VERSION     = 2.000012;
+$Apache2::ServerUtil::VERSION     = 2.000013;
 
 package Apache2::SubProcess;
-$Apache2::SubProcess::VERSION     = 2.000012;
+$Apache2::SubProcess::VERSION     = 2.000013;
 
 package Apache2::SubRequest;
-$Apache2::SubRequest::VERSION     = 2.000012;
+$Apache2::SubRequest::VERSION     = 2.000013;
 
 package Apache2::URI;
-$Apache2::URI::VERSION            = 2.000012;
+$Apache2::URI::VERSION            = 2.000013;
 
 package Apache2::Util;
-$Apache2::Util::VERSION           = 2.000012;
+$Apache2::Util::VERSION           = 2.000013;
 
 package ModPerl::Global;
-$ModPerl::Global::VERSION         = 2.000012;
+$ModPerl::Global::VERSION         = 2.000013;
 
 package ModPerl::InterpPool;
-$ModPerl::InterpPool::VERSION     = 2.000012;
+$ModPerl::InterpPool::VERSION     = 2.000013;
 
 package ModPerl::Interpreter;
-$ModPerl::Interpreter::VERSION    = 2.000012;
+$ModPerl::Interpreter::VERSION    = 2.000013;
 
 package ModPerl::MethodLookup;
-$ModPerl::MethodLookup::VERSION   = 2.000012;
+$ModPerl::MethodLookup::VERSION   = 2.000013;
 
 package ModPerl::TiPool;
-$ModPerl::TiPool::VERSION         = 2.000012;
+$ModPerl::TiPool::VERSION         = 2.000013;
 
 package ModPerl::TiPoolConfig;
-$ModPerl::TiPoolConfig::VERSION   = 2.000012;
+$ModPerl::TiPoolConfig::VERSION   = 2.000013;
 
 package ModPerl::Util;
-$ModPerl::Util::VERSION           = 2.000012;
+$ModPerl::Util::VERSION           = 2.000013;
 

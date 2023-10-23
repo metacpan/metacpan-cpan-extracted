@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Printf
 
+2.03 2023-10-22T08:03:39Z
+
+    - Introduce $Text::ANSI::Printf::REORDER variable to enable argument reordering.
+
 2.02 2023-10-20T04:18:34Z
 
     - Support argument reordering.

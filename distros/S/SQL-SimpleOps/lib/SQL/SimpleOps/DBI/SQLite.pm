@@ -28,7 +28,7 @@
 
 	our @EXPORT = qw(new Open $VERSION);
 
-	our $VERSION = "2023.274.1";
+	our $VERSION = "2023.284.1";
 
 	our @EXPORT_OK = @EXPORT;
 

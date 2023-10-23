@@ -1,5 +1,9 @@
 Revision history for Perl script App-ansiecho
 
+1.06 2023-10-23T03:06:40Z
+
+    - Support duplicated arguments.
+
 1.05 2023-10-20T09:14:30Z
 
     - Support arguments reordering in the format string.

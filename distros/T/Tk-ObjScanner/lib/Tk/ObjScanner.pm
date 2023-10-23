@@ -1,13 +1,13 @@
 #
 # This file is part of Tk-ObjScanner
 #
-# This software is copyright (c) 2014 by Dominique Dumont.
+# This software is copyright (c) 1997-2004,2007,2014,2017,2023 by Dominique Dumont.
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
 #
 package Tk::ObjScanner;
-$Tk::ObjScanner::VERSION = '2.017';
+$Tk::ObjScanner::VERSION = '2.018';
 require 5.006;
 
 use strict;
@@ -145,18 +145,7 @@ sub Populate {
         : defined $args->{'destroyable'}  ? delete $args->{'destroyable'}
         :                                   1;
 
-    my $display_view_pseudo_button = defined $args->{'-view_pseudo'}
-        || defined $args->{view_pseudo} ? 0 : 1;
-
-    my $view_pseudo =
-           delete $args->{'-view_pseudo'}
-        || delete $args->{'view_pseudo'}
-        || 0;
-
-    # override option for feature not supported by Perl 5.09 and later
-    if ( $] >= 5.009 ) {
-        $view_pseudo = 0;
-    }
+    my $destroy_label = delete $args->{'-destroy_label'} // delete $args->{destroy_label} // "destroy";
 
     croak "Missing caller argument in ObjScanner\n"
         unless defined $cw->{chief};
@@ -235,9 +224,9 @@ sub Populate {
         -text    => 'OK',
         -command => sub { $popup->withdraw(); } )->pack;
 
-    # add a destroy commend to the menu
+    # add a destroy command to the menu
     $menu->command(
-        -label   => 'destroy',
+        -label   => $destroy_label,
         -command => sub { $cw->destroy; } ) if defined $cw->{menu} && $destroyable;
 
     $cw->ConfigSpecs(
@@ -253,18 +242,7 @@ sub Populate {
 
     $cw->SUPER::Populate($args);
 
-    $cw->{viewpseudohash} = $view_pseudo;
-
     if ( defined $menuframe ) {
-        $menuframe->Checkbutton(
-            -text     => 'view pseudo-hashes',
-            -variable => \$cw->{viewpseudohash},
-            -onvalue  => 1,
-            -offvalue => 0,
-            -command  => sub { $cw->updateListBox; }
-            )->pack( -side => 'right' )
-            if $display_view_pseudo_button;
-
         $menuframe->Checkbutton(
             -text     => 'show tied info',
             -variable => \$cw->{show_tied},
@@ -278,31 +256,6 @@ sub Populate {
     $cw->updateListBox;
 
     return $cw;
-}
-
-# function to find whether a reference is a pseudo hash
-# return the nb of elements of the pseudo hash
-sub isPseudoHash {
-    my $cw   = shift;
-    my $item = shift;
-
-    return 0
-        unless ( defined $item
-        && $cw->{viewpseudohash}
-        && _isa( $item, 'ARRAY' )
-        && scalar @$item
-        && ref( $item->[0] ) =~ /^(HASH|pseudohash)$/ );
-
-    my @indexes   = values %{ $item->[0] };
-    my $nb_of_elt = scalar keys %{ $item->[0] };
-
-    # check that all indexes are numbers and within the range
-    return 0 if scalar grep( /\D/ || $_ < 1 || $_ > $nb_of_elt, @indexes );
-
-    # check that not more array items than in the range are defined
-    return 0 unless $nb_of_elt >= scalar @$item - 1;
-
-    return $nb_of_elt;
 }
 
 sub updateListBox {
@@ -399,9 +352,8 @@ sub displayObject {
     my $ref  = shift;
 
     my $h            = $cw->Subwidget('hlist');
-    my $isPseudoHash = $cw->isPseudoHash($$ref);
 
-    if ( _isa( $$ref, 'ARRAY' ) and not $isPseudoHash ) {
+    if ( _isa( $$ref, 'ARRAY' )) {
         foreach my $i ( 0 .. $#$$ref ) {
 
             #print "adding array item $i: $_,",ref($_),"\n";
@@ -441,7 +393,7 @@ sub displayObject {
             $cw->popup_text( 'Error', "Sorry, can't display " . $$ref . " reference" );
         }
     }
-    elsif ( _isa( $$ref, 'HASH' ) or $isPseudoHash ) {
+    elsif ( _isa( $$ref, 'HASH' )) {
 
         # hash or object
         foreach my $k ( sort keys %$$ref ) {
@@ -471,15 +423,14 @@ sub displayObject {
 
 sub describe_element {
     my ( $cw, $ref, $index ) = @_;
-    my $isPseudoHash = $cw->isPseudoHash($$ref);
 
-    if ( _isa( $$ref, 'ARRAY' ) and not $isPseudoHash ) {
+    if ( _isa( $$ref, 'ARRAY' )) {
         return "[$index]-> " . $cw->element( \$$ref->[$index] );
     }
     elsif ( _isa( $$ref, 'REF' ) or _isa( $$ref, 'SCALAR' ) ) {
         return $cw->element($$ref);
     }
-    elsif ( _isa( $$ref, 'HASH' ) or $isPseudoHash ) {
+    elsif ( _isa( $$ref, 'HASH' )) {
         return ( "{$index}-> " . $cw->element( \$$ref->{$index} ) );
     }
     else {
@@ -504,7 +455,6 @@ sub analyse_element {
     my %info = ( description => '' );
     confess "ref error" unless ref($ref);
 
-    my $pseudo = $info{pseudo_hash} = $cw->isPseudoHash($$ref);
     $info{element_ref} = $ref;
 
     my $str_ref = ref($$ref);
@@ -522,15 +472,11 @@ sub analyse_element {
     elsif ( $str_ref and _isa( $$ref, 'UNIVERSAL' ) ) {
         $info{class} = $str_ref;
         $info{base} =
-              $pseudo ? 'PSEUDO-HASH'
-            : _isa( $$ref, 'SCALAR' ) ? 'SCALAR'
+              _isa( $$ref, 'SCALAR' ) ? 'SCALAR'
             : ( $$ref =~ /=([A-Z]+)\(/ ) ? $1
             :                              "some magic with $$ref";    # desperate measure
 
         $info{description} = "$str_ref OBJECT based on $info{base}";
-    }
-    elsif ($pseudo) {
-        $info{description} = 'PSEUDO-HASH';
     }
     elsif ($str_ref) {
 
@@ -549,8 +495,7 @@ sub analyse_element {
 
     if ( defined $$ref ) {
         $info{nb} =
-              $pseudo ? $pseudo
-            : _isa( $$ref, 'ARRAY' ) ? scalar(@$$ref)
+              _isa( $$ref, 'ARRAY' ) ? scalar(@$$ref)
             : _isa( $$ref, 'HASH' )  ? scalar keys(%$$ref)
             :                         undef;
     }
@@ -714,8 +659,8 @@ The image for a composite item (array or hash) when open
 
 =item C<-show_menu>
 
-ObjScanner can feature a menu with 'reload' button, 'show tied info',
-'view pseudo-hash' check box. (optional default 0).
+ObjScanner can feature a menu with 'reload' button, 'show tied info'.
+(optional default 0).
 
 =item C<-destroyable>
 
@@ -724,10 +669,9 @@ widget. (optional, default 1) . You may want to set this parameter to
 0 if the destroy can be managed by a higher level object. This
 parameter is ignored if show_menu is unset.
 
-=item C<-view_pseudo>
+=item C<-destroy_label>
 
-If set, will interpret pseudo hashes as hash (default 0). This option
-is disabled for Perl 5.09 and later.
+Label to be used for C<destroy> menu entry.
 
 =item C<-show_tied>
 
@@ -758,15 +702,6 @@ ObjScanner does not detect recursive data structures. It will just
 keep on displaying the tree until the user gets tired of clicking on
 the HList items.
 
-There's no sure way to detect if a reference is a pseudo-hash or
-not. When a reference is believed to be a pseudo-hash, ObjScanner will
-display the content of the reference like a hash. If the reference is
-should not be displayed like a pseudo-hash, you can turn off the
-pseudo-hash view with the check button on the top right of the widget.
-
-Aynway, pseudo-hashes are deprecated from perl 5.8.0. Hence they are
-also deprecated in ObjScanner.
-
 The icon used for tied scalar changes from scalar icon to folder icon
 when opening the object hidden behind the tied scalar (using the
 middle button). I sure could use a better icon for tied items. (hint
@@ -782,22 +717,16 @@ To Slaven Rezic for:
 
 =item *
 
-The propotype code of the pseudo-hash viewer.
-
-=item *
-
 The idea to use B::Deparse to view code ref.
 
 =back
 
 =head1 CONTRIBUTORS
 
-Many thanks to Achim Bohnet for all the tests, patches (and reports) he 
+Many thanks to Achim Bohnet for all the tests, patches (and reports) he
 made. Many improvements were made thanks to his efforts.
 
 Thanks to Rudi Farkas for the 'watch' patch.
-
-Thanks to Slavec Rezic for the pseudo-hash prototype.
 
 Thanks to heytitle for the documentation fixes
 
@@ -805,13 +734,9 @@ Thanks to heytitle for the documentation fixes
 
 Dominique Dumont, ddumont@cpan.org
 
-Copyright (c) 1997-2004,2007,2014,2017 Dominique Dumont. All rights reserved.
-This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
-
 =head1 SEE ALSO
 
-L<perl>, L<Tk>, L<Tk::HList>, L<B::Deparse>
+L<perl>, L<Tk>, L<Tk::HList>, L<B::Deparse>, L<data_viewer>
 
 =cut
 

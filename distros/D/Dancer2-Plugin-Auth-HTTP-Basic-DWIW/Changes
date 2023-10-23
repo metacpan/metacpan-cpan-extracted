@@ -1,5 +1,12 @@
 Revision history for Dancer2-Plugin-Auth-HTTP-Basic-DWIW
 
+0.0901  2023-10-22
+        - no code changes, only re-uploading without all the dependencies in the package (was too long since I last touched perl ^^')
+
+0.09    2023-10-22
+        - fix for Dancer2 1.0.0: header keyword deprecated, replaced by response_header (thanks ANDK!)
+        - remove deprecated handler configuration (deprecated since 0.06, so Feb 2019)
+
 0.0801  2020-09-30
         - add repository URL to metacpan sidebar (thanks github @chorny!)
 

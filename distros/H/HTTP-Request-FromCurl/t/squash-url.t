@@ -2,12 +2,7 @@
 use strict;
 use HTTP::Request::FromCurl;
 use URI;
-use Test::More;
-use Data::Dumper;
-
-use Filter::signatures;
-use feature 'signatures';
-no warnings 'experimental::signatures';
+use Test2::V0;
 
 my @tests = (
     [ 'https://example.com' => 'https://example.com/' ],

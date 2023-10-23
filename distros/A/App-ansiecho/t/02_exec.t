@@ -110,6 +110,10 @@ test('-f', '%2$d %d',    '12', '34',       "34 12\n");
 test('-f', '%2$d %d %d', '12', '34',       "34 12 34\n");
 test('-f', '%3$d %d %d', '12', '34', '56', "56 12 34\n");
 
+# duplicated arguments
+test('-f', '%2$s %s %s', R('12'), G('34'),         => join(' ',G('34'),R('12'),G('34'))."\n");
+test('-f', '%3$s %3$s %3$s', R('12'), G('34'), B('56') => join(' ',B('56'),B('56'),B('56'))."\n");
+
 sub RED   { R('RED') };
 sub GREEN { G('GREEN') };
 sub BLUE  { B('BLUE') };
@@ -123,7 +127,7 @@ test(qw(-f %3$.1s-%2$.1s-%1$.1s -cR RED -cG GREEN -cB BLUE),
      sprintf("%s-%s-%s\n", B('B'), G('G'), R('R')));
 }
 
-# reordered precision arguments
+# reordered width/precision arguments
 SKIP: {
     skip "reordered precision arguments was supported by v5.24", 7
 	if $] < 5.024;

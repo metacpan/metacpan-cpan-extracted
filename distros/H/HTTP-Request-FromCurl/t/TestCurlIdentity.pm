@@ -1,8 +1,8 @@
 package # hide from CPAN
     TestCurlIdentity;
-use strict;
+use 5.020;
 use HTTP::Request::FromCurl;
-use Test2::V0;
+use Test2::V0 '-no_srand';
 use Data::Dumper;
 use Capture::Tiny 'capture';
 use Test::HTTP::LocalServer;
@@ -18,7 +18,6 @@ BEGIN {
     }
 }
 
-use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
@@ -39,13 +38,14 @@ my $curl = $ENV{TEST_CURL_BIN} // 'curl';
 my @erase;
 
 sub tempname($content='') {
-    my ($fh,$tempfile) = tempfile;
+    my ($fh,$tempname) = tempfile('curl-XXXXXXXXXX', TMPDIR => 1);
     if( $content ) {
         binmode $fh;
         print $fh $content;
         close $fh;
     };
-    $tempfile
+    push @erase, $tempname;
+    return $tempname
 };
 END { unlink @erase; }
 
@@ -132,7 +132,7 @@ sub curl_request( @args ) {
 }
 
 sub compiles_ok( $code, $name ) {
-    my( $fh, $tempname ) = tempfile( UNLINK => 1 );
+    my( $fh, $tempname ) = tempfile('curl-XXXXXXXXXX', UNLINK => 1, TMPDIR => 1 );
     binmode $fh, ':raw';
     print $fh $code;
     close $fh;
@@ -142,15 +142,15 @@ sub compiles_ok( $code, $name ) {
     });
 
     if( $exit ) {
-        diag $stderr;
+        diag "ERROR: $stderr";
         diag "Exit code: ", $exit;
-        fail($name);
+        return fail($name);
     } elsif( $stderr !~ /(^|\n)\Q$tempname\E syntax OK\s*$/) {
-        diag $stderr;
+        diag "WARN: $stderr";
         diag $code;
-        fail($name);
+        return fail($name);
     } else {
-        pass($name);
+        return pass($name);
     };
 };
 
@@ -159,8 +159,10 @@ sub identical_headers_ok( $code, $expected_request, $name,
     %options
 ) {
     my $res;
-    $res = eval $code
-        or do { diag $@; };
+    $res = eval $code;
+    if( $@ ) {
+        diag "EVAL: $@";
+    };
     if( ref $res eq 'HASH' and $res->{status} >= 300 ) {
         diag Dumper $res;
     };
@@ -173,7 +175,7 @@ sub identical_headers_ok( $code, $expected_request, $name,
         (my $old_boundary) = ($log =~ m!Content-Type: multipart/form-data; boundary=(.*?)$!ms);
         if( ! $old_boundary ) {
             diag "Old request didn't have a boundary?!";
-            diag $log;
+            diag "LOG: $log";
             return;
         };
 
@@ -256,13 +258,13 @@ sub request_logs_identical_ok( $test, $name, $r, $res ) {
 
     } elsif( $r->method ne $res->{method} ) {
         is $r->method, $res->{method}, $name;
-        diag join " ", @{ $test->{cmd} };
+        diag "CMD: " . join " ", @{ $test->{cmd} };
         SKIP: {
             skip "We can't check the request body", 1;
         };
     } elsif( uri_unescape($r->uri->path_query) ne $res->{path} ) {
         is uri_unescape($r->uri->path_query), $res->{path}, $name ;
-        diag join " ", @{ $test->{cmd} };
+        diag "CMD: " . join " ", @{ $test->{cmd} };
         SKIP: {
             skip "We can't check the request body", 1;
         };
@@ -316,8 +318,7 @@ sub request_logs_identical_ok( $test, $name, $r, $res ) {
             $res->{headers}->{ 'User-Agent' } =~ s!^(curl/7\.19\.7)\b.+!$1!;
         };
 
-        is \%got, $res->{headers}, $name
-            or diag Dumper [\%got, $res->{headers}];
+        is \%got, $res->{headers}, "$name (headers)";
 
         # Now, also check that our HTTP::Request looks similar
         my $http_request = $r->as_request;
@@ -376,7 +377,7 @@ sub request_identical_ok( $test ) {
 
         } else {
             fail $name;
-            diag join " ", @$cmd;
+            diag "CMD: " . join " ", @$cmd;
             diag $res[0]->{error_output};
         };
         SKIP: {
@@ -433,6 +434,7 @@ sub request_identical_ok( $test ) {
     # Well, no!
     # is_deeply \@reconstructed, $cmd, "Reconstructed command";
     # Check that the reconstructed command behaves identically
+    note "Running reconstructed curl command";
     my @reconstructed = curl_request( @reconstructed_commandline );
 
     # Can we maybe even loop over all requests?!

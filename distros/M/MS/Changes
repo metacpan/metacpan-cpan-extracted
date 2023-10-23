@@ -1,5 +1,8 @@
 Revision history for MS
 
+0.207003 2023-10-22
+        Update Uniprot REST URLs
+
 0.207002 2022-03-02
         Allow NME in protein digests
         Only check mzML sha256 if present

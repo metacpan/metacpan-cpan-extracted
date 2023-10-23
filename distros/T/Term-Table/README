@@ -5,23 +5,22 @@ NAME
 DESCRIPTION
 
     This is used by some failing tests to provide diagnostics about what
-    has gone wrong. This module is able to generic format rows of data into
-    tables.
+    has gone wrong. This module is able to format rows of data into tables.
 
 SYNOPSIS
 
         use Term::Table;
     
         my $table = Term::Table->new(
-            max_width      => 80,    # defaults to terminal size
+            max_width      => 80,    # Defaults to terminal size
             pad            => 4,     # Extra padding between table and max-width (defaults to 4)
-            allow_overflow => 0,     # default is 0, when off an exception will be thrown if the table is too big
-            collapse       => 1,     # do not show empty columns
+            allow_overflow => 0,     # Default is 0, when off an exception will be thrown if the table is too big
+            collapse       => 1,     # Do not show empty columns
     
             header => ['name', 'age', 'hair color'],
             rows   => [
-                ['Fred Flinstone',  2000000, 'black'],
-                ['Wilma Flinstone', 1999995, 'red'],
+                ['Fred Flintstone',  2000000, 'black'],
+                ['Wilma Flintstone', 1999995, 'red'],
                 ...
             ],
         );
@@ -30,13 +29,13 @@ SYNOPSIS
 
     This prints a table like this:
 
-        +-----------------+---------+------------+
-        | name            | age     | hair color |
-        +-----------------+---------+------------+
-        | Fred Flinstone  | 2000000 | black      |
-        | Wilma Flinstone | 1999995 | red        |
-        | ...             | ...     | ...        |
-        +-----------------+---------+------------+
+        +------------------+---------+------------+
+        | name             | age     | hair color |
+        +------------------+---------+------------+
+        | Fred Flintstone  | 2000000 | black      |
+        | Wilma Flintstone | 1999995 | red        |
+        | ...              | ...     | ...        |
+        +------------------+---------+------------+
 
 INTERFACE
 
@@ -87,9 +86,9 @@ INTERFACE
       replaced with escape sequences. This prevents newlines, tabs, and
       similar whitespace from disrupting the table.
 
-      Note: newlines are marked as '\n', but a newline is also inserted
-      into the data so that it typically displays in a way that is useful
-      to humans.
+      Note: newlines are marked as \n, but a newline is also inserted into
+      the data so that it typically displays in a way that is useful to
+      humans.
 
       Example:
 
@@ -166,7 +165,7 @@ NOTE ON UNICODE/WIDE CHARACTERS
 SOURCE
 
     The source code repository for Term-Table can be found at
-    http://github.com/exodist/Term-Table/.
+    https://github.com/exodist/Term-Table/.
 
 MAINTAINERS
 
@@ -183,5 +182,5 @@ COPYRIGHT
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
 
-    See http://dev.perl.org/licenses/
+    See https://dev.perl.org/licenses/
 

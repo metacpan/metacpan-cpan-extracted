@@ -14,11 +14,13 @@
 #include "sv_setrv.c.inc"
 
 #include "perl-additions.c.inc"
+#include "lexer-additions.c.inc"
 #include "forbid_outofblock_ops.c.inc"
 #include "force_list_keeping_pushmark.c.inc"
 #include "optree-additions.c.inc"
 #include "newOP_CUSTOM.c.inc"
 #include "cv_copy_flags.c.inc"
+#include "OP_HELEMEXISTSOR.c.inc"
 
 #include "object_pad.h"
 #include "class.h"
@@ -32,6 +34,15 @@
 #else
 #  undef  DEBUG_OVERRIDE_PLCURCOP
 #  define DEBUG_SET_CURCOP_LINE(line)
+#endif
+
+#if HAVE_PERL_VERSION(5, 22, 0)
+#  define COP_SEQ_RANGE_LOW_set(sv,val)  \
+      STMT_START { (sv)->xpadn_low = (val); } STMT_END
+#else
+  /* Before Perl 5.22, padnames were just normal SVs with some weird fields in them */
+#  define COP_SEQ_RANGE_LOW_set(sv,val)  \
+      STMT_START { ((XPVNV*)SvANY(sv))->xnv_u.xpad_cop_seq.xlow = (val); } STMT_END
 #endif
 
 #define need_PLparser()  ObjectPad__need_PLparser(aTHX)
@@ -515,21 +526,7 @@ void ObjectPad__prepare_method_parse(pTHX_ ClassMeta *meta)
   PL_comppad_name = PadlistNAMES(CvPADLIST(methodscope));
   PL_curpad  = AvARRAY(PL_comppad);
 
-  AV *fields = meta->direct_fields;
-  U32 nfields = av_count(fields);
-
-  U32 i;
-  for(i = 0; i < nfields; i++) {
-    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
-
-    /* Skip the anonymous ones */
-    if(SvCUR(fieldmeta->name) < 2)
-      continue;
-
-    /* Claim these are all STATE variables just to quiet the "will not stay
-     * shared" warning */
-    pad_add_name_sv(fieldmeta->name, padadd_STATE, NULL, NULL);
-  }
+  add_fields_to_pad(meta, -1);
 
   intro_my();
 
@@ -578,6 +575,27 @@ void ObjectPad__start_method_parse(pTHX_ ClassMeta *meta, bool is_common)
   intro_my();
 }
 
+void ObjectPad__add_fields_to_pad(pTHX_ ClassMeta *meta, FIELDOFFSET since_fieldix)
+{
+  AV *fields = meta->direct_fields;
+  U32 nfields = av_count(fields);
+
+  U32 i;
+  for(i = 0; i < nfields; i++) {
+    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+    if(fieldmeta->fieldix < since_fieldix)
+      continue;
+
+    /* Skip the anonymous ones */
+    if(SvCUR(fieldmeta->name) < 2)
+      continue;
+
+    /* Claim these are all STATE variables just to quiet the "will not stay
+     * shared" warning */
+    pad_add_name_sv(fieldmeta->name, padadd_STATE, NULL, NULL);
+  }
+}
+
 #define find_padix_for_field(fieldmeta)  S_find_padix_for_field(aTHX_ fieldmeta)
 static PADOFFSET S_find_padix_for_field(pTHX_ FieldMeta *fieldmeta)
 {
@@ -623,6 +641,8 @@ static PADOFFSET S_find_padix_for_field(pTHX_ FieldMeta *fieldmeta)
 
 OP *ObjectPad__finish_method_parse(pTHX_ ClassMeta *meta, bool is_common, OP *body)
 {
+  assert(meta->methodscope && SvTYPE(meta->methodscope) == SVt_PVCV);
+
   PADNAMELIST *fieldnames = PadlistNAMES(CvPADLIST(meta->methodscope));
   I32 nfields = av_count(meta->direct_fields);
   PADNAME **snames = PadnamelistARRAY(fieldnames);
@@ -795,6 +815,196 @@ OP *ObjectPad__finish_method_parse(pTHX_ ClassMeta *meta, bool is_common, OP *bo
   return body;
 }
 
+void ObjectPad__prepare_adjust_params(pTHX_ ClassMeta *meta)
+{
+  /* Skip the PADIX_EMBEDDING slot */
+  pad_add_name_pvs("", 0, NULL, NULL);
+
+  PADOFFSET params_padix = pad_add_name_pvs("%(params)", 0, NULL, NULL);
+  assert(params_padix == PADIX_PARAMS);
+  PERL_UNUSED_VAR(params_padix);
+
+  intro_my();
+}
+
+void ObjectPad__parse_adjust_params(pTHX_ ClassMeta *meta, AV *params)
+{
+  /* This is a custom parser because XPK won't handle this */
+  if(lex_peek_unichar(0) != '(')
+    croak("Expected ADJUST :params signature in parens");
+  lex_read_unichar(0);
+
+  if(!meta->parammap)
+    meta->parammap = newHV();
+
+  HV *parammap = meta->parammap;
+
+  bool seen_slurpy = false;
+
+  while(1) {
+    lex_read_space(0);
+
+    /* Should now follow a sequence of comma-separated elements; each element is
+     *   :$NAME    or
+     *   :$NAME = EXPR
+     *   :$NAME //= EXPR
+     *   :$NAME ||= EXPR
+     * The final one may also be
+     *   %NAME
+     */
+    char c = lex_peek_unichar(0);
+    if(c == ')')
+      break;
+
+    if(seen_slurpy)
+      croak("Cannot have more parameters after the final slurpy one");
+
+    if(c == ':') {
+      lex_read_unichar(0);
+      lex_read_space(0);
+
+      SV *varname = lex_scan_lexvar();
+      lex_read_space(0);
+
+      if(SvPVX(varname)[0] != '$')
+        croak("Expected a named scalar parameter");
+
+      SV *paramname = newSVpvn(SvPVX(varname)+1, SvCUR(varname)-1);
+
+      check_colliding_param(meta, paramname);
+
+      PADOFFSET padix = pad_add_name_sv(varname, 0, NULL, NULL);
+
+      ParamMeta *parammeta;
+      Newx(parammeta, 1, struct ParamMeta);
+
+      *parammeta = (struct ParamMeta){
+        .name  = paramname,
+        .class = meta,
+        .type  = PARAM_ADJUST,
+        .adjust.padix = padix,
+      };
+
+      av_push(params, newSVuv(PTR2UV((SV *)parammeta)));
+      hv_store_ent(parammap, paramname, (SV *)parammeta, 0);
+
+      if(lex_consume("=")) {
+        lex_read_space(0);
+        parammeta->adjust.defexpr = parse_termexpr(0);
+      }
+      else if(lex_consume("//=")) {
+        lex_read_space(0);
+        parammeta->adjust.defexpr = parse_termexpr(0);
+        parammeta->adjust.def_if_undef = 1;
+      }
+      else if(lex_consume("||=")) {
+        lex_read_space(0);
+        parammeta->adjust.defexpr = parse_termexpr(0);
+        parammeta->adjust.def_if_false = 1;
+      }
+
+      intro_my();
+    }
+    else if(c == '%') {
+      SV *varname = lex_scan_lexvar();
+
+      /* Lets now be evil and simply rename %(params) to this. Due to the way
+       * that the PADNAME structure itself contains the string, we can't
+       * just change the name *inside* it. Instead we'll have to allocate a
+       * new one and swap it in.
+       */
+      PADNAME **pnp = &PadnamelistARRAY(PL_comppad_name)[PADIX_PARAMS];
+
+      PADNAME *new_pn = newPADNAMEpvn(SvPVX(varname), SvCUR(varname));
+      COP_SEQ_RANGE_LOW_set(new_pn, COP_SEQ_RANGE_LOW(*pnp));
+
+      PadnameREFCNT_dec(*pnp);
+      *pnp = new_pn;
+
+      /* Don't need to intro_my() because the padname has already been
+       * introduced
+       */
+
+      seen_slurpy = true;
+    }
+    else
+      croak("Expected a named scalar parameter or slurpy hash");
+
+    lex_read_space(0);
+    c = lex_peek_unichar(0);
+
+    if(c == ')')
+      break;
+    if(c != ',')
+      croak("Expected , or end of signature parens");
+
+    lex_read_unichar(0);
+  }
+
+  /* consume the ')' */
+  lex_read_unichar(0);
+
+  lex_read_space(0);
+}
+
+static OP *pp_bind_params_hv(pTHX)
+{
+  HV *params = HV_FROM_REF(*av_fetch(GvAV(PL_defgv), 0, 0));
+
+  SAVESPTR(PAD_SVl(PADIX_PARAMS));
+  PAD_SVl(PADIX_PARAMS) = SvREFCNT_inc(params);
+  save_freesv((SV *)params);
+
+  return NORMAL;
+}
+
+OP *ObjectPad__finish_adjust_params(pTHX_ ClassMeta *meta, AV *params, OP *body)
+{
+  OP *paramsops = NULL;
+
+  paramsops = op_append_elem(OP_LINESEQ, paramsops,
+    newOP_CUSTOM(&pp_bind_params_hv, 0));
+
+  for(U32 i = 0; params && i < av_count(params); i++) {
+    ParamMeta *parammeta = NUM2PTR(ParamMeta *, SvUV(AvARRAY(params)[i]));
+
+    SV *paramname = parammeta->name;
+    OP *defexpr   = parammeta->adjust.defexpr;
+
+    if(!defexpr)
+      defexpr = newop_croak_from_constructor(
+        newSVpvf("Required parameter '%" SVf "' is missing for %" SVf " constructor",
+          SVfARG(paramname), SVfARG(meta->name)));
+
+    OP *helemop =
+      newBINOP(OP_HELEM, 0,
+        newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
+        newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)));
+
+    OP *rhs;
+    if(parammeta->adjust.def_if_undef) {
+      /* delete $(params){KEY} // DEFEXPR */
+      rhs = newLOGOP(OP_DOR, 0, newUNOP(OP_DELETE, 0, helemop), defexpr);
+    }
+    else if(parammeta->adjust.def_if_false) {
+      /* delete $(params){KEY} || DEFEXPR */
+      rhs = newLOGOP(OP_OR, 0, newUNOP(OP_DELETE, 0, helemop), defexpr);
+    }
+    else {
+      /* Equivalent of
+       *   exists $(params){KEY} ? delete $(params){KEY} : DEFEXPR; */
+      rhs = newHELEMEXISTSOROP(OPpHELEMEXISTSOR_DELETE << 8, helemop, defexpr);
+    }
+
+    paramsops = op_append_elem(OP_LINESEQ, paramsops,
+      newBINOP(OP_SASSIGN, 0,
+        rhs,
+        newPADxVOP(OP_PADSV, OPf_MOD|OPf_REF, parammeta->adjust.padix)));
+  }
+
+  return op_append_list(OP_LINESEQ, paramsops, body);
+}
+
 MethodMeta *ObjectPad_mop_class_add_method(pTHX_ ClassMeta *meta, SV *methodname)
 {
   AV *methods = meta->direct_methods;
@@ -896,10 +1106,10 @@ void ObjectPad_mop_class_add_BUILD(pTHX_ ClassMeta *meta, CV *cv)
   if(meta->strict_params)
     croak("Cannot add a BUILD block to a class with :strict(params)");
 
-  if(!meta->buildblocks)
-    meta->buildblocks = newAV();
+  if(!meta->buildcvs)
+    meta->buildcvs = newAV();
 
-  av_push(meta->buildblocks, (SV *)cv);
+  av_push(meta->buildcvs, (SV *)cv);
 }
 
 void ObjectPad_mop_class_add_ADJUST(pTHX_ ClassMeta *meta, CV *cv)
@@ -909,19 +1119,12 @@ void ObjectPad_mop_class_add_ADJUST(pTHX_ ClassMeta *meta, CV *cv)
 
   warn_outofblock_ops(CvROOT(cv), "Using %s to leave an ADJUST block is discouraged and will be removed in a later version");
 
-  if(!meta->adjustblocks)
-    meta->adjustblocks = newAV();
-
-  AdjustBlock *block;
-  Newx(block, 1, struct AdjustBlock);
-
-  *block = (struct AdjustBlock){
-    .cv = cv,
-  };
+  if(!meta->adjustcvs)
+    meta->adjustcvs = newAV();
 
   meta->has_adjust = true;
 
-  av_push(meta->adjustblocks, (SV *)block);
+  av_push(meta->adjustcvs, (SV *)cv);
 }
 
 void ObjectPad_mop_class_add_required_method(pTHX_ ClassMeta *meta, SV *methodname)
@@ -991,23 +1194,23 @@ static RoleEmbedding *S_embed_role(pTHX_ ClassMeta *classmeta, ClassMeta *roleme
   av_push(classmeta->cls.embedded_roles, (SV *)embedding);
   hv_store_ent(rolemeta->role.applied_classes, classmeta->name, (SV *)embedding, 0);
 
-  U32 nbuilds = rolemeta->buildblocks ? av_count(rolemeta->buildblocks) : 0;
+  U32 nbuilds = rolemeta->buildcvs ? av_count(rolemeta->buildcvs) : 0;
   for(i = 0; i < nbuilds; i++) {
-    CV *buildblock = (CV *)AvARRAY(rolemeta->buildblocks)[i];
+    CV *buildcv = (CV *)AvARRAY(rolemeta->buildcvs)[i];
 
-    CV *embedded_buildblock = embed_cv(buildblock, embedding);
+    CV *embedded_buildcv = embed_cv(buildcv, embedding);
 
-    if(!classmeta->buildblocks)
-      classmeta->buildblocks = newAV();
+    if(!classmeta->buildcvs)
+      classmeta->buildcvs = newAV();
 
-    av_push(classmeta->buildblocks, (SV *)embedded_buildblock);
+    av_push(classmeta->buildcvs, (SV *)embedded_buildcv);
   }
 
-  U32 nadjusts = rolemeta->adjustblocks ? av_count(rolemeta->adjustblocks) : 0;
+  U32 nadjusts = rolemeta->adjustcvs ? av_count(rolemeta->adjustcvs) : 0;
   for(i = 0; i < nadjusts; i++) {
-    AdjustBlock *block = (AdjustBlock *)AvARRAY(rolemeta->adjustblocks)[i];
+    CV *cv = (CV *)AvARRAY(rolemeta->adjustcvs)[i];
 
-    CV *embedded_cv = embed_cv(block->cv, embedding);
+    CV *embedded_cv = embed_cv(cv, embedding);
 
     mop_class_add_ADJUST(classmeta, embedded_cv);
   }
@@ -1422,7 +1625,7 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
       meta->has_buildargs = true;
   }
 
-  if(meta->strict_params && meta->buildblocks)
+  if(meta->strict_params && meta->buildcvs)
     croak("Class %" SVf " cannot be :strict(params) because it has BUILD blocks",
       SVfARG(meta->name));
 
@@ -1475,6 +1678,34 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
   }
 
   S_generate_initfields_method(aTHX_ meta);
+
+  if(meta->adjust_lines) {
+    ENTER;
+
+    need_PLparser();
+
+    I32 floor_ix = PL_savestack_ix;
+    {
+      SAVEI32(PL_subline);
+      save_item(PL_subname);
+
+      resume_compcv(&meta->adjust_compcv);
+    }
+
+    SvREFCNT_inc(PL_compcv);
+
+    OP *body = finish_adjust_params(meta, meta->adjust_params, meta->adjust_lines);
+
+    meta->methodscope = meta->adjust_methodscope;
+
+    body = finish_method_parse(meta, FALSE, body);
+
+    CV *adjustcv = newATTRSUB(floor_ix, NULL, NULL, NULL, body);
+
+    mop_class_add_ADJUST(meta, adjustcv);
+
+    LEAVE;
+  }
 
   meta->sealed = true;
 
@@ -1770,14 +2001,14 @@ XS_INTERNAL(injected_constructor)
     LEAVE;
   }
 
-  if(meta->buildblocks) {
+  if(meta->buildcvs) {
     DEBUG_SET_CURCOP_LINE(__LINE__);
 
-    AV *buildblocks = meta->buildblocks;
+    AV *buildcvs = meta->buildcvs;
     SV **argsvs = AvARRAY(args);
     int i;
-    for(i = 0; i < av_count(buildblocks); i++) {
-      CV *buildblock = (CV *)AvARRAY(buildblocks)[i];
+    for(i = 0; i < av_count(buildcvs); i++) {
+      CV *buildcv = (CV *)AvARRAY(buildcvs)[i];
 
       ENTER;
       SAVETMPS;
@@ -1794,21 +2025,21 @@ XS_INTERNAL(injected_constructor)
         PUSHs(argsvs[argi]);
       PUTBACK;
 
-      assert(buildblock);
-      call_sv((SV *)buildblock, G_VOID);
+      assert(buildcv);
+      call_sv((SV *)buildcv, G_VOID);
 
       FREETMPS;
       LEAVE;
     }
   }
 
-  if(meta->adjustblocks) {
+  if(meta->adjustcvs) {
     DEBUG_SET_CURCOP_LINE(__LINE__);
 
-    AV *adjustblocks = meta->adjustblocks;
+    AV *adjustcvs = meta->adjustcvs;
     U32 i;
-    for(i = 0; i < av_count(adjustblocks); i++) {
-      AdjustBlock *block = (AdjustBlock *)AvARRAY(adjustblocks)[i];
+    for(i = 0; i < av_count(adjustcvs); i++) {
+      CV *cv = (CV *)AvARRAY(adjustcvs)[i];
 
       ENTER;
       SAVETMPS;
@@ -1822,8 +2053,8 @@ XS_INTERNAL(injected_constructor)
         mPUSHs(newRV_inc((SV *)paramhv));
       PUTBACK;
 
-      assert(block->cv);
-      call_sv((SV *)block->cv, G_VOID);
+      assert(cv);
+      call_sv((SV *)cv, G_VOID);
 
       FREETMPS;
       LEAVE;
@@ -2005,21 +2236,21 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
 
   need_PLparser();
 
+  if(!PL_compcv) {
+    /* We require the initfields CV to have a CvOUTSIDE, or else cv_clone()
+     * will segv when we compose role fields. Any class dynamically generated
+     * by string eval() will likely not get one, because it won't inherit a
+     * PL_compcv here. We'll fake it up
+     *   See also  https://rt.cpan.org/Ticket/Display.html?id=137952
+     */
+    SAVEVPTR(PL_compcv);
+    PL_compcv = find_runcv(0);
+
+    assert(PL_compcv);
+  }
+
   /* Prepare meta->initfields for containing a CV parsing operation */
   {
-    if(!PL_compcv) {
-      /* We require the initfields CV to have a CvOUTSIDE, or else cv_clone()
-       * will segv when we compose role fields. Any class dynamically generated
-       * by string eval() will likely not get one, because it won't inherit a
-       * PL_compcv here. We'll fake it up
-       *   See also  https://rt.cpan.org/Ticket/Display.html?id=137952
-       */
-      SAVEVPTR(PL_compcv);
-      PL_compcv = find_runcv(0);
-
-      assert(PL_compcv);
-    }
-
     I32 floor_ix = start_subparse(FALSE, 0);
 
     extend_pad_vars(meta);
@@ -2035,6 +2266,26 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
     intro_my();
 
     suspend_compcv(&meta->initfields_compcv);
+
+    LEAVE_SCOPE(floor_ix);
+  }
+
+  if(hv_fetchs(GvHV(PL_hintgv), "Object::Pad/experimental(composed_adjust)", 0)) {
+    meta->composed_adjust = TRUE;
+
+    prepare_method_parse(meta);
+
+    I32 floor_ix = start_subparse(FALSE, 0);
+
+    start_method_parse(meta, FALSE);
+
+    suspend_compcv(&meta->adjust_compcv);
+    meta->adjust_methodscope = meta->methodscope;
+
+    prepare_adjust_params(meta);
+    meta->adjust_params = newAV();
+
+    meta->next_fieldix_for_adjust = meta->next_fieldix;
 
     LEAVE_SCOPE(floor_ix);
   }
@@ -2116,18 +2367,18 @@ void ObjectPad_mop_class_set_superclass(pTHX_ ClassMeta *meta, SV *superclassnam
     meta->repr = supermeta->repr;
     meta->cls.foreign_new = supermeta->cls.foreign_new;
 
-    if(supermeta->buildblocks) {
-      if(!meta->buildblocks)
-        meta->buildblocks = newAV();
+    if(supermeta->buildcvs) {
+      if(!meta->buildcvs)
+        meta->buildcvs = newAV();
 
-      av_push_from_av_noinc(meta->buildblocks, supermeta->buildblocks);
+      av_push_from_av_noinc(meta->buildcvs, supermeta->buildcvs);
     }
 
-    if(supermeta->adjustblocks) {
-      if(!meta->adjustblocks)
-        meta->adjustblocks = newAV();
+    if(supermeta->adjustcvs) {
+      if(!meta->adjustcvs)
+        meta->adjustcvs = newAV();
 
-      av_push_from_av_noinc(meta->adjustblocks, supermeta->adjustblocks);
+      av_push_from_av_noinc(meta->adjustcvs, supermeta->adjustcvs);
     }
 
     if(supermeta->fieldhooks_makefield) {

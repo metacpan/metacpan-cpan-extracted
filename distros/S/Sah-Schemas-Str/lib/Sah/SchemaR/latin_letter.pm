@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::latin_letter;
 
-our $DATE = '2023-09-03'; # DATE
-our $VERSION = '0.015'; # VERSION
+our $DATE = '2023-10-23'; # DATE
+our $VERSION = '0.016'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{examples=>[{valid=>0,value=>""},{valid=>1,value=>"A"},{summary=>"Multiple letters",valid=>0,value=>"AB"},{summary=>"Non-letter",valid=>0,value=>1},{summary=>"Non-letter",valid=>0,value=>";"}],len=>1,match=>qr(\A[A-Za-z]\z),summary=>"A single latin letter, i.e. A-Z or a-z"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::latin_letter - A single latin letter, i.e. A-Z or a-z
 
 =head1 VERSION
 
-This document describes version 0.015 of Sah::SchemaR::latin_letter (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
+This document describes version 0.016 of Sah::SchemaR::latin_letter (from Perl distribution Sah-Schemas-Str), released on 2023-10-23.
 
 =head1 DESCRIPTION
 

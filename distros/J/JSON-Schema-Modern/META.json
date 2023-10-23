@@ -63,7 +63,6 @@
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
-            "Test::Pod::No404s" : "0",
             "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
             "Time::Moment" : "0"
@@ -215,7 +214,6 @@
             "Dist::Zilla::Plugin::Test::Kwalitee" : "2.10",
             "Dist::Zilla::Plugin::Test::MinimumVersion" : "2.000010",
             "Dist::Zilla::Plugin::Test::NoTabs" : "0.08",
-            "Dist::Zilla::Plugin::Test::Pod::No404s" : "1.003",
             "Dist::Zilla::Plugin::Test::PodSpelling" : "2.006003",
             "Dist::Zilla::Plugin::Test::Portability" : "2.000007",
             "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0.022",
@@ -231,63 +229,63 @@
    "provides" : {
       "JSON::Schema::Modern" : {
          "file" : "lib/JSON/Schema/Modern.pm",
-         "version" : "0.572"
+         "version" : "0.573"
       },
       "JSON::Schema::Modern::Annotation" : {
          "file" : "lib/JSON/Schema/Modern/Annotation.pm",
-         "version" : "0.572"
+         "version" : "0.573"
       },
       "JSON::Schema::Modern::Document" : {
          "file" : "lib/JSON/Schema/Modern/Document.pm",
-         "version" : "0.572"
+         "version" : "0.573"
       },
       "JSON::Schema::Modern::Error" : {
          "file" : "lib/JSON/Schema/Modern/Error.pm",
-         "version" : "0.572"
+         "version" : "0.573"
       },
       "JSON::Schema::Modern::Result" : {
          "file" : "lib/JSON/Schema/Modern/Result.pm",
-         "version" : "0.572"
+         "version" : "0.573"
       },
       "JSON::Schema::Modern::Utilities" : {
          "file" : "lib/JSON/Schema/Modern/Utilities.pm",
-         "version" : "0.572"
+         "version" : "0.573"
       },
       "JSON::Schema::Modern::Vocabulary" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary.pm",
-         "version" : "0.572"
+         "version" : "0.573"
       },
       "JSON::Schema::Modern::Vocabulary::Applicator" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Applicator.pm",
-         "version" : "0.572"
+         "version" : "0.573"
       },
       "JSON::Schema::Modern::Vocabulary::Content" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Content.pm",
-         "version" : "0.572"
+         "version" : "0.573"
       },
       "JSON::Schema::Modern::Vocabulary::Core" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Core.pm",
-         "version" : "0.572"
+         "version" : "0.573"
       },
       "JSON::Schema::Modern::Vocabulary::FormatAnnotation" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/FormatAnnotation.pm",
-         "version" : "0.572"
+         "version" : "0.573"
       },
       "JSON::Schema::Modern::Vocabulary::FormatAssertion" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/FormatAssertion.pm",
-         "version" : "0.572"
+         "version" : "0.573"
       },
       "JSON::Schema::Modern::Vocabulary::MetaData" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/MetaData.pm",
-         "version" : "0.572"
+         "version" : "0.573"
       },
       "JSON::Schema::Modern::Vocabulary::Unevaluated" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Unevaluated.pm",
-         "version" : "0.572"
+         "version" : "0.573"
       },
       "JSON::Schema::Modern::Vocabulary::Validation" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Validation.pm",
-         "version" : "0.572"
+         "version" : "0.573"
       }
    },
    "release_status" : "stable",
@@ -302,7 +300,7 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Modern"
       }
    },
-   "version" : "0.572",
+   "version" : "0.573",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.039003"
@@ -562,11 +560,6 @@
             },
             "name" : "@Author::ETHER/Test::PodSpelling",
             "version" : "2.007005"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Test::Pod::No404s",
-            "name" : "@Author::ETHER/Test::Pod::No404s",
-            "version" : "1.004"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Kwalitee",
@@ -1176,7 +1169,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.572",
+                  "tag" : "v0.573",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

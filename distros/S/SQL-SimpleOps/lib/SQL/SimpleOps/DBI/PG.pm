@@ -29,7 +29,7 @@
 
 	our @EXPORT = qw(new Open $VERSION);
 
-	our $VERSION = "2023.274.1";
+	our $VERSION = "2023.284.1";
 
 	our @EXPORT_OK = @EXPORT;
 
@@ -43,6 +43,7 @@ sub new()
 {
 	my $class = shift; $class = ref($class) || $class || 'SQL::SimpleOps::DBI::PG';
 	my $self = {@_};
+	
 	$self->{sql_simple}->{init}{plugin_id} = "PG";
 	$self->{sql_simple}->{init}{schema} = 1;
 	$self->{sql_simple}->{init}{test_server} = 1;

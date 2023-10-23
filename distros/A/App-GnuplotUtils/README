@@ -2,8 +2,8 @@ NAME
     App::GnuplotUtils - Utilities related to plotting data using gnuplot
 
 VERSION
-    This document describes version 0.003 of App::GnuplotUtils (from Perl
-    distribution App-GnuplotUtils), released on 2021-07-02.
+    This document describes version 0.005 of App::GnuplotUtils (from Perl
+    distribution App-GnuplotUtils), released on 2023-10-21.
 
 DESCRIPTION
     This distributions provides the following command-line utilities. They
@@ -20,46 +20,69 @@ FUNCTIONS
     Plot XY dataset(s) using gnuplot.
 
     This utility is a wrapper for gnuplot to quickly generate a graph from
-    the command-line and view it using a browser or an image viewer program.
+    the command-line and view it using an image viewer program or a browser.
+
+    Specifying dataset
+
     You can specify the dataset to plot directly from the command-line or
     specify filename to read the dataset from.
 
-    To plot directly from the command-line:
+    To plot directly from the command-line, specify comma-separated list of
+    X & Y number pairs using "--dataset-data" option:
 
      % xyplot --dataset-data '1,1, 2,3, 3,5.5, 4,7.9, 6,11.5' ; # whitespaces are optional
 
     To add more datasets, specify more "--dataset-data" options:
 
      % xyplot --dataset-data '1,1, 2,3, 3,5.5, 4,7.9, 6,11.5' \
-              --dataset-data '1,4,2,4,3,2,4,9,5,3,6,6'
+              --dataset-data '1,4,2,4,3,2,4,9,5,3,6,6';         # will plot two lines
 
-    To add a title to your chart and every dataset:
+    To add a title to your chart and every dataset, use "--dataset-title":
 
      % xyplot --chart-title "my chart" \
               --dataset-title "foo" --dataset-data '1,1, 2,3, 3,5.5, 4,7.9, 6,11.5' \
               --dataset-title "bar" --dataset-data '1,4,2,4,3,2,4,9,5,3,6,6'
 
-    To specify dataset from a file, use "--dataset-file" option (or specify
-    as arguments):
+    To specify dataset from files, use one or more "--dataset-file" options
+    (or specify the filenames as arguments):
 
      % xyplot --dataset-file ds1.txt --dataset-file ds2.txt
      % xyplot ds1.txt ds2.txt
 
-    "ds1.txt" contains these lines:
+    "ds1.txt" should contain comma, or whitespace-separated list of X & Y
+    numbers. You can put one number per line or more.
 
      1 1
      2 3
      3 5.5
      4 7.9
      6 11.5
+     8
+     13.5
+     9 14.2 10 14.8
 
-    Keywords: xychart, XY chart, XY plot
+    To accept data from stdin, you can specify "-" as the filename:
+
+     % tabulate-drug-concentration ... | xyplot -
+
+    Seeing plot result
+
+    "xyplot" uses Desktop::Open to view the resulting plot. The module will
+    first find a suitable application, and failing that will use the web
+    browser. If you specify "--output-file" ("-o"), the plot is written to
+    the specified image file.
+
+    Keywords
+
+    xychart, XY chart, XY plot
 
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
     *   chart_title => *str*
+
+        (No description)
 
     *   dataset_datas => *array[str]*
 
@@ -84,7 +107,11 @@ FUNCTIONS
 
     *   output_file => *filename*
 
+        (No description)
+
     *   overwrite => *bool*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -108,20 +135,36 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-App-GnuplotUtils>.
 
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023, 2021, 2020, 2018 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
 BUGS
     Please report any bugs or feature requests on the bugtracker website
     <https://rt.cpan.org/Public/Dist/Display.html?Name=App-GnuplotUtils>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
-
-SEE ALSO
-AUTHOR
-    perlancar <perlancar@cpan.org>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2018 by perlancar@cpan.org.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

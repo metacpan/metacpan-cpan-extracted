@@ -3,7 +3,7 @@ use warnings;
 
 package Dancer2::Plugin::Auth::HTTP::Basic::DWIW;
 # ABSTRACT: HTTP Basic authentication plugin for Dancer2 that does what I want.
-$Dancer2::Plugin::Auth::HTTP::Basic::DWIW::VERSION = '0.0801';
+$Dancer2::Plugin::Auth::HTTP::Basic::DWIW::VERSION = '0.0901';
 use MIME::Base64;
 use Dancer2::Plugin;
 
@@ -52,7 +52,7 @@ register http_basic_auth => sub {
         else {
             my $error_code = ${$@};
 
-            $dsl->header('WWW-Authenticate' => 'Basic realm="' . $realm . '"');
+            $dsl->response_header('WWW-Authenticate' => 'Basic realm="' . $realm . '"');
             $dsl->status($error_code);
 
             if(my $handler = $HANDLERS->{no_auth}) {
@@ -80,13 +80,6 @@ register http_basic_auth_login => sub {
     is_global => 0
 };
 
-register http_basic_auth_set_check_handler => sub {
-    my ($dsl, $handler) = @_;
-
-    warn 'This is deprecated! Please use http_basic_auth_handler check_login => sub {}';
-    $dsl->http_basic_auth_handler(check_login => $handler);
-};
-
 register http_basic_auth_handler => sub {
     my ($dsl, $name, $handler) = @_;
     $HANDLERS->{$name} = $handler;
@@ -107,7 +100,7 @@ Dancer2::Plugin::Auth::HTTP::Basic::DWIW - HTTP Basic authentication plugin for 
 
 =head1 VERSION
 
-version 0.0801
+version 0.0901
 
 =head1 SYNOPSIS
 
@@ -180,7 +173,7 @@ Mara Sophie Grosch (LittleFox) <littlefox@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Mara Sophie Grosch (LittleFox).
+This software is copyright (c) 2023 by Mara Sophie Grosch (LittleFox).
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

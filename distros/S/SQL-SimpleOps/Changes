@@ -1,5 +1,25 @@
 Revision history for Perl extension SQL::SimpleOps.
 
+2023.284.1 Wed Oct 11 23:14:01 2023
+	- WARNING: The Enchanced Changes can provide differents results by previous versions
+	- WARNING: Before applying this version you must retest your SQL command 
+	- WARNING: to verify formatting created by previous versions.
+	- news: Command 'SelectSubQuery' added; by CCELSO
+	- news: Option 'subquery' added; by CCELSO
+	- news: Option 'buffer_hashindex' added; by CCELSO
+	- news: Option 'cursor_key' multiple entries support added; by CCELSO
+	- news: Option 'table' in update command with multiple entries support added; by CCELSO
+	- news: Option 'fields => "*"' with 'Alias Table' configuration; by CCELSO
+	- fix: Selectcursor fail with buffer as hash based buffer_hashkey; by CCELSO
+	- fix: Duplicate keys in order_by; by CCELSO
+	- fix: Cursor_key can not be mapped when using fields/aliases in multiple tables; by CCELSO
+	- fix: Mismatch field list configuration in select for fields/aliases; by CCELSO
+	- fix: Order_by does not translate the column using alias name; by CCELSO
+	- fix: Last message does not reset before new command; by CCELSO
+	- change: Enchanced changes in fields/aliases analizer and formater; by CCELSO
+	- change: Enchanced changes in where clause analizer and formater; by CCELSO
+	- change: Message 010 and 021 text revised; by CCELSO
+
 2023.274.1 Sun Oct 1 01:34:53 2023
 	- news: Option 'buffer_hashkey' added; by CCELSO
 	- news: Option 'buffer_arrayref' added; by CCELSO

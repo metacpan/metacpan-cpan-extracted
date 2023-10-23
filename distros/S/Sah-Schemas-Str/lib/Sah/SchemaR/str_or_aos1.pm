@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::str_or_aos1;
 
-our $DATE = '2023-09-03'; # DATE
-our $VERSION = '0.015'; # VERSION
+our $DATE = '2023-10-23'; # DATE
+our $VERSION = '0.016'; # VERSION
 
 our $rschema = do{my$var={base=>"any",clsets_after_base=>[{examples=>[{valid=>1,value=>""},{valid=>1,value=>"a"},{summary=>"Not string or array",valid=>0,value=>{}},{summary=>"Empty array",valid=>0,value=>[]},{valid=>1,value=>["a"]},{summary=>"Has undef element",valid=>0,value=>["a",undef]},{summary=>"Has non-string element",valid=>0,value=>["a",[]]}],of=>[["str",{}],["aos",{min_len=>1}]],summary=>"String or array (1+ length) of (defined) string"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["any"],type=>"any",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::str_or_aos1 - String or array (1+ length) of (defined) string
 
 =head1 VERSION
 
-This document describes version 0.015 of Sah::SchemaR::str_or_aos1 (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
+This document describes version 0.016 of Sah::SchemaR::str_or_aos1 (from Perl distribution Sah-Schemas-Str), released on 2023-10-23.
 
 =head1 DESCRIPTION
 

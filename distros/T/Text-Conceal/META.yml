@@ -26,7 +26,7 @@ no_index:
 provides:
   Text::Conceal:
     file: lib/Text/Conceal.pm
-    version: '1.02'
+    version: '1.03'
 requires:
   Text::ANSI::Fold: '2.1301'
   perl: v5.14.0
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/tecolicom/Text-Conceal/issues
   homepage: https://github.com/tecolicom/Text-Conceal
   repository: https://github.com/tecolicom/Text-Conceal.git
-version: '1.02'
+version: '1.03'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

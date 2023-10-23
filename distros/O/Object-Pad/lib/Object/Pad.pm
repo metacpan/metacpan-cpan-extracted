@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.804;
+package Object::Pad 0.805;
 
 use v5.14;
 use warnings;
@@ -111,7 +111,7 @@ module to only silence the module's warnings selectively:
 
    use Object::Pad ':experimental(custom_field_attr)';
 
-   use Object::Pad ':experimental(adjust_params)';
+   use Object::Pad ':experimental(composed_adjust)';
 
    use Object::Pad ':experimental';  # all of the above
 
@@ -120,7 +120,7 @@ I<Since version 0.64.>
 Multiple experimental features can be enabled at once by giving multiple names
 in the parens, separated by spaces:
 
-   use Object::Pad ':experimental(mop adjust_params)';
+   use Object::Pad ':experimental(mop custom_field_attr)';
 
 =head2 Automatic Construction
 
@@ -882,6 +882,13 @@ is emitted if out-of-block control flow is attempted.
    Using return to leave an ADJUST block is discouraged and will be removed
    in a later version at FILE line LINE.
 
+I<Since version 0.805> an experimental feature can be enabled that puts all
+the C<ADJUST> blocks into a single CV, rather than creating one CV for every
+block. This is currently being tested for stability, and may become the
+default behaviour in a future version. For now it must be requested specially:
+
+   use Object::Pad ':experimental(composed_adjust)';
+
 =head2 ADJUST :params
 
    ADJUST :params ( :$var1, :$var2, ... ) {
@@ -897,11 +904,6 @@ I<Since version 0.70.>
 An C<ADJUST> block can marked with a C<:params> attribute, meaning that it
 consumes additional constructor parameters by assigning them into lexical
 variables.
-
-This feature should be considered B<experimental>, and will emit warnings to
-that effect. They can be silenced with
-
-   use Object::Pad ':experimental(adjust_params)';
 
 Before the block itself, a list of lexical variables are introduced, inside
 parentheses. The name of each one is preceeded by a colon, and consumes a
@@ -1332,7 +1334,7 @@ sub import_into
    my $class = shift;
    my $caller = shift;
 
-   $class->_import_experimental( \@_, qw( init_expr mop custom_field_attr adjust_params ) );
+   $class->_import_experimental( \@_, qw( init_expr mop custom_field_attr adjust_params composed_adjust ) );
 
    $class->_import_configuration( \@_ );
 

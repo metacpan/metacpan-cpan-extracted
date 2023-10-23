@@ -27,7 +27,7 @@ requires:
 resources:
   bugtracker: https://github.com/bbrtj/perl-bitcoin-crypto/issues
   repository: git://github.com/bbrtj/perl-bitcoin-crypto.git
-version: '2.001'
+version: '2.002'
 x_generated_by_perl: v5.38.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

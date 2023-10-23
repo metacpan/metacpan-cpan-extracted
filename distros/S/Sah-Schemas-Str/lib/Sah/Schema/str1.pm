@@ -3,9 +3,9 @@ package Sah::Schema::str1;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2023-10-23'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 our $schema = [str => {
     summary => 'A non-empty string (length >= 1)',
@@ -34,7 +34,7 @@ Sah::Schema::str1 - A non-empty string (length >= 1)
 
 =head1 VERSION
 
-This document describes version 0.015 of Sah::Schema::str1 (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
+This document describes version 0.016 of Sah::Schema::str1 (from Perl distribution Sah-Schemas-Str), released on 2023-10-23.
 
 =head1 SYNOPSIS
 

@@ -14,17 +14,6 @@ my $LINE;
 
 class C1 {
    BEGIN { $LINE = __LINE__+1 }
-   ADJUST :params (:$x) { }
-}
-
-BEGIN {
-   like( $warnings, qr/^ADJUST :params is experimental .* at \S+ line $LINE\./,
-      'ADJUST :params raises warning' );
-   $warnings = "";
-}
-
-class C2 {
-   BEGIN { $LINE = __LINE__+1 }
    field $x { "init-block" }
 }
 

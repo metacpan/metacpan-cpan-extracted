@@ -1,6 +1,5 @@
-package HTTP::Request::CurlParameters;
-use strict;
-use warnings;
+package HTTP::Request::CurlParameters 0.54;
+use 5.020;
 use HTTP::Request;
 use HTTP::Request::Common;
 use URI;
@@ -10,11 +9,8 @@ use PerlX::Maybe;
 use Carp 'croak';
 
 use Moo 2;
-use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
-
-our $VERSION = '0.52';
 
 =head1 NAME
 
@@ -645,6 +641,7 @@ sub as_lwp_snippet( $self, %options ) {
 
     if( $self->method ne 'GET' and @{ $self->form_args }) {
         push @preamble, 'use HTTP::Request::Common;';
+        push @{$options{ implicit_headers }}, 'Content-Type';
         $request_constructor = <<SNIPPET;
     my \$r = HTTP::Request::Common::@{[$self->method]}(
         '@{[$self->uri]}',
@@ -950,9 +947,20 @@ sub as_curl($self,%options) {
         };
     };
 
-    if( my $body = $self->body ) {
+    if( @{$self->form_args} ) {
+        my $form_args = $self->form_args;
+        for (0..(@{$form_args}/2-1)) {
+            my( $name, $val) = ($form_args->[$_*2], $form_args->[$_*2+1]);
+            push @request_commands,
+                '--form-string',
+                "$name=$val";
+        }
+
+    } elsif( defined( my $body = $self->body )) {
+        # Can we collapse stuff into --json or other nicer representations
+        # here ?!
         push @request_commands,
-            $options{ long_options } ? '--data-raw' : '--data-raw',
+            '--data-raw',
             $body;
     };
 

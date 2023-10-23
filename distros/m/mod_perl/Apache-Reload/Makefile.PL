@@ -2,6 +2,7 @@ use strict;
 
 use lib qw(lib);
 use Config;
+use Symbol qw(gensym);
 
 my %prereqs = ();
 my %mp2 = ( mod_perl2 => 1.99022 );
@@ -13,7 +14,7 @@ my $mp_gen;
 # also set MP_APXS
 if ($ENV{MOD_PERL_2_BUILD}) {
     push @ARGV, "-apxs", $ENV{MP_APXS};
-    my $mp_gen = satisfy_mp_generation(2);
+    $mp_gen = satisfy_mp_generation(2);
 }
 else {
     $mp_gen = satisfy_mp_generation();
@@ -24,7 +25,7 @@ else {
 my $HAS_APACHE_TEST = check_for_apache_test();
 
 my $VERSION;
-set_version();
+set_apache_reload_version();
 
 my %common_opts = (
                    VERSION         => $VERSION,
@@ -84,7 +85,7 @@ sub check_for_apache_test {
     return 1;
 }
 
-sub set_version {
+sub set_apache_reload_version {
     require Apache::Reload;
     $VERSION = $Apache::Reload::VERSION;
 
@@ -121,13 +122,14 @@ sub satisfy_mp_generation {
 
     unless ($wanted == 1 || $wanted == 2) {
         die "don't know anything about mod_perl generation: $wanted\n" .
-            "currently supporting only generations 1 and 2";
+            "currently supporting only generations 1 and 2.\n" .
+            "Please specify MOD_PERL=1 or MOD_PERL=2 on the commandline\n";
     }
 
     my $selected = 0;
 
     if ($wanted == 1) {
-        require_mod_perl();
+        require_mod_perl(1);
         if ($mod_perl::VERSION >= 1.99) {
             # so we don't pick 2.0 version if 1.0 is wanted
             die "You don't seem to have mod_perl 1.0 installed";
@@ -136,7 +138,7 @@ sub satisfy_mp_generation {
     }
     elsif ($wanted == 2) {
         #warn "Looking for mod_perl 2.0";
-        require_mod_perl();
+        require_mod_perl(2);
         if ($mod_perl::VERSION < 2.0) {
             die "You don't seem to have mod_perl 2.0 installed";
         }
@@ -152,8 +154,25 @@ sub satisfy_mp_generation {
 }
 
 sub require_mod_perl {
-    eval { require mod_perl };
-    eval { require mod_perl2 }  if ($@);
+    my($rversion) = @_;
+    if (!$rversion || $rversion==1){
+        eval { require mod_perl };
+        if ($rversion == 1){
+            if ($@){
+		warn "Note: Did not find mod_perl installed\n";
+	    }
+            return; # do not die, let PREREQ_PM handle it
+        }
+    }
+    if ($@ || !$rversion || $rversion==2){
+        eval { require mod_perl2 };
+        if ($rversion == 2){
+            if ($@){
+		warn "Note: Did not find mod_perl2 installed\n";
+	    }
+            return; # do not die, let PREREQ_PM handle it
+        }
+    }
     die "Can't find mod_perl installed\nThe error was: $@" if $@;
 }
 
@@ -210,7 +229,7 @@ EOF
                 unshift @INC, $atlib if -d $atlib;
             } 
 
-            eval { require mod_perl2 } if ($@);
+            eval { require mod_perl2 };
             unless ($@) {
                 $wanted = 2;
             }
@@ -228,12 +247,13 @@ package MY;
 sub postamble {
     my $self = shift;
 
+    my $q = ($^O =~ /MSWin32/i ? '"' : "'");
+
     my $string = $self->SUPER::postamble;
 
-    $string .= <<'EOF';
+    $string .= <<"EOF";
 tag :
-	svn copy https://svn.apache.org/repos/asf/perl/Apache-Reload/trunk https://svn.apache.org/repos/asf/perl/Apache-Reload/tags/$(VERSION_SYM)
-	@echo update lib/Apache/Reload.pm VERSION now
+	svn copy -m $q\$(VERSION_SYM) tag$q https://svn.apache.org/repos/asf/perl/Apache-Reload/trunk https://svn.apache.org/repos/asf/perl/Apache-Reload/tags/\$(VERSION_SYM)
 EOF
 
     return $string;

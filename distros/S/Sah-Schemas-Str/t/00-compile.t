@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 35 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 39 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Filter/perl/Str/maybe_convert_to_re.pm',
@@ -19,6 +19,7 @@ my @module_files = (
     'Sah/Schema/latin_lowercase_letter.pm',
     'Sah/Schema/latin_uppercase_alpha.pm',
     'Sah/Schema/latin_uppercase_letter.pm',
+    'Sah/Schema/lowercase_str.pm',
     'Sah/Schema/non_empty_str.pm',
     'Sah/Schema/percent_str.pm',
     'Sah/Schema/str1.pm',
@@ -27,6 +28,7 @@ my @module_files = (
     'Sah/Schema/str_or_code.pm',
     'Sah/Schema/str_or_re.pm',
     'Sah/Schema/str_or_re_or_code.pm',
+    'Sah/Schema/uppercase_str.pm',
     'Sah/SchemaR/hexstr.pm',
     'Sah/SchemaR/latin_alpha.pm',
     'Sah/SchemaR/latin_alphanum.pm',
@@ -35,6 +37,7 @@ my @module_files = (
     'Sah/SchemaR/latin_lowercase_letter.pm',
     'Sah/SchemaR/latin_uppercase_alpha.pm',
     'Sah/SchemaR/latin_uppercase_letter.pm',
+    'Sah/SchemaR/lowercase_str.pm',
     'Sah/SchemaR/non_empty_str.pm',
     'Sah/SchemaR/percent_str.pm',
     'Sah/SchemaR/str1.pm',
@@ -43,6 +46,7 @@ my @module_files = (
     'Sah/SchemaR/str_or_code.pm',
     'Sah/SchemaR/str_or_re.pm',
     'Sah/SchemaR/str_or_re_or_code.pm',
+    'Sah/SchemaR/uppercase_str.pm',
     'Sah/Schemas/Str.pm'
 );
 

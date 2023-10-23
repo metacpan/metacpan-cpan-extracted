@@ -29,7 +29,6 @@ Apache2::ServerUtil - Perl API for Apache server record utils
   # server build and version info:
   $when_built = Apache2::ServerUtil::get_server_built(); 
   $description = Apache2::ServerUtil::get_server_description(); 
-  $version = Apache2::ServerUtil::get_server_version();
   $banner = Apache2::ServerUtil::get_server_banner(); 
   
   # ServerRoot value
@@ -364,6 +363,8 @@ The server build time string
 Get the server version string
 
   $version = Apache2::ServerUtil::get_server_version();
+
+This function is deprecated. Use C<get_server_banner()> instead.
 
 =over 4
 

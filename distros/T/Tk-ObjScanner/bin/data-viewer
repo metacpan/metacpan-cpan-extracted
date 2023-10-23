@@ -1,0 +1,124 @@
+#!/usr/bin/env perl
+#
+# This file is part of Tk-ObjScanner
+#
+# This software is copyright (c) 1997-2004,2007,2014,2017,2023 by Dominique Dumont.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
+use 5.016;
+use strict;
+use warnings;
+use Tk;
+use Tk::ObjScanner;
+use YAML::PP;
+use JSON;
+use Path::Tiny;
+use warnings  qw(FATAL utf8);    # fatalize encoding glitches
+use open      qw(:std :utf8);    # undeclared streams in UTF-8
+
+use Getopt::Long;
+
+my $opt = {};
+
+GetOptions($opt, 'yaml!', 'json!')
+    or die("Error in command line arguments\n");
+
+my $file = shift @ARGV // '';
+my $format = $opt->{yaml} ? 'yaml'
+    : $opt->{json} ? 'json'
+    : $file =~ /\.ya?ml$/i ? 'yaml'
+    : $file =~ /\.json/i ? 'json'
+    : die "Unknown format for ", $file ? "file $file" : "standard input. Please use -yaml or -json option";
+
+my $string = $file ? path($file)->slurp_utf8($file) : join('', <> );
+my $ypp = YAML::PP->new;
+
+my $data = $format eq 'yaml' ? $ypp->load_string( $string )
+    : decode_json ($string) ;
+
+my $mw = MainWindow->new;
+# $mw->geometry('+10+10');
+my $s = $mw->ObjScanner(
+    '-caller'    => $data,
+    -destroyable => 1,
+    -destroy_label => "quit",
+    -show_tied => 0,
+    -title       => 'data viewer'
+);
+
+$s->pack( -expand => 1, -fill => 'both' );
+$s->OnDestroy( sub { $mw->destroy; } );
+
+MainLoop;    # Tk's
+
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+data_viewer - Open a data viewer widget for you JSON or YAML data
+
+=head1 SYNOPSIS
+
+  # view json file
+  data_viewer file.json
+
+  # viewn yaml file
+  data_viewer file.yml
+
+  # pipe json data
+  data_viewer -json < file.json
+
+  # pipe yaml data
+  data_viewer -yaml < file.yml
+
+=head1 DESCRIPTION
+
+This command opens a L<Tk::ObjScanner> widget for the data stored in
+YAML or JSON file.
+
+This command can be applied on a file passed as argument or data can
+be piped to C<data_viewer>. Yaml file suffix can be C<yaml> or C<yml>.
+
+=head1 OPTIONS
+
+=head2 -json
+
+Parse the data as JSON.
+
+=head2 -yaml
+
+Parse the data as YAML.
+
+=head1 BUGS
+
+=over
+
+=item *
+
+YAML anchor and aliases are ignored. Data is seen as duplicated in the widget.
+
+=item *
+
+JSON object are showed as C<HASH>, which is Perl terminology.
+
+=back
+
+=head1 SEE ALSO
+
+L<Tk::ObjScanner>
+
+=cut
+
+=cut
+
+
+
+

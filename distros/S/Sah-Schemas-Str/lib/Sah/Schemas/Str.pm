@@ -1,11 +1,12 @@
 package Sah::Schemas::Str;
 
+use 5.014;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2023-10-23'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 1;
 # ABSTRACT: Various string schemas
@@ -22,7 +23,7 @@ Sah::Schemas::Str - Various string schemas
 
 =head1 VERSION
 
-This document describes version 0.015 of Sah::Schemas::Str (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
+This document describes version 0.016 of Sah::Schemas::Str (from Perl distribution Sah-Schemas-Str), released on 2023-10-23.
 
 =head1 SAH SCHEMAS
 
@@ -71,6 +72,13 @@ Uppercase letters will be coerced to lowercase.
 
 A single latin uppercase letter, i.e. A-Z.
 
+=item * L<lowercase_str|Sah::Schema::lowercase_str>
+
+String containing only zero or more lowercase letters.
+
+Uppercase letters will be coerced to lowercase.
+
+
 =item * L<non_empty_str|Sah::Schema::non_empty_str>
 
 A non-empty string (length E<gt>= 1) (alias for str1).
@@ -106,6 +114,9 @@ If string matches the regex C<qr/\Asub\s*\{.*\}\z/s>, then it will be eval'ed
 into a coderef. If the code fails to compile, the value will be rejected. Note
 that this means you accept arbitrary code from the user to execute! Please make
 sure first and foremost that this is acceptable in your case.
+
+Currently string is eval'ed in the C<main> package, without C<use strict> or C<use
+warnings>.
 
 This schema is handy if you want to accept string or coderef from the
 command-line.
@@ -147,6 +158,13 @@ is eval'ed in the C<main> package, without C<use strict> or C<use warnings>.
 
 This schema is handy if you want to accept string or regex or coderef from the
 command-line.
+
+
+=item * L<uppercase_str|Sah::Schema::uppercase_str>
+
+String containing only zero or more uppercase letters.
+
+Uppercase letters will be coerced to lowercase.
 
 
 =back

@@ -2,8 +2,8 @@ NAME
     Sort::Sub::by_spec - Sort by spec
 
 VERSION
-    This document describes version 0.002 of Sort::Sub::by_spec (from Perl
-    distribution Sort-Sub-by_spec), released on 2023-09-06.
+    This document describes version 0.003 of Sort::Sub::by_spec (from Perl
+    distribution Sort-Sub-by_spec), released on 2023-10-23.
 
 SYNOPSIS
     Generate sorter (accessed as variable) via Sort::Sub import:

@@ -503,6 +503,7 @@ BEGIN {
                }
                if ((-1<index $shell, 'bash') ||
                      (-1<index $shell, 'ksh')) {
+#print "ARE WE HERE and CMD=$cmd??????????\n";
                   ($stdout,$stderr)=Rem_Command::cmd(
                      { _cmd_handle=>$handle,
                        _hostlabel=>[ $hostlabel,'' ] },
@@ -580,6 +581,10 @@ BEGIN {
                   if ($stdout=~/^SHELL=(.*)$/m) {
                      my $shell=$1;chomp $shell;
                      $handle->{_shell}=$shell;
+                  }
+                  if ($^O eq 'cygwin') {
+                     my $cfh_ignore='';my $cfh_error='';
+                     ($cfh_ignore,$cfh_error)=&clean_filehandle($handle);
                   }
                }
                $handle->{_shell}||='';
@@ -2427,7 +2432,7 @@ print "localhost cleanup() LINE=$line<==\n"
       if $Net::FullAuto::FA_Core::log &&
       !($Net::FullAuto::FA_Core::quiet ||
       $Net::FullAuto::FA_Core::cron);
-   my $c=($^O ne 'MSWin32' && $^O ne 'MSWin64' && !exists
+   my $c=($^O ne 'MSWin32' && $^O ne 'MSWin64' && $^O ne 'cygwin' && !exists
           $ENV{PAR_TEMP})?'©':'(C)';
    print "FullAuto$c COMPLETED SUCCESSFULLY on ".localtime()."\n"
       if (!$Net::FullAuto::FA_Core::cron
@@ -6699,7 +6704,7 @@ sub connect_host
       (join ' ',@topcaller),"\n\n"
       if $Net::FullAuto::FA_Core::log &&
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
-   my $c=($^O ne 'MSWin32' && $^O ne 'MSWin64' && !exists
+   my $c=($^O ne 'MSWin32' && $^O ne 'MSWin64' && $^O ne 'cygwin' && !exists
           $ENV{PAR_TEMP})?'©':'(C)';
 #my $envv=`env`;
 #print "ENVV FOR WINDOWS INSTALLER=$envv<== ENVV FOR WINDOWS INSTALLER\n";sleep 2;
@@ -7024,7 +7029,7 @@ sub memnow
 
 sub handle_error
 {
-#print "handleerror caller=",caller,"\n";
+print "handleerror caller=",caller,"\n";
 #my $logreset=1;
 #if ($Net::FullAuto::FA_Core::log) { $logreset=0 }
 #else { $Net::FullAuto::FA_Core::log=1 }
@@ -26975,23 +26980,46 @@ print $Net::FullAuto::FA_Core::LOG
                         $cmd_handle->print();
                      }
                      $cmd_handle->print("echo $$");
-                     while (my $line=$cmd_handle->get(Timeout=>$timeout)) {
-                        last if $shell_pid=~s/\s*_funkyPrompt_\s*$//s;
-                        $shell_pid=$line;
-                        select(undef,undef,undef,0.02); # sleep for 1/50th
-                                                        # second;
-                        $cmd_handle->print();
+                     if ($^O eq 'cygwin') {
+                        while (my $line=$cmd_handle->get(Timeout=>300)) {
+                           if ($shell_pid=~/_funkyPrompt_/s) {
+                              $shell_pid=~s/[^0-9]//sg;
+                              $shell_pid=~s/2004$//s;
+                              $shell_pid=~s/^.*2004//s;
+                              if ($shell_pid!~/\d/) {
+                                 $cmd_handle->print("echo $$");
+                                 next;
+                              }
+                              last;
+                           }
+                           $shell_pid=$line;
+                           select(undef,undef,undef,0.02); # sleep for 1/50th
+                                                           # second;
+                           $cmd_handle->print();
+                        }
+                     } else {
+                        while (my $line=$cmd_handle->get(Timeout=>$timeout)) {
+                           last if $shell_pid=~s/\s*_funkyPrompt_\s*$//s;
+                           $shell_pid=$line;
+                           select(undef,undef,undef,0.02); # sleep for 1/50th
+                                                           # second;
+                           $cmd_handle->print();
+                        }
+                        $shell_pid=~s/^.*\n(\d+)\s*$/$1/s;
                      }
-                     $shell_pid=~s/^.*\n(\d+)\s*$/$1/s;
                      $work_dirs=&Net::FullAuto::FA_Core::work_dirs(
                         $transfer_dir,$hostlabel,{ _cmd_handle=>$cmd_handle,
                         _uname=>$uname },$cmd_type,$cygdrive,$_connect);
                      if ($^O eq 'cygwin') {
                         &Net::FullAuto::FA_Core::acquire_fa_lock(8712);
+                        my $path=$Net::FullAuto::FA_Core::gbp->('mount');
+                        ($stdout,$stderr)=
+                          &Net::FullAuto::FA_Core::clean_filehandle(
+                          $cmd_handle);
                         ($cygdrive,$stderr)=Rem_Command::cmd(
                            { _cmd_handle=>$cmd_handle,
                              _hostlabel=>[ $hostlabel,'' ] },
-                           $Net::FullAuto::FA_Core::gbp->('mount')."mount -p");
+                           $path."mount -p");
                         &Net::FullAuto::FA_Core::release_fa_lock(8712);
                         $cygdrive=~s/^.*(\/\S+).*$/$1/s;
                      }

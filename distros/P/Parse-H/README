@@ -1,7 +1,7 @@
 Language Interfaces - Parse::H
 
 This module provides subroutines for parsing C language header files
- (*.h files) while calling user-provided callback subroutines on various
+ (*.h files) by calling user-provided callback subroutines on various
  found elements.
 
 This module requires:
@@ -39,19 +39,13 @@ You can also look for information at:
 
     Search CPAN
         https://metacpan.org/release/Parse-H
-        http://search.cpan.org/dist/Parse-H
 
     CPAN Request Tracker:
         https://rt.cpan.org/Public/Dist/Display.html?Name=Parse-H
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Parse-H
-
-    CPAN Ratings:
-        https://cpanratings.perl.org/dist/Parse-H
-        http://cpanratings.perl.org/d/Parse-H
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2022 Bogdan Drozdowski <bogdro /AT/ cpan . org>
+Copyright (C) 2022-2023 Bogdan Drozdowski <bogdro /AT/ cpan . org>
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -1,0 +1,48 @@
+---
+abstract: 'Extractor for identifiers from URIs'
+author:
+  - 'Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>'
+build_requires:
+  Test::Exception: '0.30'
+  Test::More: '1.3'
+  Test::Warn: '0.30'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-URIID
+no_index:
+  directory:
+    - t
+provides:
+  Data::URIID:
+    file: lib/Data/URIID.pm
+    version: v0.2.0
+  Data::URIID::Result:
+    file: lib/Data/URIID/Result.pm
+    version: v0.2.0
+  Data::URIID::Service:
+    file: lib/Data/URIID/Service.pm
+    version: v0.2.0
+requires:
+  Carp: '1.35'
+  Encode: '3.19'
+  I18N::LangTags: '0.45'
+  I18N::LangTags::Detect: '1.08'
+  JSON: '4.10'
+  LWP::UserAgent: '6.68'
+  Math::BigInt: '1.999816'
+  URI: '1.5'
+  URI::Escape: '3.31'
+  UUID::Tiny: '1.04'
+  perl: v5.10.0
+resources:
+  repository: git://gitea.dev.loewenfelsen.net/11201-Loewenfelsen/Data-URIID.git
+version: v0.02
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

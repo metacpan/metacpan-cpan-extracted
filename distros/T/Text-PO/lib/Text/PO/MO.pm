@@ -507,23 +507,23 @@ It accepts the following options:
 
 =over 4
 
-=item I<auto_decode>
+=item * C<auto_decode>
 
 Takes a boolean value and enables or disables auto decoding of data.
 
-=item I<default_encoding>
+=item * C<default_encoding>
 
 Sets the default encoding. This is used when I<auto_decode> is enabled.
 
-=item I<encoding>
+=item * C<encoding>
 
 Sets the value of the encoding to use when I<auto_decode> is enabled.
 
-=item I<file>
+=item * C<file>
 
 Sets or gets the C<.mo> file to read.
 
-=item I<use_cache>
+=item * C<use_cache>
 
 Takes a boolean value. If true, this will cache the data read by L</read>
 
@@ -575,15 +575,15 @@ It takes the following optional parameters:
 
 =over 4
 
-=item I<auto_decode>
+=item * C<auto_decode>
 
 Boolean value. If true, the data will be automatically decoded using either the character encoding specified with L</encoding> or the one found in the C<Content-type> field in the file meta information.
 
-=item I<default_encoding>
+=item * C<default_encoding>
 
 The default encoding to use if no encoding was set using L</encoding> and none could be found in the C<.mo> file meta information.
 
-=item I<no_cache>
+=item * C<no_cache>
 
 Boolean value. If true, this will ignore any cached data and re-read the C<.mo> file.
 
@@ -619,7 +619,7 @@ It takes an hash reference of parameters:
 
 =over 4
 
-=item I<file>
+=item * C<file>
 
 The output file to write the data to.
 

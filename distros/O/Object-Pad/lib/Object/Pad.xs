@@ -27,7 +27,6 @@
 #include "force_list_keeping_pushmark.c.inc"
 #include "optree-additions.c.inc"
 #include "newOP_CUSTOM.c.inc"
-#include "OP_HELEMEXISTSOR.c.inc"
 
 #if HAVE_PERL_VERSION(5, 26, 0)
 #  define HAVE_PARSE_SUBSIGNATURE
@@ -42,15 +41,6 @@
 #include "field.h"
 
 #define warn_deprecated(...)  Perl_ck_warner(aTHX_ packWARN(WARN_DEPRECATED), __VA_ARGS__)
-
-#if HAVE_PERL_VERSION(5, 22, 0)
-#  define COP_SEQ_RANGE_LOW_set(sv,val)  \
-      STMT_START { (sv)->xpadn_low = (val); } STMT_END
-#else
-  /* Before Perl 5.22, padnames were just normal SVs with some weird fields in them */
-#  define COP_SEQ_RANGE_LOW_set(sv,val)  \
-      STMT_START { ((XPVNV*)SvANY(sv))->xnv_u.xpad_cop_seq.xlow = (val); } STMT_END
-#endif
 
 typedef void MethodAttributeHandler(pTHX_ MethodMeta *meta, const char *value, void *data);
 
@@ -669,35 +659,6 @@ enum {
   FIELD_INIT_OREXPR,
 };
 
-#define OP_TYPE_OR_EX(o)  ((o)->op_type == OP_NULL ? (o)->op_targ : (o)->op_type)
-
-static bool optree_is_const(OP *o)
-{
-  OP *kid;
-
-  switch(OP_TYPE_OR_EX(o)) {
-    case OP_CONST:
-    case OP_UNDEF:
-    case OP_STUB:
-      return TRUE;
-
-    case OP_SCOPE:
-      return optree_is_const(cUNOPo->op_first);
-
-    case OP_LIST:
-      kid = cLISTOPo->op_first;
-      if(OP_TYPE_OR_EX(kid) == OP_PUSHMARK)
-        kid = OpSIBLING(kid);
-      for( ; kid; kid = OpSIBLING(kid)) {
-        if(!optree_is_const(kid))
-          return FALSE;
-      }
-      return TRUE;
-  }
-
-  return FALSE;
-}
-
 static void check_field(pTHX_ void *hookdata)
 {
   char *kwname = hookdata;
@@ -1050,10 +1011,6 @@ static bool parse_phaser_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV
     if(type != PHASER_ADJUST)
       croak("Cannot set :params for a phaser block other than ADJUST");
 
-    if(!hints || !hv_fetchs(hints, "Object::Pad/experimental(adjust_params)", 0))
-      Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
-        "ADJUST :params is experimental and may be changed or removed without notice");
-
     hv_stores(ctx->moddata, "Object::Pad/ADJUST:params", newRV_noinc((SV *)newAV()));
     return true;
   }
@@ -1080,147 +1037,10 @@ static void parse_method_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx
   if(type == PHASER_ADJUST && (svp = hv_fetchs(ctx->moddata, "Object::Pad/ADJUST:params", 0))) {
     AV *params = AV_FROM_REF(*svp);
 
-    if(!compclassmeta->parammap)
-      compclassmeta->parammap = newHV();
+    prepare_adjust_params(compclassmeta);
 
-    HV *parammap = compclassmeta->parammap;
-
-    /* This is a custom parser because XPK won't handle this */
-    if(lex_peek_unichar(0) != '(')
-      croak("Expected ADJUST :params signature in parens");
-    lex_read_unichar(0);
-
-    /* Skip the PADIX_EMBEDDING slot */
-    pad_add_name_pvs("", 0, NULL, NULL);
-
-    {
-      PADOFFSET params_padix = pad_add_name_pvs("%(params)", 0, NULL, NULL);
-      assert(params_padix == PADIX_PARAMS);
-      PERL_UNUSED_VAR(params_padix);
-    }
-
-    intro_my();
-
-    bool seen_slurpy = false;
-
-    while(1) {
-      lex_read_space(0);
-
-      /* Should now follow a sequence of comma-separated elements; each element is
-       *   :$NAME    or
-       *   :$NAME = EXPR
-       *   :$NAME //= EXPR
-       *   :$NAME ||= EXPR
-       * The final one may also be
-       *   %NAME
-       */
-      char c = lex_peek_unichar(0);
-      if(c == ')')
-        break;
-      else if(c == ':') {
-        if(seen_slurpy)
-          croak("Cannot have more parameters after the final slurpy one");
-
-        lex_read_unichar(0);
-        lex_read_space(0);
-
-        SV *varname = lex_scan_lexvar();
-        lex_read_space(0);
-
-        if(SvPVX(varname)[0] != '$')
-          croak("Expected a named scalar parameter");
-
-        SV *paramname = newSVpvn(SvPVX(varname)+1, SvCUR(varname)-1);
-
-        check_colliding_param(compclassmeta, paramname);
-
-        PADOFFSET padix = pad_add_name_sv(varname, 0, NULL, NULL);
-
-        ParamMeta *parammeta;
-        Newx(parammeta, 1, struct ParamMeta);
-
-        *parammeta = (struct ParamMeta){
-          .name  = paramname,
-          .class = compclassmeta,
-          .type  = PARAM_ADJUST,
-          .adjust.padix = padix,
-        };
-
-        av_push(params, newSVuv(PTR2UV((SV *)parammeta)));
-        hv_store_ent(parammap, paramname, (SV *)parammeta, 0);
-
-        if(lex_consume("=")) {
-          lex_read_space(0);
-          parammeta->adjust.defexpr = parse_termexpr(0);
-        }
-        else if(lex_consume("//=")) {
-          lex_read_space(0);
-          parammeta->adjust.defexpr = parse_termexpr(0);
-          parammeta->adjust.def_if_undef = 1;
-        }
-        else if(lex_consume("||=")) {
-          lex_read_space(0);
-          parammeta->adjust.defexpr = parse_termexpr(0);
-          parammeta->adjust.def_if_false = 1;
-        }
-
-        intro_my();
-      }
-      else if(c == '%') {
-        if(seen_slurpy)
-          croak("Cannot have more parameters after the final slurpy one");
-
-        SV *varname = lex_scan_lexvar();
-
-        /* Lets now be evil and simply rename %(params) to this. Due to the way
-         * that the PADNAME structure itself contains the string, we can't
-         * just change the name *inside* it. Instead we'll have to allocate a
-         * new one and swap it in.
-         */
-        PADNAME **pnp = &PadnamelistARRAY(PL_comppad_name)[PADIX_PARAMS];
-
-        PADNAME *new_pn = newPADNAMEpvn(SvPVX(varname), SvCUR(varname));
-        COP_SEQ_RANGE_LOW_set(new_pn, COP_SEQ_RANGE_LOW(*pnp));
-
-        PadnameREFCNT_dec(*pnp);
-        *pnp = new_pn;
-
-        /* Don't need to intro_my() because the padname has already been
-         * introduced
-         */
-
-        seen_slurpy = true;
-      }
-      else
-        croak("Expected a named scalar parameter or slurpy hash");
-
-      lex_read_space(0);
-      c = lex_peek_unichar(0);
-
-      if(c == ')')
-        break;
-      if(c != ',')
-        croak("Expected , or end of signature parens");
-
-      lex_read_unichar(0);
-    }
-
-    /* consume the ')' */
-    lex_read_unichar(0);
-
-    lex_read_space(0);
+    parse_adjust_params(compclassmeta, params);
   }
-}
-
-static OP *pp_bind_params_hv(pTHX)
-{
-  HV *params = HV_FROM_REF(*av_fetch(GvAV(PL_defgv), 0, 0));
-
-  SAVESPTR(PAD_SVl(PADIX_PARAMS));
-  PAD_SVl(PADIX_PARAMS) = SvREFCNT_inc(params);
-  save_freesv((SV *)params);
-
-  return NORMAL;
 }
 
 #define walk_optree_warn_for_defargs(o)  S_walk_optree_warn_for_defargs(aTHX_ o)
@@ -1315,51 +1135,7 @@ redo:
   if(type == PHASER_ADJUST && (svp = hv_fetchs(ctx->moddata, "Object::Pad/ADJUST:params", 0))) {
     AV *params = AV_FROM_REF(*svp);
 
-    OP *paramsops = NULL;
-
-    paramsops = op_append_elem(OP_LINESEQ, paramsops,
-      newOP_CUSTOM(&pp_bind_params_hv, 0));
-
-    for(U32 i = 0; i < av_count(params); i++) {
-      ParamMeta *parammeta = NUM2PTR(ParamMeta *, SvUV(AvARRAY(params)[i]));
-
-      SV *paramname = parammeta->name;
-      OP *defexpr   = parammeta->adjust.defexpr;
-
-      if(!defexpr)
-        defexpr = newop_croak_from_constructor(
-          newSVpvf("Required parameter '%" SVf "' is missing for %" SVf " constructor",
-            SVfARG(paramname), SVfARG(compclassmeta->name)));
-
-      OP *helemop =
-        newBINOP(OP_HELEM, 0,
-          newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
-          newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)));
-
-      OP *rhs;
-      if(parammeta->adjust.def_if_undef) {
-        /* delete $(params){KEY} // DEFEXPR */
-        rhs = newLOGOP(OP_DOR, 0, newUNOP(OP_DELETE, 0, helemop), defexpr);
-      }
-      else if(parammeta->adjust.def_if_false) {
-        /* delete $(params){KEY} || DEFEXPR */
-        rhs = newLOGOP(OP_OR, 0, newUNOP(OP_DELETE, 0, helemop), defexpr);
-      }
-      else {
-        /* Equivalent of
-         *   exists $(params){KEY} ? delete $(params){KEY} : DEFEXPR; */
-        rhs = newHELEMEXISTSOROP(OPpHELEMEXISTSOR_DELETE << 8, helemop, defexpr);
-      }
-
-      paramsops = op_append_elem(OP_LINESEQ, paramsops,
-        newBINOP(OP_SASSIGN, 0,
-          rhs,
-          newPADxVOP(OP_PADSV, OPf_MOD|OPf_REF, parammeta->adjust.padix)));
-    }
-
-    ctx->body = op_append_list(OP_LINESEQ,
-      paramsops,
-      ctx->body);
+    ctx->body = finish_adjust_params(compclassmeta, params, ctx->body);
   }
 
   ctx->body = finish_method_parse(compclassmeta, compmethodmeta->is_common, ctx->body);
@@ -1467,6 +1243,78 @@ static int parse_phaser(pTHX_ OP **out, void *hookdata)
     croak("Cannot '%s' outside of 'class'", phasertypename[PTR2UV(hookdata)]);
 
   lex_read_space(0);
+
+  if(PTR2UV(hookdata) == PHASER_ADJUST && compclassmeta->composed_adjust) {
+    ClassMeta *classmeta = compclassmeta;
+
+    ENTER;
+
+    resume_compcv_and_save(&classmeta->adjust_compcv);
+
+    bool do_params = false;
+
+    if(lex_consume_unichar(':')) {
+      lex_read_space(0);
+
+      SV *name = sv_newmortal(), *val = sv_newmortal();
+      /* A custom copy of lex_scan_attrs() because we only care about one thing */
+      while(lex_scan_attrval_into(name, val)) {
+        lex_read_space(0);
+
+        if(!strEQ(SvPVX(name), "params"))
+          // Normally core perl makes this complaint; we'll have to make do here
+          SvPOK(val) ? croak("Invalid CODE attribute %" SVf "(%" SVf ")", SVfARG(name), SVfARG(val))
+                     : croak("Invalid CODE attribute %" SVf,              SVfARG(name));
+
+        // ignore the value - even its mere presence
+        do_params = true;
+
+        if(lex_peek_unichar(0) == ':') {
+          lex_read_unichar(0);
+          lex_read_space(0);
+        }
+      }
+    }
+
+    if(classmeta->next_fieldix > classmeta->next_fieldix_for_adjust) {
+      ENTER;
+      SAVESPTR(PL_comppad);
+      SAVESPTR(PL_comppad_name);
+      SAVESPTR(PL_curpad);
+
+      CV *fieldscope = CvOUTSIDE(PL_compcv);
+
+      PL_comppad = PadlistARRAY(CvPADLIST(fieldscope))[1];
+      PL_comppad_name = PadlistNAMES(CvPADLIST(fieldscope));
+      PL_curpad  = AvARRAY(PL_comppad);
+
+      add_fields_to_pad(classmeta, classmeta->next_fieldix_for_adjust);
+
+      intro_my();
+
+      LEAVE;
+
+      classmeta->next_fieldix_for_adjust = classmeta->next_fieldix;
+    }
+
+    CvOUTSIDE_SEQ(PL_compcv) = PL_cop_seqmax;
+
+    if(do_params) {
+      parse_adjust_params(classmeta, classmeta->adjust_params);
+    }
+
+    OP *body = parse_block(0);
+    if(!body || PL_parser->error_count) {
+      croak("syntax error");
+    }
+
+    classmeta->adjust_lines = op_append_list(OP_LINESEQ, classmeta->adjust_lines,
+      body);
+
+    LEAVE;
+
+    return KEYWORD_PLUGIN_STMT;
+  }
 
   return xs_parse_sublike(&parse_phaser_hooks, hookdata, out);
 }
@@ -1622,15 +1470,6 @@ static void dump_parammeta(pTHX_ DMDContext *ctx, ParamMeta *parammeta)
   }
 }
 
-static void dump_adjustblock(pTHX_ DMDContext *ctx, AdjustBlock *adjustblock)
-{
-  DMD_DUMP_STRUCT(ctx, "Object::Pad/AdjustBlock", adjustblock, sizeof(AdjustBlock),
-    2, ((const DMDNamedField []){
-      {"the CV",          DMD_FIELD_PTR,  .ptr = adjustblock->cv},
-    })
-  );
-}
-
 static void dump_roleembedding(pTHX_ DMDContext *ctx, RoleEmbedding *embedding)
 {
   DMD_DUMP_STRUCT(ctx, "Object::Pad/RoleEmbedding", embedding, sizeof(RoleEmbedding),
@@ -1664,8 +1503,8 @@ static void dump_classmeta(pTHX_ DMDContext *ctx, ClassMeta *classmeta)
       {"the param map HV",           DMD_FIELD_PTR,  .ptr = classmeta->parammap},        \
       {"the requiremethods AV",      DMD_FIELD_PTR,  .ptr = classmeta->requiremethods},  \
       {"the initfields CV",          DMD_FIELD_PTR,  .ptr = classmeta->initfields},      \
-      {"the BUILD blocks AV",        DMD_FIELD_PTR,  .ptr = classmeta->buildblocks},     \
-      {"the ADJUST blocks AV",       DMD_FIELD_PTR,  .ptr = classmeta->adjustblocks},    \
+      {"the BUILD blocks AV",        DMD_FIELD_PTR,  .ptr = classmeta->buildcvs},        \
+      {"the ADJUST blocks AV",       DMD_FIELD_PTR,  .ptr = classmeta->adjustcvs},       \
       {"the temporary method scope", DMD_FIELD_PTR,  .ptr = classmeta->methodscope}
 
   switch(classmeta->type) {
@@ -1709,8 +1548,8 @@ static void dump_classmeta(pTHX_ DMDContext *ctx, ClassMeta *classmeta)
     dump_methodmeta(aTHX_ ctx, methodmeta);
   }
 
-  {
-    HV *parammap = classmeta->parammap;
+  HV *parammap;
+  if((parammap = classmeta->parammap)) {
     hv_iterinit(parammap);
 
     HE *iter;
@@ -1719,12 +1558,6 @@ static void dump_classmeta(pTHX_ DMDContext *ctx, ClassMeta *classmeta)
 
       dump_parammeta(aTHX_ ctx, parammeta);
     }
-  }
-
-  for(i = 0; classmeta->adjustblocks && i < av_count(classmeta->adjustblocks); i++) {
-    AdjustBlock *adjustblock = (AdjustBlock *)AvARRAY(classmeta->adjustblocks)[i];
-
-    dump_adjustblock(aTHX_ ctx, adjustblock);
   }
 
   switch(classmeta->type) {

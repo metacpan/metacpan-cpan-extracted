@@ -18,6 +18,7 @@ WriteMakefile(
 		'File::Spec' => 0,
 		'Test::Carp' => 0,
 		'Test::Exception' => 0.42,
+		'Test::File::Contents' => 0,
 		'Test::Most' => 0,
 		'Test::NoWarnings' => 0,
 		'Test::CleanNamespaces' => 0,

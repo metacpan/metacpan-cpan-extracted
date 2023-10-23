@@ -1,0 +1,13 @@
+.editorconfig
+Build.PL
+Changes
+lib/Device/Chip/PMS5003.pm
+MANIFEST			This list of files
+t/00use.t
+t/01readings.t
+t/70sensors.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

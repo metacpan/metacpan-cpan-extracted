@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2023-10-23'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 sub meta {
     +{
@@ -59,7 +59,7 @@ Data::Sah::Filter::perl::Str::maybe_eval - Eval string if in the form of 'sub { 
 
 =head1 VERSION
 
-This document describes version 0.015 of Data::Sah::Filter::perl::Str::maybe_eval (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
+This document describes version 0.016 of Data::Sah::Filter::perl::Str::maybe_eval (from Perl distribution Sah-Schemas-Str), released on 2023-10-23.
 
 =head1 DESCRIPTION
 

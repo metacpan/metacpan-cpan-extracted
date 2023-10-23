@@ -1,3 +1,13 @@
+0.54 2023-10-23
+    * Restore compatibility with 5.020
+
+0.53 2023-10-22
+    * Properly output form arguments when regenerating a curl command line
+    * Fix code generation for form submission with LWP::UserAgent
+    * disable Test2::V0 srand() tomfoolery
+    * clean up our tempfiles
+    * Test Mojolicious if available for fetch() parameter generation
+
 0.52 2023-09-15
     * Switch test suite to Test2::V0
     * Suppress trivial Content-Length headers in ->as_curl

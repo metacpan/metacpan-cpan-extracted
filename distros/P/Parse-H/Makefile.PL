@@ -1,4 +1,13 @@
 #!/usr/bin/perl -w
+# A build file for Parse::H - A parser module for C header files.
+#
+#	Copyright (C) 2022-2023 Bogdan 'bogdro' Drozdowski,
+#	  bogdro (at) users . sourceforge . net
+#	  bogdro /at\ cpan . org
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+#
 
 use strict;
 use warnings;
@@ -46,7 +55,7 @@ WriteMakefile(
 	MIN_PERL_VERSION	=> '5.006',	# just because of 'Exporter'
 	META_ADD		=> { provides => { $mod_name => {
 					file => $mod_file,
-					version => '0.11'
+					version => '0.20'
 					}
 				} },
 

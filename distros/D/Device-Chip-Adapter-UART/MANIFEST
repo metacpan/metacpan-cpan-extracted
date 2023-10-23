@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 lib/Device/Chip/Adapter/UART.pm
@@ -7,4 +8,6 @@ META.json
 META.yml
 README
 t/00use.t
+t/01write.t
+t/02read.t
 t/99pod.t

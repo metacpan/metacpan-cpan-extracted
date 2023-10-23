@@ -3,13 +3,13 @@ package Sah::Schema::str_or_code;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2023-10-23'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 our $schema = [any => {
     summary => 'String or coderef (if string is of the form `sub {...}`)',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Either string or coderef is accepted.
 
@@ -18,10 +18,13 @@ into a coderef. If the code fails to compile, the value will be rejected. Note
 that this means you accept arbitrary code from the user to execute! Please make
 sure first and foremost that this is acceptable in your case.
 
+Currently string is eval'ed in the `main` package, without `use strict` or `use
+warnings`.
+
 This schema is handy if you want to accept string or coderef from the
 command-line.
 
-_
+MARKDOWN
     of => [
         ['str'],
         ['code'],
@@ -58,7 +61,7 @@ Sah::Schema::str_or_code - String or coderef (if string is of the form `sub {...
 
 =head1 VERSION
 
-This document describes version 0.015 of Sah::Schema::str_or_code (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
+This document describes version 0.016 of Sah::Schema::str_or_code (from Perl distribution Sah-Schemas-Str), released on 2023-10-23.
 
 =head1 SYNOPSIS
 
@@ -94,12 +97,12 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "a";
+ $data = "sub{\"foo\"}";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
  $data = "sub {1=2}";
- my $errmsg = $validator->($data); # => "Error in compiling code: Can't modify constant item in scalar assignment at (eval 2766) line 1, at EOF\n"
+ my $errmsg = $validator->($data); # => "Error in compiling code: Can't modify constant item in scalar assignment at (eval 2804) line 1, at EOF\n"
 
 Often a schema has coercion rule or default value rules, so after validation the
 validated value will be different from the original. To return the validated
@@ -109,12 +112,12 @@ validated value will be different from the original. To return the validated
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "a";
- my $res = $validator->($data); # => ["","a"]
+ $data = "sub{\"foo\"}";
+ my $res = $validator->($data); # => ["",sub{BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x51\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55"}use strict;no feature;use feature ':5.10';'foo'}]
  
  # a sample invalid data
  $data = "sub {1=2}";
- my $res = $validator->($data); # => ["Error in compiling code: Can't modify constant item in scalar assignment at (eval 2779) line 1, at EOF\n","sub {1=2}"]
+ my $res = $validator->($data); # => ["Error in compiling code: Can't modify constant item in scalar assignment at (eval 2818) line 1, at EOF\n","sub {1=2}"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -215,6 +218,9 @@ If string matches the regex C<qr/\Asub\s*\{.*\}\z/s>, then it will be eval'ed
 into a coderef. If the code fails to compile, the value will be rejected. Note
 that this means you accept arbitrary code from the user to execute! Please make
 sure first and foremost that this is acceptable in your case.
+
+Currently string is eval'ed in the C<main> package, without C<use strict> or C<use
+warnings>.
 
 This schema is handy if you want to accept string or coderef from the
 command-line.

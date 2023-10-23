@@ -6,7 +6,7 @@ use Net::DBus::Reactor;
 use Log::Any;
 use App::XScreenSaver::DBus::Logind;
 use App::XScreenSaver::DBus::Saver;
-our $VERSION = '1.0.3'; # VERSION
+our $VERSION = '1.0.4'; # VERSION
 # ABSTRACT: tie xscreensaver into dbus
 
 
@@ -53,7 +53,7 @@ App::XScreenSaver::DBus - tie xscreensaver into dbus
 
 =head1 VERSION
 
-version 1.0.3
+version 1.0.4
 
 =head1 SYNOPSIS
 

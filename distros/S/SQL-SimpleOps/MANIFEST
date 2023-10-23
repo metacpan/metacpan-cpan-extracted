@@ -1,27 +1,32 @@
-AUTHORS					List of Authors
-Changes					ChangeLog
-LICENSE					License file
-MANIFEST				this file
-Makefile.PL				Makefile Writer
-README					ReadMe First
-SAMPLE-01-PRECREATE-DB			mySample of pre creating db
-SAMPLE-02-MYTEST-SQLITE			mySample of test sqlite db
-SAMPLE-03-MYTEST-MYSQL			mySample of test mysql db
-SAMPLE-04-MYTEST-POSTGRES		mySample of test postgres db
-lib/SQL/SimpleOps.pm			Master lib
-lib/SQL/SimpleOps.pod			POD file
-lib/SQL/SimpleOps/DBI/MyPlugin.pm	Sample of Plugin
-lib/SQL/SimpleOps/DBI/MySQL.pm		Plugin for MySQL
-lib/SQL/SimpleOps/DBI/PG.pm		Plugin for PG
-lib/SQL/SimpleOps/DBI/SQLite.pm		Plugin for SQLite
-t/testDB.t				test database master
-t/testDB_mysql.pm			test database lib for mysql
-t/testDB_mysql.sql			test database sql for mysql
-t/testDB_postgres.pm			test database lib for postgres
-t/testDB_postgres.sql			test database sql for postgres
-t/testDB_sqlite.pm			test database lib for sqlite
-t/testDB_sqlite.sql			test database sql for sqlite
-t/testSQL.t				test sql formater
-t/testWhere.t				test where clause formater
+AUTHORS
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+SAMPLE-01-PRECREATE-DB
+SAMPLE-01-PRECREATE-DB-MYSQL
+SAMPLE-01-PRECREATE-DB-PG
+SAMPLE-01-PRECREATE-DB-SQLITE
+SAMPLE-02-MYTEST-MYSQL
+SAMPLE-02-MYTEST-POSTGRES
+SAMPLE-02-MYTEST-SQLITE
+lib/SQL/SimpleOps/DBI/MyPlugin.pm
+lib/SQL/SimpleOps/DBI/MySQL.pm
+lib/SQL/SimpleOps/DBI/ODBC.pm
+lib/SQL/SimpleOps/DBI/PG.pm
+lib/SQL/SimpleOps/DBI/SQLite.pm
+lib/SQL/SimpleOps.pm
+lib/SQL/SimpleOps.pod
+t/testDB.t
+t/testDB_mysql.pm
+t/testDB_mysql.sql
+t/testDB_postgres.pm
+t/testDB_postgres.sql
+t/testDB_sqlite.pm
+t/testDB_sqlite.sql
+t/testFirst.t
+t/testSQL.t
+t/testWhere.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

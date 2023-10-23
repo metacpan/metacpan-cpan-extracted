@@ -3,9 +3,9 @@ package Sah::Schema::latin_uppercase_alpha;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2023-10-23'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 our $schema = [str => {
     summary => 'String containing only zero or more uppercase Latin letters, i.e. A-Z',
@@ -40,7 +40,7 @@ Sah::Schema::latin_uppercase_alpha - String containing only zero or more upperca
 
 =head1 VERSION
 
-This document describes version 0.015 of Sah::Schema::latin_uppercase_alpha (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
+This document describes version 0.016 of Sah::Schema::latin_uppercase_alpha (from Perl distribution Sah-Schemas-Str), released on 2023-10-23.
 
 =head1 SYNOPSIS
 
@@ -198,6 +198,8 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Str>.
 L<Sah::Schema::latin_alpha>
 
 L<Sah::Schema::latin_lowercase_alpha>
+
+L<Sah::Schema::lowercase_str>
 
 =head1 AUTHOR
 

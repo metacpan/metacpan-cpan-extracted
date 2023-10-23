@@ -26,13 +26,18 @@
 	use IO::File;
 	use Test::More;
 
-	our $VERSION = "2023.274.1";
+	our $VERSION = "2023.284.1";
 
 	BEGIN{ use_ok('SQL::SimpleOps'); };
 
 	my $dir = ($0 =~ /^(.*)\/(.*)/) ? $1 : "";
 	$dir = getcwd()."/".$dir if (!($dir =~ /^\//));
 	unshift(@INC,$dir);
+
+################################################################################
+## enable this option to abort on first error
+
+	#$ENV{EXIT_ON_FIRT_ERROR} = 1;
 
 ################################################################################
 
@@ -47,16 +52,16 @@
 	if ($test == 0)
 	{
 		diag("No type of test found");
-		diag("See README.txt before doing any test");
+		diag("See text README before doing any test");
 		done_testing();
-		exit;
+		exit(0);
 	}
 	if ($test != 1)
 	{
 		diag("Multiple test found, there can be only one");
-		diag("See README.txt before doing any test");
+		diag("See text README before doing any test");
 		done_testing();
-		exit;
+		exit(0);
 	}
 
 ################################################################################
@@ -102,8 +107,9 @@
 		diag($@);
 		diag("DBD::Pg not found, Postegres test skipped");
 	}
-	done_testing();
-	exit;
+
+	&DONE();
+	exit(0);
 
 ################################################################################
 
@@ -112,22 +118,26 @@ sub testGeneric()
 	my $dbh = shift;
 	my $contents = shift;
 
+	## removing previous data test
 	&testInitialize($dbh,$contents);
 
-	&testGenericStandardInsert($dbh,$contents);
-	&testGenericStandardSelect($dbh,$contents);
+	## all tests, Autoincrement cursor singlkeys
+	&test_all_Standard_Insert($dbh,$contents);
+	&test_all_Standard_Select($dbh,$contents);
 
-	&testGenericAutoincrementInsert($dbh,$contents);
-	&testGenericAutoincrementSelect($dbh,$contents);
-	&testGenericAutoincrementUpdate($dbh,$contents);
-	&testGenericAutoincrementDelete($dbh,$contents);
+	## Autoincrement
+	&test_Autoincrement_Cursor_Insert($dbh,$contents);
+	&test_Autoincrement_ScanSingleKey_Select($dbh,$contents);
+	&test_Autoincrement_Standard_Update($dbh,$contents);
+	&test_Autoincrement_Standard_Delete($dbh,$contents);
 
-	&testGenericMasterSlaveInsert($dbh,$contents);
-	&testGenericMasterSlaveSelect($dbh,$contents);
-	&testGenericMasterSlaveMerges($dbh,$contents);
-
-	&testGenericBuffering($dbh,$contents);
-	&testGenericSingles($dbh,$contents);
+	## Master/Slave
+	&test_Master_Insert($dbh,$contents);
+	&test_Master_Generic_Select($dbh,$contents);
+	&test_Master_Merges_Select($dbh,$contents);
+	&test_Master_ScanMultiKeys_Select($dbh,$contents);
+	&test_Master_Singles($dbh,$contents);
+	&test_Master_Buffering_Select($dbh,$contents);
 
 	$dbh->Close();
 }
@@ -140,34 +150,38 @@ sub testInitialize()
 	my $contents = shift;
 	my @tables = sort(keys(%{$contents}));
 
+	&myDIAG("Initializations");
+
 	## show environments if required
 
 	if ($ENV{SQL_SIMPLE_DB_SHOW_CONTENTS})
 	{
-		diag("INI000 Contents and Tables");
+		&myDIAG("Contents and Tables");
 
 		require Data::Dumper;
 		print Data::Dumper->Dumper(\@tables,$contents);
 	}
 
-	diag("INI001 Removing previous data");
-
+	my $er=0;
+	my $no=0;
 	foreach my $table (@tables)
 	{
+		$no++;
 		$dbh->Delete ( table=>$table, force => 1, notfound => 1 );
-		&testRC($dbh,"INI001",$table);
+		$er++ if (&testRC($dbh,"0111",$table));
 	}
+	&myOK(!$er,"0111","Removing previous data, tables: ".$no.", errors: ".$er);
 }
 
 ################################################################################
 
-sub testGenericMasterSlaveMerges()
+sub test_Master_Merges_Select()
 {
 	my $dbh = shift;
 	my $contents = shift;
 	my @buffer;
 
-	note("MSM000 Merge");
+	&myDIAG("Merge");
 
 	$dbh->Select
 	(
@@ -175,8 +189,8 @@ sub testGenericMasterSlaveMerges()
 		fields => [ {"my_master.my_s_m_code"=>"ms"}, ],
 		buffer => \@buffer,
 	);
-	&testRC($dbh,"MSM001","my_master");
-	ok($dbh->getRows()==10,"MSM002 Aliases select-1, expected 10, found ".$dbh->getRows());
+	&testRC($dbh,"0210","my_master");
+	&myOK($dbh->getRows()==10,"0220","Aliases select-1, expected 10, found ".$dbh->getRows());
 
 	$dbh->Select
 	(
@@ -184,24 +198,73 @@ sub testGenericMasterSlaveMerges()
 		fields => [ {"my_master.my_s_m_code"=>"ms"}, {"my_slave.my_s_s_code"=>"ss"}, ],
 		buffer => \@buffer,
 	);
-	&testRC($dbh,"MSM003","my_master/my_slave");
-	ok($dbh->getRows()==1000,"MSM004 Aliases select-2, expected 1000, found ".$dbh->getRows());
+	&testRC($dbh,"0230","my_master/my_slave");
+	&myOK($dbh->getRows()==1000,"0240","Aliases select-2, expected 1000, found ".$dbh->getRows());
 }
 
 ################################################################################
 
-sub testGenericBuffering()
+sub test_Master_Buffering_Select()
 {
 	my $dbh = shift;
 	my $contents = shift;
 	my @buffer_array;
 	my %buffer_hash;
+	my @buffer_hashindex;
 	my @keys = ("master_0000","master_0001","master_0002","master_0003","master_0004");
 
-	note("BFF000 Buffering");
+	&myDIAG("Buffering");
+
+	## test hashref and hashindex
+
+	diag("Select using buffer_hashkey and buffer_hashindex, loading single value");
+	$dbh->Select
+	(
+		table => ["my_master"],
+		fields => [ "i_m_id", "s_m_code" ],
+		cursor_key => [ "i_m_id", ],
+		buffer => \%buffer_hash,
+		buffer_hashkey => [ "i_m_id", ],
+		buffer_hashindex => \@buffer_hashindex,
+	);
+	return 0 if (&testRC($dbh,"0300","my_master"));
+	diag("Expected: Buffer_hash with 10 rows, buffer_hashindex with 10 keys and each buffer with one value");
+	foreach my $k(@buffer_hashindex)
+	{
+		if (&myOK(defined($buffer_hash{$k}),"0301","Key ".$k." is mapped"))
+		{
+			&myOK(ref($buffer_hash{$k}) eq "","0302","Buffer_hash key ".$k." is a single value, ref: ".ref($buffer_hash{$k}));
+		}
+	}
+
+	## test hashref and hashindex
+
+	diag("Select using buffer_hashkey and buffer_hashindex, loading multiple values");
+	$dbh->Select
+	(
+		table => ["my_master"],
+		fields => [ "i_m_id", "s_m_code", "s_m_desc" ],
+		cursor_key => [ "i_m_id", ],
+		buffer => \%buffer_hash,
+		buffer_hashkey => [ "i_m_id", ],
+		buffer_hashindex => \@buffer_hashindex,
+	);
+	return 0 if (&testRC($dbh,"0300","my_master"));
+
+	diag("Expected: Buffer_hash with 10 rows, buffer_hashindex with 10 keys and each buffer with two values");
+	foreach my $k(@buffer_hashindex)
+	{
+		if (!&myOK(defined($buffer_hash{$k}),"0305","Key ".$k." is mapped")){}
+		elsif (!&myOK(ref($buffer_hash{$k}) eq "HASH","0306","Buffer_hash key ".$k." is hash multi value, ref: ".ref($buffer_hash{$k}))){}
+		else
+		{
+			&myOK(keys(%{$buffer_hash{$k}}) == 2,"0307","Buffer_hash key ".$k." have two values, values: ".keys(%{$buffer_hash{$k}}));
+		}
+	}
 
 	## test buffer_arrayref
 
+	diag("Expected: Buffer_array simple with buffer_arrayref disabled");
 	$dbh->Select
 	(
 		table => "my_master",
@@ -215,12 +278,11 @@ sub testGenericBuffering()
 		notfound => 1,
 		order_by => [ {"s_m_code" => "asc"} ],
 	);
-	&testRC($dbh,"BFF001","my_master");
-	ok($dbh->getRows()==5,"BFF002 Buffer_arrayref, expected 5, found ".$dbh->getRows());
-	(join(" ",@keys) eq join(" ",@buffer_array)) ? 
-		pass("BFF003 Buffer_arrayref matched values") :
-		fail("BFF004 Buffer_arrayref mismatch values");
+	&testRC($dbh,"0310","my_master");
+	&myOK($dbh->getRows()==5,"0311","Buffer_arrayref, expected 5, found ".$dbh->getRows());
+	&myOK(join(" ",@keys) eq join(" ",@buffer_array),"0312","Buffer_arrayref, test match retrieved data");
 
+	diag("Expected: Buffer_hash with buffer_arrayref=0 and without buffer_hashindex");
 	$dbh->Select
 	(
 		table => "my_master",
@@ -235,30 +297,21 @@ sub testGenericBuffering()
 		buffer_hashkey => "code",
 		notfound => 1,
 	);
-	&testRC($dbh,"BFF010","my_master");
-	ok($dbh->getRows()==5,"BFF011 Buffer_hashkey, expected 5, found ".$dbh->getRows());
+	&testRC($dbh,"0320","my_master");
+	&myOK($dbh->getRows()==5,"0321","Buffer_hashkey, expected 5, found ".$dbh->getRows());
 
-	note("BFF100 Buffering");
+	&myDIAG("Buffering");
 
 	my $ok1=1;
 	foreach my $id(@keys)
 	{
-		if(!defined($buffer_hash{$id}))
+		if (!&myOK(defined($buffer_hash{$id}),"0331","Buffer_hash key ".$id." is mapped"))
 		{
-			fail("BFF101 buffer_hashkey 'code=$id' missing");
-			$ok1=0;
-			last;
-		}
-		my $no =%{$buffer_hash{$id}}+0;
-		if ($no!=2)
-		{
-			fail("BFF102 Buffer_hashkey 'code=$id', expected 2 fields, found ".$no);
-			$ok1=0;
-			last;
+			&myOK(%{$buffer_hash{$id}}+0 == 2,"0332","Buffer_hashkey key ".$id.", expected 2 fields, found ".(%{$buffer_hash{$id}}+0));
 		}
 	}
-	pass("BFF103 Buffer_hashkey indexed by single successful") if ($ok1);
 
+	diag("Expected: master/slave data merged into buffer_hash");
 	$dbh->Select
 	(
 		table => [ "my_master","my_slave" ],
@@ -269,12 +322,12 @@ sub testGenericBuffering()
 			{"my_master.my_s_m_code"=>"ms"},
 			{"my_slave.my_s_s_code"=>"ss"},
 	       	],
-		where => [ "my_master.my_s_m_code" => \@keys, "my_master.my_s_m_code" => "my_slave.my_s_m_code" ],
+		where => [ "my_master.my_s_m_code" => \@keys, "my_master.my_s_m_code" => "\\my_slave.my_s_m_code" ],
 		buffer => \%buffer_hash,
 		buffer_hashkey => ["ms","ss"],
 		notfound => 1,
 	);
-	&testRC($dbh,"BFF110","my_master/my_slave");
+	&testRC($dbh,"0340","my_master/my_slave");
 
 	my $a = @keys;
 	my $b = %buffer_hash+0;
@@ -291,7 +344,7 @@ LOOP1:		foreach my $key1(sort(keys(%buffer_hash)))
 					my $d = %{$buffer_hash{$key1}{$key2}}+0;
 					if ($d!=2)
 					{
-						fail("BFF111 Buffer_hashkey key1 '$key1 with key2 '$key2', expected 2, found $d");
+						fail("Buffer_hashkey key1 '$key1 with key2 '$key2', expected 2, found $d");
 						$ok2=0;
 						last LOOP;
 					}
@@ -299,7 +352,7 @@ LOOP1:		foreach my $key1(sort(keys(%buffer_hash)))
 			}
 			else
 			{
-				fail("BFF112 Buffer_hashkey key1 '$key1', expected 10, found $c");
+				fail("Buffer_hashkey key1 '$key1', expected 10, found $c");
 				$ok2=0;
 				last LOOP;
 			}
@@ -307,29 +360,29 @@ LOOP1:		foreach my $key1(sort(keys(%buffer_hash)))
 	}
 	else
 	{
-		fail("BFF113 Buffer_hashkey, expected $a, found $b");
+		fail("Buffer_hashkey, expected $a, found $b");
 		$ok2=0;
 	}
-	pass("BFF114 Buffer_hashkey indexed by array successful") if ($ok2);
+	pass("Buffer_hashkey indexed by array successful") if ($ok2);
 }
 
 ################################################################################
 
-sub testGenericSingles()
+sub test_Master_Singles()
 {
 	my $dbh = shift;
 	my $contents = shift;
 
-	&testGenericSinglesTABLES($dbh,$contents);
-	&testGneericSinglesFIELDS($dbh,$contents);
-	&testGneericSinglesWHERE($dbh,$contents);
-	&testGneericSinglesORDERBY($dbh,$contents);
-	&testGneericSinglesGROUPBY($dbh,$contents);
+	&test_Master_SinglesTABLES_Select($dbh,$contents);
+	&test_Master_SinglesFIELDS_Select($dbh,$contents);
+	&test_Master_SinglesWHERE_Select($dbh,$contents);
+	&test_Master_SinglesORDERBY_Select($dbh,$contents);
+	&test_Master_SinglesGROUPBY_Select($dbh,$contents);
 }
 
 ################################################################################
 
-sub testGneericSinglesGROUPBY()
+sub test_Master_SinglesGROUPBY_Select()
 {
 	my $dbh = shift;
 	my $contents = shift;
@@ -337,9 +390,11 @@ sub testGneericSinglesGROUPBY()
 	my @buffer_array;
 	my @groupby_array;
 	my $groupby_arrayref;
-my @orderby_array;
-my $orderby_arrayref;
-	note("SIG400 GroupBy, group_by => 'value'");
+	my @orderby_array;
+	my $orderby_arrayref;
+
+	&myDIAG("GroupBy, group_by => 'value'");
+
 	$dbh->Select
 	(
 		table => "my_master",
@@ -349,11 +404,12 @@ my $orderby_arrayref;
 		notfound => 1,
 		group_by => "s_m_code",
 	);
-	&testRC($dbh,"SIG401","my_master");
-	ok($dbh->getRows()==1,"SIG402 Buffer expected 1, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG403 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0401","my_master");
+	&myOK($dbh->getRows()==1,"0402","Buffer expected 1, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0403","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 
-	note("SIG410 GroupBy, group_by => \$group_by, \$group_by => [ 'value' ]");
+	&myDIAG("GroupBy, group_by => \$group_by, \$group_by => [ 'value' ]");
+
 	$groupby_arrayref = [ "s_m_code" ];
 	$dbh->Select
 	(
@@ -364,11 +420,12 @@ my $orderby_arrayref;
 		notfound => 1,
 		group_by => $groupby_arrayref,
 	);
-	&testRC($dbh,"SIG411","my_master");
-	ok($dbh->getRows()==1,"SIG412 Buffer expected 1, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG413 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0411","my_master");
+	&myOK($dbh->getRows()==1,"0412","Buffer expected 1, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0413","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 
-	note("SIG420 GroupBy, group_by => \@group_by, \@group_by => [ 'value' ]");
+	&myDIAG("GroupBy, group_by => \@group_by, \@group_by => [ 'value' ]");
+
 	@groupby_array = [ "s_m_code" ];
 	$dbh->Select
 	(
@@ -379,11 +436,12 @@ my $orderby_arrayref;
 		notfound => 1,
 		group_by => @groupby_array,
 	);
-	&testRC($dbh,"SIG421","my_master");
-	ok($dbh->getRows()==1,"SIG422 Buffer expected 1, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG423 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0421","my_master");
+	&myOK($dbh->getRows()==1,"0422","Buffer expected 1, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0423","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 
-	note("SIG430 GroupBy, group_by => \@group_by, \@group_by => ( 'value' )");
+	&myDIAG("GroupBy, group_by => \@group_by, \@group_by => ( 'value' )");
+
 	@groupby_array = ( "s_m_code" );
 	$dbh->Select
 	(
@@ -394,14 +452,14 @@ my $orderby_arrayref;
 		notfound => 1,
 		group_by => \@groupby_array,
 	);
-	&testRC($dbh,"SIG431","my_master");
-	ok($dbh->getRows()==1,"SIG432 Buffer expected 1, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG433 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0431","my_master");
+	&myOK($dbh->getRows()==1,"0432","Buffer expected 1, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0433","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 }
 
 ################################################################################
 
-sub testGneericSinglesORDERBY()
+sub test_Master_SinglesORDERBY_Select()
 {
 	my $dbh = shift;
 	my $contents = shift;
@@ -410,7 +468,8 @@ sub testGneericSinglesORDERBY()
 	my @orderby_array;
 	my $orderby_arrayref;
 
-	note("SIG300 OrderBy, order_by => [ 'value' ]");
+	&myDIAG("OrderBy, order_by => [ 'value' ]");
+
 	$dbh->Select
 	(
 		table => "my_master",
@@ -420,11 +479,12 @@ sub testGneericSinglesORDERBY()
 		notfound => 1,
 		order_by => [ {"my_s_m_code"=>"asc"}, ],
 	);
-	&testRC($dbh,"SIG201","my_master");
-	ok($dbh->getRows()==2,"SIG202 Buffer expected 2, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000" && $buffer_array[1]->{s_m_code} eq "master_0001","SIG203 Buffer code expected 'master_0000', found 0:".$buffer_array[0]->{s_m_code}." 1:".$buffer_array[1]->{s_m_code});
+	&testRC($dbh,"0501","my_master");
+	&myOK($dbh->getRows()==2,"0502","Buffer expected 2, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000" && $buffer_array[1]->{s_m_code} eq "master_0001","0503","Buffer code expected 'master_0000', found 0:".$buffer_array[0]->{s_m_code}." 1:".$buffer_array[1]->{s_m_code});
 
-	note("SIG310 OrderBy, order_by => \$order_by, \$order_by => [ 'value' ]");
+	&myDIAG("OrderBy, order_by => \$order_by, \$order_by => [ 'value' ]");
+
 	$orderby_arrayref = [ {"my_s_m_code" => "asc"} ];
 	$dbh->Select
 	(
@@ -435,11 +495,12 @@ sub testGneericSinglesORDERBY()
 		notfound => 1,
 		order_by => $orderby_arrayref,
 	);
-	&testRC($dbh,"SIG311","my_master");
-	ok($dbh->getRows()==2,"SIG312 Buffer expected 2, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000" && $buffer_array[1]->{s_m_code} eq "master_0001","SIG313 Buffer code expected 'master_0000', found 0:".$buffer_array[0]->{s_m_code}." 1:".$buffer_array[1]->{s_m_code});
+	&testRC($dbh,"0511","my_master");
+	&myOK($dbh->getRows()==2,"0512","Buffer expected 2, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000" && $buffer_array[1]->{s_m_code} eq "master_0001","0513","Buffer code expected 'master_0000', found 0:".$buffer_array[0]->{s_m_code}." 1:".$buffer_array[1]->{s_m_code});
 
-	note("SIG320 OrderBy, order_by => \@order_by, \@order_by => [ 'value' ]");
+	&myDIAG("OrderBy, order_by => \@order_by, \@order_by => [ 'value' ]");
+
 	@orderby_array = [ {"my_s_m_code" => "asc"} ];
 	$dbh->Select
 	(
@@ -450,11 +511,12 @@ sub testGneericSinglesORDERBY()
 		notfound => 1,
 		order_by => @orderby_array,
 	);
-	&testRC($dbh,"SIG321","my_master");
-	ok($dbh->getRows()==2,"SIG322 Buffer expected 2, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000" && $buffer_array[1]->{s_m_code} eq "master_0001","SIG323 Buffer code expected 'master_0000', found 0:".$buffer_array[0]->{s_m_code}." 1:".$buffer_array[1]->{s_m_code});
+	&testRC($dbh,"0521","my_master");
+	&myOK($dbh->getRows()==2,"0522","Buffer expected 2, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000" && $buffer_array[1]->{s_m_code} eq "master_0001","0523","Buffer code expected 'master_0000', found 0:".$buffer_array[0]->{s_m_code}." 1:".$buffer_array[1]->{s_m_code});
 
-	note("SIG330 OrderBy, order_by => \@order_by, \@order_by => ( 'value' )");
+	&myDIAG("OrderBy, order_by => \@order_by, \@order_by => ( 'value' )");
+
 	@orderby_array = ( {"my_s_m_code" => "asc"} );
 	$dbh->Select
 	(
@@ -465,14 +527,14 @@ sub testGneericSinglesORDERBY()
 		notfound => 1,
 		order_by => \@orderby_array,
 	);
-	&testRC($dbh,"SIG331","my_master");
-	ok($dbh->getRows()==2,"SIG332 Buffer expected 2, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000" && $buffer_array[1]->{s_m_code} eq "master_0001","SIG333 Buffer code expected 'master_0000', found 0:".$buffer_array[0]->{s_m_code}." 1:".$buffer_array[1]->{s_m_code});
+	&testRC($dbh,"0531","my_master");
+	&myOK($dbh->getRows()==2,"0532","Buffer expected 2, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000" && $buffer_array[1]->{s_m_code} eq "master_0001","0533","Buffer code expected 'master_0000', found 0:".$buffer_array[0]->{s_m_code}." 1:".$buffer_array[1]->{s_m_code});
 }
 
 ################################################################################
 
-sub testGneericSinglesWHERE()
+sub test_Master_SinglesWHERE_Select()
 {
 	my $dbh = shift;
 	my $contents = shift;
@@ -481,7 +543,8 @@ sub testGneericSinglesWHERE()
 	my @where_array;
 	my $where_arrayref;
 
-	note("SIG200 Where, where => [ 'value' ]");
+	&myDIAG("Where, where => [ 'value' ]");
+
 	$dbh->Select
 	(
 		table => "my_master",
@@ -490,11 +553,12 @@ sub testGneericSinglesWHERE()
 		buffer => \@buffer_array,
 		notfound => 1,
 	);
-	&testRC($dbh,"SIG201","my_master");
-	ok($dbh->getRows()==1,"SIG202 Buffer expected 1, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG203 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0601","my_master");
+	&myOK($dbh->getRows()==1,"0602","Buffer expected 1, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0603","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 
-	note("SIG210 Where, where => \$where, \$where => [ 'value' ]");
+	&myDIAG("Where, where => \$where, \$where => [ 'value' ]");
+
 	$where_arrayref = [ "my_s_m_code" => "master_0000" ];
 	$dbh->Select
 	(
@@ -504,11 +568,12 @@ sub testGneericSinglesWHERE()
 		buffer => \@buffer_array,
 		notfound => 1,
 	);
-	&testRC($dbh,"SIG211","my_master");
-	ok($dbh->getRows()==1,"SIG212 Buffer expected 1, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG213 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0611","my_master");
+	&myOK($dbh->getRows()==1,"0612","Buffer expected 1, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0613","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 
-	note("SIG220 Where, where => \@where, \@where => [ 'value' ]");
+	&myDIAG("Where, where => \@where, \@where => [ 'value' ]");
+
 	@where_array = [ "my_s_m_code" => "master_0000" ];
 	$dbh->Select
 	(
@@ -518,11 +583,12 @@ sub testGneericSinglesWHERE()
 		buffer => \@buffer_array,
 		notfound => 1,
 	);
-	&testRC($dbh,"SIG221","my_master");
-	ok($dbh->getRows()==1,"SIG222 Buffer expected 1, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG223 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0621","my_master");
+	&myOK($dbh->getRows()==1,"0622","Buffer expected 1, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0623","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 
-	note("SIG230 Where, where => \@where, \@where => ( 'value' )");
+	&myDIAG("Where, where => \@where, \@where => ( 'value' )");
+
 	@where_array = ( "my_s_m_code" => "master_0000" );
 	$dbh->Select
 	(
@@ -532,14 +598,14 @@ sub testGneericSinglesWHERE()
 		buffer => \@buffer_array,
 		notfound => 1,
 	);
-	&testRC($dbh,"SIG231","my_master");
-	ok($dbh->getRows()==1,"SIG232 Buffer expected 1, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG233 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0641","my_master");
+	&myOK($dbh->getRows()==1,"0642","Buffer expected 1, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0643","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 }
 
 ################################################################################
 
-sub testGneericSinglesFIELDS()
+sub test_Master_SinglesFIELDS_Select()
 {
 	my $dbh = shift;
 	my $contents = shift;
@@ -552,7 +618,8 @@ sub testGneericSinglesFIELDS()
 	my $fields_arrayref;
 	my $fields_scalar;
 
-	note("SIG100 Fields, fields => 'fieldname'");
+	&myDIAG("Fields, fields => 'fieldname'");
+
 	$dbh->Select
 	(
 		table => "my_master",
@@ -561,11 +628,12 @@ sub testGneericSinglesFIELDS()
 		buffer => \@buffer_array,
 		notfound => 1,
 	);
-	&testRC($dbh,"SIG101","my_master");
-	ok($dbh->getRows()==1,"SIG102 Buffer expected 1, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG103 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0701","my_master");
+	&myOK($dbh->getRows()==1,"0702","Buffer expected 1, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0703","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 
-	note("SIG110 Fields, fields => [ 'fieldname' ]");
+	&myDIAG("Fields, fields => [ 'fieldname' ]");
+
 	$dbh->Select
 	(
 		table => "my_master",
@@ -574,11 +642,12 @@ sub testGneericSinglesFIELDS()
 		buffer => \@buffer_array,
 		notfound => 1,
 	);
-	&testRC($dbh,"SIG111","my_master");
-	ok($dbh->getRows()==1,"SIG112 Buffer expected 1, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG113 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0711","my_master");
+	&myOK($dbh->getRows()==1,"0712","Buffer expected 1, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0713","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 
-	note("SIG120 Fields, fields => \$fieldvar, \$fieldvar => 'fieldname'");
+	&myDIAG("Fields, fields => \$fieldvar, \$fieldvar => 'fieldname'");
+
 	$dbh->Select
 	(
 		table => "my_master",
@@ -587,11 +656,12 @@ sub testGneericSinglesFIELDS()
 		buffer => \@buffer_array,
 		notfound => 1,
 	);
-	&testRC($dbh,"SIG121","my_master");
-	ok($dbh->getRows()==1,"SIG122 Buffer expected 1, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG123 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0721","my_master");
+	&myOK($dbh->getRows()==1,"0722","Buffer expected 1, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0723","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 
-	note("SIG130 Fields, fields => \$fieldvar, \$fieldvar => [ \$fieldvar ]");
+	&myDIAG("Fields, fields => \$fieldvar, \$fieldvar => [ \$fieldvar ]");
+
 	$fields_scalar = [ $fields_code,$fields_name ];
 	$dbh->Select
 	(
@@ -601,11 +671,12 @@ sub testGneericSinglesFIELDS()
 		buffer => \@buffer_array,
 		notfound => 1,
 	);
-	&testRC($dbh,"SIG131","my_master");
-	ok($dbh->getRows()==1,"SIG132 Buffer expected 1, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG133 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0731","my_master");
+	&myOK($dbh->getRows()==1,"0732","Buffer expected 1, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0733","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 
-	note("SIG140 Fields, fields => \@field_array, \@fields_array => [ \$fieldvar ]");
+	&myDIAG("Fields, fields => \@field_array, \@fields_array => [ \$fieldvar ]");
+
 	@fields_array = [ $fields_code,$fields_name ];
 	$dbh->Select
 	(
@@ -615,11 +686,12 @@ sub testGneericSinglesFIELDS()
 		buffer => \@buffer_array,
 		notfound => 1,
 	);
-	&testRC($dbh,"SIG141","my_master");
-	ok($dbh->getRows()==1,"SIG142 Buffer expected 1, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG143 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0741","my_master");
+	&myOK($dbh->getRows()==1,"0742","Buffer expected 1, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0744","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 
-	note("SIG150 Fields, fields => \@field_array, \@fields_array => ( \$fieldvar )");
+	&myDIAG("Fields, fields => \@field_array, \@fields_array => ( \$fieldvar )");
+
 	@fields_array = ( $fields_code,$fields_name,$fields_desc );
 	$dbh->Select
 	(
@@ -629,14 +701,14 @@ sub testGneericSinglesFIELDS()
 		buffer => \@buffer_array,
 		notfound => 1,
 	);
-	&testRC($dbh,"SIG151","my_master");
-	ok($dbh->getRows()==1,"SIG152 Buffer expected 1, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG153 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0751","my_master");
+	&myOK($dbh->getRows()==1,"0752","Buffer expected 1, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0753","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 }
 
 ################################################################################
 
-sub testGenericSinglesTABLES()
+sub test_Master_SinglesTABLES_Select()
 {
 	my $dbh = shift;
 	my $contents = shift;
@@ -648,7 +720,8 @@ sub testGenericSinglesTABLES()
 
 	my @buffer_array;
 
-	note("SIG000 Tables, table=>'mytable'");
+	&myDIAG("Tables, table=>'mytable'");
+
 	$dbh->Select
 	(
 		table => "$table_master",
@@ -657,11 +730,12 @@ sub testGenericSinglesTABLES()
 		buffer => \@buffer_array,
 		notfound => 1,
 	);
-	&testRC($dbh,"SIG001","my_master");
-	ok($dbh->getRows()==1,"SIG002 Buffer expected 1, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG003 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0801","my_master");
+	&myOK($dbh->getRows()==1,"0802","Buffer expected 1, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0804","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 
-	note("SIG010 Tables, table=> [ 'mytable' ]");
+	&myDIAG("Tables, table=> [ 'mytable' ]");
+
 	$dbh->Select
 	(
 		table => [ $table_master ],
@@ -670,11 +744,12 @@ sub testGenericSinglesTABLES()
 		buffer => \@buffer_array,
 		notfound => 1,
 	);
-	&testRC($dbh,"SIG011","my_master");
-	ok($dbh->getRows()==1,"SIG012 Buffer expected 1, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG013 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0811","my_master");
+	&myOK($dbh->getRows()==1,"0812","Buffer expected 1, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0813","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 
-	note("SIG020 Tables, table=>\$mytable, \$table => 'mytable'");
+	&myDIAG("Tables, table=>\$mytable, \$table => 'mytable'");
+
 	$dbh->Select
 	(
 		table => $table_master,
@@ -683,11 +758,12 @@ sub testGenericSinglesTABLES()
 		buffer => \@buffer_array,
 		notfound => 1,
 	);
-	&testRC($dbh,"SIG021","my_master");
-	ok($dbh->getRows()==1,"SIG022 Buffer expected 1, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG023 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0821","my_master");
+	&myOK($dbh->getRows()==1,"0822","Buffer expected 1, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0823","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 
-	note("SIG030 Tables, table=>\$mytable, \$table => [ 'mytable' ]");
+	&myDIAG("Tables, table=>\$mytable, \$table => [ 'mytable' ]");
+
 	$table_scalar = [ $table_master ];
 	$dbh->Select
 	(
@@ -697,11 +773,12 @@ sub testGenericSinglesTABLES()
 		buffer => \@buffer_array,
 		notfound => 1,
 	);
-	&testRC($dbh,"SIG031","my_master");
-	ok($dbh->getRows()==1,"SIG032 Buffer expected 1, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG033 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0831","my_master");
+	&myOK($dbh->getRows()==1,"0832","Buffer expected 1, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0833","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 
-	note("SIG040 Tables, table=>[\$mytable]");
+	&myDIAG("Tables, table=>[\$mytable]");
+
 	@table_array = [ $table_master,$table_slave ];
 	$dbh->Select
 	(
@@ -711,11 +788,12 @@ sub testGenericSinglesTABLES()
 		buffer => \@buffer_array,
 		notfound => 1,
 	);
-	&testRC($dbh,"SIG041","my_master");
-	ok($dbh->getRows()==100,"SIG042 Buffer expected 100, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG043 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0841","my_master");
+	&myOK($dbh->getRows()==100,"0842","Buffer expected 100, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0843","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 
-	note("SIG050 Tables, table=>[\$mytable]");
+	&myDIAG("Tables, table=>[\$mytable]");
+
 	@table_array = ( $table_master,$table_slave );
 	$dbh->Select
 	(
@@ -725,20 +803,20 @@ sub testGenericSinglesTABLES()
 		buffer => \@buffer_array,
 		notfound => 1,
 	);
-	&testRC($dbh,"SIG051","my_master");
-	ok($dbh->getRows()==100,"SIG052 Buffer expected 100, found ".$dbh->getRows());
-	ok($buffer_array[0]->{s_m_code} eq "master_0000","SIG053 Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
+	&testRC($dbh,"0851","my_master");
+	&myOK($dbh->getRows()==100,"0852","Buffer expected 100, found ".$dbh->getRows());
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000","0853","Buffer code expected 'master_0000', found ".$buffer_array[0]->{s_m_code});
 }
 
 ################################################################################
 
-sub testGenericMasterSlaveSelect()
+sub test_Master_Generic_Select()
 {
 	my $dbh = shift;
 	my $contents = shift;
 	my @buffer;
 
-	note("MSS000 Master and Slave merges");
+	&myDIAG("Master and Slave merges");
 
 	$dbh->Select
 	(
@@ -746,8 +824,8 @@ sub testGenericMasterSlaveSelect()
 		buffer => \@buffer,
 		order_by => "my_i_m_id",
 	);
-	&testRC($dbh,"MSS001","my_master");
-	ok($dbh->getRows()==10,"MSS002 Master select, expected 10, found ".$dbh->getRows());
+	&testRC($dbh,"0901","my_master");
+	&myOK($dbh->getRows()==10,"0902","Master select, expected 10, found ".$dbh->getRows());
 
 	$dbh->Select
 	(
@@ -755,8 +833,8 @@ sub testGenericMasterSlaveSelect()
 		buffer => \@buffer,
 		order_by => "my_i_s_id",
 	);
-	&testRC($dbh,"MSS003","my_slave");
-	ok($dbh->getRows()==100,"MSS004 Slave select, expected 100, found ".$dbh->getRows());
+	&testRC($dbh,"0910","my_slave");
+	&myOK($dbh->getRows()==100,"0911","Slave select, expected 100, found ".$dbh->getRows());
 
 	$dbh->Select
 	(
@@ -764,21 +842,8 @@ sub testGenericMasterSlaveSelect()
 		buffer => \@buffer,
 		fields => [ "my_master.my_s_m_code", "my_slave.my_s_s_code" ],
 	);
-	&testRC($dbh,"MSS004","my_master/my_slave");
-	ok($dbh->getRows()==1000,"MSS005 Master/Slave merge-1, expected 1000, found ".$dbh->getRows());
-
-	$dbh->Select
-	(
-		table => [ "my_master","my_slave" ],
-		buffer => \@buffer,
-		fields => [ "my_master.my_s_m_code", "my_slave.my_s_s_code" ],
-		where =>
-		[
-			"my_master.my_s_m_code" => "my_slave.my_s_m_code"
-		]
-	);
-	&testRC($dbh,"MSS006","my_master/my_slave");
-	ok($dbh->getRows()==100,"MSS007 Master/Slave merge-2, expected 100, found ".$dbh->getRows());
+	&testRC($dbh,"0920","my_master/my_slave");
+	&myOK($dbh->getRows()==1000,"0921","Master/Slave merge-1, expected 1000, found ".$dbh->getRows());
 
 	$dbh->Select
 	(
@@ -787,13 +852,24 @@ sub testGenericMasterSlaveSelect()
 		fields => [ "my_master.my_s_m_code", "my_slave.my_s_s_code" ],
 		where =>
 		[
-			"my_master.my_s_m_code" => [ "!", "my_slave.my_s_m_code" ],
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
 		]
 	);
-	&testRC($dbh,"MSS008","my_master/m_slave");
-	ok($dbh->getRows()==900,"MSS009 Master/Slave merge-3, expected 900, found ".$dbh->getRows());
+	&testRC($dbh,"0930","my_master/my_slave");
+	&myOK($dbh->getRows()==100,"0931","Master/Slave merge-2, expected 100, found ".$dbh->getRows());
 
-	diag("MSS100 Grouped");
+	$dbh->Select
+	(
+		table => [ "my_master","my_slave" ],
+		buffer => \@buffer,
+		fields => [ "my_master.my_s_m_code", "my_slave.my_s_s_code" ],
+		where =>
+		[
+			"my_master.my_s_m_code" => [ "!", "\\my_slave.my_s_m_code" ],
+		]
+	);
+	&testRC($dbh,"0940","my_master/m_slave");
+	&myOK($dbh->getRows()==900,"0941","Master/Slave merge-3, expected 900, found ".$dbh->getRows());
 
 	$dbh->Select
 	(
@@ -802,52 +878,54 @@ sub testGenericMasterSlaveSelect()
 		group_by => "my_s_m_code",
 		buffer => \@buffer,
 	);
-	&testRC($dbh,"MSS111","my_slave");
-	ok($dbh->getRows()==10,"MSS112 Slave grouped-1, expected 10 masters, found ".$dbh->getRows());
+	&testRC($dbh,"0950","my_slave");
+	&myOK($dbh->getRows()==10,"0951","Slave grouped-1, expected 10 masters, found ".$dbh->getRows());
 
 	foreach my $ref(@buffer)
 	{
-		ok($ref->{my_s_s_code} == 10,"MSS113 Slave grouped-2, expected 10 slaves, found ".$ref->{my_s_s_code});
+		&myOK($ref->{my_s_s_code} == 10,"0960","Slave grouped-2, expected 10 slaves, found ".$ref->{my_s_s_code});
 	}
 }
 
 ################################################################################
 
-sub testGenericAutoincrementDelete()
+sub test_Autoincrement_Standard_Delete()
 {
 	my $dbh = shift;
 	my $contents = shift;
 	my @buffer;
 
-	note("DEL000 Delete");
+	&myDIAG("Delete");
 
 	$dbh->Delete
 	(
 		table => "my_autoincrement_1",
-		where=>
+		where =>
 		[
 			my_i_no_2 => [ "<", 9999 ],
 		],
 	);
-	&testRC($dbh,"DEL001","my_autoincrement_1");
+	&testRC($dbh,"1010","my_autoincrement_1");
+
 	$dbh->Select
 	(
 		table => "my_autoincrement_1",
 		buffer => \@buffer,
 	);
-	&testRC($dbh,"DEL002","my_autoincrement_1");
-	ok($dbh->getRows() == 10,"DEL003 Delete expected 10, found ".$dbh->getRows());
+	&testRC($dbh,"1020","my_autoincrement_1");
+
+	&myOK($dbh->getRows() == 10,"1030","Delete expected 10, found ".$dbh->getRows());
 }
 
 ################################################################################
 
-sub testGenericAutoincrementUpdate()
+sub test_Autoincrement_Standard_Update()
 {
 	my $dbh = shift;
 	my $contents = shift;
 	my @buffer;
 
-	note("UPD000 Update");
+	&myDIAG("Update");
 
 	$dbh->Update
 	(
@@ -856,39 +934,84 @@ sub testGenericAutoincrementUpdate()
 		{
 			my_i_no_2 => 9999,
 		},
-		where=>
+		where =>
 		[
 			my_i_id => [ ">", 90 ],
 		],
 	);
-	&testRC($dbh,"UPD001","my_autoincrement_1");
+
+	&testRC($dbh,"1110","my_autoincrement_1");
 	$dbh->Select
 	(
 		table => "my_autoincrement_1",
-		where=>
+		where =>
 		[
 			my_i_no_2 => 9999
 		],
 		buffer => \@buffer,
 	);
-	&testRC($dbh,"UPD002","my_autoincrement_1");
-	ok($dbh->getRows() == 10,"UPD003 Update expected 10, found ".$dbh->getRows());
+	&testRC($dbh,"1120","my_autoincrement_1");
+
+	&myOK($dbh->getRows() == 10,"1130","Update expected 10, found ".$dbh->getRows());
 }
 
 ################################################################################
 
-sub testGenericAutoincrementSelect()
+sub test_Autoincrement_ScanSingleKey_Select()
 {
 	my $dbh = shift;
 	my $contents = shift;
 
-	note("CUR000 SelectCursor");
-
 	my %cursor;
 	my @buffer;
+	my %buffer_hash;
+	my $cursor_scalar;
+	my $cursor_hash;
+	my @cursor_array;
+	my @cursor_split;
+
+	&myDIAG("SelectCursor Single Key");
+
+	##my test my first buffer
+
+	diag("SelectCursor on top of page, command TOP, page #1, using cursor_info hash and buffer as hash");
+	$dbh->SelectCursor
+	(
+		table => "my_autoincrement_1",
+		fields => "*",
+		cursor_key => "i_id",
+		cursor_command => SQL_SIMPLE_CURSOR_TOP,
+		cursor_info => \%cursor,
+		buffer => \%buffer_hash,
+		buffer_hashkey => 'i_id',
+		limit => 10,
+	);
+	return 0 if (&testRC($dbh,"1200","my_autoincrement_1"));
+	&myOK($cursor{lines}==10 && $cursor{first}==1 && $cursor{last}==10,"1201","Cursor expected (first/last/lines) (1), (10) and (10), found ($cursor{first}), ($cursor{last}) and ($cursor{lines})");
+	&myOK($buffer_hash{$cursor{first}}{i_no_1}==2 && $buffer_hash{$cursor{last}}{i_no_1}==20,"1202","Buffer expected first field i_no_1=2 and last field i_no_1=20, found ".$buffer_hash{$cursor{first}}{i_no_1}." and ".$buffer_hash{$cursor{last}}{i_no_1});
+
+	##my test my first buffer
+
+	diag("SelectCursor on top of page, command TOP, page #1, using cursor_info as scalar and buffer hash");
+	$dbh->SelectCursor
+	(
+		table => "my_autoincrement_1",
+		fields => "*",
+		cursor_key => "i_id",
+		cursor_command => SQL_SIMPLE_CURSOR_TOP,
+		cursor_info => \$cursor_scalar,
+		buffer => \%buffer_hash,
+		buffer_hashkey => 'i_id',
+		limit => 10,
+	);
+	return 0 if (&testRC($dbh,"1205","my_autoincrement_1"));
+	@cursor_split = split(" ",$cursor_scalar);
+	&myOK($cursor_split[1]==10 && $cursor_split[2]==1 && $cursor_split[3]==10,"1206","Cursor expected (first/last/lines) (1), (10) and (10), found ($cursor{first}), array: ".join(" ",@cursor_split));
+	&myOK($buffer_hash{$cursor_split[2]}{i_no_1}==2 && $buffer_hash{$cursor_split[3]}{i_no_1}==20,"1207","Buffer expected first field i_no_1=2 and last field i_no_1=20, found ".$buffer_hash{ $cursor_split[2] }{i_no_1}." and ".$buffer_hash{ $cursor_split[3] }{i_no_1});
 
 	##my page-1
-	#
+
+	diag("SelectCursor on top of page, command TOP, page #1, using cursor_info as hash and buffer array");
 	$dbh->SelectCursor
 	(
 		table => "my_autoincrement_1",
@@ -898,11 +1021,13 @@ sub testGenericAutoincrementSelect()
 		buffer => \@buffer,
 		limit => 10,
 	);
-	return 0 if (&testRC($dbh,"CUR001","my_autoincrement_1"));
-	ok($cursor{lines}==10 && $cursor{first}==1 && $cursor{last}==10,"CUR002 SelectCursor first-page, expected first(1) last(10) lines(10), first($cursor{first}) last($cursor{last}) lines($cursor{lines})");
+	return 0 if (&testRC($dbh,"1210","my_autoincrement_1"));
+	&myOK($cursor{lines}==10 && $cursor{first}==1 && $cursor{last}==10,"1211","Cursor expected (first/last/lines) (1), (10) and (10), found ($cursor{first}), ($cursor{last}) and ($cursor{lines})");
+	&myOK($cursor{first}==$buffer[0]->{my_i_id} && $cursor{last}==$buffer[$cursor{lines}-1]->{my_i_id},"1212","Buffer expected (first/last) as ".$cursor{first}." and ".$cursor{last}.", found ".$buffer[0]->{my_i_id}." and ".$buffer[$cursor{lines}-1]->{my_i_id});
 
 	## my page-2
-	#
+
+	diag("SelectCursor on forward page, command NEXT, page #2");
 	$dbh->SelectCursor
 	(
 		table => "my_autoincrement_1",
@@ -912,11 +1037,13 @@ sub testGenericAutoincrementSelect()
 		cursor_key => "my_i_id",
 		limit => 10,
 	);
-	return 0 if (&testRC($dbh,"CUR003","my_autoincrement_1"));
-	ok($cursor{lines}==10 && $cursor{first}==11 && $cursor{last}==20,"CUR004 SelectCursor goto-page2, expected first(11) last(20) lines(10), first($cursor{first}) last($cursor{last}) lines($cursor{lines})");
+	return 0 if (&testRC($dbh,"1220","my_autoincrement_1"));
+	&myOK($cursor{lines}==10 && $cursor{first}==11 && $cursor{last}==20,"1221","Cursor expected (first/last/lines) (11), (20) and (10), found ($cursor{first}), ($cursor{last}) and ($cursor{lines})");
+	&myOK($cursor{first}==$buffer[0]->{my_i_id} && $cursor{last}==$buffer[$cursor{lines}-1]->{my_i_id},"1222","Buffer expected (first/last) as ".$cursor{first}." and ".$cursor{last}.", found ".$buffer[0]->{my_i_id}." and ".$buffer[$cursor{lines}-1]->{my_i_id});
 
 	## my return page-1
-	#
+
+	diag("SelectCursor on backward page, command BACK, page #1");
 	$dbh->SelectCursor
 	(
 		table => "my_autoincrement_1",
@@ -926,11 +1053,13 @@ sub testGenericAutoincrementSelect()
 		cursor_key => "my_i_id",
 		limit => 10,
 	);
-	return 0 if (&testRC($dbh,"CUR005","my_autoincrement_1"));
-	ok($cursor{lines}==10 && $cursor{first}==1 && $cursor{last}==10,"CUR006 SelectCursor return-first, expected first(1) last(10) lines(10), first($cursor{first}) last($cursor{last}) lines($cursor{lines})");
+	return 0 if (&testRC($dbh,"1230","my_autoincrement_1"));
+	&myOK($cursor{lines}==10 && $cursor{first}==1 && $cursor{last}==10,"1231","Cursor expected (first/last/lines) (1), (10) and (10), found ($cursor{first}), ($cursor{last}) and ($cursor{lines})");
+	&myOK($cursor{last}==$buffer[0]->{my_i_id} && $cursor{first}==$buffer[$cursor{lines}-1]->{my_i_id},"1232","Buffer expected (first/last) as ".$cursor{last}." and ".$cursor{first}.", found ".$buffer[0]->{my_i_id}." and ".$buffer[$cursor{lines}-1]->{my_i_id});
 
 	## my return page2
-	#
+
+	diag("SelectCursor on forward page, command NEXT, page #2");
 	$dbh->SelectCursor
 	(
 		table => "my_autoincrement_1",
@@ -940,11 +1069,13 @@ sub testGenericAutoincrementSelect()
 		cursor_key => "my_i_id",
 		limit => 10,
 	);
-	return 0 if (&testRC($dbh,"CUR007","my_autoincrement_1"));
-	ok($cursor{lines}==10 && $cursor{first}==11 && $cursor{last}==20,"CUR008 SelectCursor return-page2, expected first(11) last(20) lines(10), first($cursor{first}) last($cursor{last}) lines($cursor{lines})");
+	return 0 if (&testRC($dbh,"1240","my_autoincrement_1"));
+	&myOK($cursor{lines}==10 && $cursor{first}==11 && $cursor{last}==20,"1241","Cursor expected (first/last/lines) (11), (20) and (10), found ($cursor{first}), ($cursor{last}) and ($cursor{lines})");
+	&myOK($cursor{first}==$buffer[0]->{my_i_id} && $cursor{last}==$buffer[$cursor{lines}-1]->{my_i_id},"1242","Buffer expected (first/last) as ".$cursor{first}." and ".$cursor{last}.", found ".$buffer[0]->{my_i_id}." and ".$buffer[$cursor{lines}-1]->{my_i_id});
 
 	## my page-3
-	#
+
+	diag("SelectCursor on forward page, command NEXT, page #3");
 	$dbh->SelectCursor
 	(
 		table => "my_autoincrement_1",
@@ -954,11 +1085,13 @@ sub testGenericAutoincrementSelect()
 		cursor_key => "my_i_id",
 		limit => 10,
 	);
-	return 0 if (&testRC($dbh,"CUR009","my_autoincrement_1"));
-	ok($cursor{lines}==10 && $cursor{first}==21 && $cursor{last}==30,"CUR010 SelectCursor goto-page3, expected first(21) last(30) lines(10), first($cursor{first}) last($cursor{last}) lines($cursor{lines})");
+	return 0 if (&testRC($dbh,"1250","my_autoincrement_1"));
+	&myOK($cursor{lines}==10 && $cursor{first}==21 && $cursor{last}==30,"1251","Cursor expected (first/last/lines) (21), (30) and (10), found ($cursor{first}), ($cursor{last}) and ($cursor{lines})");
+	&myOK($cursor{first}==$buffer[0]->{my_i_id} && $cursor{last}==$buffer[$cursor{lines}-1]->{my_i_id},"1252","Buffer expected (first/last) as ".$cursor{first}." and ".$cursor{last}.", found ".$buffer[0]->{my_i_id}." and ".$buffer[$cursor{lines}-1]->{my_i_id});
 
 	## my bottom
-	#
+
+	diag("SelectCursor on last page, command LAST");
 	$dbh->SelectCursor
 	(
 		table => "my_autoincrement_1",
@@ -968,19 +1101,225 @@ sub testGenericAutoincrementSelect()
 		cursor_key => "my_i_id",
 		limit => 10,
 	);
-	return 0 if (&testRC($dbh,"CUR011","my_autoincrement_1"));
-	ok($cursor{lines}==10 && $cursor{first}==100 && $cursor{last}==91,"CUR012 SelectCursor goto-last-page, expected first(100) last(91) lines(10), first($cursor{first}) last($cursor{last}) lines($cursor{lines})");
+	return 0 if (&testRC($dbh,"1260","my_autoincrement_1"));
+	&myOK($cursor{lines}==10 && $cursor{first}==91 && $cursor{last}==100,"1261","Cursor expected (first/last/lines) (91), (100) and (10), found ($cursor{first}), ($cursor{last}) and ($cursor{lines})");
+	&myOK($cursor{last}==$buffer[0]->{my_i_id} && $cursor{first}==$buffer[$cursor{lines}-1]->{my_i_id},"1262","Buffer expected (first/last) as ".$cursor{first}." and ".$cursor{last}.", found ".$buffer[$cursor{lines}-1]->{my_i_id}." and ".$buffer[0]->{my_i_id});
 	return 1;
 }
 
 ################################################################################
 
-sub testGenericStandardSelect()
+sub test_Master_ScanMultiKeys_Select()
 {
 	my $dbh = shift;
 	my $contents = shift;
 
-	note("SEL000 Select");
+	&myDIAG("SelectCursor Multiple Keys");
+
+	my %cursor;
+	my @buffer;
+
+	##my page-1
+
+	diag("SelectCursor on top of page, command TOP, page-1");
+	$dbh->SelectCursor
+	(
+		table => ["my_master","my_slave"],
+		fields =>
+		[
+			{"my_master.my_i_m_id"=>"mi"},
+			{"my_slave.my_i_s_id"=>"si"},
+			{"my_master.my_s_m_code"=>"ms"},
+			{"my_slave.my_s_s_code"=>"ss"},
+	       	],
+		where =>
+		[
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+		],
+		cursor_key =>
+		[
+			"ms",
+			"ss",
+		],
+		cursor_info => \%cursor,
+		buffer => \@buffer,
+		limit => 10,
+		cursor_command => SQL_SIMPLE_CURSOR_TOP,
+	);
+	return 0 if (&testRC($dbh,"1301","my_autoincrement_1"));
+	diag("Expected: master_0000.slave_0010, master_0000.slave_0019");
+	diag("Buffer..: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	&myOK($cursor{lines}==10 && join(".",@{$cursor{first}}) eq "master_0000.slave_0010" && join(".",@{$cursor{last}}) eq "master_0000.slave_0019","1302","Cursor expected page-1");
+
+	## my page-2
+
+	diag("SelectCursor on forward page, command NEXT, page-2");
+	$dbh->SelectCursor
+	(
+		table => ["my_master","my_slave"],
+		fields =>
+		[
+			{"my_master.my_i_m_id"=>"mi"},
+			{"my_slave.my_i_s_id"=>"si"},
+			{"my_master.my_s_m_code"=>"ms"},
+			{"my_slave.my_s_s_code"=>"ss"},
+	       	],
+		where =>
+		[
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+		],
+		cursor_key =>
+		[
+			"ms",
+			"ss",
+		],
+		cursor_info => \%cursor,
+		buffer => \@buffer,
+		limit => 10,
+		cursor_command => SQL_SIMPLE_CURSOR_NEXT,
+	);
+	return 0 if (&testRC($dbh,"1310","my_autoincrement_1"));
+	diag("Expected: master_0001.slave_0010, master_0001.slave_0019");
+	diag("Buffer..: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	&myOK($cursor{lines}==10 && join(".",@{$cursor{first}}) eq "master_0001.slave_0010" && join(".",@{$cursor{last}}) eq "master_0001.slave_0019","1301","Cursor expected page-2");
+
+	## my page-1
+
+	diag("SelectCursor on forward page, command BACK, page-1");
+	$dbh->SelectCursor
+	(
+		table => ["my_master","my_slave"],
+		fields =>
+		[
+			{"my_master.my_i_m_id"=>"mi"},
+			{"my_slave.my_i_s_id"=>"si"},
+			{"my_master.my_s_m_code"=>"ms"},
+			{"my_slave.my_s_s_code"=>"ss"},
+	       	],
+		where =>
+		[
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+		],
+		cursor_key =>
+		[
+			"ms",
+			"ss",
+		],
+		cursor_info => \%cursor,
+		buffer => \@buffer,
+		limit => 10,
+		cursor_command => SQL_SIMPLE_CURSOR_BACK,
+	);
+	return 0 if (&testRC($dbh,"1320","my_autoincrement_1"));
+	diag("Expected: master_0000.slave_0010, master_0000.slave_0019");
+	diag("Buffer..: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	&myOK($cursor{lines}==10 && join(".",@{$cursor{first}}) eq "master_0000.slave_0010" && join(".",@{$cursor{last}}) eq "master_0000.slave_0019","1321","Cursor expected page-1");
+
+	## my page-2
+
+	diag("SelectCursor on forward page, command NEXT, page-2");
+	$dbh->SelectCursor
+	(
+		table => ["my_master","my_slave"],
+		fields =>
+		[
+			{"my_master.my_i_m_id"=>"mi"},
+			{"my_slave.my_i_s_id"=>"si"},
+			{"my_master.my_s_m_code"=>"ms"},
+			{"my_slave.my_s_s_code"=>"ss"},
+	       	],
+		where =>
+		[
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+		],
+		cursor_key =>
+		[
+			"ms",
+			"ss",
+		],
+		cursor_info => \%cursor,
+		buffer => \@buffer,
+		limit => 10,
+		cursor_command => SQL_SIMPLE_CURSOR_NEXT,
+	);
+	return 0 if (&testRC($dbh,"1330","my_autoincrement_1"));
+	diag("Expected: master_0001.slave_0010, master_0001.slave_0019");
+	diag("Buffer..: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	&myOK($cursor{lines}==10 && join(".",@{$cursor{first}}) eq "master_0001.slave_0010" && join(".",@{$cursor{last}}) eq "master_0001.slave_0019","1331","Cursor expected page-2");
+
+	## my page-reload
+
+	diag("SelectCursor on forward page, command RELOAD, page-2");
+	$dbh->SelectCursor
+	(
+		table => ["my_master","my_slave"],
+		fields =>
+		[
+			{"my_master.my_i_m_id"=>"mi"},
+			{"my_slave.my_i_s_id"=>"si"},
+			{"my_master.my_s_m_code"=>"ms"},
+			{"my_slave.my_s_s_code"=>"ss"},
+	       	],
+		where =>
+		[
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+		],
+		cursor_key =>
+		[
+			"ms",
+			"ss",
+		],
+		cursor_info => \%cursor,
+		buffer => \@buffer,
+		limit => 10,
+		cursor_command => SQL_SIMPLE_CURSOR_RELOAD,
+	);
+	return 0 if (&testRC($dbh,"1340","my_autoincrement_1"));
+	diag("Expected: master_0001.slave_0010, master_0001.slave_0019");
+	diag("Buffer..: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	&myOK($cursor{lines}==10 && join(".",@{$cursor{first}}) eq "master_0001.slave_0010" && join(".",@{$cursor{last}}) eq "master_0001.slave_0019","1341","Cursor expected page-2");
+
+	## my page-last
+
+	diag("SelectCursor on forward page, command LAST, page-LAST");
+	$dbh->SelectCursor
+	(
+		table => ["my_master","my_slave"],
+		fields =>
+		[
+			{"my_master.my_i_m_id"=>"mi"},
+			{"my_slave.my_i_s_id"=>"si"},
+			{"my_master.my_s_m_code"=>"ms"},
+			{"my_slave.my_s_s_code"=>"ss"},
+	       	],
+		where =>
+		[
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+		],
+		cursor_key =>
+		[
+			"ms",
+			"ss",
+		],
+		cursor_info => \%cursor,
+		buffer => \@buffer,
+		limit => 10,
+		cursor_command => SQL_SIMPLE_CURSOR_LAST,
+	);
+	return 0 if (&testRC($dbh,"1350","my_autoincrement_1"));
+	diag("Expected: master_0009.slave_0010, master_0009.slave_0019");
+	diag("Buffer..: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	&myOK($cursor{lines}==10 && join(".",@{$cursor{first}}) eq "master_0009.slave_0010" && join(".",@{$cursor{last}}) eq "master_0009.slave_0019","1351","Cursor expected page-LAST");
+}
+
+################################################################################
+
+sub test_all_Standard_Select()
+{
+	my $dbh = shift;
+	my $contents = shift;
+
+	&myDIAG("Select");
 
 	foreach my $table(sort(keys(%{$contents})))
 	{
@@ -988,7 +1327,7 @@ sub testGenericStandardSelect()
 
 		my $er1=0;
 		my $er2=0;
-		my $er3=0;
+		my $warn=0;
 		my $ok1=0;
 		my $ok2=0;
 		my @buffer;
@@ -1022,35 +1361,28 @@ sub testGenericStandardSelect()
 				if (&testRC($dbh,"SEL002",$table))
 				{
 					$er2++;
-					diag($dbh->getLastSQL());
-					diag("ERROR: table $table, field $field, value $ref->{$field}");
 					next;
 				}
 				if ($dbh->getRows()==0)
 				{
-					$er3++;
-					diag($dbh->getLastSQL());
-					diag("ERROR: table $table, field $field, value $ref->{$field}");
+					$warn++;
+					diag("WARNING: table $table is empty, where $field => [ $ref->{$field} ] ");
 				}
 				$ok2++;
 			}
 		}
-		pass("SEL003 table ".$table.", ".$ok1." step1 successful") if ($ok1);
-		pass("SEL005 table ".$table.", ".$ok2." step2 successful") if ($ok2);
-		fail("SEL006 table ".$table.", ".$er1." step1 failure") if ($er1);
-		fail("SEL007 table ".$table.", ".$er2." step2 failure") if ($er2);
-		fail("SEL008 table ".$table.", ".$er3." step3 failure") if ($er3);
+		&myOK($er1==0 && $er2==0,"1401","Standard Select Test completed, table: ".$table.", ok: ".$ok1."/".$ok2.", errors: ".$er1."/".$er2.", warning(s): ".$warn);
 	}
 }
 
 ################################################################################
 
-sub testGenericAutoincrementInsert()
+sub test_Autoincrement_Cursor_Insert()
 {
 	my $dbh = shift;
 	my $contents = shift;
 
-	note("AUT000 Insert Autoincrement");
+	&myDIAG("Insert Autoincrement");
 
 	my $er=0;
 	my $ok=0;
@@ -1063,23 +1395,22 @@ sub testGenericAutoincrementInsert()
 			{
 				my_i_id => $ix,
 				my_i_no_1 => $ix+$ix,
-			    my_i_no_2 => $ix*$ix,
+				my_i_no_2 => $ix*$ix,
 			}
-	    );
-		(&testRC($dbh,"AUT001","my_autoincrement_1")) ? $er++ : $ok++;
+		);
+		(&testRC($dbh,"1501","my_autoincrement_1")) ? $er++ : $ok++;
 	}
-	fail("AUT002 ".$er." inserted errors") if ($er);
-	pass("AUT003 ".$ok." inserted successful") if ($ok);
+	&myOK($er==0,"1502","Insert Autoincrement completed, ok: ".$ok.", errors: ".$er);
 }
 
 ################################################################################
 
-sub testGenericMasterSlaveInsert()
+sub test_Master_Insert()
 {
 	my $dbh = shift;
 	my $contents = shift;
 
-	note("IMS000 Insert Master/Slave");
+	&myDIAG("Insert Master/Slave");
 
 	foreach my $code(0..9)
 	{
@@ -1096,7 +1427,7 @@ sub testGenericMasterSlaveInsert()
 				my_s_m_desc => "description_".$code,
 			}
 	       	);
-		(&testRC($dbh,"IMS001","my_master")) ? $er++ : $ok++;
+		(&testRC($dbh,"1601","my_master")) ? $er++ : $ok++;
 
 		foreach my $subcode(10..19)
 		{
@@ -1112,13 +1443,12 @@ sub testGenericMasterSlaveInsert()
 					my_s_s_desc => "description_".$subcode,
 				}
 		       	);
-			(&testRC($dbh,"IMS002","my_slave")) ? $er++ : $ok++;
+			(&testRC($dbh,"1602","my_slave")) ? $er++ : $ok++;
 		}
-		fail("IMS003 Number of ".$er." errors (master+slave), Code ".$code) if ($er);
-		pass("IMS004 Number of ".$ok." successful (master+slave), Code ".$code) if ($ok);
+		&myOK($er==0,"1603","Insert Master/Slave completed, ok: ".$ok.", errors: ".$er);
 	}
 
-	note("IMS010 Insert Master with duplicate state");
+	&myDIAG("Insert Master with duplicate state");
 
 	my $er=0;
 	my $ok=0;
@@ -1134,9 +1464,9 @@ sub testGenericMasterSlaveInsert()
 			where => [ my_s_m_code => "master_".$code ],
 			buffer => \$mykey
 		);
-		if (&testRC($dbh,"IMS010","my_master"))
+		if (&testRC($dbh,"1611","my_master"))
 		{
-			$no++;
+			$er++;
 			next;
 		}
 		my $update = "DESCRIPTION_".$code."_DUP";
@@ -1156,7 +1486,7 @@ sub testGenericMasterSlaveInsert()
 			},
 			conflict_key => "my_i_m_id",
 	       	);
-		if (&testRC($dbh,"IMS011","my_master"))
+		if (&testRC($dbh,"1612","my_master"))
 	       	{
 			$er++;
 			next;
@@ -1169,15 +1499,14 @@ sub testGenericMasterSlaveInsert()
 			where => [ my_s_m_code => "master_".$code ],
 			buffer => \$mydesc
 		);
-		if (&testRC($dbh,"IMS012","my_master"))
+		if (&testRC($dbh,"1613","my_master"))
 		{
-			$no++;
+			$er++;
 			next;
 		}
-		ok($mydesc eq $update,"IMS013 insert with conflict/duplicate for ".$code);
+		&myOK($mydesc eq $update,"1614","code ".$code);
 	}
-	fail("IMS014 Number of ".$no." notkey") if ($no);
-	fail("IMS015 Number of ".$er." errors") if ($er);
+	&myOK($er==0,"1615","Insert Master with duplicate state, errors: ".$er);
 }
 
 ################################################################################
@@ -1193,16 +1522,20 @@ sub testGenericMasterSlaveInsert()
 #	},
 #
 
-sub testGenericStandardInsert()
+sub test_all_Standard_Insert()
 {
 	my $dbh = shift;
 	my $contents = shift;
 
-	note("STD000 Insert Standard");
+	&myDIAG("Insert Standard");
 
+	my $no=0;
+	my $ok=0;
 	foreach my $table(sort(keys(%{$contents})))
 	{
 		next if (!($table =~ /^my_standard_/));
+
+		$no++;
 
 		my %fields;
 		my @fields;
@@ -1270,47 +1603,29 @@ sub testGenericStandardInsert()
 			}
 			else
 			{
-				fail("STD001 Field Invalid Type ".$contents->{$table}{info}{$field}{T});
+				&myOK(0,"1701","Field Invalid Type ".$contents->{$table}{info}{$field}{T});
 			}
 		}
 
 		$dbh->Insert( table=>$table, fields=>\%fields );
-		if (&testRC($dbh,"STD002",$table))
-		{
-			print STDERR $dbh->getLastSQL(),"\n";
-			fail("STD003 Insert-1, ".$table.", ".$dbh->getMessage());
-		}
-		else { pass("STD004 Insert-1, ".$table); }
+		next if (&testRC($dbh,"1702",$table));
 
-		$dbh->Insert( table=>$table, fields=>\@fields, values=>[ \@values ] );
-		if (&testRC($dbh,"STD010",$table))
-		{
-			print STDERR $dbh->getLastSQL(),"\n";
-			fail("STD011 Insert-2, ".$table.", ".$dbh->getMessage());
-		}
-		else { pass("SID012 Insert-2, ".$table); }
+		$dbh->Insert( table=>$table, fields=>\@fields, values=>\@values );
+		next if (&testRC($dbh,"1703",$table));
 
 		if (@fields==1)
 		{
 			$dbh->Insert( table=>$table, fields=>\@fields, values=>\@values2 );
-			if (&testRC($dbh,"STD020",$table))
-			{
-				print STDERR $dbh->getLastSQL(),"\n";
-				fail("STD021 Insert-3, ".$table.", ".$dbh->getMessage());
-			}
-			else { pass("STD022 Insert-3, ".$table); }
+			return 1 if (&testRC($dbh,"1704",$table));
 		}
 		else
 		{
 			$dbh->Insert( table=>$table, fields=>\@fields, values=>\@values1 );
-			if (&testRC($dbh,"STD030",$table))
-			{
-				print STDERR $dbh->getLastSQL(),"\n";
-				fail("STD031 Insert-4, ".$table.", ".$dbh->getMessage());
-			}
-			else { pass("STD032 Insert-4, ".$table); }
+			return 1 if (&testRC($dbh,"1705",$table));
 		}
+		$ok++;
 	}
+	&myOK($ok==$no,"1710","Insert Standard completed, tables: ".$no.", errors ".($no-$ok));
 }
 
 ################################################################################
@@ -1319,7 +1634,7 @@ sub testOPEN()
 {
 	my $options = {@_};
 
-	my $dbh = SQL::SimpleOps->new ( %{$options} );
+	my $dbh = SQL::SimpleOps->new ( %{$options}, message_log => 0 );
 	if (!defined($dbh))
 	{
 		print STDERR $SQL::SimpleOps::errstr."\n";
@@ -1333,23 +1648,72 @@ sub testOPEN()
 sub testRC()
 {
 	my $dbh = shift;
-	my $msg = shift;
+	my $cod = shift;
 	my $tbl = shift;
 
-	diag($dbh->getLastSQL()) if (defined($ENV{SQL_SIMPLE_DB_SHOW_SQL}) && $ENV{SQL_SIMPLE_DB_SHOW_SQL} eq "1");
 	my $cmd = $dbh->getLastSQL();
-	if ($dbh->getRC())
+	my ($hdr) = split(" ",$cmd);
+	my $rc = $dbh->getRC();
+
+	if ($rc)
 	{
+		fail("test-D".$cod." ".$hdr." ".$tbl);
+		diag("Code...: ".$rc);
+		diag("Message: ".$dbh->getMessage());
 		diag("Command: ".$cmd);
-		fail($msg." Code: ".$dbh->getRC().", Message: ".$dbh->getMessage());
+		&DONE() if ($ENV{EXIT_ON_FIRT_ERROR});
 		return 1;
 	}
 	else
 	{
-		($cmd) = split(" ",$cmd);
-		pass($msg." ".$cmd."[".$tbl."] successful");
+#		diag("test-D".$cod." ".$hdr." ".$tbl." successful");
 	}
-	return 0;
+	diag($dbh->getLastSQL()) if (defined($ENV{SQL_SIMPLE_DB_SHOW_SQL}) && $ENV{SQL_SIMPLE_DB_SHOW_SQL} eq "1");
+	return $rc;
+}
+
+################################################################################
+
+sub myDIAG()
+{
+	diag("################################################################################");
+
+	foreach my $msg(@_)
+	{
+		diag($msg);
+	}
+}
+
+################################################################################
+
+sub myOK()
+{
+	my $chk = shift;
+	my $cod = shift;
+	my $msg = shift;
+
+	my $rc = ok($chk,"test-D".$cod.": ".$msg);
+
+	&DONE() if (!$chk && $ENV{EXIT_ON_FIRT_ERROR});
+
+	return $rc;
+}
+
+################################################################################
+
+sub DONE()
+{
+	diag("");
+
+	if ($ENV{EXIT_ON_FIRT_ERROR})
+	{
+		diag("##########################################");
+		diag("##  ENV{EXIT_ON_FIRT_ERROR} is enabled  ##");
+		diag("##########################################");
+	}
+
+	done_testing();
+	exit(0);
 }
 
 __END__

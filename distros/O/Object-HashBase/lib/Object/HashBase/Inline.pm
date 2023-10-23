@@ -2,7 +2,7 @@ package Object::HashBase::Inline;
 use strict;
 use warnings;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 BEGIN { $Object::HashBase::Test::NO_RUN = 1 }
 use Object::HashBase;

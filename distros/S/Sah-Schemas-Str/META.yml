@@ -19,121 +19,133 @@ name: Sah-Schemas-Str
 provides:
   Data::Sah::Filter::perl::Str::maybe_convert_to_re:
     file: lib/Data/Sah/Filter/perl/Str/maybe_convert_to_re.pm
-    version: '0.015'
+    version: '0.016'
   Data::Sah::Filter::perl::Str::maybe_eval:
     file: lib/Data/Sah/Filter/perl/Str/maybe_eval.pm
-    version: '0.015'
+    version: '0.016'
   Sah::Schema::hexstr:
     file: lib/Sah/Schema/hexstr.pm
-    version: '0.015'
+    version: '0.016'
   Sah::Schema::latin_alpha:
     file: lib/Sah/Schema/latin_alpha.pm
-    version: '0.015'
+    version: '0.016'
   Sah::Schema::latin_alphanum:
     file: lib/Sah/Schema/latin_alphanum.pm
-    version: '0.015'
+    version: '0.016'
   Sah::Schema::latin_letter:
     file: lib/Sah/Schema/latin_letter.pm
-    version: '0.015'
+    version: '0.016'
   Sah::Schema::latin_lowercase_alpha:
     file: lib/Sah/Schema/latin_lowercase_alpha.pm
-    version: '0.015'
+    version: '0.016'
   Sah::Schema::latin_lowercase_letter:
     file: lib/Sah/Schema/latin_lowercase_letter.pm
-    version: '0.015'
+    version: '0.016'
   Sah::Schema::latin_uppercase_alpha:
     file: lib/Sah/Schema/latin_uppercase_alpha.pm
-    version: '0.015'
+    version: '0.016'
   Sah::Schema::latin_uppercase_letter:
     file: lib/Sah/Schema/latin_uppercase_letter.pm
-    version: '0.015'
+    version: '0.016'
+  Sah::Schema::lowercase_str:
+    file: lib/Sah/Schema/lowercase_str.pm
+    version: '0.016'
   Sah::Schema::non_empty_str:
     file: lib/Sah/Schema/non_empty_str.pm
-    version: '0.015'
+    version: '0.016'
   Sah::Schema::percent_str:
     file: lib/Sah/Schema/percent_str.pm
-    version: '0.015'
+    version: '0.016'
   Sah::Schema::str1:
     file: lib/Sah/Schema/str1.pm
-    version: '0.015'
+    version: '0.016'
   Sah::Schema::str_or_aos:
     file: lib/Sah/Schema/str_or_aos.pm
-    version: '0.015'
+    version: '0.016'
   Sah::Schema::str_or_aos1:
     file: lib/Sah/Schema/str_or_aos1.pm
-    version: '0.015'
+    version: '0.016'
   Sah::Schema::str_or_code:
     file: lib/Sah/Schema/str_or_code.pm
-    version: '0.015'
+    version: '0.016'
   Sah::Schema::str_or_re:
     file: lib/Sah/Schema/str_or_re.pm
-    version: '0.015'
+    version: '0.016'
   Sah::Schema::str_or_re_or_code:
     file: lib/Sah/Schema/str_or_re_or_code.pm
-    version: '0.015'
+    version: '0.016'
+  Sah::Schema::uppercase_str:
+    file: lib/Sah/Schema/uppercase_str.pm
+    version: '0.016'
   Sah::SchemaR::hexstr:
     file: lib/Sah/SchemaR/hexstr.pm
-    version: '0.015'
+    version: '0.016'
   Sah::SchemaR::latin_alpha:
     file: lib/Sah/SchemaR/latin_alpha.pm
-    version: '0.015'
+    version: '0.016'
   Sah::SchemaR::latin_alphanum:
     file: lib/Sah/SchemaR/latin_alphanum.pm
-    version: '0.015'
+    version: '0.016'
   Sah::SchemaR::latin_letter:
     file: lib/Sah/SchemaR/latin_letter.pm
-    version: '0.015'
+    version: '0.016'
   Sah::SchemaR::latin_lowercase_alpha:
     file: lib/Sah/SchemaR/latin_lowercase_alpha.pm
-    version: '0.015'
+    version: '0.016'
   Sah::SchemaR::latin_lowercase_letter:
     file: lib/Sah/SchemaR/latin_lowercase_letter.pm
-    version: '0.015'
+    version: '0.016'
   Sah::SchemaR::latin_uppercase_alpha:
     file: lib/Sah/SchemaR/latin_uppercase_alpha.pm
-    version: '0.015'
+    version: '0.016'
   Sah::SchemaR::latin_uppercase_letter:
     file: lib/Sah/SchemaR/latin_uppercase_letter.pm
-    version: '0.015'
+    version: '0.016'
+  Sah::SchemaR::lowercase_str:
+    file: lib/Sah/SchemaR/lowercase_str.pm
+    version: '0.016'
   Sah::SchemaR::non_empty_str:
     file: lib/Sah/SchemaR/non_empty_str.pm
-    version: '0.015'
+    version: '0.016'
   Sah::SchemaR::percent_str:
     file: lib/Sah/SchemaR/percent_str.pm
-    version: '0.015'
+    version: '0.016'
   Sah::SchemaR::str1:
     file: lib/Sah/SchemaR/str1.pm
-    version: '0.015'
+    version: '0.016'
   Sah::SchemaR::str_or_aos:
     file: lib/Sah/SchemaR/str_or_aos.pm
-    version: '0.015'
+    version: '0.016'
   Sah::SchemaR::str_or_aos1:
     file: lib/Sah/SchemaR/str_or_aos1.pm
-    version: '0.015'
+    version: '0.016'
   Sah::SchemaR::str_or_code:
     file: lib/Sah/SchemaR/str_or_code.pm
-    version: '0.015'
+    version: '0.016'
   Sah::SchemaR::str_or_re:
     file: lib/Sah/SchemaR/str_or_re.pm
-    version: '0.015'
+    version: '0.016'
   Sah::SchemaR::str_or_re_or_code:
     file: lib/Sah/SchemaR/str_or_re_or_code.pm
-    version: '0.015'
+    version: '0.016'
+  Sah::SchemaR::uppercase_str:
+    file: lib/Sah/SchemaR/uppercase_str.pm
+    version: '0.016'
   Sah::Schemas::Str:
     file: lib/Sah/Schemas/Str.pm
-    version: '0.015'
+    version: '0.016'
 requires:
   Data::Sah::Coerce::perl::To_str::From_str::to_lower: '0'
   Data::Sah::Coerce::perl::To_str::From_str::to_upper: '0'
   Regexp::Pattern::Float: '0'
-  perl: '5.010001'
+  perl: '5.014'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Str
   homepage: https://metacpan.org/release/Sah-Schemas-Str
   repository: git://github.com/perlancar/perl-Sah-Schemas-Str.git
-version: '0.015'
+version: '0.016'
 x_Dist_Zilla:
   perl:
     version: '5.038000'

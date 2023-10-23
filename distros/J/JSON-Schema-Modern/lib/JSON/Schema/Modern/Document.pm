@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.572';
+our $VERSION = '0.573';
 
 use 5.020;
 use Moo;
@@ -100,7 +100,7 @@ has errors => (
 );
 
 sub errors { ($_[0]->{errors}//[])->@* }
-sub has_errors { scalar ($_[0]->{errors}//[])->@* }
+sub has_errors { scalar(($_[0]->{errors}//[])->@*) }
 
 around _add_resources => sub {
   my $orig = shift;
@@ -210,7 +210,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.572
+version 0.573
 
 =head1 SYNOPSIS
 

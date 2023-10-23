@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::latin_lowercase_letter;
 
-our $DATE = '2023-09-03'; # DATE
-our $VERSION = '0.015'; # VERSION
+our $DATE = '2023-10-23'; # DATE
+our $VERSION = '0.016'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{examples=>[{valid=>0,value=>""},{valid=>1,validated_value=>"a",value=>"A"},{valid=>1,value=>"a"},{summary=>"Multiple letters",valid=>0,value=>"ab"},{summary=>"Non-letter",valid=>0,value=>1},{summary=>"Non-letter",valid=>0,value=>";"}],len=>1,match=>qr(\A[a-z]\z),summary=>"A single latin lowercase letter, i.e. a-z","x.perl.coerce_rules"=>["From_str::to_lower"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::latin_lowercase_letter - A single latin lowercase letter, i.e. a-z
 
 =head1 VERSION
 
-This document describes version 0.015 of Sah::SchemaR::latin_lowercase_letter (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
+This document describes version 0.016 of Sah::SchemaR::latin_lowercase_letter (from Perl distribution Sah-Schemas-Str), released on 2023-10-23.
 
 =head1 DESCRIPTION
 

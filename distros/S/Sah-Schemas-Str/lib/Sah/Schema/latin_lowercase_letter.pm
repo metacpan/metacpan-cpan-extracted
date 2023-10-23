@@ -3,9 +3,9 @@ package Sah::Schema::latin_lowercase_letter;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2023-10-23'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 our $schema = [str => {
     summary => 'A single latin lowercase letter, i.e. a-z',
@@ -39,7 +39,7 @@ Sah::Schema::latin_lowercase_letter - A single latin lowercase letter, i.e. a-z
 
 =head1 VERSION
 
-This document describes version 0.015 of Sah::Schema::latin_lowercase_letter (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
+This document describes version 0.016 of Sah::Schema::latin_lowercase_letter (from Perl distribution Sah-Schemas-Str), released on 2023-10-23.
 
 =head1 SYNOPSIS
 
@@ -73,12 +73,12 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "a";
+ $data = "A";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = ";";
- my $errmsg = $validator->($data); # => "Must match regex pattern qr(\\A[a-z]\\z)"
+ $data = "ab";
+ my $errmsg = $validator->($data); # => "Length must be 1"
 
 Often a schema has coercion rule or default value rules, so after validation the
 validated value will be different from the original. To return the validated
@@ -88,12 +88,12 @@ validated value will be different from the original. To return the validated
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "a";
+ $data = "A";
  my $res = $validator->($data); # => ["","a"]
  
  # a sample invalid data
- $data = ";";
- my $res = $validator->($data); # => ["Must match regex pattern qr(\\A[a-z]\\z)",";"]
+ $data = "ab";
+ my $res = $validator->($data); # => ["Length must be 1","ab"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -197,6 +197,8 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Str>.
 =head1 SEE ALSO
 
 L<Sah::Schema::latin_uppercase_letter>
+
+L<Sah::Schema::uppercase_str>
 
 =head1 AUTHOR
 

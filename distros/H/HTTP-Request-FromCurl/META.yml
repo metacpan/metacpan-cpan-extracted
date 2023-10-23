@@ -31,7 +31,6 @@ no_index:
 requires:
   Carp: '0'
   File::Basename: '0'
-  Filter::signatures: '0.16'
   Getopt::Long: '2.39'
   HTTP::Request: '6.07'
   HTTP::Request::Common: '6.07'
@@ -43,11 +42,11 @@ requires:
   PerlX::Maybe: '0'
   URI: '0'
   URI::Escape: '0'
-  perl: '5.010'
+  perl: '5.020'
 resources:
   bugtracker: https://github.com/Corion/HTTP-Request-FromCurl/issues
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/HTTP-Request-FromCurl.git
-version: '0.52'
+version: '0.54'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

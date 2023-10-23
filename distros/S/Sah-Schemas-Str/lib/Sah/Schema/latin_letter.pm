@@ -3,9 +3,9 @@ package Sah::Schema::latin_letter;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2023-10-23'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 our $schema = [str => {
     summary => 'A single latin letter, i.e. A-Z or a-z',
@@ -37,7 +37,7 @@ Sah::Schema::latin_letter - A single latin letter, i.e. A-Z or a-z
 
 =head1 VERSION
 
-This document describes version 0.015 of Sah::Schema::latin_letter (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
+This document describes version 0.016 of Sah::Schema::latin_letter (from Perl distribution Sah-Schemas-Str), released on 2023-10-23.
 
 =head1 SYNOPSIS
 
@@ -73,8 +73,8 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = ";";
- my $errmsg = $validator->($data); # => "Must match regex pattern qr(\\A[A-Za-z]\\z)"
+ $data = "AB";
+ my $errmsg = $validator->($data); # => "Length must be 1"
 
 Often a schema has coercion rule or default value rules, so after validation the
 validated value will be different from the original. To return the validated
@@ -88,8 +88,8 @@ validated value will be different from the original. To return the validated
  my $res = $validator->($data); # => ["","A"]
  
  # a sample invalid data
- $data = ";";
- my $res = $validator->($data); # => ["Must match regex pattern qr(\\A[A-Za-z]\\z)",";"]
+ $data = "AB";
+ my $res = $validator->($data); # => ["Length must be 1","AB"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like

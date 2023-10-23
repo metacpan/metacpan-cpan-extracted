@@ -3,9 +3,9 @@ package Sah::Schema::latin_alphanum;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2023-10-23'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 our $schema = [str => {
     summary => 'String containing only zero or more Latin letters/digits, i.e. A-Za-z0-9',
@@ -34,7 +34,7 @@ Sah::Schema::latin_alphanum - String containing only zero or more Latin letters/
 
 =head1 VERSION
 
-This document describes version 0.015 of Sah::Schema::latin_alphanum (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
+This document describes version 0.016 of Sah::Schema::latin_alphanum (from Perl distribution Sah-Schemas-Str), released on 2023-10-23.
 
 =head1 SYNOPSIS
 
@@ -62,7 +62,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "A019";
+ $data = "";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
@@ -77,8 +77,8 @@ validated value will be different from the original. To return the validated
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "A019";
- my $res = $validator->($data); # => ["","A019"]
+ $data = "";
+ my $res = $validator->($data); # => ["",""]
  
  # a sample invalid data
  $data = "foo bar";

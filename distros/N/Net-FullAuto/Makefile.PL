@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000641';
+our $VERSION='1.0000642';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -1887,10 +1887,10 @@ if ($^O ne 'MSWin32' && $^O ne 'MSWin64') {
    &fa_install_module('Net::HTTP','install','Makefile');
    &fa_install_module('Data::Dump','install','Makefile');
    &fa_install_module('File::HomeDir','install','Makefile');
+   &fa_install_module('Try::Tiny','install','Makefile');
    &fa_install_module('Test::Fatal','install','Makefile');
    #&fa_install_module('Test::Needs','install','Makefile');
    &fa_install_module('Test::RequiresInternet','install','Makefile');
-   &fa_install_module('Try::Tiny','install','Makefile');
    &fa_install_module('LWP','install','Makefile');
    &fa_install_module('CPAN::Mini','install','Makefile');
    eval {

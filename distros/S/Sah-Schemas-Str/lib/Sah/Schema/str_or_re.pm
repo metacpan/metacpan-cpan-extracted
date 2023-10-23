@@ -3,9 +3,9 @@ package Sah::Schema::str_or_re;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2023-10-23'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 our $schema = [any => {
     summary => 'String or regex (if string is of the form `/.../`)',
@@ -66,7 +66,7 @@ Sah::Schema::str_or_re - String or regex (if string is of the form `/.../`)
 
 =head1 VERSION
 
-This document describes version 0.015 of Sah::Schema::str_or_re (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
+This document describes version 0.016 of Sah::Schema::str_or_re (from Perl distribution Sah-Schemas-Str), released on 2023-10-23.
 
 =head1 SYNOPSIS
 
@@ -114,12 +114,12 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "/foo";
+ $data = "qr(foo(";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = {};
- my $errmsg = $validator->($data); # => "Not of type text"
+ $data = "/foo[/";
+ my $errmsg = $validator->($data); # => "Invalid regex: Unmatched [ in regex; marked by <-- HERE in m/foo[ <-- HERE / at (eval 2842) line 1.\n"
 
 Often a schema has coercion rule or default value rules, so after validation the
 validated value will be different from the original. To return the validated
@@ -129,12 +129,12 @@ validated value will be different from the original. To return the validated
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "/foo";
- my $res = $validator->($data); # => ["","/foo"]
+ $data = "qr(foo(";
+ my $res = $validator->($data); # => ["","qr(foo("]
  
  # a sample invalid data
- $data = {};
- my $res = $validator->($data); # => ["Not of type text",{}]
+ $data = "/foo[/";
+ my $res = $validator->($data); # => ["Invalid regex: Unmatched [ in regex; marked by <-- HERE in m/foo[ <-- HERE / at (eval 2855) line 1.\n","/foo[/"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like

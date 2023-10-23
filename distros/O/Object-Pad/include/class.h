@@ -3,10 +3,6 @@
 
 #include "suspended_compcv.h"
 
-typedef struct AdjustBlock {
-  CV *cv;
-} AdjustBlock;
-
 /* Metadata about a class or role */
 struct ClassMeta {
   enum MetaType type : 8;
@@ -16,6 +12,7 @@ struct ClassMeta {
   unsigned int role_is_invokable : 1;
   unsigned int strict_params : 1;
   unsigned int has_adjust : 1; /* has at least one ADJUST(PARAMS) block */
+  unsigned int composed_adjust : 1; /* all ADJUST blocks are true blocks, composed into initfields */
   unsigned int has_superclass : 1;
   unsigned int has_buildargs : 1;
 
@@ -36,8 +33,8 @@ struct ClassMeta {
   HV *parammap;        /* NULL, or each elem is a raw pointer directly at a ParamMeta (MERGED) */
   AV *requiremethods;  /* each elem is an SVt_PV giving a name */
   CV *initfields;      /* the INITFIELDS method body */
-  AV *buildblocks;     /* the BUILD {} phaser blocks; each elem is a CV* directly (MERGED) */
-  AV *adjustblocks;    /* the ADJUST {} phaser blocks; each elem is a AdjustBlock* (MERGED) */
+  AV *buildcvs;        /* the BUILD {} phaser blocks; each elem is a CV* directly (MERGED) */
+  AV *adjustcvs;       /* the ADJUST {} phaser blocks; each elem is a CV* directly (MERGED) */
 
   AV *fieldhooks_makefield; /* NULL, or AV of struct FieldHook, all of whose ->funcs->post_makefield exist (MERGED) */
   AV *fieldhooks_construct; /* NULL, or AV of struct FieldHook, all of whose ->funcs->post_construct exist (MERGED) */
@@ -47,6 +44,12 @@ struct ClassMeta {
 
   SuspendedCompCVBuffer initfields_compcv; /* temporary PL_compcv + associated state during initfields */
   OP *initfields_lines;                    /* temporary OP_LINESEQ to contain the initfield ops */
+
+  SuspendedCompCVBuffer adjust_compcv; /* temporary PL_compcv + associated state during true-block ADJUSTs */
+  CV *adjust_methodscope;              /* temporary CV used during compilation of ADJUST blocks */
+  AV *adjust_params;                   /* temporary AV of the params used by true-block ADJUST :params */
+  OP *adjust_lines;                    /* temporary OP_LINESEQ to contain true-block ADJUSTs */
+  FIELDOFFSET next_fieldix_for_adjust; /* how many fields have we seen so far? */
 
   union {
     /* Things that only true classes have */
@@ -133,11 +136,23 @@ RoleEmbedding **ObjectPad_mop_class_get_all_roles(pTHX_ const ClassMeta *meta, U
 #define prepare_method_parse(meta)  ObjectPad__prepare_method_parse(aTHX_ meta)
 void ObjectPad__prepare_method_parse(pTHX_ ClassMeta *meta);
 
+#define add_fields_to_pad(meta, since_fieldix)  ObjectPad__add_fields_to_pad(aTHX_ meta, since_fieldix)
+void ObjectPad__add_fields_to_pad(pTHX_ ClassMeta *meta, FIELDOFFSET since_fieldix);
+
 #define start_method_parse(meta, is_common)  ObjectPad__start_method_parse(aTHX_ meta, is_common)
 void ObjectPad__start_method_parse(pTHX_ ClassMeta *meta, bool is_common);
 
 #define finish_method_parse(meta, is_common, body)  ObjectPad__finish_method_parse(aTHX_ meta, is_common, body)
 OP *ObjectPad__finish_method_parse(pTHX_ ClassMeta *meta, bool is_common, OP *body);
+
+#define prepare_adjust_params(meta)  ObjectPad__prepare_adjust_params(aTHX_ meta)
+void ObjectPad__prepare_adjust_params(pTHX_ ClassMeta *meta);
+
+#define parse_adjust_params(meta, params)  ObjectPad__parse_adjust_params(aTHX_ meta, params)
+void ObjectPad__parse_adjust_params(pTHX_ ClassMeta *meta, AV *params);
+
+#define finish_adjust_params(meta, params, body)  ObjectPad__finish_adjust_params(aTHX_ meta, params, body)
+OP *ObjectPad__finish_adjust_params(pTHX_ ClassMeta *meta, AV *params, OP *body);
 
 #define newop_croak_from_constructor(message)  ObjectPad__newop_croak_from_constructor(aTHX_ message)
 OP *ObjectPad__newop_croak_from_constructor(pTHX_ SV *message);

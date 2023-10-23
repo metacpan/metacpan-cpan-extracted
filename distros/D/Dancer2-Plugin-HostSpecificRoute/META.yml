@@ -1,0 +1,122 @@
+---
+abstract: 'Allow designating routes to respond only on hostname match'
+author:
+  - 'D Ruth Holloway <ruth@hiruthie.me>'
+build_requires:
+  Dancer2: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::Plugin::Times: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+  Test::WWW::Mechanize::PSGI: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: '0'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-HostSpecificRoute
+provides:
+  Dancer2::Plugin::HostSpecificRoute:
+    file: lib/Dancer2/Plugin/HostSpecificRoute.pm
+    version: '1.0000'
+requires:
+  Dancer2::Plugin: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://gitlab.com/GeekRuthie/Dancer2-Plugin-HostSpecificRoute/-/issues
+  homepage: https://p3rl.org/Dancer2::Plugin::HostSpecificRoute
+  repository: https://gitlab.com/GeekRuthie/Dancer2-Plugin-HostSpecificRoute.git
+version: '1.0000'
+x_BuiltWith:
+  modules:
+    CPAN::Meta: '2.150010'
+    Dancer2: '0.400001'
+    Dancer2::Plugin: '0.400001'
+    Dist::Zilla: '6.030'
+    Dist::Zilla::Plugin::Authority: '1.009'
+    Dist::Zilla::Plugin::AutoPrereqs: '6.030'
+    Dist::Zilla::Plugin::CPANFile: '6.030'
+    Dist::Zilla::Plugin::ChangeStats::Git: 0.6.0
+    Dist::Zilla::Plugin::CheckChangesHasContent: '0.011'
+    Dist::Zilla::Plugin::CoalescePod: 0.3.0
+    Dist::Zilla::Plugin::ConfirmRelease: '6.030'
+    Dist::Zilla::Plugin::ContributorCovenant: '2.000000'
+    Dist::Zilla::Plugin::ContributorsFile: 0.3.0
+    Dist::Zilla::Plugin::CopyrightYearFromGit: '0.009'
+    Dist::Zilla::Plugin::Covenant: 0.1.2
+    Dist::Zilla::Plugin::ExecDir: '6.030'
+    Dist::Zilla::Plugin::FakeRelease: '6.030'
+    Dist::Zilla::Plugin::Git::Check: '2.048'
+    Dist::Zilla::Plugin::Git::Commit: '2.048'
+    Dist::Zilla::Plugin::Git::CommitBuild: '2.048'
+    Dist::Zilla::Plugin::Git::Contributors: '0.036'
+    Dist::Zilla::Plugin::Git::GatherDir: '2.048'
+    Dist::Zilla::Plugin::Git::Push: '2.048'
+    Dist::Zilla::Plugin::Git::Tag: '2.048'
+    Dist::Zilla::Plugin::GitLab::Meta: '1.0002'
+    Dist::Zilla::Plugin::GitLab::Update: '1.0002'
+    Dist::Zilla::Plugin::INI::Baked: '0.002002'
+    Dist::Zilla::Plugin::InstallGuide: '1.200014'
+    Dist::Zilla::Plugin::InstallRelease: '0.008'
+    Dist::Zilla::Plugin::License: '6.030'
+    Dist::Zilla::Plugin::MakeMaker: '6.030'
+    Dist::Zilla::Plugin::Manifest: '6.030'
+    Dist::Zilla::Plugin::ManifestSkip: '6.030'
+    Dist::Zilla::Plugin::MetaData::BuiltWith: '1.004005'
+    Dist::Zilla::Plugin::MetaJSON: '6.030'
+    Dist::Zilla::Plugin::MetaProvides::Package: '2.004003'
+    Dist::Zilla::Plugin::MetaYAML: '6.030'
+    Dist::Zilla::Plugin::MinimumPerl: '1.006'
+    Dist::Zilla::Plugin::NextRelease: '6.030'
+    Dist::Zilla::Plugin::NextVersion::Semantic: 0.2.6
+    Dist::Zilla::Plugin::OurPkgVersion: '0.21'
+    Dist::Zilla::Plugin::PodWeaver: '4.010'
+    Dist::Zilla::Plugin::Prereqs::Plugins: '1.003003'
+    Dist::Zilla::Plugin::PreviousVersion::Changelog: 0.2.6
+    Dist::Zilla::Plugin::PruneCruft: '6.030'
+    Dist::Zilla::Plugin::ReadmeMarkdownFromPod: '0.141140'
+    Dist::Zilla::Plugin::RunExtraTests: '0.029'
+    Dist::Zilla::Plugin::SchwartzRatio: 0.3.4
+    Dist::Zilla::Plugin::Test::Compile: '2.058'
+    Dist::Zilla::Plugin::Test::ReportPrereqs: '0.029'
+    Dist::Zilla::Plugin::TestRelease: '6.030'
+    ExtUtils::MakeMaker: '7.62'
+    File::Spec: '3.80'
+    IO::Handle: '1.46'
+    IPC::Open3: '1.21'
+    Test2::Plugin::NoWarnings: '0.09'
+    Test2::Plugin::Times: '0.000155'
+    Test2::V0: '0.000155'
+    Test::More: '1.302183'
+    Test::WWW::Mechanize::PSGI: '0.39'
+    lib: '0.65'
+    strict: '1.12'
+    warnings: '1.51'
+  perl:
+    original: v5.34.1
+    qv: 1
+    version:
+      - 5
+      - 34
+      - 1
+  platform: linux
+x_author_pledge:
+  version: '1'
+x_authority: cpan:GEEKRUTH
+x_contributor_covenant:
+  version: '0.02'
+x_generated_by_perl: v5.34.1
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

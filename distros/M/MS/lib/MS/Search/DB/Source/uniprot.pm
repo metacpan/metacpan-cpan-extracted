@@ -41,11 +41,12 @@ sub _fetch_fh {
             @proteomes = ($self->{proteome});
         }
         elsif (defined $self->{taxid} && ! defined $self->{proteome}) {
-            my $ref_only = $self->{ref_only} ? 'yes' : 'no';
+            my $ref_only = $self->{ref_only} ? 'true' : 'false';
             my $top_node = $self->{taxid} // die "No taxon specified\n";
             die "Taxon must be NCBI integer ID\n" if ($top_node =~ /\D/);
 
-            my $list_url = "http://www.uniprot.org/proteomes/?query=reference:$ref_only+taxonomy:$top_node&format=list";
+            #my $list_url = "http://www.uniprot.org/proteomes/?query=reference:$ref_only+taxonomy:$top_node&format=list";
+            my $list_url = "https://rest.uniprot.org/proteomes/stream?query=reference:$ref_only+taxonomy_id:$top_node&format=list";
 
             my $resp = HTTP::Tiny->new->get($list_url);
             die "Failed to fetch proteome list: $resp->{status} $resp->{reason}\n"
@@ -59,7 +60,7 @@ sub _fetch_fh {
         my $fasta;
         my $want;
         my $reviewed = $self->{reviewed_only}
-            ? '+AND+reviewed:yes'
+            ? '+AND+reviewed:true'
             : '';
         my $include  = $self->{include_isoforms}
             ? 'yes'
@@ -67,7 +68,8 @@ sub _fetch_fh {
         for (@proteomes) {
             my $id = uri_escape($_);
             warn "Fetching $id\n";
-            my $fetch_url = "http://www.uniprot.org/uniprot/?query=proteome:$id$reviewed&include=$include&format=fasta";
+            #my $fetch_url = "http://www.uniprot.org/uniprot/?query=proteome:$id$reviewed&include=$include&format=fasta";
+            my $fetch_url = "https://rest.uniprot.org/uniprotkb/stream?query=proteome:$id$reviewed&include=$include&format=fasta";
             my $resp = HTTP::Tiny->new->get( $fetch_url, { data_callback
                 => sub { print {$wtr} $_[0] if ($_[1]->{status} < 300 ) } } );
             die "Failed to fetch sequences for $_: $resp->{status} $resp->{reason}\n"
@@ -86,13 +88,13 @@ __END__
 
 =head1 NAME
 
-MS::DB::Search::Source::uniprot - interface for Uniprot downloads
+MS::Search::DB::Source::uniprot - interface for Uniprot downloads
 
 =head1 SYNOPSIS
 
-    use MS::DB::Search;
+    use MS::Search::DB;
 
-    my $db = MS::DB::Search->new();
+    my $db = MS::Search::DB->new();
 
     $db->add_from_source(
         source           => 'uniprot',
@@ -104,14 +106,14 @@ MS::DB::Search::Source::uniprot - interface for Uniprot downloads
 
 =head1 DESCRIPTION
 
-C<MS::DB::Search::Source::uniprot> provides an interface to the Uniprot
+C<MS::Search::DB::Source::uniprot> provides an interface to the Uniprot
 database for fetching proteomes based on taxonomic ID. It is not intended to
 be called directly, but rather used via the 'source' argument to the
-L<MS::DB::Search> C<add_from_source> method.
+L<MS::Search::DB> C<add_from_source> method.
 
 =head1 ARGUMENTS
 
-The following arguments should be provided to the L<MS::DB::Search>
+The following arguments should be provided to the L<MS::Search::DB>
 C<add_from_source> method call:
 
 =over 4

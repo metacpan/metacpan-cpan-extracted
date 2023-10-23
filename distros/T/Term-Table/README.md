@@ -5,22 +5,22 @@ Term::Table - Format a header and rows into a table
 # DESCRIPTION
 
 This is used by some failing tests to provide diagnostics about what has gone
-wrong. This module is able to generic format rows of data into tables.
+wrong. This module is able to format rows of data into tables.
 
 # SYNOPSIS
 
     use Term::Table;
 
     my $table = Term::Table->new(
-        max_width      => 80,    # defaults to terminal size
+        max_width      => 80,    # Defaults to terminal size
         pad            => 4,     # Extra padding between table and max-width (defaults to 4)
-        allow_overflow => 0,     # default is 0, when off an exception will be thrown if the table is too big
-        collapse       => 1,     # do not show empty columns
+        allow_overflow => 0,     # Default is 0, when off an exception will be thrown if the table is too big
+        collapse       => 1,     # Do not show empty columns
 
         header => ['name', 'age', 'hair color'],
         rows   => [
-            ['Fred Flinstone',  2000000, 'black'],
-            ['Wilma Flinstone', 1999995, 'red'],
+            ['Fred Flintstone',  2000000, 'black'],
+            ['Wilma Flintstone', 1999995, 'red'],
             ...
         ],
     );
@@ -29,13 +29,13 @@ wrong. This module is able to generic format rows of data into tables.
 
 This prints a table like this:
 
-    +-----------------+---------+------------+
-    | name            | age     | hair color |
-    +-----------------+---------+------------+
-    | Fred Flinstone  | 2000000 | black      |
-    | Wilma Flinstone | 1999995 | red        |
-    | ...             | ...     | ...        |
-    +-----------------+---------+------------+
+    +------------------+---------+------------+
+    | name             | age     | hair color |
+    +------------------+---------+------------+
+    | Fred Flintstone  | 2000000 | black      |
+    | Wilma Flintstone | 1999995 | red        |
+    | ...              | ...     | ...        |
+    +------------------+---------+------------+
 
 # INTERFACE
 
@@ -46,8 +46,8 @@ This prints a table like this:
 
 - header => \[ ... \]
 
-    If you want a header specify it here. This takes an arrayref with each columns
-    heading.
+    If you want a header specify it here.
+    This takes an arrayref with each columns heading.
 
 - rows => \[ \[...\], \[...\], ... \]
 
@@ -66,16 +66,17 @@ This prints a table like this:
 
 - pad => $num
 
-    Defaults to 4, extra padding for row width calculations. Default is for legacy
-    support. Set this to 0 to turn padding off.
+    Defaults to `4`, extra padding for row width calculations.
+    Default is for legacy support.
+    Set this to `0` to turn padding off.
 
 - allow\_overflow => $bool
 
-    Defaults to 0. If this is off then an exception will be thrown if the table
-    cannot be made to fit inside the max-width. If this is set to 1 then the table
-    will be rendered anyway, larger than max-width, if it is not possible to stay
-    within the max-width. In other words this turns max-width from a hard-limit to
-    a soft recommendation.
+    Defaults to `0`. If this is off then an exception will be thrown if the table
+    cannot be made to fit inside the max-width. If this is set to `1` then the
+    table will be rendered anyway, larger than max-width, if it is not possible
+    to stay within the max-width. In other words this turns max-width from a
+    hard-limit to a soft recommendation.
 
 - sanitize => $bool
 
@@ -84,7 +85,7 @@ This prints a table like this:
     escape sequences. This prevents newlines, tabs, and similar whitespace from
     disrupting the table.
 
-    **Note:** newlines are marked as '\\n', but a newline is also inserted into the
+    **Note:** newlines are marked as `\n`, but a newline is also inserted into the
     data so that it typically displays in a way that is useful to humans.
 
     Example:
@@ -156,8 +157,8 @@ will be anomalies in the table:
 
 # SOURCE
 
-The source code repository for Term-Table can be found at
-`http://github.com/exodist/Term-Table/`.
+The source code repository for `Term-Table` can be found at
+[https://github.com/exodist/Term-Table/](https://github.com/exodist/Term-Table/).
 
 # MAINTAINERS
 
@@ -174,4 +175,4 @@ Copyright 2016 Chad Granum <exodist@cpan.org>.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See `http://dev.perl.org/licenses/`
+See [https://dev.perl.org/licenses/](https://dev.perl.org/licenses/)

@@ -2,7 +2,7 @@ package Object::HashBase;
 use strict;
 use warnings;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 our $HB_VERSION = $VERSION;
 # The next line is for inlining
 # <-- START -->
@@ -260,7 +260,7 @@ C<Object::HashBase>.
 You can re-run this script to regenerate the files, or upgrade them to newer
 versions.
 
-If the script was not installed, it can be found int he C<scripts/> directory.
+If the script was not installed, it can be found in the C<scripts/> directory.
 
 =head1 METHODS
 

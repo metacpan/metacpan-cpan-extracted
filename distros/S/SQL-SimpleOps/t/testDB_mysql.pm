@@ -34,7 +34,7 @@ sub MySQL_envfail()
 	diag("MySQL/MariaDB tests IGNORED");
 	diag("");
 	if (@_) { diag(@_); diag(""); }
-	diag("see: README.txt how to configure the MySQL/MariaDB tests");
+	diag("See text README how to configure the MySQL/MariaDB tests");
 	diag("");
 }
 

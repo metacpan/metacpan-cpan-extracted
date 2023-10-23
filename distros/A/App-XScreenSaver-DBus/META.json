@@ -38,7 +38,7 @@
             "Moo" : "0",
             "Net::DBus" : "0",
             "Net::DBus::Exporter" : "0",
-            "Net::DBus::Object" : "0",
+            "Net::DBus::ProxyObject" : "0",
             "Net::DBus::Reactor" : "0",
             "Try::Tiny" : "0",
             "curry" : "0",
@@ -66,7 +66,7 @@
          "web" : "https://www.thenautilus.net/cgit/xscreensaver-dbus/"
       }
    },
-   "version" : "1.0.3",
+   "version" : "1.0.4",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.23",
    "x_spdx_expression" : "AGPL-3.0"

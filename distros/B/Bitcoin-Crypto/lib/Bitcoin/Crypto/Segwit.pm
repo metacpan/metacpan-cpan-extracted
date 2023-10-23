@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Segwit;
-$Bitcoin::Crypto::Segwit::VERSION = '2.001';
+$Bitcoin::Crypto::Segwit::VERSION = '2.002';
 use v5.10;
 use strict;
 use warnings;

@@ -24,7 +24,6 @@ use Exporter;
 use vars qw(
             $VERSION
             $REQUEST_COUNT
-            $USE_SMAPS
 
             $MAX_PROCESS_SIZE
             $MAX_UNSHARED_SIZE
@@ -41,7 +40,6 @@ use vars qw(
 @EXPORT_OK = qw(
                 $VERSION
                 $REQUEST_COUNT
-                $USE_SMAPS
                 $MAX_PROCESS_SIZE
                 $MAX_UNSHARED_SIZE
                 $MIN_SHARE_SIZE
@@ -49,7 +47,7 @@ use vars qw(
                 $START_TIME
                );
 
-$VERSION = '0.97';
+$VERSION = '0.98';
 
 $REQUEST_COUNT          = 1;
 
@@ -140,17 +138,8 @@ BEGIN {
     }
     elsif ($Config{'osname'} eq 'linux') {
         _load('Linux::Pid');
-
         *_platform_getppid = \&_linux_getppid;
-
-        if (eval { require Linux::Smaps && Linux::Smaps->new($$) }) {
-            $USE_SMAPS = 1;
-            *_platform_check_size = \&_linux_smaps_size_check;
-        }
-        else {
-            $USE_SMAPS = 0;
-            *_platform_check_size = \&_linux_size_check;
-        }
+        *_platform_check_size = \&_linux_size_check;
     }
     elsif ($Config{'osname'} =~ /(?:bsd|aix)/i) {
         # on OSX, getrusage() is returning 0 for proc & shared size.
@@ -170,24 +159,13 @@ BEGIN {
     }
 }
 
-sub _linux_smaps_size_check {
-    my $class = shift;
-
-    return $class->_linux_size_check() unless $USE_SMAPS;
-
-    my $s = Linux::Smaps->new($$)->all;
-    return ($s->size,
-	    $s->shared_clean + $s->shared_dirty,
-	    $s->private_clean + $s->private_dirty);
-}
-
 sub _linux_size_check {
     my $class = shift;
 
-    my ($size, $share) = (0, 0);
+    my ($size, $data) = (0, 0);
 
     if (open my $fh, '<', '/proc/self/statm') {
-        ($size, $share) = (split /\s/, scalar <$fh>)[0,2];
+        ($size, $data) = (split /\s/, scalar <$fh>)[0,5];
         close $fh;
     }
     else {
@@ -195,7 +173,9 @@ sub _linux_size_check {
     }
 
     # linux on intel x86 has 4KB page size...
-    return ($size * 4, $share * 4);
+    $size <<= 2;
+    $data <<= 2;
+    return ($size, $size - $data, $data);
 }
 
 sub _solaris_2_6_size_check {

@@ -1,0 +1,30 @@
+---
+abstract: 'chip driver for F<PMS5003>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test2::V0: '0'
+  Test::Device::Chip::Adapter: '0.26'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Device-Chip-PMS5003
+provides:
+  Device::Chip::PMS5003:
+    file: lib/Device/Chip/PMS5003.pm
+    version: '0.01'
+requires:
+  Device::Chip: '0.10'
+  Device::Chip::Sensor: '0.23'
+  Future::AsyncAwait: '0.47'
+  Object::Pad: '0.800'
+  perl: '5.026'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

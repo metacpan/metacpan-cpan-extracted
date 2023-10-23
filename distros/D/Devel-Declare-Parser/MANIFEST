@@ -7,11 +7,11 @@ lib/Devel/Declare/Parser/Emulate.pm
 lib/Devel/Declare/Parser/Method.pm
 lib/Devel/Declare/Parser/Sublike.pm
 MANIFEST			This list of files
-META.json
-META.yml
 README
 t/Codeblock.t
 t/Method.t
 t/Parser.t
 t/Parsers.t
 t/Sublike.t
+META.yml
+META.json

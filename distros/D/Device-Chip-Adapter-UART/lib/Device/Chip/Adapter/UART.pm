@@ -1,15 +1,18 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2018-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2018-2023 -- leonerd@leonerd.org.uk
 
-package Device::Chip::Adapter::UART;
-
-use strict;
+use v5.26;
 use warnings;
-use base qw( Device::Chip::Adapter );
+use Object::Pad 0.70;
 
-our $VERSION = '0.02';
+package Device::Chip::Adapter::UART 0.03;
+class Device::Chip::Adapter::UART;
+
+# Can't isa Device::Chip::Adapter because it doesn't have a 'new'
+use Device::Chip::Adapter;
+*make_protocol = \&Device::Chip::Adapter::make_protocol;
 
 use Carp;
 
@@ -34,6 +37,11 @@ This adapter provides both the C<GPIO> and C<UART> protocols. The C<GPIO>
 protocol wraps the modem control and handshaking lines. The C<UART> protocol
 adds access to the transmit and receive lines by adding the L</write> and
 L</read> methods.
+
+As the C<Device::Chip> interface is intended for hardware IO interfaces, it
+does not support the concept that a serial stream might spontaneously become
+disconnected. As such, an end-of-file condition on the stream filehandle will
+be reported as a future failure.
 
 =cut
 
@@ -60,31 +68,34 @@ F</dev/ttyUSB0> or F</dev/ttyACM0>.
 
 =cut
 
-sub new
-{
-   my $class = shift;
-   my %args = @_;
+field $_fh;
+field %_config = (
+   bits   => 8,
+   parity => "n",
+   stop   => 1,
+);
 
-   my $termios = IO::Termios->open( $args{dev} ) or
-      die "Cannot open $args{dev} - $!";
-
-   $termios->blocking( 0 );
-
-   for( $termios->getattr ) {
-      $_->cfmakeraw;
-      $_->setflag_clocal( 1 );
-
-      $termios->setattr( $_ );
+ADJUST :params (
+   :$fh = undef,
+   :$dev = undef,
+) {
+   if( defined $fh ) {
+      $_fh = $fh;
+      # OK
    }
+   else {
+      $_fh = IO::Termios->open( $dev ) or
+         die "Cannot open $dev - $!";
 
-   return bless {
-      termios => $termios,
+      $_fh->blocking( 0 );
 
-      # protocol defaults
-      bits   => 8,
-      parity => "n",
-      stop   => 1,
-   }, $class;
+      for( $_fh->getattr ) {
+         $_->cfmakeraw;
+         $_->setflag_clocal( 1 );
+
+         $_fh->setattr( $_ );
+      }
+   }
 }
 
 sub new_from_description
@@ -120,30 +131,29 @@ my %GPIOS_READ = (
    RI  => 1,
 );
 
-sub configure
+method configure ( %args )
 {
-   my $self = shift;
-   my %args = @_;
-
-   exists $args{$_} and $self->{$_} = delete $args{$_}
+   exists $args{$_} and $_config{$_} = delete $args{$_}
       for qw( baudrate bits parity stop );
 
    keys %args and
       croak "Unrecognised configure options: " . join( ", ", keys %args );
 
-   $self->{termios}->set_mode( join ",",
-      @{$self}{qw( baudrate bits parity stop )}
+   $_fh->set_mode( join ",",
+      @_config{qw( baudrate bits parity stop )}
    );
 
    return Future->done;
 }
 
-sub list_gpios
+method power ( $ ) { return Future->done } # ignore
+
+method list_gpios ()
 {
    return qw( DTR DSR RTS CTS CD RI );
 }
 
-sub meta_gpios
+method meta_gpios ()
 {
    return map {
       $GPIOS_READ{$_} ?
@@ -152,12 +162,9 @@ sub meta_gpios
    } shift->list_gpios;
 }
 
-sub read_gpios
+method read_gpios ( $gpios )
 {
-   my $self = shift;
-   my ( $gpios ) = @_;
-
-   my $values = $self->{termios}->get_modem();
+   my $values = $_fh->get_modem();
 
    my %ret;
 
@@ -168,41 +175,35 @@ sub read_gpios
    return Future->done( \%ret );
 }
 
-sub write_gpios
+method write_gpios ( $gpios )
 {
-   my $self = shift;
-   my ( $gpios ) = @_;
-
    my %set;
    defined $gpios->{$_} and $set{lc $_} = $gpios->{$_}
       for qw( DTR RTS );
 
    if( %set ) {
-      $self->{termios}->set_modem( \%set );
+      $_fh->set_modem( \%set );
    }
 
    return Future->done;
 }
 
-sub tris_gpios
+method tris_gpios ( $ )
 {
    # ignore
    Future->done;
 }
 
-sub write
+method write ( $bytes )
 {
-   my $self = shift;
-   my ( $bytes ) = @_;
-
-   return Future::IO->syswrite_exactly( $self->{termios}, $bytes );
+   return Future::IO->syswrite_exactly( $_fh, $bytes );
 }
 
-sub readbuffer
+field $_readbuf;
+method readbuffer ()
 {
-   my $self = shift;
-   return $self->{readbuf} //= do {
-      my $fh  = $self->{termios};
+   return $_readbuf //= do {
+      my $fh = $_fh;
 
       Future::Buffer->new(
          fill => sub { Future::IO->sysread( $fh, 256 ) },
@@ -210,13 +211,11 @@ sub readbuffer
    };
 }
 
-sub read
+method read ( $len )
 {
-   my $self = shift;
-   my ( $len ) = @_;
-
    # This is a 'read_exactly'
-   return $self->readbuffer->read_exactly( $len );
+   return $self->readbuffer->read_exactly( $len )
+      ->then( sub { return @_ ? Future->done( @_ ) : Future->fail( "EOF" ) } );
 }
 
 =head1 AUTHOR

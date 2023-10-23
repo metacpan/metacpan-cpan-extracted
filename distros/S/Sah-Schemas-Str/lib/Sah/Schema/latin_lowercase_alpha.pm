@@ -3,9 +3,9 @@ package Sah::Schema::latin_lowercase_alpha;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2023-10-23'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 our $schema = [str => {
     summary => 'String containing only zero or more lowercases Latin letters, i.e. a-z',
@@ -40,7 +40,7 @@ Sah::Schema::latin_lowercase_alpha - String containing only zero or more lowerca
 
 =head1 VERSION
 
-This document describes version 0.015 of Sah::Schema::latin_lowercase_alpha (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
+This document describes version 0.016 of Sah::Schema::latin_lowercase_alpha (from Perl distribution Sah-Schemas-Str), released on 2023-10-23.
 
 =head1 SYNOPSIS
 
@@ -68,7 +68,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "Abz";
+ $data = "";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
@@ -83,8 +83,8 @@ validated value will be different from the original. To return the validated
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "Abz";
- my $res = $validator->($data); # => ["","abz"]
+ $data = "";
+ my $res = $validator->($data); # => ["",""]
  
  # a sample invalid data
  $data = "foo123";
@@ -198,6 +198,8 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Str>.
 L<Sah::Schema::latin_alpha>
 
 L<Sah::Schema::latin_uppercase_alpha>
+
+L<Sah::Schema::uppercase_str>
 
 =head1 AUTHOR
 

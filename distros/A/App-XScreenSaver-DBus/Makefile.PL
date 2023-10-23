@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Moo" => 0,
     "Net::DBus" => 0,
     "Net::DBus::Exporter" => 0,
-    "Net::DBus::Object" => 0,
+    "Net::DBus::ProxyObject" => 0,
     "Net::DBus::Reactor" => 0,
     "Try::Tiny" => 0,
     "curry" => 0,
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.0.3",
+  "VERSION" => "1.0.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,7 +58,7 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "Net::DBus" => 0,
   "Net::DBus::Exporter" => 0,
-  "Net::DBus::Object" => 0,
+  "Net::DBus::ProxyObject" => 0,
   "Net::DBus::Reactor" => 0,
   "Test::More" => 0,
   "Try::Tiny" => 0,

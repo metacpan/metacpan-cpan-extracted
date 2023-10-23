@@ -35,7 +35,7 @@ sub PG_envfail()
 	diag("Postgres tests IGNORED");
 	diag("");
 	if (@_) { diag(@_); diag(""); }
-	diag("see: README.txt how to configure the Postgres tests");
+	diag("See text README how to configure the Postgres tests");
 	diag("");
 }
 

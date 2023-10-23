@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -25,19 +25,23 @@
             "Future" : "0",
             "Future::Buffer" : "0",
             "Future::IO" : "0.04",
-            "IO::Termios" : "0"
+            "IO::Termios" : "0",
+            "Object::Pad" : "0.70",
+            "perl" : "5.026"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Future::AsyncAwait" : "0",
+            "Test2::V0" : "0",
+            "Test::Future::IO" : "0.05"
          }
       }
    },
    "provides" : {
       "Device::Chip::Adapter::UART" : {
          "file" : "lib/Device/Chip/Adapter/UART.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -46,6 +50,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

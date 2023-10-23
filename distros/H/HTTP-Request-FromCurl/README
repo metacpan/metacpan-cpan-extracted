@@ -1,6 +1,8 @@
 HTTP::Request::FromCurl - create a HTTP::Request from a curl command line
 
 
+This document describes version 0.54.
+
 
 INSTALLATION
 

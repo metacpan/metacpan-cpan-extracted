@@ -1,5 +1,14 @@
 Revision history for Device-Chip-Adapter-UART
 
+0.03    2023-10-21
+        [CHANGES]
+         * Provide a dummy implememntation of the `->power` method
+         * Yield failed futures on EOF conditions
+         * General module style updates
+            + Use perl 5.26 features
+            + Use Object::Pad
+            + Swap unit tests from `Test::More` to `Test2::V0`
+
 0.02    2020-06-12
         [CHANGES]
          * Initial implementation of the 'UART' protocol, with ->write and

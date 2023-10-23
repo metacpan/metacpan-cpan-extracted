@@ -1,8 +1,9 @@
 # Parse::H - A parser for C header files that calls the given
 #  subroutines when a symbol of a specified type is encountered.
 #
-#	Copyright (C) 2022 Bogdan 'bogdro' Drozdowski,
+#	Copyright (C) 2022-2023 Bogdan 'bogdro' Drozdowski,
 #	  bogdro (at) users . sourceforge . net
+#	  bogdro /at\ cpan . org
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
@@ -25,11 +26,11 @@ Parse::H - A parser for C header files that calls the given subroutines when a s
 
 =head1 VERSION
 
-Version 0.11
+Version 0.20
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.20';
 
 =head1 DESCRIPTION
 
@@ -77,7 +78,7 @@ found elements.
         'pointer_size' => 8,
     );
 
-    parse_file (\%params);
+    parse_file (%params);
 
     close $infile;
 
@@ -122,6 +123,121 @@ sub _get_param
 	my $hash = shift;
 	my $name = shift;
 	return defined($hash->{$name})? $hash->{$name} : undef;
+}
+
+# =head2 _is_a_number
+#
+#  PRIVATE SUBROUTINE.
+#  Returns 1 if the provided parameter string looks like a valid number, 0 otherwise.
+#
+# =cut
+sub _is_a_number
+{
+	my $v = shift;
+	return ($v =~ /^((0?x[0-9a-f]+)|(0?b[01]+)|(0?o[0-7]+)|([0-9]+))$/oi)? 1 : 0;
+}
+
+# =head2 _output_array_entry_size
+#
+#  PRIVATE SUBROUTINE.
+#  Outputs an entry for the given array count and element size.
+#  Params: entry sub ref (struct or union), output sub ref,
+#   variable name, element count, element size.
+#  Returns the element count, converted to a number if possible.
+#
+# =cut
+sub _output_array_entry_size
+{
+	my $entry_sub = shift;
+	my $output_sub = shift;
+	my $var_name = shift;
+	my $count = shift;
+	my $size = shift;
+	my $line = '';
+	if ( $count =~ /^(0?[xbo])[0-9a-f_]+$/oi )
+	{
+		# looks like a hex/bin/oct number - convert
+		$count = oct($count);
+		$line = &$entry_sub($var_name, $size * $count) if $entry_sub;
+	}
+	elsif ( $count =~ /^[0-9_]+$/oi )
+	{
+		# looks like a dec number - convert
+		$count = int($count);
+		$line = &$entry_sub($var_name, $size * $count) if $entry_sub;
+	}
+	else
+	{
+		# not a number - emit a string
+		$line = &$entry_sub($var_name, "$size * $count") if $entry_sub;
+	}
+	&$output_sub($line) if $output_sub and $line;
+	# remove the parsed element
+	s/^[^;]*;//o;
+	return $count;
+}
+
+# =head2 _split_decl
+#
+#  PRIVATE SUBROUTINE.
+#  Splits a declaration line of multiple variables into separate declarations.
+#  Params: the input file handle.
+#
+# =cut
+sub _split_decl
+{
+	my $infile = shift;
+	# many variables of the same type - we put each on a separate line together with its type
+	if ( m#/\*#o )
+	{
+		while ( /,\s*$/o )
+		{
+			s/[\r\n]+//o;
+			$_ .= <$infile>;
+		}
+		while ( m#,.*/\*#o )#&& !/\(/o )
+		{
+			if ( m#\[.*/\*#o )
+			{
+				s/([\w*\s]+)\s+([()\w\s*]+)\s*(\[\w+\]),\s*(.*)/$1 $2$3;\n$1 $4/;
+			}
+			else
+			{
+				s/([\w*\s]+)\s+([()\w\s*]+)\s*,\s*(.*)/$1 $2;\n$1 $3/;
+			}
+		}
+	}
+	else
+	{
+		while ( /,\s*$/o )
+		{
+			s/[\r\n]+//o;
+			$_ .= <$infile>;
+		}
+		while ( /,.*/o )#&& !/\(/o )
+		{
+			if ( /\[/o )
+			{
+				s/([\w*\s]+)\s+([()\w\s*]+)\s*(\[\w+\]),\s*(.*)/$1 $2$3;\n$1 $4/;
+			}
+			else
+			{
+				s/([\w*\s]+)\s+([()\w\s*]+)\s*,\s*(.*)/$1 $2;\n$1 $3/;
+			}
+		}
+	}
+}
+
+# =head2 _remove_attrs
+#
+#  PRIVATE SUBROUTINE.
+#  Removes attributes from the current line.
+#
+# =cut
+sub _remove_attrs
+{
+	s/__attribute__\s*\(\(.*\)\)//go;
+	s/\[\[.*\]\]//go;
 }
 
 sub parse_union(\%);
@@ -202,15 +318,28 @@ sub parse_struct(\%)
 		'pointer_size' => $pointer_size,
 	);
 
+	&_remove_attrs;
 	# skip over "struct foo;"
-	if ( /^\s*struct\s+[\w\s\$\*]+(\[[^\]]*\])?;/o && ! /{/o )
+	if ( /^\s*struct\s+[\w\s\$\*]+(\[[^\]]*\])?;/o )#&& ! /{/o )
 	{
-		# changing the comments
-		if ( $comment_sub )
-		{
-			$_ = &$comment_sub($_);
-			&$output_sub($_) if $output_sub and $_;
-		}
+		# processing the comments
+# 		if ( $comment_sub )
+# 		{
+# 			$_ = &$comment_sub($_);
+# 			&$output_sub($_) if $output_sub and $_;
+# 		}
+		return (0, '');
+	}
+
+	# skip over "struct {};" (syntax error, but causes an infinite loop)
+	if ( /^\s*struct\s*\{\s*\}\s*;/o )
+	{
+		# processing the comments
+# 		if ( $comment_sub )
+# 		{
+# 			$_ = &$comment_sub($_);
+# 			&$output_sub($_) if $output_sub and $_;
+# 		}
 		return (0, '');
 	}
 
@@ -218,11 +347,14 @@ sub parse_struct(\%)
 	my $str_name = '';
 	if ( /^\s*struct\s+(\w+)/o )
 	{
-		if ( $1 and $1 ne '' and $1 !~ /\{/o )
-		{
-			$str_name = $1;
-		}
+		$str_name = $1;
 		s/^\s*struct\s+\w+//o;
+	}
+	else
+	{
+		# remove 'struct' so that the start line is not interpreted
+		# as a structure inside a structure
+		s/^\s*struct\s*\{?//o;
 	}
 	my $size = 0;
 	my ($memb_size, $name);
@@ -230,85 +362,81 @@ sub parse_struct(\%)
 	$line = &$struct_start_sub($str_name) if $struct_start_sub;
 	&$output_sub($line) if $output_sub and $line;
 
-	# a structure can end in the same line or contain many declaration per line
-	#   we simply put a newline after each semicolon and go on
+	# a structure can end on the same line or contain many declaration per line
+	# - we simply put a newline after each semicolon and go on
 
 	s/;/;\n/go;
-	# changing the comments
-	if ( $comment_sub )
+	# processing the comments
+	if ( $comment_sub and ( m#//# or m#/\*# ) )
 	{
-		$_ = &$comment_sub($_);
+		$line = &$comment_sub($_);
+		$_ = $line if $line;
 	}
 
 	do
 	{
-		s/{//go;
+		s/^\s*{\s*$//go;
 		# joining lines
 		while ( /[\\,]$/o )
 		{
-			s/\\\n//o;
+			s/\\[\r\n]+//o;
 			$_ .= <$infile>;
 		}
 
-		# many variables of the same type - we put each on a separate line together with its type
-		if ( m#/\*#o )
+		&_remove_attrs;
+		&_split_decl($infile);
+
+		# processing the comments
+		if ( $comment_sub and ( m#//# or m#/\*# ) )
 		{
-			while ( /,\s*$/o )
-			{
-				s/\n//o;
-				$_ .= <$infile>;
-			}
-			while ( m#,.*/\*#o && !/\(/o )
-			{
-				if ( m#\[.*/\*#o )
-				{
-					s/([\w ]*)\s+(\w+)\s*(\[\w+\]),\s*(.*)/$1 $2$3;\n$1 $4/;
-				}
-				else
-				{
-					s/([\w ]*)\s+([\w\*]+)\s*,\s*(.*)/$1 $2;\n$1 $3/;
-				}
-			}
-		}
-		else
-		{
-			while ( /,\s*$/o )
-			{
-				s/\n//o;
-				$_ .= <$infile>;
-			}
-			while ( /,.*/o && !/\(/o )
-			{
-				if ( /\[/o )
-				{
-					s/([\w ]*)\s+(\w+)\s*(\[\w+\]),\s*(.*)/$1 $2$3;\n$1 $4/;
-				}
-				else
-				{
-					s/([\w ]*)\s+([\w\*]+)\s*,\s*(.*)/$1 $2;\n$1 $3/;
-				}
-			}
+			$line = &$comment_sub($_);
+			$_ = $line if $line;
 		}
 
-		# changing the comments
-		if ( $comment_sub )
+		# union/struct arrays must be processed first
+		while ( /.*union\s+(\w+)\s+(\w+)\s*\[(\w+)\]\s*;/o )
 		{
-			$_ = &$comment_sub($_);
-		}
-
-		while ( /^\s*union\s+(\w+)/o )
-		{
-			$sub_params{'line'} = $_;
-			($memb_size, $name) = parse_union(%sub_params);
-			$line = &$struct_entry_sub($name, $memb_size) if $struct_entry_sub;
+			$line = &$struct_entry_sub($2, 0) if $struct_entry_sub;
 			&$output_sub($line) if $output_sub and $line;
-			$_ = '';
-			$size += $memb_size;
-			goto STR_END;
+			# remove the parsed element
+			s/.*union\s+(\w+)\s+(\w+)\s*\[(\w+)\]\s*;//o;
 		}
+		while ( /.*union\s+(\w+)\s+(\w+)\s*;/o )
+		{
+			$line = &$struct_entry_sub($2, 0) if $struct_entry_sub;
+			&$output_sub($line) if $output_sub and $line;
+			# remove the parsed element
+			s/.*union\s+\w+\s+\w+\s*;//o;
+		}
+# 		while ( /^\s*union\s+(\w+)/o )
+# 		{
+# 			$sub_params{'line'} = $_;
+# 			($memb_size, $name) = parse_union(%sub_params);
+# 			$line = &$struct_entry_sub($name, $memb_size) if $struct_entry_sub;
+# 			&$output_sub($line) if $output_sub and $line;
+# 			$_ = '';
+# 			$size += $memb_size;
+# 			goto STR_END;
+# 		}
 
 		while ( /^\s*union/o )
 		{
+			if ( ! /^\s*union\s+(\w+)/o )
+			{
+				# no name on the first line - look for it
+				while ( ! /\{/o )
+				{
+					s/\\[\r\n]+//o;
+					$_ .= <$infile>;
+				}
+				&_remove_attrs;
+				if ( ! /^\s*union\s+(\w+)/o )
+				{
+					# no name at all - delete 'union' to
+					# avoid endless loop
+					s/^\s*union\s*//o;
+				}
+			}
 			$sub_params{'line'} = $_;
 			my ($memb_size, $name) = parse_union(%sub_params);
 			$line = &$struct_entry_sub($name, $memb_size) if $struct_entry_sub;
@@ -325,7 +453,7 @@ sub parse_struct(\%)
 		s/_*volatile_*//gio;
 
 		# pointers to functions
-		while ( /.+\(\s*\*\s*(\w+)\s*\)\s*\(.*\)\s*;/o )
+		while ( /^[^};]+\(\s*\*\s*(\w+)\s*\)\s*\([^)]*\)\s*;/o )
 		{
 			$line = &$struct_entry_sub($1, $pointer_size) if $struct_entry_sub;
 			&$output_sub($line) if $output_sub and $line;
@@ -334,7 +462,7 @@ sub parse_struct(\%)
 			$size += $pointer_size;
 		}
 		# pointer type
-		while ( /.+\*\s*(\w+)\s*;/o )
+		while ( /^[^};]+\*\s*(\w+)\s*;/o )
 		{
 			$line = &$struct_entry_sub($1, $pointer_size) if $struct_entry_sub;
 			&$output_sub($line) if $output_sub and $line;
@@ -353,102 +481,52 @@ sub parse_struct(\%)
 		}
 		while ( /.*(signed|unsigned)?\s+long\s+long(\s+int)?\s+(\w+)\s*\[(\w+)\]\s*;/o )
 		{
-			my $var_name = $3;
-			my $count = $4;
-			if ( $count =~ /^0/o )
-			{
-				$count = oct("$count");
-			}
-			$line = &$struct_entry_sub($var_name, 8 * $count) if $struct_entry_sub;
-			&$output_sub($line) if $output_sub and $line;
-			# remove the parsed element
-			s/^[^;]*;//o;
-			$size += 8 * $count;
+			my $count = &_output_array_entry_size ($struct_entry_sub,
+				$output_sub, $3, $4, 8);
+			$size += 8 * $count if _is_a_number ($count);
 		}
 		while ( /.*long\s+double\s+(\w+)\s*\[(\w+)\]\s*;/o )
 		{
-			my $var_name = $1;
-			my $count = $2;
-			if ( $count =~ /^0/o )
-			{
-				$count = oct("$count");
-			}
-			$line = &$struct_entry_sub($var_name, 10 * $count) if $struct_entry_sub;
-			&$output_sub($line) if $output_sub and $line;
-			# remove the parsed element
-			s/^[^;]*;//o;
-			$size += 10 * $count;
+			my $count = &_output_array_entry_size ($struct_entry_sub,
+				$output_sub, $1, $2, 10);
+			$size += 10 * $count if _is_a_number ($count);
 		}
 		while ( /.*(char|unsigned\s+char|signed\s+char)\s+(\w+)\s*\[(\w+)\]\s*;/o )
 		{
-			my $var_name = $2;
-			my $count = $3;
-			if ( $count =~ /^0/o )
-			{
-				$count = oct("$count");
-			}
-			$line = &$struct_entry_sub($var_name, 1 * $count) if $struct_entry_sub;
-			&$output_sub($line) if $output_sub and $line;
-			# remove the parsed element
-			s/^[^;]*;//o;
-			$size += 1 * $count;
+			my $count = &_output_array_entry_size ($struct_entry_sub,
+				$output_sub, $2, $3, 1);
+			$size += 1 * $count if _is_a_number ($count);
 		}
 		while ( /.*float\s+(\w+)\s*\[(\w+)\]\s*;/o )
 		{
-			my $var_name = $1;
-			my $count = $2;
-			if ( $count =~ /^0/o )
-			{
-				$count = oct("$count");
-			}
-			$line = &$struct_entry_sub($var_name, 4 * $count) if $struct_entry_sub;
-			&$output_sub($line) if $output_sub and $line;
-			# remove the parsed element
-			s/^[^;]*;//o;
-			$size += 4 * $count;
+			my $count = &_output_array_entry_size ($struct_entry_sub,
+				$output_sub, $1, $2, 4);
+			$size += 4 * $count if _is_a_number ($count);
 		}
 		while ( /.*double\s+(\w+)\s*\[(\w+)\]\s*;/o )
 		{
-			my $var_name = $1;
-			my $count = $2;
-			if ( $count =~ /^0/o )
-			{
-				$count = oct("$count");
-			}
-			$line = &$struct_entry_sub($var_name, 8 * $count) if $struct_entry_sub;
-			&$output_sub($line) if $output_sub and $line;
-			# remove the parsed element
-			s/^[^;]*;//o;
-			$size += 8 * $count;
+			my $count = &_output_array_entry_size ($struct_entry_sub,
+				$output_sub, $1, $2, 8);
+			$size += 8 * $count if _is_a_number ($count);
 		}
-		while ( /.*(short|signed\s+short|unsigned\s+short){1}(\s+int)?\s+(\w+)\s*\[(\w+)\]\s*;/o )
+		while ( /.*(short|signed\s+short|unsigned\s+short)(\s+int)?\s+(\w+)\s*\[(\w+)\]\s*;/o )
 		{
-			my $var_name = $3;
-			my $count = $4;
-			if ( $count =~ /^0/o )
-			{
-				$count = oct("$count");
-			}
-			$line = &$struct_entry_sub($var_name, 2 * $count) if $struct_entry_sub;
-			&$output_sub($line) if $output_sub and $line;
-			# remove the parsed element
-			s/^[^;]*;//o;
-			$size += 2 * $count;
+			my $count = &_output_array_entry_size ($struct_entry_sub,
+				$output_sub, $3, $4, 2);
+			$size += 2 * $count if _is_a_number ($count);
 		}
-		while ( /.*(long|signed|signed\s+long|unsigned|unsigned\s+long|int){1}(\s+int)?\s+(\w+)\s*\[(\w+)\]\s*;/o )
+		while ( /.*(long|signed\s+long|unsigned\s+long)(\s+int)?\s+(\w+)\s*\[(\w+)\]\s*;/o )
 		{
-			my $var_name = $3;
-			my $count = $4;
-			if ( $count =~ /^0/o )
-			{
-				$count = oct("$count");
-			}
 			# NOTE: assuming 'long int' is the same size as a pointer (should be on 32- and 64-bit systems)
-			$line = &$struct_entry_sub($var_name, $pointer_size * $count) if $struct_entry_sub;
-			&$output_sub($line) if $output_sub and $line;
-			# remove the parsed element
-			s/^[^;]*;//o;
-			$size += $pointer_size * $count;
+			my $count = &_output_array_entry_size ($struct_entry_sub,
+				$output_sub, $3, $4, $pointer_size);
+			$size += $pointer_size * $count if _is_a_number ($count);
+		}
+		while ( /.*(signed\s+|unsigned\s+)?int\s+(\w+)\s*\[(\w+)\]\s*;/o )
+		{
+			my $count = &_output_array_entry_size ($struct_entry_sub,
+				$output_sub, $2, $3, 4);
+			$size += 4 * $count if _is_a_number ($count);
 		}
 
 		# variables' types
@@ -461,6 +539,22 @@ sub parse_struct(\%)
 		}
 		while ( /^\s*struct/o )
 		{
+			if ( ! /^\s*struct\s+(\w+)/o )
+			{
+				# no name on the first line - look for it
+				while ( ! /\{/o )
+				{
+					s/\\[\r\n]+//o;
+					$_ .= <$infile>;
+				}
+				&_remove_attrs;
+				if ( ! /^\s*struct\s+(\w+)/o )
+				{
+					# no name at all - delete 'struct' to
+					# avoid endless loop
+					s/^\s*struct\s*//o;
+				}
+			}
 			$sub_params{'line'} = $_;
 			my ($memb_size, $name) = parse_struct(%sub_params);
 			$line = &$struct_entry_sub($name, $memb_size) if $struct_entry_sub;
@@ -511,7 +605,7 @@ sub parse_struct(\%)
 			s/^[^;]*;//o;
 			$size += 8;
 		}
-		while ( /.*(short|signed\s+short|unsigned\s+short){1}(\s+int)?\s+(\w+)\s*;/o )
+		while ( /.*(short|signed\s+short|unsigned\s+short)(\s+int)?\s+(\w+)\s*;/o )
 		{
 			$line = &$struct_entry_sub($3, 2) if $struct_entry_sub;
 			&$output_sub($line) if $output_sub and $line;
@@ -519,7 +613,7 @@ sub parse_struct(\%)
 			s/^[^;]*;//o;
 			$size += 2;
 		}
-		while ( /.*(long|signed|signed\s+long|unsigned|unsigned\s+long|int){1}(\s+int)?\s+(\w+)\s*;/o )
+		while ( /.*(long|signed\s+long|unsigned\s+long)(\s+int)?\s+(\w+)\s*;/o )
 		{
 			# NOTE: assuming 'long int' is the same size as a pointer (should be on 32- and 64-bit systems)
 			$line = &$struct_entry_sub($3, $pointer_size) if $struct_entry_sub;
@@ -527,6 +621,14 @@ sub parse_struct(\%)
 			# remove the parsed element
 			s/^[^;]*;//o;
 			$size += $pointer_size;
+		}
+		while ( /.*(unsigned\s+|signed\s+)?int\s+(\w+)\s*;/o )
+		{
+			$line = &$struct_entry_sub($2, 4) if $struct_entry_sub;
+			&$output_sub($line) if $output_sub and $line;
+			# remove the parsed element
+			s/^[^;]*;//o;
+			$size += 4;
 		}
 
 		# look for the end of the structure
@@ -549,7 +651,7 @@ sub parse_struct(\%)
 		}
 
 		# processing of conditional compiling directives
-		if ( $preproc_sub )
+		if ( $preproc_sub && /^\s*#/o )
 		{
 			$_ = &$preproc_sub($_);
 		}
@@ -634,15 +736,28 @@ sub parse_union(\%)
 		'pointer_size' => $pointer_size,
 	);
 
+	&_remove_attrs;
 	# skip over "union foo;"
 	if ( /^\s*union\s+[^;{}]*;/o )
 	{
-		# changing the comments
-		if ( $comment_sub )
-		{
-			$_ = &$comment_sub($_);
-			&$output_sub($_) if $output_sub and $_;
-		}
+		# processing the comments
+# 		if ( $comment_sub )
+# 		{
+# 			$_ = &$comment_sub($_);
+# 			&$output_sub($_) if $output_sub and $_;
+# 		}
+		return (0, '');
+	}
+
+	# skip over "union {};" (syntax error, but causes an infinite loop)
+	if ( /^\s*union\s*\{\s*\}\s*;/o )
+	{
+		# processing the comments
+# 		if ( $comment_sub )
+# 		{
+# 			$_ = &$comment_sub($_);
+# 			&$output_sub($_) if $output_sub and $_;
+# 		}
 		return (0, '');
 	}
 
@@ -651,11 +766,14 @@ sub parse_union(\%)
 
 	if ( /^\s*union\s+(\w+)/o )
 	{
-		if ( $1 and $1 ne '' and $1 !~ /\{/o )
-		{
-			$union_name = $1;
-		}
+		$union_name = $1;
 		s/^\s*union\s+\w+//o;
+	}
+	else
+	{
+		# remove 'union' so that the start line is not interpreted
+		# as a union inside a union
+		s/^\s*union\s*\{?//o;
 	}
 	my $size = 0;
 	my ($memb_size, $name);
@@ -664,38 +782,71 @@ sub parse_union(\%)
 	&$output_sub($line) if $output_sub and $line;
 
 	# if there was a '{' in the first line, we put it in the second
-	if ( !/union/o )
+	if ( /{/o )
 	{
 		s/\s*\{/\n\{\n/o;
 	}
-	else
-	{
-		s/\s*union\s*{//o;
-		s/\s*union//o;
-	}
 
-	# an union can end in the same line or contain many declaration per line
-	#   we simply put a newline after each semicolon and go on
+	# an union can end on the same line or contain many declaration per line
+	# - we simply put a newline after each semicolon and go on
 
 	s/;/;\n/go;
 
 	do
 	{
-		s/{//go;
-		# changing the comments
-		if ( $comment_sub )
+		s/^\s*{\s*$//go;
+		&_remove_attrs;
+		&_split_decl($infile);
+
+		# processing the comments
+		if ( $comment_sub and ( m#//# or m#/\*# ) )
 		{
-			$_ = &$comment_sub($_);
+			$line = &$comment_sub($_);
+			$_ = $line if $line;
 		}
 
-		# pointer type
-		while ( /.+\*\s*(\w+)\s*;/o )
+		# pointers to functions
+		while ( /^[^};]+\(\s*\*\s*(\w+)\s*\)\s*\([^)]*\)\s*;/o )
 		{
 			$line = &$union_entry_sub($1, $pointer_size) if $union_entry_sub;
 			&$output_sub($line) if $output_sub and $line;
 			# remove the parsed element
 			s/^[^;]*;//o;
 			$size = _max($size, $pointer_size);
+		}
+		# pointer type
+		while ( /^[^};]+\*\s*(\w+)\s*;/o )
+		{
+			$line = &$union_entry_sub($1, $pointer_size) if $union_entry_sub;
+			&$output_sub($line) if $output_sub and $line;
+			# remove the parsed element
+			s/^[^;]*;//o;
+			$size = _max($size, $pointer_size);
+		}
+
+		# union/struct arrays must be processed first
+		while ( /.*union\s+(\w+)\s+(\w+)\s*\[(\w+)\]\s*;/o )
+		{
+			$line = &$union_entry_sub($2, 0) if $union_entry_sub;
+			&$output_sub($line) if $output_sub and $line;
+			# remove the parsed element
+			s/.*union\s+(\w+)\s+(\w+)\s*\[(\w+)\]\s*;//o;
+		}
+
+		while ( /.*union\s+(\w+)\s+(\w+)\s*;/o )
+		{
+			$line = &$union_entry_sub($2, 0) if $union_entry_sub;
+			&$output_sub($line) if $output_sub and $line;
+			# remove the parsed element
+			s/.*union\s+\w+\s+\w+\s*;//o;
+		}
+
+		while ( /.*struct\s+(\w+)\s+(\w+)\s*\[(\w+)\]\s*;/o )
+		{
+			$line = &$union_entry_sub($2, 0) if $union_entry_sub;
+			&$output_sub($line) if $output_sub and $line;
+			# remove the parsed element
+			s/.*struct\s+(\w+)\s+(\w+)\s*\[(\w+)\]\s*;//o;
 		}
 
 		while ( /.*struct\s+(\w+)\s+(\w+)\s*;/o )
@@ -708,6 +859,22 @@ sub parse_union(\%)
 
 		while ( /^\s*struct/o )
 		{
+			if ( ! /^\s*struct\s+(\w+)/o )
+			{
+				# no name on the first line - look for it
+				while ( ! /\{/o )
+				{
+					s/\\[\r\n]+//o;
+					$_ .= <$infile>;
+				}
+				&_remove_attrs;
+				if ( ! /^\s*struct\s+(\w+)/o )
+				{
+					# no name at all - delete 'struct' to
+					# avoid endless loop
+					s/^\s*struct\s*//o;
+				}
+			}
 			$sub_params{'line'} = $_;
 			my ($memb_size, $name) = parse_struct(%sub_params);
 			$line = &$union_entry_sub($name, $memb_size) if $union_entry_sub;
@@ -764,7 +931,7 @@ sub parse_union(\%)
 			$size = _max($size, 8);
 		}
 
-		while ( /.*(short|signed\s+short|unsigned\s+short){1}(\s+int)?\s+(\w+)\s*;/o )
+		while ( /.*(short|signed\s+short|unsigned\s+short)(\s+int)?\s+(\w+)\s*;/o )
 		{
 			$line = &$union_entry_sub($3, 2) if $union_entry_sub;
 			&$output_sub($line) if $output_sub and $line;
@@ -773,7 +940,7 @@ sub parse_union(\%)
 			$size = _max($size, 2);
 		}
 
-		while ( /.*(long|signed|signed\s+long|unsigned|unsigned\s+long|int){1}(\s+int)?\s+(\w+)\s*;/o )
+		while ( /.*(long|signed\s+long|unsigned\s+long)(\s+int)?\s+(\w+)\s*;/o )
 		{
 			# NOTE: assuming 'long int' is the same size as a pointer (should be on 32- and 64-bit systems)
 			$line = &$union_entry_sub($3, $pointer_size) if $union_entry_sub;
@@ -783,127 +950,95 @@ sub parse_union(\%)
 			$size = _max($size, $pointer_size);
 		}
 
+		while ( /.*(unsigned\s+|signed\s+)?int\s+(\w+)\s*;/o )
+		{
+			$line = &$union_entry_sub($2, 4) if $union_entry_sub;
+			&$output_sub($line) if $output_sub and $line;
+			# remove the parsed element
+			s/^[^;]*;//o;
+			$size = _max($size, 4);
+		}
+
 		# arrays
 
-		while ( /.*struct\s+(\w+)\s+(\w+)\s*\[(\w+)\]\s*;/o )
+		while ( /.*(signed|unsigned)?\s+long\s+long(\s+int)?\s+(\w+)\s*\[(\w+)\]\s*;/o )
 		{
-			$line = &$union_entry_sub($2, 0) if $union_entry_sub;
-			&$output_sub($line) if $output_sub and $line;
-			# remove the parsed element
-			s/.*struct\s+(\w+)\s+(\w+)\s*\[(\w+)\]\s*;//o;
+			my $count = &_output_array_entry_size ($union_entry_sub,
+				$output_sub, $3, $4, 8);
+			$size = _max($size, 8 * $count) if _is_a_number ($count);
 		}
 
-		while ( /.*(signed|unsigned)?\s+long\s+long(\s+int)?\s+(\w+)\s*\[(\d+)\]\s*;/o )
+		while ( /.*long\s+double\s+(\w+)\s*\[(\w+)\]\s*;/o )
 		{
-			my $var_name = $3;
-			my $count = $4;
-			if ( $count =~ /^0/o )
-			{
-				$count = oct("$count");
-			}
-			$line = &$union_entry_sub($var_name, 8 * $count) if $union_entry_sub;
-			&$output_sub($line) if $output_sub and $line;
-			# remove the parsed element
-			s/^[^;]*;//o;
-			$size = _max($size, 8 * $count);
+			my $count = &_output_array_entry_size ($union_entry_sub,
+				$output_sub, $1, $2, 10);
+			$size = _max($size, 10 * $count) if _is_a_number ($count);
 		}
 
-		while ( /.*long\s+double\s+(\w+)\s*\[(\d+)\]\s*;/o )
+		while ( /.*(char|unsigned\s+char|signed\s+char)\s+(\w+)\s*\[(\w+)\]\s*;/o )
 		{
-			my $var_name = $1;
-			my $count = $2;
-			if ( $count =~ /^0/o )
-			{
-				$count = oct("$count");
-			}
-			$line = &$union_entry_sub($var_name, 10 * $count) if $union_entry_sub;
-			&$output_sub($line) if $output_sub and $line;
-			# remove the parsed element
-			s/^[^;]*;//o;
-			$size = _max($size, 10 * $count);
+			my $count = &_output_array_entry_size ($union_entry_sub,
+				$output_sub, $2, $3, 1);
+			$size = _max($size, 1 * $count) if _is_a_number ($count);
 		}
 
-		while ( /.*(char|unsigned\s+char|signed\s+char)\s+(\w+)\s*\[(\d+)\]\s*;/o )
+		while ( /.*float\s+(\w+)\s*\[(\w+)\]\s*;/o )
 		{
-			my $var_name = $2;
-			my $count = $3;
-			if ( $count =~ /^0/o )
-			{
-				$count = oct("$count");
-			}
-			$line = &$union_entry_sub($var_name, 1 * $count) if $union_entry_sub;
-			&$output_sub($line) if $output_sub and $line;
-			# remove the parsed element
-			s/^[^;]*;//o;
-			$size = _max($size, 1 * $count);
+			my $count = &_output_array_entry_size ($union_entry_sub,
+				$output_sub, $1, $2, 4);
+			$size = _max($size, 4 * $count) if _is_a_number ($count);
 		}
 
-		while ( /.*float\s+(\w+)\s*\[(\d+)\]\s*;/o )
+		while ( /.*double\s+(\w+)\s*\[(\w+)\]\s*;/o )
 		{
-			my $var_name = $1;
-			my $count = $2;
-			if ( $count =~ /^0/o )
-			{
-				$count = oct("$count");
-			}
-			$line = &$union_entry_sub($var_name, 4 * $count) if $union_entry_sub;
-			&$output_sub($line) if $output_sub and $line;
-			# remove the parsed element
-			s/^[^;]*;//o;
-			$size = _max($size, 4 * $count);
+			my $count = &_output_array_entry_size ($union_entry_sub,
+				$output_sub, $1, $2, 8);
+			$size = _max($size, 8 * $count) if _is_a_number ($count);
 		}
 
-		while ( /.*double\s+(\w+)\s*\[(\d+)\]\s*;/o )
+		while ( /.*(short|signed\s+short|unsigned\s+short)(\s+int)?\s+(\w+)\s*\[(\w+)\]\s*;/o )
 		{
-			my $var_name = $1;
-			my $count = $2;
-			if ( $count =~ /^0/o )
-			{
-				$count = oct("$count");
-			}
-			$line = &$union_entry_sub($var_name, 8 * $count) if $union_entry_sub;
-			&$output_sub($line) if $output_sub and $line;
-			# remove the parsed element
-			s/^[^;]*;//o;
-			$size = _max($size, 8 * $count);
+			my $count = &_output_array_entry_size ($union_entry_sub,
+				$output_sub, $3, $4, 2);
+			$size = _max($size, 2 * $count) if _is_a_number ($count);
 		}
 
-		while ( /.*(short|signed\s+short|unsigned\s+short){1}(\s+int)?\s+(\w+)\s*\[(\d+)\]\s*;/o )
+		while ( /.*(long|signed\s+long|unsigned\s+long)(\s+int)?\s+(\w+)\s*\[(\w+)\]\s*;/o )
 		{
-			my $var_name = $3;
-			my $count = $4;
-			if ( $count =~ /^0/o )
-			{
-				$count = oct("$count");
-			}
-			$line = &$union_entry_sub($var_name, 2 * $count) if $union_entry_sub;
-			&$output_sub($line) if $output_sub and $line;
-			# remove the parsed element
-			s/^[^;]*;//o;
-			$size = _max($size, 2 * $count);
-		}
-
-		while ( /.*(long|signed|signed\s+long|unsigned|unsigned\s+long|int){1}(\s+int)?\s+(\w+)\s*\[(\d+)\]\s*;/o )
-		{
-			my $var_name = $3;
-			my $count = $4;
-			if ( $count =~ /^0/o )
-			{
-				$count = oct("$count");
-			}
 			# NOTE: assuming 'long int' is the same size as a pointer (should be on 32- and 64-bit systems)
-			$line = &$union_entry_sub($var_name, $pointer_size * $count) if $union_entry_sub;
-			&$output_sub($line) if $output_sub and $line;
-			# remove the parsed element
-			s/^[^;]*;//o;
-			$size = _max($size, $pointer_size * $count);
+			my $count = &_output_array_entry_size ($union_entry_sub,
+				$output_sub, $3, $4, $pointer_size);
+			$size = _max($size, $pointer_size * $count) if _is_a_number ($count);
+		}
+
+		while ( /.*(signed\s+|unsigned\s+)?int\s+(\w+)\s*\[(\w+)\]\s*;/o )
+		{
+			my $count = &_output_array_entry_size ($union_entry_sub,
+				$output_sub, $2, $3, 4);
+			$size = _max($size, 4 * $count) if _is_a_number ($count);
 		}
 
 		while ( /^\s*union/o )
 		{
+			if ( ! /^\s*union\s+(\w+)/o )
+			{
+				# no name on the first line - look for it
+				while ( ! /\{/o )
+				{
+					s/\\[\r\n]+//o;
+					$_ .= <$infile>;
+				}
+				&_remove_attrs;
+				if ( ! /^\s*union\s+(\w+)/o )
+				{
+					# no name at all - delete 'union' to
+					# avoid endless loop
+					s/^\s*union\s*//o;
+				}
+			}
 			$sub_params{'line'} = $_;
 			my ($memb_size, $name) = parse_union(%sub_params);
-			$line = &$struct_entry_sub($name, $memb_size) if $struct_entry_sub;
+			$line = &$union_entry_sub($name, $memb_size) if $union_entry_sub;
 			&$output_sub($line) if $output_sub and $line;
 			$_ = '';
 			$size = _max($size, $memb_size);
@@ -913,9 +1048,13 @@ sub parse_union(\%)
 		if ( /\s*\}.*/o )
 		{
 			my $var_name = '';
-			if ( /\s*\}\s*(\w+)[^;]*;/o )
+			if ( /\}\s*(\*?)\s*(\w+)[^;]*;/o )
 			{
-				$var_name = $1;
+				$var_name = $2;
+			}
+			if ( /\}\s*\*/o )
+			{
+				$size = $pointer_size;
 			}
 			$line = &$union_end_sub($var_name, $size, $union_name) if $union_end_sub;
 			&$output_sub($line) if $output_sub and $line;
@@ -924,7 +1063,7 @@ sub parse_union(\%)
 		}
 
 		# processing of conditional compiling directives
-		if ( $preproc_sub )
+		if ( $preproc_sub && /^\s*#/o )
 		{
 			$_ = &$preproc_sub($_);
 		}
@@ -1033,23 +1172,25 @@ sub parse_file(\%)
 		# joining lines
 		while ( /[\\,]$/o )
 		{
-			s/\\\n//o;
-			s/,\n/,/o;
+			s/\\[\r\n]+//o;
+			s/,[\r\n]+/,/o;
 			$_ .= <$infile>;
 		}
 
+		&_remove_attrs;
 		# check if a comment is the only thing on this line
 		if ( m#^\s*/\*.*\*/\s*$#o || m#^\s*//#o )
 		{
 			if ( $comment_sub )
 			{
-				$_ = &$comment_sub($_);
+				$line = &$comment_sub($_);
+				$_ = $line if $line;
 			}
 			else
 			{
 				$_ = '';
 			}
-			&$output_sub($_) if $output_sub and $_;
+			&$output_sub($_) if $output_sub;
 
 			next;
 		}
@@ -1059,7 +1200,8 @@ sub parse_file(\%)
 		{
 			if ( $comment_sub )
 			{
-				$_ = &$comment_sub($_);
+				$line = &$comment_sub($_);
+				$_ = $line if $line;
 			}
 			if ( $preproc_sub )
 			{
@@ -1079,16 +1221,21 @@ sub parse_file(\%)
 		{
 			if ( $comment_sub )
 			{
-				$_ = &$comment_sub($_);
+				$line = &$comment_sub($_);
+				$_ = $line if $line;
 			}
 
-			# joining lines
-			while ( ! /;/o )
+			if ( ! /^\s*extern\s+"C/o )
 			{
-				s/\n//o;
-				$_ .= <$infile>;
+				# joining lines
+				while ( ! /;/o )
+				{
+					s/[\r\n]+//o;
+					$_ .= <$infile>;
+				}
 			}
 
+			&_remove_attrs;
 			# external functions
 
 			# extern "C", extern "C++"
@@ -1106,24 +1253,28 @@ sub parse_file(\%)
 			{
 				if ( $extern_sub )
 				{
-					$_ = &$extern_sub($1);
+					$line = &$extern_sub($1);
+					$_ = $line if $line;
 				}
 				else
 				{
 					$_ = '';
 				}
+				&$output_sub($_) if $output_sub;
 			}
 
 			if ( /^\s*\w*\s*extern\s+[\w\*\s]+?(\w+)\s*\(.*/o )
 			{
 				if ( $extern_sub )
 				{
-					$_ = &$extern_sub($1);
+					$line = &$extern_sub($1);
+					$_ = $line if $line;
 				}
 				else
 				{
 					$_ = '';
 				}
+				&$output_sub($_) if $output_sub;
 			}
 
 			# external variables
@@ -1131,14 +1282,15 @@ sub parse_file(\%)
 			{
 				if ( $extern_sub )
 				{
-					$_ = &$extern_sub($1);
+					$line = &$extern_sub($1);
+					$_ = $line if $line;
 				}
 				else
 				{
 					$_ = '';
 				}
+				&$output_sub($_) if $output_sub;
 			}
-			&$output_sub($_) if $output_sub and $_;
 
 			next;
 		}
@@ -1146,38 +1298,57 @@ sub parse_file(\%)
 		# typedef
 		if ( /^\s*typedef/o )
 		{
-			if ( /\(/o )
+			if ( ! /\b(struct|union|enum)\b/o )
 			{
-				while ( ! /\)/o or /,\s*$/o )
+				# joining lines
+				while ( ! /;/o )
 				{
-					s/\n//og;
+					s/[\r\n]+//o;
 					$_ .= <$infile>;
 				}
 			}
+
+			&_remove_attrs;
+			# split typedefs, but not within function parameters
+			&_split_decl($infile) unless /\([^)]*,/o or /enum/o;
 
 			if ( /\(/o )
 			{
 				s/^.*$/\n/o;
 			}
-			elsif ( !/{/o && /;/o )
-			{
-				/\s*typedef([\w\*\s]+)\s+\**(\w+)(\[[^\]]*\])?\s*;/o;
-				if ( $typedef_sub )
-				{
-					$_ = &$typedef_sub($1, $2);
-				}
-				else
-				{
-					$_ = '';
-				}
-				&$output_sub($_) if $output_sub and $_;
-
-				next;
-			}
 			# "typedef struct ...."  ----> "struct ....."
 			elsif ( /(struct|union|enum)/o )
 			{
-				s/^\s*typedef\s+//i;
+				s/^\s*typedef\s+//o;
+			}
+			elsif ( ! /{/o ) #&& /;/o ) # lines already joined
+			{
+				while ( /\btypedef\s+[^;]+\s*;/o )
+				{
+					# cannot do function pointers, take
+					# just simple types
+					if ( /\btypedef([\w*\s]+)\b(\w+)\s*;/o )
+					{
+						if ( $typedef_sub )
+						{
+							my $old = $1;
+							my $new = $2;
+							$old =~ s/^\s+//o;
+							$new =~ s/^\s+//o;
+							$old =~ s/\s+$//o;
+							$new =~ s/\s+$//o;
+							$line = &$typedef_sub($old, $new);
+						}
+						else
+						{
+							$line = '';
+						}
+						&$output_sub($line) if $output_sub and $line;
+					}
+					s/^\s*typedef\s+[^;]+\s*;//o;
+				}
+
+				next;
 			}
 			# no NEXT here
 		}
@@ -1187,9 +1358,8 @@ sub parse_file(\%)
 		if ( /^\s*struct/o )
 		{
 			# skip over expressions of the type:
-			# struct xxx;
 			# struct xxx function(arg1, ...);
-			if ( /^\s*struct[^{;]+;.*$/o || /\(/o )
+			if ( /\(/o )
 			{
 				$_ = '';
 			}
@@ -1211,8 +1381,13 @@ sub parse_file(\%)
 				&$output_sub($line) if $output_sub and $line;
 				s/^.*enum\s+\w+\s*\{?//o;
 			}
+			else
+			{
+				s/^.*enum\s*\{?//o;
+			}
 			my $curr_value = 0;
 
+			#&_split_decl($infile);
 			# check if one-line enum
 			if ( /}/o )
 			{
@@ -1260,8 +1435,8 @@ sub parse_file(\%)
 
 				$line = &$enum_end_sub() if $enum_end_sub;
 				&$output_sub($line) if $output_sub and $line;
-				# changing the comments
-				if ( $comment_sub )
+				# processing the comments
+				if ( $comment_sub and ( m#//# or m#/\*# ) )
 				{
 					$_ = &$comment_sub($_);
 					&$output_sub($_) if $output_sub and $_;
@@ -1288,20 +1463,21 @@ sub parse_file(\%)
 						next;
 					}
 
+					&_remove_attrs;
 					# skip over the first '{' character
 					#next if /^\s*\{\s*$/o;
-					s/{//go;
+					s/^\s*{\s*$//go;
 
-					next if /^\s*;/o;
+					next if /^\s*$/o;
 
 					# if the constant has a value, we don't touch it
 					if ( /=/o )
 					{
-						if ( /^\s*(\w+)\s*=\s*(\w+)\s*,?/o )
+						if ( /^\s*(\w+)\s*=\s*([-*\/+\w]+)\s*,?/o )
 						{
 							$line = &$enum_entry_sub ($1, $2) if $enum_entry_sub;
 							&$output_sub($line) if $output_sub and $line;
-							$curr_value = $2 + 1;
+							$curr_value = $2 + 1 if _is_a_number ($2);
 							s/^\s*\w+\s*=\s*\w+\s*,?//o;
 						}
 					}
@@ -1317,10 +1493,11 @@ sub parse_file(\%)
 						}
 					}
 
-					# changing the comments
-					if ( $comment_sub )
+					# processing the comments
+					if ( $comment_sub and ( m#//# or m#/\*# ) )
 					{
-						$_ = &$comment_sub($_);
+						$line = &$comment_sub($_);
+						$_ = $line if $line;
 					}
 
 					# look for the end of the enum
@@ -1339,9 +1516,8 @@ sub parse_file(\%)
 		if ( /^\s*union/o )
 		{
 			# skip over expressions of the type:
-			# union xxx;
 			# union xxx function(arg1, ...);
-			if ( /^\s*union[^{;]+;.*$/o || /\(/o )
+			if ( /\(/o )
 			{
 				$_ = '';
 			}
@@ -1353,13 +1529,15 @@ sub parse_file(\%)
 			next;
 		}
 
+		s/^\s*{\s*$//go;
 		# remove any }'s left after <extern "C">, for example
-		s/}//go;
-		if ( $comment_sub )
+		s/^\s*}\s*$//go;
+		if ( $comment_sub and m#/\*# ) # single-line comments should be processed at the top
 		{
-			$_ = &$comment_sub($_);
+			$line = &$comment_sub($_);
+			$_ = $line if $line;
 		}
-		&$output_sub($_) if $output_sub and $_;
+		&$output_sub($_) if $output_sub; # and $_; # the line won't be empty here
 	}
 }
 
@@ -1378,16 +1556,13 @@ You can also look for information at:
     CPAN Request Tracker:
         https://rt.cpan.org/Public/Dist/Display.html?Name=Parse-H
 
-    CPAN Ratings:
-        https://cpanratings.perl.org/dist/Parse-H
-
 =head1 AUTHOR
 
-Bogdan Drozdowski, C<< <bogdro at cpan.org> >>
+Bogdan Drozdowski, C<< <bogdro /at cpan . org> >>
 
 =head1 COPYRIGHT
 
-Copyright 2022 Bogdan Drozdowski, all rights reserved.
+Copyright 2022-2023 Bogdan Drozdowski, all rights reserved.
 
 =head1 LICENSE
 

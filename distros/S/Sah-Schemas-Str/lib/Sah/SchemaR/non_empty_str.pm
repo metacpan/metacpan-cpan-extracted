@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::non_empty_str;
 
-our $DATE = '2023-09-03'; # DATE
-our $VERSION = '0.015'; # VERSION
+our $DATE = '2023-10-23'; # DATE
+our $VERSION = '0.016'; # VERSION
 
 our $rschema = do{my$var={base=>"str1",clsets_after_base=>[{summary=>"A non-empty string (length >= 1) (alias for str1)"}],clsets_after_type=>[{examples=>[{summary=>"Empty",valid=>0,value=>""},{valid=>1,value=>"a"},{summary=>"Not a string",valid=>0,value=>[]}],min_len=>1,summary=>"A non-empty string (length >= 1)"},'$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_type}[0]','$var->{clsets_after_base}[0]'],resolve_path=>["str","str1"],type=>"str",v=>2};$var->{clsets_after_type}[1]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_type}[0];$var->{"clsets_after_type.alt.merge.merged"}[1]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::non_empty_str - A non-empty string (length >= 1) (alias for str1)
 
 =head1 VERSION
 
-This document describes version 0.015 of Sah::SchemaR::non_empty_str (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
+This document describes version 0.016 of Sah::SchemaR::non_empty_str (from Perl distribution Sah-Schemas-Str), released on 2023-10-23.
 
 =head1 DESCRIPTION
 

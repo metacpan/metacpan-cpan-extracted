@@ -2,12 +2,8 @@
 use strict;
 use HTTP::Request::FromCurl;
 use URI;
-use Test::More;
+use Test2::V0;
 use Data::Dumper;
-
-use Filter::signatures;
-use feature 'signatures';
-no warnings 'experimental::signatures';
 
 plan tests => 2;
 

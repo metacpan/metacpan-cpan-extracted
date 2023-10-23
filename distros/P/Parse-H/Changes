@@ -1,5 +1,58 @@
 Revision history for Parse-H
 
+2023-10-15	Bogdan Drozdowski <bogdro \at\ cpan . org>
+
+	* Version 0.20
+	  Many significant improvements and fixes in parsing, especially with
+	  structures and unions and their elements. Better parsing typedefs,
+	  multiline and multi-variable declarations. Better resistance to the
+	  callbacks returning undef. Removing attributes prior to parsing.
+	  Improvements and simplifications in tests, reaching 100% coverage.
+	  Other small changes and fixes in code and documentation.
+	* lib/Parse/H.pm: Fixed the docs on calling the subroutines. Updated
+	  the copyright and version. Deleted the cpanratings.perl.org link
+	  (thanks to Peter John Acklam for reporting).
+	* lib/Parse/H.pm (parse_struct): Fixed the expressions for structure
+	  names. Fixed infinite loop with "struct {};". Fixed endless loop
+	  with struct inside a struct. Fixed endless loop with struct inside a
+	  typedef. Modify the structure size only if the element size is a
+	  number. Support structure arrays. Added and updated checking for
+	  empty or forward structure declarations. Don't do output if skipping
+	  an empty structure.
+	* lib/Parse/H.pm (parse_union): Fixed the expressions for union names.
+	  Fixed endless loop with union inside a union. Fixed endless loop
+	  with union inside a typedef. Modify the union size only if the
+	  element size is a number. Support union arrays. Fixed calling
+	  structure entry sub instead of union entry. Allow non-digit array
+	  sizes in unions. Added checking for empty or forward union
+	  declarations. Don't do output if skipping an empty union.
+	* lib/Parse/H.pm (parse_file): Checking if some of the called
+	  subroutines return undef. Fixed the expressions when structure or
+	  union lines need to be skipped. Fixed parsing typedefs and parsing
+	  just variable types. Moved checking for forward or empty structure
+	  and union declarations to parse_struct and parse_union. Fixed joining
+	  lines with >extern "C"<. Set the next enum value only if the current
+	  is a number. Allow enums with negative values. Skip standalone "{"
+	  in output.
+	* lib/Parse/H.pm (parse_struct, parse_union): Checking if some of the
+	  called subroutines return undef. Use _output_array_entry_size() to
+	  process array entries. Support simple 'int' entries. Fixed splitting
+	  multiple pointer variable declarations on a single line. Simplified
+	  some regexes. Fixed regexes for long ints. Parse all int types before
+	  the 'int' type itself. Fixed removing standalone "{" characters.
+	* lib/Parse/H.pm (_output_array_entry_size): A new private subroutine
+	  for common code in struct and union array fields.
+	* lib/Parse/H.pm (_remove_attrs): A new private subroutine for removing
+	  function and variable attributes from declarations.
+	* lib/Parse/H.pm (parse_struct, parse_union, parse_file): Allow other
+	  line endings. Remove function and variable attributes.
+	* t/z_parse_file.t: Simplified resetting and validating the variables.
+	  Added many more tests, especially with missing subroutines or ones
+	  which return undef. Changed $enum_end_sub returning undef to return
+	  and empty string. Added debugging statements.
+	* README: Updated the copyright. Deleted the cpanratings.perl.org link
+	  and the plain HTTP links.
+
 2022-10-31	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.11
@@ -11,3 +64,7 @@ Revision history for Parse-H
 	  Initial version. Parsing structures, unions, enumerations,
 	  preprocessor statements, comments, typedefs and external
 	  declarations. Accepting configuration hashes.
+	  The module was created from utility scripts called CallbackCParse.pl
+	  and HParser, for the C header - to - assembly language converters,
+	  which currently are a part of Project Asmosis
+	  (https://asmosis.sourceforge.io/).

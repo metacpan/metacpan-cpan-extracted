@@ -1,10 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'Device::Chip::Adapter::UART' );
+require Device::Chip::Adapter::UART;
 
+pass( 'Modules loaded' );
 done_testing;

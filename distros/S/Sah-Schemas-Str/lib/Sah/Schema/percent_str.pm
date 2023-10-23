@@ -5,9 +5,9 @@ use strict;
 use Regexp::Pattern::Float;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-03'; # DATE
+our $DATE = '2023-10-23'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 our $schema = [str => {
     summary => 'A number in percent form, e.g. "10.5%"',
@@ -46,7 +46,7 @@ Sah::Schema::percent_str - A number in percent form, e.g. "10.5%"
 
 =head1 VERSION
 
-This document describes version 0.015 of Sah::Schema::percent_str (from Perl distribution Sah-Schemas-Str), released on 2023-09-03.
+This document describes version 0.016 of Sah::Schema::percent_str (from Perl distribution Sah-Schemas-Str), released on 2023-10-23.
 
 =head1 SYNOPSIS
 
@@ -80,11 +80,11 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "1%";
+ $data = "-1.23%";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = "";
+ $data = "1 %";
  my $errmsg = $validator->($data); # => "Must match regex pattern qr(\\A(?^:[+-]?(?:[0-9]+(?:\\.[0-9]*)?|[0-9]*\\.[0-9]+))%\\z)"
 
 Often a schema has coercion rule or default value rules, so after validation the
@@ -95,12 +95,12 @@ validated value will be different from the original. To return the validated
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "1%";
- my $res = $validator->($data); # => ["","1%"]
+ $data = "-1.23%";
+ my $res = $validator->($data); # => ["","-1.23%"]
  
  # a sample invalid data
- $data = "";
- my $res = $validator->($data); # => ["Must match regex pattern qr(\\A(?^:[+-]?(?:[0-9]+(?:\\.[0-9]*)?|[0-9]*\\.[0-9]+))%\\z)",""]
+ $data = "1 %";
+ my $res = $validator->($data); # => ["Must match regex pattern qr(\\A(?^:[+-]?(?:[0-9]+(?:\\.[0-9]*)?|[0-9]*\\.[0-9]+))%\\z)","1 %"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like

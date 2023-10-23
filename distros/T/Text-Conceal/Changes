@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-Conceal
 
+1.03 2023-10-21T05:00:24Z
+
+    - Introduce 'duplicate' parameter.
+
 1.02 2023-10-20T01:54:29Z
 
     - Document 'ordered' parameter.
